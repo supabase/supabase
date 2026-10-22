@@ -21,10 +21,10 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'create-publishable-api-key'
@@ -44,7 +44,7 @@ export const CreatePublishableAPIKeyDialog = () => {
 
   const [visible, setVisible] = usePanelQueryState(
     'new',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withDefault('').withOptions({ history: 'push' })
   )
 
   const onOpenChange = (value: boolean) => {

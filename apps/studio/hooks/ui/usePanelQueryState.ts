@@ -1,22 +1,20 @@
 import { useQueryState, type UseQueryStateOptions, type UseQueryStateReturn } from 'nuqs'
 import { useCallback } from 'react'
 
-import {
-  armPanelPush,
-  dismissPanelUrl,
-  isCommittingPanelUrl,
-  replaceMissingPanelId,
-} from '@/lib/panel-history'
+import { armPanelPush, dismissPanelUrl, replacePanelUrl } from '@/lib/panel-history'
+import { panelHistoryAction, resolvePanelUpdater } from '@/lib/panel-history.utils'
 
-function isClearedValue(value: unknown) {
-  return value == null || value === false || value === ''
+type PanelCallOptions = { history?: 'push' | 'replace' }
+
+function readHistoryMode(history: unknown): 'push' | 'replace' | undefined {
+  if (history === 'push' || history === 'replace') return history
+  return undefined
 }
 
 /**
- * `useQueryState` for a panel param that pushes on open.
- * Clearing without `history: 'replace'` goes back when this session pushed
- * the current entry, and replaces otherwise. An explicit replace clear
- * (save, delete, missing id) never calls `history.back()`.
+ * `useQueryState` for a panel param.
+ * Push only on closed to open. A new value while open replaces.
+ * Clearing goes back when this session still owns the entry, and replaces otherwise.
  */
 export function usePanelQueryState<T>(
   key: string,
@@ -27,46 +25,41 @@ export function usePanelQueryState<T>(
   options: UseQueryStateOptions<T>
 ): UseQueryStateReturn<NonNullable<ReturnType<typeof options.parse>>, undefined>
 export function usePanelQueryState(key: string, options: UseQueryStateOptions<unknown>) {
-  const [value, setValue] = useQueryState(key, options as never)
+  const [value, setValue] = useQueryState(key, options)
+  const parserHistory = readHistoryMode(options.history)
 
   const setPanelValue = useCallback(
-    (next: unknown, callOptions?: { history?: 'push' | 'replace' }) => {
-      const write = (nextValue: unknown, options?: { history?: 'push' | 'replace' }) => {
-        if (options) return setValue(nextValue as never, options as never)
+    (next: unknown, callOptions?: PanelCallOptions) => {
+      const resolved = resolvePanelUpdater(value, next)
+      const action = panelHistoryAction({
+        currentValue: value,
+        nextValue: resolved,
+        requestedHistory: callOptions?.history,
+        parserHistory,
+      })
+      const write = (history: 'push' | 'replace') => setValue(resolved, { ...callOptions, history })
 
-        return setValue(nextValue as never)
+      if (action === 'push') {
+        armPanelPush(key)
+        return write('push')
       }
 
-      if (typeof next === 'function') {
-        return write(next, callOptions)
+      if (action === 'replace-clear') {
+        return replacePanelUrl(key, () => write('replace'))
       }
 
-      const isClear = isClearedValue(next)
-
-      if (callOptions?.history === 'replace') {
-        if (!isClear) return write(next, callOptions)
-
-        if (isCommittingPanelUrl()) {
-          return write(next, callOptions)
-        }
-
-        return replaceMissingPanelId(() => {
-          write(next, callOptions)
+      if (action === 'dismiss') {
+        const written: { promise?: Promise<URLSearchParams> } = {}
+        dismissPanelUrl(key, () => {
+          written.promise = write('replace')
         })
+        return written.promise ?? Promise.resolve(new URLSearchParams(window.location.search))
       }
 
-      if (isClear) {
-        return dismissPanelUrl(() => {
-          write(next, { ...callOptions, history: 'replace' })
-        })
-      }
-
-      if (!Object.is(next, value)) armPanelPush()
-
-      return write(next, callOptions)
+      return write('replace')
     },
-    [setValue, value]
+    [key, parserHistory, setValue, value]
   )
 
-  return [value, setPanelValue] as never
+  return [value, setPanelValue]
 }

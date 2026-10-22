@@ -7,7 +7,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { HooksListEmpty } from './HooksListEmpty'
 import { SchemaTable } from './SchemaTable'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -15,6 +14,7 @@ import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -25,7 +25,7 @@ export const HooksList = () => {
 
   const [, setShowCreateHookForm] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const {

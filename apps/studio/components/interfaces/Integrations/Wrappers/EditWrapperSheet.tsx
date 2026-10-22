@@ -75,7 +75,8 @@ export const EditWrapperSheet = ({
       const { tables } = getValues()
       const hasNewSchema = (tables as Record<string, any>[]).some((table) => table.is_new_schema)
       if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
-      ;(onCommit ?? onClose)()
+      const handleSuccess = onCommit ?? onClose
+      handleSuccess()
     },
   })
 
@@ -124,7 +125,6 @@ export const EditWrapperSheet = ({
   const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
-    // Mounted only while the edit sheet is open.
     active: true,
   })
 

@@ -5,12 +5,11 @@ import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useFDWDropForeignTableMutation } from '@/data/fdw/fdw-drop-foreign-table-mutation'
 import { useVectorBucketIndexDeleteMutation } from '@/data/storage/vector-bucket-index-delete-mutation'
 import { useVectorBucketsIndexesQuery } from '@/data/storage/vector-buckets-indexes-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const DeleteVectorTableModal = () => {
   const { ref: projectRef, bucketId } = useParams()
@@ -51,7 +50,7 @@ export const DeleteVectorTableModal = () => {
           })
         }
         toast.success(`Table "${vars.indexName}" deleted successfully`)
-        setSelectedTableIdToDelete(null, { history: 'replace' })
+        setSelectedTableIdToDelete(null)
       } catch (error: any) {
         toast.success(
           `Table "${vars.indexName}" deleted successfully, but its corresponding foreign table failed to clean up: ${error.message}`
@@ -74,7 +73,7 @@ export const DeleteVectorTableModal = () => {
   useEffect(() => {
     if (!!selectedTableIdToDelete && isSuccessIndexes && !table && !isSuccessDelete) {
       toast(`Table ${selectedTableIdToDelete} cannot be found in your bucket`)
-      replaceMissingPanelId(() => setSelectedTableIdToDelete(null, { history: 'replace' }))
+      setSelectedTableIdToDelete(null, { history: 'replace' })
     }
   }, [
     isSuccessIndexes,

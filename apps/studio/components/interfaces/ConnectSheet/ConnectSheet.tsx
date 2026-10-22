@@ -37,7 +37,7 @@ export const ConnectSheet = () => {
 
   const [showConnect, setShowConnect] = usePanelQueryState(
     'showConnect',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
   // URL params have no defaults: a `null` value signals "not in URL" so we can
   // fall back to the user's last-used selections from localStorage.
@@ -107,9 +107,7 @@ export const ConnectSheet = () => {
       return
     }
 
-    // Back restores the pre-open url, including hydration params. Replace only
-    // when this entry was not opened here (deep link or forward).
-    dismissPanelUrl(() => {
+    dismissPanelUrl('showConnect', () => {
       clearAllQueryParams()
       setShowConnect(false)
     })

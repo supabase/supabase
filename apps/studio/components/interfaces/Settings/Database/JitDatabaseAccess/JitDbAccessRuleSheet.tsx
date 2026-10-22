@@ -51,7 +51,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 
 const grantSchema = z.object({
   roleId: z.string(),
@@ -130,11 +129,11 @@ export function JitDbAccessRuleSheet({
 
   const [isNewRule, setIsNewRule] = usePanelQueryState(
     'jit_new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
   const [ruleIdToEdit, setRuleIdToEdit] = usePanelQueryState(
     'jit_edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
 
   const { data: databaseRoles, isSuccess: isSuccessDatabaseRoles } = useDatabaseRolesQuery({
@@ -177,8 +176,8 @@ export function JitDbAccessRuleSheet({
   }
 
   const onCommitSheet = () => {
-    setIsNewRule(false, { history: 'replace' })
-    setRuleIdToEdit(null, { history: 'replace' })
+    setIsNewRule(false)
+    setRuleIdToEdit(null)
   }
 
   const {
@@ -223,7 +222,7 @@ export function JitDbAccessRuleSheet({
   useEffect(() => {
     if (!!ruleIdToEdit && isDataReady && !user) {
       toast('Access rule cannot be found')
-      replaceMissingPanelId(() => setRuleIdToEdit(null, { history: 'replace' }))
+      setRuleIdToEdit(null, { history: 'replace' })
     }
   }, [isDataReady, ruleIdToEdit, setRuleIdToEdit, user])
 

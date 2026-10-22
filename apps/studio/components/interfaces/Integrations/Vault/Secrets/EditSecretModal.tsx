@@ -22,13 +22,12 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from '@/data/vault/vault-secret-update-mutation'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { VaultSecret } from '@/types'
 
 const SecretSchema = z.object({
@@ -48,7 +47,7 @@ export const EditSecretModal = () => {
   })
   const [secretIdToEdit, setSelectedSecretToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const secret = secrets.find((secret) => secret.id === secretIdToEdit)
 
@@ -98,7 +97,7 @@ export const EditSecretModal = () => {
         {
           onSuccess: () => {
             toast.success('Successfully updated secret')
-            setSelectedSecretToEdit(null, { history: 'replace' })
+            setSelectedSecretToEdit(null)
           },
           onError: (error) => {
             toast.error(`Failed to update secret: ${error.message}`)
@@ -111,7 +110,7 @@ export const EditSecretModal = () => {
   useEffect(() => {
     if (isSuccess && !!secretIdToEdit && !secret) {
       toast('Secret not found')
-      replaceMissingPanelId(() => setSelectedSecretToEdit(null, { history: 'replace' }))
+      setSelectedSecretToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, secretIdToEdit, secret, setSelectedSecretToEdit])
 

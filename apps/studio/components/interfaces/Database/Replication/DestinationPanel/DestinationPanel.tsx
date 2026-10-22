@@ -25,7 +25,6 @@ import { DestinationForm } from './DestinationForm'
 import { DESTINATION_DOCS_PATHS } from './DestinationPanel.constants'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -104,8 +103,8 @@ export const DestinationPanel = () => {
 
   const onCommit = () => {
     checkIsDirtyRef.current = () => false
-    setDestinationType(null, { history: 'replace' })
-    setEdit(null, { history: 'replace' })
+    setDestinationType(null)
+    setEdit(null)
   }
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
@@ -125,7 +124,7 @@ export const DestinationPanel = () => {
   useEffect(() => {
     if (edit !== null && invalidExistingDestination) {
       toast(`Unable to find destination ID ${edit}`)
-      replaceMissingPanelId(() => setEdit(null, { history: 'replace' }))
+      setEdit(null, { history: 'replace' })
     }
   }, [edit, invalidExistingDestination, setEdit])
 

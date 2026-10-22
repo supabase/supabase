@@ -37,7 +37,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -64,18 +63,18 @@ export const Indexes = () => {
 
   const [showCreateIndex, setShowCreateIndex] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const [editIndexId, setEditIndexId] = usePanelQueryState(
     'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const selectedIndex = allIndexes?.find((idx) => idx.name === editIndexId)
 
   const [deleteIndexId, setDeleteIndexId] = usePanelQueryState(
     'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const selectedIndexToDelete = allIndexes?.find((idx) => idx.name === deleteIndexId)
 
@@ -95,7 +94,7 @@ export const Indexes = () => {
     isSuccess: isSuccessDelete,
   } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      setDeleteIndexId(null, { history: 'replace' })
+      setDeleteIndexId(null)
       toast.success('Successfully deleted index')
     },
   })
@@ -145,14 +144,14 @@ export const Indexes = () => {
   useEffect(() => {
     if (isSuccessIndexes && !!editIndexId && !selectedIndex) {
       toast('Index not found')
-      replaceMissingPanelId(() => setEditIndexId(null, { history: 'replace' }))
+      setEditIndexId(null, { history: 'replace' })
     }
   }, [isSuccessIndexes, editIndexId, selectedIndex, setEditIndexId])
 
   useEffect(() => {
     if (isSuccessIndexes && !!deleteIndexId && !selectedIndexToDelete && !isSuccessDelete) {
       toast('Index not found')
-      replaceMissingPanelId(() => setDeleteIndexId(null, { history: 'replace' }))
+      setDeleteIndexId(null, { history: 'replace' })
     }
   }, [isSuccessIndexes, deleteIndexId, selectedIndexToDelete, isSuccessDelete, setDeleteIndexId])
 
@@ -320,7 +319,7 @@ export const Indexes = () => {
       <CreateIndexSidePanel
         visible={showCreateIndex}
         onClose={() => setShowCreateIndex(false)}
-        onCommit={() => setShowCreateIndex(false, { history: 'replace' })}
+        onCommit={() => setShowCreateIndex(false)}
       />
 
       <ConfirmationModal

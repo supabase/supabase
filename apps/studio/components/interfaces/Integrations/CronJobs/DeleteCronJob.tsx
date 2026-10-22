@@ -5,11 +5,10 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { parseCronJobCommand } from './CronJobs.utils'
 import { useCronJobsData } from './CronJobsTab.useCronJobsData'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseCronJobDeleteMutation } from '@/data/database-cron-jobs/database-cron-jobs-delete-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -19,7 +18,7 @@ export const DeleteCronJob = () => {
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [cronJobIdForDeletion, setCronJobForDeletion] = usePanelQueryState(
     'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
 
   const { grid } = useCronJobsData({
@@ -41,7 +40,7 @@ export const DeleteCronJob = () => {
         track('cron_job_removed', { type })
       }
       toast.success(`Successfully removed cron job`)
-      setCronJobForDeletion(null, { history: 'replace' })
+      setCronJobForDeletion(null)
     },
   })
 
@@ -60,7 +59,7 @@ export const DeleteCronJob = () => {
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForDeletion && !cronJob && !isSuccessDelete) {
       toast('Cron job not found')
-      replaceMissingPanelId(() => setCronJobForDeletion(null, { history: 'replace' }))
+      setCronJobForDeletion(null, { history: 'replace' })
     }
   }, [cronJob, cronJobIdForDeletion, grid.isSuccess, isSuccessDelete, setCronJobForDeletion])
 

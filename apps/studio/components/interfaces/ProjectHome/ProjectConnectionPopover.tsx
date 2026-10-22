@@ -20,7 +20,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
 import { appendHighAvailabilitySslParams } from '@/components/interfaces/ConnectSheet/DatabaseSettings.utils'
@@ -29,6 +28,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -49,7 +49,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
   const [, setShowConnect] = usePanelQueryState(
     'showConnect',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissionsV2(

@@ -321,7 +321,7 @@ export const VectorBucketDetails = () => {
         bucketName={bucket?.vectorBucketName}
         onCancel={() => setShowDeleteModal(false)}
         onSuccess={() => {
-          setShowDeleteModal(false, { history: 'replace' })
+          setShowDeleteModal(false)
           router.push(`/project/${projectRef}/storage/vectors`)
         }}
       />

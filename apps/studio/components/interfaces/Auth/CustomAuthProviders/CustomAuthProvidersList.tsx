@@ -47,7 +47,6 @@ import {
 } from './customProviders.utils'
 import { DeleteCustomProviderModal } from './DeleteCustomProviderModal'
 import { DisableCustomProviderModal } from './DisableCustomProviderModal'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { AlertError } from '@/components/ui/AlertError'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -159,7 +158,7 @@ export const CustomAuthProvidersList = () => {
   // Prevent opening the create sheet if custom providers are disabled or at plan limit
   useEffect(() => {
     if (showCreateSheet && (!isCustomProvidersEnabled || atProviderLimit)) {
-      replaceMissingPanelId(() => setShowCreateSheet(false, { history: 'replace' }))
+      setShowCreateSheet(false, { history: 'replace' })
     }
   }, [showCreateSheet, atProviderLimit, isCustomProvidersEnabled, setShowCreateSheet])
 
@@ -546,7 +545,7 @@ export const CustomAuthProvidersList = () => {
           setSelectedProviderToEdit(null)
         }}
         onCommit={() => {
-          setShowCreateSheet(false, { history: 'replace' })
+          setShowCreateSheet(false)
           setSelectedProviderToEdit(null)
         }}
       />

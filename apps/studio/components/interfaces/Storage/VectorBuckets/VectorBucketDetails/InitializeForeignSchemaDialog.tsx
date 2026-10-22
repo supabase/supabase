@@ -47,7 +47,7 @@ export const InitializeForeignSchemaDialog = () => {
 
   const [isOpen, setIsOpen] = usePanelQueryState(
     'initForeignSchema',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
   const [isCreating, setIsCreating] = useState(false)
 
@@ -128,7 +128,7 @@ export const InitializeForeignSchemaDialog = () => {
       toast.success(
         `Successfully created "${values.schema}" schema! Data from tables in this bucket can now be queried from there.`
       )
-      setIsOpen(false, { history: 'replace' })
+      setIsOpen(false)
 
       await queryClient.invalidateQueries({
         queryKey: fdwKeys.list(projectRef),

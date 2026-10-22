@@ -12,7 +12,6 @@ export function useAddonsPagePanel() {
     'panel',
     parseAsStringLiteral(ADDONS_PANEL_KEYS_ARRAY).withOptions({
       history: 'push',
-      clearOnDefault: true,
     })
   )
 
@@ -27,7 +26,7 @@ export function useAddonsPagePanel() {
   }
 
   const commitPanel = () => {
-    setPanelParam(null, { history: 'replace' })
+    setPanelParam(null)
   }
 
   return {

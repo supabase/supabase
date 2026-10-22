@@ -16,12 +16,12 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { BASE_PATH } from '@/lib/constants'
 
@@ -40,11 +40,11 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
 
   const [, setSelectedHookIdToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withDefault('').withOptions({ history: 'push' })
   )
   const [, setSelectedHookIdToDelete] = usePanelQueryState(
     'delete',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withDefault('').withOptions({ history: 'push' })
   )
 
   const restUrl = project?.restUrl

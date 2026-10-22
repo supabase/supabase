@@ -25,10 +25,10 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const NAME_SCHEMA = z
@@ -52,7 +52,7 @@ export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
   const [visible, setVisible] = usePanelQueryState(
     'new',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withDefault('').withOptions({ history: 'push' })
   )
   const formRef = useRef<HTMLFormElement>(null)
 

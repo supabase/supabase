@@ -25,7 +25,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
-
 import {
   PageSection,
   PageSectionContent,
@@ -43,7 +42,6 @@ import {
 import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
 import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
 import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SSLEnforcementConfirmDialog } from '@/components/interfaces/Settings/Database/SSLEnforcementConfirmDialog'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -62,6 +60,7 @@ import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enfo
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 
 export const JitDbAccessConfiguration = () => {
@@ -74,11 +73,11 @@ export const JitDbAccessConfiguration = () => {
   const [enabled, setEnabled] = useState(false)
   const [, setShowCreateRuleSheet] = usePanelQueryState(
     'jit_new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
   const [ruleIdToEdit, setRuleIdToEdit] = usePanelQueryState(
     'jit_edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const [showEnableJitDialog, setShowEnableJitDialog] = useState(false)
   const [enableJitError, setEnableJitError] = useState<string | null>(null)
@@ -220,8 +219,8 @@ export const JitDbAccessConfiguration = () => {
   )
 
   const resetSheetState = () => {
-    setShowCreateRuleSheet(false, { history: 'replace' })
-    setRuleIdToEdit(null, { history: 'replace' })
+    setShowCreateRuleSheet(false)
+    setRuleIdToEdit(null)
   }
 
   const getErrorMessage = (error: unknown) =>

@@ -187,7 +187,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     toast.success(`Successfully created vector table “${values.name}”`)
     form.reset()
 
-    setVisible(false, { history: 'replace' })
+    setVisible(false)
   }
 
   useEffect(() => {

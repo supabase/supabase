@@ -1,13 +1,12 @@
 import { parseAsString } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseTriggerDeleteMutation } from '@/data/database-triggers/database-trigger-delete-mutation'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const DeleteHookModal = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -19,7 +18,7 @@ export const DeleteHookModal = () => {
 
   const [selectedHookIdToDelete, setSelectedHookIdToDelete] = usePanelQueryState(
     'delete',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withDefault('').withOptions({ history: 'push' })
   )
   const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToDelete)
   const { name, schema } = selectedHook ?? {}
@@ -31,7 +30,7 @@ export const DeleteHookModal = () => {
   } = useDatabaseTriggerDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${name}`)
-      setSelectedHookIdToDelete(null, { history: 'replace' })
+      setSelectedHookIdToDelete(null)
     },
   })
 
@@ -49,7 +48,7 @@ export const DeleteHookModal = () => {
   useEffect(() => {
     if (isSuccess && !!selectedHookIdToDelete && !selectedHook && !isSuccessDelete) {
       toast('Webhook not found')
-      replaceMissingPanelId(() => setSelectedHookIdToDelete(null, { history: 'replace' }))
+      setSelectedHookIdToDelete(null, { history: 'replace' })
     }
   }, [isSuccess, isSuccessDelete, selectedHook, selectedHookIdToDelete, setSelectedHookIdToDelete])
 

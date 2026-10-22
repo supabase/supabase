@@ -56,7 +56,6 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { buildUnifiedLogsUrl } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -76,6 +75,7 @@ import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
@@ -484,7 +484,7 @@ export const UsersV2 = () => {
       setShowDeleteModal(false)
       setSelectedUsers(new Set([]))
 
-      if (userIds.includes(selectedUser)) setSelectedId(null, { history: 'replace' })
+      if (userIds.includes(selectedUser)) setSelectedId(null)
     } catch (error: any) {
       toast.error(`Failed to delete selected users: ${error.message}`)
     } finally {
@@ -1019,7 +1019,7 @@ export const UsersV2 = () => {
           cleanPointerEventsNoneOnBody()
         }}
         onDeleteSuccess={() => {
-          if (selectedUserToDelete?.id === selectedUser) setSelectedId(null, { history: 'replace' })
+          if (selectedUserToDelete?.id === selectedUser) setSelectedId(null)
           setSelectedUserToDelete(undefined)
           cleanPointerEventsNoneOnBody(500)
         }}

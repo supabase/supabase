@@ -21,7 +21,6 @@ import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 
 export type HTTPArgument = { id: string; name: string; value: string }
 
@@ -79,12 +78,12 @@ export const EditHookPanel = () => {
 
   const [showCreateHookForm, setShowCreateHookForm] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const [selectedHookIdToEdit, setSelectedHookIdToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withDefault('').withOptions({ history: 'push' })
   )
   const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToEdit)
 
@@ -105,8 +104,8 @@ export const EditHookPanel = () => {
 
   const onCommit = () => {
     isClosingRef.current = true
-    setShowCreateHookForm(false, { history: 'replace' })
-    setSelectedHookIdToEdit(null, { history: 'replace' })
+    setShowCreateHookForm(false)
+    setSelectedHookIdToEdit(null)
   }
 
   const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
@@ -157,7 +156,7 @@ export const EditHookPanel = () => {
   useEffect(() => {
     if (isSuccess && !!selectedHookIdToEdit && !selectedHook && !isClosingRef.current) {
       toast('Webhook not found')
-      replaceMissingPanelId(() => setSelectedHookIdToEdit(null, { history: 'replace' }))
+      setSelectedHookIdToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, selectedHook, selectedHookIdToEdit, setSelectedHookIdToEdit])
 

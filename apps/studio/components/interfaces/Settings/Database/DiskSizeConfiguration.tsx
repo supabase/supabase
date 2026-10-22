@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { parseAsBoolean } from 'nuqs'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, Button, InfoIcon as StatusInfoIcon } from 'ui'
-
 import {
   PageSection,
   PageSectionContent,
@@ -13,12 +12,6 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import {
-  useIsAwsNimbusCloudProvider,
-  useIsHighAvailability,
-  useSelectedProjectQuery,
-} from '@/hooks/misc/useSelectedProject'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { Markdown } from '@/components/interfaces/Markdown'
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -30,6 +23,12 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  useIsAwsNimbusCloudProvider,
+  useIsHighAvailability,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 
@@ -48,7 +47,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
 
   const [showIncreaseDiskSizeModal, setShowIncreaseDiskSizeModal] = usePanelQueryState(
     'show_increase_disk_size_modal',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissionsV2(

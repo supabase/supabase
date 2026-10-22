@@ -22,7 +22,6 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -73,18 +72,18 @@ export const RolesList = () => {
   } = useDatabaseRoleDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted role`)
-      setSelectedRoleIdToDelete(null, { history: 'replace' })
+      setSelectedRoleIdToDelete(null)
     },
   })
 
   const [isCreatingRole, setIsCreatingRole] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = usePanelQueryState(
     'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
   const roleToDelete = roles?.find((role) => role.id.toString() === selectedRoleIdToDelete)
@@ -118,7 +117,7 @@ export const RolesList = () => {
   useEffect(() => {
     if (isSuccess && !!selectedRoleIdToDelete && !roleToDelete && !isSuccessDelete) {
       toast('Role cannot be found')
-      replaceMissingPanelId(() => setSelectedRoleIdToDelete(null, { history: 'replace' }))
+      setSelectedRoleIdToDelete(null, { history: 'replace' })
     }
   }, [isSuccess, selectedRoleIdToDelete, roleToDelete, isSuccessDelete, setSelectedRoleIdToDelete])
 
@@ -301,7 +300,7 @@ export const RolesList = () => {
       <CreateRolePanel
         visible={isCreatingRole}
         onClose={() => setIsCreatingRole(false)}
-        onCommit={() => setIsCreatingRole(false, { history: 'replace' })}
+        onCommit={() => setIsCreatingRole(false)}
       />
 
       <ConfirmationModal

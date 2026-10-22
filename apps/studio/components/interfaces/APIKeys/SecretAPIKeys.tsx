@@ -7,8 +7,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -16,6 +14,7 @@ import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -43,7 +42,7 @@ export const SecretAPIKeys = () => {
 
   const [deleteId, setDeleteId] = usePanelQueryState(
     'deleteSecretKey',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const apiKeyToDelete = secretApiKeys?.find((key) => key.id === deleteId)
 
@@ -54,7 +53,7 @@ export const SecretAPIKeys = () => {
   } = useAPIKeyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted secret key')
-      setDeleteId(null, { history: 'replace' })
+      setDeleteId(null)
     },
   })
 
@@ -67,7 +66,7 @@ export const SecretAPIKeys = () => {
   useEffect(() => {
     if (isSuccessApiKeys && !!deleteId && !apiKeyToDelete && !isDeleteSuccess) {
       toast('Unable to find secret key')
-      replaceMissingPanelId(() => setDeleteId(null, { history: 'replace' }))
+      setDeleteId(null, { history: 'replace' })
     }
   }, [apiKeyToDelete, deleteId, isDeleteSuccess, isSuccessApiKeys, setDeleteId])
 

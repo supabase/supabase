@@ -7,10 +7,10 @@ import { Badge, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } f
 
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { convertKVStringArrayToJson, formatWrapperTables } from './Wrappers.utils'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { FDW } from '@/data/fdw/fdws-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 interface WrapperRowProps {
   wrapper: FDW
@@ -24,11 +24,11 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
   const [, setSelectedWrapperToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const [, setSelectedWrapperToDelete] = usePanelQueryState(
     'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
 
   const integration = INTEGRATIONS.find((i) => i.id === id)

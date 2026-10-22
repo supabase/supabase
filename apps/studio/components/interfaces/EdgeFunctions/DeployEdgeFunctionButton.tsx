@@ -10,10 +10,10 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -26,7 +26,7 @@ export const DeployEdgeFunctionButton = () => {
   const track = useTrack()
   const [, setCreateMethod] = usePanelQueryState(
     'create',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
 
   const isProjectActive = useIsProjectActive()

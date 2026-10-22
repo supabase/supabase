@@ -18,11 +18,11 @@ import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
 import { PANEL_PADDING } from './Users.constants'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useUserQuery } from '@/data/auth/user-query'
 import { User } from '@/data/auth/users-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -107,7 +107,7 @@ export const UserPanel = () => {
 
               <TabsContent value="overview" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
                 {selectedUser && (
-                  <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null, { history: 'replace' })} />
+                  <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
                 )}
               </TabsContent>
               {showLogs && (

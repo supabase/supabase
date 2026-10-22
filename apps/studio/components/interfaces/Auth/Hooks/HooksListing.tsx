@@ -22,7 +22,6 @@ import { extractMethod, isValidHook } from './hooks.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -36,10 +35,7 @@ export const HooksListing = () => {
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
-  const [hook, setHook] = usePanelQueryState(
-    'hook',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [hook, setHook] = usePanelQueryState('hook', parseAsString.withOptions({ history: 'push' }))
 
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook>()
   const [addHookAsideOpen, setAddHookAsideOpen] = useState(false)
@@ -70,7 +66,7 @@ export const HooksListing = () => {
   useEffect(() => {
     if (!!hook && !selectedHook) {
       toast('Hook not found')
-      replaceMissingPanelId(() => setHook(null, { history: 'replace' }))
+      setHook(null, { history: 'replace' })
     }
   }, [hook, selectedHook, setHook])
 
@@ -155,7 +151,7 @@ export const HooksListing = () => {
             if (hook) setSelectedHookForDeletion(hook)
           }}
           onClose={() => setHook(null)}
-          onCommit={() => setHook(null, { history: 'replace' })}
+          onCommit={() => setHook(null)}
           authConfig={authConfig!}
         />
 
@@ -166,7 +162,7 @@ export const HooksListing = () => {
           }}
           onDeleteSuccess={() => {
             setSelectedHookForDeletion(undefined)
-            setHook(null, { history: 'replace' })
+            setHook(null)
           }}
         />
       </PageSectionContent>

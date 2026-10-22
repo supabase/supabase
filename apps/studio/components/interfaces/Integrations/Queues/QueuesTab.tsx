@@ -198,7 +198,7 @@ export const QueuesTab = () => {
           setCreateQueueSheetShown(false)
         }}
         onCommit={() => {
-          setCreateQueueSheetShown(false, { history: 'replace' })
+          setCreateQueueSheetShown(false)
         }}
       />
     </>

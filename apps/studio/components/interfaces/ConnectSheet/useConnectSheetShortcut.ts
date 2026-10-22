@@ -1,8 +1,8 @@
 import { parseAsBoolean } from 'nuqs'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -14,7 +14,7 @@ export function useConnectSheetShortcut() {
   const { setConnectSheetSource } = useAppStateSnapshot()
   const [, setShowConnect] = usePanelQueryState(
     'showConnect',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
   const enabled = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 

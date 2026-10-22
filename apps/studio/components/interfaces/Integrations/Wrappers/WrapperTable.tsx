@@ -24,7 +24,6 @@ import { wrapperMetaComparator } from './Wrappers.utils'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 
 interface WrapperTableProps {
   isLatest?: boolean
@@ -52,7 +51,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
 
   const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
   const openedWrapperId = useRef<string | null>(null)
@@ -66,7 +65,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
       if (openedWrapperId.current !== selectedWrapperIdToEdit) {
         toast('Wrapper not found')
       }
-      replaceMissingPanelId(() => setSelectedWrapperToEdit(null, { history: 'replace' }))
+      setSelectedWrapperToEdit(null, { history: 'replace' })
     }
   }, [isError, isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 
@@ -132,7 +131,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
                 setIsClosingEditWrapper(false)
               }}
               onCommit={() => {
-                setSelectedWrapperToEdit(null, { history: 'replace' })
+                setSelectedWrapperToEdit(null)
                 setIsClosingEditWrapper(false)
               }}
               isClosing={isClosingEditWrapper}

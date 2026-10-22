@@ -7,9 +7,9 @@ import { Badge, Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlertError } from '@/components/ui/AlertError'
 import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { ResponseError } from '@/types'
 
 interface QueueDataGridProps {
@@ -141,7 +141,7 @@ export const QueueMessagesDataGrid = ({
 
   const [selectedMessageId, setSelectedMessageId] = usePanelQueryState(
     'messageId',
-    parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsInteger.withOptions({ history: 'push' })
   )
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
@@ -182,11 +182,7 @@ export const QueueMessagesDataGrid = ({
                     return
                   }
 
-                  // replace only when a message panel is actually open
-                  const isSwitchingMessages = selectedMessage !== undefined
-                  setSelectedMessageId(props.row.msg_id, {
-                    history: isSwitchingMessages ? 'replace' : 'push',
-                  })
+                  setSelectedMessageId(props.row.msg_id)
                   gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                 }}
               />

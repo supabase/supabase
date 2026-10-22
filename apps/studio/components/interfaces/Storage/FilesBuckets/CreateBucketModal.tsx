@@ -155,7 +155,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
 
       form.reset()
       setSelectedUnit(StorageSizeUnits.MB)
-      onOpenChange(false, { history: 'replace' })
+      onOpenChange(false)
     } catch (error: any) {
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''

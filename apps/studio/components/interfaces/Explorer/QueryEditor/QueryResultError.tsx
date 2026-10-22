@@ -7,11 +7,11 @@ import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { buildDebugPromptText } from '../../SQLEditor/SQLEditor.utils'
 import { useCreateChat } from '../hooks'
 import { type QueryResult } from '../types'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { getSqlErrorLines } from '@/data/sql/utils'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 
 export const QueryResultError = ({
@@ -34,7 +34,7 @@ export const QueryResultError = ({
 
   const [, setShowConnect] = usePanelQueryState(
     'showConnect',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const canDebug = sql !== undefined && source !== undefined

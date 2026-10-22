@@ -24,11 +24,11 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { SecretTableColumn } from './Secrets.types'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { VaultSecret } from '@/types'
 
 interface SecretRowProps {
@@ -44,11 +44,11 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
 
   const [, setSelectedSecretToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const [, setSelectedSecretToDelete] = usePanelQueryState(
     'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
 
   const { can: canManageSecrets } = useAsyncCheckPermissionsV2(

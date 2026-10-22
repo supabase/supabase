@@ -17,14 +17,13 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
 import { APIKeysData, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -60,7 +59,7 @@ export const PublishableAPIKeys = () => {
 
   const [deleteId, setDeleteId] = usePanelQueryState(
     'deletePublishableKey',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const apiKeyToDelete = publishableApiKeys?.find((key) => key.id === deleteId)
 
@@ -71,7 +70,7 @@ export const PublishableAPIKeys = () => {
   } = useAPIKeyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted publishable key')
-      setDeleteId(null, { history: 'replace' })
+      setDeleteId(null)
     },
   })
 
@@ -84,7 +83,7 @@ export const PublishableAPIKeys = () => {
   useEffect(() => {
     if (isSuccessApiKeys && !!deleteId && !apiKeyToDelete && !isDeleteSuccess) {
       toast('Unable to find publishable key')
-      replaceMissingPanelId(() => setDeleteId(null, { history: 'replace' }))
+      setDeleteId(null, { history: 'replace' })
     }
   }, [apiKeyToDelete, deleteId, isDeleteSuccess, isSuccessApiKeys, setDeleteId])
 

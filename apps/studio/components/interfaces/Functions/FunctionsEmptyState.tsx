@@ -7,7 +7,6 @@ import { useMemo } from 'react'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -15,6 +14,7 @@ import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -30,7 +30,7 @@ export const FunctionsEmptyState = () => {
   const track = useTrack()
   const [, setCreateMethod] = usePanelQueryState(
     'create',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
 
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')

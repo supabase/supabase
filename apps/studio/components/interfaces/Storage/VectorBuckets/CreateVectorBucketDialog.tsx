@@ -158,7 +158,7 @@ export const CreateVectorBucketDialog = ({
     setIsLoading(false)
     track('storage_bucket_created', { bucketType: 'vector' })
     form.reset()
-    setVisible(false, { history: 'replace' })
+    setVisible(false)
   }
 
   useEffect(() => {

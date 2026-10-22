@@ -1,13 +1,13 @@
 import { parseAsString } from 'nuqs'
 import { Dialog, DialogContent, DialogSection, DialogTitle } from 'ui'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { TerminalInstructions } from './TerminalInstructions'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const TerminalInstructionsDialog = () => {
   const [createMethod, setCreateMethod] = usePanelQueryState(
     'create',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
 
   const isOpen = createMethod === 'cli'

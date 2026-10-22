@@ -18,6 +18,8 @@ import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
+import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
@@ -27,8 +29,6 @@ import {
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from '@/components/layouts/Scaffold'
-import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
-import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { AlertError } from '@/components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
@@ -251,7 +251,7 @@ export const AnalyticBucketDetails = () => {
         visible={showDeleteModal}
         bucketId={bucket?.name}
         onClose={() => setShowDeleteModal(false)}
-        onCommit={() => setShowDeleteModal(false, { history: 'replace' })}
+        onCommit={() => setShowDeleteModal(false)}
         onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />
     </>

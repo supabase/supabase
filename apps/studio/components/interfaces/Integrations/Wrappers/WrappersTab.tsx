@@ -102,7 +102,7 @@ export const WrappersTab = () => {
               wrapperMeta={wrapperMeta}
               onDirty={setIsDirty}
               onClose={() => {
-                setIsCreating(null, { history: 'replace' })
+                setIsCreating(null)
                 setIsDirty(false)
               }}
               onCloseWithConfirmation={confirmOnClose}

@@ -27,13 +27,13 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const MAP_WIDTH = 800
@@ -57,7 +57,7 @@ const MapView = () => {
   }>()
   const [, setShowConnect] = usePanelQueryState(
     'showConnect',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const { data } = useReadReplicasQuery({ projectRef: ref })

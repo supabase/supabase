@@ -19,16 +19,15 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  generatePolicyUpdateSQL,
-  type Policy,
-} from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { Policies } from '@/components/interfaces/Database/Policies/Policies'
 import { getGeneralPolicyTemplates } from '@/components/interfaces/Database/Policies/Policies.constants'
 import { PoliciesDataProvider } from '@/components/interfaces/Database/Policies/PoliciesDataContext'
 import { PolicyEditorPanel } from '@/components/interfaces/Database/Policies/PolicyEditorPanel'
+import {
+  generatePolicyUpdateSQL,
+  type Policy,
+} from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -241,7 +240,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (selectedIdToEdit && isPoliciesSuccess && !selectedPolicyToEdit) {
       toast(`Policy ID ${selectedIdToEdit} cannot be found`)
-      replaceMissingPanelId(() => setSelectedIdToEdit(null, { history: 'replace' }))
+      setSelectedIdToEdit(null, { history: 'replace' })
     }
   }, [selectedIdToEdit, selectedPolicyToEdit, isPoliciesSuccess, setSelectedIdToEdit])
 
@@ -365,9 +364,9 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
               onCommit={() => {
                 setSelectedTable(undefined)
                 if (isUpdatingPolicy) {
-                  setSelectedIdToEdit(null, { history: 'replace' })
+                  setSelectedIdToEdit(null)
                 } else {
-                  setShowCreatePolicy(false, { history: 'replace' })
+                  setShowCreatePolicy(false)
                 }
               }}
               authContext="database"

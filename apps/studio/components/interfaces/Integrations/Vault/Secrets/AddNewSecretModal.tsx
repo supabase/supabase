@@ -24,10 +24,10 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { useVaultSecretCreateMutation } from '@/data/vault/vault-secret-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 const formSchema = z.object({
   name: z.string().min(1, 'Please provide a name for your secret'),
@@ -47,7 +47,7 @@ export const AddNewSecretModal = () => {
 
   const [showAddSecretModal, setShowAddSecretModal] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const form = useForm<FormSchema>({
@@ -81,7 +81,7 @@ export const AddNewSecretModal = () => {
         secret: values.secret,
       })
       toast.success(`Successfully added new secret ${values.name}`)
-      setShowAddSecretModal(null, { history: 'replace' })
+      setShowAddSecretModal(null)
     } catch (error: any) {
       // [Joshen] No error handler required as they are all handled within the mutations already
     } finally {

@@ -3,7 +3,6 @@ import { noop } from 'lodash'
 import { CheckIcon, ChevronDownIcon, Loader2Icon, PlusIcon } from 'lucide-react'
 import { parseAsBoolean } from 'nuqs'
 import { useEffect, useState } from 'react'
-
 import {
   Button,
   ButtonProps,
@@ -21,18 +20,18 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { Markdown } from '@/components/interfaces/Markdown'
 import {
   getAddReadReplicaPath,
   getInfrastructurePath,
 } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { Markdown } from '@/components/interfaces/Markdown'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -63,7 +62,7 @@ export const DatabaseSelector = ({
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = usePanelQueryState(
     'showConnect',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])

@@ -19,12 +19,12 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../../ProtectedSchemaWarning'
 import { FunctionList } from './FunctionList'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { CreateFunction } from '@/components/interfaces/Database/Functions/CreateFunction'
 import {
   ReportsSelectFilter,
   selectFilterSchema,
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
-import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
-import { CreateFunction } from '@/components/interfaces/Database/Functions/CreateFunction'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -41,7 +41,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -185,19 +184,19 @@ export const FunctionsList = () => {
 
   const [functionIdToEdit, setSelectedFunctionToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const functionToEdit = functions.find((fn) => fn.id.toString() === functionIdToEdit)
 
   const [functionIdToDuplicate, setSelectedFunctionIdToDuplicate] = usePanelQueryState(
     'duplicate',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const functionToDuplicate = functions.find((fn) => fn.id.toString() === functionIdToDuplicate)
 
   const [functionIdToDelete, setSelectedFunctionToDelete] = usePanelQueryState(
     'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const functionToDelete = functions.find((fn) => fn.id.toString() === functionIdToDelete)
 
@@ -208,7 +207,7 @@ export const FunctionsList = () => {
   } = useDatabaseFunctionDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully removed function ${variables.func.name}`)
-      setSelectedFunctionToDelete(null, { history: 'replace' })
+      setSelectedFunctionToDelete(null)
     },
   })
 
@@ -226,21 +225,21 @@ export const FunctionsList = () => {
   useEffect(() => {
     if (isSuccess && !!functionIdToEdit && !functionToEdit) {
       toast('Function not found')
-      replaceMissingPanelId(() => setSelectedFunctionToEdit(null, { history: 'replace' }))
+      setSelectedFunctionToEdit(null, { history: 'replace' })
     }
   }, [functionIdToEdit, functionToEdit, isSuccess, setSelectedFunctionToEdit])
 
   useEffect(() => {
     if (isSuccess && !!functionIdToDuplicate && !functionToDuplicate) {
       toast('Function not found')
-      replaceMissingPanelId(() => setSelectedFunctionIdToDuplicate(null, { history: 'replace' }))
+      setSelectedFunctionIdToDuplicate(null, { history: 'replace' })
     }
   }, [functionIdToDuplicate, functionToDuplicate, isSuccess, setSelectedFunctionIdToDuplicate])
 
   useEffect(() => {
     if (isSuccess && !!functionIdToDelete && !functionToDelete && !isSuccessDelete) {
       toast('Function not found')
-      replaceMissingPanelId(() => setSelectedFunctionToDelete(null, { history: 'replace' }))
+      setSelectedFunctionToDelete(null, { history: 'replace' })
     }
   }, [
     functionIdToDelete,
@@ -390,9 +389,9 @@ export const FunctionsList = () => {
           setSelectedFunctionIdToDuplicate(null)
         }}
         onCommit={() => {
-          setShowCreateFunctionForm(false, { history: 'replace' })
-          setSelectedFunctionToEdit(null, { history: 'replace' })
-          setSelectedFunctionIdToDuplicate(null, { history: 'replace' })
+          setShowCreateFunctionForm(false)
+          setSelectedFunctionToEdit(null)
+          setSelectedFunctionIdToDuplicate(null)
         }}
         isDuplicating={!!functionToDuplicate}
       />

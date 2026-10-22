@@ -20,13 +20,13 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL, type PostgresTrigger } from './TriggerList.utils'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
+import { TriggerSheet } from '@/components/interfaces/Database/Triggers/TriggerSheet'
 import {
   ReportsSelectFilter,
   selectFilterSchema,
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
-import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
-import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
-import { TriggerSheet } from '@/components/interfaces/Database/Triggers/TriggerSheet'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -43,7 +43,6 @@ import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema, useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -104,19 +103,19 @@ export const TriggersList = () => {
 
   const [triggerIdToEdit, setTriggerToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const triggerToEdit = triggers?.find((fn) => fn.id.toString() === triggerIdToEdit)
 
   const [triggerIdToDuplicate, setTriggerToDuplicate] = usePanelQueryState(
     'duplicate',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const triggerToDuplicate = triggers?.find((fn) => fn.id.toString() === triggerIdToDuplicate)
 
   const [triggerIdToDelete, setTriggerToDelete] = usePanelQueryState(
     'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const triggerToDelete = triggers?.find((fn) => fn.id.toString() === triggerIdToDelete)
 
@@ -127,7 +126,7 @@ export const TriggersList = () => {
   } = useDatabaseTriggerDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully removed ${variables.trigger.name}`)
-      setTriggerToDelete(null, { history: 'replace' })
+      setTriggerToDelete(null)
     },
   })
 
@@ -216,21 +215,21 @@ execute function function_name();`
   useEffect(() => {
     if (isSuccess && !!triggerIdToEdit && !triggerToEdit) {
       toast('Trigger not found')
-      replaceMissingPanelId(() => setTriggerToEdit(null, { history: 'replace' }))
+      setTriggerToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, setTriggerToEdit, triggerIdToEdit, triggerToEdit])
 
   useEffect(() => {
     if (isSuccess && !!triggerIdToDuplicate && !triggerToDuplicate) {
       toast('Trigger not found')
-      replaceMissingPanelId(() => setTriggerToDuplicate(null, { history: 'replace' }))
+      setTriggerToDuplicate(null, { history: 'replace' })
     }
   }, [isSuccess, triggerIdToDuplicate, triggerToDuplicate, setTriggerToDuplicate])
 
   useEffect(() => {
     if (isSuccess && !!triggerIdToDelete && !triggerToDelete && !isSuccessDelete) {
       toast('Trigger not found')
-      replaceMissingPanelId(() => setTriggerToDelete(null, { history: 'replace' }))
+      setTriggerToDelete(null, { history: 'replace' })
     }
   }, [isSuccess, triggerIdToDelete, triggerToDelete, isSuccessDelete, setTriggerToDelete])
 
@@ -354,9 +353,9 @@ execute function function_name();`
           setTriggerToDuplicate(null)
         }}
         onCommit={() => {
-          setShowCreateTriggerForm(false, { history: 'replace' })
-          setTriggerToEdit(null, { history: 'replace' })
-          setTriggerToDuplicate(null, { history: 'replace' })
+          setShowCreateTriggerForm(false)
+          setTriggerToEdit(null)
+          setTriggerToDuplicate(null)
         }}
         isDuplicatingTrigger={!!triggerToDuplicate}
       />

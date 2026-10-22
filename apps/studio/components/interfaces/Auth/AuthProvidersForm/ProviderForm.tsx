@@ -25,7 +25,6 @@ import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -36,6 +35,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { BASE_PATH } from '@/lib/constants'
 
 interface ProviderFormProps {
@@ -52,7 +52,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const { data: organization } = useSelectedOrganizationQuery()
   const [urlProvider, setUrlProvider] = usePanelQueryState(
     'provider',
-    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withDefault('').withOptions({ history: 'push' })
   )
 
   const [open, setOpen] = useState(false)
@@ -142,7 +142,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       {
         onSuccess: (newValues) => {
           setOpen(false)
-          setUrlProvider(null, { history: 'replace' })
+          setUrlProvider(null)
           form.reset(getValuesForProvider(newValues))
           toast.success('Successfully updated settings')
         },

@@ -19,7 +19,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
 import { createNavigationHandler } from '@/lib/navigation'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -58,13 +57,13 @@ export const CronjobsTab = () => {
 
   const [cronJobIdForEditing, setCronJobForEditing] = usePanelQueryState(
     'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const cronJobForEditing = grid.rows.find((j) => j.jobid.toString() === cronJobIdForEditing)
 
   const [, setCronJobForDeletion] = usePanelQueryState(
     'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
 
   const columns = useMemo(
@@ -126,15 +125,15 @@ export const CronjobsTab = () => {
   }
 
   const onCommit = () => {
-    setCronJobForEditing(null, { history: 'replace' })
-    setCreateCronJobSheetShown(false, { history: 'replace' })
+    setCronJobForEditing(null)
+    setCreateCronJobSheetShown(false)
     cleanPointerEventsNoneOnBody(500)
   }
 
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
       toast('Cron job not found')
-      replaceMissingPanelId(() => setCronJobForEditing(null, { history: 'replace' }))
+      setCronJobForEditing(null, { history: 'replace' })
     }
   }, [cronJobForEditing, cronJobIdForEditing, grid.isSuccess, setCronJobForEditing])
 

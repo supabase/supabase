@@ -56,7 +56,6 @@ import { useOAuthServerAppRegenerateSecretMutation } from '@/data/oauth-server-a
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { replaceMissingPanelId } from '@/lib/panel-history'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -116,18 +115,18 @@ export const OAuthAppsList = () => {
 
   const [showCreateSheet, setShowCreateSheet] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const [selectedAppToEdit, setSelectedAppToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const appToEdit = oAuthApps?.find((app) => app.client_id === selectedAppToEdit)
 
   const [selectedAppToDelete, setSelectedAppToDelete] = usePanelQueryState(
     'delete',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withOptions({ history: 'push' })
   )
   const appToDelete = oAuthApps?.find((app) => app.client_id === selectedAppToDelete)
 
@@ -138,7 +137,7 @@ export const OAuthAppsList = () => {
   } = useOAuthServerAppDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted OAuth app`)
-      setSelectedAppToDelete(null, { history: 'replace' })
+      setSelectedAppToDelete(null)
     },
   })
 
@@ -217,21 +216,21 @@ export const OAuthAppsList = () => {
   // Prevent opening the create sheet if OAuth Server is disabled
   useEffect(() => {
     if (isSuccessAuthConfig && !isOAuthServerEnabled && showCreateSheet) {
-      replaceMissingPanelId(() => setShowCreateSheet(false, { history: 'replace' }))
+      setShowCreateSheet(false, { history: 'replace' })
     }
   }, [isSuccessAuthConfig, isOAuthServerEnabled, showCreateSheet, setShowCreateSheet])
 
   useEffect(() => {
     if (isSuccess && !!selectedAppToEdit && !appToEdit) {
       toast('App not found')
-      replaceMissingPanelId(() => setSelectedAppToEdit(null, { history: 'replace' }))
+      setSelectedAppToEdit(null, { history: 'replace' })
     }
   }, [appToEdit, isSuccess, selectedAppToEdit, setSelectedAppToEdit])
 
   useEffect(() => {
     if (isSuccess && !!selectedAppToDelete && !appToDelete && !isSuccessDelete) {
       toast('App not found')
-      replaceMissingPanelId(() => setSelectedAppToDelete(null, { history: 'replace' }))
+      setSelectedAppToDelete(null, { history: 'replace' })
     }
   }, [appToDelete, isSuccess, isSuccessDelete, selectedAppToDelete, setSelectedAppToDelete])
 
@@ -472,8 +471,8 @@ export const OAuthAppsList = () => {
         appToEdit={appToEdit}
         onSuccess={(app) => {
           const isCreating = !appToEdit
-          setShowCreateSheet(false, { history: 'replace' })
-          setSelectedAppToEdit(null, { history: 'replace' })
+          setShowCreateSheet(false)
+          setSelectedAppToEdit(null)
           setSelectedApp(undefined)
           // Only show banner for new apps or regenerated secrets, not for simple edits
           if (isCreating || app.client_secret) {

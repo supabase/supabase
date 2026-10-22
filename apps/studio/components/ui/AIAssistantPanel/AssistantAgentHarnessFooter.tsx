@@ -8,9 +8,7 @@ export const AssistantAgentHarnessFooter = () => {
   const { resolvedTheme } = useTheme()
   const theme = resolvedTheme === 'dark' ? 'dark' : 'light'
   const [, setConnectParams] = useQueryStates({
-    showConnect: parseAsBoolean
-      .withDefault(false)
-      .withOptions({ history: 'push', clearOnDefault: true }),
+    showConnect: parseAsBoolean.withDefault(false).withOptions({ history: 'push' }),
     connectTab: parseAsString,
   })
 
@@ -21,7 +19,7 @@ export const AssistantAgentHarnessFooter = () => {
         tabIndex={0}
         className="flex w-full shrink-0 cursor-pointer items-center justify-between gap-3 overflow-hidden rounded-b-lg border-x border-b bg-surface-100 py-2 pr-2 pl-3 text-left text-xs text-foreground-light shadow-xs transition-colors hover:bg-surface-200 hover:border-default"
         onClick={() => {
-          armPanelPush()
+          armPanelPush('showConnect')
           setConnectParams({ showConnect: true, connectTab: 'mcp' })
         }}
       >
