@@ -1,0 +1,17 @@
+---
+title: How do I add background job processing to my app?
+topics: ['Queues']
+---
+
+Use [Supabase Queues](/docs/guides/queues). Your app adds a message when work needs doing, and a worker reads the message and processes it. Queues are built on the [`pgmq` Postgres extension](/docs/guides/queues/pgmq), so messages are stored in your database.
+
+Supabase Queues have several advantages, including:
+
+- **Guaranteed message delivery**: Messages added to Queues are guaranteed to be delivered to your consumers.
+- **Exactly once message delivery**: A Message is delivered exactly once to a consumer within a customizable visibility window.
+- **Message durability and archival**: Messages are stored in Postgres and you can choose to archive them for analytical or auditing purposes.
+- **Granular authorization**: Control client-side consumer access to Queues with API permissions and Row Level Security (RLS) policies.
+- **Queue management and monitoring**: Create, manage, and monitor Queues and Messages in the Supabase Dashboard.
+
+> [!TIP]
+> For work that runs on a schedule rather than on demand, use [Cron](/docs/guides/cron) to add messages to a queue at set times.

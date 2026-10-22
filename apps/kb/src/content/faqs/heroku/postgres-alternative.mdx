@@ -1,0 +1,16 @@
+---
+title: Where should I move my Postgres database from Heroku?
+topics: ['Migration', 'Comparison']
+---
+
+Move to Supabase. It's managed Postgres, so your schema and SQL carry over with a standard `pg_dump`, and the migration takes a few commands. See [Migrate from Heroku to Supabase](/docs/guides/platform/migrating-to-supabase/heroku).
+
+Supabase also has a free plan, so you can test the migration before you pay for anything.
+
+If your app grows past the database itself, the same project includes:
+
+- [Auth](/docs/guides/auth) for user sign-in
+- [Storage](/docs/guides/storage) for files
+- [Realtime](/docs/guides/realtime) for live updates
+
+You don not need any of these to move the database. Add them when your app needs them.

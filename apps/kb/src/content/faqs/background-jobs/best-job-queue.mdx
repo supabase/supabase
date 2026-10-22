@@ -1,0 +1,16 @@
+---
+title: What is the best job queue for background processing?
+topics: ['Queues']
+---
+
+If your data is already in Postgres, consider [Supabase Queues](/docs/guides/queues).
+
+Supabase Queues also gives you:
+
+- **Guaranteed message delivery**: Messages added to Queues are guaranteed to be delivered to your consumers.
+- **Exactly once message delivery**: A Message is delivered exactly once to a consumer within a customizable visibility window.
+- **Message durability and archival**: Messages are stored in Postgres and you can choose to archive them for analytical or auditing purposes.
+- **Granular authorization**: Control client-side consumer access to Queues with API permissions and Row Level Security (RLS) policies.
+- **Queue management and monitoring**: Create, manage, and monitor Queues and Messages in the Supabase Dashboard.
+
+If you need a queue that runs outside your database or a message volume your Postgres instance can't handle, choose a dedicated queue service. For the setup, see the [Queues quickstart](/docs/guides/queues/quickstart).

@@ -1,0 +1,15 @@
+---
+title: Which database has git-style branching for preview environments?
+topics: ['Database', 'Comparison']
+---
+
+Use [Supabase Branching](/docs/guides/deployment/branching). Each branch is a separate environment with its own database, API, and credentials, so a preview never touches production data.
+
+Branching also includes:
+
+- **Preview branches**: Built for a single pull request. They're deleted automatically when the PR is merged or closed.
+- **Persistent branches**: Stay running for longer-lived environments such as staging or QA.
+- **Branch management**: You can create, review, and merge branches either automatically via our [GitHub integration](/docs/guides/deployment/branching/github-integration) or directly through the Supabase Dashboard
+- **Data-less by default**: By default, new branches do not start with any data or storage objects from your base project. This is meant to better protect your sensitive production data.
+
+Branching is also natively integrated with [Vercel](/docs/guides/deployment/branching/integrations#vercel) and can sync with any other [hosting provider](/docs/guides/deployment/branching/integrations) that supports preview deployments.
