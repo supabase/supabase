@@ -19,25 +19,33 @@ export function articleSelectorForPagePath(pagePath: string): string {
   return GUIDE_ARTICLE_SELECTOR
 }
 
-export async function collectDocsOwnedLinks(
-  page: Page,
-  baseURL: string,
-  articleSelector: string = GUIDE_ARTICLE_SELECTOR
-): Promise<string[]> {
+export type LinkTarget = {
+  url: string
+  anchor?: string
+}
+
+function decodeAnchor(hash: string): string {
+  try {
+    return decodeURIComponent(hash)
+  } catch {
+    return hash
+  }
+}
+
+export function docsOwnedLinkTargets(
+  hrefs: string[],
+  pageUrl: string,
+  baseURL: string
+): LinkTarget[] {
   const origin = new URL(baseURL).origin
-  const hrefs = await page
-    .locator(`${articleSelector} a[href]`)
-    .evaluateAll((anchors) =>
-      anchors.map((anchor) => (anchor as HTMLAnchorElement).getAttribute('href') ?? '')
-    )
-  const links = new Set<string>()
+  const links = new Map<string, LinkTarget>()
 
   for (const href of hrefs) {
-    if (!href || href.startsWith('#')) continue
+    if (!href || href === '#') continue
 
     let url: URL
     try {
-      url = new URL(href, baseURL)
+      url = new URL(href, pageUrl)
     } catch {
       continue
     }
@@ -48,30 +56,75 @@ export async function collectDocsOwnedLinks(
       continue
     }
 
+    const anchor = decodeAnchor(url.hash.slice(1))
     url.hash = ''
-    links.add(url.toString())
+    const target: LinkTarget = anchor ? { url: url.toString(), anchor } : { url: url.toString() }
+    links.set(`${target.url}#${anchor}`, target)
   }
 
-  return [...links].sort()
+  return [...links.keys()].sort().map((key) => links.get(key)!)
+}
+
+export async function collectDocsOwnedLinks(
+  page: Page,
+  baseURL: string,
+  articleSelector: string = GUIDE_ARTICLE_SELECTOR
+): Promise<LinkTarget[]> {
+  const hrefs = await page
+    .locator(`${articleSelector} a[href]`)
+    .evaluateAll((anchors) =>
+      anchors.map((anchor) => (anchor as HTMLAnchorElement).getAttribute('href') ?? '')
+    )
+
+  return docsOwnedLinkTargets(hrefs, page.url(), baseURL)
 }
 
 export type LinkCheckResult = {
   ok: boolean
   status: number
   error?: string
+  anchors: string[]
 }
+
+const linkChecks = new Map<string, Promise<LinkCheckResult>>()
 
 // The docs middleware rewrites /reference/* requests whose user agent looks like a bot
 // (isbot, which matches HeadlessChrome) to /api/crawlers. Fetching from inside the page
 // keeps the browser's own user agent and network stack, so a link resolves the same way
 // page.goto resolves it in this suite.
-export async function checkLinkFromBrowser(page: Page, url: string): Promise<LinkCheckResult> {
-  return page.evaluate(async (linkUrl) => {
-    try {
-      const response = await fetch(linkUrl)
-      return { ok: response.ok, status: response.status }
-    } catch (error) {
-      return { ok: false, status: 0, error: error instanceof Error ? error.message : String(error) }
-    }
-  }, url)
+export function checkLinkFromBrowser(page: Page, url: string): Promise<LinkCheckResult> {
+  let check = linkChecks.get(url)
+  if (!check) {
+    check = page.evaluate(async (linkUrl) => {
+      try {
+        const response = await fetch(linkUrl)
+        if (!response.ok) return { ok: false, status: response.status, anchors: [] }
+
+        const doc = new DOMParser().parseFromString(await response.text(), 'text/html')
+        const anchors = [
+          ...[...doc.querySelectorAll('[id]')].map((element) => element.id),
+          ...[...doc.querySelectorAll('a[name]')].map((element) => element.getAttribute('name')!),
+        ]
+        return { ok: true, status: response.status, anchors }
+      } catch (error) {
+        return {
+          ok: false,
+          status: 0,
+          error: error instanceof Error ? error.message : String(error),
+          anchors: [],
+        }
+      }
+    }, url)
+    check.catch(() => linkChecks.delete(url))
+    linkChecks.set(url, check)
+  }
+  return check
+}
+
+export function hasAnchorOnPage(page: Page, anchor: string): Promise<boolean> {
+  return page.evaluate(
+    (id) =>
+      !!(document.getElementById(id) ?? document.querySelector(`a[name="${CSS.escape(id)}"]`)),
+    anchor
+  )
 }

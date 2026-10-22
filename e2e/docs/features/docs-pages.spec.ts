@@ -18,6 +18,7 @@ import {
   articleSelectorForPagePath,
   checkLinkFromBrowser,
   collectDocsOwnedLinks,
+  hasAnchorOnPage,
 } from '../utils/docs-links.js'
 
 const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
@@ -55,18 +56,45 @@ test.describe('Docs owned pages', () => {
       const article = page.locator(articleSelector)
       await expect(article, 'Page article should be present').toBeVisible()
 
+      const currentUrl = new URL(page.url())
+      currentUrl.hash = ''
       const links = await collectDocsOwnedLinks(page, baseURL!, articleSelector)
+      const checkedUrls = new Set<string>()
 
-      for (const url of links) {
+      for (const { url, anchor } of links) {
+        if (url === currentUrl.toString()) {
+          if (anchor) {
+            expect
+              .soft(
+                await hasAnchorOnPage(page, anchor),
+                `${pagePath} links to #${anchor}, but the page has no element with id "${anchor}"`
+              )
+              .toBeTruthy()
+          }
+          continue
+        }
+
         const result = await checkLinkFromBrowser(page, url)
-        expect
-          .soft(
-            result.ok,
-            result.error
-              ? `${url} should be reachable (${result.error})`
-              : `${url} should resolve (status ${result.status})`
-          )
-          .toBeTruthy()
+        if (!checkedUrls.has(url)) {
+          checkedUrls.add(url)
+          expect
+            .soft(
+              result.ok,
+              result.error
+                ? `${url} should be reachable (${result.error})`
+                : `${url} should resolve (status ${result.status})`
+            )
+            .toBeTruthy()
+        }
+
+        if (anchor && result.ok) {
+          expect
+            .soft(
+              result.anchors.includes(anchor),
+              `${pagePath} links to ${url}#${anchor}, but ${url} has no element with id "${anchor}"`
+            )
+            .toBeTruthy()
+        }
       }
     })
   }
