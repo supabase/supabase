@@ -45,6 +45,18 @@ describe('account recovery reminder selection', () => {
 })
 
 describe('return destination', () => {
+  it('preserves the deployment base path exactly once', () => {
+    expect(getRecoveryReturnTo(null, '/dashboard')).toBe('/dashboard/organizations')
+    expect(getRecoveryReturnTo('/organizations', '/dashboard')).toBe('/dashboard/organizations')
+    expect(getRecoveryReturnTo('/dashboard/project/abc?tab=1#tables', '/dashboard')).toBe(
+      '/dashboard/project/abc?tab=1#tables'
+    )
+    expect(getRecoveryReturnTo('/dashboard/account-recovery', '/dashboard')).toBe(
+      '/dashboard/organizations'
+    )
+    expect(getRecoveryReturnTo('//evil.test', '/dashboard')).toBe('/dashboard/organizations')
+  })
+
   it('preserves internal routes, query strings and fragments', () => {
     expect(getRecoveryReturnTo('/project/abc?tab=1#tables')).toBe('/project/abc?tab=1#tables')
   })
