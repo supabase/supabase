@@ -151,9 +151,7 @@ function TOCItem({ item }: { item: TOCItemType }) {
       )}
     >
       {formatTOCHeader(removeAnchor(item.title)).map((x, index) => (
-        <Fragment key={index}>
-          {x.type === 'code' ? <code className="text-code-inline">{x.value}</code> : x.value}
-        </Fragment>
+        <Fragment key={index}>{x.type === 'code' ? <code>{x.value}</code> : x.value}</Fragment>
       ))}
     </Primitive.TOCItem>
   )
