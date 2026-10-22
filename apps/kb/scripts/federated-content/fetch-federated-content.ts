@@ -4,7 +4,7 @@
 // collection). No content processing: body text is written as fetched.
 import '../utils/dotenv.js'
 
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Octokit } from '@octokit/core'
@@ -94,6 +94,7 @@ async function fetchPage(filename: string): Promise<'fetched' | 'legacy-toml'> {
 }
 
 async function fetchFederatedContent() {
+  await rm(TROUBLESHOOTING_DIRECTORY, { recursive: true, force: true })
   await mkdir(TROUBLESHOOTING_DIRECTORY, { recursive: true })
 
   const filenames = await listMarkdownFiles(SOURCE.dir)
