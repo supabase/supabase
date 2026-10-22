@@ -1,20 +1,16 @@
-import { expect } from '@playwright/test'
+import { expect, type Page } from '@playwright/test'
 
 import { createTable, dropTable, query } from '../utils/db/index.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForGridDataToLoad, waitForTableToLoad } from '../utils/wait-for-response.js'
 
-test('schema switch replaces history and back leaves the editor', async ({ page, ref }) => {
-  // One document only. The open table writes its id back after a plain clear,
-  // and a standing init script would also clear the later visits that must redirect.
-  await page.addInitScript((projectRef) => {
-    if (sessionStorage.getItem('pw-clear-editor-history') !== '1') return
-    sessionStorage.removeItem('pw-clear-editor-history')
-    localStorage.removeItem(`dashboard-history-${projectRef}`)
-    localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
-  }, ref)
+const listHeading = (page: Page) => page.getByRole('heading', { name: 'Recent items' })
 
+// nuqs can flush a schema write after the list paints
+const waitForQueuedSchemaWrite = (page: Page) => page.waitForTimeout(300)
+
+test('schema switch replaces history and back leaves the editor', async ({ page, ref }) => {
   const tableName = 'pw_schema_back'
 
   await using _cleanup = await withSetupCleanup(
@@ -56,23 +52,19 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   expect(await historyLength()).toBe(historyBeforeSchemaChange)
 
   await page.goBack()
-  await expect
-    .poll(() => page.url(), {
-      message: 'a queued schema write would bounce back onto /editor',
-    })
-    .toMatch(new RegExp(`/project/${ref}/?$`))
-  await expect(page, 'a queued schema write would bounce back onto /editor').not.toHaveURL(
-    /\/editor/
-  )
+  await expect(page.getByRole('heading', { name: 'Get connected' })).toBeVisible()
+  await waitForQueuedSchemaWrite(page)
+  await expect(page).toHaveURL(new RegExp(`/project/${ref}/?$`))
+  await expect(page).not.toHaveURL(/\/editor/)
 
   const authIndexLoad = waitForTableToLoad(page, ref, 'auth')
   await page.goto(toUrl(`/project/${ref}/editor?schema=auth`))
   await authIndexLoad
-  await expect(page).toHaveURL(new RegExp(`/editor/${tableId}\\?`))
-  await expect(page).toHaveURL(/schema=auth/)
-  await expect(page).not.toHaveURL(/schema=public/)
+  await expect(listHeading(page)).toBeVisible()
+  await waitForQueuedSchemaWrite(page)
+  await expect(page).toHaveURL(/\/editor\?schema=auth/)
+  await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
   await expect(page.getByRole('combobox', { name: 'Schema auth' })).toBeVisible()
-  await expect(page.getByRole('tab', { name: new RegExp(tableName) })).toBeVisible()
 
   const freshLoad = waitForTableToLoad(page, ref, 'public')
   await page.goto(toUrl(`/project/${ref}/editor`))
@@ -81,27 +73,15 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   await expect(page.getByRole('tab', { name: new RegExp(tableName) })).toBeVisible()
   await expect(page.getByRole('combobox', { name: 'Schema public' })).toBeVisible()
 
-  // Arm the one-shot, then load the list. Reloading the open table would record it again.
+  await page.goto(toUrl(`/project/${ref}`))
+  await page.evaluate((projectRef) => {
+    localStorage.removeItem(`dashboard-history-${projectRef}`)
+    localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
+  }, ref)
   const listLoad = waitForTableToLoad(page, ref, 'public')
-  const listUrl = page.waitForURL(/\/editor\?schema=public/)
-  const leftTable = page
-    .evaluate((projectRef) => {
-      sessionStorage.setItem('pw-clear-editor-history', '1')
-      const url = new URL(window.location.href)
-      url.pathname = `/project/${projectRef}/editor`
-      url.search = '?schema=public'
-      window.location.replace(url.toString())
-    }, ref)
-    .catch((error: unknown) => {
-      const message = error instanceof Error ? error.message : String(error)
-      if (!message.includes('context was destroyed') && !message.includes('navigation')) {
-        throw error
-      }
-    })
-  await Promise.all([listUrl, leftTable])
+  await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
   await listLoad
-  await expect(page).toHaveURL(/\/editor\?schema=public/)
-  await page.reload()
+  await expect(listHeading(page)).toBeVisible()
   await expect(page).toHaveURL(/\/editor\?schema=public/)
 
   const reopenLoad = waitForGridDataToLoad(page, ref)
@@ -110,18 +90,10 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   await reopenLoad
 
   await page.goBack()
-  await expect(
-    page.getByRole('button', { name: `View ${tableName}`, exact: true }),
-    'a queued schema write would bounce back onto /editor'
-  ).toBeVisible()
-  await expect
-    .poll(() => page.url(), {
-      message: 'a queued schema write would bounce back onto /editor',
-    })
-    .toMatch(/\/editor\?schema=public/)
-  await expect(page, 'a queued schema write would bounce back onto /editor').not.toHaveURL(
-    new RegExp(`/editor/${tableId}`)
-  )
+  await expect(listHeading(page)).toBeVisible()
+  await waitForQueuedSchemaWrite(page)
+  await expect(page).toHaveURL(/\/editor\?schema=public/)
+  await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
 })
 
 test('a full back to /editor does not open the last table', async ({ page, ref }) => {
@@ -164,17 +136,8 @@ test('a full back to /editor does not open the last table', async ({ page, ref }
   await expect(page).toHaveURL(new RegExp(`/editor/${tableId}`))
 
   await page.goBack()
-  await expect(
-    page.getByRole('button', { name: `View ${tableName}`, exact: true }),
-    'a document back_forward load used to settle before the editor read the flag'
-  ).toBeVisible()
-  await expect
-    .poll(() => page.url(), {
-      message: 'a document back_forward load used to settle before the editor read the flag',
-    })
-    .toMatch(/\/editor\?schema=public/)
-  await expect(
-    page,
-    'a document back_forward load used to settle before the editor read the flag'
-  ).not.toHaveURL(new RegExp(`/editor/${tableId}`))
+  await expect(listHeading(page)).toBeVisible()
+  await waitForQueuedSchemaWrite(page)
+  await expect(page).toHaveURL(/\/editor\?schema=public/)
+  await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
 })

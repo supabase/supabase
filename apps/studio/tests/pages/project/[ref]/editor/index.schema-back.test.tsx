@@ -5,9 +5,8 @@ import mockRouter from 'next-router-mock'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
-  acknowledgeHistoryTraverse,
   isHistoryTraverseNavigation,
-  resetHistoryTraverseState,
+  settleHistoryTraverseNavigation,
 } from '@/lib/history-traverse'
 import TableEditorPage from '@/pages/project/[ref]/editor/index'
 import { TabsStateContextProvider } from '@/state/tabs'
@@ -18,7 +17,7 @@ vi.mock('@/lib/history-traverse', async (importOriginal) => {
   return {
     ...actual,
     isHistoryTraverseNavigation: vi.fn(actual.isHistoryTraverseNavigation),
-    acknowledgeHistoryTraverse: vi.fn(actual.acknowledgeHistoryTraverse),
+    settleHistoryTraverseNavigation: vi.fn(actual.settleHistoryTraverseNavigation),
   }
 })
 
@@ -102,9 +101,18 @@ const waitForHistory = async (queryClient: QueryClient) => {
   })
 }
 
+const resetHistoryTraverseState = () => {
+  const state = window.__studioHistoryTraverseState
+  if (!state) return
+
+  state.isTraverseNavigation = false
+  state.isShellReady = false
+  state.documentConsumed = false
+}
+
 const waitForRedirectDecision = async () => {
   await waitFor(() => {
-    expect(acknowledgeHistoryTraverse).toHaveBeenCalled()
+    expect(settleHistoryTraverseNavigation).toHaveBeenCalled()
   })
 }
 
@@ -120,7 +128,7 @@ describe('Table Editor index schema and history', () => {
     mockRouter.setCurrentUrl('/project/default/editor')
   })
 
-  test('opens the last table and keeps an explicit schema from another schema', async () => {
+  test('stays on the list when an explicit schema is not the last table schema', async () => {
     mockNavigationType('navigate')
     seedLastTable({ tableId: 12, schema: 'auth' })
     params.schema = 'public'
@@ -129,10 +137,25 @@ describe('Table Editor index schema and history', () => {
 
     const queryClient = renderIndex()
     await waitForHistory(queryClient)
+    await waitForRedirectDecision()
+
+    expect(replace).not.toHaveBeenCalled()
+    expect(mockRouter.asPath).toBe('/project/default/editor?schema=public')
+  })
+
+  test('opens the last table when the explicit schema matches', async () => {
+    mockNavigationType('navigate')
+    seedLastTable({ tableId: 12, schema: 'auth' })
+    params.schema = 'auth'
+    mockRouter.setCurrentUrl('/project/default/editor?schema=auth')
+    const replace = vi.spyOn(mockRouter, 'replace')
+
+    const queryClient = renderIndex()
+    await waitForHistory(queryClient)
 
     await waitFor(() => {
       expect(replace).toHaveBeenCalledWith(
-        expect.stringMatching(/\/project\/default\/editor\/12\?schema=public$/)
+        expect.stringMatching(/\/project\/default\/editor\/12\?schema=auth$/)
       )
     })
   })
@@ -152,7 +175,7 @@ describe('Table Editor index schema and history', () => {
     expect(replace).not.toHaveBeenCalled()
     expect(mockRouter.asPath).toBe('/project/default/editor?schema=public')
 
-    const decisionsBeforeSchemaChange = vi.mocked(acknowledgeHistoryTraverse).mock.calls.length
+    const decisionsBeforeSchemaChange = vi.mocked(settleHistoryTraverseNavigation).mock.calls.length
 
     await act(async () => {
       params.schema = 'auth'
@@ -162,7 +185,7 @@ describe('Table Editor index schema and history', () => {
     await waitFor(() => {
       expect(mockRouter.query.schema).toBe('auth')
     })
-    expect(acknowledgeHistoryTraverse).toHaveBeenCalledTimes(decisionsBeforeSchemaChange)
+    expect(settleHistoryTraverseNavigation).toHaveBeenCalledTimes(decisionsBeforeSchemaChange)
     expect(replace).not.toHaveBeenCalled()
   })
 
@@ -229,6 +252,8 @@ describe('Table Editor index schema and history', () => {
       expect(replace).toHaveBeenCalledWith(expect.stringMatching(/\/project\/other\/editor\/34$/))
     })
 
+    const decisionsBeforeReturn = vi.mocked(settleHistoryTraverseNavigation).mock.calls.length
+
     await act(async () => {
       window.dispatchEvent(new PopStateEvent('popstate'))
       params.ref = 'default'
@@ -236,8 +261,11 @@ describe('Table Editor index schema and history', () => {
     })
 
     await waitFor(() => {
-      expect(acknowledgeHistoryTraverse).toHaveBeenCalledTimes(3)
+      expect(vi.mocked(settleHistoryTraverseNavigation).mock.calls.length).toBeGreaterThan(
+        decisionsBeforeReturn
+      )
     })
+    expect(mockRouter.asPath).toBe('/project/default/editor')
     expect(replace).toHaveBeenCalledTimes(2)
   })
 
@@ -284,7 +312,7 @@ describe('Table Editor index schema and history', () => {
     await waitFor(() => {
       expect(replace).toHaveBeenCalledTimes(1)
     })
-    const decisionsBeforeSchemaChange = vi.mocked(acknowledgeHistoryTraverse).mock.calls.length
+    const decisionsBeforeSchemaChange = vi.mocked(settleHistoryTraverseNavigation).mock.calls.length
 
     await act(async () => {
       params.schema = 'public'
@@ -294,7 +322,7 @@ describe('Table Editor index schema and history', () => {
     await waitFor(() => {
       expect(mockRouter.query.schema).toBe('public')
     })
-    expect(acknowledgeHistoryTraverse).toHaveBeenCalledTimes(decisionsBeforeSchemaChange)
+    expect(settleHistoryTraverseNavigation).toHaveBeenCalledTimes(decisionsBeforeSchemaChange)
     expect(replace).toHaveBeenCalledTimes(1)
   })
 })

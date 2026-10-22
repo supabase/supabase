@@ -1,14 +1,21 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
-  clearHistoryTraverseLatch,
   installHistoryTraverseListener,
   isHistoryTraverseNavigation,
   markHistoryTraverseShellReady,
-  resetHistoryTraverseState,
   scheduleHistoryTraverseSettlement,
   settleHistoryTraverseNavigation,
 } from './history-traverse'
+
+const resetHistoryTraverseState = () => {
+  const state = window.__studioHistoryTraverseState
+  if (!state) return
+
+  state.isTraverseNavigation = false
+  state.isShellReady = false
+  state.documentConsumed = false
+}
 
 const mockNavigationType = (type?: PerformanceNavigationTiming['type'], name?: string) => {
   const documentUrl = name ?? window.location.href
@@ -82,22 +89,16 @@ describe('isHistoryTraverseNavigation', () => {
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 
-  test('keeps a back-forward document load after settle until the next push', () => {
+  test('reads a document back-forward once, and settle does not clear it first', () => {
     mockNavigationType('back_forward')
-
-    expect(isHistoryTraverseNavigation()).toBe(true)
 
     settleHistoryTraverseNavigation()
     expect(isHistoryTraverseNavigation()).toBe(true)
-
-    history.pushState(null, '', '/project/default/sql')
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 
-  test('treats a document back-forward load as a traverse until the next push', () => {
+  test('does not treat a document back-forward as a traverse after a push', () => {
     mockNavigationType('back_forward')
-
-    expect(isHistoryTraverseNavigation()).toBe(true)
 
     history.pushState(null, '', '/project/default/sql')
     expect(isHistoryTraverseNavigation()).toBe(false)
@@ -134,8 +135,6 @@ describe('isHistoryTraverseNavigation', () => {
     const documentUrl = window.location.href
     mockNavigationType('back_forward', documentUrl)
 
-    expect(isHistoryTraverseNavigation()).toBe(true)
-
     history.replaceState(null, '', '/project/default/sql')
     expect(isHistoryTraverseNavigation()).toBe(false)
 
@@ -151,21 +150,6 @@ describe('isHistoryTraverseNavigation', () => {
     expect(isHistoryTraverseNavigation()).toBe(true)
 
     scheduleHistoryTraverseSettlement()
-    expect(isHistoryTraverseNavigation()).toBe(false)
-  })
-
-  test('keeps a document back-forward when the latch is cleared before it is read', () => {
-    mockNavigationType('back_forward')
-    clearHistoryTraverseLatch()
-
-    expect(isHistoryTraverseNavigation()).toBe(true)
-  })
-
-  test('drops a document back-forward once a later navigation clears the latch', () => {
-    mockNavigationType('back_forward')
-    expect(isHistoryTraverseNavigation()).toBe(true)
-
-    clearHistoryTraverseLatch()
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 })

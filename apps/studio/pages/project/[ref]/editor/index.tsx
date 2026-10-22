@@ -11,7 +11,10 @@ import { TableEditorMenu } from '@/components/layouts/TableEditorLayout/TableEdi
 import { NewTab } from '@/components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { acknowledgeHistoryTraverse, isHistoryTraverseNavigation } from '@/lib/history-traverse'
+import {
+  isHistoryTraverseNavigation,
+  settleHistoryTraverseNavigation,
+} from '@/lib/history-traverse'
 import { getLastTableRedirect } from '@/lib/table-editor-redirect'
 import { useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
@@ -27,26 +30,27 @@ const TableEditorPage: NextPageWithLayout = () => {
     isHistoryTraverse: boolean
     hasDecided: boolean
   } | null>(null)
-  if (decisionRef.current === null) {
+  const decision = decisionRef.current
+  const hasProjectChanged = Boolean(
+    projectRef && decision?.projectRef && decision.projectRef !== projectRef
+  )
+  const isLateRef = Boolean(projectRef && decision && decision.projectRef === null)
+
+  if (decision === null) {
     decisionRef.current = {
       projectRef: projectRef ?? null,
       isHistoryTraverse: isHistoryTraverseNavigation(),
       hasDecided: false,
     }
-  } else if (
-    projectRef &&
-    decisionRef.current.projectRef &&
-    decisionRef.current.projectRef !== projectRef
-  ) {
-    // the ref can show up after the first render. recapture only when it changes
-    // from one project to another, so that late ref does not read a settled flag.
+  } else if (hasProjectChanged && projectRef) {
+    // recapture only when the project changes, so a late ref does not read a settled flag
     decisionRef.current = {
       projectRef,
       isHistoryTraverse: isHistoryTraverseNavigation(),
       hasDecided: false,
     }
-  } else if (projectRef && decisionRef.current.projectRef === null) {
-    decisionRef.current.projectRef = projectRef
+  } else if (isLateRef && projectRef) {
+    decision.projectRef = projectRef
   }
 
   const onTableCreated = (table: { id: number }) => {
@@ -68,7 +72,7 @@ const TableEditorPage: NextPageWithLayout = () => {
     // decide once per project. a later schema change on the list must not reopen a table.
     decision.projectRef = projectRef
     decision.hasDecided = true
-    acknowledgeHistoryTraverse()
+    settleHistoryTraverseNavigation()
 
     const redirect = getLastTableRedirect({
       historyEditor: history.editor,

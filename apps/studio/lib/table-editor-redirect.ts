@@ -23,8 +23,8 @@ export function getLastTableRedirect({
   const lastTableTabId = openTabs.find((id) => tableTabTypes.includes(tabsMap[id]?.type ?? ''))
   const lastTableTab = lastTableTabId ? tabsMap[lastTableTabId] : undefined
   const lastTabId = lastTableTab?.metadata?.tableId
-  // Tabs are keyed by a prefixed id (e.g. "r-293522"), but history only stores
-  // the bare table id, so look up the tab by its metadata instead of by key.
+  // tabs are keyed by a prefixed id (e.g. "r-293522"), but history only stores
+  // the bare table id, so look the tab up by its metadata
   const historyTable = hasHistoryTable
     ? Object.values(tabsMap).find(
         (tab) =>
@@ -36,6 +36,11 @@ export function getLastTableRedirect({
     : { tableId: lastTabId, schema: lastTableTab?.metadata?.schema }
 
   if (lastTable.tableId === undefined) {
+    return null
+  }
+
+  // an explicit ?schema= stays on the list unless the last table is known to be in it
+  if (explicitSchema && lastTable.schema !== explicitSchema) {
     return null
   }
 

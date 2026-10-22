@@ -64,7 +64,6 @@ import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import {
-  clearHistoryTraverseLatch,
   markHistoryTraverseShellReady,
   scheduleHistoryTraverseSettlement,
   settleHistoryTraverseNavigation,
@@ -186,16 +185,13 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   }, [])
 
   useEffect(() => {
-    const handleRouteChangeStart = () => clearHistoryTraverseLatch()
     const handleRouteSettled = () => scheduleHistoryTraverseSettlement()
     const handleRouteChangeError = () => settleHistoryTraverseNavigation()
-    Router.events.on('routeChangeStart', handleRouteChangeStart)
     Router.events.on('routeChangeComplete', handleRouteSettled)
     Router.events.on('hashChangeComplete', handleRouteSettled)
     Router.events.on('routeChangeError', handleRouteChangeError)
     markHistoryTraverseShellReady()
     return () => {
-      Router.events.off('routeChangeStart', handleRouteChangeStart)
       Router.events.off('routeChangeComplete', handleRouteSettled)
       Router.events.off('hashChangeComplete', handleRouteSettled)
       Router.events.off('routeChangeError', handleRouteChangeError)

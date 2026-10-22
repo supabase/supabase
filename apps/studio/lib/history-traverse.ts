@@ -1,42 +1,36 @@
-// NOTE: router.tsx imports this module before createRouter reaches TanStack
-// createBrowserHistory, which copies pushState. The flag lives on window
-// because that copy is an unmarked wrapper. popstate also fires before the
-// page chunk loads.
+// router.tsx imports this before createRouter copies pushState. the flag lives
+// on window because that copy is an unmarked wrapper, and popstate fires
+// before the page chunk loads.
 
-const TRAVERSE_STATE = '__studioHistoryTraverseState'
-
-type TraverseState = {
+interface HistoryTraverseState {
   isInstalled: boolean
   isTraverseNavigation: boolean
-  hasClientPush: boolean
   isShellReady: boolean
-  // The document back-forward entry is only a traverse on its own URL, and only
-  // until something reads it. A later replace or same-URL push (Next skips
-  // pushState when the URL is unchanged) must not skip the redirect.
+  // a document back-forward is only a traverse on its own url, and only for
+  // the first read. the editor copies that read into its decision.
   documentConsumed: boolean
-  latchedHref: string | null
-  latchedValue: boolean | null
 }
 
-function getTraverseState(): TraverseState {
-  const host = window as Window & { [TRAVERSE_STATE]?: TraverseState }
+declare global {
+  interface Window {
+    __studioHistoryTraverseState?: HistoryTraverseState
+  }
+}
 
-  if (!host[TRAVERSE_STATE]) {
-    host[TRAVERSE_STATE] = {
+function getTraverseState(): HistoryTraverseState {
+  if (!window.__studioHistoryTraverseState) {
+    window.__studioHistoryTraverseState = {
       isInstalled: false,
       isTraverseNavigation: false,
-      hasClientPush: false,
       isShellReady: false,
       documentConsumed: false,
-      latchedHref: null,
-      latchedValue: null,
     }
   }
 
-  return host[TRAVERSE_STATE]
+  return window.__studioHistoryTraverseState
 }
 
-function isNavigationTiming(entry: PerformanceEntry): entry is PerformanceNavigationTiming {
+function isNavigationTiming(entry: unknown): entry is PerformanceNavigationTiming {
   if (
     typeof PerformanceNavigationTiming !== 'undefined' &&
     entry instanceof PerformanceNavigationTiming
@@ -44,9 +38,10 @@ function isNavigationTiming(entry: PerformanceEntry): entry is PerformanceNaviga
     return true
   }
 
-  // jsdom does not implement PerformanceNavigationTiming, so unit tests pass a
-  // plain entry. The discriminant is the navigation type.
-  if (!('type' in entry) || typeof entry.name !== 'string') return false
+  // jsdom has no PerformanceNavigationTiming, so tests pass a plain entry
+  if (typeof entry !== 'object' || entry === null) return false
+  if (!('type' in entry) || !('name' in entry)) return false
+  if (typeof entry.name !== 'string' || typeof entry.type !== 'string') return false
 
   return (
     entry.type === 'navigate' ||
@@ -83,9 +78,8 @@ export function installHistoryTraverseListener(): void {
   const originalPushState = history.pushState.bind(history)
   history.pushState = (data, unused, url) => {
     state.isTraverseNavigation = false
-    state.hasClientPush = true
-    state.latchedHref = null
-    state.latchedValue = null
+    // a client push is a new visit, so a later read must not reuse this document's back-forward
+    state.documentConsumed = true
     return originalPushState(data, unused, url)
   }
 }
@@ -95,9 +89,8 @@ export function settleHistoryTraverseNavigation(): void {
     return
   }
 
-  // Clear the popstate bit only. A document back-forward load stays latched
-  // until the next navigation: settling here also runs before a deferred
-  // page render, and hiding that load would make the editor miss it.
+  // clear only the popstate bit. a document back-forward stays until the editor
+  // reads it, because this can run before that render.
   getTraverseState().isTraverseNavigation = false
 }
 
@@ -111,8 +104,8 @@ export function markHistoryTraverseShellReady(): void {
   settleHistoryTraverseNavigation()
 }
 
-// Settle immediately once the shell has painted. A timer can run before a
-// transition-deferred render and clear the popstate bit first.
+// settle once the shell has painted. a timer can clear the popstate bit before
+// a transition-deferred render reads it.
 export function scheduleHistoryTraverseSettlement(): void {
   if (typeof window === 'undefined') {
     return
@@ -125,30 +118,15 @@ export function scheduleHistoryTraverseSettlement(): void {
   settleHistoryTraverseNavigation()
 }
 
-// Drop the latched document decision so the next read runs again. Call this
-// from the start of a client navigation, including a same-URL push that never
-// hits pushState. The editor's first read on a document load happens before
-// that event, so this does not hide the load it is already on.
-export function clearHistoryTraverseLatch(): void {
-  if (typeof window === 'undefined') {
-    return
-  }
-
-  const state = getTraverseState()
-  state.latchedHref = null
-  state.latchedValue = null
-}
-
-function readDocumentBackForward(state: TraverseState): boolean {
+function readDocumentBackForward(state: HistoryTraverseState): boolean {
   if (state.documentConsumed) return false
 
   const entry = getNavigationTiming()
   if (!entry || entry.type !== 'back_forward') return false
 
-  if (entry.name !== window.location.href) {
-    state.documentConsumed = true
-    return false
-  }
+  state.documentConsumed = true
+
+  if (entry.name !== window.location.href) return false
 
   return true
 }
@@ -164,42 +142,7 @@ export function isHistoryTraverseNavigation(): boolean {
     return true
   }
 
-  if (state.hasClientPush) {
-    return false
-  }
-
-  const href = window.location.href
-  if (state.latchedHref === href && state.latchedValue !== null) {
-    return state.latchedValue
-  }
-
-  const isDocumentBackForward = readDocumentBackForward(state)
-  state.latchedHref = href
-  state.latchedValue = isDocumentBackForward
-  if (isDocumentBackForward) {
-    state.documentConsumed = true
-  }
-  return isDocumentBackForward
-}
-
-// The editor calls this after it has copied the flag into its decision, so a
-// cancelled or settled popstate cannot leak into the next project.
-export function acknowledgeHistoryTraverse(): void {
-  settleHistoryTraverseNavigation()
-}
-
-export function resetHistoryTraverseState(): void {
-  if (typeof window === 'undefined') {
-    return
-  }
-
-  const state = getTraverseState()
-  state.isTraverseNavigation = false
-  state.hasClientPush = false
-  state.isShellReady = false
-  state.documentConsumed = false
-  state.latchedHref = null
-  state.latchedValue = null
+  return readDocumentBackForward(state)
 }
 
 installHistoryTraverseListener()
