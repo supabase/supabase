@@ -31,17 +31,20 @@ function topNavLevels(menu: GlobalMenuItems): Level[] {
 }
 
 function oversizedLevels(navItems: Record<string, unknown>): string[] {
-  const sidebars = Object.values(navItems).filter(
-    (value): value is { title: string; items: NavNode[] } =>
-      typeof value === 'object' &&
-      value !== null &&
-      'title' in value &&
-      Array.isArray((value as { items?: unknown }).items)
+  // A sidebar shared by several URL prefixes is exported under each name.
+  const sidebars = new Set(
+    Object.values(navItems).filter(
+      (value): value is { title: string; items: NavNode[] } =>
+        typeof value === 'object' &&
+        value !== null &&
+        'title' in value &&
+        Array.isArray((value as { items?: unknown }).items)
+    )
   )
 
   return [
     ...topNavLevels(navItems.GLOBAL_MENU_ITEMS as GlobalMenuItems),
-    ...sidebars.flatMap((sidebar) => sidebarLevels(sidebar.title, sidebar.items)),
+    ...[...sidebars].flatMap((sidebar) => sidebarLevels(sidebar.title, sidebar.items)),
   ]
     .filter((level) => level.size > MAX_ITEMS)
     .map((level) => level.path)
@@ -68,7 +71,23 @@ const ALLOWLIST = [
   'Start with Supabase > Web app demos',
   'Storage > File Buckets',
 ]
-const OPTION_1_ALLOWLIST = ALLOWLIST
+const OPTION_1_ALLOWLIST = [
+  'Auth',
+  'Auth > Flows (How-tos)',
+  'Auth > Flows (How-tos) > Social Login (OAuth)',
+  'Database',
+  'Database > Extensions',
+  'Database > Foreign Data Wrappers > Sources',
+  'Database > Working with your database (intermediate)',
+  'Edge Functions',
+  'Edge Functions > Examples',
+  'Edge Functions > Third-Party Tools',
+  'Self-Hosting',
+  'Self-Hosting > How-to Guides',
+  'Start with Supabase > Framework Quickstarts',
+  'Start with Supabase > Web app demos',
+  'Storage > File Buckets',
+]
 
 describe('navigation level size', () => {
   it.each([
