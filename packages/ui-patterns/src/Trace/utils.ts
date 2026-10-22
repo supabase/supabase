@@ -320,3 +320,18 @@ export function formatAttributeValue(value: unknown): string {
   if (value === null || typeof value !== 'object') return String(value)
   return JSON.stringify(value)
 }
+
+export function areAllCollapsed(index: TraceIndex, collapsed: ReadonlySet<string>): boolean {
+  if (index.childrenOf.size === 0) return false
+  for (const id of index.childrenOf.keys()) {
+    if (!collapsed.has(id)) return false
+  }
+  return true
+}
+
+export function toggleAllCollapsed(
+  index: TraceIndex,
+  collapsed: ReadonlySet<string>
+): ReadonlySet<string> {
+  return areAllCollapsed(index, collapsed) ? new Set() : new Set(index.childrenOf.keys())
+}

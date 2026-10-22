@@ -3,7 +3,7 @@
 import { createContext, use, useCallback, useMemo, useRef, useState } from 'react'
 
 import type { RootProps, TimeWindow, TraceIndex, ViewContextValue } from './types'
-import { buildTraceIndex, clampWindow } from './utils'
+import { buildTraceIndex, clampWindow, toggleAllCollapsed } from './utils'
 
 const TraceContext = createContext<TraceIndex | null>(null)
 const ViewContext = createContext<ViewContextValue | null>(null)
@@ -28,6 +28,11 @@ export function Root({ trace, minRangeMs, defaultCollapsed, children }: RootProp
     })
   }, [])
 
+  const toggleCollapseAll = useCallback(
+    () => setCollapsedIds((previous) => toggleAllCollapsed(index, previous)),
+    [index]
+  )
+
   const { bounds } = index
   const [zoom, setZoom] = useState<TimeWindow | null>(null)
   const window = useMemo(() => (zoom ? clampWindow(zoom, bounds) : bounds), [zoom, bounds])
@@ -46,11 +51,12 @@ export function Root({ trace, minRangeMs, defaultCollapsed, children }: RootProp
       isZoomed: zoom !== null,
       select,
       setCollapsed,
+      toggleCollapseAll,
       setWindow,
       resetWindow,
       treeRef,
     }),
-    [selectedId, collapsed, window, zoom, setCollapsed, setWindow, resetWindow]
+    [selectedId, collapsed, window, zoom, setCollapsed, toggleCollapseAll, setWindow, resetWindow]
   )
 
   return (
