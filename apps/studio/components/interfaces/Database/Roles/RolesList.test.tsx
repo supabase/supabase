@@ -75,6 +75,51 @@ function mockRolesApis() {
   })
 }
 
+function mockRolesDeleteFlow() {
+  let deleted = false
+
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: ({ request }) => {
+      const key = new URL(request.url).searchParams.get('key')
+
+      if (key === 'max-connections') {
+        return HttpResponse.json<[{ max_connections: number }]>([{ max_connections: 60 }])
+      }
+
+      if (key === 'database-roles') {
+        return HttpResponse.json<PgRole[]>(deleted ? [] : [customRole])
+      }
+
+      deleted = true
+      return HttpResponse.json<[]>([])
+    },
+  })
+}
+
+// customRender mounts the nuqs testing adapter, which never calls history.forward or listens for popstate.
+function renderWithRealHistory() {
+  window.history.replaceState(null, '', '/project/default/database/roles')
+  installNavigationDouble()
+
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  })
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <NuqsAdapter>
+        <TooltipProvider>
+          <CommandProvider openKey="">
+            <RolesList />
+          </CommandProvider>
+        </TooltipProvider>
+      </NuqsAdapter>
+    </QueryClientProvider>
+  )
+}
+
 const customRole: PgRole = {
   id: 4,
   name: 'custom_role',
@@ -133,45 +178,8 @@ describe('RolesList URL history', () => {
   })
 
   it('clears a deleted role id when forward restores it', async () => {
-    let deleted = false
-
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: ({ request }) => {
-        const key = new URL(request.url).searchParams.get('key')
-
-        if (key === 'max-connections') {
-          return HttpResponse.json([{ max_connections: 60 }])
-        }
-
-        if (key === 'database-roles') {
-          return HttpResponse.json(deleted ? [] : [customRole])
-        }
-
-        deleted = true
-        return HttpResponse.json([])
-      },
-    })
-
-    window.history.replaceState(null, '', '/project/default/database/roles')
-    installNavigationDouble()
-
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-    })
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <NuqsAdapter>
-          <TooltipProvider>
-            <CommandProvider openKey="">
-              <RolesList />
-            </CommandProvider>
-          </TooltipProvider>
-        </NuqsAdapter>
-      </QueryClientProvider>
-    )
+    mockRolesDeleteFlow()
+    renderWithRealHistory()
 
     await userEvent.click(await screen.findByRole('button', { name: 'custom_role actions' }))
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }))
@@ -201,45 +209,8 @@ describe('RolesList URL history', () => {
   })
 
   it('clears a different missing role id after a successful delete', async () => {
-    let deleted = false
-
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: ({ request }) => {
-        const key = new URL(request.url).searchParams.get('key')
-
-        if (key === 'max-connections') {
-          return HttpResponse.json([{ max_connections: 60 }])
-        }
-
-        if (key === 'database-roles') {
-          return HttpResponse.json(deleted ? [] : [customRole])
-        }
-
-        deleted = true
-        return HttpResponse.json([])
-      },
-    })
-
-    window.history.replaceState(null, '', '/project/default/database/roles')
-    installNavigationDouble()
-
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
-    })
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <NuqsAdapter>
-          <TooltipProvider>
-            <CommandProvider openKey="">
-              <RolesList />
-            </CommandProvider>
-          </TooltipProvider>
-        </NuqsAdapter>
-      </QueryClientProvider>
-    )
+    mockRolesDeleteFlow()
+    renderWithRealHistory()
 
     await userEvent.click(await screen.findByRole('button', { name: 'custom_role actions' }))
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }))

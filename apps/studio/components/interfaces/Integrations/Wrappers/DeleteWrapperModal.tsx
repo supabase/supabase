@@ -80,7 +80,9 @@ export const DeleteWrapperModal = () => {
     })
 
     if (action === 'keep') return
-    if (action === 'clear-and-notify') toast('Wrapper not found')
+    if (action === 'clear-and-notify') {
+      toast('Wrapper not found')
+    }
     setSelectedWrapperToDelete(null, { history: 'replace' })
   }, [
     deletedWrapper,

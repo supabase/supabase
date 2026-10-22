@@ -160,7 +160,9 @@ export const Indexes = () => {
     })
 
     if (action === 'keep') return
-    if (action === 'clear-and-notify') toast('Index not found')
+    if (action === 'clear-and-notify') {
+      toast('Index not found')
+    }
     setDeleteIndexId(null, { history: 'replace' })
   }, [
     deleteIndexId,

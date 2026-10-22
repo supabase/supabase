@@ -38,6 +38,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -63,6 +64,7 @@ export const EnumeratedTypes = () => {
     mutate: deleteEnumeratedType,
     isPending: isDeleting,
     isSuccess: isSuccessDelete,
+    variables: deletedType,
   } = useEnumeratedTypeDeleteMutation({
     onSuccess: (_, vars) => {
       toast.success(`Successfully deleted type "${vars.name}"`)
@@ -121,6 +123,7 @@ export const EnumeratedTypes = () => {
       connectionString: project?.connectionString,
       name: typeToDelete.name,
       schema: typeToDelete.schema,
+      id: typeToDelete.id,
     })
   }
 
@@ -132,11 +135,27 @@ export const EnumeratedTypes = () => {
   }, [isSuccess, selectedTypeIdToEdit, setSelectedTypeIdToEdit, typeToEdit])
 
   useEffect(() => {
-    if (isSuccess && !!selectedTypeIdToDelete && !typeToDelete && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: selectedTypeIdToDelete,
+      resourceFound: !!typeToDelete,
+      isSuccessDelete,
+      deletedId: deletedType?.id,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('Type cannot be found')
-      setSelectedTypeIdToDelete(null, { history: 'replace' })
     }
-  }, [isSuccess, selectedTypeIdToDelete, setSelectedTypeIdToDelete, typeToDelete, isSuccessDelete])
+    setSelectedTypeIdToDelete(null, { history: 'replace' })
+  }, [
+    deletedType,
+    isSuccess,
+    isSuccessDelete,
+    selectedTypeIdToDelete,
+    setSelectedTypeIdToDelete,
+    typeToDelete,
+  ])
 
   return (
     <div className="space-y-4">

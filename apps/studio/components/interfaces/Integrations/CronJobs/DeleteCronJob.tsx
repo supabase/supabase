@@ -68,7 +68,9 @@ export const DeleteCronJob = () => {
     })
 
     if (action === 'keep') return
-    if (action === 'clear-and-notify') toast('Cron job not found')
+    if (action === 'clear-and-notify') {
+      toast('Cron job not found')
+    }
     setCronJobForDeletion(null, { history: 'replace' })
   }, [
     cronJob,

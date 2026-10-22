@@ -25,6 +25,7 @@ import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 
 export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
@@ -77,6 +78,7 @@ export const EdgeFunctionSecrets = () => {
     mutate: deleteSecret,
     isPending: isDeleting,
     isSuccess: isSuccessDelete,
+    variables: deletedSecret,
   } = useSecretsDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully deleted secret “${variables.secrets[0]}”`)
@@ -109,11 +111,21 @@ export const EdgeFunctionSecrets = () => {
   }, [isSuccess, selectedIdToEdit, selectedSecretToEdit, setSelectedIdToEdit])
 
   useEffect(() => {
-    if (!!selectedIdToDelete && isSuccess && !selectedSecretToDelete && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: selectedIdToDelete,
+      resourceFound: !!selectedSecretToDelete,
+      isSuccessDelete,
+      deletedId: deletedSecret?.secrets[0],
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast(`Secret ${selectedIdToDelete} cannot be found`)
-      setSelectedIdToDelete(null, { history: 'replace' })
     }
+    setSelectedIdToDelete(null, { history: 'replace' })
   }, [
+    deletedSecret,
     isSuccess,
     isSuccessDelete,
     selectedIdToDelete,

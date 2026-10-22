@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   armPanelPush,
   dismissPanelUrl,
+  isPanelHistoryTraversalTo,
   registerPanelBackGuard,
   replacePanelUrl,
   resetPanelHistoryForTests,
@@ -309,6 +310,7 @@ describe('panel history', () => {
     dismissPanelUrl('new', vi.fn())
 
     await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(isPanelHistoryTraversalTo(window.location.href)).toBe(false)
   })
 
   it('expires each armed key on its own timer', () => {
@@ -325,6 +327,38 @@ describe('panel history', () => {
 
     expect(back).toHaveBeenCalledOnce()
     expect(replace).not.toHaveBeenCalled()
+  })
+
+  it('redispatches the swallowed popstate when a restore never lands', () => {
+    vi.useFakeTimers()
+    const onBlock = vi.fn()
+    const unsubscribe = registerPanelBackGuard({
+      shouldBlock: () => true,
+      onBlock,
+    })
+    const popped: string[] = []
+    const onPopState = () => {
+      popped.push(window.location.href)
+    }
+    window.addEventListener('popstate', onPopState)
+
+    armPanelPush('new')
+    window.history.pushState(null, '', PANEL_URL)
+    const panelHref = window.location.href
+    consumeUserActivation()
+    userTraverse(-1)
+    vi.spyOn(window.history, 'go').mockImplementation(() => undefined)
+    vi.advanceTimersByTime(0)
+
+    expect(popped).toEqual([])
+    expect(window.location.href).not.toBe(panelHref)
+
+    vi.advanceTimersByTime(1000)
+
+    expect(popped).toEqual([window.location.href])
+    expect(onBlock).not.toHaveBeenCalled()
+    window.removeEventListener('popstate', onPopState)
+    unsubscribe()
   })
 
   it('stops swallowing popstate when a restore never arrives', () => {

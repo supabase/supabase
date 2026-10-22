@@ -11,6 +11,7 @@ export type EnumeratedTypeDeleteVariables = {
   connectionString: string | null
   name: string
   schema: string
+  id: number
 }
 
 export async function deleteEnumeratedType({

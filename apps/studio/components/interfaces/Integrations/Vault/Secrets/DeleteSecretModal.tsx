@@ -67,7 +67,9 @@ export const DeleteSecretModal = () => {
     })
 
     if (action === 'keep') return
-    if (action === 'clear-and-notify') toast('Secret not found')
+    if (action === 'clear-and-notify') {
+      toast('Secret not found')
+    }
     setSelectedSecretToDelete(null, { history: 'replace' })
   }, [
     deletedSecret,

@@ -238,7 +238,9 @@ execute function function_name();`
     })
 
     if (action === 'keep') return
-    if (action === 'clear-and-notify') toast('Trigger not found')
+    if (action === 'clear-and-notify') {
+      toast('Trigger not found')
+    }
     setTriggerToDelete(null, { history: 'replace' })
   }, [
     deletedTrigger,

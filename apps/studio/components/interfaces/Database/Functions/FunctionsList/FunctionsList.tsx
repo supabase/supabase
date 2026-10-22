@@ -248,7 +248,9 @@ export const FunctionsList = () => {
     })
 
     if (action === 'keep') return
-    if (action === 'clear-and-notify') toast('Function not found')
+    if (action === 'clear-and-notify') {
+      toast('Function not found')
+    }
     setSelectedFunctionToDelete(null, { history: 'replace' })
   }, [
     deletedFunction,

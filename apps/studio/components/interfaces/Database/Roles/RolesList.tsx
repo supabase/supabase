@@ -126,7 +126,9 @@ export const RolesList = () => {
     })
 
     if (action === 'keep') return
-    if (action === 'clear-and-notify') toast('Role cannot be found')
+    if (action === 'clear-and-notify') {
+      toast('Role cannot be found')
+    }
     setSelectedRoleIdToDelete(null, { history: 'replace' })
   }, [
     deletedRole,

@@ -239,7 +239,9 @@ export const OAuthAppsList = () => {
     })
 
     if (action === 'keep') return
-    if (action === 'clear-and-notify') toast('App not found')
+    if (action === 'clear-and-notify') {
+      toast('App not found')
+    }
     setSelectedAppToDelete(null, { history: 'replace' })
   }, [
     appToDelete,

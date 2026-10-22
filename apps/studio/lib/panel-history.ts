@@ -314,11 +314,19 @@ function scheduleRestore(guard: PanelGuard, delta: number, expectedHref: string)
 
     if (generation !== latest.restoreGeneration || !latest.restoring) return
 
+    const missedHref = latest.expectedRestoreHref
+
     latest.restoring = false
     latest.pendingGuard = null
     latest.expectedRestoreHref = null
     latest.restoreTimer = null
     detachPopStateListener()
+
+    // The back popstate was swallowed, and go() never restored the panel.
+    // nuqs and Next still have the panel url until they see this popstate.
+    if (missedHref && window.location.href !== missedHref) {
+      window.dispatchEvent(new PopStateEvent('popstate', { state: window.history.state }))
+    }
   }, RESTORE_TIMEOUT_MS)
 
   window.setTimeout(() => {
@@ -450,17 +458,18 @@ export function bindPanelTraversalRouter(events: RouterEvents) {
   }
 }
 
+function isPromise(value: unknown): value is Promise<unknown> {
+  return value instanceof Promise
+}
+
 function swallowAbortedNavigation(result: unknown) {
   if (typeof result !== 'object' || result === null) return
-
-  for (const key of ['committed', 'finished']) {
-    const promise = Reflect.get(result, key)
-    if (!(promise instanceof Promise)) continue
-
-    promise.catch(() => {
-      clearPendingDestination()
+  ;(['committed', 'finished'] as const)
+    .map((key) => Reflect.get(result, key))
+    .filter(isPromise)
+    .forEach((promise) => {
+      promise.catch(clearPendingDestination)
     })
-  }
 }
 
 function traverseBy(delta: number) {

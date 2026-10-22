@@ -162,13 +162,7 @@ export function isStaleDeletedPanelId(
 
 export type MissingPanelIdAction = 'keep' | 'clear-silently' | 'clear-and-notify'
 
-/**
- * A missing delete-panel id is always replaced away.
- * The id from the successful delete is cleared with no toast, so Forward
- * does not announce a resource this session just removed.
- * Any other missing id is the normal not-found case, even while that
- * mutation is still successful.
- */
+/** How to clear a delete-panel id that is not in the loaded list. */
 export function missingPanelIdAction({
   listLoaded,
   currentId,
@@ -183,6 +177,8 @@ export function missingPanelIdAction({
   deletedId: unknown
 }): MissingPanelIdAction {
   if (!listLoaded || resourceFound || isPanelValueClear(currentId)) return 'keep'
+  // The successful delete stays true, so Forward of that same id must not toast.
+  // A different missing id is still the normal not-found case.
   if (isStaleDeletedPanelId(currentId, isSuccessDelete, deletedId)) return 'clear-silently'
   return 'clear-and-notify'
 }
