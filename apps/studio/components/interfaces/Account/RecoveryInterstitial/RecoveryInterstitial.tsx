@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag, useUser } from 'common'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, CardFooter } from 'ui'
@@ -10,15 +10,10 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryCodesModal'
 import { AuthenticatorTask } from './AuthenticatorTask'
-import { PreviewRecoveryCodesFlow } from './PreviewRecoveryCodesFlow'
-import {
-  getMockRecoveryGap,
-  getRecoveryGap,
-  getRecoveryReturnTo,
-  type RecoveryGap,
-} from './RecoveryInterstitial.utils'
+import { getRecoveryGap, getRecoveryReturnTo, type RecoveryGap } from './RecoveryInterstitial.utils'
 import { RecoveryTaskRow } from './RecoveryTaskRow'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { profileKeys } from '@/data/profile/keys'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
@@ -32,25 +27,9 @@ import { useTrack } from '@/lib/telemetry/track'
 import { BASE_PATH } from '@/lib/constants'
 
 export const RecoveryInterstitial = () => {
-  const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
   const [returnTo] = useQueryState('returnTo', parseAsString)
-  const [mockTasks] = useQueryState('mockRecoveryTasks', parseAsString)
-  const mockGap = getMockRecoveryGap(
-    mock,
-    process.env.NODE_ENV === 'development',
-    process.env.NEXT_PUBLIC_VERCEL_ENV
-  )
   const destination = getRecoveryReturnTo(returnTo, BASE_PATH)
 
-  if (mockGap)
-    return (
-      <RecoveryReminder
-        gap={mockGap}
-        destination={destination}
-        isPreview
-        hasAuthenticatorTask={mockTasks !== 'codes'}
-      />
-    )
   return <LiveRecoveryReminder destination={destination} />
 }
 
@@ -70,6 +49,7 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
       gap={gap}
       destination={destination}
       isLoading={isPending}
+      isError={isError}
       hasAuthenticatorTask={verifiedFactorCount === 1}
       onAction={(actionType) => track('account_recovery_action_clicked', { actionType })}
       onTaskComplete={(taskType) => track('account_recovery_task_completed', { taskType })}
@@ -103,8 +83,8 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
 export const RecoveryReminder = ({
   gap,
   destination,
-  isPreview = false,
   isLoading = false,
+  isError = false,
   hasAuthenticatorTask = true,
   onCodesComplete,
   onFactorComplete,
@@ -114,8 +94,8 @@ export const RecoveryReminder = ({
 }: {
   gap: RecoveryGap | null
   destination: string
-  isPreview?: boolean
   isLoading?: boolean
+  isError?: boolean
   hasAuthenticatorTask?: boolean
   onCodesComplete?: () => void
   onFactorComplete?: () => void
@@ -131,6 +111,24 @@ export const RecoveryReminder = ({
   const [isFactorComplete, setIsFactorComplete] = useState(false)
   // Preserve all task dialogs and completed rows during background status updates.
   const activeGap = startedGap ?? gap
+  if (!activeGap && isError) {
+    return (
+      <InterstitialLayout
+        logo={<SupabaseLogo />}
+        title="Account recovery check unavailable"
+        widthClassName="max-w-md"
+      >
+        <div className="px-6">
+          <AlertError subject="Failed to check account recovery" />
+        </div>
+        <CardFooter className="justify-center">
+          <Button asChild size="tiny">
+            <a href={destination}>Continue</a>
+          </Button>
+        </CardFooter>
+      </InterstitialLayout>
+    )
+  }
   if (!activeGap) {
     return (
       <InterstitialLayout
@@ -216,18 +214,11 @@ export const RecoveryReminder = ({
           description={getCodesDescription(isExhausted, areCodesSaved)}
           isComplete={areCodesSaved}
         >
-          {isPreview && (
-            <PreviewRecoveryCodesFlow
-              action={isExhausted ? 'regenerate' : 'generate'}
-              {...flowProps}
-            />
-          )}
-          {!isPreview && isExhausted && <RegenerateRecoveryCodesModal {...flowProps} />}
-          {!isPreview && !isExhausted && <GenerateRecoveryCodesModal {...flowProps} />}
+          {isExhausted && <RegenerateRecoveryCodesModal {...flowProps} />}
+          {!isExhausted && <GenerateRecoveryCodesModal {...flowProps} />}
         </RecoveryTaskRow>
         {(startedHasAuthenticatorTask ?? hasAuthenticatorTask) && (
           <AuthenticatorTask
-            isPreview={isPreview}
             onStart={() => {
               handleStart()
               onAction?.('add_factor')
@@ -249,7 +240,7 @@ export const RecoveryReminder = ({
           className={areCodesSaved || isFactorComplete ? '' : 'text-foreground-lighter'}
           iconRight={
             areCodesSaved || isFactorComplete ? (
-              <ArrowRight size={14} aria-hidden="true" />
+              <ArrowRightIcon size={14} aria-hidden="true" />
             ) : undefined
           }
         >

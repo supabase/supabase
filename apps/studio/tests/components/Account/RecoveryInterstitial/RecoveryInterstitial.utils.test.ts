@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  getMockRecoveryGap,
   getRecoveryGap,
   getRecoveryReturnTo,
 } from '@/components/interfaces/Account/RecoveryInterstitial/RecoveryInterstitial.utils'
@@ -70,21 +69,5 @@ describe('return destination', () => {
     '/ /evil',
   ])('rejects unsafe or looping destination %s', (value) => {
     expect(getRecoveryReturnTo(value)).toBe('/organizations')
-  })
-})
-
-describe('mock preview', () => {
-  it('accepts only known fixtures in development', () => {
-    expect(getMockRecoveryGap('missing', true)).toBe('missing')
-    expect(getMockRecoveryGap('exhausted', true)).toBe('exhausted')
-    expect(getMockRecoveryGap('unknown', true)).toBeNull()
-    expect(getMockRecoveryGap('exhausted', false)).toBeNull()
-  })
-  it('accepts fixtures on Vercel previews but rejects production deployments', () => {
-    expect(getMockRecoveryGap('missing', false, 'preview')).toBe('missing')
-    expect(getMockRecoveryGap('exhausted', false, 'preview')).toBe('exhausted')
-    expect(getMockRecoveryGap('unknown', false, 'preview')).toBeNull()
-    expect(getMockRecoveryGap('exhausted', false, 'production')).toBeNull()
-    expect(getMockRecoveryGap('exhausted', false)).toBeNull()
   })
 })
