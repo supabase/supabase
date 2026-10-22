@@ -1021,7 +1021,7 @@ withTestDatabase(
 
     await expect(
       executeQuery(
-        \`BEGIN; ${createColumnSql} ALTER TABLE public.t ADD CONSTRAINT invalid_fk FOREIGN KEY (id) REFERENCES public.missing(id); COMMIT;\`
+        `BEGIN; ${createColumnSql} ALTER TABLE public.t ADD CONSTRAINT invalid_fk FOREIGN KEY (id) REFERENCES public.missing(id); COMMIT;`
       )
     ).rejects.toThrow()
     await executeQuery('ROLLBACK;')
@@ -1055,7 +1055,7 @@ withTestDatabase('column updates can be composed in a caller transaction', async
   expect(updateSql).not.toContain('BEGIN;')
   expect(updateSql).not.toContain('COMMIT;')
 
-  await executeQuery(\`BEGIN; ${updateSql} COMMIT;\`)
+  await executeQuery(`BEGIN; ${updateSql} COMMIT;`)
   const { sql: updatedColumnSql, zod: updatedColumnZod } = pgMeta.columns.retrieve({
     schema: 'public',
     table: 't',
