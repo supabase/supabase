@@ -40,11 +40,11 @@ Most buckets have a maximum capacity of 30 requests. When a bucket is full, brie
 
 This means a client that has been idle will tolerate a brief spike in traffic, but sustained requests above the rate limit are denied. When rate limits are exceeded, a **429 Too Many Requests** error is returned.
 
-To test auth flows without hitting these limits, see [Test auth flows](/docs/guides/auth/testing-auth-flows).
-
 The table below shows the rate limit quotas and additional details for authentication endpoints.
 
 <$Partial path="auth_rate_limits.mdx" />
+
+To test auth flows without hitting these limits, see [Test auth flows](/docs/guides/auth/testing-auth-flows).
 
 ## IP address forwarding
 

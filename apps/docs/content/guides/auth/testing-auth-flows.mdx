@@ -5,9 +5,11 @@ subtitle: 'Test email and phone sign-in without hitting email and SMS limits'
 
 Test sign-up, sign-in, and password recovery as often as you need without waiting on email or SMS limits. Develop against local Supabase to capture every email in Mailpit, and use test phone numbers to sign in with a fixed code.
 
+The local development steps need the Supabase CLI and a project initialized with `supabase init`. To set them up, see [Supabase CLI](/docs/guides/local-development/cli/getting-started).
+
 ## Test email flows locally
 
-The Supabase CLI sends every email from local Auth to [Mailpit](https://github.com/axllent/mailpit), an email testing server that runs with your local stack. No email leaves your machine, so you can send to any address. The hourly email limit for hosted projects doesn't apply.
+The Supabase CLI sends every email from local Auth to [Mailpit](https://github.com/axllent/mailpit), an email testing server that runs with your local stack. No email leaves your machine, so you can send to any address. Local Auth has no hourly email limit.
 
 1. In your project directory, start the local stack:
 
@@ -22,7 +24,7 @@ The Supabase CLI sends every email from local Auth to [Mailpit](https://github.c
    ```
 
 3. Set your app's Supabase URL to the API URL from `supabase status`, and then sign up or request a magic link.
-4. Open the Mailpit URL in your browser, and open the email to get the link or code.
+4. Go to the Mailpit URL in your browser, and open the email to get the link or code.
 
 Local Auth limits how often it sends to the same address. By default, it sends one email per address per second. To change this, set `max_frequency` under `[auth.email]` in `supabase/config.toml`.
 
@@ -32,20 +34,20 @@ Email confirmation is off by default in local development and on by default for 
 
 Hosted projects send email through a built-in email service until you set up custom SMTP. The built-in service is for trying out Auth, and it has the following limits:
 
-- It sends only to the email addresses of your organization's team members. Other addresses fail with `Email address not authorized`.
+- It sends only to the email addresses of your organization's team members. Other addresses fail with the error code `email_address_not_authorized`.
 - It sends <SharedData data="config">auth.rate_limits.email.inbuilt_smtp_per_hour.value</SharedData> emails per hour across the whole project while **Confirm email** is on. When the project reaches the limit, Auth returns a `429` error with the code `over_email_send_rate_limit` and the message `email rate limit exceeded`.
 
-To send to any address and raise the limit, [set up custom SMTP](/docs/guides/auth/auth-smtp) or the [Send Email hook](/docs/guides/auth/auth-hooks/send-email-hook). You can then change the email limit in [**Authentication** > **Rate Limits**](/dashboard/project/_/auth/rate-limits). For more information about the limits, see [Rate limits](/docs/guides/auth/rate-limits).
+To send to any address and raise the limit, set up [custom SMTP](/docs/guides/auth/auth-smtp) or the [Send Email hook](/docs/guides/auth/auth-hooks/send-email-hook). You can then change the email limit in [**Authentication** > **Rate Limits**](/dashboard/project/_/auth/rate-limits). For more information about the limits, see [Rate limits](/docs/guides/auth/rate-limits).
 
 <Admonition type="caution">
 
-Turning off **Confirm email** lets anyone sign up with an email address they don't own, and Auth marks that address as confirmed. It also turns off the hourly email limit, so nothing caps how many emails your project sends. If you turn it off while testing, turn it back on in [**Authentication** > **Sign In / Providers**](/dashboard/project/_/auth/providers) before you launch.
+Turning off **Confirm email** lets anyone sign up with an email address they don't own, and Auth marks that address as confirmed. It also turns off the project's hourly email limit. If you turn it off while testing, turn it back on in [**Authentication** > **Sign In / Providers**](/dashboard/project/_/auth/providers) before you launch.
 
 </Admonition>
 
 ## Test phone sign-in with test numbers
 
-A test phone number signs in with a fixed one-time password (OTP) that you choose. Auth doesn't send an SMS to a test number, and it accepts the fixed code as many times as you need.
+With a test phone number, you sign in with a fixed one-time password (OTP) that you choose. Auth doesn't send an SMS to a test number, and it accepts the fixed code as many times as you need.
 
 Test numbers work for phone sign-up, sign-in, and phone number changes. They don't apply to [phone multi-factor authentication](/docs/guides/auth/auth-mfa/phone), which always sends a real SMS.
 
@@ -64,12 +66,23 @@ Write each phone number in international format, with the country code and witho
 </TabPanel>
 <TabPanel id="local" label="Local development">
 
-1. In `supabase/config.toml`, add each test number and its code under `[auth.sms.test_otp]`:
+1. In `supabase/config.toml`, turn on phone sign-up, enable an SMS provider, and add each test number and its code. These sections exist in the default file, so edit them in place:
 
    ```toml supabase/config.toml
+   [auth.sms]
+   enable_signup = true
+
+   [auth.sms.twilio]
+   enabled = true
+   account_sid = "placeholder"
+   message_service_sid = "placeholder"
+   auth_token = "placeholder"
+
    [auth.sms.test_otp]
    14155552671 = "123456"
    ```
+
+   Auth doesn't use the provider credentials for test numbers, so placeholder values work.
 
 2. Restart the local stack:
 
@@ -81,6 +94,8 @@ Local test numbers don't expire.
 
 </TabPanel>
 <TabPanel id="management-api" label="Management API">
+
+Update the project's Auth configuration with the test numbers and their expiry date:
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
@@ -99,11 +114,11 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 </TabPanel>
 </Tabs>
 
-Test numbers don't count toward the project's hourly SMS limit. Auth still makes you wait between codes for the same number. The wait defaults to 5 seconds on hosted projects. Locally, set it with `max_frequency` under `[auth.sms]`.
+Test numbers don't count toward the project's hourly SMS limit. Auth still makes you wait between codes for the same number. The wait defaults to 5 seconds. Locally, change it with `max_frequency` under `[auth.sms]`.
 
 <Admonition type="danger">
 
-Anyone who knows a test number and its code can sign in as that user. Remove test numbers before you launch, or set **Test OTPs Valid Until** to a date before launch.
+Anyone who knows a test number and its code can sign in as the user with that number. Remove test numbers before you launch, or set **Test OTPs Valid Until** to a date before launch.
 
 `supabase config push` copies `[auth.sms.test_otp]` from `config.toml` to your hosted project and sets the test numbers to expire after 10 years. Remove the section before you push to a production project.
 
