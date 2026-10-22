@@ -88,7 +88,7 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
         'pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-sm px-1',
         placement === 'inside' && fitsInBar && '[&>span]:text-background',
         placement === 'inside' && !fitsInBar && 'bg-background/90',
-        !isZoomed && LIVE_GROWTH_TRANSITION,
+        placement !== 'before' && !isZoomed && LIVE_GROWTH_TRANSITION,
         className
       )}
       style={{ ...position, ...style }}
