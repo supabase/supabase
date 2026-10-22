@@ -948,6 +948,11 @@ export const examples: Registry = [
     files: ['example/dithered-skeleton-pixel-size.tsx'],
   },
   {
+    name: 'dithered-skeleton-fine-grain',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-fine-grain.tsx'],
+  },
+  {
     name: 'slider-demo',
     type: 'components:example',
     registryDependencies: ['slider'],

@@ -36,3 +36,9 @@ Size and shape it with `className`, the same way you would a `Skeleton`.
 Use `pixelSize` to control the dither cell size. The default is `2`.
 
 <ComponentPreview name="dithered-skeleton-pixel-size" peekCode />
+
+### Fine grain
+
+For a finer, more tactile texture, set `pixelSize` below `1` to dither at device resolution, and add `grain` (`0`–`1`) for flickering film-like noise. On a 1x display, sub-pixel sizes fall back to one physical pixel.
+
+<ComponentPreview name="dithered-skeleton-fine-grain" peekCode wide />

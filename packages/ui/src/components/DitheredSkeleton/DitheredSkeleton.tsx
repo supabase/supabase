@@ -76,16 +76,22 @@ function resolveRgb(cssColor: string): [number, number, number] {
 }
 
 export interface DitheredSkeletonProps extends HTMLAttributes<HTMLDivElement> {
-  /** Size of one dither cell in CSS pixels. Larger values feel chunkier and more lo-fi. */
+  /**
+   * Size of one dither cell in CSS pixels. Larger values feel chunkier and more lo-fi.
+   * Values below `1` render at device resolution (e.g. `0.5` is one physical pixel on a 2x screen).
+   */
   pixelSize?: number
   /** Multiplier for the shine sweep and texture drift. */
   speed?: number
+  /** Amount of per-cell flickering noise from `0` to `1`, for a sandy, film-like texture. */
+  grain?: number
 }
 
 export function DitheredSkeleton({
   className,
   pixelSize = 2,
   speed = 1,
+  grain = 0,
   ...props
 }: DitheredSkeletonProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -95,7 +101,11 @@ export function DitheredSkeleton({
     const ctx = canvas?.getContext('2d')
     if (!canvas || !ctx) return
 
-    const cell = Math.max(1, Math.round(pixelSize))
+    const dpr = window.devicePixelRatio || 1
+    // Cell size in device pixels; `cell` is the same size expressed in CSS pixels.
+    const deviceCell = Math.max(1, Math.round(pixelSize * dpr))
+    const cell = deviceCell / dpr
+    const grainAmount = Math.min(Math.max(grain, 0), 1)
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     let image: ImageData | null = null
     let rgb = resolveRgb(getComputedStyle(canvas).color)
@@ -121,6 +131,8 @@ export function DitheredSkeleton({
         : (t * SWEEP_VELOCITY_PX_PER_MS) % SWEEP_PERIOD_PX
       const { width, height, data } = image
       const [r, g, b] = rgb
+      // Re-seed the flicker at ~12fps so it reads as film grain rather than shimmer.
+      const grainSeed = Math.floor(t / 83) * 7919
 
       for (let y = 0; y < height; y++) {
         const gy = originY + y
@@ -132,9 +144,13 @@ export function DitheredSkeleton({
           const wx = gx * cell
 
           // Two octaves of drifting noise give the base its mottled, paper-like grain.
-          const grain =
+          let grain =
             valueNoise(wx / 22 + drift * 40, wy / 22 - drift * 25) * 0.65 +
             valueNoise(wx / 7 - drift * 90, wy / 7 + drift * 60) * 0.35
+
+          if (grainAmount > 0) {
+            grain += (hash(gx + grainSeed, gy - grainSeed) - 0.5) * grainAmount * 0.9
+          }
 
           // Low-frequency noise bends the shine band so its edge ripples organically.
           const warp = (valueNoise(wy / 70 + drift * 20, wx / 260) - 0.5) * 160
@@ -171,8 +187,8 @@ export function DitheredSkeleton({
     }
 
     const resizeObserver = new ResizeObserver(([entry]) => {
-      const width = Math.max(1, Math.ceil(entry.contentRect.width / cell))
-      const height = Math.max(1, Math.ceil(entry.contentRect.height / cell))
+      const width = Math.max(1, Math.ceil((entry.contentRect.width * dpr) / deviceCell))
+      const height = Math.max(1, Math.ceil((entry.contentRect.height * dpr) / deviceCell))
       if (image?.width === width && image.height === height) return
       canvas.width = width
       canvas.height = height
@@ -195,7 +211,7 @@ export function DitheredSkeleton({
       reducedMotion.removeEventListener('change', syncLoop)
       unsubscribe?.()
     }
-  }, [pixelSize, speed])
+  }, [pixelSize, speed, grain])
 
   return (
     <div
