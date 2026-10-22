@@ -4,11 +4,15 @@
  * is unchanged. Otherwise close replaces. Without the Navigation API, close
  * always replaces.
  *
+ * A panel's own back records the destination url. Page guards compare that
+ * url, so the exemption survives the awaits between popstate and the router.
+ *
  * The store lives on `globalThis` so every copy of this module shares it.
  */
 
 import {
   isHashOnlyChange,
+  sameHistoryUrl,
   searchWithoutPanelParam,
   shouldGoBackOnDismiss,
   traverseRestoreDelta,
@@ -20,20 +24,35 @@ type PanelGuard = {
   onBlock: () => void
 }
 
+type RouterEventName =
+  | 'routeChangeComplete'
+  | 'routeChangeError'
+  | 'routeChangeStart'
+  | 'beforeHistoryChange'
+  | 'hashChangeComplete'
+  | 'hashChangeStart'
+
+type RouterEvents = {
+  on: (event: RouterEventName, handler: () => void) => void
+  off: (event: RouterEventName, handler: () => void) => void
+}
+
 type PanelHistoryStore = {
   owned: Map<string, PanelEntryOwnership>
   armedKeys: Set<string>
-  armTimer: ReturnType<typeof setTimeout> | null
+  armTimers: Map<string, ReturnType<typeof setTimeout>>
   pendingBackEntryKey: string | null
-  panelTraversal: boolean
-  traversalGeneration: number
-  traversalSettled: number
+  pendingDestinationHref: string | null
+  pendingTimer: ReturnType<typeof setTimeout> | null
   restoring: boolean
   pendingGuard: PanelGuard | null
   expectedRestoreHref: string | null
   restoreGeneration: number
+  restoreTimer: ReturnType<typeof setTimeout> | null
   listenersInstalled: boolean
+  popStateListening: boolean
   navigationTarget: EventTarget | null
+  routerEvents: RouterEvents | null
   guards: Set<PanelGuard>
 }
 
@@ -45,11 +64,14 @@ type NavigationHistoryEntryLike = {
 
 type NavigationLike = EventTarget & {
   currentEntry?: NavigationHistoryEntryLike | null
+  entries?: () => NavigationHistoryEntryLike[]
   back?: () => unknown
 }
 
 const STORE_KEY = '__supabasePanelHistory'
 const ARM_TIMEOUT_MS = 500
+const PENDING_TIMEOUT_MS = 1000
+const RESTORE_TIMEOUT_MS = 1000
 
 type PanelHistoryGlobal = typeof globalThis & {
   [STORE_KEY]?: PanelHistoryStore
@@ -59,17 +81,19 @@ function createStore(): PanelHistoryStore {
   return {
     owned: new Map(),
     armedKeys: new Set(),
-    armTimer: null,
+    armTimers: new Map(),
     pendingBackEntryKey: null,
-    panelTraversal: false,
-    traversalGeneration: 0,
-    traversalSettled: 0,
+    pendingDestinationHref: null,
+    pendingTimer: null,
     restoring: false,
     pendingGuard: null,
     expectedRestoreHref: null,
     restoreGeneration: 0,
+    restoreTimer: null,
     listenersInstalled: false,
+    popStateListening: false,
     navigationTarget: null,
+    routerEvents: null,
     guards: new Set(),
   }
 }
@@ -78,7 +102,14 @@ function getStore() {
   const scope = globalThis as PanelHistoryGlobal
   const existing = scope[STORE_KEY]
 
-  if (existing && existing.owned instanceof Map && existing.guards instanceof Set) return existing
+  if (
+    existing &&
+    existing.owned instanceof Map &&
+    existing.guards instanceof Set &&
+    existing.armTimers instanceof Map
+  ) {
+    return existing
+  }
 
   const created = createStore()
   scope[STORE_KEY] = created
@@ -95,13 +126,23 @@ function readNavigation(): NavigationLike | null {
   return candidate as NavigationLike
 }
 
-function clearArmTimer() {
+function clearArmTimer(panelKey: string) {
+  const store = getStore()
+  const timer = store.armTimers.get(panelKey)
+
+  if (timer === undefined) return
+
+  clearTimeout(timer)
+  store.armTimers.delete(panelKey)
+}
+
+function clearArmTimers() {
   const store = getStore()
 
-  if (store.armTimer === null) return
-
-  clearTimeout(store.armTimer)
-  store.armTimer = null
+  store.armTimers.forEach((timer) => {
+    clearTimeout(timer)
+  })
+  store.armTimers.clear()
 }
 
 function captureOwnership(panelKey: string): PanelEntryOwnership | null {
@@ -110,16 +151,13 @@ function captureOwnership(panelKey: string): PanelEntryOwnership | null {
 
   if (entryKey === null) return null
 
-  const href = window.location.href
-  const url = new URL(href)
+  const url = new URL(window.location.href)
 
   return {
     entryKey,
-    index: typeof entry?.index === 'number' ? entry.index : null,
     pathname: url.pathname,
     searchWithoutPanel: searchWithoutPanelParam(url.search, panelKey),
     hash: url.hash,
-    href,
   }
 }
 
@@ -140,13 +178,16 @@ function onCurrentEntryChange(event: Event) {
 
   if (navigationType !== 'push' || store.armedKeys.size === 0) return
 
-  for (const panelKey of store.armedKeys) {
+  const params = new URLSearchParams(window.location.search)
+
+  store.armedKeys.forEach((panelKey) => {
+    if (!params.has(panelKey)) return
+
     const owned = captureOwnership(panelKey)
     if (owned) store.owned.set(panelKey, owned)
-  }
-
-  store.armedKeys.clear()
-  clearArmTimer()
+    store.armedKeys.delete(panelKey)
+    clearArmTimer(panelKey)
+  })
 }
 
 function readEventString(event: Event, key: string) {
@@ -173,16 +214,76 @@ function readDestination(event: Event) {
   }
 }
 
+function destinationHref(delta: number) {
+  const navigation = readNavigation()
+  const index = navigation?.currentEntry?.index
+  const entries = navigation?.entries?.()
+
+  if (!entries || typeof index !== 'number') return null
+
+  const target = entries[index + delta]
+  if (typeof target?.url !== 'string') return null
+
+  return target.url
+}
+
+function clearPendingTimer() {
+  const store = getStore()
+
+  if (store.pendingTimer === null) return
+
+  clearTimeout(store.pendingTimer)
+  store.pendingTimer = null
+}
+
+function clearPendingDestination() {
+  const store = getStore()
+
+  store.pendingDestinationHref = null
+  clearPendingTimer()
+}
+
+function rememberPendingDestination(href: string | null) {
+  if (!href) return
+
+  const store = getStore()
+
+  store.pendingDestinationHref = href
+  clearPendingTimer()
+  store.pendingTimer = setTimeout(() => {
+    clearPendingDestination()
+  }, PENDING_TIMEOUT_MS)
+}
+
+function clearRestoreTimer() {
+  const store = getStore()
+
+  if (store.restoreTimer === null) return
+
+  clearTimeout(store.restoreTimer)
+  store.restoreTimer = null
+}
+
+/** True when `url` is the destination of a panel back or restore still in flight. */
+export function isPanelHistoryTraversalTo(url: string) {
+  const href = getStore().pendingDestinationHref
+
+  if (!href) return false
+
+  return sameHistoryUrl(href, url, window.location.href)
+}
+
 function finishRestore(blocked: PanelGuard | null) {
   const store = getStore()
 
-  if (store.restoring === false) return
+  if (!store.restoring) return
 
   store.restoring = false
   store.pendingGuard = null
   store.expectedRestoreHref = null
   store.restoreGeneration += 1
-  store.panelTraversal = false
+  clearRestoreTimer()
+  clearPendingDestination()
 
   if (blocked) blocked.onBlock()
 }
@@ -190,24 +291,36 @@ function finishRestore(blocked: PanelGuard | null) {
 function scheduleRestore(guard: PanelGuard, delta: number, expectedHref: string) {
   const store = getStore()
 
+  ensurePopStateListener()
   store.restoring = true
   store.pendingGuard = guard
   store.expectedRestoreHref = expectedHref
   store.restoreGeneration += 1
+  clearRestoreTimer()
   const generation = store.restoreGeneration
+
+  store.restoreTimer = setTimeout(() => {
+    const latest = getStore()
+
+    if (generation !== latest.restoreGeneration || !latest.restoring) return
+
+    latest.restoring = false
+    latest.pendingGuard = null
+    latest.expectedRestoreHref = null
+    latest.restoreTimer = null
+  }, RESTORE_TIMEOUT_MS)
 
   window.setTimeout(() => {
     const latest = getStore()
 
-    if (generation !== latest.restoreGeneration || latest.restoring === false) return
+    if (generation !== latest.restoreGeneration || !latest.restoring) return
     if (window.location.href === expectedHref) {
       finishRestore(guard)
       return
     }
 
-    withPanelHistoryTraversal(() => {
-      window.history.go(delta)
-    })
+    rememberPendingDestination(expectedHref)
+    window.history.go(delta)
 
     if (window.location.href === expectedHref) finishRestore(guard)
   }, 0)
@@ -219,19 +332,21 @@ function onNavigate(event: Event) {
   const userInitiated = Reflect.get(event, 'userInitiated')
   if (userInitiated !== true) return
 
-  const store = getStore()
-  if (store.panelTraversal) return
-
   const destination = readDestination(event)
+  if (destination.url && isPanelHistoryTraversalTo(destination.url)) return
+
   const hashOnly =
     destination.url !== null && isHashOnlyChange(window.location.href, destination.url)
   if (hashOnly) return
+
+  const store = getStore()
 
   if (store.restoring) {
     store.restoring = false
     store.pendingGuard = null
     store.expectedRestoreHref = null
     store.restoreGeneration += 1
+    clearRestoreTimer()
   }
 
   const guard = [...store.guards].find((candidate) => candidate.shouldBlock())
@@ -245,13 +360,9 @@ function onNavigate(event: Event) {
   const expectedHref = window.location.href
 
   if (event.cancelable) {
-    try {
-      event.preventDefault()
-      guard.onBlock()
-      return
-    } catch {
-      // the user activation was already used, so the traverse will commit
-    }
+    event.preventDefault()
+    guard.onBlock()
+    return
   }
 
   if (delta === null) return
@@ -259,35 +370,29 @@ function onNavigate(event: Event) {
   scheduleRestore(guard, delta, expectedHref)
 }
 
-function settlePanelTraversal() {
-  const store = getStore()
+function onNavigateSuccess() {
+  if (getStore().routerEvents) return
 
-  if (store.panelTraversal === false) return
-
-  const generation = store.traversalGeneration
-  store.traversalSettled = generation
-
-  // after this event, so a page blocker on the same pop still sees the flag
-  queueMicrotask(() => {
-    const current = getStore()
-
-    if (current.traversalGeneration !== generation) return
-
-    current.panelTraversal = false
-  })
+  clearPendingDestination()
 }
 
 function onPopState(event: PopStateEvent) {
   const store = getStore()
 
-  // clear after this event so a page blocker running on the same pop still sees it
-  if (store.panelTraversal) settlePanelTraversal()
-
-  if (store.restoring === false) return
+  if (!store.restoring) return
 
   event.stopImmediatePropagation()
 
   if (window.location.href === store.expectedRestoreHref) finishRestore(store.pendingGuard)
+}
+
+function ensurePopStateListener() {
+  const store = getStore()
+
+  if (store.popStateListening || typeof window === 'undefined') return
+
+  store.popStateListening = true
+  window.addEventListener('popstate', onPopState, true)
 }
 
 function installListeners() {
@@ -298,72 +403,94 @@ function installListeners() {
 
   if (navigation && store.navigationTarget !== navigation) {
     navigation.addEventListener('navigate', onNavigate, true)
+    navigation.addEventListener('navigatesuccess', onNavigateSuccess)
     navigation.addEventListener('currententrychange', onCurrentEntryChange)
     store.navigationTarget = navigation
   }
 
-  if (store.listenersInstalled) return
-
   store.listenersInstalled = true
-  window.addEventListener('popstate', onPopState, true)
 }
 
-/** True while this module is moving history for a panel close or restore. */
-export function isPanelHistoryTraversal() {
-  return getStore().panelTraversal
-}
-
-function beginPanelTraversal() {
+/** Next clears the pending destination once the route change finishes. */
+export function bindPanelTraversalRouter(events: RouterEvents) {
   const store = getStore()
 
-  store.traversalGeneration += 1
-  store.panelTraversal = true
-  return store.traversalGeneration
+  if (store.routerEvents === events) return
+
+  if (store.routerEvents) {
+    store.routerEvents.off('routeChangeComplete', clearPendingDestination)
+    store.routerEvents.off('routeChangeError', clearPendingDestination)
+  }
+
+  events.on('routeChangeComplete', clearPendingDestination)
+  events.on('routeChangeError', clearPendingDestination)
+  store.routerEvents = events
 }
 
-function clearPanelTraversalIfUnsettled(generation: number) {
-  // popstate settles the flag. this only covers a back that never navigates.
-  // two macrotasks is too soon: chrome can fire the click's navigate after that,
-  // and the guard then treats this close as another user back.
-  window.setTimeout(() => {
-    const current = getStore()
+function swallowFinished(result: unknown) {
+  if (typeof result !== 'object' || result === null) return
 
-    if (current.traversalGeneration !== generation) return
-    if (current.traversalSettled === generation) return
-
-    current.panelTraversal = false
-  }, 250)
+  const finished = Reflect.get(result, 'finished')
+  if (finished instanceof Promise) {
+    finished.catch(() => {
+      clearPendingDestination()
+    })
+  }
 }
 
-/** Keep page-level unsaved-changes guards from trapping a panel's own back. */
+function traverseBy(delta: number) {
+  installListeners()
+  rememberPendingDestination(destinationHref(delta))
+
+  const navigation = readNavigation()
+  const back = navigation?.back
+
+  if (delta === -1 && typeof back === 'function') {
+    const result = back.call(navigation)
+    swallowFinished(result)
+    return
+  }
+
+  if (delta === -1) {
+    window.history.back()
+    return
+  }
+
+  window.history.go(delta)
+}
+
+/**
+ * Record the destination of `history.back` / `go` inside `run` so page guards
+ * can recognize that traversal after popstate.
+ */
 export function withPanelHistoryTraversal(run: () => void) {
-  const generation = beginPanelTraversal()
+  const history = window.history
+  const originalBack = history.back
+  const originalForward = history.forward
+  const originalGo = history.go
+
+  history.back = () => {
+    rememberPendingDestination(destinationHref(-1))
+    originalBack.call(history)
+  }
+  history.forward = () => {
+    rememberPendingDestination(destinationHref(1))
+    originalForward.call(history)
+  }
+  history.go = (delta?: number) => {
+    if (typeof delta === 'number' && delta !== 0) {
+      rememberPendingDestination(destinationHref(delta))
+    }
+    originalGo.call(history, delta)
+  }
 
   try {
     run()
   } finally {
-    clearPanelTraversalIfUnsettled(generation)
+    history.back = originalBack
+    history.forward = originalForward
+    history.go = originalGo
   }
-}
-
-function traverseBack() {
-  installListeners()
-  const generation = beginPanelTraversal()
-  const navigation = readNavigation()
-  const back = navigation?.back
-
-  if (typeof back === 'function') {
-    try {
-      back.call(navigation)
-      clearPanelTraversalIfUnsettled(generation)
-      return
-    } catch {
-      getStore().panelTraversal = false
-    }
-  }
-
-  window.history.back()
-  clearPanelTraversalIfUnsettled(generation)
 }
 
 /** Call immediately before the open write that should push. */
@@ -372,14 +499,17 @@ export function armPanelPush(panelKey: string) {
   const store = getStore()
 
   store.armedKeys.add(panelKey)
-  clearArmTimer()
+  clearArmTimer(panelKey)
 
-  // nuqs flushes on a short timer. drop the arm if this open never pushed.
-  store.armTimer = setTimeout(() => {
-    const current = getStore()
-    current.armedKeys.clear()
-    current.armTimer = null
-  }, ARM_TIMEOUT_MS)
+  // nuqs flushes on a short timer. drop this key if its open never pushed.
+  store.armTimers.set(
+    panelKey,
+    setTimeout(() => {
+      const current = getStore()
+      current.armedKeys.delete(panelKey)
+      current.armTimers.delete(panelKey)
+    }, ARM_TIMEOUT_MS)
+  )
 }
 
 /** Replace a panel url and forget that key only. */
@@ -389,6 +519,7 @@ export function replacePanelUrl<T>(panelKey: string, replace: () => T) {
 
   store.owned.delete(panelKey)
   store.armedKeys.delete(panelKey)
+  clearArmTimer(panelKey)
   return replace()
 }
 
@@ -411,8 +542,9 @@ export function dismissPanelUrl(panelKey: string, replace: () => void) {
 
   store.owned.delete(panelKey)
   store.armedKeys.delete(panelKey)
+  clearArmTimer(panelKey)
 
-  if (shouldGoBack === false) {
+  if (!shouldGoBack) {
     replace()
     return
   }
@@ -426,7 +558,7 @@ export function dismissPanelUrl(panelKey: string, replace: () => void) {
     const latest = getStore()
     if (latest.pendingBackEntryKey === entryKey) latest.pendingBackEntryKey = null
   })
-  traverseBack()
+  traverseBy(-1)
 }
 
 export function registerPanelBackGuard(guard: PanelGuard) {
@@ -445,13 +577,13 @@ export function resetPanelHistoryForTests() {
   store.owned.clear()
   store.armedKeys.clear()
   store.pendingBackEntryKey = null
-  store.panelTraversal = false
-  store.traversalGeneration += 1
-  store.traversalSettled = 0
+  store.pendingDestinationHref = null
   store.restoring = false
   store.pendingGuard = null
   store.expectedRestoreHref = null
   store.restoreGeneration += 1
   store.guards.clear()
-  clearArmTimer()
+  clearPendingTimer()
+  clearRestoreTimer()
+  clearArmTimers()
 }

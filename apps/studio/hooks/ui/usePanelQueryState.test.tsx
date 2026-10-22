@@ -104,7 +104,8 @@ describe('usePanelQueryState through the react history adapter', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Close user' }))
     await waitFor(() => expect(window.location.search).toBe(''))
-    expect(screen.getByText('closed')).toBeInTheDocument()
+    // popstate follows the traversal, so nuqs state updates on the next task
+    await waitFor(() => expect(screen.getByText('closed')).toBeInTheDocument())
   })
 
   it('replaces a function update while the panel is open', async () => {

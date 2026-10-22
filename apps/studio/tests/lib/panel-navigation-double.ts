@@ -32,7 +32,10 @@ function currentEntry() {
 function emit(type: string, extras: NavigateExtras) {
   if (!navigationTarget) return false
 
-  const event = new Event(type, { cancelable: extras.cancelable ?? false })
+  const cancelable = activationConsumed ? false : (extras.cancelable ?? false)
+  if (activationConsumed) activationConsumed = false
+
+  const event = new Event(type, { cancelable })
   Object.defineProperty(event, 'navigationType', { value: extras.navigationType })
 
   if (extras.userInitiated !== undefined) {
@@ -49,10 +52,6 @@ function emit(type: string, extras: NavigateExtras) {
   let prevented = false
   const preventDefault = event.preventDefault.bind(event)
   event.preventDefault = () => {
-    if (activationConsumed) {
-      activationConsumed = false
-      throw new DOMException('The operation is not supported.', 'InvalidStateError')
-    }
     prevented = true
     preventDefault()
   }
@@ -70,9 +69,14 @@ function showEntry(entry: HistoryEntry) {
     })
   }
 
-  // jsdom traverses on two timers. show the destination before this call returns.
+  // the url moves before this call returns. popstate is a later task, like a browser.
   originalReplaceState?.call(window.history, entry.state, '', entry.url)
-  window.dispatchEvent(new PopStateEvent('popstate', { state: entry.state }))
+  const state = entry.state
+  window.setTimeout(() => {
+    if (!installed) return
+    window.dispatchEvent(new PopStateEvent('popstate', { state }))
+    emit('navigatesuccess', { navigationType: 'traverse' })
+  }, 0)
   emit('currententrychange', { navigationType: 'traverse' })
 }
 
@@ -89,18 +93,14 @@ function commitTraverse(delta: number, userInitiated: boolean) {
   const destination = stack[nextIndex]
   let prevented = false
 
-  try {
-    const continued = emit('navigate', {
-      navigationType: 'traverse',
-      userInitiated,
-      destinationIndex: nextIndex,
-      destinationUrl: destination.url,
-      cancelable: true,
-    })
-    prevented = continued === false
-  } catch {
-    prevented = false
-  }
+  const continued = emit('navigate', {
+    navigationType: 'traverse',
+    userInitiated,
+    destinationIndex: destination.index,
+    destinationUrl: destination.url,
+    cancelable: true,
+  })
+  prevented = continued === false
 
   if (prevented) return
 
@@ -123,11 +123,19 @@ export function installNavigationDouble() {
     writable: true,
     value: stack[0],
   })
+  Object.defineProperty(navigationTarget, 'entries', {
+    configurable: true,
+    value: () => stack,
+  })
   Object.defineProperty(navigationTarget, 'back', {
     configurable: true,
+    writable: true,
     value: () => {
-      window.history.back()
-      return Promise.resolve()
+      // a click's navigation.back() is user initiated. the finished promise
+      // rejects with AbortError when a later replace interrupts it.
+      const finished = Promise.resolve()
+      commitTraverse(-1, true)
+      return { finished, committed: finished }
     },
   })
 
@@ -189,6 +197,8 @@ export function installNavigationDouble() {
 }
 
 export function uninstallNavigationDouble() {
+  if (!installed) return
+
   if (originalPushState) window.history.pushState = originalPushState
   if (originalReplaceState) window.history.replaceState = originalReplaceState
   if (originalBack) window.history.back = originalBack

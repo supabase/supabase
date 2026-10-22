@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   isHashOnlyChange,
   isPanelValueClear,
+  isStaleDeletedPanelId,
   panelHistoryAction,
   resolvePanelUpdater,
+  sameHistoryUrl,
   searchWithoutPanelParam,
   shouldGoBackOnDismiss,
   traverseRestoreDelta,
@@ -13,11 +15,9 @@ import {
 
 const ownership: PanelEntryOwnership = {
   entryKey: 'entry-a',
-  index: 4,
   pathname: '/project/default/auth/users',
   searchWithoutPanel: '',
   hash: '',
-  href: 'http://localhost/project/default/auth/users?show=1',
 }
 
 describe('panel value helpers', () => {
@@ -122,6 +122,29 @@ describe('panelHistoryAction', () => {
     ).toBe('replace-clear')
   })
 
+  it('does nothing when the key is already clear', () => {
+    expect(
+      panelHistoryAction({
+        currentValue: null,
+        nextValue: null,
+        parserHistory: 'push',
+      })
+    ).toBe('noop')
+    expect(
+      panelHistoryAction({
+        currentValue: '',
+        nextValue: null,
+        requestedHistory: 'replace',
+      })
+    ).toBe('noop')
+    expect(
+      panelHistoryAction({
+        currentValue: false,
+        nextValue: false,
+      })
+    ).toBe('noop')
+  })
+
   it('does not push an open whose parser and caller both replace', () => {
     expect(
       panelHistoryAction({
@@ -203,6 +226,32 @@ describe('traverseRestoreDelta', () => {
     expect(traverseRestoreDelta(null, 4)).toBe(null)
     expect(traverseRestoreDelta(5, null)).toBe(null)
     expect(traverseRestoreDelta(5, 5)).toBe(null)
+  })
+})
+
+describe('sameHistoryUrl', () => {
+  it('matches a relative router url to an absolute history href', () => {
+    const base = 'http://localhost/project/default/database/functions?new=true'
+    expect(sameHistoryUrl('/project/default/database/functions', base, base)).toBe(false)
+    expect(
+      sameHistoryUrl(
+        'http://localhost/project/default/database/functions',
+        '/project/default/database/functions',
+        base
+      )
+    ).toBe(true)
+    expect(sameHistoryUrl(base, '/project/default/auth/users', base)).toBe(false)
+  })
+})
+
+describe('isStaleDeletedPanelId', () => {
+  it('is true only when this successful delete is the id forward restored', () => {
+    expect(isStaleDeletedPanelId('secret-1', true, 'secret-1')).toBe(true)
+    expect(isStaleDeletedPanelId(4, true, '4')).toBe(true)
+    expect(isStaleDeletedPanelId('secret-1', true, 'secret-2')).toBe(false)
+    expect(isStaleDeletedPanelId('secret-1', false, 'secret-1')).toBe(false)
+    expect(isStaleDeletedPanelId(null, true, 'secret-1')).toBe(false)
+    expect(isStaleDeletedPanelId('', true, '')).toBe(false)
   })
 })
 

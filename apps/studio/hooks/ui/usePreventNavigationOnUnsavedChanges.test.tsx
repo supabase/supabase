@@ -1,11 +1,20 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { usePreventNavigationOnUnsavedChanges } from './usePreventNavigationOnUnsavedChanges'
-import { withPanelHistoryTraversal } from '@/lib/panel-history'
+import { resetPanelHistoryForTests, withPanelHistoryTraversal } from '@/lib/panel-history'
+import {
+  installNavigationDouble,
+  uninstallNavigationDouble,
+} from '@/tests/lib/panel-navigation-double'
 import { routerMock } from '@/tests/lib/route-mock'
 
 vi.mock('@/lib/constants', () => ({ BASE_PATH: '/dashboard' }))
+
+afterEach(() => {
+  resetPanelHistoryForTests()
+  uninstallNavigationDouble()
+})
 
 describe('Next unsaved-change navigation guard', () => {
   it('runs without a TanStack router provider and allows clean navigation', async () => {
@@ -50,16 +59,33 @@ describe('Next unsaved-change navigation guard', () => {
     push.mockRestore()
   })
 
-  it('lets a panel history traversal change routes while the page is dirty', () => {
+  it('lets a panel history traversal change routes while the page is dirty', async () => {
+    installNavigationDouble()
+    window.history.replaceState(null, '', '/overview')
+    window.history.pushState(null, '', '/project/default/observability?newReport=true')
     const { result } = renderHook(() => usePreventNavigationOnUnsavedChanges({ hasChanges: true }))
 
     act(() => {
       withPanelHistoryTraversal(() => {
-        routerMock.events.emit('routeChangeStart', '/overview', { shallow: false })
+        window.history.back()
       })
     })
 
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    act(() => {
+      routerMock.events.emit('routeChangeStart', '/overview', { shallow: false })
+    })
     expect(result.current.shouldConfirmNavigation).toBe(false)
+
+    act(() => {
+      expect(() =>
+        routerMock.events.emit('routeChangeStart', '/project/default/settings', { shallow: false })
+      ).toThrow('Route change declined')
+    })
+    expect(result.current.shouldConfirmNavigation).toBe(true)
   })
 
   it('keeps unload protection conditional on dirty state', () => {

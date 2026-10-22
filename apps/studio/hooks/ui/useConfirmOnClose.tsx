@@ -12,7 +12,10 @@ export interface ConfirmOnCloseModalProps {
 interface UseConfirmOnCloseProps {
   checkIsDirty: () => boolean
   onClose: () => void
-  /** When true, browser Back on a dirty panel restores the entry and confirms. */
+  /**
+   * When true, browser Back on a dirty panel restores the entry and confirms.
+   * That confirm needs the Navigation API (Firefox 147+, Safari 26.2+).
+   */
   active?: boolean
 }
 

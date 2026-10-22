@@ -1,13 +1,11 @@
 export type PanelEntryOwnership = {
   entryKey: string
-  index: number | null
   pathname: string
   searchWithoutPanel: string
   hash: string
-  href: string
 }
 
-export type PanelHistoryAction = 'push' | 'replace' | 'replace-clear' | 'dismiss'
+export type PanelHistoryAction = 'push' | 'replace' | 'replace-clear' | 'dismiss' | 'noop'
 
 export function isPanelValueClear(value: unknown) {
   return value == null || value === false || value === ''
@@ -41,6 +39,9 @@ export function panelHistoryAction({
 }): PanelHistoryAction {
   const isClear = isPanelValueClear(nextValue)
 
+  // clearing a key that is already clear must not queue another replace
+  if (isClear && isPanelValueClear(currentValue)) return 'noop'
+
   if (requestedHistory === 'replace') {
     if (isClear) return 'replace-clear'
     return 'replace'
@@ -49,7 +50,7 @@ export function panelHistoryAction({
   if (isClear) return 'dismiss'
 
   const isOpening = isPanelValueClear(currentValue)
-  if (isOpening === false) return 'replace'
+  if (!isOpening) return 'replace'
 
   const shouldPush = requestedHistory === 'push' || parserHistory === 'push'
   if (shouldPush) return 'push'
@@ -61,14 +62,9 @@ export function searchWithoutPanelParam(search: string, panelKey: string) {
   const params = new URLSearchParams(search)
   params.delete(panelKey)
 
-  const entries = [...params.entries()].sort((left, right) => left[0].localeCompare(right[0]))
-  const normalized = new URLSearchParams()
+  const entries = [...params.entries()].sort(([left], [right]) => left.localeCompare(right))
 
-  for (const [key, value] of entries) {
-    normalized.append(key, value)
-  }
-
-  return normalized.toString()
+  return new URLSearchParams(entries).toString()
 }
 
 export function shouldGoBackOnDismiss({
@@ -88,8 +84,8 @@ export function shouldGoBackOnDismiss({
   currentHash: string
   panelKey: string
 }) {
-  if (navigationAvailable === false) return false
-  if (ownership === null) return false
+  if (!navigationAvailable) return false
+  if (!ownership) return false
   if (currentEntryKey !== ownership.entryKey) return false
   if (currentPathname !== ownership.pathname) return false
   if (currentHash !== ownership.hash) return false
@@ -126,7 +122,40 @@ export function isHashOnlyChange(currentHref: string, destinationUrl: string) {
     current.pathname === destination.pathname &&
     current.search === destination.search
 
-  if (sameDocument === false) return false
+  if (!sameDocument) return false
 
   return current.hash !== destination.hash
+}
+
+/** Compare a history href with a router url that may be relative. */
+export function sameHistoryUrl(left: string, right: string, base: string) {
+  try {
+    const a = new URL(left, base)
+    const b = new URL(right, base)
+
+    return (
+      a.origin === b.origin &&
+      a.pathname === b.pathname &&
+      a.search === b.search &&
+      a.hash === b.hash
+    )
+  } catch {
+    return false
+  }
+}
+
+/**
+ * A delete mutation stays successful for the life of the hook, so Forward
+ * restoring that same id must clear it again.
+ */
+export function isStaleDeletedPanelId(
+  currentId: unknown,
+  isSuccessDelete: boolean,
+  deletedId: unknown
+) {
+  if (!isSuccessDelete) return false
+  if (currentId == null || currentId === '' || currentId === false) return false
+  if (deletedId == null) return false
+
+  return String(currentId) === String(deletedId)
 }

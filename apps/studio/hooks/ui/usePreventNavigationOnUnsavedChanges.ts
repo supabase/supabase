@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { BASE_PATH } from '@/lib/constants'
-import { isPanelHistoryTraversal } from '@/lib/panel-history'
+import { bindPanelTraversalRouter, isPanelHistoryTraversalTo } from '@/lib/panel-history'
 
 interface UsePreventNavigationOnUnsavedChangesOptions {
   /*
@@ -48,7 +48,7 @@ export const usePreventNavigationOnUnsavedChanges = ({
     }
 
     const handleBrowseAway = (url: string) => {
-      if (isPanelHistoryTraversal()) return
+      if (isPanelHistoryTraversalTo(url)) return
 
       if (hasChanges && !confirmNavigate) {
         setNavigateUrl(url)
@@ -57,6 +57,7 @@ export const usePreventNavigationOnUnsavedChanges = ({
       }
       setNavigateUrl(undefined)
     }
+    bindPanelTraversalRouter(router.events)
     window.addEventListener('beforeunload', handleBeforeUnload)
     router.events.on('routeChangeStart', handleBrowseAway)
 

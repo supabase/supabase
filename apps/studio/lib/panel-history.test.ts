@@ -18,6 +18,11 @@ import {
 
 const PANEL_URL = '/project/default/database/functions?new=true'
 
+function spyOnNavigationBack() {
+  const navigation = Reflect.get(window, 'navigation') as { back: () => unknown }
+  return vi.spyOn(navigation, 'back')
+}
+
 describe('panel history', () => {
   beforeEach(() => {
     resetPanelHistoryForTests()
@@ -33,7 +38,7 @@ describe('panel history', () => {
 
   it('goes back when the armed push is still the current entry', () => {
     const replace = vi.fn()
-    const back = vi.spyOn(window.history, 'back')
+    const back = spyOnNavigationBack()
 
     armPanelPush('new')
     window.history.pushState(null, '', PANEL_URL)
@@ -113,7 +118,7 @@ describe('panel history', () => {
 
   it('goes back for each nested panel that still owns its entry', () => {
     const replace = vi.fn()
-    const back = vi.spyOn(window.history, 'back')
+    const back = spyOnNavigationBack()
 
     armPanelPush('a')
     window.history.pushState(null, '', '/project/default/database/functions?a=1')
@@ -131,7 +136,7 @@ describe('panel history', () => {
 
   it('keeps the other panel owned when one key is replace-cleared', () => {
     const replace = vi.fn()
-    const back = vi.spyOn(window.history, 'back')
+    const back = spyOnNavigationBack()
 
     armPanelPush('a')
     window.history.pushState(null, '', '/project/default/database/functions?a=1')
@@ -145,12 +150,12 @@ describe('panel history', () => {
     dismissPanelUrl('a', replace)
 
     expect(replace).not.toHaveBeenCalled()
-    expect(back).toHaveBeenCalledTimes(2)
+    expect(back).toHaveBeenCalledOnce()
   })
 
   it('still goes back after Forward returns to the owned entry', () => {
     const replace = vi.fn()
-    const back = vi.spyOn(window.history, 'back')
+    const back = spyOnNavigationBack()
 
     armPanelPush('edit')
     window.history.pushState(null, '', '/project/default/database/functions?edit=1')
@@ -159,7 +164,7 @@ describe('panel history', () => {
     dismissPanelUrl('edit', replace)
 
     expect(replace).not.toHaveBeenCalled()
-    expect(back).toHaveBeenCalledTimes(2)
+    expect(back).toHaveBeenCalledOnce()
     expect(window.location.search).toBe('')
   })
 
@@ -269,6 +274,98 @@ describe('panel history', () => {
 
     expect(onBlock).toHaveBeenCalledOnce()
     expect(window.location.href).toBe(panelHref)
+    unsubscribe()
+  })
+
+  it('does not confirm again when a click closes a dirty panel', () => {
+    const onBlock = vi.fn()
+    const replace = vi.fn()
+    const unsubscribe = registerPanelBackGuard({
+      shouldBlock: () => true,
+      onBlock,
+    })
+
+    armPanelPush('new')
+    window.history.pushState(null, '', PANEL_URL)
+    dismissPanelUrl('new', replace)
+
+    expect(onBlock).not.toHaveBeenCalled()
+    expect(replace).not.toHaveBeenCalled()
+    expect(window.location.search).toBe('')
+    unsubscribe()
+  })
+
+  it('still confirms a different destination while a panel close is pending', () => {
+    const onBlock = vi.fn()
+    const unsubscribe = registerPanelBackGuard({
+      shouldBlock: () => true,
+      onBlock,
+    })
+
+    armPanelPush('new')
+    window.history.pushState(null, '', PANEL_URL)
+    const navigation = Reflect.get(window, 'navigation') as { back?: () => unknown }
+    const back = navigation.back
+    navigation.back = () => ({ finished: Promise.resolve() })
+    dismissPanelUrl('new', vi.fn())
+    navigation.back = back
+    emitUserNavigate('http://localhost/project/default/auth/users')
+
+    expect(onBlock).toHaveBeenCalledOnce()
+    expect(window.location.search).toBe('?new=true')
+    unsubscribe()
+  })
+
+  it('swallows an aborted navigation.back finished promise', async () => {
+    const finished = Promise.reject(new DOMException('The operation was aborted.', 'AbortError'))
+    const navigation = Reflect.get(window, 'navigation') as { back?: () => unknown }
+    navigation.back = () => ({ finished })
+
+    armPanelPush('new')
+    window.history.pushState(null, '', PANEL_URL)
+    dismissPanelUrl('new', vi.fn())
+
+    await finished.catch(() => undefined)
+  })
+
+  it('expires each armed key on its own timer', () => {
+    vi.useFakeTimers()
+    const replace = vi.fn()
+    const back = spyOnNavigationBack()
+
+    armPanelPush('edit')
+    vi.advanceTimersByTime(400)
+    armPanelPush('show')
+    vi.advanceTimersByTime(100)
+    window.history.pushState(null, '', '/project/default/database/functions?show=1')
+    dismissPanelUrl('show', replace)
+
+    expect(back).toHaveBeenCalledOnce()
+    expect(replace).not.toHaveBeenCalled()
+  })
+
+  it('stops swallowing popstate when a restore never arrives', () => {
+    vi.useFakeTimers()
+    const onBlock = vi.fn()
+    const unsubscribe = registerPanelBackGuard({
+      shouldBlock: () => true,
+      onBlock,
+    })
+
+    armPanelPush('new')
+    window.history.pushState(null, '', PANEL_URL)
+    consumeUserActivation()
+    userTraverse(-1)
+    vi.spyOn(window.history, 'go').mockImplementation(() => undefined)
+    vi.advanceTimersByTime(0)
+    vi.advanceTimersByTime(1000)
+
+    const event = new PopStateEvent('popstate', { cancelable: true })
+    const stop = vi.spyOn(event, 'stopImmediatePropagation')
+    window.dispatchEvent(event)
+
+    expect(stop).not.toHaveBeenCalled()
+    expect(onBlock).not.toHaveBeenCalled()
     unsubscribe()
   })
 
