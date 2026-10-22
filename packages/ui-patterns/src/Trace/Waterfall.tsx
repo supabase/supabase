@@ -10,7 +10,7 @@ import { useKeyboard } from './hooks/useKeyboard'
 import { SpanContext } from './hooks/useSpan'
 import { useTimeScale } from './hooks/useTimeScale'
 import { useVisibleRows } from './hooks/useVisibleRows'
-import { useView } from './Trace'
+import { useData, useView } from './Trace'
 import type { BarState, SpanContextValue, VisibleRow } from './types'
 
 export interface WaterfallProps extends ComponentProps<'div'> {
@@ -46,6 +46,9 @@ export interface RulerProps extends ComponentProps<'div'> {
 
 export function Ruler({ targetTickSpacing = 80, className, children, ...props }: RulerProps) {
   const { ref, scale } = useTimeScale<HTMLDivElement>({ targetTickSpacing })
+  const { isLive, nowMs } = useData()
+  const nowFraction = scale.toFraction(nowMs)
+  const showNow = isLive && nowFraction >= 0 && nowFraction <= 1
 
   return (
     <div
@@ -65,7 +68,7 @@ export function Ruler({ targetTickSpacing = 80, className, children, ...props }:
             <div
               key={tick.ms}
               data-trace-tick
-              className="absolute inset-y-0 border-l border-strong"
+              className="absolute inset-y-0 border-l border-strong transition-[left] duration-300 ease-linear motion-reduce:transition-none"
               style={{ left: `${tick.fraction * 100}%` }}
             >
               <span className="absolute left-2 top-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-xs tabular-nums text-foreground-muted">
@@ -73,6 +76,15 @@ export function Ruler({ targetTickSpacing = 80, className, children, ...props }:
               </span>
             </div>
           ))}
+          {showNow && (
+            <div
+              data-trace-now
+              className="absolute inset-y-0 border-l border-brand transition-[left] duration-300 ease-linear motion-reduce:transition-none"
+              style={{ left: `${nowFraction * 100}%` }}
+            >
+              <span className="absolute -top-px left-1/2 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand" />
+            </div>
+          )}
         </div>
       </div>
     </div>

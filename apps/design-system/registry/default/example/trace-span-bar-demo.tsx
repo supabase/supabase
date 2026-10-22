@@ -29,6 +29,7 @@ const spans: Span[] = [
       { timeMs: base + 340, name: 'exception', attributes: { 'exception.type': 'TimeoutError' } },
     ],
   }),
+  make('slowest', 'slowest (auto-marked)', { endMs: base + TRACE_MS }),
 ]
 
 const filteredSpans: Span[] = [
@@ -53,6 +54,7 @@ function Gallery() {
         <Trace.Lane>
           <Trace.Bar />
           <Trace.Markers />
+          <Trace.Slowest />
         </Trace.Lane>
       </Trace.Rows>
     </Trace.Waterfall>

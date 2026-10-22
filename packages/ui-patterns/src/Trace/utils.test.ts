@@ -181,6 +181,22 @@ describe('buildTraceIndex', () => {
     expect(buildTraceIndex(treeSpans, 150).bounds).toEqual([0, 150])
     expect(buildTraceIndex([]).bounds).toEqual([0, 0])
   })
+
+  it('flags isLive when any span has not ended', () => {
+    expect(index.isLive).toBe(true)
+    expect(buildTraceIndex(treeSpans.filter((s) => s.id !== 'running')).isLive).toBe(false)
+  })
+
+  it('floors bounds to minRangeMs only while live', () => {
+    expect(buildTraceIndex(treeSpans, undefined, 500).bounds).toEqual([0, 500])
+    const finished = treeSpans.filter((s) => s.id !== 'running')
+    expect(buildTraceIndex(finished, undefined, 500).bounds).toEqual([0, 100])
+  })
+
+  it('picks the longest finished span as slowestId, ignoring running spans', () => {
+    expect(index.slowestId).toBe('root')
+    expect(buildTraceIndex([]).slowestId).toBeNull()
+  })
 })
 
 describe('flattenTree', () => {

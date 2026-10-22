@@ -1,4 +1,4 @@
-import type { Dispatch, ReactNode } from 'react'
+import type { Dispatch, ReactNode, RefObject } from 'react'
 
 export type SpanStatus = 'ok' | 'error' | 'unset'
 
@@ -49,6 +49,8 @@ export interface TraceIndex {
   bounds: TimeWindow
   nowMs: number
   serviceNames: readonly string[]
+  isLive: boolean
+  slowestId: string | null
 }
 
 export type FilterMatch = 'inactive' | 'match' | 'ancestor'
@@ -165,6 +167,7 @@ export interface ViewContextValue {
   query: string
   matchIds: ReadonlySet<string> | null
   dispatch: Dispatch<ViewAction>
+  rootRef: RefObject<HTMLDivElement | null>
 }
 
 export interface SpanContextValue {
@@ -185,5 +188,6 @@ export interface RootProps {
   onWindowChange?: (window: TimeWindow) => void
   defaultCollapsed?: ReadonlySet<string>
   defaultQuery?: string
+  minRangeMs?: number
   children?: ReactNode
 }

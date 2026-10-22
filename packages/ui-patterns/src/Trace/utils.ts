@@ -37,7 +37,11 @@ function compareByStart(byId: ReadonlyMap<string, Span>) {
   }
 }
 
-export function buildTraceIndex(spans: readonly Span[], nowMs?: number): TraceIndex {
+export function buildTraceIndex(
+  spans: readonly Span[],
+  nowMs?: number,
+  minRangeMs?: number
+): TraceIndex {
   const byId = new Map<string, Span>()
   for (const span of spans) byId.set(span.id, span)
 
@@ -48,11 +52,13 @@ export function buildTraceIndex(spans: readonly Span[], nowMs?: number): TraceIn
 
   let minStart = Number.POSITIVE_INFINITY
   let maxKnown = Number.NEGATIVE_INFINITY
+  let isLive = false
 
   for (const span of byId.values()) {
     services.add(span.serviceName)
     if (span.startMs < minStart) minStart = span.startMs
     if (span.startMs > maxKnown) maxKnown = span.startMs
+    if (span.endMs === null) isLive = true
     if (span.endMs !== null && span.endMs > maxKnown) maxKnown = span.endMs
 
     const hasParent = span.parentId !== null && byId.has(span.parentId)
@@ -104,8 +110,19 @@ export function buildTraceIndex(spans: readonly Span[], nowMs?: number): TraceIn
     descendantCountOf.set(id, count)
   }
 
+  let slowestId: string | null = null
+  let slowestDuration = 0
+  for (const span of byId.values()) {
+    if (span.endMs === null) continue
+    const duration = span.endMs - span.startMs
+    if (duration <= slowestDuration) continue
+    slowestDuration = duration
+    slowestId = span.id
+  }
+
+  const floor = isLive && minRangeMs ? minStart + minRangeMs : Number.NEGATIVE_INFINITY
   const bounds: TimeWindow = Number.isFinite(minStart)
-    ? [minStart, Math.max(maxEnd, minStart)]
+    ? [minStart, Math.max(maxEnd, minStart, floor)]
     : [0, 0]
 
   return {
@@ -119,6 +136,8 @@ export function buildTraceIndex(spans: readonly Span[], nowMs?: number): TraceIn
     bounds,
     nowMs: resolvedNow,
     serviceNames: Array.from(services).sort(),
+    isLive,
+    slowestId,
   }
 }
 

@@ -64,9 +64,13 @@ export function Root({
   onWindowChange,
   defaultCollapsed = EMPTY_SET,
   defaultQuery = '',
+  minRangeMs,
   children,
 }: RootProps) {
-  const index = useMemo(() => buildTraceIndex(trace.spans, trace.nowMs), [trace.spans, trace.nowMs])
+  const index = useMemo(
+    () => buildTraceIndex(trace.spans, trace.nowMs, minRangeMs),
+    [trace.spans, trace.nowMs, minRangeMs]
+  )
 
   const [state, rawDispatch] = useReducer(
     viewReducer,
@@ -136,6 +140,7 @@ export function Root({
 
   const selectedId = isSelectionControlled ? (selectedIdProp ?? null) : state.selectedId
   const matchIds = useMemo(() => computeMatchIds(index, state.query), [index, state.query])
+  const rootRef = useRef<HTMLDivElement | null>(null)
 
   const view = useMemo<ViewContextValue>(
     () => ({
@@ -148,14 +153,17 @@ export function Root({
       query: state.query,
       matchIds,
       dispatch,
+      rootRef,
     }),
     [window, bounds, selectedId, state.hoveredId, state.collapsed, state.query, matchIds, dispatch]
   )
 
   return (
-    <DataContext.Provider value={index}>
-      <ViewContext.Provider value={view}>{children}</ViewContext.Provider>
-    </DataContext.Provider>
+    <div ref={rootRef} data-trace-root style={{ display: 'contents' }}>
+      <DataContext.Provider value={index}>
+        <ViewContext.Provider value={view}>{children}</ViewContext.Provider>
+      </DataContext.Provider>
+    </div>
   )
 }
 

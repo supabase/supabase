@@ -1,4 +1,4 @@
-import { Bar, Duration, Markers } from './Bar'
+import { Bar, CollapsedChildren, Duration, Markers, Slowest } from './Bar'
 import { Cell } from './Cell'
 import { CollapseAll, Filter, Header, ResetZoom, Status, Title } from './Header'
 import { Inspector } from './Inspector'
@@ -22,6 +22,8 @@ export const Trace = {
   Lane,
   Bar,
   Markers,
+  Slowest,
+  CollapsedChildren,
   Duration,
   Inspector,
 }

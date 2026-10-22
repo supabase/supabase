@@ -2,6 +2,7 @@
 
 import { ChevronRight, CircleAlert, Copy, CornerDownRight, ExternalLink } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -11,6 +12,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
   copyToClipboard,
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
   ScrollArea,
   Table,
   TableBody,
@@ -351,49 +355,106 @@ function Links({ span }: { span: Span }) {
   )
 }
 
-export interface InspectorProps extends ComponentProps<'aside'> {
-  spanId?: string
-  emptyMessage?: ReactNode
+function findAnchor(root: HTMLElement | null, id: string): HTMLElement | null {
+  const row = root?.querySelector<HTMLElement>(`[data-trace-row-id="${CSS.escape(id)}"]`) ?? null
+  if (!row) return null
+  return row.querySelector<HTMLElement>('[data-trace-bar]') ?? row
 }
 
-export function Inspector({ spanId, emptyMessage, className, ...props }: InspectorProps) {
+function useRowAnchor(rootRef: { current: HTMLDivElement | null }, id: string | null) {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (id === null) {
+      setAnchorEl(null)
+      return
+    }
+    let frame = 0
+    let attempt = 0
+    const find = () => {
+      const el = findAnchor(rootRef.current, id)
+      if (el) {
+        setAnchorEl(el)
+        return
+      }
+      if (attempt++ < 5) frame = requestAnimationFrame(find)
+      else setAnchorEl(null)
+    }
+    find()
+
+    const recheck = () => {
+      setAnchorEl((previous) => {
+        const el = findAnchor(rootRef.current, id)
+        return previous === el ? previous : el
+      })
+    }
+    document.addEventListener('scroll', recheck, true)
+    return () => {
+      cancelAnimationFrame(frame)
+      document.removeEventListener('scroll', recheck, true)
+    }
+  }, [rootRef, id])
+
+  return anchorEl
+}
+
+export interface InspectorProps extends Omit<ComponentProps<typeof PopoverContent>, 'children'> {
+  spanId?: string
+}
+
+export function Inspector({ spanId, className, ...props }: InspectorProps) {
   const data = useData()
-  const { selectedId } = useView()
+  const { selectedId, dispatch, rootRef } = useView()
   const resolvedId = spanId ?? selectedId
   const span = resolvedId !== null ? (data.byId.get(resolvedId) ?? null) : null
+  const isSelection = spanId === undefined
+  const anchorEl = useRowAnchor(rootRef, resolvedId)
+
+  const virtualRef = useMemo(() => {
+    if (!anchorEl) return null
+    return {
+      current: {
+        getBoundingClientRect: () => anchorEl.getBoundingClientRect(),
+        contextElement: anchorEl,
+      },
+    }
+  }, [anchorEl])
+
+  if (!span) return null
 
   return (
-    <aside
-      role="complementary"
-      aria-label="Span details"
-      data-trace-inspector
-      data-empty={span ? undefined : ''}
-      className={cn(
-        'flex min-h-0 flex-col overflow-hidden border-l border-default bg-surface-100 text-xs',
-        className
-      )}
-      {...props}
+    <Popover
+      key={resolvedId}
+      open
+      onOpenChange={(open) => {
+        if (!open && isSelection) dispatch({ type: 'select', id: null })
+      }}
     >
-      {!span && (
-        <div
-          data-trace-inspector-empty
-          className="flex flex-1 items-center justify-center p-6 text-center text-xs text-foreground-light"
-        >
-          {emptyMessage ?? 'Select a span to see its details'}
-        </div>
+      {virtualRef ? (
+        <PopoverAnchor virtualRef={virtualRef} />
+      ) : (
+        <PopoverAnchor asChild>
+          <span aria-hidden className="sr-only" />
+        </PopoverAnchor>
       )}
-      {span && (
-        <>
-          <SpanHeader span={span} />
-          <ScrollArea className="min-h-0 flex-1">
-            <Section title="Attributes" count={Object.keys(span.attributes).length}>
-              <KeyValue data={span.attributes} />
-            </Section>
-            <Events span={span} />
-            <Links span={span} />
-          </ScrollArea>
-        </>
-      )}
-    </aside>
+      <PopoverContent
+        side="bottom"
+        align="start"
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        data-trace-inspector
+        aria-label={`${span.name} details`}
+        className={cn('flex max-h-96 w-96 flex-col overflow-hidden p-0 text-xs', className)}
+        {...props}
+      >
+        <SpanHeader span={span} />
+        <ScrollArea className="min-h-0 flex-1">
+          <Section title="Attributes" count={Object.keys(span.attributes).length}>
+            <KeyValue data={span.attributes} />
+          </Section>
+          <Events span={span} />
+          <Links span={span} />
+        </ScrollArea>
+      </PopoverContent>
+    </Popover>
   )
 }

@@ -43,19 +43,25 @@ export const STATUS_BADGE_VARIANT: Record<SpanStatus, BadgeProps['variant']> = {
 }
 
 export function Status({ className, children, ...props }: Omit<BadgeProps, 'variant'>) {
-  const { roots, byId } = useData()
+  const { roots, byId, isLive } = useData()
   const root = roots.length > 0 ? byId.get(roots[0]) : undefined
   const status: SpanStatus = root?.status ?? 'unset'
+  const announcement = isLive ? 'Live' : status === 'error' ? 'Failed' : 'Done'
   return (
-    <Badge
-      variant={STATUS_BADGE_VARIANT[status]}
-      data-trace-status
-      data-status={status}
-      className={className}
-      {...props}
-    >
-      {children ?? status}
-    </Badge>
+    <>
+      <Badge
+        variant={STATUS_BADGE_VARIANT[status]}
+        data-trace-status
+        data-status={status}
+        className={className}
+        {...props}
+      >
+        {children ?? status}
+      </Badge>
+      <span role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </span>
+    </>
   )
 }
 

@@ -36,8 +36,8 @@ export default function TraceWaterfallUrlSyncDemo() {
         ?{PARAM}={selectedId ?? '(none)'}
       </p>
       <Trace.Root trace={sample} selectedId={selectedId} onSelectedIdChange={setSelectedId}>
-        <div className="flex h-72 overflow-hidden rounded-md border border-default">
-          <Trace.Waterfall treeWidth={240} className="min-w-0 flex-1 rounded-none border-0">
+        <div className="h-72 overflow-hidden rounded-md border border-default">
+          <Trace.Waterfall treeWidth={240} className="h-full rounded-none border-0">
             <Trace.Ruler />
             <Trace.Rows rowHeight={26}>
               <Trace.Cell />
@@ -46,8 +46,8 @@ export default function TraceWaterfallUrlSyncDemo() {
               </Trace.Lane>
             </Trace.Rows>
           </Trace.Waterfall>
-          <Trace.Inspector className="w-72 shrink-0" />
         </div>
+        <Trace.Inspector />
       </Trace.Root>
     </div>
   )

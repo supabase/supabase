@@ -2,7 +2,7 @@
 
 import { CircleAlert } from 'lucide-react'
 import type { ComponentProps } from 'react'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useSpan } from './hooks/useSpan'
 import { useData, useView } from './Trace'
@@ -44,6 +44,7 @@ export function Bar({ className, style, children, ...props }: ComponentProps<'di
         'data-[clip=start]:rounded-l-none data-[clip=end]:rounded-r-none data-[clip=both]:rounded-none',
         'data-[zero-duration]:w-0.5',
         'data-[running]:bg-[repeating-linear-gradient(135deg,currentColor_0_6px,transparent_6px_10px)] data-[running]:motion-safe:animate-pulse',
+        'data-[running]:transition-[width] data-[running]:duration-300 data-[running]:ease-linear motion-reduce:transition-none',
         className
       )}
       style={{
@@ -117,6 +118,72 @@ export function Markers() {
   )
 }
 
+export function Slowest({ className, ...props }: ComponentProps<'div'>) {
+  const { span, isRunning } = useSpan()
+  const { window } = useView()
+  const { nowMs, slowestId } = useData()
+  if (span.id !== slowestId) return null
+
+  const endMs = effectiveEndMs(span, isRunning ? Math.max(nowMs, window[1]) : nowMs)
+  const geometry = computeBarGeometry(span.startMs, endMs, window)
+  if (!geometry.isVisible) return null
+
+  const rightFraction = geometry.leftFraction + geometry.widthFraction
+
+  return (
+    <Badge
+      variant="warning"
+      data-trace-slowest
+      className={cn(
+        'pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap border-warning-500 bg-background shadow-sm',
+        className
+      )}
+      style={{ right: `calc(${(1 - rightFraction) * 100}% + 4px)` }}
+      {...props}
+    >
+      Slowest
+    </Badge>
+  )
+}
+
+const MAX_COLLAPSED_MARKS = 200
+
+export function CollapsedChildren({ className, ...props }: ComponentProps<'div'>) {
+  const { row } = useSpan()
+  const { window } = useView()
+  const { byId, childrenOf, nowMs } = useData()
+
+  if (!row.hasChildren || row.isExpanded) return null
+  const childIds = childrenOf.get(row.id)
+  if (!childIds || childIds.length === 0 || childIds.length > MAX_COLLAPSED_MARKS) return null
+
+  return (
+    <>
+      {childIds.map((childId) => {
+        const child = byId.get(childId)
+        if (!child) return null
+        const endMs = effectiveEndMs(child, nowMs)
+        const geometry = computeBarGeometry(child.startMs, endMs, window)
+        if (!geometry.isVisible) return null
+
+        return (
+          <div
+            key={childId}
+            aria-hidden
+            data-trace-collapsed-mark
+            className={cn(
+              'pointer-events-none absolute top-1/2 h-[30%] w-px -translate-y-1/2 bg-background/70',
+              className
+            )}
+            style={{ left: `${(geometry.leftFraction + geometry.widthFraction / 2) * 100}%` }}
+            {...props}
+          />
+        )
+      })}
+    </>
+  )
+}
+
 export function Duration({ className, ...props }: ComponentProps<'span'>) {
   const { span, isRunning } = useSpan()
   const { nowMs } = useData()
@@ -127,7 +194,7 @@ export function Duration({ className, ...props }: ComponentProps<'span'>) {
       data-trace-duration
       className={cn(
         'shrink-0 font-mono text-xs tabular-nums text-foreground-lighter tracking-wide',
-        isRunning && 'text-foreground-light',
+        isRunning && 'text-foreground-light motion-safe:animate-pulse',
         className
       )}
       {...props}

@@ -29,19 +29,21 @@ export default function TraceWaterfallDemo() {
           </Toggle>
         </Trace.Header>
         <Trace.Minimap />
-        <div className="flex flex-col overflow-hidden rounded-md border border-default">
+        <div className="overflow-hidden rounded-md border border-default">
           <Trace.Waterfall treeWidth={300} className="h-[360px] w-full">
             <Trace.Ruler />
             <Trace.Rows rowHeight={28}>
               <Trace.Cell />
               <Trace.Lane>
                 <Trace.Bar />
+                <Trace.CollapsedChildren />
                 <Trace.Markers />
+                <Trace.Slowest />
               </Trace.Lane>
             </Trace.Rows>
           </Trace.Waterfall>
-          <Trace.Inspector className="h-72 border-l-0 border-t border-default" />
         </div>
+        <Trace.Inspector />
       </Trace.Root>
     </div>
   )

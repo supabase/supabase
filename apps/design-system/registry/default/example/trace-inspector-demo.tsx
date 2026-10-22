@@ -38,7 +38,7 @@ export default function TraceInspectorDemo() {
         selectedId={selectedId === 'none' ? null : selectedId}
         onSelectedIdChange={(id) => setSelectedId(id ?? 'none')}
       >
-        <Trace.Inspector className="h-[420px] w-full max-w-md rounded-md border" />
+        <Trace.Inspector />
       </Trace.Root>
     </div>
   )
