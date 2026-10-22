@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -40,7 +40,6 @@ mockAnimationsApi()
 const params = vi.hoisted(() => ({
   ref: 'default' as string | undefined,
   id: '25837' as string | undefined,
-  sidebar: undefined as string | undefined,
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -90,7 +89,6 @@ describe('TableEditorMenu schema switch', () => {
   beforeEach(() => {
     params.ref = 'default'
     params.id = '25837'
-    params.sidebar = undefined
     localStorage.clear()
     mockMenuApis()
     mockRouter.setCurrentUrl('/project/default/editor/25837?schema=public')
@@ -98,33 +96,7 @@ describe('TableEditorMenu schema switch', () => {
     vi.spyOn(mockRouter, 'push').mockClear()
   })
 
-  test('replaces the open table with the schema list', async () => {
-    customRender(<TableEditorMenu />, { nuqs: { searchParams: '?schema=public' } })
-    await openSchemaList()
-    await userEvent.click(screen.getByRole('option', { name: 'auth' }))
-
-    expect(mockRouter.replace).toHaveBeenCalledWith('/project/default/editor?schema=auth')
-    expect(mockRouter.push).not.toHaveBeenCalled()
-  })
-
-  test('keeps a sidebar param when leaving the open table', async () => {
-    params.sidebar = 'ai-assistant'
-    mockRouter.setCurrentUrl('/project/default/editor/25837?schema=public&sidebar=ai-assistant')
-
-    customRender(<TableEditorMenu />, {
-      nuqs: { searchParams: '?schema=public&sidebar=ai-assistant' },
-    })
-    await openSchemaList()
-    await userEvent.click(screen.getByRole('option', { name: 'extensions' }))
-
-    expect(mockRouter.replace).toHaveBeenCalledWith(
-      '/project/default/editor?schema=extensions&sidebar=ai-assistant'
-    )
-  })
-
-  test('pushes a history entry when switching schema from the list', async () => {
-    params.id = undefined
-    mockRouter.setCurrentUrl('/project/default/editor?schema=public')
+  test('pushes a schema change without leaving the open table', async () => {
     const onUrlUpdate = vi.fn()
 
     customRender(<TableEditorMenu />, {
@@ -135,6 +107,7 @@ describe('TableEditorMenu schema switch', () => {
 
     expect(mockRouter.replace).not.toHaveBeenCalled()
     expect(mockRouter.push).not.toHaveBeenCalled()
+    expect(mockRouter.asPath).toBe('/project/default/editor/25837?schema=public')
     await waitFor(() => {
       expect(onUrlUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -143,5 +116,54 @@ describe('TableEditorMenu schema switch', () => {
         })
       )
     })
+  })
+
+  test('syncs the dropdown to the url schema on back', async () => {
+    const onUrlUpdate = vi.fn()
+
+    customRender(<TableEditorMenu />, {
+      nuqs: { hasMemory: true, searchParams: '?schema=public', onUrlUpdate },
+    })
+    await screen.findByRole('combobox', { name: 'Schema public' })
+
+    act(() => {
+      window.history.pushState({}, '', '/project/default/editor/25837?schema=auth')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    })
+
+    await waitFor(() => {
+      expect(onUrlUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          queryString: '?schema=auth',
+          options: expect.objectContaining({ history: 'replace' }),
+        })
+      )
+    })
+    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(mockRouter.push).not.toHaveBeenCalled()
+  })
+
+  test('keeps a sidebar param when switching schema', async () => {
+    mockRouter.setCurrentUrl('/project/default/editor/25837?schema=public&sidebar=ai-assistant')
+    const onUrlUpdate = vi.fn()
+
+    customRender(<TableEditorMenu />, {
+      nuqs: { hasMemory: true, searchParams: '?schema=public&sidebar=ai-assistant', onUrlUpdate },
+    })
+    await openSchemaList()
+    await userEvent.click(screen.getByRole('option', { name: 'extensions' }))
+
+    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(mockRouter.push).not.toHaveBeenCalled()
+    await waitFor(() => {
+      expect(onUrlUpdate).toHaveBeenCalled()
+    })
+    const update = onUrlUpdate.mock.calls.at(-1)?.[0] as {
+      searchParams: URLSearchParams
+      options: { history: string }
+    }
+    expect(update.searchParams.get('schema')).toBe('extensions')
+    expect(update.searchParams.get('sidebar')).toBe('ai-assistant')
+    expect(update.options.history).toBe('push')
   })
 })

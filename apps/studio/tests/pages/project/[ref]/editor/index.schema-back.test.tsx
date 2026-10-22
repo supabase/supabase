@@ -103,24 +103,7 @@ describe('Table Editor index schema and history', () => {
     mockRouter.setCurrentUrl('/project/default/editor')
   })
 
-  test('opens the last table when the explicit schema matches it', async () => {
-    mockNavigationType('navigate')
-    seedLastTable({ tableId: 12, schema: 'auth' })
-    params.schema = 'auth'
-    mockRouter.setCurrentUrl('/project/default/editor?schema=auth')
-    const replace = vi.spyOn(mockRouter, 'replace')
-
-    const queryClient = renderIndex()
-    await waitForHistory(queryClient)
-
-    await waitFor(() => {
-      expect(replace).toHaveBeenCalledWith(
-        expect.stringMatching(/\/project\/default\/editor\/12\?schema=auth$/)
-      )
-    })
-  })
-
-  test('does not redirect when the explicit schema does not match the last table', async () => {
+  test('opens the last table and keeps an explicit schema from another schema', async () => {
     mockNavigationType('navigate')
     seedLastTable({ tableId: 12, schema: 'auth' })
     params.schema = 'public'
@@ -129,13 +112,15 @@ describe('Table Editor index schema and history', () => {
 
     const queryClient = renderIndex()
     await waitForHistory(queryClient)
-    await waitForRedirectDecision()
 
-    expect(replace).not.toHaveBeenCalled()
-    expect(mockRouter.asPath).toBe('/project/default/editor?schema=public')
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(
+        expect.stringMatching(/\/project\/default\/editor\/12\?schema=public$/)
+      )
+    })
   })
 
-  test('does not redirect on a history pop even when the schema matches', async () => {
+  test('does not redirect on a history pop, including after the schema changes', async () => {
     mockNavigationType('navigate')
     seedLastTable({ tableId: 12, schema: 'public' })
     params.schema = 'public'
@@ -149,6 +134,21 @@ describe('Table Editor index schema and history', () => {
 
     expect(replace).not.toHaveBeenCalled()
     expect(mockRouter.asPath).toBe('/project/default/editor?schema=public')
+
+    const decisionsBeforeSchemaChange = vi.mocked(isHistoryTraverseNavigation).mock.calls.length
+
+    await act(async () => {
+      params.schema = 'auth'
+      mockRouter.setCurrentUrl('/project/default/editor?schema=auth')
+    })
+
+    await waitFor(() => {
+      expect(mockRouter.query.schema).toBe('auth')
+    })
+    expect(vi.mocked(isHistoryTraverseNavigation).mock.calls.length).toBe(
+      decisionsBeforeSchemaChange
+    )
+    expect(replace).not.toHaveBeenCalled()
   })
 
   test('does not redirect when the document was restored with back or forward', async () => {
@@ -166,28 +166,27 @@ describe('Table Editor index schema and history', () => {
   test('does not reopen the last table if the schema changes after the visit is decided', async () => {
     mockNavigationType('navigate')
     seedLastTable({ tableId: 12, schema: 'auth' })
-    params.schema = 'public'
-    mockRouter.setCurrentUrl('/project/default/editor?schema=public')
     const replace = vi.spyOn(mockRouter, 'replace')
 
     const queryClient = renderIndex()
     await waitForHistory(queryClient)
-    await waitForRedirectDecision()
-    expect(replace).not.toHaveBeenCalled()
 
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledTimes(1)
+    })
     const decisionsBeforeSchemaChange = vi.mocked(isHistoryTraverseNavigation).mock.calls.length
 
     await act(async () => {
-      params.schema = 'auth'
-      mockRouter.setCurrentUrl('/project/default/editor?schema=auth')
+      params.schema = 'public'
+      mockRouter.setCurrentUrl('/project/default/editor?schema=public')
     })
 
     await waitFor(() => {
-      expect(mockRouter.query.schema).toBe('auth')
+      expect(mockRouter.query.schema).toBe('public')
     })
     expect(vi.mocked(isHistoryTraverseNavigation).mock.calls.length).toBe(
       decisionsBeforeSchemaChange
     )
-    expect(replace).not.toHaveBeenCalled()
+    expect(replace).toHaveBeenCalledTimes(1)
   })
 })
