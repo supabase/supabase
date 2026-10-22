@@ -103,3 +103,7 @@ export function getRemainingRecoveryGap({
   if (remainingGap === 'exhausted' && isFactorComplete) return null
   return remainingGap
 }
+
+export function resetRecoveryReminderSession(userId: string) {
+  fallback.delete(getStorageKey(userId))
+}

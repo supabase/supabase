@@ -9,6 +9,7 @@ import {
   getRemainingRecoveryGap,
   isRecoveryReminderSnoozed,
   readRecoveryReminderSnooze,
+  resetRecoveryReminderSession,
   writeRecoveryReminderSnooze,
 } from './recovery-reminder'
 
@@ -77,6 +78,14 @@ describe('recovery reminder storage', () => {
     expect(readRecoveryReminderSnooze('other-user')).toBeNull()
     clearRecoveryReminderSnooze('blocked-user')
     expect(readRecoveryReminderSnooze('blocked-user')).toBeNull()
+  })
+
+  it('resets memory-only snooze when a sign-in session ends', () => {
+    vi.spyOn(safeLocalStorage, 'setItem').mockImplementation(() => {})
+    writeRecoveryReminderSnooze('reset-session', 'missing', NOW)
+    expect(readRecoveryReminderSnooze('reset-session')).not.toBeNull()
+    resetRecoveryReminderSession('reset-session')
+    expect(readRecoveryReminderSnooze('reset-session')).toBeNull()
   })
 
   it('does not restore stale storage when removal fails', () => {
