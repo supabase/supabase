@@ -130,10 +130,6 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
                 setSelectedWrapperToEdit(null)
                 setIsClosingEditWrapper(false)
               }}
-              onCommit={() => {
-                setSelectedWrapperToEdit(null)
-                setIsClosingEditWrapper(false)
-              }}
               isClosing={isClosingEditWrapper}
               setIsClosing={setIsClosingEditWrapper}
             />

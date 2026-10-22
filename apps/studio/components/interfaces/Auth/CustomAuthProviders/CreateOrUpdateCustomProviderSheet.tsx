@@ -47,7 +47,6 @@ interface CreateOrUpdateCustomProviderSheetProps {
   visible: boolean
   providerToEdit?: CustomOAuthProvider
   onClose: () => void
-  onCommit?: () => void
 }
 
 const SharedFormSchema = z.object({
@@ -112,7 +111,6 @@ export const CreateOrUpdateCustomProviderSheet = ({
   visible,
   providerToEdit,
   onClose,
-  onCommit,
 }: CreateOrUpdateCustomProviderSheetProps) => {
   const isEditMode = !!providerToEdit
   const { ref: projectRef } = useParams()
@@ -163,14 +161,14 @@ export const CreateOrUpdateCustomProviderSheet = ({
     useOAuthCustomProviderCreateMutation({
       onSuccess: () => {
         toast.success('Custom provider created successfully')
-        ;(onCommit ?? onClose)()
+        onClose()
       },
     })
   const { mutate: updateCustomProvider, isPending: isUpdating } =
     useOAuthCustomProviderUpdateMutation({
       onSuccess: () => {
         toast.success('Custom provider updated successfully')
-        ;(onCommit ?? onClose)()
+        onClose()
       },
     })
 

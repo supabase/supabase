@@ -282,7 +282,6 @@ export const EnumeratedTypes = () => {
       <CreateEnumeratedTypeSidePanel
         visible={showCreateTypePanel}
         onClose={() => setShowCreateTypePanel(false)}
-        onCommit={() => setShowCreateTypePanel(false)}
         schema={selectedSchema}
       />
 
@@ -290,7 +289,6 @@ export const EnumeratedTypes = () => {
         visible={!!typeToEdit}
         selectedEnumeratedType={typeToEdit}
         onClose={() => setSelectedTypeIdToEdit(null)}
-        onCommit={() => setSelectedTypeIdToEdit(null)}
       />
 
       <ConfirmationModal

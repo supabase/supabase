@@ -53,7 +53,6 @@ interface CreateHookSheetProps {
   title: HOOK_DEFINITION_TITLE | null
   authConfig: AuthConfigResponse
   onClose: () => void
-  onCommit?: () => void
   onDelete: () => void
 }
 
@@ -121,7 +120,6 @@ export const CreateHookSheet = ({
   title,
   authConfig,
   onClose,
-  onCommit,
   onDelete,
 }: CreateHookSheetProps) => {
   const { ref: projectRef } = useParams()
@@ -224,7 +222,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
           sql: joinSqlFragments(statements, '\n'),
         })
       }
-      ;(onCommit ?? onClose)()
+      onClose()
     },
     onError: (error) => {
       toast.error(`Failed to create hook: ${error.message}`)

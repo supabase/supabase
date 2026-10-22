@@ -30,12 +30,11 @@ import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 export interface CreateQueueSheetProps {
   visible: boolean
   onClose: () => void
-  onCommit?: () => void
 }
 
 const FORM_ID = 'create-queue-sidepanel'
 
-export const CreateQueueSheet = ({ visible, onClose, onCommit }: CreateQueueSheetProps) => {
+export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
 
@@ -102,7 +101,7 @@ export const CreateQueueSheet = ({ visible, onClose, onCommit }: CreateQueueShee
       {
         onSuccess: () => {
           toast.success(`Successfully created queue ${name}`)
-          ;(onCommit ?? onClose)()
+          onClose()
           router.push(`/project/${project?.ref}/integrations/queues/queues/${name}`)
         },
       }

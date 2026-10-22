@@ -175,11 +175,6 @@ export function JitDbAccessRuleSheet({
     setRuleIdToEdit(null)
   }
 
-  const onCommitSheet = () => {
-    setIsNewRule(false)
-    setRuleIdToEdit(null)
-  }
-
   const {
     confirmOnClose,
     handleOpenChange,
@@ -195,7 +190,7 @@ export function JitDbAccessRuleSheet({
       toast.success(
         mode === 'edit' ? 'Successfully updated user access' : 'Successfully granted user access'
       )
-      onCommitSheet()
+      onCloseSheet()
     },
     onError: (error) => {
       toast.error(`Failed to ${mode === 'edit' ? 'update' : 'grant'} user access: ${error.message}`)

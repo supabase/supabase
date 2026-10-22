@@ -178,12 +178,10 @@ export const QueueMessagesDataGrid = ({
                 key={props.row.msg_id}
                 {...props}
                 onClick={() => {
-                  if (typeof idx !== 'number' || idx < 0) {
-                    return
+                  if (typeof idx === 'number' && idx >= 0) {
+                    setSelectedMessageId(props.row.msg_id)
+                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                   }
-
-                  setSelectedMessageId(props.row.msg_id)
-                  gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                 }}
               />
             )

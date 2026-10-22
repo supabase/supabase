@@ -22,7 +22,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 interface CreateRolePanelProps {
   visible: boolean
   onClose: () => void
-  onCommit?: () => void
 }
 
 const FormSchema = z.object({
@@ -45,7 +44,7 @@ const initialValues = {
   canBypassRls: false,
 }
 
-export const CreateRolePanel = ({ visible, onClose, onCommit }: CreateRolePanelProps) => {
+export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const formId = 'create-new-role'
 
   const { data: project } = useSelectedProjectQuery()
@@ -59,7 +58,7 @@ export const CreateRolePanel = ({ visible, onClose, onCommit }: CreateRolePanelP
     onSuccess: (_, vars) => {
       toast.success(`Successfully created new role: ${vars.payload.name}`)
       form.reset(initialValues)
-      ;(onCommit ?? onClose)()
+      onClose()
     },
   })
 

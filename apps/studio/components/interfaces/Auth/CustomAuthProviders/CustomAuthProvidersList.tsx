@@ -544,10 +544,6 @@ export const CustomAuthProvidersList = () => {
           setShowCreateSheet(false)
           setSelectedProviderToEdit(null)
         }}
-        onCommit={() => {
-          setShowCreateSheet(false)
-          setSelectedProviderToEdit(null)
-        }}
       />
 
       <DeleteCustomProviderModal

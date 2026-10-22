@@ -197,9 +197,6 @@ export const QueuesTab = () => {
         onClose={() => {
           setCreateQueueSheetShown(false)
         }}
-        onCommit={() => {
-          setCreateQueueSheetShown(false)
-        }}
       />
     </>
   )

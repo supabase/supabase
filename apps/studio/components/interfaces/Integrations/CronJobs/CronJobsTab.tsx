@@ -124,12 +124,6 @@ export const CronjobsTab = () => {
     cleanPointerEventsNoneOnBody(500)
   }
 
-  const onCommit = () => {
-    setCronJobForEditing(null)
-    setCreateCronJobSheetShown(false)
-    cleanPointerEventsNoneOnBody(500)
-  }
-
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
       toast('Cron job not found')
@@ -177,7 +171,6 @@ export const CronjobsTab = () => {
         open={!!createCronJobSheetShown || !!cronJobForEditing}
         selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
         onClose={onClose}
-        onCommit={onCommit}
       />
     </>
   )

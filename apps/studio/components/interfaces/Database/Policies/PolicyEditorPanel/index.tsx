@@ -61,7 +61,6 @@ interface PolicyEditorPanelProps {
   selectedTable?: string
   selectedPolicy?: Policy
   onSelectCancel: () => void
-  onCommit?: () => void
   authContext: 'database' | 'realtime'
 }
 
@@ -91,7 +90,6 @@ export const PolicyEditorPanel = memo(function ({
   selectedTable,
   selectedPolicy,
   onSelectCancel,
-  onCommit,
   authContext,
 }: PolicyEditorPanelProps) {
   const { ref } = useParams()
@@ -145,7 +143,7 @@ export const PolicyEditorPanel = memo(function ({
       // refresh all policies
       await queryClient.invalidateQueries({ queryKey: databasePoliciesKeys.list(ref) })
       toast.success('Successfully created new policy')
-      ;(onCommit ?? onSelectCancel)()
+      onSelectCancel()
     },
     onError: (error) => setError(error),
   })
@@ -153,7 +151,7 @@ export const PolicyEditorPanel = memo(function ({
   const { mutate: updatePolicy, isPending: isUpdating } = useDatabasePolicyUpdateMutation({
     onSuccess: () => {
       toast.success('Successfully updated policy')
-      ;(onCommit ?? onSelectCancel)()
+      onSelectCancel()
     },
   })
 

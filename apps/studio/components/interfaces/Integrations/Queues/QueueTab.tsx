@@ -257,7 +257,6 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
       <SendMessageModal
         visible={sendMessageModalShown}
         onClose={() => setSendMessageModalShown(false)}
-        onCommit={() => setSendMessageModalShown(false)}
       />
       <DeleteQueue
         queueName={queueName!}

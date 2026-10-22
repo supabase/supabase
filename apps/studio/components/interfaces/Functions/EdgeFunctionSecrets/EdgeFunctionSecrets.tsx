@@ -214,7 +214,6 @@ export const EdgeFunctionSecrets = () => {
         secret={selectedSecretToEdit}
         visible={!!selectedSecretToEdit}
         onClose={() => setSelectedIdToEdit(null)}
-        onCommit={() => setSelectedIdToEdit(null)}
       />
 
       <ConfirmationModal

@@ -49,7 +49,6 @@ export interface EditWrapperSheetProps {
   wrapperMeta: WrapperMeta
   setIsClosing: (v: boolean) => void
   onClose: () => void
-  onCommit?: () => void
 }
 
 const FORM_ID = 'edit-wrapper-form'
@@ -60,7 +59,6 @@ export const EditWrapperSheet = ({
   isClosing,
   setIsClosing,
   onClose,
-  onCommit,
 }: EditWrapperSheetProps) => {
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
@@ -75,8 +73,7 @@ export const EditWrapperSheet = ({
       const { tables } = getValues()
       const hasNewSchema = (tables as Record<string, any>[]).some((table) => table.is_new_schema)
       if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
-      const handleSuccess = onCommit ?? onClose
-      handleSuccess()
+      onClose()
     },
   })
 

@@ -151,7 +151,6 @@ export const HooksListing = () => {
             if (hook) setSelectedHookForDeletion(hook)
           }}
           onClose={() => setHook(null)}
-          onCommit={() => setHook(null)}
           authConfig={authConfig!}
         />
 

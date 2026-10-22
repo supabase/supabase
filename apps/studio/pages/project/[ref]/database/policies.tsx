@@ -361,14 +361,6 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
                   setShowCreatePolicy(false)
                 }
               }}
-              onCommit={() => {
-                setSelectedTable(undefined)
-                if (isUpdatingPolicy) {
-                  setSelectedIdToEdit(null)
-                } else {
-                  setShowCreatePolicy(false)
-                }
-              }}
               authContext="database"
             />
           </PageSectionContent>

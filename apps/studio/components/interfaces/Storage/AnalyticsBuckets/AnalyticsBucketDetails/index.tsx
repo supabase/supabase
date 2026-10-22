@@ -251,7 +251,6 @@ export const AnalyticBucketDetails = () => {
         visible={showDeleteModal}
         bucketId={bucket?.name}
         onClose={() => setShowDeleteModal(false)}
-        onCommit={() => setShowDeleteModal(false)}
         onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />
     </>
