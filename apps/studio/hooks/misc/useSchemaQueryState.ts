@@ -40,5 +40,5 @@ export const useQuerySchemaState = () => {
     }
   }, [schema, ref])
 
-  return { selectedSchema: schema, setSelectedSchema, defaultSchema: originalDefaultSchema }
+  return { selectedSchema: schema, setSelectedSchema }
 }
