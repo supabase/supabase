@@ -170,7 +170,7 @@ Library defaults are too high for serverless. [Postgres.js](https://github.com/p
 
 Raise the pool above 1 only when you have evidence that concurrent invocations on one instance are queuing for the connection.
 
-For more on sizing an application-side pool, see the [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI). If you use Prisma, [Prisma troubleshooting](/docs/guides/database/prisma/prisma-troubleshooting) covers the equivalent `connection_limit` setting.
+For more on sizing an application-side pool, see the [Supavisor FAQ](/kb/troubleshooting/supavisor-faq-YyP5tI). If you use Prisma, [Prisma troubleshooting](/docs/guides/database/prisma/prisma-troubleshooting) covers the equivalent `connection_limit` setting.
 
 ### Transaction mode limitations
 
@@ -185,7 +185,7 @@ For more on sizing an application-side pool, see the [Supavisor FAQ](/docs/guide
 | asyncpg              | `statement_cache_size=0`                  |
 | JDBC                 | `prepareThreshold=0`                      |
 
-For node-postgres, Psycopg, and Rust drivers, see [Disabling prepared statements](/docs/guides/troubleshooting/disabling-prepared-statements-qL8lEL).
+For node-postgres, Psycopg, and Rust drivers, see [Disabling prepared statements](/kb/troubleshooting/disabling-prepared-statements-qL8lEL).
 
 **Cursors** work inside a single transaction only. A `with hold` cursor is meant to outlive its transaction, and it doesn't survive the connection returning to the pool.
 
@@ -213,7 +213,7 @@ Set SSL to `require` so the driver refuses to connect without encryption. Most d
 
 ### Stale connections
 
-Serverless runtimes freeze a function between requests, which can leave a pooled TCP socket stale. If you see `CONNECT_TIMEOUT` errors or queries that hang until the execution limit, see [Troubleshooting `CONNECT_TIMEOUT` or hanging queries in Serverless Functions](/docs/guides/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions-775f92).
+Serverless runtimes freeze a function between requests, which can leave a pooled TCP socket stale. If you see `CONNECT_TIMEOUT` errors or queries that hang until the execution limit, see [Troubleshooting `CONNECT_TIMEOUT` or hanging queries in Serverless Functions](/kb/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions).
 
 ## Quickstarts [#quickstarts]
 
@@ -258,7 +258,7 @@ Each quickstart connects one ORM or database GUI to your Supabase database.
 
 ### Troubleshooting
 
-- [Tenant or user not found](/docs/guides/troubleshooting/tenant-or-user-not-found), when the pooler can't match your host and username to a project.
-- [FATAL: Password authentication failed](/docs/guides/troubleshooting/fatal-password-authentication-failed)
-- [Connection refused](/docs/guides/troubleshooting/error-connection-refused-when-trying-to-connect-to-supabase-database-hwG0Dr), which is usually an IP ban rather than an outage.
-- [Too many connections](/docs/guides/troubleshooting/too-many-connections-for-database-postgres)
+- [Tenant or user not found](/kb/troubleshooting/tenant-or-user-not-found), when the pooler can't match your host and username to a project.
+- [FATAL: Password authentication failed](/kb/troubleshooting/fatal-password-authentication-failed)
+- [Connection refused](/kb/troubleshooting/error-connection-refused-when-trying-to-connect-to-supabase-database-hwG0Dr), which is usually an IP ban rather than an outage.
+- [Too many connections](/kb/troubleshooting/too-many-connections-for-database-postgres)

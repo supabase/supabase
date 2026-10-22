@@ -34,7 +34,7 @@ There are two kinds, and they work together.
 
 **Server-side poolers**, such as Supavisor in transaction mode, run in front of the database and serve many clients. Use one when connections come from serverless or edge functions, or from anything that scales horizontally. These environments open many short-lived connections, which is the case an application-side pooler can't cover.
 
-For more on when each is needed and how to size them, see the [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI).
+For more on when each is needed and how to size them, see the [Supavisor FAQ](/kb/troubleshooting/supavisor-faq-YyP5tI).
 
 ### Shared and dedicated poolers [#shared-pooler]
 
@@ -52,7 +52,7 @@ Pool size sets how many connections a pooler is allowed to open to Postgres. You
 
 Supavisor and PgBouncer read the same setting but apply it independently, so raising it raises the ceiling for both.
 
-For what the setting counts, and how it interacts with the user, database, and mode combinations connecting to your project, see [the Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI).
+For what the setting counts, and how it interacts with the user, database, and mode combinations connecting to your project, see [the Supavisor FAQ](/kb/troubleshooting/supavisor-faq-YyP5tI).
 
 ### Client connections and backend connections [#client-connections-and-backend-connections]
 
@@ -74,7 +74,7 @@ Direct connections +
 
 Stay below the maximum rather than at it. Supabase services hold their own connections, including Auth, Storage, PostgREST, and the health checker, and those come out of the same total. [Managing connections](/docs/guides/database/connection-management) covers how much headroom to leave.
 
-For the connection counts that come with each compute size, see [compute and disk](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections). For the terminology, see [Supavisor and connection terminology explained](/docs/guides/troubleshooting/supavisor-and-connection-terminology-explained-9pr_ZO).
+For the connection counts that come with each compute size, see [compute and disk](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections). For the terminology, see [Supavisor and connection terminology explained](/kb/troubleshooting/supavisor-and-connection-terminology-explained-9pr_ZO).
 
 ### Monitor connection usage [#monitor-connection-usage]
 
@@ -105,4 +105,4 @@ To list every connection with its state and query, and to read which Supabase se
 
 - [Connect to your database](/docs/guides/database/connecting-to-postgres)
 - [Managing connections](/docs/guides/database/connection-management)
-- [Supavisor FAQ](/docs/guides/troubleshooting/supavisor-faq-YyP5tI)
+- [Supavisor FAQ](/kb/troubleshooting/supavisor-faq-YyP5tI)
