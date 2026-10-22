@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useUser } from 'common'
 
 import { recoveryCodeKeys } from './keys'
 import { handleError } from '@/data/fetchers'
@@ -26,11 +27,13 @@ export const useRecoveryCodesStatusQuery = <TData = RecoveryCodesStatusData>({
   ...options
 }: UseCustomQueryOptions<RecoveryCodesStatusData, RecoveryCodesError, TData> & {
   userId?: string
-} = {}) =>
-  useQuery<RecoveryCodesStatusData, RecoveryCodesError, TData>({
-    queryKey: recoveryCodeKeys.status(userId),
+} = {}) => {
+  const signedInUserId = useUser()?.id
+  return useQuery<RecoveryCodesStatusData, RecoveryCodesError, TData>({
+    queryKey: recoveryCodeKeys.status(userId ?? signedInUserId),
     queryFn: () => getRecoveryCodesStatus(),
     staleTime: 1000 * 60 * 30,
     enabled,
     ...options,
   })
+}
