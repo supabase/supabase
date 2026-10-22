@@ -43,7 +43,7 @@ function SupavisorOverview(props: LogOverviewProps) {
   return (
     <>
       <DetailSectionHeader
-        title="Request started"
+        title="Event time"
         className="border-b"
         icon={ClockIcon}
         summary={timestamp === null ? undefined : new Date(timestamp).toLocaleString()}
