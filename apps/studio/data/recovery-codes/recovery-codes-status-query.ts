@@ -23,14 +23,11 @@ export type RecoveryCodesError = ResponseError
 
 export const useRecoveryCodesStatusQuery = <TData = RecoveryCodesStatusData>({
   enabled = true,
-  userId,
   ...options
-}: UseCustomQueryOptions<RecoveryCodesStatusData, RecoveryCodesError, TData> & {
-  userId?: string
-} = {}) => {
-  const signedInUserId = useUser()?.id
+}: UseCustomQueryOptions<RecoveryCodesStatusData, RecoveryCodesError, TData> = {}) => {
+  const userId = useUser()?.id
   return useQuery<RecoveryCodesStatusData, RecoveryCodesError, TData>({
-    queryKey: recoveryCodeKeys.status(userId ?? signedInUserId),
+    queryKey: recoveryCodeKeys.status(userId),
     queryFn: () => getRecoveryCodesStatus(),
     staleTime: 1000 * 60 * 30,
     enabled,
