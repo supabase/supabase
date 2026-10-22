@@ -322,17 +322,17 @@ function beginPanelTraversal() {
 }
 
 function clearPanelTraversalIfUnsettled(generation: number) {
-  // jsdom fires popstate two timers after back(). one timer clears the flag first.
+  // popstate settles the flag. this only covers a back that never navigates.
+  // two macrotasks is too soon: chrome can fire the click's navigate after that,
+  // and the guard then treats this close as another user back.
   window.setTimeout(() => {
-    window.setTimeout(() => {
-      const current = getStore()
+    const current = getStore()
 
-      if (current.traversalGeneration !== generation) return
-      if (current.traversalSettled === generation) return
+    if (current.traversalGeneration !== generation) return
+    if (current.traversalSettled === generation) return
 
-      current.panelTraversal = false
-    }, 0)
-  }, 0)
+    current.panelTraversal = false
+  }, 250)
 }
 
 /** Keep page-level unsaved-changes guards from trapping a panel's own back. */
