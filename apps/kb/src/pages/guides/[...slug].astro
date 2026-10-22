@@ -18,7 +18,7 @@ export async function getStaticPaths() {
 }
 
 const { guide, related } = Astro.props
-const { title, description, topics, github_url, date: dateModified } = guide.data
+const { title, description, topics, github_url, date } = guide.data
 const { Content, headings } = await render(guide)
 const toc = headings
 	.filter((heading) => heading.depth === 2 || heading.depth === 3)
@@ -31,7 +31,7 @@ const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb
 
 const url = canonicalUrl(Astro.url.pathname)
 const jsonLd = [
-	techArticleSchema({ url, headline: title, description, dateModified }),
+	techArticleSchema({ url, headline: title, description, dateModified: date }),
 	breadcrumbListSchema([
 		{ name: 'Knowledge Base', url: KB_BASE_URL },
 		{ name: title, url },
@@ -45,7 +45,7 @@ const jsonLd = [
 	topics={topics}
 	github_url={github_url}
 	viewGitHubLink={viewGitHubLink}
-	lastEdited={dateModified}
+	lastEdited={date}
 	jsonLd={jsonLd}
 	toc={toc}
 	related={related}
