@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import {
   Badge,
+  Button,
   Card,
   CardContent,
   Input,
@@ -39,6 +40,7 @@ import {
   useIsOrioleDb,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ServiceVersionsSection = () => {
   const { ref } = useParams()
@@ -88,6 +90,15 @@ export const ServiceVersionsSection = () => {
 
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
+
+  const hasValidationErrors = (data?.validation_errors ?? []).length > 0
+  const hasValidationWarnings = (data?.warnings ?? []).length > 0
+  const canShowUpgradeHint =
+    showDatabaseUpgrades &&
+    !isAwsK8s &&
+    !data?.eligible &&
+    !hasValidationErrors &&
+    !hasValidationWarnings
 
   return (
     <PageSection id="service-versions">
@@ -200,6 +211,25 @@ export const ServiceVersionsSection = () => {
                           </InputGroup>
                         </FormItemLayout>
                       </>
+                    )}
+
+                    {canShowUpgradeHint && (
+                      <Admonition
+                        type="note"
+                        title="Postgres upgrades appear here"
+                        description="When a newer Postgres version is available, an upgrade option shows in this section."
+                        actions={
+                          <Button size="tiny" asChild>
+                            <a
+                              href={`${DOCS_URL}/guides/platform/upgrading`}
+                              target="_blank"
+                              rel="noreferrer noopener"
+                            >
+                              Learn about upgrading
+                            </a>
+                          </Button>
+                        }
+                      />
                     )}
 
                     {showDatabaseUpgrades && data && data.eligible && !isAwsK8s ? (
