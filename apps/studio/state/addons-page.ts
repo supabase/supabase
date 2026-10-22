@@ -25,14 +25,9 @@ export function useAddonsPagePanel() {
     setPanelParam(null)
   }
 
-  const commitPanel = () => {
-    setPanelParam(null)
-  }
-
   return {
     panel,
     setPanel,
     closePanel,
-    commitPanel,
   }
 }

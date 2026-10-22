@@ -116,7 +116,7 @@ function getStore() {
   return created
 }
 
-function readNavigation(): NavigationLike | null {
+export function readNavigation(): NavigationLike | null {
   if (typeof window === 'undefined') return null
 
   const candidate = Reflect.get(window, 'navigation')
@@ -273,6 +273,15 @@ export function isPanelHistoryTraversalTo(url: string) {
   return sameHistoryUrl(href, url, window.location.href)
 }
 
+function detachPopStateListener() {
+  const store = getStore()
+
+  if (!store.popStateListening || typeof window === 'undefined') return
+
+  window.removeEventListener('popstate', onPopState, true)
+  store.popStateListening = false
+}
+
 function finishRestore(blocked: PanelGuard | null) {
   const store = getStore()
 
@@ -284,6 +293,7 @@ function finishRestore(blocked: PanelGuard | null) {
   store.restoreGeneration += 1
   clearRestoreTimer()
   clearPendingDestination()
+  detachPopStateListener()
 
   if (blocked) blocked.onBlock()
 }
@@ -308,6 +318,7 @@ function scheduleRestore(guard: PanelGuard, delta: number, expectedHref: string)
     latest.pendingGuard = null
     latest.expectedRestoreHref = null
     latest.restoreTimer = null
+    detachPopStateListener()
   }, RESTORE_TIMEOUT_MS)
 
   window.setTimeout(() => {
@@ -347,6 +358,7 @@ function onNavigate(event: Event) {
     store.expectedRestoreHref = null
     store.restoreGeneration += 1
     clearRestoreTimer()
+    detachPopStateListener()
   }
 
   const guard = [...store.guards].find((candidate) => candidate.shouldBlock())
@@ -386,6 +398,7 @@ function onPopState(event: PopStateEvent) {
   if (window.location.href === store.expectedRestoreHref) finishRestore(store.pendingGuard)
 }
 
+/** Capture-phase popstate only while a canceled dirty back is being restored. */
 function ensurePopStateListener() {
   const store = getStore()
 
@@ -415,24 +428,36 @@ function installListeners() {
 export function bindPanelTraversalRouter(events: RouterEvents) {
   const store = getStore()
 
-  if (store.routerEvents === events) return
+  if (store.routerEvents !== events) {
+    if (store.routerEvents) {
+      store.routerEvents.off('routeChangeComplete', clearPendingDestination)
+      store.routerEvents.off('routeChangeError', clearPendingDestination)
+    }
 
-  if (store.routerEvents) {
-    store.routerEvents.off('routeChangeComplete', clearPendingDestination)
-    store.routerEvents.off('routeChangeError', clearPendingDestination)
+    events.on('routeChangeComplete', clearPendingDestination)
+    events.on('routeChangeError', clearPendingDestination)
+    store.routerEvents = events
   }
 
-  events.on('routeChangeComplete', clearPendingDestination)
-  events.on('routeChangeError', clearPendingDestination)
-  store.routerEvents = events
+  return () => {
+    const current = getStore()
+
+    if (current.routerEvents !== events) return
+
+    events.off('routeChangeComplete', clearPendingDestination)
+    events.off('routeChangeError', clearPendingDestination)
+    current.routerEvents = null
+  }
 }
 
-function swallowFinished(result: unknown) {
+function swallowAbortedNavigation(result: unknown) {
   if (typeof result !== 'object' || result === null) return
 
-  const finished = Reflect.get(result, 'finished')
-  if (finished instanceof Promise) {
-    finished.catch(() => {
+  for (const key of ['committed', 'finished']) {
+    const promise = Reflect.get(result, key)
+    if (!(promise instanceof Promise)) continue
+
+    promise.catch(() => {
       clearPendingDestination()
     })
   }
@@ -447,7 +472,7 @@ function traverseBy(delta: number) {
 
   if (delta === -1 && typeof back === 'function') {
     const result = back.call(navigation)
-    swallowFinished(result)
+    swallowAbortedNavigation(result)
     return
   }
 
@@ -457,40 +482,6 @@ function traverseBy(delta: number) {
   }
 
   window.history.go(delta)
-}
-
-/**
- * Record the destination of `history.back` / `go` inside `run` so page guards
- * can recognize that traversal after popstate.
- */
-export function withPanelHistoryTraversal(run: () => void) {
-  const history = window.history
-  const originalBack = history.back
-  const originalForward = history.forward
-  const originalGo = history.go
-
-  history.back = () => {
-    rememberPendingDestination(destinationHref(-1))
-    originalBack.call(history)
-  }
-  history.forward = () => {
-    rememberPendingDestination(destinationHref(1))
-    originalForward.call(history)
-  }
-  history.go = (delta?: number) => {
-    if (typeof delta === 'number' && delta !== 0) {
-      rememberPendingDestination(destinationHref(delta))
-    }
-    originalGo.call(history, delta)
-  }
-
-  try {
-    run()
-  } finally {
-    history.back = originalBack
-    history.forward = originalForward
-    history.go = originalGo
-  }
 }
 
 /** Call immediately before the open write that should push. */
@@ -586,4 +577,5 @@ export function resetPanelHistoryForTests() {
   clearPendingTimer()
   clearRestoreTimer()
   clearArmTimers()
+  detachPopStateListener()
 }

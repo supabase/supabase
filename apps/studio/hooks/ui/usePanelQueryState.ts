@@ -1,17 +1,8 @@
 import { useQueryState, type UseQueryStateOptions, type UseQueryStateReturn } from 'nuqs'
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 
-import { armPanelPush, dismissPanelUrl, replacePanelUrl } from '@/lib/panel-history'
+import { armPanelPush, dismissPanelUrl, readNavigation, replacePanelUrl } from '@/lib/panel-history'
 import { panelHistoryAction } from '@/lib/panel-history.utils'
-
-function isValueUpdater(next: unknown): next is (current: unknown) => unknown {
-  return typeof next === 'function'
-}
-
-function readPanelValue(current: unknown, next: unknown) {
-  if (isValueUpdater(next)) return next(current)
-  return next
-}
 
 type PanelCallOptions = { history?: 'push' | 'replace' }
 
@@ -20,23 +11,17 @@ function readHistoryMode(history: unknown): 'push' | 'replace' | undefined {
   return undefined
 }
 
-function readNavigationTarget(): EventTarget | null {
-  if (typeof window === 'undefined') return null
-
-  const candidate = Reflect.get(window, 'navigation')
-  if (typeof candidate !== 'object' || candidate === null) return null
-  if (typeof Reflect.get(candidate, 'addEventListener') !== 'function') return null
-
-  return candidate as EventTarget
+function isPanelValueUpdater(next: unknown): next is (current: unknown) => unknown {
+  return typeof next === 'function'
 }
 
 /**
  * Going back resolves after `currententrychange`. Until that event, `location`
  * is still the open panel, so this must not resolve with the search read immediately.
- * Subscribe before `back()` — the double emits `currententrychange` synchronously.
+ * Subscribe before `back()` — that event can fire before `back()` returns.
  */
 function listenForEntryChange() {
-  const navigation = readNavigationTarget()
+  const navigation = readNavigation()
   let settled = false
   let timer: ReturnType<typeof setTimeout> | undefined
   let resolvePromise: (search: URLSearchParams) => void = () => {}
@@ -85,17 +70,21 @@ export function usePanelQueryState<T>(
 export function usePanelQueryState<T>(key: string, options: UseQueryStateOptions<T>) {
   const [value, setValue] = useQueryState(key, options)
   const parserHistory = readHistoryMode(options.history)
+  const valueRef = useRef(value)
+  valueRef.current = value
 
   const setPanelValue = useCallback(
     (next: Parameters<typeof setValue>[0], callOptions?: PanelCallOptions) => {
-      const resolved = readPanelValue(value, next)
+      const currentValue = valueRef.current
+      const resolved = isPanelValueUpdater(next) ? next(currentValue) : next
       const action = panelHistoryAction({
-        currentValue: value,
+        currentValue,
         nextValue: resolved,
         requestedHistory: callOptions?.history,
         parserHistory,
       })
-      const write = (history: 'push' | 'replace') => setValue(next, { ...callOptions, history })
+      const write = (history: 'push' | 'replace') =>
+        setValue(resolved as Parameters<typeof setValue>[0], { ...callOptions, history })
 
       if (action === 'noop') {
         return Promise.resolve(new URLSearchParams(window.location.search))
@@ -125,7 +114,7 @@ export function usePanelQueryState<T>(key: string, options: UseQueryStateOptions
 
       return write('replace')
     },
-    [key, parserHistory, setValue, value]
+    [key, parserHistory, setValue]
   )
 
   return [value, setPanelValue]

@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { usePreventNavigationOnUnsavedChanges } from './usePreventNavigationOnUnsavedChanges'
-import { resetPanelHistoryForTests, withPanelHistoryTraversal } from '@/lib/panel-history'
+import { armPanelPush, dismissPanelUrl, resetPanelHistoryForTests } from '@/lib/panel-history'
 import {
   installNavigationDouble,
   uninstallNavigationDouble,
@@ -59,15 +59,16 @@ describe('Next unsaved-change navigation guard', () => {
     push.mockRestore()
   })
 
-  it('lets a panel history traversal change routes while the page is dirty', async () => {
+  it('does not confirm again when a panel back starts a route change on a dirty page', async () => {
     installNavigationDouble()
     window.history.replaceState(null, '', '/overview')
-    window.history.pushState(null, '', '/project/default/observability?newReport=true')
     const { result } = renderHook(() => usePreventNavigationOnUnsavedChanges({ hasChanges: true }))
 
     act(() => {
-      withPanelHistoryTraversal(() => {
-        window.history.back()
+      armPanelPush('new')
+      window.history.pushState(null, '', '/overview?new=true')
+      dismissPanelUrl('new', () => {
+        window.history.replaceState(null, '', '/overview')
       })
     })
 

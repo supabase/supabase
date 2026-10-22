@@ -6,8 +6,11 @@ import { isPanelHistoryTraversalTo } from '@/lib/panel-history'
 // Vite selects this implementation; Next keeps the pages-router hook.
 export const usePreventNavigationOnUnsavedChanges = ({ hasChanges }: { hasChanges: boolean }) => {
   const shouldBlockFn = useCallback<ShouldBlockFn>(
-    ({ next }) => {
-      // The mapped blocker location drops href. At popstate time, location is the destination.
+    ({ action, next }) => {
+      const isTraversal = action === 'BACK' || action === 'FORWARD' || action === 'GO'
+      if (!isTraversal) return hasChanges
+
+      // The mapped blocker location drops href. After a traverse, location is the destination.
       const hrefValue = Reflect.get(next, 'href')
       const nextHref = typeof hrefValue === 'string' ? hrefValue : window.location.href
       if (isPanelHistoryTraversalTo(nextHref)) return false

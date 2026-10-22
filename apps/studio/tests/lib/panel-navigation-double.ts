@@ -131,11 +131,11 @@ export function installNavigationDouble() {
     configurable: true,
     writable: true,
     value: () => {
-      // a click's navigation.back() is user initiated. the finished promise
-      // rejects with AbortError when a later replace interrupts it.
-      const finished = Promise.resolve()
-      commitTraverse(-1, true)
-      return { finished, committed: finished }
+      // Scripted navigation.back() is not user initiated. committed and finished
+      // both reject with AbortError when a later navigation interrupts them.
+      const settled = Promise.resolve()
+      commitTraverse(-1, false)
+      return { finished: settled, committed: settled }
     },
   })
 

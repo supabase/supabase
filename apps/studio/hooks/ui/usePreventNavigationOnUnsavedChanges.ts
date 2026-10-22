@@ -57,11 +57,12 @@ export const usePreventNavigationOnUnsavedChanges = ({
       }
       setNavigateUrl(undefined)
     }
-    bindPanelTraversalRouter(router.events)
+    const unbindPanelTraversal = bindPanelTraversalRouter(router.events)
     window.addEventListener('beforeunload', handleBeforeUnload)
     router.events.on('routeChangeStart', handleBrowseAway)
 
     return () => {
+      unbindPanelTraversal()
       window.removeEventListener('beforeunload', handleBeforeUnload)
       router.events.off('routeChangeStart', handleBrowseAway)
     }

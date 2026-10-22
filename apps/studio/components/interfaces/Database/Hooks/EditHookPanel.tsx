@@ -102,7 +102,7 @@ export const EditHookPanel = () => {
     setSelectedHookIdToEdit(null)
   }
 
-  const onCommit = () => {
+  const handleCommit = () => {
     isClosingRef.current = true
     setShowCreateHookForm(false)
     setSelectedHookIdToEdit(null)
@@ -112,7 +112,7 @@ export const EditHookPanel = () => {
     {
       onSuccess: (_, variables) => {
         toast.success(`Successfully created new webhook "${variables.payload.name}"`)
-        onCommit()
+        handleCommit()
       },
       onError: (error) => {
         toast.error(`Failed to create webhook: ${error.message}`)
@@ -124,7 +124,7 @@ export const EditHookPanel = () => {
     {
       onSuccess: (res) => {
         toast.success(`Successfully updated webhook "${res.name}"`)
-        onCommit()
+        handleCommit()
       },
       onError: (error) => {
         toast.error(`Failed to update webhook: ${error.message}`)
@@ -167,36 +167,23 @@ export const EditHookPanel = () => {
     }
   }, [visible])
 
-  // Reset form when the panel opens or the webhook changes. A later `restUrl`
-  // (project load) must not wipe edits the user already made.
-  const formIdentityRef = useRef('')
-
+  // Reset form when panel opens with new selectedHook
   useEffect(() => {
-    if (!visible) {
-      formIdentityRef.current = ''
-      return
+    if (visible) {
+      form.reset({
+        name: selectedHook?.name ?? '',
+        table_id: selectedHook?.table_id?.toString() ?? '',
+        http_url: selectedHook?.function_args?.[0] ?? '',
+        http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
+        function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
+          ? 'supabase_function'
+          : 'http_request',
+        timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
+        events: selectedHook?.events ?? [],
+        httpHeaders: parseHeaders(selectedHook),
+        httpParameters: parseParameters(selectedHook),
+      })
     }
-
-    const identity = `${selectedHook?.id ?? 'new'}:${ref ?? ''}`
-    const openedOrSwitched = formIdentityRef.current !== identity
-
-    formIdentityRef.current = identity
-
-    if (!openedOrSwitched && form.formState.isDirty) return
-
-    form.reset({
-      name: selectedHook?.name ?? '',
-      table_id: selectedHook?.table_id?.toString() ?? '',
-      http_url: selectedHook?.function_args?.[0] ?? '',
-      http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
-      function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
-        ? 'supabase_function'
-        : 'http_request',
-      timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
-      events: selectedHook?.events ?? [],
-      httpHeaders: parseHeaders(selectedHook),
-      httpParameters: parseParameters(selectedHook),
-    })
   }, [visible, selectedHook, ref, restUrl, form])
 
   const queryClient = useQueryClient()

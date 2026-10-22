@@ -93,7 +93,11 @@ describe('DeleteSecretModal', () => {
           nuqs={{ hasMemory: true, searchParams, onUrlUpdate }}
         >
           <DeleteIdProbe />
-          <button type="button" onClick={() => setSearchParams('?delete=secret-1&restored=1')}>
+          <button
+            type="button"
+            tabIndex={0}
+            onClick={() => setSearchParams('?delete=secret-1&restored=1')}
+          >
             Restore forward
           </button>
           <DeleteSecretModal />

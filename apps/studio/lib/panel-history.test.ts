@@ -277,24 +277,6 @@ describe('panel history', () => {
     unsubscribe()
   })
 
-  it('does not confirm again when a click closes a dirty panel', () => {
-    const onBlock = vi.fn()
-    const replace = vi.fn()
-    const unsubscribe = registerPanelBackGuard({
-      shouldBlock: () => true,
-      onBlock,
-    })
-
-    armPanelPush('new')
-    window.history.pushState(null, '', PANEL_URL)
-    dismissPanelUrl('new', replace)
-
-    expect(onBlock).not.toHaveBeenCalled()
-    expect(replace).not.toHaveBeenCalled()
-    expect(window.location.search).toBe('')
-    unsubscribe()
-  })
-
   it('still confirms a different destination while a panel close is pending', () => {
     const onBlock = vi.fn()
     const unsubscribe = registerPanelBackGuard({
@@ -316,16 +298,17 @@ describe('panel history', () => {
     unsubscribe()
   })
 
-  it('swallows an aborted navigation.back finished promise', async () => {
+  it('swallows an aborted navigation.back committed and finished promise', async () => {
+    const committed = Promise.reject(new DOMException('The operation was aborted.', 'AbortError'))
     const finished = Promise.reject(new DOMException('The operation was aborted.', 'AbortError'))
     const navigation = Reflect.get(window, 'navigation') as { back?: () => unknown }
-    navigation.back = () => ({ finished })
+    navigation.back = () => ({ committed, finished })
 
     armPanelPush('new')
     window.history.pushState(null, '', PANEL_URL)
     dismissPanelUrl('new', vi.fn())
 
-    await finished.catch(() => undefined)
+    await new Promise((resolve) => setTimeout(resolve, 0))
   })
 
   it('expires each armed key on its own timer', () => {
