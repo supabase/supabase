@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { FeatureFlagContext, useFlag, useParams } from 'common'
+import dayjs from 'dayjs'
 import { isEqual } from 'lodash'
 import { useContext, useState } from 'react'
 
@@ -11,16 +12,17 @@ import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import { reportKeys } from '@/data/reports/keys'
+import { SAFE_GRANULARITY_SQL, type Granularity } from '@/data/reports/report.utils'
 import { IS_PLATFORM } from '@/lib/constants'
 
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], granularity: Granularity = 'hour'): SafeLogSqlFragment =>
       safeSql`
         --reports-api-total-requests
         select
-          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          cast(timestamp_trunc(t.timestamp, ${SAFE_GRANULARITY_SQL[granularity]}) as datetime) as timestamp,
           count(t.id) as count
         FROM edge_logs t
           cross join unnest(metadata) as m
@@ -59,11 +61,11 @@ export const SHARED_API_REPORT_SQL = {
   },
   errorCounts: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], granularity: Granularity = 'hour'): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-error-counts
         select
-          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          cast(timestamp_trunc(t.timestamp, ${SAFE_GRANULARITY_SQL[granularity]}) as datetime) as timestamp,
           count(t.id) as count
         FROM edge_logs t
           cross join unnest(metadata) as m
@@ -107,11 +109,11 @@ export const SHARED_API_REPORT_SQL = {
   },
   responseSpeed: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], granularity: Granularity = 'hour'): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-response-speed
         select
-          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          cast(timestamp_trunc(t.timestamp, ${SAFE_GRANULARITY_SQL[granularity]}) as datetime) as timestamp,
           avg(response.origin_time) as avg
         FROM
           edge_logs t
@@ -153,11 +155,11 @@ export const SHARED_API_REPORT_SQL = {
   },
   networkTraffic: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[], granularity: Granularity = 'hour'): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-network-traffic
         select
-          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
+          cast(timestamp_trunc(t.timestamp, ${SAFE_GRANULARITY_SQL[granularity]}) as datetime) as timestamp,
           coalesce(
             safe_divide(
               sum(
@@ -203,6 +205,17 @@ type SharedAPIReportParams = {
   projectRef: string
   enabled?: boolean
 }
+export const getSharedAPIReportSql = (
+  queryName: SharedAPIReportKey,
+  filters: ReportFilterItem[],
+  { start, end, useOtel }: { start: string; end: string; useOtel: boolean }
+): SafeLogSqlFragment => {
+  const granularity = dayjs(end).diff(dayjs(start), 'minute') <= 60 ? 'minute' : 'hour'
+  return useOtel
+    ? getLogsSql(PRESET_CONFIG.api.queries[queryName], filters, true, granularity)
+    : SHARED_API_REPORT_SQL[queryName].safeSql(filters, granularity)
+}
+
 export const useSharedAPIReport = ({
   filterBy,
   start,
@@ -232,9 +245,7 @@ export const useSharedAPIReport = ({
   const isQueryModeReady = !IS_PLATFORM || hasLoadedFlags === true
   const keys = Object.keys(SHARED_API_REPORT_SQL) as SharedAPIReportKey[]
   const getQuerySql = (queryName: SharedAPIReportKey) =>
-    useOtel
-      ? getLogsSql(PRESET_CONFIG.api.queries[queryName], allFilters, true)
-      : SHARED_API_REPORT_SQL[queryName].safeSql(allFilters)
+    getSharedAPIReportSql(queryName, allFilters, { start, end, useOtel })
   const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
     totalRequests: getQuerySql('totalRequests'),
     topRoutes: getQuerySql('topRoutes'),
