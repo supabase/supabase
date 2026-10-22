@@ -324,12 +324,10 @@ export const AddRestrictionModal = ({
             {isValidCIDR ? (
               <DialogSection className="space-y-1">
                 <p className="text-sm">
-                  The address range <code>{normalizedAddress}</code>{' '}
-                  will be restricted
+                  The address range <code>{normalizedAddress}</code> will be restricted
                 </p>
                 <p className="text-sm text-foreground-light">
-                  Selected address space:{' '}
-                  <code>{addressRange.start}</code> to{' '}
+                  Selected address space: <code>{addressRange.start}</code> to{' '}
                   <code>{addressRange.end}</code>{' '}
                 </p>
                 <p className="text-sm text-foreground-light">
