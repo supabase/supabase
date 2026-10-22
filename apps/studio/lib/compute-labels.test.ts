@@ -42,12 +42,29 @@ describe('getComputeCpuLabel', () => {
 })
 
 describe('getComputeSizeLabel', () => {
-  it('maps infra compute sizes to display labels', () => {
-    expect(getComputeSizeLabel('nano')).toBe('Nano')
-    expect(getComputeSizeLabel('medium')).toBe('Medium')
-    expect(getComputeSizeLabel('xlarge')).toBe('XL')
-    expect(getComputeSizeLabel('2xlarge')).toBe('2XL')
-    expect(getComputeSizeLabel('48xlarge_high_memory')).toBe('48XL - High Memory')
+  it.each([
+    ['pico', 'Pico'],
+    ['nano', 'Nano'],
+    ['micro', 'Micro'],
+    ['small', 'Small'],
+    ['medium', 'Medium'],
+    ['large', 'Large'],
+    ['xlarge', 'XL'],
+    ['2xlarge', '2XL'],
+    ['4xlarge', '4XL'],
+    ['8xlarge', '8XL'],
+    ['12xlarge', '12XL'],
+    ['16xlarge', '16XL'],
+    ['24xlarge', '24XL'],
+    ['24xlarge_optimized_memory', '24XL - Optimized Memory'],
+    ['24xlarge_optimized_cpu', '24XL - Optimized CPU'],
+    ['24xlarge_high_memory', '24XL - High Memory'],
+    ['48xlarge', '48XL'],
+    ['48xlarge_optimized_memory', '48XL - Optimized Memory'],
+    ['48xlarge_optimized_cpu', '48XL - Optimized CPU'],
+    ['48xlarge_high_memory', '48XL - High Memory'],
+  ])('maps %s to %s', (size, label) => {
+    expect(getComputeSizeLabel(size)).toBe(label)
   })
 
   it('accepts addon variant identifiers and mixed case', () => {
@@ -57,6 +74,7 @@ describe('getComputeSizeLabel', () => {
 
   it('returns undefined for unknown or missing values instead of leaking them', () => {
     expect(getComputeSizeLabel('t4g.small')).toBeUndefined()
+    expect(getComputeSizeLabel('')).toBeUndefined()
     expect(getComputeSizeLabel(undefined)).toBeUndefined()
     expect(getComputeSizeLabel(null)).toBeUndefined()
   })

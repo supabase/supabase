@@ -26,6 +26,7 @@ import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query
 import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReadReplicasStatusesQuery } from '@/data/read-replicas/replicas-status-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { getComputeSizeLabel } from '@/lib/compute-labels'
@@ -42,6 +43,9 @@ export const ReadReplicaDetails = () => {
 
   const { data: project } = useSelectedProjectQuery()
   const computeSize = getComputeSizeLabel(project?.infra_compute_size)
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
 
   const { data: statuses = [] } = useReadReplicasStatusesQuery({ projectRef })
   const replicaStatus = statuses.find((x) => x.identifier === identifier)
@@ -159,14 +163,16 @@ export const ReadReplicaDetails = () => {
                       icon={<RegionFlag className="w-5" region={region ?? ''} />}
                     />
                   </FormItemLayout>
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="horizontal"
-                    label="Compute Size"
-                    description="Size of replica will be identical to the primary database."
-                  >
-                    <Input readOnly className="input-mono" value={computeSize} />
-                  </FormItemLayout>
+                  {projectHomepageShowInstanceSize && (
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="horizontal"
+                      label="Compute Size"
+                      description="Size of replica will be identical to the primary database."
+                    >
+                      <Input readOnly className="input-mono" value={computeSize} />
+                    </FormItemLayout>
+                  )}
                 </CardContent>
               </>
             )}
