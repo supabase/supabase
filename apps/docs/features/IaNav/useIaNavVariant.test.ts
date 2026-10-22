@@ -18,13 +18,18 @@ const captureExposure = vi.mocked(posthogClient.captureExperimentExposure)
 function renderVariant({
   flagValue,
   override,
+  isOverrideLoaded = true,
 }: {
   flagValue?: string | boolean
   override?: string
+  isOverrideLoaded?: boolean
 }) {
   const posthog = flagValue === undefined ? {} : { [IA_NAV_FLAG]: flagValue }
-  const searchParams = new URLSearchParams(override ? { [IA_NAV_FLAG]: override } : {})
+  const query = new URLSearchParams(override ? { [IA_NAV_FLAG]: override } : {})
+  // useSearchParamsShallow starts empty and reads the URL in an effect after mount.
+  const searchParams = isOverrideLoaded ? query : new URLSearchParams()
 
+  window.history.replaceState(null, '', `/?${query}`)
   vi.mocked(useFeatureFlags).mockReturnValue({ posthog } as unknown as ReturnType<
     typeof useFeatureFlags
   >)
@@ -47,24 +52,30 @@ describe('useIaNavVariant', () => {
     expect(captureExposure).toHaveBeenCalledWith(IA_NAV_FLAG, { variant: 'option-1' }, true)
   })
 
-  it('falls back to control for visitors outside the experiment', () => {
-    const { result } = renderVariant({ flagValue: false })
+  it('records control exposure for visitors in the control group', () => {
+    const { result } = renderVariant({ flagValue: 'control' })
 
     expect(result.current).toBe('control')
     expect(captureExposure).toHaveBeenCalledWith(IA_NAV_FLAG, { variant: 'control' }, true)
   })
 
-  it('records no exposure before the flag store loads', () => {
-    const { result } = renderVariant({})
+  it('falls back to control without exposure for visitors outside the experiment', () => {
+    const { result } = renderVariant({ flagValue: false })
 
     expect(result.current).toBe('control')
     expect(captureExposure).not.toHaveBeenCalled()
   })
 
   it('records no exposure when the query param forces option-1', () => {
-    const { result } = renderVariant({ flagValue: false, override: 'option-1' })
+    const { result } = renderVariant({ flagValue: 'control', override: 'option-1' })
 
     expect(result.current).toBe('option-1')
+    expect(captureExposure).not.toHaveBeenCalled()
+  })
+
+  it('records no exposure before the forcing query param loads', () => {
+    renderVariant({ flagValue: 'control', override: 'option-1', isOverrideLoaded: false })
+
     expect(captureExposure).not.toHaveBeenCalled()
   })
 
