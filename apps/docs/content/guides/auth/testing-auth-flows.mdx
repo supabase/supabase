@@ -116,7 +116,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 </TabPanel>
 </Tabs>
 
-Test numbers don't count toward the project's hourly SMS limit. Auth makes you wait between codes for the same number. The wait defaults to <SharedData data="config">auth.rate_limits.otp.period</SharedData> on hosted projects and 5 seconds locally. Locally, change it with `max_frequency` under `[auth.sms]`.
+Test numbers don't count toward the project's hourly SMS limit. Auth makes you wait between codes for the same number. The wait defaults to 5 seconds. Locally, change it with `max_frequency` under `[auth.sms]`.
 
 <Admonition type="danger">
 
