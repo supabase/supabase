@@ -4183,10 +4183,10 @@ export interface WarehouseDisabledEvent {
 }
 
 /**
- * Account recovery rollout exposure and user interactions.
+ * Account recovery rollout exposure before redirecting to the reminder.
  * @group Events
- * @source Account recovery interstitial and automatic reminder controller
- * @page /account-recovery
+ * @source Automatic reminder controller
+ * @page /organizations, /org/*, /project/*, /new, /new/*
  */
 export interface AccountRecoveryReminderEvent {
   action: 'account_recovery_reminder_exposed'

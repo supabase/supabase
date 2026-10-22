@@ -42,6 +42,7 @@ vi.mock('@/lib/gotrue', () => ({
 vi.mock('@/lib/constants', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/constants')>()),
   IS_PLATFORM: true,
+  BASE_PATH: '/dashboard',
 }))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mock.track }))
 
@@ -148,6 +149,16 @@ describe('RecoveryReminderController', () => {
     expect(mock.track).toHaveBeenCalledWith('account_recovery_reminder_exposed', {
       gap: 'exhausted',
     })
+  })
+
+  it('recognizes the deployment base path and retains the complete return URL', async () => {
+    const href = '/dashboard/project/ref/editor?schema=private#row-2'
+    const { onNavigate } = renderController(href)
+    await waitFor(() => expect(onNavigate).toHaveBeenCalledOnce())
+    expect(
+      new URL(onNavigate.mock.calls[0][0], 'https://studio.local').searchParams.get('returnTo')
+    ).toBe(href)
+    expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument()
   })
 
   it('does not interrupt when rollout is disabled', async () => {

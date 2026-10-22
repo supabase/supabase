@@ -358,7 +358,10 @@ function RootComponent() {
                                     <RecoveryReminderController
                                       href={recoveryLocation.href}
                                       onNavigate={(href) => {
-                                        void recoveryNavigate({ href, replace: true })
+                                        void recoveryNavigate({
+                                          ...splitInternalUrl(href),
+                                          replace: true,
+                                        })
                                       }}
                                     >
                                       <ClientOnly fallback={<ShellFallback />}>
