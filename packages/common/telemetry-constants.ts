@@ -4217,6 +4217,18 @@ export interface WarehouseDisabledEvent {
 }
 
 /**
+ * Account recovery rollout exposure when the takeover opens.
+ * @group Events
+ * @source Automatic reminder controller
+ * @page /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface AccountRecoveryReminderExposed {
+  action: 'account_recovery_reminder_exposed'
+  properties: { gap: 'missing' | 'exhausted' }
+  groups: TelemetryGroups
+}
+
+/**
  * @group Events
  * @source User starts a recovery task
  * @page /organizations, /org/*, /project/*, /new
@@ -4253,6 +4265,7 @@ export interface AccountRecoveryReminderClosed {
  * @hidden
  */
 export type TelemetryEvent =
+  | AccountRecoveryReminderExposed
   | AccountRecoveryActionClicked
   | AccountRecoveryTaskCompleted
   | AccountRecoveryReminderClosed

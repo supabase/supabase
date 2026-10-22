@@ -30,6 +30,8 @@ import {
   Outlet,
   redirect,
   Scripts,
+  useLocation,
+  useNavigate,
   type AnyRouter,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
@@ -62,6 +64,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { RecoveryReminderController } from '@/components/interfaces/Account/RecoveryReminderController'
 import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
@@ -345,6 +348,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
+  const recoveryLocation = useLocation()
+  const recoveryNavigate = useNavigate()
   useThemeSandbox()
 
   return (
@@ -353,6 +358,12 @@ function RootComponent() {
         <AuthProvider>
           <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
             <ProfileProvider>
+              <RecoveryReminderController
+                href={recoveryLocation.href}
+                onNavigate={(href) => {
+                  void recoveryNavigate({ href, replace: true })
+                }}
+              />
               <TimezoneProvider>
                 <TimestampInfoTimezoneBridge>
                   <DynamicTitle />

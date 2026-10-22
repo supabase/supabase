@@ -70,6 +70,67 @@ describe('RecoveryReminder', () => {
     })
   })
 
+  test('reports actions, acknowledged completion, and exit state', async () => {
+    const onAction = vi.fn()
+    const onTaskComplete = vi.fn()
+    const onExit = vi.fn()
+    customRender(
+      <RecoveryReminder
+        gap="missing"
+        destination="/organizations"
+        isPreview
+        hasAuthenticatorTask={false}
+        onAction={onAction}
+        onTaskComplete={onTaskComplete}
+        onExit={onExit}
+      />
+    )
+    fireEvent.click(screen.getByRole('link', { name: 'Skip for now' }))
+    expect(onExit).toHaveBeenLastCalledWith({
+      gap: 'missing',
+      areCodesSaved: false,
+      isFactorComplete: false,
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Generate codes' }))
+    expect(onAction).toHaveBeenCalledWith('generate_codes')
+    await screen.findByText('PREVIEW-NOT-A-VALID-RECOVERY-CODE-01')
+    expect(screen.getByRole('link', { name: /Account Security/ })).toHaveAttribute(
+      'target',
+      '_blank'
+    )
+    expect(onTaskComplete).not.toHaveBeenCalled()
+    await acknowledgeCodes()
+    await screen.findByText('Recovery codes saved')
+    expect(onTaskComplete).toHaveBeenCalledWith('recovery_codes')
+    fireEvent.click(screen.getByRole('link', { name: 'Continue' }))
+    expect(onExit).toHaveBeenLastCalledWith({
+      gap: 'missing',
+      areCodesSaved: true,
+      isFactorComplete: false,
+    })
+  })
+
+  test('retains the authenticator dialog when background factors change', async () => {
+    const { rerender } = customRender(
+      <RecoveryReminder gap="missing" destination="/organizations" isPreview hasAuthenticatorTask />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
+    await screen.findByRole('dialog')
+    rerender(
+      <RecoveryReminder
+        gap="missing"
+        destination="/organizations"
+        isPreview
+        hasAuthenticatorTask={false}
+      />
+    )
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Complete preview' })
+    )
+    await screen.findByText('Backup authenticator added')
+  })
+
   test('supports a codes-only task list', () => {
     customRender(
       <RecoveryReminder

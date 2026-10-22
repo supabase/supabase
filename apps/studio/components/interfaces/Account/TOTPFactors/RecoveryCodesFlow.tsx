@@ -14,6 +14,7 @@ interface RecoveryCodesFlowProps {
   onGenerate: () => void
   onComplete?: () => void
   onStart?: () => void
+  showSecurityLink?: boolean
   children: (trigger: RecoveryCodesTrigger) => ReactNode
 }
 
@@ -23,6 +24,7 @@ export const RecoveryCodesFlow = ({
   onGenerate,
   onComplete,
   onStart,
+  showSecurityLink,
   children,
 }: RecoveryCodesFlowProps) => {
   const [stage, setStage] = useState<'idle' | 'confirm' | 'codes'>('idle')
@@ -58,6 +60,7 @@ export const RecoveryCodesFlow = ({
       <RecoveryCodesModal
         open={stage === 'codes'}
         mutation={mutation}
+        showSecurityLink={showSecurityLink}
         onOpenChange={(isOpen) => {
           if (isOpen) return
           setStage('idle')
