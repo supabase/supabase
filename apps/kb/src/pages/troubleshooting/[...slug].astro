@@ -29,7 +29,7 @@ const { Content } = await render(entry)
 
 const url = canonicalUrl(Astro.url.pathname)
 const jsonLd = [
-	techArticleSchema({ url, headline: title, description }),
+	techArticleSchema({ url, headline: title, description, dateModified: lastEdited }),
 	breadcrumbListSchema([
 		{ name: 'Knowledge Base', url: KB_BASE_URL },
 		{ name: title, url },

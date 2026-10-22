@@ -6,6 +6,7 @@ import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
+import { toIsoDay } from '../../lib/format-date'
 
 export async function getStaticPaths() {
 	const faqs = await getCollection('faqs')
@@ -34,10 +35,13 @@ visit(unified().use(remarkParse).parse(faq.body ?? ''), (node) => {
 })
 
 // https://schema.org/FAQPage for this page's single question. "<" is escaped so
-// the JSON can't close the script tag early.
+// the JSON can't close the script tag early. dateModified is a UTC day, the
+// same one shown as "Last edited".
+const dateModified = date && toIsoDay(date)
 const faqPageJsonLd = JSON.stringify({
 	'@context': 'https://schema.org',
 	'@type': 'FAQPage',
+	dateModified,
 	mainEntity: [
 		{
 			'@type': 'Question',
@@ -48,7 +52,7 @@ const faqPageJsonLd = JSON.stringify({
 }).replace(/</g, '\\u003c')
 ---
 
-<ArticleLayout title={title} topics={topics} viewGitHubLink={viewGitHubLink} date={date}>
+<ArticleLayout title={title} topics={topics} viewGitHubLink={viewGitHubLink} lastEdited={date}>
 	<script type="application/ld+json" set:html={faqPageJsonLd} />
 	<Content components={{ Admonition }} />
 </ArticleLayout>

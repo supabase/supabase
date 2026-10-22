@@ -4,17 +4,6 @@ import { z } from 'astro/zod'
 
 import { TOPIC_NAMES } from './lib/topics'
 
-// Format date as "September 26, 2026"
-const formatDate = (date: Date): string => {
-  // Adjust for timezone offset to preserve the intended date
-  const adjusted = new Date(date.getTime() + date.getTimezoneOffset() * 60000)
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(adjusted)
-}
-
 // Astro's default id is a lowercased slug of the file path, but the markdown
 // export (scripts/generate-markdown.ts) keeps the filename's case and Vercel
 // serves static files case-sensitively. Keeping the case here makes the page
@@ -31,6 +20,8 @@ const articleFields = {
   // Surfaces the guide in the homepage's "Featured Guides" section.
   pinned: z.boolean().default(false),
   github_url: z.string().optional(),
+  // Frontmatter date, the day the page was last edited. Formatted at display time.
+  date: z.coerce.date().optional(),
 }
 
 // Every entry here is rendered through ArticleLayout by
@@ -47,10 +38,6 @@ const guides = defineCollection({
     // Surfaces the guide in the homepage's "Featured Guides" section.
     pinned: z.boolean().default(false),
     github_url: z.string().optional(),
-    date: z
-      .date()
-      .optional()
-      .transform((date) => (date ? formatDate(date) : undefined)),
   }),
 })
 
@@ -83,10 +70,7 @@ const faqs = defineCollection({
     .object({
       title: z.string(),
       topics: z.array(z.string()).default([]),
-      date: z
-        .date()
-        .optional()
-        .transform((date) => (date ? formatDate(date) : undefined)),
+      date: z.coerce.date().optional(),
     })
     .transform((data) => ({ ...data, topics: [...new Set(['FAQs', ...data.topics])] })),
 })

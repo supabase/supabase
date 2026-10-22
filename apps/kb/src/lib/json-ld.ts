@@ -1,3 +1,5 @@
+import { toIsoDay } from './format-date'
+
 // Canonical origin + base path from astro.config.mjs (`site` and `base`).
 const KB_ORIGIN = 'https://supabase.com'
 export const KB_BASE_URL = `${KB_ORIGIN}/kb`
@@ -21,10 +23,11 @@ interface TechArticleSchemaInput {
   url: string
   headline: string
   description?: string
+  dateModified?: Date
 }
 
-// Guides carry no publish or modified dates in their frontmatter, so the
-// schema omits them rather than inventing values.
+// Modified date is emitted as a calendar day (YYYY-MM-DD, UTC), matching the
+// "Last edited" date shown on the page.
 export function techArticleSchema(input: TechArticleSchemaInput) {
   return {
     '@context': 'https://schema.org',
@@ -37,6 +40,7 @@ export function techArticleSchema(input: TechArticleSchemaInput) {
     url: input.url,
     headline: input.headline,
     description: input.description,
+    dateModified: input.dateModified && toIsoDay(input.dateModified),
     inLanguage: 'en',
     publisher: {
       '@type': 'Organization',
