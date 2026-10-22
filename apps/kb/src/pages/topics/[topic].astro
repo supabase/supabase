@@ -43,7 +43,7 @@ const jsonLd = breadcrumbListSchema([
 ---
 
 <Layout title={topic} description={description} jsonLd={jsonLd}>
-	<TopicHero client:load topic={topic} description={description} guides={[...guides, ...troubleshooting, ...faqs]}>
+	<TopicHero client:load topic={topic} description={description}>
 		<Breadcrumb slot="breadcrumb">
 			<BreadcrumbList>
 				<BreadcrumbItem>
