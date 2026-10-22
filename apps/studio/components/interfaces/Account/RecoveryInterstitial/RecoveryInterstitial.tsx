@@ -1,0 +1,190 @@
+import { useFlag, useUser } from 'common'
+import { ArrowRight } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useState } from 'react'
+import { Button, CardFooter } from 'ui'
+import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
+
+import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
+import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryCodesModal'
+import { PreviewRecoveryCodesFlow } from './PreviewRecoveryCodesFlow'
+import {
+  getMockRecoveryGap,
+  getRecoveryGap,
+  getRecoveryReturnTo,
+  type RecoveryGap,
+} from './RecoveryInterstitial.utils'
+import { RecoveryTaskRow } from './RecoveryTaskRow'
+import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+
+export const RecoveryInterstitial = () => {
+  const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
+  const [returnTo] = useQueryState('returnTo', parseAsString)
+  const mockGap = getMockRecoveryGap(
+    mock,
+    process.env.NODE_ENV === 'development',
+    process.env.NEXT_PUBLIC_VERCEL_ENV
+  )
+  const destination = getRecoveryReturnTo(returnTo)
+
+  if (mockGap) return <RecoveryReminder gap={mockGap} destination={destination} isPreview />
+  return <LiveRecoveryReminder destination={destination} />
+}
+
+const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
+  const user = useUser()
+  const isEnabled = useFlag('enableAuthRecoveryCodes')
+  const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
+  const { findings, isPending, isError } = useAccountRecovery({
+    enabled: isEnabled && hasSecuritySettings,
+  })
+  const gap = isError || isPending ? null : getRecoveryGap(findings)
+  return (
+    <RecoveryReminder key={user?.id} gap={gap} destination={destination} isLoading={isPending} />
+  )
+}
+
+export const RecoveryReminder = ({
+  gap,
+  destination,
+  isPreview = false,
+  isLoading = false,
+  onCodesComplete,
+  onAction,
+  onTaskComplete,
+  onExit,
+}: {
+  gap: RecoveryGap | null
+  destination: string
+  isPreview?: boolean
+  isLoading?: boolean
+  onCodesComplete?: () => void
+  onAction?: (action: 'generate_codes' | 'regenerate_codes' | 'add_factor') => void
+  onTaskComplete?: (task: 'recovery_codes' | 'authenticator') => void
+  onExit?: (state: { gap: RecoveryGap; areCodesSaved: boolean; isFactorComplete: boolean }) => void
+}) => {
+  const [startedGap, setStartedGap] = useState<RecoveryGap | null>(null)
+  const [areCodesSaved, setAreCodesSaved] = useState(false)
+  const isFactorComplete = false
+  // Preserve all task dialogs and completed rows during background status updates.
+  const activeGap = startedGap ?? gap
+  if (!activeGap) {
+    return (
+      <InterstitialLayout
+        logo={<SupabaseLogo />}
+        title={isLoading ? 'Checking account recovery' : 'You’re all set'}
+        description={isLoading ? undefined : 'No account recovery reminder is available.'}
+        widthClassName="max-w-md"
+      >
+        <CardFooter className="justify-center min-h-12">
+          {!isLoading && (
+            <Button asChild size="tiny">
+              <a href={destination}>Continue</a>
+            </Button>
+          )}
+        </CardFooter>
+      </InterstitialLayout>
+    )
+  }
+  const isExhausted = activeGap === 'exhausted'
+  const handleStart = () => {
+    setStartedGap(activeGap)
+  }
+  const handleCodesSaved = () => {
+    setAreCodesSaved(true)
+    onCodesComplete?.()
+    onTaskComplete?.('recovery_codes')
+  }
+  const flowProps = {
+    showSecurityLink: true,
+    onStart: () => {
+      handleStart()
+      onAction?.(isExhausted ? 'regenerate_codes' : 'generate_codes')
+    },
+    onComplete: handleCodesSaved,
+    children: getRecoveryCodeTrigger(isExhausted, areCodesSaved),
+  }
+  let codesTitle = isExhausted ? 'Recovery codes used up' : 'No recovery codes'
+  if (areCodesSaved) codesTitle = 'Recovery codes saved'
+
+  return (
+    <InterstitialLayout
+      logo={
+        <div className="relative">
+          <SupabaseLogo />
+          <span className="absolute -top-2 -right-2 scale-80">
+            <AdmonitionTypeIcon type="warning" />
+          </span>
+        </div>
+      }
+      title="Secure your account"
+      description="Complete the following tasks to reduce the risk of being locked out of your Supabase account."
+      widthClassName="max-w-md"
+      containerClassName="relative before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-64 before:bg-gradient-to-b before:from-warning-600/10 before:to-transparent"
+      cardClassName="relative"
+    >
+      <div className="border-t divide-y">
+        <RecoveryTaskRow
+          title={codesTitle}
+          description={getCodesDescription(isExhausted, areCodesSaved)}
+          isComplete={areCodesSaved}
+        >
+          {isPreview && (
+            <PreviewRecoveryCodesFlow
+              action={isExhausted ? 'regenerate' : 'generate'}
+              {...flowProps}
+            />
+          )}
+          {!isPreview && isExhausted && <RegenerateRecoveryCodesModal {...flowProps} />}
+          {!isPreview && !isExhausted && <GenerateRecoveryCodesModal {...flowProps} />}
+        </RecoveryTaskRow>
+      </div>
+      <CardFooter className="justify-center px-6 py-5 border-t">
+        <Button
+          asChild
+          variant="text"
+          size="tiny"
+          className={areCodesSaved || isFactorComplete ? '' : 'text-foreground-lighter'}
+          iconRight={
+            areCodesSaved || isFactorComplete ? (
+              <ArrowRight size={14} aria-hidden="true" />
+            ) : undefined
+          }
+        >
+          <a
+            href={destination}
+            onClick={() => onExit?.({ gap: activeGap, areCodesSaved, isFactorComplete })}
+          >
+            {areCodesSaved || isFactorComplete ? 'Continue' : 'Skip for now'}
+          </a>
+        </Button>
+      </CardFooter>
+    </InterstitialLayout>
+  )
+}
+
+function getCodesDescription(isExhausted: boolean, areCodesSaved: boolean) {
+  if (areCodesSaved) return 'Keep your recovery codes somewhere safe.'
+  return isExhausted
+    ? 'Generate a new set for future use.'
+    : 'Save codes in case you lose access to your authenticator.'
+}
+
+function getRecoveryCodeTrigger(isExhausted: boolean, areCodesSaved: boolean) {
+  return function RecoveryCodeTrigger({
+    onClick,
+    isPending,
+  }: {
+    onClick: () => void
+    isPending: boolean
+  }) {
+    if (areCodesSaved) return null
+    return (
+      <Button variant="primary" size="tiny" onClick={onClick} loading={isPending}>
+        {isExhausted ? 'Regenerate codes' : 'Generate codes'}
+      </Button>
+    )
+  }
+}
