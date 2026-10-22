@@ -34,6 +34,7 @@ export * from './src/components/ExpandingTextArea'
 
 // layout
 export * from './src/components/LoadingLine'
+export * from './src/components/DitheredSkeleton'
 
 // ai icon
 export * from './src/layout/ai-icon-animation'

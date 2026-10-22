@@ -366,6 +366,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Dithered Skeleton',
+          href: '/docs/components/dithered-skeleton',
+          items: [],
+        },
+        {
           title: 'Drawer',
           href: '/docs/components/drawer',
           items: [],
