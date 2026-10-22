@@ -58,6 +58,7 @@ export interface TimeScale {
 export interface RootProps {
   trace: TraceData
   minRangeMs?: number
+  defaultCollapsed?: ReadonlySet<string>
   children?: ReactNode
 }
 
