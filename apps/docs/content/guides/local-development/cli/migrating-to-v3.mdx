@@ -4,12 +4,6 @@ description: 'Breaking changes between Supabase CLI v2 and v3, and what to chang
 subtitle: 'Breaking changes between Supabase CLI v2 and v3, and what to change in your scripts, CI, and config.'
 ---
 
-<Admonition type="note">
-
-Supabase CLI v3 is in preview. Install it from the `next` tag on npm to try it before the stable release.
-
-</Admonition>
-
 Supabase CLI v3 is a major release. Most of its breaking changes fall into five areas:
 
 - **Database commands target your local stack by default.** Add `--remote` to reach your hosted project.
@@ -29,30 +23,28 @@ A removed command or flag still parses: it exits with code 1 and prints its repl
 
 ## Installing v3
 
-Until v3.0.0 is released, previews publish to the `next` tag on npm:
+Every install channel (npm, Homebrew, Scoop, and the Linux packages) installs v3 by default. See [Install and run the CLI](/docs/guides/local-development/cli/getting-started) for each one. If your project installs the CLI from npm:
 
 ```sh
-npm install supabase@next --save-dev
+npm install supabase@latest --save-dev
 ```
-
-Once v3.0.0 is released, every install channel (npm, Homebrew, Scoop, and the Linux packages) moves to v3.
 
 ### GitHub Actions
 
-`supabase/setup-cli` installs `latest` when you don't set `version`, unless a `bun.lock`, `pnpm-lock.yaml`, or `package-lock.json` at the root of your repository pins `supabase`. Those workflows move to v3 on release day. Pin a version to upgrade on your own schedule:
+`supabase/setup-cli` installs `latest`, which is now v3, when you don't set `version`, unless a `bun.lock`, `pnpm-lock.yaml`, or `package-lock.json` at the root of your repository pins `supabase`. Pin v2 to upgrade on your own schedule:
 
 ```yaml
 steps:
   - uses: supabase/setup-cli@v3
     with:
-      version: 2.121.0 # or v2.stable, once v3.0.0 is released
+      version: v2.stable
 ```
 
 During the transition, some commands work the same way on both majors. For example, `supabase db push --linked --yes` runs against the linked project on v2 and v3. v3 warns about `--linked`, which you can switch to `--remote` once you've upgraded.
 
 ### Staying on v2
 
-v2 continues to receive security fixes and fixes for broken behavior, but no new features. After v3.0.0 is released, install v2 from these channels:
+v2 continues to receive security fixes and fixes for broken behavior, but no new features. Install v2 from these channels:
 
 | Channel        | Command                                         |
 | -------------- | ----------------------------------------------- |
