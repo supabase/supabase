@@ -138,8 +138,6 @@ const stepCard = () => {
 
   return card
 }
-const waitForStep = (step: number) =>
-  waitFor(() => expect(stepStatus()).toHaveTextContent(`Step ${step} of 4`))
 const withinRegion = (name: string) => within(screen.getByRole('region', { name }))
 const destinationType = () => within(screen.getByRole('radiogroup', { name: 'Destination type' }))
 const continueToData = () => next('?step=data')
