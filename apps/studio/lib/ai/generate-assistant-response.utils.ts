@@ -1,6 +1,14 @@
-import { isToolUIPart, type DynamicToolUIPart, type ToolUIPart, type UIMessage } from 'ai'
+import {
+  isToolUIPart,
+  type DynamicToolUIPart,
+  type ModelMessage,
+  type ToolUIPart,
+  type UIMessage,
+} from 'ai'
 
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
+import { NO_DATA_ERROR } from '@/lib/ai/tools/execute-sql-output'
 import { decodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
@@ -46,5 +54,28 @@ export function prepareMessagesForModel(rawMessages: UIMessage[], aiOptInLevel: 
       return { ...msg, parts: cleanedParts }
     }
     return msg
+  })
+}
+
+/**
+ * Below the data level, hides `execute_sql` errors from later steps in the same request, since
+ * database errors can echo row values. The UI still gets the real error. Later turns drop
+ * `output-error` parts in `prepareMessagesForModel`.
+ */
+export function hideToolErrorsFromModel(messages: ModelMessage[], aiOptInLevel: AiOptInLevel) {
+  if (isOptInLevelAtLeast(aiOptInLevel, 'schema_and_log_and_data')) return messages
+
+  return messages.map((message) => {
+    if (message.role !== 'tool') return message
+    return {
+      ...message,
+      content: message.content.map((part) =>
+        part.type === 'tool-result' &&
+        part.toolName === 'execute_sql' &&
+        (part.output.type === 'error-text' || part.output.type === 'error-json')
+          ? { ...part, output: { type: 'error-text' as const, value: NO_DATA_ERROR } }
+          : part
+      ),
+    }
   })
 }

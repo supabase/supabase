@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { isTracingAllowed, maskTraceValue } from './braintrust-logger'
-import { NO_DATA_PERMISSIONS } from './tools/execute-sql-output'
+import {
+  hideSpanErrorFromTrace,
+  isTracingAllowed,
+  maskTraceValue,
+  redactHiddenSpanError,
+} from './braintrust-logger'
+import { NO_DATA_ERROR, NO_DATA_PERMISSIONS } from './tools/execute-sql-output'
 import { sanitizeNotebookRunOutput, type NotebookRunOutput } from './tools/notebook-run-output'
 
 describe('isTracingAllowed', () => {
@@ -65,5 +70,25 @@ describe('maskTraceValue', () => {
   it('masks stamped output nested in message history', () => {
     const messages = [{ parts: [{ output: { rows, optInLevel: 'schema' } }] }]
     expect(maskTraceValue(messages)).toEqual([{ parts: [{ output: NO_DATA_PERMISSIONS }] }])
+  })
+})
+
+describe('redactHiddenSpanError', () => {
+  it('hides the next error on a hidden span or its child, once', () => {
+    hideSpanErrorFromTrace('parent')
+    const childError = { span_id: 'tool', span_parents: ['parent'], error: 'key (email)=(a@b.c)' }
+
+    expect(redactHiddenSpanError(childError)).toEqual({
+      ...childError,
+      error: NO_DATA_ERROR,
+    })
+    expect(redactHiddenSpanError(childError)).toEqual(childError)
+  })
+
+  it('leaves errors on other spans alone', () => {
+    hideSpanErrorFromTrace('hidden')
+    const otherError = { span_id: 'other', span_parents: ['root'], error: 'boom' }
+
+    expect(redactHiddenSpanError(otherError)).toEqual(otherError)
   })
 })

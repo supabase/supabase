@@ -67,6 +67,7 @@ allowBuilds:
   '@supabase/pg-meta@file:packages/pg-meta': set this to true or false
   ai-commands@file:packages/ai-commands: set this to true or false
   api-types@file:packages/api-types: set this to true or false
+  braintrust: false
   common@file:packages/common: set this to true or false
   config@file:packages/config: set this to true or false
   contentlayer2: false
