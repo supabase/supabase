@@ -177,10 +177,16 @@ export const QueueMessagesDataGrid = ({
                 key={props.row.msg_id}
                 {...props}
                 onClick={() => {
-                  if (typeof idx === 'number' && idx >= 0) {
-                    setSelectedMessageId(props.row.msg_id)
-                    gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                  if (typeof idx !== 'number' || idx < 0) {
+                    return
                   }
+
+                  // replace while a message is open so switching rows does not stack history
+                  const isSwitchingMessages = selectedMessageId !== null
+                  setSelectedMessageId(props.row.msg_id, {
+                    history: isSwitchingMessages ? 'replace' : 'push',
+                  })
+                  gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                 }}
               />
             )
