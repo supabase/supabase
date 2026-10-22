@@ -41,6 +41,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -204,6 +205,7 @@ export const FunctionsList = () => {
     mutate: deleteDatabaseFunction,
     isPending: isDeletingFunction,
     isSuccess: isSuccessDelete,
+    variables: deletedFunction,
   } = useDatabaseFunctionDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully removed function ${variables.func.name}`)
@@ -237,11 +239,19 @@ export const FunctionsList = () => {
   }, [functionIdToDuplicate, functionToDuplicate, isSuccess, setSelectedFunctionIdToDuplicate])
 
   useEffect(() => {
-    if (isSuccess && !!functionIdToDelete && !functionToDelete && !isSuccessDelete) {
+    if (!isSuccess || !functionIdToDelete || functionToDelete) return
+
+    if (isStaleDeletedPanelId(functionIdToDelete, isSuccessDelete, deletedFunction?.func?.id)) {
+      setSelectedFunctionToDelete(null, { history: 'replace' })
+      return
+    }
+
+    if (!isSuccessDelete) {
       toast('Function not found')
       setSelectedFunctionToDelete(null, { history: 'replace' })
     }
   }, [
+    deletedFunction,
     functionIdToDelete,
     functionToDelete,
     isSuccess,
@@ -384,11 +394,6 @@ export const FunctionsList = () => {
         func={functionToEdit || functionToDuplicate}
         visible={showCreateFunctionForm || !!functionToEdit || !!functionToDuplicate}
         onClose={() => {
-          setShowCreateFunctionForm(false)
-          setSelectedFunctionToEdit(null)
-          setSelectedFunctionIdToDuplicate(null)
-        }}
-        onCommit={() => {
           setShowCreateFunctionForm(false)
           setSelectedFunctionToEdit(null)
           setSelectedFunctionIdToDuplicate(null)

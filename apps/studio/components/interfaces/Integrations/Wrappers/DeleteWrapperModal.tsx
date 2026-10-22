@@ -19,6 +19,7 @@ import { useFDWDeleteMutation } from '@/data/fdw/fdw-delete-mutation'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
 
 export const DeleteWrapperModal = () => {
   const { id, ref } = useParams()
@@ -44,7 +45,11 @@ export const DeleteWrapperModal = () => {
   )
   const selectedWrapper = wrappers.find((x) => x.id.toString() === selectedWrapperIdToDelete)
 
-  const { mutateAsync: deleteFDW, isSuccess: isSuccessDelete } = useFDWDeleteMutation({
+  const {
+    mutateAsync: deleteFDW,
+    isSuccess: isSuccessDelete,
+    variables: deletedWrapper,
+  } = useFDWDeleteMutation({
     onSuccess: () => {
       toast.success('Connection deleted')
       setSelectedWrapperToDelete(null)
@@ -66,11 +71,21 @@ export const DeleteWrapperModal = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && !!selectedWrapperIdToDelete && !selectedWrapper && !isSuccessDelete) {
+    if (!isSuccess || !selectedWrapperIdToDelete || selectedWrapper) return
+
+    if (
+      isStaleDeletedPanelId(selectedWrapperIdToDelete, isSuccessDelete, deletedWrapper?.wrapper?.id)
+    ) {
+      setSelectedWrapperToDelete(null, { history: 'replace' })
+      return
+    }
+
+    if (!isSuccessDelete) {
       toast('Wrapper not found')
       setSelectedWrapperToDelete(null, { history: 'replace' })
     }
   }, [
+    deletedWrapper,
     isSuccess,
     isSuccessDelete,
     selectedWrapper,

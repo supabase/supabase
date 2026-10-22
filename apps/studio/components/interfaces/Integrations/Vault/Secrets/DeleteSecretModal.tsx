@@ -16,6 +16,7 @@ import { useVaultSecretDeleteMutation } from '@/data/vault/vault-secret-delete-m
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
 
 export const DeleteSecretModal = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -31,7 +32,11 @@ export const DeleteSecretModal = () => {
   )
   const selectedSecret = secrets.find((secret) => secret.id === secretIdToDelete)
 
-  const { mutateAsync: deleteSecret, isSuccess: isSuccessDelete } = useVaultSecretDeleteMutation({
+  const {
+    mutateAsync: deleteSecret,
+    isSuccess: isSuccessDelete,
+    variables: deletedSecret,
+  } = useVaultSecretDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted secret ${selectedSecret?.name}`)
       setSelectedSecretToDelete(null)
@@ -53,11 +58,25 @@ export const DeleteSecretModal = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && !!secretIdToDelete && !selectedSecret && !isSuccessDelete) {
+    if (!isSuccess || !secretIdToDelete || selectedSecret) return
+
+    if (isStaleDeletedPanelId(secretIdToDelete, isSuccessDelete, deletedSecret?.id)) {
+      setSelectedSecretToDelete(null, { history: 'replace' })
+      return
+    }
+
+    if (!isSuccessDelete) {
       toast('Secret not found')
       setSelectedSecretToDelete(null, { history: 'replace' })
     }
-  }, [isSuccess, isSuccessDelete, secretIdToDelete, selectedSecret, setSelectedSecretToDelete])
+  }, [
+    deletedSecret,
+    isSuccess,
+    isSuccessDelete,
+    secretIdToDelete,
+    selectedSecret,
+    setSelectedSecretToDelete,
+  ])
 
   return (
     <AlertDialog open={!!selectedSecret} onOpenChange={() => setSelectedSecretToDelete(null)}>

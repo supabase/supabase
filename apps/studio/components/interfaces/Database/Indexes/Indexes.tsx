@@ -37,6 +37,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -92,6 +93,7 @@ export const Indexes = () => {
     mutate: deleteIndex,
     isPending: isExecuting,
     isSuccess: isSuccessDelete,
+    variables: deletedIndex,
   } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
       setDeleteIndexId(null)
@@ -149,11 +151,25 @@ export const Indexes = () => {
   }, [isSuccessIndexes, editIndexId, selectedIndex, setEditIndexId])
 
   useEffect(() => {
-    if (isSuccessIndexes && !!deleteIndexId && !selectedIndexToDelete && !isSuccessDelete) {
+    if (!isSuccessIndexes || !deleteIndexId || selectedIndexToDelete) return
+
+    if (isStaleDeletedPanelId(deleteIndexId, isSuccessDelete, deletedIndex?.name)) {
+      setDeleteIndexId(null, { history: 'replace' })
+      return
+    }
+
+    if (!isSuccessDelete) {
       toast('Index not found')
       setDeleteIndexId(null, { history: 'replace' })
     }
-  }, [isSuccessIndexes, deleteIndexId, selectedIndexToDelete, isSuccessDelete, setDeleteIndexId])
+  }, [
+    deleteIndexId,
+    deletedIndex,
+    isSuccessDelete,
+    isSuccessIndexes,
+    selectedIndexToDelete,
+    setDeleteIndexId,
+  ])
 
   return (
     <>
@@ -316,11 +332,7 @@ export const Indexes = () => {
         </div>
       </SidePanel>
 
-      <CreateIndexSidePanel
-        visible={showCreateIndex}
-        onClose={() => setShowCreateIndex(false)}
-        onCommit={() => setShowCreateIndex(false)}
-      />
+      <CreateIndexSidePanel visible={showCreateIndex} onClose={() => setShowCreateIndex(false)} />
 
       <ConfirmationModal
         variant="warning"

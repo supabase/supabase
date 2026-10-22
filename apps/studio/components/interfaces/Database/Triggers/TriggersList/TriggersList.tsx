@@ -43,6 +43,7 @@ import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema, useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -123,6 +124,7 @@ export const TriggersList = () => {
     mutate: deleteDatabaseTrigger,
     isPending: isDeletingTrigger,
     isSuccess: isSuccessDelete,
+    variables: deletedTrigger,
   } = useDatabaseTriggerDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully removed ${variables.trigger.name}`)
@@ -227,11 +229,25 @@ execute function function_name();`
   }, [isSuccess, triggerIdToDuplicate, triggerToDuplicate, setTriggerToDuplicate])
 
   useEffect(() => {
-    if (isSuccess && !!triggerIdToDelete && !triggerToDelete && !isSuccessDelete) {
+    if (!isSuccess || !triggerIdToDelete || triggerToDelete) return
+
+    if (isStaleDeletedPanelId(triggerIdToDelete, isSuccessDelete, deletedTrigger?.trigger?.id)) {
+      setTriggerToDelete(null, { history: 'replace' })
+      return
+    }
+
+    if (!isSuccessDelete) {
       toast('Trigger not found')
       setTriggerToDelete(null, { history: 'replace' })
     }
-  }, [isSuccess, triggerIdToDelete, triggerToDelete, isSuccessDelete, setTriggerToDelete])
+  }, [
+    deletedTrigger,
+    isSuccess,
+    isSuccessDelete,
+    setTriggerToDelete,
+    triggerIdToDelete,
+    triggerToDelete,
+  ])
 
   if (isPending) {
     return <GenericSkeletonLoader />
@@ -348,11 +364,6 @@ execute function function_name();`
         selectedTrigger={triggerToEdit || triggerToDuplicate}
         open={showCreateTriggerForm || !!triggerToEdit || !!triggerToDuplicate}
         onClose={() => {
-          setShowCreateTriggerForm(false)
-          setTriggerToEdit(null)
-          setTriggerToDuplicate(null)
-        }}
-        onCommit={() => {
           setShowCreateTriggerForm(false)
           setTriggerToEdit(null)
           setTriggerToDuplicate(null)

@@ -56,6 +56,7 @@ import { useOAuthServerAppRegenerateSecretMutation } from '@/data/oauth-server-a
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -134,6 +135,7 @@ export const OAuthAppsList = () => {
     mutate: deleteOAuthApp,
     isPending: isDeletingApp,
     isSuccess: isSuccessDelete,
+    variables: deletedApp,
   } = useOAuthServerAppDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted OAuth app`)
@@ -228,11 +230,25 @@ export const OAuthAppsList = () => {
   }, [appToEdit, isSuccess, selectedAppToEdit, setSelectedAppToEdit])
 
   useEffect(() => {
-    if (isSuccess && !!selectedAppToDelete && !appToDelete && !isSuccessDelete) {
+    if (!isSuccess || !selectedAppToDelete || appToDelete) return
+
+    if (isStaleDeletedPanelId(selectedAppToDelete, isSuccessDelete, deletedApp?.clientId)) {
+      setSelectedAppToDelete(null, { history: 'replace' })
+      return
+    }
+
+    if (!isSuccessDelete) {
       toast('App not found')
       setSelectedAppToDelete(null, { history: 'replace' })
     }
-  }, [appToDelete, isSuccess, isSuccessDelete, selectedAppToDelete, setSelectedAppToDelete])
+  }, [
+    appToDelete,
+    deletedApp,
+    isSuccess,
+    isSuccessDelete,
+    selectedAppToDelete,
+    setSelectedAppToDelete,
+  ])
 
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />

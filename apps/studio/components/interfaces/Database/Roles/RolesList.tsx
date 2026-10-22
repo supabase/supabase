@@ -22,6 +22,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -69,6 +70,7 @@ export const RolesList = () => {
     mutate: deleteDatabaseRole,
     isPending: isDeleting,
     isSuccess: isSuccessDelete,
+    variables: deletedRole,
   } = useDatabaseRoleDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted role`)
@@ -115,11 +117,25 @@ export const RolesList = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && !!selectedRoleIdToDelete && !roleToDelete && !isSuccessDelete) {
+    if (!isSuccess || !selectedRoleIdToDelete || roleToDelete) return
+
+    if (isStaleDeletedPanelId(selectedRoleIdToDelete, isSuccessDelete, deletedRole?.id)) {
+      setSelectedRoleIdToDelete(null, { history: 'replace' })
+      return
+    }
+
+    if (!isSuccessDelete) {
       toast('Role cannot be found')
       setSelectedRoleIdToDelete(null, { history: 'replace' })
     }
-  }, [isSuccess, selectedRoleIdToDelete, roleToDelete, isSuccessDelete, setSelectedRoleIdToDelete])
+  }, [
+    deletedRole,
+    isSuccess,
+    isSuccessDelete,
+    roleToDelete,
+    selectedRoleIdToDelete,
+    setSelectedRoleIdToDelete,
+  ])
 
   return (
     <>
@@ -297,11 +313,7 @@ export const RolesList = () => {
         <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
       )}
 
-      <CreateRolePanel
-        visible={isCreatingRole}
-        onClose={() => setIsCreatingRole(false)}
-        onCommit={() => setIsCreatingRole(false)}
-      />
+      <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
 
       <ConfirmationModal
         visible={!!roleToDelete}

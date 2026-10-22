@@ -10,6 +10,7 @@ import { useDatabaseCronJobDeleteMutation } from '@/data/database-cron-jobs/data
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
+import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const DeleteCronJob = () => {
@@ -33,6 +34,7 @@ export const DeleteCronJob = () => {
     mutate: deleteDatabaseCronJob,
     isPending,
     isSuccess: isSuccessDelete,
+    variables: deletedCronJob,
   } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
       if (cronJob && project) {
@@ -57,11 +59,25 @@ export const DeleteCronJob = () => {
   }
 
   useEffect(() => {
-    if (grid.isSuccess && !!cronJobIdForDeletion && !cronJob && !isSuccessDelete) {
+    if (!grid.isSuccess || !cronJobIdForDeletion || cronJob) return
+
+    if (isStaleDeletedPanelId(cronJobIdForDeletion, isSuccessDelete, deletedCronJob?.jobId)) {
+      setCronJobForDeletion(null, { history: 'replace' })
+      return
+    }
+
+    if (!isSuccessDelete) {
       toast('Cron job not found')
       setCronJobForDeletion(null, { history: 'replace' })
     }
-  }, [cronJob, cronJobIdForDeletion, grid.isSuccess, isSuccessDelete, setCronJobForDeletion])
+  }, [
+    cronJob,
+    cronJobIdForDeletion,
+    deletedCronJob,
+    grid.isSuccess,
+    isSuccessDelete,
+    setCronJobForDeletion,
+  ])
 
   if (!cronJob) {
     return null
