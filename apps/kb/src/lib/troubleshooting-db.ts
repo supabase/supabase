@@ -5,6 +5,13 @@ export interface TroubleshootingEntryMetadata {
   dateUpdated?: Date
 }
 
+// Undefined when the row has no date or the value doesn't parse.
+function parseDateUpdated(value: string | null): Date | undefined {
+  if (!value) return undefined
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? undefined : date
+}
+
 /**
  * Looks up each slug's `github_url` and `date_updated` from
  * `troubleshooting_entries` (build time only — kb is fully static, no SSR).
@@ -25,17 +32,13 @@ export async function getEntryMetadataBySlug(
       .in('slug', slugs)
     if (error) throw error
     return new Map(
-      (rows ?? []).map((row) => {
-        const dateUpdated = row.date_updated ? new Date(row.date_updated) : undefined
-        return [
-          row.slug,
-          {
-            githubUrl: row.github_url ?? undefined,
-            dateUpdated:
-              dateUpdated && !Number.isNaN(dateUpdated.getTime()) ? dateUpdated : undefined,
-          },
-        ]
-      })
+      (rows ?? []).map((row) => [
+        row.slug,
+        {
+          githubUrl: row.github_url ?? undefined,
+          dateUpdated: parseDateUpdated(row.date_updated),
+        },
+      ])
     )
   } catch (error) {
     console.warn('[troubleshooting] Failed to look up entry metadata from the database:', error)
