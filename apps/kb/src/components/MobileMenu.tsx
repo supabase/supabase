@@ -1,51 +1,49 @@
-import { X } from 'lucide-react'
-import { type KeyboardEvent } from 'react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  Button,
-  cn,
-  singleThemes,
-  ToggleGroup,
-  ToggleGroupItem,
-} from 'ui'
+import { useState, type KeyboardEvent } from 'react'
+import { Button } from 'ui'
+import { MobileNavDrawer } from 'ui-patterns/MobileNav/MobileNavDrawer'
+import { MobileNavTabs } from 'ui-patterns/MobileNav/MobileNavTabs'
 
 import { SIGN_UP_URL, type NavMenu } from '../lib/nav'
-import { revealStyle } from '../lib/reveal'
-import { EXTERNAL_LINKS, useThemeChoice } from './HeaderMenu'
-import { Logo } from './Logo'
+import { EXTERNAL_LINKS } from './HeaderMenu'
 
 export interface MobileMenuProps {
   id: string
+  open: boolean
   menus: NavMenu[]
+  currentPath: string
   onClose: () => void
   className?: string
 }
 
-export const MobileMenu = ({ id, menus, onClose, className }: MobileMenuProps) => {
-  const { choice, onChoiceChange } = useThemeChoice()
+export const MobileMenu = ({
+  id,
+  open,
+  menus,
+  currentPath,
+  onClose,
+  className,
+}: MobileMenuProps) => {
+  const [pickedLabel, setPickedLabel] = useState<string>()
+  const [wasOpen, setWasOpen] = useState(open)
+  // the menu opens on the tab that holds the current page again
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    if (open) setPickedLabel(undefined)
+  }
+
+  const currentLabel = menus.find((menu) =>
+    menu.groups.some((group) => group.links.some((link) => link.href === currentPath))
+  )?.label
+  const selectedLabel = pickedLabel ?? currentLabel ?? menus[0]?.label
+  const selectedMenu = menus.find((menu) => menu.label === selectedLabel)
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape') onClose()
-    if (event.key !== 'Tab') return
-    // aria-modal doesn't stop Tab, so wrap focus between the first and last focusable element
-    const focusable = event.currentTarget.querySelectorAll<HTMLElement>('a[href], button')
-    const first = focusable[0]
-    const last = focusable[focusable.length - 1]
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault()
-      last.focus()
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault()
-      first.focus()
-    }
   }
 
   // the menu only exists below lg, so close it once the viewport grows past that
-  const bindDesktopClose = (dialog: HTMLDivElement | null) => {
-    if (!dialog) return
+  const bindDesktopClose = (drawer: HTMLDivElement | null) => {
+    if (!drawer) return
     const desktop = window.matchMedia('(width >= 64rem)')
     const handleDesktopChange = (event: MediaQueryListEvent) => {
       if (event.matches) onClose()
@@ -55,83 +53,55 @@ export const MobileMenu = ({ id, menus, onClose, className }: MobileMenuProps) =
   }
 
   return (
-    <div
+    <MobileNavDrawer
       ref={bindDesktopClose}
       id={id}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Menu"
+      open={open}
       onKeyDown={handleKeyDown}
-      className={cn(
-        'fixed inset-0 z-50 flex h-svh flex-col bg-overlay',
-        'transition-opacity duration-150 starting:opacity-0 motion-reduce:transition-none',
-        className
-      )}
+      className={className}
+      footer={
+        <Button variant="primary" size="large" block asChild>
+          <a href={SIGN_UP_URL}>Start your project</a>
+        </Button>
+      }
     >
-      <div className="flex h-(--header-height) shrink-0 items-center justify-between border-b border-transparent px-6">
-        <Logo />
-        <button
-          type="button"
-          autoFocus
-          onClick={onClose}
-          className="inline-flex items-center justify-center rounded-md p-2 text-foreground-lighter hover:text-foreground-light focus-ring"
-        >
-          <span className="sr-only">Close menu</span>
-          <X aria-hidden className="size-6" strokeWidth={2} />
-        </button>
-      </div>
-      <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-8 pt-4">
-        <Accordion type="multiple">
-          {menus.map((menu, index) => (
-            <AccordionItem
-              key={menu.label}
-              value={menu.label}
-              style={revealStyle(index)}
-              className={cn(
-                'border-b transition duration-250 ease-out',
-                'delay-[calc(var(--reveal-index)*50ms)] motion-reduce:transition-none',
-                'starting:translate-y-2.5 starting:opacity-0'
-              )}
-            >
-              <AccordionTrigger className="py-2 pl-2 pr-4 text-base font-medium text-foreground hover:bg-surface-200">
-                {menu.label}
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <div className="flex flex-col gap-5 px-3 pb-4">
-                  {menu.groups.map((group) => (
-                    <div key={group.label} className="flex flex-col gap-3">
-                      {menu.groups.length > 1 ? (
-                        <span className="font-mono text-xs uppercase tracking-widest text-foreground-lighter">
-                          {group.label}
-                        </span>
-                      ) : null}
-                      <ul className="flex flex-col gap-3">
-                        {group.links.map((link) => (
-                          <li key={link.href}>
-                            <a
-                              href={link.href}
-                              className="rounded-sm text-sm text-foreground-light hover:text-foreground focus-ring"
-                            >
-                              {link.label}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-        <ul className="mt-auto flex flex-col gap-3 px-2 pt-6">
+      <nav aria-label="Menu" className="flex flex-col gap-6">
+        <MobileNavTabs
+          tabs={menus.map((menu) => ({ label: menu.label }))}
+          selectedLabel={selectedLabel}
+          currentLabel={currentLabel}
+          onTabSelect={setPickedLabel}
+        />
+        {selectedMenu?.groups.map((group) => (
+          <section key={group.label} aria-label={group.label} className="flex flex-col">
+            {selectedMenu.groups.length > 1 ? (
+              <h2 className="py-2 font-mono text-xs uppercase tracking-widest text-foreground-lighter">
+                {group.label}
+              </h2>
+            ) : null}
+            <ul className="flex flex-col">
+              {group.links.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={link.href === currentPath ? 'page' : undefined}
+                    className="flex h-10 items-center text-sm text-foreground-light hover:text-foreground focus-ring aria-[current=page]:text-foreground"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+        <ul className="flex flex-col border-t pt-4">
           {EXTERNAL_LINKS.map(({ label, href, Icon }) => (
             <li key={href}>
               <a
                 href={href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="flex items-center gap-2 rounded-sm text-sm text-foreground-light hover:text-foreground focus-ring"
+                className="flex h-10 items-center gap-2 text-sm text-foreground-light hover:text-foreground focus-ring"
               >
                 <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
                 {label}
@@ -139,33 +109,7 @@ export const MobileMenu = ({ id, menus, onClose, className }: MobileMenuProps) =
             </li>
           ))}
         </ul>
-        <div className="px-2 pt-6">
-          <ToggleGroup
-            type="single"
-            variant="segmented"
-            tone="outline"
-            size="sm"
-            allowDeselect={false}
-            value={choice}
-            onValueChange={onChoiceChange}
-            aria-label="Theme"
-            className="w-full"
-          >
-            {singleThemes.map((theme) => (
-              <ToggleGroupItem key={theme.value} value={theme.value} className="flex-1">
-                {theme.name}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
-      </div>
-      <div className="flex shrink-0 bg-alternative p-4">
-        <Button variant="primary" block asChild>
-          <a href={SIGN_UP_URL} className="h-10 py-4">
-            Start your project
-          </a>
-        </Button>
-      </div>
-    </div>
+      </nav>
+    </MobileNavDrawer>
   )
 }
