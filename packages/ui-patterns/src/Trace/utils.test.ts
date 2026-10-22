@@ -9,6 +9,7 @@ import {
   createTimeScale,
   effectiveEndMs,
   flattenTree,
+  formatAttributeValue,
   formatDuration,
   formatMs,
   getTimingPlacement,
@@ -324,5 +325,16 @@ describe('computeMinimapRects', () => {
 
   it('returns nothing for an empty trace', () => {
     expect(computeMinimapRects(buildTraceIndex([]), 4, 8)).toEqual({ rects: [], laneCount: 0 })
+  })
+})
+
+describe('formatAttributeValue', () => {
+  it('formats primitives as text and objects as JSON', () => {
+    expect(formatAttributeValue('GET')).toBe('GET')
+    expect(formatAttributeValue(200)).toBe('200')
+    expect(formatAttributeValue(false)).toBe('false')
+    expect(formatAttributeValue(null)).toBe('null')
+    expect(formatAttributeValue(undefined)).toBe('undefined')
+    expect(formatAttributeValue({ rows: 3, tags: ['a'] })).toBe('{"rows":3,"tags":["a"]}')
   })
 })

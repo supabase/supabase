@@ -6,7 +6,7 @@ function span(
   name: string,
   startMs: number,
   endMs: number | null,
-  extra: Partial<Pick<Span, 'status' | 'events'>> = {}
+  extra: Partial<Pick<Span, 'status' | 'attributes' | 'events'>> = {}
 ): Span {
   return {
     id,
@@ -26,6 +26,7 @@ const finished: TraceData = {
   spans: [
     span('root', null, 'POST /checkout', 0, 480),
     span('auth', 'root', 'auth.verify', 8, 140, {
+      attributes: { 'enduser.id': 'usr_42', 'auth.method': 'jwt' },
       events: [
         { timeMs: 30, name: 'jwt.decoded' },
         { timeMs: 95, name: 'cache.miss' },
@@ -68,6 +69,7 @@ export default function TraceWaterfallDemo() {
             </Trace.Lane>
           </Trace.Rows>
         </Trace.Waterfall>
+        <Trace.Inspector />
       </Trace.Root>
 
       <Trace.Root trace={live} minRangeMs={3000}>
@@ -86,6 +88,7 @@ export default function TraceWaterfallDemo() {
             </Trace.Lane>
           </Trace.Rows>
         </Trace.Waterfall>
+        <Trace.Inspector />
       </Trace.Root>
     </div>
   )
