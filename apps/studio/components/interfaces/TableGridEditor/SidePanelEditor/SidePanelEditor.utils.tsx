@@ -262,8 +262,7 @@ export const createColumn = async ({
     await executeSql({
       projectRef,
       connectionString,
-      sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';
-')}; COMMIT;`,
+      sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\n')}; COMMIT;`,
       queryKey: ['column', 'create-with-constraints'],
     })
 
