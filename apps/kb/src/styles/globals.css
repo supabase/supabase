@@ -3,12 +3,14 @@
 @import 'ui-patterns/CodeBlock/code-block.css';
 @import './utilities.css';
 @import './keyframes.css';
+@import 'docs-search/styles.css';
 
 @source '../pages/**/*.astro';
 @source '../components/**/*.{astro,tsx}';
 @source '../layouts/**/*.astro';
 @source './../../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../../packages/docs-search/src/**/*.{tsx,ts}';
 
 /* apps/docs loads Inter/Manrope via next/font, which injects these two
  * variables as inline styles on <html>. kb loads the same fonts via the

@@ -22,6 +22,10 @@ const navTopics = getListedTopics({
 }).map((topic) => topic.name)
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 const canonicalHref = canonicalUrl(Astro.url.pathname)
+const ogImage = title
+	? `https://obuldanrptloktxcffvn.supabase.co/functions/v1/og-images?site=kb&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description ?? 'undefined')}`
+	: 'https://supabase.com/docs/img/supabase-og-image.png'
+const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowledge Base'
 ---
 
 <!doctype html>
@@ -60,7 +64,17 @@ const canonicalHref = canonicalUrl(Astro.url.pathname)
 		/>
 		<link rel="canonical" href={canonicalHref} />
 		<link rel="sitemap" href={`${import.meta.env.BASE_URL}/sitemap-index.xml`} />
-		<title>{title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowledge Base'}</title>
+		<title>{pageTitle}</title>
+		<meta property="og:type" content="article" />
+		<meta property="og:title" content={pageTitle} />
+		{description && <meta property="og:description" content={description} />}
+		<meta property="og:url" content={canonicalHref} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:alt" content={title ?? pageTitle} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:site" content="@supabase" />
+		<meta name="twitter:creator" content="@supabase" />
+		<meta name="twitter:image" content={ogImage} />
 		{jsonLd && <script type="application/ld+json" is:inline set:html={serializeJsonLd(jsonLd)} />}
 	</head>
 	<body class="flex min-h-dvh flex-col">

@@ -710,8 +710,10 @@ _sign-in_, _sign-out_, and _sign-up_ as nouns or adjectives. Match the product U
 labels **Sign in**, **Sign out**, and **Sign up**.
 
 Keep _login_, _log in_, _logout_, _log out_, and `logOut` when quoting
-third-party UI or when they are part of code, routes, URL slugs, CLI commands, or
-established feature names such as _social login_.
+third-party UI or when they are part of code, routes, URL slugs, or CLI commands.
+
+Feature names follow the same rule: _social sign-in_, _phone sign-in_, and
+_anonymous sign-in_.
 
 ### singular they
 

@@ -19,6 +19,8 @@ ingestMarkdown({
   table: TABLE_NAME,
   contentRoot: path.resolve(process.cwd(), 'public/markdown'),
   include: ['**/*.md'],
+  // listing pages (the sitemap and one per topic) only link to the content that's already indexed
+  ignore: ['sitemap.md', 'topics/**'],
   slugPrefix: 'kb/',
 }).catch((err) => {
   console.error(err instanceof Error ? err.message : err)

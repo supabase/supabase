@@ -2,7 +2,14 @@ import { load } from 'cheerio'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
-import { formatHeadingPath, highlightMatches } from './SearchV2.utils'
+import type { SearchState } from './types'
+import {
+  formatHeadingPath,
+  getHighlightQuery,
+  getIsSearching,
+  getVisibleResults,
+  highlightMatches,
+} from './utils'
 
 describe('formatHeadingPath', () => {
   it('joins multiple headings with " > "', () => {
@@ -75,5 +82,69 @@ describe('highlightMatches', () => {
   it('returns the text unchanged when the query is made up entirely of ignored words', () => {
     const result = highlightMatches('The best MCP server', 'the of')
     expect(result).toBe('The best MCP server')
+  })
+})
+
+const result = {
+  path: '/guides/auth',
+  title: 'Auth',
+  heading: 'Auth',
+  excerpt: '',
+  headingPath: ['Auth'],
+  score: 1,
+}
+
+describe('getVisibleResults / getHighlightQuery', () => {
+  it('uses the settled results and query', () => {
+    const state: SearchState = { status: 'results', key: 1, results: [result], query: 'auth' }
+    expect(getVisibleResults(state)).toEqual([result])
+    expect(getHighlightQuery(state)).toBe('auth')
+  })
+
+  it('keeps the previous results and query while a new search is loading', () => {
+    const state: SearchState = {
+      status: 'loading',
+      key: 2,
+      staleResults: [result],
+      staleQuery: 'auth',
+    }
+    expect(getVisibleResults(state)).toEqual([result])
+    expect(getHighlightQuery(state)).toBe('auth')
+  })
+
+  it('is empty before the first search and after an error', () => {
+    for (const state of [
+      { status: 'initial', key: 0 },
+      { status: 'error', key: 1, message: 'nope' },
+    ] satisfies SearchState[]) {
+      expect(getVisibleResults(state)).toEqual([])
+      expect(getHighlightQuery(state)).toBe('')
+    }
+  })
+})
+
+describe('getIsSearching', () => {
+  it('is on while a request is in flight', () => {
+    const state: SearchState = { status: 'loading', key: 1, staleResults: [], staleQuery: '' }
+    expect(getIsSearching({ searchState: state, query: 'auth' })).toBe(true)
+  })
+
+  it('is off after an error', () => {
+    const state: SearchState = { status: 'error', key: 1, message: 'nope' }
+    expect(getIsSearching({ searchState: state, query: 'auth' })).toBe(false)
+  })
+
+  it('starts on the keystroke, before the request for the typed query is sent', () => {
+    const state: SearchState = { status: 'results', key: 1, results: [result], query: 'aut' }
+    expect(getIsSearching({ searchState: state, query: 'auth' })).toBe(true)
+  })
+
+  it('is off once the typed query has settled', () => {
+    const state: SearchState = { status: 'results', key: 1, results: [result], query: 'auth' }
+    expect(getIsSearching({ searchState: state, query: ' auth ' })).toBe(false)
+  })
+
+  it('is off for an empty query', () => {
+    expect(getIsSearching({ searchState: { status: 'initial', key: 0 }, query: '  ' })).toBe(false)
   })
 })

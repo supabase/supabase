@@ -325,12 +325,12 @@ export const gettingStartedMobileTutorials: ContentListingGroup = {
         'Learn how to build a user management app with Expo React Native and Supabase Database, Auth, and Storage functionality.',
     },
     {
-      title: 'Expo React Native Social Auth',
+      title: 'Expo React Native Social Sign-in',
       href: '/guides/auth/quickstarts/with-expo-react-native-social-auth',
       icon: '/docs/img/icons/expo-icon',
       hasLightIcon: true,
       description:
-        'Learn how to implement social authentication in an app with Expo React Native and Supabase Database and Auth functionality.',
+        'Learn how to implement social sign-in in an app with Expo React Native and Supabase Database and Auth functionality.',
     },
     {
       title: 'Android Kotlin',

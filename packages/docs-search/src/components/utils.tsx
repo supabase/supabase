@@ -1,10 +1,9 @@
-import type { useDocsSearchV2 } from 'common'
 import type { ReactNode } from 'react'
 
-type DocsSearchV2State = ReturnType<typeof useDocsSearchV2>['searchState']
+import type { SearchResult, SearchState } from './types'
 
 interface GetIsSearchingParams {
-  searchState: DocsSearchV2State
+  searchState: SearchState
   query: string
 }
 
@@ -107,4 +106,18 @@ function getIsSearching({ searchState, query }: GetIsSearchingParams): boolean {
   return trimmedQuery !== '' && trimmedQuery !== settledQuery
 }
 
-export { formatHeadingPath, getIsSearching, highlightMatches }
+/** The results to show: the settled ones, or the previous ones while a new search is loading. */
+function getVisibleResults(searchState: SearchState): SearchResult[] {
+  if ('results' in searchState) return searchState.results
+  if ('staleResults' in searchState) return searchState.staleResults
+  return []
+}
+
+/** The query the visible results belong to, not the one being typed. */
+function getHighlightQuery(searchState: SearchState): string {
+  if ('query' in searchState) return searchState.query
+  if ('staleQuery' in searchState) return searchState.staleQuery
+  return ''
+}
+
+export { formatHeadingPath, getHighlightQuery, getIsSearching, getVisibleResults, highlightMatches }
