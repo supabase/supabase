@@ -9,7 +9,7 @@ import { Button, cn, ScrollBar, ScrollViewport } from 'ui'
 
 import { useTrace, useView } from './Trace'
 import type { SpanContextValue } from './types'
-import { flattenTree, formatDuration } from './utils'
+import { effectiveEndMs, flattenTree, formatDuration } from './utils'
 
 const ROW_HEIGHT = 24
 const OVERSCAN = 8
@@ -17,7 +17,7 @@ const INDENT = 14
 
 const SpanContext = createContext<SpanContextValue | null>(null)
 
-function useSpan(): SpanContextValue {
+export function useSpan(): SpanContextValue {
   const value = use(SpanContext)
   if (!value) throw new Error('Trace parts must be rendered inside Trace.Rows')
   return value
@@ -226,8 +226,8 @@ export function Lane({ className, ...props }: ComponentProps<'div'>) {
 export function Duration({ className, ...props }: ComponentProps<'span'>) {
   const { row } = useSpan()
   const { nowMs } = useTrace()
-  const { startMs, endMs } = row.span
-  const isRunning = endMs === null
+  const { span } = row
+  const isRunning = span.endMs === null
 
   return (
     <span
@@ -239,7 +239,7 @@ export function Duration({ className, ...props }: ComponentProps<'span'>) {
       )}
       {...props}
     >
-      {formatDuration((endMs ?? Math.max(startMs, nowMs)) - startMs)}
+      {formatDuration(effectiveEndMs(span, nowMs) - span.startMs)}
     </span>
   )
 }

@@ -13,9 +13,9 @@ const LIVE_GROWTH_TRANSITION =
 
 const WaterfallContext = createContext<TimeScale | null>(null)
 
-function useWaterfallScale(): TimeScale {
+export function useWaterfallScale(): TimeScale {
   const value = use(WaterfallContext)
-  if (!value) throw new Error('Trace.Ruler and Trace.Grid must be rendered inside Trace.Waterfall')
+  if (!value) throw new Error('Trace parts must be rendered inside Trace.Waterfall')
   return value
 }
 
