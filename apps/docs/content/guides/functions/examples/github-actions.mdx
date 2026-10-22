@@ -33,7 +33,7 @@ jobs:
         with:
           version: latest
 
-      - run: supabase functions deploy --project-ref $PROJECT_ID
+      - run: supabase functions deploy --remote=$PROJECT_ID --yes
 ```
 
 Since Supabase CLI [v1.62.0](https://github.com/supabase/cli/releases/tag/v1.62.0) you can deploy all functions with a single command.

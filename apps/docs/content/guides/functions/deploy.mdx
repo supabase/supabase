@@ -152,14 +152,14 @@ jobs:
         with:
           version: latest
 
-      - run: supabase functions deploy --project-ref $PROJECT_ID
+      - run: supabase functions deploy --remote=$PROJECT_ID --yes
 ```
 
 ---
 
 ### GitLab CI
 
-Here is the sample pipeline configuration to deploy via GitLab CI.
+Here is the sample pipeline configuration to deploy via GitLab CI. Set `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` as CI/CD variables in your GitLab project.
 
 ```yaml
 image: node:20
@@ -185,8 +185,7 @@ setup-npm:
 deploy-function:
   stage: deploy
   script:
-    - npx supabase init
-    - npx supabase functions deploy --debug
+    - npx supabase functions deploy --debug --yes
   services:
     - docker:dind
   variables:
@@ -197,7 +196,7 @@ deploy-function:
 
 ### Bitbucket Pipelines
 
-Here is the sample pipeline configuration to deploy via Bitbucket.
+Here is the sample pipeline configuration to deploy via Bitbucket. Set `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` as repository variables.
 
 ```yaml
 image: node:20
@@ -214,8 +213,7 @@ pipelines:
         - step:
             name: Functions Deploy
             script:
-              - npx supabase init
-              - npx supabase functions deploy --debug
+              - npx supabase functions deploy --debug --yes
             services:
               - docker
 ```

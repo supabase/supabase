@@ -14,15 +14,15 @@ For a detailed, step-by-step guide on restoring your database from the Supabase 
 Back up your cloud database:
 
 ```bash
-supabase db dump --db-url "[CONNECTION_STRING]" -f roles.sql --role-only
+supabase db dump --remote="[CONNECTION_STRING]" -f roles.sql --role-only
 ```
 
 ```bash
-supabase db dump --db-url "[CONNECTION_STRING]" -f schema.sql
+supabase db dump --remote="[CONNECTION_STRING]" -f schema.sql
 ```
 
 ```bash
-supabase db dump --db-url "[CONNECTION_STRING]" -f data.sql --use-copy --data-only
+supabase db dump --remote="[CONNECTION_STRING]" -f data.sql --use-copy --data-only
 ```
 
 Restore to your self-hosted instance:

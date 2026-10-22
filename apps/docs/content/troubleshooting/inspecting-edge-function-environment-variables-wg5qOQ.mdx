@@ -31,7 +31,7 @@ echo "MY_NAME=Some_name" >> ./supabase/.env
 4. deploy the newly added secret
 
 ```bash
-npx supabase secrets set --env-file ./supabase/.env --project-ref <PROJECT REF>
+npx supabase secrets set --env-file ./supabase/.env --remote=<PROJECT REF>
 ```
 
 5. Run the following CLI command to check secrets:

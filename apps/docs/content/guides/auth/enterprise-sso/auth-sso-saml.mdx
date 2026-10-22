@@ -72,7 +72,7 @@ Note that SLO (Single Logout) is not supported at this time with Supabase Auth a
 
 Append `?download=true` to the Metadata URL to download the Metadata XML file. This is useful in cases where the identity provider requires a file.
 
-Alternatively, you can use the `supabase sso info --project-ref <your-project>` [command](/docs/reference/cli/supabase-sso-info) to get setup information for your project.
+Alternatively, you can use the `supabase sso info --remote=<your-project>` [command](/docs/reference/cli/supabase-sso-info) to get setup information for your project.
 
 ### User accounts and identities
 
@@ -160,7 +160,7 @@ Commonly used SAML 2.0 Identity Providers that only support Metadata XML files:
 Once you've obtained the SAML 2.0 Metadata XML file or URL you can [establish a connection](/docs/reference/cli/supabase-sso-add) with your project's Supabase Auth server by running:
 
 ```bash
-supabase sso add --type saml --project-ref <your-project> \
+supabase sso add --type saml --remote=<your-project> \
   --metadata-url 'https://company.com/idp/saml/metadata' \
   --domains company.com
 ```
@@ -168,7 +168,7 @@ supabase sso add --type saml --project-ref <your-project> \
 If you wish to use a Metadata XML file instead, you can use:
 
 ```bash
-supabase sso add --type saml --project-ref <your-project> \
+supabase sso add --type saml --remote=<your-project> \
   --metadata-file /path/to/saml/metadata.xml \
   --domains company.com
 ```
@@ -296,7 +296,7 @@ When creating or updating an identity provider with the [Supabase CLI](/docs/gui
 For example, to change the attribute mappings to an existing provider you can use:
 
 ```bash
-supabase sso update <provider-uuid> --project-ref <your-project> \
+supabase sso update <provider-uuid> --remote=<your-project> \
   --attribute-mapping-file /path/to/attribute/mapping.json
 ```
 
@@ -402,7 +402,7 @@ Some SAML Assertions may expose the same attribute under different names for dif
 Once a connection to an identity provider is established, you can [remove it](/docs/reference/cli/supabase-sso-remove) by running:
 
 ```bash
-supabase sso remove <provider-id> --project-ref <your-project>
+supabase sso remove <provider-id> --remote=<your-project>
 ```
 
 If successful, the details of the removed identity provider will be shown. All user accounts from that identity provider will be immediately logged out. User information will remain in the system, but it will no longer be possible for any of those accounts to be accessed in the future, even if you add the connection again.
@@ -410,7 +410,7 @@ If successful, the details of the removed identity provider will be shown. All u
 A [list of all](/docs/reference/cli/supabase-sso-list) registered identity providers can be displayed by running:
 
 ```bash
-supabase sso list --project-ref <your-project>
+supabase sso list --remote=<your-project>
 ```
 
 ### Update a connection
@@ -427,7 +427,7 @@ Commonly this is necessary when:
 You can use this command to [update](/docs/reference/cli/supabase-sso-update) the configuration of an identity provider:
 
 ```bash
-supabase sso update <provider-id> --project-ref <your-project>
+supabase sso update <provider-id> --remote=<your-project>
 ```
 
 Use `--help` to see all available flags.
@@ -439,13 +439,13 @@ It is not possible to change the unique SAML identifier of the identity provider
 You can always obtain a [list](/docs/reference/cli/supabase-sso-list) of all registered providers using:
 
 ```bash
-supabase sso list --project-ref <your-project>
+supabase sso list --remote=<your-project>
 ```
 
 This list will only include basic information about each provider. To see [all of the information](/docs/reference/cli/supabase-sso-show) about a provider you can use:
 
 ```bash
-supabase sso show <provider-id> --project-ref <your-project>
+supabase sso show <provider-id> --remote=<your-project>
 ```
 
 You can use the `-o json` flag to output the information as JSON, should you need to. Other formats may be supported, use `--help` to see all available options.

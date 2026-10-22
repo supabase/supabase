@@ -119,7 +119,7 @@ Parameters marked with **Restart: Yes** cause the CLI to automatically restart y
 
 </Admonition>
 
-Use the examples below with `supabase postgres-config update --project-ref <project-ref> --experimental`:
+Use the examples below with `supabase postgres-config update --remote=<project-ref> --experimental`:
 
 | Parameter                                                                                                                                                                                                                      | Type      | Restart | Example                                         |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------- | ----------------------------------------------- |
@@ -172,7 +172,7 @@ To update Postgres configurations, use the [`postgres config`](/docs/reference/c
 
 ```bash
 supabase postgres-config update --config shared_buffers=250MB \
---project-ref <project-ref> \
+--remote=<project-ref> \
 --experimental
 ```
 
@@ -181,7 +181,7 @@ By default, the CLI will merge any provided config overrides with any existing o
 ```bash
 supabase postgres-config update --config max_parallel_workers=3 \
 --replace-existing-overrides \
---project-ref <project-ref> \
+--remote=<project-ref> \
 --experimental
 ```
 
@@ -189,7 +189,7 @@ To delete specific configuration overrides, use the `postgres-config delete` com
 
 ```bash
 supabase postgres-config delete --config shared_buffers,work_mem \
---project-ref <project-ref> \
+--remote=<project-ref> \
 --experimental
 ```
 
@@ -230,7 +230,7 @@ By default, Supabase ensures that this propagation is executed correctly. Howeve
 
 ```bash
 supabase postgres-config delete --config shared_buffers --no-restart \
---project-ref <project-ref> \
+--remote=<project-ref> \
 --experimental
 ```
 

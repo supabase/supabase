@@ -53,7 +53,7 @@ To prevent recreation, always provide your database password using one of these 
 - **Environment Variables:** Set the `SUPABASE_DB_PASSWORD` variable in your local shell or `.env` file.
 - **Command Flags:** Use the password flag (typically `-p` or `--password`) when executing commands:
   ```bash
-  supabase db query --linked -p 'your_database_password' "SELECT 1;"
+  supabase migration list -p 'your_database_password' --remote
   ```
 
 By providing the password, the CLI authenticates directly as the `postgres` user rather than provisioning a temporary `cli_login_postgres` role.

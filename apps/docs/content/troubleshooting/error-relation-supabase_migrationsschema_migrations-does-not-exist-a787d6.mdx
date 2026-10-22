@@ -13,4 +13,4 @@ The Supabase dashboard performs background queries to retrieve migration data fr
 **How to Resolve:**
 
 - **Ignore the error:** If you are not using the Supabase CLI to manage your database migrations, this error is a harmless side effect of dashboard polling and can be safely ignored.
-- **Initialize the migration metadata**: If you manage your database with the Supabase CLI, running `supabase db push` will create the supabase_migrations schema and schema_migrations table as part of applying your local migrations. Be aware that this command may also apply any pending migration files to your database, so only run it if that's your intended workflow.
+- **Initialize the migration metadata**: If you manage your database with the Supabase CLI, running `supabase db push --remote` will create the supabase_migrations schema and schema_migrations table as part of applying your local migrations. Be aware that this command may also apply any pending migration files to your database, so only run it if that's your intended workflow.

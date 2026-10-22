@@ -43,7 +43,7 @@ supabase link
 ## 4. Pull down your production migration history
 
 ```bash
-supabase migration fetch
+supabase migration fetch --remote
 ```
 
 This retrieves the migration files currently recorded against your `main` branch, so you can compare them against the actual live schema and locate the one causing the failure.
@@ -56,7 +56,7 @@ This retrieves the migration files currently recorded against your `main` branch
 2. After correcting the file, mark it as applied using its timestamp:
 
    ```bash
-   supabase migration repair <timestamp> --status applied
+   supabase migration repair <timestamp> --status applied --remote
    ```
 
 3. Verify the repair took effect by checking [production migrations](/dashboard/project/_/database/migrations) in the Dashboard.
