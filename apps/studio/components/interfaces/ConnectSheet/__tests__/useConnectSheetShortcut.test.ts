@@ -18,7 +18,7 @@ const {
   mockSetShowConnect: vi.fn(),
   mockUseSelectedProjectQuery: vi.fn(),
   mockUseShortcut: vi.fn(),
-  mockWithOptions: vi.fn(() => 'showConnectParser'),
+  mockWithOptions: vi.fn((options) => options),
 }))
 
 vi.mock('ui-patterns/CommandMenu', () => ({
@@ -70,7 +70,7 @@ describe('useConnectSheetShortcut', () => {
 
     expect(mockSetConnectSheetSource).toHaveBeenCalledWith('keyboard_shortcut')
     expect(mockSetCommandMenuOpen).toHaveBeenCalledWith(false)
-    expect(mockSetShowConnect).toHaveBeenCalledWith(true)
+    expect(mockSetShowConnect).toHaveBeenCalledWith(true, { history: 'push' })
   })
 
   it('disables the shortcut when the selected project cannot connect', () => {
