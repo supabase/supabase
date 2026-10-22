@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -49,10 +49,23 @@ export const AddNewSecretModal = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const handleClose = () => {
-    setShowAddSecretModal(null)
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: '', description: '', secret: '' },
+  })
+
+  // this modal stays mounted, so back can drop ?new without calling handleClose
+  useEffect(() => {
+    if (showAddSecretModal) {
+      return
+    }
+
     setIsSecretVisible(false)
     form.reset()
+  }, [form, showAddSecretModal])
+
+  const handleClose = () => {
+    setShowAddSecretModal(null)
   }
 
   const onAddNewSecret: SubmitHandler<FormSchema> = async (values) => {
@@ -73,11 +86,6 @@ export const AddNewSecretModal = () => {
     } finally {
     }
   }
-
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: '', description: '', secret: '' },
-  })
 
   const { isDirty, isSubmitting } = form.formState
 
