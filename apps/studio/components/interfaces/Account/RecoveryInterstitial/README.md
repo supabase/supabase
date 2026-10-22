@@ -1,30 +1,29 @@
 # Account recovery interstitial
 
-Independent delivery on `dnywh/account-recovery-interstitial`, based on master.
+The interstitial uses the signed-in account's recovery state and existing setup dialogs. There are no runtime mock parameters. Account Security and Advisors remain separate delivery work.
 
-## Local preview
+## Test with Chrome DevTools
 
-- Exhausted codes: `http://localhost:8082/account-recovery?mockRecoveryInterstitial=exhausted&returnTo=%2Forganizations`
-- Missing codes: `http://localhost:8082/account-recovery?mockRecoveryInterstitial=missing&returnTo=%2Forganizations`
-- Add `&mockRecoveryTasks=codes` for a codes-only list. By default both recovery codes and the optional backup authenticator task are shown.
-- Replace `returnTo` with an encoded local project or organization URL to test returning there.
+Use a dedicated staging test account with MFA enabled and complete sign-in first. Open the deploy preview's `/dashboard/account-recovery?returnTo=%2Forganizations` route, or `/account-recovery?returnTo=%2Forganizations` locally when no base path is configured.
 
-Mock state is accepted in development and Vercel preview deployments (`NEXT_PUBLIC_VERCEL_ENV=preview`). It is disabled on production deployments. Use the same query parameters on the deploy preview URL. It bypasses eligibility and flags and uses deliberately invalid preview codes. Generate and regenerate open the same confirmation and save-code dialogs as Account Security, without calling the authentication service or changing your account. Add authenticator opens an inert preview dialog with no real QR code or auth mutation.
+1. In Chrome DevTools, open Network and enable Preserve log. Filter for `recovery-codes`.
+2. For an account that already has codes, right-click the GET request ending in `/factors/recovery-codes`, choose Override content, and select a local overrides folder when prompted.
+3. Keep the existing JSON fields and change `remaining` to `0`. Save and reload. With one verified authenticator, the exhausted-code task should appear. Restore a healthy count to test the all-clear state. These overrides affect this browser only.
+4. For the missing-code state, use a staging account that has MFA but has never generated recovery codes. The API returns `mfa_factor_not_found`; changing a successful response body alone does not reproduce that error status.
+5. Use Network request blocking on the status request to check the unavailable state. It must not show “You’re all set”. Disable blocking afterwards.
+6. Remove or disable the overrides and reload before testing live generation, regeneration or authenticator enrollment. These actions use the actual authentication service and change the test account. Verify regeneration cancellation leaves existing codes intact, and Done requires the save acknowledgement.
+7. Verify Continue returns to `/dashboard/organizations` on the preview, or `/organizations` locally. Query strings and fragments must survive.
 
-The live reminder generates or regenerates codes directly in the existing dialogs. Regeneration requires confirmation. Completion requires the save acknowledgement and closing with Done; creation alone does not resolve the reminder. Errors can be closed and retried. Each completed row remains visible. Adding an authenticator is recommended and completes only after successful verification, independently of saving codes. Canceling either flow leaves its row unresolved. Continue to dashboard remains available and returns to the original destination. The dialog remains mounted during background recovery-status updates.
+Chrome's instructions: https://developer.chrome.com/docs/devtools/overrides
 
-Without the mock parameter, the authenticated route uses the shared account recovery findings. It requires the recovery-code flag and Account Security availability. This interstitial selects only missing or exhausted recovery codes. Low codes, a single MFA factor, and a single OAuth identity do not trigger the reminder. The shared evaluator handles account eligibility and SSO exclusion.
+For isolated dialog tests without real account mutations, use the component tests. They mock authentication responses at the test boundary; those mocks are not part of the application.
 
 ## Automatic reminders and rollout
 
-Create the ConfigCat boolean flag `enableAccountRecoveryInterstitial`, defaulting to false. Enable it for internal test accounts first, then roll out gradually after verifying recovery-code availability. Automatic interruption also requires `enableAuthRecoveryCodes` and Account Security availability. The direct authenticated route and inert mocks remain available independently of the rollout flag.
+The ConfigCat flag `enableAccountRecoveryInterstitial` gates automatic interruption, alongside recovery-code availability and Account Security access. Both Studio runtimes wait for MFA verification and successful recovery reads. Account, sign-in, consent and connection flows are excluded.
 
-The shared controller is mounted in both Next.js and TanStack Start. It waits for a verified authenticated session and successful recovery reads. It checks dashboard organization, project, and creation routes; account settings, sign-in, MFA verification, consent and connection routes are excluded. Return destinations retain their query string and fragment.
+Skip for now snoozes missing codes for thirty days or exhausted codes for seven. Escalation breaks snooze. Storage is versioned and user-scoped, survives sign-out, and falls back to memory if unavailable. No recovery codes are stored. Other browsers and devices have independent reminders.
 
-Skip for now snoozes the aggregated reminder for seven days when codes are exhausted, or thirty days when codes are missing. Escalation from missing to exhausted breaks the snooze. Browser storage is versioned and scoped to the signed-in user, survives sign-out, and falls back to memory when unavailable. No codes are stored. Other browsers and devices have independent reminders.
+Saved codes resolve either gap; another verified factor resolves an exhausted-code gap. The optional authenticator task appears only with one verified factor and never triggers an interruption alone. Completed rows stay visible during background updates.
 
-Completed tasks stay visible. On exit, unresolved code gaps are snoozed; saved codes resolve either gap, and a verified backup factor resolves an exhausted-code gap. Another factor alone never causes an interruption. Only accounts with exactly one verified factor see that optional task.
-
-Telemetry records rollout exposure, task starts, successful completion, and exits with completion state. Mocks send no events and write no reminder state. No backend changes are required. Cross-device cadence would require durable account-level storage.
-
-The advisor, account settings, and interstitial surfaces select from the shared recovery findings.
+Telemetry records reminder exposure, task actions, completion and exit. No backend changes are required; cross-device cadence would need account-level persistence.

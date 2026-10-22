@@ -23,8 +23,8 @@ import {
   getRemainingRecoveryGap,
   writeRecoveryReminderSnooze,
 } from '@/lib/account-recovery/recovery-reminder'
-import { useTrack } from '@/lib/telemetry/track'
 import { BASE_PATH } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const RecoveryInterstitial = () => {
   const [returnTo] = useQueryState('returnTo', parseAsString)
