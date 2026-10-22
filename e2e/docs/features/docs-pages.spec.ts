@@ -57,8 +57,6 @@ test.describe('Docs owned pages', () => {
       const article = page.locator(articleSelector)
       await expect(article, 'Page article should be present').toBeVisible()
 
-      // Same-page anchors go through the fetch too, so every anchor is checked against
-      // the server-rendered HTML rather than some against the hydrated page.
       const links = await collectDocsOwnedLinks(page, baseURL!, articleSelector)
       const anchoredUrls = new Set(links.filter((link) => link.anchor).map((link) => link.url))
       const urls = [...new Set(links.map((link) => link.url))]

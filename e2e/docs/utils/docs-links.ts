@@ -99,7 +99,6 @@ export function checkLinkFromBrowser(
   withAnchors: boolean
 ): Promise<LinkCheckResult> {
   const key = `${withAnchors}:${url}`
-  // A result read with anchors also answers a plain reachability check.
   let check = linkChecks.get(key) ?? (withAnchors ? undefined : linkChecks.get(`true:${url}`))
   if (!check) {
     check = page.evaluate(
@@ -111,9 +110,6 @@ export function checkLinkFromBrowser(
           }
 
           const doc = new DOMParser().parseFromString(await response.text(), 'text/html')
-          // Only count ids in the article, so a sidebar or table of contents id can't stand
-          // in for a removed heading. Pages without one, like reference pages, use the whole
-          // document.
           const root = doc.querySelector(articleSelector) ?? doc
           const anchors = [
             ...[...root.querySelectorAll('[id]')].map((element) => element.id),
@@ -137,7 +133,6 @@ export function checkLinkFromBrowser(
         articleSelector: articleSelectorForPagePath(new URL(url).pathname),
       }
     )
-    // Only cache successes, so a transient failure is retried by the next page that links here.
     check.then(
       (result) => {
         if (!result.ok) linkChecks.delete(key)
