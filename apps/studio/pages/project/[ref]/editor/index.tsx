@@ -68,8 +68,6 @@ const TableEditorPage: NextPageWithLayout = () => {
 
     const shouldRedirect = shouldOpenLastTableOnEditorIndex({
       isHistoryTraverse: isHistoryTraverseNavigation(),
-      explicitSchema,
-      lastTableSchema: lastTable.schema,
     })
 
     if (!shouldRedirect) {
@@ -81,7 +79,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       buildTableEditorUrl({
         projectRef,
         tableId: lastTable.tableId,
-        schema: lastTable.schema,
+        schema: explicitSchema || lastTable.schema,
       })
     )
     // router and tabStore are intentionally excluded: in the TanStack build useRouter()

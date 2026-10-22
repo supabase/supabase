@@ -1,7 +1,6 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { FilterIcon, PlusIcon } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Label, Popover, PopoverContent, PopoverTrigger } from 'ui'
 import {
@@ -14,7 +13,6 @@ import {
 
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import { EntityListItem } from './EntityListItem'
-import { buildTableEditorSchemaListPath } from './TableEditorMenu.utils'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 import { TableMenuFilterEmptyState } from './TableMenuFilterEmptyState'
 import { ExportDialog } from '@/components/grid/components/header/ExportDialog'
@@ -44,11 +42,21 @@ import { useTableEditorStateSnapshot } from '@/state/table-editor'
 type Sort = 'alphabetical' | 'grouped-alphabetical'
 
 export const TableEditorMenu = () => {
-  const router = useRouter()
-  const { id: _id, ref: projectRef, sidebar } = useParams()
+  const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+
+  useEffect(() => {
+    const onPopState = () => {
+      const schema = new URLSearchParams(window.location.search).get('schema')
+      if (!schema || schema === selectedSchema) return
+      setSelectedSchema(schema, { history: 'replace' })
+    }
+
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [selectedSchema, setSelectedSchema])
 
   const [searchText, setSearchText] = useState<string>('')
   const [isSchemaDropdownOpen, setIsSchemaDropdownOpen] = useState(false)
@@ -176,24 +184,7 @@ export const TableEditorMenu = () => {
               onSelectSchema={(name: string) => {
                 setSearchText('')
                 setIsSchemaDropdownOpen(false)
-
-                const isViewingTable = Number.isInteger(id)
-                const isSchemaChange = name !== selectedSchema
-
-                if (isViewingTable && isSchemaChange && projectRef) {
-                  router.replace(
-                    buildTableEditorSchemaListPath({
-                      projectRef,
-                      schema: name,
-                      sidebar,
-                    })
-                  )
-                  return
-                }
-
-                // From the list, push so Back returns to the previous schema.
-                // Re-selecting the current schema keeps the default replace.
-                setSelectedSchema(name, { history: isSchemaChange ? 'push' : 'replace' })
+                setSelectedSchema(name, { history: name === selectedSchema ? 'replace' : 'push' })
               }}
               onSelectCreateSchema={() => {
                 snap.onAddSchema()
