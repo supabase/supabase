@@ -253,7 +253,17 @@ const TopicTab = ({ topic }: TopicTabProps) => (
     value={toTabValue(topic)}
     className={cn(
       'shrink-0 whitespace-nowrap rounded-md py-2 text-sm tracking-body transition-colors focus-inset',
-      'relative z-1 data-[state=active]:shadow-none'
+      'relative z-1 data-[state=active]:shadow-none',
+      // indicator set before hydration
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:rounded-b-none',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:rounded-t-lg',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:bg-200',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:absolute',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:inset-0',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:rounded-t-lg',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border-b-0',
+      'group-not-data-[tab-indicator-ready]/list:data-[state=active]:before:border-default'
     )}
   >
     <span className="block px-3">{topic ?? 'All'}</span>
