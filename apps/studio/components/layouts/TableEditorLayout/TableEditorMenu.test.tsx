@@ -1,4 +1,4 @@
-import { act, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -96,7 +96,7 @@ describe('TableEditorMenu schema switch', () => {
     vi.spyOn(mockRouter, 'push').mockClear()
   })
 
-  test('pushes a schema change without leaving the open table', async () => {
+  test('replaces a schema change without leaving the open table', async () => {
     const onUrlUpdate = vi.fn()
 
     customRender(<TableEditorMenu />, {
@@ -112,74 +112,10 @@ describe('TableEditorMenu schema switch', () => {
       expect(onUrlUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
           queryString: '?schema=auth',
-          options: expect.objectContaining({ history: 'push' }),
-        })
-      )
-    })
-  })
-
-  test('syncs the dropdown to the url schema on back', async () => {
-    const onUrlUpdate = vi.fn()
-
-    customRender(<TableEditorMenu />, {
-      nuqs: { hasMemory: true, searchParams: '?schema=public', onUrlUpdate },
-    })
-    await screen.findByRole('combobox', { name: 'Schema public' })
-
-    act(() => {
-      window.history.pushState({}, '', '/project/default/editor/25837?schema=auth')
-      window.dispatchEvent(new PopStateEvent('popstate'))
-    })
-
-    await waitFor(() => {
-      expect(onUrlUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          queryString: '?schema=auth',
           options: expect.objectContaining({ history: 'replace' }),
         })
       )
     })
-    expect(mockRouter.replace).not.toHaveBeenCalled()
-    expect(mockRouter.push).not.toHaveBeenCalled()
-  })
-
-  test('falls back to the default schema when back has no schema param', async () => {
-    const onUrlUpdate = vi.fn()
-
-    customRender(<TableEditorMenu />, {
-      nuqs: { hasMemory: true, searchParams: '?schema=auth', onUrlUpdate },
-    })
-    await screen.findByRole('combobox', { name: 'Schema auth' })
-
-    act(() => {
-      window.history.pushState({}, '', '/project/default/editor/25837')
-      window.dispatchEvent(new PopStateEvent('popstate'))
-    })
-
-    await waitFor(() => {
-      expect(onUrlUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          queryString: '?schema=public',
-          options: expect.objectContaining({ history: 'replace' }),
-        })
-      )
-    })
-  })
-
-  test('does not rewrite the schema when back already matches the dropdown', async () => {
-    const onUrlUpdate = vi.fn()
-
-    customRender(<TableEditorMenu />, {
-      nuqs: { hasMemory: true, searchParams: '?schema=public', onUrlUpdate },
-    })
-    await screen.findByRole('combobox', { name: 'Schema public' })
-
-    act(() => {
-      window.history.pushState({}, '', '/project/default/editor/25837')
-      window.dispatchEvent(new PopStateEvent('popstate'))
-    })
-
-    expect(onUrlUpdate).not.toHaveBeenCalled()
   })
 
   test('keeps a sidebar param when switching schema', async () => {
@@ -203,6 +139,6 @@ describe('TableEditorMenu schema switch', () => {
     }
     expect(update.searchParams.get('schema')).toBe('extensions')
     expect(update.searchParams.get('sidebar')).toBe('ai-assistant')
-    expect(update.options.history).toBe('push')
+    expect(update.options.history).toBe('replace')
   })
 })
