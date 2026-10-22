@@ -39,7 +39,10 @@ export const SecretAPIKeys = () => {
 
   const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
-  const [deleteId, setDeleteId] = useQueryState('deleteSecretKey', parseAsString)
+  const [deleteId, setDeleteId] = useQueryState(
+    'deleteSecretKey',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const apiKeyToDelete = secretApiKeys?.find((key) => key.id === deleteId)
 
   const {
@@ -62,7 +65,8 @@ export const SecretAPIKeys = () => {
   useEffect(() => {
     if (isSuccessApiKeys && !!deleteId && !apiKeyToDelete && !isDeleteSuccess) {
       toast('Unable to find secret key')
-      setDeleteId(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setDeleteId(null, { history: 'replace' })
     }
   }, [apiKeyToDelete, deleteId, isDeleteSuccess, isSuccessApiKeys, setDeleteId])
 

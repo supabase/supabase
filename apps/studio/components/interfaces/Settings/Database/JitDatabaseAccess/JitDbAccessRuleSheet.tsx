@@ -126,8 +126,14 @@ export function JitDbAccessRuleSheet({
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const [isNewRule, setIsNewRule] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
-  const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
+  const [isNewRule, setIsNewRule] = useQueryState(
+    'jit_new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [ruleIdToEdit, setRuleIdToEdit] = useQueryState(
+    'jit_edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { data: databaseRoles, isSuccess: isSuccessDatabaseRoles } = useDatabaseRolesQuery({
     projectRef,
@@ -209,7 +215,8 @@ export function JitDbAccessRuleSheet({
   useEffect(() => {
     if (!!ruleIdToEdit && isDataReady && !user) {
       toast('Access rule cannot be found')
-      setRuleIdToEdit(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setRuleIdToEdit(null, { history: 'replace' })
     }
   }, [isDataReady, ruleIdToEdit, setRuleIdToEdit, user])
 

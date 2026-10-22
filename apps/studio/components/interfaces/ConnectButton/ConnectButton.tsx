@@ -29,7 +29,7 @@ export const ConnectButton = ({
 
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   if (isActiveHealthy) {

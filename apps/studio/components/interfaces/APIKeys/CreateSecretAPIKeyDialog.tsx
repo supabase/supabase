@@ -49,7 +49,10 @@ const SCHEMA = z.object({
 
 export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
-  const [visible, setVisible] = useQueryState('new', parseAsString)
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const formRef = useRef<HTMLFormElement>(null)
 
   const onOpenChange = (value: boolean) => {

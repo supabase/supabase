@@ -26,7 +26,7 @@ export const WrappersTab = () => {
 
   const [isCreating, setIsCreating] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const { can: canCreateWrapper } = useAsyncCheckPermissionsV2(

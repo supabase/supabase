@@ -77,10 +77,13 @@ export const RolesList = () => {
 
   const [isCreatingRole, setIsCreatingRole] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = useQueryState('delete', parseAsString)
+  const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
   const roleToDelete = roles?.find((role) => role.id.toString() === selectedRoleIdToDelete)
 
@@ -113,7 +116,8 @@ export const RolesList = () => {
   useEffect(() => {
     if (isSuccess && !!selectedRoleIdToDelete && !roleToDelete && !isSuccessDelete) {
       toast('Role cannot be found')
-      setSelectedRoleIdToDelete(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedRoleIdToDelete(null, { history: 'replace' })
     }
   }, [isSuccess, selectedRoleIdToDelete, roleToDelete, isSuccessDelete, setSelectedRoleIdToDelete])
 

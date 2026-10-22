@@ -45,7 +45,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
 
   const [_, setOpenImportForeignSchemaDialog] = useQueryState(
     'initForeignSchema',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const updateLanguage = (value: 'javascript' | 'sql') => {

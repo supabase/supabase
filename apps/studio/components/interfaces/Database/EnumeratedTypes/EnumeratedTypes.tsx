@@ -71,13 +71,19 @@ export const EnumeratedTypes = () => {
 
   const [showCreateTypePanel, setShowCreateTypePanel] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [selectedTypeIdToEdit, setSelectedTypeIdToEdit] = useQueryState('edit', parseAsString)
+  const [selectedTypeIdToEdit, setSelectedTypeIdToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const typeToEdit = data?.find((type) => type.id.toString() === selectedTypeIdToEdit)
 
-  const [selectedTypeIdToDelete, setSelectedTypeIdToDelete] = useQueryState('delete', parseAsString)
+  const [selectedTypeIdToDelete, setSelectedTypeIdToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const typeToDelete = data?.find((type) => type.id.toString() === selectedTypeIdToDelete)
 
   const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
@@ -120,14 +126,15 @@ export const EnumeratedTypes = () => {
   useEffect(() => {
     if (isSuccess && !!selectedTypeIdToEdit && !typeToEdit) {
       toast('Type cannot be found')
-      setSelectedTypeIdToEdit(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedTypeIdToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, selectedTypeIdToEdit, setSelectedTypeIdToEdit, typeToEdit])
 
   useEffect(() => {
     if (isSuccess && !!selectedTypeIdToDelete && !typeToDelete && !isSuccessDelete) {
       toast('Type cannot be found')
-      setSelectedTypeIdToDelete(null)
+      setSelectedTypeIdToDelete(null, { history: 'replace' })
     }
   }, [isSuccess, selectedTypeIdToDelete, setSelectedTypeIdToDelete, typeToDelete, isSuccessDelete])
 

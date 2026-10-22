@@ -44,7 +44,10 @@ export const EditSecretModal = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [secretIdToEdit, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
+  const [secretIdToEdit, setSelectedSecretToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const secret = secrets.find((secret) => secret.id === secretIdToEdit)
 
   const [showSecretValue, setShowSecretValue] = useState(false)
@@ -106,7 +109,8 @@ export const EditSecretModal = () => {
   useEffect(() => {
     if (isSuccess && !!secretIdToEdit && !secret) {
       toast('Secret not found')
-      setSelectedSecretToEdit(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedSecretToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, secretIdToEdit, secret, setSelectedSecretToEdit])
 

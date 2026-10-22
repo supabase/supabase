@@ -54,7 +54,10 @@ const MapView = () => {
     y: number
     region: { key: string; country?: string; name?: string; region?: string }
   }>()
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = useQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { data } = useReadReplicasQuery({ projectRef: ref })
   const databases = data ?? []

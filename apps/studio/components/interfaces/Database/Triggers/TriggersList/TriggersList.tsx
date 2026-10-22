@@ -100,13 +100,22 @@ export const TriggersList = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [triggerIdToEdit, setTriggerToEdit] = useQueryState('edit', parseAsString)
+  const [triggerIdToEdit, setTriggerToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const triggerToEdit = triggers?.find((fn) => fn.id.toString() === triggerIdToEdit)
 
-  const [triggerIdToDuplicate, setTriggerToDuplicate] = useQueryState('duplicate', parseAsString)
+  const [triggerIdToDuplicate, setTriggerToDuplicate] = useQueryState(
+    'duplicate',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const triggerToDuplicate = triggers?.find((fn) => fn.id.toString() === triggerIdToDuplicate)
 
-  const [triggerIdToDelete, setTriggerToDelete] = useQueryState('delete', parseAsString)
+  const [triggerIdToDelete, setTriggerToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const triggerToDelete = triggers?.find((fn) => fn.id.toString() === triggerIdToDelete)
 
   const {
@@ -205,21 +214,22 @@ execute function function_name();`
   useEffect(() => {
     if (isSuccess && !!triggerIdToEdit && !triggerToEdit) {
       toast('Trigger not found')
-      setTriggerToEdit(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setTriggerToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, setTriggerToEdit, triggerIdToEdit, triggerToEdit])
 
   useEffect(() => {
     if (isSuccess && !!triggerIdToDuplicate && !triggerToDuplicate) {
       toast('Trigger not found')
-      setTriggerToDuplicate(null)
+      setTriggerToDuplicate(null, { history: 'replace' })
     }
   }, [isSuccess, triggerIdToDuplicate, triggerToDuplicate, setTriggerToDuplicate])
 
   useEffect(() => {
     if (isSuccess && !!triggerIdToDelete && !triggerToDelete && !isSuccessDelete) {
       toast('Trigger not found')
-      setTriggerToDelete(null)
+      setTriggerToDelete(null, { history: 'replace' })
     }
   }, [isSuccess, triggerIdToDelete, triggerToDelete, isSuccessDelete, setTriggerToDelete])
 

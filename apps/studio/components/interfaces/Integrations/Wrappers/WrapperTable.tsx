@@ -48,7 +48,10 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
     [data, integration]
   )
 
-  const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
+  const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
   const openedWrapperId = useRef<string | null>(null)
 
@@ -61,7 +64,8 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
       if (openedWrapperId.current !== selectedWrapperIdToEdit) {
         toast('Wrapper not found')
       }
-      setSelectedWrapperToEdit(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedWrapperToEdit(null, { history: 'replace' })
     }
   }, [isError, isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 

@@ -6,7 +6,9 @@ export const AssistantAgentHarnessFooter = () => {
   const { resolvedTheme } = useTheme()
   const theme = resolvedTheme === 'dark' ? 'dark' : 'light'
   const [, setConnectParams] = useQueryStates({
-    showConnect: parseAsBoolean.withDefault(false),
+    showConnect: parseAsBoolean
+      .withDefault(false)
+      .withOptions({ history: 'push', clearOnDefault: true }),
     connectTab: parseAsString,
   })
 

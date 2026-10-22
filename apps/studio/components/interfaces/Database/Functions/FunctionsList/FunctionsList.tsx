@@ -181,16 +181,22 @@ export const FunctionsList = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [functionIdToEdit, setSelectedFunctionToEdit] = useQueryState('edit', parseAsString)
+  const [functionIdToEdit, setSelectedFunctionToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const functionToEdit = functions.find((fn) => fn.id.toString() === functionIdToEdit)
 
   const [functionIdToDuplicate, setSelectedFunctionIdToDuplicate] = useQueryState(
     'duplicate',
-    parseAsString
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
   const functionToDuplicate = functions.find((fn) => fn.id.toString() === functionIdToDuplicate)
 
-  const [functionIdToDelete, setSelectedFunctionToDelete] = useQueryState('delete', parseAsString)
+  const [functionIdToDelete, setSelectedFunctionToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const functionToDelete = functions.find((fn) => fn.id.toString() === functionIdToDelete)
 
   const {
@@ -218,21 +224,22 @@ export const FunctionsList = () => {
   useEffect(() => {
     if (isSuccess && !!functionIdToEdit && !functionToEdit) {
       toast('Function not found')
-      setSelectedFunctionToEdit(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedFunctionToEdit(null, { history: 'replace' })
     }
   }, [functionIdToEdit, functionToEdit, isSuccess, setSelectedFunctionToEdit])
 
   useEffect(() => {
     if (isSuccess && !!functionIdToDuplicate && !functionToDuplicate) {
       toast('Function not found')
-      setSelectedFunctionIdToDuplicate(null)
+      setSelectedFunctionIdToDuplicate(null, { history: 'replace' })
     }
   }, [functionIdToDuplicate, functionToDuplicate, isSuccess, setSelectedFunctionIdToDuplicate])
 
   useEffect(() => {
     if (isSuccess && !!functionIdToDelete && !functionToDelete && !isSuccessDelete) {
       toast('Function not found')
-      setSelectedFunctionToDelete(null)
+      setSelectedFunctionToDelete(null, { history: 'replace' })
     }
   }, [
     functionIdToDelete,

@@ -44,7 +44,10 @@ export const InitializeForeignSchemaDialog = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: schemas } = useSchemasQuery({ projectRef })
 
-  const [isOpen, setIsOpen] = useQueryState('initForeignSchema', parseAsBoolean.withDefault(false))
+  const [isOpen, setIsOpen] = useQueryState(
+    'initForeignSchema',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [isCreating, setIsCreating] = useState(false)
 
   const { data: wrapperInstance, meta: wrapperMeta } = useS3VectorsWrapperInstance({ bucketId })

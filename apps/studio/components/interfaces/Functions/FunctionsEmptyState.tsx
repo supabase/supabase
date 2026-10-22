@@ -27,7 +27,10 @@ export const FunctionsEmptyState = () => {
   const { openSidebar } = useSidebarManagerSnapshot()
 
   const track = useTrack()
-  const [, setCreateMethod] = useQueryState('create', parseAsString)
+  const [, setCreateMethod] = useQueryState(
+    'create',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {

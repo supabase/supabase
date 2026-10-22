@@ -31,7 +31,10 @@ export const QueryResultError = ({
 }) => {
   const { createChat, isCreating } = useCreateChat()
 
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = useQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const canDebug = sql !== undefined && source !== undefined
 

@@ -40,7 +40,10 @@ export const SecretsManagement = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [searchValue, setSearchValue] = useState<string>('')
-  const [, setShowAddSecretModal] = useQueryState('new', parseAsBoolean.withDefault(false))
+  const [, setShowAddSecretModal] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
   const { can: canManageSecrets } = useAsyncCheckPermissionsV2(

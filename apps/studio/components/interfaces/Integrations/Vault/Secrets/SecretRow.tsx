@@ -41,8 +41,14 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   const [revealSecret, setRevealSecret] = useState(false)
   const name = row?.name ?? 'No name provided'
 
-  const [, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
-  const [, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
+  const [, setSelectedSecretToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [, setSelectedSecretToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE

@@ -77,12 +77,12 @@ export const EditHookPanel = () => {
 
   const [showCreateHookForm, setShowCreateHookForm] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const [selectedHookIdToEdit, setSelectedHookIdToEdit] = useQueryState(
     'edit',
-    parseAsString.withDefault('')
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )
   const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToEdit)
 
@@ -149,7 +149,8 @@ export const EditHookPanel = () => {
   useEffect(() => {
     if (isSuccess && !!selectedHookIdToEdit && !selectedHook && !isClosingRef.current) {
       toast('Webhook not found')
-      setSelectedHookIdToEdit(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedHookIdToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, selectedHook, selectedHookIdToEdit, setSelectedHookIdToEdit])
 

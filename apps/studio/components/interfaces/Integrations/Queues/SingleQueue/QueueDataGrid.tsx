@@ -138,7 +138,10 @@ export const QueueMessagesDataGrid = ({
 }: QueueDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
 
-  const [selectedMessageId, setSelectedMessageId] = useQueryState('messageId', parseAsInteger)
+  const [selectedMessageId, setSelectedMessageId] = useQueryState(
+    'messageId',
+    parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     if (isLoading || !isAtBottom(event)) return

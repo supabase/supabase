@@ -39,7 +39,7 @@ export const DeleteWrapperModal = () => {
 
   const [selectedWrapperIdToDelete, setSelectedWrapperToDelete] = useQueryState(
     'delete',
-    parseAsString
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
   const selectedWrapper = wrappers.find((x) => x.id.toString() === selectedWrapperIdToDelete)
 
@@ -67,7 +67,8 @@ export const DeleteWrapperModal = () => {
   useEffect(() => {
     if (isSuccess && !!selectedWrapperIdToDelete && !selectedWrapper && !isSuccessDelete) {
       toast('Wrapper not found')
-      setSelectedWrapperToDelete(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedWrapperToDelete(null, { history: 'replace' })
     }
   }, [
     isSuccess,

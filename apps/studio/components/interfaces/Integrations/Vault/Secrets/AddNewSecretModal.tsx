@@ -46,7 +46,7 @@ export const AddNewSecretModal = () => {
 
   const [showAddSecretModal, setShowAddSecretModal] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const handleClose = () => {

@@ -4,7 +4,10 @@ import { Dialog, DialogContent, DialogSection, DialogTitle } from 'ui'
 import { TerminalInstructions } from './TerminalInstructions'
 
 export const TerminalInstructionsDialog = () => {
-  const [createMethod, setCreateMethod] = useQueryState('create', parseAsString)
+  const [createMethod, setCreateMethod] = useQueryState(
+    'create',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const isOpen = createMethod === 'cli'
 

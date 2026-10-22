@@ -41,7 +41,10 @@ export const CreatePublishableAPIKeyDialog = () => {
   const projectRef = params?.ref as string
   const formRef = useRef<HTMLFormElement>(null)
 
-  const [visible, setVisible] = useQueryState('new', parseAsString.withDefault(''))
+  const [visible, setVisible] = useQueryState(
+    'new',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const onOpenChange = (value: boolean) => {
     if (value) setVisible('publishable')

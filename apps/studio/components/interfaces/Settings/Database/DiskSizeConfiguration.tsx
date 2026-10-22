@@ -46,7 +46,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
 
   const [showIncreaseDiskSizeModal, setShowIncreaseDiskSizeModal] = useQueryState(
     'show_increase_disk_size_modal',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissionsV2(

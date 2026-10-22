@@ -11,7 +11,10 @@ export function useConnectSheetShortcut() {
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = useQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const enabled = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   useShortcut(

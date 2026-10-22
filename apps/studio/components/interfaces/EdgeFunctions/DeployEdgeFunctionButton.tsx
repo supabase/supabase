@@ -23,7 +23,10 @@ export const DeployEdgeFunctionButton = () => {
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const track = useTrack()
-  const [, setCreateMethod] = useQueryState('create', parseAsString)
+  const [, setCreateMethod] = useQueryState(
+    'create',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const isProjectActive = useIsProjectActive()
 

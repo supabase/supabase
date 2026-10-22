@@ -24,7 +24,9 @@ vi.mock('ui-patterns/CommandMenu', () => ({
 }))
 
 vi.mock('nuqs', () => ({
-  parseAsBoolean: { withDefault: vi.fn(() => 'showConnectParser') },
+  parseAsBoolean: {
+    withDefault: vi.fn(() => ({ withOptions: vi.fn(() => 'showConnectParser') })),
+  },
   useQueryState: () => [false, mockSetShowConnect],
 }))
 

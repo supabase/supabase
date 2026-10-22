@@ -51,13 +51,19 @@ export const CronjobsTab = () => {
 
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [cronJobIdForEditing, setCronJobForEditing] = useQueryState('edit', parseAsString)
+  const [cronJobIdForEditing, setCronJobForEditing] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const cronJobForEditing = grid.rows.find((j) => j.jobid.toString() === cronJobIdForEditing)
 
-  const [, setCronJobForDeletion] = useQueryState('delete', parseAsString)
+  const [, setCronJobForDeletion] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const columns = useMemo(
     () =>
@@ -120,7 +126,8 @@ export const CronjobsTab = () => {
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
       toast('Cron job not found')
-      setCronJobForEditing(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setCronJobForEditing(null, { history: 'replace' })
     }
   }, [cronJobForEditing, cronJobIdForEditing, grid.isSuccess, setCronJobForEditing])
 

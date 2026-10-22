@@ -24,7 +24,10 @@ export const DeleteSecretModal = () => {
     connectionString: project?.connectionString,
   })
 
-  const [secretIdToDelete, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
+  const [secretIdToDelete, setSelectedSecretToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const selectedSecret = secrets.find((secret) => secret.id === secretIdToDelete)
 
   const { mutateAsync: deleteSecret, isSuccess: isSuccessDelete } = useVaultSecretDeleteMutation({
@@ -51,7 +54,8 @@ export const DeleteSecretModal = () => {
   useEffect(() => {
     if (isSuccess && !!secretIdToDelete && !selectedSecret && !isSuccessDelete) {
       toast('Secret not found')
-      setSelectedSecretToDelete(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedSecretToDelete(null, { history: 'replace' })
     }
   }, [isSuccess, isSuccessDelete, secretIdToDelete, selectedSecret, setSelectedSecretToDelete])
 

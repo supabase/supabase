@@ -114,13 +114,19 @@ export const OAuthAppsList = () => {
 
   const [showCreateSheet, setShowCreateSheet] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [selectedAppToEdit, setSelectedAppToEdit] = useQueryState('edit', parseAsString)
+  const [selectedAppToEdit, setSelectedAppToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const appToEdit = oAuthApps?.find((app) => app.client_id === selectedAppToEdit)
 
-  const [selectedAppToDelete, setSelectedAppToDelete] = useQueryState('delete', parseAsString)
+  const [selectedAppToDelete, setSelectedAppToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const appToDelete = oAuthApps?.find((app) => app.client_id === selectedAppToDelete)
 
   const {
@@ -209,21 +215,23 @@ export const OAuthAppsList = () => {
   // Prevent opening the create sheet if OAuth Server is disabled
   useEffect(() => {
     if (isSuccessAuthConfig && !isOAuthServerEnabled && showCreateSheet) {
-      setShowCreateSheet(false)
+      // replace so Back does not reopen a sheet the project cannot show
+      setShowCreateSheet(false, { history: 'replace' })
     }
   }, [isSuccessAuthConfig, isOAuthServerEnabled, showCreateSheet, setShowCreateSheet])
 
   useEffect(() => {
     if (isSuccess && !!selectedAppToEdit && !appToEdit) {
       toast('App not found')
-      setSelectedAppToEdit(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedAppToEdit(null, { history: 'replace' })
     }
   }, [appToEdit, isSuccess, selectedAppToEdit, setSelectedAppToEdit])
 
   useEffect(() => {
     if (isSuccess && !!selectedAppToDelete && !appToDelete && !isSuccessDelete) {
       toast('App not found')
-      setSelectedAppToDelete(null)
+      setSelectedAppToDelete(null, { history: 'replace' })
     }
   }, [appToDelete, isSuccess, isSuccessDelete, selectedAppToDelete, setSelectedAppToDelete])
 

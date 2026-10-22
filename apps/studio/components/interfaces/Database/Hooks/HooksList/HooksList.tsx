@@ -22,7 +22,10 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const HooksList = () => {
   const { data: project } = useSelectedProjectQuery()
 
-  const [, setShowCreateHookForm] = useQueryState('new', parseAsBoolean.withDefault(false))
+  const [, setShowCreateHookForm] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const {
     data: hooks = [],

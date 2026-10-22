@@ -27,7 +27,10 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
     const sessionSnap = useSqlEditorSessionSnapshot()
-    const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+    const [, setShowConnect] = useQueryState(
+      'showConnect',
+      parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+    )
 
     const result = sessionSnap.results[id]?.[0]
 

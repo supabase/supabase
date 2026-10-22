@@ -59,7 +59,10 @@ export const DatabaseSelector = ({
   const isHighAvailability = useIsHighAvailability()
 
   const [open, setOpen] = useState(false)
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = useQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 

@@ -15,7 +15,10 @@ export const DeleteCronJob = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
-  const [cronJobIdForDeletion, setCronJobForDeletion] = useQueryState('delete', parseAsString)
+  const [cronJobIdForDeletion, setCronJobForDeletion] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const { grid } = useCronJobsData({
     projectRef: project?.ref,
@@ -55,7 +58,8 @@ export const DeleteCronJob = () => {
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForDeletion && !cronJob && !isSuccessDelete) {
       toast('Cron job not found')
-      setCronJobForDeletion(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setCronJobForDeletion(null, { history: 'replace' })
     }
   }, [cronJob, cronJobIdForDeletion, grid.isSuccess, isSuccessDelete, setCronJobForDeletion])
 

@@ -17,7 +17,7 @@ export const DeleteHookModal = () => {
 
   const [selectedHookIdToDelete, setSelectedHookIdToDelete] = useQueryState(
     'delete',
-    parseAsString.withDefault('')
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )
   const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToDelete)
   const { name, schema } = selectedHook ?? {}
@@ -47,7 +47,8 @@ export const DeleteHookModal = () => {
   useEffect(() => {
     if (isSuccess && !!selectedHookIdToDelete && !selectedHook && !isSuccessDelete) {
       toast('Webhook not found')
-      setSelectedHookIdToDelete(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setSelectedHookIdToDelete(null, { history: 'replace' })
     }
   }, [isSuccess, isSuccessDelete, selectedHook, selectedHookIdToDelete, setSelectedHookIdToDelete])
 

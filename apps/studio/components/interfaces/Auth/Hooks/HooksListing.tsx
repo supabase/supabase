@@ -34,7 +34,10 @@ export const HooksListing = () => {
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
-  const [hook, setHook] = useQueryState('hook', parseAsString)
+  const [hook, setHook] = useQueryState(
+    'hook',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook>()
   const [addHookAsideOpen, setAddHookAsideOpen] = useState(false)
@@ -65,7 +68,8 @@ export const HooksListing = () => {
   useEffect(() => {
     if (!!hook && !selectedHook) {
       toast('Hook not found')
-      setHook(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setHook(null, { history: 'replace' })
     }
   }, [hook, selectedHook, setHook])
 

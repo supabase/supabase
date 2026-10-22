@@ -21,8 +21,14 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
-  const [, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
-  const [, setSelectedWrapperToDelete] = useQueryState('delete', parseAsString)
+  const [, setSelectedWrapperToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [, setSelectedWrapperToDelete] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
 

@@ -183,7 +183,9 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
 
   const state = useDatabaseSelectorStateSnapshot()
   const [, setConnect] = useQueryStates({
-    showConnect: parseAsBoolean.withDefault(false),
+    showConnect: parseAsBoolean
+      .withDefault(false)
+      .withOptions({ history: 'push', clearOnDefault: true }),
     source: parseAsString,
   })
 

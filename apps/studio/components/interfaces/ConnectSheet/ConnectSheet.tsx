@@ -35,7 +35,7 @@ export const ConnectSheet = () => {
 
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
   // URL params have no defaults: a `null` value signals "not in URL" so we can
   // fall back to the user's last-used selections from localStorage.

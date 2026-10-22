@@ -62,13 +62,19 @@ export const Indexes = () => {
 
   const [showCreateIndex, setShowCreateIndex] = useQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [editIndexId, setEditIndexId] = useQueryState('edit', parseAsString)
+  const [editIndexId, setEditIndexId] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const selectedIndex = allIndexes?.find((idx) => idx.name === editIndexId)
 
-  const [deleteIndexId, setDeleteIndexId] = useQueryState('delete', parseAsString)
+  const [deleteIndexId, setDeleteIndexId] = useQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const selectedIndexToDelete = allIndexes?.find((idx) => idx.name === deleteIndexId)
 
   const {
@@ -137,14 +143,15 @@ export const Indexes = () => {
   useEffect(() => {
     if (isSuccessIndexes && !!editIndexId && !selectedIndex) {
       toast('Index not found')
-      setEditIndexId(null)
+      // replace so Back does not return to a missing id and retrigger this effect
+      setEditIndexId(null, { history: 'replace' })
     }
   }, [isSuccessIndexes, editIndexId, selectedIndex, setEditIndexId])
 
   useEffect(() => {
     if (isSuccessIndexes && !!deleteIndexId && !selectedIndexToDelete && !isSuccessDelete) {
       toast('Index not found')
-      setDeleteIndexId(null)
+      setDeleteIndexId(null, { history: 'replace' })
     }
   }, [isSuccessIndexes, deleteIndexId, selectedIndexToDelete, isSuccessDelete, setDeleteIndexId])
 

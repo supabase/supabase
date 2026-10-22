@@ -37,8 +37,14 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
     connectionString: project?.connectionString,
   })
 
-  const [, setSelectedHookIdToEdit] = useQueryState('edit', parseAsString.withDefault(''))
-  const [, setSelectedHookIdToDelete] = useQueryState('delete', parseAsString.withDefault(''))
+  const [, setSelectedHookIdToEdit] = useQueryState(
+    'edit',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [, setSelectedHookIdToDelete] = useQueryState(
+    'delete',
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
+  )
 
   const restUrl = project?.restUrl
 

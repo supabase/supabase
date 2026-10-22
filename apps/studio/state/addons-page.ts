@@ -5,7 +5,8 @@ export const ADDONS_PANEL_KEYS_ARRAY = ['pitr', 'customDomain', 'ipv4'] as const
 export type ADDONS_PANEL_KEYS = undefined | (typeof ADDONS_PANEL_KEYS_ARRAY)[number]
 
 export function useAddonsPagePanel() {
-  const [{ panel: _panel }, setParams] = useUrlState({ replace: true })
+  // push so browser Back closes the add-on side panel
+  const [{ panel: _panel }, setParams] = useUrlState({ replace: false })
 
   const panel = ADDONS_PANEL_KEYS_ARRAY.find((key) => key === _panel)
 

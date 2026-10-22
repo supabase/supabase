@@ -70,8 +70,14 @@ export const JitDbAccessConfiguration = () => {
   const parentProjectRef = project?.parent_project_ref
 
   const [enabled, setEnabled] = useState(false)
-  const [, setShowCreateRuleSheet] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
-  const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
+  const [, setShowCreateRuleSheet] = useQueryState(
+    'jit_new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [ruleIdToEdit, setRuleIdToEdit] = useQueryState(
+    'jit_edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [showEnableJitDialog, setShowEnableJitDialog] = useState(false)
   const [enableJitError, setEnableJitError] = useState<string | null>(null)
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<JitUserRule | null>(null)
