@@ -92,31 +92,42 @@ const linkChecks = new Map<string, Promise<LinkCheckResult>>()
 // (isbot, which matches HeadlessChrome) to /api/crawlers. Fetching from inside the page
 // keeps the browser's own user agent and network stack, so a link resolves the same way
 // page.goto resolves it in this suite.
-export function checkLinkFromBrowser(page: Page, url: string): Promise<LinkCheckResult> {
-  let check = linkChecks.get(url)
+// Reading the body is slow for large reference pages, so only do it when an anchor needs it.
+export function checkLinkFromBrowser(
+  page: Page,
+  url: string,
+  withAnchors: boolean
+): Promise<LinkCheckResult> {
+  const key = `${withAnchors}:${url}`
+  let check = linkChecks.get(key)
   if (!check) {
-    check = page.evaluate(async (linkUrl) => {
-      try {
-        const response = await fetch(linkUrl)
-        if (!response.ok) return { ok: false, status: response.status, anchors: [] }
+    check = page.evaluate(
+      async ({ linkUrl, readAnchors }) => {
+        try {
+          const response = await fetch(linkUrl)
+          if (!response.ok || !readAnchors) {
+            return { ok: response.ok, status: response.status, anchors: [] }
+          }
 
-        const doc = new DOMParser().parseFromString(await response.text(), 'text/html')
-        const anchors = [
-          ...[...doc.querySelectorAll('[id]')].map((element) => element.id),
-          ...[...doc.querySelectorAll('a[name]')].map((element) => element.getAttribute('name')!),
-        ]
-        return { ok: true, status: response.status, anchors }
-      } catch (error) {
-        return {
-          ok: false,
-          status: 0,
-          error: error instanceof Error ? error.message : String(error),
-          anchors: [],
+          const doc = new DOMParser().parseFromString(await response.text(), 'text/html')
+          const anchors = [
+            ...[...doc.querySelectorAll('[id]')].map((element) => element.id),
+            ...[...doc.querySelectorAll('a[name]')].map((element) => element.getAttribute('name')!),
+          ]
+          return { ok: true, status: response.status, anchors }
+        } catch (error) {
+          return {
+            ok: false,
+            status: 0,
+            error: error instanceof Error ? error.message : String(error),
+            anchors: [],
+          }
         }
-      }
-    }, url)
-    check.catch(() => linkChecks.delete(url))
-    linkChecks.set(url, check)
+      },
+      { linkUrl: url, readAnchors: withAnchors }
+    )
+    check.catch(() => linkChecks.delete(key))
+    linkChecks.set(key, check)
   }
   return check
 }

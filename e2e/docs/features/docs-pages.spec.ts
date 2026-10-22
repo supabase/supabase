@@ -59,6 +59,7 @@ test.describe('Docs owned pages', () => {
       const currentUrl = new URL(page.url())
       currentUrl.hash = ''
       const links = await collectDocsOwnedLinks(page, baseURL!, articleSelector)
+      const anchoredUrls = new Set(links.filter((link) => link.anchor).map((link) => link.url))
       const checkedUrls = new Set<string>()
 
       for (const { url, anchor } of links) {
@@ -74,7 +75,7 @@ test.describe('Docs owned pages', () => {
           continue
         }
 
-        const result = await checkLinkFromBrowser(page, url)
+        const result = await checkLinkFromBrowser(page, url, anchoredUrls.has(url))
         if (!checkedUrls.has(url)) {
           checkedUrls.add(url)
           expect
