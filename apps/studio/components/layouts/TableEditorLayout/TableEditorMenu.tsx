@@ -173,6 +173,7 @@ export const TableEditorMenu = () => {
               onSelectSchema={(name: string) => {
                 setSearchText('')
                 setIsSchemaDropdownOpen(false)
+                // Replace so Back leaves the editor instead of stepping through schemas.
                 setSelectedSchema(name, { history: 'replace' })
               }}
               onSelectCreateSchema={() => {

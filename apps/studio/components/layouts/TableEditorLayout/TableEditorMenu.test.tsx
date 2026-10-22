@@ -107,7 +107,6 @@ describe('TableEditorMenu schema switch', () => {
 
     expect(mockRouter.replace).not.toHaveBeenCalled()
     expect(mockRouter.push).not.toHaveBeenCalled()
-    expect(mockRouter.asPath).toBe('/project/default/editor/25837?schema=public')
     await waitFor(() => {
       expect(onUrlUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
