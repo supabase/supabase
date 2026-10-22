@@ -311,6 +311,7 @@ export const updateColumn = async ({
     return { error }
   }
 }
+
 /** TODO: Refactor to do in a single transaction */
 export const duplicateTable = async (
   projectRef: string,
@@ -865,6 +866,7 @@ export const updateTable = async ({
     hasError: false,
   }
 }
+
 /**
  * Used in insertRowsViaSpreadsheet + insertTableRows
  */
