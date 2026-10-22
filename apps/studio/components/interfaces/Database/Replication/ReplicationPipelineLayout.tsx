@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { parseAsInteger } from 'nuqs'
 import { PropsWithChildren, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
@@ -47,6 +47,11 @@ import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -57,10 +62,6 @@ import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import { DOCS_URL } from '@/lib/constants'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from '@/state/replication-pipeline-request-status'
 import { type ResponseError } from '@/types'
 
 type LifecycleAction = 'start' | 'stop' | 'restart'
@@ -80,7 +81,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [, setEdit] = useQueryState(
+  const [, setEdit] = usePanelQueryState(
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )

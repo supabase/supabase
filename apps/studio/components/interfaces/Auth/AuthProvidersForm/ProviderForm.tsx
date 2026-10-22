@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
@@ -25,6 +25,7 @@ import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -49,7 +50,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const [urlProvider, setUrlProvider] = useQueryState(
+  const [urlProvider, setUrlProvider] = usePanelQueryState(
     'provider',
     parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -141,7 +142,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       {
         onSuccess: (newValues) => {
           setOpen(false)
-          setUrlProvider(null)
+          setUrlProvider(null, { history: 'replace' })
           form.reset(getValuesForProvider(newValues))
           toast.success('Successfully updated settings')
         },

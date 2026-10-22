@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { includes } from 'lodash'
 import { Edit3Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import Image from 'next/legacy/image'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import {
   Badge,
   Button,
@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
@@ -37,11 +38,11 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
     connectionString: project?.connectionString,
   })
 
-  const [, setSelectedHookIdToEdit] = useQueryState(
+  const [, setSelectedHookIdToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [, setSelectedHookIdToDelete] = useQueryState(
+  const [, setSelectedHookIdToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )

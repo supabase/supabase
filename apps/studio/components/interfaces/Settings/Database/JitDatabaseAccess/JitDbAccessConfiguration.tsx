@@ -2,7 +2,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -25,6 +25,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+
 import {
   PageSection,
   PageSectionContent,
@@ -42,6 +43,7 @@ import {
 import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
 import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
 import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SSLEnforcementConfirmDialog } from '@/components/interfaces/Settings/Database/SSLEnforcementConfirmDialog'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -70,11 +72,11 @@ export const JitDbAccessConfiguration = () => {
   const parentProjectRef = project?.parent_project_ref
 
   const [enabled, setEnabled] = useState(false)
-  const [, setShowCreateRuleSheet] = useQueryState(
+  const [, setShowCreateRuleSheet] = usePanelQueryState(
     'jit_new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [ruleIdToEdit, setRuleIdToEdit] = useQueryState(
+  const [ruleIdToEdit, setRuleIdToEdit] = usePanelQueryState(
     'jit_edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -218,8 +220,8 @@ export const JitDbAccessConfiguration = () => {
   )
 
   const resetSheetState = () => {
-    setShowCreateRuleSheet(false)
-    setRuleIdToEdit(null)
+    setShowCreateRuleSheet(false, { history: 'replace' })
+    setRuleIdToEdit(null, { history: 'replace' })
   }
 
   const getErrorMessage = (error: unknown) =>

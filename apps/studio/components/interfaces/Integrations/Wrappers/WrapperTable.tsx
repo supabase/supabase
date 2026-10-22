@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -23,6 +23,8 @@ import { WrapperRow } from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 
 interface WrapperTableProps {
   isLatest?: boolean
@@ -48,7 +50,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
     [data, integration]
   )
 
-  const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState(
+  const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -64,8 +66,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
       if (openedWrapperId.current !== selectedWrapperIdToEdit) {
         toast('Wrapper not found')
       }
-      // replace so Back does not return to a missing id and retrigger this effect
-      setSelectedWrapperToEdit(null, { history: 'replace' })
+      replaceMissingPanelId(() => setSelectedWrapperToEdit(null, { history: 'replace' }))
     }
   }, [isError, isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 
@@ -128,6 +129,10 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
               wrapperMeta={integration.meta}
               onClose={() => {
                 setSelectedWrapperToEdit(null)
+                setIsClosingEditWrapper(false)
+              }}
+              onCommit={() => {
+                setSelectedWrapperToEdit(null, { history: 'replace' })
                 setIsClosingEditWrapper(false)
               }}
               isClosing={isClosingEditWrapper}

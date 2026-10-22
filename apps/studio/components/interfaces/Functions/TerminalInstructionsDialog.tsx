@@ -1,10 +1,11 @@
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { Dialog, DialogContent, DialogSection, DialogTitle } from 'ui'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { TerminalInstructions } from './TerminalInstructions'
 
 export const TerminalInstructionsDialog = () => {
-  const [createMethod, setCreateMethod] = useQueryState(
+  const [createMethod, setCreateMethod] = usePanelQueryState(
     'create',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )

@@ -33,20 +33,21 @@ import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { FormSectionLabel } from '@/components/ui/Forms/FormSection'
-import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useOAuthCustomProviderCreateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-create-mutation'
 import {
   useOAuthCustomProviderUpdateMutation,
   type OAuthCustomProviderUpdateVariables,
 } from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { FormSectionLabel } from '@/components/ui/Forms/FormSection'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useOAuthCustomProviderCreateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-create-mutation'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface CreateOrUpdateCustomProviderSheetProps {
   visible: boolean
   providerToEdit?: CustomOAuthProvider
   onClose: () => void
+  onCommit?: () => void
 }
 
 const SharedFormSchema = z.object({
@@ -111,6 +112,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
   visible,
   providerToEdit,
   onClose,
+  onCommit,
 }: CreateOrUpdateCustomProviderSheetProps) => {
   const isEditMode = !!providerToEdit
   const { ref: projectRef } = useParams()
@@ -161,14 +163,14 @@ export const CreateOrUpdateCustomProviderSheet = ({
     useOAuthCustomProviderCreateMutation({
       onSuccess: () => {
         toast.success('Custom provider created successfully')
-        onClose()
+        ;(onCommit ?? onClose)()
       },
     })
   const { mutate: updateCustomProvider, isPending: isUpdating } =
     useOAuthCustomProviderUpdateMutation({
       onSuccess: () => {
         toast.success('Custom provider updated successfully')
-        onClose()
+        ;(onCommit ?? onClose)()
       },
     })
 
@@ -244,6 +246,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
       form.reset(initialValues)
       onClose()
     },
+    active: visible,
   })
 
   const issuerUrlValue = useWatch({ control: form.control, name: 'issuer' })

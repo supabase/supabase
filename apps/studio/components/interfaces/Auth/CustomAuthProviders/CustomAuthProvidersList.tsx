@@ -47,6 +47,7 @@ import {
 } from './customProviders.utils'
 import { DeleteCustomProviderModal } from './DeleteCustomProviderModal'
 import { DisableCustomProviderModal } from './DisableCustomProviderModal'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { AlertError } from '@/components/ui/AlertError'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -57,6 +58,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthCustomProviderUpdateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
 import { useOAuthCustomProvidersQuery } from '@/data/oauth-custom-providers/oauth-custom-providers-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -149,7 +151,7 @@ export const CustomAuthProvidersList = () => {
   const providerCount = customProviders?.length ?? 0
   const atProviderLimit = providerLimit !== Infinity && providerCount >= providerLimit
 
-  const [showCreateSheet, setShowCreateSheet] = useQueryState(
+  const [showCreateSheet, setShowCreateSheet] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -157,7 +159,7 @@ export const CustomAuthProvidersList = () => {
   // Prevent opening the create sheet if custom providers are disabled or at plan limit
   useEffect(() => {
     if (showCreateSheet && (!isCustomProvidersEnabled || atProviderLimit)) {
-      setShowCreateSheet(false)
+      replaceMissingPanelId(() => setShowCreateSheet(false, { history: 'replace' }))
     }
   }, [showCreateSheet, atProviderLimit, isCustomProvidersEnabled, setShowCreateSheet])
 
@@ -541,6 +543,10 @@ export const CustomAuthProvidersList = () => {
         providerToEdit={providerToEdit}
         onClose={() => {
           setShowCreateSheet(false)
+          setSelectedProviderToEdit(null)
+        }}
+        onCommit={() => {
+          setShowCreateSheet(false, { history: 'replace' })
           setSelectedProviderToEdit(null)
         }}
       />

@@ -6,6 +6,7 @@ import { Card, CardContent, cn } from 'ui'
 
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
 import { CONNECT_ACTIONS } from './ConnectSection.config'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -16,7 +17,7 @@ export const ConnectSection = () => {
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
   const track = useTrack()
-  const [, setShowConnect] = useQueryState(
+  const [, setShowConnect] = usePanelQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

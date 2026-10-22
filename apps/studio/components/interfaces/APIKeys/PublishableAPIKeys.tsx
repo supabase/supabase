@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import {
@@ -17,6 +17,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -56,7 +58,7 @@ export const PublishableAPIKeys = () => {
   const showSelfHostedEmptyState =
     !IS_PLATFORM && publishableApiKeys.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
-  const [deleteId, setDeleteId] = useQueryState(
+  const [deleteId, setDeleteId] = usePanelQueryState(
     'deletePublishableKey',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -69,7 +71,7 @@ export const PublishableAPIKeys = () => {
   } = useAPIKeyDeleteMutation({
     onSuccess: () => {
       toast.success('Successfully deleted publishable key')
-      setDeleteId(null)
+      setDeleteId(null, { history: 'replace' })
     },
   })
 
@@ -82,8 +84,7 @@ export const PublishableAPIKeys = () => {
   useEffect(() => {
     if (isSuccessApiKeys && !!deleteId && !apiKeyToDelete && !isDeleteSuccess) {
       toast('Unable to find publishable key')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setDeleteId(null, { history: 'replace' })
+      replaceMissingPanelId(() => setDeleteId(null, { history: 'replace' }))
     }
   }, [apiKeyToDelete, deleteId, isDeleteSuccess, isSuccessApiKeys, setDeleteId])
 

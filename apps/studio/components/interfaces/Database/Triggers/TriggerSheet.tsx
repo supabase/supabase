@@ -81,6 +81,7 @@ interface TriggerSheetProps {
   isDuplicatingTrigger?: boolean
   open: boolean
   onClose: () => void
+  onCommit?: () => void
 }
 
 export const TriggerSheet = ({
@@ -88,6 +89,7 @@ export const TriggerSheet = ({
   isDuplicatingTrigger,
   open,
   onClose,
+  onCommit,
 }: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema } = useQuerySchemaState()
@@ -98,7 +100,7 @@ export const TriggerSheet = ({
     {
       onSuccess: () => {
         toast.success(`Successfully created trigger`)
-        onClose()
+        ;(onCommit ?? onClose)()
       },
       onError: (error) => {
         toast.error(`Failed to create trigger: ${error.message}`)
@@ -109,7 +111,7 @@ export const TriggerSheet = ({
     {
       onSuccess: () => {
         toast.success(`Successfully updated trigger`)
-        onClose()
+        ;(onCommit ?? onClose)()
       },
       onError: (error) => {
         toast.error(`Failed to update trigger: ${error.message}`)
@@ -144,6 +146,7 @@ export const TriggerSheet = ({
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
+    active: open,
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {

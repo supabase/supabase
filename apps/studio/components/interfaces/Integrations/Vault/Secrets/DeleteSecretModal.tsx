@@ -1,6 +1,7 @@
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +13,8 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useVaultSecretDeleteMutation } from '@/data/vault/vault-secret-delete-mutation'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -24,7 +27,7 @@ export const DeleteSecretModal = () => {
     connectionString: project?.connectionString,
   })
 
-  const [secretIdToDelete, setSelectedSecretToDelete] = useQueryState(
+  const [secretIdToDelete, setSelectedSecretToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -33,7 +36,7 @@ export const DeleteSecretModal = () => {
   const { mutateAsync: deleteSecret, isSuccess: isSuccessDelete } = useVaultSecretDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted secret ${selectedSecret?.name}`)
-      setSelectedSecretToDelete(null)
+      setSelectedSecretToDelete(null, { history: 'replace' })
     },
     onError: (error) => {
       toast.error(`Failed to delete secret: ${error.message}`)
@@ -54,8 +57,7 @@ export const DeleteSecretModal = () => {
   useEffect(() => {
     if (isSuccess && !!secretIdToDelete && !selectedSecret && !isSuccessDelete) {
       toast('Secret not found')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setSelectedSecretToDelete(null, { history: 'replace' })
+      replaceMissingPanelId(() => setSelectedSecretToDelete(null, { history: 'replace' }))
     }
   }, [isSuccess, isSuccessDelete, secretIdToDelete, selectedSecret, setSelectedSecretToDelete])
 

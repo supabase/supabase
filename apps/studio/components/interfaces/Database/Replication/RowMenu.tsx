@@ -10,7 +10,7 @@ import {
   TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { parseAsInteger } from 'nuqs'
 import { toast } from 'sonner'
 import {
   Button,
@@ -28,15 +28,16 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from '@/state/replication-pipeline-request-status'
 import type { ResponseError } from '@/types'
 
 interface RowMenuProps {
@@ -65,7 +66,7 @@ export const RowMenu = ({
   const { ref: projectRef } = useParams()
   const statusName = getStatusName(pipelineStatus)
 
-  const [, setEdit] = useQueryState(
+  const [, setEdit] = usePanelQueryState(
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )

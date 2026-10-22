@@ -16,8 +16,10 @@ import { CreateCronJobSheet } from '@/components/interfaces/Integrations/CronJob
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
 import { createNavigationHandler } from '@/lib/navigation'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -49,18 +51,18 @@ export const CronjobsTab = () => {
     searchQuery,
   })
 
-  const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
+  const [createCronJobSheetShown, setCreateCronJobSheetShown] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [cronJobIdForEditing, setCronJobForEditing] = useQueryState(
+  const [cronJobIdForEditing, setCronJobForEditing] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
   const cronJobForEditing = grid.rows.find((j) => j.jobid.toString() === cronJobIdForEditing)
 
-  const [, setCronJobForDeletion] = useQueryState(
+  const [, setCronJobForDeletion] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -123,11 +125,16 @@ export const CronjobsTab = () => {
     cleanPointerEventsNoneOnBody(500)
   }
 
+  const onCommit = () => {
+    setCronJobForEditing(null, { history: 'replace' })
+    setCreateCronJobSheetShown(false, { history: 'replace' })
+    cleanPointerEventsNoneOnBody(500)
+  }
+
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
       toast('Cron job not found')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setCronJobForEditing(null, { history: 'replace' })
+      replaceMissingPanelId(() => setCronJobForEditing(null, { history: 'replace' }))
     }
   }, [cronJobForEditing, cronJobIdForEditing, grid.isSuccess, setCronJobForEditing])
 
@@ -171,6 +178,7 @@ export const CronjobsTab = () => {
         open={!!createCronJobSheetShown || !!cronJobForEditing}
         selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
         onClose={onClose}
+        onCommit={onCommit}
       />
     </>
   )

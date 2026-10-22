@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import { ChevronRightIcon, SearchIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useState } from 'react'
 import {
   Card,
@@ -25,6 +25,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlertError } from '@/components/ui/AlertError'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
@@ -38,7 +39,7 @@ export const AnalyticsBuckets = () => {
 
   const [filterString, setFilterString] = useState('')
 
-  const [visible, setVisible] = useQueryState(
+  const [visible, setVisible] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

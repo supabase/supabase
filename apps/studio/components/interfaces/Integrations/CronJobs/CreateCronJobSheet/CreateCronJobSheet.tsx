@@ -63,6 +63,7 @@ interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> &
     Partial<Pick<CronJob, 'jobid'>>
   onClose: () => void
+  onCommit?: () => void
 }
 
 const FORM_ID = 'create-cron-job-sidepanel'
@@ -91,7 +92,12 @@ const buildCommand = (values: CronJobType) => {
   return command
 }
 
-export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCronJobSheetProps) => {
+export const CreateCronJobSheet = ({
+  open,
+  selectedCronJob,
+  onClose,
+  onCommit,
+}: CreateCronJobSheetProps) => {
   const { childId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
@@ -167,6 +173,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose: () => onClose(),
+    active: open,
   })
 
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
@@ -236,7 +243,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
             track('cron_job_created', { type: values.type, schedule: schedule })
           }
 
-          onClose()
+          ;(onCommit ?? onClose)()
         },
       }
     )

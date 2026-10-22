@@ -1,14 +1,9 @@
-import {
-  parseAsArrayOf,
-  parseAsBoolean,
-  parseAsString,
-  parseAsStringEnum,
-  useQueryState,
-} from 'nuqs'
+import { parseAsArrayOf, parseAsBoolean, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { Dispatch, RefObject, SetStateAction, useEffect, useState } from 'react'
 import type { CellKeyboardEvent, DataGridHandle } from 'react-data-grid'
 
 import { MAX_BULK_DELETE } from './Users.constants'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { User } from '@/data/auth/users-infinite-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -49,7 +44,7 @@ export function useAuthUsersShortcuts({
   const [hasCellSelected, setHasCellSelected] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const [selectedId, setSelectedId] = useQueryState(
+  const [selectedId, setSelectedId] = usePanelQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -65,11 +60,11 @@ export function useAuthUsersShortcuts({
   const [sortByValue, setSortByValue] = useQueryState('sortBy', {
     defaultValue: 'created_at:desc',
   })
-  const [, setInviteVisible] = useQueryState(
+  const [, setInviteVisible] = usePanelQueryState(
     'invite',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [, setCreateVisible] = useQueryState(
+  const [, setCreateVisible] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

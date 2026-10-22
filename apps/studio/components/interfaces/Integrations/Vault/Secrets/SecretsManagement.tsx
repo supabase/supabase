@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { sortBy } from 'lodash'
 import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 import {
@@ -23,6 +23,7 @@ import { AddNewSecretModal } from './AddNewSecretModal'
 import { DeleteSecretModal } from './DeleteSecretModal'
 import { EditSecretModal } from './EditSecretModal'
 import { formatSecretColumns } from './Secrets.utils'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -40,7 +41,7 @@ export const SecretsManagement = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [searchValue, setSearchValue] = useState<string>('')
-  const [, setShowAddSecretModal] = useQueryState(
+  const [, setShowAddSecretModal] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

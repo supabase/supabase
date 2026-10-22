@@ -60,7 +60,7 @@ const DEFAULT_VALUES: BucketFormValues = {
 
 interface CreateBucketModalProps {
   open: boolean
-  onOpenChange: (value: boolean) => void
+  onOpenChange: (value: boolean, options?: { history?: 'push' | 'replace' }) => void
 }
 
 export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps) => {
@@ -155,7 +155,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
 
       form.reset()
       setSelectedUnit(StorageSizeUnits.MB)
-      onOpenChange(false)
+      onOpenChange(false, { history: 'replace' })
     } catch (error: any) {
       // Handle specific error cases for inline display
       const errorMessage = error.message?.toLowerCase() || ''

@@ -3,7 +3,7 @@ import { keyword } from '@supabase/pg-meta'
 import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -18,8 +18,10 @@ import { useDatabaseHooksQuery } from '@/data/database-triggers/database-trigger
 import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 
 export type HTTPArgument = { id: string; name: string; value: string }
 
@@ -75,12 +77,12 @@ export const EditHookPanel = () => {
     connectionString: project?.connectionString,
   })
 
-  const [showCreateHookForm, setShowCreateHookForm] = useQueryState(
+  const [showCreateHookForm, setShowCreateHookForm] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [selectedHookIdToEdit, setSelectedHookIdToEdit] = useQueryState(
+  const [selectedHookIdToEdit, setSelectedHookIdToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -101,11 +103,17 @@ export const EditHookPanel = () => {
     setSelectedHookIdToEdit(null)
   }
 
+  const onCommit = () => {
+    isClosingRef.current = true
+    setShowCreateHookForm(false, { history: 'replace' })
+    setSelectedHookIdToEdit(null, { history: 'replace' })
+  }
+
   const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
     {
       onSuccess: (_, variables) => {
         toast.success(`Successfully created new webhook "${variables.payload.name}"`)
-        onClose()
+        onCommit()
       },
       onError: (error) => {
         toast.error(`Failed to create webhook: ${error.message}`)
@@ -117,7 +125,7 @@ export const EditHookPanel = () => {
     {
       onSuccess: (res) => {
         toast.success(`Successfully updated webhook "${res.name}"`)
-        onClose()
+        onCommit()
       },
       onError: (error) => {
         toast.error(`Failed to update webhook: ${error.message}`)
@@ -149,8 +157,7 @@ export const EditHookPanel = () => {
   useEffect(() => {
     if (isSuccess && !!selectedHookIdToEdit && !selectedHook && !isClosingRef.current) {
       toast('Webhook not found')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setSelectedHookIdToEdit(null, { history: 'replace' })
+      replaceMissingPanelId(() => setSelectedHookIdToEdit(null, { history: 'replace' }))
     }
   }, [isSuccess, selectedHook, selectedHookIdToEdit, setSelectedHookIdToEdit])
 
@@ -161,23 +168,36 @@ export const EditHookPanel = () => {
     }
   }, [visible])
 
-  // Reset form when panel opens with new selectedHook
+  // Reset form when the panel opens or the webhook changes. A later `restUrl`
+  // (project load) must not wipe edits the user already made.
+  const formIdentityRef = useRef('')
+
   useEffect(() => {
-    if (visible) {
-      form.reset({
-        name: selectedHook?.name ?? '',
-        table_id: selectedHook?.table_id?.toString() ?? '',
-        http_url: selectedHook?.function_args?.[0] ?? '',
-        http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
-        function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
-          ? 'supabase_function'
-          : 'http_request',
-        timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
-        events: selectedHook?.events ?? [],
-        httpHeaders: parseHeaders(selectedHook),
-        httpParameters: parseParameters(selectedHook),
-      })
+    if (!visible) {
+      formIdentityRef.current = ''
+      return
     }
+
+    const identity = `${selectedHook?.id ?? 'new'}:${ref ?? ''}`
+    const openedOrSwitched = formIdentityRef.current !== identity
+
+    formIdentityRef.current = identity
+
+    if (!openedOrSwitched && form.formState.isDirty) return
+
+    form.reset({
+      name: selectedHook?.name ?? '',
+      table_id: selectedHook?.table_id?.toString() ?? '',
+      http_url: selectedHook?.function_args?.[0] ?? '',
+      http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
+      function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
+        ? 'supabase_function'
+        : 'http_request',
+      timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
+      events: selectedHook?.events ?? [],
+      httpHeaders: parseHeaders(selectedHook),
+      httpParameters: parseParameters(selectedHook),
+    })
   }, [visible, selectedHook, ref, restUrl, form])
 
   const queryClient = useQueryClient()
@@ -271,11 +291,13 @@ export const EditHookPanel = () => {
     }
   }
 
-  // This is intentionally kept outside of the useConfirmOnClose hook to force RHF to update the isDirty state.
+  // Read during render so RHF subscribes. Also read the proxy when Back fires:
+  // the render boolean is still false until that subscription flushes.
   const isDirty = form.formState.isDirty
   const { confirmOnClose, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
+    checkIsDirty: () => form.formState.isDirty || isDirty,
     onClose: () => onClose(),
+    active: visible,
   })
 
   return (

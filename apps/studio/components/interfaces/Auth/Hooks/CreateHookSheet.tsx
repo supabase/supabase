@@ -53,6 +53,7 @@ interface CreateHookSheetProps {
   title: HOOK_DEFINITION_TITLE | null
   authConfig: AuthConfigResponse
   onClose: () => void
+  onCommit?: () => void
   onDelete: () => void
 }
 
@@ -120,6 +121,7 @@ export const CreateHookSheet = ({
   title,
   authConfig,
   onClose,
+  onCommit,
   onDelete,
 }: CreateHookSheetProps) => {
   const { ref: projectRef } = useParams()
@@ -176,8 +178,9 @@ export const CreateHookSheet = ({
     handleOpenChange,
     modalProps: discardChangesModalProps,
   } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
+    checkIsDirty: () => form.formState.isDirty || isDirty,
     onClose,
+    active: visible,
   })
 
   const statements = useMemo(() => {
@@ -221,7 +224,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
           sql: joinSqlFragments(statements, '\n'),
         })
       }
-      onClose()
+      ;(onCommit ?? onClose)()
     },
     onError: (error) => {
       toast.error(`Failed to create hook: ${error.message}`)

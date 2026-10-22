@@ -30,6 +30,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 interface SendMessageModalProps {
   visible: boolean
   onClose: () => void
+  onCommit?: () => void
 }
 
 const FormSchema = z.object({
@@ -53,7 +54,7 @@ export type SendMessageForm = z.infer<typeof FormSchema>
 
 const FORM_ID = 'QUEUES_SEND_MESSAGE_FORM'
 
-export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) => {
+export const SendMessageModal = ({ visible, onClose, onCommit }: SendMessageModalProps) => {
   const { childId: queueName } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const form = useForm<SendMessageForm>({
@@ -67,7 +68,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
   const { isPending, mutate } = useDatabaseQueueMessageSendMutation({
     onSuccess: () => {
       toast.success(`Successfully added a message to the queue.`)
-      onClose()
+      ;(onCommit ?? onClose)()
     },
   })
 

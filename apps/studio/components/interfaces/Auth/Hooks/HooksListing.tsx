@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -21,6 +21,8 @@ import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -34,7 +36,7 @@ export const HooksListing = () => {
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
-  const [hook, setHook] = useQueryState(
+  const [hook, setHook] = usePanelQueryState(
     'hook',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -68,8 +70,7 @@ export const HooksListing = () => {
   useEffect(() => {
     if (!!hook && !selectedHook) {
       toast('Hook not found')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setHook(null, { history: 'replace' })
+      replaceMissingPanelId(() => setHook(null, { history: 'replace' }))
     }
   }, [hook, selectedHook, setHook])
 
@@ -154,6 +155,7 @@ export const HooksListing = () => {
             if (hook) setSelectedHookForDeletion(hook)
           }}
           onClose={() => setHook(null)}
+          onCommit={() => setHook(null, { history: 'replace' })}
           authConfig={authConfig!}
         />
 
@@ -164,7 +166,7 @@ export const HooksListing = () => {
           }}
           onDeleteSuccess={() => {
             setSelectedHookForDeletion(undefined)
-            setHook(null)
+            setHook(null, { history: 'replace' })
           }}
         />
       </PageSectionContent>

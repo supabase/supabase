@@ -1,6 +1,6 @@
 import { partition, sortBy } from 'lodash'
 import { PlusIcon, SearchIcon, XIcon } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -20,7 +20,9 @@ import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-quer
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -71,16 +73,16 @@ export const RolesList = () => {
   } = useDatabaseRoleDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted role`)
-      setSelectedRoleIdToDelete(null)
+      setSelectedRoleIdToDelete(null, { history: 'replace' })
     },
   })
 
-  const [isCreatingRole, setIsCreatingRole] = useQueryState(
+  const [isCreatingRole, setIsCreatingRole] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = useQueryState(
+  const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -116,8 +118,7 @@ export const RolesList = () => {
   useEffect(() => {
     if (isSuccess && !!selectedRoleIdToDelete && !roleToDelete && !isSuccessDelete) {
       toast('Role cannot be found')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setSelectedRoleIdToDelete(null, { history: 'replace' })
+      replaceMissingPanelId(() => setSelectedRoleIdToDelete(null, { history: 'replace' }))
     }
   }, [isSuccess, selectedRoleIdToDelete, roleToDelete, isSuccessDelete, setSelectedRoleIdToDelete])
 
@@ -297,7 +298,11 @@ export const RolesList = () => {
         <NoSearchResults searchString={filterString} onResetFilter={() => setFilterString('')} />
       )}
 
-      <CreateRolePanel visible={isCreatingRole} onClose={() => setIsCreatingRole(false)} />
+      <CreateRolePanel
+        visible={isCreatingRole}
+        onClose={() => setIsCreatingRole(false)}
+        onCommit={() => setIsCreatingRole(false, { history: 'replace' })}
+      />
 
       <ConfirmationModal
         visible={!!roleToDelete}

@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { SqlEditor } from 'icons'
 import { ChevronDownIcon, ListPlusIcon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
@@ -26,6 +26,7 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
@@ -43,7 +44,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
   const [language, setLanguage] = useState<'javascript' | 'sql'>('sql')
   const [showLanguage, setShowLanguage] = useState(false)
 
-  const [_, setOpenImportForeignSchemaDialog] = useQueryState(
+  const [_, setOpenImportForeignSchemaDialog] = usePanelQueryState(
     'initForeignSchema',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

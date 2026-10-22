@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Menu } from 'ui'
@@ -14,6 +14,11 @@ import {
   useGenerateObservabilityMenu,
 } from './ObservabilityMenu.utils'
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -21,10 +26,6 @@ import { ProductMenu } from '@/components/ui/ProductMenu'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { ContentOfType } from '@/data/content/content-query'
-import {
-  FGA_PERMISSIONS,
-  useAsyncCheckUserContentPermissions,
-} from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -49,7 +50,7 @@ export const ObservabilityMenu = () => {
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  const [showNewReportModal, setShowNewReportModal] = useQueryState(
+  const [showNewReportModal, setShowNewReportModal] = usePanelQueryState(
     'newReport',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

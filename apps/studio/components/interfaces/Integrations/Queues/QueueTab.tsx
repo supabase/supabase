@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { LockIcon, PaintbrushIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, LoadingLine, Popover, PopoverContent, PopoverTrigger, Separator } from 'ui'
@@ -24,6 +24,7 @@ import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/data
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
@@ -31,7 +32,7 @@ export const QueueTab = () => {
 
   const [openRlsPopover, setOpenRlsPopover] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
-  const [sendMessageModalShown, setSendMessageModalShown] = useQueryState(
+  const [sendMessageModalShown, setSendMessageModalShown] = usePanelQueryState(
     'new-message',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -256,6 +257,7 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
       <SendMessageModal
         visible={sendMessageModalShown}
         onClose={() => setSendMessageModalShown(false)}
+        onCommit={() => setSendMessageModalShown(false, { history: 'replace' })}
       />
       <DeleteQueue
         queueName={queueName!}

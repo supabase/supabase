@@ -69,7 +69,7 @@ const PITRSidePanel = () => {
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
-  const { panel, closePanel } = useAddonsPagePanel()
+  const { panel, closePanel, commitPanel } = useAddonsPagePanel()
   const visible = panel === 'pitr'
 
   const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
@@ -79,7 +79,7 @@ const PITRSidePanel = () => {
   const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated point in time recovery duration`)
-      closePanel()
+      commitPanel()
     },
     onError: (error) => {
       toast.error(`Unable to update PITR: ${error.message}`)
@@ -88,7 +88,7 @@ const PITRSidePanel = () => {
   const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled point in time recovery`)
-      closePanel()
+      commitPanel()
     },
     onError: (error) => {
       toast.error(`Unable to disable PITR: ${error.message}`)

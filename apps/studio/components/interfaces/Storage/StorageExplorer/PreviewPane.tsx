@@ -9,9 +9,10 @@ import {
   UploadIcon,
   XIcon,
 } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
+
 import {
   Badge,
   Button,
@@ -38,15 +39,16 @@ import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { VersionCompareWidget } from './VersionCompareWidget'
 import { VersionHistory } from './VersionHistory'
-import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { bucketLifecycleQueryOptions } from '@/data/storage/bucket-lifecycle-query'
-import { useObjectVersionRestoreMutation } from '@/data/storage/versioning/object-version-restore-mutation'
 import {
   objectVersionsQueryOptions,
   type LifecyclePolicy,
   type ObjectVersion,
 } from '@/data/storage/versioning/object-versions-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { bucketLifecycleQueryOptions } from '@/data/storage/bucket-lifecycle-query'
+import { useObjectVersionRestoreMutation } from '@/data/storage/versioning/object-version-restore-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -269,7 +271,7 @@ export const PreviewPane = () => {
   const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
-  const [, setShowEditBucketModal] = useQueryState(
+  const [, setShowEditBucketModal] = usePanelQueryState(
     'edit',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { uniq } from 'lodash'
 import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -18,8 +18,6 @@ import { NamespaceWithTables } from './NamespaceWithTables'
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
 import { useIcebergWrapperExtension } from './useIcebergWrapper'
-import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
-import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import {
   convertKVStringArrayToJson,
   formatWrapperTables,
@@ -29,10 +27,13 @@ import {
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from '@/components/layouts/Scaffold'
+import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { AlertError } from '@/components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const AnalyticBucketDetails = () => {
   const router = useRouter()
@@ -46,7 +47,7 @@ export const AnalyticBucketDetails = () => {
     isError: isErrorBucket,
   } = useSelectedAnalyticsBucket()
 
-  const [showDeleteModal, setShowDeleteModal] = useQueryState(
+  const [showDeleteModal, setShowDeleteModal] = usePanelQueryState(
     'delete',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -250,6 +251,7 @@ export const AnalyticBucketDetails = () => {
         visible={showDeleteModal}
         bucketId={bucket?.name}
         onClose={() => setShowDeleteModal(false)}
+        onCommit={() => setShowDeleteModal(false, { history: 'replace' })}
         onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />
     </>

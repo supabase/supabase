@@ -2,6 +2,7 @@ import { PlugIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
@@ -16,7 +17,7 @@ export function useConnectCommands() {
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const enabled = !!selectedProject && isActiveHealthy
 
-  const [, setShowConnect] = useQueryState(
+  const [, setShowConnect] = usePanelQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

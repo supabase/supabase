@@ -59,6 +59,7 @@ import { DOCS_URL } from '@/lib/constants'
 interface CreateIndexSidePanelProps {
   visible: boolean
   onClose: () => void
+  onCommit?: () => void
 }
 
 const formSchema = z.object({
@@ -73,7 +74,7 @@ const formSchema = z.object({
 
 type FormSchema = z.infer<typeof formSchema>
 
-export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
+export const CreateIndexSidePanel = ({ visible, onClose, onCommit }: CreateIndexSidePanelProps) => {
   const { data: project } = useSelectedProjectQuery()
   const isOrioleDb = useIsOrioleDb()
 
@@ -124,7 +125,7 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
 
   const { mutate: createIndex, isPending: isExecuting } = useDatabaseIndexCreateMutation({
     onSuccess: () => {
-      onClose()
+      ;(onCommit ?? onClose)()
       toast.success(`Successfully created index`)
     },
   })

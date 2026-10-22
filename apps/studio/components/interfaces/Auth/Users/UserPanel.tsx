@@ -1,5 +1,5 @@
 import { XIcon } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
@@ -18,6 +18,7 @@ import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
 import { PANEL_PADDING } from './Users.constants'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useUserQuery } from '@/data/auth/user-query'
 import { User } from '@/data/auth/users-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -27,7 +28,7 @@ export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
   const showLogs = useIsFeatureEnabled('logs:all')
 
-  const [selectedId, setSelectedId] = useQueryState(
+  const [selectedId, setSelectedId] = usePanelQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -106,7 +107,7 @@ export const UserPanel = () => {
 
               <TabsContent value="overview" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
                 {selectedUser && (
-                  <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
+                  <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null, { history: 'replace' })} />
                 )}
               </TabsContent>
               {showLogs && (

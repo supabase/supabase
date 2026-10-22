@@ -2,11 +2,12 @@ import { useParams } from 'common'
 import { CodeIcon, ServerIcon, TerminalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useMemo } from 'react'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 import { EDGE_FUNCTION_TEMPLATES } from './Functions.templates'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -27,7 +28,7 @@ export const FunctionsEmptyState = () => {
   const { openSidebar } = useSidebarManagerSnapshot()
 
   const track = useTrack()
-  const [, setCreateMethod] = useQueryState(
+  const [, setCreateMethod] = usePanelQueryState(
     'create',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )

@@ -1,12 +1,13 @@
 import dayjs from 'dayjs'
 import { TextSearchIcon } from 'lucide-react'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { parseAsInteger } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { Badge, Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlertError } from '@/components/ui/AlertError'
 import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
 import type { ResponseError } from '@/types'
@@ -138,7 +139,7 @@ export const QueueMessagesDataGrid = ({
 }: QueueDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
 
-  const [selectedMessageId, setSelectedMessageId] = useQueryState(
+  const [selectedMessageId, setSelectedMessageId] = usePanelQueryState(
     'messageId',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -181,8 +182,8 @@ export const QueueMessagesDataGrid = ({
                     return
                   }
 
-                  // replace while a message is open so switching rows does not stack history
-                  const isSwitchingMessages = selectedMessageId !== null
+                  // replace only when a message panel is actually open
+                  const isSwitchingMessages = selectedMessage !== undefined
                   setSelectedMessageId(props.row.msg_id, {
                     history: isSwitchingMessages ? 'replace' : 'push',
                   })

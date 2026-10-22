@@ -10,6 +10,7 @@ export interface DeleteAnalyticsBucketModalProps {
   visible: boolean
   bucketId?: string
   onClose: () => void
+  onCommit?: () => void
   onSuccess?: () => void
 }
 
@@ -17,6 +18,7 @@ export const DeleteAnalyticsBucketModal = ({
   visible,
   bucketId,
   onClose,
+  onCommit,
   onSuccess,
 }: DeleteAnalyticsBucketModalProps) => {
   const { ref: projectRef } = useParams()
@@ -30,7 +32,7 @@ export const DeleteAnalyticsBucketModal = ({
       onSuccess: async () => {
         if (project?.connectionString) await deleteAnalyticsBucketCleanUp()
         toast.success(`Successfully deleted analytics bucket ${bucketId}`)
-        onClose()
+        ;(onCommit ?? onClose)()
         onSuccess?.()
       },
     })

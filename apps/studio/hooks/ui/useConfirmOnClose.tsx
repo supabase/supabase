@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 
 import { useLatest } from '../misc/useLatest'
+import { usePanelBackGuard } from './usePanelBackGuard'
 
 export interface ConfirmOnCloseModalProps {
   visible: boolean
@@ -11,9 +12,15 @@ export interface ConfirmOnCloseModalProps {
 interface UseConfirmOnCloseProps {
   checkIsDirty: () => boolean
   onClose: () => void
+  /** When true, browser Back on a dirty panel restores the entry and confirms. */
+  active?: boolean
 }
 
-export const useConfirmOnClose = ({ checkIsDirty, onClose }: UseConfirmOnCloseProps) => {
+export const useConfirmOnClose = ({
+  checkIsDirty,
+  onClose,
+  active = false,
+}: UseConfirmOnCloseProps) => {
   const [visible, setVisible] = useState(false)
 
   const checkIsDirtyRef = useLatest(checkIsDirty)
@@ -46,6 +53,12 @@ export const useConfirmOnClose = ({ checkIsDirty, onClose }: UseConfirmOnClosePr
   const onCancel = useCallback(() => {
     setVisible(false)
   }, [])
+
+  usePanelBackGuard({
+    active,
+    isDirty: checkIsDirty,
+    onBlock: confirmOnClose,
+  })
 
   const modalProps: ConfirmOnCloseModalProps = useMemo(
     () => ({

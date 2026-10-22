@@ -1,12 +1,13 @@
 import { includes, map as lodashMap, uniqBy } from 'lodash'
 import { SearchIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useRef, useState } from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { HooksListEmpty } from './HooksListEmpty'
 import { SchemaTable } from './SchemaTable'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -22,7 +23,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const HooksList = () => {
   const { data: project } = useSelectedProjectQuery()
 
-  const [, setShowCreateHookForm] = useQueryState(
+  const [, setShowCreateHookForm] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

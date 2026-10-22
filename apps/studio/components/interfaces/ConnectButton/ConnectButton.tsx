@@ -1,7 +1,8 @@
 import { PlugIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { ComponentProps } from 'react'
 import { Button, cn } from 'ui'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -27,7 +28,7 @@ export const ConnectButton = ({
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const track = useTrack()
 
-  const [showConnect, setShowConnect] = useQueryState(
+  const [showConnect, setShowConnect] = usePanelQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

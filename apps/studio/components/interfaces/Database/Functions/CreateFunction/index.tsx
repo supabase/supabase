@@ -60,6 +60,7 @@ interface CreateFunctionProps {
   isDuplicating?: boolean
   visible: boolean
   onClose: () => void
+  onCommit?: () => void
 }
 
 const FormSchema = z.object({
@@ -82,6 +83,7 @@ export const CreateFunction = ({
   visible,
   isDuplicating = false,
   onClose,
+  onCommit,
 }: CreateFunctionProps) => {
   const { selectedSchema } = useQuerySchemaState()
   const { data: project } = useSelectedProjectQuery()
@@ -96,9 +98,12 @@ export const CreateFunction = ({
   })
   const [type, language] = useWatch({ control: form.control, name: ['type', 'language'] })
 
+  const commit = onCommit ?? onClose
+
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
+    active: visible,
   })
 
   const { mutate: createDatabaseFunction, isPending: isCreating } =
@@ -130,7 +135,7 @@ export const CreateFunction = ({
         {
           onSuccess: () => {
             toast.success(`Successfully updated function ${data.name}`)
-            onClose()
+            commit()
           },
         }
       )
@@ -144,7 +149,7 @@ export const CreateFunction = ({
         {
           onSuccess: () => {
             toast.success(`Successfully created function ${data.name}`)
-            onClose()
+            commit()
           },
         }
       )

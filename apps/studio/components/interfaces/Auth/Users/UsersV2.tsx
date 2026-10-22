@@ -56,6 +56,7 @@ import {
 import { formatUserColumns, formatUsersData } from './Users.utils'
 import { UsersFooter } from './UsersFooter'
 import { UsersSearch } from './UsersSearch'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { buildUnifiedLogsUrl } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -186,7 +187,7 @@ export const UsersV2 = () => {
     'providers',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
-  const [selectedId, setSelectedId] = useQueryState(
+  const [selectedId, setSelectedId] = usePanelQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -483,7 +484,7 @@ export const UsersV2 = () => {
       setShowDeleteModal(false)
       setSelectedUsers(new Set([]))
 
-      if (userIds.includes(selectedUser)) setSelectedId(null)
+      if (userIds.includes(selectedUser)) setSelectedId(null, { history: 'replace' })
     } catch (error: any) {
       toast.error(`Failed to delete selected users: ${error.message}`)
     } finally {
@@ -1018,7 +1019,7 @@ export const UsersV2 = () => {
           cleanPointerEventsNoneOnBody()
         }}
         onDeleteSuccess={() => {
-          if (selectedUserToDelete?.id === selectedUser) setSelectedId(null)
+          if (selectedUserToDelete?.id === selectedUser) setSelectedId(null, { history: 'replace' })
           setSelectedUserToDelete(undefined)
           cleanPointerEventsNoneOnBody(500)
         }}

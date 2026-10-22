@@ -85,7 +85,7 @@ export const CreateVectorBucketDialog = ({
   setVisible,
 }: {
   visible: boolean
-  setVisible: (visible: boolean) => void
+  setVisible: (visible: boolean, options?: { history?: 'push' | 'replace' }) => void
 }) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -158,7 +158,7 @@ export const CreateVectorBucketDialog = ({
     setIsLoading(false)
     track('storage_bucket_created', { bucketType: 'vector' })
     form.reset()
-    setVisible(false)
+    setVisible(false, { history: 'replace' })
   }
 
   useEffect(() => {

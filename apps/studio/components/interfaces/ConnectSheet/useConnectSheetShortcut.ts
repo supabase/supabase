@@ -1,5 +1,6 @@
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -11,7 +12,7 @@ export function useConnectSheetShortcut() {
   const setCommandMenuOpen = useSetCommandMenuOpen()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
-  const [, setShowConnect] = useQueryState(
+  const [, setShowConnect] = usePanelQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

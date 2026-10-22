@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { VectorBucket as VectorBucketIcon } from 'icons'
 import { ChevronRightIcon, SearchIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useState } from 'react'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -15,6 +15,7 @@ import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
 import { VectorBucketsErrorState } from './VectorBucketsErrorState'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
@@ -30,7 +31,7 @@ export const VectorsBuckets = () => {
   const router = useRouter()
 
   const [filterString, setFilterString] = useState('')
-  const [visible, setVisible] = useQueryState(
+  const [visible, setVisible] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

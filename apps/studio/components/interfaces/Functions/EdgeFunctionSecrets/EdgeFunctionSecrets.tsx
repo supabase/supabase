@@ -1,6 +1,6 @@
 import { useFlag, useParams } from 'common'
 import { SearchIcon } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
@@ -16,6 +16,7 @@ import {
 } from './DefaultEdgeFunctionSecrets.utils'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
 import { EditSecretSheet } from './EditSecretSheet'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -23,6 +24,7 @@ import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 
 export const EdgeFunctionSecrets = () => {
@@ -54,7 +56,7 @@ export const EdgeFunctionSecrets = () => {
     [data]
   )
 
-  const [selectedIdToEdit, setSelectedIdToEdit] = useQueryState(
+  const [selectedIdToEdit, setSelectedIdToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -63,7 +65,7 @@ export const EdgeFunctionSecrets = () => {
     [customSecrets, selectedIdToEdit]
   )
 
-  const [selectedIdToDelete, setSelectedIdToDelete] = useQueryState(
+  const [selectedIdToDelete, setSelectedIdToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -79,7 +81,7 @@ export const EdgeFunctionSecrets = () => {
   } = useSecretsDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully deleted secret “${variables.secrets[0]}”`)
-      setSelectedIdToDelete(null)
+      setSelectedIdToDelete(null, { history: 'replace' })
     },
   })
 
@@ -103,14 +105,14 @@ export const EdgeFunctionSecrets = () => {
   useEffect(() => {
     if (!!selectedIdToEdit && isSuccess && !selectedSecretToEdit) {
       toast(`Secret ${selectedIdToEdit} cannot be found`)
-      setSelectedIdToEdit(null)
+      replaceMissingPanelId(() => setSelectedIdToEdit(null, { history: 'replace' }))
     }
   }, [isSuccess, selectedIdToEdit, selectedSecretToEdit, setSelectedIdToEdit])
 
   useEffect(() => {
     if (!!selectedIdToDelete && isSuccess && !selectedSecretToDelete && !isSuccessDelete) {
       toast(`Secret ${selectedIdToDelete} cannot be found`)
-      setSelectedIdToDelete(null)
+      replaceMissingPanelId(() => setSelectedIdToDelete(null, { history: 'replace' }))
     }
   }, [
     isSuccess,
@@ -213,6 +215,7 @@ export const EdgeFunctionSecrets = () => {
         secret={selectedSecretToEdit}
         visible={!!selectedSecretToEdit}
         onClose={() => setSelectedIdToEdit(null)}
+        onCommit={() => setSelectedIdToEdit(null, { history: 'replace' })}
       />
 
       <ConfirmationModal

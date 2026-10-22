@@ -20,13 +20,13 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateTriggerButtons } from './CreateTriggerButtons'
 import { TriggerList } from './TriggerList'
 import { generateTriggerCreateSQL, type PostgresTrigger } from './TriggerList.utils'
-import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
-import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
-import { TriggerSheet } from '@/components/interfaces/Database/Triggers/TriggerSheet'
 import {
   ReportsSelectFilter,
   selectFilterSchema,
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
+import { TriggerSheet } from '@/components/interfaces/Database/Triggers/TriggerSheet'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -39,9 +39,11 @@ import { useTablesQuery } from '@/data/tables/tables-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema, useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -95,24 +97,24 @@ export const TriggersList = () => {
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
-  const [showCreateTriggerForm, setShowCreateTriggerForm] = useQueryState(
+  const [showCreateTriggerForm, setShowCreateTriggerForm] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [triggerIdToEdit, setTriggerToEdit] = useQueryState(
+  const [triggerIdToEdit, setTriggerToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
   const triggerToEdit = triggers?.find((fn) => fn.id.toString() === triggerIdToEdit)
 
-  const [triggerIdToDuplicate, setTriggerToDuplicate] = useQueryState(
+  const [triggerIdToDuplicate, setTriggerToDuplicate] = usePanelQueryState(
     'duplicate',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
   const triggerToDuplicate = triggers?.find((fn) => fn.id.toString() === triggerIdToDuplicate)
 
-  const [triggerIdToDelete, setTriggerToDelete] = useQueryState(
+  const [triggerIdToDelete, setTriggerToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -125,7 +127,7 @@ export const TriggersList = () => {
   } = useDatabaseTriggerDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully removed ${variables.trigger.name}`)
-      setTriggerToDelete(null)
+      setTriggerToDelete(null, { history: 'replace' })
     },
   })
 
@@ -214,22 +216,21 @@ execute function function_name();`
   useEffect(() => {
     if (isSuccess && !!triggerIdToEdit && !triggerToEdit) {
       toast('Trigger not found')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setTriggerToEdit(null, { history: 'replace' })
+      replaceMissingPanelId(() => setTriggerToEdit(null, { history: 'replace' }))
     }
   }, [isSuccess, setTriggerToEdit, triggerIdToEdit, triggerToEdit])
 
   useEffect(() => {
     if (isSuccess && !!triggerIdToDuplicate && !triggerToDuplicate) {
       toast('Trigger not found')
-      setTriggerToDuplicate(null, { history: 'replace' })
+      replaceMissingPanelId(() => setTriggerToDuplicate(null, { history: 'replace' }))
     }
   }, [isSuccess, triggerIdToDuplicate, triggerToDuplicate, setTriggerToDuplicate])
 
   useEffect(() => {
     if (isSuccess && !!triggerIdToDelete && !triggerToDelete && !isSuccessDelete) {
       toast('Trigger not found')
-      setTriggerToDelete(null, { history: 'replace' })
+      replaceMissingPanelId(() => setTriggerToDelete(null, { history: 'replace' }))
     }
   }, [isSuccess, triggerIdToDelete, triggerToDelete, isSuccessDelete, setTriggerToDelete])
 
@@ -351,6 +352,11 @@ execute function function_name();`
           setShowCreateTriggerForm(false)
           setTriggerToEdit(null)
           setTriggerToDuplicate(null)
+        }}
+        onCommit={() => {
+          setShowCreateTriggerForm(false, { history: 'replace' })
+          setTriggerToEdit(null, { history: 'replace' })
+          setTriggerToDuplicate(null, { history: 'replace' })
         }}
         isDuplicatingTrigger={!!triggerToDuplicate}
       />

@@ -7,7 +7,7 @@ import {
   Link2Icon,
   TerminalIcon,
 } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
 import { appendHighAvailabilitySslParams } from '@/components/interfaces/ConnectSheet/DatabaseSettings.utils'
@@ -46,7 +47,7 @@ interface ProjectConnectionPopoverProps {
 export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopoverProps) => {
   const [open, setOpen] = useState(false)
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
-  const [, setShowConnect] = useQueryState(
+  const [, setShowConnect] = usePanelQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import { MoreVerticalIcon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useCallback, useEffect, useState } from 'react'
 import {
   ComposableMap,
@@ -27,6 +27,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { RegionFlag } from '@/components/ui/RegionFlag'
@@ -54,7 +55,7 @@ const MapView = () => {
     y: number
     region: { key: string; country?: string; name?: string; region?: string }
   }>()
-  const [, setShowConnect] = useQueryState(
+  const [, setShowConnect] = usePanelQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

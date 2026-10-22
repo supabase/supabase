@@ -45,19 +45,21 @@ interface EditEnumeratedTypeSidePanelProps {
   visible: boolean
   selectedEnumeratedType?: EnumeratedType
   onClose: () => void
+  onCommit?: () => void
 }
 
 const EditEnumeratedTypeSidePanel = ({
   visible,
   selectedEnumeratedType,
   onClose,
+  onCommit,
 }: EditEnumeratedTypeSidePanelProps) => {
   const submitRef = useRef<HTMLButtonElement>(null)
   const { data: project } = useSelectedProjectQuery()
   const { mutate: updateEnumeratedType, isPending: isCreating } = useEnumeratedTypeUpdateMutation({
     onSuccess: (_, vars) => {
       toast.success(`Successfully updated type "${vars.name.updated}"`)
-      onClose()
+      ;(onCommit ?? onClose)()
     },
   })
 

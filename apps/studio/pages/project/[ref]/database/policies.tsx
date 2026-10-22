@@ -19,15 +19,16 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import {
+  generatePolicyUpdateSQL,
+  type Policy,
+} from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { Policies } from '@/components/interfaces/Database/Policies/Policies'
 import { getGeneralPolicyTemplates } from '@/components/interfaces/Database/Policies/Policies.constants'
 import { PoliciesDataProvider } from '@/components/interfaces/Database/Policies/PoliciesDataContext'
 import { PolicyEditorPanel } from '@/components/interfaces/Database/Policies/PolicyEditorPanel'
-import {
-  generatePolicyUpdateSQL,
-  type Policy,
-} from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -44,6 +45,7 @@ import { useTablesQuery } from '@/data/tables/tables-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -103,7 +105,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   )
   const deferredSearchString = useDeferredValue(searchString)
 
-  const [selectedIdToEdit, setSelectedIdToEdit] = useQueryState(
+  const [selectedIdToEdit, setSelectedIdToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -125,7 +127,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   } = useEditorPanelStateSnapshot()
 
   const [selectedTable, setSelectedTable] = useState<string>()
-  const [showCreatePolicy, setShowCreatePolicy] = useQueryState(
+  const [showCreatePolicy, setShowCreatePolicy] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -239,7 +241,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (selectedIdToEdit && isPoliciesSuccess && !selectedPolicyToEdit) {
       toast(`Policy ID ${selectedIdToEdit} cannot be found`)
-      setSelectedIdToEdit(null)
+      replaceMissingPanelId(() => setSelectedIdToEdit(null, { history: 'replace' }))
     }
   }, [selectedIdToEdit, selectedPolicyToEdit, isPoliciesSuccess, setSelectedIdToEdit])
 
@@ -358,6 +360,14 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
                   setSelectedIdToEdit(null)
                 } else {
                   setShowCreatePolicy(false)
+                }
+              }}
+              onCommit={() => {
+                setSelectedTable(undefined)
+                if (isUpdatingPolicy) {
+                  setSelectedIdToEdit(null, { history: 'replace' })
+                } else {
+                  setShowCreatePolicy(false, { history: 'replace' })
                 }
               }}
               authContext="database"

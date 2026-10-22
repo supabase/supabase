@@ -2,11 +2,12 @@ import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ChevronRightIcon, EditIcon, ExternalLinkIcon, Table2Icon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { Badge, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { convertKVStringArrayToJson, formatWrapperTables } from './Wrappers.utils'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { FDW } from '@/data/fdw/fdws-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
@@ -21,11 +22,11 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
-  const [, setSelectedWrapperToEdit] = useQueryState(
+  const [, setSelectedWrapperToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [, setSelectedWrapperToDelete] = useQueryState(
+  const [, setSelectedWrapperToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )

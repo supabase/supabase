@@ -1,5 +1,5 @@
 import { ExternalLinkIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useCallback } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -7,6 +7,7 @@ import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { buildDebugPromptText } from '../../SQLEditor/SQLEditor.utils'
 import { useCreateChat } from '../hooks'
 import { type QueryResult } from '../types'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -31,7 +32,7 @@ export const QueryResultError = ({
 }) => {
   const { createChat, isCreating } = useCreateChat()
 
-  const [, setShowConnect] = useQueryState(
+  const [, setShowConnect] = usePanelQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

@@ -23,6 +23,7 @@ import {
   SpecificFilterColumn,
   UUIDV4_LEFT_PREFIX_REGEX,
 } from './Users.constants'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -55,7 +56,7 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
   { search, setSearch, improvedSearchEnabled = false, telemetryProps, onSelectFilterColumn },
   ref
 ) {
-  const [, setSelectedId] = useQueryState(
+  const [, setSelectedId] = usePanelQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )

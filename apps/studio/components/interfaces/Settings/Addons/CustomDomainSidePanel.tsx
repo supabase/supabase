@@ -36,14 +36,14 @@ const CustomDomainSidePanel = () => {
     FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE
   )
 
-  const { panel, closePanel } = useAddonsPagePanel()
+  const { panel, closePanel, commitPanel } = useAddonsPagePanel()
   const visible = panel === 'customDomain'
 
   const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
   const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled custom domain`)
-      closePanel()
+      commitPanel()
     },
     onError: (error) => {
       toast.error(`Unable to enable custom domain: ${error.message}`)
@@ -52,7 +52,7 @@ const CustomDomainSidePanel = () => {
   const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled custom domain`)
-      closePanel()
+      commitPanel()
     },
     onError: (error) => {
       toast.error(`Unable to disable custom domain: ${error.message}`)

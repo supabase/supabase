@@ -1,7 +1,8 @@
 import { useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +16,8 @@ import {
 
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { getWrapperMetaForWrapper, wrapperMetaComparator } from './Wrappers.utils'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { useFDWDeleteMutation } from '@/data/fdw/fdw-delete-mutation'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -37,7 +40,7 @@ export const DeleteWrapperModal = () => {
     [data, integration]
   )
 
-  const [selectedWrapperIdToDelete, setSelectedWrapperToDelete] = useQueryState(
+  const [selectedWrapperIdToDelete, setSelectedWrapperToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -46,7 +49,7 @@ export const DeleteWrapperModal = () => {
   const { mutateAsync: deleteFDW, isSuccess: isSuccessDelete } = useFDWDeleteMutation({
     onSuccess: () => {
       toast.success('Connection deleted')
-      setSelectedWrapperToDelete(null)
+      setSelectedWrapperToDelete(null, { history: 'replace' })
     },
   })
   const wrapperMeta = getWrapperMetaForWrapper(selectedWrapper)
@@ -67,8 +70,7 @@ export const DeleteWrapperModal = () => {
   useEffect(() => {
     if (isSuccess && !!selectedWrapperIdToDelete && !selectedWrapper && !isSuccessDelete) {
       toast('Wrapper not found')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setSelectedWrapperToDelete(null, { history: 'replace' })
+      replaceMissingPanelId(() => setSelectedWrapperToDelete(null, { history: 'replace' }))
     }
   }, [
     isSuccess,

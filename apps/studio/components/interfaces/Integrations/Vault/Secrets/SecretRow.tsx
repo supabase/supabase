@@ -9,7 +9,7 @@ import {
   MoreVerticalIcon,
   TrashIcon,
 } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
@@ -24,6 +24,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { SecretTableColumn } from './Secrets.types'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
@@ -41,11 +42,11 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   const [revealSecret, setRevealSecret] = useState(false)
   const name = row?.name ?? 'No name provided'
 
-  const [, setSelectedSecretToEdit] = useQueryState(
+  const [, setSelectedSecretToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [, setSelectedSecretToDelete] = useQueryState(
+  const [, setSelectedSecretToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )

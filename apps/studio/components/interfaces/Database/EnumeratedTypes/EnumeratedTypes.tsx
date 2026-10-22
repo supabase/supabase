@@ -1,5 +1,5 @@
 import { EditIcon, MoreVerticalIcon, SearchIcon, TrashIcon } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -35,8 +35,10 @@ import { useEnumeratedTypeDeleteMutation } from '@/data/enumerated-types/enumera
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -65,22 +67,22 @@ export const EnumeratedTypes = () => {
   } = useEnumeratedTypeDeleteMutation({
     onSuccess: (_, vars) => {
       toast.success(`Successfully deleted type "${vars.name}"`)
-      setSelectedTypeIdToDelete(null)
+      setSelectedTypeIdToDelete(null, { history: 'replace' })
     },
   })
 
-  const [showCreateTypePanel, setShowCreateTypePanel] = useQueryState(
+  const [showCreateTypePanel, setShowCreateTypePanel] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [selectedTypeIdToEdit, setSelectedTypeIdToEdit] = useQueryState(
+  const [selectedTypeIdToEdit, setSelectedTypeIdToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
   const typeToEdit = data?.find((type) => type.id.toString() === selectedTypeIdToEdit)
 
-  const [selectedTypeIdToDelete, setSelectedTypeIdToDelete] = useQueryState(
+  const [selectedTypeIdToDelete, setSelectedTypeIdToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -126,15 +128,14 @@ export const EnumeratedTypes = () => {
   useEffect(() => {
     if (isSuccess && !!selectedTypeIdToEdit && !typeToEdit) {
       toast('Type cannot be found')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setSelectedTypeIdToEdit(null, { history: 'replace' })
+      replaceMissingPanelId(() => setSelectedTypeIdToEdit(null, { history: 'replace' }))
     }
   }, [isSuccess, selectedTypeIdToEdit, setSelectedTypeIdToEdit, typeToEdit])
 
   useEffect(() => {
     if (isSuccess && !!selectedTypeIdToDelete && !typeToDelete && !isSuccessDelete) {
       toast('Type cannot be found')
-      setSelectedTypeIdToDelete(null, { history: 'replace' })
+      replaceMissingPanelId(() => setSelectedTypeIdToDelete(null, { history: 'replace' }))
     }
   }, [isSuccess, selectedTypeIdToDelete, setSelectedTypeIdToDelete, typeToDelete, isSuccessDelete])
 
@@ -282,6 +283,7 @@ export const EnumeratedTypes = () => {
       <CreateEnumeratedTypeSidePanel
         visible={showCreateTypePanel}
         onClose={() => setShowCreateTypePanel(false)}
+        onCommit={() => setShowCreateTypePanel(false, { history: 'replace' })}
         schema={selectedSchema}
       />
 
@@ -289,6 +291,7 @@ export const EnumeratedTypes = () => {
         visible={!!typeToEdit}
         selectedEnumeratedType={typeToEdit}
         onClose={() => setSelectedTypeIdToEdit(null)}
+        onCommit={() => setSelectedTypeIdToEdit(null, { history: 'replace' })}
       />
 
       <ConfirmationModal

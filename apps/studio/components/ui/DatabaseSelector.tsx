@@ -1,8 +1,9 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { CheckIcon, ChevronDownIcon, Loader2Icon, PlusIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useState } from 'react'
+
 import {
   Button,
   ButtonProps,
@@ -20,11 +21,12 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { Markdown } from '@/components/interfaces/Markdown'
 import {
   getAddReadReplicaPath,
   getInfrastructurePath,
 } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { Markdown } from '@/components/interfaces/Markdown'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -59,7 +61,7 @@ export const DatabaseSelector = ({
   const isHighAvailability = useIsHighAvailability()
 
   const [open, setOpen] = useState(false)
-  const [, setShowConnect] = useQueryState(
+  const [, setShowConnect] = usePanelQueryState(
     'showConnect',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

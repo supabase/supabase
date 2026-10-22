@@ -29,14 +29,14 @@ const IPv4SidePanel = () => {
     FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE
   )
 
-  const { panel, closePanel } = useAddonsPagePanel()
+  const { panel, closePanel, commitPanel } = useAddonsPagePanel()
   const visible = panel === 'ipv4'
 
   const { data: addons, isPending: isLoading } = useProjectAddonsQuery({ projectRef })
   const { mutate: updateAddon, isPending: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled IPv4`)
-      closePanel()
+      commitPanel()
     },
     onError: (error) => {
       toast.error(`Unable to enable IPv4: ${error.message}`)
@@ -45,7 +45,7 @@ const IPv4SidePanel = () => {
   const { mutate: removeAddon, isPending: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled IPv4.`)
-      closePanel()
+      commitPanel()
     },
     onError: (error) => {
       toast.error(`Unable to disable IPv4: ${error.message}`)

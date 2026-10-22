@@ -40,9 +40,10 @@ interface EditSecretSheetProps {
   secret?: ProjectSecret
   visible: boolean
   onClose: () => void
+  onCommit?: () => void
 }
 
-export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetProps) {
+export function EditSecretSheet({ secret, visible, onClose, onCommit }: EditSecretSheetProps) {
   const { ref: projectRef } = useParams()
   const secretName = useLatest(secret?.name)
   const [showSecretValue, setShowSecretValue] = useState(false)
@@ -57,7 +58,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
   const { mutate: updateSecret, isPending: isUpdating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully updated secret "${variables.secrets[0].name}"`)
-      onClose()
+      ;(onCommit ?? onClose)()
     },
   })
   const onSubmit: SubmitHandler<FormSchemaType> = async ({ name, value }) => {
@@ -68,8 +69,9 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
   }
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
+    checkIsDirty: () => form.formState.isDirty || isDirty,
     onClose,
+    active: visible,
   })
 
   useEffect(() => {

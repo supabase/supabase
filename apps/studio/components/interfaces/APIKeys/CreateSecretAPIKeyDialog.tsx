@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { PlusIcon, ShieldCheckIcon } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useRef } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -25,6 +25,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
@@ -49,7 +50,7 @@ const SCHEMA = z.object({
 
 export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
-  const [visible, setVisible] = useQueryState(
+  const [visible, setVisible] = usePanelQueryState(
     'new',
     parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )

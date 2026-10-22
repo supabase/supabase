@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { literal, safeSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -34,6 +34,7 @@ import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign
 import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
 import { fdwKeys } from '@/data/fdw/keys'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 
@@ -44,7 +45,7 @@ export const InitializeForeignSchemaDialog = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: schemas } = useSchemasQuery({ projectRef })
 
-  const [isOpen, setIsOpen] = useQueryState(
+  const [isOpen, setIsOpen] = usePanelQueryState(
     'initForeignSchema',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -127,7 +128,7 @@ export const InitializeForeignSchemaDialog = () => {
       toast.success(
         `Successfully created "${values.schema}" schema! Data from tables in this bucket can now be queried from there.`
       )
-      setIsOpen(false)
+      setIsOpen(false, { history: 'replace' })
 
       await queryClient.invalidateQueries({
         queryKey: fdwKeys.list(projectRef),

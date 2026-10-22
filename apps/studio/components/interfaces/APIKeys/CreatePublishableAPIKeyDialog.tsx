@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusIcon } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useRef } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
@@ -21,6 +21,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
@@ -41,7 +42,7 @@ export const CreatePublishableAPIKeyDialog = () => {
   const projectRef = params?.ref as string
   const formRef = useRef<HTMLFormElement>(null)
 
-  const [visible, setVisible] = useQueryState(
+  const [visible, setVisible] = usePanelQueryState(
     'new',
     parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )

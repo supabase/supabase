@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Database } from 'icons'
 import { PlusIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { Button, Card, CardContent, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -20,6 +20,7 @@ import { AddReadReplicaDialog } from './AddReadReplicaDialog'
 import { ReadReplicaRow } from './ReadReplicaRow'
 import { REPLICA_STATUS } from './ReadReplicas.constants'
 import type { RecommendedComputeForReadReplicas } from './recommendCompute'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
@@ -37,7 +38,7 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
   const isHighAvailability = useIsHighAvailability()
 
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
-  const [isAddReplicaOpen, setAddReplica] = useQueryState(
+  const [isAddReplicaOpen, setAddReplica] = usePanelQueryState(
     'addReplica',
     parseAsBoolean.withDefault(false).withOptions({
       history: 'push',

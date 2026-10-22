@@ -3,7 +3,7 @@ import { SqlEditor, TableEditor } from 'icons'
 import { MoreVerticalIcon, SearchIcon, Trash2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
@@ -48,6 +48,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useVectorBucketQuery } from '@/data/storage/vector-bucket-query'
 import { useVectorBucketsIndexesQuery } from '@/data/storage/vector-buckets-indexes-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const VectorBucketDetails = () => {
   const router = useRouter()
@@ -55,11 +56,11 @@ export const VectorBucketDetails = () => {
   const { data: _bucket, isSuccess } = useSelectedVectorBucket()
 
   const [filterString, setFilterString] = useState('')
-  const [showDeleteModal, setShowDeleteModal] = useQueryState(
+  const [showDeleteModal, setShowDeleteModal] = usePanelQueryState(
     'delete',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [_, setSelectedTableIdToDelete] = useQueryState(
+  const [_, setSelectedTableIdToDelete] = usePanelQueryState(
     'deleteTable',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -320,7 +321,7 @@ export const VectorBucketDetails = () => {
         bucketName={bucket?.vectorBucketName}
         onCancel={() => setShowDeleteModal(false)}
         onSuccess={() => {
-          setShowDeleteModal(false)
+          setShowDeleteModal(false, { history: 'replace' })
           router.push(`/project/${projectRef}/storage/vectors`)
         }}
       />

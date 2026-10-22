@@ -34,8 +34,10 @@ import { useIndexesQuery, type DatabaseIndex } from '@/data/database-indexes/ind
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { replaceMissingPanelId } from '@/lib/panel-history'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -60,18 +62,18 @@ export const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const [showCreateIndex, setShowCreateIndex] = useQueryState(
+  const [showCreateIndex, setShowCreateIndex] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [editIndexId, setEditIndexId] = useQueryState(
+  const [editIndexId, setEditIndexId] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
   const selectedIndex = allIndexes?.find((idx) => idx.name === editIndexId)
 
-  const [deleteIndexId, setDeleteIndexId] = useQueryState(
+  const [deleteIndexId, setDeleteIndexId] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -93,7 +95,7 @@ export const Indexes = () => {
     isSuccess: isSuccessDelete,
   } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
-      setDeleteIndexId(null)
+      setDeleteIndexId(null, { history: 'replace' })
       toast.success('Successfully deleted index')
     },
   })
@@ -143,15 +145,14 @@ export const Indexes = () => {
   useEffect(() => {
     if (isSuccessIndexes && !!editIndexId && !selectedIndex) {
       toast('Index not found')
-      // replace so Back does not return to a missing id and retrigger this effect
-      setEditIndexId(null, { history: 'replace' })
+      replaceMissingPanelId(() => setEditIndexId(null, { history: 'replace' }))
     }
   }, [isSuccessIndexes, editIndexId, selectedIndex, setEditIndexId])
 
   useEffect(() => {
     if (isSuccessIndexes && !!deleteIndexId && !selectedIndexToDelete && !isSuccessDelete) {
       toast('Index not found')
-      setDeleteIndexId(null, { history: 'replace' })
+      replaceMissingPanelId(() => setDeleteIndexId(null, { history: 'replace' }))
     }
   }, [isSuccessIndexes, deleteIndexId, selectedIndexToDelete, isSuccessDelete, setDeleteIndexId])
 
@@ -316,7 +317,11 @@ export const Indexes = () => {
         </div>
       </SidePanel>
 
-      <CreateIndexSidePanel visible={showCreateIndex} onClose={() => setShowCreateIndex(false)} />
+      <CreateIndexSidePanel
+        visible={showCreateIndex}
+        onClose={() => setShowCreateIndex(false)}
+        onCommit={() => setShowCreateIndex(false, { history: 'replace' })}
+      />
 
       <ConfirmationModal
         variant="warning"

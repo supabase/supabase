@@ -4,7 +4,7 @@ import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
 import { useRouter as useNextRouter } from 'next/compat/router'
 import Link from 'next/link'
-import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { parseAsStringEnum } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -40,6 +40,11 @@ import {
   useIsETLSnowflakePrivateAlpha,
 } from './useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
+import {
+  replicationPipelineStatusQueryOptions,
+  type ReplicationPipelineStatusData,
+} from '@/data/replication/pipeline-status-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -47,10 +52,6 @@ import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
-import {
-  replicationPipelineStatusQueryOptions,
-  type ReplicationPipelineStatusData,
-} from '@/data/replication/pipeline-status-query'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
@@ -121,7 +122,7 @@ export const Destinations = () => {
   const pendingCreationTypeRef = useRef<DestinationType | null>(null)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
-  const [, setDestinationType] = useQueryState(
+  const [, setDestinationType] = usePanelQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',

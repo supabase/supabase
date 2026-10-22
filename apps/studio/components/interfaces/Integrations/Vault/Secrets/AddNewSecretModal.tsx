@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -24,6 +24,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { useVaultSecretCreateMutation } from '@/data/vault/vault-secret-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -44,7 +45,7 @@ export const AddNewSecretModal = () => {
 
   const [isSecretVisible, setIsSecretVisible] = useState(false)
 
-  const [showAddSecretModal, setShowAddSecretModal] = useQueryState(
+  const [showAddSecretModal, setShowAddSecretModal] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -80,7 +81,7 @@ export const AddNewSecretModal = () => {
         secret: values.secret,
       })
       toast.success(`Successfully added new secret ${values.name}`)
-      handleClose()
+      setShowAddSecretModal(null, { history: 'replace' })
     } catch (error: any) {
       // [Joshen] No error handler required as they are all handled within the mutations already
     } finally {

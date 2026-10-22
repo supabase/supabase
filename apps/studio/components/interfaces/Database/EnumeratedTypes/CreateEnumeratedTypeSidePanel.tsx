@@ -44,6 +44,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
   onClose: () => void
+  onCommit?: () => void
   schema: string
 }
 
@@ -52,6 +53,7 @@ const initialValues = { name: '', description: '', values: [{ value: '' }] }
 const CreateEnumeratedTypeSidePanel = ({
   visible,
   onClose,
+  onCommit,
   schema,
 }: CreateEnumeratedTypeSidePanelProps) => {
   const submitRef = useRef<HTMLButtonElement>(null)
@@ -59,7 +61,8 @@ const CreateEnumeratedTypeSidePanel = ({
   const { mutate: createEnumeratedType, isPending: isCreating } = useEnumeratedTypeCreateMutation({
     onSuccess: (_res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
-      closePanel()
+      form.reset(initialValues)
+      ;(onCommit ?? onClose)()
     },
   })
 
