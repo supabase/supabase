@@ -143,7 +143,7 @@ First, make sure you have the Docker installed on your device. You can download 
    cp .env.example .env
    ```
 
-3. If you run Studio from source against this Docker stack, create `apps/studio/.env.local`. Copy `PG_META_CRYPTO_KEY` and `POSTGRES_PASSWORD` from `docker/.env` into it. Studio must use the same crypto key as postgres-meta to access the database. Git ignores `.env.local`.
+3. If you run Studio from source against this Docker stack, create `../apps/studio/.env.local`. Copy `PG_META_CRYPTO_KEY` and `POSTGRES_PASSWORD` from `.env` into it. Studio must use the same crypto key as postgres-meta to access the database. Git ignores `.env.local`.
 
 4. Run docker:
 
