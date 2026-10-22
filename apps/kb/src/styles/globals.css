@@ -1,6 +1,7 @@
 @import 'config/tailwind.config.css';
 @import 'config/inline-code.css';
 @import 'ui-patterns/CodeBlock/code-block.css';
+@import 'ui-patterns/Toc/toc-menu.css';
 @import './utilities.css';
 @import './keyframes.css';
 @import 'docs-search/styles.css';
@@ -114,5 +115,9 @@ h6:not(.font-mono),
 @media (width < 64rem) {
   html[data-mobile-menu-open] {
     overflow: hidden;
+  }
+
+  html:has([data-toc-menu]) {
+    scroll-padding-top: calc(var(--header-height) + 2.5rem);
   }
 }
