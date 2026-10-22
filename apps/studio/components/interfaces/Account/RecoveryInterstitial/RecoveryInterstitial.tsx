@@ -1,7 +1,8 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Button, CardFooter, cn } from 'ui'
+import { Button, CardFooter } from 'ui'
 import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -12,8 +13,16 @@ import { getRecoveryGap, type RecoveryGap } from './RecoveryInterstitial.utils'
 import { RecoveryTaskRow } from './RecoveryTaskRow'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
+import { profileKeys } from '@/data/profile/keys'
+import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import {
+  clearRecoveryReminderSnooze,
+  getRemainingRecoveryGap,
+  writeRecoveryReminderSnooze,
+} from '@/lib/account-recovery/recovery-reminder'
+import { useTrack } from '@/lib/telemetry/track'
 
 // Anchor the header while the card grows from checking to actionable tasks.
 const recoveryContainerClassName = 'items-start pt-16 sm:pt-32'
@@ -24,6 +33,8 @@ export const RecoveryInterstitial = ({ onDismiss }: { onDismiss: () => void }) =
 
 const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
   const user = useUser()
+  const queryClient = useQueryClient()
+  const track = useTrack()
   const { hasLoaded, isConfigCatStale } = useFeatureFlags()
   const flagsReady = hasLoaded === true && !isConfigCatStale
   const isEnabled = useFlag('enableAuthRecoveryCodes')
@@ -52,6 +63,31 @@ const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
         isUnavailable={isUnavailable}
         hasAuthenticatorTask={verifiedFactorCount === 1}
         isError={isError}
+        onAction={(actionType) => track('account_recovery_action_clicked', { actionType })}
+        onTaskComplete={(taskType) => track('account_recovery_task_completed', { taskType })}
+        onExit={({ gap: activeGap, areCodesSaved, isFactorComplete }) => {
+          if (user?.id) {
+            // Completed mutations can precede the refreshed status response.
+            const remainingGap = getRemainingRecoveryGap({
+              currentGap: getRecoveryGap(findings),
+              activeGap,
+              isReadUnavailable: isPending || isError,
+              areCodesSaved,
+              isFactorComplete,
+            })
+            if (remainingGap) writeRecoveryReminderSnooze(user.id, remainingGap)
+            else clearRecoveryReminderSnooze(user.id)
+          }
+          track('account_recovery_reminder_closed', {
+            hasCompletedTask: areCodesSaved || isFactorComplete,
+          })
+        }}
+        onCodesComplete={() => {
+          queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status(user?.id) })
+        }}
+        onFactorComplete={() => {
+          queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors(user?.id) })
+        }}
       />
     </>
   )
@@ -166,10 +202,7 @@ export const RecoveryReminder = ({
       title="Secure your account"
       description="Complete the following tasks to reduce the risk of being locked out of your Supabase account."
       widthClassName="max-w-md"
-      containerClassName={cn(
-        recoveryContainerClassName,
-        'relative before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-64 before:bg-gradient-to-b before:from-warning-600/10 before:to-transparent'
-      )}
+      containerClassName={`${recoveryContainerClassName} relative before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-64 before:bg-gradient-to-b before:from-warning-600/10 before:to-transparent`}
       cardClassName="relative"
     >
       <div className="border-t divide-y">
