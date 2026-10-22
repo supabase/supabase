@@ -276,6 +276,7 @@ export const createColumn = async ({
     return { error }
   }
 }
+
 /** TODO: Refactor to do in a single transaction */
 export const updateColumn = async ({
   projectRef,
