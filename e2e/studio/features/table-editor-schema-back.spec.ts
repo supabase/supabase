@@ -6,6 +6,15 @@ import { toUrl } from '../utils/to-url.js'
 import { waitForGridDataToLoad, waitForTableToLoad } from '../utils/wait-for-response.js'
 
 test('schema switch replaces history and back leaves the editor', async ({ page, ref }) => {
+  // One document only. The open table writes its id back after a plain clear,
+  // and a standing init script would also clear the later visits that must redirect.
+  await page.addInitScript((projectRef) => {
+    if (sessionStorage.getItem('pw-clear-editor-history') !== '1') return
+    sessionStorage.removeItem('pw-clear-editor-history')
+    localStorage.removeItem(`dashboard-history-${projectRef}`)
+    localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
+  }, ref)
+
   const tableName = 'pw_schema_back'
 
   await using _cleanup = await withSetupCleanup(
@@ -72,14 +81,12 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   await expect(page.getByRole('tab', { name: new RegExp(tableName) })).toBeVisible()
   await expect(page.getByRole('combobox', { name: 'Schema public' })).toBeVisible()
 
-  // Clear and leave in one turn. A later reload of the open table records that
-  // table id again before the list document can read empty storage.
+  // Arm the one-shot, then load the list. Reloading the open table would record it again.
   const listLoad = waitForTableToLoad(page, ref, 'public')
   const listUrl = page.waitForURL(/\/editor\?schema=public/)
   const leftTable = page
     .evaluate((projectRef) => {
-      localStorage.removeItem(`dashboard-history-${projectRef}`)
-      localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
+      sessionStorage.setItem('pw-clear-editor-history', '1')
       const url = new URL(window.location.href)
       url.pathname = `/project/${projectRef}/editor`
       url.search = '?schema=public'
