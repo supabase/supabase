@@ -346,19 +346,6 @@ th code {
   @apply text-nowrap;
 }
 
-/*
- * First column (e.g. variable names): wrap at word boundaries, not mid-token.
- */
-.prose :where(td:first-child) code {
-  @apply break-normal break-words whitespace-normal;
-}
-
-.prose table td:first-child,
-.prose table th:first-child {
-  min-width: 12rem;
-  width: 30%;
-}
-
 /* Zoomable image */
 
 [data-rmiz-modal]:focus,
