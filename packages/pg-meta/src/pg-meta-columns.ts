@@ -236,6 +236,7 @@ function update(
     is_unique,
     comment,
     check,
+    no_transaction = false,
   }: {
     name?: string
     type?: ColumnTypeRef
@@ -248,6 +249,7 @@ function update(
     is_unique?: boolean
     comment?: string | null
     check?: SafeSqlFragment | null
+    no_transaction?: boolean
   }
 ): { sql: SafeSqlFragment } {
   const nameSql: SafeSqlFragment =
@@ -385,7 +387,11 @@ BEGIN;
   ${nameSql}
 COMMIT;`
 
-  return { sql }
+  if (no_transaction) {
+    return { sql }
+  }
+
+  return { sql: safeSql`BEGIN; ${sql} COMMIT;` }
 }
 
 function remove(
