@@ -126,4 +126,16 @@ describe('CloseOnNavigation', () => {
     expect(screen.getByText('initiated')).toBeInTheDocument()
     expect(screen.getByText('menu-mounted')).toBeInTheDocument()
   })
+
+  it('closes an open menu on a shallow completion', async () => {
+    const user = userEvent.setup()
+    renderMenu()
+
+    await user.click(screen.getByRole('button', { name: 'Open menu' }))
+    await completeRoute('/new/org', { shallow: true })
+
+    expect(screen.getByText('closed')).toBeInTheDocument()
+    expect(screen.getByText('initiated')).toBeInTheDocument()
+    expect(screen.getByText('menu-mounted')).toBeInTheDocument()
+  })
 })

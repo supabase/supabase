@@ -78,20 +78,10 @@ function CloseOnNavigation({ children }: PropsWithChildren) {
   const legacyRouter = useLegacyRouter()
   const isUsingLegacyRouting = !!legacyRouter
 
-  const completeNavigation = useCallback(
-    (_url?: string, options?: { shallow?: boolean }) => {
-      // shallow search updates still emit routeChangeComplete. closing on one
-      // calls setOpen(false), which mounts the lazy command menu.
-      const isShallowSearchUpdate = options?.shallow === true
-      if (isShallowSearchUpdate) {
-        return
-      }
-
-      setIsOpen(false)
-      resetCommandMenu()
-    },
-    [resetCommandMenu, setIsOpen]
-  )
+  const completeNavigation = useCallback(() => {
+    setIsOpen(false)
+    resetCommandMenu()
+  }, [resetCommandMenu, setIsOpen])
 
   const ctx = useMemo(
     () => ({
