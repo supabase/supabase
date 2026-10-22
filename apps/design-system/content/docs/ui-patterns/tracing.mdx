@@ -13,6 +13,12 @@ import { Trace } from 'ui-patterns/Trace'
 
 The ruler adapts its ticks to the visible range. While a trace is live (any span has no end), `Trace.Cursor` also draws a line at `nowMs` from the top of the ruler to the bottom of the waterfall, with a dot on the ruler's bottom edge. Pass `nowMs` on the trace to pin it, and `minRangeMs` to keep a minimum visible duration while live.
 
+## Minimap and zoom
+
+`Trace.Minimap` compresses the whole trace into a full-width strip above the ruler, with one row per depth level, colored by span status. The brush shows the visible window. Drag the brush to pan, drag either edge to resize it, or click outside the brush to recenter it. With the brush focused, the left and right arrow keys pan, and Shift with an arrow key moves the end edge.
+
+Until the window is changed, it follows the trace as it grows. Once it is zoomed it stays fixed, and ruler labels still read as offsets from the trace start. Read and control the window with `useView()`: `window`, `setWindow(start, end)` and `resetWindow()`.
+
 ## Rows and bars
 
 `Trace.Rows` is a virtualized, scrollable list with one row per visible span. Its children are the row template and render once per row. `Trace.Cell` is the tree column: indent by depth, an expand and collapse toggle, the span name, and a spinner while the span is running. `Trace.Lane` is the timeline column, a positioned container for the primitives below.
