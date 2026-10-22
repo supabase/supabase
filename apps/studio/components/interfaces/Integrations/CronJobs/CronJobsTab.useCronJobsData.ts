@@ -60,7 +60,7 @@ export function useCronJobsData({
   projectRef,
   connectionString,
   searchQuery,
-  enabled,
+  enabled = true,
 }: UseCronJobsDataParams): UseCronJobsDataResult {
   const isProjectReady = !!projectRef
 
