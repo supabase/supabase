@@ -17,6 +17,14 @@ export function passwordNeedsPercentEncoding(password: string) {
   }
 }
 
+/**
+ * True when the password contains non-ASCII or non-printable characters.
+ * Database passwords must only contain standard printable ASCII characters.
+ */
+export function passwordHasUnsupportedCharacters(password: string) {
+  return /[^\x20-\x7E]/.test(password)
+}
+
 export async function passwordStrength(value: string) {
   // [Alaister]: Lazy load zxcvbn to avoid bundling it with the main app (it's pretty chunky)
   const zxcvbn = await import('zxcvbn').then((module) => module.default)
@@ -26,9 +34,22 @@ export async function passwordStrength(value: string) {
   let strength: PasswordStrengthScore = 0
 
   if (value && value !== '') {
+    const errors: string[] = []
+    const warnings: string[] = []
+
     if (value.length > 99) {
-      message = `${PASSWORD_STRENGTH[0]} Maximum length of password exceeded`
-      warning = `Password should be less than 100 characters`
+      errors.push('Maximum length of password exceeded')
+      warnings.push('Password should be less than 100 characters')
+    }
+
+    if (passwordHasUnsupportedCharacters(value)) {
+      errors.push('Contains unsupported characters')
+      warnings.push('Password should only contain letters, numbers, and standard symbols')
+    }
+
+    if (errors.length > 0) {
+      message = `${PASSWORD_STRENGTH[0]} ${errors.join('. ')}`
+      warning = warnings.join('. ')
     } else {
       const result = zxcvbn(value)
       const resultScore = result?.score ?? 0
@@ -39,10 +60,9 @@ export async function passwordStrength(value: string) {
       message = `${score} ${suggestions}`
       strength = resultScore
 
-      // warning message for anything below 4 strength :string
       if (resultScore < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
         warning = `${
-          result?.feedback?.warning ? result?.feedback?.warning + '.' : ''
+          result?.feedback?.warning ? result.feedback.warning + '.' : ''
         } You need a stronger password.`
       }
     }
