@@ -43,16 +43,16 @@ describe('maskTraceValue', () => {
     ],
   } satisfies NotebookRunOutput
 
-  it('replaces execute_sql output below the data level with what the model saw', () => {
+  it('masks execute_sql output below the data level', () => {
     expect(maskTraceValue({ rows, totalRows: 1, optInLevel: 'disabled' })).toBe(NO_DATA_PERMISSIONS)
   })
 
-  it('leaves output at the data level unchanged', () => {
+  it('preserves output at the data level', () => {
     const output = { rows, totalRows: 1, optInLevel: 'schema_and_log_and_data' }
     expect(maskTraceValue(output)).toEqual(output)
   })
 
-  it('replaces run_notebook output below the data level with what the model saw', () => {
+  it('masks run_notebook output below the data level', () => {
     const masked = maskTraceValue(notebook)
     expect(masked).toEqual(sanitizeNotebookRunOutput(notebook, 'schema'))
     expect(JSON.stringify(masked)).not.toContain('test@example.com')
@@ -67,7 +67,7 @@ describe('maskTraceValue', () => {
     expect(maskTraceValue(modelView)).toEqual(modelView)
   })
 
-  it('masks stamped output nested in message history', () => {
+  it('masks stamped output in message history', () => {
     const messages = [{ parts: [{ output: { rows, optInLevel: 'schema' } }] }]
     expect(maskTraceValue(messages)).toEqual([{ parts: [{ output: NO_DATA_PERMISSIONS }] }])
   })

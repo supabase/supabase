@@ -201,7 +201,7 @@ describe('ai/tools/studio-tools', () => {
       })
     })
 
-    it('should rethrow the original execute_sql error below the data level', async () => {
+    it('preserves execute_sql errors below the data level', async () => {
       const error = new Error('duplicate key (email)=(test@example.com)')
       vi.mocked(executeSql).mockRejectedValue(error)
 

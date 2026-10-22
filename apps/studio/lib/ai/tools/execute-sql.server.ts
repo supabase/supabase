@@ -27,7 +27,6 @@ export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
         abortSignal,
         authHeaders
       ).catch((error: unknown) => {
-        // Database errors can echo row values. The user still sees the real error.
         if (!isOptInLevelAtLeast(aiOptInLevel, 'schema_and_log_and_data')) hideSpanErrorFromTrace()
         throw error
       })

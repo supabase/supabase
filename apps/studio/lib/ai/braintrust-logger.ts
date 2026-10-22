@@ -17,15 +17,13 @@ if (IS_TRACING_ENABLED) {
     apiKey: BRAINTRUST_API_KEY,
     projectId: BRAINTRUST_PROJECT_ID,
   })
-  // Unlike `setMaskingFunction`, span customizers also see a span's `error`.
+  // Span customizers can redact errors before upload.
   // https://www.braintrust.dev/docs/admin/data-management/protect-sensitive-data#redact-before-upload
   configureInstrumentation({ spanCustomizers: [{ onSpanExport: redactSpanExport }] })
 }
 
-// Fields that can carry tool output, like a later LLM span's input.
 const MASKED_FIELDS = ['input', 'output', 'expected', 'metadata']
 
-/** If this throws, the SDK drops the record. */
 export function redactSpanExport(data: SpanExportData): SpanExportData {
   const masked = { ...data }
   for (const field of MASKED_FIELDS) {
@@ -34,22 +32,18 @@ export function redactSpanExport(data: SpanExportData): SpanExportData {
   return redactHiddenSpanError(masked)
 }
 
-// An id stays here if its span's end is never exported, at most one per failed request.
+// Markers survive if their span never exports an end record.
 const hiddenErrorSpanIds = new Set<string>()
 
 /**
- * Hides every error Braintrust exports for the current span and its children until the span
- * ends. The thrown error is unchanged. `execute` runs in the parent of the tool span, so
- * parallel failures share one id.
+ * Keeps a shared parent marked across parallel failures. See braintrust-logger.sdk.test.ts.
+ * [tool error, tool error] → one marker → parent end clears it
  */
 export function hideSpanErrorFromTrace(spanId = currentSpan().spanId) {
   if (spanId) hiddenErrorSpanIds.add(spanId)
 }
 
-/**
- * Error records are incremental, so they carry span ids but no span name or metadata.
- * This also hides unrelated errors under the same span, which fails closed.
- */
+// The parent marker also hides unrelated child errors.
 export function redactHiddenSpanError(data: SpanExportData): SpanExportData {
   const parentIds = Array.isArray(data.span_parents) ? data.span_parents : []
   const hiddenId = [data.span_id, ...parentIds].find(
@@ -57,7 +51,6 @@ export function redactHiddenSpanError(data: SpanExportData): SpanExportData {
   )
   if (hiddenId === undefined) return data
 
-  // Children end before their parent, so the parent's end is the last record that needs this id
   const isEnd = isRecord(data.metrics) && data.metrics.end !== undefined
   if (data.span_id === hiddenId && isEnd) hiddenErrorSpanIds.delete(hiddenId)
 
@@ -69,12 +62,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 /**
- * TODO: Remove this mask once tool spans log `toModelOutput` instead of the raw `execute` result:
+ * Masks stamped tool output using its contract's model view.
+ * TODO remove once Braintrust logs `toModelOutput`.
  * https://github.com/braintrustdata/braintrust-sdk-javascript/issues/2651
- *
- * Replaces stamped `execute_sql` and `run_notebook` output below the data opt-in level with what
- * `toModelOutput` sent the model. The mask only receives a bare value, so the tool is recognized
- * by its output schema. A stamped value that neither schema accepts keeps only its stamp.
  */
 export function maskTraceValue(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(maskTraceValue)

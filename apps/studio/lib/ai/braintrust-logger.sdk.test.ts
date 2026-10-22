@@ -12,9 +12,8 @@ type DoStream = Extract<
 type StreamPart =
   Awaited<ReturnType<DoStream>>['stream'] extends ReadableStream<infer Part> ? Part : never
 
-// Uses the real SDKs, since the mask, span customizer and `prepareStep` depend on how they
-// record tool spans and pass errors along. Starts the way a chat resumes after the user clicks Run.
-//   approved [rows, error, error] → all execute in parallel → one model step
+// Exercise SDK span exports and approval continuation together.
+// approved [rows, error, error] → parallel execution → model step
 it('hides rows and errors from the model and Braintrust', async () => {
   process.env.BRAINTRUST_API_KEY = 'test'
   process.env.BRAINTRUST_PROJECT_ID = '00000000-0000-4000-8000-000000000000'
@@ -25,7 +24,7 @@ it('hides rows and errors from the model and Braintrust', async () => {
   await simulateLoginForTests()
   const uploads = useTestBackgroundLogger()
   const { hideSpanErrorFromTrace } = await import('./braintrust-logger')
-  // A project name skips the logger's network lookup of the project
+  // Use a named test project to avoid a network lookup.
   braintrust.initLogger({ projectId: process.env.BRAINTRUST_PROJECT_ID, projectName: 'test' })
 
   const queryErrors = [
@@ -99,7 +98,7 @@ it('hides rows and errors from the model and Braintrust', async () => {
   for await (const part of result.fullStream) streamParts.push(part)
   await braintrust.flush()
 
-  // The UI still gets the real error
+  // Redaction must preserve the errors streamed to the UI.
   for (const error of queryErrors) {
     expect(streamParts).toContainEqual(expect.objectContaining({ type: 'tool-error', error }))
   }

@@ -58,9 +58,8 @@ export function prepareMessagesForModel(rawMessages: UIMessage[], aiOptInLevel: 
 }
 
 /**
- * Below the data level, hides `execute_sql` errors from later steps in the same request, since
- * database errors can echo row values. The UI still gets the real error. Later turns drop
- * `output-error` parts in `prepareMessagesForModel`.
+ * Database errors can echo row values. Sanitize same-request steps here.
+ * `prepareMessagesForModel` drops errors from later turns.
  */
 export function hideToolErrorsFromModel(messages: ModelMessage[], aiOptInLevel: AiOptInLevel) {
   if (isOptInLevelAtLeast(aiOptInLevel, 'schema_and_log_and_data')) return messages
