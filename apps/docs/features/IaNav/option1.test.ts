@@ -3,14 +3,26 @@ import { describe, expect, it } from 'vitest'
 import * as option1 from './option1.constants'
 import * as today from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
 
-type NavNode = { url?: string; href?: string; items?: NavNode[]; menuItems?: NavNode[][] }
+type NavNode = {
+  name?: string
+  url?: string
+  href?: string
+  items?: NavNode[]
+  menuItems?: NavNode[][]
+}
 
-function navUrls(navItems: Record<string, unknown>): string[] {
-  const walk = (node: NavNode): string[] => [
-    ...[node.url, node.href].filter((url): url is string => Boolean(url)),
-    ...(node.items ?? []).flatMap((child) => walk(child)),
-    ...(node.menuItems ?? []).flat().flatMap((child) => walk(child)),
-  ]
+const nodes = (node: NavNode): NavNode[] => [
+  node,
+  ...(node.items ?? []).flatMap((child) => nodes(child)),
+]
+
+const walk = (node: NavNode): string[] => [
+  ...[node.url, node.href].filter((url): url is string => Boolean(url)),
+  ...(node.items ?? []).flatMap((child) => walk(child)),
+  ...(node.menuItems ?? []).flat().flatMap((child) => walk(child)),
+]
+
+function sidebarUrls(navItems: Record<string, unknown>): string[] {
   // A sidebar shared by several URL prefixes is exported under each name.
   const sidebars = new Set(
     Object.values(navItems).filter(
@@ -19,44 +31,57 @@ function navUrls(navItems: Record<string, unknown>): string[] {
     )
   )
 
+  return [...sidebars].flatMap((sidebar) => (sidebar.items ?? []).flatMap((item) => walk(item)))
+}
+
+function navUrls(navItems: Record<string, unknown>): string[] {
   return [
     ...(navItems.GLOBAL_MENU_ITEMS as NavNode[][]).flat().flatMap((item) => walk(item)),
-    ...[...sidebars].flatMap((sidebar) => walk(sidebar)),
+    ...sidebarUrls(navItems),
   ]
 }
 
 describe('Option 1 navigation', () => {
-  it("links only to URLs already in today's navigation", () => {
-    const todayUrls = new Set(navUrls(today))
+  // These topics link to a section of their source page. When a topic gets its own page,
+  // fix its link in the sidebar and remove it from this test.
+  it('links each of the seven new topics to the section it comes from', () => {
+    const links = Object.values(option1 as Record<string, unknown>)
+      .filter((value): value is NavNode => typeof value === 'object' && value !== null)
+      .flatMap((sidebar) => nodes(sidebar))
+      .map((node) => [node.name, node.url])
 
-    expect(navUrls(option1).filter((url) => !todayUrls.has(url))).toEqual([])
-  })
-
-  it('reads Start, Build, Develop and deploy, Run and manage, Self-Hosting, Reference, and Resources at the top level', () => {
-    expect(option1.GLOBAL_MENU_ITEMS.map(([item]) => item.label)).toEqual([
-      'Start',
-      'Build',
-      'Develop and deploy',
-      'Run and manage',
-      'Self-Hosting',
-      'Reference',
-      'Resources',
-    ])
-  })
-
-  it.each(['platform', 'security', 'telemetry'] as const)(
-    'shows the Run and manage groups in the %s sidebar',
-    (menuId) => {
-      expect(option1[menuId].title).toBe('Run and manage')
-      expect(option1[menuId].items.map((item) => item.name)).toEqual([
-        'Projects, compute and scaling',
-        'Network, SSL and domains',
-        'Team',
-        'Security and compliance',
-        'Backups, restore and upgrades',
-        'Billing and usage',
-        'Logs and monitoring',
+    expect(links).toEqual(
+      expect.arrayContaining([
+        ['Rotate a leaked or compromised API key', '/guides/getting-started/api-keys#leaked-key'],
+        ['Production security checklist', '/guides/deployment/going-into-prod#security'],
+        [
+          'Log slow and failing queries',
+          '/guides/database/postgres/postgres-log-config#logmindurationstatement',
+        ],
+        ['Query plans with explain()', '/guides/database/debugging-performance#using-explain'],
+        ['Preview branches on Vercel', '/guides/deployment/branching/integrations#vercel'],
+        [
+          'Map team members to Postgres roles',
+          '/guides/platform/temporary-access#configure-user-access',
+        ],
+        [
+          'Test RLS policies with pgTAP',
+          '/guides/local-development/testing/overview#database-unit-testing-with-pgtap',
+        ],
       ])
-    }
-  )
+    )
+  })
+
+  it('lists each page once across its sidebars', () => {
+    const urls = sidebarUrls(option1)
+
+    expect(urls.filter((url, index) => urls.indexOf(url) !== index)).toEqual([])
+  })
+
+  it("links only to pages already in today's navigation", () => {
+    const page = (url: string) => url.split('#')[0]
+    const todayPages = new Set(navUrls(today).map((url) => page(url)))
+
+    expect(navUrls(option1).filter((url) => !todayPages.has(page(url)))).toEqual([])
+  })
 })

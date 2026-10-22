@@ -102,6 +102,10 @@ export const runAndManage: NavMenuConstant = {
           enabled: fullPlatformEnabled,
         },
         { name: 'Audit logs (team activity)', url: '/guides/security/platform-audit-logs' },
+        {
+          name: 'Map team members to Postgres roles',
+          url: '/guides/platform/temporary-access#configure-user-access',
+        },
       ],
     },
     {
@@ -126,6 +130,14 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Secure product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
+        {
+          name: 'Rotate a leaked or compromised API key',
+          url: '/guides/getting-started/api-keys#leaked-key',
+        },
+        {
+          name: 'Production security checklist',
+          url: '/guides/deployment/going-into-prod#security',
+        },
       ],
     },
     {
@@ -298,6 +310,10 @@ export const runAndManage: NavMenuConstant = {
             {
               name: 'Postgres Connection Logging',
               url: '/guides/platform/postgres-connection-logging',
+            },
+            {
+              name: 'Log slow and failing queries',
+              url: '/guides/database/postgres/postgres-log-config#logmindurationstatement',
             },
           ],
         },

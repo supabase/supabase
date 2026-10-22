@@ -72,21 +72,11 @@ const ALLOWLIST = [
   'Storage > File Buckets',
 ]
 const OPTION_1_ALLOWLIST = [
-  'Auth',
-  'Auth > Flows (How-tos)',
-  'Auth > Flows (How-tos) > Social Login (OAuth)',
-  'Database',
-  'Database > Extensions',
-  'Database > Foreign Data Wrappers > Sources',
-  'Database > Working with your database (intermediate)',
-  'Edge Functions',
-  'Edge Functions > Examples',
-  'Edge Functions > Third-Party Tools',
-  'Self-Hosting',
-  'Self-Hosting > How-to Guides',
-  'Start with Supabase > Framework Quickstarts',
-  'Start with Supabase > Web app demos',
-  'Storage > File Buckets',
+  'Auth > Social Sign-in (OAuth)',
+  'Database > Foreign Data Wrappers > Apps and APIs',
+  'Database > Foreign Data Wrappers > Databases and warehouses',
+  'Start > Framework Quickstarts > JavaScript and TypeScript',
+  'Start > Web app demos',
 ]
 
 describe('navigation level size', () => {
