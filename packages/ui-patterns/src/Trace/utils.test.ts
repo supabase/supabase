@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import type { Span } from './types'
 import {
   buildTraceIndex,
+  clampWindow,
   collapsedChildMidpoints,
+  computeMinimapRects,
   createTimeScale,
   effectiveEndMs,
   flattenTree,
@@ -12,6 +14,7 @@ import {
   getTimingPlacement,
   MAX_COLLAPSED_MARKS,
   niceTickStep,
+  resizeWindow,
 } from './utils'
 
 const span = (id: string, startMs: number, endMs: number | null, parentId: string | null = null) =>
@@ -59,14 +62,14 @@ describe('buildTraceIndex', () => {
 
 describe('createTimeScale', () => {
   it('maps time to position and back', () => {
-    const scale = createTimeScale([100, 200], 500)
+    const scale = createTimeScale([100, 200], 500, 100)
     expect(scale.toX(150)).toBe(250)
     expect(scale.toFraction(200)).toBe(1)
     expect(scale.toMs(250)).toBe(150)
   })
 
   it('handles an empty window', () => {
-    const scale = createTimeScale([5, 5], 500)
+    const scale = createTimeScale([5, 5], 500, 5)
     expect(scale.toX(5)).toBe(0)
     expect(scale.toMs(100)).toBe(5)
   })
@@ -90,7 +93,7 @@ describe('ticks', () => {
   })
 
   it('places ticks as fractions of the window', () => {
-    const { ticks } = createTimeScale([100, 1100], 800)
+    const { ticks } = createTimeScale([100, 1100], 800, 100)
     expect(ticks.map((tick) => tick.label)).toEqual([
       '0ms',
       '100ms',
@@ -108,8 +111,8 @@ describe('ticks', () => {
   })
 
   it('has no ticks for an empty window or zero width', () => {
-    expect(createTimeScale([5, 5], 800).ticks).toEqual([])
-    expect(createTimeScale([0, 100], 0).ticks).toEqual([])
+    expect(createTimeScale([5, 5], 800, 5).ticks).toEqual([])
+    expect(createTimeScale([0, 100], 0, 0).ticks).toEqual([])
   })
 })
 
@@ -227,5 +230,99 @@ describe('getTimingPlacement', () => {
   it('fits before at exactly the label width', () => {
     expect(getTimingPlacement({ ...base, startPx: 50, endPx: 400 })).toBe('before')
     expect(getTimingPlacement({ ...base, startPx: 49, endPx: 400 })).toBe('inside')
+  })
+})
+
+describe('ticks when zoomed', () => {
+  it('labels ticks as offsets from the trace start', () => {
+    const { ticks } = createTimeScale([250, 650], 800, 100)
+    expect(ticks.map((tick) => tick.label)).toEqual([
+      '150ms',
+      '200ms',
+      '250ms',
+      '300ms',
+      '350ms',
+      '400ms',
+      '450ms',
+      '500ms',
+      '550ms',
+    ])
+    expect(ticks[0]).toMatchObject({ ms: 250, fraction: 0 })
+    expect(ticks[1]).toMatchObject({ ms: 300, fraction: 0.125 })
+  })
+})
+
+describe('clampWindow', () => {
+  const bounds = [100, 1100] as const
+
+  it('keeps the window inside bounds without changing its width', () => {
+    expect(clampWindow([300, 500], bounds)).toEqual([300, 500])
+    expect(clampWindow([0, 200], bounds)).toEqual([100, 300])
+    expect(clampWindow([1000, 1200], bounds)).toEqual([900, 1100])
+  })
+
+  it('enforces a minimum width and a maximum of the full bounds', () => {
+    expect(clampWindow([500, 501], bounds)).toEqual([500, 510])
+    expect(clampWindow([1095, 1096], bounds)).toEqual([1090, 1100])
+    expect(clampWindow([0, 5000], bounds)).toEqual([100, 1100])
+  })
+
+  it('returns an empty window for empty bounds', () => {
+    expect(clampWindow([3, 9], [5, 5])).toEqual([5, 5])
+  })
+})
+
+describe('resizeWindow', () => {
+  const bounds = [100, 1100] as const
+
+  it('moves one edge and keeps the other fixed', () => {
+    expect(resizeWindow([300, 500], 'start', 250, bounds)).toEqual([250, 500])
+    expect(resizeWindow([300, 500], 'end', 700, bounds)).toEqual([300, 700])
+  })
+
+  it('stops at the bounds', () => {
+    expect(resizeWindow([300, 500], 'start', -50, bounds)).toEqual([100, 500])
+    expect(resizeWindow([300, 500], 'end', 5000, bounds)).toEqual([300, 1100])
+  })
+
+  it('stops at the minimum width instead of crossing the other edge', () => {
+    expect(resizeWindow([300, 500], 'start', 900, bounds)).toEqual([490, 500])
+    expect(resizeWindow([300, 500], 'end', 100, bounds)).toEqual([300, 310])
+  })
+})
+
+describe('computeMinimapRects', () => {
+  const index = buildTraceIndex(
+    [
+      span('root', 0, 100),
+      { ...span('a', 0, 50, 'root'), status: 'error' },
+      span('a1', 20, 30, 'a'),
+      span('c', 50, null, 'root'),
+    ],
+    100
+  )
+
+  it('draws one row per depth with runs merged by status', () => {
+    const { rects, laneCount } = computeMinimapRects(index, 4, 8)
+    expect(laneCount).toBe(3)
+    expect(rects).toEqual([
+      { lane: 0, x: 0, width: 4, status: 'ok' },
+      { lane: 1, x: 0, width: 2, status: 'error' },
+      { lane: 1, x: 2, width: 2, status: 'ok' },
+      { lane: 2, x: 0, width: 2, status: 'ok' },
+    ])
+  })
+
+  it('folds deeper spans into the last row and lets errors win', () => {
+    const { rects, laneCount } = computeMinimapRects(index, 4, 2)
+    expect(laneCount).toBe(2)
+    expect(rects.filter((rect) => rect.lane === 1)).toEqual([
+      { lane: 1, x: 0, width: 2, status: 'error' },
+      { lane: 1, x: 2, width: 2, status: 'ok' },
+    ])
+  })
+
+  it('returns nothing for an empty trace', () => {
+    expect(computeMinimapRects(buildTraceIndex([]), 4, 8)).toEqual({ rects: [], laneCount: 0 })
   })
 })

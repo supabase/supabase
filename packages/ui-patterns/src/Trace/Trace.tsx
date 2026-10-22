@@ -2,8 +2,8 @@
 
 import { createContext, use, useCallback, useMemo, useState } from 'react'
 
-import type { RootProps, TraceIndex, ViewContextValue } from './types'
-import { buildTraceIndex } from './utils'
+import type { RootProps, TimeWindow, TraceIndex, ViewContextValue } from './types'
+import { buildTraceIndex, clampWindow } from './utils'
 
 const TraceContext = createContext<TraceIndex | null>(null)
 const ViewContext = createContext<ViewContextValue | null>(null)
@@ -28,9 +28,27 @@ export function Root({ trace, minRangeMs, defaultCollapsed, children }: RootProp
     })
   }, [])
 
+  const { bounds } = index
+  const [zoom, setZoom] = useState<TimeWindow | null>(null)
+  const window = useMemo(() => (zoom ? clampWindow(zoom, bounds) : bounds), [zoom, bounds])
+  const setWindow = useCallback(
+    (start: number, end: number) => setZoom(clampWindow([start, end], bounds)),
+    [bounds]
+  )
+  const resetWindow = useCallback(() => setZoom(null), [])
+
   const view = useMemo<ViewContextValue>(
-    () => ({ selectedId, collapsed, select, setCollapsed }),
-    [selectedId, collapsed, setCollapsed]
+    () => ({
+      selectedId,
+      collapsed,
+      window,
+      isZoomed: zoom !== null,
+      select,
+      setCollapsed,
+      setWindow,
+      resetWindow,
+    }),
+    [selectedId, collapsed, window, zoom, setCollapsed, setWindow, resetWindow]
   )
 
   return (
