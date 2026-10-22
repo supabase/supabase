@@ -15,8 +15,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { AiTools } from '@/components/AiTools'
 import SectionContainer from '@/components/Layouts/SectionContainer'
-import { MarkdownActions } from '@/components/MarkdownActions'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -210,9 +210,10 @@ function CaseStudyPage(props: any) {
                           )
                         })}
 
-                        <MarkdownActions
+                        <AiTools
                           pagePath={`/customers/${slug}`}
                           pageType="customers"
+                          titleClassName="mb-2 normal-case text-foreground-lighter [font:inherit]"
                           className="not-prose"
                         />
 
