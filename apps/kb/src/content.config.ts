@@ -59,7 +59,7 @@ const guides = defineCollection({
 // entirely generated, never hand-authored, see .gitignore. Rendered through
 // ArticleLayout by src/pages/troubleshooting/[...slug].astro.
 const troubleshooting = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/troubleshooting', generateId }),
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/troubleshooting', generateId }),
   schema: z.object({
     ...articleFields,
     // The source has no description field, and ArticleLayout already
