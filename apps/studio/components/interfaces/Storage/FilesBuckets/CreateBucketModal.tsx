@@ -60,7 +60,7 @@ const DEFAULT_VALUES: BucketFormValues = {
 
 interface CreateBucketModalProps {
   open: boolean
-  onOpenChange: (value: boolean, options?: { history?: 'push' | 'replace' }) => void
+  onOpenChange: (value: boolean) => void
 }
 
 export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps) => {

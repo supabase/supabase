@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { ContainerIcon, PackageIcon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsStringEnum } from 'nuqs'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -33,7 +33,6 @@ import { ComputeInstanceOverviewTab } from './ComputeInstanceOverviewTab'
 import { AlertError } from '@/components/ui/AlertError'
 import type { ComputeInstanceLogStream } from '@/data/compute/compute-instance-logs-query'
 import { computeInstanceQueryOptions } from '@/data/compute/compute-instance-query'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
 
 type ComputeInstanceTab = 'overview' | 'invocations' | 'logs' | 'activity'
@@ -55,7 +54,7 @@ const TAB_STREAM: Partial<Record<ComputeInstanceTab, ComputeInstanceLogStream>> 
 export const ComputeInstanceDetail = () => {
   const { ref: projectRef, name: instanceName } = useParams()
 
-  const [tab, setTab] = usePanelQueryState(
+  const [tab, setTab] = useQueryState(
     'tab',
     parseAsStringEnum<ComputeInstanceTab>(COMPUTE_INSTANCE_TABS)
       .withDefault('overview')

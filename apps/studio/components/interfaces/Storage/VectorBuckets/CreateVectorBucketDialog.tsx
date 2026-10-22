@@ -85,7 +85,7 @@ export const CreateVectorBucketDialog = ({
   setVisible,
 }: {
   visible: boolean
-  setVisible: (visible: boolean, options?: { history?: 'push' | 'replace' }) => void
+  setVisible: (visible: boolean) => void
 }) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
