@@ -100,6 +100,8 @@ Commands that only work against a hosted project, such as `functions deploy`, `s
 
 `SUPABASE_PROJECT_ID` no longer selects a hosted project on its own. It now only sets which project a bare `--remote` means.
 
+See [Which project a command runs against](/docs/guides/local-development/local-and-hosted-projects#targets) for how the CLI picks a target.
+
 ### Use `=` with `--remote`
 
 `--remote` works on its own, so a value must be attached with `=`: write `--remote=<branch>`, not `--remote <branch>`. When a word after a bare `--remote` could be read either way, the CLI fails with a "did you mean" error instead of guessing. To decide, it checks the word against the branches of the linked project, so the run also fails if it can't list them, for example without a valid access token.
@@ -156,9 +158,12 @@ When the CLI can't ask, the command fails with `HostedMutationConsentRequiredErr
 <Admonition type="caution">
 
 - Piping an answer, such as `echo y | supabase db push`, no longer confirms anything.
-- `SUPABASE_YES` in `supabase/.env`, or in a `.env`, `.env.local`, or `.env.<NODE_ENV>[.local]` file in the working directory, doesn't count. If one of those files defines `SUPABASE_YES` at all, a shell-exported `SUPABASE_YES` doesn't count either, because the CLI can't tell the two apart. Use `--yes`.
+- `SUPABASE_YES` in `supabase/.env`, or in any other project env file, doesn't count.
+- If a `.env`, `.env.local`, or `.env.<NODE_ENV>[.local]` file in your working directory defines `SUPABASE_YES` at all, a shell-exported `SUPABASE_YES` doesn't count either, because the CLI can't tell the two apart. Use `--yes`.
 
 </Admonition>
+
+See [When a command asks first](/docs/guides/local-development/local-and-hosted-projects#confirmation) for how the CLI decides when to ask.
 
 ### Commands that need `--yes` in unattended runs
 
@@ -219,6 +224,8 @@ grep -h ^SUPABASE_ supabase/.env* .env*
 Set `SUPABASE_ENV` in CI so that `.env.development` doesn't apply.
 
 `supabase config push` now pushes these overrides. For example, a `SUPABASE_AUTH_SITE_URL` in `.env.local` replaces the `site_url` in `[remotes.production]`. Push labels each value that came from the environment, and `supabase config diff` shows the same values, so run `config diff` before your first v3 push. See [Managing config and secrets](/docs/guides/local-development/managing-config).
+
+See [Which settings a command uses](/docs/guides/local-development/local-and-hosted-projects#settings) for the precedence order and how to see where a value came from.
 
 ### Seeding
 
@@ -329,7 +336,7 @@ If your scripts match on error names in JSON output, update them:
 | `MigrationPasswordFlagsError`        | `DbPasswordFlagsError`        |
 | Command-specific cancellation errors | `HostedMutationDeclinedError` |
 
-v3 also adds `CliConfigValueError` for an invalid config or environment value, `SeedConsentRequiredError` for seeding without consent, and `HostedMutationConsentRequiredError` for a hosted change without `--yes` in a run that can't prompt.
+v3 also adds `CliConfigValueError` for an invalid config or environment value, and `HostedMutationConsentRequiredError` for a hosted change, including seeding, without `--yes` in a run that can't prompt.
 
 If your scripts match on error text, these messages are reworded:
 
