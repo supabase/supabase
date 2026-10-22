@@ -3,13 +3,7 @@
 import { useEffect, useRef, type HTMLAttributes } from 'react'
 
 import { cn } from '../../lib/utils/cn'
-
-// Classic 8x8 ordered-dither matrix, normalized to (0, 1) thresholds.
-const BAYER_8 = [
-  0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26, 12, 44, 4, 36, 14, 46, 6, 38, 60, 28,
-  52, 20, 62, 30, 54, 22, 3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25, 15, 47, 7,
-  39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21,
-].map((value) => (value + 0.5) / 64)
+import { BAYER_8, hash } from './dither'
 
 const FRAME_INTERVAL_MS = 1000 / 30
 const SWEEP_PERIOD_PX = 1100
@@ -40,12 +34,6 @@ function subscribe(render: Renderer) {
       frameId = null
     }
   }
-}
-
-function hash(x: number, y: number) {
-  let h = (Math.imul(x, 374761393) + Math.imul(y, 668265263)) | 0
-  h = Math.imul(h ^ (h >>> 13), 1274126177)
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967295
 }
 
 function valueNoise(x: number, y: number) {
