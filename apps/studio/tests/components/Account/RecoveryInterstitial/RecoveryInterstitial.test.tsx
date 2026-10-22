@@ -37,6 +37,30 @@ async function confirmRegeneration() {
 }
 
 describe('RecoveryReminder', () => {
+  test('shimmers while checking and hides Continue until resolved', () => {
+    const { rerender } = customRender(
+      <RecoveryReminder gap={null} destination="/organizations" isLoading />
+    )
+    expect(screen.getByRole('status', { name: 'Checking account recovery' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Continue' })).not.toBeInTheDocument()
+    expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
+    rerender(<RecoveryReminder gap={null} destination="/organizations" />)
+    expect(screen.getByRole('link', { name: 'Continue' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('status', { name: 'Checking account recovery' })
+    ).not.toBeInTheDocument()
+  })
+
+  test('shows the resolved state and preserves the return destination', () => {
+    customRender(<RecoveryReminder gap={null} destination="/organizations?view=all" />)
+    expect(screen.getByRole('heading', { name: 'You’re all set' })).toBeInTheDocument()
+    expect(screen.getByText('No account recovery reminder is available.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute(
+      'href',
+      '/organizations?view=all'
+    )
+  })
+
   test('completes optional authenticator independently and preserves codes task on cancellation', async () => {
     const enroll = vi.spyOn(auth.mfa, 'enroll')
     const { rerender } = customRender(
