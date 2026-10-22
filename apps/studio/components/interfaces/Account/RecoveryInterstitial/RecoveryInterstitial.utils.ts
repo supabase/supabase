@@ -27,12 +27,3 @@ export function getRecoveryReturnTo(value: string | null, basePath = ''): string
     return fallback
   }
 }
-
-export function getMockRecoveryGap(
-  value: string | null,
-  isDevelopment: boolean,
-  vercelEnvironment?: string
-): RecoveryGap | null {
-  if (!isDevelopment && vercelEnvironment !== 'preview') return null
-  return value === 'missing' || value === 'exhausted' ? value : null
-}
