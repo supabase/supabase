@@ -953,6 +953,26 @@ export const examples: Registry = [
     files: ['example/dithered-skeleton-fine-grain.tsx'],
   },
   {
+    name: 'dithered-skeleton-lite-demo',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-lite-demo.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-lite-list',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-lite-list.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-lite-comparison',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-lite-comparison.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-lite-stress',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-lite-stress.tsx'],
+  },
+  {
     name: 'slider-demo',
     type: 'components:example',
     registryDependencies: ['slider'],
