@@ -163,6 +163,14 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
         'Native Android apps in Kotlin and Jetpack Compose, using the Supabase Kotlin SDK.',
     },
     {
+      title: 'Capacitor',
+      href: '/guides/getting-started/quickstarts/capacitor',
+      icon: '/docs/img/icons/ionic-icon',
+      hasLightIcon: false,
+      description:
+        'Ship Android and web from one codebase with Capacitor, querying Postgres through supabase-js.',
+    },
+    {
       title: 'Expo React Native',
       href: '/guides/getting-started/quickstarts/expo-react-native',
       icon: '/docs/img/icons/expo-icon',
