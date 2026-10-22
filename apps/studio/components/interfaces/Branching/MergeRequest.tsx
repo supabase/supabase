@@ -49,7 +49,7 @@ export const MergeTitle = () => {
       <div className="flex items-center gap-x-2">
         <span>Merge</span>
 
-        <code className="flex items-center text-code-inline gap-x-1.5 px-2 py-1 border border-border">
+        <code className="flex items-center gap-x-1.5 px-2 py-1 border border-border">
           <GitBranchIcon strokeWidth={1.5} size={14} className="text-foreground-lighter" />
           {currentBranch?.name}
         </code>
@@ -57,7 +57,7 @@ export const MergeTitle = () => {
         <span>into</span>
 
         <Link href={`/project/${mainBranch?.project_ref}`} className="font-mono inline-flex gap-4">
-          <code className="flex items-center text-code-inline font-mono gap-x-1.5 px-2 py-1 border border-border">
+          <code className="flex items-center font-mono gap-x-1.5 px-2 py-1 border border-border">
             <ShieldIcon strokeWidth={1.5} size={14} className="text-warning" />
             {mainBranch?.name || 'main'}
           </code>

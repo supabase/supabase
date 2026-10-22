@@ -1,19 +1,15 @@
 import { getTableRowsCountSql } from '@supabase/pg-meta'
 import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 
 import { tableRowKeys } from './keys'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from '@/components/grid/types'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import {
-  PG_META_SCOPED_INTROSPECTION_FLAG,
-  prefetchTableEditor,
-} from '@/data/table-editor/table-editor-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -35,7 +31,6 @@ export type TableRowsCountVariables = Omit<GetTableRowsCountArgs, 'table'> & {
   roleImpersonationState?: RoleImpersonationState
   projectRef?: string
   connectionString?: string | null
-  scoped?: boolean
 }
 
 export type TableRowsCountData = TableRowsCount
@@ -51,7 +46,6 @@ export async function getTableRowsCount(
     roleImpersonationState,
     enforceExactCount,
     isReadOnlyContext = false,
-    scoped,
   }: TableRowsCountVariables & { isReadOnlyContext?: boolean },
   signal?: AbortSignal
 ) {
@@ -59,7 +53,6 @@ export async function getTableRowsCount(
     projectRef,
     connectionString,
     id: tableId,
-    scoped,
   })
   if (!entity) {
     throw new Error('Table not found')
@@ -77,7 +70,6 @@ export async function getTableRowsCount(
       filters: formattedFilters,
       enforceExactCount,
       isReadOnlyContext,
-      scoped,
     }),
     roleImpersonationState
   )
@@ -115,18 +107,15 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
     identifier: readReplicaIdentifier,
     type,
   } = useConnectionStringForReadOps()
-  const { can: canSQLAdminWrite, isLoading: isPermissionsLoading } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canSQLAdminWrite, isLoading: isPermissionsLoading } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
-  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   return useQuery<TableRowsCountData, TableRowsCountError, TData>({
     queryKey: tableRowKeys.tableRowsCount(projectRef, {
       table: { id: tableId },
       readReplicaIdentifier,
       ...args,
-      scoped,
     }),
     queryFn: ({ signal }) =>
       getTableRowsCount(
@@ -137,7 +126,6 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
           tableId,
           isReadOnlyContext: type === 'replica' || !canSQLAdminWrite,
           ...args,
-          scoped,
         },
         signal
       ),
@@ -150,7 +138,7 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
       // read replicas it's already known synchronously, but otherwise it depends on
       // canSQLAdminWrite, which starts out `false` while permissions are loading.
       // Firing while that's still in flight would cache a transient
-      // isReadOnlyContext:true (and, on a never-analyzed table, a scoped
+      // isReadOnlyContext:true (and, on a never-analyzed table,
       // count:-1/is_estimate:true) for what may actually be a writable user. Wait
       // for the permission check to settle before firing in that case.
       (type === 'replica' || !isPermissionsLoading),

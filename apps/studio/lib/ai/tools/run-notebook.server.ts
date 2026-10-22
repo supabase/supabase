@@ -24,7 +24,7 @@ function getErrorMessage(error: unknown): string {
 }
 
 export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
-  const { projectRef, connectionString, aiOptInLevel = 'schema' } = ctx
+  const { projectRef, connectionString, aiOptInLevel } = ctx
   const authHeaders = getAuthHeaders(ctx.authorization)
 
   return approvalGatedToolFromContract(

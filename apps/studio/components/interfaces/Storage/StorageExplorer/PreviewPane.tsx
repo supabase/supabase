@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import {
   AlertCircleIcon,
@@ -48,7 +47,7 @@ import {
   type LifecyclePolicy,
   type ObjectVersion,
 } from '@/data/storage/versioning/object-versions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -267,7 +266,7 @@ export const PreviewPane = () => {
   const { clearPreviewedFile } = useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
 
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
   const [, setShowEditBucketModal] = useQueryState(

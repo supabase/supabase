@@ -95,7 +95,7 @@ export const ForeignKeyRow = ({
                 {x.source || '[column_name]'}
               </code>
               <ArrowRightIcon size={16} />
-              <code className="text-code-inline">
+              <code>
                 {foreignKey.schema}.{foreignKey.table}.{x.target}
               </code>
             </div>

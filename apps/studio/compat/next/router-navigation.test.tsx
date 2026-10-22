@@ -65,9 +65,11 @@ describe('Next router compatibility subscriptions', () => {
 
   it('updates route pattern, params, query and hash after pending navigation', async () => {
     const loaded = Promise.withResolvers<void>()
+    const onRouterChange = vi.fn()
 
     function Layout() {
       const router = useRouter()
+      useEffect(() => onRouterChange(router), [router])
       return (
         <>
           <div data-testid="location">{router.asPath}</div>
@@ -94,6 +96,7 @@ describe('Next router compatibility subscriptions', () => {
     })
     await router.load()
     const view = render(<RouterProvider router={router} />)
+    expect(onRouterChange).toHaveBeenCalledTimes(1)
 
     try {
       let navigation: Promise<void> | undefined
@@ -108,11 +111,26 @@ describe('Next router compatibility subscriptions', () => {
       expect(screen.getByTestId('location')).toHaveTextContent(
         '/project/other/editor/42?schema=private#selection'
       )
+      expect(onRouterChange).toHaveBeenCalledTimes(2)
+      expect(onRouterChange).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          asPath: '/project/other/editor/42?schema=private#selection',
+        })
+      )
 
       await act(async () => {
         loaded.resolve()
         await navigation
       })
+      expect(onRouterChange).toHaveBeenCalledTimes(3)
+      expect(onRouterChange).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({
+          pathname: '/project/[ref]/editor/[id]',
+          query: { ref: 'other', id: '42', schema: 'private' },
+        })
+      )
       expect(screen.getByTestId('pattern')).toHaveTextContent('/project/[ref]/editor/[id]')
       expect(JSON.parse(screen.getByTestId('query').textContent ?? '')).toEqual({
         ref: 'other',

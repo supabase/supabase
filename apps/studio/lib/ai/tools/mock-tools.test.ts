@@ -124,7 +124,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     it('overrides create_notebook needsApproval to false, unlike the real tool', async () => {
       const mockTools = await getMockTools(undefined)
 
-      expect(getNotebookTools().create_notebook.needsApproval).toBe(true)
+      expect(getNotebookTools({ aiOptInLevel: 'schema' }).create_notebook.needsApproval).toBe(true)
       expect(mockTools.create_notebook.needsApproval).toBe(false)
     })
 
@@ -167,7 +167,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     it('overrides update_notebook needsApproval to false, unlike the real tool', async () => {
       const mockTools = await getMockTools(undefined)
 
-      expect(getNotebookTools().update_notebook.needsApproval).toBe(true)
+      expect(getNotebookTools({ aiOptInLevel: 'schema' }).update_notebook.needsApproval).toBe(true)
       expect(mockTools.update_notebook.needsApproval).toBe(false)
     })
 
@@ -249,7 +249,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     it('overrides delete_notebook needsApproval to false, unlike the real tool', async () => {
       const mockTools = await getMockTools(undefined)
 
-      expect(getNotebookTools().delete_notebook.needsApproval).toBe(true)
+      expect(getNotebookTools({ aiOptInLevel: 'schema' }).delete_notebook.needsApproval).toBe(true)
       expect(mockTools.delete_notebook.needsApproval).toBe(false)
     })
 

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { keyword } from '@supabase/pg-meta'
 import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -21,10 +21,7 @@ import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/datab
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
 import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import {
-  PG_META_SCOPED_INTROSPECTION_FLAG,
-  tableEditorQueryOptions,
-} from '@/data/table-editor/table-editor-query'
+import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
@@ -77,9 +74,10 @@ const parseParameters = (selectedHook?: PGTrigger): HTTPArgument[] => {
 export const EditHookPanel = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [isLoadingTable, setIsLoadingTable] = useState(false)
-  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
+
+  const [isLoadingTable, setIsLoadingTable] = useState(false)
+
   const {
     requiredExtensionsToInstall,
     needsExtensions,
@@ -247,7 +245,6 @@ export const EditHookPanel = () => {
           id: Number(values.table_id),
           projectRef: project?.ref,
           connectionString: project?.connectionString,
-          scoped,
         })
       )
       if (!selectedTable) {
@@ -342,9 +339,9 @@ export const EditHookPanel = () => {
           selectedHook === undefined ? (
             'Create a new database webhook'
           ) : (
-            <>
+            <span>
               Update webhook <code className="text-sm">{selectedHook.name}</code>
-            </>
+            </span>
           )
         }
         className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"

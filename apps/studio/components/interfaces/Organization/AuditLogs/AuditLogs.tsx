@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import {
   getCoreRowModel,
@@ -57,7 +56,7 @@ import {
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -98,9 +97,8 @@ export const AuditLogs = () => {
     if (range) setDateRange({ from: range[0].toISOString(), to: range[1].toISOString() })
   }
 
-  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'notifications'
+  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.AUDIT_LOGS_READ
   )
 
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =

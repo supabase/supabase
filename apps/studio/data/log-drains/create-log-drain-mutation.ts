@@ -1,27 +1,35 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { logDrainsKeys } from './keys'
-import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+type LogDrainAttributes =
+  components['schemas']['CreateLogDrainRequestOpenApi']['data']['attributes']
 
 export type LogDrainCreateVariables = {
   projectRef: string
   name: string
   description: string
-  config: Record<string, never>
-  type: LogDrainType
+  config: LogDrainAttributes['config']
+  type: LogDrainAttributes['backend_type']
 }
 
 export async function createLogDrain(payload: LogDrainCreateVariables) {
-  const { data, error } = await post('/platform/projects/{ref}/analytics/log-drains', {
+  const { data, error } = await post('/v2/projects/{ref}/analytics/log-drains', {
     params: { path: { ref: payload.projectRef } },
     body: {
-      name: payload.name,
-      description: payload.description,
-      type: payload.type,
-      config: payload.config as any,
+      data: {
+        type: 'log_drain',
+        attributes: {
+          name: payload.name,
+          description: payload.description,
+          backend_type: payload.type,
+          config: payload.config,
+        },
+      },
     },
   })
 

@@ -218,6 +218,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'AI Tools',
+          href: '/docs/fragments/ai-tools',
+          items: [],
+        },
+        {
           title: 'Table of Contents (TOC)',
           href: '/docs/fragments/toc',
           items: [],

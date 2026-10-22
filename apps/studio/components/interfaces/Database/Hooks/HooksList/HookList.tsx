@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { includes } from 'lodash'
 import { Edit3Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
@@ -20,7 +19,7 @@ import {
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { BASE_PATH } from '@/lib/constants'
@@ -49,9 +48,8 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
       x.schema === schema &&
       x.function_args.length >= 2
   )
-  const { can: canUpdateWebhook } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  const { can: canUpdateWebhook } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   return (
@@ -93,7 +91,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
             </Table.td>
             <Table.td className="hidden xl:table-cell">
               <p className="truncate" title={url}>
-                <code className="text-code-inline">{method}</code>: {url}
+                <code>{method}</code>: {url}
               </p>
             </Table.td>
             <Table.td className="text-right">
@@ -104,7 +102,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            className="px-1"
+                            className="w-6.5"
                             icon={<MoreVerticalIcon />}
                             aria-label={`${x.name} actions`}
                             // Tooltip repeats the label; screen readers would read it twice
