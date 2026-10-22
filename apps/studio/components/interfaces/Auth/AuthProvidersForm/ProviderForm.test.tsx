@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
 import { ProviderForm } from './ProviderForm'
+import { resetPanelHistoryForTests } from '@/lib/panel-history'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -23,11 +24,11 @@ const AUTH_PROVIDERS_PATH = '/project/default/auth/providers'
 
 mockAnimationsApi()
 
-function renderProviderForm() {
+function renderProviderForm(config: Partial<GoTrueConfigResponse> = {}) {
   return customRender(
     <NuqsAdapter>
       <ProviderForm
-        config={{ HOOK_SEND_SMS_ENABLED: false } as GoTrueConfigResponse}
+        config={{ HOOK_SEND_SMS_ENABLED: false, ...config } as GoTrueConfigResponse}
         provider={emailProvider}
         isActive={false}
       />
@@ -54,7 +55,9 @@ async function traverseHistory(direction: 'back' | 'forward') {
 
 describe('ProviderForm URL history', () => {
   beforeEach(() => {
-    window.history.replaceState(null, '', AUTH_PROVIDERS_PATH)
+    resetPanelHistoryForTests()
+    // pushState drops leftover forward entries so length deltas are per test.
+    window.history.pushState(null, '', AUTH_PROVIDERS_PATH)
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -131,10 +134,13 @@ describe('ProviderForm URL history', () => {
     expect(window.location.search).toBe('?provider=Email')
   })
 
-  it('pushes again when Cancel closes the panel so Back reopens it', async () => {
+  it('goes back on Cancel when this session opened the panel, so Back does not reopen it', async () => {
+    window.history.pushState(null, '', '/project/default')
+    window.history.pushState(null, '', AUTH_PROVIDERS_PATH)
+    const historyLength = window.history.length
     renderProviderForm()
     const dialog = await openEmailProvider()
-    const historyLength = window.history.length
+    await waitFor(() => expect(window.history.length).toBe(historyLength + 1))
 
     fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
 
@@ -144,8 +150,74 @@ describe('ProviderForm URL history', () => {
     })
     expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
 
-    await traverseHistory('back')
+    // Close popped the open entry, so Forward still has it and another Back leaves the page.
+    await traverseHistory('forward')
     expect(await screen.findByRole('dialog', { name: 'Email' })).toBeInTheDocument()
-    expect(window.location.search).toBe('?provider=Email')
+
+    await traverseHistory('back')
+    await waitFor(() => expect(window.location.search).toBe(''))
+    expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
+
+    await traverseHistory('back')
+    expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
+    expect(window.location.pathname).toBe('/project/default')
+  })
+
+  it('replaces a deep-linked panel on close', async () => {
+    window.history.replaceState(null, '', `${AUTH_PROVIDERS_PATH}?provider=Email`)
+    const historyLength = window.history.length
+    renderProviderForm()
+
+    const dialog = await screen.findByRole('dialog', { name: 'Email' })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+
+    await waitFor(() => expect(window.location.search).toBe(''))
+    expect(window.history.length).toBe(historyLength)
+    expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
+
+    window.history.forward()
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    })
+    expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
+    expect(window.location.search).toBe('')
+  })
+
+  it('replaces history when the provider is saved', async () => {
+    addAPIMock({
+      method: 'patch',
+      path: '/platform/auth/:ref/config',
+      response: () => HttpResponse.json<any>({}),
+    })
+
+    const historyLength = window.history.length
+    // Enabling email validates the password and OTP fields, so they need real values.
+    renderProviderForm({
+      EXTERNAL_EMAIL_ENABLED: false,
+      MAILER_SECURE_EMAIL_CHANGE_ENABLED: true,
+      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: false,
+      SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD: false,
+      PASSWORD_HIBP_ENABLED: false,
+      PASSWORD_MIN_LENGTH: 8,
+      PASSWORD_REQUIRED_CHARACTERS: '',
+      MAILER_OTP_EXP: 3600,
+      MAILER_OTP_LENGTH: 6,
+    })
+    const dialog = await openEmailProvider()
+    await waitFor(() => expect(window.history.length).toBe(historyLength + 1))
+
+    fireEvent.click(within(dialog).getByRole('switch', { name: 'Enable email provider' }))
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => expect(window.location.search).toBe(''))
+    expect(window.history.length).toBe(historyLength + 1)
+    expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
+
+    window.history.forward()
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    })
+    expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
+    expect(window.location.search).toBe('')
   })
 })
