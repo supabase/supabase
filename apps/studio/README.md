@@ -77,12 +77,14 @@ SUPABASE_SERVICE_KEY=
 
 Use `ANON_KEY` for `SUPABASE_ANON_KEY` and `SERVICE_ROLE_KEY` for `SUPABASE_SERVICE_KEY`. The crypto key must match so postgres-meta can decrypt Studio's connection string.
 
-From `apps/studio`, run the following commands to install dependencies and start the dashboard.
+From `apps/studio`, install dependencies and start the dashboard on an available port other than 8082, which the Docker Studio service uses. Keep the Docker services running for the API gateway.
 
+```bash
+pnpm install
+STUDIO_PORT=8083 pnpm run dev
 ```
-npm install
-npm run dev
-```
+
+Open http://localhost:8083.
 
 If you would like to configure different defaults for "Default Organization" and "Default Project", set the corresponding values in `.env.local`.
 
