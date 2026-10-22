@@ -13,7 +13,7 @@ export type DatabasePasswordResetVariables = {
 export async function resetDatabasePassword({ ref, password }: DatabasePasswordResetVariables) {
   if (!ref) return console.error('Project ref is required')
 
-  const { data, error } = await patch('/platform/projects/{ref}/db-password', {
+  const { data, error } = await patch('/v1/projects/{ref}/database/password', {
     params: { path: { ref } },
     body: { password },
   })

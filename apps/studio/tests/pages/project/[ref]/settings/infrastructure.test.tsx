@@ -256,7 +256,7 @@ function mockInfrastructureEndpoints() {
   })
   addAPIMock({
     method: 'get',
-    path: '/platform/projects/:ref/disk/custom-config',
+    path: '/v1/projects/:ref/config/disk/autoscale',
     response: {
       growth_percent: 20,
       max_size_gb: 1000,
