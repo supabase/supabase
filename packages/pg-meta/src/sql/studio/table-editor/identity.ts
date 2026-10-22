@@ -9,19 +9,30 @@ export const getUpdateIdentitySequenceSQL = ({
   table: string
   column: string
 }): SafeSqlFragment => {
-  // Never lower the sequence, so this is safe to run even when no rows were inserted
-  return safeSql`WITH sequence_reference AS (
-  SELECT pg_get_serial_sequence(${literal(`${schema}.${table}`)}, ${literal(column)}) AS sequence_name
+  // Only moves the sequence past imported values in its own direction, so this is a no-op
+  // when no rows were inserted. An unused sequence has no last value and next issues its start.
+  return safeSql`WITH sequence_state AS (
+  SELECT
+    pg_sequence.seqrelid AS sequence_id,
+    pg_sequence.seqincrement > 0 AS is_ascending,
+    pg_sequence.seqstart AS start_value,
+    pg_sequence_last_value(pg_sequence.seqrelid) AS last_value,
+    CASE
+      WHEN pg_sequence.seqincrement > 0
+        THEN (SELECT MAX(${ident(column)}) FROM ${ident(schema)}.${ident(table)})
+      ELSE (SELECT MIN(${ident(column)}) FROM ${ident(schema)}.${ident(table)})
+    END AS imported_value
+  FROM pg_sequence
+  WHERE pg_sequence.seqrelid = pg_get_serial_sequence(${literal(`${schema}.${table}`)}, ${literal(column)})::regclass
 )
-SELECT setval(
-  sequence_reference.sequence_name,
-  GREATEST(
-    COALESCE((SELECT MAX(${ident(column)}) FROM ${ident(schema)}.${ident(table)}), 1),
-    COALESCE(pg_sequence_last_value(sequence_reference.sequence_name::regclass), 1)
-  )
-)
-FROM sequence_reference
-WHERE sequence_reference.sequence_name IS NOT NULL`
+SELECT setval(sequence_id, imported_value)
+FROM sequence_state
+WHERE CASE
+  WHEN last_value IS NULL AND is_ascending THEN imported_value >= start_value
+  WHEN last_value IS NULL THEN imported_value <= start_value
+  WHEN is_ascending THEN imported_value > last_value
+  ELSE imported_value < last_value
+END`
 }
 
 export const getDuplicateIdentitySequenceSQL = ({
