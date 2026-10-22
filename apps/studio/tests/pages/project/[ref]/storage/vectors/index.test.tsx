@@ -50,7 +50,7 @@ vi.mock('@/components/interfaces/Storage/BucketsUpgradePlan', () => ({
 const mockStorageConfig = (vectorBucketsEnabled: boolean) => {
   addAPIMock({
     method: 'get',
-    path: '/platform/projects/:ref/config/storage',
+    path: '/v1/projects/:ref/config/storage',
     response: () =>
       HttpResponse.json<ProjectStorageConfigData>({
         capabilities: { iceberg_catalog: false, list_v2: false, object_versioning: false },

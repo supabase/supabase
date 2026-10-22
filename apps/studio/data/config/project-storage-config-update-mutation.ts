@@ -17,7 +17,7 @@ export async function updateProjectStorageConfigUpdate({
   fileSizeLimit,
   features,
 }: ProjectStorageConfigUpdateUpdateVariables) {
-  const { data, error } = await patch('/platform/projects/{ref}/config/storage', {
+  const { data, error } = await patch('/v1/projects/{ref}/config/storage', {
     params: { path: { ref: projectRef } },
     body: { fileSizeLimit, features },
   })

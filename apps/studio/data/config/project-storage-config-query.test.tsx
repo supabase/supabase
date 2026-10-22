@@ -65,7 +65,7 @@ describe('useIsVectorBucketsEnabled', () => {
     mockUseDeploymentMode.mockReturnValue(deploymentMode({ isPlatform: true }))
     addAPIMock({
       method: 'get',
-      path: '/platform/projects/:ref/config/storage',
+      path: '/v1/projects/:ref/config/storage',
       response: () => HttpResponse.json<ProjectStorageConfigData>(createStorageConfig(true)),
     })
 
@@ -81,7 +81,7 @@ describe('useIsVectorBucketsEnabled', () => {
     let configRequested = false
     addAPIMock({
       method: 'get',
-      path: '/platform/projects/:ref/config/storage',
+      path: '/v1/projects/:ref/config/storage',
       response: () => {
         configRequested = true
         return HttpResponse.json<ProjectStorageConfigData>(createStorageConfig(false))

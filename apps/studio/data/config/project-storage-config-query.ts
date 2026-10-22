@@ -19,7 +19,7 @@ export async function getProjectStorageConfig(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get('/platform/projects/{ref}/config/storage', {
+  const { data, error } = await get('/v1/projects/{ref}/config/storage', {
     params: { path: { ref: projectRef } },
     signal,
   })
