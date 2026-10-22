@@ -1,6 +1,5 @@
 import { useAuth, useFeatureFlags, useFlag, useUser } from 'common'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 import {
   getRecoveryGap,
@@ -31,7 +30,6 @@ export const RecoveryReminderController = ({
   const { session, isLoading } = useAuth()
   const { hasLoaded, isConfigCatStale } = useFeatureFlags()
   const flagsReady = hasLoaded === true && !isConfigCatStale
-  const [admittedUser, setAdmittedUser] = useState<string | null>(null)
   const isRolloutEnabled = useFlag('enableAccountRecoveryInterstitial')
   const internalHref =
     BASE_PATH && href.startsWith(`${BASE_PATH}/`) ? href.slice(BASE_PATH.length) : href
@@ -55,7 +53,6 @@ export const RecoveryReminderController = ({
   useEffect(() => {
     if (!session || !user?.id) {
       lastRedirect.current = null
-      setAdmittedUser(null)
       return
     }
     if (!isRouteEligible) lastRedirect.current = null
@@ -89,27 +86,6 @@ export const RecoveryReminderController = ({
     user?.id,
   ])
 
-  const isFirstEntry = admittedUser !== user?.id
-  const isWaiting =
-    isLoading ||
-    !flagsReady ||
-    (isEnabled && assurance.isPending) ||
-    (hasVerifiedSession && (recovery.isPending || recovery.isFetching))
-  const shouldInterrupt =
-    hasVerifiedSession &&
-    !recovery.isError &&
-    !!gap &&
-    !!user?.id &&
-    !isRecoveryReminderSnoozed(readRecoveryReminderSnooze(user.id), gap)
-  const shouldHoldDashboard =
-    IS_PLATFORM && isRouteEligible && isFirstEntry && (isWaiting || shouldInterrupt)
-
-  useEffect(() => {
-    if (IS_PLATFORM && isRouteEligible && user?.id && !isWaiting && !shouldInterrupt) {
-      setAdmittedUser(user.id)
-    }
-  }, [isRouteEligible, isWaiting, shouldInterrupt, user?.id])
-
   useEffect(() => {
     const userId = user?.id
     return () => {
@@ -117,15 +93,5 @@ export const RecoveryReminderController = ({
     }
   }, [user?.id])
 
-  if (shouldHoldDashboard)
-    return (
-      <div
-        role="status"
-        aria-label="Loading dashboard"
-        className="flex min-h-screen items-center justify-center bg-studio"
-      >
-        <ShimmeringLoader className="h-5 w-40 py-0" />
-      </div>
-    )
   return children
 }

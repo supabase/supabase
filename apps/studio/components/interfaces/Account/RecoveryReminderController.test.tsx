@@ -93,11 +93,11 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks())
 
 describe('RecoveryReminderController', () => {
-  it('hides the dashboard until flags and the entry check resolve', async () => {
+  it('shows the dashboard immediately while flags and the entry check resolve', async () => {
     mock.flagsLoaded = false
     const { client, rerender, onNavigate } = renderController()
-    expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument()
-    expect(screen.getByRole('status', { name: 'Loading dashboard' })).toBeInTheDocument()
+    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
+    expect(screen.queryByRole('status', { name: 'Loading dashboard' })).not.toBeInTheDocument()
     mock.flagsLoaded = true
     mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
     rerender()
@@ -105,13 +105,13 @@ describe('RecoveryReminderController', () => {
     await settle(client)
     expect(onNavigate).not.toHaveBeenCalled()
   })
-  it('never reveals the dashboard before redirecting an eligible account', async () => {
+  it('shows the dashboard while checking and then redirects an eligible account', async () => {
     const { onNavigate } = renderController()
-    expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument()
+    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
     await waitFor(() => expect(onNavigate).toHaveBeenCalledOnce())
-    expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument()
+    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
   })
-  it('keeps an admitted dashboard visible during background reads', async () => {
+  it('keeps the dashboard visible during background reads', async () => {
     mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
     const { client } = renderController()
     await screen.findByText('Dashboard content')
@@ -158,7 +158,7 @@ describe('RecoveryReminderController', () => {
     expect(
       new URL(onNavigate.mock.calls[0][0], 'https://studio.local').searchParams.get('returnTo')
     ).toBe(href)
-    expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument()
+    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
   })
 
   it('does not interrupt when rollout is disabled', async () => {
@@ -201,6 +201,7 @@ describe('RecoveryReminderController', () => {
     const { onNavigate } = renderController()
     await waitFor(() => expect(mock.getStatus).toHaveBeenCalled())
     expect(onNavigate).not.toHaveBeenCalled()
+    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
   })
 
   it('does not interrupt for an authenticator recommendation alone', async () => {
