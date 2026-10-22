@@ -358,12 +358,6 @@ function RootComponent() {
         <AuthProvider>
           <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
             <ProfileProvider>
-              <RecoveryReminderController
-                href={recoveryLocation.href}
-                onNavigate={(href) => {
-                  void recoveryNavigate({ href, replace: true })
-                }}
-              />
               <TimezoneProvider>
                 <TimestampInfoTimezoneBridge>
                   <DynamicTitle />
@@ -376,9 +370,16 @@ function RootComponent() {
                               <BannerStackProvider>
                                 <FeaturePreviewContextProvider>
                                   <MainScrollContainerProvider>
-                                    <ClientOnly fallback={<ShellFallback />}>
-                                      <Outlet />
-                                    </ClientOnly>
+                                    <RecoveryReminderController
+                                      href={recoveryLocation.href}
+                                      onNavigate={(href) => {
+                                        void recoveryNavigate({ href, replace: true })
+                                      }}
+                                    >
+                                      <ClientOnly fallback={<ShellFallback />}>
+                                        <Outlet />
+                                      </ClientOnly>
+                                    </RecoveryReminderController>
                                   </MainScrollContainerProvider>
                                   <GlobalShortcuts />
                                   <StudioCommandMenu />

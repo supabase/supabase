@@ -210,12 +210,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
             <AuthProvider>
               <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
                 <ProfileProvider>
-                  <RecoveryReminderController
-                    href={recoveryRouter.asPath}
-                    onNavigate={(href) => {
-                      void recoveryRouter.replace(href)
-                    }}
-                  />
                   <TimezoneProvider>
                     <TimestampInfoTimezoneBridge>
                       <Head>
@@ -252,7 +246,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                   <BannerStackProvider>
                                     <FeaturePreviewContextProvider>
                                       <MainScrollContainerProvider>
-                                        {getLayout(<Component {...pageProps} />)}
+                                        <RecoveryReminderController
+                                          href={recoveryRouter.asPath}
+                                          onNavigate={(href) => {
+                                            void recoveryRouter.replace(href)
+                                          }}
+                                        >
+                                          {getLayout(<Component {...pageProps} />)}
+                                        </RecoveryReminderController>
                                       </MainScrollContainerProvider>
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />

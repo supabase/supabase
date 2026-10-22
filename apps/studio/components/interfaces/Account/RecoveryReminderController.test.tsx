@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, render, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RecoveryReminderController } from './RecoveryReminderController'
@@ -9,6 +9,7 @@ const mock = vi.hoisted(() => ({
   userId: 'controller-user',
   rolloutEnabled: true,
   isAuthLoading: false,
+  flagsLoaded: true,
   getAssurance: vi.fn(),
   listFactors: vi.fn(),
   getUser: vi.fn(),
@@ -20,8 +21,12 @@ vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
   useFlag: (name: string) =>
     name === 'enableAccountRecoveryInterstitial' ? mock.rolloutEnabled : true,
-  useUser: () => ({ id: mock.userId }),
-  useAuth: () => ({ session: { user: { id: mock.userId } }, isLoading: mock.isAuthLoading }),
+  useFeatureFlags: () => ({ hasLoaded: mock.flagsLoaded }),
+  useUser: () => (mock.userId ? { id: mock.userId } : null),
+  useAuth: () => ({
+    session: mock.userId ? { user: { id: mock.userId } } : null,
+    isLoading: mock.isAuthLoading,
+  }),
 }))
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({ useIsFeatureEnabled: () => true }))
 vi.mock('@/lib/gotrue', () => ({
@@ -45,7 +50,9 @@ function renderController(href = '/organizations') {
   const onNavigate = vi.fn()
   const createTree = (destination: string) => (
     <QueryClientProvider client={client}>
-      <RecoveryReminderController href={destination} onNavigate={onNavigate} />
+      <RecoveryReminderController href={destination} onNavigate={onNavigate}>
+        <div>Dashboard content</div>
+      </RecoveryReminderController>
     </QueryClientProvider>
   )
   const view = render(createTree(href))
@@ -67,6 +74,7 @@ beforeEach(() => {
   mock.userId = 'controller-user'
   mock.rolloutEnabled = true
   mock.isAuthLoading = false
+  mock.flagsLoaded = true
   mock.getAssurance.mockResolvedValue({
     data: { currentLevel: 'aal2', nextLevel: 'aal2' },
     error: null,
@@ -84,6 +92,49 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks())
 
 describe('RecoveryReminderController', () => {
+  it('hides the dashboard until flags and the entry check resolve', async () => {
+    mock.flagsLoaded = false
+    const { client, rerender, onNavigate } = renderController()
+    expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument()
+    expect(screen.getByRole('status', { name: 'Loading dashboard' })).toBeInTheDocument()
+    mock.flagsLoaded = true
+    mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
+    rerender()
+    await screen.findByText('Dashboard content')
+    await settle(client)
+    expect(onNavigate).not.toHaveBeenCalled()
+  })
+  it('never reveals the dashboard before redirecting an eligible account', async () => {
+    const { onNavigate } = renderController()
+    expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument()
+    await waitFor(() => expect(onNavigate).toHaveBeenCalledOnce())
+    expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument()
+  })
+  it('keeps an admitted dashboard visible during background reads', async () => {
+    mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
+    const { client } = renderController()
+    await screen.findByText('Dashboard content')
+    await settle(client)
+    mock.getStatus.mockReturnValue(new Promise(() => {}))
+    act(() => {
+      void client.invalidateQueries({ queryKey: ['recovery-code-status-query'] })
+    })
+    await waitFor(() => expect(mock.getStatus).toHaveBeenCalledTimes(2))
+    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
+  })
+  it('can interrupt the same account after sign-out and clearing snooze', async () => {
+    const { client, onNavigate, rerender } = renderController()
+    await waitFor(() => expect(onNavigate).toHaveBeenCalledOnce())
+    writeRecoveryReminderSnooze(mock.userId, 'exhausted')
+    mock.userId = ''
+    rerender()
+    await settle(client)
+    localStorage.removeItem('account-recovery-reminder:controller-user')
+    mock.userId = 'controller-user'
+    rerender()
+    await waitFor(() => expect(onNavigate).toHaveBeenCalledTimes(2))
+  })
+
   it('preserves the full destination and avoids duplicate redirects', async () => {
     const href = '/project/ref/editor?schema=private&table=notes#row-2'
     const { client, onNavigate, rerender } = renderController(href)
