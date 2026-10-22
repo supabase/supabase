@@ -54,6 +54,15 @@ export const toSummary = (guide: CollectionEntry<'guides'>): GuideSummary => ({
   date: guide.data.date,
 })
 
+// FAQ entries have no description in frontmatter.
+export const toFaqSummary = (faq: CollectionEntry<'faqs'>): GuideSummary => ({
+  id: faq.id,
+  title: faq.data.title,
+  description: '',
+  topics: faq.data.topics.filter((topic): topic is Topic => isKnownTopic(topic)),
+  href: `${import.meta.env.BASE_URL}/faqs/${faq.id}`,
+})
+
 export const toTroubleshootingSummary = (
   entry: CollectionEntry<'troubleshooting'>
 ): GuideSummary => ({
