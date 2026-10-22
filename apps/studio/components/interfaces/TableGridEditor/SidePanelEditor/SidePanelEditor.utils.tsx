@@ -217,7 +217,6 @@ export const createColumn = async ({
       is_identity: formattedPayload.isIdentity,
       identity_generation: formattedPayload.identityGeneration,
       is_nullable: formattedPayload.isNullable,
-      is_primary_key: formattedPayload.isPrimaryKey,
       is_unique: formattedPayload.isUnique,
       comment: formattedPayload.comment,
       check: formattedPayload.check,
