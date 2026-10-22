@@ -244,7 +244,7 @@ function mockInfrastructureEndpoints() {
   })
   addAPIMock({
     method: 'get',
-    path: '/platform/projects/:ref/disk/util',
+    path: '/v1/projects/:ref/config/disk/util',
     response: {
       metrics: {
         fs_avail_bytes: 60 * 1024 * 1024 * 1024,
