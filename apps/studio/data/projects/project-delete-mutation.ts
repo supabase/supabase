@@ -2,7 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { projectKeys } from './keys'
-import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
+import {
+  useCancelProjectsInfiniteQuery,
+  useInvalidateProjectsInfiniteQuery,
+} from './org-projects-infinite-query'
 import { del, handleError } from '@/data/fetchers'
 import { organizationKeys } from '@/data/organizations/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -33,6 +36,7 @@ export const useProjectDeleteMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
+  const { cancelProjectsQuery } = useCancelProjectsInfiniteQuery()
 
   return useMutation<ProjectDeleteData, ResponseError, ProjectDeleteVariables>({
     mutationFn: (vars) => deleteProject(vars),
@@ -49,12 +53,20 @@ export const useProjectDeleteMutation = ({
         ...freeProjectLimitCheckQueries.map((query) =>
           queryClient.invalidateQueries({ queryKey: query.queryKey })
         ),
+        queryClient.cancelQueries({ queryKey: projectKeys.detail(data.ref) }),
+        ...freeProjectLimitCheckQueries.map((query) =>
+          queryClient.cancelQueries({ queryKey: query.queryKey })
+        ),
       ])
 
       if (variables.organizationSlug) {
         await Promise.all([
           invalidateProjectsQuery(),
           queryClient.invalidateQueries({
+            queryKey: organizationKeys.detail(variables.organizationSlug),
+          }),
+          cancelProjectsQuery(),
+          queryClient.cancelQueries({
             queryKey: organizationKeys.detail(variables.organizationSlug),
           }),
         ])

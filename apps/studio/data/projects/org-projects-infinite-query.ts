@@ -106,3 +106,11 @@ export const useInvalidateProjectsInfiniteQuery = () => {
   }, [queryClient])
   return { invalidateProjectsQuery }
 }
+
+export const useCancelProjectsInfiniteQuery = () => {
+  const queryClient = useQueryClient()
+  const cancelProjectsQuery = useCallback(() => {
+    return queryClient.cancelQueries({ queryKey: [INFINITE_PROJECTS_KEY_PREFIX] })
+  }, [queryClient])
+  return { cancelProjectsQuery }
+}
