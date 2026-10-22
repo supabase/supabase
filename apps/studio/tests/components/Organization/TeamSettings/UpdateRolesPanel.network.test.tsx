@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { platformComponents as components } from 'api-types'
+import { apiV1Components, platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -16,7 +16,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
-type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse_Output']
+type ListEntitlementsResponse = apiV1Components['schemas']['V1ListEntitlementsResponse_Output']
 type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 const ORG_SLUG = 'test-org'
@@ -138,7 +138,7 @@ function setupMocks() {
   // renders the org-scoped role flow (a single Select).
   addAPIMock({
     method: 'get',
-    path: '/platform/organizations/:slug/entitlements',
+    path: '/v1/organizations/:slug/entitlements',
     response: () => HttpResponse.json<ListEntitlementsResponse>({ entitlements: [] }),
   })
 }

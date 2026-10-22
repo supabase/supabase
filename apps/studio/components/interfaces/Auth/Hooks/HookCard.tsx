@@ -157,7 +157,7 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
                   },
                 }}
               >
-                <EditIcon size={12} />
+                <EditIcon size={14} />
                 <span>Edit hook</span>
               </DropdownMenuItemTooltip>
               <DropdownMenuItem asChild className="gap-x-2">
@@ -166,7 +166,7 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
                   rel="noreferrer noopener"
                   href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`}
                 >
-                  <BookOpenIcon size={12} />
+                  <BookOpenIcon size={14} />
                   <span>Documentation</span>
                 </a>
               </DropdownMenuItem>
@@ -184,7 +184,7 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
                   },
                 }}
               >
-                <TrashIcon size={12} />
+                <TrashIcon size={14} />
                 <span>Delete hook</span>
               </DropdownMenuItemTooltip>
             </DropdownMenuContent>

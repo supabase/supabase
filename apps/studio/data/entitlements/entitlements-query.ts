@@ -8,16 +8,16 @@ import { UseCustomQueryOptions } from '@/types'
 import { ResponseError } from '@/types/base'
 
 export type FeatureKey =
-  components['schemas']['ListEntitlementsResponse_Output']['entitlements'][number]['feature']['key']
+  components['schemas']['V1ListEntitlementsResponse_Output']['entitlements'][number]['feature']['key']
 
 export type EntitlementsVariables = {
   slug: string
 }
 
 export type EntitlementConfig =
-  components['schemas']['ListEntitlementsResponse_Output']['entitlements'][0]['config']
+  components['schemas']['V1ListEntitlementsResponse_Output']['entitlements'][0]['config']
 export type Entitlement =
-  components['schemas']['ListEntitlementsResponse_Output']['entitlements'][0]
+  components['schemas']['V1ListEntitlementsResponse_Output']['entitlements'][0]
 export type EntitlementType = Entitlement['type']
 
 export async function getEntitlements(
@@ -27,7 +27,7 @@ export async function getEntitlements(
 ) {
   if (!slug) throw new Error('slug is required')
 
-  const { data, error } = await get('/platform/organizations/{slug}/entitlements', {
+  const { data, error } = await get('/v1/organizations/{slug}/entitlements', {
     params: { path: { slug } },
     signal,
     ...(headers && { headers }),

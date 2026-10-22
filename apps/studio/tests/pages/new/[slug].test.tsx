@@ -1,6 +1,6 @@
 import { act, configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { platformComponents as components } from 'api-types'
+import { apiV1Components, platformComponents as components } from 'api-types'
 import { FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
@@ -23,7 +23,8 @@ type RegionsInfo = components['schemas']['RegionsInfoPlatform_Output']
 type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
 type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
-type Entitlement = components['schemas']['ListEntitlementsResponse_Output']['entitlements'][number]
+type Entitlement =
+  apiV1Components['schemas']['V1ListEntitlementsResponse_Output']['entitlements'][number]
 type AvailableVersion = {
   postgres_engine: '15' | '17' | '17-oriole'
   release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
@@ -266,7 +267,7 @@ function mockWizardEndpoints(
   })
   addAPIMock({
     method: 'get',
-    path: '/platform/organizations/:slug/entitlements',
+    path: '/v1/organizations/:slug/entitlements',
     response: () =>
       HttpResponse.json<{ entitlements: Entitlement[] }>({
         entitlements: overrides.entitlements ?? DEFAULT_ENTITLEMENTS,

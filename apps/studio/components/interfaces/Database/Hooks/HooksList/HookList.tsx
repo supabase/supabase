@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { includes } from 'lodash'
-import { Edit3Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
+import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { parseAsString, useQueryState } from 'nuqs'
 import {
@@ -113,24 +113,22 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                       <TooltipContent side="bottom">More options</TooltipContent>
                     </Tooltip>
 
-                    <DropdownMenuContent side="left">
-                      <>
-                        <DropdownMenuItem
-                          className="space-x-2"
-                          onClick={() => setSelectedHookIdToEdit(x.id.toString())}
-                        >
-                          <Edit3Icon size="14" />
-                          <p>Edit hook</p>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="space-x-2"
-                          onClick={() => setSelectedHookIdToDelete(x.id.toString())}
-                        >
-                          <TrashIcon stroke="red" size="14" />
-                          <p>Delete hook</p>
-                        </DropdownMenuItem>
-                      </>
+                    <DropdownMenuContent align="end" side="bottom" className="w-32">
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        onClick={() => setSelectedHookIdToEdit(x.id.toString())}
+                      >
+                        <EditIcon size={14} />
+                        <p>Edit hook</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        onClick={() => setSelectedHookIdToDelete(x.id.toString())}
+                      >
+                        <TrashIcon size={14} />
+                        <p>Delete hook</p>
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (

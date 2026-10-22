@@ -114,7 +114,7 @@ describe('RealtimeSettings', () => {
 
     addAPIMock({
       method: 'get',
-      path: '/platform/organizations/:slug/entitlements',
+      path: '/v1/organizations/:slug/entitlements',
       response: { entitlements: REALTIME_ENTITLEMENTS },
     })
   })
@@ -219,7 +219,7 @@ describe('RealtimeSettings', () => {
     async ({ value, accepted }) => {
       addAPIMock({
         method: 'get',
-        path: '/platform/organizations/:slug/entitlements',
+        path: '/v1/organizations/:slug/entitlements',
         response: {
           entitlements: buildRealtimeEntitlements({ 'realtime.max_concurrent_users': 'unlimited' }),
         },

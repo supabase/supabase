@@ -10,7 +10,7 @@ export type HooksEnableVariables = {
 }
 
 export async function enableDatabaseWebhooks({ ref }: HooksEnableVariables) {
-  const { data, error } = await post('/platform/database/{ref}/hook-enable', {
+  const { data, error } = await post('/v1/projects/{ref}/database/webhooks/enable', {
     params: { path: { ref } },
   })
   if (error) handleError(error)

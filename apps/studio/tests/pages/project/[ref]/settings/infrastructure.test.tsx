@@ -163,7 +163,7 @@ function mockInfrastructureEndpoints() {
   })
   addAPIMock({
     method: 'get',
-    path: '/platform/organizations/:slug/entitlements',
+    path: '/v1/organizations/:slug/entitlements',
     response: {
       entitlements: [
         {
