@@ -179,10 +179,7 @@ const CodePage = () => {
               <ol className="text-left space-y-1">
                 <li>1. Update to the latest Supabase CLI version</li>
                 <li>
-                  2. Redeploy your function using:{' '}
-                  <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                    supabase functions deploy
-                  </code>
+                  2. Redeploy your function using: <code>supabase functions deploy</code>
                 </li>
                 <li>
                   3. Or use the{' '}

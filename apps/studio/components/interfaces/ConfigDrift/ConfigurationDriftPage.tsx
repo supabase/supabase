@@ -108,7 +108,7 @@ function ConfigurationDriftItem({ row }: { row: ConfigurationDriftRow }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
           <h3 className="text-sm font-medium text-foreground">{row.settingLabel}</h3>
-          <code className="text-code-inline max-w-full truncate text-xs" title={row.configPath}>
+          <code className="max-w-full truncate text-xs" title={row.configPath}>
             {row.configPath}
           </code>
           <span className="text-xs text-warning">Drift</span>
@@ -199,6 +199,7 @@ function ConfigFieldSection({
                   >
                     <span className="text-foreground-light">{row.label}</span>
                     <code
+                      data-code-style="plain"
                       className="max-w-[60%] truncate text-xs text-foreground-muted"
                       title={row.value}
                     >
@@ -281,9 +282,8 @@ export function ConfigurationDriftPage() {
         description={
           <>
             This project is connected to GitHub. The next commit redeploys{' '}
-            <code className="text-code-inline text-xs">config.toml</code> and overwrite changes made
-            here. To keep these changes, run{' '}
-            <code className="text-code-inline text-xs">supabase config pull</code> locally.
+            <code className="text-xs">config.toml</code> and overwrite changes made here. To keep
+            these changes, run <code className="text-xs">supabase config pull</code> locally.
           </>
         }
       />

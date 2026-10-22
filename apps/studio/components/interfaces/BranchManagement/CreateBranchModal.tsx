@@ -593,9 +593,9 @@ export const CreateBranchModal = () => {
                   <p className="text-sm text-foreground-light">
                     {withData ? (
                       <>
-                        <code className="text-code-inline">{branchComputeSize.label}</code> compute
-                        size is automatically selected to match your production branch. You may
-                        downgrade after creation or pause the branch when not in use to save cost.
+                        <code>{branchComputeSize.label}</code> compute size is automatically
+                        selected to match your production branch. You may downgrade after creation
+                        or pause the branch when not in use to save cost.
                       </>
                     ) : (
                       <>This cost will continue for as long as the branch has not been removed.</>
