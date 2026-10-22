@@ -1,9 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const Route = createFileRoute('/project/$ref/database/triggers')({
   component: TriggersShell,
@@ -14,9 +13,8 @@ export const Route = createFileRoute('/project/$ref/database/triggers')({
 
 function TriggersShell() {
   const { ref } = Route.useParams()
-  const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_READ,
-    'triggers'
+  const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_READ
   )
 
   if (isPermissionsLoaded && !canReadTriggers) {

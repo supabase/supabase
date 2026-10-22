@@ -20,8 +20,8 @@ const DIMMED_FILL_OPACITY = 0.35
 const CHART_COLORS = {
   TICK: 'var(--background-overlay-hover)',
   AXIS: 'var(--background-overlay-hover)',
-  BRAND: 'hsl(var(--brand-default))',
-  BRAND_HOVER: 'hsl(var(--brand-500))',
+  PRIMARY: 'var(--primary-bright)',
+  PRIMARY_HOVER: 'var(--primary-bright-hover)',
 }
 
 export type ChartBarTick =
@@ -97,8 +97,8 @@ export const ChartBar = ({
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
   isFullHeight = false,
   className,
-  color = CHART_COLORS.BRAND,
-  hoverColor = CHART_COLORS.BRAND_HOVER,
+  color = CHART_COLORS.PRIMARY,
+  hoverColor = CHART_COLORS.PRIMARY_HOVER,
   chartHighlight,
   syncId,
   showHighlightArea = true,

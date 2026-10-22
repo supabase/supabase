@@ -105,6 +105,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         actions,
         supportsOperators,
         freeformDefaultProperty: resolvedFreeformDefaultProperty,
+        isNested: path.length > 0,
       }),
     [
       filterProperties,
@@ -114,6 +115,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
       actions,
       supportsOperators,
       resolvedFreeformDefaultProperty,
+      path.length,
     ]
   )
 
@@ -206,7 +208,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
                 onFocus={() => handleGroupFreeformFocus(path)}
                 onBlur={handleFreeformBlur}
                 onKeyDown={handleFreeformKeyDown}
-                className="border-none bg-transparent text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full flex-1 h-auto min-w-0 px-2 py-1"
+                className="relative mx-[3px] border-none bg-transparent text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-auto flex-1 h-auto min-w-0 px-2 py-1"
                 placeholder={
                   group.conditions.length === 0 ? emptyPlaceholder : 'Add more filters...'
                 }

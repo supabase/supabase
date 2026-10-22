@@ -76,7 +76,7 @@ Alternatively, you can use the `supabase sso info --project-ref <your-project>` 
 
 ### User accounts and identities
 
-User accounts and identities created via SSO differ from regular (email, phone, password, social login...) accounts in these ways:
+User accounts and identities created via SSO differ from regular (email, phone, password, social sign-in...) accounts in these ways:
 
 - **No identity linking.**
   Each user account verified using an SSO identity provider are not eligible for [identity linking](/docs/guides/auth/auth-identity-linking) to existing user accounts for security reasons. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO sign-in with your project, there will be two `valid.email@supabase.io` user accounts in the system.

@@ -55,7 +55,7 @@
     "resolution": "Your project may have been suspended for exceeding usage quotas. Contact support with your project reference ID and a description of your Realtime use case.",
     "references": [
       {
-        "href": "/docs/guides/troubleshooting/realtime-project-suspended-for-exceeding-quotas",
+        "href": "/kb/troubleshooting/realtime-project-suspended-for-exceeding-quotas",
         "description": "Troubleshooting guide for suspended projects"
       }
     ]
@@ -243,7 +243,7 @@
     "resolution": "Reserve Presence for slow-changing state and use Broadcast for high-frequency updates such as live cursors, or throttle your track() calls.",
     "references": [
       {
-        "href": "/docs/guides/troubleshooting/realtime-client-presence-rate-limit-reached",
+        "href": "/kb/troubleshooting/realtime-client-presence-rate-limit-reached",
         "description": "Troubleshooting guide for the ClientPresenceRateLimitReached error"
       }
     ]

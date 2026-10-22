@@ -154,22 +154,22 @@ describe('categorizeInviteEmails', () => {
 
 describe('buildProjectPayload', () => {
   test('returns empty object when applyToOrg is true', () => {
-    expect(buildProjectPayload(true, 'ref_abc')).toStrictEqual({})
+    expect(buildProjectPayload(true, [])).toStrictEqual({})
   })
 
-  test('throws an error when applyToOrg is false but projectRef is empty', () => {
-    expect(() => buildProjectPayload(false, '')).toThrowError(
-      'projectRef is required when applyToOrg is false'
+  test('throws an error when applyToOrg is false but no projects are selected', () => {
+    expect(() => buildProjectPayload(false, [])).toThrowError(
+      'At least one project is required when applyToOrg is false'
     )
   })
 
-  test('returns projects array when applyToOrg is false and projectRef is set', () => {
-    expect(buildProjectPayload(false, 'ref_abc')).toStrictEqual({ projects: ['ref_abc'] })
+  test('returns a projects array when applyToOrg is false and one project is selected', () => {
+    expect(buildProjectPayload(false, ['ref_abc'])).toStrictEqual({ projects: ['ref_abc'] })
   })
 
-  test('wraps the projectRef in a single-element array', () => {
-    expect(buildProjectPayload(false, 'my-project-ref')).toStrictEqual({
-      projects: ['my-project-ref'],
+  test('returns all selected projects when applyToOrg is false and multiple are selected', () => {
+    expect(buildProjectPayload(false, ['ref_abc', 'ref_def', 'ref_ghi'])).toStrictEqual({
+      projects: ['ref_abc', 'ref_def', 'ref_ghi'],
     })
   })
 })

@@ -1,4 +1,4 @@
-import { BookOpen } from 'lucide-react'
+import { BookOpenIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 interface DocsButtonProps {
@@ -16,7 +16,7 @@ export const DocsButton = ({ href, abbrev = true, className, topic, label }: Doc
       asChild
       variant="default"
       className={className}
-      icon={<BookOpen />}
+      icon={<BookOpenIcon />}
       onClick={(e) => e.stopPropagation()}
     >
       <a

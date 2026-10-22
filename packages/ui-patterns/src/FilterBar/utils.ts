@@ -166,11 +166,15 @@ export function addFilterToGroup(
   }
 }
 
-export function addGroupToGroup(group: FilterGroup, path: number[]): FilterGroup {
+export function addGroupToGroup(
+  group: FilterGroup,
+  path: number[],
+  logicalOperator: FilterGroup['logicalOperator'] = 'AND'
+): FilterGroup {
   if (path.length === 0) {
     return {
       ...group,
-      conditions: [...group.conditions, { logicalOperator: 'AND', conditions: [] }],
+      conditions: [...group.conditions, { logicalOperator, conditions: [] }],
     }
   }
 
@@ -178,7 +182,7 @@ export function addGroupToGroup(group: FilterGroup, path: number[]): FilterGroup
   return {
     ...group,
     conditions: group.conditions.map((condition, i) =>
-      i === current ? addGroupToGroup(condition as FilterGroup, rest) : condition
+      i === current ? addGroupToGroup(condition as FilterGroup, rest, logicalOperator) : condition
     ),
   }
 }

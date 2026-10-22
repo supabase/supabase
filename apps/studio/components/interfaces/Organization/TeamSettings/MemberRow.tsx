@@ -1,4 +1,5 @@
-import { ArrowRight, Check, ChevronRight, User, X } from 'lucide-react'
+import { useParams } from 'common'
+import { ArrowRightIcon, CheckIcon, ChevronRightIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { memo, useMemo } from 'react'
 import {
@@ -8,31 +9,37 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   ScrollArea,
-  TableCell,
-  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
+import { MEMBERS_GRID_CLASS } from './MembersList.constants'
 import { useTeamSettingsData } from './TeamSettingsDataContext'
+import { type RowComponentBaseProps } from '@/components/ui/InfiniteList'
+import { InlineLink } from '@/components/ui/InlineLink'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
-import { OrganizationRole } from '@/data/organization-members/organization-roles-query'
-import { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { type OrganizationRole } from '@/data/organization-members/organization-roles-query'
+import { type OrganizationMember } from '@/data/organizations/organization-members-query'
+import { pluralize } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
-
-interface MemberRowProps {
-  member: OrganizationMember
-}
 
 const MEMBER_ORIGIN_TO_MANAGED_BY = {
   vercel: 'vercel-marketplace',
 } as const
 
-export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
+export const MemberRow = memo(function MemberRow({
+  item: member,
+  index,
+  style,
+}: RowComponentBaseProps<OrganizationMember>) {
+  const { slug } = useParams()
   const { profile } = useProfile()
-  const { roles, isLoadingRoles, orgProjects } = useTeamSettingsData()
+  const { roles, isLoadingRoles, totalNumOrgProjects } = useTeamSettingsData()
 
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
@@ -48,48 +55,64 @@ export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
     return map
   }, [roles])
 
-  const projectNameByRef = useMemo(
-    () => new Map(orgProjects.map((p) => [p.ref, p.name])),
-    [orgProjects]
-  )
-
   const roleRows = useMemo(() => {
     return member.role_ids.map((id) => {
       const role = roleById.get(id)
       const roleName = (role?.name ?? '').split('_')[0]
       const appliesToAllProjects = role?.projects.length === 0
-      const projectsApplied = appliesToAllProjects
-        ? orgProjects.map((p) => ({ ref: p.ref, name: p.name }))
-        : (role?.projects ?? [])
-            .map(({ ref }) => ({ ref, name: projectNameByRef.get(ref) ?? '' }))
-            .filter(({ name }) => name.length > 0)
+      const projectsApplied = role?.projects ?? []
 
       return { id, roleName, appliesToAllProjects, projectsApplied }
     })
-  }, [member.role_ids, roleById, orgProjects, projectNameByRef])
+  }, [member.role_ids, roleById])
+
+  const roleBreakdown = useMemo(
+    () =>
+      roleRows.flatMap(({ id, roleName, appliesToAllProjects, projectsApplied }) =>
+        appliesToAllProjects
+          ? [{ key: `${id}-all`, roleName, label: 'Organization' }]
+          : projectsApplied.map((project) => ({
+              key: `${id}-${project.ref}`,
+              roleName,
+              label: project.name,
+            }))
+      ),
+    [roleRows]
+  )
+  const totalProjectsApplied = roleRows.reduce((sum, row) => sum + row.projectsApplied.length, 0)
 
   return (
-    <TableRow>
-      <TableCell>
-        <div className="flex items-center gap-x-4">
+    <div
+      role="row"
+      aria-rowindex={index + 2}
+      style={style}
+      className={cn(MEMBERS_GRID_CLASS, 'border-b hover:bg-surface-200 transition-colors')}
+    >
+      <div role="cell" className="min-w-0">
+        <div className="flex items-center gap-x-4 min-w-0">
           <ProfileImage
             alt={member.primary_email ?? member.username ?? ''}
             src={profileImageUrl}
-            className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"
+            className="border rounded-full w-6 h-6 md:w-8 md:h-8 shrink-0"
             placeholder={
               <div
                 className={cn(
-                  'w-[32px] h-[32px] md:w-[40px] md:h-[40px]',
+                  'w-6 h-6 md:w-8 md:h-8 text-xs shrink-0',
                   'bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center'
                 )}
               >
-                <User size={20} strokeWidth={1.5} />
+                {member.primary_email?.[0]?.toUpperCase()}
               </div>
             }
           />
-          <div className="flex item-center gap-x-3">
-            <p className="text-foreground-light truncate">{member.primary_email}</p>
-            <div className="flex items-center gap-x-2">
+          <div className="flex items-center gap-x-3 min-w-0">
+            <p
+              title={member.primary_email ?? ''}
+              className="text-foreground-light truncate text-sm"
+            >
+              {member.primary_email}
+            </p>
+            <div className="flex items-center gap-x-2 shrink-0 text-sm">
               {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
               {isInvitedUser && member.invited_at && (
                 <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
@@ -111,34 +134,68 @@ export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
             </div>
           </div>
         </div>
-      </TableCell>
+      </div>
 
-      <TableCell>
-        <div className="flex items-center gap-x-1.5">
-          {member.mfa_enabled ? (
-            <>
-              <span className="text-foreground-lighter">Enabled</span>
-              <Check className="text-primary" strokeWidth={2} size={16} />
-            </>
-          ) : (
-            <>
-              <span className="text-foreground-lighter">Disabled</span>
-              <X className="text-foreground-muted" strokeWidth={1.5} size={16} />
-            </>
-          )}
+      <div role="cell">
+        <div className="flex items-center ml-1">
+          <Tooltip>
+            <TooltipTrigger>
+              {member.mfa_enabled ? (
+                <CheckIcon className="text-primary" strokeWidth={2} size={16} />
+              ) : (
+                <XIcon className="text-foreground-muted" strokeWidth={1.5} size={16} />
+              )}
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-70 text-center">
+              {member.mfa_enabled ? (
+                'Member has MFA enabled'
+              ) : (
+                <span className="text-balance">
+                  Member does not have MFA enabled. You can enforce MFA from your organization's{' '}
+                  <InlineLink href={`/org/${slug}/security`}>security settings</InlineLink>,
+                  restricting access until members enable it.
+                </span>
+              )}
+            </TooltipContent>
+          </Tooltip>
         </div>
-      </TableCell>
+      </div>
 
-      <TableCell className="max-w-64">
+      <div role="cell" className="min-w-0">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
+        ) : roleRows.length > 1 ? (
+          <div className="flex items-center gap-x-2 min-w-0 text-sm">
+            <p className="text-foreground-light whitespace-nowrap">Multiple roles</p>
+            <ChevronRightIcon className="text-foreground-muted/50 shrink-0" size={14} />
+            <HoverCard openDelay={200}>
+              <HoverCardTrigger asChild>
+                <span className="text-foreground-light truncate">
+                  {totalProjectsApplied} {pluralize(totalProjectsApplied, 'project')}
+                </span>
+              </HoverCardTrigger>
+              <HoverCardContent className="p-0">
+                <div className="flex flex-col py-1">
+                  <ScrollArea className={cn(roleBreakdown.length > 5 ? 'h-[130px]' : '')}>
+                    {roleBreakdown.map(({ key, roleName, label }) => (
+                      <div key={key} className="px-2 py-1 flex items-center gap-x-2 text-xs">
+                        <span className="whitespace-nowrap">{roleName}</span>
+                        <ChevronRightIcon className="text-foreground-muted/50 shrink-0" size={12} />
+                        <span className="text-foreground-light truncate">{label}</span>
+                      </div>
+                    ))}
+                  </ScrollArea>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
         ) : (
           roleRows.map(({ id, roleName, appliesToAllProjects, projectsApplied }) => (
-            <div key={`role-${id}`} className="flex items-center gap-x-2">
-              <p className="text-foreground-light">{roleName}</p>
+            <div key={`role-${id}`} className="flex items-center gap-x-2 min-w-0 text-sm">
+              <p className="text-foreground-light whitespace-nowrap">{roleName}</p>
               {hasProjectScopedRoles && (
                 <>
-                  <ChevronRight className="text-foreground-muted/50" size={14} />
+                  <ChevronRightIcon className="text-foreground-muted/50 shrink-0" size={14} />
                   {projectsApplied.length === 1 ? (
                     <span
                       className="text-foreground-light truncate"
@@ -149,34 +206,48 @@ export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
                   ) : (
                     <HoverCard openDelay={200}>
                       <HoverCardTrigger asChild>
-                        <span className="text-foreground-light">
+                        <span className="text-foreground-light truncate">
                           {appliesToAllProjects
                             ? 'Organization'
-                            : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
+                            : `${projectsApplied.length} ${pluralize(projectsApplied.length, 'project')}`}
                         </span>
                       </HoverCardTrigger>
                       <HoverCardContent className="p-0">
-                        <p className="p-2 text-xs">
-                          {roleName} role applies to {projectsApplied.length} project
-                          {projectsApplied.length > 1 ? 's' : ''}
-                        </p>
-                        <div className="border-t flex flex-col py-1">
-                          <ScrollArea className={cn(projectsApplied.length > 5 ? 'h-[130px]' : '')}>
-                            {projectsApplied.map(({ ref, name }) => (
-                              <Link
-                                key={ref}
-                                href={`/project/${ref}`}
-                                className="px-2 py-1 group hover:bg-surface-300 hover:text-foreground transition flex items-center justify-between"
-                              >
-                                <span className="text-xs truncate max-w-[60%]">{name}</span>
-                                <span className="text-xs text-foreground flex items-center gap-x-1 opacity-0 group-hover:opacity-100 transition">
-                                  Go to project
-                                  <ArrowRight size={14} />
-                                </span>
-                              </Link>
-                            ))}
-                          </ScrollArea>
-                        </div>
+                        {
+                          // If the role is org scoped, don't list all projects
+                          appliesToAllProjects ? (
+                            <p className="p-2 text-xs">
+                              {roleName} role applies to {totalNumOrgProjects}{' '}
+                              {pluralize(totalNumOrgProjects, 'project')}
+                            </p>
+                          ) : (
+                            <>
+                              <p className="p-2 text-xs">
+                                {roleName} role applies to {projectsApplied.length}{' '}
+                                {pluralize(projectsApplied.length, 'project')}
+                              </p>
+                              <div className="border-t flex flex-col py-1">
+                                <ScrollArea
+                                  className={cn(projectsApplied.length > 5 ? 'h-[130px]' : '')}
+                                >
+                                  {projectsApplied.map(({ ref, name }) => (
+                                    <Link
+                                      key={ref}
+                                      href={`/project/${ref}`}
+                                      className="px-2 py-1 group hover:bg-surface-300 hover:text-foreground transition flex items-center justify-between"
+                                    >
+                                      <span className="text-xs truncate max-w-[60%]">{name}</span>
+                                      <span className="text-xs text-foreground flex items-center gap-x-1 opacity-0 group-hover:opacity-100 transition">
+                                        Go to project
+                                        <ArrowRightIcon size={14} />
+                                      </span>
+                                    </Link>
+                                  ))}
+                                </ScrollArea>
+                              </div>
+                            </>
+                          )
+                        }
                       </HoverCardContent>
                     </HoverCard>
                   )}
@@ -185,11 +256,11 @@ export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
             </div>
           ))
         )}
-      </TableCell>
+      </div>
 
-      <TableCell>
+      <div role="cell">
         <MemberActions member={member} />
-      </TableCell>
-    </TableRow>
+      </div>
+    </div>
   )
 })

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ArrowRight, Loader2 } from 'lucide-react'
+import { ArrowRightIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { Badge, Button } from 'ui'
@@ -67,7 +67,7 @@ const BuildingState = () => {
             <h1 className="text-3xl">{project?.name}</h1>
             <Badge>
               <div className="flex items-center gap-2">
-                <Loader2 className="animate-spin" size={12} />
+                <Loader2Icon className="animate-spin" size={12} />
                 <span>
                   {project.status === PROJECT_STATUS.UNKNOWN
                     ? 'Initiating project set up'
@@ -96,7 +96,7 @@ const BuildingState = () => {
                       Browse the Supabase{' '}
                       <Link
                         href={`${DOCS_URL}`}
-                        className="mb-0 text-primary transition-colors hover:text-brand-600"
+                        className="mb-0 text-primary transition-colors hover:text-primary-hover"
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -174,7 +174,7 @@ const ChecklistItem = ({ description }: any) => {
   return (
     <li className="my-3 flex flex-wrap space-x-3">
       <div className="mt-0.5">
-        <ArrowRight className="text-foreground-lighter" size={14} />
+        <ArrowRightIcon className="text-foreground-lighter" size={14} />
       </div>
       <div className="flex-1">{description}</div>
     </li>

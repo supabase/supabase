@@ -1,10 +1,10 @@
 ---
-title: 'Configure Social Login (OAuth) Providers'
-description: 'Set up social login (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
-subtitle: 'Set up social login (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
+title: 'Configure Social Sign-in (OAuth) Providers'
+description: 'Set up social sign-in (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
+subtitle: 'Set up social sign-in (OAuth/OIDC) providers for self-hosted Supabase with Docker.'
 ---
 
-This guide covers the **server-side configuration** required to enable social login providers on a self-hosted Supabase instance running with Docker Compose. This applies to all OAuth and OIDC-based providers, including third-party identity providers like Keycloak.
+This guide covers the **server-side configuration** required to enable social sign-in providers on a self-hosted Supabase instance running with Docker Compose. This applies to all OAuth and OIDC-based providers, including third-party identity providers like Keycloak.
 
 ## Before you begin
 
@@ -65,8 +65,6 @@ GOOGLE_ENABLED=true
 GOOGLE_CLIENT_ID=your-client-id
 GOOGLE_SECRET=your-client-secret
 ```
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Step 3: Enable the matching lines in Docker Compose configuration
 
@@ -378,7 +376,7 @@ You can test OAuth with the following minimal HTML page:
 </html>
 ```
 
-For detailed client-side integration, see [social login](/docs/guides/auth/social-login).
+For detailed client-side integration, see [social sign-in](/docs/guides/auth/social-login).
 
 ## Troubleshooting
 
@@ -406,8 +404,6 @@ After a successful OAuth sign-in, the Auth service redirects to `SITE_URL` or a 
 
 - `SITE_URL` in `.env` is set to your **application's URL**
 - If your app uses a different redirect URL, add it to `ADDITIONAL_REDIRECT_URLS` (comma-separated)
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Nonce check failure on mobile (Google Sign In)
 

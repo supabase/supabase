@@ -1,5 +1,5 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { Check, ChevronDown } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import {
@@ -54,7 +54,7 @@ export const ScopeSection = ({
   return (
     <div className="first:border-t border-b flex flex-row space-x-1 text-sm text-foreground-light py-2 px-1">
       <div className="pt-0.5">
-        <Check className="size-4 text-primary" strokeWidth={1.5} />
+        <CheckIcon className="size-4 text-primary" strokeWidth={1.5} />
       </div>
       <div>
         <span className="font-semibold text-foreground">{permissions}</span> {description}
@@ -299,7 +299,7 @@ export const AuthorizeRequesterDetails = ({
           <Collapsible open={showDetails} onOpenChange={setShowDetails} className="mt-2 space-y-2">
             <CollapsibleTrigger className={PERMISSION_DETAILS_TRIGGER_CLASSNAME}>
               <span>{showDetails ? 'Hide detailed permissions' : 'Show detailed permissions'}</span>
-              <ChevronDown
+              <ChevronDownIcon
                 className={cn('size-3.5 transition-transform', showDetails && 'rotate-180')}
               />
             </CollapsibleTrigger>

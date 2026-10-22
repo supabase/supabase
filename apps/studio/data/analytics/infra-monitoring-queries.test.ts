@@ -1,12 +1,20 @@
+import { waitFor } from '@testing-library/react'
 import dayjs from 'dayjs'
+import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
-import { aggregate1MinTo2Min, mapResponseToAnalyticsData } from './infra-monitoring-queries'
+import {
+  aggregate1MinTo2Min,
+  mapResponseToAnalyticsData,
+  useInfraMonitoringQueries,
+} from './infra-monitoring-queries'
 import type {
   InfraMonitoringMultiData,
   InfraMonitoringMultiResponse,
   InfraMonitoringSingleResponse,
 } from './infra-monitoring-query'
+import { customRenderHook } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 
 const mockMultiResponse: InfraMonitoringMultiResponse = {
   data: [
@@ -281,6 +289,24 @@ describe('2m interval aggregation', () => {
 })
 
 describe('aggregate1MinTo2Min', () => {
+  it('keeps commitment available when its capacity is missing from part of the bucket', () => {
+    const GIB = 1024 ** 3
+    const result = aggregate1MinTo2Min(
+      [
+        {
+          period_start: '2024-01-02T03:00:00Z',
+          ram_commit_used: 4 * GIB,
+          ram_commit_limit: 5 * GIB,
+        },
+        { period_start: '2024-01-02T03:01:00Z', ram_commit_used: 4 * GIB },
+      ],
+      'ram_commit_used'
+    )
+
+    expect(result[0].ram_commit_used).toBe(4 * GIB)
+    expect(result[0].ram_commit_limit).toBeUndefined()
+  })
+
   it('aggregates 1-minute data points into 2-minute buckets with correct averages', () => {
     const dataPoints = [
       {
@@ -498,5 +524,45 @@ describe('aggregate1MinTo2Min', () => {
 
     expect(result[0].periodStartFormatted).toBeDefined()
     expect(typeof result[0].periodStartFormatted).toBe('string')
+  })
+})
+
+describe('useInfraMonitoringQueries partial failures', () => {
+  it('reports errors only for failed attributes in a successful batch response', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/infra-monitoring',
+      response: () =>
+        HttpResponse.json<InfraMonitoringMultiResponse>({
+          ...mockMultiResponse,
+          series: { ram_usage: mockMultiResponse.series.ram_usage },
+          errors: { max_cpu_usage: { message: 'CPU unavailable' } },
+        }),
+    })
+    const { result } = customRenderHook(() =>
+      useInfraMonitoringQueries(
+        ['max_cpu_usage', 'ram_usage'],
+        'default',
+        '2024-01-02T00:00:00Z',
+        '2024-01-03T00:00:00Z',
+        '1h',
+        undefined,
+        undefined,
+        true
+      )
+    )
+
+    await waitFor(() => expect(result.current[1].status).toBe('success'))
+    expect(result.current[0]).toMatchObject({
+      data: undefined,
+      error: { message: 'CPU unavailable' },
+      isError: true,
+      status: 'error',
+    })
+    expect(result.current[1]).toMatchObject({
+      error: null,
+      isError: false,
+      data: { total: 3 },
+    })
   })
 })

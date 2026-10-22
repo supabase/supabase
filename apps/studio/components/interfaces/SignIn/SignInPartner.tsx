@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
@@ -48,7 +48,7 @@ export const SignInPartner = () => {
 
   return (
     <div className="relative mx-auto w-full flex flex-col items-center justify-center gap-y-6">
-      <Loader2 className="animate-spin" />
+      <Loader2Icon className="animate-spin" />
       <h2 className="text-lg text-center">Signing in to Supabase Dashboard</h2>
       <p className="text-xs text-foreground-lighter text-center max-w-[220px] sm:max-w-full">
         By continuing, you agree to Supabase’s{' '}

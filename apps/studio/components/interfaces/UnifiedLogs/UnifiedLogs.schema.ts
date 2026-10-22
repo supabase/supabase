@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { LOG_TYPES, METHODS, REGIONS } from './UnifiedLogs.constants'
+import { METHODS, REGIONS } from './UnifiedLogs.constants'
 import {
   ARRAY_DELIMITER,
   LEVELS,
@@ -9,15 +9,15 @@ import {
 
 export const columnSchema = z.object({
   id: z.string(),
-  log_type: z.enum(LOG_TYPES),
-  method: z.enum(METHODS).nullable(),
+  log_type: z.string(),
+  method: z.string().nullable(),
   pathname: z.string().nullable(),
   level: z.enum(LEVELS).nullable(),
-  status: z.number().nullable(),
+  status: z.union([z.string(), z.number()]).nullable(),
   date: z.date(),
-  timestamp: z.number(),
+  timestamp: z.union([z.string(), z.number()]),
   event_message: z.string().optional(),
-  log_count: z.number().optional(), // used to count function logs for a given execution_id
+  log_count: z.number().nullish(),
   logs: z.array(z.any()).optional(), // array of function logs
   auth_user: z.string().nullable().optional(),
   metadata: z.record(z.string(), z.unknown()).nullable().optional(),

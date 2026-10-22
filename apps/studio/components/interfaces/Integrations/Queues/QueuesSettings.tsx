@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { QUEUES_SCHEMA } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -27,15 +26,14 @@ import { useDatabaseQueueToggleExposeMutation } from '@/data/database-queues/dat
 import { useDatabaseQueuesVersionQuery } from '@/data/database-queues/database-queues-version-query'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_postgrest'
+  const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE
   )
   const [isToggling, setIsToggling] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
@@ -217,24 +215,18 @@ export const QueuesSettings = () => {
                           <>
                             <p className="max-w-2xl">
                               When enabled, you will be able to use the following functions from the{' '}
-                              <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema to
-                              manage your queues via any Supabase client library or PostgREST
-                              endpoints:
+                              <code>{QUEUES_SCHEMA}</code> schema to manage your queues via any
+                              Supabase client library or PostgREST endpoints:
                             </p>
                             <p className="mt-2">
-                              <code className="text-code-inline">send</code>,{' '}
-                              <code className="text-code-inline">send_batch</code>,{' '}
-                              <code className="text-code-inline">read</code>,{' '}
-                              <code className="text-code-inline">pop</code>,
-                              <code className="text-code-inline">archive</code>, and{' '}
-                              <code className="text-code-inline">delete</code>
+                              <code>send</code>, <code>send_batch</code>, <code>read</code>,{' '}
+                              <code>pop</code>, <code>archive</code>, and <code>delete</code>
                             </p>
                             {!IS_PLATFORM ? (
                               <div className="mt-6 max-w-2xl">
                                 When running Supabase locally with the CLI or self-hosting using
                                 Docker Compose, you also need to update your configuration to expose
-                                the <code className="text-code-inline">{QUEUES_SCHEMA}</code>{' '}
-                                schema.
+                                the <code>{QUEUES_SCHEMA}</code> schema.
                                 <br />
                                 <InlineLink
                                   href={`${DOCS_URL}/guides/queues/expose-self-hosted-queues`}
@@ -273,9 +265,7 @@ export const QueuesSettings = () => {
                             {tablesWithoutRLS.map((x) => {
                               return (
                                 <li key={x.name}>
-                                  <code className="text-code-inline">
-                                    {queueDisplayName(x.name)}
-                                  </code>
+                                  <code>{queueDisplayName(x.name)}</code>
                                 </li>
                               )
                             })}
@@ -293,28 +283,25 @@ export const QueuesSettings = () => {
                         <Admonition type="warning" className="mt-2">
                           <p>
                             Queues will be exposed and managed through the{' '}
-                            <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema
+                            <code>{QUEUES_SCHEMA}</code> schema
                           </p>
                           <p className="text-foreground-light">
-                            Database functions will be created in the{' '}
-                            <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema upon
-                            enabling. Call these functions via any Supabase client library or
-                            PostgREST endpoint to manage your queues. Permissions on individual
-                            queues can also be further managed through privileges and row level
-                            security (RLS).
+                            Database functions will be created in the <code>{QUEUES_SCHEMA}</code>{' '}
+                            schema upon enabling. Call these functions via any Supabase client
+                            library or PostgREST endpoint to manage your queues. Permissions on
+                            individual queues can also be further managed through privileges and row
+                            level security (RLS).
                           </p>
                         </Admonition>
                       )}
                       {formState.dirtyFields.enable && field.value === false && (
                         <Admonition type="warning" className="mt-2">
                           <p>
-                            The <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema
-                            will be removed once disabled
+                            The <code>{QUEUES_SCHEMA}</code> schema will be removed once disabled
                           </p>
                           <p className="text-foreground-light">
-                            Ensure that the database functions from the{' '}
-                            <code className="text-code-inline">{QUEUES_SCHEMA}</code> schema are not
-                            in use within your client applications before disabling.
+                            Ensure that the database functions from the <code>{QUEUES_SCHEMA}</code>{' '}
+                            schema are not in use within your client applications before disabling.
                           </p>
                         </Admonition>
                       )}
@@ -365,7 +352,7 @@ export const QueuesSettings = () => {
           {tablesWithoutRLS.map((x) => {
             return (
               <li key={x.id}>
-                <code className="text-code-inline">{queueDisplayName(x.name)}</code>
+                <code>{queueDisplayName(x.name)}</code>
               </li>
             )
           })}

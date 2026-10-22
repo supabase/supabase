@@ -108,12 +108,12 @@ export function BuiltWithSupabaseSection() {
           Kickstart your next project <br />
           <span className="text-foreground">with production ready templates</span>
         </h3>
-        <Link
+        <a
           href="/docs/guides/examples"
           className="text-sm text-foreground-light hover:text-foreground underline"
         >
           View all examples
-        </Link>
+        </a>
       </div>
 
       <div>

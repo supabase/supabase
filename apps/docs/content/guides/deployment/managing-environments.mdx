@@ -22,7 +22,7 @@ height={933}
 
 ## Set up a local environment
 
-The first step is to set up your local repository with the Supabase CLI:
+The first step is to set up your local repository with the Supabase CLI. Each developer, and each feature branch or git worktree, can have its own local database. To run several local projects at the same time on one machine, see [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
 
 ```bash
 supabase init
@@ -161,9 +161,11 @@ You need a _new_ project for staging. A project which has already been modified 
 
 The Supabase CLI requires a few environment variables to run in non-interactive mode.
 
-- `SUPABASE_ACCESS_TOKEN` is your personal access token
+- `SUPABASE_ACCESS_TOKEN` is a [scoped personal access token](/docs/guides/platform/personal-access-tokens) limited to the projects this workflow deploys to
 - `SUPABASE_DB_PASSWORD` is your project specific database password
 - `SUPABASE_PROJECT_ID` is your project specific reference string
+
+The workflows below run `supabase link`, so grant the token **Project Settings**, **API Keys**, and **API Key Secrets**, all with **Read** access.
 
 We recommend adding these as [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) to your GitHub Actions runners.
 
@@ -353,7 +355,7 @@ Error: Error running pg_dump on remote database: pg_dump: error: query failed: E
 pg_dump: error: query was: LOCK TABLE "graphql"."_type" IN ACCESS SHARE MODE
 ```
 
-To resolve this error, you need to grant `postgres` role permissions to `graphql` schema. You can do that by running the following query from Supabase dashboard's SQL Editor.
+To resolve this error, you need to grant `postgres` role permissions to `graphql` schema. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 grant all on all tables in schema graphql to postgres, anon, authenticated, service_role;

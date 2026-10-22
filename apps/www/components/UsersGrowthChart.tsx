@@ -1,5 +1,5 @@
 import { companyStats } from '~/data/company-stats'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { FC, useEffect, useMemo, useState } from 'react'
 import { useMedia } from 'react-use'
 import { AnimatedCounter, Badge, cn } from 'ui'
