@@ -18,12 +18,16 @@ type CustomMFAListFactorsError = NonNullable<AuthMFAListFactorsResponse['error']
 
 export const useMfaListFactorsQuery = <TData = CustomMFAListFactorsData>({
   enabled = true,
+  userId,
   ...options
-}: UseCustomQueryOptions<CustomMFAListFactorsData, CustomMFAListFactorsError, TData> = {}) => {
+}: UseCustomQueryOptions<CustomMFAListFactorsData, CustomMFAListFactorsError, TData> & {
+  userId?: string
+} = {}) => {
   return useQuery<CustomMFAListFactorsData, CustomMFAListFactorsError, TData>({
-    queryKey: profileKeys.mfaFactors(),
+    queryKey: profileKeys.mfaFactors(userId),
     queryFn: () => getMfaListFactors(),
     staleTime: 1000 * 60 * 30,
+    enabled,
     ...options,
   })
 }

@@ -59,7 +59,7 @@ export const getLintCategory = (lint: Lint): LintCategory | undefined =>
 
 /**
  * Telemetry reports the API's own category names. Notifications have no API category;
- * signals are security-only today.
+ * signals and account advice are security-only today.
  */
 export const getAdvisorItemTelemetryCategory = (item: AdvisorItem): LintCategory | undefined => {
   if (item.source === 'lint') return getLintCategory(item.original)
@@ -161,7 +161,7 @@ export const getAdvisorItemSecondaryText = (
   }
 
   if (item.source === 'signal') {
-    return `Database · ${item.sourceData.ip}`
+    return item.scope === 'account' ? 'Account' : `Database · ${item.sourceData.ip}`
   }
 
   if (item.source === 'notification') {

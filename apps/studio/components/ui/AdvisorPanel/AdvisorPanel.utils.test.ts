@@ -40,6 +40,7 @@ const createBannedIPSignalItem = (ip: string): AdvisorSignalItem => ({
   id: `signal:banned-ip:${ip}:v1`,
   dismissalKey: `signal:banned-ip:${ip}:v1`,
   source: 'signal',
+  scope: 'project',
   type: 'banned-ip',
   severity: 'warning',
   category: 'security',
@@ -71,6 +72,23 @@ describe('AdvisorPanel.utils', () => {
   it('uses database surface-area metadata and the IP address for banned IP signals', () => {
     const bannedIpSignal = createBannedIPSignalItem('203.0.113.10')
     expect(getAdvisorItemSecondaryText(bannedIpSignal)).toBe('Database · 203.0.113.10')
+  })
+
+  it('labels account signals without reading banned IP fields', () => {
+    const accountSignal: AdvisorSignalItem = {
+      id: 'account:recovery-codes-missing',
+      source: 'signal',
+      scope: 'account',
+      type: 'recovery-codes-missing',
+      severity: 'critical',
+      category: 'security',
+      title: 'Generate account recovery codes',
+      summary: 'No recovery codes',
+      actions: [{ label: 'Generate recovery codes', href: '/account/security#recovery-codes' }],
+    }
+
+    expect(getAdvisorItemSecondaryText(accountSignal)).toBe('Account')
+    expect(getAdvisorItemTelemetryCategory(accountSignal)).toBe('SECURITY')
   })
 
   describe('lint categories', () => {
