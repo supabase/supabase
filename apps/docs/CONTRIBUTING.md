@@ -97,6 +97,14 @@ The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/
 
 Add an entry with the `name`, `url`, and optional `icon` for your page.
 
+### Remove a linked section
+
+CI fails a PR that removes a heading other docs pages link to. To remove it anyway:
+
+1. Confirm the removal is deliberate and the content has no new home.
+2. Add the `skip-anchor-check` label to the PR.
+3. Wait for the check to rerun. It passes and lists the broken links as warnings.
+
 ## Reference structure
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
