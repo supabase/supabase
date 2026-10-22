@@ -18,7 +18,6 @@ import '@/styles/storage.css'
 import '@/styles/stripe.css'
 import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
-import '@/lib/history-traverse'
 
 import * as Sentry from '@sentry/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'
@@ -85,6 +84,7 @@ import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { settleHistoryTraverseNavigation } from '@/lib/history-traverse'
 import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
@@ -347,6 +347,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootComponent() {
   useThemeSandbox()
+
+  useEffect(() => {
+    settleHistoryTraverseNavigation()
+  }, [])
 
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>

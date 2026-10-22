@@ -4,6 +4,7 @@ import {
   installHistoryTraverseListener,
   isHistoryTraverseNavigation,
   resetHistoryTraverseState,
+  settleHistoryTraverseNavigation,
 } from './history-traverse'
 
 const mockNavigationType = (type?: PerformanceNavigationTiming['type']) => {
@@ -42,6 +43,26 @@ describe('isHistoryTraverseNavigation', () => {
     history.replaceState(null, '', '/project/default/editor?schema=public')
 
     expect(isHistoryTraverseNavigation()).toBe(true)
+  })
+
+  test('clears a popstate once the navigation settles, including after replaceState', () => {
+    mockNavigationType()
+
+    window.dispatchEvent(new PopStateEvent('popstate'))
+    history.replaceState(null, '', '/project/default/editor?schema=public')
+    expect(isHistoryTraverseNavigation()).toBe(true)
+
+    settleHistoryTraverseNavigation()
+    expect(isHistoryTraverseNavigation()).toBe(false)
+  })
+
+  test('clears a back-forward document load once the navigation settles', () => {
+    mockNavigationType('back_forward')
+
+    expect(isHistoryTraverseNavigation()).toBe(true)
+
+    settleHistoryTraverseNavigation()
+    expect(isHistoryTraverseNavigation()).toBe(false)
   })
 
   test('treats a document back-forward load as a traverse until the next push', () => {

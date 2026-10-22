@@ -6,7 +6,6 @@ import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
-import { shouldOpenLastTableOnEditorIndex } from '@/components/layouts/TableEditorLayout/TableEditorIndex.utils'
 import { TableEditorLayout } from '@/components/layouts/TableEditorLayout/TableEditorLayout'
 import { TableEditorMenu } from '@/components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from '@/components/layouts/Tabs/NewTab'
@@ -23,6 +22,10 @@ const TableEditorPage: NextPageWithLayout = () => {
   const { selectedSchema } = useQuerySchemaState()
   const { history, isHistoryLoaded } = useDashboardHistory()
   const hasDecidedRedirectRef = useRef(false)
+  const isHistoryTraverseRef = useRef<boolean | null>(null)
+  if (isHistoryTraverseRef.current === null) {
+    isHistoryTraverseRef.current = isHistoryTraverseNavigation()
+  }
 
   const onTableCreated = (table: { id: number }) => {
     router.push(
@@ -39,7 +42,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       return
     }
 
-    // Decide once per visit. A later schema change on the list must not reopen a table.
+    // decide once per visit. a later schema change on the list must not reopen a table.
     hasDecidedRedirectRef.current = true
 
     const lastOpenedTableId = Number(history.editor)
@@ -66,11 +69,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       return
     }
 
-    const shouldRedirect = shouldOpenLastTableOnEditorIndex({
-      isHistoryTraverse: isHistoryTraverseNavigation(),
-    })
-
-    if (!shouldRedirect) {
+    if (isHistoryTraverseRef.current) {
       return
     }
 

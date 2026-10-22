@@ -32,13 +32,12 @@ import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
+import Router from 'next/router'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
-
-import '@/lib/history-traverse'
 
 import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
@@ -64,6 +63,10 @@ import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import {
+  scheduleHistoryTraverseSettlement,
+  settleHistoryTraverseNavigation,
+} from '@/lib/history-traverse'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { ToastErrorTracker } from '@/lib/toast-errors'
@@ -178,6 +181,17 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useEffect(() => {
     clearBootTimeoutFallback()
+  }, [])
+
+  useEffect(() => {
+    const onSettled = () => scheduleHistoryTraverseSettlement()
+    Router.events.on('routeChangeComplete', onSettled)
+    Router.events.on('hashChangeComplete', onSettled)
+    settleHistoryTraverseNavigation()
+    return () => {
+      Router.events.off('routeChangeComplete', onSettled)
+      Router.events.off('hashChangeComplete', onSettled)
+    }
   }, [])
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'

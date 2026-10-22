@@ -51,6 +51,20 @@ export function installHistoryTraverseListener(): void {
   }
 }
 
+export function settleHistoryTraverseNavigation(): void {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  const state = getTraverseState()
+  state.isTraverseNavigation = false
+  state.hasClientPush = true
+}
+
+export function scheduleHistoryTraverseSettlement(): void {
+  setTimeout(settleHistoryTraverseNavigation, 0)
+}
+
 export function isHistoryTraverseNavigation(): boolean {
   if (typeof window === 'undefined') {
     return false
