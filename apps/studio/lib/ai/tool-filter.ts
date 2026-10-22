@@ -2,7 +2,12 @@ import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
 
 import { isOptInLevelAtLeast } from './opt-in-level'
-import { getToolContract, type ContractToolName } from './tools/registry'
+import {
+  getRemoteToolContract,
+  getToolContract,
+  type ContractToolName,
+  type RemoteContractToolName,
+} from './tools/registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
@@ -79,15 +84,18 @@ type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
 
 /**
  * Mapping of tool names to their categories. Tools that have migrated to a contract
- * (`TOOL_CONTRACTS`) declare their own `minOptInLevel` instead and aren't listed here.
+ * (`TOOL_CONTRACTS` or `REMOTE_TOOL_CONTRACTS`) declare their own `minOptInLevel` instead and
+ * aren't listed here.
  */
-export const TOOL_CATEGORY_MAP: Record<Exclude<ToolName, ContractToolName>, ToolCategory> = {
+export const TOOL_CATEGORY_MAP: Record<
+  Exclude<ToolName, ContractToolName | RemoteContractToolName>,
+  ToolCategory
+> = {
   // UI tools - always available
   search_docs: TOOL_CATEGORIES.UI,
 
   // Schema tools - MCP
   list_tables: TOOL_CATEGORIES.SCHEMA,
-  list_extensions: TOOL_CATEGORIES.SCHEMA,
   list_edge_functions: TOOL_CATEGORIES.SCHEMA,
   list_branches: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
@@ -127,7 +135,7 @@ function isCategorizedTool(name: string): name is keyof typeof TOOL_CATEGORY_MAP
  * tool isn't on the allowlist. A contract's `minOptInLevel` wins over the category map.
  */
 function getToolMinimumLevel(toolName: string): AiOptInLevel | null | undefined {
-  const contract = getToolContract(toolName)
+  const contract = getToolContract(toolName) ?? getRemoteToolContract(toolName)
   if (contract) return contract.minOptInLevel
   if (isCategorizedTool(toolName)) return getMinimumOptInLevel(TOOL_CATEGORY_MAP[toolName])
   return undefined

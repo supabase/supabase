@@ -42,6 +42,12 @@ export type ToolContract<TInput = unknown, TOutput = unknown> = {
   outputOnInvalid?: JSONValue
 }
 
+/**
+ * A tool the remote MCP server implements. The server owns the description, input schema,
+ * execution and output; Studio decides only who may run it and whether it needs approval.
+ */
+export type RemoteToolContract = Pick<ToolContract, 'name' | 'minOptInLevel' | 'needsApproval'>
+
 export type ToolContractInput<C extends ToolContract> = z.infer<C['inputSchema']>
 export type ToolContractOutput<C extends ToolContract> = z.infer<C['outputSchema']>
 
