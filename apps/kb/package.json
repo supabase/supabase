@@ -33,6 +33,7 @@
     "common": "workspace:*",
     "docs-search": "workspace:*",
     "gray-matter": "^4.0.3",
+    "hast-util-from-html": "^2.0.3",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -47,6 +48,7 @@
     "yaml": "^2.9.0"
   },
   "devDependencies": {
+    "@astrojs/markdown-satteri": "0.3.8",
     "@tailwindcss/vite": "4.2.4",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
