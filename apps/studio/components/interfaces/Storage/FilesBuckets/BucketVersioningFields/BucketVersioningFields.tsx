@@ -26,6 +26,8 @@ interface BucketVersioningFieldsProps {
   isUnsupportedPolicy?: boolean
   /** The bucket's stored lifecycle policy could not be fetched. */
   policyError?: { message: string } | null
+  /** Set when editing an existing bucket, to link to its individual lifecycle rules. */
+  bucketName?: string
 }
 
 export const BucketVersioningFields = ({
@@ -37,6 +39,7 @@ export const BucketVersioningFields = ({
   isLoadingPolicy = false,
   isUnsupportedPolicy = false,
   policyError,
+  bucketName,
 }: BucketVersioningFieldsProps) => {
   const { control } = form
 
@@ -151,6 +154,7 @@ export const BucketVersioningFields = ({
                 isLoading={isLoadingPolicy}
                 isUnsupported={isUnsupportedPolicy}
                 error={policyError}
+                bucketName={bucketName}
               />
             </FormSectionCollapse>
           )}

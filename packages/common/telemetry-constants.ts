@@ -2225,6 +2225,58 @@ export interface StorageBucketVersioningEnabledEvent {
 }
 
 /**
+ * Triggered when a lifecycle rule is added to a bucket from its card on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleCreatedEvent {
+  action: 'storage_bucket_lifecycle_rule_created'
+  properties: {
+    /** The new rule's status, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is edited, enabled, or disabled on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleUpdatedEvent {
+  action: 'storage_bucket_lifecycle_rule_updated'
+  properties: {
+    /** The rule's status after the save, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is deleted on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleRemovedEvent {
+  action: 'storage_bucket_lifecycle_rule_removed'
+  properties: {
+    /** How many rules remain; 0 means the configuration was removed. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * Triggered when a new branch is created.
  *
  * @group Events
@@ -4324,6 +4376,9 @@ export type TelemetryEvent =
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
   | StorageBucketVersioningEnabledEvent
+  | StorageBucketLifecycleRuleCreatedEvent
+  | StorageBucketLifecycleRuleUpdatedEvent
+  | StorageBucketLifecycleRuleRemovedEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent

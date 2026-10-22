@@ -532,6 +532,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                   isLoadingPolicy={isLoadingLifecycle}
                   isUnsupportedPolicy={isUnsupportedPolicy}
                   policyError={lifecycleError}
+                  bucketName={bucket?.name}
                 />
               )}
             </form>
