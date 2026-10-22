@@ -123,6 +123,22 @@ curl -X POST "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invita
   }'
 ```
 
+An email address can have only one invite at a time, even after that invite expires. Creating another invite for the same email returns a `409` error. To send a new invite, call [Delete organization invitations](/docs/reference/api/v2-delete-organization-invitations) with the same permission, then create the invite again:
+
+```bash
+curl -X DELETE "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invitations" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": [
+      {
+        "type": "organization_invitation",
+        "attributes": { "email": "person@example.com" }
+      }
+    ]
+  }'
+```
+
 </TabPanel>
 </Tabs>
 
