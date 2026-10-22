@@ -5,6 +5,19 @@ import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForGridDataToLoad, waitForTableToLoad } from '../utils/wait-for-response.js'
 
+// A document Back must reload so navigation type is back_forward. Scoped to this
+// file because the flag makes other table-editor navigations hang.
+test.use({
+  launchOptions: {
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-back-forward-cache',
+    ],
+  },
+})
+
 test('schema switch replaces history and back leaves the editor', async ({ page, ref }) => {
   const tableName = 'pw_schema_back'
 
