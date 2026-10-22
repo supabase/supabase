@@ -71,6 +71,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Tracing',
+          href: '/docs/ui-patterns/tracing',
+          items: [],
+        },
+        {
           title: 'Connect Interstitials',
           href: '/docs/ui-patterns/connect-interstitials',
           items: [],

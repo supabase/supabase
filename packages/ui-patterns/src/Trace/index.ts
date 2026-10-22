@@ -1,6 +1,7 @@
 import { Root } from './Trace'
+import { Ruler, Waterfall } from './Waterfall'
 
-export const Trace = { Root }
+export const Trace = { Root, Waterfall, Ruler }
 
 export type {
   RootProps,
@@ -8,7 +9,9 @@ export type {
   SpanEvent,
   SpanStatus,
   TimeScale,
+  TimeTick,
   TimeWindow,
   TraceData,
   TraceIndex,
+  WaterfallProps,
 } from './types'
