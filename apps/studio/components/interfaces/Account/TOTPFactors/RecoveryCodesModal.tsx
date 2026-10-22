@@ -26,12 +26,17 @@ interface RecoveryCodesModalProps<T>
   extends
     Omit<ComponentProps<typeof Dialog>, 'onOpenChange'>,
     Required<Pick<ComponentProps<typeof Dialog>, 'onOpenChange'>> {
-  mutation: UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>
+  showSecurityLink?: boolean
+  mutation: Pick<
+    UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>,
+    'data' | 'status' | 'error' | 'isError' | 'isPending' | 'isSuccess' | 'reset'
+  >
 }
 
 export const RecoveryCodesModal = <T = unknown,>({
   onOpenChange,
   mutation,
+  showSecurityLink = false,
   ...props
 }: RecoveryCodesModalProps<T>) => {
   const queryClient = useQueryClient()
@@ -176,6 +181,21 @@ export const RecoveryCodesModal = <T = unknown,>({
                   </label>
                 </div>
               </Admonition>
+              {showSecurityLink && (
+                <p className="text-xs text-foreground-lighter">
+                  Manage recovery codes in{' '}
+                  <a
+                    href="/account/security"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline underline-offset-2 hover:text-foreground"
+                  >
+                    Account Security
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                  .
+                </p>
+              )}
             </div>
           )}
         </DialogSection>
