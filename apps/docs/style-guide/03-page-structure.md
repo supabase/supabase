@@ -161,7 +161,7 @@ to secure a table that several users share.
 
 1. Run `alter table profiles enable row level security`. The change takes effect
    immediately.
-2. Write a policy that grants the access your app needs.
+1. Write a policy that grants the access your app needs.
 
 <Admonition type="caution">
 

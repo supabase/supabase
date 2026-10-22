@@ -143,8 +143,13 @@ its level preserves the anchor; only renaming breaks it.
 #### Choose the list type by whether order matters
 
 Use an ordered list for steps taken in sequence, and an unordered list when order
-doesn't matter. Use Arabic numerals (`1`, `2`, `3`) for ordered lists and dashes (`-`)
-for unordered lists.
+doesn't matter. Start each unordered-list item with a dash (`-`).
+
+#### Write `1.` for every item in an ordered list
+
+Number every item `1.`, including the items in a nested ordered list. Markdown renders
+the correct sequence, which keeps the list maintainable. When you insert or remove an
+item, the other items keep their `1.` and need no update.
 
 #### Point forward to a list with _the following_
 
@@ -166,10 +171,10 @@ consistency across sibling sections, or an item that needs the visual separation
 
 ```md
 1. List item
-2. List item
+1. List item
    1. List item
-   2. List item
-3. List item
+   1. List item
+1. List item
    - List item
    - List item
      <!-- DON'T ADD ANOTHER LEVEL OF NESTING -->
@@ -210,7 +215,7 @@ An apparent one-step procedure can become two steps when there's a real orientat
 action:
 
 1. Open a terminal in your project directory.
-2. Run `supabase start`.
+1. Run `supabase start`.
 
 The first step establishes the operating context for both readers and agents. Don't add
 a redundant orientation step to a genuinely atomic instruction. Write `Click **Save**.`
