@@ -1,5 +1,8 @@
-import { URL_SIGNING_KEY_ALGORITHMS, URL_SIGNING_KEY_KIND } from './UrlSigningKeys.constants'
-import type { UrlSigningKeyAlgorithm } from '@/data/storage/url-signing-key-create-mutation'
+import {
+  URL_SIGNING_KEY_ALGORITHMS,
+  URL_SIGNING_KEY_KIND,
+  URL_SIGNING_KEY_TYPE_ALGORITHMS,
+} from './UrlSigningKeys.constants'
 import type { UrlSigningKey } from '@/data/storage/url-signing-keys-query'
 
 /**
@@ -27,8 +30,10 @@ export const groupUrlSigningKeys = (keys: UrlSigningKey[]) => {
   }
 }
 
-const isUrlSigningKeyAlgorithm = (type: string): type is UrlSigningKeyAlgorithm =>
-  Object.hasOwn(URL_SIGNING_KEY_ALGORITHMS, type)
-
-export const getUrlSigningKeyAlgorithmLabel = (type: string) =>
-  isUrlSigningKeyAlgorithm(type) ? URL_SIGNING_KEY_ALGORITHMS[type].label : type
+/** `type` is the JWK type reported by the API (`EC`, `oct`), not the algorithm name. */
+export const getUrlSigningKeyAlgorithmLabel = (type: string) => {
+  const algorithm = Object.hasOwn(URL_SIGNING_KEY_TYPE_ALGORITHMS, type)
+    ? URL_SIGNING_KEY_TYPE_ALGORITHMS[type]
+    : undefined
+  return algorithm ? URL_SIGNING_KEY_ALGORITHMS[algorithm].label : type
+}

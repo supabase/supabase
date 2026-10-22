@@ -1,18 +1,24 @@
-import { Key } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 import { getUrlSigningKeyAlgorithmLabel } from './UrlSigningKeys.utils'
+import { CopyableKey } from '@/components/interfaces/JwtSecrets/jwt-secret-keys-table/copyable-key'
 import type { UrlSigningKey } from '@/data/storage/url-signing-keys-query'
 
 interface UrlSigningKeysTableProps {
   keys: UrlSigningKey[]
+  /** Label shown above each key ID, e.g. "Active" */
+  statusLabel: string
+  /** Dims the row, used for every status except the key that signs new URLs */
+  dimmed?: boolean
   emptyState?: { title: string; description: string }
   renderActions?: (key: UrlSigningKey) => ReactNode
 }
 
 export const UrlSigningKeysTable = ({
   keys,
+  statusLabel,
+  dimmed = false,
   emptyState,
   renderActions,
 }: UrlSigningKeysTableProps) => {
@@ -23,16 +29,11 @@ export const UrlSigningKeysTable = ({
       <Table>
         <TableHeader>
           <TableRow>
-            {!isEmpty && (
-              <TableHead className="w-1">
-                <span className="sr-only">Icon</span>
-              </TableHead>
-            )}
-            <TableHead className={cn(isEmpty && 'text-foreground-muted')}>Key ID</TableHead>
-            <TableHead className={cn(isEmpty && 'text-foreground-muted')}>Algorithm</TableHead>
-            <TableHead className="w-1">
-              <span className="sr-only">Actions</span>
+            <TableHead className={cn('w-[315px]', isEmpty && 'text-foreground-muted')}>
+              Key
             </TableHead>
+            <TableHead className={cn(isEmpty && 'text-foreground-muted')}>Algorithm</TableHead>
+            <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -45,12 +46,15 @@ export const UrlSigningKeysTable = ({
             </TableRow>
           )}
           {keys.map((key) => (
-            <TableRow key={key.kid}>
-              <TableCell className="w-1">
-                <Key size={16} className="text-foreground-muted" />
+            <TableRow
+              key={key.kid}
+              className={cn(dimmed ? 'border-b border-dashed border-border' : 'border-b')}
+            >
+              <TableCell className="whitespace-nowrap">
+                <p className={cn(dimmed && 'text-foreground-lighter')}>{statusLabel}</p>
+                <CopyableKey keyId={key.kid} />
               </TableCell>
-              <TableCell className="font-mono text-xs">{key.kid}</TableCell>
-              <TableCell className="text-foreground-lighter">
+              <TableCell className="text-foreground-light">
                 {getUrlSigningKeyAlgorithmLabel(key.type)}
               </TableCell>
               <TableCell>

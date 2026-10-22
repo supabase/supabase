@@ -27,4 +27,13 @@ export const URL_SIGNING_KEY_ALGORITHMS: Record<
   },
 }
 
+/**
+ * The key list reports each key's JWK type (`kty`) rather than the algorithm it was created with,
+ * so map it back: elliptic curve keys are ES256 and symmetric (octet) keys are HS512.
+ */
+export const URL_SIGNING_KEY_TYPE_ALGORITHMS: Record<string, UrlSigningKeyAlgorithm> = {
+  EC: 'ES256',
+  oct: 'HS512',
+}
+
 export const DEFAULT_URL_SIGNING_KEY_ALGORITHM: UrlSigningKeyAlgorithm = 'ES256'

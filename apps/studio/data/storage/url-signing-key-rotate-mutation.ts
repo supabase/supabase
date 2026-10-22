@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type UrlSigningKeyRotateVariables = {
   projectRef?: string
@@ -31,7 +31,7 @@ export const useUrlSigningKeyRotateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UrlSigningKeyRotateData, ResponseError, UrlSigningKeyRotateVariables>,
+  UseCustomMutationOptions<UrlSigningKeyRotateData, ResponseError, UrlSigningKeyRotateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

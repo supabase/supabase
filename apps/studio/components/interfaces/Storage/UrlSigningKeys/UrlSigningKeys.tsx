@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { EllipsisVertical, RotateCw, Timer, Trash2 } from 'lucide-react'
+import {
+  CircleArrowUpIcon,
+  MoreVerticalIcon,
+  RotateCwIcon,
+  ShieldOffIcon,
+  TimerIcon,
+} from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -31,6 +31,7 @@ import { groupUrlSigningKeys } from './UrlSigningKeys.utils'
 import { UrlSigningKeysTable } from './UrlSigningKeysTable'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useUrlSigningKeyUpdateMutation } from '@/data/storage/url-signing-key-update-mutation'
 import { UrlSigningKey, urlSigningKeysQueryOptions } from '@/data/storage/url-signing-keys-query'
@@ -119,7 +120,7 @@ export const UrlSigningKeys = () => {
                 </PageSectionSummary>
               </PageSectionMeta>
               <PageSectionContent>
-                <UrlSigningKeysTable keys={activeKey ? [activeKey] : []} />
+                <UrlSigningKeysTable keys={activeKey ? [activeKey] : []} statusLabel="Active" />
               </PageSectionContent>
             </PageSection>
 
@@ -135,7 +136,7 @@ export const UrlSigningKeys = () => {
                 <PageSectionAside>
                   <ButtonTooltip
                     variant="primary"
-                    icon={<Timer />}
+                    icon={<TimerIcon />}
                     disabled={!canCreateStandbyKey}
                     onClick={() => setDialog({ type: 'create' })}
                     tooltip={{
@@ -152,6 +153,8 @@ export const UrlSigningKeys = () => {
               <PageSectionContent>
                 <UrlSigningKeysTable
                   keys={standbyKeys}
+                  statusLabel="Standby"
+                  dimmed
                   emptyState={{
                     title: 'No standby key',
                     description: 'Create a standby key to rotate the active key.',
@@ -181,23 +184,17 @@ export const UrlSigningKeys = () => {
                 <PageSectionContent>
                   <UrlSigningKeysTable
                     keys={revokedKeys}
+                    statusLabel="Revoked"
+                    dimmed
                     renderActions={(key) => (
-                      <ButtonTooltip
-                        variant="default"
-                        size="tiny"
-                        className="hit-area-2"
-                        loading={isMovingToStandby && movingKey?.kid === key.kid}
-                        disabled={!canUpdateKeys || hasStandbyKey || isMovingToStandby}
-                        onClick={() => updateKey({ projectRef, kid: key.kid, active: true })}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: getMoveToStandbyDisabledReason({ canUpdateKeys, hasStandbyKey }),
-                          },
-                        }}
-                      >
-                        Move to standby key
-                      </ButtonTooltip>
+                      <RevokedKeyActions
+                        canUpdateKeys={canUpdateKeys}
+                        hasStandbyKey={hasStandbyKey}
+                        isLoading={isMovingToStandby && movingKey?.kid === key.kid}
+                        onMoveToStandby={() =>
+                          updateKey({ projectRef, kid: key.kid, active: true })
+                        }
+                      />
                     )}
                   />
                 </PageSectionContent>
@@ -227,6 +224,20 @@ export const UrlSigningKeys = () => {
   )
 }
 
+const MoreOptionsTrigger = ({ disabled, loading }: { disabled?: boolean; loading?: boolean }) => (
+  <DropdownMenuTrigger asChild>
+    <ButtonTooltip
+      variant="default"
+      aria-label="More options"
+      className="px-1.5"
+      disabled={disabled}
+      loading={loading}
+      icon={<MoreVerticalIcon className="size-4" />}
+      tooltip={{ content: { side: 'bottom', text: 'More options' } }}
+    />
+  </DropdownMenuTrigger>
+)
+
 const StandbyKeyActions = ({
   canUpdateKeys,
   onRotate,
@@ -239,9 +250,7 @@ const StandbyKeyActions = ({
   <>
     <ButtonTooltip
       variant="default"
-      size="tiny"
-      icon={<RotateCw />}
-      className="hit-area-2"
+      icon={<RotateCwIcon />}
       disabled={!canUpdateKeys}
       onClick={onRotate}
       tooltip={{
@@ -251,26 +260,50 @@ const StandbyKeyActions = ({
         },
       }}
     >
-      Make active
+      Rotate key
     </ButtonTooltip>
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="default"
-          icon={<EllipsisVertical />}
-          aria-label="More actions"
-          className="w-7 hit-area-2"
-          disabled={!canUpdateKeys}
-        />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-40">
-        <DropdownMenuItem className="gap-x-2" onClick={onRevoke}>
-          <Trash2 size={14} />
-          <span>Revoke key</span>
+      <MoreOptionsTrigger disabled={!canUpdateKeys} />
+      <DropdownMenuContent side="bottom" align="end" className="w-52">
+        <DropdownMenuItem className="gap-x-2" onSelect={onRevoke}>
+          <ShieldOffIcon size={14} />
+          Revoke key
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </>
+)
+
+const RevokedKeyActions = ({
+  canUpdateKeys,
+  hasStandbyKey,
+  isLoading,
+  onMoveToStandby,
+}: {
+  canUpdateKeys: boolean
+  hasStandbyKey: boolean
+  isLoading: boolean
+  onMoveToStandby: () => void
+}) => (
+  <DropdownMenu>
+    <MoreOptionsTrigger disabled={!canUpdateKeys} loading={isLoading} />
+    <DropdownMenuContent side="bottom" align="end" className="w-52">
+      <DropdownMenuItemTooltip
+        className="gap-x-2"
+        disabled={hasStandbyKey}
+        onSelect={onMoveToStandby}
+        tooltip={{
+          content: {
+            side: 'left',
+            text: hasStandbyKey ? 'You may only have one standby key at a time' : undefined,
+          },
+        }}
+      >
+        <CircleArrowUpIcon size={14} />
+        Move to standby key
+      </DropdownMenuItemTooltip>
+    </DropdownMenuContent>
+  </DropdownMenu>
 )
 
 const getCreateDisabledReason = ({
@@ -282,17 +315,5 @@ const getCreateDisabledReason = ({
 }) => {
   if (!canUpdateKeys) return 'You need additional permissions to create keys'
   if (hasStandbyKey) return 'Revoke the existing standby key to create a new one'
-  return undefined
-}
-
-const getMoveToStandbyDisabledReason = ({
-  canUpdateKeys,
-  hasStandbyKey,
-}: {
-  canUpdateKeys: boolean
-  hasStandbyKey: boolean
-}) => {
-  if (!canUpdateKeys) return 'You need additional permissions to move keys to standby'
-  if (hasStandbyKey) return 'Revoke the existing standby key to move this one to standby'
   return undefined
 }

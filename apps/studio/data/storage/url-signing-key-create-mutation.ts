@@ -1,10 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type UrlSigningKeyAlgorithm = components['schemas']['CreateStandbyJwkBody']['type']
 
@@ -32,7 +32,7 @@ export const useUrlSigningKeyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UrlSigningKeyCreateData, ResponseError, UrlSigningKeyCreateVariables>,
+  UseCustomMutationOptions<UrlSigningKeyCreateData, ResponseError, UrlSigningKeyCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
