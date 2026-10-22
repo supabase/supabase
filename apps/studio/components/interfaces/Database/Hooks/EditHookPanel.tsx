@@ -344,7 +344,7 @@ export const EditHookPanel = () => {
             </span>
           )
         }
-        className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
+        className="mr-0 transform transition-all duration-300 ease-in-out"
         onConfirm={() => {}}
         onCancel={confirmOnClose}
         customFooter={
