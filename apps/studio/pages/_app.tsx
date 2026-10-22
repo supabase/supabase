@@ -64,8 +64,8 @@ import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import {
+  markHistoryTraverseShellReady,
   scheduleHistoryTraverseSettlement,
-  settleHistoryTraverseNavigation,
 } from '@/lib/history-traverse'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
@@ -187,7 +187,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     const onSettled = () => scheduleHistoryTraverseSettlement()
     Router.events.on('routeChangeComplete', onSettled)
     Router.events.on('hashChangeComplete', onSettled)
-    settleHistoryTraverseNavigation()
+    markHistoryTraverseShellReady()
     return () => {
       Router.events.off('routeChangeComplete', onSettled)
       Router.events.off('hashChangeComplete', onSettled)

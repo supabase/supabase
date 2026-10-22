@@ -51,17 +51,32 @@ export function installHistoryTraverseListener(): void {
   }
 }
 
+let isShellReady = false
+
 export function settleHistoryTraverseNavigation(): void {
   if (typeof window === 'undefined') {
     return
   }
 
   const state = getTraverseState()
+  // clear the popstate bit only. a document back_forward load stays a traverse
+  // until a real pushState: next runs this from the app effect before the page
+  // renders, so hiding that load here makes the editor miss it.
   state.isTraverseNavigation = false
-  state.hasClientPush = true
+}
+
+// tanstack clientonly renders its fallback on the first hydrated commit, so a
+// root effect can settle before the page reads the traverse flag.
+export function markHistoryTraverseShellReady(): void {
+  isShellReady = true
+  settleHistoryTraverseNavigation()
 }
 
 export function scheduleHistoryTraverseSettlement(): void {
+  if (!isShellReady) {
+    return
+  }
+
   setTimeout(settleHistoryTraverseNavigation, 0)
 }
 
@@ -94,6 +109,7 @@ export function resetHistoryTraverseState(): void {
   const state = getTraverseState()
   state.isTraverseNavigation = false
   state.hasClientPush = false
+  isShellReady = false
 }
 
 installHistoryTraverseListener()

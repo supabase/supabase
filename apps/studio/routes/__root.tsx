@@ -84,7 +84,7 @@ import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
-import { settleHistoryTraverseNavigation } from '@/lib/history-traverse'
+import { markHistoryTraverseShellReady } from '@/lib/history-traverse'
 import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
@@ -345,12 +345,16 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   errorComponent: ErrorBoundaryRoute,
 })
 
+function SettleHistoryTraverse() {
+  useEffect(() => {
+    markHistoryTraverseShellReady()
+  }, [])
+
+  return null
+}
+
 function RootComponent() {
   useThemeSandbox()
-
-  useEffect(() => {
-    settleHistoryTraverseNavigation()
-  }, [])
 
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
@@ -371,6 +375,7 @@ function RootComponent() {
                                 <FeaturePreviewContextProvider>
                                   <MainScrollContainerProvider>
                                     <ClientOnly fallback={<ShellFallback />}>
+                                      <SettleHistoryTraverse />
                                       <Outlet />
                                     </ClientOnly>
                                   </MainScrollContainerProvider>
