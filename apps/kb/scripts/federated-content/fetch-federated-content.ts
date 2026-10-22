@@ -89,7 +89,7 @@ async function fetchPage(filename: string): Promise<'fetched' | 'legacy-toml'> {
     topics: guide.topics,
   }
   const output = matter.stringify(guide.body, frontmatter)
-  await writeFile(join(TROUBLESHOOTING_DIRECTORY, `${slugFromFilename(filename)}.md`), output)
+  await writeFile(join(TROUBLESHOOTING_DIRECTORY, `${slugFromFilename(filename)}.mdx`), output)
   return 'fetched'
 }
 
