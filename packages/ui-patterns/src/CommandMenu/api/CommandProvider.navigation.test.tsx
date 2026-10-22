@@ -6,7 +6,7 @@ import { CommandProvider } from './CommandProvider'
 import {
   useCommandMenuInitiated,
   useCommandMenuOpen,
-  useToggleCommandMenu,
+  useSetCommandMenuOpen,
 } from './hooks/viewHooks'
 
 type RouteHandler = (url: string, options?: { shallow?: boolean }) => void
@@ -39,15 +39,15 @@ vi.mock('next/compat/router', () => ({
 const MenuProbe = () => {
   const isInitiated = useCommandMenuInitiated()
   const isOpen = useCommandMenuOpen()
-  const toggleOpen = useToggleCommandMenu()
+  const setOpen = useSetCommandMenuOpen()
 
   return (
     <>
       <span>{isInitiated ? 'initiated' : 'idle'}</span>
       <span>{isOpen ? 'open' : 'closed'}</span>
       {isInitiated && <span>menu-mounted</span>}
-      <button type="button" onClick={() => toggleOpen()}>
-        Toggle menu
+      <button type="button" onClick={() => setOpen(true)}>
+        Open menu
       </button>
     </>
   )
@@ -71,11 +71,21 @@ describe('CloseOnNavigation', () => {
     legacyRouter.reset()
   })
 
-  it('does not mount the command menu on a shallow search update', async () => {
+  it('does not initiate a never-opened menu on a real navigation', async () => {
     renderMenu()
 
     expect(screen.getByText('idle')).toBeInTheDocument()
     expect(screen.queryByText('menu-mounted')).not.toBeInTheDocument()
+
+    await completeRoute('/project/ref/sql', { shallow: false })
+
+    expect(screen.getByText('idle')).toBeInTheDocument()
+    expect(screen.getByText('closed')).toBeInTheDocument()
+    expect(screen.queryByText('menu-mounted')).not.toBeInTheDocument()
+  })
+
+  it('does not initiate a never-opened menu on a shallow completion', async () => {
+    renderMenu()
 
     await completeRoute('/project/ref/editor?schema=auth', { shallow: true })
 
@@ -84,43 +94,36 @@ describe('CloseOnNavigation', () => {
     expect(screen.queryByText('menu-mounted')).not.toBeInTheDocument()
   })
 
-  it('mounts the command menu after a real navigation', async () => {
-    renderMenu()
-
-    await completeRoute('/project/ref/sql', { shallow: false })
-
-    expect(screen.getByText('initiated')).toBeInTheDocument()
-    expect(screen.getByText('closed')).toBeInTheDocument()
-    expect(screen.getByText('menu-mounted')).toBeInTheDocument()
-  })
-
-  it('mounts the command menu when the completion omits shallow', async () => {
+  it('does not initiate a never-opened menu when the completion omits shallow', async () => {
     renderMenu()
 
     await completeRoute('/project/ref/sql')
 
-    expect(screen.getByText('initiated')).toBeInTheDocument()
+    expect(screen.getByText('idle')).toBeInTheDocument()
     expect(screen.getByText('closed')).toBeInTheDocument()
-    expect(screen.getByText('menu-mounted')).toBeInTheDocument()
+    expect(screen.queryByText('menu-mounted')).not.toBeInTheDocument()
   })
 
-  it('keeps an open menu open across a shallow search update and closes it on a real navigation', async () => {
+  it('initiates and mounts when opened', async () => {
     const user = userEvent.setup()
     renderMenu()
 
-    await user.click(screen.getByRole('button', { name: 'Toggle menu' }))
+    await user.click(screen.getByRole('button', { name: 'Open menu' }))
 
     expect(screen.getByText('initiated')).toBeInTheDocument()
     expect(screen.getByText('open')).toBeInTheDocument()
-
-    await completeRoute('/project/ref/editor?schema=auth', { shallow: true })
-
-    expect(screen.getByText('open')).toBeInTheDocument()
     expect(screen.getByText('menu-mounted')).toBeInTheDocument()
+  })
 
+  it('closes an open menu on a real navigation without unmounting it', async () => {
+    const user = userEvent.setup()
+    renderMenu()
+
+    await user.click(screen.getByRole('button', { name: 'Open menu' }))
     await completeRoute('/project/ref/sql', { shallow: false })
 
     expect(screen.getByText('closed')).toBeInTheDocument()
     expect(screen.getByText('initiated')).toBeInTheDocument()
+    expect(screen.getByText('menu-mounted')).toBeInTheDocument()
   })
 })
