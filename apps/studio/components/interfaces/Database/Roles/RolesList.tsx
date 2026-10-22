@@ -22,7 +22,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -117,17 +117,17 @@ export const RolesList = () => {
   }
 
   useEffect(() => {
-    if (!isSuccess || !selectedRoleIdToDelete || roleToDelete) return
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: selectedRoleIdToDelete,
+      resourceFound: !!roleToDelete,
+      isSuccessDelete,
+      deletedId: deletedRole?.id,
+    })
 
-    if (isStaleDeletedPanelId(selectedRoleIdToDelete, isSuccessDelete, deletedRole?.id)) {
-      setSelectedRoleIdToDelete(null, { history: 'replace' })
-      return
-    }
-
-    if (!isSuccessDelete) {
-      toast('Role cannot be found')
-      setSelectedRoleIdToDelete(null, { history: 'replace' })
-    }
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') toast('Role cannot be found')
+    setSelectedRoleIdToDelete(null, { history: 'replace' })
   }, [
     deletedRole,
     isSuccess,

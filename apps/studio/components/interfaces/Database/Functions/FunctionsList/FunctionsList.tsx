@@ -41,7 +41,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -239,17 +239,17 @@ export const FunctionsList = () => {
   }, [functionIdToDuplicate, functionToDuplicate, isSuccess, setSelectedFunctionIdToDuplicate])
 
   useEffect(() => {
-    if (!isSuccess || !functionIdToDelete || functionToDelete) return
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: functionIdToDelete,
+      resourceFound: !!functionToDelete,
+      isSuccessDelete,
+      deletedId: deletedFunction?.func?.id,
+    })
 
-    if (isStaleDeletedPanelId(functionIdToDelete, isSuccessDelete, deletedFunction?.func?.id)) {
-      setSelectedFunctionToDelete(null, { history: 'replace' })
-      return
-    }
-
-    if (!isSuccessDelete) {
-      toast('Function not found')
-      setSelectedFunctionToDelete(null, { history: 'replace' })
-    }
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') toast('Function not found')
+    setSelectedFunctionToDelete(null, { history: 'replace' })
   }, [
     deletedFunction,
     functionIdToDelete,

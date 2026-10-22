@@ -16,7 +16,7 @@ import { useVaultSecretDeleteMutation } from '@/data/vault/vault-secret-delete-m
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 
 export const DeleteSecretModal = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -58,17 +58,17 @@ export const DeleteSecretModal = () => {
   }
 
   useEffect(() => {
-    if (!isSuccess || !secretIdToDelete || selectedSecret) return
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: secretIdToDelete,
+      resourceFound: !!selectedSecret,
+      isSuccessDelete,
+      deletedId: deletedSecret?.id,
+    })
 
-    if (isStaleDeletedPanelId(secretIdToDelete, isSuccessDelete, deletedSecret?.id)) {
-      setSelectedSecretToDelete(null, { history: 'replace' })
-      return
-    }
-
-    if (!isSuccessDelete) {
-      toast('Secret not found')
-      setSelectedSecretToDelete(null, { history: 'replace' })
-    }
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') toast('Secret not found')
+    setSelectedSecretToDelete(null, { history: 'replace' })
   }, [
     deletedSecret,
     isSuccess,

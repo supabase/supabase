@@ -10,7 +10,7 @@ import { useVectorBucketIndexDeleteMutation } from '@/data/storage/vector-bucket
 import { useVectorBucketsIndexesQuery } from '@/data/storage/vector-buckets-indexes-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 
 export const DeleteVectorTableModal = () => {
   const { ref: projectRef, bucketId } = useParams()
@@ -73,17 +73,19 @@ export const DeleteVectorTableModal = () => {
   }
 
   useEffect(() => {
-    if (!isSuccessIndexes || !selectedTableIdToDelete || table) return
+    const action = missingPanelIdAction({
+      listLoaded: isSuccessIndexes,
+      currentId: selectedTableIdToDelete,
+      resourceFound: !!table,
+      isSuccessDelete,
+      deletedId: deletedIndex?.indexName,
+    })
 
-    if (isStaleDeletedPanelId(selectedTableIdToDelete, isSuccessDelete, deletedIndex?.indexName)) {
-      setSelectedTableIdToDelete(null, { history: 'replace' })
-      return
-    }
-
-    if (!isSuccessDelete) {
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast(`Table ${selectedTableIdToDelete} cannot be found in your bucket`)
-      setSelectedTableIdToDelete(null, { history: 'replace' })
     }
+    setSelectedTableIdToDelete(null, { history: 'replace' })
   }, [
     deletedIndex,
     isSuccessDelete,

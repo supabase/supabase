@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -18,6 +18,17 @@ import {
   installNavigationDouble,
   uninstallNavigationDouble,
 } from '@/tests/lib/panel-navigation-double'
+
+const { toastMock } = vi.hoisted(() => ({
+  toastMock: Object.assign(vi.fn(), {
+    success: vi.fn(),
+    error: vi.fn(),
+  }),
+}))
+
+vi.mock('sonner', () => ({
+  toast: toastMock,
+}))
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 
@@ -187,5 +198,64 @@ describe('RolesList URL history', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
     window.removeEventListener('popstate', onPopState)
+  })
+
+  it('clears a different missing role id after a successful delete', async () => {
+    let deleted = false
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: ({ request }) => {
+        const key = new URL(request.url).searchParams.get('key')
+
+        if (key === 'max-connections') {
+          return HttpResponse.json([{ max_connections: 60 }])
+        }
+
+        if (key === 'database-roles') {
+          return HttpResponse.json(deleted ? [] : [customRole])
+        }
+
+        deleted = true
+        return HttpResponse.json([])
+      },
+    })
+
+    window.history.replaceState(null, '', '/project/default/database/roles')
+    installNavigationDouble()
+
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    })
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <NuqsAdapter>
+          <TooltipProvider>
+            <CommandProvider openKey="">
+              <RolesList />
+            </CommandProvider>
+          </TooltipProvider>
+        </NuqsAdapter>
+      </QueryClientProvider>
+    )
+
+    await userEvent.click(await screen.findByRole('button', { name: 'custom_role actions' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Submit' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() => expect(window.location.search).not.toContain('delete='))
+
+    toastMock.mockClear()
+    await act(async () => {
+      window.history.pushState(null, '', '/project/default/database/roles?delete=999')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    })
+
+    await waitFor(() => expect(window.location.search).not.toContain('delete='))
+    expect(toastMock).toHaveBeenCalledWith('Role cannot be found')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 })

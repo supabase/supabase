@@ -16,6 +16,7 @@ import {
 
 import { usePgPartmanStatus } from '../usePgPartmanStatus'
 import { CreateQueueForm, FormSchema } from './CreateQueueSheet.schema'
+import { navigateToCreatedQueue } from './CreateQueueSheet.utils'
 import { PartitionConfigFields } from './PartitionConfigFields'
 import { PgPartmanCallout } from './PgPartmanCallout'
 import { QueueNameField } from './QueueNameField'
@@ -29,7 +30,7 @@ import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 export interface CreateQueueSheetProps {
   visible: boolean
-  onClose: () => void
+  onClose: () => void | Promise<unknown>
 }
 
 const FORM_ID = 'create-queue-sidepanel'
@@ -100,9 +101,16 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
       },
       {
         onSuccess: () => {
+          const projectRef = project?.ref
+          if (!projectRef) return
+
           toast.success(`Successfully created queue ${name}`)
-          onClose()
-          router.push(`/project/${project?.ref}/integrations/queues/queues/${name}`)
+          return navigateToCreatedQueue({
+            dismissPanel: () => onClose(),
+            navigate: (path) => router.push(path),
+            projectRef,
+            queueName: name,
+          })
         },
       }
     )

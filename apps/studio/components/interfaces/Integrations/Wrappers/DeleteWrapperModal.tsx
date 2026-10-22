@@ -19,7 +19,7 @@ import { useFDWDeleteMutation } from '@/data/fdw/fdw-delete-mutation'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
-import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 
 export const DeleteWrapperModal = () => {
   const { id, ref } = useParams()
@@ -71,19 +71,17 @@ export const DeleteWrapperModal = () => {
   }
 
   useEffect(() => {
-    if (!isSuccess || !selectedWrapperIdToDelete || selectedWrapper) return
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: selectedWrapperIdToDelete,
+      resourceFound: !!selectedWrapper,
+      isSuccessDelete,
+      deletedId: deletedWrapper?.wrapper?.id,
+    })
 
-    if (
-      isStaleDeletedPanelId(selectedWrapperIdToDelete, isSuccessDelete, deletedWrapper?.wrapper?.id)
-    ) {
-      setSelectedWrapperToDelete(null, { history: 'replace' })
-      return
-    }
-
-    if (!isSuccessDelete) {
-      toast('Wrapper not found')
-      setSelectedWrapperToDelete(null, { history: 'replace' })
-    }
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') toast('Wrapper not found')
+    setSelectedWrapperToDelete(null, { history: 'replace' })
   }, [
     deletedWrapper,
     isSuccess,

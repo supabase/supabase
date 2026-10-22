@@ -37,7 +37,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -151,17 +151,17 @@ export const Indexes = () => {
   }, [isSuccessIndexes, editIndexId, selectedIndex, setEditIndexId])
 
   useEffect(() => {
-    if (!isSuccessIndexes || !deleteIndexId || selectedIndexToDelete) return
+    const action = missingPanelIdAction({
+      listLoaded: isSuccessIndexes,
+      currentId: deleteIndexId,
+      resourceFound: !!selectedIndexToDelete,
+      isSuccessDelete,
+      deletedId: deletedIndex?.name,
+    })
 
-    if (isStaleDeletedPanelId(deleteIndexId, isSuccessDelete, deletedIndex?.name)) {
-      setDeleteIndexId(null, { history: 'replace' })
-      return
-    }
-
-    if (!isSuccessDelete) {
-      toast('Index not found')
-      setDeleteIndexId(null, { history: 'replace' })
-    }
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') toast('Index not found')
+    setDeleteIndexId(null, { history: 'replace' })
   }, [
     deleteIndexId,
     deletedIndex,

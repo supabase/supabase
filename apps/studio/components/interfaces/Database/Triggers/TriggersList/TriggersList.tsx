@@ -43,7 +43,7 @@ import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema, useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { isStaleDeletedPanelId } from '@/lib/panel-history.utils'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -229,17 +229,17 @@ execute function function_name();`
   }, [isSuccess, triggerIdToDuplicate, triggerToDuplicate, setTriggerToDuplicate])
 
   useEffect(() => {
-    if (!isSuccess || !triggerIdToDelete || triggerToDelete) return
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: triggerIdToDelete,
+      resourceFound: !!triggerToDelete,
+      isSuccessDelete,
+      deletedId: deletedTrigger?.trigger?.id,
+    })
 
-    if (isStaleDeletedPanelId(triggerIdToDelete, isSuccessDelete, deletedTrigger?.trigger?.id)) {
-      setTriggerToDelete(null, { history: 'replace' })
-      return
-    }
-
-    if (!isSuccessDelete) {
-      toast('Trigger not found')
-      setTriggerToDelete(null, { history: 'replace' })
-    }
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') toast('Trigger not found')
+    setTriggerToDelete(null, { history: 'replace' })
   }, [
     deletedTrigger,
     isSuccess,

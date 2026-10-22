@@ -4,6 +4,7 @@ import {
   isHashOnlyChange,
   isPanelValueClear,
   isStaleDeletedPanelId,
+  missingPanelIdAction,
   panelHistoryAction,
   resolvePanelUpdater,
   sameHistoryUrl,
@@ -252,6 +253,54 @@ describe('isStaleDeletedPanelId', () => {
     expect(isStaleDeletedPanelId('secret-1', false, 'secret-1')).toBe(false)
     expect(isStaleDeletedPanelId(null, true, 'secret-1')).toBe(false)
     expect(isStaleDeletedPanelId('', true, '')).toBe(false)
+  })
+})
+
+describe('missingPanelIdAction', () => {
+  const loaded = {
+    listLoaded: true,
+    resourceFound: false,
+    isSuccessDelete: false,
+    deletedId: undefined,
+  }
+
+  it('keeps a loaded row, an empty id, and a list that has not loaded', () => {
+    expect(missingPanelIdAction({ ...loaded, currentId: '4', resourceFound: true })).toBe('keep')
+    expect(missingPanelIdAction({ ...loaded, currentId: null })).toBe('keep')
+    expect(missingPanelIdAction({ ...loaded, currentId: '' })).toBe('keep')
+    expect(missingPanelIdAction({ ...loaded, currentId: false })).toBe('keep')
+    expect(missingPanelIdAction({ ...loaded, listLoaded: false, currentId: '4' })).toBe('keep')
+  })
+
+  it('clears the just-deleted id with no toast', () => {
+    expect(
+      missingPanelIdAction({
+        ...loaded,
+        currentId: '4',
+        isSuccessDelete: true,
+        deletedId: 4,
+      })
+    ).toBe('clear-silently')
+  })
+
+  it('notifies for a different missing id even after a successful delete', () => {
+    expect(
+      missingPanelIdAction({
+        ...loaded,
+        currentId: '9',
+        isSuccessDelete: true,
+        deletedId: 4,
+      })
+    ).toBe('clear-and-notify')
+    expect(missingPanelIdAction({ ...loaded, currentId: '9' })).toBe('clear-and-notify')
+    expect(
+      missingPanelIdAction({
+        ...loaded,
+        currentId: '9',
+        isSuccessDelete: true,
+        deletedId: null,
+      })
+    ).toBe('clear-and-notify')
   })
 })
 

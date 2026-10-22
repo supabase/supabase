@@ -194,9 +194,7 @@ export const QueuesTab = () => {
 
       <CreateQueueSheet
         visible={createQueueSheetShown}
-        onClose={() => {
-          setCreateQueueSheetShown(false)
-        }}
+        onClose={() => setCreateQueueSheetShown(false)}
       />
     </>
   )
