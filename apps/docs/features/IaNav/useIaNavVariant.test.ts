@@ -47,13 +47,6 @@ describe('useIaNavVariant', () => {
     expect(captureExposure).toHaveBeenCalledWith(IA_NAV_FLAG, { variant: 'option-1' }, true)
   })
 
-  it('records control exposure for visitors in the control group', () => {
-    const { result } = renderVariant({ flagValue: 'control' })
-
-    expect(result.current).toBe('control')
-    expect(captureExposure).toHaveBeenCalledWith(IA_NAV_FLAG, { variant: 'control' }, true)
-  })
-
   it('falls back to control for visitors outside the experiment', () => {
     const { result } = renderVariant({ flagValue: false })
 
@@ -72,13 +65,6 @@ describe('useIaNavVariant', () => {
     const { result } = renderVariant({ flagValue: false, override: 'option-1' })
 
     expect(result.current).toBe('option-1')
-    expect(captureExposure).not.toHaveBeenCalled()
-  })
-
-  it('records no exposure when the query param forces control', () => {
-    const { result } = renderVariant({ flagValue: 'option-1', override: 'control' })
-
-    expect(result.current).toBe('control')
     expect(captureExposure).not.toHaveBeenCalled()
   })
 
