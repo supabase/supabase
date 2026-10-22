@@ -12,17 +12,16 @@ import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import { reportKeys } from '@/data/reports/keys'
-import { SAFE_GRANULARITY_SQL, type Granularity } from '@/data/reports/report.utils'
 import { IS_PLATFORM } from '@/lib/constants'
 
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], granularity: Granularity = 'hour'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         --reports-api-total-requests
         select
-          cast(timestamp_trunc(t.timestamp, ${SAFE_GRANULARITY_SQL[granularity]}) as datetime) as timestamp,
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
         FROM edge_logs t
           cross join unnest(metadata) as m
@@ -61,11 +60,11 @@ export const SHARED_API_REPORT_SQL = {
   },
   errorCounts: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], granularity: Granularity = 'hour'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-error-counts
         select
-          cast(timestamp_trunc(t.timestamp, ${SAFE_GRANULARITY_SQL[granularity]}) as datetime) as timestamp,
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
         FROM edge_logs t
           cross join unnest(metadata) as m
@@ -109,11 +108,11 @@ export const SHARED_API_REPORT_SQL = {
   },
   responseSpeed: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], granularity: Granularity = 'hour'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-response-speed
         select
-          cast(timestamp_trunc(t.timestamp, ${SAFE_GRANULARITY_SQL[granularity]}) as datetime) as timestamp,
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           avg(response.origin_time) as avg
         FROM
           edge_logs t
@@ -155,11 +154,11 @@ export const SHARED_API_REPORT_SQL = {
   },
   networkTraffic: {
     queryType: 'logs',
-    safeSql: (filters: ReportFilterItem[], granularity: Granularity = 'hour'): SafeLogSqlFragment =>
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
       safeSql`
         -- reports-api-network-traffic
         select
-          cast(timestamp_trunc(t.timestamp, ${SAFE_GRANULARITY_SQL[granularity]}) as datetime) as timestamp,
+          cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           coalesce(
             safe_divide(
               sum(
@@ -213,7 +212,7 @@ export const getSharedAPIReportSql = (
   const granularity = dayjs(end).diff(dayjs(start), 'minute') <= 60 ? 'minute' : 'hour'
   return useOtel
     ? getLogsSql(PRESET_CONFIG.api.queries[queryName], filters, true, granularity)
-    : SHARED_API_REPORT_SQL[queryName].safeSql(filters, granularity)
+    : SHARED_API_REPORT_SQL[queryName].safeSql(filters)
 }
 
 export const useSharedAPIReport = ({
