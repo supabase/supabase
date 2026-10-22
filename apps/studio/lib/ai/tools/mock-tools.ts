@@ -233,7 +233,9 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
 ]
 
 function createMockedStudioTools() {
-  const studioTools = getStudioTools()
+  // Pinned to `schema` so the model sees the same execute_sql output it always has in evals,
+  // whatever level the eval runs at. Evals don't yet use one level for every tool and for replay.
+  const studioTools = getStudioTools({ aiOptInLevel: 'schema' })
 
   return Object.fromEntries(
     Object.entries(studioTools).map(([name, baseTool]) => {

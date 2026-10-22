@@ -4,6 +4,7 @@ import type { ToolSet } from 'ai'
 
 import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
+import { REMOTE_TOOL_CONTRACTS } from './registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 /**
@@ -78,7 +79,15 @@ export const getMcpTools = async ({
   signal.addEventListener('abort', closeClient, { once: true })
 
   try {
-    const availableMcpTools = (await mcpClient.tools()) as ToolSet
+    const remoteTools = (await mcpClient.tools()) as ToolSet
+
+    const availableMcpTools: ToolSet = { ...remoteTools }
+    for (const contract of Object.values(REMOTE_TOOL_CONTRACTS)) {
+      const remoteTool = remoteTools[contract.name]
+      if (remoteTool) {
+        availableMcpTools[contract.name] = { ...remoteTool, needsApproval: contract.needsApproval }
+      }
+    }
 
     // Runtime drift detection: `EXPECTED_MCP_TOOLS` is compile-time-checked
     // against the pinned package (see its declaration), but the *deployed* remote

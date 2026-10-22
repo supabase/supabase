@@ -20,8 +20,9 @@ vi.mock('common', async () => {
   }
 })
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { AUTH_SIGNING_KEYS_READ: 'auth_signing_keys_read' } },
 }))
 
 vi.mock('@/hooks/misc/useDeploymentMode', () => ({

@@ -79,6 +79,11 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
     ),
   },
   {
+    accessorKey: 'eventType',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Event</TanStackTableHeadSort>,
+    cell: ({ row }) => <code className="text-xs">{row.original.eventType}</code>,
+  },
+  {
     accessorKey: 'responseCode',
     header: ({ column }) => <TanStackTableHeadSort column={column}>Response</TanStackTableHeadSort>,
     sortingFn: (rowA, rowB, columnId) => {
@@ -158,7 +163,6 @@ export const PlatformWebhooksEndpointDetails = ({
   onRetryDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
-  const hasName = selectedEndpoint.name.trim().length > 0
   const hasDescription = selectedEndpoint.description.trim().length > 0
   const deliverySearchRef = useRef<HTMLInputElement>(null)
   const [sorting, setSorting] = useState<SortingState>(DEFAULT_DELIVERY_SORTING)
@@ -204,8 +208,6 @@ export const PlatformWebhooksEndpointDetails = ({
         <Card className="overflow-hidden">
           <CardContent className="pb-5">
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
-              {hasName && <DetailItem label="Name">{selectedEndpoint.name}</DetailItem>}
-
               <DetailItem label="URL" ddClassName="flex items-start gap-2 text-sm">
                 <span className="break-all">{selectedEndpoint.url}</span>
                 <ShortcutTooltip
@@ -232,10 +234,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   ? ['All events (*)']
                   : selectedEndpoint.eventTypes
                 ).map((eventType) => (
-                  <code
-                    key={eventType}
-                    className="text-code-inline rounded-md border px-3 py-1.5 text-2xs"
-                  >
+                  <code key={eventType} className="rounded-md border px-3 py-1.5 text-2xs">
                     {eventType}
                   </code>
                 ))}
@@ -247,6 +246,7 @@ export const PlatformWebhooksEndpointDetails = ({
                     {selectedEndpoint.customHeaders.map((header) => (
                       <div
                         key={header.id}
+                        data-code-style="plain"
                         className="px-2 py-2 font-mono font-medium text-xs flex items-center gap-2 flex-wrap"
                       >
                         <code className="text-code_block-4">{header.key}:</code>

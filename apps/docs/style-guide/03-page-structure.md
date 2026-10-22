@@ -24,13 +24,13 @@ Apply this document when you add a page or move content around on an existing on
 Supabase docs contain five types of document. Decide which one you need before you start
 writing.
 
-| Type            | Purpose                     | Contains                            | Doesn't contain                  | Example                                                                            |
-| --------------- | --------------------------- | ----------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------- |
-| Explainer       | Learn a topic               | What it is, why, and when to use it | Instructions                     | [Auth architecture](/docs/guides/auth/architecture)                                |
-| Tutorial        | Finish a multi-feature goal | Procedures plus the reasoning       | —                                | [Build a Next.js app](/docs/guides/getting-started/tutorials/with-nextjs)          |
-| Guide           | Finish one task             | Procedures in sequence              | Background; link to an explainer | [Passwordless logins](/docs/guides/auth/auth-email-passwordless)                   |
-| Reference       | Look something up           | Parameters, return types, samples   | Context and use cases            | [JavaScript client](/docs/reference/javascript/introduction)                       |
-| Troubleshooting | Resolve one error           | The symptom, the cause, the fix     | Feature overviews                | [Too many channels](/docs/guides/troubleshooting/realtime-too-many-channels-error) |
+| Type            | Purpose                     | Contains                            | Doesn't contain                  | Example                                                                   |
+| --------------- | --------------------------- | ----------------------------------- | -------------------------------- | ------------------------------------------------------------------------- |
+| Explainer       | Learn a topic               | What it is, why, and when to use it | Instructions                     | [Auth architecture](/docs/guides/auth/architecture)                       |
+| Tutorial        | Finish a multi-feature goal | Procedures plus the reasoning       | —                                | [Build a Next.js app](/docs/guides/getting-started/tutorials/with-nextjs) |
+| Guide           | Finish one task             | Procedures in sequence              | Background; link to an explainer | [Passwordless logins](/docs/guides/auth/auth-email-passwordless)          |
+| Reference       | Look something up           | Parameters, return types, samples   | Context and use cases            | [JavaScript client](/docs/reference/javascript/introduction)              |
+| Troubleshooting | Resolve one error           | The symptom, the cause, the fix     | Feature overviews                | [Too many channels](/kb/troubleshooting/realtime-too-many-channels-error) |
 
 Reference content is generated from spec files rather than hand-authored. See
 [CONTRIBUTING.md](../CONTRIBUTING.md) for the reference pipeline.

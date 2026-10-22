@@ -400,7 +400,7 @@ export const OAuthAppsList = () => {
                         </Button>
                       </TableCell>
                       <TableCell title={app.client_id}>
-                        <code className="text-code-inline">{app.client_id}</code>
+                        <code>{app.client_id}</code>
                       </TableCell>
                       <TableCell className="max-w-28 capitalize">{app.client_type}</TableCell>
                       <TableCell className="max-w-28 capitalize">{app.registration_type}</TableCell>

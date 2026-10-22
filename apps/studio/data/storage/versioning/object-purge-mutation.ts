@@ -69,7 +69,7 @@ export const useObjectPurgeMutation = ({
 
   return useMutation<void, ResponseError, ObjectPurgeVariables>({
     mutationFn: purgeObject,
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       // The object list lives in the explorer's state, not React Query.
       await queryClient.invalidateQueries({
         queryKey: storageKeys.objectVersions(
@@ -78,11 +78,11 @@ export const useObjectPurgeMutation = ({
           variables.path
         ),
       })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(error, variables, context) {
+    async onError(error, variables, context, mutationContext) {
       if (onError === undefined) toast.error(`Failed to delete object: ${error.message}`)
-      else onError(error, variables, context)
+      else onError(error, variables, context, mutationContext)
     },
     ...options,
   })

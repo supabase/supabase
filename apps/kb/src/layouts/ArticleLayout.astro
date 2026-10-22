@@ -1,9 +1,14 @@
 ---
-import { ExternalLink, Github } from 'lucide-react'
-import { Badge } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, GithubIcon } from 'ui'
+import type { TOCItemType } from 'ui-patterns/Toc/types'
 
+import { CodeBlockControlsIsland } from '../components/CodeBlockControlsIsland'
+import { FeaturedSection } from '../components/FeaturedSection'
+import { GuideSidebar } from '../components/GuideSidebar'
+import type { RelatedGuides } from '../lib/guides'
 import Layout from './Layout.astro'
-import { getTopicDescription, type Topic, TOPIC_NAMES, topicToSlug } from '../lib/topics'
+import { getTopicDescription, isKnownTopic, topicToSlug } from '../lib/topics'
 
 interface Props {
 	title: string
@@ -15,61 +20,119 @@ interface Props {
 	github_url?: string
 	viewGitHubLink?: string
 	date?: string
+	toc?: TOCItemType[]
+	jsonLd?: Record<string, unknown> | Record<string, unknown>[]
+	related?: RelatedGuides | null
 }
 
-const { title, description, topics = [], github_url, viewGitHubLink, date } = Astro.props
-
-function isKnownTopic(topic: string): topic is Topic {
-	return (TOPIC_NAMES as readonly string[]).includes(topic)
-}
+const {
+	title,
+	description,
+	topics = [],
+	github_url,
+	viewGitHubLink,
+	date,
+	toc = [],
+	jsonLd,
+	related,
+} = Astro.props
+const pagePath = Astro.url.pathname.replace(/\/$/, '')
+// the `<page>.md` redirect only exists on vercel (vercel.json), so fetch the generated file directly
+const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta.env.BASE_URL}/markdown`)}.md`
 ---
 
-<Layout title={title} description={description}>
-	<article class="prose max-w-3xl mx-auto px-6 py-16">
-		<h1>{title}</h1>
-		{date && <p class="text-sm pb-4">{date}</p>}
-		{description && <p class="lead">{description}</p>}
-		{
-			topics.length > 0 && (
-				<div class="flex flex-wrap gap-2">
-					{topics.map((topic) =>
-						isKnownTopic(topic) ? (
-							<a
-								href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
-								title={getTopicDescription(topic)}
-							>
-								<Badge>{topic}</Badge>
-							</a>
-						) : (
-							<Badge>{topic}</Badge>
+<Layout title={title} description={description} jsonLd={jsonLd}>
+	<div class="section-container lg:grid lg:grid-cols-3 lg:gap-6">
+		<article class="prose prose-img:rounded-lg max-w-none min-w-0 py-16 lg:col-span-2">
+			<Breadcrumb className="not-prose mb-6">
+				<BreadcrumbList>
+					<BreadcrumbItem>
+						<BreadcrumbLink href={import.meta.env.BASE_URL}>Knowledge base</BreadcrumbLink>
+					</BreadcrumbItem>
+					{
+						topics.length > 0 && (
+							<>
+								<BreadcrumbSeparator />
+								{/* a guide can sit in several topics, so they share one level instead of nesting */}
+								<BreadcrumbItem>
+									{topics.map((topic, index) => (
+										<span>
+											{isKnownTopic(topic) ? (
+												<BreadcrumbLink
+													href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
+													title={getTopicDescription(topic)}
+												>
+													{topic}
+												</BreadcrumbLink>
+											) : (
+												topic
+											)}
+											{index < topics.length - 1 && ','}
+										</span>
+									))}
+								</BreadcrumbItem>
+							</>
 						)
-					)}
-				</div>
-			)
-		}
-		<slot />
-		{
-			github_url && (
-				<p>
-					<a href={github_url} target="_blank" rel="noreferrer" class="inline-flex items-center gap-1.5">
-						<Github size={16} /> Go to the GitHub discussion
-					</a>
-				</p>
-			)
-		}
-		{
-			viewGitHubLink && (
-				<footer class="mt-16 not-prose">
-					<a
-						href={viewGitHubLink}
-						target="_blank"
-						rel="noreferrer noopener edit"
-						class="w-fit inline-flex items-center gap-1 text-sm text-foreground-light hover:text-foreground"
-					>
-						View this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
-					</a>
-				</footer>
-			)
-		}
-	</article>
+					}
+				</BreadcrumbList>
+			</Breadcrumb>
+			<header class="mb-8">
+				<h1 class="mt-0 mb-0 text-balance">{title}</h1>
+				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
+			</header>
+			<slot />
+			<CodeBlockControlsIsland client:only="react" />
+			<div class="not-prose mt-12 -ml-5 lg:hidden">
+				<GuideSidebar
+					client:visible
+					items={[]}
+					pageUrl={new URL(pagePath, Astro.site).href}
+					markdownUrl={markdownUrl}
+					className="border-l-0 px-0"
+				/>
+			</div>
+			{
+				github_url && (
+					<p>
+						<a href={github_url} target="_blank" rel="noreferrer" class="inline-flex items-center gap-1.5">
+							<GithubIcon size={16} /> Go to the GitHub discussion
+						</a>
+					</p>
+				)
+			}
+			{
+				viewGitHubLink && (
+					<footer class="mt-16 not-prose flex items-center justify-between gap-4">
+						<a
+							href={viewGitHubLink}
+							target="_blank"
+							rel="noreferrer noopener edit"
+							class="w-fit inline-flex items-center gap-1 text-sm text-foreground-light hover:text-foreground"
+						>
+							View this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+						</a>
+						{date && <p class="m-0 text-sm text-foreground-lighter">{date}</p>}
+					</footer>
+				)
+			}
+		</article>
+		<aside class="sticky top-(--header-height) hidden justify-self-end max-h-[calc(100vh-var(--header-height))] w-60 self-start overflow-y-auto py-16 lg:block">
+			<GuideSidebar
+				client:load
+				items={toc}
+				pageUrl={new URL(pagePath, Astro.site).href}
+				markdownUrl={markdownUrl}
+			/>
+		</aside>
+	</div>
+	{
+		related && (
+			<FeaturedSection
+				client:load
+				title={`More ${related.topic} guides`}
+				items={related.guides.map((guide) => ({ ...guide, slot: guide.id }))}
+				className="pb-24 pt-16"
+			/>
+		)
+	}
 </Layout>

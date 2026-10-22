@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { notebookMutationOutputSchema } from './notebook-mutation-output'
 import type { ToolContract } from './types'
 import { notebookOperationsSchema } from '@/data/content/notebooks/notebook-operations'
 import { notebookSchema } from '@/data/content/notebooks/notebook-schema'
@@ -20,9 +21,7 @@ const inputSchema = z.object({
  * `previous_content` lets the client re-derive the diff it already showed for approval,
  * without re-fetching a notebook that's now post-update. It is UI-only: `toModelOutput` drops it.
  */
-const outputSchema = z.object({
-  id: z.string(),
-  name: z.string(),
+const outputSchema = notebookMutationOutputSchema.extend({
   previous_content: notebookSchema.optional(),
 })
 

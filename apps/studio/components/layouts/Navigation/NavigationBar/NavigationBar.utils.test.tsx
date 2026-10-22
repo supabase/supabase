@@ -194,6 +194,18 @@ describe('generateOtherRoutes', () => {
     const advisorsRoute = routes.find((r) => r.key === 'advisors')
     expect(advisorsRoute?.disabled).toBe(true)
   })
+
+  it('links advisors to the security advisor page by default', () => {
+    const routes = generateOtherRoutes(REF, activeProject)
+    const advisorsRoute = routes.find((r) => r.key === 'advisors')
+    expect(advisorsRoute?.link).toBe(`/project/${REF}/advisors/security`)
+  })
+
+  it('links advisors to the health advisor page when health advisor is enabled', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { isHealthAdvisorEnabled: true })
+    const advisorsRoute = routes.find((r) => r.key === 'advisors')
+    expect(advisorsRoute?.link).toBe(`/project/${REF}/advisors/health`)
+  })
 })
 
 describe('generateSettingsRoutes', () => {

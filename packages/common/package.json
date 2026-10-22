@@ -34,7 +34,7 @@
     "@typescript/native": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "tsconfig": "workspace:*",
     "type-fest": "5.6.0",
     "typescript": "catalog:",
@@ -44,7 +44,7 @@
   "peerDependencies": {
     "@supabase/auth-js": "catalog:",
     "@supabase/supabase-js": "catalog:",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

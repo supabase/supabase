@@ -205,7 +205,7 @@ export const SpreadsheetImportPreview = ({
                                   <ul className="ml-2 list-disc">
                                     {errorData.__parsed_extra.map((value: string, i: number) => (
                                       <li key={i}>
-                                        <code className="text-code-inline">{value}</code>
+                                        <code>{value}</code>
                                       </li>
                                     ))}
                                   </ul>

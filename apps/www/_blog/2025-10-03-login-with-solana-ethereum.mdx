@@ -36,7 +36,7 @@ Resources:
 - <https://example.com/my-web2-claim.json>
 ```
 
-It's interpreted both by the wallet application, which presents a secure login confirmation dialog, while also being validated by Supabase Auth before issuing a user session.
+It's interpreted both by the wallet application, which presents a secure login confirmation dialog, while also being validated by [Supabase Auth](/auth) before issuing a user session.
 
 Most of these details are already handled for you by the Supabase JavaScript SDK, so it's really as simple as calling this in your Web3 app:
 
@@ -49,7 +49,7 @@ await supabase.auth.signInWithWeb3({
 
 The API is powerful enough to support more modern approaches to building Web3 applications such as using the [Solana Wallet Adapter](https://solana.com/developers/courses/intro-to-solana/interact-with-wallets#solanas-wallet-adapter) system or the [Ethereum Wallet Discovery Mechanism](https://docs.metamask.io/wallet/tutorials/react-dapp-local-state).
 
-You can configure these on the Supabase Dashboard, or in the Supabase CLI:
+You can configure these on the Supabase Dashboard, or in the [Supabase CLI](/docs/guides/local-development/cli/getting-started):
 
 ```toml
 [auth.web3.solana]

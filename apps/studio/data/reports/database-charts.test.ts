@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import { getReportAttributesV2, shouldShowDiskIOBurstBalanceChart } from './database-charts'
+import { getThresholdZoneChart } from '@/components/ui/Charts/ComposedChartThresholdZones.utils'
 import { RESOURCE_WARNING_MESSAGES } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
+import { mapResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
+import type { InfraMonitoringMultiData } from '@/data/analytics/infra-monitoring-query'
 import { Project } from '@/data/projects/project-detail-query'
 
 const PROJECT: Project = {
@@ -160,5 +163,105 @@ describe('resource warning metrics chart IDs', () => {
       .filter((chartId) => !visibleChartIds.has(chartId))
 
     expect(missingChartIds).toEqual([])
+  })
+})
+
+describe('getReportAttributesV2 memory commitment chart', () => {
+  it.each(['multi', 'single'] as const)(
+    'prevents missing capacity from turning normal commitment into a Severe warning in 2m %s responses',
+    (format) => {
+      const chart = getReportAttributesV2(ENTITLED_FEATURES, buildProject()).find(
+        (chart) => chart.id === 'memory-commitment'
+      )
+      if (!chart) throw new Error('Expected the memory commitment chart')
+
+      const GIB = 1024 ** 3
+      const samples = [
+        { period_start: '2024-01-02T03:00:00Z', ram_commit_limit: String(5 * GIB) },
+        { period_start: '2024-01-02T03:01:00Z', ram_commit_limit: undefined },
+        { period_start: '2024-01-02T03:02:00Z', ram_commit_limit: String(5 * GIB) },
+        { period_start: '2024-01-02T03:03:00Z', ram_commit_limit: String(5 * GIB) },
+      ].map((sample) => ({ ...sample, ram_commit_used: String(4 * GIB) }))
+      const metadata = { format: 'bytes', total: 0, totalAverage: 0, yAxisLimit: 9 * GIB }
+      const attributes = ['ram_commit_used', 'ram_commit_limit'] as const
+      const mapped = attributes.map((attribute) => {
+        const response: InfraMonitoringMultiData =
+          format === 'multi'
+            ? {
+                _originalInterval: '2m',
+                data: samples.map(({ period_start, ...values }) => ({ period_start, values })),
+                series: { [attribute]: metadata },
+              }
+            : { ...metadata, _originalInterval: '2m', data: samples }
+        return mapResponseToAnalyticsData(
+          response,
+          [attribute],
+          undefined,
+          chart.thresholdZoneAttribute
+        )[attribute].data
+      })
+      const data = mapped[0].map((point, index) => ({ ...point, ...mapped[1][index] }))
+      const guidance = getThresholdZoneChart(
+        data,
+        chart.thresholdZones,
+        chart.thresholdZoneAttribute
+      )
+
+      expect(guidance.selectedZone).toBeUndefined()
+      expect(data[0].ram_commit_limit).toBeUndefined()
+      expect(data.map((point) => point.ram_commit_used)).toEqual([4 * GIB, 4 * GIB])
+      expect(data[1].ram_commit_limit).toBe(5 * GIB)
+    }
+  )
+
+  it.each([true, false])(
+    'controls risk guidance without hiding the commitment chart when risk zones are %s',
+    (showMemoryCommitmentRiskZones) => {
+      const chart = getReportAttributesV2(
+        ENTITLED_FEATURES,
+        buildProject(),
+        undefined,
+        undefined,
+        undefined,
+        false,
+        false,
+        true,
+        showMemoryCommitmentRiskZones
+      ).find((chart) => chart.id === 'memory-commitment')
+      if (!chart) throw new Error('Expected the memory commitment chart')
+
+      const GIB = 1024 ** 3
+      const guidance = getThresholdZoneChart(
+        [{ ram_commit_limit: 5 * GIB, ram_commit_used: 8.5 * GIB }],
+        chart.thresholdZones,
+        chart.thresholdZoneAttribute
+      )
+
+      expect(chart.hide).toBe(false)
+      expect(guidance.selectedZone?.badgeLabel).toBe(
+        showMemoryCommitmentRiskZones ? 'Severe' : undefined
+      )
+      expect(guidance.zones.map((zone) => zone.label)).toEqual(
+        showMemoryCommitmentRiskZones ? ['Severe', 'Full commitment capacity'] : []
+      )
+    }
+  )
+
+  it('keeps capacity tied to compute size so overcommitment cannot raise the reference', () => {
+    const chart = getReportAttributesV2(ENTITLED_FEATURES, buildProject()).find(
+      (chart) => chart.id === 'memory-commitment'
+    )
+    const capacity = chart?.thresholdZones?.find((zone) => zone.isAlwaysVisible)
+    const GIB = 1024 ** 3
+
+    expect(
+      capacity?.getRanges([
+        { ram_commit_limit: 5 * GIB, ram_commit_used: 12 * GIB },
+        { ram_commit_limit: 2 * GIB, ram_commit_used: 6 * GIB },
+      ])
+    ).toEqual([
+      [9 * GIB, 9 * GIB],
+      [3 * GIB, 3 * GIB],
+    ])
   })
 })

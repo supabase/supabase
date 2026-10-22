@@ -52,6 +52,8 @@ export const AlertError = ({
   const hasInlineSupportLink =
     showInstructions && !hideContactSupport && SUPPORT_PHRASE_REGEX.test(description)
   const canShowSupportFallback = !hideContactSupport && !hasInlineSupportLink
+  // Without instructions there's no sentence to link, so the fallback continues the message
+  const isSupportFallbackInline = canShowSupportFallback && !showInstructions && !!error?.message
 
   const renderSupportLink = (text: string, key?: number) => (
     <SupportLink
@@ -100,6 +102,12 @@ export const AlertError = ({
             <p>
               {showErrorPrefix && 'Error: '}
               {formattedErrorMessage}
+              {isSupportFallbackInline && (
+                <>
+                  {/[.!?]$/.test(formattedErrorMessage ?? '') ? ' ' : '. '}
+                  If the issue persists, {renderSupportLink('contact support')}.
+                </>
+              )}
             </p>
           )}
           {showInstructions && (
@@ -107,7 +115,9 @@ export const AlertError = ({
               {hasInlineSupportLink ? renderDescriptionWithSupportLink(description) : description}
             </p>
           )}
-          {canShowSupportFallback && <p>{renderSupportLink('Contact support')}</p>}
+          {canShowSupportFallback && !isSupportFallbackInline && (
+            <p>{renderSupportLink('Contact support')}</p>
+          )}
           {children}
         </>
       }
