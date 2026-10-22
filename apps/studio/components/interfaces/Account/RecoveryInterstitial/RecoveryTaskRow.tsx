@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 import { Button, CardContent } from 'ui'
 
@@ -26,7 +26,7 @@ export const RecoveryTaskRow = ({
           variant="default"
           size="tiny"
           disabled
-          icon={<Check size={14} aria-hidden="true" />}
+          icon={<CheckIcon size={14} aria-hidden="true" />}
         >
           Done
         </Button>
