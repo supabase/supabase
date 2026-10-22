@@ -422,19 +422,20 @@ describe('PipelineCreationFlow', () => {
 
   it('edits each section from Review without losing values', async () => {
     const onUrlUpdate = vi.fn()
-    const waitForReview = () =>
+    // The testing adapter drops a queued history push when it re-renders, so
+    // the next click has to wait for the URL write and not only the step text.
+    const waitForStepQuery = (queryString: string) =>
       waitFor(() =>
-        expect(onUrlUpdate).toHaveBeenLastCalledWith(
-          expect.objectContaining({ queryString: '?step=review' })
-        )
+        expect(onUrlUpdate).toHaveBeenLastCalledWith(expect.objectContaining({ queryString }))
       )
     await reachReview(vi.fn(), onUrlUpdate)
     expect(screen.getByText('Check these details, then start the pipeline.')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
-    await waitForReview()
+    await waitForStepQuery('?step=review')
     fireEvent.click(screen.getByRole('button', { name: 'Edit connection' }))
     await screen.findByText(/Step 2 of 4/)
     expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Warehouse')
+    await waitForStepQuery('?step=connection')
     next()
     await screen.findByText(/Step 3 of 4/)
     expect(
@@ -444,16 +445,21 @@ describe('PipelineCreationFlow', () => {
       'href',
       `${DOCS_URL}/guides/database/replication/pipelines#choosing-which-tables-to-copy`
     )
+    await waitForStepQuery('?step=data')
     next()
-    await waitForReview()
+    await waitForStepQuery('?step=review')
     fireEvent.click(screen.getByRole('button', { name: 'Edit data' }))
     await screen.findByText(/Step 3 of 4/)
+    await waitForStepQuery('?step=data')
     next()
-    await waitForReview()
+    await waitForStepQuery('?step=review')
     fireEvent.click(screen.getByRole('button', { name: 'Edit destination' }))
     await screen.findByText(/Step 1 of 4/)
+    // Destination is the default step, so clearOnDefault removes the query.
+    await waitForStepQuery('')
     next()
     await screen.findByText(/Step 2 of 4/)
+    await waitForStepQuery('?step=connection')
     expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Warehouse')
   })
 
