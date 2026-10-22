@@ -1,5 +1,13 @@
 import { useParams } from 'common'
-import { ChevronRight, Info, Loader2, MoreVertical, Plus, RefreshCw, Trash } from 'lucide-react'
+import {
+  ChevronRightIcon,
+  InfoIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  TrashIcon,
+} from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -137,13 +145,13 @@ export const NamespaceWithTables = ({
 
   const missingTables = useMemo(() => {
     return (tablesData || []).filter(
-      (t) => !tables.find((table) => table.table.split('.')[1] === t)
+      (t) => !tables.find((table) => (table.table as string).split('.')[1] === t)
     )
   }, [tablesData, tables])
 
   // Get all tables (connected + missing) for display
   const allTables = useMemo(() => {
-    const connectedTableNames = tables.map((table) => table.table.split('.')[1])
+    const connectedTableNames = tables.map((table) => (table.table as string).split('.')[1])
     const allTableNames = [...new Set([...connectedTableNames, ...missingTables])]
 
     return allTableNames.map((tableName) => ({
@@ -241,7 +249,7 @@ export const NamespaceWithTables = ({
 
           {!HIDE_REPLICATION_USER_FLOW && validSchema && (
             <>
-              <ChevronRight size={12} className="text-foreground-muted" />
+              <ChevronRightIcon size={12} className="text-foreground-muted" />
               <Tooltip>
                 <TooltipTrigger
                   asChild
@@ -255,7 +263,7 @@ export const NamespaceWithTables = ({
                     }
                   >
                     {displaySchema}
-                    {tables.length === 0 && <Info size={12} />}
+                    {tables.length === 0 && <InfoIcon size={12} />}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
@@ -271,7 +279,7 @@ export const NamespaceWithTables = ({
             <Tooltip>
               <TooltipTrigger>
                 <div className="flex items-center gap-x-2 text-foreground-lighter">
-                  <Loader2 size={14} className="animate-spin" />
+                  <Loader2Icon size={14} className="animate-spin" />
                   <p className="text-sm">
                     Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
                     {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
@@ -301,14 +309,14 @@ export const NamespaceWithTables = ({
                 ) : null}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button className="w-7" icon={<MoreVertical />} />
+                    <Button className="w-7" icon={<MoreVerticalIcon />} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-fit min-w-[180px]">
                     <DropdownMenuItem
                       className="flex items-center gap-x-2"
                       onClick={() => setShowConfirmDeleteNamespace(true)}
                     >
-                      <Trash size={12} className="text-foreground-lighter" />
+                      <TrashIcon size={12} className="text-foreground-lighter" />
                       <p>Delete namespace</p>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -318,7 +326,7 @@ export const NamespaceWithTables = ({
               <Button
                 variant={schema ? 'default' : 'warning'}
                 size="tiny"
-                icon={schema ? <RefreshCw /> : <Plus size={14} />}
+                icon={schema ? <RefreshCwIcon /> : <PlusIcon size={14} />}
                 onClick={() => (schema ? rescanNamespace() : setImportForeignSchemaShown(true))}
                 loading={isImportingForeignSchema || isLoadingNamespaceTables}
               >

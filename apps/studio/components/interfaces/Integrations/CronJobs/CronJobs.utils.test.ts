@@ -133,6 +133,24 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should fall back to the pg_net default timeout when timeout_milliseconds is missing', () => {
+    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), body:='' );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toMatchObject({
+      type: 'edge_function',
+      timeoutMs: 5000,
+    })
+  })
+
+  it('should fall back to the pg_net default timeout for http requests without timeout_milliseconds', () => {
+    const command = `select net.http_get( url:='https://example.com/api' );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toMatchObject({
+      type: 'http_request',
+      method: 'GET',
+      endpoint: 'https://example.com/api',
+      timeoutMs: 5000,
+    })
+  })
+
   it('should return a edge function config when the body is missing', () => {
     const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({

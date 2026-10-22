@@ -57,12 +57,14 @@ You need:
 
 The `supabase stack` commands exist only when the `[experimental] stack` setting is on. Without it, `supabase stack` commands fail with `Unknown subcommand "stack"`.
 
-1. Add this to `supabase/config.toml` in your app directory:
+1. In `supabase/config.toml` in your app directory, add `stack = true` under the existing `[experimental]` table. If your `config.toml` doesn't have an `[experimental]` table, add one:
 
    ```toml
    [experimental]
    stack = true
    ```
+
+   Don't add a second `[experimental]` table. A duplicate table makes `config.toml` invalid. The stack commands then stay off. Commands that read the config fail with `failed to load config`.
 
    In a directory without a `config.toml`, set the environment variable instead:
 
@@ -104,7 +106,15 @@ For an app that already has a `config.toml`, remove the port lines from each app
    - `smtp_port` and `pop3_port` under `[local_smtp]`, and `vector_port` under `[analytics]`, if you set them. `supabase init` writes the SMTP ports commented out.
 3. Save the file and commit it, so everyone on the team gets the same behavior.
 
-Remove the ports before the app's first `supabase start` with the setting on. A local project keeps the ports it was created with. If you already started one with the fixed ports, removing them afterward makes `supabase start` fail with `cannot change on the saved stack`. Start a new local project with a different `--stack` name, or run `supabase stack destroy` and start again. Destroying deletes the local project's data.
+If you already started a local project with the fixed ports:
+
+1. Stop it with `supabase stop`.
+2. Remove the port keys from `config.toml`.
+3. Run `supabase start` again.
+
+In CLI v2.121.0 or later, `supabase start` applies the port change to the stopped local project and prints each moved endpoint, such as `api: 54321 → 26199`. The local project keeps its data.
+
+Earlier versions fail with `The saved stack cannot adopt these changes`. On those versions, start a new local project with a different `--stack` name or run `supabase stack destroy` and start again. Destroying deletes the local project's data.
 
 The CLI also treats ports you set with an environment variable, such as `SUPABASE_API_PORT` or `SUPABASE_DB_PORT`, as exact requests. If another process already listens on that port, the start fails. When the port belongs to another local project, the error names that local project.
 
@@ -144,7 +154,7 @@ The database can't be excluded. Studio needs the REST API, so to exclude `rest`,
 
 Running `supabase start` again on a running local project keeps its current settings and prints `Stack is already running with its current services`. To apply a change to `config.toml`, `--exclude`, or `--eager`, stop the local project and start it again. Starting without `--exclude` restores the services enabled in `config.toml`.
 
-Stopping and starting doesn't apply changes to ports or to the Postgres major version. For those, start a new local project with a different `--stack` name, or run `supabase stack destroy` and start again.
+In CLI v2.121.0 or later, stopping and starting also applies port changes. A change to the Postgres major version always needs a new local project. Start one with a different `--stack` name, or run `supabase stack destroy` and start again.
 
 ## Run named local projects for one app
 
@@ -166,7 +176,7 @@ One app can run several local projects by name. This keeps a destructive test ru
 
 A local project started without `--stack` is the app directory's default local project. Named local projects and the default one are independent of each other.
 
-The `db`, `migration`, and other database commands use the default local project for the current branch. They can't target a named local project. See [Limitations](#limitations).
+The `db`, `migration`, and other database commands don't accept `--stack`. When they run against a local database, they use the default local project for the current branch. `supabase db pull`, `supabase db push`, and `supabase db dump` target the linked project unless you pass `--local`. To reach a named local project from a command that accepts `--db-url`, pass the `DB_URL` from `supabase status --stack <name> --env`. See [Limitations](#limitations).
 
 ## Find a local project's endpoints and keys
 
@@ -204,9 +214,15 @@ To list every local project on the machine, across all apps, run:
 supabase stack list
 ```
 
-The list shows each local project's name, project root, branch, runtime, and a short ID. Pass `--output-format json` to get the full ID that `--stack-id` accepts.
+The list shows each local project's name, project root, branch, runtime, whether its background process is reachable, and a short ID. Pass `--output-format json` to get the full ID that `--stack-id` accepts.
 
-To stream live logs from a local project, run `supabase stack logs`. Pass `--service database` to limit the output to one service.
+To read a local project's logs, run `supabase stack logs` in its app directory. The command prints the last 200 retained lines and exits. It also works while the local project is stopped. These flags change what it prints:
+
+- `--follow` keeps streaming new lines after the history.
+- `--tail <n>` changes how many retained lines it prints.
+- `--since 10m` prints only lines from the last 10 minutes.
+- `--service database` narrows the output to one service.
+- `--service gateway` shows only the requests that reached the shared API port.
 
 ## Choose a runtime
 
@@ -244,18 +260,20 @@ To permanently delete one local project and its data, run `supabase stack destro
 supabase stack destroy --stack test --yes
 ```
 
+In CLI v2.121.0 or later, you can destroy several local projects in one command by passing `--stack-id` more than once with IDs from `supabase stack list`. The command asks for confirmation once. Every ID must match a local project before it destroys anything. Earlier versions destroy one local project per command.
+
 <Admonition type="danger">
 
-`supabase stack destroy` deletes the local project's database data and frees its ports. There is no backup and no undo. There is also no bulk destroy, so one command removes one local project.
+`supabase stack destroy` takes no backup, so you can't recover the local project's data afterward. It also frees the local project's ports.
 
 </Admonition>
 
 `destroy` keeps two kinds of data:
 
 - Storage upload files, which live in your app at `supabase/.temp/stack-uploads/<id>/`. Delete that directory to remove them.
-- Container engine resources, if Docker or Podman isn't running. If no process for the local project is still running, the command removes the local project's registration. It prints cleanup commands to run after the engine starts again. Otherwise it fails and asks you to start the engine and retry.
+- Container engine resources, if Docker or Podman isn't running. The command can still remove the local project's registration if no process for it is still running and your user can delete its database files on the host. It then prints cleanup commands to run after the engine starts again. Otherwise it fails, keeps the local project, and asks you to start the engine and retry. Your user might not be able to delete database files that a container wrote to a host directory. Local projects created with Docker version 25 or earlier store data that way.
 
-The printed cleanup command deletes only this local project's database data, from a Docker volume that other local projects share. Don't delete the volume itself.
+If the local project stores its database data in a Docker volume, other local projects share that volume. The printed cleanup command deletes only this local project's data from it. Don't delete the volume itself.
 
 ## Differences from the default `supabase start`
 
@@ -274,10 +292,10 @@ Keep these differences in mind when you turn the setting on for an app that used
   - Custom Auth email templates with `content_path`
   - Storage Analytics and Storage vector buckets
   - A custom `edge_runtime.deno_version`
-  - OrioleDB, and `db.major_version` values other than 15 and 17
-- Database commands can't target a named local project. `supabase db reset`, `supabase db diff`, `supabase db pull`, `supabase db dump`, and the other local database commands use the app directory's default local project for the current branch, and don't accept `--stack`.
+  - `db.major_version` values other than 15 and 17
+  - `db.orioledb_version` in CLI versions earlier than v2.121.0, and the `experimental.s3_*` settings for OrioleDB in any version
+- Database commands don't accept `--stack`. `supabase db reset` and `supabase db diff` run against the current branch's default local project. `supabase db pull`, `supabase db push`, and `supabase db dump` target the linked project unless you pass `--local`. To reach a named local project, pass the `DB_URL` from `supabase status --stack <name> --env` to a command that accepts `--db-url`.
 - Switching branches switches local projects. The git branch is part of the identity. After you check out another branch in the same directory, `supabase start` creates or resumes a different local project with its own data. The first branch's local project keeps running until you stop it.
 - Moving or renaming an app directory creates a new local project, because the identity includes the project root path. The previous local project's data stays until you destroy it.
-- `supabase stack logs` streams new log lines only. It has no history.
 
 <ContentListings id="local-development-parallel-projects-learn-more" />

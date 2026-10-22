@@ -1,6 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DatabaseBackup, Info } from 'lucide-react'
+import { DatabaseBackupIcon, InfoIcon } from 'lucide-react'
+import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -17,12 +17,17 @@ import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/Databas
 import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
 import InformationBox from '@/components/ui/InformationBox'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useBackupsQuery } from '@/data/database/backups-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import {
+  useIsHighAvailability,
+  useIsOrioleDbInAws,
+  useOrioleDbReleaseStage,
+} from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -62,17 +67,29 @@ const ScheduledBackups = () => {
   } = useBackupsQuery({ projectRef })
 
   const isHighAvailability = useIsHighAvailability()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
+  const orioleDbReleaseStage = useOrioleDbReleaseStage()
   const isPitrEnabled = backups?.pitr_enabled
 
-  const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'back_ups'
-  )
+  const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.BACKUPS_READ)
+
+  if (isOrioleDbInAws && orioleDbReleaseStage === 'alpha') {
+    return (
+      <Admonition
+        type="default"
+        title="Database backups are not available for OrioleDB"
+        description={`OrioleDB is currently in public ${orioleDbReleaseStage} and projects created are strictly ephemeral with no database backups`}
+      >
+        <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
+      </Admonition>
+    )
+  }
 
   if (isHighAvailability) {
     return (
       <HighAvailabilityDisabledEmptyState
-        icon={DatabaseBackup}
+        icon={DatabaseBackupIcon}
         title="Scheduled backups unavailable on High Availability projects"
         description="We're working to bring scheduled backups to High Availability projects. Contact support if this is blocking your work."
         className="max-w-none mx-0"
@@ -99,7 +116,7 @@ const ScheduledBackups = () => {
             <InformationBox
               hideCollapse
               defaultVisibility
-              icon={<Info strokeWidth={2} />}
+              icon={<InfoIcon strokeWidth={2} />}
               title="Point-In-Time-Recovery (PITR) enabled"
               description={
                 <div>

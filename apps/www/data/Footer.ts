@@ -27,6 +27,10 @@ const footerData = [
         url: '/edge-functions',
       },
       {
+        text: 'Compute',
+        url: '/compute',
+      },
+      {
         text: 'Realtime',
         url: '/realtime',
       },
@@ -95,6 +99,10 @@ const footerData = [
       {
         text: 'Partner Catalog',
         url: '/partners/catalog',
+      },
+      {
+        text: 'Knowledge Base',
+        url: '/kb',
       },
       {
         text: 'Brand Assets',

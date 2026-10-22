@@ -1,4 +1,4 @@
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontalIcon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -127,8 +127,7 @@ const CreditCard = ({
             {isSpt && spt && (
               <div className="mt-2.5 flex items-center gap-2 border-t pt-2.5 text-xs text-foreground-light">
                 <p className="m-0">
-                  Managed via Stripe Projects · Token ending in{' '}
-                  <code className="text-code-inline">{spt.last4}</code>
+                  Managed via Stripe Projects · Token ending in <code>{spt.last4}</code>
                   {tokenExpiry && <span> · Expires {tokenExpiry}</span>}
                 </p>
               </div>
@@ -157,7 +156,7 @@ const CreditCard = ({
                 <Button
                   variant="outline"
                   className="hover:border-muted px-1"
-                  icon={<MoreHorizontal />}
+                  icon={<MoreHorizontalIcon />}
                   aria-label="More options"
                 />
               </DropdownMenuTrigger>

@@ -23,6 +23,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
+import { MFA_SUPPORT_EMAIL_HREF } from './SignInMfa.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
@@ -36,8 +37,6 @@ const schema = z.object({
 })
 
 const formId = 'sign-in-recovery-code-form'
-
-const SUPPORT_EMAIL_HREF = `mailto:support@supabase.com?subject=${encodeURIComponent('Unable to sign in via MFA')}`
 
 export const SignInRecoveryCodeForm = () => {
   const router = useRouter()
@@ -112,7 +111,7 @@ export const SignInRecoveryCodeForm = () => {
               <Link href="/sign-in">Back to sign in</Link>
             </Button>
             <Button asChild>
-              <a href={SUPPORT_EMAIL_HREF}>Email support</a>
+              <a href={MFA_SUPPORT_EMAIL_HREF}>Email support</a>
             </Button>
           </>
         }
@@ -237,6 +236,14 @@ export const SignInRecoveryCodeForm = () => {
             >
               Force sign out and clear cookies
             </Link>
+          </li>
+          <li>
+            <a
+              href={MFA_SUPPORT_EMAIL_HREF}
+              className="text-sm transition text-foreground-light hover:text-foreground"
+            >
+              Email support to regain access
+            </a>
           </li>
         </ul>
       </div>

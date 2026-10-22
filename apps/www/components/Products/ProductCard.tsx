@@ -6,6 +6,8 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
+import { isCrossZoneHref } from '@/lib/cross-zone'
+
 const ProductCard = ({
   className,
   title,
@@ -36,15 +38,12 @@ const ProductCard = ({
     setHasShimmer(detectBrowser() !== 'Safari')
   }, [])
 
-  return (
-    <Link
-      href={url}
-      className={cn(
-        'group relative w-full sm:h-[400px] flex flex-col gap-5 lg:flex-row focus-ring rounded-xl',
-        className
-      )}
-      onClick={onClick}
-    >
+  const cardClassName = cn(
+    'group relative w-full sm:h-[400px] flex flex-col gap-5 lg:flex-row focus-ring rounded-xl',
+    className
+  )
+  const cardContent = (
+    <>
       <Panel
         hasShimmer={hasShimmer}
         hasActiveOnHover
@@ -102,6 +101,16 @@ const ProductCard = ({
         </div>
         {image && <span aria-hidden="true">{image}</span>}
       </Panel>
+    </>
+  )
+
+  return isCrossZoneHref(url) ? (
+    <a href={url} className={cardClassName} onClick={onClick}>
+      {cardContent}
+    </a>
+  ) : (
+    <Link href={url} className={cardClassName} onClick={onClick}>
+      {cardContent}
     </Link>
   )
 }

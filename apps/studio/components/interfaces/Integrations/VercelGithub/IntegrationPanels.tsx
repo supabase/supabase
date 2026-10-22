@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink, Github } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
-import { Badge, Button, cn } from 'ui'
+import { Badge, Button, cn, GithubIcon } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -29,7 +29,7 @@ type HandleIconType = Integration['integration']['name'] | 'Supabase'
 const HandleIcon = ({ type, className }: { type: HandleIconType; className?: string }) => {
   switch (type) {
     case 'GitHub':
-      return <Github strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+      return <GithubIcon strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
     // case 'Netlify':
     //   return <Square strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
@@ -118,7 +118,7 @@ export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInst
           </div>
         </div>
 
-        <Button asChild disabled={disabled} iconRight={<ExternalLink />}>
+        <Button asChild disabled={disabled} iconRight={<ExternalLinkIcon />}>
           {disabled ? (
             <p>Manage</p>
           ) : (
@@ -140,13 +140,23 @@ export interface IntegrationConnectionProps extends HTMLAttributes<HTMLLIElement
   connection: IntegrationProjectConnection
   type: Integration['integration']['name']
   actions?: ReactNode
+  leadingAction?: ReactNode
   showNode?: boolean
   orientation?: 'horizontal' | 'vertical'
 }
 
 export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   (
-    { connection, type, actions, showNode = true, orientation = 'horizontal', className, ...props },
+    {
+      connection,
+      type,
+      actions,
+      leadingAction,
+      showNode = true,
+      orientation = 'horizontal',
+      className,
+      ...props
+    },
     ref
   ) => {
     const { data: project } = useProjectDetailQuery({ ref: connection.supabase_project_ref })
@@ -180,7 +190,7 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
                 </span>
               </div>
 
-              <ArrowRight
+              <ArrowRightIcon
                 size={14}
                 className="shrink-0 text-foreground-lighter"
                 strokeWidth={1.5}
@@ -222,7 +232,10 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
             </div>
           </div>
 
-          <div className="shrink-0">{actions}</div>
+          <div className="shrink-0 flex items-center gap-x-2">
+            {leadingAction}
+            {actions}
+          </div>
         </div>
       </li>
     )
@@ -246,7 +259,7 @@ export const IntegrationConnectionOption = forwardRef<HTMLLIElement, Integration
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
             <span className="text-sm">{project?.name}</span>
-            <ArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
+            <ArrowRightIcon size={14} className="text-foreground-lighter" strokeWidth={1.5} />
             <HandleIcon type={type} />
             <span className="text-sm">{connection.metadata.name}</span>
           </div>

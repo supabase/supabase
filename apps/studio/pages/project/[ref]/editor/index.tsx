@@ -30,13 +30,21 @@ const TableEditorPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (isHistoryLoaded && projectRef && router) {
       const lastOpenedTableId = Number(history.editor)
-      const lastTabId = Number(
-        tabStore.openTabs.find((id) => editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type))
+      const lastTableTabId = tabStore.openTabs.find((id) =>
+        editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
       )
+      const lastTableTab = lastTableTabId ? tabStore.tabsMap[lastTableTabId] : undefined
+      const lastTabId = lastTableTab?.metadata?.tableId
 
       // Handle redirect to last opened table tab, or last table tab
       if (Number.isInteger(lastOpenedTableId)) {
-        const lastOpenedTableData = tabStore.tabsMap[lastOpenedTableId]
+        // Tabs are keyed by a prefixed id (e.g. "r-293522"), but history only stores
+        // the bare table id, so look up the tab by its metadata instead of by key.
+        const lastOpenedTableData = Object.values(tabStore.tabsMap).find(
+          (tab) =>
+            editorEntityTypes.table.includes(tab.type) &&
+            tab.metadata?.tableId === lastOpenedTableId
+        )
         router.push(
           buildTableEditorUrl({
             projectRef,
@@ -44,19 +52,22 @@ const TableEditorPage: NextPageWithLayout = () => {
             schema: lastOpenedTableData?.metadata?.schema,
           })
         )
-      } else if (Number.isInteger(lastTabId)) {
-        const lastOpenedTableData = tabStore.tabsMap[lastTabId]
+      } else if (lastTabId !== undefined) {
         router.push(
           buildTableEditorUrl({
             projectRef,
             tableId: lastTabId,
-            schema: lastOpenedTableData?.metadata?.schema,
+            schema: lastTableTab?.metadata?.schema,
           })
         )
       }
     }
+    // router is intentionally excluded: in the TanStack build useRouter() returns a
+    // new object on every navigation-related render, and including it here caused
+    // this effect to re-fire mid-navigation and push the same redirect repeatedly,
+    // freezing the page.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHistoryLoaded, projectRef, router])
+  }, [isHistoryLoaded, projectRef])
 
   return (
     <>

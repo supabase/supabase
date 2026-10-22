@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { ChevronLeft, X } from 'lucide-react'
+import { ChevronLeftIcon, XIcon } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { cn } from 'ui'
 
@@ -36,7 +36,7 @@ export const StoragePolicyEditorModalTitle = ({
               'hit-area-6'
             )}
           >
-            <ChevronLeft strokeWidth={2} size={14} />
+            <ChevronLeftIcon strokeWidth={2} size={14} />
             <span className="sr-only">Back</span>
           </button>
           <span>Select a template to use for your new policy</span>
@@ -55,7 +55,7 @@ export const StoragePolicyEditorModalTitle = ({
           'hit-area-6'
         )}
       >
-        <X size={16} />
+        <XIcon size={16} />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </div>
