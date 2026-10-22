@@ -302,8 +302,6 @@ Each removed command or flag exits with code 1 and prints its replacement.
 | `--include-raw-output` on `domains create`, `get`, `reverify`, `activate`, `delete` | `-o json`                                                                                                                                          |
 | `--create-ticket` (global flag)                                                     | `supabase issue bug`                                                                                                                               |
 
-The separate `supabase-go` executable is no longer installed. Call `supabase` instead.
-
 ## Removed config keys and environment variables
 
 Removed config keys fail, so you see them on the first run. Some removed environment variables are ignored instead, so check for these by hand.
@@ -350,6 +348,15 @@ These still work in v3 and are removed in v4:
 - `--linked`, `--project-ref` (except on `supabase link`), `--db-url`, `--local`, and `gen types --project-id`. Use `--remote`.
 - The `linked` value of `db diff --from` and `--to`. Use `remote`.
 - `supabase link --password`, which is ignored.
+
+## `supabase-go` is no longer installed
+
+v3 ships a single `supabase` executable on every install channel. v2 also installed a separate `supabase-go` executable next to it, which a few commands ran through. Most projects don't need to change anything, but check for these:
+
+- Scripts that call `supabase-go` directly fail, because v3 doesn't install it. Call `supabase` instead.
+- `SUPABASE_GO_BINARY` is ignored.
+- The commands that ran through `supabase-go` in v2 are removed. See [Removed commands and flags](#removed-commands-and-flags).
+- If your security tooling allowlists the CLI's executables, `supabase` is the only one left.
 
 ## Getting help
 
