@@ -61,7 +61,7 @@ export function techArticleSchema(input: TechArticleSchemaInput) {
 interface FaqPageSchemaInput {
   question: string
   /** The answer as markdown; only its paragraphs and headings are kept. */
-  answer: string
+  answerMarkdown: string
   dateModified?: Date
 }
 
@@ -89,7 +89,10 @@ export function faqPageSchema(input: FaqPageSchemaInput) {
       {
         '@type': 'Question',
         name: input.question,
-        acceptedAnswer: { '@type': 'Answer', text: plainTextBlocks(input.answer).join('\n\n') },
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: plainTextBlocks(input.answerMarkdown).join('\n\n'),
+        },
       },
     ],
   }

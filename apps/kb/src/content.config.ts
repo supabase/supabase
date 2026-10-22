@@ -20,8 +20,7 @@ const articleFields = {
   // Surfaces the guide in the homepage's "Featured Guides" section.
   pinned: z.boolean().default(false),
   github_url: z.string().optional(),
-  // Frontmatter date, the day the page was last edited. Formatted at display time.
-  date: z.coerce.date().optional(),
+  lastEdited: z.coerce.date().optional(),
 }
 
 // Every entry here is rendered through ArticleLayout by
@@ -70,7 +69,7 @@ const faqs = defineCollection({
     .object({
       title: z.string(),
       topics: z.array(z.string()).default([]),
-      date: z.coerce.date().optional(),
+      lastEdited: z.coerce.date().optional(),
     })
     .transform((data) => ({ ...data, topics: [...new Set(['FAQs', ...data.topics])] })),
 })

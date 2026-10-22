@@ -14,18 +14,18 @@ export async function getStaticPaths() {
 }
 
 const { faq } = Astro.props
-const { title, topics, date } = faq.data
+const { title, topics, lastEdited } = faq.data
 const { Content } = await render(faq)
 
 // faq.filePath is relative to the kb app root, e.g. "src/content/faqs/auth/foo.mdx"
 const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb/${faq.filePath}`
 
 const faqPageJsonLd = serializeJsonLd(
-	faqPageSchema({ question: title, answer: faq.body ?? '', dateModified: date })
+	faqPageSchema({ question: title, answerMarkdown: faq.body ?? '', dateModified: lastEdited })
 )
 ---
 
-<ArticleLayout title={title} topics={topics} viewGitHubLink={viewGitHubLink} lastEdited={date}>
+<ArticleLayout title={title} topics={topics} viewGitHubLink={viewGitHubLink} lastEdited={lastEdited}>
 	<script type="application/ld+json" set:html={faqPageJsonLd} />
 	<Content components={{ Admonition }} />
 </ArticleLayout>

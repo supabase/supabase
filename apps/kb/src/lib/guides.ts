@@ -52,7 +52,7 @@ export const toSummary = (guide: CollectionEntry<'guides'>): GuideSummary => ({
   description: guide.data.description,
   topics: guide.data.topics,
   href: `${import.meta.env.BASE_URL}/guides/${guide.id}`,
-  date: guide.data.date ? formatDisplayDate(guide.data.date) : undefined,
+  date: guide.data.lastEdited ? formatDisplayDate(guide.data.lastEdited) : undefined,
 })
 
 // FAQ entries have no description in frontmatter.
