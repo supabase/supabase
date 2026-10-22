@@ -5,19 +5,6 @@ import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForGridDataToLoad, waitForTableToLoad } from '../utils/wait-for-response.js'
 
-// A document Back must reload so navigation type is back_forward. Scoped to this
-// file because the flag makes other table-editor navigations hang.
-test.use({
-  launchOptions: {
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-back-forward-cache',
-    ],
-  },
-})
-
 test('schema switch replaces history and back leaves the editor', async ({ page, ref }) => {
   const tableName = 'pw_schema_back'
 
@@ -60,12 +47,14 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   expect(await historyLength()).toBe(historyBeforeSchemaChange)
 
   await page.goBack()
-  await expect(page).toHaveURL(new RegExp(`/project/${ref}/?$`))
-  await expect(page).not.toHaveURL(/\/editor/)
-  // a queued schema write would bounce back onto /editor after this back.
-  await page.waitForTimeout(1000)
-  await expect(page).toHaveURL(new RegExp(`/project/${ref}/?$`))
-  await expect(page).not.toHaveURL(/\/editor/)
+  await expect
+    .poll(() => page.url(), {
+      message: 'a queued schema write would bounce back onto /editor',
+    })
+    .toMatch(new RegExp(`/project/${ref}/?$`))
+  await expect(page, 'a queued schema write would bounce back onto /editor').not.toHaveURL(
+    /\/editor/
+  )
 
   const authIndexLoad = waitForTableToLoad(page, ref, 'auth')
   await page.goto(toUrl(`/project/${ref}/editor?schema=auth`))
@@ -83,10 +72,11 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   await expect(page.getByRole('tab', { name: new RegExp(tableName) })).toBeVisible()
   await expect(page.getByRole('combobox', { name: 'Schema public' })).toBeVisible()
 
-  await page.addInitScript((projectRef) => {
+  await page.evaluate((projectRef) => {
     localStorage.removeItem(`dashboard-history-${projectRef}`)
     localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
   }, ref)
+  await page.reload()
   const listLoad = waitForTableToLoad(page, ref, 'public')
   await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
   await listLoad
@@ -98,11 +88,18 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   await reopenLoad
 
   await page.goBack()
-  await expect(page).toHaveURL(/\/editor\?schema=public/)
-  await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
-  await page.waitForTimeout(1000)
-  await expect(page).toHaveURL(/\/editor\?schema=public/)
-  await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
+  await expect(
+    page.getByRole('button', { name: `View ${tableName}`, exact: true }),
+    'a queued schema write would bounce back onto /editor'
+  ).toBeVisible()
+  await expect
+    .poll(() => page.url(), {
+      message: 'a queued schema write would bounce back onto /editor',
+    })
+    .toMatch(/\/editor\?schema=public/)
+  await expect(page, 'a queued schema write would bounce back onto /editor').not.toHaveURL(
+    new RegExp(`/editor/${tableId}`)
+  )
 })
 
 test('a full back to /editor does not open the last table', async ({ page, ref }) => {
@@ -145,10 +142,17 @@ test('a full back to /editor does not open the last table', async ({ page, ref }
   await expect(page).toHaveURL(new RegExp(`/editor/${tableId}`))
 
   await page.goBack()
-  await expect(page).toHaveURL(/\/editor\?schema=public/)
-  await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
-  // a document back_forward load used to settle before the editor read the flag.
-  await page.waitForTimeout(1500)
-  await expect(page).toHaveURL(/\/editor\?schema=public/)
-  await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
+  await expect(
+    page.getByRole('button', { name: `View ${tableName}`, exact: true }),
+    'a document back_forward load used to settle before the editor read the flag'
+  ).toBeVisible()
+  await expect
+    .poll(() => page.url(), {
+      message: 'a document back_forward load used to settle before the editor read the flag',
+    })
+    .toMatch(/\/editor\?schema=public/)
+  await expect(
+    page,
+    'a document back_forward load used to settle before the editor read the flag'
+  ).not.toHaveURL(new RegExp(`/editor/${tableId}`))
 })
