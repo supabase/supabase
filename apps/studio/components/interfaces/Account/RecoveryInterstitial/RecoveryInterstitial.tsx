@@ -4,9 +4,11 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, CardFooter } from 'ui'
 import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryCodesModal'
+import { AuthenticatorTask } from './AuthenticatorTask'
 import { PreviewRecoveryCodesFlow } from './PreviewRecoveryCodesFlow'
 import {
   getMockRecoveryGap,
@@ -22,6 +24,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 export const RecoveryInterstitial = () => {
   const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
   const [returnTo] = useQueryState('returnTo', parseAsString)
+  const [mockTasks] = useQueryState('mockRecoveryTasks', parseAsString)
   const mockGap = getMockRecoveryGap(
     mock,
     process.env.NODE_ENV === 'development',
@@ -29,7 +32,15 @@ export const RecoveryInterstitial = () => {
   )
   const destination = getRecoveryReturnTo(returnTo)
 
-  if (mockGap) return <RecoveryReminder gap={mockGap} destination={destination} isPreview />
+  if (mockGap)
+    return (
+      <RecoveryReminder
+        gap={mockGap}
+        destination={destination}
+        isPreview
+        hasAuthenticatorTask={mockTasks !== 'codes'}
+      />
+    )
   return <LiveRecoveryReminder destination={destination} />
 }
 
@@ -37,12 +48,18 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
   const user = useUser()
   const isEnabled = useFlag('enableAuthRecoveryCodes')
   const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-  const { findings, isPending, isError } = useAccountRecovery({
+  const { findings, isPending, isError, verifiedFactorCount } = useAccountRecovery({
     enabled: isEnabled && hasSecuritySettings,
   })
   const gap = isError || isPending ? null : getRecoveryGap(findings)
   return (
-    <RecoveryReminder key={user?.id} gap={gap} destination={destination} isLoading={isPending} />
+    <RecoveryReminder
+      key={user?.id}
+      gap={gap}
+      destination={destination}
+      isLoading={isPending}
+      hasAuthenticatorTask={verifiedFactorCount === 1}
+    />
   )
 }
 
@@ -51,7 +68,9 @@ export const RecoveryReminder = ({
   destination,
   isPreview = false,
   isLoading = false,
+  hasAuthenticatorTask = true,
   onCodesComplete,
+  onFactorComplete,
   onAction,
   onTaskComplete,
   onExit,
@@ -60,23 +79,51 @@ export const RecoveryReminder = ({
   destination: string
   isPreview?: boolean
   isLoading?: boolean
+  hasAuthenticatorTask?: boolean
   onCodesComplete?: () => void
+  onFactorComplete?: () => void
   onAction?: (action: 'generate_codes' | 'regenerate_codes' | 'add_factor') => void
   onTaskComplete?: (task: 'recovery_codes' | 'authenticator') => void
   onExit?: (state: { gap: RecoveryGap; areCodesSaved: boolean; isFactorComplete: boolean }) => void
 }) => {
   const [startedGap, setStartedGap] = useState<RecoveryGap | null>(null)
+  const [startedHasAuthenticatorTask, setStartedHasAuthenticatorTask] = useState<boolean | null>(
+    null
+  )
   const [areCodesSaved, setAreCodesSaved] = useState(false)
-  const isFactorComplete = false
+  const [isFactorComplete, setIsFactorComplete] = useState(false)
   // Preserve all task dialogs and completed rows during background status updates.
   const activeGap = startedGap ?? gap
   if (!activeGap) {
     return (
       <InterstitialLayout
-        logo={<SupabaseLogo />}
-        title={isLoading ? 'Checking account recovery' : 'You’re all set'}
-        description={isLoading ? undefined : 'No account recovery reminder is available.'}
+        logo={
+          <div className="relative">
+            <SupabaseLogo />
+            {!isLoading && (
+              <span className="absolute -top-2 -right-2 scale-80">
+                <AdmonitionTypeIcon type="success" />
+              </span>
+            )}
+          </div>
+        }
+        title={
+          isLoading ? (
+            <div role="status" aria-label="Checking account recovery">
+              <ShimmeringLoader className="h-7 w-40 py-0" />
+            </div>
+          ) : (
+            'You’re all set'
+          )
+        }
         widthClassName="max-w-md"
+        description={
+          isLoading ? (
+            <ShimmeringLoader className="h-5 w-64 max-w-full py-0" />
+          ) : (
+            'No account recovery reminder is available.'
+          )
+        }
       >
         <CardFooter className="justify-center min-h-12">
           {!isLoading && (
@@ -91,6 +138,7 @@ export const RecoveryReminder = ({
   const isExhausted = activeGap === 'exhausted'
   const handleStart = () => {
     setStartedGap(activeGap)
+    setStartedHasAuthenticatorTask(startedHasAuthenticatorTask ?? hasAuthenticatorTask)
   }
   const handleCodesSaved = () => {
     setAreCodesSaved(true)
@@ -140,6 +188,21 @@ export const RecoveryReminder = ({
           {!isPreview && isExhausted && <RegenerateRecoveryCodesModal {...flowProps} />}
           {!isPreview && !isExhausted && <GenerateRecoveryCodesModal {...flowProps} />}
         </RecoveryTaskRow>
+        {(startedHasAuthenticatorTask ?? hasAuthenticatorTask) && (
+          <AuthenticatorTask
+            isPreview={isPreview}
+            onStart={() => {
+              handleStart()
+              onAction?.('add_factor')
+            }}
+            onComplete={() => {
+              setIsFactorComplete(true)
+              onFactorComplete?.()
+              onTaskComplete?.('authenticator')
+            }}
+            onRecoveryCodesSaved={handleCodesSaved}
+          />
+        )}
       </div>
       <CardFooter className="justify-center px-6 py-5 border-t">
         <Button
