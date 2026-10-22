@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useUrlSigningKeyUpdateMutation } from '@/data/storage/url-signing-key-update-mutation'
 import type { UrlSigningKey } from '@/data/storage/url-signing-keys-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface RevokeUrlSigningKeyDialogProps {
   projectRef?: string
@@ -15,8 +16,11 @@ export const RevokeUrlSigningKeyDialog = ({
   selectedKey,
   onClose,
 }: RevokeUrlSigningKeyDialogProps) => {
+  const track = useTrack()
+
   const { mutate: updateKey, isPending } = useUrlSigningKeyUpdateMutation({
     onSuccess: () => {
+      track('storage_url_signing_key_updated', { change: 'revoked' })
       toast.success('URL signing key revoked')
       onClose()
     },

@@ -3,6 +3,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useUrlSigningKeyRotateMutation } from '@/data/storage/url-signing-key-rotate-mutation'
 import type { UrlSigningKey } from '@/data/storage/url-signing-keys-query'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface RotateUrlSigningKeyDialogProps {
   projectRef?: string
@@ -17,8 +18,11 @@ export const RotateUrlSigningKeyDialog = ({
   activeKey,
   onClose,
 }: RotateUrlSigningKeyDialogProps) => {
+  const track = useTrack()
+
   const { mutate: rotateKey, isPending } = useUrlSigningKeyRotateMutation({
     onSuccess: () => {
+      track('storage_url_signing_key_updated', { change: 'rotated' })
       toast.success('URL signing key rotated')
       onClose()
     },

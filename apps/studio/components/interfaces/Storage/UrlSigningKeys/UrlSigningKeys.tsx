@@ -37,6 +37,7 @@ import { useUrlSigningKeyUpdateMutation } from '@/data/storage/url-signing-key-u
 import { UrlSigningKey, urlSigningKeysQueryOptions } from '@/data/storage/url-signing-keys-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 type DialogState =
   | { type: 'create' }
@@ -46,6 +47,7 @@ type DialogState =
 export const UrlSigningKeys = () => {
   const { ref: projectRef } = useParams()
   const isProjectActive = useIsProjectActive()
+  const track = useTrack()
   const [dialog, setDialog] = useState<DialogState>()
 
   const { can: canReadKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -65,7 +67,10 @@ export const UrlSigningKeys = () => {
     isPending: isMovingToStandby,
     variables: movingKey,
   } = useUrlSigningKeyUpdateMutation({
-    onSuccess: () => toast.success('URL signing key moved to standby'),
+    onSuccess: () => {
+      track('storage_url_signing_key_updated', { change: 'moved_to_standby' })
+      toast.success('URL signing key moved to standby')
+    },
   })
 
   const { activeKey, standbyKeys, revokedKeys } = groupUrlSigningKeys(data ?? [])

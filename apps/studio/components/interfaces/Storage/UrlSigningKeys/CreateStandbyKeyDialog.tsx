@@ -11,6 +11,7 @@ import {
   useUrlSigningKeyCreateMutation,
   type UrlSigningKeyAlgorithm,
 } from '@/data/storage/url-signing-key-create-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface CreateStandbyKeyDialogProps {
   projectRef?: string
@@ -27,8 +28,11 @@ export const CreateStandbyKeyDialog = ({
     DEFAULT_URL_SIGNING_KEY_ALGORITHM
   )
 
+  const track = useTrack()
+
   const { mutate: createKey, isPending } = useUrlSigningKeyCreateMutation({
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      track('storage_url_signing_key_created', { algorithm: variables.algorithm })
       toast.success('Standby key created')
       onClose()
     },
