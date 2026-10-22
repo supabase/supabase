@@ -45,7 +45,7 @@ type NavigationHistoryEntryLike = {
 
 type NavigationLike = EventTarget & {
   currentEntry?: NavigationHistoryEntryLike | null
-  back?: () => Promise<unknown>
+  back?: () => unknown
 }
 
 const STORE_KEY = '__supabasePanelHistory'

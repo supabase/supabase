@@ -11,6 +11,14 @@ function readHistoryMode(history: unknown): 'push' | 'replace' | undefined {
   return undefined
 }
 
+function toParserValue(value: unknown): {} | null {
+  if (value == null) return null
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
+    return value
+  if (typeof value === 'object') return value
+  return null
+}
+
 /**
  * `useQueryState` for a panel param.
  * Push only on closed to open. A new value while open replaces.
@@ -37,7 +45,8 @@ export function usePanelQueryState(key: string, options: UseQueryStateOptions<un
         requestedHistory: callOptions?.history,
         parserHistory,
       })
-      const write = (history: 'push' | 'replace') => setValue(resolved, { ...callOptions, history })
+      const write = (history: 'push' | 'replace') =>
+        setValue(toParserValue(resolved), { ...callOptions, history })
 
       if (action === 'push') {
         armPanelPush(key)
