@@ -933,6 +933,21 @@ export const examples: Registry = [
     files: ['example/skeleton-card.tsx'],
   },
   {
+    name: 'dithered-skeleton-demo',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-demo.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-list',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-list.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-pixel-size',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-pixel-size.tsx'],
+  },
+  {
     name: 'slider-demo',
     type: 'components:example',
     registryDependencies: ['slider'],

@@ -1,0 +1,38 @@
+---
+title: Dithered Skeleton
+description: A textured loading placeholder with an ordered-dither shine.
+component: true
+---
+
+`DitheredSkeleton` is a drop-in alternative to [Skeleton](/docs/components/skeleton). Instead of a flat pulse, it renders drifting noise through an ordered-dither pattern, with a shine band whose edge ripples as it sweeps across.
+
+<ComponentPreview name="dithered-skeleton-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { DitheredSkeleton } from 'ui'
+
+;<DitheredSkeleton className="h-4 w-[200px]" />
+```
+
+Size and shape it with `className`, the same way you would a `Skeleton`.
+
+## Behavior
+
+- **Continuous across a page:** The texture and shine are mapped to page coordinates, so neighboring skeletons read as one surface catching the same light.
+- **Cheap at scale:** Every instance shares a single animation loop capped at 30 frames per second, and instances outside the viewport stop rendering.
+- **Reduced motion:** When the user prefers reduced motion, a static textured frame is shown instead.
+- **Theme-aware:** The dither color follows `text-foreground-lighter` over `bg-muted`, in both light and dark themes.
+
+## Examples
+
+### List
+
+<ComponentPreview name="dithered-skeleton-list" peekCode />
+
+### Pixel size
+
+Use `pixelSize` to control the dither cell size. The default is `2`.
+
+<ComponentPreview name="dithered-skeleton-pixel-size" peekCode />
