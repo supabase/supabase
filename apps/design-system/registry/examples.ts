@@ -973,6 +973,21 @@ export const examples: Registry = [
     files: ['example/dithered-skeleton-lite-stress.tsx'],
   },
   {
+    name: 'gradient-skeleton-demo',
+    type: 'components:example',
+    files: ['example/gradient-skeleton-demo.tsx'],
+  },
+  {
+    name: 'gradient-skeleton-table',
+    type: 'components:example',
+    files: ['example/gradient-skeleton-table.tsx'],
+  },
+  {
+    name: 'gradient-skeleton-speed',
+    type: 'components:example',
+    files: ['example/gradient-skeleton-speed.tsx'],
+  },
+  {
     name: 'slider-demo',
     type: 'components:example',
     registryDependencies: ['slider'],

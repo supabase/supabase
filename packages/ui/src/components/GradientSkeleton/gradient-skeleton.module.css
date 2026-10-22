@@ -1,0 +1,110 @@
+/*
+ * Every layer uses `background-attachment: fixed`, so gradients are positioned against the
+ * viewport rather than each element. Neighboring skeletons show slices of one shared light,
+ * with no JavaScript needed to keep them in phase.
+ */
+
+.root {
+  --gs-sweep-duration: 2.6s;
+  --gs-drift-duration: 9s;
+  --gs-tile: 240vw;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  /* A whisper of static grain breaks up 8-bit banding in the soft gradient falloff. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.root::before,
+.root::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-attachment: fixed;
+}
+
+/* Slow, breathing pools of light that drift underneath the sweep. */
+.root::before {
+  background-image:
+    radial-gradient(
+      ellipse 38vw 26vh at 22% 30%,
+      color-mix(in srgb, currentColor 14%, transparent),
+      color-mix(in srgb, currentColor 6%, transparent) 45%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 30vw 34vh at 74% 68%,
+      color-mix(in srgb, currentColor 11%, transparent),
+      color-mix(in srgb, currentColor 4%, transparent) 50%,
+      transparent 75%
+    );
+  background-size: 140vw 140vh;
+  background-repeat: repeat;
+  animation: gs-drift var(--gs-drift-duration) ease-in-out infinite alternate;
+}
+
+/* The sweep: a long soft tail, a brighter crest, and a quick falloff on the leading edge. */
+.root::after {
+  background-image:
+    linear-gradient(
+      100deg,
+      transparent 30%,
+      color-mix(in srgb, currentColor 3%, transparent) 36%,
+      color-mix(in srgb, currentColor 8%, transparent) 41%,
+      color-mix(in srgb, currentColor 15%, transparent) 45%,
+      color-mix(in srgb, currentColor 24%, transparent) 48%,
+      color-mix(in srgb, currentColor 34%, transparent) 49.6%,
+      color-mix(in srgb, currentColor 20%, transparent) 50.6%,
+      color-mix(in srgb, currentColor 7%, transparent) 52%,
+      transparent 54.5%
+    ),
+    linear-gradient(
+      100deg,
+      transparent 48.8%,
+      color-mix(in srgb, currentColor 30%, transparent) 49.5%,
+      transparent 50.1%
+    );
+  background-size: var(--gs-tile) 100vh;
+  background-repeat: repeat-x;
+  animation: gs-sweep var(--gs-sweep-duration) linear infinite;
+}
+
+@keyframes gs-sweep {
+  from {
+    background-position: calc(var(--gs-tile) * -1) 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes gs-drift {
+  0% {
+    background-position:
+      0 0,
+      0 0;
+  }
+  50% {
+    background-position:
+      9vw 5vh,
+      -7vw -4vh;
+  }
+  100% {
+    background-position:
+      3vw 10vh,
+      -12vw 2vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root::before,
+  .root::after {
+    animation: none;
+  }
+
+  .root::after {
+    background-position: calc(var(--gs-tile) * -0.35) 0;
+  }
+}

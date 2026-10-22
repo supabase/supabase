@@ -371,6 +371,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Gradient Skeleton',
+          href: '/docs/components/gradient-skeleton',
+          items: [],
+        },
+        {
           title: 'Drawer',
           href: '/docs/components/drawer',
           items: [],

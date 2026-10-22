@@ -1,0 +1,43 @@
+---
+title: Gradient Skeleton
+description: A CSS-only loading placeholder with a soft, monotone light sweep.
+component: true
+---
+
+`GradientSkeleton` is a lightweight alternative to [Skeleton](/docs/components/skeleton) and [Dithered Skeleton](/docs/components/dithered-skeleton). A soft band of light sweeps across slow, drifting pools of light, all in a single tone. It's pure CSS, with no JavaScript or canvas.
+
+<ComponentPreview name="gradient-skeleton-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { GradientSkeleton } from 'ui'
+
+;<GradientSkeleton className="h-4 w-[200px]" />
+```
+
+Size and shape it with `className`, the same way you would a `Skeleton`. It works in Server Components.
+
+## Behavior
+
+- **Continuous across a page:** Every gradient uses `background-attachment: fixed`, so it's positioned against the viewport. Neighboring skeletons show slices of the same light instead of each running its own shimmer.
+- **Layered light:** A long soft tail leads into a bright crest and a quick falloff, over two pools of light that drift on a slower, independent cycle.
+- **No banding:** A faint static grain breaks up the color steps in the soft gradient falloff.
+- **Reduced motion:** When the user prefers reduced motion, the light stays still.
+- **Theme-aware:** The light follows `text-foreground-lighter` over `bg-muted`, in both light and dark themes.
+
+## Examples
+
+### Table
+
+<ComponentPreview name="gradient-skeleton-table" peekCode />
+
+### Speed
+
+Use `speed` to change how fast the sweep moves. The default is `1`. The drifting light underneath keeps its pace.
+
+<ComponentPreview name="gradient-skeleton-speed" peekCode />
+
+## Trade-offs
+
+Animating a fixed background repaints each skeleton on every frame, which is cheap for typical loading states but adds up across very large areas. Some mobile browsers ignore `background-attachment: fixed`, so on those each skeleton shows its own sweep rather than a shared one.
