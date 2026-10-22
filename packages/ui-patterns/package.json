@@ -741,6 +741,10 @@
       "import": "./src/Trace/Bar.tsx",
       "types": "./src/Trace/Bar.tsx"
     },
+    "./Trace/Header": {
+      "import": "./src/Trace/Header.tsx",
+      "types": "./src/Trace/Header.tsx"
+    },
     "./Trace/Inspector": {
       "import": "./src/Trace/Inspector.tsx",
       "types": "./src/Trace/Inspector.tsx"
