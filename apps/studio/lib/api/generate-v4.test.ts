@@ -38,6 +38,8 @@ vi.mock('ai', async () => {
   const actual = await vi.importActual('ai')
   return {
     ...actual,
+    // Braintrust's `wrapAISDK` reads this to tell a model from the module, and a mock throws on missing exports
+    specificationVersion: undefined,
     streamText: vi.fn().mockImplementation(() => ({
       stream: new ReadableStream({
         start(controller) {
