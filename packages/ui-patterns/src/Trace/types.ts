@@ -64,3 +64,22 @@ export interface RootProps {
 export interface WaterfallProps extends ComponentProps<'div'> {
   treeWidth?: number
 }
+
+export interface VisibleRow {
+  span: Span
+  depth: number
+  hasChildren: boolean
+  isExpanded: boolean
+}
+
+export interface ViewContextValue {
+  selectedId: string | null
+  collapsed: ReadonlySet<string>
+  select: (id: string | null) => void
+  setCollapsed: (id: string, collapsed: boolean) => void
+}
+
+export interface SpanContextValue {
+  row: VisibleRow
+  isSelected: boolean
+}
