@@ -32,4 +32,13 @@ describe('getFirstTouchAttributionProps', () => {
       Object.fromEntries(FIRST_TOUCH_CLICK_ID_KEYS.map((key) => [key, `${key}-value`]))
     )
   })
+
+  it('drops click ids with an empty value', () => {
+    const props = getFirstTouchAttributionProps(
+      makeTelemetryData('https://supabase.com/dashboard?gclid=&fbclid=abc')
+    )
+
+    expect(props).not.toHaveProperty('gclid')
+    expect(props).toHaveProperty('fbclid', 'abc')
+  })
 })
