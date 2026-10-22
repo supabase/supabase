@@ -8,9 +8,34 @@ import { usePathname } from 'next/navigation'
 import { cn } from 'ui'
 import { TocSection } from 'ui-patterns/Toc'
 
+export type ReferenceLink = { title: string; href: string }
+
+export function ReferenceLinks({
+  links,
+  className,
+}: {
+  links: ReferenceLink[]
+  className?: string
+}) {
+  return (
+    <div className={className}>
+      <h3 className="font-mono text-xs uppercase text-foreground">Additional links</h3>
+      <ul className="mt-2 flex flex-col gap-1.5 text-sm">
+        {links.map((link) => (
+          <li key={link.href}>
+            <MdxAnchor href={link.href} className="text-foreground-lighter">
+              {link.title}
+            </MdxAnchor>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 interface ReferenceSidebarProps {
   className?: string
-  links?: Array<{ title: string; href: string }>
+  links?: ReferenceLink[]
 }
 
 /**
@@ -33,20 +58,7 @@ export function ReferenceSidebar({ className, links = [] }: ReferenceSidebarProp
           </div>
         )}
         {toc.length !== 0 && <TocSection items={toc} />}
-        {links.length !== 0 && (
-          <div className="pl-5">
-            <h3 className="font-mono text-xs uppercase text-foreground">Additional links</h3>
-            <ul className="mt-2 flex flex-col gap-1.5 text-sm">
-              {links.map((link) => (
-                <li key={link.href}>
-                  <MdxAnchor href={link.href} className="text-foreground-lighter">
-                    {link.title}
-                  </MdxAnchor>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {links.length !== 0 && <ReferenceLinks links={links} className="pl-5" />}
       </div>
     </div>
   )

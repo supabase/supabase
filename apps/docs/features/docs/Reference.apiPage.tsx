@@ -2,28 +2,19 @@ import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { reference_api } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { getSectionsBySlug } from '~/features/docs/Reference.generated.singleton'
-import { getRefMarkdown } from '~/features/docs/Reference.mdx'
+import { getRefFrontmatter } from '~/features/docs/Reference.mdx'
 import { ReferenceNavigation } from '~/features/docs/Reference.navigation'
 import { ReferenceContentScrollHandler } from '~/features/docs/Reference.navigation.client'
 import { SectionSwitch } from '~/features/docs/Reference.sections'
-import { ReferenceSidebar } from '~/features/docs/Reference.sidebar'
+import {
+  ReferenceLinks,
+  ReferenceSidebar,
+  type ReferenceLink,
+} from '~/features/docs/Reference.sidebar'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { notFound, redirect } from 'next/navigation'
 import { cn } from 'ui'
-
-/**
- * The links live in the MDX source so they also reach the generated reference
- * markdown. The web page lifts them into the sidebar (the copy in the article
- * is hidden from `md` up).
- */
-function getAdditionalLinks(mdx: string) {
-  const [, list = ''] = mdx.split(/^Additional links\s*$/m)
-  return Array.from(list.matchAll(/^\s*-\s+\[([^\]]+)\]\(([^)]+)\)/gm), ([, title, href]) => ({
-    title,
-    href,
-  }))
-}
 
 export async function ApiReferencePage({ path }: { path: Array<string> }) {
   const operationSlug = path[0]
@@ -45,7 +36,7 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
 
   const isIntroduction = section.type === 'markdown'
   const additionalLinks = isIntroduction
-    ? getAdditionalLinks(await getRefMarkdown(`api/${section.id}`))
+    ? (((await getRefFrontmatter(`api/${section.id}`)).links as ReferenceLink[] | undefined) ?? [])
     : []
 
   return (
@@ -74,6 +65,10 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
                   className="@container/article col-span-12 md:col-span-8 min-w-0"
                 >
                   <SectionSwitch libraryId="api" version="latest" section={section} />
+                  {/* The sidebar is hidden below `md`, so keep the links reachable */}
+                  {additionalLinks.length !== 0 && (
+                    <ReferenceLinks links={additionalLinks} className="mt-8 md:hidden" />
+                  )}
                 </article>
                 <ReferenceSidebar
                   links={additionalLinks}
