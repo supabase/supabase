@@ -314,3 +314,9 @@ export function computeMinimapRects(
   })
   return { rects, laneCount }
 }
+
+export function formatAttributeValue(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (value === null || typeof value !== 'object') return String(value)
+  return JSON.stringify(value)
+}
