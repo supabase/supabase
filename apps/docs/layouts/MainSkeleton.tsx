@@ -177,6 +177,7 @@ function SidebarSkeleton({
 
   const mobileMenuOpen = useMenuMobileOpen()
   const [tocSlot, setTocSlot] = useState<HTMLDivElement | null>(null)
+  const [scrolledTitle, setScrolledTitle] = useState<string | null>(null)
   const [pickedGroupLabel, setPickedGroupLabel] = useState<string>()
   const currentGroupLabel = getMenuGroupLabel(menuId)
   const selectedGroupLabel = pickedGroupLabel ?? currentGroupLabel
@@ -211,12 +212,15 @@ function SidebarSkeleton({
           <TopNavBar
             isMenuOpen={mobileMenuOpen}
             onMenuToggle={hideSideNav ? undefined : handleMenuToggle}
+            scrolledTitle={mobileMenuOpen ? null : scrolledTitle}
           />
           <div ref={setTocSlot} inert={mobileMenuOpen} className="md:hidden" />
         </div>
         {/* the drawer covers the page, so tab stays in the header and the drawer */}
         <div inert={mobileMenuOpen} className="grow">
-          <MobileHeaderSlotsContext value={{ tocSlot }}>{children}</MobileHeaderSlotsContext>
+          <MobileHeaderSlotsContext value={{ tocSlot, onTitleScroll: setScrolledTitle }}>
+            {children}
+          </MobileHeaderSlotsContext>
           {!hideFooter && <Footer />}
         </div>
         <MobileMenuBackdrop />

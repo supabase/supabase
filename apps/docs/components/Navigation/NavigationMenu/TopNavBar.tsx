@@ -14,6 +14,7 @@ import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
+import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
@@ -29,9 +30,11 @@ interface TopNavBarProps {
   // on pages with a sidebar the burger opens the sidebar drawer, not the global menu
   isMenuOpen?: boolean
   onMenuToggle?: () => void
+  // the page title after it scrolls under the bar, null while the title is in view
+  scrolledTitle?: string | null
 }
 
-const TopNavBar: FC<TopNavBarProps> = ({ isMenuOpen = false, onMenuToggle }) => {
+const TopNavBar: FC<TopNavBarProps> = ({ isMenuOpen = false, onMenuToggle, scrolledTitle }) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -55,8 +58,8 @@ const TopNavBar: FC<TopNavBarProps> = ({ isMenuOpen = false, onMenuToggle }) => 
             <GlobalNavigationMenu />
           </div>
           <div className="w-full grow lg:w-auto flex gap-3 justify-between lg:justify-end items-center h-full">
-            <div className="lg:hidden">
-              <HeaderLogo />
+            <div className="lg:hidden min-w-0">
+              <MobileHeaderLogo scrolledTitle={scrolledTitle} />
             </div>
 
             <div className="flex gap-2 items-center">
@@ -140,11 +143,19 @@ const TopNavBar: FC<TopNavBarProps> = ({ isMenuOpen = false, onMenuToggle }) => 
   )
 }
 
-const HeaderLogo = memo(() => {
+const HeaderLogo = memo(() => (
+  <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit">
+    <HeaderLogoContent />
+  </Link>
+))
+
+HeaderLogo.displayName = 'HeaderLogo'
+
+const HeaderLogoContent = () => {
   const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   return (
-    <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit">
+    <>
       <Image
         className={cn('hidden dark:block m-0!', largeLogo && 'h-[36px]')}
         src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
@@ -164,11 +175,30 @@ const HeaderLogo = memo(() => {
         alt="Supabase wordmark"
       />
       <span className="font-mono text-sm font-medium text-primary mb-px">DOCS</span>
+    </>
+  )
+}
+
+const MobileHeaderLogo = ({ scrolledTitle }: { scrolledTitle?: string | null }) => {
+  // the large logo is taller than the reel, so it does not roll
+  if (largeLogo) return <HeaderLogo />
+
+  return (
+    <Link
+      href="/"
+      aria-label="Supabase docs"
+      className="flex h-11 min-w-0 items-center text-sm font-medium text-foreground"
+    >
+      <HeadingReel id={scrolledTitle ?? 'logo'} index={scrolledTitle ? 1 : 0}>
+        {scrolledTitle ?? (
+          <span className="flex items-center gap-1.5">
+            <HeaderLogoContent />
+          </span>
+        )}
+      </HeadingReel>
     </Link>
   )
-})
-
-HeaderLogo.displayName = 'HeaderLogo'
+}
 
 TopNavBar.displayName = 'TopNavBar'
 
