@@ -257,9 +257,10 @@ export const updateColumn = async ({
       }
 
       const columnName = formattedPayload.name ?? originalColumn.name
-      primaryKeyColumns = isPrimaryKey
-        ? existingPrimaryKeys.concat([columnName])
-        : existingPrimaryKeys.filter((x) => x !== columnName)
+      primaryKeyColumns = existingPrimaryKeys.filter((name) => name !== originalColumn.name)
+      if (isPrimaryKey) {
+        primaryKeyColumns.push(columnName)
+      }
     }
 
     const { sql: updateColumnSQL } = pgMeta.columns.update(originalColumn, {
@@ -654,6 +655,7 @@ export const createTable = async ({
   return { table }
 }
 
+/** Updates a table and its columns and constraints atomically. */
 export const updateTable = async ({
   projectRef,
   connectionString,
