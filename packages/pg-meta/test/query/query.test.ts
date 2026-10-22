@@ -4,8 +4,8 @@ import { ident, joinSqlFragments, safeSql } from '../../src/pg-format'
 import { Query } from '../../src/query/Query'
 import * as QueryUtils from '../../src/query/Query.utils'
 import { QueryAction } from '../../src/query/QueryAction'
-import { QueryFilter } from '../../src/query/QueryFilter'
-import { QueryModifier } from '../../src/query/QueryModifier'
+import { IQueryFilter, QueryFilter } from '../../src/query/QueryFilter'
+import { IQueryModifier, QueryModifier } from '../../src/query/QueryModifier'
 import type { Filter, QueryTable, Sort } from '../../src/query/types'
 
 describe('Query', () => {
@@ -818,5 +818,16 @@ describe('End-to-end query chaining', () => {
     const sql = query.from('users', 'public').truncate().toSql()
 
     expect(sql).toBe('truncate public.users;')
+  })
+
+  test('should allow tuple filters and CTE options via IQueryFilter and IQueryModifier interfaces', () => {
+    const query = new Query()
+    const filterBuilder: IQueryFilter = query.from('users', 'public').select()
+    filterBuilder.filter(['id', 'version'], '=', [1, 2])
+    const modifierBuilder: IQueryModifier = filterBuilder
+    const sqlDefault = modifierBuilder.toSql()
+    expect(sqlDefault).toBe('select * from public.users where (id, version) = (1, 2);')
+    const sqlWithOptions = modifierBuilder.toSql({ isCTE: false, isFinal: false })
+    expect(sqlWithOptions).toBe('select * from public.users where (id, version) = (1, 2)')
   })
 })
