@@ -225,6 +225,84 @@ describe('PipelineCreationFlow', () => {
     return { requests, starts, destinationRequests, pipelineRequests }
   }
 
+  it.each([
+    [false, false],
+    [true, false],
+    [false, true],
+    [true, true],
+  ])(
+    'places review failures and keeps the current position (connection: %s, warnings: %s)',
+    async (hasConnectionFailure, hasWarnings) => {
+      const { requests } = mockCreation()
+      await reachReview()
+      const validationStatus = screen.getByRole('status', { name: 'Pipeline validation status' })
+      expect(validationStatus).toBeEmptyDOMElement()
+      const scrollIntoView = vi.fn()
+      vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(scrollIntoView)
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/destinations/validate',
+        response: () =>
+          HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+            validation_failures: hasConnectionFailure
+              ? [
+                  {
+                    name: 'Credentials',
+                    reason: 'Check destination credentials.',
+                    failure_type: 'critical',
+                  },
+                ]
+              : [],
+          }),
+      })
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/pipelines/validate',
+        response: () =>
+          HttpResponse.json<components['schemas']['ValidatePipelineResponse_Output']>({
+            validation_failures: [
+              {
+                name: 'Publication',
+                reason: 'Check publication settings.',
+                failure_type: 'critical',
+              },
+              ...(hasWarnings
+                ? [
+                    {
+                      name: 'Retention',
+                      reason: 'Review retention settings.',
+                      failure_type: 'warning' as const,
+                    },
+                  ]
+                : []),
+            ],
+          }),
+      })
+      fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+      await screen.findByText('Check publication settings.')
+      expect(screen.getByRole('status', { name: 'Pipeline validation status' })).toBe(
+        validationStatus
+      )
+      const connection = withinRegion('Connection review')
+      const data = withinRegion('Data review')
+      if (hasConnectionFailure)
+        expect(connection.getByText('Check destination credentials.')).toBeInTheDocument()
+      expect(connection.getByRole('button', { name: 'Edit connection' })).toBeInTheDocument()
+      expect(connection.queryByText('Check publication settings.')).not.toBeInTheDocument()
+      expect(data.getByText('Check publication settings.')).toBeInTheDocument()
+      expect(data.getByRole('button', { name: 'Edit data' })).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          hasWarnings
+            ? 'Fix the above issues and review warnings before starting the pipeline.'
+            : 'Fix the above issues before starting the pipeline.'
+        )
+      ).toBeInTheDocument()
+      expect(scrollIntoView).not.toHaveBeenCalled()
+      expect(requests).toHaveLength(0)
+    }
+  )
+
   it.each([false, true])(
     'leaves after one committed creation, including start failure: %s',
     async (failStart) => {
@@ -340,6 +418,9 @@ describe('PipelineCreationFlow', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
     await screen.findByRole('button', { name: 'Start pipeline anyway' })
+    expect(
+      screen.getByText('Review the warnings above before starting the pipeline.')
+    ).toBeInTheDocument()
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toBeEnabled()
     )
@@ -712,6 +793,82 @@ describe('PipelineCreationFlow', () => {
     expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
   })
 
+  it('shows one publication loading failure before Continue and clears it after a successful retry', async () => {
+    let shouldFail = true
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: () =>
+        shouldFail
+          ? HttpResponse.json<{ message: string }>({ message: 'Unavailable' }, { status: 503 })
+          : HttpResponse.json<components['schemas']['PublicationDetailsResponse_Output']>({
+              name: 'analytics',
+              config: {
+                type: 'tables',
+                tables: [],
+                operations: ['insert'],
+                publish_via_partition_root: false,
+              },
+              tables: [],
+            }),
+    })
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      nuqs: { hasMemory: true },
+    })
+    next()
+    fillConnection()
+    await continueToData()
+    await selectPublication()
+    await screen.findByText('Publication tables could not be loaded')
+    fireEvent.click(withinRegion('Data').getByRole('button', { name: /Advanced settings/ }))
+    expect(screen.queryByText('Table settings could not be loaded')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Partition handling could not be loaded/)).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getAllByText('Publication tables could not be loaded')).toHaveLength(1)
+    )
+    expect(screen.getByText('Click Continue to try again.')).toBeInTheDocument()
+    expect(screen.queryByText(/Refresh the page before changing/)).not.toBeInTheDocument()
+    next()
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled())
+    await waitFor(() =>
+      expect(screen.getAllByText('Publication tables could not be loaded')).toHaveLength(1)
+    )
+    shouldFail = false
+    next()
+    await waitForStep(4)
+    expect(screen.queryByText('Publication tables could not be loaded')).not.toBeInTheDocument()
+  })
+
+  it('asks for another publication when the selected publication was deleted', async () => {
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      nuqs: { hasMemory: true },
+    })
+    next()
+    fillConnection()
+    await continueToData()
+    await selectPublication()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications',
+      response: () =>
+        HttpResponse.json<components['schemas']['ReadPublicationsResponse_Output']>({
+          publications: [],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: () =>
+        HttpResponse.json<{ message: string }>({ message: 'Not found' }, { status: 404 }),
+    })
+    next()
+    await screen.findByText('The publication analytics was not found.')
+    await screen.findByText('Select an available publication.')
+    expect(screen.queryByText('Publication tables could not be loaded')).not.toBeInTheDocument()
+    expect(screen.queryByText('Click Continue to try again.')).not.toBeInTheDocument()
+    expect(stepStatus()).toHaveTextContent('Step 3 of 4')
+  })
+
   it('blocks incomplete data, retries metadata failures, and reveals invalid advanced settings', async () => {
     const onUrlUpdate = vi.fn()
     customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
@@ -756,9 +913,7 @@ describe('PipelineCreationFlow', () => {
     })
     next()
     await waitFor(() =>
-      expect(
-        screen.queryByText('Publication tables could not be loaded. Click Continue to try again.')
-      ).toBeInTheDocument()
+      expect(screen.queryByText('Click Continue to try again.')).toBeInTheDocument()
     )
     shouldFail = false
     next()
