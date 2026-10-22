@@ -25,12 +25,12 @@ The Supabase CLI sends every email from local Auth to Mailpit, an email testing 
 
    Variable names depend on your framework. To test against your hosted project again, restore its project URL and publishable key.
 
-1. In your app, sign up or request a magic link.
+1. In your app, request a magic link or a password recovery email.
 1. In your browser, go to the **Mailpit** URL and open the email to get the link or code.
 
 Local Auth limits how often it sends to the same address. By default, it sends one email per address per second. To change this, set `max_frequency` under `[auth.email]` in `supabase/config.toml`.
 
-Email confirmation is off by default in local development and on by default for hosted projects. To test the confirmation flow locally, set `enable_confirmations = true` under `[auth.email]`, and then restart the local stack.
+Email confirmation is off by default in local development and on by default for hosted projects, so local sign-up doesn't send an email. To test the confirmation email locally, set `enable_confirmations = true` under `[auth.email]`, and then restart the local stack.
 
 ## Test email flows on a hosted project
 
@@ -116,7 +116,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 </TabPanel>
 </Tabs>
 
-Test numbers don't count toward the project's hourly SMS limit. Auth still makes you wait between codes for the same number. The wait defaults to 5 seconds. Locally, change it with `max_frequency` under `[auth.sms]`.
+Test numbers don't count toward the project's hourly SMS limit. Auth makes you wait between codes for the same number. The wait defaults to <SharedData data="config">auth.rate_limits.otp.period</SharedData> on hosted projects and 5 seconds locally. Locally, change it with `max_frequency` under `[auth.sms]`.
 
 <Admonition type="danger">
 
