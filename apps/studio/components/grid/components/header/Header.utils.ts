@@ -5,13 +5,19 @@ import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePa
 import { getCellValue } from '@/data/table-rows/get-cell-value-mutation'
 import type { RoleImpersonationState } from '@/lib/role-impersonation'
 
-export const formatRowsForCSV = ({ rows, columns }: { rows: any[]; columns: string[] }) => {
+export const formatRowsForCSV = ({
+  rows,
+  columns,
+}: {
+  rows: readonly Record<string, unknown>[]
+  columns: string[]
+}) => {
   const formattedRows = rows.map((row) => {
-    const formattedRow = row
-    Object.keys(row).map((column) => {
+    const formattedRow = { ...row }
+    for (const column of Object.keys(row)) {
       if (typeof row[column] === 'object' && row[column] !== null)
         formattedRow[column] = JSON.stringify(formattedRow[column])
-    })
+    }
     return formattedRow
   })
   const csv = Papa.unparse(formattedRows, { columns })
