@@ -8,6 +8,7 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderDescription,
+  PageHeaderMeta,
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
@@ -39,12 +40,14 @@ export function ModelDashboard() {
   return (
     <>
       <PageHeader size="large">
-        <PageHeaderSummary>
-          <PageHeaderTitle>
-            {state.status === 'ready' ? state.model.title : 'Dashboard Links'}
-          </PageHeaderTitle>
-          <PageHeaderDescription>A temporary view defined by its link</PageHeaderDescription>
-        </PageHeaderSummary>
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>
+              {state.status === 'ready' ? state.model.title : 'Dashboard Links'}
+            </PageHeaderTitle>
+            <PageHeaderDescription>A temporary view defined by its link</PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="large">
         <PageSection>
