@@ -1,13 +1,56 @@
 import { AuthError } from '@supabase/auth-js'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useFlag } from 'common'
 import { HttpResponse } from 'msw'
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { RecoveryReminder } from '@/components/interfaces/Account/RecoveryInterstitial/RecoveryInterstitial'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return { ...actual, useFlag: vi.fn(() => false), useParams: () => ({ ref: 'default' }) }
+})
+
+async function enrollFactor() {
+  vi.spyOn(auth.mfa, 'enroll').mockResolvedValue({
+    data: {
+      id: 'backup-factor',
+      type: 'totp',
+      friendly_name: 'Backup',
+      totp: { qr_code: 'data:image/svg+xml,<svg/>', secret: 'test', uri: 'otpauth://test' },
+    },
+    error: null,
+  })
+  await userEvent.type(screen.getByRole('textbox', { name: 'Authenticator app name' }), 'Backup')
+  fireEvent.click(screen.getByRole('button', { name: 'Generate QR' }))
+  await screen.findByText('Verify new factor Backup')
+}
+
+async function verifyFactor() {
+  vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
+    data: {
+      access_token: 'test',
+      token_type: 'bearer',
+      expires_in: 3600,
+      refresh_token: 'test',
+      user: {
+        id: 'user',
+        aud: 'authenticated',
+        app_metadata: {},
+        user_metadata: {},
+        created_at: '2026-01-01T00:00:00Z',
+      },
+    },
+    error: null,
+  })
+  await userEvent.type(screen.getByRole('textbox', { name: 'Authentication code' }), '123456')
+  fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+  await screen.findByText('Backup authenticator added')
+}
 
 const response = {
   data: {
@@ -20,11 +63,12 @@ const response = {
 }
 
 async function acknowledgeCodes() {
-  expect(screen.getByRole('button', { name: 'Done' })).toBeDisabled()
+  const dialog = within(screen.getByRole('dialog'))
+  expect(dialog.getByRole('button', { name: 'Done' })).toBeDisabled()
   fireEvent.click(
-    screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
+    dialog.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
   )
-  fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+  fireEvent.click(dialog.getByRole('button', { name: 'Done' }))
 }
 
 async function confirmRegeneration() {
@@ -37,6 +81,7 @@ async function confirmRegeneration() {
 }
 
 describe('RecoveryReminder', () => {
+  beforeEach(() => vi.mocked(useFlag).mockReturnValue(false))
   test('shimmers while checking and hides Continue until resolved', () => {
     const { rerender } = customRender(
       <RecoveryReminder gap={null} destination="/organizations" isLoading />
@@ -62,30 +107,28 @@ describe('RecoveryReminder', () => {
   })
 
   test('completes optional authenticator independently and preserves codes task on cancellation', async () => {
-    const enroll = vi.spyOn(auth.mfa, 'enroll')
+    vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({ data: { id: 'backup-factor' }, error: null })
+    vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue(response)
     const { rerender } = customRender(
-      <RecoveryReminder gap="missing" destination="/organizations" isPreview />
+      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask />
     )
     expect(screen.getByRole('link', { name: 'Skip for now' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
-    const dialog = await screen.findByRole('dialog')
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+    await enrollFactor()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(screen.getByRole('button', { name: 'Add authenticator' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Generate codes' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
-    rerender(<RecoveryReminder gap={null} destination="/organizations" isPreview />)
-    fireEvent.click(
-      within(await screen.findByRole('dialog')).getByRole('button', { name: 'Complete preview' })
-    )
-    await screen.findByText('Backup authenticator added')
+    await enrollFactor()
+    rerender(<RecoveryReminder gap={null} destination="/organizations" hasAuthenticatorTask />)
+    await verifyFactor()
     expect(screen.getByRole('button', { name: 'Done' })).toBeDisabled()
     expect(screen.getByRole('link', { name: 'Continue' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Generate codes' })).toBeInTheDocument()
     expect(screen.queryByText('Recovery codes saved')).not.toBeInTheDocument()
-    expect(enroll).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Generate codes' }))
-    await screen.findByText('PREVIEW-NOT-A-VALID-RECOVERY-CODE-01')
+    await screen.findByText('WTO2-4T5X-BEUL-VJMI')
     await acknowledgeCodes()
     await screen.findByText('Recovery codes saved')
     expect(screen.getAllByRole('button', { name: 'Done' })).toHaveLength(2)
@@ -95,6 +138,7 @@ describe('RecoveryReminder', () => {
   })
 
   test('reports actions, acknowledged completion, and exit state', async () => {
+    vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue(response)
     const onAction = vi.fn()
     const onTaskComplete = vi.fn()
     const onExit = vi.fn()
@@ -102,7 +146,6 @@ describe('RecoveryReminder', () => {
       <RecoveryReminder
         gap="missing"
         destination="/organizations"
-        isPreview
         hasAuthenticatorTask={false}
         onAction={onAction}
         onTaskComplete={onTaskComplete}
@@ -117,7 +160,7 @@ describe('RecoveryReminder', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Generate codes' }))
     expect(onAction).toHaveBeenCalledWith('generate_codes')
-    await screen.findByText('PREVIEW-NOT-A-VALID-RECOVERY-CODE-01')
+    await screen.findByText('WTO2-4T5X-BEUL-VJMI')
     expect(screen.getByRole('link', { name: /Account Security/ })).toHaveAttribute(
       'target',
       '_blank'
@@ -136,33 +179,20 @@ describe('RecoveryReminder', () => {
 
   test('retains the authenticator dialog when background factors change', async () => {
     const { rerender } = customRender(
-      <RecoveryReminder gap="missing" destination="/organizations" isPreview hasAuthenticatorTask />
+      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask />
     )
     fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
-    await screen.findByRole('dialog')
+    await enrollFactor()
     rerender(
-      <RecoveryReminder
-        gap="missing"
-        destination="/organizations"
-        isPreview
-        hasAuthenticatorTask={false}
-      />
+      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask={false} />
     )
     expect(screen.getByRole('dialog')).toBeInTheDocument()
-    fireEvent.click(
-      within(screen.getByRole('dialog')).getByRole('button', { name: 'Complete preview' })
-    )
-    await screen.findByText('Backup authenticator added')
+    await verifyFactor()
   })
 
   test('supports a codes-only task list', () => {
     customRender(
-      <RecoveryReminder
-        gap="missing"
-        destination="/organizations"
-        isPreview
-        hasAuthenticatorTask={false}
-      />
+      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask={false} />
     )
     expect(screen.getByText('No recovery codes')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add authenticator' })).not.toBeInTheDocument()
@@ -257,23 +287,18 @@ describe('RecoveryReminder', () => {
     await screen.findByText('Recovery codes saved')
   })
 
-  test.each(['missing', 'exhausted'] as const)(
-    'previews %s flow without live mutations',
-    async (gap) => {
-      const generate = vi.spyOn(auth.mfa.recoveryCodes, 'generate')
-      const regenerate = vi.spyOn(auth.mfa.recoveryCodes, 'regenerate')
-      customRender(<RecoveryReminder gap={gap} destination="/organizations" isPreview />)
-      fireEvent.click(
-        screen.getByRole('button', {
-          name: gap === 'missing' ? 'Generate codes' : 'Regenerate codes',
-        })
-      )
-      if (gap === 'exhausted') await confirmRegeneration()
-      await screen.findByText('PREVIEW-NOT-A-VALID-RECOVERY-CODE-01')
-      await acknowledgeCodes()
-      await screen.findByText('Recovery codes saved')
-      expect(generate).not.toHaveBeenCalled()
-      expect(regenerate).not.toHaveBeenCalled()
-    }
-  )
+  test('does not claim the account is safe when recovery checks fail', () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
+    })
+    customRender(<RecoveryReminder gap={null} destination="/organizations" isError />)
+    expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Account recovery check unavailable' })
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute('href', '/organizations')
+  })
 })
