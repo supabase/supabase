@@ -89,9 +89,7 @@ export default function TableRowLinkActions() {
               </TableCell>
               <TableCell>{policy.name}</TableCell>
               <TableCell>
-                <code className="text-foreground-muted text-code-inline uppercase">
-                  {policy.command}
-                </code>
+                <code className="text-foreground-muted uppercase">{policy.command}</code>
               </TableCell>
               <TableCell className="text-foreground-lighter">{policy.appliedTo}</TableCell>
               <TableCell className="flex justify-end items-center h-full gap-3">

@@ -58,8 +58,9 @@ vi.mock('@/lib/telemetry/track', () => ({
   useTrack: () => vi.fn(),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: () => ({ can: true }),
 }))
 
 vi.mock('@/state/organization-settings', () => ({

@@ -1,4 +1,7 @@
 @import 'config/tailwind.config.css';
+@import 'config/inline-code.css';
+@import './utilities.css';
+@import './keyframes.css';
 
 @source '../pages/**/*.astro';
 @source '../components/**/*.{astro,tsx}';
@@ -21,6 +24,26 @@
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-manrope, var(--font-sans));
   --font-mono: 'Source Code Pro', ui-monospace, Menlo, monospace;
+}
+
+@theme {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --animate-draw-out: draw-out 700ms cubic-bezier(0.65, 0, 0.35, 1) both;
+  --animate-draw-line: draw-line 1.8s linear both;
+  --animate-draw-line-fast: draw-line 850ms cubic-bezier(0.65, 0, 0.35, 1) both;
+  --animate-fade-in: fade-in 450ms ease-out both;
+}
+
+@theme {
+  --tracking-display: -0.03em;
+  --tracking-title: -0.015em;
+  --tracking-body: -0.012em;
+  --tracking-label: 0.08em;
+}
+
+@theme inline {
+  --shadow-raised: var(--raised-shadow, 0 0 #0000);
+  --drop-shadow-raised: var(--raised-drop-shadow, 0 0 #0000);
 }
 
 /* Same type scale as apps/docs/styles/globals.css — without this, utilities
@@ -65,12 +88,14 @@ h6:not(.font-mono),
   @apply font-heading font-semibold;
 }
 
-*,
-::after,
-::before,
-::backdrop,
-::file-selector-button {
-  border-color: var(--border-default, currentColor);
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border-default, currentColor);
+  }
 }
 
 /* Code block theme colors for use with Supabase Theme */
@@ -88,6 +113,9 @@ h6:not(.font-mono),
   --code-token-number: #ffffff;
   --code-token-property: #3ecf8e;
   --code-highlight-color: #232323;
+  --raised-shadow:
+    0 0 0 0 var(--border-default), 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --raised-drop-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme='light'] {
@@ -108,4 +136,10 @@ h6:not(.font-mono),
 
 .prose [role='alert'] {
   margin: 1.25rem 0;
+}
+
+@media (width < 64rem) {
+  html[data-mobile-menu-open] {
+    overflow: hidden;
+  }
 }

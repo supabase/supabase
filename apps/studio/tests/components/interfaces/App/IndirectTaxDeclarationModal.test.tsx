@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
@@ -6,6 +5,7 @@ import { toast } from 'sonner'
 import { describe, expect, test, vi } from 'vitest'
 
 import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -35,17 +35,6 @@ vi.mock('sonner', () => ({
   },
 }))
 
-const billingWritePermission = {
-  actions: [PermissionAction.BILLING_WRITE],
-  condition: null,
-  organization_id: 1,
-  organization_slug: ORG_SLUG,
-  project_ids: [],
-  project_refs: [],
-  resources: ['stripe.customer'],
-  restrictive: false,
-}
-
 function setupMocks({
   canUpdateBilling = true,
   requiresDeclaration = true,
@@ -67,8 +56,17 @@ function setupMocks({
 
   addAPIMock({
     method: 'get',
-    path: '/platform/profile/permissions',
-    response: canUpdateBilling ? [billingWritePermission] : [],
+    path: '/platform/profile/permissions/v2',
+    response: {
+      organizations: [
+        {
+          slug: ORG_SLUG,
+          role: 'administrator',
+          permissions: canUpdateBilling ? [FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE] : [],
+          projects: [],
+        },
+      ],
+    },
   })
 }
 

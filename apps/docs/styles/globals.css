@@ -1,4 +1,5 @@
 @import 'config/tailwind.config.css';
+@import 'config/inline-code.css';
 @import './code-block.css';
 @import './reference.css';
 @import './loading-beam.css';
@@ -148,7 +149,7 @@ h6:not(.font-mono),
   white-space: pre-line;
 }
 
-.prose :where(p, a, code, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
+.prose :where(p, a, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
 .prose :where(ol > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
   font-weight: inherit;
 }
@@ -220,13 +221,6 @@ pre[class*='language-'] {
   }
 }
 
-.method-list-item-validation {
-  code {
-    @apply text-xs bg-control rounded-sm;
-    padding: 1px 6px;
-  }
-}
-
 .method-list-group {
   @apply p-0 m-0 list-none border-b;
 }
@@ -284,20 +278,11 @@ pre[class*='language-'] {
   }
 }
 
-/* format <code> inside <p> */
 h2 code,
 h3 code,
 h4 code {
   word-break: keep-all !important;
   white-space: nowrap !important;
-  padding: 0.1rem 0.35rem !important;
-
-  &:before {
-    display: none;
-  }
-  &::after {
-    display: none;
-  }
 }
 
 article p strong {
@@ -307,15 +292,6 @@ article p strong {
 /* fix box shadow when <code> is inside <a> */
 a:has(code) {
   box-shadow: none !important;
-}
-
-/* fix code line wrapping */
-/* need to set this to happen from medium onwards, otherwise the would cause horizontal scroll */
-article p code {
-  &::before,
-  &::after {
-    display: none !important;
-  }
 }
 
 .short-inline-codeblock {
@@ -373,15 +349,7 @@ th code {
  * First column (e.g. variable names): wrap at word boundaries, not mid-token.
  */
 .prose :where(td:first-child) code {
-  @apply break-words whitespace-normal;
-}
-
-/*
- * Other columns: prevents very long code lines (checksums, URLs, etc.) from
- * breaking table widths.
- */
-.prose :where(td:not(:first-child)) code {
-  @apply break-all;
+  @apply break-normal break-words whitespace-normal;
 }
 
 .prose table td:first-child,

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import {
   AlertCircleIcon,
@@ -48,7 +47,7 @@ import {
   type LifecyclePolicy,
   type ObjectVersion,
 } from '@/data/storage/versioning/object-versions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -126,7 +125,7 @@ const CurrentFilePreview = ({
       <div className="shrink">
         {/* No `title`: the explorer rows use it as their handle, and a second
             element carrying the same one makes `getByTitle` ambiguous. */}
-        <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+        <p className="truncate text-sm font-medium text-foreground">{getBaseFileName(file.name)}</p>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
           {mimeType}
           {size && <>, {size}</>}
@@ -267,7 +266,7 @@ export const PreviewPane = () => {
   const { clearPreviewedFile } = useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
 
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
   const [, setShowEditBucketModal] = useQueryState(
@@ -442,4 +441,8 @@ export const PreviewPane = () => {
       </div>
     </div>
   )
+}
+
+const getBaseFileName = (name: string) => {
+  return name.split('/').filter(Boolean).pop() ?? name
 }

@@ -98,7 +98,9 @@ Larger compute instances (4XL and above) are designed for sustained, high perfor
 
 ### Choosing the right compute instance for consistent disk performance
 
-If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](/dashboard/project/_/observability). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has exceeded the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget. Projects that use any disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
+If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure how much throughput or IOPS your application requires, load test your project and inspect **Disk IO balance** in [Observability](/dashboard/project/_/observability). The metric uses the lower remaining balance of throughput and IOPS. A value of 100% means the balance is full, and 0% means it is exhausted.
+
+Observability shows the average balance for the selected time window, so it can hide periods when the balance was exhausted. To see the lowest sampled balance over the last seven days and its chart, open [Infrastructure settings](/dashboard/project/_/settings/infrastructure). Projects that use disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
 
 ### Provisioned disk throughput and IOPS
 
