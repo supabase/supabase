@@ -74,8 +74,7 @@ const troubleshooting = defineCollection({
 })
 
 // Question-and-answer entries in src/content/faqs. `title` holds the question,
-// and the body holds the answer. Entries are not rendered by a page yet — this
-// collection only defines the schema so content can be authored against it.
+// and the body holds the answer. Rendered by src/pages/faqs/[...slug].astro.
 const faqs = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/faqs', generateId }),
   // Every entry is tagged with the FAQs topic in addition to any topics its
@@ -84,6 +83,10 @@ const faqs = defineCollection({
     .object({
       title: z.string(),
       topics: z.array(z.string()).default([]),
+      date: z
+        .date()
+        .optional()
+        .transform((date) => (date ? formatDate(date) : undefined)),
     })
     .transform((data) => ({ ...data, topics: [...new Set(['FAQs', ...data.topics])] })),
 })

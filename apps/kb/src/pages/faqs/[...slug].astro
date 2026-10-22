@@ -16,7 +16,7 @@ export async function getStaticPaths() {
 }
 
 const { faq } = Astro.props
-const { title, topics } = faq.data
+const { title, topics, date } = faq.data
 const { Content } = await render(faq)
 
 // faq.filePath is relative to the kb app root, e.g. "src/content/faqs/auth/foo.mdx"
@@ -48,7 +48,7 @@ const faqPageJsonLd = JSON.stringify({
 }).replace(/</g, '\\u003c')
 ---
 
-<ArticleLayout title={title} topics={topics} viewGitHubLink={viewGitHubLink}>
+<ArticleLayout title={title} topics={topics} viewGitHubLink={viewGitHubLink} date={date}>
 	<script type="application/ld+json" set:html={faqPageJsonLd} />
 	<Content components={{ Admonition }} />
 </ArticleLayout>
