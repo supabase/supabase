@@ -87,7 +87,8 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
   const onSubmitSearch = () => {
     const s = search.trim().toLocaleLowerCase()
     setFilterKeywords(s)
-    setSelectedId(null)
+    // same tick as the keyword update, so close must not history.back() first
+    setSelectedId(null, { history: 'replace' })
     track('auth_users_search_submitted', {
       trigger: 'search_input',
       ...telemetryProps,
