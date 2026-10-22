@@ -9,7 +9,7 @@ The local development steps need the Supabase CLI and a project initialized with
 
 ## Test email flows locally
 
-The Supabase CLI sends every email from local Auth to [Mailpit](https://github.com/axllent/mailpit), an email testing server that runs with your local stack. No email leaves your machine, so you can send to any address. Local Auth has no hourly email limit.
+The Supabase CLI sends every email from local Auth to Mailpit, an email testing server that runs with your local stack. No email leaves your machine, so you can send to any address. Local Auth has no hourly email limit. For more information about Mailpit, see the [Mailpit repository on GitHub](https://github.com/axllent/mailpit).
 
 1. In your project directory, run `supabase start` to start the local stack.
 1. Run `supabase status` to get your local stack's connection details. Copy the following values from the output:
@@ -23,7 +23,7 @@ The Supabase CLI sends every email from local Auth to [Mailpit](https://github.c
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
    ```
 
-   Variable names depend on your framework. To test against your hosted project again, restore its **Project URL** and **Publishable** key.
+   Variable names depend on your framework. To test against your hosted project again, restore its project URL and publishable key.
 
 1. In your app, sign up or request a magic link.
 1. In your browser, go to the **Mailpit** URL and open the email to get the link or code.
@@ -97,7 +97,7 @@ Local test numbers don't expire.
 </TabPanel>
 <TabPanel id="management-api" label="Management API">
 
-Update the project's Auth configuration with the test numbers and their expiry date:
+Update the project's Auth configuration with the test numbers and the date they stop working. Replace `YYYY-MM-DDTHH:MM:SSZ` with that date in UTC:
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
@@ -109,7 +109,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   -H "Content-Type: application/json" \
   -d '{
     "sms_test_otp": "14155552671=123456",
-    "sms_test_otp_valid_until": "2026-12-31T23:59:59Z"
+    "sms_test_otp_valid_until": "YYYY-MM-DDTHH:MM:SSZ"
   }'
 ```
 
