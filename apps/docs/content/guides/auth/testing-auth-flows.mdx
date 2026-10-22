@@ -26,14 +26,14 @@ The Supabase CLI sends every email from local Auth to [Mailpit](https://github.c
 
 Local Auth limits how often it sends to the same address. By default, it sends one email per address per second. To change this, set `max_frequency` under `[auth.email]` in `supabase/config.toml`.
 
-Email confirmation is off by default in local development, so local sign-ups don't send a confirmation email. To test the confirmation flow, set `enable_confirmations = true` under `[auth.email]`, and then restart the local stack.
+Email confirmation is off by default in local development and on by default for hosted projects. To test the confirmation flow locally, set `enable_confirmations = true` under `[auth.email]`, and then restart the local stack.
 
 ## Test email flows on a hosted project
 
 Hosted projects send email through a built-in email service until you set up custom SMTP. The built-in service is for trying out Auth, and it has the following limits:
 
 - It sends only to the email addresses of your organization's team members. Other addresses fail with `Email address not authorized`.
-- It sends <SharedData data="config">auth.rate_limits.email.inbuilt_smtp_per_hour.value</SharedData> emails per hour across the whole project. Past that, Auth returns a `429` error with the code `over_email_send_rate_limit` and the message `email rate limit exceeded`.
+- It sends <SharedData data="config">auth.rate_limits.email.inbuilt_smtp_per_hour.value</SharedData> emails per hour across the whole project. When the project reaches the limit, Auth returns a `429` error with the code `over_email_send_rate_limit` and the message `email rate limit exceeded`.
 
 To send to any address and raise the limit, [set up custom SMTP](/docs/guides/auth/auth-smtp) or the [Send Email hook](/docs/guides/auth/auth-hooks/send-email-hook). You can then change the email limit in [**Authentication** > **Rate Limits**](/dashboard/project/_/auth/rate-limits). For more information about the limits, see [Rate limits](/docs/guides/auth/rate-limits).
 
@@ -58,7 +58,7 @@ Write each phone number in international format, with the country code and witho
 
 1. Go to [**Authentication** > **Sign In / Providers**](/dashboard/project/_/auth/providers), and open **Phone**.
 2. In **Test Phone Numbers and OTPs**, enter a comma-separated list of `<phone number>=<OTP>` pairs, such as `14155552671=123456`.
-3. In **Test OTPs Valid Until**, choose when the test numbers stop working.
+3. In **Test OTPs Valid Until**, choose when the test numbers stop working. The Dashboard requires this date.
 4. Click **Save**.
 
 </TabPanel>
@@ -99,7 +99,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 </TabPanel>
 </Tabs>
 
-Test numbers don't count toward the project's hourly SMS limit. Auth still makes you wait between codes for the same number. The wait defaults to <SharedData data="config">auth.rate_limits.otp.period</SharedData> on hosted projects. Locally, set it with `max_frequency` under `[auth.sms]`.
+Test numbers don't count toward the project's hourly SMS limit. Auth still makes you wait between codes for the same number. The wait defaults to 5 seconds on hosted projects. Locally, set it with `max_frequency` under `[auth.sms]`.
 
 <Admonition type="danger">
 
