@@ -11,6 +11,7 @@ import {
 import TableEditorPage from '@/pages/project/[ref]/editor/index'
 import { TabsStateContextProvider } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
+import { resetHistoryTraverseState } from '@/tests/lib/history-traverse-test-utils'
 
 vi.mock('@/lib/history-traverse', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/history-traverse')>()
@@ -99,15 +100,6 @@ const waitForHistory = async (queryClient: QueryClient) => {
   await waitFor(() => {
     expect(queryClient.getQueryState(HISTORY_QUERY_KEY)?.status).toBe('success')
   })
-}
-
-const resetHistoryTraverseState = () => {
-  const state = window.__studioHistoryTraverseState
-  if (!state) return
-
-  state.isTraverseNavigation = false
-  state.isShellReady = false
-  state.documentConsumed = false
 }
 
 const waitForRedirectDecision = async () => {

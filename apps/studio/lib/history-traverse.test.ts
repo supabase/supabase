@@ -7,15 +7,7 @@ import {
   scheduleHistoryTraverseSettlement,
   settleHistoryTraverseNavigation,
 } from './history-traverse'
-
-const resetHistoryTraverseState = () => {
-  const state = window.__studioHistoryTraverseState
-  if (!state) return
-
-  state.isTraverseNavigation = false
-  state.isShellReady = false
-  state.documentConsumed = false
-}
+import { resetHistoryTraverseState } from '@/tests/lib/history-traverse-test-utils'
 
 const mockNavigationType = (type?: PerformanceNavigationTiming['type'], name?: string) => {
   const documentUrl = name ?? window.location.href

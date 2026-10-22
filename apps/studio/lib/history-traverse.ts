@@ -6,8 +6,10 @@ interface HistoryTraverseState {
   isInstalled: boolean
   isTraverseNavigation: boolean
   isShellReady: boolean
-  // set once a push or a url change leaves the document back-forward.
-  // repeated reads on that same url stay true, because the editor can remount.
+  // no url listener. the patched pushState sets this, and a read sets it when
+  // location.href no longer matches the document back-forward entry.
+  // a same-url visit that skips pushState leaves it unset, so repeated reads
+  // on that url stay true (the editor can remount).
   documentConsumed: boolean
 }
 
