@@ -99,7 +99,8 @@ export function checkLinkFromBrowser(
   withAnchors: boolean
 ): Promise<LinkCheckResult> {
   const key = `${withAnchors}:${url}`
-  let check = linkChecks.get(key)
+  // A result read with anchors also answers a plain reachability check.
+  let check = linkChecks.get(key) ?? (withAnchors ? undefined : linkChecks.get(`true:${url}`))
   if (!check) {
     check = page.evaluate(
       async ({ linkUrl, readAnchors }) => {
@@ -126,7 +127,13 @@ export function checkLinkFromBrowser(
       },
       { linkUrl: url, readAnchors: withAnchors }
     )
-    check.catch(() => linkChecks.delete(key))
+    // Only cache successes, so a transient failure is retried by the next page that links here.
+    check.then(
+      (result) => {
+        if (!result.ok) linkChecks.delete(key)
+      },
+      () => linkChecks.delete(key)
+    )
     linkChecks.set(key, check)
   }
   return check
