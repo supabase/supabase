@@ -3,8 +3,10 @@ title: Can I use Amazon Cognito as an authentication provider with Supabase?
 topics: ['Auth']
 ---
 
-Yes. You can use Amazon Cognito as an authentication provider alongside [Supabase Auth](/docs/guides/auth), or standalone, with your Supabase project.
+Yes. You can use Amazon Cognito as an authentication provider with Supabase.
 
-If you already have a production app using Amazon Cognito and want access to the rest of the Supabase Platform, use the [Amazon Cognito integration with Supabase](/docs/guides/auth/third-party/aws-cognito).
+If you have an application using Amazon Cognito and want access to the Supabase Platform, use the [Amazon Cognito integration with Supabase](/docs/guides/auth/third-party/aws-cognito).
 
-For more details on how this affects pricing, see [Manage Monthly Active Third-Party Users usage](/docs/guides/platform/manage-your-usage/monthly-active-users-third-party).
+If you are building an application using Amazon Cognito and need a [standalone PostgreSQL database](/docs/guides/database/overview), you can also use Supabase. In this case, you would set up your own authentication and authorization flows using any provider.
+
+If you are building a new application, consider building it all on Supabase, which includes [Auth](/docs/guides/auth), a [full PostgreSQL database](/docs/guides/database/overview), a [Data API (REST and GraphQL)](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), [Edge Functions](/docs/guides/functions), and more.
