@@ -19,16 +19,29 @@ import { ExpirationModeToggle } from './ExpirationModeToggle'
 import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 const toFieldValue = (rawInput: string): '' | number => {
   const digits = rawInput.replace(/[^0-9]/g, '')
   return digits === '' ? '' : Number(digits)
 }
 
-const SectionHeading = () => (
-  <div className="flex flex-col gap-y-0.5">
-    <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
-    <p className="text-sm text-foreground-lighter">Automatically expire noncurrent versions</p>
+const getRulesHref = (projectRef?: string, bucketName?: string) =>
+  projectRef && bucketName
+    ? `/project/${projectRef}/storage/files/policies?search=${encodeURIComponent(bucketName)}`
+    : undefined
+
+const SectionHeading = ({ rulesHref }: { rulesHref?: string }) => (
+  <div className="flex items-start justify-between gap-x-2">
+    <div className="flex flex-col gap-y-0.5">
+      <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
+      <p className="text-sm text-foreground-lighter">Automatically expire noncurrent versions</p>
+    </div>
+    {rulesHref && (
+      <InlineLink href={rulesHref} className="text-sm shrink-0">
+        View rules
+      </InlineLink>
+    )}
   </div>
 )
 
@@ -43,6 +56,8 @@ interface LifecyclePolicySectionProps {
   isUnsupported?: boolean
   /** The stored policy could not be read, so the fields would be showing a guess. */
   error?: { message: string } | null
+  /** Set for an existing bucket, to link to its rules on the Storage policies page. */
+  bucketName?: string
 }
 
 export const LifecyclePolicySection = ({
@@ -53,8 +68,10 @@ export const LifecyclePolicySection = ({
   isLoading = false,
   isUnsupported = false,
   error,
+  bucketName,
 }: LifecyclePolicySectionProps) => {
   const { ref } = useParams()
+  const rulesHref = getRulesHref(ref, bucketName)
   const { control, setValue } = form
   const hasNoPolicy = !hasDays && !hasVersions
   const hasBothConditions = hasDays && hasVersions
@@ -98,7 +115,16 @@ export const LifecyclePolicySection = ({
         <Admonition
           type="default"
           title="Lifecycle policy set outside the dashboard"
-          description="It uses rules the dashboard cannot show, so saving leaves the policy as it is. Manage it with the S3 or Storage API."
+          description={
+            rulesHref ? (
+              <>
+                It uses rules these fields cannot show, so saving leaves the policy as it is.{' '}
+                <InlineLink href={rulesHref}>Manage its rules individually</InlineLink> instead.
+              </>
+            ) : (
+              'It uses rules these fields cannot show, so saving leaves the policy as it is. Manage it with the S3 or Storage API.'
+            )
+          }
         />
       </div>
     )
@@ -106,7 +132,7 @@ export const LifecyclePolicySection = ({
 
   return (
     <div className="flex flex-col gap-y-2">
-      <SectionHeading />
+      <SectionHeading rulesHref={rulesHref} />
 
       <FormField
         name="version_expiry_days"
