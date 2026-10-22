@@ -103,7 +103,7 @@ export function checkLinkFromBrowser(
   let check = linkChecks.get(key) ?? (withAnchors ? undefined : linkChecks.get(`true:${url}`))
   if (!check) {
     check = page.evaluate(
-      async ({ linkUrl, readAnchors }) => {
+      async ({ linkUrl, readAnchors, articleSelector }) => {
         try {
           const response = await fetch(linkUrl)
           if (!response.ok || !readAnchors) {
@@ -111,9 +111,15 @@ export function checkLinkFromBrowser(
           }
 
           const doc = new DOMParser().parseFromString(await response.text(), 'text/html')
+          // Only count ids in the article, so a sidebar or table of contents id can't stand
+          // in for a removed heading. Pages without one, like reference pages, use the whole
+          // document.
+          const root = doc.querySelector(articleSelector) ?? doc
           const anchors = [
-            ...[...doc.querySelectorAll('[id]')].map((element) => element.id),
-            ...[...doc.querySelectorAll('a[name]')].map((element) => element.getAttribute('name')!),
+            ...[...root.querySelectorAll('[id]')].map((element) => element.id),
+            ...[...root.querySelectorAll('a[name]')].map(
+              (element) => element.getAttribute('name')!
+            ),
           ]
           return { ok: true, status: response.status, anchors }
         } catch (error) {
@@ -125,7 +131,11 @@ export function checkLinkFromBrowser(
           }
         }
       },
-      { linkUrl: url, readAnchors: withAnchors }
+      {
+        linkUrl: url,
+        readAnchors: withAnchors,
+        articleSelector: articleSelectorForPagePath(new URL(url).pathname),
+      }
     )
     // Only cache successes, so a transient failure is retried by the next page that links here.
     check.then(
@@ -137,12 +147,4 @@ export function checkLinkFromBrowser(
     linkChecks.set(key, check)
   }
   return check
-}
-
-export function hasAnchorOnPage(page: Page, anchor: string): Promise<boolean> {
-  return page.evaluate(
-    (id) =>
-      !!(document.getElementById(id) ?? document.querySelector(`a[name="${CSS.escape(id)}"]`)),
-    anchor
-  )
 }

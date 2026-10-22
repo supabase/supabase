@@ -6,8 +6,9 @@ this repo owns.
 Use this suite when you change guides, troubleshooting entries, or shared
 partials under `apps/docs/content`. It loads each in-scope page, checks that the
 article renders, and verifies that docs-owned links in the article resolve. For
-links with an anchor, it also checks that the target page has an element with
-that `id`, including same-page `#anchor` links.
+links with an anchor, it also checks that the target page's article has an element
+with that `id` or an `a[name]` with that value, including same-page `#anchor`
+links.
 
 This page covers:
 

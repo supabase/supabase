@@ -18,10 +18,11 @@ import {
   articleSelectorForPagePath,
   checkLinkFromBrowser,
   collectDocsOwnedLinks,
-  hasAnchorOnPage,
+  type LinkCheckResult,
 } from '../utils/docs-links.js'
 
 const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
+const LINK_CHECK_CONCURRENCY = 4
 
 function annotate(testInfo: TestInfo, description: string) {
   testInfo.annotations.push({ type: 'warning', description })
@@ -56,38 +57,36 @@ test.describe('Docs owned pages', () => {
       const article = page.locator(articleSelector)
       await expect(article, 'Page article should be present').toBeVisible()
 
-      const currentUrl = new URL(page.url())
-      currentUrl.hash = ''
+      // Same-page anchors go through the fetch too, so every anchor is checked against
+      // the server-rendered HTML rather than some against the hydrated page.
       const links = await collectDocsOwnedLinks(page, baseURL!, articleSelector)
       const anchoredUrls = new Set(links.filter((link) => link.anchor).map((link) => link.url))
-      const checkedUrls = new Set<string>()
+      const urls = [...new Set(links.map((link) => link.url))]
+
+      const results = new Map<string, LinkCheckResult>()
+      const queue = [...urls]
+      await Promise.all(
+        Array.from({ length: LINK_CHECK_CONCURRENCY }, async () => {
+          for (let url = queue.shift(); url; url = queue.shift()) {
+            results.set(url, await checkLinkFromBrowser(page, url, anchoredUrls.has(url)))
+          }
+        })
+      )
+
+      for (const url of urls) {
+        const result = results.get(url)!
+        expect
+          .soft(
+            result.ok,
+            result.error
+              ? `${url} should be reachable (${result.error})`
+              : `${url} should resolve (status ${result.status})`
+          )
+          .toBeTruthy()
+      }
 
       for (const { url, anchor } of links) {
-        if (url === currentUrl.toString()) {
-          if (anchor) {
-            expect
-              .soft(
-                await hasAnchorOnPage(page, anchor),
-                `${pagePath} links to #${anchor}, but the page has no element with id "${anchor}"`
-              )
-              .toBeTruthy()
-          }
-          continue
-        }
-
-        const result = await checkLinkFromBrowser(page, url, anchoredUrls.has(url))
-        if (!checkedUrls.has(url)) {
-          checkedUrls.add(url)
-          expect
-            .soft(
-              result.ok,
-              result.error
-                ? `${url} should be reachable (${result.error})`
-                : `${url} should resolve (status ${result.status})`
-            )
-            .toBeTruthy()
-        }
-
+        const result = results.get(url)!
         if (anchor && result.ok) {
           expect
             .soft(
