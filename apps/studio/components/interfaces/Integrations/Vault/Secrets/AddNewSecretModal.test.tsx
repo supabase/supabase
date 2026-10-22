@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { useEffect } from 'react'
 import { describe, expect, it } from 'vitest'
@@ -8,6 +9,28 @@ import { AddNewSecretModal } from './AddNewSecretModal'
 import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
+
+const project: ProjectDetailResponse = {
+  id: 1,
+  ref: 'default',
+  name: 'Default Project',
+  organization_id: 1,
+  status: 'ACTIVE_HEALTHY',
+  cloud_provider: 'localhost',
+  region: 'local',
+  db_host: 'localhost',
+  restUrl: 'http://localhost:8000/rest/v1/',
+  connectionString: null,
+  inserted_at: '2021-08-02T06:40:40.646Z',
+  updated_at: '2021-08-02T06:40:40.646Z',
+  subscription_id: 'subscription',
+  is_branch_enabled: false,
+  is_physical_backups_enabled: false,
+  high_availability: false,
+  integration_source: null,
+}
+
 mockAnimationsApi()
 
 describe('AddNewSecretModal', () => {
@@ -15,17 +38,7 @@ describe('AddNewSecretModal', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
-      // @ts-expect-error partial project response
-      response: {
-        cloud_provider: 'localhost',
-        id: 1,
-        inserted_at: '2021-08-02T06:40:40.646Z',
-        name: 'Default Project',
-        organization_id: 1,
-        ref: 'default',
-        region: 'local',
-        status: 'ACTIVE_HEALTHY',
-      },
+      response: project,
     })
 
     let searchParams = '?new=true'

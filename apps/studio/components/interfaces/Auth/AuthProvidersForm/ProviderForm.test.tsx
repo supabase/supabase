@@ -3,7 +3,7 @@ import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { NuqsAdapter } from 'nuqs/adapters/react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
@@ -11,6 +11,10 @@ import { ProviderForm } from './ProviderForm'
 import { resetPanelHistoryForTests } from '@/lib/panel-history'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import {
+  installNavigationDouble,
+  uninstallNavigationDouble,
+} from '@/tests/lib/panel-navigation-double'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Output']
@@ -56,6 +60,7 @@ async function traverseHistory(direction: 'back' | 'forward') {
 describe('ProviderForm URL history', () => {
   beforeEach(() => {
     resetPanelHistoryForTests()
+    installNavigationDouble()
     // pushState drops leftover forward entries so length deltas are per test.
     window.history.pushState(null, '', AUTH_PROVIDERS_PATH)
     addAPIMock({
@@ -107,6 +112,11 @@ describe('ProviderForm URL history', () => {
           status: 'ACTIVE_HEALTHY',
         }),
     })
+  })
+
+  afterEach(() => {
+    resetPanelHistoryForTests()
+    uninstallNavigationDouble()
   })
 
   it('opens the email provider from a deep link', async () => {
@@ -176,14 +186,13 @@ describe('ProviderForm URL history', () => {
     expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
 
     window.history.forward()
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 50))
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
     })
-    expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
     expect(window.location.search).toBe('')
   })
 
-  it('replaces history when the provider is saved', async () => {
+  it('goes back when the provider is saved so Back does not reopen it', async () => {
     addAPIMock({
       method: 'patch',
       path: '/platform/auth/:ref/config',
@@ -213,11 +222,8 @@ describe('ProviderForm URL history', () => {
     expect(window.history.length).toBe(historyLength + 1)
     expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
 
-    window.history.forward()
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 50))
-    })
-    expect(screen.queryByRole('dialog', { name: 'Email' })).not.toBeInTheDocument()
-    expect(window.location.search).toBe('')
+    await traverseHistory('forward')
+    expect(await screen.findByRole('dialog', { name: 'Email' })).toBeInTheDocument()
+    expect(window.location.search).toBe('?provider=Email')
   })
 })

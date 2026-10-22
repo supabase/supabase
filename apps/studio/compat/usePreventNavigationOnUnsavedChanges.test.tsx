@@ -11,6 +11,7 @@ import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { usePreventNavigationOnUnsavedChanges } from './usePreventNavigationOnUnsavedChanges'
+import { withPanelHistoryTraversal } from '@/lib/panel-history'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 let destroyHistory: (() => void) | undefined
@@ -289,6 +290,22 @@ describe('TanStack unsaved-change navigation guard', () => {
     await act(async () => result.current.handleConfirmNavigation())
     await waitFor(() => expect(history.location.pathname).toBe('/editor'))
     expect(dispatchBeforeUnload().defaultPrevented).toBe(true)
+  })
+
+  it('does not block a panel history traversal on a dirty page', async () => {
+    const { result, rerender, history } = renderNavigationGuard(false)
+    act(() => history.push('/overview'))
+    await waitFor(() => expect(window.location.pathname).toBe('/overview'))
+    rerender({ hasChanges: true })
+
+    act(() => {
+      withPanelHistoryTraversal(() => {
+        window.history.back()
+      })
+    })
+
+    await waitFor(() => expect(window.location.pathname).toBe('/editor'))
+    expect(result.current.shouldConfirmNavigation).toBe(false)
   })
 
   it('ignores confirmation controls when there is no blocked navigation', async () => {

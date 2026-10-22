@@ -59,7 +59,7 @@ describe('useConnectCommands', () => {
       name: 'Connect to your project',
     })
     expect(commands[0].badge).toBeTypeOf('function')
-    expect(mockWithOptions).toHaveBeenCalledWith({ history: 'push', clearOnDefault: true })
+    expect(mockWithOptions).toHaveBeenCalledWith({ history: 'push' })
   })
 
   it('disables the commands when the selected project cannot connect', () => {

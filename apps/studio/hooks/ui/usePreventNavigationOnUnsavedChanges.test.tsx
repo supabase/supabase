@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { usePreventNavigationOnUnsavedChanges } from './usePreventNavigationOnUnsavedChanges'
+import { withPanelHistoryTraversal } from '@/lib/panel-history'
 import { routerMock } from '@/tests/lib/route-mock'
 
 vi.mock('@/lib/constants', () => ({ BASE_PATH: '/dashboard' }))
@@ -47,6 +48,18 @@ describe('Next unsaved-change navigation guard', () => {
     expect(push).toHaveBeenCalledWith('/overview?tab=details')
     expect(result.current.shouldConfirmNavigation).toBe(false)
     push.mockRestore()
+  })
+
+  it('lets a panel history traversal change routes while the page is dirty', () => {
+    const { result } = renderHook(() => usePreventNavigationOnUnsavedChanges({ hasChanges: true }))
+
+    act(() => {
+      withPanelHistoryTraversal(() => {
+        routerMock.events.emit('routeChangeStart', '/overview', { shallow: false })
+      })
+    })
+
+    expect(result.current.shouldConfirmNavigation).toBe(false)
   })
 
   it('keeps unload protection conditional on dirty state', () => {

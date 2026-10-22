@@ -59,7 +59,7 @@ describe('useConnectSheetShortcut', () => {
       expect.any(Function),
       { enabled: true }
     )
-    expect(mockWithOptions).toHaveBeenCalledWith({ history: 'push', clearOnDefault: true })
+    expect(mockWithOptions).toHaveBeenCalledWith({ history: 'push' })
   })
 
   it('opens the Connect sheet from the keyboard shortcut', () => {
