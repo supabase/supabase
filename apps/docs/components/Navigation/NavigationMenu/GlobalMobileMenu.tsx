@@ -12,7 +12,7 @@ import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
-import { useNavItems } from '@/features/IaNav'
+import { useIaNavReady, useNavItems } from '@/features/IaNav'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 
@@ -88,10 +88,11 @@ const AccordionMenuItem = ({
 
 const Menu = () => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
+  const isNavReady = useIaNavReady()
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
 
   return (
-    <Accordion type="multiple" className="space-y-1 mt-2.5">
+    <Accordion type="multiple" className={cn('space-y-1 mt-2.5', !isNavReady && 'invisible')}>
       {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
         <AccordionMenuItem key={index} section={section} activeLabel={activeLabel} />
       ))}
