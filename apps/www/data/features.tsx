@@ -2033,8 +2033,7 @@ Turn on the OAuth 2.1 server and dynamic client registration under Authenticatio
 `,
     icon: Server,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION, PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: '',
-    hideHero: true,
+    heroImage: 'https://www.youtube-nocookie.com/embed/vEv87D-eJK4',
     docsUrl: 'https://supabase.com/docs/reference/server/introduction',
     slug: 'server-sdk',
     status: {
