@@ -101,6 +101,19 @@ const BRANCH_PROJECT: ProjectDetailData = {
   updated_at: '2026-01-01T00:00:00.000Z',
 }
 
+function mockProjectDetail() {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: ({ params }) =>
+      HttpResponse.json<ProjectDetailData>(
+        params.ref === BRANCH_PROJECT.ref
+          ? BRANCH_PROJECT
+          : { ...BRANCH_PROJECT, ref: String(params.ref), parent_project_ref: undefined }
+      ),
+  })
+}
+
 beforeEach(() => {
   mocks.isPlatform = true
   mocks.params = { ref: 'default' }
@@ -292,6 +305,10 @@ describe('useGrant', () => {
 describe('ensureGrant', () => {
   const scope = { organizationSlug: ORG_SLUG, projectRef: 'proj' }
 
+  beforeEach(() => {
+    mockProjectDetail()
+  })
+
   test('grants when permissions allow', async () => {
     mockPermissions(permissionsFor({ permissions: ['branching_production_read'] }))
 
@@ -326,7 +343,7 @@ describe('ensureGrant', () => {
     expect(result.status).toBe('granted')
   })
 
-  test('uses the cached project detail to resolve the parent ref', async () => {
+  test('fetches the project detail to resolve the parent ref', async () => {
     mockPermissions(
       permissionsFor({
         role: 'member',
@@ -336,16 +353,30 @@ describe('ensureGrant', () => {
       })
     )
     const queryClient = new QueryClient()
-    const branchScope = { organizationSlug: ORG_SLUG, projectRef: 'branch-ref' }
 
-    const uncached = await ensureGrant(queryClient, BRANCHES, branchScope)
-    expect(uncached.status).toBe('denied')
+    const result = await ensureGrant(queryClient, BRANCHES, {
+      organizationSlug: ORG_SLUG,
+      projectRef: 'branch-ref',
+    })
 
-    queryClient.setQueryData(projectKeys.detail('branch-ref'), BRANCH_PROJECT)
-    const cached = await ensureGrant(queryClient, BRANCHES, branchScope)
+    expect(result.status).toBe('granted')
+    if (result.status === 'granted') expect(result.grant.projectRef).toBe('branch-ref')
+    expect(queryClient.getQueryData(projectKeys.detail('branch-ref'))).toMatchObject({
+      parent_project_ref: 'parent-ref',
+    })
+  })
 
-    expect(cached.status).toBe('granted')
-    if (cached.status === 'granted') expect(cached.grant.projectRef).toBe('branch-ref')
+  test('returns an error when the project detail cannot be fetched', async () => {
+    mockPermissions(permissionsFor({ permissions: ['branching_production_read'] }))
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
+    })
+
+    const result = await ensureGrant(new QueryClient(), BRANCHES, scope)
+
+    expect(result).toMatchObject({ status: 'error', error: { message: 'Boom' } })
   })
 })
 

@@ -8,8 +8,7 @@ import {
   usePermissionsQueryV2,
   type PermissionsV2Data,
 } from '@/data/permissions/permissions-query-v2'
-import { projectKeys } from '@/data/projects/keys'
-import type { ProjectDetailData } from '@/data/projects/project-detail-query'
+import { prefetchProjectDetail } from '@/data/projects/project-detail-query'
 import { doPermissionsCheckV2, usePermissionScopeV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
 import { fgaRefinements, type FgaRefinementMap, type FgaRefinements } from '@/lib/fga-refinements'
@@ -165,7 +164,7 @@ export function useGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = 
 
 /**
  * Imperative counterpart of `useGrant` for prefetching and callbacks. Reuses fresh cached
- * permissions, and resolves a branch's parent from cached project details without fetching.
+ * permissions and project details, fetching them otherwise.
  */
 export async function ensureGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
   queryClient: QueryClient,
@@ -179,9 +178,16 @@ export async function ensureGrant<E extends FgaGuardedEndpoint, V extends Varian
 > {
   if (!IS_PLATFORM) return getGrant(undefined, endpoint, scope, opts)
 
-  let permissions: PermissionsV2Data
   try {
-    permissions = await queryClient.fetchQuery(permissionsQueryOptionsV2())
+    const permissions = await queryClient.fetchQuery(permissionsQueryOptionsV2())
+
+    let permissionsProjectRef = scope.permissionsProjectRef
+    if (permissionsProjectRef === undefined && typeof scope.projectRef === 'string') {
+      const project = await prefetchProjectDetail(queryClient, { ref: scope.projectRef })
+      permissionsProjectRef = project.parent_project_ref ?? scope.projectRef
+    }
+
+    return getGrant(permissions, endpoint, { ...scope, permissionsProjectRef }, opts)
   } catch (error) {
     const responseError =
       error instanceof ResponseError
@@ -189,14 +195,4 @@ export async function ensureGrant<E extends FgaGuardedEndpoint, V extends Varian
         : new ResponseError(error instanceof Error ? error.message : undefined)
     return { status: 'error', error: responseError }
   }
-
-  let permissionsProjectRef = scope.permissionsProjectRef
-  if (permissionsProjectRef === undefined && typeof scope.projectRef === 'string') {
-    const project = queryClient.getQueryData<ProjectDetailData>(
-      projectKeys.detail(scope.projectRef)
-    )
-    permissionsProjectRef = project?.parent_project_ref ?? scope.projectRef
-  }
-
-  return getGrant(permissions, endpoint, { ...scope, permissionsProjectRef }, opts)
 }
