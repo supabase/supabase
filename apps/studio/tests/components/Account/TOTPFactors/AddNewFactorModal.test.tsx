@@ -1,10 +1,12 @@
 import { AuthApiError } from '@supabase/auth-js'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { QueryClient } from '@tanstack/react-query'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useFlag } from 'common'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AddNewFactorModal } from '@/components/interfaces/Account/TOTPFactors/AddNewFactorModal'
+import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 
@@ -120,5 +122,52 @@ describe('AddNewFactorModal completion', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Done' }))
     await waitFor(() => expect(onRecoveryCodesSaved).toHaveBeenCalledOnce())
+  })
+  test('cannot cancel a verified factor while cached code status refreshes', async () => {
+    vi.mocked(useFlag).mockReturnValue(true)
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    client.setQueryData(recoveryCodeKeys.status(), { status: 'available', data: { remaining: 4 } })
+    let finishStatus = () => {}
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishStatus = () =>
+            resolve({
+              data: { id: 'codes', type: 'recovery_code', total: 4, remaining: 4 },
+              error: null,
+            })
+        })
+    )
+    const unenroll = vi.spyOn(auth.mfa, 'unenroll')
+    vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
+      data: {
+        access_token: 'preview',
+        token_type: 'bearer',
+        expires_in: 3600,
+        refresh_token: 'preview',
+        user: {
+          id: 'user',
+          aud: 'authenticated',
+          app_metadata: {},
+          user_metadata: {},
+          created_at: '2026-01-01T00:00:00Z',
+        },
+      },
+      error: null,
+    })
+    const onComplete = vi.fn()
+    const onClose = vi.fn()
+    customRender(<AddNewFactorModal visible onClose={onClose} onComplete={onComplete} />, {
+      queryClient: client,
+    })
+    await enrollFactor()
+    await userEvent.type(screen.getByRole('textbox', { name: 'Authentication code' }), '123456')
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
+    expect(unenroll).not.toHaveBeenCalled()
+    await act(async () => finishStatus())
   })
 })
