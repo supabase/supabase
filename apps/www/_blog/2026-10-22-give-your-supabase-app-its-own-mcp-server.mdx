@@ -37,6 +37,16 @@ Install the MCP Server block from the Supabase Library:
 npx shadcn@latest add https://supabase.com/library/r/mcp.json
 ```
 
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/vEv87D-eJK4"
+    title="Add MCP Server to Your Supabase App"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
 The command copies an Edge Function into `supabase/functions/mcp`. It includes the MCP handler, authentication middleware, and a `whoami` tool for checking the caller’s identity. Each tool has its own file, and `tools/index.ts` registers them.
 
 You own that code. Add tools for the operations your product supports, change their inputs, and decide what information they return. The block's Library page has a Copy agent prompt button that points your coding agent at the block's docs.
