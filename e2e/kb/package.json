@@ -1,0 +1,15 @@
+{
+  "name": "e2e-kb",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e:kb": "playwright test"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.59.1"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:"
+  }
+}

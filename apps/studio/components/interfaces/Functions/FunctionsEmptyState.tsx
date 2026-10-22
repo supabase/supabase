@@ -184,9 +184,8 @@ const SelfHostedManualFunctionContent = () => (
       <h4 className="text-base text-foreground">Self-Hosted</h4>
     </div>
     <p className="text-sm text-foreground-light mb-4 mt-1">
-      Place each function at{' '}
-      <code className="text-code-inline">volumes/functions/&lt;function-name&gt;/index.ts</code> and
-      restart the <code className="text-code-inline">functions</code> service to pick up changes.
+      Place each function at <code>volumes/functions/&lt;function-name&gt;/index.ts</code> and
+      restart the <code>functions</code> service to pick up changes.
     </p>
     <DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-functions`} />
   </div>

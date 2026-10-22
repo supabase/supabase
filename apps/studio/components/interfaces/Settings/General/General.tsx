@@ -117,9 +117,8 @@ export const General = () => {
               title="Local development with the Supabase CLI"
               description={
                 <p>
-                  Project settings are configured in{' '}
-                  <code className="text-code-inline">supabase/config.toml</code> — applied on{' '}
-                  <code className="text-code-inline">supabase start</code>.
+                  Project settings are configured in <code>supabase/config.toml</code> — applied on{' '}
+                  <code>supabase start</code>.
                 </p>
               }
               actions={<DocsButton href={`${DOCS_URL}/guides/local-development`} />}

@@ -1,14 +1,14 @@
 ---
-title: 'Build a Social Auth App with Expo React Native'
-description: 'Learn how to implement social authentication in an app with Expo React Native and Supabase Database and Auth functionality.'
+title: 'Build a Social Sign-in App with Expo React Native'
+description: 'Learn how to implement social sign-in in an app with Expo React Native and Supabase Database and Auth functionality.'
 ---
 
-This tutorial demonstrates how to build a React Native app with [Expo](https://expo.dev) that implements social authentication. The app showcases a complete authentication flow with protected navigation using:
+This tutorial demonstrates how to build a React Native app with [Expo](https://expo.dev) that implements social sign-in. The app showcases a complete authentication flow with protected navigation using:
 
 - [Supabase Database](/docs/guides/database/overview) - a Postgres database for storing your user data with [Row Level Security](/docs/guides/auth#row-level-security) to ensure data is protected and users can only access their own information.
-- [Supabase Auth](/docs/guides/auth) - enables users to sign in through social authentication providers (Apple and Google).
+- [Supabase Auth](/docs/guides/auth) - enables users to sign in through social sign-in providers (Apple and Google).
 
-![Supabase Social Auth example](/docs/img/supabase-expo-social-auth-login.png)
+![The app's login screen in a web browser, an Android emulator, and an iPhone simulator. Each screen shows the Supabase logo, a Login heading, and buttons to sign in with Apple and Google.](/docs/img/supabase-expo-social-auth-login.png)
 
 <Admonition type="note">
 
@@ -187,9 +187,9 @@ While testing, you can disable email confirmation in your [project's email auth 
 
 </Admonition>
 
-## Integrate social authentication
+## Integrate social sign-in
 
-Now integrate social authentication with Supabase Auth, starting with Apple authentication.
+Now integrate social sign-in with Supabase Auth, starting with Apple authentication.
 If you only need to implement Google authentication, you can skip to the [Google authentication](#google-authentication) section.
 
 ### Apple authentication
@@ -545,7 +545,7 @@ EXPO_PUBLIC_GOOGLE_AUTH_WEB_CLIENT_ID="YOUR_GOOGLE_AUTH_WEB_CLIENT_ID"
 
     You should see the sign-in screen with the Google authentication button.
 
-    ![Supabase Social Auth example](/docs/img/supabase-expo-social-auth-tabs.png)
+    ![The app's home screen after sign-in in a web browser, an Android emulator, and an iPhone simulator. Each screen shows a Welcome heading, the username and full name, a sign-out button, and Home and Explore tabs.](/docs/img/supabase-expo-social-auth-tabs.png)
 
   </TabPanel>
   <TabPanel id="web" label="Web">

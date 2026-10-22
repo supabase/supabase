@@ -91,7 +91,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
             </Table.td>
             <Table.td className="hidden xl:table-cell">
               <p className="truncate" title={url}>
-                <code className="text-code-inline">{method}</code>: {url}
+                <code>{method}</code>: {url}
               </p>
             </Table.td>
             <Table.td className="text-right">
@@ -102,7 +102,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            className="px-1"
+                            className="w-6.5"
                             icon={<MoreVerticalIcon />}
                             aria-label={`${x.name} actions`}
                             // Tooltip repeats the label; screen readers would read it twice

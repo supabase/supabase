@@ -91,8 +91,13 @@ const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const MetricsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() => import('@/components/ui/DevToolbar/MetricsTab').then((m) => m.MetricsTab))
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [
+      { id: 'metrics', label: 'Metrics', content: <MetricsTab /> },
       { id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> },
       { id: 'project-status', label: 'Project Status', content: <ProjectStatusTab /> },
     ]

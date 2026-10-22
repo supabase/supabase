@@ -79,7 +79,7 @@ The following table shows how each kind of role can reach the `net` schema.
 
 On some projects, only `postgres`, `anon`, `authenticated`, `service_role`, and `supabase_functions_admin` can call `net.http_get` and `net.http_post`. For the events that revoke `execute` from `PUBLIC`, see [When the default grants are applied](#when-the-default-grants-are-applied). A role you create can still add rows to the queue, and the worker sends them. To check a role, run the `has_function_privilege` query from [Check which roles have access](#check-which-roles-have-access).
 
-A row in `net.http_request_queue` holds the request's URL, headers, and body until the pg_net worker sends it. To check what a queued request exposes, see [Database roles can read request headers queued by pg_net](/docs/guides/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net-ad6357).
+A row in `net.http_request_queue` holds the request's URL, headers, and body until the pg_net worker sends it. To check what a queued request exposes, see [Database roles can read request headers queued by pg_net](/kb/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net).
 
 ## Limit pg_net access on your project
 

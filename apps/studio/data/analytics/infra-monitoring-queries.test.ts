@@ -289,6 +289,24 @@ describe('2m interval aggregation', () => {
 })
 
 describe('aggregate1MinTo2Min', () => {
+  it('keeps commitment available when its capacity is missing from part of the bucket', () => {
+    const GIB = 1024 ** 3
+    const result = aggregate1MinTo2Min(
+      [
+        {
+          period_start: '2024-01-02T03:00:00Z',
+          ram_commit_used: 4 * GIB,
+          ram_commit_limit: 5 * GIB,
+        },
+        { period_start: '2024-01-02T03:01:00Z', ram_commit_used: 4 * GIB },
+      ],
+      'ram_commit_used'
+    )
+
+    expect(result[0].ram_commit_used).toBe(4 * GIB)
+    expect(result[0].ram_commit_limit).toBeUndefined()
+  })
+
   it('aggregates 1-minute data points into 2-minute buckets with correct averages', () => {
     const dataPoints = [
       {

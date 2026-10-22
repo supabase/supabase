@@ -286,9 +286,9 @@ export const EditHookPanel = () => {
           selectedHook === undefined ? (
             'Create a new database webhook'
           ) : (
-            <>
+            <span>
               Update webhook <code className="text-sm">{selectedHook.name}</code>
-            </>
+            </span>
           )
         }
         className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
