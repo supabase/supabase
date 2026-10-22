@@ -39,9 +39,9 @@ export const ai: NavMenuConstant = {
     {
       name: 'JavaScript Examples',
       items: [
-        { name: 'OpenAI completions using Edge Functions', url: '/guides/ai/examples/openai' },
+        { name: 'OpenAI completions', url: '/guides/ai/examples/openai' },
         {
-          name: 'Generate image captions using Hugging Face',
+          name: 'Image captions with Hugging Face',
           url: '/guides/ai/examples/huggingface-image-captioning',
         },
         {
@@ -49,11 +49,11 @@ export const ai: NavMenuConstant = {
           url: '/guides/ai/quickstarts/generate-text-embeddings',
         },
         {
-          name: 'Adding generative Q&A to your documentation',
+          name: 'Generative Q&A for docs',
           url: '/guides/ai/examples/headless-vector-search',
         },
         {
-          name: 'Adding generative Q&A to your Next.js site',
+          name: 'Generative Q&A for Next.js',
           url: '/guides/ai/examples/nextjs-vector-search',
         },
       ],

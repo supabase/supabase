@@ -38,7 +38,7 @@ export const auth: NavMenuConstant = {
             { name: 'React', url: '/guides/auth/quickstarts/react' },
             { name: 'React Native', url: '/guides/auth/quickstarts/react-native' },
             {
-              name: 'React Native with Expo & Social Sign-in',
+              name: 'React Native Expo social sign-in',
               url: '/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
             },
           ],
@@ -118,7 +118,7 @@ export const auth: NavMenuConstant = {
           items: [
             { name: 'About enterprise SSO', url: '/guides/auth/enterprise-sso' },
             {
-              name: "SAML 2.0 SSO with your customers' identity providers",
+              name: 'SAML 2.0 SSO',
               url: '/guides/auth/enterprise-sso/auth-sso-saml',
             },
           ],

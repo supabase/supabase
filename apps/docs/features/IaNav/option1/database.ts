@@ -46,7 +46,7 @@ export const database: NavMenuConstant = {
         },
         navDataForMdx.guiQuickstarts,
         {
-          name: 'Temporary access with Supabase user tokens',
+          name: 'Temporary access with user tokens',
           url: '/guides/platform/temporary-access',
         },
       ],
@@ -63,7 +63,7 @@ export const database: NavMenuConstant = {
             { name: 'Querying joins and nested tables', url: '/guides/database/joins-and-nesting' },
             { name: 'Using Full Text Search', url: '/guides/database/full-text-search' },
             {
-              name: 'PGroonga: multilingual full text search',
+              name: 'PGroonga: multilingual search',
               url: '/guides/database/extensions/pgroonga',
             },
             {
@@ -93,7 +93,7 @@ export const database: NavMenuConstant = {
               url: '/guides/database/postgres/cascade-deletes',
             },
             {
-              name: 'Deleting data and dropping objects safely',
+              name: 'Delete data and drop objects safely',
               url: '/guides/database/postgres/data-deletion',
             },
             {
@@ -128,7 +128,7 @@ export const database: NavMenuConstant = {
           items: [
             { name: 'Overview', url: '/guides/database/postgres/roles' },
             {
-              name: 'Superuser Access and Unsupported Operations',
+              name: 'Superuser access and limitations',
               url: '/guides/database/postgres/roles-superuser',
             },
             { name: 'Default platform permissions', url: '/guides/platform/permissions' },
@@ -237,7 +237,7 @@ export const database: NavMenuConstant = {
           ],
         },
         {
-          name: 'Replicating from Supabase to External Postgres',
+          name: 'Replicate to external Postgres',
           url: '/guides/database/postgres/setup-replication-external',
         },
         {
@@ -262,7 +262,7 @@ export const database: NavMenuConstant = {
               url: '/guides/database/extensions/index_advisor',
             },
             {
-              name: 'pg_stat_statements: SQL Planning and Execution Statistics',
+              name: 'pg_stat_statements: query stats',
               url: '/guides/database/extensions/pg_stat_statements',
             },
             {
@@ -279,11 +279,11 @@ export const database: NavMenuConstant = {
           name: 'Search, vectors and geospatial',
           items: [
             {
-              name: 'RUM: inverted index for full-text search',
+              name: 'RUM: inverted index for search',
               url: '/guides/database/extensions/rum',
             },
             {
-              name: 'pgvector: Embeddings and vector similarity',
+              name: 'pgvector: Embeddings and similarity',
               url: '/guides/database/extensions/pgvector',
             },
             { name: 'PostGIS: Geo queries', url: '/guides/database/extensions/postgis' },
@@ -323,7 +323,7 @@ export const database: NavMenuConstant = {
           name: 'Data types and IDs',
           items: [
             {
-              name: 'pg_jsonschema: JSON Schema Validation',
+              name: 'pg_jsonschema: JSON validation',
               url: '/guides/database/extensions/pg_jsonschema',
             },
             { name: 'pg_hashids: Short UIDs', url: '/guides/database/extensions/pg_hashids' },
@@ -335,7 +335,7 @@ export const database: NavMenuConstant = {
           items: [
             { name: 'PGAudit: Postgres Auditing', url: '/guides/database/extensions/pgaudit' },
             {
-              name: 'pgsodium (pending deprecation): Encryption Features',
+              name: 'pgsodium: encryption (deprecating)',
               url: '/guides/database/extensions/pgsodium',
             },
             { name: 'pgjwt (deprecated)', url: '/guides/database/extensions/pgjwt' },
@@ -360,7 +360,7 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/extensions/wrappers/overview' },
         {
-          name: 'postgres_fdw: query another Postgres server',
+          name: 'postgres_fdw: query other Postgres',
           url: '/guides/database/extensions/postgres_fdw',
         },
         {

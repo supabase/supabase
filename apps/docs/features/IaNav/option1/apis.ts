@@ -29,7 +29,7 @@ export const apis: NavMenuConstant = {
           items: [
             { name: 'Auto-generated Docs', url: '/guides/api/rest/auto-generated-docs' },
             { name: 'SQL to REST API Translator', url: '/guides/api/sql-to-rest' },
-            { name: 'Converting from SQL to JavaScript API', url: '/guides/api/sql-to-api' },
+            { name: 'SQL to JavaScript API', url: '/guides/api/sql-to-api' },
             {
               name: 'Query plans with explain()',
               url: '/guides/database/debugging-performance#using-explain',
@@ -98,11 +98,11 @@ export const apis: NavMenuConstant = {
             },
             { name: 'Using Realtime with Next.js', url: '/guides/realtime/realtime-with-nextjs' },
             {
-              name: 'Using Realtime Presence with Flutter',
+              name: 'Realtime Presence with Flutter',
               url: '/guides/realtime/realtime-user-presence',
             },
             {
-              name: 'Listening to Postgres Changes with Flutter',
+              name: 'Postgres Changes with Flutter',
               url: '/guides/realtime/realtime-listening-flutter',
             },
           ],

@@ -52,7 +52,7 @@ describe('Option 1 navigation', () => {
 
     expect(links).toEqual(
       expect.arrayContaining([
-        ['Rotate a leaked or compromised API key', '/guides/getting-started/api-keys#leaked-key'],
+        ['Rotate a leaked API key', '/guides/getting-started/api-keys#leaked-key'],
         ['Production security checklist', '/guides/deployment/going-into-prod#security'],
         [
           'Log slow and failing queries',

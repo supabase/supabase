@@ -58,9 +58,9 @@ export const runAndManage: NavMenuConstant = {
     {
       name: 'Team',
       items: [
-        { name: 'Roles and permissions (access control)', url: '/guides/platform/access-control' },
+        { name: 'Roles and permissions', url: '/guides/platform/access-control' },
         {
-          name: 'Single sign-on (SSO) for your team',
+          name: 'Single sign-on (SSO)',
           enabled: fullPlatformEnabled,
           items: [
             { name: 'Overview', url: '/guides/platform/sso' },
@@ -80,13 +80,13 @@ export const runAndManage: NavMenuConstant = {
               url: '/guides/platform/sso/testing-best-practices',
             },
             {
-              name: 'Enterprise-Managed Authentication for MCP',
+              name: 'Enterprise-managed auth for MCP',
               url: '/guides/platform/sso/enterprise-mcp-authentication',
             },
           ],
         },
         {
-          name: 'Multi-factor authentication (MFA) for your team',
+          name: 'Multi-factor authentication (MFA)',
           enabled: fullPlatformEnabled,
           items: [
             { name: 'Overview', url: '/guides/platform/multi-factor-authentication' },
@@ -131,7 +131,7 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
         {
-          name: 'Rotate a leaked or compromised API key',
+          name: 'Rotate a leaked API key',
           url: '/guides/getting-started/api-keys#leaked-key',
         },
         {
@@ -258,7 +258,7 @@ export const runAndManage: NavMenuConstant = {
               ],
             },
             {
-              name: 'Branching, PITR, replicas and pipelines',
+              name: 'Branching, PITR, and replication',
               items: [
                 { name: 'Branching', url: '/guides/platform/manage-your-usage/branching' },
                 {

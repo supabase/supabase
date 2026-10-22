@@ -82,7 +82,7 @@ export const functions: NavMenuConstant = {
           name: 'AI and MCP',
           items: [
             {
-              name: 'Building an MCP Server with mcp-lite',
+              name: 'MCP server with mcp-lite',
               url: '/guides/functions/examples/mcp-server-mcp-lite',
             },
             {
@@ -95,7 +95,7 @@ export const functions: NavMenuConstant = {
               url: '/guides/functions/examples/elevenlabs-generate-speech-stream',
             },
             {
-              name: 'Speech Transcription with ElevenLabs',
+              name: 'Speech to text with ElevenLabs',
               url: '/guides/functions/examples/elevenlabs-transcribe-speech',
             },
           ],
@@ -142,7 +142,7 @@ export const functions: NavMenuConstant = {
               url: '/guides/functions/examples/stripe-webhooks',
             },
             {
-              name: 'CAPTCHA support with Cloudflare Turnstile',
+              name: 'CAPTCHA with Cloudflare Turnstile',
               url: '/guides/functions/examples/cloudflare-turnstile',
             },
             { name: 'Rate-limiting with Redis', url: '/guides/functions/examples/rate-limiting' },

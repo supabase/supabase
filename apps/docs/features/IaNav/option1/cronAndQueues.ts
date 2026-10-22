@@ -27,11 +27,11 @@ export const cronAndQueues: NavMenuConstant = {
           items: [
             { name: 'Quickstart', url: '/guides/queues/quickstart' },
             {
-              name: 'Consuming Messages with Edge Functions',
+              name: 'Read messages with Edge Functions',
               url: '/guides/queues/consuming-messages-with-edge-functions',
             },
             {
-              name: 'Expose Queues for local and self-hosted Supabase',
+              name: 'Expose Queues for self-hosting',
               url: '/guides/queues/expose-self-hosted-queues',
             },
           ],

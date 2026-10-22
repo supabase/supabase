@@ -7,7 +7,7 @@ export const selfHosting: NavMenuConstant = {
   items: [
     { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
     {
-      name: 'Keys, gateway, HTTPS and Postgres access',
+      name: 'Keys, gateway, HTTPS, and Postgres',
       items: [
         { name: 'Accessing Postgres', url: '/guides/self-hosting/accessing-postgres' },
         { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
@@ -45,7 +45,7 @@ export const selfHosting: NavMenuConstant = {
       ],
     },
     {
-      name: 'Functions, Storage, MCP and extensions',
+      name: 'Functions, Storage, MCP, extensions',
       items: [
         { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
