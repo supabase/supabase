@@ -14,7 +14,7 @@ import {
   readRecoveryReminderSnooze,
   resetRecoveryReminderSession,
 } from '@/lib/account-recovery/recovery-reminder'
-import { IS_PLATFORM } from '@/lib/constants'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 // Router adapters pass the full internal destination, including search and hash.
@@ -33,7 +33,9 @@ export const RecoveryReminderController = ({
   const flagsReady = hasLoaded === true && !isConfigCatStale
   const [admittedUser, setAdmittedUser] = useState<string | null>(null)
   const isRolloutEnabled = useFlag('enableAccountRecoveryInterstitial')
-  const isRouteEligible = canInterruptRecoveryRoute(href)
+  const internalHref =
+    BASE_PATH && href.startsWith(`${BASE_PATH}/`) ? href.slice(BASE_PATH.length) : href
+  const isRouteEligible = canInterruptRecoveryRoute(internalHref)
   const isEnabled =
     IS_PLATFORM &&
     flagsReady &&
