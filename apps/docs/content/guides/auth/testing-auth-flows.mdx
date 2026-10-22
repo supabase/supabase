@@ -11,20 +11,22 @@ The local development steps need the Supabase CLI and a project initialized with
 
 The Supabase CLI sends every email from local Auth to [Mailpit](https://github.com/axllent/mailpit), an email testing server that runs with your local stack. No email leaves your machine, so you can send to any address. Local Auth has no hourly email limit.
 
-1. In your project directory, start the local stack:
+1. In your project directory, run `supabase start` to start the local stack.
+1. Run `supabase status` to get your local stack's connection details. Copy the following values from the output:
+   - **Project URL**: the local API URL, which is `http://127.0.0.1:54321` by default
+   - **Publishable**: the local publishable key, which starts with `sb_publishable_`
+   - **Mailpit**: the Mailpit URL, which is `http://127.0.0.1:54324` by default
+1. Connect your app to the local stack. Your app's Supabase client reads a project URL and a publishable key from environment variables, which usually hold your hosted project's values. Replace them with the **Project URL** and **Publishable** key you copied from `supabase status`:
 
-   ```bash
-   supabase start
+   ```bash .env.local
+   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
    ```
 
-2. Get the Mailpit URL, which is `http://127.0.0.1:54324` by default:
+   Variable names depend on your framework. To test against your hosted project again, restore its **Project URL** and **Publishable** key.
 
-   ```bash
-   supabase status
-   ```
-
-3. Set your app's Supabase URL to the API URL from `supabase status`, and then sign up or request a magic link.
-4. Go to the Mailpit URL in your browser, and open the email to get the link or code.
+1. In your app, sign up or request a magic link.
+1. In your browser, go to the **Mailpit** URL and open the email to get the link or code.
 
 Local Auth limits how often it sends to the same address. By default, it sends one email per address per second. To change this, set `max_frequency` under `[auth.email]` in `supabase/config.toml`.
 
@@ -59,9 +61,9 @@ Write each phone number in international format, with the country code and witho
 <TabPanel id="dashboard" label="Dashboard">
 
 1. Go to [**Authentication** > **Sign In / Providers**](/dashboard/project/_/auth/providers), and open **Phone**.
-2. In **Test Phone Numbers and OTPs**, enter a comma-separated list of `<phone number>=<OTP>` pairs, such as `14155552671=123456`.
-3. In **Test OTPs Valid Until**, choose when the test numbers stop working. The Dashboard requires this date.
-4. Click **Save**.
+1. In **Test Phone Numbers and OTPs**, enter a comma-separated list of `<phone number>=<OTP>` pairs, such as `14155552671=123456`.
+1. In **Test OTPs Valid Until**, choose when the test numbers stop working. The Dashboard requires this date.
+1. Click **Save**.
 
 </TabPanel>
 <TabPanel id="local" label="Local development">
@@ -84,7 +86,7 @@ Write each phone number in international format, with the country code and witho
 
    Auth doesn't use the provider credentials for test numbers, so placeholder values work.
 
-2. Restart the local stack:
+1. Restart the local stack:
 
    ```bash
    supabase stop && supabase start
