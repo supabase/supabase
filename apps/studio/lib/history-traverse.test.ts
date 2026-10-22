@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
+  clearHistoryTraverseLatch,
   installHistoryTraverseListener,
   isHistoryTraverseNavigation,
   markHistoryTraverseShellReady,
@@ -9,10 +10,22 @@ import {
   settleHistoryTraverseNavigation,
 } from './history-traverse'
 
-const mockNavigationType = (type?: PerformanceNavigationTiming['type']) => {
+const mockNavigationType = (type?: PerformanceNavigationTiming['type'], name?: string) => {
+  const documentUrl = name ?? window.location.href
   vi.spyOn(performance, 'getEntriesByType').mockImplementation((entryType) => {
     if (entryType !== 'navigation' || type === undefined) return []
-    return [{ type } as PerformanceNavigationTiming]
+    return [
+      {
+        name: documentUrl,
+        entryType: 'navigation',
+        startTime: 0,
+        duration: 0,
+        type,
+        toJSON() {
+          return {}
+        },
+      },
+    ]
   })
 }
 
@@ -114,6 +127,45 @@ describe('isHistoryTraverseNavigation', () => {
   test('does not treat a reload as a traverse', () => {
     mockNavigationType('reload')
 
+    expect(isHistoryTraverseNavigation()).toBe(false)
+  })
+
+  test('stops treating a document back-forward as a traverse once replace leaves its url', () => {
+    const documentUrl = window.location.href
+    mockNavigationType('back_forward', documentUrl)
+
+    expect(isHistoryTraverseNavigation()).toBe(true)
+
+    history.replaceState(null, '', '/project/default/sql')
+    expect(isHistoryTraverseNavigation()).toBe(false)
+
+    history.replaceState(null, '', documentUrl)
+    expect(isHistoryTraverseNavigation()).toBe(false)
+  })
+
+  test('settles a popstate as soon as the shell is ready, without a timer', () => {
+    mockNavigationType('navigate')
+    markHistoryTraverseShellReady()
+
+    window.dispatchEvent(new PopStateEvent('popstate'))
+    expect(isHistoryTraverseNavigation()).toBe(true)
+
+    scheduleHistoryTraverseSettlement()
+    expect(isHistoryTraverseNavigation()).toBe(false)
+  })
+
+  test('keeps a document back-forward when the latch is cleared before it is read', () => {
+    mockNavigationType('back_forward')
+    clearHistoryTraverseLatch()
+
+    expect(isHistoryTraverseNavigation()).toBe(true)
+  })
+
+  test('drops a document back-forward once a later navigation clears the latch', () => {
+    mockNavigationType('back_forward')
+    expect(isHistoryTraverseNavigation()).toBe(true)
+
+    clearHistoryTraverseLatch()
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 })

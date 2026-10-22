@@ -5,7 +5,10 @@ import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query
 import { routeTree } from './routeTree.gen'
 import { initSentryTanStackClient } from './sentry.tanstack'
 import { getQueryClient } from '@/data/query-client'
-import { scheduleHistoryTraverseSettlement } from '@/lib/history-traverse'
+import {
+  clearHistoryTraverseLatch,
+  scheduleHistoryTraverseSettlement,
+} from '@/lib/history-traverse'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 export interface RouterContext {
@@ -41,7 +44,12 @@ export function getRouter() {
   // under TanStack Start, so init happens here — the earliest point with
   // access to the router instance, which the tracing integration needs.
   // No-op on the server and when no DSN is configured (see module).
-  router.subscribe('onResolved', () => {
+  router.subscribe('onBeforeNavigate', () => {
+    clearHistoryTraverseLatch()
+  })
+  // onRendered runs in the commit's layout effect, after the page has read the
+  // flag. onResolved plus a timer can clear a popstate before a deferred render.
+  router.subscribe('onRendered', () => {
     scheduleHistoryTraverseSettlement()
   })
 
