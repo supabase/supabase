@@ -56,6 +56,7 @@ const nextConfig = {
     'ui',
     'ui-patterns',
     'common',
+    'docs-search',
     'dayjs',
     'shared-data',
     'api-types',
