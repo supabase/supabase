@@ -21,10 +21,20 @@ const TableEditorPage: NextPageWithLayout = () => {
   const tabStore = useTabsStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
   const { history, isHistoryLoaded } = useDashboardHistory()
-  const hasDecidedRedirectRef = useRef(false)
+  const capturedForRef = useRef<string | null>(null)
+  const decidedProjectRef = useRef<string | null>(null)
   const isHistoryTraverseRef = useRef<boolean | null>(null)
   if (isHistoryTraverseRef.current === null) {
     isHistoryTraverseRef.current = isHistoryTraverseNavigation()
+  }
+  // the ref can show up after the first render. recapture only when it changes
+  // from one project to another, so that late ref does not read a settled flag.
+  if (projectRef && capturedForRef.current && capturedForRef.current !== projectRef) {
+    decidedProjectRef.current = null
+    isHistoryTraverseRef.current = isHistoryTraverseNavigation()
+  }
+  if (projectRef) {
+    capturedForRef.current = projectRef
   }
 
   const onTableCreated = (table: { id: number }) => {
@@ -34,16 +44,16 @@ const TableEditorPage: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    if (hasDecidedRedirectRef.current) {
-      return
-    }
-
     if (!isHistoryLoaded || !projectRef || !router.isReady) {
       return
     }
 
-    // decide once per visit. a later schema change on the list must not reopen a table.
-    hasDecidedRedirectRef.current = true
+    if (decidedProjectRef.current === projectRef) {
+      return
+    }
+
+    // decide once per project. a later schema change on the list must not reopen a table.
+    decidedProjectRef.current = projectRef
 
     const lastOpenedTableId = Number(history.editor)
     const hasHistoryTable = Number.isInteger(lastOpenedTableId)
