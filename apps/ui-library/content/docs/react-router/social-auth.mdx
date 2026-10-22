@@ -51,10 +51,10 @@ This block uses the PKCE flow with GitHub as the provider. To switch providers, 
 If you want to combine this block with the password-based auth, you need to:
 
 - Copy the `@/app/routes/auth.oauth.tsx` in your app under the same route.
-- Copy just the action from the social login page into a separate route.
+- Copy just the action from the social sign-in page into a separate route.
 - In the password-based `login.tsx` page, create another form with a "Login with ..." button. The method should be `post` and the `action` should point at the action route from the previous step.
 
 ## Further reading
 
-- [Social login](https://supabase.com/docs/guides/auth/social-login)
+- [Social sign-in](https://supabase.com/docs/guides/auth/social-login)
 - [Authentication error codes](https://supabase.com/docs/guides/auth/debugging/error-codes)
