@@ -2524,6 +2524,7 @@ export const local_development: NavMenuConstant = {
   items: [
     { name: 'Overview & quickstart', url: '/guides/local-development' },
     { name: 'Install and run the CLI', url: '/guides/local-development/cli/getting-started' },
+    { name: 'Migrating to CLI v3', url: '/guides/local-development/cli/migrating-to-v3' },
     { name: 'Local development workflow', url: '/guides/local-development/cli-workflows' },
     {
       name: 'Guides',

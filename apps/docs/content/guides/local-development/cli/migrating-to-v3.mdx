@@ -1,0 +1,364 @@
+---
+title: 'Migrating to Supabase CLI v3'
+description: 'Breaking changes between Supabase CLI v2 and v3, and what to change in your scripts, CI, and config.'
+subtitle: 'Breaking changes between Supabase CLI v2 and v3, and what to change in your scripts, CI, and config.'
+---
+
+<Admonition type="note">
+
+Supabase CLI v3 is in preview. Install it from the `next` tag on npm to try it before the stable release.
+
+</Admonition>
+
+Supabase CLI v3 is a major release. Most of its breaking changes fall into five areas:
+
+- **Database commands target your local stack by default.** Add `--remote` to reach your hosted project.
+- **Commands that change a hosted project ask for confirmation.** Unattended runs, such as CI, need `--yes`.
+- **Flags and environment variables override `config.toml`**, including `[remotes.<name>]` blocks.
+- **pg-delta is the default schema diff engine.**
+- **Deprecated commands, flags, config keys, and environment variables are removed.**
+
+Two smaller changes can affect a production project: `config push` now applies `[auth.sms] enable_confirmations` as written, and `secrets unset` no longer defaults to yes.
+
+A removed command or flag still parses: it exits with code 1 and prints its replacement, so a failing run tells you what to change.
+
+## Before you upgrade
+
+1. **Update to the latest v2 release.** v2.122.0 and later warn about removed commands, flags, config keys, and environment variables, and about commands whose default target changes in v3. Run your usual workflows, including CI and deploy scripts, and fix each warning. v2 doesn't warn about the confirmation, config precedence, diff engine, or SMS changes, so read those sections too.
+2. **Stop your local stack** with `supabase stop` if `supabase/config.toml` has no `project_id`. Local container and volume names can change in v3. See [Local container names](#local-container-names).
+
+## Installing v3
+
+Until v3.0.0 is released, previews publish to the `next` tag on npm:
+
+```sh
+npm install supabase@next --save-dev
+```
+
+Once v3.0.0 is released, every install channel (npm, Homebrew, Scoop, and the Linux packages) moves to v3.
+
+### GitHub Actions
+
+`supabase/setup-cli` installs `latest` when you don't set `version`, unless a `bun.lock`, `pnpm-lock.yaml`, or `package-lock.json` at the root of your repository pins `supabase`. Those workflows move to v3 on release day. Pin a version to upgrade on your own schedule:
+
+```yaml
+steps:
+  - uses: supabase/setup-cli@v3
+    with:
+      version: 2.121.0 # or v2.stable, once v3.0.0 is released
+```
+
+During the transition, some commands work the same way on both majors. For example, `supabase db push --linked --yes` runs against the linked project on v2 and v3. v3 warns about `--linked`, which you can switch to `--remote` once you've upgraded.
+
+### Staying on v2
+
+v2 continues to receive security fixes and fixes for broken behavior, but no new features. After v3.0.0 is released, install v2 from these channels:
+
+| Channel        | Command                                         |
+| -------------- | ----------------------------------------------- |
+| npm            | `npm install supabase@v2.stable --save-dev`     |
+| Homebrew       | `brew install supabase/tap/supabase@2`          |
+| Scoop          | `scoop install supabase-v2-stable`              |
+| GitHub Actions | `version: v2.stable` on `supabase/setup-cli@v3` |
+
+## Quick reference for CI
+
+| v2                                                  | v3                                                      |
+| --------------------------------------------------- | ------------------------------------------------------- |
+| `supabase db push`                                  | `supabase db push --yes --remote`                       |
+| `supabase db push --db-url "$DB_URL"`               | `supabase db push --yes --remote="$DB_URL"`             |
+| `supabase migration list --linked`                  | `supabase migration list --remote`                      |
+| `supabase gen types typescript --project-id "$REF"` | `supabase gen types typescript --remote="$REF"`         |
+| `supabase gen types typescript --local`             | `supabase gen types typescript`                         |
+| `supabase db dump --linked -f schema.sql`           | `supabase db dump -f schema.sql --remote`               |
+| `supabase functions deploy`                         | `supabase functions deploy --yes`                       |
+| `supabase secrets set --env-file .env.production`   | `supabase secrets set --env-file .env.production --yes` |
+| `supabase config push`                              | `supabase config push --yes`                            |
+| `echo y \| supabase <command>`                      | `supabase <command> --yes`                              |
+
+<Admonition type="caution">
+
+If your job starts a local stack, for example to run tests, a bare `supabase db push` succeeds against that stack and never touches your project. Add `--remote` to every command that should reach your hosted project.
+
+</Admonition>
+
+The rest of this guide explains each change.
+
+## Database commands target the local stack by default
+
+In v2, some database commands defaulted to the linked project and others to the local stack. In v3, every command that can run against the local stack does so unless you pass `--remote`:
+
+- `db push`, `db pull`, and `db dump`
+- `migration fetch`, `migration list`, and `migration repair`
+- `inspect db *` and `inspect report`
+- `gen types`
+- `storage ls`, `storage cp`, `storage mv`, and `storage rm`
+
+Use `--remote` to choose a hosted target:
+
+| You pass                  | Target                                                                            |
+| ------------------------- | --------------------------------------------------------------------------------- |
+| Nothing                   | The local stack                                                                   |
+| `--remote`                | The linked project                                                                |
+| `--remote=<project-ref>`  | That project                                                                      |
+| `--remote=<branch>`       | A branch of the linked project, by name or ID                                     |
+| `--remote=<postgres-url>` | That database, as a `postgres://` or `postgresql://` URL. Database commands only. |
+
+Commands that only work against a hosted project, such as `functions deploy`, `secrets set`, and `config push`, still default to the linked project. Pass `--remote=<project-ref>` or `--remote=<branch>` to point them at another project or branch.
+
+`SUPABASE_PROJECT_ID` no longer selects a hosted project on its own. It now only sets which project a bare `--remote` means.
+
+### Use `=` with `--remote`
+
+`--remote` works on its own, so a value must be attached with `=`: write `--remote=<branch>`, not `--remote <branch>`. When a word after a bare `--remote` could be read either way, the CLI fails with a "did you mean" error instead of guessing. To decide, it checks the word against the branches of the linked project, so the run also fails if it can't list them, for example without a valid access token.
+
+Put `--remote` last when a command also takes an argument:
+
+```sh
+supabase db pull add_profiles --remote
+```
+
+### Deprecated target flags
+
+These flags still work in v3. They're hidden from help, print a warning on stderr that names the replacement, and are removed in v4.
+
+| v2                                      | v3                                      |
+| --------------------------------------- | --------------------------------------- |
+| `--linked`                              | `--remote`                              |
+| `--project-ref <ref>`                   | `--remote=<ref>`                        |
+| `--db-url <url>`                        | `--remote=<url>`                        |
+| `gen types --project-id <ref>`          | `gen types --remote=<ref>`              |
+| `--local`                               | Nothing, because local is the default   |
+| `db diff --from linked` / `--to linked` | `db diff --from=remote` / `--to=remote` |
+
+Don't swap `--linked` for `--remote` in place. Move `--remote` to the end of the command, so that `supabase migration repair --linked 20240101000000 --status reverted` becomes `supabase migration repair 20240101000000 --status reverted --remote`.
+
+`supabase link --project-ref <ref>` is unchanged, and so is `supabase link <ref>`. `link` doesn't take `--remote`.
+
+### Other target changes
+
+- `--remote=<value>` can't be combined with any of the deprecated flags.
+- `--project-ref` on a database command no longer needs `--linked`.
+- An empty `--project-ref=` is an error instead of being ignored.
+- `--password` only applies to a hosted project. It fails with the local stack or `--remote=<url>`, so put the password in the URL instead.
+- `db diff` rejects `--remote` together with `--from` or `--to`. Use `--from=remote` or `--to=remote`.
+- `db query` rejects SQL passed both as an argument and with `--file`.
+- A bare `--remote` in a checkout that isn't linked opens the project picker in an interactive terminal. Database and storage commands used to fail.
+
+### `gen types` and declarative schemas
+
+- `gen types` with no target generates types from the local database, instead of opening a project picker or failing. In a linked checkout with no local stack running, it suggests `--remote`.
+- `db schema declarative generate` no longer asks which target to use.
+- `db schema declarative sync` with no declarative files generates them from the local database, and no longer offers the linked project as the source. To start from the linked project, run `supabase db schema declarative generate --remote` first.
+
+## Hosted changes need confirmation
+
+Every command that changes a hosted project asks for confirmation first. The question defaults to **No**, except for commands that only create something: `projects create`, `orgs create`, `branches create`, `domains create`, and `bootstrap`. Pressing Enter now declines `db push`, deploys, secret changes, and migration history updates.
+
+When the CLI can't ask, the command fails with `HostedMutationConsentRequiredError` and changes nothing, unless you pass `--yes` or export `SUPABASE_YES=1` in your shell. The CLI can't ask when:
+
+- stdin or stdout isn't a terminal, as in CI
+- the output is machine-readable: `--output-format json` or `stream-json`, or `-o json`, `yaml`, `toml`, or `env`
+- an AI coding agent runs the command. Agents never get a prompt, even in a terminal, and the error tells the agent to ask you before it passes `--yes`.
+
+<Admonition type="caution">
+
+- Piping an answer, such as `echo y | supabase db push`, no longer confirms anything.
+- `SUPABASE_YES` in `supabase/.env`, or in a `.env`, `.env.local`, or `.env.<NODE_ENV>[.local]` file in the working directory, doesn't count. If one of those files defines `SUPABASE_YES` at all, a shell-exported `SUPABASE_YES` doesn't count either, because the CLI can't tell the two apart. Use `--yes`.
+
+</Admonition>
+
+### Commands that need `--yes` in unattended runs
+
+| Area                     | Commands                                                                                                                                                                                                                                                                                                       |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Database (hosted target) | `db push`; `db pull` when it updates the remote migration history; `pull`, except with `--dry-run`; `migration up`, `down`, `squash`, and `repair`; `db reset`; `test db`; `db query`, or pass `--read-only` for reads                                                                                         |
+| Storage (hosted target)  | `seed buckets`, `storage cp`, `storage mv`, and `storage rm`                                                                                                                                                                                                                                                   |
+| Functions and config     | `functions deploy`, `functions delete`, `secrets set`, `secrets unset`, and `config push`                                                                                                                                                                                                                      |
+| Projects and branches    | `projects create`, `projects delete`, `orgs create`, `bootstrap`, `backups restore`, and `branches create`, `delete`, `disable`, `pause`, `unpause`, and `update`                                                                                                                                              |
+| Project settings         | `encryption update-root-key`, `network-bans remove`, `network-restrictions update`, `ssl-enforcement update`, `postgres-config update` and `delete`, `sso add`, `update`, and `remove`, `vanity-subdomains activate` and `delete`, `domains create`, `activate`, and `delete`, and `compute push` and `delete` |
+| Other                    | `notebooks push` and `feedback delete`                                                                                                                                                                                                                                                                         |
+
+### Other confirmation changes
+
+- `db push`, `db reset` against a hosted target (including seeding), `config push`, and `functions deploy --prune` each ask one combined question instead of several.
+- `functions deploy --prune` confirms the deploy and the prune before anything is deployed, and now prunes even when every function is already up to date.
+- `secrets unset --all` lists the secrets before it asks.
+- Declining fails with `HostedMutationDeclinedError` ("context canceled") and exit code 1. The command-specific cancellation errors are removed.
+- Declining `db pull` or `pull` stops before any file is written. There's no longer a files-only path.
+- Removing network bans automatically while connecting to a hosted database needs `--yes`, even for read-only commands such as `db dump --remote`. Without it, the command fails and points you to `supabase network-bans remove`.
+- `migration down` and `migration repair --all` against the local database no longer prompt.
+
+### Output changes
+
+- Commands that resolve a target print `Target: …` once on stderr, including read-only commands against a hosted project. `config push` no longer prints its own "Pushing config to" line.
+- JSON object results and JSON error envelopes gain a `target` object. The `target` in `db reset` output changes from a string to that object, and `config push` JSON no longer reports `declined_addons` or a skipped status. Arrays and generated artifacts, such as `gen types` output, are unchanged.
+- `migration up` against a hosted target reports "Remote database is up to date." instead of "Local database is up to date.", and `migration list` labels the history column "Local DB" when the target is local.
+
+## `secrets unset` defaults to no
+
+- The prompt defaults to No.
+- A run that can't prompt fails unless you pass `--yes` or set `SUPABASE_YES=1`, for named secrets and `--all` alike.
+- Piped answers are no longer read.
+- Running it with no secret names fails, instead of unsetting every secret. Pass `--all` to unset every secret.
+
+## Flags and environment variables override config
+
+Every config value now resolves in one order:
+
+1. Command-line flag
+2. Shell environment variable
+3. Project env files
+4. `supabase/config.json` or `supabase/config.toml`, with a matched `[remotes.<name>]` block over the base config
+5. Default
+
+Project env files are `.env.<SUPABASE_ENV>.local`, `.env.local`, `.env.<SUPABASE_ENV>`, and `.env`, read from `supabase/` and then the project root. `SUPABASE_ENV` defaults to `development`.
+
+The change matters most if you use `[remotes.<name>]` blocks. In v2, a matched block beat `SUPABASE_*` environment variables. In v3 the variable wins, and the CLI prints a warning for each value it overrides. If you deploy to a project with a `[remotes.<name>]` block, check for variables that now take effect:
+
+```sh
+# In CI
+env | grep ^SUPABASE_
+
+# In your repository
+grep -h ^SUPABASE_ supabase/.env* .env*
+```
+
+Set `SUPABASE_ENV` in CI so that `.env.development` doesn't apply.
+
+`supabase config push` now pushes these overrides. For example, a `SUPABASE_AUTH_SITE_URL` in `.env.local` replaces the `site_url` in `[remotes.production]`. Push labels each value that came from the environment, and `supabase config diff` shows the same values, so run `config diff` before your first v3 push. See [Managing config and secrets](/docs/guides/local-development/managing-config).
+
+### Seeding
+
+- Seeding a project that matches a `[remotes.<name>]` block asks first, unless the block itself sets `db.seed.enabled = true`. `db push --include-seed` and a hosted `db reset` exit with code 1 in CI unless you pass `--yes`.
+- `--include-seed` and `SUPABASE_DB_SEED_ENABLED=true` now override `enabled = false` in the base `[db.seed]` block.
+- `db push` still seeds only with `--include-seed`.
+
+### Database passwords
+
+- `--password` with the local stack or a database URL exits with code 1 on `db push`, `db pull`, `db dump`, `db schema declarative generate`, `migration list`, and `migration repair`. Put the password in the URL, or set `[db].password` for the local database.
+- `migration squash` targets the local database by default, so `migration squash --password` also needs `--remote`.
+- In a directory linked to one project, `SUPABASE_DB_PASSWORD` is no longer sent to a different project. Pass `--password`, or provide an access token so the CLI can create a temporary login role.
+- `gen types` against the local database uses `[db].password`, not `SUPABASE_DB_PASSWORD`.
+- `supabase link --password` is deprecated and ignored.
+
+### Stricter validation
+
+- An invalid value in config or in a `SUPABASE_*` variable fails every command that loads project config, including `db push`, `stop`, and `services`. For example, `SUPABASE_STUDIO_PORT=abc` fails with `CliConfigValueError`, and the error names the variable or file.
+- Boolean environment variables, including `SUPABASE_EXPERIMENTAL_*`, accept `1`, `t`, `T`, `true`, `True`, `TRUE`, `0`, `f`, `F`, `false`, `False`, or `FALSE`. Anything else fails.
+- Ports with a leading zero, such as `054322`, are rejected.
+- `inspect report` needs `[[experimental.inspect.rules]]` (an array of tables) with string fields. A single `[experimental.inspect.rules]` table fails.
+
+### Local container names
+
+`SUPABASE_PROJECT_ID` now names local containers even when a `[remotes.<name>]` block matches. Without a `project_id` in `config.toml`, local containers and volumes are named after the project folder, not the project ref. Run `supabase stop` before you upgrade, or set `project_id` in `config.toml`.
+
+If v3 starts a fresh local stack and your local data seems to be missing, it's still in the volumes under the old name. Find that name with `docker volume ls --filter name=supabase_db_`, set it as `project_id` in `config.toml`, and restart the stack.
+
+### Finding the project directory
+
+- Without `--workdir`, the CLI uses the nearest directory that contains `supabase/config.toml` or `supabase/config.json`. A nested `config.json` project now wins over an outer `config.toml` one.
+- `services` and the `functions` commands read `config.json` before `config.toml`.
+
+## `config push` applies SMS confirmations as written
+
+In v2, `config push` applied `[auth.sms] enable_confirmations` inverted: `true` skipped the phone code, and `false` required it. v3 applies the setting as written, so phone confirmation on your project flips on your next `config push`:
+
+- `false`, the default that `supabase init` writes, turns phone confirmation off.
+- `true` turns phone confirmation on, so phone sign-ups need a working SMS provider.
+
+<Admonition type="caution">
+
+Check `enable_confirmations` in `[auth.sms]`, and in any `[remotes.<name>.auth.sms]` block, and run `supabase config diff` before your first v3 push.
+
+</Admonition>
+
+## pg-delta is the default diff engine
+
+pg-delta is now the default schema diff engine for every project, so the SQL that `db diff` and `db pull` generate can change if you hadn't opted in. See [Diff engines](/docs/guides/local-development/diff-engines) for how the two engines differ.
+
+Under pg-delta, `[db.migrations].schema_paths` and the declarative files in `supabase/schemas` are no longer inputs to `db diff` or to a migration-style `db pull`. The "edit `supabase/schemas`, then run `db diff -f`" workflow no longer picks up your edits. Use `supabase db schema declarative sync` to generate migrations from [declarative schema](/docs/guides/local-development/declarative-database-schemas) files.
+
+To keep using migra for every run, set this in `supabase/config.toml`:
+
+```toml
+[experimental.pgdelta]
+enabled = false
+```
+
+To use migra for a single run, pass `--use-migra` to `db diff` or `--diff-engine migra` to `db pull`, or set `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED=false`.
+
+- `SUPABASE_EXPERIMENTAL_PG_DELTA` is ignored. Use `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED`.
+- `db diff --use-pg-delta=false` now turns pg-delta off even when config or the environment turns it on.
+
+## Removed commands and flags
+
+Each removed command or flag exits with code 1 and prints its replacement.
+
+| Removed                                                                             | Use instead                                                                                                                                        |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `supabase db remote changes`                                                        | `supabase db diff --remote`                                                                                                                        |
+| `supabase db remote commit`                                                         | `supabase db pull --remote`                                                                                                                        |
+| `supabase gen keys`                                                                 | `supabase projects api-keys --remote=<ref>`                                                                                                        |
+| `supabase db branch create`, `delete`, `list`, and `switch`                         | No local replacement. Manage hosted preview branches with `supabase branches`.                                                                     |
+| `supabase inspect db total-index-size`                                              | `supabase inspect db index-stats`                                                                                                                  |
+| `supabase inspect db total-table-sizes` and `table-index-sizes`                     | `supabase inspect db table-stats`                                                                                                                  |
+| `db diff --use-pg-schema`                                                           | Omit the flag to use the default engine, or pass `--use-pg-delta`                                                                                  |
+| `db pull --use-pg-delta`                                                            | `db pull --declarative`                                                                                                                            |
+| `db pull --experimental`, or `SUPABASE_EXPERIMENTAL` set, without `--declarative`   | `db pull --declarative`, or `--experimental=false` for a migration pull                                                                            |
+| `functions download --legacy-bundle`                                                | `functions download --use-api`. If that fails and the function was deployed with a CLI older than 1.120.0, redeploy it with the current CLI first. |
+| `--include-raw-output` on `domains create`, `get`, `reverify`, `activate`, `delete` | `-o json`                                                                                                                                          |
+| `--create-ticket` (global flag)                                                     | `supabase issue bug`                                                                                                                               |
+
+The separate `supabase-go` executable is no longer installed. Call `supabase` instead.
+
+## Removed config keys and environment variables
+
+Removed config keys fail, so you see them on the first run. Some removed environment variables are ignored instead, so check for these by hand.
+
+| Removed                                                      | In v3                     | Use instead                                                      |
+| ------------------------------------------------------------ | ------------------------- | ---------------------------------------------------------------- |
+| `[inbucket]` and `[remotes.<name>.inbucket]`                 | Fails                     | `[local_smtp]`                                                   |
+| `[experimental] orioledb_version` (non-empty)                | Fails                     | `[db] orioledb_version`                                          |
+| `SUPABASE_EXPERIMENTAL_ORIOLEDB_VERSION` (non-empty)         | Fails                     | `SUPABASE_DB_ORIOLEDB_VERSION`                                   |
+| `[auth.external.linkedin]` and `[auth.external.slack]`       | Fails, even when disabled | `[auth.external.linkedin_oidc]` and `[auth.external.slack_oidc]` |
+| A function's own `supabase/functions/<name>/import_map.json` | Fails                     | Rename it to `deno.json`, or set `[functions.<name>] import_map` |
+| `--override-name inbucket.url`                               | Fails                     | `--override-name mailpit.url`                                    |
+| `INBUCKET_URL` in `status` and `stack status` output         | No longer printed         | `MAILPIT_URL`                                                    |
+| `SUPABASE_EXPERIMENTAL_PG_DELTA`                             | Ignored                   | `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED`                          |
+| `COBRA_COMPLETION_DESCRIPTIONS`                              | Ignored                   | `SUPABASE_COMPLETION_DESCRIPTIONS`                               |
+
+If a script reads `INBUCKET_URL` from `supabase status -o env`, it now gets an empty value. The shared `supabase/functions/import_map.json` fallback still works.
+
+## Error names and messages
+
+If your scripts match on error names in JSON output, update them:
+
+| v2                                   | v3                            |
+| ------------------------------------ | ----------------------------- |
+| `MigrationPasswordFlagsError`        | `DbPasswordFlagsError`        |
+| Command-specific cancellation errors | `HostedMutationDeclinedError` |
+
+v3 also adds `CliConfigValueError` for an invalid config or environment value, `SeedConsentRequiredError` for seeding without consent, and `HostedMutationConsentRequiredError` for a hosted change without `--yes` in a run that can't prompt.
+
+If your scripts match on error text, these messages are reworded:
+
+- Invalid boolean flag values say `expected a boolean`, instead of `strconv.ParseBool: …`.
+- Invalid unsigned values, such as `storage cp --jobs` and `db reset --last`, say `expected an unsigned integer` or `value out of range`, instead of `strconv.ParseUint: …`.
+- Oversized migration or seed statements report `scanner: token too long`, instead of `bufio.Scanner: token too long`.
+- `gen bearer-jwt` claim and JWK errors read `invalid claims: …` and `failed to parse JWK: …` and name the JSON shape they expected.
+- Config decode errors drop the `decoding failed due to the following error(s):` header and read `<key>: expected a string, got <type>`, `<key>: unknown keys: …`, or `<key>: must be one of …`.
+- `SUPABASE_PROFILE` errors are reworded, for example `unknown keys: …`, `<key> is required`, and `<key> must be an http(s) URL`.
+- `failed to unmarshal …` messages read `failed to parse …`, and TOML output errors drop the `toml:` prefix.
+
+## Deprecated in v3
+
+These still work in v3 and are removed in v4:
+
+- `--linked`, `--project-ref`, `--db-url`, `--local`, and `gen types --project-id`. Use `--remote`.
+- The `linked` value of `db diff --from` and `--to`. Use `remote`.
+- `supabase link --password`, which is ignored.
+
+## Getting help
+
+If something on this page doesn't match what you see, or a change breaks a workflow this page doesn't cover, run `supabase issue bug` or [open an issue](https://github.com/supabase/cli/issues).
