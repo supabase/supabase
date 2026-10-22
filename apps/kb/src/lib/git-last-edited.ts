@@ -38,6 +38,25 @@ export function parseLastEditedLog(stdout: string): Map<string, string> {
   return dates
 }
 
+async function git(args: string[]): Promise<string> {
+  const { stdout } = await execFileAsync('git', args, { cwd: APP_ROOT, maxBuffer: MAX_BUFFER })
+  return stdout
+}
+
+/**
+ * False for a shallow clone, or when HEAD has no parent (a truncated history
+ * can report as not shallow when it has grafts).
+ */
+async function isHistoryComplete(): Promise<boolean> {
+  if ((await git(['rev-parse', '--is-shallow-repository'])).trim() === 'true') return false
+  try {
+    await git(['rev-parse', '--verify', '--quiet', 'HEAD^'])
+    return true
+  } catch {
+    return false
+  }
+}
+
 async function loadLastEdited(paths: string[]): Promise<Map<string, string>> {
   // TEMPORARY: production gate removed so previews show dates. Restore
   // `if (process.env.VERCEL_ENV !== 'production') return new Map()` before
@@ -45,15 +64,14 @@ async function loadLastEdited(paths: string[]): Promise<Map<string, string>> {
   // if (process.env.VERCEL_ENV !== 'production') return new Map()
 
   try {
-    // Vercel clones shallowly. Without full history, `git log` stops at the
-    // clone depth and older files get the wrong date or none.
-    const { stdout: shallow } = await execFileAsync(
-      'git',
-      ['rev-parse', '--is-shallow-repository'],
-      { cwd: APP_ROOT }
-    )
-    if (shallow.trim() === 'true') {
-      await execFileAsync('git', ['fetch', '--unshallow'], { cwd: APP_ROOT, maxBuffer: MAX_BUFFER })
+    // Vercel clones shallowly. `git log` on a truncated history reports the
+    // tip commit's date for every file, so fetch the full history first.
+    if (!(await isHistoryComplete())) {
+      await git(['fetch', '--unshallow'])
+    }
+    if (!(await isHistoryComplete())) {
+      console.warn('[git-last-edited] git history is still truncated, skipping last edited dates.')
+      return new Map()
     }
 
     const { stdout } = await execFileAsync(
