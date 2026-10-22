@@ -5,6 +5,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, CardFooter } from 'ui'
 import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryCodesModal'
@@ -132,17 +133,40 @@ export const RecoveryReminder = ({
   if (!activeGap) {
     return (
       <InterstitialLayout
-        title={isLoading ? 'Checking account recovery' : 'Continue to your dashboard'}
+        logo={
+          <div className="relative">
+            <SupabaseLogo />
+            {!isLoading && (
+              <span className="absolute -top-2 -right-2 scale-80">
+                <AdmonitionTypeIcon type="success" />
+              </span>
+            )}
+          </div>
+        }
+        title={
+          isLoading ? (
+            <div role="status" aria-label="Checking account recovery">
+              <ShimmeringLoader className="h-7 w-40 py-0" />
+            </div>
+          ) : (
+            'You’re all set'
+          )
+        }
+        widthClassName="max-w-md"
         description={
-          isLoading
-            ? 'Checking your backup sign-in options.'
-            : 'No account recovery reminder is available.'
+          isLoading ? (
+            <ShimmeringLoader className="h-5 w-64 max-w-full py-0" />
+          ) : (
+            'No account recovery reminder is available.'
+          )
         }
       >
-        <CardFooter className="justify-center">
-          <Button asChild size="tiny">
-            <a href={destination}>Continue to dashboard</a>
-          </Button>
+        <CardFooter className="justify-center min-h-12">
+          {!isLoading && (
+            <Button asChild size="tiny">
+              <a href={destination}>Continue</a>
+            </Button>
+          )}
         </CardFooter>
       </InterstitialLayout>
     )
