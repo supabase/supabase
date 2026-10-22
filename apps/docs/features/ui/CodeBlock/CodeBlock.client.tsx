@@ -135,7 +135,7 @@ export function AnnotatedSpan({
 function Annotation({ annotation }: { annotation: CodeAnnotation }) {
   const { text, docs, tags } = annotation
   return (
-    <div className="flex flex-col gap-2">
+    <div data-code-style="plain" className="flex flex-col gap-2">
       <code className={cn('block bg-200 p-2', (docs || tags) && 'border-b border-default')}>
         {text}
       </code>
