@@ -1,12 +1,16 @@
+import { QueryClient } from '@tanstack/react-query'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { delay, HttpResponse } from 'msw'
+import router from 'next-router-mock'
 import { NuqsAdapter } from 'nuqs/adapters/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PipelineCreationFlow as CreationFlow } from './PipelineCreationFlow'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
+import { replicationKeys } from '@/data/replication/keys'
+import { DOCS_URL } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -35,7 +39,9 @@ const PipelineCreationFlow = (props: Parameters<typeof CreationFlow>[0]) => (
 )
 
 mockAnimationsApi()
+const onUrlUpdate = vi.fn()
 beforeEach(() => {
+  onUrlUpdate.mockClear()
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
@@ -94,7 +100,20 @@ beforeEach(() => {
       }),
   })
 })
-const next = () => fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
+// nuqs 2.7.1 resets the testing adapter queue on every render and drops any
+// queued write. wait for the url before changing steps again. nuqs 2.10.1 and
+// later only reset on the first render, so these waits can go once studio
+// moves off the 2.7.1 pin.
+const waitForStepQuery = (queryString: string) =>
+  waitFor(() =>
+    expect(onUrlUpdate).toHaveBeenLastCalledWith(expect.objectContaining({ queryString }))
+  )
+const clickContinue = () =>
+  fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
+const next = async (queryString: string) => {
+  clickContinue()
+  await waitForStepQuery(queryString)
+}
 const fillConnection = () => {
   const fields = [
     ['Pipeline name', 'Warehouse'],
@@ -119,32 +138,125 @@ const stepCard = () => {
 
   return card
 }
-const waitForStep = (step: number) =>
-  waitFor(() => expect(stepStatus()).toHaveTextContent(`Step ${step} of 4`))
 const withinRegion = (name: string) => within(screen.getByRole('region', { name }))
 const destinationType = () => within(screen.getByRole('radiogroup', { name: 'Destination type' }))
-const continueToData = async () => {
-  next()
-  await waitForStep(3)
-}
+const continueToData = () => next('?step=data')
 const selectPublication = async () => {
   fireEvent.click(screen.getByText('Select publication'))
   await waitFor(() => expect(screen.queryByText('analytics')).toBeInTheDocument())
   fireEvent.click(screen.getByText('analytics'))
 }
-const back = () => fireEvent.click(within(stepCard()).getByRole('button', { name: 'Back' }))
+const back = async (queryString: string) => {
+  fireEvent.click(within(stepCard()).getByRole('button', { name: 'Back' }))
+  await waitForStepQuery(queryString)
+}
+const renderWizard = (
+  ui: Parameters<typeof customRender>[0],
+  options?: { queryClient?: QueryClient; rateLimitFactor?: number }
+) =>
+  customRender(ui, {
+    queryClient: options?.queryClient,
+    nuqs: {
+      hasMemory: true,
+      onUrlUpdate,
+      ...(options?.rateLimitFactor === undefined
+        ? {}
+        : { rateLimitFactor: options.rateLimitFactor }),
+    },
+  })
 
 describe('PipelineCreationFlow', () => {
-  const reachReview = async (onClose = vi.fn(), onUrlUpdate = vi.fn()) => {
-    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />, {
-      nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate },
+  it('keeps header navigation pending until dirty changes are discarded', async () => {
+    const push = vi.spyOn(router, 'push')
+    customRender(
+      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />
+    )
+    fireEvent.click(destinationType().getByRole('radio', { name: /Snowflake/ }))
+    fireEvent.click(screen.getByRole('link', { name: 'Supabase home' }))
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    expect(push).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
+    expect(push).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('link', { name: 'Supabase home' }))
+    const discard = await screen.findByRole('button', { name: 'Discard changes' })
+    fireEvent.click(discard)
+
+    await waitFor(() =>
+      expect(push).toHaveBeenCalledWith(`${window.location.origin}/organizations`)
+    )
+    push.mockRestore()
+  })
+
+  it.each([
+    ['BigQuery', 'bigquery#configure-bigquery-as-a-destination'],
+    ['DuckLake', 'ducklake#choose-a-configuration-mode'],
+    ['Snowflake', 'snowflake#prepare-snowflake-resources'],
+    ['ClickHouse', 'clickhouse#configure-clickhouse-as-a-destination'],
+  ] as const)('matches the connection subtitle and Docs to %s', async (type, path) => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>({
+          id: 1,
+          ref: 'default',
+          name: 'Test project',
+          organization_id: 1,
+          status: 'ACTIVE_HEALTHY',
+          cloud_provider: 'AWS',
+          region: 'us-east-1',
+          db_host: 'db.default.supabase.co',
+          restUrl: 'https://default.supabase.co/rest/v1/',
+          connectionString: null,
+          inserted_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-01T00:00:00Z',
+          subscription_id: 'subscription',
+          is_branch_enabled: false,
+          is_physical_backups_enabled: false,
+          high_availability: false,
+          integration_source: null,
+        }),
     })
-    next()
+    renderWizard(
+      <PipelineCreationFlow
+        availableDestinations={['BigQuery', 'DuckLake', 'Snowflake', 'ClickHouse']}
+        onClose={vi.fn()}
+      />
+    )
+    expect(screen.getByText('Where should this database be replicated?')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
+    fireEvent.click(destinationType().getByRole('radio', { name: new RegExp(type) }))
+    await next('?step=connection')
+    expect(
+      screen.getByText(`Name this pipeline and enter credentials for ${type}.`)
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+      'href',
+      `${DOCS_URL}/guides/database/replication/pipelines/${path}`
+    )
+    await back('')
+    expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
+  })
+
+  const reachReview = async (
+    onClose = vi.fn(),
+    queryClient?: QueryClient,
+    shouldWaitForEstimate = true
+  ) => {
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />, {
+      queryClient,
+      rateLimitFactor: 1,
+    })
+    await next('?step=connection')
     fillConnection()
     await continueToData()
     await selectPublication()
-    next()
-    await screen.findByText(/Step 4 of 4/)
+    await next('?step=review')
+    if (shouldWaitForEstimate)
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+      )
   }
 
   const mockCreation = ({ failCreate = false, failStart = false } = {}) => {
@@ -213,6 +325,84 @@ describe('PipelineCreationFlow', () => {
     return { requests, starts, destinationRequests, pipelineRequests }
   }
 
+  it.each([
+    [false, false],
+    [true, false],
+    [false, true],
+    [true, true],
+  ])(
+    'places review failures and keeps the current position (connection: %s, warnings: %s)',
+    async (hasConnectionFailure, hasWarnings) => {
+      const { requests } = mockCreation()
+      await reachReview()
+      const validationStatus = screen.getByRole('status', { name: 'Pipeline validation status' })
+      expect(validationStatus).toBeEmptyDOMElement()
+      const scrollIntoView = vi.fn()
+      vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(scrollIntoView)
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/destinations/validate',
+        response: () =>
+          HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+            validation_failures: hasConnectionFailure
+              ? [
+                  {
+                    name: 'Credentials',
+                    reason: 'Check destination credentials.',
+                    failure_type: 'critical',
+                  },
+                ]
+              : [],
+          }),
+      })
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/pipelines/validate',
+        response: () =>
+          HttpResponse.json<components['schemas']['ValidatePipelineResponse_Output']>({
+            validation_failures: [
+              {
+                name: 'Publication',
+                reason: 'Check publication settings.',
+                failure_type: 'critical',
+              },
+              ...(hasWarnings
+                ? [
+                    {
+                      name: 'Retention',
+                      reason: 'Review retention settings.',
+                      failure_type: 'warning' as const,
+                    },
+                  ]
+                : []),
+            ],
+          }),
+      })
+      fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+      await screen.findByText('Check publication settings.')
+      expect(screen.getByRole('status', { name: 'Pipeline validation status' })).toBe(
+        validationStatus
+      )
+      const connection = withinRegion('Connection review')
+      const data = withinRegion('Data review')
+      if (hasConnectionFailure)
+        expect(connection.getByText('Check destination credentials.')).toBeInTheDocument()
+      expect(connection.getByRole('button', { name: 'Edit connection' })).toBeInTheDocument()
+      expect(connection.queryByText('Check publication settings.')).not.toBeInTheDocument()
+      expect(data.getByText('Check publication settings.')).toBeInTheDocument()
+      expect(data.getByRole('button', { name: 'Edit data' })).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          hasWarnings
+            ? 'Fix the above issues and review warnings before starting the pipeline.'
+            : 'Fix the above issues before starting the pipeline.'
+        )
+      ).toBeInTheDocument()
+      expect(scrollIntoView).not.toHaveBeenCalled()
+      expect(requests).toHaveLength(0)
+    }
+  )
+
   it.each([false, true])(
     'leaves after one committed creation, including start failure: %s',
     async (failStart) => {
@@ -255,30 +445,33 @@ describe('PipelineCreationFlow', () => {
   )
 
   it('edits each section from Review without losing values', async () => {
-    const onUrlUpdate = vi.fn()
-    const waitForReview = () =>
-      waitFor(() =>
-        expect(onUrlUpdate).toHaveBeenLastCalledWith(
-          expect.objectContaining({ queryString: '?step=review' })
-        )
-      )
-    await reachReview(vi.fn(), onUrlUpdate)
-    await waitForReview()
+    await reachReview()
+    expect(screen.getByText('Check these details, then start the pipeline.')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Edit connection' }))
-    await screen.findByText(/Step 2 of 4/)
+    await waitForStepQuery('?step=connection')
+    expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Warehouse')
-    next()
-    await screen.findByText(/Step 3 of 4/)
-    next()
-    await waitForReview()
+    await next('?step=data')
+    expect(screen.getByText(/Step 3 of 4/)).toBeInTheDocument()
+    expect(
+      screen.getByText('Select a publication and which existing rows to copy during initial sync.')
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+      'href',
+      `${DOCS_URL}/guides/database/replication/pipelines#choosing-which-tables-to-copy`
+    )
+    await next('?step=review')
     fireEvent.click(screen.getByRole('button', { name: 'Edit data' }))
-    await screen.findByText(/Step 3 of 4/)
-    next()
-    await waitForReview()
+    await waitForStepQuery('?step=data')
+    expect(screen.getByText(/Step 3 of 4/)).toBeInTheDocument()
+    await next('?step=review')
     fireEvent.click(screen.getByRole('button', { name: 'Edit destination' }))
-    await screen.findByText(/Step 1 of 4/)
-    next()
-    await screen.findByText(/Step 2 of 4/)
+    // destination is the default step, so clearOnDefault removes the query.
+    await waitForStepQuery('')
+    expect(screen.getByText(/Step 1 of 4/)).toBeInTheDocument()
+    await next('?step=connection')
+    expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Warehouse')
   })
 
@@ -328,20 +521,23 @@ describe('PipelineCreationFlow', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
     await screen.findByRole('button', { name: 'Start pipeline anyway' })
+    expect(
+      screen.getByText('Review the warnings above before starting the pipeline.')
+    ).toBeInTheDocument()
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toBeEnabled()
     )
     expect(screen.getByText('Check the publication.')).toBeInTheDocument()
     expect(requests).toHaveLength(0)
-    back()
-    back()
+    await back('?step=data')
+    await back('?step=connection')
     fireEvent.change(screen.getByRole('textbox', { name: 'Pipeline name' }), {
       target: { value: 'Updated warehouse' },
     })
-    next()
-    await screen.findByText(/Step 3 of 4/)
-    next()
-    await screen.findByText(/Step 4 of 4/)
+    await next('?step=data')
+    expect(screen.getByText(/Step 3 of 4/)).toBeInTheDocument()
+    await next('?step=review')
+    expect(screen.getByText(/Step 4 of 4/)).toBeInTheDocument()
     expect(screen.queryByText('Check the publication.')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
     await waitFor(() =>
@@ -408,10 +604,8 @@ describe('PipelineCreationFlow', () => {
   })
 
   it('requires connection fields and reveals invalid advanced settings', async () => {
-    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
-      nuqs: { hasMemory: true },
-    })
-    next()
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />)
+    await next('?step=connection')
     const connection = withinRegion('Destination connection')
     fireEvent.click(connection.getByRole('button', { name: /Advanced settings/ }))
     fireEvent.change(connection.getByRole('spinbutton', { name: 'Connection pool size' }), {
@@ -458,28 +652,25 @@ describe('PipelineCreationFlow', () => {
         })
       },
     })
-    customRender(
-      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
-      {
-        nuqs: { hasMemory: true },
-      }
+    renderWizard(
+      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />
     )
-    next()
+    await next('?step=connection')
     fillConnection()
-    fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
+    clickContinue()
     expect(within(stepCard()).getByRole('button', { name: 'Back' })).toBeDisabled()
     await waitFor(() => expect(screen.queryByText('Try again')).toBeInTheDocument())
     fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'retry-project' },
     })
     expect(screen.getByText('Try again')).toBeInTheDocument()
-    back()
+    await back('')
     fireEvent.click(destinationType().getByRole('radio', { name: /Snowflake/ }))
-    next()
+    await next('?step=connection')
     expect(screen.queryByText('Try again')).not.toBeInTheDocument()
-    back()
+    await back('')
     fireEvent.click(destinationType().getByRole('radio', { name: /BigQuery/ }))
-    next()
+    await next('?step=connection')
     expect(screen.queryByText('Try again')).not.toBeInTheDocument()
     fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
     await waitFor(() => expect(screen.queryByText('Check credentials')).toBeInTheDocument())
@@ -514,12 +705,10 @@ describe('PipelineCreationFlow', () => {
         })
       },
     })
-    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
-      nuqs: { hasMemory: true },
-    })
-    next()
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />)
+    await next('?step=connection')
     fillConnection()
-    next()
+    clickContinue()
     await waitFor(() => expect(screen.queryByText(/Replication can start/)).toBeInTheDocument())
     fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'changed' },
@@ -544,13 +733,13 @@ describe('PipelineCreationFlow', () => {
         <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />
       </NuqsAdapter>
     )
-    next()
+    clickContinue()
     await waitFor(() => expect(window.location.search).toBe('?step=connection'))
     fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'history-project' },
     })
     fillConnection()
-    await continueToData()
+    clickContinue()
     await waitFor(() => expect(window.location.search).toBe('?step=data'))
     await act(async () => {
       await new Promise<void>((resolve) => {
@@ -602,14 +791,13 @@ describe('PipelineCreationFlow', () => {
     }
   )
 
-  it('preserves connection values across destination changes', async () => {
-    const onUrlUpdate = vi.fn()
-    customRender(
+  it('preserves connection and data values across destination changes', async () => {
+    renderWizard(
       <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
-      { nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate } }
+      { rateLimitFactor: 1 }
     )
     expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 1 of 4')
-    next()
+    await next('?step=connection')
     fireEvent.change(screen.getByLabelText('Pipeline name'), {
       target: { value: 'Warehouse' },
     })
@@ -619,52 +807,33 @@ describe('PipelineCreationFlow', () => {
     fillConnection()
     await continueToData()
     expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 3 of 4')
-    // Wait for the URL write, not just the optimistic step render, before going back.
-    await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenLastCalledWith(
-        expect.objectContaining({ queryString: '?step=data' })
-      )
-    )
-    back()
-    await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenLastCalledWith(
-        expect.objectContaining({ queryString: '?step=connection' })
-      )
-    )
+    const data = withinRegion('Data')
+    fireEvent.click(data.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(data.getByRole('spinbutton', { name: 'Batch wait time' }), {
+      target: { value: '750' },
+    })
+    await back('?step=connection')
     expect(screen.getByLabelText('Project ID')).toHaveValue('my-project')
-    back()
-    await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenLastCalledWith(expect.objectContaining({ queryString: '' }))
-    )
+    await back('')
     fireEvent.click(destinationType().getByRole('radio', { name: /Snowflake/ }))
-    next()
-    await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenLastCalledWith(
-        expect.objectContaining({ queryString: '?step=connection' })
-      )
-    )
+    await next('?step=connection')
     expect(screen.getByLabelText('Pipeline name')).toHaveValue('Warehouse')
-    back()
-    await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenLastCalledWith(expect.objectContaining({ queryString: '' }))
-    )
+    await back('')
     fireEvent.click(destinationType().getByRole('radio', { name: /BigQuery/ }))
-    next()
-    await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenLastCalledWith(
-        expect.objectContaining({ queryString: '?step=connection' })
-      )
-    )
+    await next('?step=connection')
     expect(screen.getByLabelText('Project ID')).toHaveValue('my-project')
+    await continueToData()
+    const dataAfterReturn = withinRegion('Data')
+    fireEvent.click(dataAfterReturn.getByRole('button', { name: /Advanced settings/ }))
+    expect(dataAfterReturn.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
   })
 
   it('preserves data values across steps and reaches Review', async () => {
-    const onUrlUpdate = vi.fn()
-    customRender(
+    renderWizard(
       <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
-      { nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate } }
+      { rateLimitFactor: 1 }
     )
-    next()
+    await next('?step=connection')
     fireEvent.change(screen.getByLabelText('Pipeline name'), {
       target: { value: 'Warehouse' },
     })
@@ -675,38 +844,98 @@ describe('PipelineCreationFlow', () => {
     fireEvent.change(data.getByRole('spinbutton', { name: 'Batch wait time' }), {
       target: { value: '750' },
     })
-    // Wait for the URL write, not just the optimistic step render, before going back.
-    await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenLastCalledWith(
-        expect.objectContaining({ queryString: '?step=data' })
-      )
-    )
-    back()
-    await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenLastCalledWith(
-        expect.objectContaining({ queryString: '?step=connection' })
-      )
-    )
+    await back('?step=connection')
     await continueToData()
     const dataAfterReturn = withinRegion('Data')
     fireEvent.click(dataAfterReturn.getByRole('button', { name: /Advanced settings/ }))
     expect(dataAfterReturn.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
     await selectPublication()
-    next()
-    await waitForStep(4)
-    expect(within(stepCard()).getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+    await next('?step=review')
+    await waitFor(() =>
+      expect(within(stepCard()).getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+    )
     expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
   })
 
-  it('blocks incomplete data, retries metadata failures, and reveals invalid advanced settings', async () => {
-    const onUrlUpdate = vi.fn()
-    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
-      nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate },
+  it('shows one publication loading failure before Continue and clears it after a successful retry', async () => {
+    let shouldFail = true
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: () =>
+        shouldFail
+          ? HttpResponse.json<{ message: string }>({ message: 'Unavailable' }, { status: 503 })
+          : HttpResponse.json<components['schemas']['PublicationDetailsResponse_Output']>({
+              name: 'analytics',
+              config: {
+                type: 'tables',
+                tables: [],
+                operations: ['insert'],
+                publish_via_partition_root: false,
+              },
+              tables: [],
+            }),
     })
-    next()
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />)
+    await next('?step=connection')
     fillConnection()
     await continueToData()
-    next()
+    await selectPublication()
+    await screen.findByText('Publication tables could not be loaded')
+    fireEvent.click(withinRegion('Data').getByRole('button', { name: /Advanced settings/ }))
+    expect(screen.queryByText('Table settings could not be loaded')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Partition handling could not be loaded/)).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getAllByText('Publication tables could not be loaded')).toHaveLength(1)
+    )
+    expect(screen.getByText('Click Continue to try again.')).toBeInTheDocument()
+    expect(screen.queryByText(/Refresh the page before changing/)).not.toBeInTheDocument()
+    clickContinue()
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled())
+    await waitFor(() =>
+      expect(screen.getAllByText('Publication tables could not be loaded')).toHaveLength(1)
+    )
+    shouldFail = false
+    await next('?step=review')
+    expect(screen.queryByText('Publication tables could not be loaded')).not.toBeInTheDocument()
+  })
+
+  it('asks for another publication when the selected publication was deleted', async () => {
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />)
+    await next('?step=connection')
+    fillConnection()
+    await continueToData()
+    await selectPublication()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications',
+      response: () =>
+        HttpResponse.json<components['schemas']['ReadPublicationsResponse_Output']>({
+          publications: [],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: () =>
+        HttpResponse.json<{ message: string }>({ message: 'Not found' }, { status: 404 }),
+    })
+    clickContinue()
+    await screen.findByText('The publication analytics was not found.')
+    await screen.findByText('Select an available publication.')
+    expect(screen.queryByText('Publication tables could not be loaded')).not.toBeInTheDocument()
+    expect(screen.queryByText('Click Continue to try again.')).not.toBeInTheDocument()
+    expect(stepStatus()).toHaveTextContent('Step 3 of 4')
+  })
+
+  it('blocks incomplete data, retries metadata failures, and reveals invalid advanced settings', async () => {
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      rateLimitFactor: 1,
+    })
+    await next('?step=connection')
+    fillConnection()
+    await continueToData()
+    clickContinue()
     await waitFor(() =>
       expect(screen.queryByText('Select an available publication.')).toBeInTheDocument()
     )
@@ -720,7 +949,7 @@ describe('PipelineCreationFlow', () => {
       target: { value: '-1' },
     })
     fireEvent.click(data.getByRole('button', { name: /Advanced settings/ }))
-    next()
+    clickContinue()
     await waitFor(() =>
       expect(data.queryByRole('spinbutton', { name: 'Batch wait time' })).toBeVisible()
     )
@@ -740,22 +969,13 @@ describe('PipelineCreationFlow', () => {
               publications: [{ name: 'analytics' }],
             }),
     })
-    next()
+    clickContinue()
     await waitFor(() =>
-      expect(
-        screen.queryByText('Publication tables could not be loaded. Click Continue to try again.')
-      ).toBeInTheDocument()
+      expect(screen.queryByText('Click Continue to try again.')).toBeInTheDocument()
     )
     shouldFail = false
-    next()
-    await waitForStep(4)
-    // Wait for the URL write, not just the optimistic step render, before going back.
-    await waitFor(() =>
-      expect(onUrlUpdate).toHaveBeenLastCalledWith(
-        expect.objectContaining({ queryString: '?step=review' })
-      )
-    )
-    await act(async () => back())
+    await next('?step=review')
+    await back('?step=data')
     const dataAfterReturn = withinRegion('Data')
     const advancedSettings = await waitFor(() => {
       const button = dataAfterReturn.queryByRole('button', { name: /Advanced settings/ })
@@ -778,13 +998,14 @@ describe('PipelineCreationFlow', () => {
         <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />
       </NuqsAdapter>
     )
-    next()
+    clickContinue()
     await waitFor(() => expect(window.location.search).toBe('?step=connection'))
     fillConnection()
-    await continueToData()
+    clickContinue()
+    await waitFor(() => expect(window.location.search).toBe('?step=data'))
     await waitFor(() => expect(screen.queryByText('Select publication')).toBeInTheDocument())
     await selectPublication()
-    next()
+    clickContinue()
     await waitFor(() => expect(window.location.search).toBe('?step=review'))
     await act(async () => {
       await new Promise<void>((resolve) => {
@@ -826,10 +1047,8 @@ describe('PipelineCreationFlow', () => {
 
   it('confirms dirty dismissal and allows keeping the form', async () => {
     const onClose = vi.fn()
-    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />, {
-      nuqs: { hasMemory: true },
-    })
-    next()
+    renderWizard(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />)
+    await next('?step=connection')
     fireEvent.change(screen.getByLabelText('Pipeline name'), {
       target: { value: 'Keep me' },
     })
@@ -869,5 +1088,74 @@ describe('PipelineCreationFlow', () => {
     expect(within(stepCard()).getByRole('button', { name: 'Continue' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(onClose).toHaveBeenCalledOnce()
+  })
+
+  it.each(['success', 'error'] as const)(
+    'waits for the initial cost estimate and permits starting after %s',
+    async (result) => {
+      const { requests } = mockCreation()
+      let finishEstimate = () => {}
+      const gate = new Promise<void>((resolve) => {
+        finishEstimate = resolve
+      })
+      addAPIMock({
+        method: 'get',
+        path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
+        response: async () => {
+          await gate
+          if (result === 'error')
+            return HttpResponse.json<{ message: string }>(
+              { message: 'Estimate unavailable' },
+              { status: 503 }
+            )
+          return HttpResponse.json<ReplicationCostEstimateData>({
+            currency: 'usd',
+            pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
+            streaming: { rate_per_gb: 3 },
+            table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
+          })
+        },
+      })
+      await reachReview(vi.fn(), undefined, false)
+      const start = screen.getByRole('button', { name: 'Start pipeline' })
+      expect(start).toBeDisabled()
+      fireEvent.click(start)
+      expect(requests).toHaveLength(0)
+      expect(screen.getByRole('button', { name: 'Back' })).toBeEnabled()
+      finishEstimate()
+      await waitFor(() => expect(start).toBeEnabled())
+      if (result === 'error')
+        expect(screen.getByText(/A cost estimate is unavailable/)).toBeInTheDocument()
+      fireEvent.click(start)
+      await waitFor(() => expect(requests).toHaveLength(1))
+    }
+  )
+
+  it('keeps starting available during a background cost refresh with a cached estimate', async () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const key = replicationKeys.costEstimate('default', 1, 'analytics')
+    queryClient.setQueryData<ReplicationCostEstimateData>(key, {
+      currency: 'usd',
+      pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
+      streaming: { rate_per_gb: 3 },
+      table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
+      response: async () => {
+        await delay('infinite')
+        return HttpResponse.json<ReplicationCostEstimateData>({
+          currency: 'usd',
+          pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
+          streaming: { rate_per_gb: 3 },
+          table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
+        })
+      },
+    })
+    await reachReview(vi.fn(), queryClient)
+    await waitFor(() => expect(queryClient.getQueryState(key)?.fetchStatus).toBe('fetching'))
+    expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+    expect(screen.getByRole('heading', { name: 'Initial sync' })).toBeInTheDocument()
   })
 })

@@ -42,6 +42,8 @@ async function generate() {
     troubleshootingPages,
     referencePages
   )
+  // Keep the output order stable across builds
+  allPages.sort((a, b) => (a.link < b.link ? -1 : a.link > b.link ? 1 : 0))
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>

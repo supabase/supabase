@@ -19,6 +19,7 @@ import { contract as resolveSupportConversation } from './resolve-support-conver
 import { contract as runNotebook } from './run-notebook'
 import type { ToolContract, ToolContractInput, ToolContractOutput } from './types'
 import { contract as updateNotebook } from './update-notebook'
+import { contract as updateOptInLevel } from './update-opt-in-level'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 /**
@@ -43,6 +44,7 @@ export const TOOL_CONTRACTS = {
   resolve_support_conversation: resolveSupportConversation,
   run_notebook: runNotebook,
   update_notebook: updateNotebook,
+  update_opt_in_level: updateOptInLevel,
 } as const satisfies Partial<Record<ToolName, ToolContract>>
 
 export type ContractToolName = keyof typeof TOOL_CONTRACTS

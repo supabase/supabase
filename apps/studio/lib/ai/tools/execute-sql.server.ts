@@ -9,7 +9,7 @@ import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCe
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 
 export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
-  const { projectRef, connectionString, aiOptInLevel = 'schema' } = ctx
+  const { projectRef, connectionString, aiOptInLevel } = ctx
   const authHeaders = getAuthHeaders(ctx.authorization, { contentType: true })
 
   return approvalGatedToolFromContract(

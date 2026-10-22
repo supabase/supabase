@@ -163,7 +163,7 @@ export const AuditLogsForm = () => {
                             rel="noopener noreferrer"
                             href={`/project/${projectRef}/editor/${auditLogTable?.id}`}
                           >
-                            <code className="text-code-inline">{AUDIT_LOG_ENTRIES_TABLE}</code>
+                            <code>{AUDIT_LOG_ENTRIES_TABLE}</code>
                           </InlineLink>{' '}
                           table.
                           <br />
@@ -192,10 +192,8 @@ export const AuditLogsForm = () => {
                         Future audit logs will only appear in the project’s{' '}
                         <InlineLink href={authAuditLogsUrl}>auth logs</InlineLink>. You are
                         responsible for backing up, copying, or migrating existing data from the{' '}
-                        <code className="text-code-inline break-keep!">
-                          {AUDIT_LOG_ENTRIES_TABLE}
-                        </code>{' '}
-                        table if needed.
+                        <code className="break-keep!">{AUDIT_LOG_ENTRIES_TABLE}</code> table if
+                        needed.
                       </p>
                     }
                   />

@@ -41,9 +41,9 @@ jobs:
           body: |
             Refreshes the sitemap snapshots in `sitemaps/` with the current values from:
 
-            - `https://supabase.com/sitemap_www.xml` → `sitemaps/raw_output/sitemap_www.xml`
-            - `https://supabase.com/docs/sitemap.xml` → `sitemaps/raw_output/sitemap_docs.xml`
-            - `https://supabase.com/kb/sitemap-0.xml` → `sitemaps/raw_output/sitemap_kb.xml`
+            - `https://supabase.com/sitemap_www.xml` → `sitemaps/json_output/sitemap_www.json`
+            - `https://supabase.com/docs/sitemap.xml` → `sitemaps/json_output/sitemap_docs.json`
+            - `https://supabase.com/kb/sitemap-0.xml` → `sitemaps/json_output/sitemap_kb.json`
 
             Source: ${{ github.event_name == 'schedule' && 'monthly schedule' || 'manual run' }}
 

@@ -206,7 +206,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 href={`mailto:support@supabase.com?subject=${encodeURIComponent('Support Request')}${hasProjectRef ? `${encodeURIComponent(' for Project ID: ')}${encodeURIComponent(projectRef)}` : ''}&body=${encodeURIComponent('Here is a detailed description of the problem I am experiencing and any other information that might be helpful...')}`}
                 className="hover:text-foreground transition-colors duration-100"
               >
-                <code className="text-code-inline text-foreground-light! underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
+                <code className="text-foreground-light! underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
                   support@supabase.com
                 </code>
               </a>
@@ -222,7 +222,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
             <p className="flex items-center gap-x-1.5 flex-wrap">
               Project ID:{' '}
               <span className="inline-flex items-center gap-x-1">
-                <code className="text-code-inline text-foreground-light!">{projectRef}</code>
+                <code className="text-foreground-light!">{projectRef}</code>
                 <CopyButton
                   iconOnly
                   variant="text"

@@ -62,6 +62,7 @@ describe('ai/tools getTools', () => {
       projectRef: BASE_PARAMS.projectRef,
       connectionString: BASE_PARAMS.connectionString,
       authorization: BASE_PARAMS.authorization,
+      aiOptInLevel: BASE_PARAMS.aiOptInLevel,
     })
   })
 

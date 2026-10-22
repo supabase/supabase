@@ -101,7 +101,7 @@ A session as `backup_reader` can still write in these ways:
 - If the pg_net extension is enabled, the session can add rows to `net.http_request_queue`, which pg_net sends as HTTP requests. The role receives this privilege from `PUBLIC`.
 - The session can create large objects with functions such as `lo_create`, which `PUBLIC` can run.
 
-For the full list of privileges every role receives, see [Custom role inherits privileges that were not explicitly granted](/docs/guides/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted-ddaa1c#what-every-role-receives-from-public).
+For the full list of privileges every role receives, see [Custom role inherits privileges that were not explicitly granted](/kb/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted#what-every-role-receives-from-public).
 
 ## Rotate the password
 

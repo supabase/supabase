@@ -54,8 +54,8 @@ Each content collection renders through a matching catch-all page — e.g. `src/
 (`src/pages/topics/[topic].astro`) are generated from the `TOPICS` list in `src/lib/topics.ts`, not from
 content files, and read from every collection.
 
-Separately, `scripts/generate-markdown.mjs` runs as a `prebuild` step and exports every content file — plus
-one page per topic, listing its guides — as a plain `.md` file under the gitignored `public/markdown/`,
+Separately, `scripts/generate-markdown.ts` runs as a `prebuild` step and exports every content file — plus
+one page per topic, listing its guides, and a root `sitemap.md` linking every topic, troubleshooting article, and guide — as a plain `.md` file under the gitignored `public/markdown/`,
 mirroring the page's URL with a `.md` extension. `vercel.json` permanently redirects `<page>.md` requests to
 these generated files, one redirect entry per route section (`guides`, `topics`, `troubleshooting`). It also
 rewrites guide, topic, and troubleshooting page requests that send `Accept: text/markdown` to the same files
@@ -65,7 +65,7 @@ rewrites guide, topic, and troubleshooting page requests that send `Accept: text
 If you add a new content collection or top-level route, add a matching redirect, negotiated rewrite, and
 `Vary: Accept` header in `vercel.json` (`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`, the
 `Accept` rewrite to `/markdown/<section>/:path+.md`, and a `headers` entry for `/kb/<section>/:path+`), and
-check whether `generate-markdown.mjs` needs updating too — the content export falls out of its generic
+check whether `generate-markdown.ts` needs updating too — the content export falls out of its generic
 `src/content/**` walk automatically, but per-topic-style listing pages don't.
 
 ## Topic-specific guidance

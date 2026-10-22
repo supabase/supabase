@@ -1,7 +1,6 @@
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection } from 'ui-patterns/PageSection'
 
-import { PublicationsAvailability } from '@/components/interfaces/Database/Publications/PublicationsAvailability'
 import { PublicationsList } from '@/components/interfaces/Database/Publications/PublicationsList'
 import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -30,11 +29,7 @@ const DatabasePublicationsContent = () => {
   )
 }
 
-const DatabasePublications: NextPageWithLayout = () => (
-  <PublicationsAvailability>
-    <DatabasePublicationsContent />
-  </PublicationsAvailability>
-)
+const DatabasePublications: NextPageWithLayout = () => <DatabasePublicationsContent />
 
 DatabasePublications.getLayout = (page) => (
   <DefaultLayout>
