@@ -4,7 +4,7 @@ import { z } from 'astro/zod'
 
 import { TOPIC_NAMES } from './lib/topics'
 
-// Format date as "26 SEPTEMBER 2026"
+// Format date as "September 26, 2026"
 const formatDate = (date: Date): string => {
   // Adjust for timezone offset to preserve the intended date
   const adjusted = new Date(date.getTime() + date.getTimezoneOffset() * 60000)
@@ -12,10 +12,14 @@ const formatDate = (date: Date): string => {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  })
-    .format(adjusted)
-    .toUpperCase()
+  }).format(adjusted)
 }
+
+// Astro's default id is a lowercased slug of the file path, but the markdown
+// export (scripts/generate-markdown.ts) keeps the filename's case and Vercel
+// serves static files case-sensitively. Keeping the case here makes the page
+// URL and the `.md` export path line up.
+const generateId = ({ entry }: { entry: string }) => entry.replace(/\.mdx?$/, '')
 
 // Every entry here is rendered through GuideLayout by
 // Shared by every article-like collection (guides, troubleshooting) so their
@@ -33,7 +37,7 @@ const articleFields = {
 // src/pages/guides/[...slug].astro — dropping a new file in
 // src/content/guides doesn't need any per-file layout wiring.
 const guides = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guides' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guides', generateId }),
   schema: z.object({
     ...articleFields,
     description: z.string(),
@@ -55,7 +59,7 @@ const guides = defineCollection({
 // entirely generated, never hand-authored, see .gitignore. Rendered through
 // ArticleLayout by src/pages/troubleshooting/[...slug].astro.
 const troubleshooting = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/troubleshooting' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/troubleshooting', generateId }),
   schema: z.object({
     ...articleFields,
     // The source has no description field, and ArticleLayout already

@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { EllipsisVertical, Pencil, RotateCw, Send, Trash2 } from 'lucide-react'
+import { EllipsisVerticalIcon, PencilIcon, RotateCwIcon, SendIcon, Trash2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -20,6 +20,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -32,6 +37,7 @@ import {
   filterWebhookDeliveries,
   filterWebhookEndpoints,
   generateSigningSecret,
+  getTestWebhookEventType,
   getWebhookEndpointDisplayName,
 } from './PlatformWebhooks.utils'
 import { PlatformWebhooksDeliveryDetailsSheet } from './PlatformWebhooksDeliveryDetailsSheet'
@@ -120,6 +126,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     null
   )
   const [showRegenerateSecretConfirm, setShowRegenerateSecretConfirm] = useState(false)
+  const [showTestEventPicker, setShowTestEventPicker] = useState(false)
+  const [testEventType, setTestEventType] = useState('')
   const [editEnabledOverride, setEditEnabledOverride] = useState<boolean | null>(null)
   const [deliveryDetailsTab, setDeliveryDetailsTab] = useState<'event' | 'response'>('event')
   const [pendingCreatedEndpointId, setPendingCreatedEndpointId] = useState<string | null>(null)
@@ -159,33 +167,22 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   )
 
   const isEndpointView = !!selectedEndpoint
-  const selectedEndpointHasName = selectedEndpoint ? selectedEndpoint.name.trim().length > 0 : false
   const selectedEndpointDisplayName = selectedEndpoint
     ? getWebhookEndpointDisplayName(selectedEndpoint)
     : ''
   const headerTitle = isEndpointView ? selectedEndpointDisplayName : scopeLabel
-  const headerDescription = isEndpointView
-    ? selectedEndpointHasName
-      ? (selectedEndpoint?.url ?? '')
-      : ''
-    : scopeDescription
+  const headerDescription = isEndpointView ? '' : scopeDescription
 
   const endpointPendingDelete = useMemo(
     () => endpoints.find((endpoint) => endpoint.id === endpointIdPendingDelete) ?? null,
     [endpoints, endpointIdPendingDelete]
   )
-  const endpointPendingDeleteHasName = endpointPendingDelete
-    ? endpointPendingDelete.name.trim().length > 0
-    : false
   const endpointPendingDeleteDisplayName = endpointPendingDelete
     ? getWebhookEndpointDisplayName(endpointPendingDelete)
     : ''
-  let deleteEndpointDescription = 'This action cannot be undone.'
-  if (endpointPendingDelete) {
-    deleteEndpointDescription = endpointPendingDeleteHasName
-      ? `Deleting “${endpointPendingDeleteDisplayName}” stops all deliveries to the URL below. This can’t be undone.`
-      : 'Deleting this endpoint stops all deliveries to the URL below. This can’t be undone.'
-  }
+  const deleteEndpointDescription = endpointPendingDelete
+    ? `Deleting “${endpointPendingDeleteDisplayName}” stops all deliveries to the URL below. This can’t be undone.`
+    : 'This action cannot be undone.'
 
   const shouldRedirect = shouldRedirectFromWebhooks({
     areFlagsReady: isFeaturePreviewInitialized,
@@ -360,15 +357,36 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     toast.success('Signing secret regenerated')
   }
 
-  const handleSendTestEvent = async () => {
+  const handleSendTestEvent = async (eventType: string) => {
     if (!selectedEndpoint) return
     try {
-      await testEndpointMutation.mutateAsync({ scope: apiScope, id: selectedEndpoint.id })
+      await testEndpointMutation.mutateAsync({
+        scope: apiScope,
+        id: selectedEndpoint.id,
+        eventType,
+      })
     } catch (error) {
       console.error('Failed to send webhook test event', error)
       return
     }
     toast.success('Test event sent — check deliveries shortly')
+  }
+
+  const testEventTypeChoices = selectedEndpoint
+    ? selectedEndpoint.eventTypes.includes('*')
+      ? eventTypeOptions
+      : selectedEndpoint.eventTypes
+    : []
+
+  const handleSendTestEventClick = () => {
+    if (!selectedEndpoint) return
+    if (testEventTypeChoices.length <= 1) {
+      const eventType = getTestWebhookEventType(selectedEndpoint.eventTypes, eventTypeOptions)
+      if (eventType) handleSendTestEvent(eventType)
+      return
+    }
+    setTestEventType(testEventTypeChoices[0])
+    setShowTestEventPicker(true)
   }
 
   const handleRetryDelivery = async (deliveryId: string) => {
@@ -448,7 +466,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 options={{ enabled: !isEndpointSheetOpen }}
               >
                 <Button
-                  icon={<Pencil size={14} />}
+                  icon={<PencilIcon size={14} />}
                   onClick={() => {
                     setEditEnabledOverride(null)
                     setPanel('edit')
@@ -459,25 +477,25 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
               </Shortcut>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button icon={<EllipsisVertical />} className="w-7" />
+                  <Button icon={<EllipsisVerticalIcon />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" side="bottom" className="w-48">
-                  <DropdownMenuItem className="gap-x-2" onClick={handleSendTestEvent}>
-                    <Send size={14} className="text-foreground-lighter" />
+                  <DropdownMenuItem className="gap-x-2" onClick={handleSendTestEventClick}>
+                    <SendIcon size={14} className="text-foreground-lighter" />
                     <span>Send test event</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="gap-x-2"
                     onClick={() => setShowRegenerateSecretConfirm(true)}
                   >
-                    <RotateCw size={14} className="text-foreground-lighter" />
+                    <RotateCwIcon size={14} className="text-foreground-lighter" />
                     <span>Regenerate secret</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="gap-x-2"
                     onClick={() => setEndpointIdPendingDelete(selectedEndpoint.id)}
                   >
-                    <Trash2 size={14} className="text-foreground-lighter" />
+                    <Trash2Icon size={14} className="text-foreground-lighter" />
                     <span>Delete endpoint</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -569,6 +587,42 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction variant="danger" onClick={handleDeleteEndpoint}>
               Delete endpoint
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showTestEventPicker} onOpenChange={setShowTestEventPicker}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send test event</AlertDialogTitle>
+            <AlertDialogDescription>
+              Choose which subscribed event type to send as a test.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="px-5 pb-5">
+            <Select value={testEventType} onValueChange={setTestEventType}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {testEventTypeChoices.map((eventType) => (
+                  <SelectItem key={eventType} value={eventType}>
+                    {eventType}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setShowTestEventPicker(false)
+                handleSendTestEvent(testEventType)
+              }}
+            >
+              Send
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

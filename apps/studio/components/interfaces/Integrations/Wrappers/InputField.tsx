@@ -1,4 +1,4 @@
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
 import { cn, FormControl, FormField, Input, InputVariants, Textarea } from 'ui'
@@ -39,7 +39,7 @@ export const InputField = <
               {option.urlHelper !== undefined && (
                 <Link href={option.urlHelper} target="_blank" rel="noreferrer">
                   <span className="sr-only">Documentation</span>
-                  <HelpCircle
+                  <HelpCircleIcon
                     strokeWidth={2}
                     size={14}
                     className="text-foreground-light hover:text-foreground cursor-pointer transition"

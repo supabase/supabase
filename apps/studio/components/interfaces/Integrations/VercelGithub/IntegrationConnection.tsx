@@ -1,4 +1,11 @@
-import { ChevronDown, Loader2, MoreVertical, RefreshCw, SettingsIcon, Trash } from 'lucide-react'
+import {
+  ChevronDownIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+  RefreshCwIcon,
+  SettingsIcon,
+  TrashIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { forwardRef, useCallback, useState } from 'react'
 import { toast } from 'sonner'
@@ -74,8 +81,8 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
     const isManageCompact = isProjectScoped && type === 'Vercel'
     const triggerLabel = isManageCompact ? null : 'Manage'
     const triggerProps = isManageCompact
-      ? { icon: <MoreVertical />, className: 'px-1.5', 'aria-label': 'Manage connection' }
-      : { iconRight: <ChevronDown size={14} /> }
+      ? { icon: <MoreVerticalIcon />, className: 'px-1.5', 'aria-label': 'Manage connection' }
+      : { iconRight: <ChevronDownIcon size={14} /> }
 
     return (
       <>
@@ -128,9 +135,9 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                       disabled={isSyncEnvLoading}
                     >
                       {isSyncEnvLoading ? (
-                        <Loader2 className="animate-spin" size={14} />
+                        <Loader2Icon className="animate-spin" size={14} />
                       ) : (
-                        <RefreshCw size={14} />
+                        <RefreshCwIcon size={14} />
                       )}
                       <p>Resync environment variables</p>
                     </DropdownMenuItem>
@@ -138,7 +145,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                   {((type === 'Vercel' && org?.managed_by !== 'vercel-marketplace') ||
                     !isProjectScoped) && <DropdownMenuSeparator />}
                   <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
-                    <Trash size={14} />
+                    <TrashIcon size={14} />
                     <p>Delete connection</p>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

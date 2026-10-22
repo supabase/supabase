@@ -94,6 +94,15 @@ export const deriveChanges = (
   return { removed, added, updated }
 }
 
+/** Order-insensitive: the same projects with the same roles count as unchanged */
+export const hasRoleConfigurationChanges = (
+  original: ProjectRoleConfiguration[],
+  final: ProjectRoleConfiguration[]
+) => {
+  const { removed, added, updated } = deriveChanges(original, final)
+  return removed.length > 0 || added.length > 0 || updated.length > 0
+}
+
 // [Joshen] Essentially spit out 3 arrays
 // What to (1) Remove (2) Assign (3) Update
 // And so that we can unit test this

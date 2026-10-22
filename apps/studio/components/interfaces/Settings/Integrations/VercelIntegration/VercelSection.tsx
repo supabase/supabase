@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, ExternalLink } from 'lucide-react'
+import { ChevronDownIcon, ExternalLinkIcon } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -31,7 +30,7 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from '@/data/integrations/integrations.types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
@@ -46,14 +45,12 @@ export const VercelSection = ({ isProjectScoped = false }: { isProjectScoped?: b
   const isBranch = project?.parent_project_ref !== undefined
 
   const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.vercel_connections')
-  const { can: canCreateVercelConnection } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'integrations.vercel_connections'
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
+  const { can: canCreateVercelConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
-  const { can: canUpdateVercelConnection } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'integrations.vercel_connections'
+  const { can: canUpdateVercelConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
 
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
@@ -195,7 +192,7 @@ export const VercelSection = ({ isProjectScoped = false }: { isProjectScoped?: b
                                 <Button
                                   className="group"
                                   iconRight={
-                                    <ChevronDown className="transition-transform group-data-[state=open]:rotate-180" />
+                                    <ChevronDownIcon className="transition-transform group-data-[state=open]:rotate-180" />
                                   }
                                 >
                                   Edit
@@ -233,7 +230,7 @@ export const VercelSection = ({ isProjectScoped = false }: { isProjectScoped?: b
                 showNode={false}
                 disabled={isBranch}
                 href={integrationUrl}
-                icon={<ExternalLink />}
+                icon={<ExternalLinkIcon />}
                 disabledTooltip="Install the Vercel integration on your project's main branch"
               >
                 Install Vercel integration

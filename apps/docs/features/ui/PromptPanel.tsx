@@ -227,11 +227,7 @@ function PromptMarkdown({ children }: { children: string }) {
 
 /** Inline code chip for prompt bodies; opts out of the text shimmer. */
 function PromptCode({ children }: { children?: ReactNode }) {
-  return (
-    <code className="shimmer-none rounded bg-surface-200 px-1 py-0.5 font-mono text-xs text-foreground">
-      {children}
-    </code>
-  )
+  return <code className="shimmer-none">{children}</code>
 }
 
 const MARKDOWN_COMPONENTS = { code: PromptCode }

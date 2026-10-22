@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -154,7 +154,7 @@ export const NewTokenDialog = ({
                   be very careful when using this API.
                 </p>
                 <div className="mt-4">
-                  <Button asChild icon={<ExternalLink />}>
+                  <Button asChild icon={<ExternalLinkIcon />}>
                     <a href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                       Experimental API documentation
                     </a>

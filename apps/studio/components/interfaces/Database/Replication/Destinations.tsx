@@ -1,6 +1,8 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import { MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
+import { useRouter as useTanStackRouter } from '@tanstack/react-router'
+import { useFeatureFlags, useParams } from 'common'
+import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
+import { useRouter as useNextRouter } from 'next/compat/router'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -31,7 +33,14 @@ import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
+} from './useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -47,6 +56,7 @@ import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -89,6 +99,16 @@ const compareStatusNames = (
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
+  const router = useTanStackRouter({ warn: false })
+  const nextRouter = useNextRouter()
+  const { isEnabled: isWizardEnabled, isLoading: isPreviewLoading } = usePipelineCreationPreview()
+  const bigQuery = useIsETLBigQueryPrivateAlpha()
+  const duckLake = useIsETLDucklakePrivateAlpha()
+  const snowflake = useIsETLSnowflakePrivateAlpha()
+  const clickHouse = useIsETLClickHousePrivateAlpha()
+  const hasWizardDestination = bigQuery || duckLake || snowflake || clickHouse
+  const { hasLoaded: hasFlagsLoaded } = useFeatureFlags()
+  const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
 
@@ -213,20 +233,37 @@ export const Destinations = () => {
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
   const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
-  const canCreate = isSourcesSuccess
-  const isCheckingPipelineStatus = !isSourcesSuccess && !isSourcesError
+  const canCreate = isSourcesSuccess && !isCreationGateLoading
+  const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
   const sourceErrorTitle = checkLocalETLNotSetUp(sourcesError)
     ? 'Replication unavailable locally'
     : 'Failed to retrieve pipeline enablement status'
 
-  const openDestinationPanel = () => {
+  const canLinkToWizard =
+    isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
+  const wizardHref = `/project/${projectRef}/database/pipelines/new`
+
+  const openCreation = (type: DestinationType) => {
+    if (isWizardEnabled && hasWizardDestination && projectRef) {
+      if (router)
+        void router.navigate({
+          to: '/project/$ref/database/pipelines/new',
+          params: { ref: projectRef },
+        })
+      else void nextRouter?.push(`/project/${projectRef}/database/pipelines/new`)
+    } else {
+      setDestinationType(type)
+    }
+  }
+
+  const handleAddPipeline = () => {
     if (!canCreate) return
     if (replicationNotEnabled) {
       pendingCreationTypeRef.current = 'BigQuery'
       setShowEnablePipelinesDialog(true)
       return
     }
-    setDestinationType('BigQuery')
+    openCreation('BigQuery')
   }
 
   const handleEnableDialogOpenChange = (open: boolean) => {
@@ -241,7 +278,7 @@ export const Destinations = () => {
       type &&
       queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
     ) {
-      setDestinationType(type)
+      openCreation(type)
     }
   }
 
@@ -285,7 +322,7 @@ export const Destinations = () => {
             ref={searchInputRef}
             placeholder="Search pipelines"
             size="tiny"
-            icon={<Search />}
+            icon={<SearchIcon />}
             value={filterString}
             className="w-full lg:w-52"
             onChange={(e) => setFilterString(e.target.value)}
@@ -295,7 +332,7 @@ export const Destinations = () => {
                 <Button
                   aria-label="Clear search"
                   variant="text"
-                  icon={<X />}
+                  icon={<XIcon />}
                   className="p-0 h-5 w-5"
                   onClick={() => setFilterString('')}
                 />
@@ -309,7 +346,7 @@ export const Destinations = () => {
               <Button
                 aria-label="More actions"
                 variant="default"
-                icon={<MoreVertical />}
+                icon={<MoreVerticalIcon />}
                 className="w-6.5 hit-area-1"
               />
             </DropdownMenuTrigger>
@@ -352,7 +389,7 @@ export const Destinations = () => {
           <Shortcut
             id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
             label="Add pipeline"
-            onTrigger={openDestinationPanel}
+            onTrigger={handleAddPipeline}
             options={{ enabled: canCreate }}
             side="bottom"
             tooltipOpen={canCreate ? undefined : false}
@@ -362,12 +399,13 @@ export const Destinations = () => {
                 content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
               }}
               variant="primary"
-              icon={<Plus />}
+              icon={<PlusIcon />}
               loading={isCheckingPipelineStatus}
               disabled={!canCreate}
-              onClick={openDestinationPanel}
+              asChild={canLinkToWizard}
+              onClick={canLinkToWizard ? undefined : handleAddPipeline}
             >
-              Add pipeline
+              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
             </ButtonTooltip>
           </Shortcut>
         </div>
@@ -451,7 +489,7 @@ export const Destinations = () => {
 
         {!isDestinationsLoading && !hasDestinations && !hasErrorsFetchingData && (
           <EmptyStatePresentational
-            icon={Workflow}
+            icon={WorkflowIcon}
             title="Add a pipeline"
             description="Send tables to an external destination for analytics workloads."
           >
@@ -460,12 +498,13 @@ export const Destinations = () => {
                 content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
               }}
               variant="default"
-              icon={<Plus />}
+              icon={<PlusIcon />}
               loading={isCheckingPipelineStatus}
               disabled={!canCreate}
-              onClick={openDestinationPanel}
+              asChild={canLinkToWizard}
+              onClick={canLinkToWizard ? undefined : handleAddPipeline}
             >
-              Add pipeline
+              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
             </ButtonTooltip>
           </EmptyStatePresentational>
         )}

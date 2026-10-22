@@ -1,4 +1,4 @@
-import { LogOut } from 'lucide-react'
+import { LogOutIcon } from 'lucide-react'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
@@ -26,7 +26,7 @@ export const AuthorizingAsCard = ({
             <ButtonTooltip
               variant="text"
               size="tiny"
-              icon={<LogOut size={14} />}
+              icon={<LogOutIcon size={14} />}
               className="shrink-0 size-6 px-0 text-foreground-light hover:text-foreground"
               aria-label="Sign out"
               aria-describedby={undefined}

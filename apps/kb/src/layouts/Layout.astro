@@ -1,16 +1,27 @@
 ---
+import { getCollection } from 'astro:content'
 import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
+import { toSummary, toTroubleshootingSummary } from '../lib/guides'
+import { getListedTopics } from '../lib/topics'
 import '../styles/globals.css'
+import { canonicalUrl, serializeJsonLd } from '../lib/json-ld'
 
 interface Props {
-	title: string
+	title?: string
 	description?: string
+	jsonLd?: Record<string, unknown> | Record<string, unknown>[]
 }
 
-const { title, description } = Astro.props
+const { title, description, jsonLd } = Astro.props
+// the nav lists only topics with entries
+const navTopics = getListedTopics({
+	guides: (await getCollection('guides')).map(toSummary),
+	troubleshooting: (await getCollection('troubleshooting')).map(toTroubleshootingSummary),
+}).map((topic) => topic.name)
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
+const canonicalHref = canonicalUrl(Astro.url.pathname)
 ---
 
 <!doctype html>
@@ -18,17 +29,22 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
-		<meta name="robots" content="noindex, nofollow" />
 		{description && <meta name="description" content={description} />}
 		<script is:inline>
 			// Set data-theme on <html> before first paint, so the page doesn't flash
-			// the wrong theme while this loads. Defaults to dark (no system-preference
-			// check — the toggle in components/ThemeToggle.tsx is light/dark only).
+			// the wrong theme while this loads. Defaults to dark, and "system" follows the
+			// OS preference, including changes mid-session (choices come from components/HeaderMenu.tsx).
 			;(function () {
-				try {
-					var stored = localStorage.getItem('theme')
-					document.documentElement.setAttribute('data-theme', stored === 'light' ? 'light' : 'dark')
-				} catch (_) {}
+				var systemDark = window.matchMedia('(prefers-color-scheme: dark)')
+				var applyTheme = function () {
+					try {
+						var stored = localStorage.getItem('theme')
+						var theme = stored === 'system' ? (systemDark.matches ? 'dark' : 'light') : stored === 'light' ? 'light' : 'dark'
+						document.documentElement.setAttribute('data-theme', theme)
+					} catch (_) {}
+				}
+				applyTheme()
+				systemDark.addEventListener('change', applyTheme)
 			})()
 		</script>
 		{genFaviconLinks(import.meta.env.BASE_URL, faviconRoute).map((link) => <link {...link} />)}
@@ -42,12 +58,16 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 			rel="stylesheet"
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
 		/>
+		<link rel="canonical" href={canonicalHref} />
 		<link rel="sitemap" href={`${import.meta.env.BASE_URL}/sitemap-index.xml`} />
-		<title>{title} | Supabase Knowledge Base</title>
+		<title>{title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowledge Base'}</title>
+		{jsonLd && <script type="application/ld+json" is:inline set:html={serializeJsonLd(jsonLd)} />}
 	</head>
-	<body>
-		<Header client:load />
-		<main>
+	<body class="flex min-h-dvh flex-col">
+		<div class="sticky top-0 z-40">
+			<Header client:load topics={navTopics} />
+		</div>
+		<main class="grow">
 			<slot />
 		</main>
 		<Footer />
@@ -58,10 +78,12 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 
 :root {
   --header-height: 50px;
+  --nav-inset: 10rem;
 }
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--header-height);
   font-weight: 500;
 }
 
@@ -72,7 +94,8 @@ html[data-theme*='dark'] {
 	body {
 		margin: 0;
 		width: 100%;
-		height: 100%;
+		min-height: 100%;
+		overscroll-behavior-y: none;
 	}
 
 	body {

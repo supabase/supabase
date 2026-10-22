@@ -1,5 +1,5 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { Dispatch, PropsWithChildren, SetStateAction } from 'react'
 import {
   Button,
@@ -76,7 +76,7 @@ const Scope = ({
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button iconRight={<ChevronDown />}>
+          <Button iconRight={<ChevronDownIcon />}>
             <p>{accessDescription}</p>
           </Button>
         </DropdownMenuTrigger>

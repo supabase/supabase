@@ -342,6 +342,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/troubleshooting' as `/${string}`,
             level: 'troubleshooting',
           },
+          {
+            label: 'Knowledge base',
+            icon: 'resources',
+            href: 'https://supabase.com/kb',
+          },
         ],
       ],
     },
@@ -871,6 +876,7 @@ export const auth: NavMenuConstant = {
         { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
         { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
         { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
+        { name: 'Custom OIDC', url: '/guides/auth/third-party/custom-oidc' },
       ],
     },
     {

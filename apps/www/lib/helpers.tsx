@@ -235,3 +235,16 @@ export const debounce = <T extends (...args: any[]) => any>(
 
   return debounced
 }
+
+/**
+ * Decodes a dynamic route param. Next.js passes params percent-encoded (e.g.
+ * `event%20triggers`), so decode before matching against content. A malformed
+ * sequence returns the raw value rather than throwing.
+ */
+export function decodeRouteParam(value: string): string {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}

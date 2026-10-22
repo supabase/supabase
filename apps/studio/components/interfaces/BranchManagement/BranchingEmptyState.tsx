@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { GitBranch } from 'lucide-react'
+import { GitBranchIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
 
@@ -28,7 +28,7 @@ export const BranchingEmptyState = ({
           <div className="flex items-start gap-x-4">
             <div className="shrink-0 text-foreground-light">
               <Card className="flex h-10 w-10 shrink-0 items-center justify-center p-0">
-                <GitBranch size={16} />
+                <GitBranchIcon size={16} />
               </Card>
             </div>
             <div className="text-sm">

@@ -84,7 +84,7 @@ Track connection usage in the [Observability](/dashboard/project/_/observability
 - **Dedicated Pooler Client Connections:** active client connections to PgBouncer.
 - **Shared Pooler (Supavisor) Client Connections:** active client connections to Supavisor.
 
-These reports are not real-time. They show the connection count from the last refresh. For up-to-the-second data, query `pg_stat_activity` in the SQL Editor:
+These reports are not real-time. They show the connection count from the last refresh. For up-to-the-second data, query `pg_stat_activity`. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 -- Count connections by application and user name

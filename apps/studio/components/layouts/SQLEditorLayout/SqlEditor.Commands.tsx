@@ -1,8 +1,7 @@
 import type { PGColumn } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
+import { AlertTriangleIcon, CodeIcon, Loader2Icon, Table2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { cn, CommandGroup, CommandItem, CommandList } from 'ui'
@@ -33,9 +32,11 @@ import {
   usePrefetchTables,
   type TablesData,
 } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProfile } from '@/lib/profile'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -76,7 +77,7 @@ export function useSnippetCommands() {
       {
         id: 'run-snippet',
         name: 'Run snippet...',
-        icon: () => <Code />,
+        icon: () => <CodeIcon />,
         action: () => setPage(SNIPPET_PAGE_NAME),
       },
     ],
@@ -101,13 +102,11 @@ function RunSnippetPage() {
 
   const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
-  const { profile } = useProfile()
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
     {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
+      mode: 'create',
+      type: 'sql',
     }
   )
 
@@ -135,7 +134,7 @@ function LoadingState() {
   return (
     <div className="p-6">
       <p className="text-center">
-        <Loader2 className="inline-block mr-2 animate-spin" />
+        <Loader2Icon className="inline-block mr-2 animate-spin" />
         Loading...
       </p>
     </div>
@@ -146,7 +145,7 @@ function ErrorState() {
   return (
     <div className="p-6">
       <p className="text-center">
-        <AlertTriangle className="inline-block mr-2" />
+        <AlertTriangleIcon className="inline-block mr-2" />
         Couldn&apos;t load snippets
       </p>
     </div>
@@ -288,7 +287,7 @@ export function useQueryTableCommands(options?: CommandOptions) {
       {
         id: 'query-table',
         name: 'Query a table...',
-        icon: () => <Table2 />,
+        icon: () => <Table2Icon />,
         action: () => setPage(QUERY_TABLE_PAGE_NAME),
       },
     ],
@@ -386,7 +385,7 @@ function TableSelector() {
                   <div className="flex items-center gap-x-2">
                     {isFetchingNextTablesPage ? (
                       <span className="flex items-center gap-2">
-                        <Loader2 size={14} className="animate-spin" /> Loading...
+                        <Loader2Icon size={14} className="animate-spin" /> Loading...
                       </span>
                     ) : (
                       <span>

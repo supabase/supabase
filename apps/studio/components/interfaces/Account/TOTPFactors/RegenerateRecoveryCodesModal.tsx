@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react'
+import { RefreshCwIcon } from 'lucide-react'
 import { ComponentProps } from 'react'
 import { Button } from 'ui'
 
@@ -23,7 +23,7 @@ export const RegenerateRecoveryCodesModal = ({
     >
       {children ??
         (({ onClick, isPending }) => (
-          <Button icon={<RefreshCw />} onClick={onClick} loading={isPending}>
+          <Button icon={<RefreshCwIcon />} onClick={onClick} loading={isPending}>
             Regenerate
           </Button>
         ))}

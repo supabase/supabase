@@ -14,10 +14,11 @@ import { OAuthApps } from '@/components/interfaces/Account/OAuthApps/OAuthApps'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import type { NextPageWithLayout } from '@/types'
 
 const UserOAuthApps: NextPageWithLayout = () => {
-  const isOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants')
+  const isOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants') && USE_MOCKS
   const { hasLoaded } = useFeatureFlags()
   const router = useRouter()
   useEffect(() => {

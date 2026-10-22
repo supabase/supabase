@@ -1,18 +1,17 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
-  AlertCircle,
-  Archive,
-  Copy,
-  Download,
-  Edit,
-  Link2,
-  LoaderCircle,
-  MoreVertical,
-  Move,
-  RotateCcw,
-  Trash2,
-  Upload,
+  AlertCircleIcon,
+  ArchiveIcon,
+  CopyIcon,
+  DownloadIcon,
+  EditIcon,
+  Link2Icon,
+  LoaderCircleIcon,
+  MoreVerticalIcon,
+  MoveIcon,
+  RotateCcwIcon,
+  Trash2Icon,
+  UploadIcon,
 } from 'lucide-react'
 import type { CSSProperties, ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -56,7 +55,7 @@ import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useArchivedObjectRestoreMutation } from '@/data/storage/versioning/archived-object-restore-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -83,11 +82,11 @@ const ArchivedRowIcon = ({ name, onOpen }: { name: string; onOpen?: () => void }
           }}
           className={cn(ARCHIVED_ICON_CLASS, 'focus-ring rounded-sm')}
         >
-          <Archive size={16} strokeWidth={ICON_STROKE_WIDTH} aria-hidden />
+          <ArchiveIcon size={16} strokeWidth={ICON_STROKE_WIDTH} aria-hidden />
         </button>
       ) : (
         <span className={ARCHIVED_ICON_CLASS}>
-          <Archive size={16} strokeWidth={ICON_STROKE_WIDTH} aria-hidden />
+          <ArchiveIcon size={16} strokeWidth={ICON_STROKE_WIDTH} aria-hidden />
           <span className="sr-only">Archived</span>
         </span>
       )}
@@ -100,7 +99,7 @@ const RowActionsMenu = ({ name, options }: { name: string; options: RowOption[] 
   <DropdownMenu>
     <DropdownMenuTrigger className="focus-ring rounded-sm">
       <div className="storage-row-menu opacity-0">
-        <MoreVertical size={16} />
+        <MoreVerticalIcon size={16} />
         <span className="sr-only">{name} actions</span>
       </div>
     </DropdownMenuTrigger>
@@ -198,7 +197,7 @@ export const FileExplorerRow = ({
   const isPreviewed =
     (!isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)) ||
     (isArchivedFile && selectedArchivedObject?.id === archivedObjectId)
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
   // Names the action being taken, not the retention behind it: a suspended bucket reads
   // "Replace file" and "Delete" even for a file that still has one retained version coming.
@@ -239,12 +238,12 @@ export const FileExplorerRow = ({
   const copyPathOptions: RowOption[] = [
     {
       name: 'Copy relative path',
-      icon: <Copy size={12} className="text-foreground-light" />,
+      icon: <CopyIcon size={12} className="text-foreground-light" />,
       onClick: () => copyStoragePath(openedFolders, itemWithColumnIndex),
     },
     {
       name: 'Copy link',
-      icon: <Link2 size={12} className="text-foreground-light" />,
+      icon: <Link2Icon size={12} className="text-foreground-light" />,
       onClick: () =>
         copyStorageExplorerUrl({
           openedFolders,
@@ -262,14 +261,14 @@ export const FileExplorerRow = ({
             ? [
                 {
                   name: 'Rename',
-                  icon: <Edit size={12} className="text-foreground-light" />,
+                  icon: <EditIcon size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
               ]
             : []),
           {
             name: 'Download',
-            icon: <Download size={12} className="text-foreground-light" />,
+            icon: <DownloadIcon size={12} className="text-foreground-light" />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
           ...copyPathOptions,
@@ -281,9 +280,9 @@ export const FileExplorerRow = ({
                   // bucket the whole prefix is archived rather than removed.
                   name: isActivelyVersioning ? 'Archive' : 'Delete',
                   icon: isActivelyVersioning ? (
-                    <Archive size={12} className="text-foreground-light" />
+                    <ArchiveIcon size={12} className="text-foreground-light" />
                   ) : (
-                    <Trash2 size={12} className="text-foreground-light" />
+                    <Trash2Icon size={12} className="text-foreground-light" />
                   ),
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
@@ -291,7 +290,7 @@ export const FileExplorerRow = ({
                   ? [
                       {
                         name: 'Delete permanently',
-                        icon: <Trash2 size={12} className="text-destructive" />,
+                        icon: <Trash2Icon size={12} className="text-destructive" />,
                         onClick: () => setItemsToPurge([itemWithColumnIndex]),
                       },
                     ]
@@ -306,7 +305,7 @@ export const FileExplorerRow = ({
                   ? [
                       {
                         name: 'Get URL',
-                        icon: <Copy size={12} className="text-foreground-light" />,
+                        icon: <CopyIcon size={12} className="text-foreground-light" />,
                         onClick: () => {
                           onCopyUrl(itemWithColumnIndex.path!)
                         },
@@ -315,7 +314,7 @@ export const FileExplorerRow = ({
                   : [
                       {
                         name: 'Get URL',
-                        icon: <Copy size={12} className="text-foreground-light" />,
+                        icon: <CopyIcon size={12} className="text-foreground-light" />,
                         children: [
                           {
                             name: 'Expire in 1 week',
@@ -341,7 +340,7 @@ export const FileExplorerRow = ({
                     ]),
                 {
                   name: 'Download',
-                  icon: <Download size={12} className="text-foreground-light" />,
+                  icon: <DownloadIcon size={12} className="text-foreground-light" />,
                   onClick: () => downloadFile(itemWithColumnIndex),
                 },
                 ...copyPathOptions,
@@ -349,17 +348,17 @@ export const FileExplorerRow = ({
                   ? [
                       {
                         name: 'Rename',
-                        icon: <Edit size={12} className="text-foreground-light" />,
+                        icon: <EditIcon size={12} className="text-foreground-light" />,
                         onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                       },
                       {
                         name: 'Move',
-                        icon: <Move size={12} className="text-foreground-light" />,
+                        icon: <MoveIcon size={12} className="text-foreground-light" />,
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
                       },
                       {
                         name: isActivelyVersioning ? 'Upload new version' : 'Replace file',
-                        icon: <Upload size={12} className="text-foreground-light" />,
+                        icon: <UploadIcon size={12} className="text-foreground-light" />,
                         onClick: onReplaceFile,
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
@@ -373,9 +372,9 @@ export const FileExplorerRow = ({
                   // On a versioned bucket this is a soft delete, so it reads as Archive.
                   name: isActivelyVersioning ? 'Archive' : 'Delete',
                   icon: isActivelyVersioning ? (
-                    <Archive size={12} className="text-foreground-light" />
+                    <ArchiveIcon size={12} className="text-foreground-light" />
                   ) : (
-                    <Trash2 size={12} className="text-foreground-light" />
+                    <Trash2Icon size={12} className="text-foreground-light" />
                   ),
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
@@ -383,7 +382,7 @@ export const FileExplorerRow = ({
                   ? [
                       {
                         name: 'Delete permanently',
-                        icon: <Trash2 size={12} className="text-destructive" />,
+                        icon: <Trash2Icon size={12} className="text-destructive" />,
                         onClick: () => setItemsToPurge([itemWithColumnIndex]),
                       },
                     ]
@@ -441,13 +440,13 @@ export const FileExplorerRow = ({
     : [
         {
           name: 'Restore',
-          icon: <RotateCcw size={12} className="text-foreground-light" />,
+          icon: <RotateCcwIcon size={12} className="text-foreground-light" />,
           onClick: handleRestoreArchived,
         },
         { name: 'Separator', icon: undefined, onClick: undefined },
         {
           name: 'Delete permanently',
-          icon: <Trash2 size={12} className="text-destructive" />,
+          icon: <Trash2Icon size={12} className="text-destructive" />,
           onClick: () => setItemsToPurge([itemWithColumnIndex]),
         },
       ]
@@ -569,7 +568,7 @@ export const FileExplorerRow = ({
           {item.isCorrupted && (
             <Tooltip>
               <TooltipTrigger>
-                <AlertCircle size={18} className="text-foreground-light" />
+                <AlertCircleIcon size={18} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 File is corrupted, please delete and reupload again.
@@ -597,7 +596,7 @@ export const FileExplorerRow = ({
           }
         >
           {item.status === STORAGE_ROW_STATUS.LOADING ? (
-            <LoaderCircle
+            <LoaderCircleIcon
               className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
               size={14}
             />

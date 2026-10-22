@@ -18,19 +18,19 @@ export async function createAWSAccount({
   accountName,
   databaseIdentifier,
 }: AWSAccountCreateVariables) {
-  const { data, error } = await post(
-    '/platform/projects/{ref}/privatelink/associations/aws-account',
-    {
-      params: {
-        path: { ref: projectRef },
+  const { data, error } = await post('/v2/projects/{ref}/private-link/associations', {
+    params: { path: { ref: projectRef } },
+    body: {
+      data: {
+        type: 'private_link_association',
+        attributes: {
+          aws_account_id: awsAccountId,
+          account_name: accountName,
+          database_identifier: databaseIdentifier,
+        },
       },
-      body: {
-        aws_account_id: awsAccountId,
-        account_name: accountName,
-        database_identifier: databaseIdentifier,
-      },
-    }
-  )
+    },
+  })
 
   if (error) handleError(error)
   return data
@@ -49,16 +49,16 @@ export const useAWSAccountCreateMutation = ({
   const queryClient = useQueryClient()
   return useMutation<AWSAccountCreateData, ResponseError, AWSAccountCreateVariables>({
     mutationFn: (vars) => createAWSAccount(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: awsAccountKeys.list(projectRef) })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to create connection: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,
