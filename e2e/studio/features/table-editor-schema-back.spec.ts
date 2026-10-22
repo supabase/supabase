@@ -76,10 +76,13 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
     localStorage.removeItem(`dashboard-history-${projectRef}`)
     localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
   }, ref)
-  await page.reload()
+  // Reloading here would reload the open table, and that page records the table
+  // id again. Load the list as its own document, then reload that document.
   const listLoad = waitForTableToLoad(page, ref, 'public')
   await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
   await listLoad
+  await expect(page).toHaveURL(/\/editor\?schema=public/)
+  await page.reload()
   await expect(page).toHaveURL(/\/editor\?schema=public/)
 
   const reopenLoad = waitForGridDataToLoad(page, ref)
