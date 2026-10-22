@@ -70,14 +70,13 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   await expect(page.getByRole('tab', { name: new RegExp(tableName) })).toBeVisible()
   await expect(page.getByRole('combobox', { name: 'Schema public' })).toBeVisible()
 
-  await page.evaluate((projectRef) => {
+  await page.addInitScript((projectRef) => {
     localStorage.removeItem(`dashboard-history-${projectRef}`)
     localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
   }, ref)
   const listLoad = waitForTableToLoad(page, ref, 'public')
   await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
   await listLoad
-  await page.reload()
   await expect(page).toHaveURL(/\/editor\?schema=public/)
 
   const reopenLoad = waitForGridDataToLoad(page, ref)
