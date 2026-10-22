@@ -16,9 +16,9 @@ export const useAccountRecovery = ({ enabled = true }: { enabled?: boolean } = {
   const recoveryCodesEnabled = useFlag('enableAuthRecoveryCodes')
   const passwordEnabled = useFlag('enableAccountPassword')
   const shouldReadAccount = IS_PLATFORM && enabled && !!userId
-  const identities = useProfileIdentitiesQuery({ enabled: shouldReadAccount, userId })
+  const identities = useProfileIdentitiesQuery({ enabled: shouldReadAccount })
   const shouldReadFactors = shouldReadAccount && hasSecuritySettings
-  const factors = useMfaListFactorsQuery({ enabled: shouldReadFactors, userId })
+  const factors = useMfaListFactorsQuery({ enabled: shouldReadFactors })
   const verifiedFactorCount = factors.isSuccess
     ? factors.data.all.filter(
         (factor) => factor.status === 'verified' && factor.factor_type !== 'recovery_code'
@@ -34,7 +34,7 @@ export const useAccountRecovery = ({ enabled = true }: { enabled?: boolean } = {
     verifiedFactorCount > 0 &&
     identities.isSuccess &&
     !isSsoAccount
-  const codes = useRecoveryCodesStatusQuery({ enabled: shouldReadCodes, userId })
+  const codes = useRecoveryCodesStatusQuery({ enabled: shouldReadCodes })
 
   const isPending =
     shouldReadAccount &&
