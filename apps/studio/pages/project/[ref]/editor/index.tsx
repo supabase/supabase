@@ -11,8 +11,9 @@ import { TableEditorMenu } from '@/components/layouts/TableEditorLayout/TableEdi
 import { NewTab } from '@/components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { isHistoryTraverseNavigation } from '@/lib/history-traverse'
-import { editorEntityTypes, useTabsStateSnapshot } from '@/state/tabs'
+import { acknowledgeHistoryTraverse, isHistoryTraverseNavigation } from '@/lib/history-traverse'
+import { getLastTableRedirect } from '@/lib/table-editor-redirect'
+import { useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -21,20 +22,31 @@ const TableEditorPage: NextPageWithLayout = () => {
   const tabStore = useTabsStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
   const { history, isHistoryLoaded } = useDashboardHistory()
-  const capturedForRef = useRef<string | null>(null)
-  const decidedProjectRef = useRef<string | null>(null)
-  const isHistoryTraverseRef = useRef<boolean | null>(null)
-  if (isHistoryTraverseRef.current === null) {
-    isHistoryTraverseRef.current = isHistoryTraverseNavigation()
-  }
-  // the ref can show up after the first render. recapture only when it changes
-  // from one project to another, so that late ref does not read a settled flag.
-  if (projectRef && capturedForRef.current && capturedForRef.current !== projectRef) {
-    decidedProjectRef.current = null
-    isHistoryTraverseRef.current = isHistoryTraverseNavigation()
-  }
-  if (projectRef) {
-    capturedForRef.current = projectRef
+  const decisionRef = useRef<{
+    projectRef: string | null
+    isHistoryTraverse: boolean
+    hasDecided: boolean
+  } | null>(null)
+  if (decisionRef.current === null) {
+    decisionRef.current = {
+      projectRef: projectRef ?? null,
+      isHistoryTraverse: isHistoryTraverseNavigation(),
+      hasDecided: false,
+    }
+  } else if (
+    projectRef &&
+    decisionRef.current.projectRef &&
+    decisionRef.current.projectRef !== projectRef
+  ) {
+    // the ref can show up after the first render. recapture only when it changes
+    // from one project to another, so that late ref does not read a settled flag.
+    decisionRef.current = {
+      projectRef,
+      isHistoryTraverse: isHistoryTraverseNavigation(),
+      hasDecided: false,
+    }
+  } else if (projectRef && decisionRef.current.projectRef === null) {
+    decisionRef.current.projectRef = projectRef
   }
 
   const onTableCreated = (table: { id: number }) => {
@@ -44,42 +56,28 @@ const TableEditorPage: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    if (!isHistoryLoaded || !projectRef || !router.isReady) {
+    const decision = decisionRef.current
+    if (!decision || !isHistoryLoaded || !projectRef || !router.isReady) {
       return
     }
 
-    if (decidedProjectRef.current === projectRef) {
+    if (decision.hasDecided && decision.projectRef === projectRef) {
       return
     }
 
     // decide once per project. a later schema change on the list must not reopen a table.
-    decidedProjectRef.current = projectRef
+    decision.projectRef = projectRef
+    decision.hasDecided = true
+    acknowledgeHistoryTraverse()
 
-    const lastOpenedTableId = Number(history.editor)
-    const hasHistoryTable = Number.isInteger(lastOpenedTableId)
-    const lastTableTabId = tabStore.openTabs.find((id) =>
-      editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
-    )
-    const lastTableTab = lastTableTabId ? tabStore.tabsMap[lastTableTabId] : undefined
-    const lastTabId = lastTableTab?.metadata?.tableId
-    // Tabs are keyed by a prefixed id (e.g. "r-293522"), but history only stores
-    // the bare table id, so look up the tab by its metadata instead of by key.
-    const historyTable = hasHistoryTable
-      ? Object.values(tabStore.tabsMap).find(
-          (tab) =>
-            editorEntityTypes.table.includes(tab.type) &&
-            tab.metadata?.tableId === lastOpenedTableId
-        )
-      : undefined
-    const lastTable = hasHistoryTable
-      ? { tableId: lastOpenedTableId, schema: historyTable?.metadata?.schema }
-      : { tableId: lastTabId, schema: lastTableTab?.metadata?.schema }
+    const redirect = getLastTableRedirect({
+      historyEditor: history.editor,
+      openTabs: tabStore.openTabs,
+      tabsMap: tabStore.tabsMap,
+      explicitSchema,
+    })
 
-    if (lastTable.tableId === undefined) {
-      return
-    }
-
-    if (isHistoryTraverseRef.current) {
+    if (!redirect || decision.isHistoryTraverse) {
       return
     }
 
@@ -87,10 +85,11 @@ const TableEditorPage: NextPageWithLayout = () => {
     router.replace(
       buildTableEditorUrl({
         projectRef,
-        tableId: lastTable.tableId,
-        schema: explicitSchema || lastTable.schema,
+        tableId: redirect.tableId,
+        schema: redirect.schema,
       })
     )
+    // explicitSchema and history.editor are inert once the visit is decided.
     // router and tabStore are intentionally excluded: in the TanStack build useRouter()
     // returns a new object on every navigation-related render, and including it here
     // caused this effect to re-fire mid-navigation and push the same redirect repeatedly,

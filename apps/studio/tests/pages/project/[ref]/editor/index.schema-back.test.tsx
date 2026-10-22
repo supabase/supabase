@@ -4,7 +4,11 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import mockRouter from 'next-router-mock'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { isHistoryTraverseNavigation, resetHistoryTraverseState } from '@/lib/history-traverse'
+import {
+  acknowledgeHistoryTraverse,
+  isHistoryTraverseNavigation,
+  resetHistoryTraverseState,
+} from '@/lib/history-traverse'
 import TableEditorPage from '@/pages/project/[ref]/editor/index'
 import { TabsStateContextProvider } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
@@ -14,6 +18,7 @@ vi.mock('@/lib/history-traverse', async (importOriginal) => {
   return {
     ...actual,
     isHistoryTraverseNavigation: vi.fn(actual.isHistoryTraverseNavigation),
+    acknowledgeHistoryTraverse: vi.fn(actual.acknowledgeHistoryTraverse),
   }
 })
 
@@ -59,10 +64,22 @@ const seedLastTable = ({ tableId, schema }: { tableId: number; schema: string })
   )
 }
 
-const mockNavigationType = (type: PerformanceNavigationTiming['type']) => {
+const mockNavigationType = (type: PerformanceNavigationTiming['type'], name?: string) => {
+  const documentUrl = name ?? window.location.href
   vi.spyOn(performance, 'getEntriesByType').mockImplementation((entryType) => {
     if (entryType !== 'navigation') return []
-    return [{ type } as PerformanceNavigationTiming]
+    return [
+      {
+        name: documentUrl,
+        entryType: 'navigation',
+        startTime: 0,
+        duration: 0,
+        type,
+        toJSON() {
+          return {}
+        },
+      },
+    ]
   })
 }
 
@@ -85,9 +102,9 @@ const waitForHistory = async (queryClient: QueryClient) => {
   })
 }
 
-const waitForRedirectDecision = async (callCount = 1) => {
+const waitForRedirectDecision = async () => {
   await waitFor(() => {
-    expect(isHistoryTraverseNavigation).toHaveBeenCalledTimes(callCount)
+    expect(acknowledgeHistoryTraverse).toHaveBeenCalled()
   })
 }
 
@@ -135,7 +152,7 @@ describe('Table Editor index schema and history', () => {
     expect(replace).not.toHaveBeenCalled()
     expect(mockRouter.asPath).toBe('/project/default/editor?schema=public')
 
-    const decisionsBeforeSchemaChange = vi.mocked(isHistoryTraverseNavigation).mock.calls.length
+    const decisionsBeforeSchemaChange = vi.mocked(acknowledgeHistoryTraverse).mock.calls.length
 
     await act(async () => {
       params.schema = 'auth'
@@ -145,9 +162,7 @@ describe('Table Editor index schema and history', () => {
     await waitFor(() => {
       expect(mockRouter.query.schema).toBe('auth')
     })
-    expect(vi.mocked(isHistoryTraverseNavigation).mock.calls.length).toBe(
-      decisionsBeforeSchemaChange
-    )
+    expect(acknowledgeHistoryTraverse).toHaveBeenCalledTimes(decisionsBeforeSchemaChange)
     expect(replace).not.toHaveBeenCalled()
   })
 
@@ -187,7 +202,75 @@ describe('Table Editor index schema and history', () => {
     await waitFor(() => {
       expect(replace).toHaveBeenCalledWith(expect.stringMatching(/\/project\/other\/editor\/34$/))
     })
-    expect(isHistoryTraverseNavigation).toHaveBeenCalledTimes(2)
+  })
+
+  test('does not redirect when a popstate returns from another project', async () => {
+    mockNavigationType('navigate')
+    seedLastTable({ tableId: 12, schema: 'auth' })
+    const replace = vi.spyOn(mockRouter, 'replace')
+
+    const queryClient = renderIndex()
+    await waitForHistory(queryClient)
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(expect.stringMatching(/\/project\/default\/editor\/12/))
+    })
+
+    localStorage.setItem(
+      LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY('other'),
+      JSON.stringify({ editor: '34' })
+    )
+
+    await act(async () => {
+      params.ref = 'other'
+      mockRouter.setCurrentUrl('/project/other/editor')
+    })
+
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(expect.stringMatching(/\/project\/other\/editor\/34$/))
+    })
+
+    await act(async () => {
+      window.dispatchEvent(new PopStateEvent('popstate'))
+      params.ref = 'default'
+      mockRouter.setCurrentUrl('/project/default/editor')
+    })
+
+    await waitFor(() => {
+      expect(acknowledgeHistoryTraverse).toHaveBeenCalledTimes(3)
+    })
+    expect(replace).toHaveBeenCalledTimes(2)
+  })
+
+  test('does not redirect for an explicit schema when there is no last table', async () => {
+    mockNavigationType('navigate')
+    params.schema = 'public'
+    mockRouter.setCurrentUrl('/project/default/editor?schema=public')
+    const replace = vi.spyOn(mockRouter, 'replace')
+
+    const queryClient = renderIndex()
+    await waitForHistory(queryClient)
+    await waitForRedirectDecision()
+
+    expect(replace).not.toHaveBeenCalled()
+    expect(mockRouter.asPath).toBe('/project/default/editor?schema=public')
+  })
+
+  test('redirects after a back-forward load once a push reaches the editor', async () => {
+    const documentUrl = window.location.href
+    mockNavigationType('back_forward', documentUrl)
+    seedLastTable({ tableId: 12, schema: 'auth' })
+    history.pushState(null, '', '/project/default/editor')
+    mockRouter.setCurrentUrl('/project/default/editor')
+    const replace = vi.spyOn(mockRouter, 'replace')
+
+    const queryClient = renderIndex()
+    await waitForHistory(queryClient)
+
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(
+        expect.stringMatching(/\/project\/default\/editor\/12\?schema=auth$/)
+      )
+    })
   })
 
   test('does not reopen the last table if the schema changes after the visit is decided', async () => {
@@ -201,7 +284,7 @@ describe('Table Editor index schema and history', () => {
     await waitFor(() => {
       expect(replace).toHaveBeenCalledTimes(1)
     })
-    const decisionsBeforeSchemaChange = vi.mocked(isHistoryTraverseNavigation).mock.calls.length
+    const decisionsBeforeSchemaChange = vi.mocked(acknowledgeHistoryTraverse).mock.calls.length
 
     await act(async () => {
       params.schema = 'public'
@@ -211,9 +294,7 @@ describe('Table Editor index schema and history', () => {
     await waitFor(() => {
       expect(mockRouter.query.schema).toBe('public')
     })
-    expect(vi.mocked(isHistoryTraverseNavigation).mock.calls.length).toBe(
-      decisionsBeforeSchemaChange
-    )
+    expect(acknowledgeHistoryTraverse).toHaveBeenCalledTimes(decisionsBeforeSchemaChange)
     expect(replace).toHaveBeenCalledTimes(1)
   })
 })
