@@ -8,7 +8,7 @@ const { docsLocalDevelopment: localDevelopmentEnabled } = isFeatureEnabled([
 
 export const localDevelopment: NavMenuConstant = {
   icon: 'dev-cli',
-  title: 'Local Development & CLI',
+  title: 'Local Development and CLI',
   url: '/guides/local-development',
   items: [
     { name: 'Install and run the CLI', url: '/guides/local-development/cli/getting-started' },
@@ -43,7 +43,10 @@ export const localDevelopment: NavMenuConstant = {
           name: 'Docker and native runtimes',
           url: '/guides/local-development/docker-and-native-runtimes',
         },
-        { name: 'Managing config and secrets', url: '/guides/local-development/managing-config' },
+        {
+          name: 'Managing configuration and secrets',
+          url: '/guides/local-development/managing-config',
+        },
         {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates',

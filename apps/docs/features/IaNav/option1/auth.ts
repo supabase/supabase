@@ -93,7 +93,7 @@ export const auth: NavMenuConstant = {
             { name: 'PKCE flow', url: '/guides/auth/sessions/pkce-flow' },
           ],
         },
-        { name: 'Signout', url: '/guides/auth/signout', enabled: authFlowsEnabled },
+        { name: 'Sign-out', url: '/guides/auth/signout', enabled: authFlowsEnabled },
       ],
     },
     {
@@ -250,7 +250,7 @@ export const auth: NavMenuConstant = {
             { name: 'Getting Started', url: '/guides/auth/oauth-server/getting-started' },
             { name: 'OAuth Flows', url: '/guides/auth/oauth-server/oauth-flows' },
             { name: 'MCP Authentication', url: '/guides/auth/oauth-server/mcp-authentication' },
-            { name: 'Token Security & RLS', url: '/guides/auth/oauth-server/token-security' },
+            { name: 'Token Security and RLS', url: '/guides/auth/oauth-server/token-security' },
           ],
         },
         {

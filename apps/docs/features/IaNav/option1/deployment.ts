@@ -33,7 +33,7 @@ export const deployment: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/deployment/branching' },
         { name: 'Branching via GitHub', url: '/guides/deployment/branching/github-integration' },
-        { name: 'Branching via dashboard', url: '/guides/deployment/branching/dashboard' },
+        { name: 'Branching via Supabase Dashboard', url: '/guides/deployment/branching/dashboard' },
         {
           name: 'Working with branches',
           url: '/guides/deployment/branching/working-with-branches',

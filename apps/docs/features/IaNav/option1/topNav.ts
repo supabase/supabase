@@ -61,7 +61,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/api',
             level: 'api',
           },
-          { label: 'AI & Vectors', icon: 'ai', href: '/guides/ai', level: 'ai' },
+          { label: 'AI and Vectors', icon: 'ai', href: '/guides/ai', level: 'ai' },
           { label: 'Cron and Queues', icon: 'cron', href: '/guides/cron', level: 'cron' },
         ],
       ],
@@ -74,7 +74,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
         [
           { label: 'AI tools', icon: 'ai-tools', href: '/guides/ai-tools', level: 'ai_tools' },
           {
-            label: 'Local Development & CLI',
+            label: 'Local Development and CLI',
             icon: 'dev-cli',
             href: '/guides/local-development',
             level: 'local_development',

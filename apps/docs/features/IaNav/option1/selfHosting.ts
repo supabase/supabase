@@ -10,7 +10,7 @@ export const selfHosting: NavMenuConstant = {
       name: 'Keys, gateway, HTTPS, and Postgres',
       items: [
         { name: 'Accessing Postgres', url: '/guides/self-hosting/accessing-postgres' },
-        { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
+        { name: 'Configure API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
         { name: 'Learn about API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
         {
           name: 'Add Reverse Proxy with HTTPS',
@@ -35,7 +35,7 @@ export const selfHosting: NavMenuConstant = {
           url: '/guides/self-hosting/self-hosted-custom-oauth-providers',
         },
         {
-          name: 'Configure Phone Sign-in & MFA',
+          name: 'Configure Phone Sign-in and MFA',
           url: '/guides/self-hosting/self-hosted-phone-mfa',
         },
         { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
@@ -67,7 +67,7 @@ export const selfHosting: NavMenuConstant = {
       ],
     },
     {
-      name: 'Service reference and config',
+      name: 'Service reference and configuration',
       items: [
         {
           name: 'Auth Server',

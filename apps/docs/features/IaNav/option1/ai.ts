@@ -3,14 +3,14 @@ import { vectorIndexItems } from '@/components/Navigation/NavigationMenu/Navigat
 
 export const ai: NavMenuConstant = {
   icon: 'ai',
-  title: 'AI & Vectors',
+  title: 'AI and Vectors',
   url: '/guides/ai',
   items: [
     {
       name: 'Concepts',
       items: [
         { name: 'Overview', url: '/guides/ai/concepts' },
-        { name: 'Structured & unstructured', url: '/guides/ai/structured-unstructured' },
+        { name: 'Structured and unstructured', url: '/guides/ai/structured-unstructured' },
       ],
     },
     {

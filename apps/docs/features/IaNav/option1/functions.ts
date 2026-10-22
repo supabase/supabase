@@ -125,7 +125,7 @@ export const functions: NavMenuConstant = {
           items: [
             { name: 'Generating OG images', url: '/guides/functions/examples/og-image' },
             {
-              name: 'Image Transformation & Optimization',
+              name: 'Transform and Optimize Images',
               url: '/guides/functions/examples/image-manipulation',
             },
             {

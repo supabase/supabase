@@ -54,7 +54,7 @@ export const database: NavMenuConstant = {
     {
       name: 'Tables, data and functions',
       items: [
-        { name: 'Managing tables and data', url: '/guides/database/tables' },
+        { name: 'Create tables and add data', url: '/guides/database/tables' },
         { name: 'Views', url: '/guides/database/views' },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
         {
@@ -148,7 +148,10 @@ export const database: NavMenuConstant = {
           name: 'Postgres configuration',
           items: [
             { name: 'Database configuration', url: '/guides/database/postgres/configuration' },
-            { name: 'Customizing Postgres config', url: '/guides/database/custom-postgres-config' },
+            {
+              name: 'Customizing Postgres configuration',
+              url: '/guides/database/custom-postgres-config',
+            },
             {
               name: 'Postgres log configuration',
               url: '/guides/database/postgres/postgres-log-config',

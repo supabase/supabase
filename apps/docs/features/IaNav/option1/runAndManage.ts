@@ -65,10 +65,13 @@ export const runAndManage: NavMenuConstant = {
           items: [
             { name: 'Overview', url: '/guides/platform/sso' },
             {
-              name: 'Login flows',
+              name: 'Sign-in flows',
               items: [
-                { name: 'Understanding Login Flows', url: '/guides/platform/sso/login-flows' },
-                { name: 'Choosing a Login Flow', url: '/guides/platform/sso/choosing-login-flow' },
+                { name: 'Understanding Sign-in Flows', url: '/guides/platform/sso/login-flows' },
+                {
+                  name: 'Choosing a Sign-in Flow',
+                  url: '/guides/platform/sso/choosing-login-flow',
+                },
               ],
             },
             { name: 'SSO with Azure AD', url: '/guides/platform/sso/azure' },

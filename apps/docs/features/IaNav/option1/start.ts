@@ -36,7 +36,7 @@ export const start: NavMenuConstant = {
   items: [
     { name: 'API keys and key rotation', url: '/guides/getting-started/api-keys' },
     {
-      name: 'Migrating to new API keys',
+      name: 'Migrating from legacy API keys',
       url: '/guides/getting-started/migrating-to-new-api-keys',
     },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
