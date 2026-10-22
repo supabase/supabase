@@ -34,29 +34,38 @@ export function redactSpanExport(data: SpanExportData): SpanExportData {
   return redactHiddenSpanError(masked)
 }
 
-// An id stays here if its span never exports an error, at most one per failed query.
+// An id stays here if its span's end is never exported, at most one per failed request.
 const hiddenErrorSpanIds = new Set<string>()
 
 /**
- * Hides the next error Braintrust exports for the current span or its children. The thrown
- * error is unchanged. `execute` can run in the tool span or its parent, so both match.
+ * Hides every error Braintrust exports for the current span and its children until the span
+ * ends. The thrown error is unchanged. `execute` runs in the parent of the tool span, so
+ * parallel failures share one id.
  */
 export function hideSpanErrorFromTrace(spanId = currentSpan().spanId) {
   if (spanId) hiddenErrorSpanIds.add(spanId)
 }
 
-/** Error records are incremental, so they carry span ids but no span name or metadata. */
+/**
+ * Error records are incremental, so they carry span ids but no span name or metadata.
+ * This also hides unrelated errors under the same span, which fails closed.
+ */
 export function redactHiddenSpanError(data: SpanExportData): SpanExportData {
-  if (data.error === undefined) return data
-
   const parentIds = Array.isArray(data.span_parents) ? data.span_parents : []
   const hiddenId = [data.span_id, ...parentIds].find(
     (id): id is string => typeof id === 'string' && hiddenErrorSpanIds.has(id)
   )
   if (hiddenId === undefined) return data
 
-  hiddenErrorSpanIds.delete(hiddenId)
-  return { ...data, error: NO_DATA_ERROR }
+  // Children end before their parent, so the parent's end is the last record that needs this id
+  const isEnd = isRecord(data.metrics) && data.metrics.end !== undefined
+  if (data.span_id === hiddenId && isEnd) hiddenErrorSpanIds.delete(hiddenId)
+
+  return data.error === undefined ? data : { ...data, error: NO_DATA_ERROR }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 /**

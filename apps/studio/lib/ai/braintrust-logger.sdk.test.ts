@@ -14,7 +14,7 @@ type StreamPart =
 
 // Uses the real SDKs, since the mask, span customizer and `prepareStep` depend on how they
 // record tool spans and pass errors along. Starts the way a chat resumes after the user clicks Run.
-//   approved [rows, error] → both execute → one model step
+//   approved [rows, error, error] → all execute in parallel → one model step
 it('hides rows and errors from the model and Braintrust', async () => {
   process.env.BRAINTRUST_API_KEY = 'test'
   process.env.BRAINTRUST_PROJECT_ID = '00000000-0000-4000-8000-000000000000'
@@ -28,7 +28,10 @@ it('hides rows and errors from the model and Braintrust', async () => {
   // A project name skips the logger's network lookup of the project
   braintrust.initLogger({ projectId: process.env.BRAINTRUST_PROJECT_ID, projectName: 'test' })
 
-  const queryError = new Error('invalid input syntax for type integer: "Buy milk"')
+  const queryErrors = [
+    new Error('invalid input syntax for type integer: "Walk dog"'),
+    new Error('invalid input syntax for type integer: "Feed cat"'),
+  ]
   const usage = {
     inputTokens: { total: 1, noCache: undefined, cacheRead: undefined, cacheWrite: undefined },
     outputTokens: { total: 1, text: undefined, reasoning: undefined },
@@ -45,11 +48,11 @@ it('hides rows and errors from the model and Braintrust', async () => {
       ]),
     }
   }
-  const toolCall = (toolCallId: string, fail: boolean) => ({
+  const toolCall = (toolCallId: string, failure: number | null) => ({
     type: 'tool-call' as const,
     toolCallId,
     toolName: 'execute_sql',
-    input: { fail },
+    input: { failure },
   })
   const { streamText } = braintrust.wrapAISDK(ai)
   const result = streamText({
@@ -59,29 +62,34 @@ it('hides rows and errors from the model and Braintrust', async () => {
       {
         role: 'assistant',
         content: [
-          toolCall('rows', false),
+          toolCall('rows', null),
           { type: 'tool-approval-request', approvalId: 'approve-rows', toolCallId: 'rows' },
-          toolCall('error', true),
-          { type: 'tool-approval-request', approvalId: 'approve-error', toolCallId: 'error' },
+          toolCall('error-0', 0),
+          { type: 'tool-approval-request', approvalId: 'approve-error-0', toolCallId: 'error-0' },
+          toolCall('error-1', 1),
+          { type: 'tool-approval-request', approvalId: 'approve-error-1', toolCallId: 'error-1' },
         ],
       },
       {
         role: 'tool',
         content: [
           { type: 'tool-approval-response', approvalId: 'approve-rows', approved: true },
-          { type: 'tool-approval-response', approvalId: 'approve-error', approved: true },
+          { type: 'tool-approval-response', approvalId: 'approve-error-0', approved: true },
+          { type: 'tool-approval-response', approvalId: 'approve-error-1', approved: true },
         ],
       },
     ],
     prepareStep: ({ messages }) => ({ messages: hideToolErrorsFromModel(messages, 'schema') }),
     tools: {
       execute_sql: ai.tool({
-        inputSchema: z.object({ fail: z.boolean() }),
+        inputSchema: z.object({ failure: z.number().nullable() }),
         needsApproval: true,
-        execute: async ({ fail }) => {
-          if (!fail) return { rows: [{ title: 'Buy milk' }], totalRows: 1, optInLevel: 'schema' }
+        execute: async ({ failure }) => {
+          if (failure === null) {
+            return { rows: [{ title: 'Buy milk' }], totalRows: 1, optInLevel: 'schema' }
+          }
           hideSpanErrorFromTrace()
-          throw queryError
+          throw queryErrors[failure]
         },
         toModelOutput: () => ({ type: 'text', value: 'rows hidden' }),
       }),
@@ -92,10 +100,14 @@ it('hides rows and errors from the model and Braintrust', async () => {
   await braintrust.flush()
 
   // The UI still gets the real error
-  expect(streamParts).toContainEqual(
-    expect.objectContaining({ type: 'tool-error', error: queryError })
-  )
+  for (const error of queryErrors) {
+    expect(streamParts).toContainEqual(expect.objectContaining({ type: 'tool-error', error }))
+  }
   expect(prompts).toHaveLength(1)
-  expect(JSON.stringify(prompts)).not.toContain('Buy milk')
-  expect(JSON.stringify(await uploads.drain())).not.toContain('Buy milk')
+  const promptsJson = JSON.stringify(prompts)
+  const uploadsJson = JSON.stringify(await uploads.drain())
+  for (const secret of ['Buy milk', 'Walk dog', 'Feed cat']) {
+    expect(promptsJson).not.toContain(secret)
+    expect(uploadsJson).not.toContain(secret)
+  }
 })
