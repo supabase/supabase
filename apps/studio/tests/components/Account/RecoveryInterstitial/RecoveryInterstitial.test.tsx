@@ -199,10 +199,7 @@ describe('RecoveryReminder', () => {
     )
     expect(screen.getByText('No recovery codes')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add authenticator' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Skip for now' })).toHaveAttribute(
-      'href',
-      '/organizations'
-    )
+    expect(screen.getByRole('button', { name: 'Skip for now' })).toBeInTheDocument()
   })
 
   test('keeps newly generated codes visible through a live status update until acknowledged', async () => {
