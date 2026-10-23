@@ -173,22 +173,7 @@ describe('useQueryTableCommands', () => {
     }
   })
 
-  it('does not prefetch tables when the menu closes', async () => {
-    mockProjectDetail(() => HttpResponse.json<ProjectDetailResponse>(PROJECT))
-    const { prefetchQuery, rerender } = renderMountedMenu()
-
-    rerender(<MenuToggle open />)
-
-    await waitFor(() => {
-      expect(prefetchQuery).toHaveBeenCalledTimes(1)
-    })
-
-    rerender(<MenuToggle open={false} />)
-
-    expect(prefetchQuery).toHaveBeenCalledTimes(1)
-  })
-
-  it('prefetches tables again when the menu reopens', async () => {
+  it('does not prefetch on close, and prefetches again when the menu reopens', async () => {
     mockProjectDetail(() => HttpResponse.json<ProjectDetailResponse>(PROJECT))
     const { prefetchQuery, rerender } = renderMountedMenu()
 

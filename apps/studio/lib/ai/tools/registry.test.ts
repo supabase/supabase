@@ -210,7 +210,9 @@ describe('read-only contracts', () => {
       output,
     } as ToolUIPart
 
-    it.each(levels)('shows the output unchanged on replay at %s', (level) => {
+    it.each(levels)('shows the output unchanged, live and on replay, at %s', (level) => {
+      const contract: ToolContract = TOOL_CONTRACTS[name as keyof typeof outputs]
+      expect(contract.toModelOutput(output, level)).toEqual(output)
       expect(sanitizeContractPart(part, level)?.output).toEqual(output)
     })
 
@@ -218,11 +220,6 @@ describe('read-only contracts', () => {
       expect(sanitizeContractPart({ ...part, output: 12345 } as ToolUIPart, 'schema')?.output).toBe(
         undefined
       )
-    })
-
-    it.each(levels)('shows the live output unchanged at %s', (level) => {
-      const contract: ToolContract = TOOL_CONTRACTS[name as keyof typeof outputs]
-      expect(contract.toModelOutput(output, level)).toEqual(output)
     })
   })
 

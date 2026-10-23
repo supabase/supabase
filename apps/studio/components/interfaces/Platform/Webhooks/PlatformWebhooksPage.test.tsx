@@ -162,7 +162,8 @@ describe('PlatformWebhooksPage (project scope)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Create endpoint' }))
 
     const urlInput = await screen.findByPlaceholderText('https://api.example.com/webhooks/supabase')
-    await userEvent.type(urlInput, 'https://hooks.example.com/project')
+    await userEvent.click(urlInput)
+    await userEvent.paste('https://hooks.example.com/project')
     await userEvent.click(screen.getByRole('checkbox', { name: /subscribe to all events/i }))
 
     fireEvent.click(screen.getByRole('button', { name: 'Create endpoint' }))
@@ -207,7 +208,7 @@ describe('PlatformWebhooksPage (project scope)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Edit' }))
     const urlInput = await screen.findByDisplayValue(ENDPOINT_ATTRIBUTES.url)
     await userEvent.clear(urlInput)
-    await userEvent.type(urlInput, updatedUrl)
+    await userEvent.paste(updatedUrl)
     fireEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
 
     await waitFor(() => expect(requests).toHaveLength(1))

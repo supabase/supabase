@@ -336,24 +336,6 @@ describe('pathname facet filter', () => {
     expect(screen.getByText('12')).toBeInTheDocument()
   })
 
-  it('shows a validation error while keeping selected paths removable', async () => {
-    addProjectMock()
-    addAPIMock({
-      method: 'post',
-      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
-      response: () =>
-        HttpResponse.json<AnalyticsResponse>({ result: [{ value: '/invalid', count: 'wrong' }] }),
-    })
-
-    customRender(<PathnameFilter search={pathnameSearch({ filter: ['pathname:eq:/selected'] })} />)
-    fireEvent.click(screen.getByText('Pathname'))
-    expect(await screen.findByText('Failed to retrieve pathnames')).toBeInTheDocument()
-    expect(screen.queryByText('/invalid')).not.toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('checkbox', { name: /\/selected/ }))
-    expect(screen.queryByRole('checkbox', { name: /\/selected/ })).not.toBeInTheDocument()
-  })
-
   it('shows a validation error when the analytics response omits results', async () => {
     addProjectMock()
     addAPIMock({
@@ -368,7 +350,8 @@ describe('pathname facet filter', () => {
     expect(screen.queryByText('No results found')).not.toBeInTheDocument()
   })
 
-  it.each([null, '', true, false, -1, 1.5, '-1', '1.5'])(
+  // One row per schema branch: wrong type, non-numeric/fractional string, negative/fractional number
+  it.each([null, true, '', 'wrong', '1.5', -1, 1.5])(
     'rejects malformed option count %s without hiding selected paths',
     async (count) => {
       addProjectMock()

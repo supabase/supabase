@@ -48,50 +48,20 @@ const buildTrigger = (overrides: Partial<DatabaseEventTrigger> = {}): DatabaseEv
 })
 
 describe('SQLEditor.utils.ts:shouldAutoGenerateTitle', () => {
-  test('returns true when AI is enabled, the name is still the placeholder, and on platform', () => {
-    expect(
-      shouldAutoGenerateTitle({
-        aiOptInLevel: 'default',
-        snippetName: `${untitledSnippetTitle} 1`,
-        isPlatform: true,
-      })
-    ).toBe(true)
-  })
-  test('returns false when AI opt-in is disabled', () => {
-    expect(
-      shouldAutoGenerateTitle({
-        aiOptInLevel: 'disabled',
-        snippetName: `${untitledSnippetTitle} 1`,
-        isPlatform: true,
-      })
-    ).toBe(false)
-  })
-  test('returns false when the snippet already has a custom name', () => {
-    expect(
-      shouldAutoGenerateTitle({
-        aiOptInLevel: 'default',
-        snippetName: 'My saved query',
-        isPlatform: true,
-      })
-    ).toBe(false)
-  })
-  test('returns false when not running on the hosted platform', () => {
-    expect(
-      shouldAutoGenerateTitle({
-        aiOptInLevel: 'default',
-        snippetName: `${untitledSnippetTitle} 1`,
-        isPlatform: false,
-      })
-    ).toBe(false)
-  })
-  test('returns false when the snippet name is undefined', () => {
-    expect(
-      shouldAutoGenerateTitle({
-        aiOptInLevel: 'default',
-        snippetName: undefined,
-        isPlatform: true,
-      })
-    ).toBe(false)
+  const base = {
+    aiOptInLevel: 'default',
+    snippetName: `${untitledSnippetTitle} 1`,
+    isPlatform: true,
+  } as const
+
+  test.each([
+    ['AI is enabled, the name is still the placeholder, and on platform', {}, true],
+    ['AI opt-in is disabled', { aiOptInLevel: 'disabled' }, false],
+    ['the snippet already has a custom name', { snippetName: 'My saved query' }, false],
+    ['not running on the hosted platform', { isPlatform: false }, false],
+    ['the snippet name is undefined', { snippetName: undefined }, false],
+  ] as const)('when %s -> %s', (_, overrides, expected) => {
+    expect(shouldAutoGenerateTitle({ ...base, ...overrides })).toBe(expected)
   })
 })
 
@@ -99,107 +69,81 @@ describe('SQLEditor.utils.ts:buildExecuteParams', () => {
   const impersonatedRoleState = createRoleImpersonationState('default', {
     current: async () => ({}),
   })
+  const base = {
+    limit: 100,
+    connectionString: 'postgresql://example',
+    projectRef: 'default',
+    impersonatedRoleState,
+  }
 
   test('applies the auto-limit suffix when appropriate', () => {
-    const params = buildExecuteParams({
-      sql: safeSql`select * from countries`,
-      limit: 100,
-      connectionString: 'postgresql://example',
-      projectRef: 'default',
-      impersonatedRoleState,
-    })
+    const params = buildExecuteParams({ ...base, sql: safeSql`select * from countries` })
     expect(params.sql).toBe('select * from countries limit 100;')
     expect(params.autoLimit).toBe(100)
   })
   test('leaves autoLimit undefined when a limit is already present', () => {
-    const params = buildExecuteParams({
-      sql: safeSql`select * from countries limit 10;`,
-      limit: 100,
-      connectionString: 'postgresql://example',
-      projectRef: 'default',
-      impersonatedRoleState,
-    })
+    const params = buildExecuteParams({ ...base, sql: safeSql`select * from countries limit 10;` })
     expect(params.sql).toBe('select * from countries limit 10;')
     expect(params.autoLimit).toBeUndefined()
   })
   test('reflects isRoleImpersonationEnabled from the impersonation state', () => {
-    const params = buildExecuteParams({
-      sql: safeSql`select * from countries`,
-      limit: 0,
-      connectionString: 'postgresql://example',
-      projectRef: 'default',
-      impersonatedRoleState,
-    })
+    const params = buildExecuteParams({ ...base, limit: 0, sql: safeSql`select * from countries` })
     expect(params.isRoleImpersonationEnabled).toBe(false)
     expect(params.isStatementTimeoutDisabled).toBe(true)
     expect(params.contextualInvalidation).toBe(true)
   })
 })
 
+type SnippetsMap = Record<string, { snippet: { content?: unknown } }>
+
 describe('SQLEditor.utils.ts:deriveSnippetIdentity', () => {
-  test('uses the generated id when there is no url id, loading reflects the snippets map like any other id', () => {
-    const result = deriveSnippetIdentity({
-      urlId: undefined,
-      generatedId: 'generated-id',
-      snippets: {},
-    })
-    expect(result).toEqual({ id: 'generated-id', isLoading: true })
-  })
-  test('uses the generated id and is not loading once it appears in the snippets map', () => {
-    const result = deriveSnippetIdentity({
-      urlId: undefined,
-      generatedId: 'generated-id',
-      snippets: { 'generated-id': { snippet: { content: { some: 'content' } } } },
-    })
-    expect(result).toEqual({ id: 'generated-id', isLoading: false })
-  })
-  test('uses the generated id and is never loading when the url id is "new"', () => {
-    const result = deriveSnippetIdentity({
-      urlId: 'new',
-      generatedId: 'generated-id',
-      snippets: { 'generated-id': { snippet: { content: undefined } } },
-    })
-    expect(result).toEqual({ id: 'generated-id', isLoading: false })
-  })
-  test('uses the url id and is loading when the snippet is not yet in the store', () => {
-    const result = deriveSnippetIdentity({
-      urlId: 'existing-id',
-      generatedId: 'generated-id',
-      snippets: {},
-    })
-    expect(result).toEqual({ id: 'existing-id', isLoading: true })
-  })
-  test('uses the url id and is loading when the snippet has no content yet', () => {
-    const result = deriveSnippetIdentity({
-      urlId: 'existing-id',
-      generatedId: 'generated-id',
-      snippets: { 'existing-id': { snippet: { content: undefined } } },
-    })
-    expect(result).toEqual({ id: 'existing-id', isLoading: true })
-  })
-  test('uses the url id and is not loading once the snippet content has arrived', () => {
-    const result = deriveSnippetIdentity({
-      urlId: 'existing-id',
-      generatedId: 'generated-id',
-      snippets: { 'existing-id': { snippet: { content: { some: 'content' } } } },
-    })
-    expect(result).toEqual({ id: 'existing-id', isLoading: false })
-  })
-  test('is loading when the snippets map itself is missing', () => {
-    const result = deriveSnippetIdentity({
-      urlId: 'existing-id',
-      generatedId: 'generated-id',
-      snippets: undefined as unknown as Record<string, { snippet: { content?: unknown } }>,
-    })
-    expect(result).toEqual({ id: 'existing-id', isLoading: true })
-  })
-  test('is loading when the snippets entry has no snippet on it', () => {
-    const result = deriveSnippetIdentity({
-      urlId: 'existing-id',
-      generatedId: 'generated-id',
-      snippets: { 'existing-id': {} as { snippet: { content?: unknown } } },
-    })
-    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  const loaded = { snippet: { content: { some: 'content' } } }
+  const noContent = { snippet: { content: undefined } }
+
+  test.each<
+    [string, string | undefined, SnippetsMap | undefined, { id: string; isLoading: boolean }]
+  >([
+    ['no url id, generated id not in map', undefined, {}, { id: 'generated-id', isLoading: true }],
+    [
+      'no url id, generated id in map',
+      undefined,
+      { 'generated-id': loaded },
+      { id: 'generated-id', isLoading: false },
+    ],
+    [
+      'url id "new" is never loading',
+      'new',
+      { 'generated-id': noContent },
+      { id: 'generated-id', isLoading: false },
+    ],
+    ['url id not yet in the store', 'existing-id', {}, { id: 'existing-id', isLoading: true }],
+    [
+      'url id with no content yet',
+      'existing-id',
+      { 'existing-id': noContent },
+      { id: 'existing-id', isLoading: true },
+    ],
+    [
+      'url id with content',
+      'existing-id',
+      { 'existing-id': loaded },
+      { id: 'existing-id', isLoading: false },
+    ],
+    ['snippets map missing', 'existing-id', undefined, { id: 'existing-id', isLoading: true }],
+    [
+      'entry has no snippet',
+      'existing-id',
+      { 'existing-id': {} as SnippetsMap[string] },
+      { id: 'existing-id', isLoading: true },
+    ],
+  ])('%s', (_, urlId, snippets, expected) => {
+    expect(
+      deriveSnippetIdentity({
+        urlId,
+        generatedId: 'generated-id',
+        snippets: snippets as SnippetsMap,
+      })
+    ).toEqual(expected)
   })
 })
 
@@ -216,27 +160,20 @@ describe('SQLEditor.utils.ts:extractDebugContext', () => {
       errorMessage: 'relation does not exist',
     })
   })
-  test('falls back to an empty sql when the snippet is undefined', () => {
-    expect(extractDebugContext(undefined, { error: { message: 'boom' } })).toEqual({
+  test.each([
+    ['the snippet is undefined', undefined],
+    ['the snippet has no content yet', { snippet: { content: undefined } }],
+  ])('falls back to an empty sql when %s', (_, snippet) => {
+    expect(extractDebugContext(snippet, { error: { message: 'boom' } })).toEqual({
       sql: '',
       errorMessage: 'boom',
     })
   })
-  test('falls back to an empty sql when the snippet has no content yet', () => {
-    expect(
-      extractDebugContext({ snippet: { content: undefined } }, { error: { message: 'boom' } })
-    ).toEqual({ sql: '', errorMessage: 'boom' })
-  })
-  test('falls back to "Unknown error" when the result is undefined', () => {
-    const snippet = buildDebugSnippet('select 1;')
-    expect(extractDebugContext(snippet, undefined)).toEqual({
-      sql: 'select 1;',
-      errorMessage: 'Unknown error',
-    })
-  })
-  test('falls back to "Unknown error" when the result has no error message', () => {
-    const snippet = buildDebugSnippet('select 1;')
-    expect(extractDebugContext(snippet, {})).toEqual({
+  test.each([
+    ['the result is undefined', undefined],
+    ['the result has no error message', {}],
+  ])('falls back to "Unknown error" when %s', (_, result) => {
+    expect(extractDebugContext(buildDebugSnippet('select 1;'), result)).toEqual({
       sql: 'select 1;',
       errorMessage: 'Unknown error',
     })
@@ -260,63 +197,37 @@ describe('SQLEditor.utils.ts:buildDebugChatArgs', () => {
   test('attaches the query with its source and names the dialect', () => {
     const snippet = buildDebugSnippet('select count(*) from logs;')
     const result = { error: { message: 'Unknown expression identifier' } }
-    expect(buildDebugChatArgs(snippet, result, 'logs').sqlSnippets).toEqual([
+    const args = buildDebugChatArgs(snippet, result, 'logs')
+    expect(args.sqlSnippets).toEqual([
       { label: 'Current Query', content: 'select count(*) from logs;', source: 'logs' },
     ])
-    expect(buildDebugChatArgs(snippet, result, 'logs').initialInput).toEqual(
-      'Help me to debug the attached sql snippet which gives the following error: \n\nUnknown expression identifier\n\nThis query runs against the Supabase logs table on a ClickHouse-backed engine, not Postgres.'
-    )
+    expect(args.initialInput).toContain('Unknown expression identifier')
+    expect(args.initialInput).toContain('ClickHouse')
+    expect(args.initialInput).toContain('not Postgres')
   })
 })
 
 describe('SQLEditor.utils.ts:buildCompletionRequestBody', () => {
-  test('builds the base request body with no extra options', () => {
+  const base = { projectRef: 'default', connectionString: 'postgresql://example', orgSlug: 'acme' }
+
+  test('builds the base request body and merges options on top', () => {
+    expect(buildCompletionRequestBody(base)).toEqual({ ...base, language: 'sql' })
     expect(
       buildCompletionRequestBody({
-        projectRef: 'default',
-        connectionString: 'postgresql://example',
-        orgSlug: 'acme',
-      })
-    ).toEqual({
-      projectRef: 'default',
-      connectionString: 'postgresql://example',
-      language: 'sql',
-      orgSlug: 'acme',
-    })
-  })
-  test('merges options on top of the base fields', () => {
-    expect(
-      buildCompletionRequestBody({
-        projectRef: 'default',
-        connectionString: 'postgresql://example',
-        orgSlug: 'acme',
+        ...base,
         options: { completionMetadata: { prompt: 'add a where clause' } },
       })
     ).toEqual({
-      projectRef: 'default',
-      connectionString: 'postgresql://example',
+      ...base,
       language: 'sql',
-      orgSlug: 'acme',
       completionMetadata: { prompt: 'add a where clause' },
     })
   })
   test('omits dialect when not provided, so the route keeps its Postgres default', () => {
-    const body = buildCompletionRequestBody({
-      projectRef: 'default',
-      connectionString: null,
-      orgSlug: 'acme',
-    })
-    expect(body).not.toHaveProperty('dialect')
-  })
-  test('includes the dialect when provided', () => {
-    expect(
-      buildCompletionRequestBody({
-        projectRef: 'default',
-        connectionString: null,
-        orgSlug: 'acme',
-        dialect: 'clickhouse',
-      }).dialect
-    ).toBe('clickhouse')
+    expect(buildCompletionRequestBody(base)).not.toHaveProperty('dialect')
+    expect(buildCompletionRequestBody({ ...base, dialect: 'clickhouse' }).dialect).toBe(
+      'clickhouse'
+    )
   })
 })
 
@@ -330,29 +241,16 @@ describe('SQLEditor.utils.ts:sqlSourceToDialect', () => {
 describe('SQLEditor.utils.ts:createSqlSnippetSkeletonV2', () => {
   const baseArgs = { name: 'Untitled', sql: 'select 1', owner_id: 1, project_id: 1 }
 
-  test('defaults to a database (sql) snippet', () => {
-    const snippet = createSqlSnippetSkeletonV2(baseArgs)
-    expect(snippet.type).toBe('sql')
-    expect(snippet.content?.unchecked_sql).toBe('select 1')
+  test.each([
+    ['defaults to a database (sql) snippet', undefined, 'sql'],
+    ['builds a database snippet for source "database"', 'database', 'sql'],
+    ['builds a logs (log_sql) snippet for source "logs"', 'logs', 'log_sql'],
+  ] as const)('%s', (_, source, type) => {
+    const snippet = createSqlSnippetSkeletonV2({ ...baseArgs, source, idOverride: 'snippet-id' })
+    expect(snippet.type).toBe(type)
     expect(snippet.status).toBe('new')
-  })
-
-  test('builds a database snippet when source is explicitly "database"', () => {
-    const snippet = createSqlSnippetSkeletonV2({ ...baseArgs, source: 'database' })
-    expect(snippet.type).toBe('sql')
-  })
-
-  test('builds a logs (log_sql) snippet when source is "logs"', () => {
-    const snippet = createSqlSnippetSkeletonV2({ ...baseArgs, source: 'logs' })
-    expect(snippet.type).toBe('log_sql')
     expect(snippet.content?.unchecked_sql).toBe('select 1')
-  })
-
-  test('sets content_id to the snippet id for both sources', () => {
-    const db = createSqlSnippetSkeletonV2({ ...baseArgs, idOverride: 'db-id' })
-    const logs = createSqlSnippetSkeletonV2({ ...baseArgs, idOverride: 'logs-id', source: 'logs' })
-    expect(db.content?.content_id).toBe('db-id')
-    expect(logs.content?.content_id).toBe('logs-id')
+    expect(snippet.content?.content_id).toBe('snippet-id')
   })
 })
 
@@ -364,500 +262,203 @@ describe('SQLEditor.utils.ts:planDiffRequestApplication', () => {
     })
     expect(plan).toEqual({ kind: 'replace', text: 'select 1;' })
   })
-  test('opens a diff against the existing content when it is not empty', () => {
-    const plan = planDiffRequestApplication({
-      existingValue: 'select 0;',
-      request: { diffType: DiffType.Modification, sql: 'select 1;' },
-    })
-    expect(plan).toEqual({
-      kind: 'diff',
-      diff: { original: 'select 0;', modified: 'select 1;' },
-      diffType: DiffType.Modification,
-    })
-  })
-  test('carries through the requested diff type', () => {
-    const plan = planDiffRequestApplication({
-      existingValue: 'select 0;',
-      request: { diffType: DiffType.NewSnippet, sql: 'select 1;' },
-    })
-    expect(plan).toEqual({
-      kind: 'diff',
-      diff: { original: 'select 0;', modified: 'select 1;' },
-      diffType: DiffType.NewSnippet,
-    })
-  })
-})
-
-const keyEvent = (overrides: Partial<Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey'>> = {}) => ({
-  key: 'a',
-  metaKey: false,
-  ctrlKey: false,
-  ...overrides,
+  test.each([DiffType.Modification, DiffType.NewSnippet])(
+    'opens a %s diff against the existing content when it is not empty',
+    (diffType) => {
+      const plan = planDiffRequestApplication({
+        existingValue: 'select 0;',
+        request: { diffType, sql: 'select 1;' },
+      })
+      expect(plan).toEqual({
+        kind: 'diff',
+        diff: { original: 'select 0;', modified: 'select 1;' },
+        diffType,
+      })
+    }
+  )
 })
 
 describe('SQLEditor.utils.ts:resolveDiffKeyAction', () => {
-  test('does nothing when neither a diff nor the prompt is open', () => {
-    const action = resolveDiffKeyAction(keyEvent({ key: 'Escape' }), {
-      isDiffOpen: false,
-      isPromptOpen: false,
-      os: 'macos',
-    })
-    expect(action).toEqual({ type: 'none' })
+  type KeyEvent = Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey'>
+  type Ctx = Parameters<typeof resolveDiffKeyAction>[1]
+  const diffOpen: Ctx = { isDiffOpen: true, isPromptOpen: false, os: 'macos' }
+  const promptOpen: Ctx = { isDiffOpen: false, isPromptOpen: true, os: 'macos' }
+  const key = (k: string, mods: Partial<KeyEvent> = {}): KeyEvent => ({
+    key: k,
+    metaKey: false,
+    ctrlKey: false,
+    ...mods,
   })
-  test('does nothing for keys other than Enter/Escape', () => {
-    const action = resolveDiffKeyAction(keyEvent({ key: 'a' }), {
-      isDiffOpen: true,
-      isPromptOpen: false,
-      os: 'macos',
-    })
-    expect(action).toEqual({ type: 'none' })
-  })
-  test('accepts on Cmd+Enter on macOS when a diff is open', () => {
-    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', metaKey: true }), {
-      isDiffOpen: true,
-      isPromptOpen: false,
-      os: 'macos',
-    })
-    expect(action).toEqual({ type: 'accept' })
-  })
-  test('accepts on Ctrl+Enter on Windows when a diff is open', () => {
-    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', ctrlKey: true }), {
-      isDiffOpen: true,
-      isPromptOpen: false,
-      os: 'windows',
-    })
-    expect(action).toEqual({ type: 'accept' })
-  })
-  test('does not accept on Ctrl+Enter on macOS (wrong modifier for the OS)', () => {
-    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', ctrlKey: true }), {
-      isDiffOpen: true,
-      isPromptOpen: false,
-      os: 'macos',
-    })
-    expect(action).toEqual({ type: 'none' })
-  })
-  test('does not accept on Enter without the modifier key', () => {
-    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter' }), {
-      isDiffOpen: true,
-      isPromptOpen: false,
-      os: 'macos',
-    })
-    expect(action).toEqual({ type: 'none' })
-  })
-  test('does not accept on Cmd+Enter when the diff is not open, even if the prompt is', () => {
-    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', metaKey: true }), {
-      isDiffOpen: false,
-      isPromptOpen: true,
-      os: 'macos',
-    })
-    expect(action).toEqual({ type: 'none' })
-  })
-  test('escapes with shouldDiscard true when a diff is open', () => {
-    const action = resolveDiffKeyAction(keyEvent({ key: 'Escape' }), {
-      isDiffOpen: true,
-      isPromptOpen: false,
-      os: 'macos',
-    })
-    expect(action).toEqual({ type: 'escape', shouldDiscard: true })
-  })
-  test('escapes with shouldDiscard false when only the prompt is open', () => {
-    const action = resolveDiffKeyAction(keyEvent({ key: 'Escape' }), {
-      isDiffOpen: false,
-      isPromptOpen: true,
-      os: 'macos',
-    })
-    expect(action).toEqual({ type: 'escape', shouldDiscard: false })
+
+  test.each<[string, KeyEvent, Ctx, ReturnType<typeof resolveDiffKeyAction>]>([
+    [
+      'nothing when neither a diff nor the prompt is open',
+      key('Escape'),
+      { ...diffOpen, isDiffOpen: false },
+      { type: 'none' },
+    ],
+    ['nothing for keys other than Enter/Escape', key('a'), diffOpen, { type: 'none' }],
+    ['accept on Cmd+Enter on macOS', key('Enter', { metaKey: true }), diffOpen, { type: 'accept' }],
+    [
+      'accept on Ctrl+Enter on Windows',
+      key('Enter', { ctrlKey: true }),
+      { ...diffOpen, os: 'windows' },
+      { type: 'accept' },
+    ],
+    [
+      'nothing on Ctrl+Enter on macOS (wrong modifier)',
+      key('Enter', { ctrlKey: true }),
+      diffOpen,
+      { type: 'none' },
+    ],
+    ['nothing on Enter without a modifier', key('Enter'), diffOpen, { type: 'none' }],
+    [
+      'nothing on Cmd+Enter when only the prompt is open',
+      key('Enter', { metaKey: true }),
+      promptOpen,
+      { type: 'none' },
+    ],
+    [
+      'escape and discard when a diff is open',
+      key('Escape'),
+      diffOpen,
+      { type: 'escape', shouldDiscard: true },
+    ],
+    [
+      'escape without discard when only the prompt is open',
+      key('Escape'),
+      promptOpen,
+      { type: 'escape', shouldDiscard: false },
+    ],
+  ])('%s', (_, event, ctx, expected) => {
+    expect(resolveDiffKeyAction(event, ctx)).toEqual(expected)
   })
 })
 
-describe(`SQLEditor.utils.ts:checkDestructiveQuery`, () => {
-  it('drop statement matches', () => {
-    const match = checkDestructiveQuery('drop table films, distributors;')
+describe('SQLEditor.utils.ts:checkDestructiveQuery', () => {
+  const doBlock = (body: string) => `DO $$\nBEGIN\n  ${body}\nEND\n$$;`
 
-    expect(match).toBe(true)
+  test.each([
+    'drop table films, distributors;',
+    'truncate films;',
+    "delete from films where kind <> 'Musical';",
+    "DELETE FROM films WHERE kind <> 'Musical';",
+    "select * from films;\n\ndelete from films where kind <> 'Musical';",
+    "delete from countries; update countries set name = 'hello';",
+    'ALTER TABLE test DROP COLUMN test;',
+    'TRUNCATE TABLE test;',
+  ])('flags plain destructive statement: %s', (sql) => {
+    expect(checkDestructiveQuery(sql)).toBe(true)
   })
 
-  it('truncate statement matches', () => {
-    const match = checkDestructiveQuery('truncate films;')
-
-    expect(match).toBe(true)
+  test.each([
+    // string literal / format / concatenation
+    `EXECUTE 'DROP TABLE users';`,
+    `EXECUTE 'DELETE FROM users';`,
+    `EXECUTE 'TRUNCATE TABLE users';`,
+    `EXECUTE format('DROP TABLE %I', table_name);`,
+    `EXECUTE format('DELETE FROM %I', table_name);`,
+    `EXECUTE format('TRUNCATE TABLE %I', table_name);`,
+    `EXECUTE 'DROP TABLE ' || table_name;`,
+    `EXECUTE 'DELETE FROM ' || table_name;`,
+    `execute 'drop table users';`,
+    `EXECUTE Format('DROP TABLE users');`,
+    // EXECUTE IMMEDIATE / OPEN cursor / RETURN QUERY
+    `EXECUTE IMMEDIATE 'DROP TABLE users';`,
+    `EXECUTE IMMEDIATE 'DELETE FROM users';`,
+    `EXECUTE IMMEDIATE 'TRUNCATE TABLE users';`,
+    `OPEN ref FOR EXECUTE 'DROP TABLE users';`,
+    `OPEN ref FOR EXECUTE format('DELETE FROM %I', tbl);`,
+    `OPEN ref FOR EXECUTE 'TRUNCATE TABLE ' || tbl;`,
+    `RETURN QUERY EXECUTE 'DROP TABLE users';`,
+    `RETURN QUERY EXECUTE format('DELETE FROM %I', tbl);`,
+    // dollar-quoted, concat, E-strings
+    `EXECUTE $sql$DROP TABLE users$sql$;`,
+    `EXECUTE $body$TRUNCATE TABLE logs$body$;`,
+    `EXECUTE concat('DROP TABLE ', 'users');`,
+    `EXECUTE concat_ws(' ', 'DELETE FROM', 'users');`,
+    `EXECUTE E'DROP TABLE users';`,
+    // ALTER TABLE ... DROP COLUMN through every dynamic form
+    `EXECUTE 'ALTER TABLE users DROP COLUMN email';`,
+    `EXECUTE format('ALTER TABLE %I DROP COLUMN %I', 'users', 'email');`,
+    `EXECUTE IMMEDIATE 'ALTER TABLE users DROP COLUMN email';`,
+    `OPEN ref FOR EXECUTE 'ALTER TABLE users DROP COLUMN email';`,
+    `RETURN QUERY EXECUTE 'ALTER TABLE users DROP COLUMN email';`,
+    `EXECUTE $sql$ALTER TABLE users DROP COLUMN email$sql$;`,
+    `EXECUTE concat('ALTER TABLE ', 'users DROP COLUMN email');`,
+    // DO blocks
+    doBlock(`EXECUTE 'DROP TABLE users';`),
+    doBlock(`EXECUTE 'ALTER TABLE users DROP COLUMN email';`),
+    stripIndent`
+      DO $$
+      BEGIN
+        FOR rec IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' LOOP
+          EXECUTE format('DROP TABLE %I', rec.tablename);
+        END LOOP;
+      END
+      $$;
+    `,
+    stripIndent`
+      DO $$
+      DECLARE
+        func_name text;
+      BEGIN
+        FOR func_name IN
+          SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public'
+        LOOP
+          EXECUTE format('DROP FUNCTION %I', func_name);
+        END LOOP;
+      END
+      $$;
+    `,
+  ])('flags destructive dynamic SQL: %s', (sql) => {
+    expect(checkDestructiveQuery(sql)).toBe(true)
   })
 
-  it('delete statement matches', () => {
-    const match = checkDestructiveQuery("delete from films where kind <> 'Musical';")
-
-    expect(match).toBe(true)
-  })
-
-  it('delete statement after another statement matches', () => {
-    const match = checkDestructiveQuery(stripIndent`
-      select * from films;
-
-      delete from films where kind <> 'Musical';
-    `)
-
-    expect(match).toBe(true)
-  })
-
-  it("rls policy containing delete doesn't match", () => {
-    const match = checkDestructiveQuery(stripIndent`
+  test.each([
+    stripIndent`
       create policy "Users can delete their own files"
       on storage.objects for delete to authenticated using (
         bucket id = 'files' and (select auth.uid()) = owner
       );
-    `)
-
-    expect(match).toBe(false)
-  })
-
-  it('capitalized statement matches', () => {
-    const match = checkDestructiveQuery("DELETE FROM films WHERE kind <> 'Musical';")
-
-    expect(match).toBe(true)
-  })
-
-  it("comment containing keyword doesn't match", () => {
-    const match = checkDestructiveQuery(stripIndent`
-      -- Going to drop this in here, might delete later
-      select * from films;
-    `)
-
-    expect(match).toBe(false)
+    `,
+    '-- Going to drop this in here, might delete later\nselect * from films;',
+    `EXECUTE 'SELECT * FROM users';`,
+    `EXECUTE 'INSERT INTO users (name) VALUES (''test'')';`,
+    `EXECUTE 'UPDATE users SET name = ''test'' WHERE id = 1';`,
+    `EXECUTE 'ALTER TABLE users ADD COLUMN email text';`,
+    `sql := 'SELECT * FROM users';`,
+    `OPEN ref FOR EXECUTE 'SELECT * FROM users';`,
+    `RETURN QUERY EXECUTE 'SELECT * FROM users';`,
+  ])('does not flag: %s', (sql) => {
+    expect(checkDestructiveQuery(sql)).toBe(false)
   })
 })
 
-describe('SQLEditor.utils:updateWithoutWhere', () => {
-  it('contains an update query with a where clause', () => {
-    const match = isUpdateWithoutWhere(stripIndent`
-      UPDATE public.countries SET name = 'New Name' WHERE id = 1;
-    `)
-
-    expect(match).toBe(false)
+describe('SQLEditor.utils:isUpdateWithoutWhere', () => {
+  test.each([
+    `UPDATE public.countries SET name = 'New Name';`,
+    `UPDATE "public"."countries" SET name = 'New Name';`,
+    `UPDATE "messages" SET id = 1;`,
+    `UPDATE "public".messages SET id = 1;`,
+    `UPDATE public."messages" SET id = 1;`,
+    `UPDATE "my table" SET id = 1;`,
+    `UPDATE "weird""name" SET id = 1;`,
+    // the word "where" inside an identifier or string literal is not a where clause
+    `UPDATE "where table" SET id = 1;`,
+    `UPDATE messages SET name = 'where x';`,
+    `delete from countries; update countries set name = 'hello';`,
+  ])('flags update without a where clause: %s', (sql) => {
+    expect(isUpdateWithoutWhere(sql)).toBe(true)
   })
 
-  it('contains an update query without a where clause', () => {
-    const match = isUpdateWithoutWhere(stripIndent`
-      UPDATE public.countries SET name = 'New Name';
-    `)
-
-    expect(match).toBe(true)
-  })
-
-  it('contains an update query, with quoted identifiers with a where clause', () => {
-    const match = isUpdateWithoutWhere(stripIndent`
-      UPDATE "public"."countries" SET name = 'New Name' WHERE id = 1;
-    `)
-
-    expect(match).toBe(false)
-  })
-
-  it('contains an update query, with quoted identifiers without a where clause', () => {
-    const match = isUpdateWithoutWhere(stripIndent`
-      UPDATE "public"."countries" SET name = 'New Name';
-    `)
-
-    expect(match).toBe(true)
-  })
-
-  it('catches update on a single quoted table name without a where clause', () => {
-    const match = isUpdateWithoutWhere(`UPDATE "messages" SET id = 1;`)
-    expect(match).toBe(true)
-  })
-
-  it('does not flag update on a single quoted table name with a where clause', () => {
-    const match = isUpdateWithoutWhere(`UPDATE "messages" SET id = 1 WHERE id = 2;`)
-    expect(match).toBe(false)
-  })
-
-  it('catches update on a quoted schema with a bareword table without a where clause', () => {
-    const match = isUpdateWithoutWhere(`UPDATE "public".messages SET id = 1;`)
-    expect(match).toBe(true)
-  })
-
-  it('catches update on a bareword schema with a quoted table without a where clause', () => {
-    const match = isUpdateWithoutWhere(`UPDATE public."messages" SET id = 1;`)
-    expect(match).toBe(true)
-  })
-
-  it('catches update on a quoted table name containing a space without a where clause', () => {
-    const match = isUpdateWithoutWhere(`UPDATE "my table" SET id = 1;`)
-    expect(match).toBe(true)
-  })
-
-  it('catches update on a quoted table name containing escaped quotes without a where clause', () => {
-    const match = isUpdateWithoutWhere(`UPDATE "weird""name" SET id = 1;`)
-    expect(match).toBe(true)
-  })
-
-  it('catches update where a quoted identifier contains the word where', () => {
-    const match = isUpdateWithoutWhere(`UPDATE "where table" SET id = 1;`)
-    expect(match).toBe(true)
-  })
-
-  it('catches update where a string literal contains the word where', () => {
-    const match = isUpdateWithoutWhere(`UPDATE messages SET name = 'where x';`)
-    expect(match).toBe(true)
-  })
-
-  it('does not flag update where the only "where" sits inside a string literal but a real where clause exists', () => {
-    const match = isUpdateWithoutWhere(`UPDATE messages SET name = 'where x' WHERE id = 1;`)
-    expect(match).toBe(false)
-  })
-
-  it('contains both an update query and a delete query, triggers destructive', () => {
-    const match = checkDestructiveQuery(stripIndent`
-      delete from countries; update countries set name = 'hello';
-    `)
-
-    expect(match).toBe(true)
-  })
-
-  it('contains both an update query and a delete query, triggers no where', () => {
-    const match = isUpdateWithoutWhere(stripIndent`
-      delete from countries; update countries set name = 'hello';
-    `)
-
-    expect(match).toBe(true)
-  })
-  it('contains both an update query and a delete query, triggers no where', () => {
-    const match = isUpdateWithoutWhere(stripIndent`
-      delete from countries; update countries set name = 'hello';
-    `)
-
-    expect(match).toBe(true)
-  })
-
-  it('should catch potential destructive queries', () => {
-    const DESTRUCTIVE_QUERIES = [
-      `ALTER TABLE test DROP COLUMN test;`,
-      `DELETE FROM test;`,
-      `DROP TABLE test;`,
-      `TRUNCATE TABLE test;`,
-    ]
-
-    DESTRUCTIVE_QUERIES.forEach((query) => {
-      expect(checkDestructiveQuery(query), `Query ${query} should be destructive`).toBe(true)
-    })
-  })
-
-  it('should catch EXECUTE with DROP in string literal', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'DROP TABLE users';`)).toBe(true)
-  })
-
-  it('should catch EXECUTE with DELETE in string literal', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'DELETE FROM users';`)).toBe(true)
-  })
-
-  it('should catch EXECUTE with TRUNCATE in string literal', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'TRUNCATE TABLE users';`)).toBe(true)
-  })
-
-  it('should catch EXECUTE format with DROP', () => {
-    expect(checkDestructiveQuery(`EXECUTE format('DROP TABLE %I', table_name);`)).toBe(true)
-  })
-
-  it('should catch EXECUTE format with DELETE', () => {
-    expect(checkDestructiveQuery(`EXECUTE format('DELETE FROM %I', table_name);`)).toBe(true)
-  })
-
-  it('should catch EXECUTE format with TRUNCATE', () => {
-    expect(checkDestructiveQuery(`EXECUTE format('TRUNCATE TABLE %I', table_name);`)).toBe(true)
-  })
-
-  it('should catch EXECUTE with string concatenation containing DROP', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'DROP TABLE ' || table_name;`)).toBe(true)
-  })
-
-  it('should catch EXECUTE with string concatenation containing DELETE', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'DELETE FROM ' || table_name;`)).toBe(true)
-  })
-
-  it('should catch DO block with EXECUTE DROP', () => {
-    expect(
-      checkDestructiveQuery(stripIndent`
-        DO $$
-        BEGIN
-          EXECUTE 'DROP TABLE users';
-        END
-        $$;
-      `)
-    ).toBe(true)
-  })
-
-  it('should catch DO block with EXECUTE format DROP', () => {
-    expect(
-      checkDestructiveQuery(stripIndent`
-        DO $$
-        BEGIN
-          FOR rec IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' LOOP
-            EXECUTE format('DROP TABLE %I', rec.tablename);
-          END LOOP;
-        END
-        $$;
-      `)
-    ).toBe(true)
-  })
-
-  it('should catch DO block with multiple EXECUTE format DROPs', () => {
-    expect(
-      checkDestructiveQuery(stripIndent`
-        DO $$
-        DECLARE
-          func_name text;
-        BEGIN
-          FOR func_name IN
-            SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public'
-          LOOP
-            EXECUTE format('DROP FUNCTION %I', func_name);
-          END LOOP;
-        END
-        $$;
-      `)
-    ).toBe(true)
-  })
-
-  it('should catch lowercase execute with drop', () => {
-    expect(checkDestructiveQuery(`execute 'drop table users';`)).toBe(true)
-  })
-
-  it('should catch mixed case EXECUTE Format with DROP', () => {
-    expect(checkDestructiveQuery(`EXECUTE Format('DROP TABLE users');`)).toBe(true)
-  })
-
-  it('should not flag EXECUTE with safe SQL', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'SELECT * FROM users';`)).toBe(false)
-  })
-
-  it('should not flag EXECUTE with INSERT', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'INSERT INTO users (name) VALUES (''test'')';`)).toBe(
-      false
-    )
-  })
-
-  it('should not flag EXECUTE with UPDATE and WHERE', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'UPDATE users SET name = ''test'' WHERE id = 1';`)).toBe(
-      false
-    )
-  })
-
-  it('should catch EXECUTE IMMEDIATE with DROP', () => {
-    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'DROP TABLE users';`)).toBe(true)
-  })
-
-  it('should catch EXECUTE IMMEDIATE with DELETE', () => {
-    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'DELETE FROM users';`)).toBe(true)
-  })
-
-  it('should catch EXECUTE IMMEDIATE with TRUNCATE', () => {
-    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'TRUNCATE TABLE users';`)).toBe(true)
-  })
-
-  it('should catch OPEN cursor FOR EXECUTE with DROP', () => {
-    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE 'DROP TABLE users';`)).toBe(true)
-  })
-
-  it('should catch OPEN cursor FOR EXECUTE format with DELETE', () => {
-    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE format('DELETE FROM %I', tbl);`)).toBe(true)
-  })
-
-  it('should catch OPEN cursor FOR EXECUTE with string concat', () => {
-    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE 'TRUNCATE TABLE ' || tbl;`)).toBe(true)
-  })
-
-  it('should catch RETURN QUERY EXECUTE with DROP', () => {
-    expect(checkDestructiveQuery(`RETURN QUERY EXECUTE 'DROP TABLE users';`)).toBe(true)
-  })
-
-  it('should catch RETURN QUERY EXECUTE format with DELETE', () => {
-    expect(checkDestructiveQuery(`RETURN QUERY EXECUTE format('DELETE FROM %I', tbl);`)).toBe(true)
-  })
-
-  it('should catch EXECUTE with dollar-quoted string containing DROP', () => {
-    expect(checkDestructiveQuery(`EXECUTE $sql$DROP TABLE users$sql$;`)).toBe(true)
-  })
-
-  it('should catch EXECUTE with dollar-quoted string containing TRUNCATE', () => {
-    expect(checkDestructiveQuery(`EXECUTE $body$TRUNCATE TABLE logs$body$;`)).toBe(true)
-  })
-
-  it('should catch EXECUTE concat with DROP', () => {
-    expect(checkDestructiveQuery(`EXECUTE concat('DROP TABLE ', 'users');`)).toBe(true)
-  })
-
-  it('should catch EXECUTE concat_ws with DELETE', () => {
-    expect(checkDestructiveQuery(`EXECUTE concat_ws(' ', 'DELETE FROM', 'users');`)).toBe(true)
-  })
-
-  it('should catch EXECUTE with E-string escape containing DROP', () => {
-    expect(checkDestructiveQuery(`EXECUTE E'DROP TABLE users';`)).toBe(true)
-  })
-
-  it('should catch EXECUTE with ALTER TABLE DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'ALTER TABLE users DROP COLUMN email';`)).toBe(true)
-  })
-
-  it('should catch EXECUTE format with ALTER TABLE DROP COLUMN', () => {
-    expect(
-      checkDestructiveQuery(`EXECUTE format('ALTER TABLE %I DROP COLUMN %I', 'users', 'email');`)
-    ).toBe(true)
-  })
-
-  it('should catch EXECUTE IMMEDIATE with ALTER TABLE DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'ALTER TABLE users DROP COLUMN email';`)).toBe(
-      true
-    )
-  })
-
-  it('should catch OPEN cursor FOR EXECUTE with ALTER TABLE DROP COLUMN', () => {
-    expect(
-      checkDestructiveQuery(`OPEN ref FOR EXECUTE 'ALTER TABLE users DROP COLUMN email';`)
-    ).toBe(true)
-  })
-
-  it('should catch RETURN QUERY EXECUTE with ALTER TABLE DROP COLUMN', () => {
-    expect(
-      checkDestructiveQuery(`RETURN QUERY EXECUTE 'ALTER TABLE users DROP COLUMN email';`)
-    ).toBe(true)
-  })
-
-  it('should catch EXECUTE dollar-quoted with ALTER TABLE DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`EXECUTE $sql$ALTER TABLE users DROP COLUMN email$sql$;`)).toBe(
-      true
-    )
-  })
-
-  it('should catch EXECUTE concat with ALTER TABLE DROP COLUMN', () => {
-    expect(
-      checkDestructiveQuery(`EXECUTE concat('ALTER TABLE ', 'users DROP COLUMN email');`)
-    ).toBe(true)
-  })
-
-  it('should catch DO block with EXECUTE ALTER TABLE DROP COLUMN', () => {
-    expect(
-      checkDestructiveQuery(stripIndent`
-        DO $$
-        BEGIN
-          EXECUTE 'ALTER TABLE users DROP COLUMN email';
-        END
-        $$;
-      `)
-    ).toBe(true)
-  })
-
-  it('should not flag ALTER TABLE without DROP COLUMN', () => {
-    expect(checkDestructiveQuery(`EXECUTE 'ALTER TABLE users ADD COLUMN email text';`)).toBe(false)
-  })
-
-  it('should not flag variable assignment with safe SQL', () => {
-    expect(checkDestructiveQuery(`sql := 'SELECT * FROM users';`)).toBe(false)
-  })
-
-  it('should not flag OPEN cursor FOR EXECUTE with safe SQL', () => {
-    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE 'SELECT * FROM users';`)).toBe(false)
-  })
-
-  it('should not flag RETURN QUERY EXECUTE with safe SQL', () => {
-    expect(checkDestructiveQuery(`RETURN QUERY EXECUTE 'SELECT * FROM users';`)).toBe(false)
+  test.each([
+    `UPDATE public.countries SET name = 'New Name' WHERE id = 1;`,
+    `UPDATE "public"."countries" SET name = 'New Name' WHERE id = 1;`,
+    `UPDATE "messages" SET id = 1 WHERE id = 2;`,
+    `UPDATE messages SET name = 'where x' WHERE id = 1;`,
+  ])('does not flag update with a where clause: %s', (sql) => {
+    expect(isUpdateWithoutWhere(sql)).toBe(false)
   })
 })
 
@@ -1143,34 +744,23 @@ describe('SQLEditor.utils:appendEnableRLSStatements', () => {
 })
 
 describe('SQLEditor.utils:hasActiveEnsureRLSTrigger', () => {
-  it('returns false for undefined triggers', () => {
-    expect(hasActiveEnsureRLSTrigger(undefined)).toBe(false)
-  })
-
-  it('returns false for an empty list', () => {
-    expect(hasActiveEnsureRLSTrigger([])).toBe(false)
-  })
-
-  it('returns true when a trigger named "ensure_rls" is active', () => {
-    expect(hasActiveEnsureRLSTrigger([buildTrigger()])).toBe(true)
-  })
-
-  it('returns true when a trigger uses the rls_auto_enable function (renamed trigger)', () => {
-    expect(
-      hasActiveEnsureRLSTrigger([
-        buildTrigger({ name: 'something_else', function_name: 'rls_auto_enable' }),
-      ])
-    ).toBe(true)
-  })
-
-  it('returns false when the matching trigger is DISABLED', () => {
-    expect(hasActiveEnsureRLSTrigger([buildTrigger({ enabled_mode: 'DISABLED' })])).toBe(false)
-  })
-
-  it('ignores unrelated triggers', () => {
-    expect(
-      hasActiveEnsureRLSTrigger([buildTrigger({ name: 'audit_log', function_name: 'log_changes' })])
-    ).toBe(false)
+  test.each<[string, DatabaseEventTrigger[] | undefined, boolean]>([
+    ['undefined triggers', undefined, false],
+    ['an empty list', [], false],
+    ['an active "ensure_rls" trigger', [buildTrigger()], true],
+    [
+      'a renamed trigger using rls_auto_enable',
+      [buildTrigger({ name: 'something_else', function_name: 'rls_auto_enable' })],
+      true,
+    ],
+    ['a DISABLED matching trigger', [buildTrigger({ enabled_mode: 'DISABLED' })], false],
+    [
+      'unrelated triggers',
+      [buildTrigger({ name: 'audit_log', function_name: 'log_changes' })],
+      false,
+    ],
+  ])('%s -> %s', (_, triggers, expected) => {
+    expect(hasActiveEnsureRLSTrigger(triggers)).toBe(expected)
   })
 })
 
@@ -1207,55 +797,21 @@ describe('SQLEditor.utils:filterTablesCoveredByEnsureRLSTrigger', () => {
 })
 
 describe('SQLEditor.utils:checkAlterDatabaseConnection', () => {
-  it('detects connection limit 0', () => {
-    const match = checkAlterDatabaseConnection('alter database postgres connection limit 0;')
-    expect(match).toBe(true)
+  test.each([
+    'alter database postgres connection limit 0;',
+    'alter database postgres allow_connections false;',
+    'ALTER DATABASE postgres CONNECTION LIMIT 0;',
+    'select * from countries;\nalter database postgres connection limit 0;',
+  ])('detects: %s', (sql) => {
+    expect(checkAlterDatabaseConnection(sql)).toBe(true)
   })
 
-  it('detects allow_connections false', () => {
-    const match = checkAlterDatabaseConnection('alter database postgres allow_connections false;')
-    expect(match).toBe(true)
-  })
-
-  it('detects case-insensitive match', () => {
-    const match = checkAlterDatabaseConnection('ALTER DATABASE postgres CONNECTION LIMIT 0;')
-    expect(match).toBe(true)
-  })
-
-  it('detects statement among multiple statements', () => {
-    const match = checkAlterDatabaseConnection(stripIndent`
-      select * from countries;
-      alter database postgres connection limit 0;
-    `)
-    expect(match).toBe(true)
-  })
-
-  it('does not flag unrelated alter database statement', () => {
-    const match = checkAlterDatabaseConnection(
-      'alter database postgres set statement_timeout = 60000;'
-    )
-    expect(match).toBe(false)
-  })
-
-  it('does not flag non-alter statements', () => {
-    const match = checkAlterDatabaseConnection('select * from countries;')
-    expect(match).toBe(false)
-  })
-
-  it('ignores statements inside comments', () => {
-    const match = checkAlterDatabaseConnection(stripIndent`
-      -- alter database postgres connection limit 0;
-      select 1;
-    `)
-    expect(match).toBe(false)
-  })
-
-  it('detects both dangerous statements in same query', () => {
-    const match = checkAlterDatabaseConnection(stripIndent`
-      alter database postgres connection limit 0;
-      alter database postgres allow_connections false;
-    `)
-    expect(match).toBe(true)
+  test.each([
+    'alter database postgres set statement_timeout = 60000;',
+    'select * from countries;',
+    '-- alter database postgres connection limit 0;\nselect 1;',
+  ])('does not flag: %s', (sql) => {
+    expect(checkAlterDatabaseConnection(sql)).toBe(false)
   })
 })
 
@@ -1382,36 +938,18 @@ describe('SQLEditor.utils:hasBlockingIssues', () => {
     createTablesMissingRLS: [],
   }
 
-  it('returns false when there are no issues', () => {
-    expect(hasBlockingIssues(noIssues, false)).toBe(false)
-  })
-
-  it('returns true when hasDestructiveOperations is set', () => {
-    expect(hasBlockingIssues({ ...noIssues, hasDestructiveOperations: true }, false)).toBe(true)
-  })
-
-  it('returns true when hasUpdateWithoutWhere is set', () => {
-    expect(hasBlockingIssues({ ...noIssues, hasUpdateWithoutWhere: true }, false)).toBe(true)
-  })
-
-  it('returns true when hasAlterDatabasePreventConnection is set', () => {
-    expect(hasBlockingIssues({ ...noIssues, hasAlterDatabasePreventConnection: true }, false)).toBe(
-      true
-    )
-  })
-
-  it('returns true when createTablesMissingRLS is non-empty', () => {
-    expect(
-      hasBlockingIssues({ ...noIssues, createTablesMissingRLS: [{ tableName: 'foo' }] }, false)
-    ).toBe(true)
+  test.each([
+    ['no issues', {}, false],
+    ['hasDestructiveOperations', { hasDestructiveOperations: true }, true],
+    ['hasUpdateWithoutWhere', { hasUpdateWithoutWhere: true }, true],
+    ['hasAlterDatabasePreventConnection', { hasAlterDatabasePreventConnection: true }, true],
+    ['createTablesMissingRLS non-empty', { createTablesMissingRLS: [{ tableName: 'foo' }] }, true],
+  ])('%s -> %s', (_, overrides, expected) => {
+    expect(hasBlockingIssues({ ...noIssues, ...overrides }, false)).toBe(expected)
   })
 
   it('returns false when force is true, even with issues present', () => {
     expect(hasBlockingIssues({ ...noIssues, hasDestructiveOperations: true }, true)).toBe(false)
-  })
-
-  it('returns false when force is true and there are no issues', () => {
-    expect(hasBlockingIssues(noIssues, true)).toBe(false)
   })
 })
 

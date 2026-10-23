@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components, paths } from 'api-types'
 import { HttpResponse } from 'msw'
@@ -109,11 +109,10 @@ describe('SSLConfiguration', () => {
     // Nothing is loading for HA projects, so there is no announcement to make
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
 
-    // The tooltip trigger is the wrapper around the (disabled) switch
-    await userEvent.hover(sslSwitch.parentElement!)
-    expect((await screen.findAllByText(HA_TOOLTIP, {}, { timeout: 2000 })).length).toBeGreaterThan(
-      0
-    )
+    // The tooltip trigger is the wrapper around the (disabled) switch. Focus opens a Radix
+    // tooltip without the hover delay.
+    fireEvent.focus(sslSwitch.parentElement!)
+    expect((await screen.findAllByText(HA_TOOLTIP)).length).toBeGreaterThan(0)
 
     expect(sslEnforcementRequests.count).toBe(0)
   })

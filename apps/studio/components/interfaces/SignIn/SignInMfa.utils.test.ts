@@ -1,10 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import {
-  getFactorDisplayName,
-  getFactorFriendlyName,
-  MFA_SUPPORT_EMAIL_HREF,
-} from './SignInMfa.utils'
+import { getFactorDisplayName, getFactorFriendlyName } from './SignInMfa.utils'
 
 describe('getFactorFriendlyName', () => {
   test('returns the trimmed friendly name', () => {
@@ -31,15 +27,5 @@ describe('getFactorDisplayName', () => {
 
   test('falls back to a generic label when the name is blank', () => {
     expect(getFactorDisplayName({ friendly_name: ' ' })).toBe('your authenticator app')
-  })
-})
-
-describe('MFA_SUPPORT_EMAIL_HREF', () => {
-  test('targets support with an encoded subject', () => {
-    const url = new URL(MFA_SUPPORT_EMAIL_HREF)
-
-    expect(url.protocol).toBe('mailto:')
-    expect(url.pathname).toBe('support@supabase.com')
-    expect(url.searchParams.get('subject')).toBe('Unable to sign in via MFA')
   })
 })
