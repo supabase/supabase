@@ -13,7 +13,7 @@ By default, Supabase sets `log_connections` to off for new projects and you must
 Existing projects may retain different settings depending on plan and compliance configuration:
 
 - **Team, Enterprise, and HIPAA organizations** — Connection logging is typically enabled to support audit requirements.
-- **HIPAA projects** — Supabase enables connection logging when a project is marked as high compliance. The [Security Advisor](/dashboard/project/_/advisors/security) warns if connection logging is later disabled.
+- **[HIPAA projects](/docs/guides/platform/hipaa-projects)** — Supabase enables connection logging when a project is marked as high compliance. The [Security Advisor](/dashboard/project/_/advisors/security) warns if connection logging is later disabled.
 
 ## Compliance considerations
 
@@ -72,7 +72,7 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/config/database/p
   }'
 ```
 
-To verify the setting, use the SQL Editor:
+Verify the setting. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 show log_connections;

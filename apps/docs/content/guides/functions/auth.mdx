@@ -62,18 +62,29 @@ A handler that queries a shared table through `ctx.supabaseAdmin` without filter
 
 ### Service-to-service calls
 
-Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'`. The wrapper validates the key against the secret key named `default` in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work.
+Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. To accept the key:
 
-```ts
-import { withSupabase } from 'npm:@supabase/server@1'
+1. In `supabase/config.toml`, disable the [`verify_jwt` check](/docs/guides/functions/auth-headers) for the function:
 
-export default {
-  fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
-    // your business logic. ctx.supabaseAdmin bypasses RLS
-    return Response.json({ ok: true })
-  }),
-}
-```
+   ```toml
+   [functions.your-function]
+   verify_jwt = false
+   ```
+
+1. In the function, use `auth: 'secret'`. The wrapper validates the key against the secret key named `default` in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work:
+
+   ```ts
+   import { withSupabase } from 'npm:@supabase/server@1'
+
+   export default {
+     fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
+       // your business logic. ctx.supabaseAdmin bypasses RLS
+       return Response.json({ ok: true })
+     }),
+   }
+   ```
+
+To call a function from Postgres with the secret key, see [Call an Edge Function](/docs/guides/database/webhooks#call-an-edge-function) for Database Webhooks and [Scheduling Edge Functions](/docs/guides/functions/schedule-functions) for `pg_cron`.
 
 <Admonition type="note">
 

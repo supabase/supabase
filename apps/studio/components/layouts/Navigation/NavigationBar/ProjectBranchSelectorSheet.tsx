@@ -1,4 +1,4 @@
-import { Box, Boxes, GitBranch } from 'lucide-react'
+import { BoxesIcon, BoxIcon, GitBranchIcon } from 'lucide-react'
 import { cn, SheetHeader, SheetTitle, Tabs, TabsContent, TabsList } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
@@ -48,22 +48,22 @@ export function ProjectBranchSelectorSheet({
     orgLabel && {
       value: 'organization' as const,
       label: orgLabel,
-      icon: Boxes,
+      icon: BoxesIcon,
     },
     projectLabel && {
       value: 'project' as const,
       label: projectLabel,
-      icon: Box,
+      icon: BoxIcon,
     },
     branchLabel && {
       value: 'branch' as const,
       label: branchLabel,
-      icon: GitBranch,
+      icon: GitBranchIcon,
     },
   ].filter(Boolean) as Array<{
     value: 'organization' | 'project' | 'branch'
     label: string
-    icon: typeof Boxes
+    icon: typeof BoxesIcon
   }>
 
   const defaultTab =

@@ -53,8 +53,7 @@ flowchart TB
 | -------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | `app/`                                 | Next.js App Router — thin route files that delegate to feature modules                 | Slug-based catch-alls per section, e.g. `guides/auth/[[...slug]]/page.tsx`                   |
 | `apps/docs/content/guides/`            | Source MDX for `/docs/guides/...` pages                                                | One file per page; `_partials/` for shared blocks                                            |
-| `apps/docs/content/_partials/`         | Reusable MDX snippets included via `<$Partial path="..." />`                           | Recursion supported                                                                          |
-| `apps/docs/content/troubleshooting/`   | Troubleshooting articles                                                               | Some synced from GitHub issues via `Troubleshooting.script.mjs`                              |
+| `apps/docs/content/_partials/`         | Reusable MDX snippets included via `<$Partial path="..." />`                           | Recursion supported                                                                          |                            |
 | `apps/docs/components/`                | React components used inside MDX                                                       | One folder per component or component family                                                 |
 | `apps/docs/data/`                      | Typed data modules consumed by components                                              | `.data.ts` suffix; lookup helpers live in `.utils.ts`, not here                              |
 | `apps/docs/lib/`                       | Pure library code shared across pipelines                                              | Schemas (zod), helpers (`.utils.ts`), tests                                                  |
@@ -218,14 +217,10 @@ Wraps the app with:
 - `DocsCommandProvider` / `DocsCommandMenu`
 - `SiteLayout` from `layouts/`
 
-## Troubleshooting page subtree
 
-- `features/docs/Troubleshooting.page.tsx` — entry-level page renderer.
-- `features/docs/Troubleshooting.utils.ts` — TS utils.
-- `features/docs/Troubleshooting.utils.common.mjs` — `.mjs` because it's
-  consumed by both the Next.js build _and_ a Node sync script with import
-  resolution quirks. **Don't convert to `.ts`** without checking the sync
-  script.
+- `features/docs/Troubleshooting.utils.common.mjs` — `.mjs`, shared between
+  the Next.js build and other scripts that read troubleshooting entries
+  (e.g. search embeddings generation).
 - Topics enum in `TroubleshootingSchema` (the `topics` field) is the source
   of truth for product tag values.
 

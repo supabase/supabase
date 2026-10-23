@@ -1,0 +1,55 @@
+name: Refresh Sitemaps
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 06:00 UTC on the first day of every month
+    - cron: '0 6 1 * *'
+
+permissions:
+  contents: read
+
+jobs:
+  refresh-sitemaps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          ref: master
+
+      - name: Download current sitemaps
+        run: bash scripts/refresh-sitemaps.sh
+
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+          repositories: supabase
+          permission-pull-requests: write
+          permission-contents: write
+
+      - name: Create or update pull request
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          commit-message: 'chore(sitemaps): refresh sitemaps'
+          title: 'chore(sitemaps): refresh sitemaps'
+          body: |
+            Refreshes the sitemap snapshots in `sitemaps/` with the current values from:
+
+            - `https://supabase.com/sitemap_www.xml` → `sitemaps/json_output/sitemap_www.json`
+            - `https://supabase.com/docs/sitemap.xml` → `sitemaps/json_output/sitemap_docs.json`
+            - `https://supabase.com/kb/sitemap-0.xml` → `sitemaps/json_output/sitemap_kb.json`
+
+            Source: ${{ github.event_name == 'schedule' && 'monthly schedule' || 'manual run' }}
+
+            This PR was created automatically and is updated in place on each run.
+          branch: 'gha/refresh-sitemaps'
+          base: 'master'
+          delete-branch: false
+          add-paths: |
+            sitemaps/**

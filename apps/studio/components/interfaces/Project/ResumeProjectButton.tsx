@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -22,16 +21,14 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
-import {
-  extractPostgresVersionDetails,
-  PostgresVersionSelector,
-} from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { PostgresVersionSelector } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from '@/data/projects/project-restore-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -83,10 +80,7 @@ export const ResumeProjectButton = ({
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
   const [billingBlockReason, setBillingBlockReason] = useState<string>()
 
-  const { can: canResumeProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_jobs.projects.initialize_or_resume'
-  )
+  const { can: canResumeProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   const { mutate: restoreProject, isPending: isRestoring } = useProjectRestoreMutation({
     onSuccess: async (_, variables) => {

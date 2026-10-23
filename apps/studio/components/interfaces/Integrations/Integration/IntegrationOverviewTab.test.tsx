@@ -18,7 +18,7 @@ vi.mock('../Landing/Integrations.constants', () => ({
   ],
 }))
 
-vi.mock('framer-motion', async (importOriginal) => {
+vi.mock('motion/react', async (importOriginal) => {
   const actual = (await importOriginal()) as any
   return {
     ...actual,

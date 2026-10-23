@@ -540,14 +540,6 @@ test.describe('Database', () => {
 
   test.describe('Triggers', () => {
     test('actions works as expected', async ({ page, ref }) => {
-      // TODO(tanstack): triggers/entity-types pg-meta queries consistently
-      // time out (>30s) under the TanStack Start server but not under Next —
-      // see PR #51141. Re-enable once the root cause is found.
-      test.skip(
-        env.STUDIO_FRAMEWORK === 'tanstack',
-        'pg-meta triggers query hangs under the TanStack Start server (#51141)'
-      )
-
       const triggersLoadWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=triggers')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
@@ -572,14 +564,6 @@ test.describe('Database', () => {
     })
 
     test('CRUD operations works as expected', async ({ page, ref }) => {
-      // TODO(tanstack): triggers/entity-types pg-meta queries consistently
-      // time out (>30s) under the TanStack Start server but not under Next —
-      // see PR #51141. Re-enable once the root cause is found.
-      test.skip(
-        env.STUDIO_FRAMEWORK === 'tanstack',
-        'pg-meta triggers query hangs under the TanStack Start server (#51141)'
-      )
-
       const databaseTableName = 'pw_database_trigger_table'
       const databaseColumnName = 'pw_database_column_trigger'
       const databaseTriggerName = 'pw_database_trigger'
@@ -900,7 +884,7 @@ test.describe('Database Extensions', () => {
     const dialog = page.getByRole('dialog')
     await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
     await expect(
-      dialog.getByText(`Confirm to enable ${EXTENSION_NAME}`),
+      dialog.getByRole('heading', { name: `Enable ${EXTENSION_NAME}`, exact: true }),
       'Dialog title should match extension name'
     ).toBeVisible()
     await expect(
@@ -915,7 +899,7 @@ test.describe('Database Extensions', () => {
       ref,
       'query?key=database-extensions'
     )
-    await dialog.getByRole('button', { name: 'Enable extension' }).click()
+    await dialog.getByRole('button', { name: 'Enable', exact: true }).click()
     await enableWait
     await refetchWait
 

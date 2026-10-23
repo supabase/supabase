@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
-import { AlertCircle, Search } from 'lucide-react'
+import { AlertCircleIcon, SearchIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Card,
@@ -22,7 +21,7 @@ import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
 import InformationBox from '@/components/ui/InformationBox'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -68,9 +67,8 @@ export const Extensions = () => {
     (ext) => !isNull(ext.installed_version)
   )
 
-  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'extensions'
+  const { can: canUpdateExtensions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   useEffect(() => {
@@ -90,14 +88,14 @@ export const Extensions = () => {
             onKeyDown={onSearchInputEscape(filterString, setFilterString)}
           />
           <InputGroupAddon>
-            <Search />
+            <SearchIcon />
           </InputGroupAddon>
         </InputGroup>
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (
         <InformationBox
-          icon={<AlertCircle className="text-foreground-light" size={18} strokeWidth={2} />}
+          icon={<AlertCircleIcon className="text-foreground-light" size={18} strokeWidth={2} />}
           title="You need additional permissions to update database extensions"
         />
       )}

@@ -29,9 +29,7 @@ async function updateEndpoint({
   })
   if (!result?.data) throw new Error('Endpoint was updated but no data was returned')
 
-  // See the comment in platform-webhook-endpoint-create-mutation.ts — `name` isn't
-  // persisted by the server, so it's carried through from what the user submitted.
-  return { ...toWebhookEndpoint(result.data), name: input.name }
+  return toWebhookEndpoint(result.data)
 }
 
 type WebhookEndpointUpdateData = Awaited<ReturnType<typeof updateEndpoint>>

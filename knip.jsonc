@@ -60,17 +60,13 @@
         // the full set, so some of it is unreferenced by design. execute.ts in
         // the same directory is hand-written and is NOT listed here.
         "data/graphql/{fragment-masking,gql,graphql}.ts": ["files"],
+        // Grant core; first consumers land with the fetch-wrapper and pilot PRs. Remove once imported.
+        "lib/grants.ts": ["files"],
         // CONSTRAINT_TYPE mirrors the complete closed set of Postgres
         // `pg_constraint.contype` values (c/f/p/u/t/x). The members we don't
         // read are documentation of the valid values, not dead code. Scoped to
         // this file so `enumMembers` keeps working everywhere else.
         "data/database/constraints-query.ts": ["enumMembers"],
-        // Org settings authorized-apps data layer, landed in #49476 ahead of the
-        // tables that consume it. Scoped to the remaining files rather than the whole
-        // folder so everything else here stays gated.
-        // TODO(FE-4330): remove — used from #50529, drop this entry in that PR.
-        "data/oauth-apps/oauth-apps-grants-query.ts": ["files"],
-        "data/oauth-apps/oauth-apps-revoke-grant-mutation.ts": ["files"],
         "hooks/misc/useTrackExperimentExposure.ts": ["files"],
         // Staging-only pinned Postgres image + FDW request payload for creating
         // Warehouse test projects by hand. Nothing imports it yet — it's kept

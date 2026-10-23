@@ -91,8 +91,13 @@ const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const MetricsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() => import('@/components/ui/DevToolbar/MetricsTab').then((m) => m.MetricsTab))
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [
+      { id: 'metrics', label: 'Metrics', content: <MetricsTab /> },
       { id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> },
       { id: 'project-status', label: 'Project Status', content: <ProjectStatusTab /> },
     ]
@@ -177,6 +182,13 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   // [Joshen] Should target hosted staging, local dev, and local CLI only
   const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
+  const isLocalEnv =
+    process.env.NODE_ENV === 'development' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    isCLI
+  let faviconRoute = '/favicon'
+  if (isNonProdEnv) faviconRoute = '/favicon/staging'
+  if (isLocalEnv) faviconRoute = '/favicon/local'
 
   const checkCliEnvironment = async () => {
     const data = await getCLIReleaseVersion()
@@ -220,7 +232,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <MetaFaviconsPagesRouter
                         includeManifest
                         applicationName="Supabase Studio"
-                        route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                        route={faviconRoute}
                       />
                       <TooltipProvider>
                         <RouteValidationWrapper>

@@ -24,12 +24,15 @@ enabled = true
 
 Existing projects without that section keep the legacy `migra` engine until they add it. See [Switch an existing project to `pg-delta`](#switch-an-existing-project-to-pg-delta).
 
-To use `migra` for a single run without changing `config.toml`, the flag depends on the command:
+To switch engines for a single run without changing `config.toml`, the flag depends on the command:
 
-| Command   | Flag to fall back to `migra` |
-| --------- | ---------------------------- |
-| `db diff` | `--use-migra`                |
-| `db pull` | `--diff-engine migra`        |
+| Command                                     | Flag to use `pg-delta`   | Flag to use `migra`   |
+| ------------------------------------------- | ------------------------ | --------------------- |
+| `db diff`                                   | `--use-pg-delta`         | `--use-migra`         |
+| `db pull`                                   | `--diff-engine pg-delta` | `--diff-engine migra` |
+| `db schema declarative generate` and `sync` | `--experimental`         | Not available         |
+
+For `db diff` and `db pull`, setting `SUPABASE_EXPERIMENTAL_PG_DELTA=1` in your shell or in `supabase/.env` has the same effect as `enabled = true`. An explicit engine flag on the command still wins.
 
 To opt out entirely, set `enabled = false` under `[experimental.pgdelta]`.
 
@@ -45,7 +48,7 @@ The commands and the migration workflow are the same on both engines. What diffe
 | Ordering of declarative files                | Automatic, based on dependencies between statements. `[db.migrations].schema_paths` is ignored, and the CLI warns when the setting lists any paths.                                                                        | Lexicographic by default. `[db.migrations].schema_paths` overrides the order. Files in `supabase/schemas/` are used even when the setting is empty.                                                                                                 |
 | Initial `db pull` (empty migration history)  | Diffs the remote database against an empty shadow database. Your customizations in managed schemas, such as triggers on `auth.users` and RLS policies on `storage.objects`, are included.                                  | Seeds the migration with `pg_dump`, which skips managed schemas, then appends a diff of your triggers and RLS policies in `auth` and `storage`. Older versions excluded those schemas and told you to run `supabase db pull --schema auth,storage`. |
 | Later `db pull` runs                         | Diffs the remote database against your migrations.                                                                                                                                                                         | Same. Trigger and RLS policy changes in managed schemas are included.                                                                                                                                                                               |
-| `db pull --declarative`                      | Replaces `supabase/schemas/` from the selected database without creating a migration.                                                                                                                                      | Runs, but don't use it. The tree it writes is only readable by the `db schema declarative` commands. `db diff` on the legacy engine then tries to load that tree as its baseline and fails.                                                         |
+| `db pull --declarative`                      | Replaces `supabase/schemas/` from the selected database without creating a migration.                                                                                                                                      | Runs, but don't use it. The command also points `[db.migrations].schema_paths` at the tree it writes. The next local `db diff` applies those files in lexicographic order and fails when a file sorts before an object it depends on.               |
 | Objects the engine doesn't track             | Reported as warnings and never silently dropped. Pass `--strict-coverage` to turn the warnings into failures.                                                                                                              | Silently omitted. `--strict-coverage` has no effect.                                                                                                                                                                                                |
 | Generated SQL                                | Uppercase keywords wrapped at 180 characters. Configurable with `[experimental.pgdelta] format_options`.                                                                                                                   | Engine default formatting.                                                                                                                                                                                                                          |
 | Migration files per run                      | Usually one. When a change crosses a transaction boundary, it may write one ordered file per unit with `_1`, `_2` suffixes. Files whose statements can't run in a transaction start with `-- pg-delta: transaction=false`. | One file.                                                                                                                                                                                                                                           |

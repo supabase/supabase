@@ -151,18 +151,30 @@ export const getAllPostSlugs = (directory: Directories) => {
   return files
 }
 
-export const getPostdata = async (slug: string, directory: string) => {
-  /**
-   * All files are mdx files
-   */
-  const fileType = 'mdx'
-  slug = slug + '.' + fileType
+/**
+ * Finds the file in `directory` that a URL slug resolves to. Matching is by
+ * substring, so `blog-post` also finds `2022-01-01-blog-post.mdx`.
+ */
+export const findPostFilename = (slug: string, directory: string): string | undefined => {
+  const postDirectory = path.join(process.cwd(), directory)
+  const folderfiles = fs.readdirSync(postDirectory)
+  return folderfiles.filter((x) => x.includes(`${slug}.mdx`))[0]
+}
 
+/**
+ * Canonical slug for a blog URL: the slug of the post the URL actually resolves
+ * to, so aliases like `/blog/postgres-13` map to `supabase-postgres-13`.
+ */
+export const resolveBlogSlug = (slug: string): string | undefined => {
+  const found = findPostFilename(slug, '_blog')
+  return found ? found.replace('.mdx', '').substring(FILENAME_SUBSTRING) : undefined
+}
+
+export const getPostdata = async (slug: string, directory: string) => {
   /**
    * Return full directory
    */
   const postDirectory = path.join(process.cwd(), directory)
-  const folderfiles = fs.readdirSync(postDirectory)
 
   /**
    * Check if the file exists in the directory
@@ -171,10 +183,10 @@ export const getPostdata = async (slug: string, directory: string) => {
    * this is so slugs like 'blog-post.mdx' will work
    * even if the mdx file is date namednamed like '2022-01-01-blog-post.mdx'
    */
-  const found = folderfiles.filter((x) => x.includes(slug))[0]
+  const found = findPostFilename(slug, directory)
 
   if (!found) {
-    throw Object.assign(new Error(`Post not found: ${slug}`), { code: 'POST_NOT_FOUND' })
+    throw Object.assign(new Error(`Post not found: ${slug}.mdx`), { code: 'POST_NOT_FOUND' })
   }
 
   const fullPath = path.join(postDirectory, found)

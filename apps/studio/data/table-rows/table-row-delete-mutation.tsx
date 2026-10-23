@@ -29,13 +29,20 @@ export function getTableRowDeleteSql({
   const { primaryKeys, error } = getPrimaryKeys({ table })
   if (error) throw error
 
-  let queryChains = new Query().from(table.name, table.schema ?? undefined).delete()
-  primaryKeys?.forEach((key) => {
-    const primaryKeyValues = rows.map((x) => x[key])
-    queryChains = queryChains.filter(key, 'in', primaryKeyValues)
-  })
+  const queryChains = new Query().from(table.name, table.schema ?? undefined).delete()
+  if (!primaryKeys || primaryKeys.length === 0) return queryChains.toSql()
 
-  return queryChains.toSql()
+  if (primaryKeys.length === 1) {
+    const [key] = primaryKeys
+    const values = rows.map((row) => row[key])
+    return queryChains.filter(key, 'in', values).toSql()
+  }
+
+  // Composite primary keys must be matched as whole tuples. Filtering each key
+  // column independently matches the cartesian product of the selected values
+  // and would delete rows that were never selected.
+  const tuples = rows.map((row) => primaryKeys.map((key) => row[key]))
+  return queryChains.filter(primaryKeys, 'in', tuples).toSql()
 }
 
 export async function deleteTableRow({

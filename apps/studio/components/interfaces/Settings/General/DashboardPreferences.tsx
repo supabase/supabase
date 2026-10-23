@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -169,7 +169,7 @@ const DashboardQueriesDialog = () => {
   return (
     <Dialog>
       <DialogTrigger className="ml-1 translate-y-0.5">
-        <HelpCircle size={14} className="hover:text-foreground transition" />
+        <HelpCircleIcon size={14} className="hover:text-foreground transition" />
       </DialogTrigger>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>

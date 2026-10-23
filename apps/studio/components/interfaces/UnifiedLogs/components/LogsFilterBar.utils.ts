@@ -17,6 +17,10 @@ import {
   findMatchingDateHelper,
   formatDateRange,
 } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
+import {
+  parseTimeRange,
+  serializeTimeRange,
+} from '@/components/interfaces/Settings/Logs/Logs.timeRange'
 import type { Option } from '@/components/ui/DataTable/DataTable.types'
 
 export const USER_PROPERTY = 'user'
@@ -127,16 +131,6 @@ export const buildColumnFilterValues = (
     }
   }
   return wrappedByColumn
-}
-
-export const serializeTimeRange = (range: Date[]): string =>
-  range.map((date) => date.toISOString()).join(' – ')
-
-export const parseTimeRange = (value: unknown): [Date, Date] | undefined => {
-  if (typeof value !== 'string') return
-  const result = z.tuple([z.coerce.date(), z.coerce.date()]).safeParse(value.split(' – '))
-  if (!result.success || result.data[0] > result.data[1]) return
-  return result.data
 }
 
 export const buildFilterGroup = (

@@ -34,6 +34,10 @@
       "import": "./src/Admonition/index.tsx",
       "types": "./src/Admonition/index.tsx"
     },
+    "./AiTools": {
+      "import": "./src/AiTools/index.tsx",
+      "types": "./src/AiTools/index.tsx"
+    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"
@@ -82,6 +86,18 @@
       "import": "./src/Chart/index.tsx",
       "types": "./src/Chart/index.tsx"
     },
+    "./CodeBlock/CodeBlock.highlight": {
+      "import": "./src/CodeBlock/CodeBlock.highlight.ts",
+      "types": "./src/CodeBlock/CodeBlock.highlight.ts"
+    },
+    "./CodeBlock/CodeBlock.theme": {
+      "import": "./src/CodeBlock/CodeBlock.theme.ts",
+      "types": "./src/CodeBlock/CodeBlock.theme.ts"
+    },
+    "./CodeBlock/CodeBlock.tokens": {
+      "import": "./src/CodeBlock/CodeBlock.tokens.ts",
+      "types": "./src/CodeBlock/CodeBlock.tokens.ts"
+    },
     "./CodeBlock/CodeBlock": {
       "import": "./src/CodeBlock/CodeBlock.tsx",
       "types": "./src/CodeBlock/CodeBlock.tsx"
@@ -89,6 +105,23 @@
     "./CodeBlock/CodeBlock.utils": {
       "import": "./src/CodeBlock/CodeBlock.utils.ts",
       "types": "./src/CodeBlock/CodeBlock.utils.ts"
+    },
+    "./CodeBlock/CodeBlockAnnotation": {
+      "import": "./src/CodeBlock/CodeBlockAnnotation.tsx",
+      "types": "./src/CodeBlock/CodeBlockAnnotation.tsx"
+    },
+    "./CodeBlock/CodeBlockControls": {
+      "import": "./src/CodeBlock/CodeBlockControls.tsx",
+      "types": "./src/CodeBlock/CodeBlockControls.tsx"
+    },
+    "./CodeBlock/CodeBlockFrame": {
+      "import": "./src/CodeBlock/CodeBlockFrame.tsx",
+      "types": "./src/CodeBlock/CodeBlockFrame.tsx"
+    },
+    "./CodeBlock/code-block.css": {
+      "style": "./src/CodeBlock/code-block.css",
+      "import": "./src/CodeBlock/code-block.css",
+      "types": "./src/CodeBlock/code-block.css"
     },
     "./CodeBlock": {
       "import": "./src/CodeBlock/index.tsx",
@@ -298,6 +331,10 @@
       "import": "./src/DatePicker/index.ts",
       "types": "./src/DatePicker/index.ts"
     },
+    "./DialogDisclosure": {
+      "import": "./src/DialogDisclosure.tsx",
+      "types": "./src/DialogDisclosure.tsx"
+    },
     "./Dialogs/ConfirmationModal": {
       "import": "./src/Dialogs/ConfirmationModal.tsx",
       "types": "./src/Dialogs/ConfirmationModal.tsx"
@@ -363,8 +400,8 @@
       "types": "./src/FilterBar/index.ts"
     },
     "./FilterBar/menuItems": {
-      "import": "./src/FilterBar/menuItems.ts",
-      "types": "./src/FilterBar/menuItems.ts"
+      "import": "./src/FilterBar/menuItems.tsx",
+      "types": "./src/FilterBar/menuItems.tsx"
     },
     "./FilterBar/types": {
       "import": "./src/FilterBar/types.ts",
@@ -377,10 +414,6 @@
     "./FilterBar/useCommandHandling": {
       "import": "./src/FilterBar/useCommandHandling.ts",
       "types": "./src/FilterBar/useCommandHandling.ts"
-    },
-    "./FilterBar/useCommandMenu": {
-      "import": "./src/FilterBar/useCommandMenu.ts",
-      "types": "./src/FilterBar/useCommandMenu.ts"
     },
     "./FilterBar/useKeyboardNavigation": {
       "import": "./src/FilterBar/useKeyboardNavigation.ts",
@@ -518,6 +551,10 @@
       "import": "./src/MultipleCodeBlock/index.tsx",
       "types": "./src/MultipleCodeBlock/index.tsx"
     },
+    "./Notch": {
+      "import": "./src/Notch/index.ts",
+      "types": "./src/Notch/index.ts"
+    },
     "./PageBreadcrumbs": {
       "import": "./src/PageBreadcrumbs/index.tsx",
       "types": "./src/PageBreadcrumbs/index.tsx"
@@ -559,6 +596,7 @@
       "types": "./src/PromoToast/index.ts"
     },
     "./PromoToast/styles.css": {
+      "style": "./src/PromoToast/styles.css",
       "import": "./src/PromoToast/styles.css",
       "types": "./src/PromoToast/styles.css"
     },
@@ -579,6 +617,7 @@
       "types": "./src/SelectionListState/index.ts"
     },
     "./ShimmeringLoader/index.css": {
+      "style": "./src/ShimmeringLoader/index.css",
       "import": "./src/ShimmeringLoader/index.css",
       "types": "./src/ShimmeringLoader/index.css"
     },
@@ -702,10 +741,6 @@
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
     },
-    "./collapsible-alert": {
-      "import": "./src/collapsible-alert.tsx",
-      "types": "./src/collapsible-alert.tsx"
-    },
     "./consent": {
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"
@@ -766,17 +801,17 @@
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "dayjs": "^1.11.13",
-    "framer-motion": "^11.18.2",
     "github-slugger": "^2.0.0",
     "highlightjs-curl": "^1.3.0",
     "icons": "workspace:*",
     "js-yaml": "^3.14.1",
     "lodash": "catalog:",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "mdast": "^3.0.0",
     "mdast-jsx": "^0.1.1",
     "mermaid": "^11.12.1",
     "monaco-editor": "*",
+    "motion": "catalog:",
     "next-themes": "catalog:",
     "openai": "^4.75.1",
     "prism-react-renderer": "^2.3.1",
@@ -795,6 +830,7 @@
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
     "scroll-into-view-if-needed": "^3.1.0",
+    "shiki": "catalog:",
     "smol-toml": "^1.6.1",
     "sonner": "^1.5.0",
     "sql-formatter": "^15.0.0",

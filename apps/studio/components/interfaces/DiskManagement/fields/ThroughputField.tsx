@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect } from 'react'
 import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
