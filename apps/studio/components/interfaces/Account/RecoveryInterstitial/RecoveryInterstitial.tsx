@@ -1,6 +1,6 @@
 import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, CardFooter } from 'ui'
 import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
 
@@ -23,12 +23,12 @@ const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
   const flagsReady = hasLoaded === true && !isConfigCatStale
   const isEnabled = useFlag('enableAuthRecoveryCodes')
   const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-  const { findings, isPending, isError } = useAccountRecovery({
+  const { findings, isPending, isFetching, isError } = useAccountRecovery({
     enabled: flagsReady && isEnabled && hasSecuritySettings,
   })
-  const isLoading = !flagsReady || isPending
+  const isLoading = !flagsReady || isPending || isFetching
   const isUnavailable = flagsReady && (!isEnabled || !hasSecuritySettings)
-  const gap = isError || isLoading || isUnavailable ? null : getRecoveryGap(findings)
+  const gap = isError || !flagsReady || isPending || isUnavailable ? null : getRecoveryGap(findings)
   let announcement = 'Account recovery check complete'
   if (gap) announcement = 'Account recovery action needed'
   if (isUnavailable) announcement = 'Account recovery check unavailable'
@@ -77,17 +77,19 @@ export const RecoveryReminder = ({
   const isFactorComplete = false
   // Preserve all task dialogs and completed rows during background status updates.
   const activeGap = startedGap ?? gap
-  const emptyTitle =
-    isError || isUnavailable ? 'Account recovery check unavailable' : 'You’re all set'
-  const emptyDescription = isUnavailable
-    ? 'Account recovery checks are not enabled for this account.'
-    : 'No account recovery reminder is available.'
+  useEffect(() => {
+    if (!activeGap && !isLoading && !isError && !isUnavailable) onDismiss()
+  }, [activeGap, isLoading, isError, isUnavailable, onDismiss])
+
+  if (!activeGap && !isLoading && !isError && !isUnavailable) return null
   if (!activeGap) {
     return (
       <InterstitialLayout
         logo={<SupabaseLogo />}
-        title={isLoading ? 'Checking account recovery' : emptyTitle}
-        description={isLoading || isError ? undefined : emptyDescription}
+        title={isLoading ? 'Checking account recovery' : 'Account recovery check unavailable'}
+        description={
+          isUnavailable ? 'Account recovery checks are not enabled for this account.' : undefined
+        }
         widthClassName="max-w-md"
       >
         {isError && (
