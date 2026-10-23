@@ -7,11 +7,11 @@ import { getMcpClientIconAssetUrl } from './mcpIconAssets'
 export function getMcpClientIconSrc({
   icon,
   useDarkVariant,
-  hasDistinctDarkIcon,
+  hasDarkIcon,
 }: {
   icon: string
   useDarkVariant: boolean
-  hasDistinctDarkIcon?: boolean
+  hasDarkIcon?: boolean
 }): string {
-  return getMcpClientIconAssetUrl(icon, useDarkVariant && Boolean(hasDistinctDarkIcon))
+  return getMcpClientIconAssetUrl(icon, useDarkVariant && Boolean(hasDarkIcon))
 }
