@@ -28,11 +28,18 @@ if (sources.size !== source.length) {
   throw new Error('Duplicate source in static-redirects.json')
 }
 
+// Insert `.md` before any query string or fragment: `/a?b=c` becomes `/a.md?b=c`.
+const withMd = (destination) => {
+  const i = destination.search(/[?#]/)
+  const path = (i === -1 ? destination : destination.slice(0, i)).replace(/\/$/, '')
+  return `${path}.md${i === -1 ? '' : destination.slice(i)}`
+}
+
 const variants = source
   .filter((r) => r.source.startsWith('/docs/guides/') && r.destination.startsWith('/'))
   .map((r) => ({
     source: `${r.source}.md`,
-    destination: `${r.destination}.md`,
+    destination: withMd(r.destination),
     permanent: r.permanent,
   }))
 for (const variant of variants) {
