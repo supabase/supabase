@@ -262,7 +262,7 @@ async function git(args: string[], cwd: string) {
   return stdout
 }
 
-export function readFromWorkingTree(repoRoot: string): ReadContent {
+function readFromWorkingTree(repoRoot: string): ReadContent {
   return async (path) => {
     try {
       return await readFile(join(repoRoot, path), 'utf-8')
@@ -292,7 +292,7 @@ const SEARCH_PATHSPEC = [
   ':!apps/docs/features/docs/generated/**',
 ]
 
-export function findInWorkingTree(repoRoot: string): FindFiles {
+function findInWorkingTree(repoRoot: string): FindFiles {
   return async (needle) => {
     try {
       const stdout = await git(
