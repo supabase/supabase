@@ -52,8 +52,13 @@ const Subscription = () => {
   const isDirectlyManaged = selectedOrganization?.managed_by === MANAGED_BY.SUPABASE
   // Fail closed until subscription succeeds: unresolved plans look like Free and
   // `billing_via_partner !== true` is true when the field is still undefined.
+  // Also require billing-read: disabled queries can keep a cached isSuccess.
   const canPurchaseThroughAws =
-    isSuccess && canChangeTier && isDirectlyManaged && subscription.billing_via_partner === false
+    canReadSubscriptions &&
+    isSuccess &&
+    canChangeTier &&
+    isDirectlyManaged &&
+    subscription.billing_via_partner === false
 
   return (
     <>
