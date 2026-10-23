@@ -3,7 +3,7 @@ import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BranchCreateVariables = {
@@ -35,6 +35,7 @@ export async function createBranch({
       with_data: withData,
       desired_instance_size,
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

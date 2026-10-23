@@ -8,6 +8,7 @@ import { getAuthHeaders } from './auth-headers'
 import type { ToolContext } from './types'
 import { getDatabaseFunctions } from '@/data/database-functions/database-functions-query'
 import { getDatabasePolicies } from '@/data/database-policies/database-policies-query'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 
@@ -43,6 +44,7 @@ export const getFallbackTools = ({
                   projectRef,
                   connectionString,
                   sql: getEntityDefinitionsSql({ schemas }),
+                  grant: unguarded.migrating,
                 },
                 abortSignal,
                 headers,
