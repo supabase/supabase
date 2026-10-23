@@ -145,6 +145,7 @@ describe('getGrant', () => {
         variant: undefined,
         organizationSlug: ORG_SLUG,
         projectRef: 'proj',
+        permissionsProjectRef: 'proj',
       },
     })
   })
@@ -160,7 +161,7 @@ describe('getGrant', () => {
     ).toEqual({ status: 'denied' })
   })
 
-  test('evaluates against permissionsProjectRef but records the branch ref', () => {
+  test('evaluates against permissionsProjectRef and records both refs', () => {
     const data = permissionsFor({
       role: 'member',
       projects: [
@@ -174,7 +175,10 @@ describe('getGrant', () => {
       permissionsProjectRef: 'parent-ref',
     })
     expect(result.status).toBe('granted')
-    if (result.status === 'granted') expect(result.grant.projectRef).toBe('branch-ref')
+    if (result.status === 'granted') {
+      expect(result.grant.projectRef).toBe('branch-ref')
+      expect(result.grant.permissionsProjectRef).toBe('parent-ref')
+    }
 
     expect(getGrant(data, BRANCHES, { ...scope, projectRef: 'branch-ref' }).status).toBe('denied')
   })
@@ -219,6 +223,7 @@ describe('useGrant', () => {
       variant: undefined,
       organizationSlug: ORG_SLUG,
       projectRef: 'proj',
+      permissionsProjectRef: 'proj',
     })
   })
 

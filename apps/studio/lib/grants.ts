@@ -29,6 +29,8 @@ export type Grant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never> 
   readonly organizationSlug: string | undefined
   /** The ref the grant authorizes (the branch ref for branch projects). */
   readonly projectRef: string | null | undefined
+  /** The ref permissions were evaluated against (the parent project for branch projects). */
+  readonly permissionsProjectRef: string | null | undefined
   // Function type: invariant in E and V. A plain property would be covariant, so `Grant<E, never>` would satisfy `Grant<E, 'write'>`.
   readonly [grantBrand]: (_: { e: E; v: V }) => { e: E; v: V }
 }
@@ -60,7 +62,7 @@ export type GrantFor<
 function mintGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E>>(
   endpoint: E,
   variant: V | undefined,
-  scope: GrantScope
+  scope: ResolvedGrantScope
 ): Grant<E, V> {
   // The brand is type-only: this is the one place a grant is created
   return {
@@ -68,6 +70,7 @@ function mintGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E>>(
     variant,
     organizationSlug: scope.organizationSlug,
     projectRef: scope.projectRef,
+    permissionsProjectRef: scope.permissionsProjectRef ?? scope.projectRef,
   } as unknown as Grant<E, V>
 }
 
