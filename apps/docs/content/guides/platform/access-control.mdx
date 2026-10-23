@@ -1,5 +1,5 @@
 ---
-title: 'Access Control'
+title: 'Access control'
 description: 'Roles and permissions at the organization and project levels'
 ---
 
@@ -21,6 +21,21 @@ The **Read-only** and **No-access** roles are available only on the [Team and En
 
 When you create an account, Supabase creates a default organization and makes you its **Owner**. You're also the **Owner** of any organization you create.
 
+## Organization scoped roles vs project scoped roles
+
+<Admonition type="note">
+
+Project-scoped roles are available only on the [Team and Enterprise plans](/pricing).
+
+</Admonition>
+
+You can give each member a role scoped to the entire organization or to specific projects.
+
+- If a member has an organization-level role, they have its permissions in all current and future projects in the organization.
+- If a member has a project-scoped role, they can access only the projects they're assigned to. In the Supabase Dashboard, they can't see the organization's other projects.
+
+To give a member no project access by default and grant access project by project, assign them the organization-level **No-access** role. Then grant project-scoped roles on the projects they need.
+
 ## Manage organization members
 
 To invite someone, go to your organization's [team settings](/dashboard/org/_/team) and send an invite link to their email address. The invite is valid for 24 hours.
@@ -35,9 +50,9 @@ This security measure prevents accidental invites to accounts that your enterpri
 
 </Admonition>
 
-### Viewing organization members using the Management API
+### List organization members with the Management API
 
-You can also list organization members with the Management API:
+You can list organization members with the Management API:
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
@@ -49,26 +64,15 @@ curl "https://api.supabase.com/v1/organizations/$ORG_ID/members" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
-### Transferring ownership of an organization
+### Transfer ownership of an organization
 
 Each Supabase organization must have at least one owner. If your organization has other owners, you can give up ownership and leave the organization. In your organization's [team settings](/dashboard/org/_/team), click **Leave team**.
 
 If you're the only owner, make another member an **Owner** before you leave. Either promote an existing member to **Owner**, or invite someone as **Owner** and wait for them to accept.
 
-### Organization scoped roles vs project scoped roles
+## Permissions across roles
 
-<Admonition type="note">
-
-Project-scoped roles are available only on the [Team and Enterprise plans](/pricing).
-
-</Admonition>
-
-You can give each member a role scoped to the entire organization or to specific projects.
-
-- If a member has an organization-level role, they have its permissions in all current and future projects in the organization.
-- If a member has a project-scoped role, they can access only the projects they're assigned to. In the Supabase Dashboard, they can't see the organization's other projects.
-
-To give a member no project access by default and grant access project by project, assign them the organization-level **No-access** role. Then grant project-scoped roles on the projects they need. The permission tables leave out **No-access**, because it has none of the listed permissions by default.
+A role grants different actions on organization resources than on project resources, so each has its own table. The tables leave out **No-access** because it has none of the listed permissions by default.
 
 ### Organization permissions across roles
 
