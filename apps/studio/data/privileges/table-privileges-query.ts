@@ -3,6 +3,7 @@ import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { privilegeKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -27,7 +28,10 @@ async function getTablePrivileges(
   }).sql
   const queryKey = ['table-privileges', includedSchemas?.join(',')]
 
-  const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey, grant: unguarded.migrating },
+    signal
+  )
 
   return result as TablePrivilegesData
 }

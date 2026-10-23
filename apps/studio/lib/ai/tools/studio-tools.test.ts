@@ -128,6 +128,7 @@ describe('ai/tools/studio-tools', () => {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
           sql: 'SELECT email FROM users limit 101;',
+          grant: unguarded.migrating,
         },
         undefined,
         undefined
@@ -189,6 +190,7 @@ describe('ai/tools/studio-tools', () => {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
           sql: 'SELECT email FROM users limit 101;',
+          grant: unguarded.migrating,
         },
         undefined,
         undefined

@@ -2,6 +2,7 @@ import { replicationLagSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { replicaKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -18,7 +19,13 @@ export async function getReplicationLag(
   const sql = replicationLagSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['replica-lag', id] },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['replica-lag', id],
+      grant: unguarded.migrating,
+    },
     signal
   )
 
