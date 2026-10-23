@@ -97,12 +97,12 @@ export default function AwsMarketplacePage() {
                 <a href={ENTERPRISE_CONTACT_URL}>Request a private offer</a>
               </Button>
             </div>
-            <Link
+            <a
               href={AWS_MARKETPLACE_DOCS_URL}
               className="mt-5 text-sm text-foreground-lighter underline underline-offset-4 hover:text-foreground transition-colors"
             >
               Read the setup guide
-            </Link>
+            </a>
           </SectionContainer>
         </section>
 
@@ -229,7 +229,7 @@ export default function AwsMarketplacePage() {
                   ))}
                 </ul>
                 <Button asChild size="small" className="mt-8" iconRight={<ArrowRight />}>
-                  <Link href={AWS_MARKETPLACE_DOCS_URL}>Read the setup guide</Link>
+                  <a href={AWS_MARKETPLACE_DOCS_URL}>Read the setup guide</a>
                 </Button>
               </div>
             </div>
