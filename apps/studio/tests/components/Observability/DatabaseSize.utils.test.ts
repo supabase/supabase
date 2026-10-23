@@ -2,9 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getSizeRows,
-  getTreemapGroups,
   getTreemapLabelLines,
-  partitionTreemap,
+  getTreemapTiles,
   relationSize,
   sizePercentage,
 } from '@/components/interfaces/Observability/DatabaseSize/DatabaseSize.utils'
@@ -78,15 +77,21 @@ describe('database size accounting', () => {
         relationSize(relations[0], metric)
       )
     ).toEqual([700, 400, 200, 100])
-    expect(getTreemapGroups(relations, 'toast').map((group) => group.name)).toEqual(['public'])
+    expect(getTreemapTiles(relations, 'toast').map((tile) => tile.schema)).toEqual(['public'])
     expect(sizePercentage(100, 1000)).toBe('10.0%')
     expect(sizePercentage(0, 0)).toBe('0.0%')
   })
 
-  it('groups small objects without losing bytes or confusing a real Other table', () => {
-    const group = getTreemapGroups(
+  it('groups small objects without losing bytes or confusing a real Other objects table', () => {
+    const tiles = getTreemapTiles(
       [
-        { ...relations[0], name: 'Other', table_bytes: 1000, index_bytes: 0, toast_bytes: 0 },
+        {
+          ...relations[0],
+          name: 'Other objects',
+          table_bytes: 1000,
+          index_bytes: 0,
+          toast_bytes: 0,
+        },
         ...Array.from({ length: 20 }, (_, index) => ({
           ...relations[0],
           id: `${index + 2}`,
@@ -97,29 +102,59 @@ describe('database size accounting', () => {
         })),
       ],
       'total'
-    )[0]
-    expect(group.size).toBe(1020)
-    expect(group.children).toEqual([
-      { name: 'Other', size: 1000, isOther: false },
-      { name: 'Other', size: 20, isOther: true },
+    )
+    expect(tiles.map((tile) => ({ name: tile.name, size: tile.size, kind: tile.kind }))).toEqual([
+      { name: 'Other objects', size: 1000, kind: 'object' },
+      { name: 'Other objects', size: 20, kind: 'objects' },
     ])
-    expect(getTreemapGroups([], 'total')).toEqual([])
+    expect(tiles[1].members).toHaveLength(20)
+    expect(tiles.reduce((sum, tile) => sum + tile.size, 0)).toBe(1020)
+    expect(getTreemapTiles([], 'total')).toEqual([])
     expect(getSizeRows([], 'schemas')).toEqual([])
   })
 
-  it('lays out proportional non-overlapping rectangles covering the entire treemap', () => {
-    const rectangles = partitionTreemap([{ size: 60 }, { size: 25 }, { size: 10 }, { size: 5 }])
-    expect(rectangles.reduce((sum, item) => sum + item.width * item.height, 0)).toBeCloseTo(10000)
-    for (const rectangle of rectangles) {
-      expect((rectangle.width * rectangle.height) / 100).toBeCloseTo(rectangle.size)
-      expect(rectangle.x + rectangle.width).toBeLessThanOrEqual(100)
-      expect(rectangle.y + rectangle.height).toBeLessThanOrEqual(100)
+  it('preserves every metric byte when grouping tiny schemas in a skewed database', () => {
+    const skewed = [
+      {
+        ...relations[0],
+        id: 'public',
+        schema: 'public',
+        table_bytes: 7400,
+        index_bytes: 100,
+        toast_bytes: 30,
+      },
+      {
+        ...relations[0],
+        id: 'cron',
+        schema: 'cron',
+        table_bytes: 2250,
+        index_bytes: 10,
+        toast_bytes: 10,
+      },
+      ...Array.from({ length: 9 }, (_, index) => ({
+        ...relations[0],
+        id: `tiny-${index}`,
+        schema: `tiny_${index}`,
+        table_bytes: 20 - index,
+        index_bytes: 1,
+        toast_bytes: 1,
+      })),
+    ]
+    for (const metric of ['total', 'table', 'index', 'toast'] as const) {
+      const tiles = getTreemapTiles(skewed, metric)
+      expect(tiles.reduce((sum, tile) => sum + tile.size, 0)).toBe(
+        skewed.reduce((sum, relation) => sum + relationSize(relation, metric), 0)
+      )
+      expect(tiles.flatMap((tile) => tile.members.map((member) => member.id)).sort()).toEqual(
+        skewed.map((relation) => relation.id).sort()
+      )
     }
-    expect(partitionTreemap([])).toEqual([])
-    expect(partitionTreemap([{ size: 0 }, { size: 0 }])).toEqual([])
+    const otherSchemas = getTreemapTiles(skewed, 'total').find((tile) => tile.kind === 'schemas')
+    expect(otherSchemas?.name).toBe('Other schemas')
+    expect(otherSchemas?.members).toHaveLength(9)
   })
   it('hides treemap labels unless complete lines fit in a tile', () => {
-    expect(getTreemapLabelLines(71, 100)).toBe(0)
+    expect(getTreemapLabelLines(31, 100)).toBe(0)
     expect(getTreemapLabelLines(100, 39)).toBe(0)
     expect(getTreemapLabelLines(100, 40)).toBe(1)
     expect(getTreemapLabelLines(100, 56)).toBe(2)

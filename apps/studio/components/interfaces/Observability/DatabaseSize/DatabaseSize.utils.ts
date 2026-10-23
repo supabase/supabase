@@ -81,78 +81,88 @@ export function getSizeRows(relations: DatabaseSizeRelation[], view: SizeView): 
   return [...tables, ...indexes, ...toast]
 }
 
-export function getTreemapGroups(relations: DatabaseSizeRelation[], metric: SizeMetric) {
-  const groups = new Map<
-    string,
-    { name: string; size: number; children: { name: string; size: number; isOther: boolean }[] }
-  >()
-  for (const relation of relations) {
-    const size = relationSize(relation, metric)
-    if (size === 0) continue
-    const group = groups.get(relation.schema) ?? { name: relation.schema, size: 0, children: [] }
-    group.size += size
-    group.children.push({ name: relation.name, size, isOther: false })
-    groups.set(relation.schema, group)
-  }
-  return [...groups.values()]
-    .sort((a, b) => b.size - a.size)
-    .map((group) => {
-      const sorted = group.children.sort((a, b) => b.size - a.size)
-      const visible = sorted.filter((item, index) => index < 8 && item.size / group.size >= 0.03)
-      const other = group.size - visible.reduce((total, item) => total + item.size, 0)
-      return {
-        ...group,
-        children: [
-          ...visible,
-          ...(other > 0 ? [{ name: 'Other', size: other, isOther: true }] : []),
-        ],
-      }
-    })
+export type SizeTreemapTile = {
+  id: string
+  name: string
+  schema: string
+  kind: 'object' | 'objects' | 'schemas'
+  size: number
+  colorIndex: number
+  members: DatabaseSizeRelation[]
 }
 
-export function partitionTreemap<T extends { size: number }>(
-  items: T[],
-  x = 0,
-  y = 0,
-  width = 100,
-  height = 100
-): (T & { x: number; y: number; width: number; height: number })[] {
-  if (items.length === 0) return []
-  if (items.length === 1) return [{ ...items[0], x, y, width, height }]
-  const total = items.reduce((sum, item) => sum + item.size, 0)
-  if (total <= 0) return []
-  let split = 1
-  let firstSize = items[0].size
-  while (split < items.length - 1 && firstSize < total / 2) {
-    firstSize += items[split].size
-    split++
+export function getTreemapTiles(
+  relations: DatabaseSizeRelation[],
+  metric: SizeMetric
+): SizeTreemapTile[] {
+  const total = relations.reduce((sum, relation) => sum + relationSize(relation, metric), 0)
+  const schemas = new Map<string, DatabaseSizeRelation[]>()
+  for (const relation of relations) {
+    if (relationSize(relation, metric) === 0) continue
+    const members = schemas.get(relation.schema) ?? []
+    members.push(relation)
+    schemas.set(relation.schema, members)
   }
-  const fraction = firstSize / total
-  if (width >= height)
-    return [
-      ...partitionTreemap(items.slice(0, split), x, y, width * fraction, height),
-      ...partitionTreemap(
-        items.slice(split),
-        x + width * fraction,
-        y,
-        width * (1 - fraction),
-        height
-      ),
-    ]
-  return [
-    ...partitionTreemap(items.slice(0, split), x, y, width, height * fraction),
-    ...partitionTreemap(
-      items.slice(split),
-      x,
-      y + height * fraction,
-      width,
-      height * (1 - fraction)
-    ),
-  ]
+  const groups = [...schemas]
+    .map(([schema, members]) => ({
+      schema,
+      members,
+      size: members.reduce((sum, relation) => sum + relationSize(relation, metric), 0),
+    }))
+    .sort((a, b) => b.size - a.size)
+  const tiles: SizeTreemapTile[] = []
+  const otherSchemas: DatabaseSizeRelation[] = []
+  for (const [colorIndex, group] of groups.entries()) {
+    if (colorIndex >= 7 || group.size / total < 0.03) {
+      otherSchemas.push(...group.members)
+      continue
+    }
+    const otherObjects: DatabaseSizeRelation[] = []
+    const sorted = [...group.members].sort(
+      (a, b) => relationSize(b, metric) - relationSize(a, metric)
+    )
+    for (const [index, relation] of sorted.entries()) {
+      const size = relationSize(relation, metric)
+      if (index >= 8 || size / total < 0.02) {
+        otherObjects.push(relation)
+        continue
+      }
+      tiles.push({
+        id: `object-${relation.id}`,
+        name: relation.name,
+        schema: relation.schema,
+        kind: 'object',
+        size,
+        colorIndex,
+        members: [relation],
+      })
+    }
+    if (otherObjects.length > 0)
+      tiles.push({
+        id: `objects-${group.schema}`,
+        name: 'Other objects',
+        schema: group.schema,
+        kind: 'objects',
+        size: otherObjects.reduce((sum, relation) => sum + relationSize(relation, metric), 0),
+        colorIndex,
+        members: otherObjects,
+      })
+  }
+  if (otherSchemas.length > 0)
+    tiles.push({
+      id: 'other-schemas',
+      name: 'Other schemas',
+      schema: '',
+      kind: 'schemas',
+      size: otherSchemas.reduce((sum, relation) => sum + relationSize(relation, metric), 0),
+      colorIndex: 7,
+      members: otherSchemas,
+    })
+  return tiles.sort((a, b) => b.size - a.size)
 }
 
 export function getTreemapLabelLines(width: number, height: number) {
-  if (width < 72 || height < 40) return 0
+  if (width < 32 || height < 40) return 0
   if (height < 56) return 1
   if (height < 72) return 2
   return 3
