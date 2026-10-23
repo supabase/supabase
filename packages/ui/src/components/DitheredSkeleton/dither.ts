@@ -10,3 +10,34 @@ export function hash(x: number, y: number) {
   h = Math.imul(h ^ (h >>> 13), 1274126177)
   return ((h ^ (h >>> 16)) >>> 0) / 4294967295
 }
+
+export const SWEEP_PERIOD_PX = 1100
+export const SWEEP_VELOCITY_PX_PER_MS = 0.42
+// The sweep travels along `x + 0.5y`. A 1:2 slope keeps the band tile an exact 1100x2200px.
+export const SWEEP_SLOPE = 0.5
+export const SWEEP_NORM = Math.hypot(1, SWEEP_SLOPE)
+export const SWEEP_ANGLE_DEG = 90 + (Math.atan(SWEEP_SLOPE) * 180) / Math.PI
+
+// Reading every skeleton's position in one frame avoids a forced layout per instance on mount.
+const pendingOrigins = new Map<HTMLElement, (left: number, top: number) => void>()
+let originFrame: number | null = null
+
+export function scheduleOrigin(element: HTMLElement, apply: (left: number, top: number) => void) {
+  pendingOrigins.set(element, apply)
+  originFrame ??= requestAnimationFrame(() => {
+    originFrame = null
+    const entries = [...pendingOrigins]
+    pendingOrigins.clear()
+    const rects = entries.map(([target]) => target.getBoundingClientRect())
+    entries.forEach(([, applyOrigin], index) =>
+      applyOrigin(rects[index].left + window.scrollX, rects[index].top + window.scrollY)
+    )
+  })
+  return () => {
+    pendingOrigins.delete(element)
+  }
+}
+
+export function mod(value: number, divisor: number) {
+  return ((value % divisor) + divisor) % divisor
+}

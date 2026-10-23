@@ -963,14 +963,29 @@ export const examples: Registry = [
     files: ['example/dithered-skeleton-lite-list.tsx'],
   },
   {
-    name: 'dithered-skeleton-lite-comparison',
+    name: 'dithered-skeleton-gif-demo',
     type: 'components:example',
-    files: ['example/dithered-skeleton-lite-comparison.tsx'],
+    files: ['example/dithered-skeleton-gif-demo.tsx'],
   },
   {
-    name: 'dithered-skeleton-lite-stress',
+    name: 'dithered-skeleton-gif-list',
     type: 'components:example',
-    files: ['example/dithered-skeleton-lite-stress.tsx'],
+    files: ['example/dithered-skeleton-gif-list.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-gif-no-shine',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-gif-no-shine.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-comparison',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-comparison.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-stress',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-stress.tsx'],
   },
   {
     name: 'slider-demo',

@@ -3,15 +3,19 @@
 import { useLayoutEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
 
 import { cn } from '../../lib/utils/cn'
-import { BAYER_8, hash } from './dither'
+import {
+  BAYER_8,
+  hash,
+  mod,
+  scheduleOrigin,
+  SWEEP_ANGLE_DEG,
+  SWEEP_NORM,
+  SWEEP_PERIOD_PX,
+  SWEEP_SLOPE,
+  SWEEP_VELOCITY_PX_PER_MS,
+} from './dither'
 
 const TILE_CELLS = 128
-const SWEEP_PERIOD_PX = 1100
-const SWEEP_VELOCITY_PX_PER_MS = 0.42
-// The sweep travels along `x + 0.5y`. A 1:2 slope keeps the band tile an exact 1100x2200px.
-const SWEEP_SLOPE = 0.5
-const SWEEP_NORM = Math.hypot(1, SWEEP_SLOPE)
-const SWEEP_ANGLE_DEG = 90 + (Math.atan(SWEEP_SLOPE) * 180) / Math.PI
 // Each level lights the cells that pass the dither threshold while the shine is at least this bright.
 const BAND_LEVELS = [0.2, 0.5, 0.85]
 const BAND_OPACITY = [0.4, 0.5, 0.6]
@@ -121,30 +125,6 @@ function bandGradient(level: number) {
 }
 
 const BAND_GRADIENTS = BAND_LEVELS.map((_, level) => bandGradient(level))
-
-// Reading every skeleton's position in one frame avoids a forced layout per instance on mount.
-const pendingOrigins = new Map<HTMLElement, (left: number, top: number) => void>()
-let originFrame: number | null = null
-
-function scheduleOrigin(element: HTMLElement, apply: (left: number, top: number) => void) {
-  pendingOrigins.set(element, apply)
-  originFrame ??= requestAnimationFrame(() => {
-    originFrame = null
-    const entries = [...pendingOrigins]
-    pendingOrigins.clear()
-    const rects = entries.map(([target]) => target.getBoundingClientRect())
-    entries.forEach(([, applyOrigin], index) =>
-      applyOrigin(rects[index].left + window.scrollX, rects[index].top + window.scrollY)
-    )
-  })
-  return () => {
-    pendingOrigins.delete(element)
-  }
-}
-
-function mod(value: number, divisor: number) {
-  return ((value % divisor) + divisor) % divisor
-}
 
 function maskStyle(variable: string): CSSProperties {
   const image = `var(${variable}, ${HIDDEN_MASK})`
