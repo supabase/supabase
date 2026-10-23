@@ -25,8 +25,18 @@ const CommandMenuEmpty = ({
   const [render, setRender] = useState(false)
   useEffect(() => {
     if (!query) return setRender(false)
-    setRender(!listRef?.current?.querySelector('[cmdk-item]'))
-  }, [query])
+
+    const node = listRef?.current
+    const checkEmpty = () => setRender(!node?.querySelector('[cmdk-item]'))
+    checkEmpty()
+    if (!node) return
+
+    // Some sections (e.g. database search results) are populated asynchronously
+    // after the query changes, so re-check whenever the list contents change.
+    const observer = new MutationObserver(checkEmpty)
+    observer.observe(node, { childList: true, subtree: true })
+    return () => observer.disconnect()
+  }, [query, listRef])
 
   return (
     render && (
