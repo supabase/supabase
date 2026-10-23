@@ -1,6 +1,8 @@
 import { sqlKeys } from '@/data/sql/keys'
 
 export const databaseKeys = {
+  sizeBreakdown: (projectRef: string | undefined, databaseIdentifier?: string) =>
+    ['projects', projectRef, 'database-size-breakdown', databaseIdentifier] as const,
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
   keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
   migrations: (projectRef: string | undefined) => ['projects', projectRef, 'migrations'] as const,
