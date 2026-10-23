@@ -9,6 +9,7 @@ Call [Fireworks AI](https://fireworks.ai) models from Supabase Edge Functions, a
 
 - [Generate text](#generate-text) calls a Fireworks chat model from an Edge Function.
 - [Search with embeddings](#search-with-embeddings) stores Fireworks embeddings in a table and finds the closest matches to a search query.
+- [Expose documents to MCP clients](#expose-documents-to-mcp-clients) serves the same table as a remote MCP server.
 
 ## Prerequisites
 
@@ -251,6 +252,115 @@ Create an Edge Function that embeds a search query with the same model and dimen
    ```
 
 The response lists the five closest documents, each with a `similarity` score between -1 and 1. Higher scores mean closer matches.
+
+## Expose documents to MCP clients
+
+Serve the `documents` table as a remote [Model Context Protocol](https://modelcontextprotocol.io/specification/2026-07-28) (MCP) server, so clients such as Claude, Cursor, or VS Code can search it. The server embeds each query with the same Fireworks model as [Search with embeddings](#search-with-embeddings), and every tool call runs as the signed-in user, so the `select` policy on `documents` decides what a client reads.
+
+The function composes the authenticated pipeline from [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp). `withOAuthProtectedResource()` answers MCP client discovery, and `withSupabase({ auth: 'user' })` verifies the user's token and scopes the Supabase client to them. Configure the OAuth 2.1 server, dynamic client registration, and a consent screen before you start. For those steps, see [Add authentication](/docs/guides/ai-tools/byo-mcp#add-authentication).
+
+1. Create the function:
+
+   ```bash
+   supabase functions new mcp
+   ```
+
+2. In `supabase/config.toml`, turn off the platform JWT check for the function. The function verifies tokens itself, and the gateway would otherwise reject the unauthenticated discovery request:
+
+   ```toml supabase/config.toml
+   [functions.mcp]
+   verify_jwt = false
+   ```
+
+3. Replace the contents of `supabase/functions/mcp/index.ts` with the following code. It reads the `FIREWORKS_API_KEY` secret from [Store your API key](#store-your-api-key) and registers one tool to search the table and one to read a single row:
+
+   ```ts supabase/functions/mcp/index.ts
+   import OpenAI from 'npm:openai@^6'
+   import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0'
+   import { pipeline } from 'npm:@supabase/middleware@1'
+   import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1'
+   import { z } from 'npm:zod@^4.3.6'
+
+   const fireworks = new OpenAI({
+     apiKey: Deno.env.get('FIREWORKS_API_KEY'),
+     baseURL: 'https://api.fireworks.ai/inference/v1',
+   })
+
+   Deno.serve(
+     pipeline(
+       [withOAuthProtectedResource(), withSupabase({ auth: 'user' })],
+       async (req, { supabase }) => {
+         // A fresh server per request: Edge Functions are stateless
+         const handler = createMcpHandler(() => {
+           const server = new McpServer({ name: 'documents', version: '0.1.0' })
+
+           server.registerTool(
+             'search_document',
+             {
+               description: 'Search documents by meaning and return the closest matches',
+               inputSchema: z.object({
+                 query: z.string().min(1),
+                 limit: z.number().int().min(1).max(20).default(5),
+               }),
+               annotations: { readOnlyHint: true },
+             },
+             async ({ query, limit }) => {
+               const response = await fireworks.embeddings.create({
+                 model: 'fireworks/qwen3-embedding-8b',
+                 input: query,
+                 dimensions: 1024,
+               })
+
+               const { data, error } = await supabase.rpc('match_documents', {
+                 query_embedding: JSON.stringify(response.data[0].embedding),
+                 match_count: limit,
+               })
+               if (error) throw new Error(error.message)
+               return { content: [{ type: 'text', text: JSON.stringify(data) }] }
+             }
+           )
+
+           server.registerTool(
+             'fetch_document',
+             {
+               description: 'Fetch the full content of one document by ID',
+               inputSchema: z.object({ id: z.number().int() }),
+               annotations: { readOnlyHint: true },
+             },
+             async ({ id }) => {
+               const { data, error } = await supabase
+                 .from('documents')
+                 .select('id, content')
+                 .eq('id', id)
+                 .single()
+               if (error) throw new Error(error.message)
+               return { content: [{ type: 'text', text: JSON.stringify(data) }] }
+             }
+           )
+
+           return server
+         })
+
+         return handler.fetch(req)
+       }
+     )
+   )
+   ```
+
+4. Deploy the function:
+
+   ```bash
+   supabase functions deploy mcp
+   ```
+
+5. Add the server to an MCP client. For Claude Code:
+
+   ```bash
+   claude mcp add --transport http documents \
+     https://<your-project-ref>.supabase.co/functions/v1/mcp
+   ```
+
+Every client takes the same URL and runs the OAuth flow on first connection. For the other clients and where to enter the URL, see [Connect from MCP clients](/docs/guides/ai-tools/byo-mcp#connect-from-mcp-clients).
 
 ## Resources
 
