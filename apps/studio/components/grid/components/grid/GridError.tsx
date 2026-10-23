@@ -163,7 +163,7 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
         again.
       </p>
       <p className="text-sm text-foreground-lighter prose max-w-full mb-4!">
-        Error: <code className="text-code-inline">{error.message}</code>
+        Error: <code>{error.message}</code>
       </p>
 
       <Button onClick={() => onApplySorts([])}>Remove sorts</Button>
@@ -228,7 +228,7 @@ const ExpandError = ({ error }: { error: ResponseError }) => {
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-1">
-        <code className="text-code-inline">{error.message}</code>
+        <code>{error.message}</code>
       </CollapsibleContent>
     </Collapsible>
   )

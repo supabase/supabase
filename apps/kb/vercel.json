@@ -18,6 +18,11 @@
       "source": "/kb/troubleshooting/:path+.md",
       "destination": "/kb/markdown/troubleshooting/:path+.md",
       "permanent": true
+    },
+    {
+      "source": "/kb/faqs/:path+.md",
+      "destination": "/kb/markdown/faqs/:path+.md",
+      "permanent": true
     }
   ],
   "rewrites": [
@@ -36,6 +41,11 @@
       "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
       "destination": "/markdown/troubleshooting/:path+.md"
     },
+    {
+      "source": "/kb/faqs/:path+",
+      "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
+      "destination": "/markdown/faqs/:path+.md"
+    },
     { "source": "/kb", "destination": "/index.html" },
     { "source": "/kb/:path*", "destination": "/:path*" }
   ],
@@ -50,6 +60,10 @@
     },
     {
       "source": "/kb/troubleshooting/:path+",
+      "headers": [{ "key": "Vary", "value": "Accept" }]
+    },
+    {
+      "source": "/kb/faqs/:path+",
       "headers": [{ "key": "Vary", "value": "Accept" }]
     }
   ]

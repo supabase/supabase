@@ -89,7 +89,7 @@ export const CreateCustomOidcIntegrationDialog = ({
                     description={
                       <>
                         Signing keys are found at the issuer's{' '}
-                        <code className="text-code-inline">/.well-known/openid-configuration</code>
+                        <code>/.well-known/openid-configuration</code>
                       </>
                     }
                   >

@@ -81,7 +81,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
     accessorKey: 'eventType',
     header: ({ column }) => <TanStackTableHeadSort column={column}>Event</TanStackTableHeadSort>,
-    cell: ({ row }) => <code className="text-code-inline text-xs">{row.original.eventType}</code>,
+    cell: ({ row }) => <code className="text-xs">{row.original.eventType}</code>,
   },
   {
     accessorKey: 'responseCode',
@@ -234,10 +234,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   ? ['All events (*)']
                   : selectedEndpoint.eventTypes
                 ).map((eventType) => (
-                  <code
-                    key={eventType}
-                    className="text-code-inline rounded-md border px-3 py-1.5 text-2xs"
-                  >
+                  <code key={eventType} className="rounded-md border px-3 py-1.5 text-2xs">
                     {eventType}
                   </code>
                 ))}
@@ -249,6 +246,7 @@ export const PlatformWebhooksEndpointDetails = ({
                     {selectedEndpoint.customHeaders.map((header) => (
                       <div
                         key={header.id}
+                        data-code-style="plain"
                         className="px-2 py-2 font-mono font-medium text-xs flex items-center gap-2 flex-wrap"
                       >
                         <code className="text-code_block-4">{header.key}:</code>

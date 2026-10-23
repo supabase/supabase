@@ -26,6 +26,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { getMemoryCommitmentPreviewData } from '@/components/ui/DevToolbar/MetricsTab.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -46,6 +47,7 @@ import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/use
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useMemoryCommitmentPreview } from '@/state/metrics-preview'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
@@ -212,6 +214,13 @@ const DatabaseUsage = () => {
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
   const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
+  const showMemoryCommitmentRiskZones = useFlag('showMemoryCommitmentRiskZones')
+  const memoryCommitmentPreview = useMemoryCommitmentPreview(ref)
+  const memoryCommitmentPreviewData = getMemoryCommitmentPreviewData(
+    memoryCommitmentPreview,
+    selectedDateRange?.period_start?.date,
+    selectedDateRange?.period_end?.date
+  )
 
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
@@ -221,7 +230,8 @@ const DatabaseUsage = () => {
     defaultMaxClientConn,
     isSpendCapEnabled,
     showDiskIOBurstBalanceChart,
-    showMemoryCommitmentChart
+    showMemoryCommitmentChart,
+    showMemoryCommitmentRiskZones
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -339,6 +349,8 @@ const DatabaseUsage = () => {
       >
         {selectedDateRange &&
           REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => {
+            const chartPreviewData =
+              chart.id === 'memory-commitment' ? memoryCommitmentPreviewData : undefined
             const chartAvailable =
               !chart.entitlement ||
               isEntitlementLoading ||
@@ -347,6 +359,8 @@ const DatabaseUsage = () => {
               <LazyComposedChartHandler
                 key={chart.id}
                 {...chart}
+                data={chartPreviewData}
+                highlightedValue={chartPreviewData?.at(-1)?.ram_commit_used}
                 attributes={chart.attributes as MultiAttribute[]}
                 interval={selectedDateRange.interval}
                 startDate={selectedDateRange?.period_start?.date}
