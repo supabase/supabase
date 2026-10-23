@@ -6,19 +6,13 @@ import {
 } from '@/components/interfaces/Account/RecoveryInterstitial/RecoveryInterstitial.utils'
 
 describe('account recovery reminder selection', () => {
-  it('selects missing and exhausted recovery codes', () => {
-    expect(
-      getRecoveryGap([
-        { id: 'recovery-codes-missing', severity: 'warning', action: 'generate-codes' },
-      ])
-    ).toBe('missing')
-    expect(
-      getRecoveryGap([
-        { id: 'recovery-codes-exhausted', severity: 'critical', action: 'regenerate-codes' },
-      ])
-    ).toBe('exhausted')
+  it.each([
+    ['recovery-codes-missing', 'warning', 'generate-codes', 'missing'],
+    ['recovery-codes-exhausted', 'critical', 'regenerate-codes', 'exhausted'],
+  ] as const)('selects %s', (id, severity, action, expected) => {
+    expect(getRecoveryGap([{ id, severity, action }])).toBe(expected)
   })
-  it('prioritizes exhausted codes if both findings are present', () => {
+  it('prioritizes exhausted codes', () => {
     expect(
       getRecoveryGap([
         { id: 'recovery-codes-missing', severity: 'warning', action: 'generate-codes' },
