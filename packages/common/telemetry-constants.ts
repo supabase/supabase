@@ -4188,7 +4188,7 @@ export interface WarehouseDisabledEvent {
  * @source Automatic reminder controller
  * @page /organizations, /org/*, /project/*, /new, /new/*
  */
-export interface AccountRecoveryReminderEvent {
+export interface AccountRecoveryReminderExposed {
   action: 'account_recovery_reminder_exposed'
   properties: { gap: 'missing' | 'exhausted' }
   groups: TelemetryGroups
@@ -4199,7 +4199,7 @@ export interface AccountRecoveryReminderEvent {
  * @source User starts a recovery task
  * @page /organizations, /org/*, /project/*, /new
  */
-export interface AccountRecoveryActionEvent {
+export interface AccountRecoveryActionClicked {
   action: 'account_recovery_action_clicked'
   properties: { actionType: 'generate_codes' | 'regenerate_codes' | 'add_factor' }
   groups: TelemetryGroups
@@ -4210,7 +4210,7 @@ export interface AccountRecoveryActionEvent {
  * @source User saves recovery codes or verifies another authenticator
  * @page /organizations, /org/*, /project/*, /new
  */
-export interface AccountRecoveryTaskEvent {
+export interface AccountRecoveryTaskCompleted {
   action: 'account_recovery_task_completed'
   properties: { taskType: 'recovery_codes' | 'authenticator' }
   groups: TelemetryGroups
@@ -4221,7 +4221,7 @@ export interface AccountRecoveryTaskEvent {
  * @source User skips or continues from the recovery interstitial
  * @page /organizations, /org/*, /project/*, /new
  */
-export interface AccountRecoveryClosedEvent {
+export interface AccountRecoveryReminderClosed {
   action: 'account_recovery_reminder_closed'
   properties: { hasCompletedTask: boolean }
   groups: TelemetryGroups
@@ -4231,10 +4231,16 @@ export interface AccountRecoveryClosedEvent {
  * @hidden
  */
 export type TelemetryEvent =
-  | AccountRecoveryReminderEvent
+<<<<<<< HEAD
+  | AccountRecoveryReminderExposed
   | AccountRecoveryActionEvent
   | AccountRecoveryTaskEvent
   | AccountRecoveryClosedEvent
+=======
+  | AccountRecoveryActionClicked
+  | AccountRecoveryTaskCompleted
+  | AccountRecoveryReminderClosed
+>>>>>>> dnywh/recovery-reminder-snooze
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
