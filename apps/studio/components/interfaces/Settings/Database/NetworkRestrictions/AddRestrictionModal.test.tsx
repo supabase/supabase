@@ -84,13 +84,21 @@ const renderModal = (
   return { onClose }
 }
 
+const user = userEvent.setup()
+
+// Pasting rather than typing: keystroke-level input isn't the behaviour under test
+const enterValue = async (input: HTMLElement, value: string) => {
+  await user.clear(input)
+  await user.paste(value)
+}
+
+const enterAddress = async (address: string) =>
+  enterValue(await screen.findByPlaceholderText('0.0.0.0'), address)
+
 const addEntry = async (address: string, cidrBlockSize?: string) => {
-  const ipInput = await screen.findByPlaceholderText('0.0.0.0')
-  await userEvent.type(ipInput, address)
+  await enterAddress(address)
   if (cidrBlockSize !== undefined) {
-    const sizeInput = screen.getByPlaceholderText('32')
-    await userEvent.clear(sizeInput)
-    await userEvent.type(sizeInput, cidrBlockSize)
+    await enterValue(screen.getByPlaceholderText('32'), cidrBlockSize)
   }
   fireEvent.click(screen.getByRole('button', { name: 'Add to list' }))
 }
@@ -148,7 +156,7 @@ describe('AddRestrictionModal', () => {
     const { onClose } = renderModal()
 
     await addEntry('203.0.113.7')
-    await userEvent.type(screen.getByPlaceholderText('0.0.0.0'), '192.0.2.1')
+    await enterAddress('192.0.2.1')
 
     fireEvent.click(await screen.findByRole('button', { name: 'Save restrictions' }))
 
@@ -166,7 +174,7 @@ describe('AddRestrictionModal', () => {
     const requests = mockApply()
     const { onClose } = renderModal()
 
-    await userEvent.type(await screen.findByPlaceholderText('0.0.0.0'), '192.0.2.1')
+    await enterAddress('192.0.2.1')
     fireEvent.click(await screen.findByRole('button', { name: 'Save restriction' }))
 
     await waitFor(() => expect(onClose).toHaveBeenCalled())
@@ -226,7 +234,7 @@ describe('AddRestrictionModal', () => {
     renderModal()
 
     await addEntry('203.0.113.7')
-    await userEvent.click(await screen.findByRole('button', { name: 'Remove 203.0.113.7/32' }))
+    await user.click(await screen.findByRole('button', { name: 'Remove 203.0.113.7/32' }))
 
     expect(screen.queryByDisplayValue('203.0.113.7/32')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save restrictions' })).toBeDisabled()
@@ -237,12 +245,12 @@ describe('AddRestrictionModal', () => {
     const { onClose } = renderModal()
 
     await addEntry('203.0.113.7')
-    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
 
     expect(await screen.findByText('Unsaved changes')).toBeInTheDocument()
     expect(onClose).not.toHaveBeenCalled()
 
-    await userEvent.click(screen.getByRole('button', { name: 'Discard changes' }))
+    await user.click(screen.getByRole('button', { name: 'Discard changes' }))
     expect(onClose).toHaveBeenCalled()
   })
 
@@ -250,7 +258,7 @@ describe('AddRestrictionModal', () => {
     mockExistingRestrictions([])
     const { onClose } = renderModal()
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
+    await user.click(await screen.findByRole('button', { name: 'Cancel' }))
 
     expect(onClose).toHaveBeenCalled()
   })
