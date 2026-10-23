@@ -220,7 +220,9 @@ async function collectLinksTo(route: string, file: string, read: ReadContent): P
 
 function formatReport(broken: BrokenAnchor[]) {
   const lines = [
-    `This change removes ${broken.length} linked section anchor${broken.length === 1 ? '' : 's'}:`,
+    `This change removes ${broken.length} linked section anchor${broken.length === 1 ? '' : 's'}.`,
+    'Agents are slow to update what they remember about the docs, so they keep following',
+    'old links after a section moves. Leave a trail so they still land on the answer.',
     '',
   ]
   for (const { route, anchor, linkedFrom } of broken) {
