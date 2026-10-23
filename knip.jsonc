@@ -42,7 +42,6 @@
         // one-off build/codegen scripts, run by hand or from package.json
         "scripts/**",
         // dynamically imported
-        "components/interfaces/ConnectSheet/content/**",
         "components/interfaces/ConnectSheet/DirectConnectionExamples.tsx",
         // data layer templates, copied when adding a new query/mutation
         "data/__templates/**",
