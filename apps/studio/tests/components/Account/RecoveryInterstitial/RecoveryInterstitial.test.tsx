@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -9,6 +9,16 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 describe('RecoveryReminder', () => {
+  test('dismisses an untouched reminder only after the resolved check finishes', async () => {
+    const onDismiss = vi.fn()
+    const { rerender } = customRender(<RecoveryReminder gap="missing" onDismiss={onDismiss} />)
+    rerender(<RecoveryReminder gap={null} isLoading onDismiss={onDismiss} />)
+    expect(onDismiss).not.toHaveBeenCalled()
+    rerender(<RecoveryReminder gap={null} onDismiss={onDismiss} />)
+    await waitFor(() => expect(onDismiss).toHaveBeenCalledOnce())
+    expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
+  })
+
   test('does not claim success when checks are disabled', () => {
     customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isUnavailable />)
     expect(
