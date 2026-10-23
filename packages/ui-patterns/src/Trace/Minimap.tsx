@@ -19,9 +19,10 @@ const STATUS_FILL: Record<SpanStatus, string> = {
   error: 'fill-destructive',
   unset: 'fill-foreground-muted',
 }
-const HEIGHT = 48
+const HEIGHT = 47
 const MIN_LANE = 2
-const MAX_LANE = 10
+const BAR_PX = 4
+const GAP_PX = 0.5
 const EDGE_PX = 8
 const KEY_STEP = 0.1
 
@@ -43,8 +44,9 @@ export function Minimap({ className, ...props }: ComponentProps<'div'>) {
     () => computeMinimapRects(index, MINIMAP_COLUMNS, Math.floor(HEIGHT / MIN_LANE)),
     [index]
   )
-  const lanePitch = Math.min(MAX_LANE, Math.max(MIN_LANE, HEIGHT / Math.max(1, laneCount)))
-  const laneGap = Math.min(2, lanePitch * 0.25)
+  const lanePitch = Math.min(BAR_PX + GAP_PX, Math.max(MIN_LANE, HEIGHT / Math.max(1, laneCount)))
+  const laneGap = Math.min(GAP_PX, lanePitch * 0.25)
+  const offsetY = Math.max(0, (HEIGHT - laneCount * lanePitch) / 2)
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0 || !(duration > 0)) return
@@ -126,7 +128,7 @@ export function Minimap({ className, ...props }: ComponentProps<'div'>) {
           <rect
             key={`${lane}-${x}`}
             x={x}
-            y={lane * lanePitch + laneGap / 2}
+            y={offsetY + lane * lanePitch + laneGap / 2}
             width={width}
             height={lanePitch - laneGap}
             className={cn('opacity-70', STATUS_FILL[status])}
@@ -158,10 +160,10 @@ export function Minimap({ className, ...props }: ComponentProps<'div'>) {
         onKeyDown={handleKeyDown}
       >
         <div aria-hidden className="absolute inset-y-0 -left-1 w-2 cursor-ew-resize">
-          <span className="absolute inset-y-[25%] left-[3px] w-0.5 rounded bg-foreground" />
+          <span className="absolute inset-y-[25%] left-[3px] w-0.5 bg-foreground" />
         </div>
         <div aria-hidden className="absolute inset-y-0 -right-1 w-2 cursor-ew-resize">
-          <span className="absolute inset-y-[25%] right-[3px] w-0.5 rounded bg-foreground" />
+          <span className="absolute inset-y-[25%] right-[3px] w-0.5 bg-foreground" />
         </div>
       </div>
     </div>
