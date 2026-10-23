@@ -62,23 +62,23 @@ Keep per-request context in `assistant-context.ts`. The shared system prompt is 
 
 ### Tools
 
-| Change                                                       | Start here                                                                                                                                                                               |
-| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tool assembly and platform/self-hosted selection             | [tools/index.ts](./tools/index.ts)                                                                                                                                                       |
-| Allowlist, minimum opt-in levels, and blocked-tool responses | [tool-filter.ts](./tool-filter.ts)                                                                                                                                                       |
-| Studio tool assembly and opt-in requests                     | [studio-tools.ts](./tools/studio-tools.ts)                                                                                                                                               |
-| Remote MCP connection and tool selection                     | [supabase-mcp.ts](./supabase-mcp.ts), [mcp-tools.ts](./tools/mcp-tools.ts)                                                                                                               |
-| Schema and policy tools                                      | [schema-tools.ts](./tools/schema-tools.ts)                                                                                                                                               |
-| Reports, notebooks, incidents, and support                   | [report-tools.ts](./tools/report-tools.ts), [notebook-tools.ts](./tools/notebook-tools.ts), [incident-tools.ts](./tools/incident-tools.ts), [support-tools.ts](./tools/support-tools.ts) |
-| Self-hosted tools                                            | [fallback-tools.ts](./tools/fallback-tools.ts)                                                                                                                                           |
-| Contract-based tools (see [Tool contracts](#tool-contracts)) | [registry.ts](./tools/registry.ts) lists them in `TOOL_CONTRACTS`; [types.ts](./tools/types.ts), [tool-from-contract.ts](./tools/tool-from-contract.ts)                                  |
+| Change                                                       | Start here                                                                                                                                                                                                |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tool assembly and platform/self-hosted selection             | [tools/index.ts](./tools/index.ts)                                                                                                                                                                        |
+| Allowlist, minimum opt-in levels, and blocked-tool responses | [tool-filter.ts](./tool-filter.ts)                                                                                                                                                                        |
+| Studio tool assembly and opt-in requests                     | [studio-tools.ts](./tools/studio-tools.ts)                                                                                                                                                                |
+| Remote MCP connection and tool selection                     | [supabase-mcp.ts](./supabase-mcp.ts), [mcp-tools.ts](./tools/mcp-tools.ts)                                                                                                                                |
+| Schema and policy tools                                      | [schema-tools.ts](./tools/schema-tools.ts)                                                                                                                                                                |
+| Reports, notebooks, incidents, and support                   | [report-tools.ts](./tools/report-tools.ts), [notebook-tools.ts](./tools/notebook-tools.ts), [incident-tools.ts](./tools/incident-tools.ts), [support-tools.ts](./tools/support-tools.ts)                  |
+| Self-hosted tools                                            | [fallback-tools.ts](./tools/fallback-tools.ts)                                                                                                                                                            |
+| Contract-based tools (see [Tool contracts](#tool-contracts)) | [registry.ts](./tools/registry.ts) lists them in `TOOL_CONTRACTS` (and remote MCP tools in `REMOTE_TOOL_CONTRACTS`); [types.ts](./tools/types.ts), [tool-from-contract.ts](./tools/tool-from-contract.ts) |
 
-Tools are moving to [contracts](#tool-contracts); the rest declare their schemas and output handling directly. [registry.ts](./tools/registry.ts) is the source of truth for which are which: a tool in `TOOL_CONTRACTS` is a contract tool.
+Tools are moving to [contracts](#tool-contracts); the rest declare their schemas and output handling directly. [registry.ts](./tools/registry.ts) is the source of truth for which are which: a tool in `TOOL_CONTRACTS` or `REMOTE_TOOL_CONTRACTS` is a contract tool.
 
 For a new or changed tool:
 
 1. Prefer a [contract](#tool-contracts) for a new tool. Otherwise implement it in the appropriate tool module.
-2. Include it in `getTools` through the module's tool getter, and add its name to the allowlist in `tool-filter.ts`. A contract declares minimum access as `minOptInLevel`; other tools use `TOOL_CATEGORY_MAP`.
+2. Include it in `getTools` through the module's tool getter, and add its name to the allowlist in `tool-filter.ts`. A contract, local or remote, declares minimum access as `minOptInLevel`; other tools use `TOOL_CATEGORY_MAP`.
 3. Decide whether execution needs user approval and what output may reach the model, including on history replay. Read the [SQL safety skill](../../../../.agents/skills/safe-sql-execution/SKILL.md) before changing SQL execution.
 4. Update `Message.Parts.tsx` and its helpers if the tool needs a UI renderer.
 5. Update relevant tests, mock tools, and evaluation cases. See [local development and validation](#local-development-and-validation).
@@ -105,6 +105,10 @@ To migrate a tool to a contract:
 6. Replace imports of the old inline schemas in the UI, evals, and `generate-assistant-response.ts` with `contract.inputSchema`, `contract.outputSchema`, or `ToolContractInput`/`ToolContractOutput`.
 7. Test the contract's `toModelOutput` at every opt-in level and on history replay, in [registry.test.ts](./tools/registry.test.ts) and [tool-sanitizer.test.ts](./tools/tool-sanitizer.test.ts) as applicable.
 8. Call out any change to what the model sees or to the stored shape in the PR description.
+
+#### Remote contracts
+
+A tool the remote MCP server implements has a `RemoteToolContract`: only `name`, `minOptInLevel`, and `needsApproval`. The server owns the description, input schema, execution, and output, so there is no `.server.ts` file and its parts stay `dynamic-tool`, outside `StudioUIMessage`. Register it in `REMOTE_TOOL_CONTRACTS` and remove it from `TOOL_CATEGORY_MAP`; [mcp-tools.ts](./tools/mcp-tools.ts) applies `needsApproval`, since MCP tool definitions can't declare it. [list-extensions.ts](./tools/list-extensions.ts) is an example.
 
 ## Access and data sharing
 

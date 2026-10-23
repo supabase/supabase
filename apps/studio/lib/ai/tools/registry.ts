@@ -10,6 +10,7 @@ import { contract as getActiveIncidents } from './get-active-incidents'
 import { contract as getNotebook } from './get-notebook'
 import { contract as getReport } from './get-report'
 import { contract as listDatabases } from './list-databases'
+import { contract as listExtensions } from './list-extensions'
 import { contract as listNotebooks } from './list-notebooks'
 import { contract as listPolicies } from './list-policies'
 import { contract as listReports } from './list-reports'
@@ -17,7 +18,12 @@ import { contract as loadKnowledge } from './load-knowledge'
 import { contract as renameChat } from './rename-chat'
 import { contract as resolveSupportConversation } from './resolve-support-conversation'
 import { contract as runNotebook } from './run-notebook'
-import type { ToolContract, ToolContractInput, ToolContractOutput } from './types'
+import type {
+  RemoteToolContract,
+  ToolContract,
+  ToolContractInput,
+  ToolContractOutput,
+} from './types'
 import { contract as updateNotebook } from './update-notebook'
 import { contract as updateOptInLevel } from './update-opt-in-level'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
@@ -70,6 +76,22 @@ export function getToolContract(toolName: string): ToolContract | undefined {
   return Object.hasOwn(TOOL_CONTRACTS, toolName)
     ? TOOL_CONTRACTS[toolName as ContractToolName]
     : undefined
+}
+
+/**
+ * Remote MCP tools whose access Studio declares. Their parts stay `dynamic-tool`, so they aren't
+ * part of `StudioUIMessage`.
+ */
+export const REMOTE_TOOL_CONTRACTS = {
+  list_extensions: listExtensions,
+} as const satisfies Partial<Record<ToolName, RemoteToolContract>>
+
+export type RemoteContractToolName = keyof typeof REMOTE_TOOL_CONTRACTS
+
+/** The contract for a migrated remote tool, or `undefined` if the tool hasn't been migrated. */
+export function getRemoteToolContract(toolName: string): RemoteToolContract | undefined {
+  const contracts: Partial<Record<string, RemoteToolContract>> = REMOTE_TOOL_CONTRACTS
+  return Object.hasOwn(contracts, toolName) ? contracts[toolName] : undefined
 }
 
 /**

@@ -36,7 +36,7 @@ describe('GET /api/search', () => {
     expect(await response.json()).toEqual([
       {
         title: 'Migrate from Heroku',
-        href: 'https://supabase.com/kb/guides/migrate-from-heroku',
+        href: 'https://supabase.com/kb/guides/Migrate-From-Heroku',
         heading: 'Overview',
         excerpt: 'Move your database',
         score: 1,
@@ -66,7 +66,7 @@ describe('GET /api/search', () => {
 
     const results = await (await search('q=x&content=true')).json()
 
-    expect(fetch).toHaveBeenCalledWith('https://supabase.com/kb/guides/migrate-from-heroku.md')
+    expect(fetch).toHaveBeenCalledWith('https://supabase.com/kb/guides/Migrate-From-Heroku.md')
     expect(results.map((r: { content: string | null }) => r.content)).toEqual(['# Heroku', null])
   })
 })

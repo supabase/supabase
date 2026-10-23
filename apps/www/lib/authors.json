@@ -1111,5 +1111,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/tr00d",
     "author_image_url": "https://github.com/tr00d.png"
+  },
+  {
+    "author_id": "raul_barroso",
+    "author": "Raúl Barroso",
+    "username": "raulb",
+    "position": "Engineering",
+    "author_url": "https://github.com/raulb",
+    "author_image_url": "https://github.com/raulb.png"
   }
 ]
