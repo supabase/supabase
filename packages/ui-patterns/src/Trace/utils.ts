@@ -200,3 +200,23 @@ export function collapsedChildMidpoints(index: TraceIndex, id: string): number[]
     return (child.startMs + effectiveEndMs(child, index.nowMs)) / 2
   })
 }
+
+export type TimingPlacement = 'after' | 'before' | 'inside'
+
+export function getTimingPlacement({
+  startPx,
+  endPx,
+  laneWidth,
+  labelPx,
+  gapPx,
+}: {
+  startPx: number
+  endPx: number
+  laneWidth: number
+  labelPx: number
+  gapPx: number
+}): TimingPlacement {
+  if (endPx + gapPx + labelPx <= laneWidth) return 'after'
+  if (startPx - gapPx - labelPx >= 0) return 'before'
+  return 'inside'
+}

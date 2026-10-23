@@ -9,6 +9,7 @@ import {
   flattenTree,
   formatDuration,
   formatMs,
+  getTimingPlacement,
   MAX_COLLAPSED_MARKS,
   niceTickStep,
 } from './utils'
@@ -192,5 +193,39 @@ describe('collapsedChildMidpoints', () => {
     const over = buildTraceIndex([span('root', 0, 1000), ...children(MAX_COLLAPSED_MARKS + 1)])
     expect(collapsedChildMidpoints(at, 'root')).toHaveLength(MAX_COLLAPSED_MARKS)
     expect(collapsedChildMidpoints(over, 'root')).toEqual([])
+  })
+})
+
+describe('getTimingPlacement', () => {
+  const base = { laneWidth: 400, labelPx: 44, gapPx: 6 }
+
+  it('places the label after the bar when there is room', () => {
+    expect(getTimingPlacement({ ...base, startPx: 50, endPx: 200 })).toBe('after')
+  })
+
+  it('fits exactly at the lane edge', () => {
+    expect(getTimingPlacement({ ...base, startPx: 50, endPx: 350 })).toBe('after')
+    expect(getTimingPlacement({ ...base, startPx: 50, endPx: 351 })).toBe('before')
+  })
+
+  it('flips to the left of the bar when the right side is full', () => {
+    expect(getTimingPlacement({ ...base, startPx: 300, endPx: 395 })).toBe('before')
+  })
+
+  it('flips for a very short bar at the right edge', () => {
+    expect(getTimingPlacement({ ...base, startPx: 392, endPx: 396 })).toBe('before')
+  })
+
+  it('goes inside a bar that spans the full lane', () => {
+    expect(getTimingPlacement({ ...base, startPx: 0, endPx: 400 })).toBe('inside')
+  })
+
+  it('goes inside when neither side has room', () => {
+    expect(getTimingPlacement({ ...base, startPx: 20, endPx: 390 })).toBe('inside')
+  })
+
+  it('fits before at exactly the label width', () => {
+    expect(getTimingPlacement({ ...base, startPx: 50, endPx: 400 })).toBe('before')
+    expect(getTimingPlacement({ ...base, startPx: 49, endPx: 400 })).toBe('inside')
   })
 })
