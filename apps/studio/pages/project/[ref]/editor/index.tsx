@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
@@ -11,15 +11,47 @@ import { TableEditorMenu } from '@/components/layouts/TableEditorLayout/TableEdi
 import { NewTab } from '@/components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { editorEntityTypes, useTabsStateSnapshot } from '@/state/tabs'
+import {
+  isHistoryTraverseNavigation,
+  settleHistoryTraverseNavigation,
+} from '@/lib/history-traverse'
+import { getLastTableRedirect } from '@/lib/table-editor-redirect'
+import { useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, schema: explicitSchema } = useParams()
   const tabStore = useTabsStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
   const { history, isHistoryLoaded } = useDashboardHistory()
+  const decisionRef = useRef<{
+    projectRef: string | null
+    isHistoryTraverse: boolean
+    hasDecided: boolean
+  } | null>(null)
+  const decision = decisionRef.current
+  const hasProjectChanged = Boolean(
+    projectRef && decision?.projectRef && decision.projectRef !== projectRef
+  )
+  const isLateRef = Boolean(projectRef && decision && decision.projectRef === null)
+
+  if (decision === null) {
+    decisionRef.current = {
+      projectRef: projectRef ?? null,
+      isHistoryTraverse: isHistoryTraverseNavigation(),
+      hasDecided: false,
+    }
+  } else if (hasProjectChanged && projectRef) {
+    // recapture only when the project changes, so a late ref does not read a settled flag
+    decisionRef.current = {
+      projectRef,
+      isHistoryTraverse: isHistoryTraverseNavigation(),
+      hasDecided: false,
+    }
+  } else if (isLateRef && projectRef) {
+    decision.projectRef = projectRef
+  }
 
   const onTableCreated = (table: { id: number }) => {
     router.push(
@@ -28,47 +60,46 @@ const TableEditorPage: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    if (isHistoryLoaded && projectRef && router) {
-      const lastOpenedTableId = Number(history.editor)
-      const lastTableTabId = tabStore.openTabs.find((id) =>
-        editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
-      )
-      const lastTableTab = lastTableTabId ? tabStore.tabsMap[lastTableTabId] : undefined
-      const lastTabId = lastTableTab?.metadata?.tableId
-
-      // Redirect to the last opened table tab, or last table tab. Replace so Back skips this
-      // index rather than landing on it and redirecting again.
-      if (Number.isInteger(lastOpenedTableId)) {
-        // Tabs are keyed by a prefixed id (e.g. "r-293522"), but history only stores
-        // the bare table id, so look up the tab by its metadata instead of by key.
-        const lastOpenedTableData = Object.values(tabStore.tabsMap).find(
-          (tab) =>
-            editorEntityTypes.table.includes(tab.type) &&
-            tab.metadata?.tableId === lastOpenedTableId
-        )
-        router.replace(
-          buildTableEditorUrl({
-            projectRef,
-            tableId: lastOpenedTableId,
-            schema: lastOpenedTableData?.metadata?.schema,
-          })
-        )
-      } else if (lastTabId !== undefined) {
-        router.replace(
-          buildTableEditorUrl({
-            projectRef,
-            tableId: lastTabId,
-            schema: lastTableTab?.metadata?.schema,
-          })
-        )
-      }
+    const decision = decisionRef.current
+    if (!decision || !isHistoryLoaded || !projectRef || !router.isReady) {
+      return
     }
-    // router is intentionally excluded: in the TanStack build useRouter() returns a
-    // new object on every navigation-related render, and including it here caused
-    // this effect to re-fire mid-navigation and push the same redirect repeatedly,
+
+    if (decision.hasDecided && decision.projectRef === projectRef) {
+      return
+    }
+
+    // decide once per project. a later schema change on the list must not reopen a table.
+    decision.projectRef = projectRef
+    decision.hasDecided = true
+    settleHistoryTraverseNavigation()
+
+    const redirect = getLastTableRedirect({
+      historyEditor: history.editor,
+      openTabs: tabStore.openTabs,
+      tabsMap: tabStore.tabsMap,
+      explicitSchema,
+    })
+
+    if (!redirect || decision.isHistoryTraverse) {
+      return
+    }
+
+    // Replace so Back skips this index rather than landing on it and redirecting again.
+    router.replace(
+      buildTableEditorUrl({
+        projectRef,
+        tableId: redirect.tableId,
+        schema: redirect.schema,
+      })
+    )
+    // explicitSchema and history.editor are inert once the visit is decided.
+    // router and tabStore are intentionally excluded: in the TanStack build useRouter()
+    // returns a new object on every navigation-related render, and including it here
+    // caused this effect to re-fire mid-navigation and push the same redirect repeatedly,
     // freezing the page.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHistoryLoaded, projectRef])
+  }, [explicitSchema, history.editor, isHistoryLoaded, projectRef, router.isReady])
 
   return (
     <>

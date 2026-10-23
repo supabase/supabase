@@ -31,10 +31,12 @@ export const EditorBaseLayout = ({
 
   const hasNoOpenTabs =
     editor === 'table' ? tabs.openTabs.filter((x) => !x.startsWith('sql')).length === 0 : false
-  const hideTabs =
-    pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql` || hasNoOpenTabs
+  const isEditorIndex = pathname === `/project/${ref}/editor` || pathname === `/project/${ref}/sql`
+  const hideTabs = isEditorIndex || hasNoOpenTabs
 
-  const activeEditorTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
+  // The index can show the list while a tab is still active, so it doesn't title itself after the tab
+  const activeEditorTab =
+    tabs.activeTab && !isEditorIndex ? tabs.tabsMap[tabs.activeTab] : undefined
   // Prefer the live tab label so browser titles update immediately after a rename,
   // even when persisted tab metadata is still catching up.
   const activeEditorTabLabel = activeEditorTab?.label ?? activeEditorTab?.metadata?.name
