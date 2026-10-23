@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { AlertError } from '@/components/ui/AlertError'
@@ -106,6 +107,13 @@ export const RecoveryCodesModal = <T = unknown,>({
         <DialogSectionSeparator />
 
         <DialogSection className={cn(isError && 'p-0 md:px-0')}>
+          {isPending && (
+            <div role="status" aria-label="Generating recovery codes" className="space-y-3">
+              <ShimmeringLoader className="h-4 py-0" />
+              <ShimmeringLoader className="h-4 w-3/4 py-0" />
+              <ShimmeringLoader className="h-32 py-0" />
+            </div>
+          )}
           {isError && (
             <AlertError
               layout="vertical"
