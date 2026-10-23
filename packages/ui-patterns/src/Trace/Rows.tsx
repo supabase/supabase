@@ -203,7 +203,6 @@ export function Cell({ className, style, ...props }: ComponentProps<'div'>) {
           <span className="sr-only">Running</span>
         </>
       )}
-      <Duration />
     </div>
   )
 }
