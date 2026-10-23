@@ -328,8 +328,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <AiTools
                   pagePath={`/events/${event.slug}`}
                   pageType="events"
-                  titleClassName="mb-2 normal-case text-foreground-light [font:inherit]"
-                  className="mb-4 text-sm"
+                  titleClassName="sr-only"
+                  className="mb-4"
                 />
                 <div className="flex flex-col text-sm">
                   <span>Share on</span>

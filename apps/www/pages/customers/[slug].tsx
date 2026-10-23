@@ -213,7 +213,7 @@ function CaseStudyPage(props: any) {
                         <AiTools
                           pagePath={`/customers/${slug}`}
                           pageType="customers"
-                          titleClassName="mb-2 normal-case text-foreground-lighter [font:inherit]"
+                          titleClassName="sr-only"
                           className="not-prose"
                         />
 

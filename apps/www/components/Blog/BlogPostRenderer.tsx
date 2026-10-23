@@ -231,7 +231,7 @@ const BlogPostRenderer = async ({
                       pagePath={`/blog/${blogMetaData.slug}`}
                       pageType="blog"
                       showPreferredSource
-                      titleClassName="text-foreground tracking-wide [font-weight:inherit]"
+                      titleClassName="text-foreground tracking-wide font-normal"
                     />
                     <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                   </div>
@@ -303,7 +303,7 @@ const BlogPostRenderer = async ({
                         pagePath={`/blog/${blogMetaData.slug}`}
                         pageType="blog"
                         showPreferredSource
-                        titleClassName="text-foreground tracking-wide [font-weight:inherit]"
+                        titleClassName="text-foreground tracking-wide font-normal"
                       />
                       <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                     </div>
