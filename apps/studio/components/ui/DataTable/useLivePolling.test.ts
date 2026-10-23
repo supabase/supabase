@@ -12,7 +12,7 @@ const pageResult = (rows: unknown[], loadedRows: unknown[] = []) => ({
 })
 const NEW_ROWS = pageResult([{ id: 'a' }])
 const NO_ROWS = pageResult([])
-// Live polls re-read a short overlap, so a quiet poll usually returns rows already loaded.
+// A poll's time range overlaps loaded rows, so a quiet poll usually returns rows already loaded.
 const ONLY_LOADED_ROWS = pageResult([{ id: 'a' }], [{ id: 'a' }])
 
 let visibilityState: DocumentVisibilityState = 'visible'

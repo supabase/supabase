@@ -21,10 +21,10 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 /**
  * Whether a live-mode poll found no new rows. A poll is `fetchPreviousPage`, which prepends
- * the new page, so its result's first page holds the rows that poll returned. Each poll
- * re-reads a short overlap before the newest loaded row, so it usually returns rows the table
- * already has: only rows whose ids aren't in the older pages count as new. Anything
- * unrecognized counts as new, so polling never slows down on unexpected data.
+ * the new page, so its result's first page holds the rows that poll returned. A poll's time
+ * range overlaps rows already loaded, so it usually returns rows the table already has: only
+ * rows whose ids aren't in the older pages count as new. Anything unrecognized counts as new,
+ * so polling never slows down on unexpected data.
  */
 export function hasNoNewRows(result: unknown): boolean {
   if (!isRecord(result) || !isRecord(result.data)) return false
