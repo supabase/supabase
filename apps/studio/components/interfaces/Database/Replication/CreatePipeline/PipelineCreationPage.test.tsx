@@ -108,26 +108,15 @@ it('renders the page body when the preview and project allow access', async () =
   customRender(<PipelineCreationPage />)
   expect(await screen.findByText('Wizard form')).toBeInTheDocument()
 })
-it.each(['loading', 'orgPending'] as const)('waits while %s', (key) => {
-  state[key] = true
-  customRender(<PipelineCreationPage />)
-  expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
-})
-it('waits for rollout flags', () => {
-  state.flagsLoaded = false
-  customRender(<PipelineCreationPage />)
-  expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
-})
-it.each(['enabled', 'canUseReplication'] as const)(
-  'does not expose the wizard when %s is false',
-  (key) => {
-    state[key] = false
-    customRender(<PipelineCreationPage />)
-    expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
-  }
-)
-it('does not expose the wizard for High Availability projects', () => {
-  state.isHighAvailability = true
+it.each([
+  { loading: true },
+  { orgPending: true },
+  { flagsLoaded: false },
+  { enabled: false },
+  { canUseReplication: false },
+  { isHighAvailability: true },
+])('does not expose the wizard when %o', (overrides) => {
+  Object.assign(state, overrides)
   customRender(<PipelineCreationPage />)
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
 })

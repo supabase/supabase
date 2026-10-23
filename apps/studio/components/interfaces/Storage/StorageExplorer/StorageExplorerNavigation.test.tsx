@@ -219,29 +219,18 @@ describe('StorageExplorerNavigation', () => {
     expect(update.options.history).toBe('replace')
   })
 
-  it('leaves ?preview alone when the listing is incomplete', async () => {
-    // The file may simply be on a later page — dropping the param would lose the deep link.
+  it('keeps ?preview while the listing is incomplete, and resolves it once a later page brings the file in', async () => {
+    // The file sits beyond the first LIMIT-sized page, so it is absent from the initial
+    // listing. Dropping the param would lose the deep link; instead it is kept, and the
+    // preview opens when pagination loads it.
     const snapshot = createSnapshot({
       columns: [makeColumn('my-bucket', [makeFile('other.png')], true)],
     })
     mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
 
-    const { onUrlUpdate } = renderWithProvider({ searchParams: '?preview=a.png' })
-
+    const { rerender, onUrlUpdate } = renderWithProvider({ searchParams: '?preview=a.png' })
     await Promise.resolve()
     expect(onUrlUpdate).not.toHaveBeenCalled()
-    expect(snapshot.setSelectedFilePreview).not.toHaveBeenCalled()
-  })
-
-  it('resolves ?preview once a later page brings the file in', async () => {
-    // The file sits beyond the first LIMIT-sized page, so it is absent from the initial
-    // listing. The param is kept, and the preview opens when pagination loads it.
-    const snapshot = createSnapshot({
-      columns: [makeColumn('my-bucket', [makeFile('other.png')], true)],
-    })
-    mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
-
-    const { rerender } = renderWithProvider({ searchParams: '?preview=a.png' })
     expect(snapshot.setSelectedFilePreview).not.toHaveBeenCalled()
 
     mockUseStorageExplorerStateSnapshot.mockReturnValue({

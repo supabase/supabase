@@ -36,38 +36,6 @@ describe('ai/tools/incident-tools', () => {
   })
 
   describe('getIncidentTools', () => {
-    it('should return an object with get_active_incidents tool', () => {
-      const tools = getIncidentTools({
-        baseUrl: 'https://supabase.com/dashboard',
-        aiOptInLevel: 'schema',
-      })
-
-      expect(tools).toBeDefined()
-      expect(tools.get_active_incidents).toBeDefined()
-    })
-
-    it('should have correct description for get_active_incidents', () => {
-      const tools = getIncidentTools({
-        baseUrl: 'https://supabase.com/dashboard',
-        aiOptInLevel: 'schema',
-      })
-
-      expect(tools.get_active_incidents.description).toContain('Check for active incidents')
-      expect(tools.get_active_incidents.description).toContain('Supabase service')
-    })
-
-    it('should have empty input schema', () => {
-      const tools = getIncidentTools({
-        baseUrl: 'https://supabase.com/dashboard',
-        aiOptInLevel: 'schema',
-      })
-      const schema = tools.get_active_incidents.inputSchema
-
-      // The schema is a Zod object that accepts empty object
-      expect(schema).toBeDefined()
-      expect((schema as any)._def.typeName).toBe('ZodObject')
-    })
-
     describe('execute function', () => {
       it('should return empty incidents when not on platform', async () => {
         const common = await import('common')

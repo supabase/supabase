@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { clearLocalStorage, LOCAL_STORAGE_KEYS } from 'common'
 import { describe, expect, it } from 'vitest'
 
