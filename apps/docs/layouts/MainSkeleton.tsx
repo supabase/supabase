@@ -181,7 +181,8 @@ function SidebarSkeleton({
   const [pickedGroupLabel, setPickedGroupLabel] = useState<string>()
   const currentGroupLabel = getMenuGroupLabel(menuId)
   const selectedGroupLabel = pickedGroupLabel ?? currentGroupLabel
-  const isSideNavShown = selectedGroupLabel === currentGroupLabel
+  // a page outside every group keeps its own nav, whichever group is picked
+  const isSideNavShown = !currentGroupLabel || selectedGroupLabel === currentGroupLabel
 
   const handleMenuToggle = () => {
     // the menu opens on the current group again

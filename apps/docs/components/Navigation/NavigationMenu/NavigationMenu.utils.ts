@@ -169,11 +169,15 @@ export const useCloseMenuOnRouteChange = () => {
   }, [pathname])
 }
 
+// a versioned menu id such as reference_javascript_v2 belongs to the reference_javascript level
+export const isMenuLevel = (menuId: string, level: string | undefined): boolean =>
+  !!level && menuId.replace(/_v\d+$/, '') === level
+
 // the top-level group that holds a section: start itself, or the group that links to it
 export const getMenuGroupLabel = (menuId: string): string | undefined =>
   GLOBAL_MENU_ITEMS.find(
     ([section]) =>
       section.enabled !== false &&
-      (section.level === menuId ||
-        section.menuItems?.some((group) => group.some((item) => item.level === menuId)))
+      (isMenuLevel(menuId, section.level) ||
+        section.menuItems?.some((group) => group.some((item) => isMenuLevel(menuId, item.level))))
   )?.[0].label

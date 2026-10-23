@@ -14,6 +14,7 @@ import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
+import { isMenuLevel } from './NavigationMenu.utils'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 
@@ -83,7 +84,9 @@ const SectionMenuItems = ({
               key={item.label}
               className="h-10 px-0 aria-[current=true]:text-primary aria-[current=true]:**:text-primary"
               // the item is the section of the open page, not the page itself
-              aria-current={activeLevel && item.level === activeLevel ? 'true' : undefined}
+              aria-current={
+                activeLevel && isMenuLevel(activeLevel, item.level) ? 'true' : undefined
+              }
               href={item.href}
               title={item.label}
               community={item.community}
