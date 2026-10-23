@@ -21,7 +21,6 @@ function useWaterfallScale(): TimeScale {
 
 export function Waterfall({
   treeWidth = 320,
-  controlsWidth = 56,
   className,
   style,
   children,
@@ -48,8 +47,8 @@ export function Waterfall({
 
   const [start, end] = bounds
   const scale = useMemo(
-    () => createTimeScale([start, end], Math.max(0, width - treeWidth - controlsWidth)),
-    [start, end, width, treeWidth, controlsWidth]
+    () => createTimeScale([start, end], Math.max(0, width - treeWidth)),
+    [start, end, width, treeWidth]
   )
 
   return (
@@ -64,7 +63,6 @@ export function Waterfall({
         style={
           {
             '--trace-tree-width': `${treeWidth}px`,
-            '--trace-controls-width': `${controlsWidth}px`,
             '--trace-ruler-height': '28px',
             '--trace-waterfall-height': `${height}px`,
             ...style,
@@ -92,9 +90,12 @@ export function Ruler({ className, children, ...props }: ComponentProps<'div'>) 
     >
       <div
         data-trace-ruler-label
-        className="flex w-(--trace-tree-width) shrink-0 select-none items-center px-3 text-xs uppercase tracking-wider text-foreground-muted"
+        className="flex w-(--trace-tree-width) shrink-0 select-none items-center justify-between px-3"
       >
-        Span
+        <span className="text-xs uppercase tracking-wider text-foreground-muted">Span</span>
+        <div data-trace-controls className="flex shrink-0 flex-nowrap items-center gap-0.5">
+          {children}
+        </div>
       </div>
       <div aria-hidden className="relative min-w-0 flex-1 select-none overflow-hidden">
         {scale.ticks.map((tick) => (
@@ -114,12 +115,6 @@ export function Ruler({ className, children, ...props }: ComponentProps<'div'>) 
           </div>
         ))}
       </div>
-      <div
-        data-trace-controls
-        className="flex w-(--trace-controls-width) shrink-0 items-center justify-center gap-1"
-      >
-        {children}
-      </div>
     </div>
   )
 }
@@ -133,7 +128,7 @@ export function Grid({ className, ...props }: ComponentProps<'div'>) {
         aria-hidden
         data-trace-grid
         className={cn(
-          'pointer-events-none absolute left-(--trace-tree-width) right-[calc(var(--trace-controls-width)+1px)] top-0 h-(--trace-waterfall-height) overflow-hidden',
+          'pointer-events-none absolute left-(--trace-tree-width) right-0 top-0 h-(--trace-waterfall-height) overflow-hidden',
           className
         )}
         {...props}
@@ -165,7 +160,7 @@ export function Cursor({ className, ...props }: ComponentProps<'div'>) {
         aria-hidden
         data-trace-cursor-track
         className={cn(
-          'pointer-events-none absolute left-(--trace-tree-width) right-[calc(var(--trace-controls-width)+1px)] top-[calc(var(--trace-ruler-height)*-1)] h-(--trace-waterfall-height) overflow-hidden',
+          'pointer-events-none absolute left-(--trace-tree-width) right-0 top-[calc(var(--trace-ruler-height)*-1)] h-(--trace-waterfall-height) overflow-hidden',
           className
         )}
         {...props}
