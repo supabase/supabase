@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "shadcn/no-arbitrary-values": 0,
+    "shadcn/no-unknown-classes": 2,
+    "shadcn/no-raw-colors": 3
+  },
+  "ruleFiles": {
+    "shadcn/no-arbitrary-values": {},
+    "shadcn/no-unknown-classes": {
+      "src/layouts/ArticleLayout.astro": 1,
+      "src/pages/topics/[topic].astro": 1
+    },
+    "shadcn/no-raw-colors": {
+      "src/components/Footer.astro": 1,
+      "src/pages/index.astro": 2
+    }
+  }
+}
