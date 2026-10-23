@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { ExternalLinkIcon, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, Button, InfoIcon as StatusInfoIcon } from 'ui'
 import {
@@ -28,6 +28,7 @@ import {
   useIsHighAvailability,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 
@@ -44,9 +45,9 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
   const isHighAvailability = useIsHighAvailability()
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
-  const [showIncreaseDiskSizeModal, setShowIncreaseDiskSizeModal] = useQueryState(
+  const [showIncreaseDiskSizeModal, setShowIncreaseDiskSizeModal] = usePanelQueryState(
     'show_increase_disk_size_modal',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissionsV2(

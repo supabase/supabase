@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -21,6 +21,7 @@ import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -34,7 +35,7 @@ export const HooksListing = () => {
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
-  const [hook, setHook] = useQueryState('hook', parseAsString)
+  const [hook, setHook] = usePanelQueryState('hook', parseAsString.withOptions({ history: 'push' }))
 
   const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook>()
   const [addHookAsideOpen, setAddHookAsideOpen] = useState(false)
@@ -65,7 +66,7 @@ export const HooksListing = () => {
   useEffect(() => {
     if (!!hook && !selectedHook) {
       toast('Hook not found')
-      setHook(null)
+      setHook(null, { history: 'replace' })
     }
   }, [hook, selectedHook, setHook])
 

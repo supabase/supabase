@@ -2,7 +2,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -60,6 +60,7 @@ import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enfo
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 
 export const JitDbAccessConfiguration = () => {
@@ -70,8 +71,14 @@ export const JitDbAccessConfiguration = () => {
   const parentProjectRef = project?.parent_project_ref
 
   const [enabled, setEnabled] = useState(false)
-  const [, setShowCreateRuleSheet] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
-  const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
+  const [, setShowCreateRuleSheet] = usePanelQueryState(
+    'jit_new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+  )
+  const [ruleIdToEdit, setRuleIdToEdit] = usePanelQueryState(
+    'jit_edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const [showEnableJitDialog, setShowEnableJitDialog] = useState(false)
   const [enableJitError, setEnableJitError] = useState<string | null>(null)
   const [selectedUserToDelete, setSelectedUserToDelete] = useState<JitUserRule | null>(null)

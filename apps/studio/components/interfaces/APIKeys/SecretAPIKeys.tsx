@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
@@ -14,6 +14,7 @@ import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -39,7 +40,10 @@ export const SecretAPIKeys = () => {
 
   const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
-  const [deleteId, setDeleteId] = useQueryState('deleteSecretKey', parseAsString)
+  const [deleteId, setDeleteId] = usePanelQueryState(
+    'deleteSecretKey',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const apiKeyToDelete = secretApiKeys?.find((key) => key.id === deleteId)
 
   const {
@@ -62,7 +66,7 @@ export const SecretAPIKeys = () => {
   useEffect(() => {
     if (isSuccessApiKeys && !!deleteId && !apiKeyToDelete && !isDeleteSuccess) {
       toast('Unable to find secret key')
-      setDeleteId(null)
+      setDeleteId(null, { history: 'replace' })
     }
   }, [apiKeyToDelete, deleteId, isDeleteSuccess, isSuccessApiKeys, setDeleteId])
 

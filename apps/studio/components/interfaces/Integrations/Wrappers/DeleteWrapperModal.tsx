@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import {
@@ -18,6 +18,8 @@ import { getWrapperMetaForWrapper, wrapperMetaComparator } from './Wrappers.util
 import { useFDWDeleteMutation } from '@/data/fdw/fdw-delete-mutation'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 
 export const DeleteWrapperModal = () => {
   const { id, ref } = useParams()
@@ -37,13 +39,18 @@ export const DeleteWrapperModal = () => {
     [data, integration]
   )
 
-  const [selectedWrapperIdToDelete, setSelectedWrapperToDelete] = useQueryState(
+  const [selectedWrapperIdToDelete, setSelectedWrapperToDelete] = usePanelQueryState(
     'delete',
-    parseAsString
+    parseAsString.withOptions({ history: 'push' })
   )
   const selectedWrapper = wrappers.find((x) => x.id.toString() === selectedWrapperIdToDelete)
 
-  const { mutateAsync: deleteFDW, isSuccess: isSuccessDelete } = useFDWDeleteMutation({
+  const {
+    mutateAsync: deleteFDW,
+    isPending: isDeleting,
+    isSuccess: isSuccessDelete,
+    variables: deletedWrapper,
+  } = useFDWDeleteMutation({
     onSuccess: () => {
       toast.success('Connection deleted')
       setSelectedWrapperToDelete(null)
@@ -65,11 +72,23 @@ export const DeleteWrapperModal = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && !!selectedWrapperIdToDelete && !selectedWrapper && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: selectedWrapperIdToDelete,
+      resourceFound: !!selectedWrapper,
+      isSuccessDelete,
+      isPendingDelete: isDeleting,
+      deletedId: deletedWrapper?.wrapper?.id,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('Wrapper not found')
-      setSelectedWrapperToDelete(null)
     }
+    setSelectedWrapperToDelete(null, { history: 'replace' })
   }, [
+    deletedWrapper,
+    isDeleting,
     isSuccess,
     isSuccessDelete,
     selectedWrapper,

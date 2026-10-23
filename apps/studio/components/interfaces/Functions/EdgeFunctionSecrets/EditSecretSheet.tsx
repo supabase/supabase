@@ -68,8 +68,9 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
   }
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
+    checkIsDirty: () => form.formState.isDirty || isDirty,
     onClose,
+    active: visible,
   })
 
   useEffect(() => {

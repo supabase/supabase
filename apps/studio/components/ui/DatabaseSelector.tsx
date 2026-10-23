@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { CheckIcon, ChevronDownIcon, Loader2Icon, PlusIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useState } from 'react'
 import {
   Button,
@@ -31,6 +31,7 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -59,7 +60,10 @@ export const DatabaseSelector = ({
   const isHighAvailability = useIsHighAvailability()
 
   const [open, setOpen] = useState(false)
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = usePanelQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+  )
 
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 

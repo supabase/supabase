@@ -7,6 +7,7 @@ import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/C
 import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -16,7 +17,10 @@ export function useConnectCommands() {
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const enabled = !!selectedProject && isActiveHealthy
 
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = usePanelQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+  )
   const [, setConnectTab] = useQueryState('connectTab', parseAsString)
 
   useRegisterCommands(

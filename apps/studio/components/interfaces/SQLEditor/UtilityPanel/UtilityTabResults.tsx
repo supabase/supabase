@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { ExternalLinkIcon, Loader2Icon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -9,6 +9,7 @@ import CopyButton from '@/components/ui/CopyButton'
 import { DataGridResults } from '@/components/ui/DataGridResults'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { getSqlErrorLines } from '@/data/sql/utils'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
@@ -27,7 +28,10 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
     const sessionSnap = useSqlEditorSessionSnapshot()
-    const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+    const [, setShowConnect] = usePanelQueryState(
+      'showConnect',
+      parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+    )
 
     const result = sessionSnap.results[id]?.[0]
 

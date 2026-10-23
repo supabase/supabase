@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { TextSearchIcon } from 'lucide-react'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { parseAsInteger } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import { Badge, Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
@@ -9,6 +9,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
 import { AlertError } from '@/components/ui/AlertError'
 import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { ResponseError } from '@/types'
 
 interface QueueDataGridProps {
@@ -138,7 +139,10 @@ export const QueueMessagesDataGrid = ({
 }: QueueDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
 
-  const [selectedMessageId, setSelectedMessageId] = useQueryState('messageId', parseAsInteger)
+  const [selectedMessageId, setSelectedMessageId] = usePanelQueryState(
+    'messageId',
+    parseAsInteger.withOptions({ history: 'push' })
+  )
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     if (isLoading || !isAtBottom(event)) return

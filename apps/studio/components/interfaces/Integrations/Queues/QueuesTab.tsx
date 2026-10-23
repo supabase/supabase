@@ -17,6 +17,7 @@ import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useQueuesQuery } from '@/data/database-queues/database-queues-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -31,7 +32,7 @@ export const QueuesTab = () => {
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [search, setSearch] = useState(searchQuery)
 
-  const [createQueueSheetShown, setCreateQueueSheetShown] = useQueryState(
+  const [createQueueSheetShown, setCreateQueueSheetShown] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -214,9 +215,7 @@ export const QueuesTab = () => {
 
       <CreateQueueSheet
         visible={createQueueSheetShown}
-        onClose={() => {
-          setCreateQueueSheetShown(false)
-        }}
+        onClose={() => setCreateQueueSheetShown(false)}
       />
     </>
   )

@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import { ChevronRightIcon, SearchIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useState } from 'react'
 import {
   Card,
@@ -30,6 +30,7 @@ import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { createNavigationHandler } from '@/lib/navigation'
 
 export const AnalyticsBuckets = () => {
@@ -38,7 +39,7 @@ export const AnalyticsBuckets = () => {
 
   const [filterString, setFilterString] = useState('')
 
-  const [visible, setVisible] = useQueryState(
+  const [visible, setVisible] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

@@ -244,6 +244,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
       form.reset(initialValues)
       onClose()
     },
+    active: visible,
   })
 
   const issuerUrlValue = useWatch({ control: form.control, name: 'issuer' })

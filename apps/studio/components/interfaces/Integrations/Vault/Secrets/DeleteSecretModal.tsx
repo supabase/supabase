@@ -1,4 +1,4 @@
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import {
@@ -15,6 +15,8 @@ import {
 import { useVaultSecretDeleteMutation } from '@/data/vault/vault-secret-delete-mutation'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 
 export const DeleteSecretModal = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -24,10 +26,18 @@ export const DeleteSecretModal = () => {
     connectionString: project?.connectionString,
   })
 
-  const [secretIdToDelete, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
+  const [secretIdToDelete, setSelectedSecretToDelete] = usePanelQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const selectedSecret = secrets.find((secret) => secret.id === secretIdToDelete)
 
-  const { mutateAsync: deleteSecret, isSuccess: isSuccessDelete } = useVaultSecretDeleteMutation({
+  const {
+    mutateAsync: deleteSecret,
+    isPending: isDeleting,
+    isSuccess: isSuccessDelete,
+    variables: deletedSecret,
+  } = useVaultSecretDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted secret ${selectedSecret?.name}`)
       setSelectedSecretToDelete(null)
@@ -49,11 +59,29 @@ export const DeleteSecretModal = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && !!secretIdToDelete && !selectedSecret && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: secretIdToDelete,
+      resourceFound: !!selectedSecret,
+      isSuccessDelete,
+      isPendingDelete: isDeleting,
+      deletedId: deletedSecret?.id,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('Secret not found')
-      setSelectedSecretToDelete(null)
     }
-  }, [isSuccess, isSuccessDelete, secretIdToDelete, selectedSecret, setSelectedSecretToDelete])
+    setSelectedSecretToDelete(null, { history: 'replace' })
+  }, [
+    deletedSecret,
+    isDeleting,
+    isSuccess,
+    isSuccessDelete,
+    secretIdToDelete,
+    selectedSecret,
+    setSelectedSecretToDelete,
+  ])
 
   return (
     <AlertDialog open={!!selectedSecret} onOpenChange={() => setSelectedSecretToDelete(null)}>

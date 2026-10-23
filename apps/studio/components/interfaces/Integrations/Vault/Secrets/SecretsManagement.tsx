@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { sortBy } from 'lodash'
 import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 import {
@@ -29,6 +29,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -40,7 +41,10 @@ export const SecretsManagement = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [searchValue, setSearchValue] = useState<string>('')
-  const [, setShowAddSecretModal] = useQueryState('new', parseAsBoolean.withDefault(false))
+  const [, setShowAddSecretModal] = usePanelQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+  )
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
   const { can: canManageSecrets } = useAsyncCheckPermissionsV2(

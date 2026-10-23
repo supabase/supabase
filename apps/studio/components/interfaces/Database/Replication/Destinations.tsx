@@ -4,7 +4,7 @@ import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
 import { useRouter as useNextRouter } from 'next/compat/router'
 import Link from 'next/link'
-import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { parseAsStringEnum } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -56,6 +56,7 @@ import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -121,7 +122,7 @@ export const Destinations = () => {
   const pendingCreationTypeRef = useRef<DestinationType | null>(null)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
-  const [, setDestinationType] = useQueryState(
+  const [, setDestinationType] = usePanelQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',

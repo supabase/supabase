@@ -9,7 +9,7 @@ import {
   UploadIcon,
   XIcon,
 } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
@@ -48,6 +48,7 @@ import {
   type ObjectVersion,
 } from '@/data/storage/versioning/object-versions-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -269,7 +270,7 @@ export const PreviewPane = () => {
   const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
-  const [, setShowEditBucketModal] = useQueryState(
+  const [, setShowEditBucketModal] = usePanelQueryState(
     'edit',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

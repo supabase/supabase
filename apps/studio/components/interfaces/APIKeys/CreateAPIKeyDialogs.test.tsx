@@ -56,7 +56,7 @@ describe('API key create dialogs', () => {
 
     await user.click(screen.getByRole('button', { name: 'New publishable key' }))
 
-    expect(mockSetVisible).toHaveBeenCalledWith('publishable')
+    expect(mockSetVisible).toHaveBeenCalledWith('publishable', { history: 'push' })
   })
 
   it('registers and surfaces the publishable key submit shortcut on the primary action', () => {
@@ -90,7 +90,7 @@ describe('API key create dialogs', () => {
 
     await user.click(screen.getByRole('button', { name: 'New secret key' }))
 
-    expect(mockSetVisible).toHaveBeenCalledWith('secret')
+    expect(mockSetVisible).toHaveBeenCalledWith('secret', { history: 'push' })
   })
 
   it('registers and surfaces the secret key submit shortcut on the primary action', () => {

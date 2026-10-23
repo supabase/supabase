@@ -57,7 +57,8 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const { mutate: createDatabaseRole, isPending: isCreating } = useDatabaseRoleCreateMutation({
     onSuccess: (_, vars) => {
       toast.success(`Successfully created new role: ${vars.payload.name}`)
-      handleClose()
+      form.reset(initialValues)
+      onClose()
     },
   })
 

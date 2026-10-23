@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -49,6 +49,7 @@ import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-m
 import { useProjectMembersQuery } from '@/data/projects/project-members-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 
 const grantSchema = z.object({
@@ -126,8 +127,14 @@ export function JitDbAccessRuleSheet({
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const [isNewRule, setIsNewRule] = useQueryState('jit_new', parseAsBoolean.withDefault(false))
-  const [ruleIdToEdit, setRuleIdToEdit] = useQueryState('jit_edit', parseAsString)
+  const [isNewRule, setIsNewRule] = usePanelQueryState(
+    'jit_new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+  )
+  const [ruleIdToEdit, setRuleIdToEdit] = usePanelQueryState(
+    'jit_edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
 
   const { data: databaseRoles, isSuccess: isSuccessDatabaseRoles } = useDatabaseRolesQuery({
     projectRef,
@@ -175,6 +182,7 @@ export function JitDbAccessRuleSheet({
   } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose: onCloseSheet,
+    active: open,
   })
 
   const { mutate: grantUserAccess, isPending: isSubmitting } = useJitDbAccessGrantMutation({
@@ -209,7 +217,7 @@ export function JitDbAccessRuleSheet({
   useEffect(() => {
     if (!!ruleIdToEdit && isDataReady && !user) {
       toast('Access rule cannot be found')
-      setRuleIdToEdit(null)
+      setRuleIdToEdit(null, { history: 'replace' })
     }
   }, [isDataReady, ruleIdToEdit, setRuleIdToEdit, user])
 

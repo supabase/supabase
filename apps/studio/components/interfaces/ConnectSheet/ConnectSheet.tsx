@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
 
@@ -18,6 +18,8 @@ import { WarehouseTab } from './WarehouseTab'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { dismissPanelUrl } from '@/lib/panel-history'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -33,9 +35,9 @@ export const ConnectSheet = () => {
   const { state, activeFields, resolvedSteps, schema, getFieldOptions, setMode, updateField } =
     useConnectState()
 
-  const [showConnect, setShowConnect] = useQueryState(
+  const [showConnect, setShowConnect] = usePanelQueryState(
     'showConnect',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
   // URL params have no defaults: a `null` value signals "not in URL" so we can
   // fall back to the user's last-used selections from localStorage.
@@ -100,8 +102,15 @@ export const ConnectSheet = () => {
   }
 
   const handleOpenChange = (sheetOpen: boolean) => {
-    if (!sheetOpen) clearAllQueryParams()
-    setShowConnect(sheetOpen)
+    if (sheetOpen) {
+      setShowConnect(true)
+      return
+    }
+
+    dismissPanelUrl('showConnect', () => {
+      clearAllQueryParams()
+      setShowConnect(false)
+    })
   }
 
   const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })

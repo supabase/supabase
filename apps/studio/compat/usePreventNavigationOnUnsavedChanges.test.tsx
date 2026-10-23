@@ -11,7 +11,12 @@ import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { usePreventNavigationOnUnsavedChanges } from './usePreventNavigationOnUnsavedChanges'
+import { armPanelPush, dismissPanelUrl, resetPanelHistoryForTests } from '@/lib/panel-history'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
+import {
+  installNavigationDouble,
+  uninstallNavigationDouble,
+} from '@/tests/lib/panel-navigation-double'
 
 let destroyHistory: (() => void) | undefined
 
@@ -48,6 +53,8 @@ function dispatchBeforeUnload() {
 afterEach(() => {
   destroyHistory?.()
   destroyHistory = undefined
+  resetPanelHistoryForTests()
+  uninstallNavigationDouble()
 })
 
 describe('TanStack unsaved-change navigation guard', () => {
@@ -289,6 +296,47 @@ describe('TanStack unsaved-change navigation guard', () => {
     await act(async () => result.current.handleConfirmNavigation())
     await waitFor(() => expect(history.location.pathname).toBe('/editor'))
     expect(dispatchBeforeUnload().defaultPrevented).toBe(true)
+  })
+
+  it('does not block a panel back on a dirty page', async () => {
+    installNavigationDouble()
+    const { result, rerender, history } = renderNavigationGuard(false)
+    act(() => history.push('/overview'))
+    await waitFor(() => expect(window.location.pathname).toBe('/overview'))
+    act(() => {
+      armPanelPush('new')
+      window.history.pushState(null, '', '/overview?new=true')
+    })
+    rerender({ hasChanges: true })
+
+    act(() => {
+      dismissPanelUrl('new', () => {
+        window.history.replaceState(null, '', '/overview')
+      })
+    })
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    await waitFor(() => expect(window.location.pathname).toBe('/overview'))
+    expect(window.location.search).toBe('')
+    expect(result.current.shouldConfirmNavigation).toBe(false)
+  })
+
+  it('still blocks a push while a panel back destination is pending', async () => {
+    installNavigationDouble()
+    const { result, router } = renderNavigationGuard(true)
+    act(() => {
+      armPanelPush('new')
+      window.history.pushState(null, '', '/editor?new=true')
+      dismissPanelUrl('new', () => {
+        window.history.replaceState(null, '', '/editor')
+      })
+      void router.navigate<AnyRouter, string>({ to: '/overview' })
+    })
+
+    await waitFor(() => expect(result.current.shouldConfirmNavigation).toBe(true))
   })
 
   it('ignores confirmation controls when there is no blocked navigation', async () => {

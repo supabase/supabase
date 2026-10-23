@@ -44,6 +44,7 @@ import { useTablesQuery } from '@/data/tables/tables-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -103,7 +104,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   )
   const deferredSearchString = useDeferredValue(searchString)
 
-  const [selectedIdToEdit, setSelectedIdToEdit] = useQueryState(
+  const [selectedIdToEdit, setSelectedIdToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -125,7 +126,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   } = useEditorPanelStateSnapshot()
 
   const [selectedTable, setSelectedTable] = useState<string>()
-  const [showCreatePolicy, setShowCreatePolicy] = useQueryState(
+  const [showCreatePolicy, setShowCreatePolicy] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -239,7 +240,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (selectedIdToEdit && isPoliciesSuccess && !selectedPolicyToEdit) {
       toast(`Policy ID ${selectedIdToEdit} cannot be found`)
-      setSelectedIdToEdit(null)
+      setSelectedIdToEdit(null, { history: 'replace' })
     }
   }, [selectedIdToEdit, selectedPolicyToEdit, isPoliciesSuccess, setSelectedIdToEdit])
 

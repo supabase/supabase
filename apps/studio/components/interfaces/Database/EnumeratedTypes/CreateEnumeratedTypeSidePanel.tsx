@@ -59,7 +59,8 @@ const CreateEnumeratedTypeSidePanel = ({
   const { mutate: createEnumeratedType, isPending: isCreating } = useEnumeratedTypeCreateMutation({
     onSuccess: (_res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
-      closePanel()
+      form.reset(initialValues)
+      onClose()
     },
   })
 

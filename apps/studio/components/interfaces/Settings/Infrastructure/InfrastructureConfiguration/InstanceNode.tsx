@@ -50,6 +50,7 @@ import {
 } from '@/data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { armPanelPush } from '@/lib/panel-history'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) => {
@@ -183,7 +184,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
 
   const state = useDatabaseSelectorStateSnapshot()
   const [, setConnect] = useQueryStates({
-    showConnect: parseAsBoolean.withDefault(false),
+    showConnect: parseAsBoolean.withDefault(false).withOptions({ history: 'push' }),
     source: parseAsString,
   })
 
@@ -361,6 +362,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
             <DropdownMenuItem
               className="gap-x-2"
               onClick={() => {
+                armPanelPush('showConnect')
                 setConnect({ showConnect: true, source: id })
                 state.setSelectedDatabaseId(id)
               }}

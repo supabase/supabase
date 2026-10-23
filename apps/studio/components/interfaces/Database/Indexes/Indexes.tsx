@@ -34,8 +34,10 @@ import { useIndexesQuery, type DatabaseIndex } from '@/data/database-indexes/ind
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -60,15 +62,21 @@ export const Indexes = () => {
     connectionString: project?.connectionString,
   })
 
-  const [showCreateIndex, setShowCreateIndex] = useQueryState(
+  const [showCreateIndex, setShowCreateIndex] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
-  const [editIndexId, setEditIndexId] = useQueryState('edit', parseAsString)
+  const [editIndexId, setEditIndexId] = usePanelQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const selectedIndex = allIndexes?.find((idx) => idx.name === editIndexId)
 
-  const [deleteIndexId, setDeleteIndexId] = useQueryState('delete', parseAsString)
+  const [deleteIndexId, setDeleteIndexId] = usePanelQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const selectedIndexToDelete = allIndexes?.find((idx) => idx.name === deleteIndexId)
 
   const {
@@ -85,6 +93,7 @@ export const Indexes = () => {
     mutate: deleteIndex,
     isPending: isExecuting,
     isSuccess: isSuccessDelete,
+    variables: deletedIndex,
   } = useDatabaseIndexDeleteMutation({
     onSuccess: async () => {
       setDeleteIndexId(null)
@@ -137,16 +146,34 @@ export const Indexes = () => {
   useEffect(() => {
     if (isSuccessIndexes && !!editIndexId && !selectedIndex) {
       toast('Index not found')
-      setEditIndexId(null)
+      setEditIndexId(null, { history: 'replace' })
     }
   }, [isSuccessIndexes, editIndexId, selectedIndex, setEditIndexId])
 
   useEffect(() => {
-    if (isSuccessIndexes && !!deleteIndexId && !selectedIndexToDelete && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccessIndexes,
+      currentId: deleteIndexId,
+      resourceFound: !!selectedIndexToDelete,
+      isSuccessDelete,
+      isPendingDelete: isExecuting,
+      deletedId: deletedIndex?.name,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('Index not found')
-      setDeleteIndexId(null)
     }
-  }, [isSuccessIndexes, deleteIndexId, selectedIndexToDelete, isSuccessDelete, setDeleteIndexId])
+    setDeleteIndexId(null, { history: 'replace' })
+  }, [
+    deleteIndexId,
+    deletedIndex,
+    isExecuting,
+    isSuccessDelete,
+    isSuccessIndexes,
+    selectedIndexToDelete,
+    setDeleteIndexId,
+  ])
 
   return (
     <>

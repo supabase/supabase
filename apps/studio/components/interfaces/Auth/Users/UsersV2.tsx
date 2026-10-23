@@ -75,6 +75,7 @@ import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
@@ -186,7 +187,7 @@ export const UsersV2 = () => {
     'providers',
     parseAsArrayOf(parseAsString, ',').withDefault([])
   )
-  const [selectedId, setSelectedId] = useQueryState(
+  const [selectedId, setSelectedId] = usePanelQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )

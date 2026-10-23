@@ -10,12 +10,14 @@ const {
   mockSetShowConnect,
   mockUseRegisterCommands,
   mockUseSelectedProjectQuery,
+  mockWithOptions,
 } = vi.hoisted(() => ({
   mockSetCommandMenuOpen: vi.fn(),
   mockSetConnectTab: vi.fn(),
   mockSetShowConnect: vi.fn(),
   mockUseRegisterCommands: vi.fn(),
   mockUseSelectedProjectQuery: vi.fn(),
+  mockWithOptions: vi.fn(() => 'showConnectParser'),
 }))
 
 vi.mock('ui-patterns/CommandMenu', () => ({
@@ -24,7 +26,9 @@ vi.mock('ui-patterns/CommandMenu', () => ({
 }))
 
 vi.mock('nuqs', () => ({
-  parseAsBoolean: { withDefault: vi.fn(() => 'showConnectParser') },
+  parseAsBoolean: {
+    withDefault: vi.fn(() => ({ withOptions: mockWithOptions })),
+  },
   parseAsString: 'stringParser',
   useQueryState: (key: string) => {
     if (key === 'showConnect') return [false, mockSetShowConnect]
@@ -55,6 +59,7 @@ describe('useConnectCommands', () => {
       name: 'Connect to your project',
     })
     expect(commands[0].badge).toBeTypeOf('function')
+    expect(mockWithOptions).toHaveBeenCalledWith({ history: 'push' })
   })
 
   it('disables the commands when the selected project cannot connect', () => {

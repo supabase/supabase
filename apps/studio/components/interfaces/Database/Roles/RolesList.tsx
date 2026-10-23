@@ -1,6 +1,6 @@
 import { partition, sortBy } from 'lodash'
 import { PlusIcon, SearchIcon, XIcon } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -20,7 +20,9 @@ import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-quer
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -68,6 +70,7 @@ export const RolesList = () => {
     mutate: deleteDatabaseRole,
     isPending: isDeleting,
     isSuccess: isSuccessDelete,
+    variables: deletedRole,
   } = useDatabaseRoleDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted role`)
@@ -75,12 +78,15 @@ export const RolesList = () => {
     },
   })
 
-  const [isCreatingRole, setIsCreatingRole] = useQueryState(
+  const [isCreatingRole, setIsCreatingRole] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
-  const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = useQueryState('delete', parseAsString)
+  const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = usePanelQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
   const roleToDelete = roles?.find((role) => role.id.toString() === selectedRoleIdToDelete)
 
@@ -111,11 +117,29 @@ export const RolesList = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && !!selectedRoleIdToDelete && !roleToDelete && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: selectedRoleIdToDelete,
+      resourceFound: !!roleToDelete,
+      isSuccessDelete,
+      isPendingDelete: isDeleting,
+      deletedId: deletedRole?.id,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('Role cannot be found')
-      setSelectedRoleIdToDelete(null)
     }
-  }, [isSuccess, selectedRoleIdToDelete, roleToDelete, isSuccessDelete, setSelectedRoleIdToDelete])
+    setSelectedRoleIdToDelete(null, { history: 'replace' })
+  }, [
+    deletedRole,
+    isDeleting,
+    isSuccess,
+    isSuccessDelete,
+    roleToDelete,
+    selectedRoleIdToDelete,
+    setSelectedRoleIdToDelete,
+  ])
 
   return (
     <>

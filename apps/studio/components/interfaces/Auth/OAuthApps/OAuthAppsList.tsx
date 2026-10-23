@@ -54,7 +54,9 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthServerAppDeleteMutation } from '@/data/oauth-server-apps/oauth-server-app-delete-mutation'
 import { useOAuthServerAppRegenerateSecretMutation } from '@/data/oauth-server-apps/oauth-server-app-regenerate-secret-mutation'
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -112,21 +114,28 @@ export const OAuthAppsList = () => {
     parseAsStringLiteral<OAuthAppsSort>(OAUTH_APPS_SORT_VALUES).withDefault('name:asc')
   )
 
-  const [showCreateSheet, setShowCreateSheet] = useQueryState(
+  const [showCreateSheet, setShowCreateSheet] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
-  const [selectedAppToEdit, setSelectedAppToEdit] = useQueryState('edit', parseAsString)
+  const [selectedAppToEdit, setSelectedAppToEdit] = usePanelQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const appToEdit = oAuthApps?.find((app) => app.client_id === selectedAppToEdit)
 
-  const [selectedAppToDelete, setSelectedAppToDelete] = useQueryState('delete', parseAsString)
+  const [selectedAppToDelete, setSelectedAppToDelete] = usePanelQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const appToDelete = oAuthApps?.find((app) => app.client_id === selectedAppToDelete)
 
   const {
     mutate: deleteOAuthApp,
     isPending: isDeletingApp,
     isSuccess: isSuccessDelete,
+    variables: deletedApp,
   } = useOAuthServerAppDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted OAuth app`)
@@ -209,23 +218,41 @@ export const OAuthAppsList = () => {
   // Prevent opening the create sheet if OAuth Server is disabled
   useEffect(() => {
     if (isSuccessAuthConfig && !isOAuthServerEnabled && showCreateSheet) {
-      setShowCreateSheet(false)
+      setShowCreateSheet(false, { history: 'replace' })
     }
   }, [isSuccessAuthConfig, isOAuthServerEnabled, showCreateSheet, setShowCreateSheet])
 
   useEffect(() => {
     if (isSuccess && !!selectedAppToEdit && !appToEdit) {
       toast('App not found')
-      setSelectedAppToEdit(null)
+      setSelectedAppToEdit(null, { history: 'replace' })
     }
   }, [appToEdit, isSuccess, selectedAppToEdit, setSelectedAppToEdit])
 
   useEffect(() => {
-    if (isSuccess && !!selectedAppToDelete && !appToDelete && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: selectedAppToDelete,
+      resourceFound: !!appToDelete,
+      isSuccessDelete,
+      isPendingDelete: isDeletingApp,
+      deletedId: deletedApp?.clientId,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('App not found')
-      setSelectedAppToDelete(null)
     }
-  }, [appToDelete, isSuccess, isSuccessDelete, selectedAppToDelete, setSelectedAppToDelete])
+    setSelectedAppToDelete(null, { history: 'replace' })
+  }, [
+    appToDelete,
+    deletedApp,
+    isDeletingApp,
+    isSuccess,
+    isSuccessDelete,
+    selectedAppToDelete,
+    setSelectedAppToDelete,
+  ])
 
   if (isAuthConfigLoading || (isOAuthServerEnabled && isLoading)) {
     return <GenericSkeletonLoader />

@@ -38,8 +38,10 @@ import { useSchemasQuery } from '@/data/database/schemas-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -176,27 +178,34 @@ export const FunctionsList = () => {
     ...(hasInvoker ? [{ label: 'Invoker', value: 'invoker' }] : []),
   ]
 
-  const [showCreateFunctionForm, setShowCreateFunctionForm] = useQueryState(
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [functionIdToEdit, setSelectedFunctionToEdit] = useQueryState('edit', parseAsString)
+  const [functionIdToEdit, setSelectedFunctionToEdit] = usePanelQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const functionToEdit = functions.find((fn) => fn.id.toString() === functionIdToEdit)
 
-  const [functionIdToDuplicate, setSelectedFunctionIdToDuplicate] = useQueryState(
+  const [functionIdToDuplicate, setSelectedFunctionIdToDuplicate] = usePanelQueryState(
     'duplicate',
-    parseAsString
+    parseAsString.withOptions({ history: 'push' })
   )
   const functionToDuplicate = functions.find((fn) => fn.id.toString() === functionIdToDuplicate)
 
-  const [functionIdToDelete, setSelectedFunctionToDelete] = useQueryState('delete', parseAsString)
+  const [functionIdToDelete, setSelectedFunctionToDelete] = usePanelQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const functionToDelete = functions.find((fn) => fn.id.toString() === functionIdToDelete)
 
   const {
     mutate: deleteDatabaseFunction,
     isPending: isDeletingFunction,
     isSuccess: isSuccessDelete,
+    variables: deletedFunction,
   } = useDatabaseFunctionDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully removed function ${variables.func.name}`)
@@ -218,24 +227,36 @@ export const FunctionsList = () => {
   useEffect(() => {
     if (isSuccess && !!functionIdToEdit && !functionToEdit) {
       toast('Function not found')
-      setSelectedFunctionToEdit(null)
+      setSelectedFunctionToEdit(null, { history: 'replace' })
     }
   }, [functionIdToEdit, functionToEdit, isSuccess, setSelectedFunctionToEdit])
 
   useEffect(() => {
     if (isSuccess && !!functionIdToDuplicate && !functionToDuplicate) {
       toast('Function not found')
-      setSelectedFunctionIdToDuplicate(null)
+      setSelectedFunctionIdToDuplicate(null, { history: 'replace' })
     }
   }, [functionIdToDuplicate, functionToDuplicate, isSuccess, setSelectedFunctionIdToDuplicate])
 
   useEffect(() => {
-    if (isSuccess && !!functionIdToDelete && !functionToDelete && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: functionIdToDelete,
+      resourceFound: !!functionToDelete,
+      isSuccessDelete,
+      isPendingDelete: isDeletingFunction,
+      deletedId: deletedFunction?.func?.id,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('Function not found')
-      setSelectedFunctionToDelete(null)
     }
+    setSelectedFunctionToDelete(null, { history: 'replace' })
   }, [
+    deletedFunction,
     functionIdToDelete,
+    isDeletingFunction,
     functionToDelete,
     isSuccess,
     isSuccessDelete,

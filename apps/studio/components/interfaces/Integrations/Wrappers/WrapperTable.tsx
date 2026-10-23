@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -23,6 +23,7 @@ import { WrapperRow } from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 interface WrapperTableProps {
   isLatest?: boolean
@@ -48,7 +49,10 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
     [data, integration]
   )
 
-  const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
+  const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = usePanelQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
   const openedWrapperId = useRef<string | null>(null)
 
@@ -61,7 +65,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
       if (openedWrapperId.current !== selectedWrapperIdToEdit) {
         toast('Wrapper not found')
       }
-      setSelectedWrapperToEdit(null)
+      setSelectedWrapperToEdit(null, { history: 'replace' })
     }
   }, [isError, isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 

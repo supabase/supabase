@@ -1,10 +1,20 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { usePreventNavigationOnUnsavedChanges } from './usePreventNavigationOnUnsavedChanges'
+import { armPanelPush, dismissPanelUrl, resetPanelHistoryForTests } from '@/lib/panel-history'
+import {
+  installNavigationDouble,
+  uninstallNavigationDouble,
+} from '@/tests/lib/panel-navigation-double'
 import { routerMock } from '@/tests/lib/route-mock'
 
 vi.mock('@/lib/constants', () => ({ BASE_PATH: '/dashboard' }))
+
+afterEach(() => {
+  resetPanelHistoryForTests()
+  uninstallNavigationDouble()
+})
 
 describe('Next unsaved-change navigation guard', () => {
   it('runs without a TanStack router provider and allows clean navigation', async () => {
@@ -47,6 +57,36 @@ describe('Next unsaved-change navigation guard', () => {
     expect(push).toHaveBeenCalledWith('/overview?tab=details')
     expect(result.current.shouldConfirmNavigation).toBe(false)
     push.mockRestore()
+  })
+
+  it('does not confirm again when a panel back starts a route change on a dirty page', async () => {
+    installNavigationDouble()
+    window.history.replaceState(null, '', '/overview')
+    const { result } = renderHook(() => usePreventNavigationOnUnsavedChanges({ hasChanges: true }))
+
+    act(() => {
+      armPanelPush('new')
+      window.history.pushState(null, '', '/overview?new=true')
+      dismissPanelUrl('new', () => {
+        window.history.replaceState(null, '', '/overview')
+      })
+    })
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    act(() => {
+      routerMock.events.emit('routeChangeStart', '/overview', { shallow: false })
+    })
+    expect(result.current.shouldConfirmNavigation).toBe(false)
+
+    act(() => {
+      expect(() =>
+        routerMock.events.emit('routeChangeStart', '/project/default/settings', { shallow: false })
+      ).toThrow('Route change declined')
+    })
+    expect(result.current.shouldConfirmNavigation).toBe(true)
   })
 
   it('keeps unload protection conditional on dirty state', () => {

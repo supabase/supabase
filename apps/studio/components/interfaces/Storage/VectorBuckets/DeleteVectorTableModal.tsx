@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -9,12 +9,14 @@ import { useFDWDropForeignTableMutation } from '@/data/fdw/fdw-drop-foreign-tabl
 import { useVectorBucketIndexDeleteMutation } from '@/data/storage/vector-bucket-index-delete-mutation'
 import { useVectorBucketsIndexesQuery } from '@/data/storage/vector-buckets-indexes-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 
 export const DeleteVectorTableModal = () => {
   const { ref: projectRef, bucketId } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const [selectedTableIdToDelete, setSelectedTableIdToDelete] = useQueryState(
+  const [selectedTableIdToDelete, setSelectedTableIdToDelete] = usePanelQueryState(
     'deleteTable',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -37,6 +39,7 @@ export const DeleteVectorTableModal = () => {
     mutate: deleteIndex,
     isPending: isDeleting,
     isSuccess: isSuccessDelete,
+    variables: deletedIndex,
   } = useVectorBucketIndexDeleteMutation({
     onSuccess: (_, vars) => {
       try {
@@ -70,16 +73,28 @@ export const DeleteVectorTableModal = () => {
   }
 
   useEffect(() => {
-    if (!!selectedTableIdToDelete && isSuccessIndexes && !table && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccessIndexes,
+      currentId: selectedTableIdToDelete,
+      resourceFound: !!table,
+      isSuccessDelete,
+      isPendingDelete: isDeleting,
+      deletedId: deletedIndex?.indexName,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast(`Table ${selectedTableIdToDelete} cannot be found in your bucket`)
-      setSelectedTableIdToDelete(null)
     }
+    setSelectedTableIdToDelete(null, { history: 'replace' })
   }, [
+    deletedIndex,
+    isDeleting,
+    isSuccessDelete,
     isSuccessIndexes,
     selectedTableIdToDelete,
-    table,
     setSelectedTableIdToDelete,
-    isSuccessDelete,
+    table,
   ])
 
   return (

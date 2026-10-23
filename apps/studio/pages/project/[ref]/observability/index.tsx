@@ -1,6 +1,6 @@
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect } from 'react'
 import { LogoLoader } from 'ui'
 
@@ -14,6 +14,7 @@ import {
   FGA_PERMISSIONS,
   useAsyncCheckUserContentPermissions,
 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { NextPageWithLayout } from '@/types'
 
 export const UserReportPage: NextPageWithLayout = () => {
@@ -22,7 +23,7 @@ export const UserReportPage: NextPageWithLayout = () => {
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const showOverview = useFlag('observabilityOverview')
-  const [showCreateReportModal, setShowCreateReportModal] = useQueryState(
+  const [showCreateReportModal, setShowCreateReportModal] = usePanelQueryState(
     'newReport',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

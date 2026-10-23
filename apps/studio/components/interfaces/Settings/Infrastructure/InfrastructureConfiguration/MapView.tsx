@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import { MoreVerticalIcon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useCallback, useEffect, useState } from 'react'
 import {
   ComposableMap,
@@ -33,6 +33,7 @@ import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const MAP_WIDTH = 800
@@ -54,7 +55,10 @@ const MapView = () => {
     y: number
     region: { key: string; country?: string; name?: string; region?: string }
   }>()
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = usePanelQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+  )
 
   const { data } = useReadReplicasQuery({ projectRef: ref })
   const databases = data ?? []
