@@ -57,10 +57,11 @@ You can list organization members with the Management API:
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
 export SUPABASE_ACCESS_TOKEN="your-access-token"
-export ORG_ID="your-organization-id"
+# Find your organization slug in your organization's general settings
+export ORG_SLUG="your-organization-slug"
 
 # List organization members
-curl "https://api.supabase.com/v1/organizations/$ORG_ID/members" \
+curl "https://api.supabase.com/v1/organizations/$ORG_SLUG/members" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
@@ -285,6 +286,6 @@ The following table shows the actions each role can take on project resources.
 
 [^6]: Listed permissions are for the API and the Supabase Dashboard.
 
-[^7]: Limited to running `select` queries. SQL snippets that a **Read-only** member runs use the `supabase_read_only_user` database role. This role has the `pg_read_all_data` role. For more information, see the Postgres documentation on [predefined roles](https://www.postgresql.org/docs/current/predefined-roles.html).
+[^7]: Limited to running `select` queries. SQL snippets that a **Read-only** member runs use the `supabase_read_only_user` database role. This role has the `pg_read_all_data` role and the `BYPASSRLS` attribute, so Row Level Security policies don't limit which rows it can read. Its transactions are read-only by default. For more information, see the Postgres documentation on [predefined roles](https://www.postgresql.org/docs/current/predefined-roles.html).
 
 [^8]: If you create branches in the Supabase Dashboard without a GitHub integration, the first branch you create also registers the project's production branch. This one-time step requires the **Owner** or **Administrator** role. After that, members with the **Developer** role can create, update, and delete branches. For more information, see [Branching via the dashboard](/docs/guides/deployment/branching/dashboard).
