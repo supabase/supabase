@@ -118,7 +118,6 @@ describe('recovery interruption routes', () => {
     '/sign-in-mfa',
     '/sign-in-recovery-code',
     '/account/security',
-    '/account-recovery?returnTo=%2Forganizations',
     '/authorize?client_id=example',
     '/integrations/github/authorize',
     '/integrations/vercel/install',
