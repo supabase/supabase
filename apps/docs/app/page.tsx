@@ -5,7 +5,7 @@ import { cn } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import { FrameworkQuickstarts } from '@/components/FrameworkQuickstarts'
-import { MIGRATION_PAGES } from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
+import { MIGRATION_PAGES } from '@/data/migration-pages'
 import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker'
 import { IconLinkImage, IconLinkList, IconLinkMenuIcon } from '@/features/ui/IconLink'
 import HomeLayout from '@/layouts/HomeLayout'
