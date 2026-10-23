@@ -132,6 +132,17 @@ If your database is down because the disk is full:
 2. On the [General settings page](/dashboard/project/_/settings/general), select **Restart project**.
 3. Wait about 10 minutes for the project to recover.
 
+#### Write Ahead Log (WAL) on the Free Plan
+
+The [Write Ahead Log (WAL)](#disk-space-usage) uses disk space in addition to your data. On a 2 GB disk, WAL can fill the disk even when your database size is small.
+
+WAL grows fast when you write a lot of data in a short time. Examples are bulk imports, large `update` or `delete` statements, and index builds. During heavy writes, WAL can grow to 1 GB or more before Postgres removes old WAL files. An inactive [replication slot](/docs/guides/database/replication) can also keep up to 512 MB of WAL on the disk.
+
+To keep WAL small:
+
+- Split large writes into smaller batches.
+- Drop replication slots that you do not use with `select pg_drop_replication_slot('<slot_name>');`.
+
 ### Fair use database size restriction
 
 Separate from the per-project read-only mode above, your organization can be placed under a [Fair Use](/docs/guides/platform/billing-faq#fair-use-policy) service restriction (requests return a `402` status code) when its database size exceeds the plan quota. This quota is evaluated **per organization**, summing the database size across all of your projects.
