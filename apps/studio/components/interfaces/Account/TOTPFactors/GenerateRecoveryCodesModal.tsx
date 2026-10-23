@@ -1,30 +1,34 @@
-import { ComponentProps } from 'react'
+import { ReactNode, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { RecoveryCodesFlow } from './RecoveryCodesFlow'
+import { RecoveryCodesModal } from './RecoveryCodesModal'
 import { useRecoveryCodesGenerateMutation } from '@/data/recovery-codes/recovery-codes-generate-mutation'
 
-type GenerateRecoveryCodesModalProps = Partial<
-  Pick<
-    ComponentProps<typeof RecoveryCodesFlow>,
-    'children' | 'onComplete' | 'onStart' | 'showSecurityLink'
-  >
->
+export interface GenerateRecoveryCodesModalProps {
+  children?: (trigger: { onClick: () => void; isPending: boolean }) => ReactNode
+  onComplete?: () => void
+  onStart?: () => void
+  showSecurityLink?: boolean
+}
 
 export const GenerateRecoveryCodesModal = ({
   children,
-  ...props
+  onComplete,
+  onStart,
+  showSecurityLink,
 }: GenerateRecoveryCodesModalProps = {}) => {
   const mutation = useRecoveryCodesGenerateMutation()
+  const [isOpen, setIsOpen] = useState(false)
+  const handleGenerate = () => {
+    onStart?.()
+    setIsOpen(true)
+    mutation.mutate({})
+  }
   return (
-    <RecoveryCodesFlow
-      action="generate"
-      mutation={mutation}
-      onGenerate={() => mutation.mutate({})}
-      {...props}
-    >
-      {children ??
+    <>
+      {(
+        children ??
         (({ onClick, isPending }) => (
           <Admonition
             type="warning"
@@ -37,7 +41,17 @@ export const GenerateRecoveryCodesModal = ({
               </Button>
             }
           />
-        ))}
-    </RecoveryCodesFlow>
+        ))
+      )({ onClick: handleGenerate, isPending: mutation.isPending })}
+      <RecoveryCodesModal
+        open={isOpen}
+        mutation={mutation}
+        showSecurityLink={showSecurityLink}
+        onOpenChange={(open) => {
+          setIsOpen(open)
+          if (!open && mutation.isSuccess) onComplete?.()
+        }}
+      />
+    </>
   )
 }
