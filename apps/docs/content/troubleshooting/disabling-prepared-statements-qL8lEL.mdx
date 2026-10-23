@@ -7,9 +7,9 @@ keywords = [ "prepared", "statements", "transaction", "mode", "disable" ]
 database_id = "04801b69-e7eb-4f40-8d41-81110397bbc2"
 ---
 
-## It is important to note that although the direct connections and Supavisor in session mode support prepared statements, Supavisor in transaction mode does not.
+Direct connections and the shared pooler (Supavisor) in session mode support prepared statements. The dedicated pooler supports them on PgBouncer 1.21 and later. The shared pooler in transaction mode doesn't support them.
 
-## How to disable prepared statements for Supavisor in transaction mode
+## How to disable prepared statements for the shared pooler in transaction mode
 
 Each ORM or library configures prepared statements differently. Here are settings for some common ones. If you don't see yours, make a comment
 

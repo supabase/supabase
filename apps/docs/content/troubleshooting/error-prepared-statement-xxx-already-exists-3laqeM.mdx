@@ -10,7 +10,9 @@ database_id = "8688dad6-3dce-4912-9b90-4f128daf79d7"
 message = "prepared statement \"XXX\" already exists"
 ---
 
-This error occurs when you are trying to connect to the database using PgBouncer. PgBouncer does not support prepared statements. If you have prepared statements in use, you will need to use direct connections - port 5432.
+This error occurs when you connect through the shared pooler (Supavisor) in transaction mode, on port 6543. The shared pooler doesn't support prepared statements in transaction mode. The dedicated pooler supports them on PgBouncer 1.21 and later.
 
-There is a special parameter in the query string for Prisma to work with PgBouncer
-https://www.prisma.io/docs/guides/performance-and-optimization/connection-management/configure-pg-bouncer
+To fix it, do one of the following:
+
+- Turn off prepared statements in your client. See [Disabling prepared statements](/kb/troubleshooting/disabling-prepared-statements-qL8lEL) for the setting your library uses. For Prisma, add [`pgbouncer=true`](https://www.prisma.io/docs/guides/performance-and-optimization/connection-management/configure-pg-bouncer) to the connection string.
+- Connect with a direct connection, or with the shared pooler in session mode, on port 5432. Both support prepared statements.

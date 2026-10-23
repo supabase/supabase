@@ -20,10 +20,10 @@ This guide provides three methods for migrating your Postgres database to Supaba
 Supabase provides the following connection modes:
 
 - Direct connection
-- Supavisor session mode
-- Supavisor transaction mode
+- Shared pooler, session mode
+- Shared pooler, transaction mode
 
-Use Supavisor session mode for the database migration tasks (pg_dump/restore and logical replication).
+Use the direct connection for database migration tasks (pg_dump/restore and logical replication). If your network is IPv4-only and you don't have the [IPv4 add-on](/docs/guides/platform/ipv4-address), use shared pooler session mode for pg_dump/restore instead. The examples on this page use session mode.
 
 ## Method 1: Google Colab (easiest)
 
@@ -199,7 +199,7 @@ Run `pg_dump --help` for a full list of options.
 #### Set connection and restore
 
 ```bash
-# Set Supabase connection (Session Pooler on port 5432 or direct connection)
+# Set Supabase connection (Session pooler on port 5432 or direct connection)
 export SUPABASE_DB_URL="Postgres://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
 
 # Determine restore parallelization based on your Supabase compute size:
@@ -327,7 +327,7 @@ Edit Postgres configuration files:
 #### Postgres.conf
 
 ```bash
-# Set Supabase connection (Session Pooler on port 5432 or direct connection)
+# Set Supabase connection (Session pooler on port 5432 or direct connection)
 export SUPABASE_DB_URL="Postgres://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
 
 # Set WAL level to logical
@@ -414,7 +414,7 @@ pg_dump \
   --format=directory \
   -f ./schema_dump
 
-# Restore schema to Supabase (use Session Pooler)
+# Restore schema to Supabase (use Session pooler)
 pg_restore \
   --dbname="$SUPABASE_DB_URL" \
   --format=directory \
