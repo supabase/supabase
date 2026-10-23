@@ -62,7 +62,7 @@ export const databaseSizeBreakdownSql = safeSql`
 
 async function getDatabaseSizeBreakdown(
   { projectRef, connectionString }: DatabaseSizeBreakdownVariables,
-  signal?: AbortSignal
+  { signal }: { signal?: AbortSignal }
 ) {
   if (!projectRef) throw new Error('Project ref is required')
   const { result } = await executeSql<unknown[]>(
@@ -72,10 +72,14 @@ async function getDatabaseSizeBreakdown(
   return snapshotSchema.parse(result[0])
 }
 
-export const databaseSizeBreakdownQueryOptions = (variables: DatabaseSizeBreakdownVariables) =>
+export const databaseSizeBreakdownQueryOptions = ({
+  projectRef,
+  databaseIdentifier,
+  connectionString,
+}: DatabaseSizeBreakdownVariables) =>
   queryOptions({
-    queryKey: databaseKeys.sizeBreakdown(variables.projectRef, variables.databaseIdentifier),
-    queryFn: ({ signal }) => getDatabaseSizeBreakdown(variables, signal),
-    enabled: !!variables.projectRef,
+    queryKey: databaseKeys.sizeBreakdown(projectRef, databaseIdentifier),
+    queryFn: getDatabaseSizeBreakdown.bind(null, { projectRef, connectionString }),
+    enabled: !!projectRef,
     staleTime: 60_000,
   })
