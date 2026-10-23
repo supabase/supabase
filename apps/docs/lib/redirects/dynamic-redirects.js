@@ -44,6 +44,12 @@ export const dynamicRedirects = [
   {
     basePath: false,
     permanent: true,
+    source: '/docs/guides/cli/github-actions/:path*',
+    destination: '/docs/guides/deployment/ci/:path*',
+  },
+  {
+    basePath: false,
+    permanent: true,
     source: '/docs/guides/cli/:path*',
     destination: '/docs/guides/local-development/cli/:path*',
   },
@@ -52,12 +58,6 @@ export const dynamicRedirects = [
     permanent: true,
     source: '/docs/guides/platform/terraform/:path*',
     destination: '/docs/guides/deployment/terraform/:path*',
-  },
-  {
-    basePath: false,
-    permanent: true,
-    source: '/docs/guides/cli/github-actions/:path*',
-    destination: '/docs/guides/deployment/ci/:path*',
   },
   {
     basePath: false,
