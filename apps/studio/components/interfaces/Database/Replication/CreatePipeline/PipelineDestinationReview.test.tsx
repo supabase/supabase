@@ -27,8 +27,6 @@ const defaults = {
   clickhouseDatabase: 'events',
   clickhouseEngine: 'merge_tree',
   clickhousePassword: 'private-password',
-  warehouseName: 'bucket',
-  namespace: 'namespace',
 } satisfies Partial<DestinationPanelSchemaType>
 
 const TestReview = ({
@@ -60,7 +58,6 @@ describe('PipelineDestinationReview', () => {
     { type: 'DuckLake', details: ['s3://warehouse/data'] },
     { type: 'Snowflake', details: ['my-account', 'warehouse', 'PUBLIC'] },
     { type: 'ClickHouse', details: ['events', 'MergeTree'] },
-    { type: 'Analytics Bucket', details: ['bucket', 'namespace'] },
   ])('shows $type details without credentials', ({ type, details }) => {
     const { container } = customRender(<TestReview type={type} />)
     expect(screen.getByDisplayValue('Analytics')).toHaveAttribute('readonly')

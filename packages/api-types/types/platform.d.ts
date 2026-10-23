@@ -6209,47 +6209,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -7483,47 +7442,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -8517,57 +8435,6 @@ export interface components {
             }
           }
         | {
-            iceberg:
-              | {
-                  supabase: {
-                    /**
-                     * @description Namespace
-                     * @example my-namespace
-                     */
-                    namespace?: string | null
-                    /**
-                     * @description Project ref
-                     * @example abcdefghijklmnopqrst
-                     */
-                    project_ref: string
-                    /**
-                     * @description S3 region
-                     * @example ap-southeast-1
-                     */
-                    s3_region: string
-                    /**
-                     * @description Warehouse name
-                     * @example my-warehouse
-                     */
-                    warehouse_name: string
-                  }
-                }
-              | {
-                  rest: {
-                    /**
-                     * @description Iceberg REST catalog URI
-                     * @example https://catalog.example.com
-                     */
-                    catalog_uri: string
-                    /**
-                     * @description Namespace
-                     * @example my-namespace
-                     */
-                    namespace?: string | null
-                    /**
-                     * @description S3-compatible storage endpoint
-                     * @example https://s3.example.com
-                     */
-                    s3_endpoint: string
-                    /**
-                     * @description Warehouse name
-                     * @example my-warehouse
-                     */
-                    warehouse_name: string
-                  }
-                }
-          }
-        | {
             ducklake: {
               /**
                * @description Persisted DuckLake data path
@@ -8811,57 +8678,6 @@ export interface components {
                  */
                 user: string
               }
-            }
-          | {
-              iceberg:
-                | {
-                    supabase: {
-                      /**
-                       * @description Namespace
-                       * @example my-namespace
-                       */
-                      namespace?: string | null
-                      /**
-                       * @description Project ref
-                       * @example abcdefghijklmnopqrst
-                       */
-                      project_ref: string
-                      /**
-                       * @description S3 region
-                       * @example ap-southeast-1
-                       */
-                      s3_region: string
-                      /**
-                       * @description Warehouse name
-                       * @example my-warehouse
-                       */
-                      warehouse_name: string
-                    }
-                  }
-                | {
-                    rest: {
-                      /**
-                       * @description Iceberg REST catalog URI
-                       * @example https://catalog.example.com
-                       */
-                      catalog_uri: string
-                      /**
-                       * @description Namespace
-                       * @example my-namespace
-                       */
-                      namespace?: string | null
-                      /**
-                       * @description S3-compatible storage endpoint
-                       * @example https://s3.example.com
-                       */
-                      s3_endpoint: string
-                      /**
-                       * @description Warehouse name
-                       * @example my-warehouse
-                       */
-                      warehouse_name: string
-                    }
-                  }
             }
           | {
               ducklake: {
@@ -14587,47 +14403,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token?: string | null
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref?: string | null
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id?: string | null
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region?: string | null
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key?: string | null
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name?: string | null
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -15755,47 +15530,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token?: string | null
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref?: string | null
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id?: string | null
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region?: string | null
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key?: string | null
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name?: string | null
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -16642,47 +16376,6 @@ export interface components {
                * @example default
                */
               user: string
-            }
-          }
-        | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
             }
           }
         | {

@@ -1,11 +1,6 @@
-export type DestinationType =
-  | 'BigQuery'
-  | 'Analytics Bucket'
-  | 'DuckLake'
-  | 'Snowflake'
-  | 'ClickHouse'
+export type DestinationType = 'BigQuery' | 'DuckLake' | 'Snowflake' | 'ClickHouse'
 
-export type FlowDestination = Exclude<DestinationType, 'Analytics Bucket'>
+export type FlowDestination = DestinationType
 
 export type ExistingDestination = {
   sourceId?: number
