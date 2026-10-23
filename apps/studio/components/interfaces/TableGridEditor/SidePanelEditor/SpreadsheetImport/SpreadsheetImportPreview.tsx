@@ -21,6 +21,7 @@ const MAX_ROWS = 20
 const MAX_HEADERS = 20
 
 interface SpreadsheetImportPreviewProps {
+  skipConflictingRows?: boolean
   selectedTable?: { name: string }
   spreadsheetData: SpreadsheetData
   errors?: any[]
@@ -30,6 +31,7 @@ interface SpreadsheetImportPreviewProps {
 }
 
 export const SpreadsheetImportPreview = ({
+  skipConflictingRows = false,
   selectedTable,
   spreadsheetData,
   errors = [],
@@ -41,6 +43,8 @@ export const SpreadsheetImportPreview = ({
   const [expandedErrors, setExpandedErrors] = useState<string[]>([])
 
   const { headers, rows } = spreadsheetData
+  const rowCountLabel = `${spreadsheetData.rowCount.toLocaleString()} ${spreadsheetData.rowCount === 1 ? 'row' : 'rows'}`
+  const columnCountLabel = `${headers.length.toLocaleString()} ${headers.length === 1 ? 'column' : 'columns'}`
   const previewHeaders = headers
     .filter((header) => selectedHeaders.includes(header))
     .slice(0, MAX_HEADERS)
@@ -75,7 +79,7 @@ export const SpreadsheetImportPreview = ({
         <SidePanel.Content>
           <div className="py-1 flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <p className="text-sm">Preview data to be imported</p>
+              <p className="text-sm">Preview CSV data</p>
               {!isCompatible && <Badge variant="destructive">Data incompatible</Badge>}
               {dedupedErrors.length > 0 && (
                 <Badge variant="warning">
@@ -103,15 +107,18 @@ export const SpreadsheetImportPreview = ({
           <div className="mb-4">
             <p className="text-sm text-foreground-light">
               {selectedTable === undefined
-                ? `Your table will have ${spreadsheetData.rowCount.toLocaleString()} rows and the
-                        following ${spreadsheetData.headers.length} columns.`
-                : `A total of ${spreadsheetData.rowCount.toLocaleString()} rows will be added to the table "${
+                ? `Your table will have ${rowCountLabel} and the following ${columnCountLabel}.`
+                : `A total of ${rowCountLabel} will be processed for the table "${
                     selectedTable.name
-                  }"`}
+                  }".`}
             </p>
+            {skipConflictingRows && (
+              <p className="text-sm text-foreground-light">
+                This preview includes rows that may be skipped during import.
+              </p>
+            )}
             <p className="text-sm text-foreground-light">
-              Here is a preview of the data that will be added (up to the first 20 columns and first
-              20 rows).
+              Here is a preview of your CSV data (up to the first 20 columns and first 20 rows).
             </p>
           </div>
           <div className="mb-4">

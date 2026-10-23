@@ -22,12 +22,15 @@ import {
   createTable,
   duplicateTable,
   getRowFromSidePanel,
-  insertRowsViaSpreadsheet,
-  insertTableRows,
   updateColumn,
   updateTable,
 } from './SidePanelEditor.utils'
 import { SpreadsheetImport } from './SpreadsheetImport/SpreadsheetImport'
+import { getImportResultMessage } from './SpreadsheetImport/SpreadsheetImport.utils'
+import {
+  insertRowsViaSpreadsheet,
+  insertTableRows,
+} from './SpreadsheetImport/SpreadsheetImportInsert.utils'
 import {
   useTableApiAccessHandlerWithHistory,
   type TableApiAccessParams,
@@ -58,7 +61,6 @@ import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { type ApiPrivilegesByRole } from '@/lib/data-api-types'
-import { isObjectContainingKeys } from '@/lib/helpers'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
@@ -650,7 +652,7 @@ export const SidePanelEditor = ({
             })
 
             try {
-              const { table } = await createTable({
+              const { table, importResult } = await createTable({
                 projectRef: project?.ref!,
                 connectionString: project?.connectionString,
                 toastId,
@@ -699,7 +701,14 @@ export const SidePanelEditor = ({
                 }
               )
 
-              toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+              if (importResult?.status === 'error') {
+                toast.error(
+                  `Table ${table.name} created. ${getImportResultMessage(importResult)}`,
+                  { id: toastId }
+                )
+              } else {
+                toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+              }
 
               onTableCreated(table)
             } catch (error) {
@@ -805,79 +814,45 @@ export const SidePanelEditor = ({
   }
 
   const onImportData = async (importContent: ImportContent) => {
-    if (!project || selectedTable === undefined) {
-      return console.error('no project or table selected')
-    }
-
-    const { file, rowCount, selectedHeaders, emptyStringAsNullHeaders, resolve } = importContent
-    const toastId = toast.loading(
-      `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`
-    )
-
-    if (file && rowCount > 0) {
-      const res = await insertRowsViaSpreadsheet({
-        projectRef: project.ref!,
+    let toastId: string | number | undefined
+    try {
+      if (!project || selectedTable === undefined) return
+      const { file, rowCount, selectedHeaders, emptyStringAsNullHeaders, skipConflictingRows } =
+        importContent
+      const message = `Processing ${rowCount.toLocaleString()} rows for ${selectedTable.name}`
+      toastId = toast.loading(message)
+      const options = {
+        projectRef: project.ref,
         connectionString: project.connectionString,
-        file,
         table: selectedTable,
         selectedHeaders,
         emptyStringAsNullHeaders,
+        skipConflictingRows,
         roleImpersonationState: getImpersonatedRoleState(),
         onProgressUpdate: (progress: number) => {
-          toast.loading(
-            <SonnerProgress
-              progress={progress}
-              message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
-            />,
-            { id: toastId }
-          )
+          toast.loading(<SonnerProgress progress={progress} message={message} />, { id: toastId })
         },
-      })
-      if (res.error) {
-        const message = isObjectContainingKeys(res.error, ['message'])
-          ? res.error.message
-          : 'An unknown error occurred during import'
-        toast.error(`Failed to import data: ${message}`, { id: toastId })
-        return resolve()
       }
-    } else {
-      const res = await insertTableRows({
-        projectRef: project.ref!,
-        connectionString: project.connectionString,
-        table: selectedTable,
-        rows: importContent.rows,
-        selectedHeaders,
-        emptyStringAsNullHeaders,
-        roleImpersonationState: getImpersonatedRoleState(),
-        onProgressUpdate: (progress: number) => {
-          toast.loading(
-            <SonnerProgress
-              progress={progress}
-              message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${
-                selectedTable.name
-              }`}
-            />,
-            { id: toastId }
-          )
-        },
+      const result = file
+        ? await insertRowsViaSpreadsheet({ ...options, file })
+        : await insertTableRows({ ...options, rows: importContent.rows })
+      // Even a failed import may have committed earlier batches.
+      await queryClient.invalidateQueries({
+        queryKey: tableRowKeys.tableRowsAndCount(project.ref, selectedTable.id),
       })
-      if (res.error) {
-        const message = isObjectContainingKeys(res.error, ['message'])
-          ? res.error.message
-          : 'An unknown error occurred during import'
-        toast.error(`Failed to import data: ${message}`, { id: toastId })
-        return resolve()
+      if (result.status === 'error') {
+        toast.error(getImportResultMessage(result), { id: toastId })
+        // Keep the panel open unless every row was inserted, so a retry can't duplicate rows.
+        if (result.phase !== 'sequence') return
+      } else {
+        toast.success(getImportResultMessage(result), { id: toastId })
       }
+      setIsEdited(false)
+      snap.closeSidePanel()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown import error'
+      toast.error(`Failed to import data: ${message}`, { id: toastId })
     }
-
-    await queryClient.invalidateQueries({
-      queryKey: tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id),
-    })
-    toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
-      id: toastId,
-    })
-    resolve()
-    snap.closeSidePanel()
   }
 
   const onClosePanel = confirmOnClose

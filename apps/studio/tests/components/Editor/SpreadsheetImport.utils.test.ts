@@ -1,9 +1,50 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  getImportResultMessage,
   inferColumnType,
   parseSpreadsheetText,
 } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
+
+describe('SpreadsheetImport.utils: getImportResultMessage', () => {
+  test('reports zero, singular, plural, and skipped rows without claiming duplicates', () => {
+    expect(getImportResultMessage({ status: 'success', insertedCount: 0, skippedCount: 2 })).toBe(
+      '0 rows imported, 2 skipped'
+    )
+    expect(getImportResultMessage({ status: 'success', insertedCount: 1, skippedCount: 0 })).toBe(
+      '1 row imported, 0 skipped'
+    )
+    expect(getImportResultMessage({ status: 'success', insertedCount: 2, skippedCount: 1 })).toBe(
+      '2 rows imported, 1 skipped'
+    )
+  })
+  test('retains confirmed progress and database errors after a partial failure', () => {
+    expect(
+      getImportResultMessage({
+        status: 'error',
+        phase: 'insert',
+        outcome: 'known',
+        insertedCount: 1000,
+        skippedCount: 4,
+        error: new Error('foreign key violation'),
+      })
+    ).toBe('1,000 rows imported, 4 skipped before the import stopped. foreign key violation')
+  })
+  test('reports a sequence-only failure without saying the import stopped', () => {
+    expect(
+      getImportResultMessage({
+        status: 'error',
+        phase: 'sequence',
+        outcome: 'known',
+        insertedCount: 3,
+        skippedCount: 1,
+        error: new Error('permission denied for sequence'),
+      })
+    ).toBe(
+      '3 rows imported, 1 skipped. The identity sequence could not be updated: permission denied for sequence'
+    )
+  })
+})
 
 describe('SpreadsheetImport.utils: inferColumnType', () => {
   test('should default column type to text if no rows to infer from', () => {

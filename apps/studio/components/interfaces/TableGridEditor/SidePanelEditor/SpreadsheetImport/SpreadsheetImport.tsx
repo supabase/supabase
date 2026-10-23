@@ -1,13 +1,19 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import type { PGTable } from '@supabase/pg-meta'
 import { noop } from 'lodash'
-import { useCallback, type ChangeEvent, type DragEvent } from 'react'
+import { useCallback, useId, type ChangeEvent, type DragEvent } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { SidePanel, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import { Form, SidePanel, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { ActionBar } from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'
 import { SpreadSheetFileUpload } from './SpreadSheetFileUpload'
-import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
+import {
+  spreadsheetImportSettingsSchema,
+  type SpreadsheetImportSettings,
+} from './SpreadsheetImport.types'
+import { SpreadsheetImportConfiguration } from './SpreadSheetImportConfiguration'
 import { SpreadsheetImportPreview } from './SpreadsheetImportPreview'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
 import {
@@ -24,7 +30,7 @@ import { useTrack } from '@/lib/telemetry/track'
 interface SpreadsheetImportProps {
   visible: boolean
   selectedTable?: PGTable
-  saveContent: (prefillData: ImportContent) => void
+  saveContent: (prefillData: ImportContent) => void | Promise<void>
   closePanel: () => void
   updateEditorDirty?: (value: boolean) => void
 }
@@ -37,6 +43,23 @@ export const SpreadsheetImport = ({
   updateEditorDirty = noop,
 }: SpreadsheetImportProps) => {
   const track = useTrack()
+  const formId = useId()
+  const form = useForm<SpreadsheetImportSettings>({
+    resolver: zodResolver(spreadsheetImportSettingsSchema),
+    defaultValues: { skipConflictingRows: false },
+  })
+  const { isSubmitting } = form.formState
+  const { getValues } = form
+  const skipConflictingRows = useWatch({ control: form.control, name: 'skipConflictingRows' })
+  const handleClose = () => {
+    if (!isSubmitting) closePanel()
+  }
+  const markDirty = useCallback(
+    (isDirty: boolean) => {
+      updateEditorDirty(isDirty || getValues('skipConflictingRows'))
+    },
+    [getValues, updateEditorDirty]
+  )
   const {
     state,
     handleSwitchTab,
@@ -45,7 +68,7 @@ export const SpreadsheetImport = ({
     handleUploadFile,
     handleRemoveFile,
     handleToggleSelectedHeader,
-  } = useSpreadsheetImport({ markDirty: updateEditorDirty })
+  } = useSpreadsheetImport({ markDirty })
   const tab = isFileTab(state) ? 'fileUpload' : 'pasteText'
 
   const selectedTableColumns = (selectedTable?.columns ?? []).map((column) => column.name)
@@ -56,111 +79,124 @@ export const SpreadsheetImport = ({
   )
   const isCompatible = !selectedTable || incompatibleHeaders.length === 0
 
-  const onConfirm = (resolve: () => void) => {
+  const onConfirm = form.handleSubmit(async (settings) => {
     if (state._tag === 'no_selected_file') {
       toast.error('Please upload a file to import your data with')
-      resolve()
     } else if (state._tag === 'no_pasted_text') {
       toast.error('Please paste some CSV text to import')
-      resolve()
     } else if (state._tag === 'parsing_file' || state._tag === 'parsing_text') {
       toast.error('Your data is still being processed, please wait a moment')
-      resolve()
     } else if (state.selectedHeaders.length === 0) {
       toast.error('Please select at least one header from your CSV')
-      resolve()
     } else if (!isCompatible) {
       toast.error(
         'The data that you are trying to import is incompatible with your table structure'
       )
-      resolve()
     } else {
-      saveContent({
-        file: state._tag === 'file_parsed' ? state.file : undefined,
-        ...state.data,
-        selectedHeaders: state.selectedHeaders,
-        emptyStringAsNullHeaders: state.emptyStringAsNullHeaders,
-        resolve,
-      })
-      track('import_data_added')
+      try {
+        await saveContent({
+          file: state._tag === 'file_parsed' ? state.file : undefined,
+          ...state.data,
+          selectedHeaders: state.selectedHeaders,
+          emptyStringAsNullHeaders: state.emptyStringAsNullHeaders,
+          skipConflictingRows: selectedTable !== undefined && settings.skipConflictingRows,
+        })
+        track('import_data_added')
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown import error'
+        toast.error(`Failed to import data: ${message}`)
+      }
     }
-  }
+  })
 
   return (
-    <SidePanel
-      size="large"
-      visible={visible}
-      align="right"
-      header={
-        selectedTable !== undefined ? (
-          <>
-            Add data to <code className="text-sm ml-1">{selectedTable.name}</code>
-          </>
-        ) : (
-          'Add content to new table'
-        )
-      }
-      onCancel={() => closePanel()}
-      customFooter={
-        <ActionBar
-          backButtonLabel="Cancel"
-          applyButtonLabel={selectedTable === undefined ? 'Save' : 'Import data'}
-          closePanel={closePanel}
-          applyFunction={onConfirm}
-        />
-      }
-    >
-      <SidePanel.Content>
-        <div className="pt-6">
-          <Tabs value={tab} onValueChange={handleSwitchTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="fileUpload">Upload CSV</TabsTrigger>
-              <TabsTrigger value="pasteText">Paste text</TabsTrigger>
-            </TabsList>
-            <TabsContent value="fileUpload">
-              <SpreadsheetFileDropZone
-                file={hasAttachedFile(state) ? state.file : undefined}
-                parseProgress={
-                  isEmptyState(state) ? 0 : isParsingState(state) ? state.progress : 100
-                }
-                onUploadFile={handleUploadFile}
-                onRemoveFile={handleRemoveFile}
-              />
-            </TabsContent>
-            <TabsContent value="pasteText">
-              <SpreadsheetInputZone
-                text={hasAttachedText(state) ? state.text : ''}
-                onInputChange={handleInputText}
-              />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </SidePanel.Content>
-      {isParsedState(state) && state.data.headers.length > 0 && (
-        <>
-          <div className="pt-4">
-            <SidePanel.Separator />
-          </div>
-          <SpreadsheetImportConfiguration
-            spreadsheetData={state.data}
-            selectedHeaders={state.selectedHeaders}
-            onToggleHeader={handleToggleSelectedHeader}
-            emptyStringAsNullHeaders={state.emptyStringAsNullHeaders}
-            onEmptyStringAsNullHeadersChange={handleSetEmptyStringAsNullHeaders}
+    <Form {...form}>
+      <SidePanel
+        size="large"
+        visible={visible}
+        align="right"
+        header={
+          selectedTable !== undefined ? (
+            <>
+              Add data to <code className="text-sm ml-1">{selectedTable.name}</code>
+            </>
+          ) : (
+            'Add content to new table'
+          )
+        }
+        onCancel={handleClose}
+        customFooter={
+          <ActionBar
+            backButtonLabel="Cancel"
+            applyButtonLabel={selectedTable === undefined ? 'Save' : 'Import data'}
+            closePanel={handleClose}
+            formId={formId}
+            loading={isSubmitting}
+            visible={visible}
           />
-          <SidePanel.Separator />
-          <SpreadsheetImportPreview
-            selectedTable={selectedTable}
-            spreadsheetData={state.data}
-            errors={state.errors}
-            selectedHeaders={state.selectedHeaders}
-            incompatibleHeaders={incompatibleHeaders}
-            emptyStringAsNullHeaders={state.emptyStringAsNullHeaders}
-          />
-          <SidePanel.Separator />
-        </>
-      )}
-    </SidePanel>
+        }
+      >
+        <form id={formId} onSubmit={onConfirm}>
+          <fieldset disabled={isSubmitting}>
+            <SidePanel.Content>
+              <div className="pt-6">
+                <Tabs value={tab} onValueChange={handleSwitchTab}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="fileUpload">Upload CSV</TabsTrigger>
+                    <TabsTrigger value="pasteText">Paste text</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="fileUpload">
+                    <SpreadsheetFileDropZone
+                      file={hasAttachedFile(state) ? state.file : undefined}
+                      parseProgress={
+                        isEmptyState(state) ? 0 : isParsingState(state) ? state.progress : 100
+                      }
+                      onUploadFile={handleUploadFile}
+                      onRemoveFile={handleRemoveFile}
+                    />
+                  </TabsContent>
+                  <TabsContent value="pasteText">
+                    <SpreadsheetInputZone
+                      text={hasAttachedText(state) ? state.text : ''}
+                      onInputChange={handleInputText}
+                    />
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </SidePanel.Content>
+            {isParsedState(state) && state.data.headers.length > 0 && (
+              <>
+                <div className="pt-4">
+                  <SidePanel.Separator />
+                </div>
+                <SpreadsheetImportConfiguration
+                  spreadsheetData={state.data}
+                  control={form.control}
+                  canSkipConflictingRows={selectedTable !== undefined}
+                  isImporting={isSubmitting}
+                  onConfigurationChange={() => updateEditorDirty(true)}
+                  selectedHeaders={state.selectedHeaders}
+                  onToggleHeader={handleToggleSelectedHeader}
+                  emptyStringAsNullHeaders={state.emptyStringAsNullHeaders}
+                  onEmptyStringAsNullHeadersChange={handleSetEmptyStringAsNullHeaders}
+                />
+                <SidePanel.Separator />
+                <SpreadsheetImportPreview
+                  skipConflictingRows={selectedTable !== undefined && skipConflictingRows}
+                  selectedTable={selectedTable}
+                  spreadsheetData={state.data}
+                  errors={state.errors}
+                  selectedHeaders={state.selectedHeaders}
+                  incompatibleHeaders={incompatibleHeaders}
+                  emptyStringAsNullHeaders={state.emptyStringAsNullHeaders}
+                />
+                <SidePanel.Separator />
+              </>
+            )}
+          </fieldset>
+        </form>
+      </SidePanel>
+    </Form>
   )
 }
 
