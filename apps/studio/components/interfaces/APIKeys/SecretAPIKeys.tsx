@@ -7,7 +7,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
-import { LegacyAPIKeysLink, useIsLegacyAPIKeysLinkEnabled } from './LegacyAPIKeysLink'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -37,8 +36,6 @@ export const SecretAPIKeys = () => {
       ) ?? [],
     [apiKeysData]
   )
-
-  const isLegacyLinkEnabled = useIsLegacyAPIKeysLinkEnabled()
 
   const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
@@ -118,8 +115,6 @@ export const SecretAPIKeys = () => {
           </Table>
         </Card>
       )}
-
-      {isLegacyLinkEnabled && canReadAPIKeys && <LegacyAPIKeysLink />}
     </div>
   )
 }
