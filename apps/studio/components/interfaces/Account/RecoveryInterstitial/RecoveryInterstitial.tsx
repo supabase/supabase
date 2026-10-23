@@ -16,7 +16,7 @@ import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 // Anchor the header while the card grows from checking to actionable tasks.
-const recoveryContainerClassName = 'items-start pt-16 sm:pt-[max(4rem,calc(50svh-16rem))]'
+const recoveryContainerClassName = 'items-start pt-16 sm:pt-32'
 
 export const RecoveryInterstitial = ({ onDismiss }: { onDismiss: () => void }) => {
   return <LiveRecoveryReminder onDismiss={onDismiss} />
