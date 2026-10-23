@@ -41,14 +41,20 @@ export default function TraceWaterfallDemo() {
   return (
     <div className="flex w-full flex-col gap-8">
       <Trace.Root trace={finished}>
-        <Trace.Waterfall treeWidth={120} className="rounded-md border">
+        <Trace.Waterfall treeWidth={120}>
           <Trace.Ruler />
+          <Trace.Grid />
+          <Trace.Cursor />
+          <div className="h-24" />
         </Trace.Waterfall>
       </Trace.Root>
 
       <Trace.Root trace={live} minRangeMs={3000}>
-        <Trace.Waterfall treeWidth={120} className="rounded-md border">
+        <Trace.Waterfall treeWidth={120}>
           <Trace.Ruler />
+          <Trace.Grid />
+          <Trace.Cursor />
+          <div className="h-24" />
         </Trace.Waterfall>
       </Trace.Root>
     </div>

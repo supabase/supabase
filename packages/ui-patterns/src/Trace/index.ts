@@ -1,7 +1,7 @@
 import { Root } from './Trace'
-import { Ruler, Waterfall } from './Waterfall'
+import { Cursor, Grid, Ruler, Waterfall } from './Waterfall'
 
-export const Trace = { Root, Waterfall, Ruler }
+export const Trace = { Root, Waterfall, Ruler, Grid, Cursor }
 
 export type {
   RootProps,
