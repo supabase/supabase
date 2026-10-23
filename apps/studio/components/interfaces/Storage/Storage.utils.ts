@@ -1,3 +1,4 @@
+import { literal } from '@supabase/pg-meta'
 import { difference } from 'lodash'
 import { useRouter } from 'next/router'
 
@@ -210,8 +211,10 @@ export const createSQLPolicies = (
   return policies
 }
 
-export const applyBucketIdToTemplateDefinition = (definition: string, bucketId: any) => {
-  return definition.replace('{bucket_id}', `'${bucketId}'`)
+export const applyBucketIdToTemplateDefinition = (definition: string, bucketId: string) => {
+  // Bucket names may contain characters like ' and $, so quote the name as a SQL literal and
+  // pass a replacer function so that $ sequences aren't treated as replacement patterns
+  return definition.replace('{bucket_id}', () => literal(bucketId))
 }
 
 export const useStorageV2Page = () => {
