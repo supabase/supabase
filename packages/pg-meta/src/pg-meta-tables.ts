@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { coalesceRowsToArray, filterByList } from './helpers'
+import { coalesceRowsToArray, filterByList, relationIdentArgs } from './helpers'
 import {
   ident,
   joinSqlFragments,
@@ -259,7 +259,7 @@ BEGIN
     FROM pg_constraint
     WHERE contype = 'p' AND conrelid = ${literal(old.id)};
   IF r IS NOT NULL THEN
-    EXECUTE ${literal(`${alter} DROP CONSTRAINT `)} || quote_ident(r.conname);
+    EXECUTE format('ALTER TABLE %I.%I DROP CONSTRAINT %I', ${relationIdentArgs(old.id)}, r.conname);
   END IF;
 END
 $$;
