@@ -3,10 +3,8 @@ import { useMemo } from 'react'
 import { Separator } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import {
-  ApiKeysCreateCallout,
-  ApiKeysFeedbackBanner,
-} from '@/components/interfaces/APIKeys/ApiKeysIllustrations'
+import { ApiKeysCreateCallout } from '@/components/interfaces/APIKeys/ApiKeysIllustrations'
+import { LegacyAPIKeysRetirementNotice } from '@/components/interfaces/APIKeys/LegacyAPIKeysRetirementNotice'
 import { PublishableAPIKeys } from '@/components/interfaces/APIKeys/PublishableAPIKeys'
 import { SecretAPIKeys } from '@/components/interfaces/APIKeys/SecretAPIKeys'
 import ApiKeysLayout from '@/components/layouts/APIKeys/APIKeysLayout'
@@ -79,7 +77,7 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
   return (
     <>
       {canReadAPIKeys && !hasNewApiKeys && <ApiKeysCreateCallout />}
-      {hasNewApiKeys && <ApiKeysFeedbackBanner />}
+      <LegacyAPIKeysRetirementNotice />
       <DisableInteraction disabled={!hasNewApiKeys} className="flex flex-col gap-8">
         <PublishableAPIKeys />
         <Separator />
