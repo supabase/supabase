@@ -109,7 +109,7 @@ Due to restrictions on the underlying cloud provider, disk expansions can occur 
 
 Free Plan projects have a fixed disk size of 2 GB. The disk does not autoscale.
 
-When disk usage reaches 95%, Supabase puts your database into [read-only mode](#read-only-mode). This stops the disk from filling completely. When disk usage goes below 95%, Supabase turns off read-only mode automatically.
+When disk usage reaches 95%, Supabase puts your database into [read-only mode](#read-only-mode). This helps prevent the disk from filling completely. When disk usage goes below 95%, Supabase turns off read-only mode automatically.
 
 <Admonition type="danger">
 
@@ -136,7 +136,7 @@ If your database is down because the disk is full:
 
 The [Write Ahead Log (WAL)](#disk-space-usage) uses disk space in addition to your data. On a 2 GB disk, WAL can fill the disk even when your database size is small.
 
-WAL grows fast when you write a lot of data in a short time. Examples are bulk imports, large `update` or `delete` statements, and index builds. During heavy writes, WAL can grow to 1 GB or more before Postgres removes old WAL files. An inactive [replication slot](/docs/guides/database/replication) can also keep up to 512 MB of WAL on the disk.
+WAL grows fast when you write a lot of data in a short time. Examples are bulk imports, large `update` or `delete` statements, and index builds. During heavy writes, WAL can grow past the default `max_wal_size` of 1 GB before Postgres removes old WAL files. An inactive [replication slot](/docs/guides/database/replication) can also keep WAL on the disk. By default, `max_slot_wal_keep_size` limits this to about 512 MB.
 
 To keep WAL small:
 
