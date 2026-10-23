@@ -83,10 +83,15 @@ export const getMcpTools = async ({
 
     const availableMcpTools: ToolSet = { ...remoteTools }
     for (const contract of Object.values(REMOTE_TOOL_CONTRACTS)) {
+      if (!(contract.name in remoteTools)) continue
+      // Reject a malformed entry here: if the opt-in filter below stubbed it, the spread would
+      // turn it into an object and it would pass validation.
       const remoteTool = remoteTools[contract.name]
-      if (remoteTool && typeof remoteTool === 'object') {
-        availableMcpTools[contract.name] = { ...remoteTool, needsApproval: contract.needsApproval }
+      if (typeof remoteTool !== 'object' || remoteTool === null) {
+        console.error(`MCP tool ${contract.name} is not an object`)
+        throw new Error('Internal error: MCP tools validation failed')
       }
+      availableMcpTools[contract.name] = { ...remoteTool, needsApproval: contract.needsApproval }
     }
 
     // Runtime drift detection: `EXPECTED_MCP_TOOLS` is compile-time-checked

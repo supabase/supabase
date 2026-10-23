@@ -132,4 +132,13 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
     await expect(getMcpTools(BASE_PARAMS)).rejects.toThrow('MCP tools validation failed')
     expect(close).toHaveBeenCalledTimes(1)
   })
+
+  it('rejects a malformed contract tool even when the opt-in level would stub it', async () => {
+    tools.mockResolvedValueOnce({ ...FULL_REMOTE_TOOLS, list_tables: 'not-an-object' })
+
+    await expect(getMcpTools({ ...BASE_PARAMS, aiOptInLevel: 'disabled' })).rejects.toThrow(
+      'MCP tools validation failed'
+    )
+    expect(close).toHaveBeenCalledTimes(1)
+  })
 })
