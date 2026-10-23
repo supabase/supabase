@@ -111,11 +111,7 @@ export const RecoveryReminderController = ({
 
   return (
     <>
-      <div
-        className="contents"
-        inert={isShowing}
-        style={isShowing ? { visibility: 'hidden' } : undefined}
-      >
+      <div className="contents" inert={isShowing}>
         {children}
       </div>
       {isShowing && reminder && (
