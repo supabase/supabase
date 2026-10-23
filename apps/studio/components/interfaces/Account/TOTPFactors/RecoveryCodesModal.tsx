@@ -20,8 +20,8 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
-import { BASE_PATH } from '@/lib/constants'
 
 interface RecoveryCodesModalProps<T>
   extends
@@ -185,15 +185,10 @@ export const RecoveryCodesModal = <T = unknown,>({
               {showSecurityLink && (
                 <p className="text-xs text-foreground-lighter">
                   Manage recovery codes in{' '}
-                  <a
-                    href={`${BASE_PATH}/account/security`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline underline-offset-2 hover:text-foreground"
-                  >
+                  <InlineLink href="/account/security" target="_blank" rel="noreferrer">
                     Account Security
                     <span className="sr-only"> (opens in a new tab)</span>
-                  </a>
+                  </InlineLink>
                   .
                 </p>
               )}
