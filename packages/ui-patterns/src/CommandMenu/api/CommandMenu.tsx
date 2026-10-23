@@ -19,7 +19,6 @@ import {
 } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
-import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 import {
   useCommandMenuOpen,
@@ -229,12 +228,6 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
 
   const size = useCommandMenuSize()
 
-  const page = useCurrentPage()
-  const popPage = usePopPage()
-
-  const query = useQuery()
-  const setQuery = useSetQuery()
-
   const telemetryContext = useCommandMenuTelemetryContext()
 
   const { ref: contentRef } = useTouchGestures({ toggleOpen: () => setOpen(!open) })
@@ -262,11 +255,12 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         onInteractOutside={() => handleOpenChange(false)}
         onEscapeKeyDown={(e) => {
           e.preventDefault()
-          return query ? setQuery('') : page ? popPage() : handleOpenChange(false)
+          handleOpenChange(false)
         }}
         size={size}
         className={cn(
           'relative flex flex-col my-0 mx-auto rounded-t-lg',
+          'focus:outline-none focus-visible:outline-none',
           'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
           '!animate-in !slide-in-from-bottom-[85%] duration-300!',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
