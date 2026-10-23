@@ -1,5 +1,6 @@
 import { act, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
+import { toast } from 'sonner'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
@@ -7,6 +8,7 @@ import type { SqlSnippetSource } from './querySource'
 import { DiffType } from './SQLEditor.types'
 import { useSqlEditorAi } from './useSqlEditorAi'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
 import { API_URL } from '@/lib/constants'
 import { sidebarManagerState } from '@/state/sidebar-manager-state'
 import { sqlEditorDiffRequestState } from '@/state/sql-editor/sql-editor-diff-request'
@@ -101,6 +103,40 @@ describe('useSqlEditorAi — accept / discard diff', () => {
     await waitFor(() => expect(utils.result.current.diff.isDiffOpen).toBe(true))
     return { ...utils, inMemoryEditor }
   }
+
+  it('shows an error when no SQL diff exists', async () => {
+    const inMemoryEditor = createInMemoryEditor('select 1;')
+    const { result } = renderSqlEditorHook(useAiHarness, { inMemoryEditor })
+
+    await act(async () => {
+      await result.current.ai.acceptAiHandler()
+    })
+
+    expect(toast.error).toHaveBeenCalledWith('No SQL modifications found to apply.')
+    expect(inMemoryEditor.editor.getValue()).toBe('select 1;')
+  })
+
+  it('shows an error when the editor is not ready', async () => {
+    const { result, inMemoryEditor } = await openModificationDiff()
+    inMemoryEditor.editor.isReady = () => false
+
+    await act(async () => {
+      await result.current.ai.acceptAiHandler()
+    })
+
+    expect(toast.error).toHaveBeenCalledWith('The editor is not ready yet. Please wait a moment and try again.')
+  })
+
+  it('shows an error when generated SQL is unavailable', async () => {
+    const { result, inMemoryEditor } = await openModificationDiff()
+    inMemoryEditor.diff.getModifiedValue = () => undefined
+
+    await act(async () => {
+      await result.current.ai.acceptAiHandler()
+    })
+
+    expect(toast.error).toHaveBeenCalledWith('Failed to retrieve the generated SQL.')
+  })
 
   it('accepting a modification writes the diff result back into the editor and closes the diff', async () => {
     const { result, inMemoryEditor } = await openModificationDiff()
