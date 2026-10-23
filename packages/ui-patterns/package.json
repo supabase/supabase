@@ -9,7 +9,7 @@
     "test": "vitest",
     "test:coverage": "vitest --run --coverage",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo",
     "gen:exports": "tsx ./scripts/update-exports.ts"
   },
   "exports": {
@@ -863,6 +863,7 @@
     "@types/react-dom": "catalog:",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "api-types": "workspace:*",
     "config": "workspace:*",

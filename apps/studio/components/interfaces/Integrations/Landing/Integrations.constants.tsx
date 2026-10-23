@@ -64,6 +64,11 @@ type InstallIdentificationMethod = NonNullable<Listing['installation_identificat
 
 export type MarketplaceSource = 'Official' | 'Partner' | 'Community'
 
+type IntegrationIconProps = {
+  className?: string
+  style?: Record<string, string | number>
+}
+
 /**
  * [Joshen] For marketplace, we probably need to revisit this definition
  * What properties are obsolete, what properties we need from remote source
@@ -74,7 +79,7 @@ export type IntegrationDefinition = {
   status?: 'alpha' | 'beta'
   categories?: string[]
   featured?: boolean
-  icon: (props?: { className?: string; style?: Record<string, string | number> }) => ReactNode
+  icon: (props?: IntegrationIconProps) => ReactNode
   description: string | null
   content?: string | null
   files?: { src: string; alt: string }[]
@@ -145,7 +150,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     requiredExtensions: ['pgmq'],
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Queues`,
-    icon: ({ className, ...props } = {}) => (
+    icon: ({ className, ...props }: IntegrationIconProps = {}) => (
       <LayersIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Lightweight message queue in Postgres',
@@ -207,7 +212,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     source: 'Community' as const,
     requiredExtensions: ['pg_cron'],
     name: `Cron`,
-    icon: ({ className, ...props } = {}) => (
+    icon: ({ className, ...props }: IntegrationIconProps = {}) => (
       <Clock5Icon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Schedule recurring Jobs in Postgres',
@@ -263,7 +268,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     missingExtensionsAlert: <UpgradeDatabaseAlert />,
     name: `Vault`,
     status: 'beta',
-    icon: ({ className, ...props } = {}) => (
+    icon: ({ className, ...props }: IntegrationIconProps = {}) => (
       <VaultIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
@@ -307,7 +312,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     type: 'postgres_extension' as const,
     source: 'Official' as const,
     name: `Database Webhooks`,
-    icon: ({ className, ...props } = {}) => (
+    icon: ({ className, ...props }: IntegrationIconProps = {}) => (
       <WebhookIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description:
@@ -364,7 +369,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     source: 'Official' as const,
     requiredExtensions: [],
     name: `Data API`,
-    icon: ({ className, ...props } = {}) => (
+    icon: ({ className, ...props }: IntegrationIconProps = {}) => (
       <Code2Icon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Auto-generate an API directly from your database schema',
@@ -428,7 +433,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     status: 'alpha' as const,
     requiredExtensions: [],
     name: `Warehouse`,
-    icon: ({ className, ...props } = {}) => (
+    icon: ({ className, ...props }: IntegrationIconProps = {}) => (
       <WarehouseIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Replicate your database to an analytical endpoint',
@@ -462,7 +467,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     source: 'Official' as const,
     requiredExtensions: ['pg_graphql'],
     name: `GraphQL`,
-    icon: ({ className, ...props } = {}) => (
+    icon: ({ className, ...props }: IntegrationIconProps = {}) => (
       <Image
         fill
         src={`${BASE_PATH}/img/graphql.svg`}
@@ -518,7 +523,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
     type: 'wrapper' as const,
     source: 'Official' as const,
     name: `${w.label} Wrapper`,
-    icon: ({ className, ...props } = {}) => (
+    icon: ({ className, ...props }: IntegrationIconProps = {}) => (
       <Image fill src={w.icon} alt={w.name} className={cn('p-2', className)} {...props} />
     ),
     requiredExtensions: ['wrappers', 'supabase_vault'],
@@ -574,7 +579,7 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Stripe Sync Engine`,
     status: 'alpha',
-    icon: ({ className, ...props } = {}) => (
+    icon: ({ className, ...props }: IntegrationIconProps = {}) => (
       <Image
         fill
         src={`${BASE_PATH}/img/icons/stripe-icon.svg`}

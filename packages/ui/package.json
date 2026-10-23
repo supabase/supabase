@@ -7,7 +7,7 @@
   "sideEffects": false,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo",
     "generate-tailwind-classes": "tsx ./scripts/generate-tailwind-classes.ts",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "test": "vitest",
@@ -53,6 +53,7 @@
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "catalog:",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "config": "workspace:*",
     "tsconfig": "workspace:*",
