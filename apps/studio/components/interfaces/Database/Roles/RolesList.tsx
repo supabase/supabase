@@ -122,6 +122,7 @@ export const RolesList = () => {
       currentId: selectedRoleIdToDelete,
       resourceFound: !!roleToDelete,
       isSuccessDelete,
+      isPendingDelete: isDeleting,
       deletedId: deletedRole?.id,
     })
 
@@ -132,6 +133,7 @@ export const RolesList = () => {
     setSelectedRoleIdToDelete(null, { history: 'replace' })
   }, [
     deletedRole,
+    isDeleting,
     isSuccess,
     isSuccessDelete,
     roleToDelete,

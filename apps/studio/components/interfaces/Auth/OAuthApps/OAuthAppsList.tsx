@@ -235,6 +235,7 @@ export const OAuthAppsList = () => {
       currentId: selectedAppToDelete,
       resourceFound: !!appToDelete,
       isSuccessDelete,
+      isPendingDelete: isDeletingApp,
       deletedId: deletedApp?.clientId,
     })
 
@@ -246,6 +247,7 @@ export const OAuthAppsList = () => {
   }, [
     appToDelete,
     deletedApp,
+    isDeletingApp,
     isSuccess,
     isSuccessDelete,
     selectedAppToDelete,

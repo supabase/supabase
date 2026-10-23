@@ -168,15 +168,20 @@ export function missingPanelIdAction({
   currentId,
   resourceFound,
   isSuccessDelete,
+  isPendingDelete = false,
   deletedId,
 }: {
   listLoaded: boolean
   currentId: unknown
   resourceFound: boolean
   isSuccessDelete: boolean
+  isPendingDelete?: boolean
   deletedId: unknown
 }): MissingPanelIdAction {
   if (!listLoaded || resourceFound || isPanelValueClear(currentId)) return 'keep'
+  // onSuccess awaits the list refetch before React Query reports success.
+  // The row can already be gone while this id is still the one being deleted.
+  if (isPendingDelete && isStaleDeletedPanelId(currentId, true, deletedId)) return 'keep'
   // The successful delete stays true, so Forward of that same id must not toast.
   // A different missing id is still the normal not-found case.
   if (isStaleDeletedPanelId(currentId, isSuccessDelete, deletedId)) return 'clear-silently'

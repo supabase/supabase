@@ -140,6 +140,7 @@ export const EnumeratedTypes = () => {
       currentId: selectedTypeIdToDelete,
       resourceFound: !!typeToDelete,
       isSuccessDelete,
+      isPendingDelete: isDeleting,
       deletedId: deletedType?.id,
     })
 
@@ -150,6 +151,7 @@ export const EnumeratedTypes = () => {
     setSelectedTypeIdToDelete(null, { history: 'replace' })
   }, [
     deletedType,
+    isDeleting,
     isSuccess,
     isSuccessDelete,
     selectedTypeIdToDelete,

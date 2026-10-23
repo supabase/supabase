@@ -64,6 +64,7 @@ export const DeleteCronJob = () => {
       currentId: cronJobIdForDeletion,
       resourceFound: !!cronJob,
       isSuccessDelete,
+      isPendingDelete: isPending,
       deletedId: deletedCronJob?.jobId,
     })
 
@@ -77,6 +78,7 @@ export const DeleteCronJob = () => {
     cronJobIdForDeletion,
     deletedCronJob,
     grid.isSuccess,
+    isPending,
     isSuccessDelete,
     setCronJobForDeletion,
   ])

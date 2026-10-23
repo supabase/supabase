@@ -306,11 +306,13 @@ describe('panel history', () => {
     navigation.back = () => ({ committed, finished })
 
     armPanelPush('new')
+    const previousHref = window.location.href
     window.history.pushState(null, '', PANEL_URL)
     dismissPanelUrl('new', vi.fn())
+    expect(isPanelHistoryTraversalTo(previousHref)).toBe(true)
 
     await new Promise((resolve) => setTimeout(resolve, 0))
-    expect(isPanelHistoryTraversalTo(window.location.href)).toBe(false)
+    expect(isPanelHistoryTraversalTo(previousHref)).toBe(false)
   })
 
   it('expires each armed key on its own timer', () => {

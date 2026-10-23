@@ -234,6 +234,7 @@ execute function function_name();`
       currentId: triggerIdToDelete,
       resourceFound: !!triggerToDelete,
       isSuccessDelete,
+      isPendingDelete: isDeletingTrigger,
       deletedId: deletedTrigger?.trigger?.id,
     })
 
@@ -244,6 +245,7 @@ execute function function_name();`
     setTriggerToDelete(null, { history: 'replace' })
   }, [
     deletedTrigger,
+    isDeletingTrigger,
     isSuccess,
     isSuccessDelete,
     setTriggerToDelete,

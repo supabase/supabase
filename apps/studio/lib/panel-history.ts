@@ -463,7 +463,10 @@ function isPromise(value: unknown): value is Promise<unknown> {
 }
 
 function swallowAbortedNavigation(result: unknown) {
-  if (typeof result !== 'object' || result === null) return
+  if (typeof result !== 'object' || result === null) {
+    return
+  }
+
   ;(['committed', 'finished'] as const)
     .map((key) => Reflect.get(result, key))
     .filter(isPromise)

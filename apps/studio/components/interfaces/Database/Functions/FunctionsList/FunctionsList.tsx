@@ -244,6 +244,7 @@ export const FunctionsList = () => {
       currentId: functionIdToDelete,
       resourceFound: !!functionToDelete,
       isSuccessDelete,
+      isPendingDelete: isDeletingFunction,
       deletedId: deletedFunction?.func?.id,
     })
 
@@ -255,6 +256,7 @@ export const FunctionsList = () => {
   }, [
     deletedFunction,
     functionIdToDelete,
+    isDeletingFunction,
     functionToDelete,
     isSuccess,
     isSuccessDelete,

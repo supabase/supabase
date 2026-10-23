@@ -53,6 +53,7 @@ export const DeleteHookModal = () => {
       currentId: selectedHookIdToDelete,
       resourceFound: !!selectedHook,
       isSuccessDelete,
+      isPendingDelete: isDeleting,
       deletedId: deletedHook?.trigger.id,
     })
 
@@ -63,6 +64,7 @@ export const DeleteHookModal = () => {
     setSelectedHookIdToDelete(null, { history: 'replace' })
   }, [
     deletedHook,
+    isDeleting,
     isSuccess,
     isSuccessDelete,
     selectedHook,

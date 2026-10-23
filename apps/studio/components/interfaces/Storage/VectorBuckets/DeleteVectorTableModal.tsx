@@ -78,6 +78,7 @@ export const DeleteVectorTableModal = () => {
       currentId: selectedTableIdToDelete,
       resourceFound: !!table,
       isSuccessDelete,
+      isPendingDelete: isDeleting,
       deletedId: deletedIndex?.indexName,
     })
 
@@ -88,6 +89,7 @@ export const DeleteVectorTableModal = () => {
     setSelectedTableIdToDelete(null, { history: 'replace' })
   }, [
     deletedIndex,
+    isDeleting,
     isSuccessDelete,
     isSuccessIndexes,
     selectedTableIdToDelete,

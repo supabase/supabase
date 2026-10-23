@@ -156,6 +156,7 @@ export const Indexes = () => {
       currentId: deleteIndexId,
       resourceFound: !!selectedIndexToDelete,
       isSuccessDelete,
+      isPendingDelete: isExecuting,
       deletedId: deletedIndex?.name,
     })
 
@@ -167,6 +168,7 @@ export const Indexes = () => {
   }, [
     deleteIndexId,
     deletedIndex,
+    isExecuting,
     isSuccessDelete,
     isSuccessIndexes,
     selectedIndexToDelete,

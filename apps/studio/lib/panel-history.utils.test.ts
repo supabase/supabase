@@ -283,6 +283,25 @@ describe('missingPanelIdAction', () => {
     ).toBe('clear-silently')
   })
 
+  it('keeps the matching id while that delete is still pending', () => {
+    expect(
+      missingPanelIdAction({
+        ...loaded,
+        currentId: '4',
+        isPendingDelete: true,
+        deletedId: 4,
+      })
+    ).toBe('keep')
+    expect(
+      missingPanelIdAction({
+        ...loaded,
+        currentId: '9',
+        isPendingDelete: true,
+        deletedId: 4,
+      })
+    ).toBe('clear-and-notify')
+  })
+
   it('notifies for a different missing id even after a successful delete', () => {
     expect(
       missingPanelIdAction({

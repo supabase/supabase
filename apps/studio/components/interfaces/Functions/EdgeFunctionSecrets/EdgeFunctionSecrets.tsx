@@ -116,6 +116,7 @@ export const EdgeFunctionSecrets = () => {
       currentId: selectedIdToDelete,
       resourceFound: !!selectedSecretToDelete,
       isSuccessDelete,
+      isPendingDelete: isDeleting,
       deletedId: deletedSecret?.secrets[0],
     })
 
@@ -126,6 +127,7 @@ export const EdgeFunctionSecrets = () => {
     setSelectedIdToDelete(null, { history: 'replace' })
   }, [
     deletedSecret,
+    isDeleting,
     isSuccess,
     isSuccessDelete,
     selectedIdToDelete,

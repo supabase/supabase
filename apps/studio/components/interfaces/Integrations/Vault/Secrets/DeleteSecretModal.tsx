@@ -34,6 +34,7 @@ export const DeleteSecretModal = () => {
 
   const {
     mutateAsync: deleteSecret,
+    isPending: isDeleting,
     isSuccess: isSuccessDelete,
     variables: deletedSecret,
   } = useVaultSecretDeleteMutation({
@@ -63,6 +64,7 @@ export const DeleteSecretModal = () => {
       currentId: secretIdToDelete,
       resourceFound: !!selectedSecret,
       isSuccessDelete,
+      isPendingDelete: isDeleting,
       deletedId: deletedSecret?.id,
     })
 
@@ -73,6 +75,7 @@ export const DeleteSecretModal = () => {
     setSelectedSecretToDelete(null, { history: 'replace' })
   }, [
     deletedSecret,
+    isDeleting,
     isSuccess,
     isSuccessDelete,
     secretIdToDelete,

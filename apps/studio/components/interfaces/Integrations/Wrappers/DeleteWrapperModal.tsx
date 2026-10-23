@@ -47,6 +47,7 @@ export const DeleteWrapperModal = () => {
 
   const {
     mutateAsync: deleteFDW,
+    isPending: isDeleting,
     isSuccess: isSuccessDelete,
     variables: deletedWrapper,
   } = useFDWDeleteMutation({
@@ -76,6 +77,7 @@ export const DeleteWrapperModal = () => {
       currentId: selectedWrapperIdToDelete,
       resourceFound: !!selectedWrapper,
       isSuccessDelete,
+      isPendingDelete: isDeleting,
       deletedId: deletedWrapper?.wrapper?.id,
     })
 
@@ -86,6 +88,7 @@ export const DeleteWrapperModal = () => {
     setSelectedWrapperToDelete(null, { history: 'replace' })
   }, [
     deletedWrapper,
+    isDeleting,
     isSuccess,
     isSuccessDelete,
     selectedWrapper,
