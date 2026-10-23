@@ -82,7 +82,7 @@ async function confirmRegeneration() {
 
 describe('RecoveryReminder', () => {
   test('does not claim success when checks are disabled', () => {
-    customRender(<RecoveryReminder gap={null} destination="/organizations" isUnavailable />)
+    customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isUnavailable />)
     expect(
       screen.getByRole('heading', { name: 'Account recovery check unavailable' })
     ).toBeInTheDocument()
@@ -91,36 +91,33 @@ describe('RecoveryReminder', () => {
 
   beforeEach(() => vi.mocked(useFlag).mockReturnValue(false))
   test('shimmers while checking and hides Continue until resolved', () => {
-    const { rerender } = customRender(
-      <RecoveryReminder gap={null} destination="/organizations" isLoading />
-    )
+    const { rerender } = customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isLoading />)
     expect(screen.getByRole('status', { name: 'Checking account recovery' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Continue' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
     expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
-    rerender(<RecoveryReminder gap={null} destination="/organizations" />)
-    expect(screen.getByRole('link', { name: 'Continue' })).toBeInTheDocument()
+    rerender(<RecoveryReminder gap={null} onDismiss={vi.fn()} />)
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
     expect(
       screen.queryByRole('status', { name: 'Checking account recovery' })
     ).not.toBeInTheDocument()
   })
 
-  test('shows the resolved state and preserves the return destination', () => {
-    customRender(<RecoveryReminder gap={null} destination="/organizations?view=all" />)
+  test('dismisses the resolved state without navigating', () => {
+    const onDismiss = vi.fn()
+    customRender(<RecoveryReminder gap={null} onDismiss={onDismiss} />)
     expect(screen.getByRole('heading', { name: 'You’re all set' })).toBeInTheDocument()
     expect(screen.getByText('No account recovery reminder is available.')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute(
-      'href',
-      '/organizations?view=all'
-    )
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(onDismiss).toHaveBeenCalledOnce()
   })
 
   test('completes optional authenticator independently and preserves codes task on cancellation', async () => {
     vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({ data: { id: 'backup-factor' }, error: null })
     vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue(response)
     const { rerender } = customRender(
-      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask />
+      <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask />
     )
-    expect(screen.getByRole('link', { name: 'Skip for now' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Skip for now' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
     await enrollFactor()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
@@ -129,10 +126,10 @@ describe('RecoveryReminder', () => {
     expect(screen.getByRole('button', { name: 'Generate codes' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
     await enrollFactor()
-    rerender(<RecoveryReminder gap={null} destination="/organizations" hasAuthenticatorTask />)
+    rerender(<RecoveryReminder gap={null} onDismiss={vi.fn()} hasAuthenticatorTask />)
     await verifyFactor()
     expect(screen.getByRole('button', { name: 'Done' })).toBeDisabled()
-    expect(screen.getByRole('link', { name: 'Continue' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Generate codes' })).toBeInTheDocument()
     expect(screen.queryByText('Recovery codes saved')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Generate codes' }))
@@ -153,14 +150,14 @@ describe('RecoveryReminder', () => {
     customRender(
       <RecoveryReminder
         gap="missing"
-        destination="/organizations"
+        onDismiss={vi.fn()}
         hasAuthenticatorTask={false}
         onAction={onAction}
         onTaskComplete={onTaskComplete}
         onExit={onExit}
       />
     )
-    fireEvent.click(screen.getByRole('link', { name: 'Skip for now' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Skip for now' }))
     expect(onExit).toHaveBeenLastCalledWith({
       gap: 'missing',
       areCodesSaved: false,
@@ -177,7 +174,7 @@ describe('RecoveryReminder', () => {
     await acknowledgeCodes()
     await screen.findByText('Recovery codes saved')
     expect(onTaskComplete).toHaveBeenCalledWith('recovery_codes')
-    fireEvent.click(screen.getByRole('link', { name: 'Continue' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     expect(onExit).toHaveBeenLastCalledWith({
       gap: 'missing',
       areCodesSaved: true,
@@ -187,24 +184,22 @@ describe('RecoveryReminder', () => {
 
   test('retains the authenticator dialog when background factors change', async () => {
     const { rerender } = customRender(
-      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask />
+      <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask />
     )
     fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
     await enrollFactor()
-    rerender(
-      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask={false} />
-    )
+    rerender(<RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />)
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     await verifyFactor()
   })
 
   test('supports a codes-only task list', () => {
     customRender(
-      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask={false} />
+      <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />
     )
     expect(screen.getByText('No recovery codes')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add authenticator' })).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Skip for now' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Skip for now' })).toHaveAttribute(
       'href',
       '/organizations'
     )
@@ -213,15 +208,13 @@ describe('RecoveryReminder', () => {
   test('keeps newly generated codes visible through a live status update until acknowledged', async () => {
     vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue(response)
     const { rerender } = customRender(
-      <RecoveryReminder gap="missing" destination="/org/example" hasAuthenticatorTask={false} />
+      <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />
     )
     fireEvent.click(screen.getByRole('button', { name: 'Generate codes' }))
     await screen.findByText('WTO2-4T5X-BEUL-VJMI')
 
     // A refetch sees new codes before the user has saved them.
-    rerender(
-      <RecoveryReminder gap={null} destination="/org/example" hasAuthenticatorTask={false} />
-    )
+    rerender(<RecoveryReminder gap={null} onDismiss={vi.fn()} hasAuthenticatorTask={false} />)
     expect(screen.getByText('WTO2-4T5X-BEUL-VJMI')).toBeInTheDocument()
     expect(screen.queryByText('Recovery codes saved')).not.toBeInTheDocument()
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
@@ -229,7 +222,7 @@ describe('RecoveryReminder', () => {
 
     await acknowledgeCodes()
     await screen.findByText('Recovery codes saved')
-    expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute('href', '/org/example')
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
   })
 
   test('keeps the pending dialog open and prevents premature completion', async () => {
@@ -239,7 +232,7 @@ describe('RecoveryReminder', () => {
     })
     vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockReturnValue(generation)
     customRender(
-      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask={false} />
+      <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />
     )
     fireEvent.click(screen.getByRole('button', { name: 'Generate codes' }))
     await screen.findByText('Generating your recovery codes...')
@@ -263,7 +256,7 @@ describe('RecoveryReminder', () => {
       .mockResolvedValueOnce({ data: null, error: new AuthError('generation failed') })
       .mockResolvedValue(response)
     customRender(
-      <RecoveryReminder gap="missing" destination="/organizations" hasAuthenticatorTask={false} />
+      <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />
     )
     fireEvent.click(screen.getByRole('button', { name: 'Generate codes' }))
     await screen.findByText('Unable to generate recovery codes')
@@ -279,7 +272,7 @@ describe('RecoveryReminder', () => {
   test('requires regeneration confirmation and preserves the reminder when cancelled', async () => {
     const regenerate = vi.spyOn(auth.mfa.recoveryCodes, 'regenerate').mockResolvedValue(response)
     customRender(
-      <RecoveryReminder gap="exhausted" destination="/organizations" hasAuthenticatorTask={false} />
+      <RecoveryReminder gap="exhausted" onDismiss={vi.fn()} hasAuthenticatorTask={false} />
     )
     fireEvent.click(screen.getByRole('button', { name: 'Regenerate codes' }))
     fireEvent.click(
@@ -302,11 +295,11 @@ describe('RecoveryReminder', () => {
       response: () =>
         HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
     })
-    customRender(<RecoveryReminder gap={null} destination="/organizations" isError />)
+    customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isError />)
     expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
     expect(
       screen.getByRole('heading', { name: 'Account recovery check unavailable' })
     ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute('href', '/organizations')
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
   })
 })
