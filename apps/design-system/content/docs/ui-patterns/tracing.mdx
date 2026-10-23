@@ -15,13 +15,14 @@ The ruler adapts its ticks to the visible range. While a trace is live (any span
 
 ## Rows and bars
 
-`Trace.Rows` is a virtualized, scrollable list with one row per visible span. Its children are the row template and render once per row. `Trace.Cell` is the tree column: indent by depth, an expand and collapse toggle, the span name, and `Trace.Duration`, which pulses while the span is running. `Trace.Lane` is the timeline column, a positioned container for the primitives below.
+`Trace.Rows` is a virtualized, scrollable list with one row per visible span. Its children are the row template and render once per row. `Trace.Cell` is the tree column: indent by depth, an expand and collapse toggle, the span name, and a spinner while the span is running. `Trace.Lane` is the timeline column, a positioned container for the primitives below.
 
-Four primitives go inside a `Trace.Lane`. `Trace.Bar` draws the span from its start to its end, tinted by status. A running span extends to `nowMs`. `Trace.Markers` places a marker at each of the span's event timestamps. `Trace.CollapsedChildren` draws a tick at each direct child's midpoint when a span is collapsed. `Trace.Slowest` badges the longest finished span. Compose them in this order so markers and the badge draw over the bar:
+Five primitives go inside a `Trace.Lane`. `Trace.Bar` draws the span from its start to its end, tinted by status. A running span extends to `nowMs`. `Trace.Timing` shows the span's duration just after the bar, or inside the bar's end when there is no room after it. `Trace.Markers` places a marker at each of the span's event timestamps. `Trace.CollapsedChildren` draws a tick at each direct child's midpoint when a span is collapsed. `Trace.Slowest` badges the longest finished span. Compose them in this order so markers and the badge draw over the bar:
 
 ```tsx
 <Trace.Lane>
   <Trace.Bar />
+  <Trace.Timing />
   <Trace.CollapsedChildren />
   <Trace.Markers />
   <Trace.Slowest />
