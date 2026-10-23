@@ -197,13 +197,15 @@ describe('RecoveryReminderController', () => {
     }
   })
 
-  it('retains the takeover while background recovery state refreshes', async () => {
+  it('does not unmount an active task dialog during background refreshes', async () => {
     const { client } = renderController()
-    await waitForTakeover()
+    const takeoverElement = await waitForTakeover()
+    fireEvent.click(screen.getByRole('button', { name: 'Open recovery dialog' }))
     mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
     await act(() => client.invalidateQueries({ queryKey: ['recovery-code-status-query'] }))
     await settle(client)
-    expect(takeover()).toBeInTheDocument()
+    expect(takeoverElement).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Recovery codes' })).toBeInTheDocument()
   })
 
   it('isolates snooze between users and removes the takeover on sign-out', async () => {
