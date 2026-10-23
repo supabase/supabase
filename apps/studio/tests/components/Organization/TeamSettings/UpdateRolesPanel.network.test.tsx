@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -171,21 +171,10 @@ describe('UpdateRolesPanel (network)', () => {
     expect(screen.getByRole('option', { name: /Developer/ })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: /Read-only/ })).toBeInTheDocument()
 
-    // The key safety message from the ticket: Administrator can delete projects
+    // Every role has a permission description; the key safety message from the
+    // ticket is that Administrator can delete projects
     expect(screen.getByText('deleting projects')).toBeInTheDocument()
-  })
-
-  test('renders a role description for every known role', async () => {
-    setupMocks()
-    customRender(<UpdateRolesPanel visible member={MEMBER} onClose={vi.fn()} />, {
-      profileContext: PROFILE_CONTEXT,
-    })
-
-    await userEvent.click(await screen.findByRole('combobox'))
-
-    await waitFor(() => {
-      expect(screen.getByText(/deleting the organization/i)).toBeInTheDocument()
-    })
+    expect(screen.getByText(/deleting the organization/i)).toBeInTheDocument()
     expect(screen.getByText(/Manage members, billing/i)).toBeInTheDocument()
     expect(screen.getByText(/Manage project content/i)).toBeInTheDocument()
     expect(screen.getByText(/limited to SELECT queries/i)).toBeInTheDocument()

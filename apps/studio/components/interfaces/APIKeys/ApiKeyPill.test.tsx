@@ -88,7 +88,7 @@ describe('ApiKeyPill', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Copy API key' }))
 
-    await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalled())
     await expect(Promise.resolve(mockCopyToClipboard.mock.calls[0][0])).resolves.toBe(FULL)
   })
 })

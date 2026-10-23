@@ -131,6 +131,12 @@ const renderShortcutsReferenceSheet = (ids: ShortcutId[] = ACTIVE_SHORTCUT_IDS) 
   return { onOpenChange }
 }
 
+// Typing isn't the behaviour under test, so paste the whole query in one go
+const searchFor = async (user: ReturnType<typeof userEvent.setup>, query: string) => {
+  await user.click(screen.getByLabelText('Search shortcuts'))
+  await user.paste(query)
+}
+
 describe('ShortcutsReferenceSheet', () => {
   beforeEach(() => {
     sequenceIdCounter = 0
@@ -156,7 +162,7 @@ describe('ShortcutsReferenceSheet', () => {
 
     renderShortcutsReferenceSheet()
 
-    await user.type(screen.getByLabelText('Search shortcuts'), 'navigation')
+    await searchFor(user, 'navigation')
 
     expect(screen.getByText('Navigation')).toBeInTheDocument()
     expect(screen.getByText('Go to Project Overview')).toBeInTheDocument()
@@ -169,7 +175,7 @@ describe('ShortcutsReferenceSheet', () => {
 
     renderShortcutsReferenceSheet()
 
-    await user.type(screen.getByLabelText('Search shortcuts'), 'Go to Project Overview')
+    await searchFor(user, 'Go to Project Overview')
 
     expect(screen.getByText('Navigation')).toBeInTheDocument()
     expect(screen.getByText('Go to Project Overview')).toBeInTheDocument()
@@ -290,7 +296,7 @@ describe('ShortcutsReferenceSheet', () => {
 
     renderShortcutsReferenceSheet()
 
-    await user.type(screen.getByLabelText('Search shortcuts'), 'Go to Tables')
+    await searchFor(user, 'Go to Tables')
 
     expect(screen.getByText('No matching shortcuts found')).toBeInTheDocument()
     expect(screen.queryByText('Database Navigation')).not.toBeInTheDocument()
@@ -317,7 +323,7 @@ describe('ShortcutsReferenceSheet', () => {
 
     renderShortcutsReferenceSheet()
 
-    await user.type(screen.getByLabelText('Search shortcuts'), 'navigation')
+    await searchFor(user, 'navigation')
 
     expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument()
 
@@ -333,19 +339,9 @@ describe('ShortcutsReferenceSheet', () => {
 
     renderShortcutsReferenceSheet()
 
-    await user.type(screen.getByLabelText('Search shortcuts'), query)
+    await searchFor(user, query)
 
     expect(screen.getByText('No matching shortcuts found')).toBeInTheDocument()
     expect(screen.queryByText('Navigation')).not.toBeInTheDocument()
-  })
-
-  it('shows an empty state when nothing matches', async () => {
-    const user = userEvent.setup()
-
-    renderShortcutsReferenceSheet()
-
-    await user.type(screen.getByLabelText('Search shortcuts'), 'totally missing')
-
-    expect(screen.getByText('No matching shortcuts found')).toBeInTheDocument()
   })
 })

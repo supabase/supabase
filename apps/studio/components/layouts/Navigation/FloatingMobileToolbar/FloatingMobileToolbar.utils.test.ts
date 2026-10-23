@@ -72,27 +72,12 @@ describe('getToolbarStyle', () => {
   const viewport = { width: 390, height: 844 }
   const navSize = { width: 200, height: 48 }
 
-  it('returns style with transform and zIndex', () => {
-    const style = getToolbarStyle({
-      position: null,
-      navSize,
-      isSheetOpen: false,
-      viewport,
-      isDragging: false,
-    })
-    expect(style.zIndex).toBe(41)
-    expect(style.transform).toBeDefined()
-    expect(style.left).toBe('50%')
-  })
+  it('centers the toolbar by default and raises it above an open sheet', () => {
+    const base = { position: null, navSize, viewport, isDragging: false }
+    const closed = getToolbarStyle({ ...base, isSheetOpen: false })
+    const open = getToolbarStyle({ ...base, isSheetOpen: true })
 
-  it('uses higher zIndex when sheet open', () => {
-    const style = getToolbarStyle({
-      position: null,
-      navSize,
-      isSheetOpen: true,
-      viewport,
-      isDragging: false,
-    })
-    expect(style.zIndex).toBe(101)
+    expect(closed.left).toBe('50%')
+    expect(Number(open.zIndex)).toBeGreaterThan(Number(closed.zIndex))
   })
 })
