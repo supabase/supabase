@@ -230,11 +230,14 @@ export const PlanUpdateSidePanel = () => {
     />
   )
 
+  // Fail closed until subscription succeeds: unresolved plan ids look eligible.
   const showAwsMarketplacePurchase =
+    isSuccessSubscription &&
     canUpdateSubscription &&
     selectedOrganization?.managed_by === MANAGED_BY.SUPABASE &&
     !isPartnerBilledOrganization &&
-    !['enterprise', 'platform'].includes(subscription?.plan?.id ?? '')
+    subscription.billing_via_partner === false &&
+    !['enterprise', 'platform'].includes(subscription.plan.id)
 
   const planCards = (
     <PlanCards
