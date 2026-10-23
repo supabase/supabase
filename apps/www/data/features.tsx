@@ -3069,8 +3069,7 @@ Requires a Supabase Team or Enterprise plan with SSO configured and a Claude Tea
 `,
     icon: ShieldCheck,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage:
-      '/images/blog/2026-08-24-enterprise-managed-auth-for-the-supabase-mcp-server/thumb.png',
+    heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/platform/sso/enterprise-mcp-authentication',
     blogUrl: '/blog/enterprise-managed-auth-for-the-supabase-mcp-server',
     slug: 'enterprise-managed-auth-for-mcp',
