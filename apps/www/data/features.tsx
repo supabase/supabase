@@ -1,4 +1,4 @@
-import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
+import { CsharpIcon, FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
 import {
   Activity,
   BarChart,
@@ -3026,6 +3026,38 @@ This feature is especially beneficial for Python developers looking to build rob
     slug: 'client-library-python',
     status: {
       stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - .NET',
+    subtitle: 'Add Auth, Database, Storage, and Realtime to your .NET app.',
+    description: `
+Use the Supabase .NET SDK from C#, F#, or any other .NET language to sign in users, query Postgres, store files, and listen for database changes.
+
+## Key benefits
+1. Official support: Supabase maintains the SDK in \`supabase/supabase-csharp\`, so Supabase triages its issues and ships its fixes.
+2. One version for every package: All Supabase .NET packages ship under one version number, so you always know which ones go together.
+3. ASP.NET Core ready: \`Supabase.Extensions.DependencyInjection\` runs every client on pooled \`HttpClient\`s, so heavy traffic doesn't use up your connections.
+4. Retries with backoff: Set \`RetryOptions\` on a client so the request retries after a brief network error instead of failing.
+5. Publishable and secret keys: Ship the publishable key in client apps and keep the secret key on your server, so a leaked app key can't bypass RLS.
+6. Web, desktop, mobile, and game apps: Every package targets \`netstandard2.1\`, so the same packages run in ASP.NET Core, MAUI, and Unity.
+
+## When to use the .NET SDK
+- You build a .NET app and want Supabase Auth, Database, Storage, Realtime, or Edge Functions in it
+- You build web apps with ASP.NET Core, desktop and mobile apps with MAUI, or games with Unity
+- Your team only uses SDKs the vendor maintains
+
+## Get started
+In the dashboard, click **Connect**, pick **.NET**, and choose ASP.NET Core & Blazor, Console / desktop, or Unity to get setup code. Or run \`dotnet add package Supabase\`. Read the [C# reference](https://supabase.com/docs/reference/csharp/introduction).
+`,
+    icon: CsharpIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/csharp/introduction',
+    slug: 'client-library-dotnet',
+    status: {
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
