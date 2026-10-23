@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { EditorBaseLayout } from './EditorBaseLayout'
 
-const { mockTabsState, mockEditorType } = vi.hoisted(() => ({
+const { mockTabsState, mockEditorType, mockPathname } = vi.hoisted(() => ({
   mockTabsState: {
     activeTab: 'r-1',
     openTabs: ['r-1'],
@@ -22,6 +22,7 @@ const { mockTabsState, mockEditorType } = vi.hoisted(() => ({
     },
   } as any,
   mockEditorType: vi.fn(),
+  mockPathname: vi.fn(),
 }))
 
 vi.mock('common', () => ({
@@ -29,7 +30,7 @@ vi.mock('common', () => ({
 }))
 
 vi.mock('next/navigation', () => ({
-  usePathname: () => '/project/default/editor/1',
+  usePathname: () => mockPathname(),
 }))
 
 vi.mock('@/state/tabs', () => ({
@@ -70,6 +71,7 @@ vi.mock('./EditorsLayout.hooks', () => ({
 describe('EditorBaseLayout browser title', () => {
   beforeEach(() => {
     mockEditorType.mockReturnValue('table')
+    mockPathname.mockReturnValue('/project/default/editor/1')
     mockTabsState.activeTab = 'r-1'
     mockTabsState.openTabs = ['r-1']
     mockTabsState.tabsMap = {
@@ -111,6 +113,20 @@ describe('EditorBaseLayout browser title', () => {
     expect(JSON.parse(screen.getByTestId('browser-title').textContent ?? '{}')).toEqual({
       section: 'Tables',
       entity: 'tasks',
+    })
+  })
+
+  it('leaves the entity out on the editor index even when a tab is still active', () => {
+    mockPathname.mockReturnValue('/project/default/editor')
+
+    render(
+      <EditorBaseLayout title="Tables" product="Table Editor">
+        <div>Page content</div>
+      </EditorBaseLayout>
+    )
+
+    expect(JSON.parse(screen.getByTestId('browser-title').textContent ?? '{}')).toEqual({
+      section: 'Tables',
     })
   })
 })
