@@ -22,7 +22,7 @@ import { toString } from 'mdast-util-to-string'
 import { getAnchor } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { visit } from 'unist-util-visit'
 
-export type ReadContent = (contentPath: string) => Promise<string | undefined>
+export type ReadContent = (path: string) => Promise<string | undefined>
 
 export type FindFiles = (needle: string) => Promise<string[]>
 
@@ -47,16 +47,17 @@ export interface CheckOptions {
 
 const BYPASS_LABEL = 'skip-anchor-check'
 
-const PARTIALS_PREFIX = '_partials/'
+const CONTENT_PREFIX = 'apps/docs/content/'
+const GUIDES_PREFIX = `${CONTENT_PREFIX}guides/`
+const PARTIALS_PREFIX = `${CONTENT_PREFIX}_partials/`
 const MAX_PARTIAL_DEPTH = 10
 
-const isMarkdown = (contentPath: string) => /\.mdx?$/.test(contentPath)
-const isGuidePage = (contentPath: string) =>
-  contentPath.startsWith('guides/') && isMarkdown(contentPath)
-const isPartial = (contentPath: string) =>
-  contentPath.startsWith(PARTIALS_PREFIX) && isMarkdown(contentPath)
+const isMarkdown = (path: string) => /\.mdx?$/.test(path)
+const isGuidePage = (path: string) => path.startsWith(GUIDES_PREFIX) && isMarkdown(path)
+const isPartial = (path: string) => path.startsWith(PARTIALS_PREFIX) && isMarkdown(path)
 
-const toRoute = (guidePath: string) => `/${guidePath.replace(/\.mdx?$/, '')}`
+const toRoute = (guidePath: string) =>
+  `/${guidePath.slice(CONTENT_PREFIX.length).replace(/\.mdx?$/, '')}`
 
 export async function findBrokenAnchors({
   changedFiles,
@@ -81,11 +82,12 @@ export async function findBrokenAnchors({
   const broken: BrokenAnchor[] = []
   for (const [page, anchors] of removedByPage) {
     const route = toRoute(page)
-    const linkers = new Set(await findFiles(`${route}#`))
-    linkers.add(page)
-
+    const linkers = await findFiles(`${route}#`)
     const links = (
-      await Promise.all([...linkers].map((file) => collectLinks(file, readHead)))
+      await Promise.all([
+        collectSamePageLinks(page, readHead),
+        ...linkers.map((file) => collectLinksTo(route, file, readHead)),
+      ])
     ).flat()
 
     for (const anchor of anchors) {
@@ -180,46 +182,40 @@ interface Link extends LinkLocation {
   anchor: string
 }
 
-async function collectLinks(file: string, read: ReadContent): Promise<Link[]> {
-  const source = await read(file)
+async function collectSamePageLinks(page: string, read: ReadContent): Promise<Link[]> {
+  const source = await read(page)
   if (source === undefined) return []
 
-  const ownRoute = isGuidePage(file) ? toRoute(file) : undefined
+  const route = toRoute(page)
   const links: Link[] = []
-  const add = (url: unknown, line: number | undefined) => {
-    if (typeof url !== 'string') return
-    const target = parseLinkTarget(url, ownRoute)
-    if (target) links.push({ ...target, file, line: line ?? 0 })
-  }
-
-  const tree = parseMdx(isPartial(file) ? substitutePartialVars(source, undefined) : source)
-  visit(tree, (node) => {
-    const line = node.position?.start.line
-    if (node.type === 'link' || node.type === 'definition') {
-      add(node.url, line)
-    } else if (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') {
-      add(getAttributeValue(node, 'href'), line)
+  visit(parseMdx(source), (node) => {
+    const url =
+      node.type === 'link' || node.type === 'definition'
+        ? node.url
+        : node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement'
+          ? getAttributeValue(node, 'href')
+          : undefined
+    if (typeof url === 'string' && url.startsWith('#') && url.length > 1) {
+      links.push({ route, anchor: url.slice(1), file: page, line: node.position?.start.line ?? 0 })
     }
   })
-
   return links
 }
 
-function parseLinkTarget(url: string, ownRoute?: string) {
-  const hashIndex = url.indexOf('#')
-  if (hashIndex === -1) return undefined
+async function collectLinksTo(route: string, file: string, read: ReadContent): Promise<Link[]> {
+  const source = await read(file)
+  if (source === undefined) return []
 
-  const anchor = url.slice(hashIndex + 1)
-  const path = url
-    .slice(0, hashIndex)
-    .split('?')[0]
-    .replace(/^https?:\/\/(www\.)?supabase\.com(?=\/)/, '')
-    .replace(/^\/docs(?=\/)/, '')
-    .replace(/\/$/, '')
-
-  if (path === '') return ownRoute && anchor ? { route: ownRoute, anchor } : undefined
-  if (!path.startsWith('/guides/') || !anchor) return undefined
-  return { route: path, anchor }
+  const escapedRoute = route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const pattern = new RegExp(`${escapedRoute}/?(?:\\?[^#\\s'"\`)]*)?#([A-Za-z0-9_-]+)`, 'g')
+  return source.split('\n').flatMap((text, index) =>
+    [...text.matchAll(pattern)].map((match) => ({
+      route,
+      anchor: match[1],
+      file,
+      line: index + 1,
+    }))
+  )
 }
 
 function formatReport(broken: BrokenAnchor[]) {
@@ -259,22 +255,41 @@ async function git(args: string[], cwd: string) {
   return stdout
 }
 
-export function readFromWorkingTree(contentDir: string): ReadContent {
-  return async (contentPath) => {
+export function readFromWorkingTree(repoRoot: string): ReadContent {
+  return async (path) => {
     try {
-      return await readFile(join(contentDir, contentPath), 'utf-8')
+      return await readFile(join(repoRoot, path), 'utf-8')
     } catch {
       return undefined
     }
   }
 }
 
-export function findInWorkingTree(contentDir: string): FindFiles {
+const SEARCH_PATHSPEC = [
+  '*.md',
+  '*.mdx',
+  '*.ts',
+  '*.tsx',
+  '*.js',
+  '*.jsx',
+  '*.mjs',
+  '*.json',
+  '*.astro',
+  '*.yml',
+  '*.yaml',
+  ':!**/*.test.*',
+  ':!**/__snapshots__/**',
+  ':!**/__generated__/**',
+  ':!**/.generated/**',
+  ':!apps/docs/features/docs/generated/**',
+]
+
+export function findInWorkingTree(repoRoot: string): FindFiles {
   return async (needle) => {
     try {
       const stdout = await git(
-        ['grep', '-l', '-F', '--untracked', '-e', needle, '--', '.'],
-        contentDir
+        ['grep', '-l', '-F', '--untracked', '-e', needle, '--', ...SEARCH_PATHSPEC],
+        repoRoot
       )
       return stdout.split('\n').filter(Boolean)
     } catch {
@@ -285,20 +300,17 @@ export function findInWorkingTree(contentDir: string): FindFiles {
 
 async function main() {
   const baseArgIndex = process.argv.indexOf('--base')
-  const contentDir = join(import.meta.dirname, '..', 'content')
-  const repoRoot = (await git(['rev-parse', '--show-toplevel'], contentDir)).trim()
-  const contentPrefix = (await git(['rev-parse', '--show-prefix'], contentDir)).trim()
+  const repoRoot = (await git(['rev-parse', '--show-toplevel'], import.meta.dirname)).trim()
   const base =
     baseArgIndex === -1
       ? (await git(['merge-base', 'origin/master', 'HEAD'], repoRoot)).trim()
       : process.argv[baseArgIndex + 1]
 
   const changedFiles = (
-    await git(['diff', '--name-only', '--no-renames', base, '--', contentPrefix], repoRoot)
+    await git(['diff', '--name-only', '--no-renames', base, '--', CONTENT_PREFIX], repoRoot)
   )
     .split('\n')
     .filter(Boolean)
-    .map((file) => file.slice(contentPrefix.length))
 
   if (changedFiles.length === 0) {
     console.log('No docs content changed.')
@@ -307,15 +319,15 @@ async function main() {
 
   const broken = await findBrokenAnchors({
     changedFiles,
-    readBase: async (contentPath) => {
+    readBase: async (path) => {
       try {
-        return await git(['show', `${base}:${contentPrefix}${contentPath}`], repoRoot)
+        return await git(['show', `${base}:${path}`], repoRoot)
       } catch {
         return undefined
       }
     },
-    readHead: readFromWorkingTree(contentDir),
-    findFiles: findInWorkingTree(contentDir),
+    readHead: readFromWorkingTree(repoRoot),
+    findFiles: findInWorkingTree(repoRoot),
   })
 
   if (broken.length === 0) {
@@ -330,7 +342,7 @@ async function main() {
     for (const { route, anchor, linkedFrom } of broken) {
       for (const { file, line } of linkedFrom) {
         console.log(
-          `::${level} file=${contentPrefix}${file},line=${line}::Links to ${route}#${anchor}, which this PR removes`
+          `::${level} file=${file},line=${line}::Links to ${route}#${anchor}, which this PR removes`
         )
       }
     }

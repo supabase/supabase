@@ -21,10 +21,31 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 2
+          sparse-checkout-cone-mode: false
           sparse-checkout: |
-            apps/docs
-            packages
-            patches
+            /*
+            !/*/
+            /apps/
+            /packages/
+            /patches/
+            /examples/
+            !*.png
+            !*.jpg
+            !*.jpeg
+            !*.gif
+            !*.webp
+            !*.avif
+            !*.svg
+            !*.mp4
+            !*.webm
+            !*.mov
+            !*.ico
+            !*.woff
+            !*.woff2
+            !*.ttf
+            !*.otf
+            !*.pdf
+            !*.zip
 
       - name: Check for docs content changes
         id: changes

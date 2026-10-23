@@ -9,12 +9,14 @@ import {
   type ReadContent,
 } from './check-removed-anchors'
 
-const CONTENT_DIR = join(import.meta.dirname, '..', 'content')
-const API_KEYS = 'guides/getting-started/api-keys.mdx'
-const GOING_INTO_PROD = 'guides/deployment/going-into-prod.mdx'
+const REPO_ROOT = join(import.meta.dirname, '..', '..', '..')
+const CONTENT = 'apps/docs/content/'
+const API_KEYS = `${CONTENT}guides/getting-started/api-keys.mdx`
+const GOING_INTO_PROD = `${CONTENT}guides/deployment/going-into-prod.mdx`
+const LEAKED_KEY_LINKER = `${CONTENT}troubleshooting/rotating-anon-service-and-jwt-secrets-1Jq6yd.mdx`
 const LEAKED_KEY_HEADING = '### Rotate a leaked or compromised key [#leaked-key]'
 
-const readBase = readFromWorkingTree(CONTENT_DIR)
+const readBase = readFromWorkingTree(REPO_ROOT)
 
 function checkRealContent(edits: Record<string, (source: string) => string>) {
   const readHead: ReadContent = async (contentPath) => {
@@ -26,7 +28,7 @@ function checkRealContent(edits: Record<string, (source: string) => string>) {
     changedFiles: Object.keys(edits),
     readBase,
     readHead,
-    findFiles: findInWorkingTree(CONTENT_DIR),
+    findFiles: findInWorkingTree(REPO_ROOT),
   })
 }
 
@@ -53,9 +55,7 @@ describe('findBrokenAnchors', () => {
         page: API_KEYS,
         route: '/guides/getting-started/api-keys',
         anchor: 'leaked-key',
-        linkedFrom: [
-          { file: 'troubleshooting/rotating-anon-service-and-jwt-secrets-1Jq6yd.mdx', line: 39 },
-        ],
+        linkedFrom: [{ file: LEAKED_KEY_LINKER, line: 39 }],
       },
     ])
   })
@@ -81,6 +81,26 @@ describe('findBrokenAnchors', () => {
     ])
   })
 
+  it('names links from other apps', async () => {
+    const bigquery = `${CONTENT}guides/database/replication/pipelines/bigquery.mdx`
+    const broken = await checkRealContent({
+      [bigquery]: replaceOrThrow(section('## Configure BigQuery as a destination'), ''),
+    })
+
+    expect(broken).toEqual([
+      expect.objectContaining({
+        anchor: 'configure-bigquery-as-a-destination',
+        linkedFrom: [
+          { file: bigquery, line: 11 },
+          {
+            file: 'apps/studio/components/interfaces/Database/Replication/DestinationPanel/DestinationPanel.tsx',
+            line: 36,
+          },
+        ],
+      }),
+    ])
+  })
+
   it('passes when the heading stays with a summary and a link', async () => {
     const broken = await checkRealContent({
       [API_KEYS]: replaceOrThrow(
@@ -95,7 +115,7 @@ describe('findBrokenAnchors', () => {
   it('passes when the same change updates every link', async () => {
     const broken = await checkRealContent({
       [API_KEYS]: replaceOrThrow(section(LEAKED_KEY_HEADING), ''),
-      'troubleshooting/rotating-anon-service-and-jwt-secrets-1Jq6yd.mdx': replaceOrThrow(
+      [LEAKED_KEY_LINKER]: replaceOrThrow(
         '/docs/guides/getting-started/api-keys#leaked-key',
         '/docs/guides/api/rotate-keys'
       ),
@@ -105,22 +125,23 @@ describe('findBrokenAnchors', () => {
   })
 
   it('fails when a heading is removed from a nested partial', async () => {
-    const page = 'guides/example.mdx'
-    const linker = 'troubleshooting/example.mdx'
+    const page = `${CONTENT}guides/example.mdx`
+    const linker = `${CONTENT}troubleshooting/example.mdx`
+    const outer = `${CONTENT}_partials/outer.mdx`
+    const inner = `${CONTENT}_partials/inner.mdx`
     const shared = {
       [page]: '<$Partial path="outer.mdx" variables={{ "name": "Shared" }} />\n',
-      '_partials/outer.mdx':
-        '<$Partial path="inner.mdx" variables={{ "name": "{{ .name }}" }} />\n',
+      [outer]: '<$Partial path="inner.mdx" variables={{ "name": "{{ .name }}" }} />\n',
       [linker]: '[Shared section](/docs/guides/example#shared-section)\n',
     }
     const base: Record<string, string> = {
       ...shared,
-      '_partials/inner.mdx': '## {{ .name }} section\n',
+      [inner]: '## {{ .name }} section\n',
     }
-    const head: Record<string, string> = { ...shared, '_partials/inner.mdx': '## Other section\n' }
+    const head: Record<string, string> = { ...shared, [inner]: '## Other section\n' }
 
     const broken = await findBrokenAnchors({
-      changedFiles: ['_partials/inner.mdx'],
+      changedFiles: [inner],
       readBase: async (file) => base[file],
       readHead: async (file) => head[file],
       findFiles: async (needle) => Object.keys(head).filter((file) => head[file].includes(needle)),
