@@ -16,6 +16,28 @@ export function getEntitySearchQuery(query: string) {
   return { query: trimmed, isSearchable }
 }
 
+/**
+ * Client-side mirror of the matching in getSearchEntitiesSql: the name contains
+ * the query, or for `schema.name` queries, the schema starts with the part
+ * before the first dot and the name contains the part after it. Used to narrow
+ * results from a previous search while the current one is still in flight.
+ */
+export function matchesEntitySearch(
+  { schema, name }: Pick<EntitySearchTable, 'schema' | 'name'>,
+  query: string
+) {
+  const lowerQuery = query.toLowerCase()
+  const lowerName = name.toLowerCase()
+  if (lowerName.includes(lowerQuery)) return true
+
+  const dotIndex = lowerQuery.indexOf('.')
+  if (dotIndex === -1) return false
+
+  const schemaPart = lowerQuery.slice(0, dotIndex)
+  const namePart = lowerQuery.slice(dotIndex + 1)
+  return schema.toLowerCase().startsWith(schemaPart) && lowerName.includes(namePart)
+}
+
 export function formatTableSearchDetails({
   policy_count,
   rls_enabled,

@@ -2,7 +2,15 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { useEffect, useState } from 'react'
-import { useCommands, useSetCommandMenuOpen, useSetQuery } from 'ui-patterns/CommandMenu'
+import {
+  CommandHeader,
+  CommandMenuInput,
+  CommandMenuList,
+  CommandWrapper,
+  useCommands,
+  useSetCommandMenuOpen,
+  useSetQuery,
+} from 'ui-patterns/CommandMenu'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useDatabaseEntitySearchCommands } from './DatabaseEntitySearchCommands'
@@ -170,5 +178,57 @@ describe('useDatabaseEntitySearchCommands', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 500))
     expect(searchRequests).toHaveLength(0)
+  })
+})
+
+/** Renders the real command menu list, to check how results interact with its empty state. */
+const CommandMenuListHarness = () => {
+  useDatabaseEntitySearchCommands()
+  const setOpen = useSetCommandMenuOpen()
+
+  useEffect(() => setOpen(true), [setOpen])
+
+  return (
+    <CommandWrapper>
+      <CommandHeader>
+        <CommandMenuInput />
+      </CommandHeader>
+      <CommandMenuList />
+    </CommandWrapper>
+  )
+}
+
+describe('useDatabaseEntitySearchCommands in the command menu list', () => {
+  beforeEach(() => {
+    mockUseSelectedProjectQuery.mockReturnValue({
+      data: { id: 1, ref: 'default', name: 'default', connectionString: 'encrypted' },
+    })
+  })
+
+  it('hides the empty state once table results arrive', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () => HttpResponse.json([SEARCH_RESULT]),
+    })
+    customRender(<CommandMenuListHarness />)
+
+    await userEvent.type(screen.getByRole('combobox'), 'blog_posts')
+
+    expect(await screen.findByText('4 policies • RLS enabled')).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByText('No results found.')).not.toBeInTheDocument())
+  })
+
+  it('shows the empty state when no tables match', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () => HttpResponse.json([{ tables: [] }]),
+    })
+    customRender(<CommandMenuListHarness />)
+
+    await userEvent.type(screen.getByRole('combobox'), 'zzzqqq')
+
+    expect(await screen.findByText('No results found.')).toBeInTheDocument()
   })
 })

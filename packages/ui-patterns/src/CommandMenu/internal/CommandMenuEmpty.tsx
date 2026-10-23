@@ -3,6 +3,7 @@
 import { useEffect, useState, type PropsWithChildren, type RefObject } from 'react'
 import { cn } from 'ui'
 
+import { useCommands } from '../api/hooks/commandsHooks'
 import { useQuery } from '../api/hooks/queryHooks'
 
 const CommandMenuEmpty = ({
@@ -21,22 +22,15 @@ const CommandMenuEmpty = ({
   listRef: RefObject<HTMLDivElement | undefined>
 }>) => {
   const query = useQuery()
+  // Re-check when sections are registered or removed after the query changed,
+  // e.g. search results that load asynchronously
+  const commandSections = useCommands()
 
   const [render, setRender] = useState(false)
   useEffect(() => {
     if (!query) return setRender(false)
-
-    const node = listRef?.current
-    const checkEmpty = () => setRender(!node?.querySelector('[cmdk-item]'))
-    checkEmpty()
-    if (!node) return
-
-    // Some sections (e.g. database search results) are populated asynchronously
-    // after the query changes, so re-check whenever the list contents change.
-    const observer = new MutationObserver(checkEmpty)
-    observer.observe(node, { childList: true, subtree: true })
-    return () => observer.disconnect()
-  }, [query, listRef])
+    setRender(!listRef?.current?.querySelector('[cmdk-item]'))
+  }, [query, commandSections])
 
   return (
     render && (

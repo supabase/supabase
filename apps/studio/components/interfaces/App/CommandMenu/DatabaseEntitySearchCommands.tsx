@@ -14,6 +14,7 @@ import {
   formatTableSearchDetails,
   getEntitySearchQuery,
   getTableEditorRoute,
+  matchesEntitySearch,
 } from './DatabaseEntitySearch.utils'
 import { orderCommandSectionsByPriority } from './ordering'
 import { entitySearchQueryOptions } from '@/data/database/entity-search-query'
@@ -30,18 +31,31 @@ export function useDatabaseEntitySearchCommands() {
   const isOpen = useCommandMenuOpen()
   const commandMenuQuery = useCommandMenuQuery()
   const debouncedQuery = useDebounce(commandMenuQuery, ENTITY_SEARCH_DEBOUNCE_MS)
-  const { query, isSearchable } = getEntitySearchQuery(debouncedQuery)
+  const currentSearch = getEntitySearchQuery(commandMenuQuery)
+  const debouncedSearch = getEntitySearchQuery(debouncedQuery)
 
-  const { data } = useQuery(
+  const { data, isPlaceholderData } = useQuery(
     entitySearchQueryOptions(
-      { projectRef: project?.ref, connectionString: project?.connectionString, query },
-      { enabled: isOpen && isSearchable }
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        query: debouncedSearch.query,
+      },
+      { enabled: isOpen && debouncedSearch.isSearchable }
     )
   )
 
-  // Placeholder data from a previous search sticks around while a query is
-  // disabled, so only show results while the current input is searchable.
-  const tables = isOpen && isSearchable ? (data?.tables ?? []) : []
+  // Results lag behind the input (debounce, request in flight, placeholder data
+  // from the previous search). Until they catch up, only keep the ones that
+  // still match what's typed, so e.g. `blog_posts` results never show for
+  // `colors`, while refining `blog` to `blog_p` narrows smoothly.
+  const canShowResults = isOpen && currentSearch.isSearchable
+  const isStale = isPlaceholderData || debouncedSearch.query !== currentSearch.query
+  const results = data?.tables ?? []
+  const visibleResults = isStale
+    ? results.filter((table) => matchesEntitySearch(table, currentSearch.query))
+    : results
+  const tables = canShowResults ? visibleResults : []
   const projectRef = project?.ref ?? '_'
 
   const tableCommands: ICommand[] = tables.map((table) => {
