@@ -1,8 +1,8 @@
 import { type Table as TTable } from '@tanstack/react-table'
 import { cn } from 'ui'
 
-import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
-import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
+import { LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { LogsFilter, logsFiltersToUrlParams, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -30,19 +30,23 @@ export function getComputeLogsAvailability({
 export const buildUnifiedLogsUrl = ({
   projectRef,
   logType,
+  filters = [],
   user,
   start,
   end,
 }: {
   projectRef: string
   logType?: UnifiedLogType
+  filters?: LogsFilter[]
   /** Pre-applies the cross-cutting "filter by user" (?user=) — an id or email. */
   user?: string
   start?: string | Date
   end?: string | Date
 }) => {
   const params = new URLSearchParams()
-  if (logType) params.append('filter', `log_type:eq:${logType}`)
+  const logFilters = logsFiltersToUrlParams(filters)
+  if (logType) logFilters.unshift(`log_type:eq:${logType}`)
+  if (logFilters.length > 0) params.set('filter', SEARCH_PARAMS_PARSER.filter.serialize(logFilters))
   if (user) params.set('user', user)
   if (start && end) {
     params.set('date', `${new Date(start).valueOf()}-${new Date(end).valueOf()}`)

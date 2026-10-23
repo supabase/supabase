@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import {
   buildUnifiedLogsUrl,
   gateLogTypeFilters,
@@ -37,6 +39,43 @@ describe('buildUnifiedLogsUrl', () => {
       buildUnifiedLogsUrl({ projectRef: 'abc', logType: 'auth', start, end })
     )
     expect(params.get('date')).toBe(`${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
+  })
+
+  it('combines service and error filters without losing the user or time range', () => {
+    const { params } = parse(
+      buildUnifiedLogsUrl({
+        projectRef: 'abc',
+        logType: 'edge',
+        filters: [
+          { column: 'level', operator: '=', value: 'error' },
+          { column: 'pathname', operator: '=', value: '/rest/v1' },
+        ],
+        user: 'user@example.com',
+        start: '2026-05-08T00:00:00.000Z',
+        end: '2026-05-08T01:00:00.000Z',
+      })
+    )
+    const filters = SEARCH_PARAMS_PARSER.filter.parse(params.get('filter') ?? '')
+    expect(parseLogsFilterUrlParams(filters)).toEqual([
+      { column: 'log_type', operator: '=', value: 'edge' },
+      { column: 'level', operator: '=', value: 'error' },
+      { column: 'pathname', operator: '=', value: '/rest/v1' },
+    ])
+    expect(params.get('user')).toBe('user@example.com')
+    expect(params.get('date')).toBe('1778198400000-1778202000000')
+  })
+
+  it('preserves commas within a filter value', () => {
+    const { params } = parse(
+      buildUnifiedLogsUrl({
+        projectRef: 'abc',
+        filters: [{ column: 'pathname', operator: '=', value: '/rest/v1/a,b' }],
+      })
+    )
+    const filters = SEARCH_PARAMS_PARSER.filter.parse(params.get('filter') ?? '')
+    expect(parseLogsFilterUrlParams(filters)).toEqual([
+      { column: 'pathname', operator: '=', value: '/rest/v1/a,b' },
+    ])
   })
 
   it('omits the date range when only one bound is provided', () => {
