@@ -72,7 +72,21 @@ export const TelemetryTagManager = () => {
   )
 }
 
-function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
+export const FIRST_TOUCH_CLICK_ID_KEYS = [
+  'gclid', // Google Ads
+  'gbraid', // Google Ads (iOS)
+  'wbraid', // Google Ads (iOS)
+  'msclkid', // Microsoft Ads (Bing)
+  'fbclid', // Meta (Facebook/Instagram)
+  'rdt_cid', // Reddit Ads
+  'ttclid', // TikTok Ads
+  'twclid', // X Ads (Twitter)
+  'li_fat_id', // LinkedIn Ads
+  'bfcid', // Freebuff Ads
+  'oppref', // ChatGPT Ads (OpenAI)
+] as const
+
+export function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
   const urlString = telemetryData.page_url
 
   try {
@@ -93,19 +107,12 @@ function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
       ...(getParam('utm_term') && { $utm_term: getParam('utm_term') }),
     }
 
-    const clickIdProps = {
-      ...(getParam('gclid') && { gclid: getParam('gclid') }), // Google Ads
-      ...(getParam('gbraid') && { gbraid: getParam('gbraid') }), // Google Ads (iOS)
-      ...(getParam('wbraid') && { wbraid: getParam('wbraid') }), // Google Ads (iOS)
-      ...(getParam('msclkid') && { msclkid: getParam('msclkid') }), // Microsoft Ads (Bing)
-      ...(getParam('fbclid') && { fbclid: getParam('fbclid') }), // Meta (Facebook/Instagram)
-      ...(getParam('rdt_cid') && { rdt_cid: getParam('rdt_cid') }), // Reddit Ads
-      ...(getParam('ttclid') && { ttclid: getParam('ttclid') }), // TikTok Ads
-      ...(getParam('twclid') && { twclid: getParam('twclid') }), // X Ads (Twitter)
-      ...(getParam('li_fat_id') && { li_fat_id: getParam('li_fat_id') }), // LinkedIn Ads
-      ...(getParam('bfcid') && { bfcid: getParam('bfcid') }), // Freebuff Ads
-      ...(getParam('oppref') && { oppref: getParam('oppref') }), // ChatGPT Ads (OpenAI)
-    }
+    const clickIdProps = Object.fromEntries(
+      FIRST_TOUCH_CLICK_ID_KEYS.flatMap((key) => {
+        const value = getParam(key)
+        return value ? [[key, value]] : []
+      })
+    )
 
     return {
       ...utmProps,

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildFirstReferrerData,
+  CLICK_ID_KEYS,
   FIRST_REFERRER_COOKIE_NAME,
   hasPaidSignals,
   isExternalReferrer,
@@ -141,6 +142,24 @@ describe('first-referrer-cookie', () => {
         gclid: 'abc123',
         msclkid: 'xyz456',
       })
+    })
+
+    it('keeps the consent-gated bfcid out of the pre-consent cookie', () => {
+      expect(CLICK_ID_KEYS).not.toContain('bfcid')
+    })
+
+    it('extracts every click id in CLICK_ID_KEYS', () => {
+      const landingUrl = new URL('https://supabase.com/')
+      for (const key of CLICK_ID_KEYS) landingUrl.searchParams.set(key, `${key}-value`)
+
+      const data = buildFirstReferrerData({
+        referrer: 'https://www.google.com/',
+        landingUrl: landingUrl.href,
+      })
+
+      expect(data.click_ids).toEqual(
+        Object.fromEntries(CLICK_ID_KEYS.map((key) => [key, `${key}-value`]))
+      )
     })
   })
 
