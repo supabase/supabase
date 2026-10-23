@@ -5,6 +5,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type React from 'react'
 import { cn, CommandInput } from 'ui'
 
+import { useCurrentPage, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 
@@ -44,8 +45,11 @@ function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) 
 const CommandMenuInput = forwardRef<
   React.ElementRef<typeof CommandInput>,
   React.ComponentPropsWithoutRef<typeof CommandInput>
->(({ className, wrapperClassName, ...props }, ref) => {
+>(({ className, wrapperClassName, onKeyDown, ...props }, ref) => {
   const inputRef = useFocusInputOnWiderScreens(ref)
+
+  const page = useCurrentPage()
+  const popPage = usePopPage()
 
   const query = useQuery()
   const setQuery = useSetQuery()
@@ -111,6 +115,17 @@ const CommandMenuInput = forwardRef<
     }
   }, [inputValue, imeComposing])
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    onKeyDown?.(event)
+    if (event.defaultPrevented) return
+
+    // Backspace on an empty input steps back to the previous page
+    if (event.key === 'Backspace' && !inputValue && !imeComposing && page) {
+      event.preventDefault()
+      popPage()
+    }
+  }
+
   return (
     <div className="relative w-full" cmdk-input-wrapper="">
       <CommandInput
@@ -120,6 +135,7 @@ const CommandMenuInput = forwardRef<
         ref={inputRef}
         value={inputValue}
         onValueChange={handleValueChange}
+        onKeyDown={handleKeyDown}
         placeholder="Run a command or search..."
         onCompositionStart={() => setImeComposing(true)}
         onCompositionEnd={() => setImeComposing(false)}

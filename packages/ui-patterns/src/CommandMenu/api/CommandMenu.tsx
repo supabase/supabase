@@ -19,7 +19,6 @@ import {
 } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
-import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 import {
   useCommandMenuOpen,
@@ -229,12 +228,6 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
 
   const size = useCommandMenuSize()
 
-  const page = useCurrentPage()
-  const popPage = usePopPage()
-
-  const query = useQuery()
-  const setQuery = useSetQuery()
-
   const telemetryContext = useCommandMenuTelemetryContext()
 
   const { ref: contentRef } = useTouchGestures({ toggleOpen: () => setOpen(!open) })
@@ -262,7 +255,7 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         onInteractOutside={() => handleOpenChange(false)}
         onEscapeKeyDown={(e) => {
           e.preventDefault()
-          return query ? setQuery('') : page ? popPage() : handleOpenChange(false)
+          handleOpenChange(false)
         }}
         size={size}
         className={cn(
