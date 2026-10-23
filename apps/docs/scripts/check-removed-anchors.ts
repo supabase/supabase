@@ -231,9 +231,9 @@ function formatReport(broken: BrokenAnchor[]) {
     lines.push('')
   }
   lines.push(
-    'To fix:',
-    '  1. If the content moved, point the links above to its new home.',
-    '  2. Or keep the heading and replace its body with a cross-reference:',
+    'To fix, do both:',
+    "  1. Point the links above to the content's new home.",
+    '  2. Keep the heading and replace its body with a cross-reference to that new home:',
     '',
     '       ### Rotate a leaked or compromised key [#leaked-key]',
     '',
