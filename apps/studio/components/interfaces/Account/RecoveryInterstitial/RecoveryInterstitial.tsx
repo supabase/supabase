@@ -17,6 +17,9 @@ import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from '@/lib/constants'
 
+// Anchor the header while the card grows from checking to actionable tasks.
+const recoveryContainerClassName = 'items-start pt-16 sm:pt-[max(4rem,calc(50svh-16rem))]'
+
 export const RecoveryInterstitial = () => {
   const [returnTo] = useQueryState('returnTo', parseAsString)
   const destination = getRecoveryReturnTo(returnTo, BASE_PATH)
@@ -98,6 +101,7 @@ export const RecoveryReminder = ({
         logo={<SupabaseLogo />}
         title="Account recovery check unavailable"
         widthClassName="max-w-md"
+        containerClassName={recoveryContainerClassName}
       >
         <div className="px-6">
           {isError ? (
@@ -139,6 +143,7 @@ export const RecoveryReminder = ({
           )
         }
         widthClassName="max-w-md"
+        containerClassName={recoveryContainerClassName}
         description={
           isLoading ? (
             <ShimmeringLoader className="h-5 w-64 max-w-full py-0" />
@@ -147,7 +152,7 @@ export const RecoveryReminder = ({
           )
         }
       >
-        <CardFooter className="justify-center min-h-12">
+        <CardFooter className="justify-center px-6 py-5 min-h-16">
           {!isLoading && (
             <Button asChild size="tiny">
               <a href={destination}>Continue</a>
@@ -192,7 +197,7 @@ export const RecoveryReminder = ({
       title="Secure your account"
       description="Complete the following tasks to reduce the risk of being locked out of your Supabase account."
       widthClassName="max-w-md"
-      containerClassName="relative before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-64 before:bg-gradient-to-b before:from-warning-600/10 before:to-transparent"
+      containerClassName={`${recoveryContainerClassName} relative before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-64 before:bg-gradient-to-b before:from-warning-600/10 before:to-transparent`}
       cardClassName="relative"
     >
       <div className="border-t divide-y">
