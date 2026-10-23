@@ -3,11 +3,16 @@
 import type { ComponentProps } from 'react'
 import { Badge, cn } from 'ui'
 
-import { useSpan } from './Rows'
+import { Duration, useSpan } from './Rows'
 import { useTrace } from './Trace'
 import type { SpanStatus } from './types'
-import { collapsedChildMidpoints, effectiveEndMs } from './utils'
+import { collapsedChildMidpoints, effectiveEndMs, formatDuration } from './utils'
 import { useWaterfallScale } from './Waterfall'
+
+const TIMING_GAP = 6
+const TIMING_CHAR_PX = 7.2
+const TIMING_CHIP_PX = 8
+const SLOWEST_PX = 65
 
 const STATUS_CLASS: Record<SpanStatus, string> = {
   ok: 'bg-brand',
@@ -39,6 +44,53 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
       style={{ left: `${left * 100}%`, width: `${width * 100}%`, ...style }}
       {...props}
     />
+  )
+}
+
+export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
+  const { row } = useSpan()
+  const { nowMs, slowestId } = useTrace()
+  const scale = useWaterfallScale()
+  const { span } = row
+  const endMs = effectiveEndMs(span, nowMs)
+  const startFraction = scale.toFraction(span.startMs)
+  const endFraction = scale.toFraction(endMs)
+  if (endFraction < 0 || startFraction > 1) return null
+
+  const visibleStart = Math.max(startFraction, 0)
+  const visibleEnd = Math.min(endFraction, 1)
+  const labelPx = formatDuration(endMs - span.startMs).length * TIMING_CHAR_PX + TIMING_CHIP_PX
+  const reserved = span.id === slowestId ? SLOWEST_PX : 0
+  const barPx = (visibleEnd - visibleStart) * scale.width
+  const placement =
+    visibleEnd * scale.width + TIMING_GAP + labelPx <= scale.width
+      ? 'after'
+      : barPx >= labelPx + reserved + 8
+        ? 'inside'
+        : 'before'
+
+  const position = {
+    after: { left: `calc(${visibleEnd * 100}% + ${TIMING_GAP}px)` },
+    inside: { right: `calc(${(1 - visibleEnd) * 100}% + ${4 + reserved}px)` },
+    before: { right: `calc(${(1 - visibleStart) * 100}% + ${TIMING_GAP}px)` },
+  }[placement]
+
+  return (
+    <div
+      data-trace-timing
+      data-placement={placement}
+      className={cn(
+        'pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-sm px-1',
+        placement === 'inside' && '[&>span]:text-background',
+        placement === 'after' &&
+          'transition-[left] duration-300 ease-linear motion-reduce:transition-none',
+        className
+      )}
+      style={{ ...position, ...style }}
+      {...props}
+    >
+      <Duration />
+    </div>
   )
 }
 

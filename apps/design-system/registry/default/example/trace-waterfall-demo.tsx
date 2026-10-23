@@ -60,6 +60,7 @@ export default function TraceWaterfallDemo() {
             <Trace.Cell />
             <Trace.Lane>
               <Trace.Bar />
+              <Trace.Timing />
               <Trace.CollapsedChildren />
               <Trace.Markers />
               <Trace.Slowest />
@@ -77,6 +78,7 @@ export default function TraceWaterfallDemo() {
             <Trace.Cell />
             <Trace.Lane>
               <Trace.Bar />
+              <Trace.Timing />
               <Trace.CollapsedChildren />
               <Trace.Markers />
             </Trace.Lane>
