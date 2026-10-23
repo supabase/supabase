@@ -20,20 +20,16 @@ const EMPTY_QUERY: ConnectSheetQueryParams = {
 const EMPTY_PREFS: ConnectSheetPrefs = {}
 
 describe('mapConnectTabToMode', () => {
-  test('returns null for null tab', () => {
-    expect(mapConnectTabToMode(null)).toBeNull()
+  test.each([null, 'not-a-real-tab'])('returns null for %s', (tab) => {
+    expect(mapConnectTabToMode(tab)).toBeNull()
   })
 
-  test('returns null for an unrecognized tab', () => {
-    expect(mapConnectTabToMode('not-a-real-tab')).toBeNull()
-  })
-
-  test.each(['frameworks', 'mobiles'])('maps "%s" to framework mode', (tab) => {
-    expect(mapConnectTabToMode(tab)).toBe('framework')
-  })
-
-  test('maps "orms" to orm mode', () => {
-    expect(mapConnectTabToMode('orms')).toBe('orm')
+  test.each([
+    ['frameworks', 'framework'],
+    ['mobiles', 'framework'],
+    ['orms', 'orm'],
+  ])('maps legacy tab "%s" to %s mode', (tab, mode) => {
+    expect(mapConnectTabToMode(tab)).toBe(mode)
   })
 
   test.each(ALL_MODES)('passes through an already-valid mode "%s"', (mode) => {

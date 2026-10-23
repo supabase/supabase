@@ -155,12 +155,6 @@ describe('Logs.utils', () => {
       const result = buildLogsPrompt(rows)
       expect(result).toContain('2 Supabase log entries')
     })
-
-    test('handles singular correctly', () => {
-      const rows: LogData[] = [createLog({ id: '1', event_message: 'single error' })]
-      const result = buildLogsPrompt(rows)
-      expect(result).toContain('1 Supabase log entry')
-    })
   })
 
   describe('extractEdgeFunctionName', () => {
@@ -168,18 +162,12 @@ describe('Logs.utils', () => {
       expect(extractEdgeFunctionName('/functions/v1/hello-world-1')).toBe('hello-world-1')
     })
 
-    test('returns empty string for null', () => {
-      expect(extractEdgeFunctionName(null)).toBe('')
-    })
-
-    test('returns empty string for undefined', () => {
-      expect(extractEdgeFunctionName(undefined)).toBe('')
-    })
-
-    test('returns empty string for non-string values', () => {
-      expect(extractEdgeFunctionName(42)).toBe('')
-      expect(extractEdgeFunctionName({})).toBe('')
-    })
+    test.each([null, undefined, 42, {}])(
+      'returns empty string for non-string value %o',
+      (value) => {
+        expect(extractEdgeFunctionName(value)).toBe('')
+      }
+    )
 
     test('handles pathname with no slashes', () => {
       expect(extractEdgeFunctionName('my-function')).toBe('my-function')

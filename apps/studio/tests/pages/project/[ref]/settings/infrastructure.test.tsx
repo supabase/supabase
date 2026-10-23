@@ -320,7 +320,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
   })
 
   test('loads the complete infrastructure page through MSW and resets an interaction', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     renderInfrastructurePage()
 
     expect(screen.getByRole('heading', { name: 'Infrastructure', level: 1 })).toBeInTheDocument()
@@ -343,6 +343,12 @@ describe('/project/[ref]/settings/infrastructure', () => {
     expect(screen.getByText('Dedicated · 2 vCPUs')).toBeInTheDocument() // Large
     expect(screen.queryByText(/-core/)).not.toBeInTheDocument()
 
+    // Compute stays editable for non High Availability projects
+    expect(
+      screen.queryByText("Compute size can't be changed on High Availability projects")
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('Contact Us')).toBeInTheDocument()
+
     await user.click(screen.getByText('Small'))
     expect(screen.getByRole('button', { name: 'Review changes' })).toBeEnabled()
 
@@ -353,7 +359,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
   })
 
   test('focuses the recommended compute option after closing the add replica dialog', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     renderInfrastructurePage()
 
     await user.click(await screen.findByRole('button', { name: 'Add read replica' }))
@@ -365,7 +371,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
   })
 
   test('reviews and confirms a compute resize through the add-on API', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     let addonRequest: unknown
 
     addAPIMock({
@@ -398,7 +404,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
   })
 
   test('renders compute as read-only for High Availability projects', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
 
     addAPIMock({
       method: 'get',
@@ -453,22 +459,6 @@ describe('/project/[ref]/settings/infrastructure', () => {
     await user.click(smallCompute)
     expect(largeCompute).toBeChecked()
     expect(screen.queryByRole('button', { name: 'Review changes' })).not.toBeInTheDocument()
-  })
-
-  test('keeps compute editable for non High Availability projects', async () => {
-    const user = userEvent.setup()
-    renderInfrastructurePage()
-
-    expect(
-      screen.queryByText("Compute size can't be changed on High Availability projects")
-    ).not.toBeInTheDocument()
-
-    const smallCompute = await screen.findByRole('radio', { name: /Small/ })
-    expect(smallCompute).toBeEnabled()
-    expect(screen.getByText('Contact Us')).toBeInTheDocument()
-
-    await user.click(smallCompute)
-    expect(screen.getByRole('button', { name: 'Review changes' })).toBeEnabled()
   })
 
   test('submits disk and autoscaling changes to both infrastructure APIs', async () => {
