@@ -3141,12 +3141,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/migrating-to-supabase/vercel-postgres',
-    destination: '/kb/guides/vercel-postgres',
+    destination: '/kb/guides/migrate-from-vercel-postgres',
   },
   {
     permanent: true,
     source: '/docs/guides/resources/migrating-to-supabase/vercel-postgres',
-    destination: '/kb/guides/vercel-postgres',
+    destination: '/kb/guides/migrate-from-vercel-postgres',
   },
   {
     permanent: true,

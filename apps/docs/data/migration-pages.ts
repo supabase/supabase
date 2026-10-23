@@ -50,7 +50,7 @@ export const MIGRATION_PAGES: MigrationPage[] = [
   {
     name: 'Vercel Postgres',
     icon: '/docs/img/icons/vercel-icon',
-    url: 'https://supabase.com/kb/guides/vercel-postgres',
+    url: 'https://supabase.com/kb/guides/migrate-from-vercel-postgres',
     hasLightIcon: true,
   },
   {

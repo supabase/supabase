@@ -3,7 +3,6 @@
 import { isFeatureEnabled } from 'common/enabled-features'
 
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
-import { MIGRATION_PAGES } from '@/data/migration-pages'
 
 const {
   authenticationShowProviders: allAuthProvidersEnabled,
@@ -2704,11 +2703,6 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/migrating-within-supabase/backup-restore' as `/${string}`,
             },
           ],
-        },
-        {
-          name: 'Migrating to Supabase',
-          url: 'https://supabase.com/kb/topics/migration',
-          items: [...MIGRATION_PAGES],
         },
       ],
     },
