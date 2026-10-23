@@ -63,6 +63,7 @@ export const TopSection = () => {
                 ) : (
                   <h1 className="text-3xl">{projectName}</h1>
                 )}
+                {!IS_PLATFORM && <Badge>Self-hosted</Badge>}
                 {isOrioleDb && (
                   <Tooltip>
                     <TooltipTrigger asChild>
