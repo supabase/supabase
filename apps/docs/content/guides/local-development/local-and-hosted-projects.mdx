@@ -1,0 +1,261 @@
+---
+title: 'Running commands against local and hosted projects'
+subtitle: 'How the Supabase CLI picks a target, resolves settings, and asks before it changes a hosted project.'
+description: 'How the Supabase CLI picks a target, resolves settings, and asks before it changes a hosted project.'
+---
+
+Every Supabase CLI command that touches a database, Storage, or a project does three things:
+
+1. It picks a **target**: the local stack or a hosted project.
+2. It resolves its **settings** for that target.
+3. It asks for **confirmation** first if it's about to change a hosted project.
+
+The sections below follow that order. For install steps, see [Install and run the CLI](/docs/guides/local-development/cli/getting-started). For every command and flag, see the [CLI reference](/docs/reference/cli).
+
+## Which project a command runs against [#targets]
+
+Local is the default for every command that can run locally. A hosted project holds real data, so reaching it is an explicit choice: you add `--remote`, and the intent is visible in the command line instead of stored in your checkout.
+
+### Three kinds of command [#command-kinds]
+
+| Kind            | Help label          | With no `--remote` | Examples                                                                                                                           |
+| --------------- | ------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Local or remote | `[local or remote]` | The local stack    | `db push`, `db pull`, `db dump`, `db reset`, `db query`, `migration list`, `gen types`, `inspect db`, `storage ls`, `seed buckets` |
+| Remote only     | `[remote only]`     | The linked project | `functions deploy`, `secrets set`, `config push`, `branches list`                                                                  |
+| Local only      | `[local only]`      | The local stack    | `start`, `stop`, `status`, `init`, `migration new`, `functions serve`                                                              |
+
+A local-only command takes no target flags, and `--remote` fails with a message saying so. Commands that act on your account, such as `login`, `orgs list`, and `projects list`, have no target and no label.
+
+To see which kind a command is, check its help. A group's help ends each subcommand row with its label, and a command's own help has a `TARGET` section above `USAGE`:
+
+```sh
+supabase db --help
+supabase db push --help
+```
+
+```text
+TARGET
+  Local by default. Pass --remote for the linked project, or --remote=<ref|branch|url>.
+```
+
+### Choose a target with `--remote` [#choose-a-target]
+
+| You pass                  | Target                                                                                                                        |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Nothing                   | The local stack, or the linked project for a remote-only command                                                              |
+| `--remote`                | The linked project                                                                                                            |
+| `--remote=<project-ref>`  | That project: 20 lowercase letters, never looked up as a branch                                                               |
+| `--remote=<branch>`       | A branch of the linked project, by name or UUID                                                                               |
+| `--remote=<postgres-url>` | That database, as a `postgres://` or `postgresql://` URL. Database commands only. Storage and remote-only commands reject it. |
+
+Remote-only commands use the linked project. A bare `--remote` changes nothing for them. Pass `--remote=<project-ref>` or `--remote=<branch>` to point them at another project or branch. `branches` commands act on a parent project, so their `--remote` takes a project ref and never a branch name.
+
+### The linked project [#linked-project]
+
+A bare `--remote` means the linked project. The CLI finds it in this order:
+
+1. `SUPABASE_PROJECT_ID`, when it's set in your environment.
+2. The project that `supabase link <project-ref>` saved in `supabase/.temp/project-ref`.
+
+With neither, a terminal opens the project picker, and any other run fails with `ProjectRefNotLinkedError`.
+
+`SUPABASE_PROJECT_ID` never makes a local-or-remote command remote on its own. It only sets what a bare `--remote` means. `--remote=<project-ref>` overrides both.
+
+### Syntax for `--remote` [#remote-syntax]
+
+`--remote` works on its own, so attach a value with `=`: write `--remote=<branch>`, not `--remote <branch>`.
+
+When a command also takes an argument, put `--remote` last:
+
+```sh
+supabase db pull add_profiles --remote
+```
+
+If the word after a bare `--remote` could be either the value or the command's argument, the CLI stops before it does anything and shows both readings instead of guessing. To decide, it checks the word against the branches of the linked project. If it can't list them, for example because the access token is missing, the run fails. A `--remote=<name>` that matches no branch fails with the list of branches and a "Did you mean" suggestion.
+
+### The `Target:` line [#target-line]
+
+Every command that resolves a target prints `Target: …` once on stderr, before it acts. It never includes credentials.
+
+```text
+Target: local stack (127.0.0.1:54322)
+Target: local stack (127.0.0.1:54322) · default; pass --remote for My Project (abcdefghijklmnopqrst)
+Target: project My Project (abcdefghijklmnopqrst) · production
+Target: project My Project (abcdefghijklmnopqrst) · branch staging (zyxwvutsrqponmlkjihg)
+Target: custom Postgres (db.example.com:5432)
+```
+
+The second line appears when a project is linked and you passed no `--remote`. With `--output-format json` or `stream-json`, results and errors also carry a `target` object, such as `{"kind":"local","host":"127.0.0.1","port":54322}`. Its `kind` is `local`, `db-url`, or `linked`. JSON arrays and generated files, such as `gen types` output, are unchanged.
+
+### Loopback database URLs [#loopback]
+
+A `--remote=<postgres-url>` that points at a loopback host (`localhost`, `127.0.0.1`, or `::1`) on the local stack's database port counts as local, so it doesn't ask for [confirmation](#confirmation).
+
+## Which settings a command uses [#settings]
+
+The CLI resolves every config value, whether it comes from `supabase/config.toml` or a `SUPABASE_*` variable, in one order. Each step takes precedence over the steps after it:
+
+1. A command-line flag.
+2. A shell environment variable.
+3. A project env file.
+4. `supabase/config.json` or `supabase/config.toml` (`config.json` wins when both exist), with a matched `[remotes.<name>]` block over the base config.
+5. The default.
+
+For what the config file holds, see [Managing config and secrets](/docs/guides/local-development/managing-config).
+
+### Project env files [#env-files]
+
+The CLI reads these files in this order. The first file that defines a variable wins, and a variable already set in your shell is never overwritten by a file:
+
+```text
+supabase/.env.<SUPABASE_ENV>.local
+supabase/.env.local
+supabase/.env.<SUPABASE_ENV>
+supabase/.env
+<project root>/.env.<SUPABASE_ENV>.local
+<project root>/.env.local
+<project root>/.env.<SUPABASE_ENV>
+<project root>/.env
+```
+
+`SUPABASE_ENV` defaults to `development`. `.env.local` is skipped when `SUPABASE_ENV` is `test`. The project root is the directory that contains `supabase/`.
+
+### Remote blocks [#remotes]
+
+A `[remotes.<name>]` block applies when its `project_id` equals the project ref of the target. Only the keys the block declares override the base config. When a block applies, commands such as `db push` and `config push` print `Loading config override: [remotes.<name>]`.
+
+- A branch has its own project ref, so `--remote=<branch>` matches the block whose `project_id` is that branch's ref.
+- The local stack and a `--remote=<postgres-url>` target have no project ref, so no block applies.
+
+### Common settings [#common-settings]
+
+| Setting                  | Flag                                                                         | Environment variable                    | `config.toml`                    |
+| ------------------------ | ---------------------------------------------------------------------------- | --------------------------------------- | -------------------------------- |
+| Hosted database password | `--password`                                                                 | `SUPABASE_DB_PASSWORD`                  | —                                |
+| Seeding                  | `--include-seed` on `db push`, `--no-seed` on `db reset`                     | `SUPABASE_DB_SEED_ENABLED`              | `[db.seed] enabled`              |
+| Diff engine              | `--use-pg-delta` or `--use-migra` on `db diff`, `--diff-engine` on `db pull` | `SUPABASE_EXPERIMENTAL_PGDELTA_ENABLED` | `[experimental.pgdelta] enabled` |
+| Studio port              | —                                                                            | `SUPABASE_STUDIO_PORT`                  | `[studio] port`                  |
+| Project directory        | `--workdir`                                                                  | `SUPABASE_WORKDIR`                      | —                                |
+
+Any config key can be set from the environment as `SUPABASE_` plus the key's path in upper case, with `_` between the parts. `[studio] port` is `SUPABASE_STUDIO_PORT`, and `[db.seed] enabled` is `SUPABASE_DB_SEED_ENABLED`. A key inside an optional section, such as an auth provider, applies only when that section exists in your config.
+
+The database password has two separate settings:
+
+- The hosted password applies only to a hosted target, never to the local stack or a database URL. If your checkout is linked to one project and you target another, the CLI doesn't send `SUPABASE_DB_PASSWORD` to it. It uses a temporary login role instead, which needs `supabase login` or `SUPABASE_ACCESS_TOKEN`. Pass `--password` to use a password for that project.
+- The local password is `[db] password` in `config.toml`. It has no flag or variable, and `SUPABASE_DB_PASSWORD` doesn't set it.
+
+### Seeing where a value came from [#value-origin]
+
+- When a variable overrides a value that a matched `[remotes.<name>]` block sets, the CLI prints a warning that names the variable and the key, such as `SUPABASE_DB_MAJOR_VERSION (shell) overrides db.major_version in [remotes.staging].`
+- `supabase config diff` labels each value that came from the environment, with `(from SUPABASE_AUTH_SITE_URL)` for a shell variable or `(from SUPABASE_AUTH_SITE_URL in supabase/.env.local)` for a project env file. The local side of the diff is what `config push` sends.
+- `supabase config push` prints `Pushing N values set by environment variables: …` before it asks, and labels each of those rows with `(from <VAR>)`.
+- `--debug` logs `config: <key> from <source>` for every value that isn't a default.
+
+### Validation [#validation]
+
+An invalid value in `config.toml` or in a `SUPABASE_*` variable, such as `SUPABASE_STUDIO_PORT=abc`, fails every command that loads the config with `CliConfigValueError`, and the error names the variable or file.
+
+## When a command asks first [#confirmation]
+
+Every command that changes a hosted project asks for confirmation before its first change. It asks once, and the question lists everything the command will do. `db push`, for example, covers custom roles, migrations, vault secrets, and seed files in one question.
+
+- The default answer is **No**, so pressing Enter declines.
+- Create-only commands default to **Yes**: `projects create`, `orgs create`, `branches create`, `domains create`, and `bootstrap`.
+- A local target never asks for this confirmation. This includes a database URL on a loopback host at the local database port.
+- Read-only commands never ask for it, such as `db dump`, `gen types`, `migration list`, `inspect db`, and `config diff`.
+- Connecting to a hosted database can remove a network ban that blocks the connection. That needs `--yes` or a shell `SUPABASE_YES`, even for read-only commands such as `db dump --remote`. Without one, the command fails with `LinkedDbNetworkBannedError` and points you to `supabase network-bans remove`.
+
+A declined prompt fails with `HostedMutationDeclinedError` (`context canceled`) and exit code 1, and nothing changes.
+
+### When the CLI can't ask [#cannot-ask]
+
+The CLI asks only in a terminal, with text output and no AI coding agent running the command. In any other run, a hosted change fails with `HostedMutationConsentRequiredError` and exit code 1, and nothing changes, unless you give consent without a prompt. The CLI can't ask when:
+
+- stdin or stdout isn't a terminal, as in CI
+- the output is machine-readable: `--output-format json` or `stream-json`, or a `-o` format such as `json`, `yaml`, `toml`, or `env`
+- an AI coding agent runs the command. See [Running from an AI coding agent](#agents).
+
+### Give consent without a prompt [#consent-flags]
+
+Pass `--yes`, or export `SUPABASE_YES=1` in your shell. The CLI prints `Confirmed by --yes: …` or `Confirmed by SUPABASE_YES: …` on stderr, so logs show what approved the change.
+
+<Admonition type="caution">
+
+- Piping an answer, such as `echo y | supabase db push --remote`, doesn't confirm anything. The CLI never reads stdin for consent.
+- `SUPABASE_YES` in `supabase/.env`, or in any other project env file, doesn't count.
+- If a `.env`, `.env.local`, or `.env.<NODE_ENV>[.local]` file in your working directory defines `SUPABASE_YES` at all, a `SUPABASE_YES` exported in your shell doesn't count either, because the CLI can't tell the two apart. Use `--yes`.
+
+</Admonition>
+
+### Review a change before you confirm [#review]
+
+| Command                                          | What it does                                                                                                                    |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `supabase db push --dry-run --remote`            | Prints the roles, migrations, and seed files it would apply, and applies nothing. It asks nothing.                              |
+| `supabase pull --dry-run`                        | Shows what would be pulled, without writing or changing anything.                                                               |
+| `supabase secrets unset <name> --dry-run`        | Prints the secrets it would unset.                                                                                              |
+| `supabase config diff`                           | Shows how `config.toml` differs from the hosted project. The local side is what `config push` sends. It never changes anything. |
+| `supabase db query "<sql>" --read-only --remote` | Accepts only read statements and runs them read-only. A hosted target needs no confirmation.                                    |
+
+### Seeding [#seeding]
+
+`db push --include-seed` and a hosted `db reset` list the seed files in their one question. When the target matches a `[remotes.<name>]` block that doesn't set `enabled = true` itself, the question names the block and the setting that enabled seeding.
+
+## Running in CI [#ci]
+
+This workflow pushes migrations and deploys functions to one project. It passes the project ref to `--remote`, so it doesn't need `supabase link`:
+
+```yaml .github/workflows/deploy.yml
+name: Deploy to Supabase
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_ENV: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v3
+
+      - run: supabase db push --remote=${{ vars.PROJECT_REF }} --yes
+      - run: supabase functions deploy --remote=${{ vars.PROJECT_REF }} --yes
+```
+
+- Pass credentials through environment variables. `SUPABASE_ACCESS_TOKEN` authenticates the CLI, and `SUPABASE_DB_PASSWORD` is the hosted database password.
+- Set `SUPABASE_ENV` so the CLI reads `.env.production` instead of `.env.development`.
+- Add `--remote` to every command that should reach your hosted project. If the job starts a local stack, a bare `supabase db push` runs against that stack.
+- Never rely on piped answers. Pass `--yes`.
+
+## Running from an AI coding agent [#agents]
+
+An agent never gets a prompt, even in a terminal, so a hosted change without `--yes` fails and changes nothing. The error names the action and the target, says why the run can't ask, and tells the agent to ask you before it passes `--yes`:
+
+```text
+Confirmation required: Apply 3 migrations (target: project abcdefghijklmnopqrst). This run can't ask because it is running in agent mode. Nothing was changed.
+```
+
+The CLI detects agents with the `@vercel/detect-agent` package, which reads environment variables that AI coding tools set, such as `CLAUDECODE`. Pass `--agent=yes` to treat a run as an agent run when your tool isn't detected.
+
+Before an agent passes `--yes`, it should tell you the command, the target from the `Target:` line, and whether the change can be undone. It should prefer the read-only and dry-run forms in [Review a change before you confirm](#review) first.
+
+Add this to your `AGENTS.md` or `CLAUDE.md`:
+
+```md
+## Supabase CLI
+
+- Database and Storage commands run against the local stack unless you pass `--remote`. Commands that only work on a hosted project, such as `functions deploy` and `config push`, use the linked project.
+- Never pass `--yes` or set `SUPABASE_YES` without asking me first. Without it, a hosted change fails and changes nothing.
+- When you ask, give the command, the target from the `Target:` line, and whether the change can be undone.
+- Prefer review forms first: `db push --dry-run`, `pull --dry-run`, `secrets unset --dry-run`, `config diff`, and `db query --read-only`.
+- Don't put `SUPABASE_YES` in any `.env` file. The CLI doesn't honor it there for hosted changes.
+```

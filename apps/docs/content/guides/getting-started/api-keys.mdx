@@ -166,10 +166,10 @@ Use the CLI to script setup, or to read the keys for a preview branch. This path
 3. List the keys for that project:
 
    ```bash
-   supabase projects api-keys --project-ref your-project-ref
+   supabase projects api-keys --remote=your-project-ref
    ```
 
-Pass the branch's own project ref to read the keys for a preview branch. A branch has its own keys, and the command returns the linked project's keys when you omit the flag.
+Pass the branch's own project ref to read the keys for a preview branch. A branch has its own keys, and the command returns the linked project's keys when you omit `--remote`.
 
 </TabPanel>
 <TabPanel id="management-api" label="Management API">

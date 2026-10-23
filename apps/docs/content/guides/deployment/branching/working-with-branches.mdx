@@ -141,7 +141,7 @@ Deno.serve(async (request) => {
       Create a [Slack webhook URL](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks/) and set it as Function secrets.
 
       ```markdown
-      supabase secrets set --project-ref <branch-ref> SLACK_WEBHOOK_URL=<your-webhook-url>
+      supabase secrets set SLACK_WEBHOOK_URL=<your-webhook-url> --remote=<branch-ref>
       ```
 
     </StepHikeCompact.Details>
@@ -154,7 +154,7 @@ Deno.serve(async (request) => {
       Create and deploy an Edge Function to process webhooks.
 
       ```markdown
-      supabase functions deploy --project-ref <branch-ref> --use-api notify-slack
+      supabase functions deploy --use-api notify-slack --remote=<branch-ref>
       ```
 
     </StepHikeCompact.Details>
@@ -229,7 +229,7 @@ If your migration history was not initialized by Supabase Branching or the Supab
       Mark the updated migration as applied so it isn't rerun on your base project. See [Diagnosing and fixing sync errors](/docs/guides/deployment/database-migrations#diagnosing-and-fixing-sync-errors).
 
       ```bash
-      supabase migration repair --status applied <migration-timestamp>
+      supabase migration repair --status applied <migration-timestamp> --remote
       ```
 
     </StepHikeCompact.Details>
@@ -361,14 +361,14 @@ You can develop with branches using either local or remote development workflows
 5. Commit and push to GitHub
 6. Open a pull request to create a preview branch
 
-If your project uses [declarative schemas](/docs/guides/local-development/declarative-database-schemas), edit your files in `supabase/schemas/` and generate migrations with `supabase db schema declarative sync` instead of `supabase db diff`, which on `pg-delta` never uses your schema files as its baseline. If your project hasn't enabled `pg-delta`, follow [Declarative schemas on the legacy `migra` engine](/docs/guides/local-development/declarative-database-schemas#declarative-schemas-on-the-legacy-migra-engine) instead. Branching applies only committed migration files, so commit the schema files and the generated migrations together.
+If your project uses [declarative schemas](/docs/guides/local-development/declarative-database-schemas), edit your files in `supabase/schemas/` and generate migrations with `supabase db schema declarative sync` instead of `supabase db diff`, which on `pg-delta` never uses your schema files as its baseline. If your project turned off `pg-delta`, follow [Declarative schemas on the legacy `migra` engine](/docs/guides/local-development/declarative-database-schemas#declarative-schemas-on-the-legacy-migra-engine) instead. Branching applies only committed migration files, so commit the schema files and the generated migrations together.
 
 ### Remote development workflow
 
 1. Create a preview branch in the Supabase dashboard
 2. Switch to the branch using the branch dropdown
 3. Make schema changes in the dashboard
-4. Pull changes locally using `supabase db pull`
+4. Pull changes locally using `supabase db pull --remote=<branch-name>`
 5. Commit the generated migration files
 6. Push to your Git repository
 

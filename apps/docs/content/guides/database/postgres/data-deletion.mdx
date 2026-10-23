@@ -152,7 +152,7 @@ drop index if exists idx_users_legacy_field;
 The `inspect` command in the [Supabase CLI](/docs/reference/cli/supabase-inspect-db-index-stats) can help you identify unused indexes:
 
 ```bash
-supabase inspect db index-stats
+supabase inspect db index-stats --remote
 ```
 
 </Admonition>
@@ -166,8 +166,8 @@ Query `pg_locks` and `pg_stat_activity` to see currently active queries and quer
 The [Supabase CLI](/docs/reference/cli/supabase-inspect-db-locks) provides commands to view these metrics:
 
 ```bash
-supabase inspect db locks
-supabase inspect db blocking
+supabase inspect db locks --remote
+supabase inspect db blocking --remote
 ```
 
 ### Monitor table bloat after large deletes
@@ -175,7 +175,7 @@ supabase inspect db blocking
 When deleting a large number of rows, the space is not always reclaimed and available for use. In normal cases, the rows are marked as deleted but the space is not immediately freed. You can monitor table bloat to see if the space is being reclaimed:
 
 ```bash
-supabase inspect db bloat
+supabase inspect db bloat --remote
 ```
 
 ## Reclaiming disk space

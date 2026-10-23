@@ -26,7 +26,7 @@ supabase start
 With your project linked, run:
 
 ```bash
-supabase db pull --linked
+supabase db pull --remote
 ```
 
 This command generates a migration file in your `supabase/migrations` folder which reflects your remote schema. This will not run the migration locally or overwrite anything.
@@ -35,19 +35,13 @@ This command generates a migration file in your `supabase/migrations` folder whi
 
 ## 3. Sync remote migration history
 
-Upon running the above command, the Supabase CLI will typically prompt with:
-
-```
-Update remote migration history table? [Y/n]
-```
-
-Type `Y` to update your remote project’s migration history and ensure it matches your new local migrations.
+When the CLI asks to update the remote migration history table, answer `y` so your remote project's migration history matches your new local migrations. The question defaults to No, and declining cancels the pull without writing any files. Non-interactive runs need `--yes`.
 
 If the CLI suggests repairing migration history due to mismatches, you might see:
 
 ```
 Make sure your local git repo is up-to-date. If the error persists, try repairing the migration history table:
-supabase migration repair --status applied TIMESTAMP_OF_MIGRATION_TO_REPAIR
+supabase migration repair --status applied TIMESTAMP_OF_MIGRATION_TO_REPAIR --remote
 ```
 
 Run the exact repair command provided, replacing the timestamp as instructed (example timestamp: 20251006141726). This synchronizes the migration state between local and remote.

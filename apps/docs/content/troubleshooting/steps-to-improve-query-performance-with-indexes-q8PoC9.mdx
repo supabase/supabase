@@ -66,7 +66,7 @@ npx supabase login
 
 npx supabase link
 
-npx supabase inspect db unused-indexes
+npx supabase inspect db unused-indexes --remote
 ```
 
 There is an extension called [index_advisor](/docs/guides/database/extensions/index_advisor) that creates virtual indexes on your queries and then checks which ones increase performance the best. Unlike normal index creation, virtual indexes can be made rapidly, which makes uncovering the most performant solutions fast. The [Query Performance Advisor](/dashboard/project/_/database/query-performance) in the Dashboard is configured to use index_advisor to make optimization suggestions and you should check it out to see where you can improve.

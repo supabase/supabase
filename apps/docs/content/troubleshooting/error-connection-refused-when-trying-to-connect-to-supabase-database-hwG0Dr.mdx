@@ -34,11 +34,11 @@ Go to [Database Settings](/dashboard/project/_/database/settings#banned-ips) and
 How to list the banned IPs:
 
 ```
-% supabase network-bans get --project-ref <project_reference_id> --experimental
+% supabase network-bans get --remote=<project_reference_id> --experimental
 ```
 
 How to unban the IPs:
 
 ```
-% supabase network-bans remove --db-unban-ip <ip_address> --project-ref <project_reference_id> --experimental
+% supabase network-bans remove --db-unban-ip <ip_address> --remote=<project_reference_id> --experimental
 ```

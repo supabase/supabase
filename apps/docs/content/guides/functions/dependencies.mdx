@@ -74,7 +74,7 @@ Each function should have its own `import_map.json` file for proper isolation:
 }
 ```
 
-This JSON file should be located within the function’s own directory:
+This JSON file should be located within the function’s own directory. `supabase functions deploy`, `supabase functions serve`, and `supabase start` fail on a function's `import_map.json` unless you point to it with the `import_map` property in `config.toml` (shown below) or `--import-map`. Otherwise, rename it to `deno.json`:
 
 ```bash
 └── supabase
