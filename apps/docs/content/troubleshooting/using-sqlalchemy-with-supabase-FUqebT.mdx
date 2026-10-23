@@ -30,7 +30,7 @@ from sqlalchemy.pool import NullPool
 con = sqlalchemy.create_engine(url, client_encoding='utf8', poolclass=NullPool)
 ```
 
-When relying on Supavisor, it's important to pick an adequate pool size. This guide can walk you through the process:
+When relying on the shared pooler, it's important to pick an adequate pool size. This guide can walk you through the process:
 
 - https://github.com/orgs/supabase/discussions/21566
 
@@ -64,7 +64,7 @@ If the command returns an IPv6 address, the network is IPv6 compatible.
 
 If your deployment environment is not IPv6 compatible, then consider:
 
-- Using the Supavisor pooler in session (port 5432)
+- Using the shared pooler in session mode (port 5432)
 - Enabling the [IPv4 Add-On](/dashboard/project/_/settings/addons) if you're on a pro or above plan
 
 ### Choosing an internal pool size
