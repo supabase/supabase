@@ -15,13 +15,33 @@ SELECT
       ENCODE(pg_t.tgargs, 'escape'), '\\000'
     )
   )[:pg_t.tgnargs] AS function_args,
-  is_t.trigger_name AS name,
-  is_t.event_object_table AS table,
-  is_t.event_object_schema AS schema,
-  is_t.action_condition AS condition,
-  is_t.action_orientation AS orientation,
-  is_t.action_timing AS activation,
-  ARRAY_AGG(is_t.event_manipulation)::text[] AS events,
+  pg_t.tgname AS name,
+  pg_c.relname AS table,
+  table_ns.nspname AS schema,
+  -- The columns below are derived the same way as in information_schema.triggers,
+  -- which can't be used directly because it has no rows for TRUNCATE events.
+  CASE
+    WHEN pg_has_role(pg_c.relowner, 'USAGE')
+    THEN (regexp_match(pg_get_triggerdef(pg_t.oid), '.{35,} WHEN \\((.+)\\) EXECUTE FUNCTION'))[1]
+  END AS condition,
+  CASE pg_t.tgtype::integer & 1
+    WHEN 1 THEN 'ROW'
+    ELSE 'STATEMENT'
+  END AS orientation,
+  CASE pg_t.tgtype::integer & 66
+    WHEN 2 THEN 'BEFORE'
+    WHEN 64 THEN 'INSTEAD OF'
+    ELSE 'AFTER'
+  END AS activation,
+  ARRAY_REMOVE(
+    ARRAY[
+      CASE WHEN pg_t.tgtype::integer & 4 <> 0 THEN 'INSERT' END,
+      CASE WHEN pg_t.tgtype::integer & 8 <> 0 THEN 'DELETE' END,
+      CASE WHEN pg_t.tgtype::integer & 16 <> 0 THEN 'UPDATE' END,
+      CASE WHEN pg_t.tgtype::integer & 32 <> 0 THEN 'TRUNCATE' END
+    ],
+    NULL
+  )::text[] AS events,
   pg_p.proname AS function_name,
   pg_n.nspname AS function_schema
 FROM
@@ -29,26 +49,18 @@ FROM
 JOIN
   pg_class AS pg_c
 ON pg_t.tgrelid = pg_c.oid
-JOIN information_schema.triggers AS is_t
-ON is_t.trigger_name = pg_t.tgname
-AND pg_c.relname = is_t.event_object_table
-AND pg_c.relnamespace = (quote_ident(is_t.event_object_schema))::regnamespace
+JOIN pg_namespace AS table_ns
+ON pg_c.relnamespace = table_ns.oid
 JOIN pg_proc AS pg_p
 ON pg_t.tgfoid = pg_p.oid
 JOIN pg_namespace AS pg_n
 ON pg_p.pronamespace = pg_n.oid
-GROUP BY
-  pg_t.oid,
-  pg_t.tgrelid,
-  pg_t.tgenabled,
-  pg_t.tgargs,
-  pg_t.tgnargs,
-  is_t.trigger_name,
-  is_t.event_object_table,
-  is_t.event_object_schema,
-  is_t.action_condition,
-  is_t.action_orientation,
-  is_t.action_timing,
-  pg_p.proname,
-  pg_n.nspname
+WHERE
+  NOT pg_t.tgisinternal
+  AND NOT pg_is_other_temp_schema(table_ns.oid)
+  AND (
+    pg_has_role(pg_c.relowner, 'USAGE')
+    OR has_table_privilege(pg_c.oid, 'INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER')
+    OR has_any_column_privilege(pg_c.oid, 'INSERT, UPDATE, REFERENCES')
+  )
 `
