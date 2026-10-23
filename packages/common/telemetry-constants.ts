@@ -4185,7 +4185,7 @@ export interface WarehouseDisabledEvent {
 /**
  * @group Events
  * @source User starts a recovery task
- * @page /account-recovery, /organizations, /org/*, /project/*, /new
+ * @page /organizations, /org/*, /project/*, /new
  */
 export interface AccountRecoveryActionEvent {
   action: 'account_recovery_action_clicked'
@@ -4196,7 +4196,7 @@ export interface AccountRecoveryActionEvent {
 /**
  * @group Events
  * @source User saves recovery codes or verifies another authenticator
- * @page /account-recovery, /organizations, /org/*, /project/*, /new
+ * @page /organizations, /org/*, /project/*, /new
  */
 export interface AccountRecoveryTaskEvent {
   action: 'account_recovery_task_completed'
@@ -4207,7 +4207,7 @@ export interface AccountRecoveryTaskEvent {
 /**
  * @group Events
  * @source User skips or continues from the recovery interstitial
- * @page /account-recovery, /organizations, /org/*, /project/*, /new
+ * @page /organizations, /org/*, /project/*, /new
  */
 export interface AccountRecoveryClosedEvent {
   action: 'account_recovery_reminder_closed'
