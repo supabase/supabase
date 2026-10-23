@@ -1,27 +1,22 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import DeleteProjectModal from './DeleteProjectModal'
+import { DeleteProjectModal } from './DeleteProjectModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface DeleteProjectButtonProps {
-  type?: 'danger' | 'default'
+  variant?: 'danger' | 'default'
 }
 
-const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
-  const { project } = useProjectContext()
+export const DeleteProjectButton = ({ variant = 'danger' }: DeleteProjectButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const canDeleteProject = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: { project_id: project?.id },
-  })
+  const { can: canDeleteProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   return (
     <>
       <ButtonTooltip
-        type={type}
+        variant={variant}
         disabled={!canDeleteProject}
         onClick={() => setIsOpen(true)}
         tooltip={{
@@ -39,5 +34,3 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
     </>
   )
 }
-
-export default DeleteProjectButton

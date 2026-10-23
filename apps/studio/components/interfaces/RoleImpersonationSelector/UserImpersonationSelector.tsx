@@ -1,68 +1,116 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { ChevronDown, ExternalLink, User as IconUser, Loader2, Search, X } from 'lucide-react'
+import { ChevronsUpDownIcon, Loader2Icon, UserIcon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import AlertError from 'components/ui/AlertError'
-import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
-import { useCustomAccessTokenHookDetails } from 'hooks/misc/useCustomAccessTokenHookDetails'
-import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
-import { ResponseError } from 'types'
 import {
   Button,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Input,
-  Switch,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  ToggleGroup,
+  ToggleGroupItem,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
+
+import { getDisplayName } from '../Auth/Users/Users.utils'
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
+import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import type { RoleImpersonationController } from '@/state/role-impersonation-state'
+import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
+type UserSource = 'user' | 'external'
 
-const UserImpersonationSelector = () => {
+type UserImpersonationSelectorProps = {
+  state: RoleImpersonationController
+  disabled?: boolean
+  onUserImpersonationCleared?: () => void
+}
+
+export const UserImpersonationSelector = ({
+  state,
+  disabled = false,
+  onUserImpersonationCleared,
+}: UserImpersonationSelectorProps) => {
   const [searchText, setSearchText] = useState('')
-  const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
+  const [aal, setAal] = useState<AuthenticatorAssuranceLevels>(() =>
+    state.role?.type === 'postgrest' && state.role.role === 'authenticated'
+      ? (state.role.aal ?? 'aal1')
+      : 'aal1'
+  )
   const [externalUserId, setExternalUserId] = useState('')
   const [additionalClaims, setAdditionalClaims] = useState('')
-  const [showExternalAuth, setShowExternalAuth] = useState(false)
-  const state = useRoleImpersonationStateSnapshot()
+  const [isUserComboboxOpen, setIsUserComboboxOpen] = useState(false)
+  const [selectedSource, setSelectedSource] = useState<UserSource>(() =>
+    state.role?.type === 'postgrest' &&
+    state.role.role === 'authenticated' &&
+    state.role.userType === 'external'
+      ? 'external'
+      : 'user'
+  )
+  const [isImpersonateLoading, setIsImpersonateLoading] = useState(false)
+
   const debouncedSearchText = useDebounce(searchText, 300)
+  const { data: project } = useSelectedProjectQuery()
+  const {
+    data,
+    isSuccess,
+    isPending: isLoading,
+    isError,
+    error,
+    isFetching,
+    isPlaceholderData,
+  } = useUsersInfiniteQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      keywords: debouncedSearchText.trim().toLocaleLowerCase(),
+    },
+    { placeholderData: keepPreviousData }
+  )
 
-  const { project } = useProjectContext()
-
-  const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } =
-    useUsersInfiniteQuery(
-      {
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        keywords: debouncedSearchText.trim().toLocaleLowerCase(),
-      },
-      {
-        keepPreviousData: true,
-      }
-    )
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
-  const isSearching = isPreviousData && isFetching
+  const isSearching = isPlaceholderData && isFetching
   const impersonatingUser =
     state.role?.type === 'postgrest' &&
     state.role.role === 'authenticated' &&
     state.role.userType === 'native' &&
     state.role.user
-
-  // Check if we're currently impersonating an external auth user (e.g. OAuth, SAML)
-  // This is used to show the correct UI state and impersonation details
-  const isExternalAuthImpersonating =
+      ? state.role.user
+      : undefined
+  const impersonatingExternalUser =
     state.role?.type === 'postgrest' &&
     state.role.role === 'authenticated' &&
     state.role.userType === 'external' &&
     state.role.externalAuth
-
+      ? state.role.externalAuth
+      : undefined
+  const displayName = impersonatingUser
+    ? getDisplayName(
+        impersonatingUser,
+        impersonatingUser.email ?? impersonatingUser.phone ?? impersonatingUser.id ?? 'Unknown'
+      )
+    : impersonatingExternalUser?.sub
+  const isUserSelected = Boolean(displayName)
   const customAccessTokenHookDetails = useCustomAccessTokenHookDetails(project?.ref)
-
-  const [isImpersonateLoading, setIsImpersonateLoading] = useState(false)
 
   async function impersonateUser(user: User) {
     setIsImpersonateLoading(true)
@@ -86,382 +134,362 @@ const UserImpersonationSelector = () => {
       )
     } catch (error) {
       toast.error(`Failed to impersonate user: ${(error as ResponseError).message}`)
+    } finally {
+      setIsImpersonateLoading(false)
     }
-
-    setIsImpersonateLoading(false)
   }
 
-  // Impersonates an external auth user (e.g. OAuth, SAML) by setting the sub and any additional claims
-  // This allows testing RLS policies for external auth users without needing to set up the full OAuth/SAML flow
   async function impersonateExternalUser() {
     setIsImpersonateLoading(true)
 
     let parsedClaims = {}
     try {
       parsedClaims = additionalClaims ? JSON.parse(additionalClaims) : {}
-    } catch (e) {
+    } catch {
       toast.error('Invalid JSON in additional claims')
+      setIsImpersonateLoading(false)
       return
     }
+
     try {
       await state.setRole(
         {
           type: 'postgrest',
           role: 'authenticated',
           userType: 'external',
-          externalAuth: {
-            sub: externalUserId,
-            additionalClaims: parsedClaims,
-          },
+          externalAuth: { sub: externalUserId, additionalClaims: parsedClaims },
           aal,
         },
         customAccessTokenHookDetails
       )
     } catch (error) {
       toast.error(`Failed to impersonate user: ${(error as ResponseError).message}`)
+    } finally {
+      setIsImpersonateLoading(false)
+    }
+  }
+
+  async function changeSelectedSource(value: UserSource) {
+    if (!isUserSelected) {
+      setSelectedSource(value)
+      return
     }
 
-    setIsImpersonateLoading(false)
+    try {
+      await state.setRole(undefined)
+      setSelectedSource(value)
+      onUserImpersonationCleared?.()
+    } catch (error) {
+      toast.error(`Failed to stop impersonating user: ${(error as ResponseError).message}`)
+    }
   }
 
-  function stopImpersonating() {
-    state.setRole(undefined)
-    setShowExternalAuth(false) // Reset external auth impersonation when stopping impersonation
-  }
+  async function changeAal(value: AuthenticatorAssuranceLevels) {
+    const previousAal = aal
+    setAal(value)
 
-  function toggleAalState() {
-    setAal((prev) => (prev === 'aal2' ? 'aal1' : 'aal2'))
-  }
+    if (
+      state.role?.type !== 'postgrest' ||
+      state.role.role !== 'authenticated' ||
+      !isUserSelected
+    ) {
+      return
+    }
 
-  const displayName = impersonatingUser
-    ? getDisplayName(
-        impersonatingUser,
-        impersonatingUser.email ?? impersonatingUser.phone ?? impersonatingUser.id ?? 'Unknown'
-      )
-    : isExternalAuthImpersonating
-      ? state.role.externalAuth.sub
-      : undefined
+    try {
+      await state.setRole({ ...state.role, aal: value }, customAccessTokenHookDetails)
+    } catch (error) {
+      setAal(previousAal)
+      toast.error(`Failed to update MFA assurance level: ${(error as ResponseError).message}`)
+    }
+  }
 
   return (
-    <div className="flex flex-col gap-1">
-      <h2 className="text-foreground text-sm">
-        {displayName ? `Impersonating ${displayName}` : 'Impersonate a User'}
-      </h2>
-      <p className="text-sm text-foreground-light">
-        {!impersonatingUser && !isExternalAuthImpersonating
-          ? "Select a user to respect your database's Row-Level Security policies for that particular user."
-          : "Results will respect your database's Row-Level Security policies for this user."}
-      </p>
-
-      {/* Check for both regular user and external auth impersonation since they use different data structures but both need to be handled for displaying impersonation UI */}
-      {!impersonatingUser && !isExternalAuthImpersonating ? (
-        <div className="flex flex-col gap-2 mt-2">
-          <Input
-            className="table-editor-search border-none"
-            icon={
-              isSearching ? (
-                <Loader2
-                  className="animate-spin text-foreground-lighter"
-                  size={16}
-                  strokeWidth={1.5}
-                />
-              ) : (
-                <Search className="text-foreground-lighter" size={16} strokeWidth={1.5} />
-              )
-            }
-            placeholder="Search for a user.."
-            onChange={(e) => setSearchText(e.target.value)}
-            value={searchText}
-            size="small"
-            actions={
-              searchText && (
-                <Button size="tiny" type="text" className="px-1" onClick={() => setSearchText('')}>
-                  <X size={12} strokeWidth={2} />
-                </Button>
-              )
-            }
-          />
-
-          <Collapsible_Shadcn_>
-            <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
-              <div className="flex items-center gap-x-1 w-full">
-                <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                  Advanced options
-                </p>
-                <ChevronDown
-                  className="transition-transform duration-200"
-                  strokeWidth={1.5}
-                  size={14}
-                />
-              </div>
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="mt-1 flex flex-col gap-y-4">
-              <div className="flex flex-row items-center gap-x-4 text-sm text-foreground-light">
-                <div className="flex items-center gap-x-1">
-                  <h3>MFA assurance level</h3>
-                  <InfoTooltip side="top" className="flex flex-col gap-1 max-w-96">
-                    <p>
-                      AAL1 verifies users via standard login methods, while AAL2 adds a second
-                      authentication factor.
-                      <br />
-                      If you're not using MFA, you can leave this on AAL1.
-                    </p>
-                    <a
-                      href="/docs/guides/auth/auth-mfa"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-x-1 opacity-50 hover:opacity-100 transition"
-                    >
-                      Learn more about MFA <ExternalLink size={14} strokeWidth={2} />
-                    </a>
-                  </InfoTooltip>
-                </div>
-
-                <div className="flex flex-row items-center gap-x-2 text-xs font-bold">
-                  <p className={aal === 'aal1' ? undefined : 'text-foreground-lighter'}>AAL1</p>
-                  <Switch checked={aal === 'aal2'} onCheckedChange={toggleAalState} />
-                  <p className={aal === 'aal2' ? undefined : 'text-foreground-lighter'}>AAL2</p>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-y-2">
-                <div className="flex items-center gap-x-1">
-                  <h3 className="text-sm text-foreground-light">External Auth Impersonation</h3>
-                  <InfoTooltip side="top" className="flex flex-col gap-1 max-w-96">
-                    <p>
-                      Test RLS policies with external auth providers like Clerk or Auth0 by
-                      providing a user ID and optional claims.
-                    </p>
-                  </InfoTooltip>
-                </div>
-
-                <div className="flex flex-row items-center gap-x-2">
-                  <Switch checked={showExternalAuth} onCheckedChange={setShowExternalAuth} />
-                  <p className="text-xs text-foreground-light">
-                    Enable external auth impersonation
-                  </p>
-                </div>
-
-                {showExternalAuth && (
-                  <div className="flex flex-col gap-y-4 mt-2 border rounded-md p-4 bg-surface-100">
-                    <Input
-                      className="border-strong"
-                      label="External User ID"
-                      descriptionText="The user ID from your external auth provider"
-                      placeholder="e.g. user_abc123"
-                      value={externalUserId}
-                      onChange={(e) => setExternalUserId(e.target.value)}
-                      size="small"
-                    />
-                    <Input
-                      className="border-strong"
-                      label="Additional Claims (JSON)"
-                      descriptionText="Optional: Add custom claims like org_id or roles"
-                      placeholder='e.g. {"app_metadata": {"org_id": "org_456"}}'
-                      value={additionalClaims}
-                      onChange={(e) => setAdditionalClaims(e.target.value)}
-                      size="small"
-                    />
-                    <div className="flex items-center justify-between">
-                      <div />
-                      <Button
-                        type="default"
-                        disabled={!externalUserId}
-                        onClick={impersonateExternalUser}
-                      >
-                        Impersonate
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
-
-          {!showExternalAuth && (
-            <>
-              {isLoading && (
-                <div className="flex flex-col gap-2 items-center justify-center h-24">
-                  <Loader2 className="animate-spin" size={24} />
-                  <span>Loading users...</span>
-                </div>
-              )}
-
-              {isError && <AlertError error={error} subject="Failed to retrieve users" />}
-
-              {isSuccess &&
-                (users.length > 0 ? (
-                  <ul className="divide-y max-h-[150px] overflow-y-scroll" role="list">
-                    {users.map((user) => (
-                      <li key={user.id} role="listitem">
-                        <UserRow
-                          user={user}
-                          onClick={impersonateUser}
-                          isLoading={isImpersonateLoading}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <div className="flex flex-col gap-2 items-center justify-center h-24">
-                    <p className="text-foreground-light text-xs" role="status">
-                      No users found
-                    </p>
-                  </div>
-                ))}
-            </>
-          )}
-        </div>
-      ) : (
-        <>
-          {impersonatingUser && (
-            <UserImpersonatingRow
-              user={impersonatingUser}
-              onClick={stopImpersonating}
-              isImpersonating={true}
-              aal={aal}
-              isLoading={isImpersonateLoading}
-            />
-          )}
-          {isExternalAuthImpersonating && (
-            <ExternalAuthImpersonatingRow
-              sub={state.role.externalAuth.sub}
-              onClick={stopImpersonating}
-              aal={aal}
-              isLoading={isImpersonateLoading}
-            />
-          )}
-        </>
+    <fieldset
+      disabled={disabled}
+      aria-disabled={disabled}
+      className={cn(
+        'm-0 flex min-w-0 flex-col gap-y-2.5 border-0 p-0 transition-opacity',
+        disabled && 'opacity-40'
       )}
-    </div>
-  )
-}
-
-export default UserImpersonationSelector
-
-// Base interface for shared impersonation row props to reduce
-// duplication between user and external auth impersonation displays
-interface BaseImpersonatingRowProps {
-  onClick: () => void
-  aal: AuthenticatorAssuranceLevels
-  displayName: string
-  avatarUrl?: string
-  isImpersonating: boolean
-  isLoading?: boolean
-}
-
-const BaseImpersonatingRow = ({
-  onClick,
-  aal,
-  displayName,
-  avatarUrl,
-  isImpersonating = false,
-  isLoading = false,
-}: BaseImpersonatingRowProps) => {
-  return (
-    <div className="flex items-center gap-3 py-2 text-foreground">
-      <div className="flex items-center gap-4 bg-surface-200 pr-4 pl-0.5 py-0.5 border rounded-full max-w-l">
-        {avatarUrl ? (
-          <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName} />
-        ) : (
-          <div className="rounded-full w-[21px] h-[21px] bg-surface-300 border border-strong flex items-center justify-center">
-            <IconUser size={12} strokeWidth={2} />
-          </div>
-        )}
-
-        <span className="text-sm truncate">
-          {displayName}{' '}
-          <span className="ml-2 text-foreground-lighter text-xs font-light">
-            {aal === 'aal2' ? 'AAL2' : 'AAL1'}
+    >
+      <FormItemLayout
+        isReactForm={false}
+        layout="horizontal"
+        size="tiny"
+        label={
+          <span className="flex items-center gap-1">
+            Users
+            <InfoTooltip side="left" className="max-w-80">
+              Project users come from Supabase Auth. External users let you test RLS policies with
+              providers such as Clerk or Auth0.
+            </InfoTooltip>
           </span>
-        </span>
+        }
+      >
+        <ToggleGroup
+          type="single"
+          value={selectedSource}
+          onValueChange={(value) => {
+            if (value === 'user' || value === 'external') void changeSelectedSource(value)
+          }}
+          variant="default"
+          size="tiny"
+          aria-label="User source"
+          className="w-full"
+        >
+          <ToggleGroupItem value="user" className="w-full">
+            Project
+          </ToggleGroupItem>
+          <ToggleGroupItem value="external" className="w-full">
+            External
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </FormItemLayout>
+
+      <FormItemLayout
+        id="run-as-user"
+        isReactForm={false}
+        layout="horizontal"
+        size="tiny"
+        label="User"
+      >
+        <ImpersonationControl
+          selectedSource={selectedSource}
+          displayName={displayName}
+          isImpersonateLoading={isImpersonateLoading}
+          stopImpersonating={async () => {
+            await state.setRole(undefined)
+            onUserImpersonationCleared?.()
+          }}
+          isUserComboboxOpen={isUserComboboxOpen}
+          setIsUserComboboxOpen={setIsUserComboboxOpen}
+          searchText={searchText}
+          setSearchText={setSearchText}
+          isLoading={isLoading}
+          isSearching={isSearching}
+          isError={isError}
+          error={error}
+          isSuccess={isSuccess}
+          users={users}
+          impersonateUser={impersonateUser}
+          externalUserId={externalUserId}
+          setExternalUserId={setExternalUserId}
+          impersonateExternalUser={impersonateExternalUser}
+        />
+      </FormItemLayout>
+
+      {selectedSource === 'external' && !isUserSelected && (
+        <FormItemLayout
+          id="run-as-user-claims"
+          isReactForm={false}
+          layout="horizontal"
+          size="tiny"
+          label="Claims"
+        >
+          <Input
+            id="run-as-user-claims"
+            size="tiny"
+            placeholder='e.g. {"app_metadata": {"org_id": "org_456"}}'
+            value={additionalClaims}
+            onChange={(event) => setAdditionalClaims(event.target.value)}
+          />
+        </FormItemLayout>
+      )}
+
+      <FormItemLayout
+        isReactForm={false}
+        layout="horizontal"
+        size="tiny"
+        label={
+          <span className="flex items-center gap-1">
+            MFA level
+            <InfoTooltip side="left" className="max-w-96">
+              AAL1 verifies users via standard login methods, while AAL2 adds a second
+              authentication factor. If you are not using MFA, leave this on AAL1. Learn more in the{' '}
+              <InlineLink href={`${DOCS_URL}/guides/auth/auth-mfa`}>MFA guide</InlineLink>.
+            </InfoTooltip>
+          </span>
+        }
+      >
+        <ToggleGroup
+          type="single"
+          value={aal}
+          onValueChange={(value) => {
+            if (value === 'aal1' || value === 'aal2') void changeAal(value)
+          }}
+          variant="default"
+          size="tiny"
+          aria-label="MFA assurance level"
+          className="w-full"
+        >
+          <ToggleGroupItem value="aal1" className="w-full">
+            AAL1
+          </ToggleGroupItem>
+          <ToggleGroupItem value="aal2" className="w-full">
+            AAL2
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </FormItemLayout>
+    </fieldset>
+  )
+}
+
+type ImpersonationControlProps = {
+  selectedSource: UserSource
+  displayName?: string
+  isImpersonateLoading: boolean
+  stopImpersonating: () => void
+  isUserComboboxOpen: boolean
+  setIsUserComboboxOpen: (open: boolean) => void
+  searchText: string
+  setSearchText: (value: string) => void
+  isLoading: boolean
+  isSearching: boolean
+  isError: boolean
+  error: ResponseError | null
+  isSuccess: boolean
+  users: User[]
+  impersonateUser: (user: User) => Promise<void>
+  externalUserId: string
+  setExternalUserId: (value: string) => void
+  impersonateExternalUser: () => Promise<void>
+}
+
+const ImpersonationControl = ({
+  selectedSource,
+  displayName,
+  isImpersonateLoading,
+  stopImpersonating,
+  isUserComboboxOpen,
+  setIsUserComboboxOpen,
+  searchText,
+  setSearchText,
+  isLoading,
+  isSearching,
+  isError,
+  error,
+  isSuccess,
+  users,
+  impersonateUser,
+  externalUserId,
+  setExternalUserId,
+  impersonateExternalUser,
+}: ImpersonationControlProps) => {
+  if (displayName) {
+    return (
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="min-w-0 flex-1 truncate text-xs">{displayName}</span>
+        <Button
+          type="button"
+          size="tiny"
+          variant="text"
+          className="px-1"
+          aria-label="Stop impersonating user"
+          icon={<XIcon size={14} />}
+          onClick={stopImpersonating}
+          disabled={isImpersonateLoading}
+          loading={isImpersonateLoading}
+        />
       </div>
+    )
+  }
 
-      <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
-      </Button>
-    </div>
-  )
-}
-
-const UserImpersonatingRow = ({
-  user,
-  onClick,
-  isImpersonating = false,
-  isLoading = false,
-  aal,
-}: UserRowProps & { aal: AuthenticatorAssuranceLevels }) => {
-  const avatarUrl = getAvatarUrl(user)
-  const displayName =
-    getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown') +
-    (user.is_anonymous ? ' (anonymous)' : '')
-
-  return (
-    <BaseImpersonatingRow
-      onClick={() => onClick(user)}
-      aal={aal}
-      displayName={displayName}
-      avatarUrl={avatarUrl}
-      isImpersonating={isImpersonating}
-      isLoading={isLoading}
-    />
-  )
-}
-
-interface ExternalAuthImpersonatingRowProps {
-  sub: string
-  onClick: () => void
-  aal: AuthenticatorAssuranceLevels
-  isLoading?: boolean
-}
-
-const ExternalAuthImpersonatingRow = ({
-  sub,
-  onClick,
-  aal,
-  isLoading = false,
-}: ExternalAuthImpersonatingRowProps) => {
-  return (
-    <BaseImpersonatingRow
-      onClick={onClick}
-      aal={aal}
-      displayName={sub}
-      isImpersonating={true}
-      isLoading={isLoading}
-    />
-  )
-}
-
-interface UserRowProps {
-  user: User
-  onClick: (user: User) => void
-  isImpersonating?: boolean
-  isLoading?: boolean
-}
-
-const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: UserRowProps) => {
-  const avatarUrl = getAvatarUrl(user)
-  const displayName =
-    getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown') +
-    (user.is_anonymous ? ' (anonymous)' : '')
+  if (selectedSource === 'external') {
+    return (
+      <InputGroup>
+        <InputGroupInput
+          id="run-as-user"
+          size="tiny"
+          placeholder="External user ID"
+          value={externalUserId}
+          onChange={(event) => setExternalUserId(event.target.value)}
+        />
+        <InputGroupAddon align="inline-end">
+          <InputGroupButton
+            type="button"
+            size="tiny"
+            variant="default"
+            disabled={!externalUserId}
+            onClick={impersonateExternalUser}
+          >
+            Apply
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
+    )
+  }
 
   return (
-    <div className="flex items-center justify-between py-1 text-foreground">
-      <div className="flex items-center gap-4">
-        {avatarUrl ? (
-          <img className="rounded-full w-5 h-5" src={avatarUrl} alt={displayName} />
-        ) : (
-          <div className="rounded-full w-[21px] h-[21px] bg-surface-300 border text-muted flex items-center justify-center text-background">
-            <IconUser size={12} strokeWidth={2} />
-          </div>
-        )}
+    <Popover open={isUserComboboxOpen} onOpenChange={setIsUserComboboxOpen} modal={false}>
+      <PopoverTrigger asChild>
+        <Button
+          id="run-as-user"
+          type="button"
+          size="tiny"
+          role="combobox"
+          aria-label="Find user"
+          aria-expanded={isUserComboboxOpen}
+          className="w-full justify-between"
+          iconRight={<ChevronsUpDownIcon className="shrink-0 text-foreground-muted" size={14} />}
+        >
+          Email, name, or ID
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+        <Command shouldFilter={false}>
+          <CommandInput
+            placeholder="Email, name, or ID"
+            value={searchText}
+            onValueChange={setSearchText}
+          />
+          <CommandList className="max-h-52">
+            {(isLoading || isSearching) && (
+              <div className="flex items-center justify-center gap-2 px-3 py-2">
+                <Loader2Icon className="animate-spin" size={14} />
+                <span className="text-xs text-foreground-light">Loading users…</span>
+              </div>
+            )}
 
-        <span className="text-sm">{displayName}</span>
-      </div>
+            {isError && <AlertError error={error} subject="Failed to retrieve users" />}
 
-      <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
-        {isImpersonating ? 'Stop Impersonating' : 'Impersonate'}
-      </Button>
-    </div>
+            {isSuccess && !isSearching && users.length === 0 && (
+              <CommandEmpty>No users found</CommandEmpty>
+            )}
+
+            {isSuccess && !isSearching && users.length > 0 && (
+              <CommandGroup>
+                {users.map((user) => {
+                  const emailOrPhone = user.email || user.phone
+                  const userDisplayName = getDisplayName(user, '')
+
+                  return (
+                    <CommandItem
+                      key={user.id}
+                      value={user.id}
+                      onSelect={() => {
+                        void impersonateUser(user)
+                        setIsUserComboboxOpen(false)
+                      }}
+                      className="gap-2"
+                    >
+                      <UserIcon size={14} className="shrink-0 text-foreground-lighter" />
+                      <span className="min-w-0 flex-1 truncate">
+                        {emailOrPhone || userDisplayName || user.id}
+                      </span>
+                      {userDisplayName && userDisplayName !== emailOrPhone && (
+                        <span className="max-w-24 truncate text-foreground-lighter">
+                          {userDisplayName}
+                        </span>
+                      )}
+                    </CommandItem>
+                  )
+                })}
+              </CommandGroup>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

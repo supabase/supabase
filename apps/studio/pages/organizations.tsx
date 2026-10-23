@@ -1,74 +1,110 @@
-import { Boxes } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { PlusIcon, SearchIcon } from 'lucide-react'
+import Head from 'next/head'
+import Link from 'next/link'
+import { useState } from 'react'
+import { Button, Skeleton } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { LayoutUpdateBanner } from 'components/interfaces/App/FeaturePreview/LayoutUpdatePreview'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { ScaffoldContainerLegacy, ScaffoldTitle } from 'components/layouts/Scaffold'
-import { ActionCard } from 'components/ui/ActionCard'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { NextPageWithLayout } from 'types'
-import { Skeleton } from 'ui'
+import { NoOrganizationsState } from '@/components/interfaces/Home/ProjectList/EmptyStates'
+import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import type { NextPageWithLayout } from '@/types'
 
 const OrganizationsPage: NextPageWithLayout = () => {
-  const router = useRouter()
+  const { appTitle } = useCustomContent(['app:title'])
+  const [search, setSearch] = useState('')
+  const pageTitle = buildStudioPageTitle({
+    section: 'Organizations',
+    brand: appTitle || 'Supabase',
+  })
 
-  const { data: organizations, isLoading, isError, error, isSuccess } = useOrganizationsQuery()
-  const { data: projects = [] } = useProjectsQuery()
+  const {
+    data: organizations = [],
+    error,
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useOrganizationsQuery()
 
-  useEffect(() => {
-    // If there are no organizations, force the user to create one
-    if (isSuccess && organizations.length <= 0) {
-      router.push('/new')
-    }
-  }, [isSuccess, organizations])
+  const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
+  const filteredOrganizations =
+    search.length === 0
+      ? organizations
+      : organizations?.filter(
+          (x) => x.name.toLowerCase().includes(search) || x.slug.toLowerCase().includes(search)
+        )
 
   return (
     <>
-      <ScaffoldContainerLegacy>
-        <LayoutUpdateBanner />
-        <ScaffoldTitle>Your Organizations</ScaffoldTitle>
-      </ScaffoldContainerLegacy>
-      <ScaffoldContainerLegacy>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {isLoading && (
-            <>
-              <Skeleton className="h-[62px] rounded-md" />
-              <Skeleton className="h-[62px] rounded-md" />
-              <Skeleton className="h-[62px] rounded-md" />
-            </>
-          )}
-          {isError && <div>Error loading organizations</div>}
-          {isSuccess &&
-            organizations?.map((organization) => {
-              const numProjects = projects.filter(
-                (x) => x.organization_slug === organization.slug
-              ).length
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content="Supabase Studio" />
+      </Head>
+      <ScaffoldContainer>
+        <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
+          {organizations.length > 0 && (
+            <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
+              <Input
+                size="tiny"
+                placeholder="Search for an organization"
+                icon={<SearchIcon />}
+                className="w-full flex-1 md:w-64"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
 
-              return (
-                <ActionCard
-                  bgColor="bg border"
-                  className="[&>div]:items-center"
-                  key={organization.id}
-                  icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
-                  title={organization.name}
-                  description={`${organization.plan.name} Plan${numProjects > 0 ? `${'  '}•${'  '}${numProjects} project${numProjects > 1 ? 's' : ''}` : ''}`}
-                  onClick={() => router.push(`/org/${organization.slug}`)}
-                />
-              )
-            })}
-        </div>
-      </ScaffoldContainerLegacy>
+              {organizationCreationEnabled && (
+                <Button asChild icon={<PlusIcon />} variant="primary" className="w-min">
+                  <Link href={`/new`}>New organization</Link>
+                </Button>
+              )}
+            </div>
+          )}
+
+          {isSuccess && organizations.length === 0 && !isError && <NoOrganizationsState />}
+
+          {search.length > 0 && filteredOrganizations.length === 0 && (
+            <NoSearchResults searchString={search} />
+          )}
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {isLoading && (
+              <>
+                <Skeleton className="h-[70px] rounded-md" />
+                <Skeleton className="h-[70px] rounded-md" />
+                <Skeleton className="h-[70px] rounded-md" />
+              </>
+            )}
+            {isError && <AlertError error={error} subject="Failed to load organizations" />}
+            {isSuccess &&
+              filteredOrganizations.map((org) => (
+                <OrganizationCard key={org.id} organization={org} />
+              ))}
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
     </>
   )
 }
 
 OrganizationsPage.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="Organizations">{page}</DefaultLayout>
+    <DefaultLayout hideMobileMenu headerTitle="Organizations">
+      <PageLayout title="Your organizations" className="max-w-[1200px] lg:px-6 mx-auto">
+        {page}
+      </PageLayout>
+    </DefaultLayout>
   </AppLayout>
 )
 
-export default OrganizationsPage
+export default withAuth(OrganizationsPage)

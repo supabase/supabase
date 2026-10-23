@@ -1,61 +1,160 @@
+import { keepPreviousData } from '@tanstack/react-query'
+import {
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type RowSelectionState,
+  type SortingState,
+} from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { RefreshCwIcon } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { cn, ResizablePanel, ResizablePanelGroup } from 'ui'
+import { FilterBar, type FilterGroup, type FilterProperty } from 'ui-patterns/FilterBar'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DatePicker } from 'components/ui/DatePicker'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { Alert, Button } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
-import { formatSelectedDateRange } from '../Organization/AuditLogs/AuditLogs.utils'
+import { parseTimeRange, serializeTimeRange } from '../Settings/Logs/Logs.timeRange'
+import { AuditLogDetailsPanel } from '@/components/interfaces/AuditLogs/AuditLogDetailsPanel'
+import { getAuditLogColumns } from '@/components/interfaces/AuditLogs/AuditLogs.columns'
+import {
+  DATE_FILTER_PROPERTY,
+  filterByFilterGroup,
+  findDateCondition,
+  getDefaultAuditLogRange,
+  PROJECT_FILTER_PROPERTY,
+} from '@/components/interfaces/AuditLogs/AuditLogs.utils'
+import {
+  DateRangeOption,
+  formatDateRangeValue,
+} from '@/components/interfaces/AuditLogs/AuditLogsDateRangeOption'
+import { createAuditLogsProjectOption } from '@/components/interfaces/AuditLogs/AuditLogsProjectOption'
+import { AuditLogsSelectionHeader } from '@/components/interfaces/AuditLogs/AuditLogsSelectionHeader'
+import { AuditLogsTable } from '@/components/interfaces/AuditLogs/AuditLogsTable'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { type AuditLog } from '@/data/organizations/organization-audit-logs-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProfileAuditLogsQuery } from '@/data/profile/profile-audit-logs-query'
+import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 
-const AuditLogs = () => {
-  const currentTime = dayjs().utc().set('millisecond', 0)
-  const [dateSortDesc, setDateSortDesc] = useState(true)
-  const [dateRange, setDateRange] = useState({
-    from: currentTime.subtract(1, 'day').toISOString(),
-    to: currentTime.toISOString(),
-  })
+const CONTENT_PADDING = 'w-full px-6 xl:px-10'
+
+export const AuditLogs = () => {
+  const [dateRange, setDateRange] = useState(getDefaultAuditLogRange)
 
   const [selectedLog, setSelectedLog] = useState<AuditLog>()
-  const [filters, setFilters] = useState<{ projects: string[] }>({
-    projects: [], // project_ref[]
-  })
+  const [filterGroup, setFilterGroup] = useState<FilterGroup>(() => ({
+    logicalOperator: 'AND',
+    conditions: [
+      {
+        propertyName: DATE_FILTER_PROPERTY,
+        operator: '=',
+        value: serializeTimeRange([new Date(dateRange.from), new Date(dateRange.to)]),
+      },
+    ],
+  }))
+  const [freeformText, setFreeformText] = useState('')
+  const [projectNames, setProjectNames] = useState<Record<string, string>>({})
 
-  const { data: projects } = useProjectsQuery()
-  const { data: organizations } = useOrganizationsQuery()
-  const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useProfileAuditLogsQuery({
+  const handleSelectProject = (project: { ref: string; name: string }) =>
+    setProjectNames((prev) => ({ ...prev, [project.ref]: project.name }))
+
+  const handleFilterChange = (next: FilterGroup) => {
+    setFilterGroup(next)
+    // The API call is driven by `dateRange`, so keep it in sync with the date chip
+    const dateCondition = findDateCondition(next)
+    if (!dateCondition) {
+      setDateRange(getDefaultAuditLogRange())
+      return
+    }
+    const range = parseTimeRange(dateCondition.value)
+    if (range) setDateRange({ from: range[0].toISOString(), to: range[1].toISOString() })
+  }
+
+  const { data: projectsData, isPending: isLoadingProjects } = useProjectsInfiniteQuery(
+    {},
+    { placeholderData: keepPreviousData }
+  )
+  const projects = useMemo(
+    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
+    [projectsData?.pages]
+  )
+
+  const { data: organizations, isPending: isLoadingOrganizations } = useOrganizationsQuery()
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+    refetch,
+  } = useProfileAuditLogsQuery(
+    {
       iso_timestamp_start: dateRange.from,
       iso_timestamp_end: dateRange.to,
-    })
+    },
+    {
+      retry: false,
+      placeholderData: keepPreviousData,
+    }
+  )
 
-  const retentionPeriod = data?.retention_period ?? 0
-  const logs = data?.result ?? []
-  const sortedLogs = logs
-    ?.sort((a, b) =>
-      dateSortDesc
-        ? Number(new Date(b.occurred_at)) - Number(new Date(a.occurred_at))
-        : Number(new Date(a.occurred_at)) - Number(new Date(b.occurred_at))
-    )
-    ?.filter((log) => {
-      if (filters.projects.length > 0) {
-        return filters.projects.includes(log.target.metadata.project_ref || '')
-      } else {
-        return log
-      }
-    })
+  const logs = useMemo(() => data?.result ?? [], [data?.result])
+  const filteredLogs = useMemo(() => filterByFilterGroup(logs, filterGroup), [logs, filterGroup])
 
-  const minDate = dayjs().subtract(retentionPeriod, 'days')
-  const maxDate = dayjs()
+  const hasDateFilter = !!findDateCondition(filterGroup)
+  const filterProperties: FilterProperty[] = [
+    {
+      label: 'Project',
+      name: PROJECT_FILTER_PROPERTY,
+      type: 'string',
+      operators: ['='],
+      options: { component: createAuditLogsProjectOption(handleSelectProject) },
+      formatValue: (value) => {
+        const ref = String(value ?? '')
+        return projectNames[ref] ?? projects.find((p) => p.ref === ref)?.name ?? ref
+      },
+    },
+    {
+      label: 'Date range',
+      name: DATE_FILTER_PROPERTY,
+      type: 'date',
+      operators: [{ label: 'Equals', value: '=', group: 'comparison' }],
+      options: { component: DateRangeOption },
+      formatValue: formatDateRangeValue,
+      isAvailable: !hasDateFilter,
+      topLevelOnly: true,
+    },
+  ]
+
+  const lastSelectedRowId = useRef<string | null>(null)
+  const columns = useMemo(
+    () =>
+      getAuditLogColumns({
+        projects,
+        organizations: organizations ?? [],
+        lastSelectedRowId,
+        isLoadingProjects,
+        isLoadingOrganizations,
+      }),
+    [projects, organizations, isLoadingProjects, isLoadingOrganizations]
+  )
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'date', desc: true }])
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+  const table = useReactTable({
+    data: filteredLogs,
+    columns,
+    state: { sorting, rowSelection },
+    enableMultiRowSelection: true,
+    getRowId: (row) => row.request_id,
+    onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  })
 
   // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
   // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
@@ -75,196 +174,95 @@ const AuditLogs = () => {
   }, [dateRange.from, dateRange.to])
 
   return (
-    <>
-      <div className="space-y-4 flex flex-col pb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <p className="text-xs prose">Filter by</p>
-            <FilterPopover
-              name="Projects"
-              options={projects ?? []}
-              labelKey="name"
-              valueKey="ref"
-              activeOptions={filters.projects}
-              onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
-            />
-            <DatePicker
-              hideTime
-              hideClear
-              triggerButtonType="dashed"
-              triggerButtonTitle=""
-              from={dateRange.from}
-              to={dateRange.to}
-              minDate={minDate.toDate()}
-              maxDate={maxDate.toDate()}
-              onChange={(value) => {
-                if (value.from !== null && value.to !== null) {
-                  const { from, to } = formatSelectedDateRange(value)
-                  setDateRange({ from, to })
-                }
-              }}
-              renderFooter={() => {
-                return (
-                  <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                    You have a log retention period of{' '}
-                    <span className="text-brand">
-                      {retentionPeriod} day
-                      {retentionPeriod > 1 ? 's' : ''}
-                    </span>
-                    . You may only view logs from{' '}
-                    {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
-                    earliest date.
-                  </Alert>
-                )
-              }}
-            />
-            {isSuccess && (
-              <>
-                <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
-                <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
-              </>
-            )}
-          </div>
-          <Button
-            type="default"
-            disabled={isLoading || isRefetching}
-            icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
-            onClick={() => refetch()}
-          >
-            {isRefetching ? 'Refreshing' : 'Refresh'}
-          </Button>
-        </div>
+    <ScaffoldContainer size="full" className="px-0 h-full flex flex-col">
+      <ScaffoldSection isFullWidth className="pt-6! pb-0! flex-1 min-h-0">
+        <div className="flex flex-col h-full min-h-0">
+          {isLoading && (
+            <div className={cn(CONTENT_PADDING, 'space-y-2')}>
+              <ShimmeringLoader />
+              <ShimmeringLoader className="w-3/4" />
+              <ShimmeringLoader className="w-1/2" />
+            </div>
+          )}
 
-        {isLoading && (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        )}
+          {isError && (
+            <div className={CONTENT_PADDING}>
+              <AlertError error={error} subject="Failed to retrieve audit logs" />
+            </div>
+          )}
 
-        {isError && <AlertError error={error} subject="Failed to retrieve audit logs" />}
-
-        {isSuccess && (
-          <>
-            {logs.length === 0 ? (
-              <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
-                <p className="prose text-sm">You do not have any audit logs available yet</p>
-              </div>
-            ) : logs.length > 0 && sortedLogs.length === 0 ? (
-              <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
-                <p className="prose text-sm">No audit logs found based on the filters applied</p>
-              </div>
-            ) : (
-              <div className="overflow-hidden md:overflow-auto overflow-x-scroll">
-                <Table
-                  head={[
-                    <Table.th key="action" className="py-2">
-                      Action
-                    </Table.th>,
-                    <Table.th key="target" className="py-2">
-                      Target
-                    </Table.th>,
-                    <Table.th key="date" className="py-2">
-                      <div className="flex items-center space-x-2">
-                        <p>Date</p>
-                        <ButtonTooltip
-                          type="text"
-                          className="px-1"
-                          icon={
-                            dateSortDesc ? (
-                              <ArrowDown strokeWidth={1.5} size={14} />
-                            ) : (
-                              <ArrowUp strokeWidth={1.5} size={14} />
-                            )
-                          }
-                          onClick={() => setDateSortDesc(!dateSortDesc)}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
-                            },
-                          }}
-                        />
-                      </div>
-                    </Table.th>,
-                    <Table.th key="actions" className="py-2"></Table.th>,
-                  ]}
-                  body={
-                    sortedLogs?.map((log) => {
-                      const project = projects?.find(
-                        (project) => project.ref === log.target.metadata.project_ref
-                      )
-                      const organization = organizations?.find(
-                        (org) => org.slug === log.target.metadata.org_slug
-                      )
-
-                      const hasStatusCode = log.action.metadata[0]?.status !== undefined
-
-                      return (
-                        <Table.tr
-                          key={log.occurred_at}
-                          onClick={() => setSelectedLog(log)}
-                          className="cursor-pointer hover:!bg-alternative transition duration-100"
-                        >
-                          <Table.td className="max-w-[250px]">
-                            <div className="flex items-center space-x-2">
-                              {hasStatusCode && (
-                                <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
-                                  {log.action.metadata[0].status}
-                                </p>
-                              )}
-                              <p className="truncate" title={log.action.name}>
-                                {log.action.name}
-                              </p>
-                            </div>
-                          </Table.td>
-                          <Table.td>
-                            <p
-                              className="text-foreground-light max-w-[230px] truncate"
-                              title={project?.name ?? organization?.name ?? '-'}
-                            >
-                              {project?.name
-                                ? 'Project: '
-                                : organization?.name
-                                  ? 'Organization: '
-                                  : null}
-                              {project?.name ?? organization?.name ?? '-'}
-                            </p>
-                            <p
-                              className="text-foreground-light text-xs mt-0.5 truncate"
-                              title={
-                                log.target.metadata.project_ref ?? log.target.metadata.org_slug
-                              }
-                            >
-                              {log.target.metadata.project_ref
-                                ? 'Ref: '
-                                : log.target.metadata.org_slug
-                                  ? 'Slug: '
-                                  : null}
-                              {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
-                            </p>
-                          </Table.td>
-                          <Table.td>
-                            <TimestampInfo className="text-sm" utcTimestamp={log.occurred_at} />
-                          </Table.td>
-                          <Table.td align="right">
-                            <Button type="default">View details</Button>
-                          </Table.td>
-                        </Table.tr>
-                      )
-                    }) ?? []
-                  }
+          {isSuccess && (
+            <>
+              <div className="border-t py-2 pl-1 pr-4 flex flex-col md:flex-row md:items-center justify-between">
+                <FilterBar
+                  supportsOperators
+                  variant="pill"
+                  defaultGroupOperator="OR"
+                  className="bg-transparent border-0 [&>div>div>div>input]:!text-xs [&_[data-testid=filter-bar-freeform-input]]:min-w-64"
+                  filterProperties={filterProperties}
+                  freeformText={freeformText}
+                  filters={filterGroup}
+                  onFilterChange={handleFilterChange}
+                  onFreeformTextChange={setFreeformText}
+                />
+                <ButtonTooltip
+                  disabled={isLoading}
+                  loading={isLoading || isRefetching}
+                  className="w-7"
+                  icon={<RefreshCwIcon />}
+                  onClick={() => refetch()}
+                  tooltip={{ content: { side: 'bottom', text: 'Refresh logs' } }}
                 />
               </div>
-            )}
-          </>
-        )}
-      </div>
 
-      <LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
-    </>
+              {logs.length === 0 ? (
+                <div className={CONTENT_PADDING}>
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
+                    <p className="prose text-sm">You do not have any audit logs available yet</p>
+                  </div>
+                </div>
+              ) : logs.length > 0 && filteredLogs.length === 0 ? (
+                <div className={CONTENT_PADDING}>
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
+                    <p className="prose text-sm">
+                      No audit logs found based on the filters applied
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-y overflow-hidden flex-1 min-h-0">
+                  <ResizablePanelGroup orientation="horizontal" className="h-full">
+                    <ResizablePanel
+                      defaultSize={100}
+                      minSize={30}
+                      className="flex flex-col overflow-hidden"
+                    >
+                      <div className="grow relative overflow-hidden">
+                        <AuditLogsSelectionHeader table={table} />
+                        <AuditLogsTable
+                          table={table}
+                          selectedLog={selectedLog}
+                          onSelectLog={(log) =>
+                            setSelectedLog((prev) =>
+                              prev?.request_id === log.request_id ? undefined : log
+                            )
+                          }
+                        />
+                      </div>
+                    </ResizablePanel>
+                    {selectedLog && (
+                      <AuditLogDetailsPanel
+                        selectedLog={selectedLog}
+                        onClose={() => setSelectedLog(undefined)}
+                      />
+                    )}
+                  </ResizablePanelGroup>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
-
-export default AuditLogs

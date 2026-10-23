@@ -1,0 +1,527 @@
+import { useQueries, useQueryClient } from '@tanstack/react-query'
+import { useRouter as useTanStackRouter } from '@tanstack/react-router'
+import { useFeatureFlags, useParams } from 'common'
+import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
+import { useRouter as useNextRouter } from 'next/compat/router'
+import Link from 'next/link'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Button,
+  Card,
+  CardContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableHeadSort,
+  TableRow,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { DestinationPanel } from './DestinationPanel/DestinationPanel'
+import { DestinationType } from './DestinationPanel/DestinationPanel.types'
+import { DestinationRow } from './DestinationRow'
+import { DisablePipelinesDialog } from './DisablePipelinesDialog'
+import { EnablePipelinesModal } from './EnablePipelinesCallout'
+import { getStatusName } from './Pipeline.utils'
+import { PipelineStatusName } from './Replication.constants'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
+} from './useIsETLPrivateAlpha'
+import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { replicationKeys } from '@/data/replication/keys'
+import {
+  replicationPipelineStatusQueryOptions,
+  type ReplicationPipelineStatusData,
+} from '@/data/replication/pipeline-status-query'
+import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
+import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+type DestinationSortColumn = 'name' | 'status'
+type DestinationSort = `${DestinationSortColumn}:${'asc' | 'desc'}`
+
+// Worst first, so sorting ascending by status surfaces the pipelines that need attention.
+const STATUS_SORT_ORDER: PipelineStatusName[] = [
+  PipelineStatusName.FAILED,
+  PipelineStatusName.STOPPED,
+  PipelineStatusName.STOPPING,
+  PipelineStatusName.STARTING,
+  PipelineStatusName.STARTED,
+  PipelineStatusName.UNKNOWN,
+]
+
+// Keyed by pipeline id from the responses themselves, so this never closes over component state.
+const combinePipelineStatuses = (
+  results: { data?: ReplicationPipelineStatusData }[]
+): Map<number, PipelineStatusName | undefined> =>
+  new Map(
+    results
+      .map((result) => result.data)
+      .filter((data): data is ReplicationPipelineStatusData => data !== undefined)
+      .map((data) => [data.pipeline_id, getStatusName(data.status)])
+  )
+
+const compareStatusNames = (
+  a: PipelineStatusName | undefined,
+  b: PipelineStatusName | undefined,
+  direction: 'asc' | 'desc'
+) => {
+  if (a === undefined) return b === undefined ? 0 : 1
+  if (b === undefined) return -1
+
+  const comparison = STATUS_SORT_ORDER.indexOf(a) - STATUS_SORT_ORDER.indexOf(b)
+  return direction === 'asc' ? comparison : -comparison
+}
+
+export const Destinations = () => {
+  const queryClient = useQueryClient()
+  const router = useTanStackRouter({ warn: false })
+  const nextRouter = useNextRouter()
+  const { isEnabled: isWizardEnabled, isLoading: isPreviewLoading } = usePipelineCreationPreview()
+  const bigQuery = useIsETLBigQueryPrivateAlpha()
+  const duckLake = useIsETLDucklakePrivateAlpha()
+  const snowflake = useIsETLSnowflakePrivateAlpha()
+  const clickHouse = useIsETLClickHousePrivateAlpha()
+  const hasWizardDestination = bigQuery || duckLake || snowflake || clickHouse
+  const { hasLoaded: hasFlagsLoaded } = useFeatureFlags()
+  const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
+  const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
+
+  useRedirectLegacyReadReplicaDestination()
+
+  const prefetchedRef = useRef(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const [filterString, setFilterString] = useState<string>('')
+  const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
+  const pendingCreationTypeRef = useRef<DestinationType | null>(null)
+  const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
+
+  const [, setDestinationType] = useQueryState(
+    'destinationType',
+    parseAsStringEnum<DestinationType>([
+      'BigQuery',
+      'Analytics Bucket',
+      'DuckLake',
+      'Snowflake',
+      'ClickHouse',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
+
+  const {
+    data: destinationsData,
+    error: destinationsError,
+    isPending: isDestinationsLoading,
+    isError: isDestinationsError,
+    isSuccess: isDestinationsSuccess,
+  } = useReplicationDestinationsQuery({
+    projectRef,
+  })
+  const destinations = useMemo(
+    () => destinationsData?.destinations ?? [],
+    [destinationsData?.destinations]
+  )
+  const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
+  const filteredDestinations = useMemo(
+    () =>
+      filterString.length === 0
+        ? destinations
+        : destinations.filter((destination) =>
+            destination.name.toLowerCase().includes(filterString.toLowerCase())
+          ),
+    [destinations, filterString]
+  )
+
+  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
+    projectRef,
+  })
+  const pipelines = useMemo(() => pipelinesData?.pipelines ?? [], [pipelinesData?.pipelines])
+
+  // Sorting by status needs every pipeline's status up here, not just inside each row. These share
+  // the rows' query keys, so each status is still only fetched once.
+  const statusByPipelineId = useQueries({
+    queries: pipelines.map((pipeline) =>
+      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id })
+    ),
+    combine: combinePipelineStatuses,
+  })
+
+  const getDestinationStatus = (destinationId: number) => {
+    const pipeline = pipelines.find((p) => p.destination_id === destinationId)
+    return pipeline === undefined ? undefined : statusByPipelineId.get(pipeline.id)
+  }
+
+  const [sort, setSort] = useState<DestinationSort>('name:asc')
+  const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
+
+  const getAriaSort = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return 'none'
+    return sortDirection === 'asc' ? 'ascending' : 'descending'
+  }
+
+  const handleSortChange = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return setSort(`${column}:asc`)
+    setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
+  }
+
+  // Not memoized: the status map is rebuilt whenever a pipeline status refetches, so a useMemo
+  // here would never hit. Sorting a handful of destinations per render costs nothing.
+  const sortedDestinations = [...filteredDestinations].sort((a, b) => {
+    if (sortColumn === 'status') {
+      const nameComparison = a.name.localeCompare(b.name)
+
+      return (
+        compareStatusNames(getDestinationStatus(a.id), getDestinationStatus(b.id), sortDirection) ||
+        (sortDirection === 'asc' ? nameComparison : -nameComparison)
+      )
+    }
+
+    const comparison = a.name.localeCompare(b.name)
+    return sortDirection === 'asc' ? comparison : -comparison
+  })
+
+  const {
+    data: sourcesData,
+    isSuccess: isSourcesSuccess,
+    isError: isSourcesError,
+    error: sourcesError,
+    refetch: refetchSources,
+  } = useReplicationSourcesQuery({
+    projectRef,
+  })
+  const externalReplicationSource = useMemo(
+    () => sourcesData?.sources.find((source) => source.name === projectRef),
+    [projectRef, sourcesData?.sources]
+  )
+  const replicationNotEnabled = isSourcesSuccess && !externalReplicationSource
+
+  const canDisablePipelines =
+    isSourcesSuccess &&
+    isDestinationsSuccess &&
+    isPipelinesSuccess &&
+    !!externalReplicationSource &&
+    destinations.length === 0 &&
+    pipelines.length === 0
+
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
+
+  const canCreate = isSourcesSuccess && !isCreationGateLoading
+  const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
+  const sourceErrorTitle = checkLocalETLNotSetUp(sourcesError)
+    ? 'Replication unavailable locally'
+    : 'Failed to retrieve pipeline enablement status'
+
+  const canLinkToWizard =
+    isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
+  const wizardHref = `/project/${projectRef}/database/pipelines/new`
+
+  const openCreation = (type: DestinationType) => {
+    if (isWizardEnabled && hasWizardDestination && projectRef) {
+      if (router)
+        void router.navigate({
+          to: '/project/$ref/database/pipelines/new',
+          params: { ref: projectRef },
+        })
+      else void nextRouter?.push(`/project/${projectRef}/database/pipelines/new`)
+    } else {
+      setDestinationType(type)
+    }
+  }
+
+  const handleAddPipeline = () => {
+    if (!canCreate) return
+    if (replicationNotEnabled) {
+      pendingCreationTypeRef.current = 'BigQuery'
+      setShowEnablePipelinesDialog(true)
+      return
+    }
+    openCreation('BigQuery')
+  }
+
+  const handleEnableDialogOpenChange = (open: boolean) => {
+    setShowEnablePipelinesDialog(open)
+    if (!open) pendingCreationTypeRef.current = null
+  }
+
+  const handlePipelinesEnabled = () => {
+    const type = pendingCreationTypeRef.current
+    pendingCreationTypeRef.current = null
+    if (
+      type &&
+      queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
+    ) {
+      openCreation(type)
+    }
+  }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search pipelines' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
+
+  useEffect(() => {
+    if (
+      projectRef &&
+      !prefetchedRef.current &&
+      pipelinesData?.pipelines &&
+      pipelinesData.pipelines.length > 0 &&
+      isPipelinesSuccess
+    ) {
+      prefetchedRef.current = true
+      pipelinesData.pipelines.forEach((p) => {
+        if (!p?.id) return
+        queryClient.prefetchQuery({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id),
+          queryFn: ({ signal }) =>
+            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id }, signal),
+          staleTime: Infinity,
+        })
+      })
+    }
+  }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
+
+  return (
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Input
+            ref={searchInputRef}
+            placeholder="Search pipelines"
+            size="tiny"
+            icon={<SearchIcon />}
+            value={filterString}
+            className="w-full lg:w-52"
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+            actions={
+              filterString.length > 0 && (
+                <Button
+                  aria-label="Clear search"
+                  variant="text"
+                  icon={<XIcon />}
+                  className="p-0 h-5 w-5"
+                  onClick={() => setFilterString('')}
+                />
+              )
+            }
+          />
+        </div>
+        <div className="flex items-center gap-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-label="More actions"
+                variant="default"
+                icon={<MoreVerticalIcon />}
+                className="w-6.5 hit-area-1"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuItem asChild>
+                <Link href={`/org/${organization?.slug}/usage#pipeline-initial-sync-data`}>
+                  View Pipelines usage
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {replicationNotEnabled ? (
+                <DropdownMenuItem
+                  onClick={() => {
+                    pendingCreationTypeRef.current = null
+                    setShowEnablePipelinesDialog(true)
+                  }}
+                >
+                  Enable Pipelines
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  className="data-disabled:pointer-events-auto data-disabled:cursor-not-allowed"
+                  disabled={!canDisablePipelines}
+                  onClick={() => {
+                    if (!canDisablePipelines) return
+                    setShowDisablePipelinesDialog(true)
+                  }}
+                >
+                  <div className="flex flex-col gap-y-0.5">
+                    <p>Disable Pipelines</p>
+                    {!canDisablePipelines && (
+                      <p className="text-foreground-lighter">Delete all pipelines first</p>
+                    )}
+                  </div>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+            label="Add pipeline"
+            onTrigger={handleAddPipeline}
+            options={{ enabled: canCreate }}
+            side="bottom"
+            tooltipOpen={canCreate ? undefined : false}
+          >
+            <ButtonTooltip
+              tooltip={{
+                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+              }}
+              variant="primary"
+              icon={<PlusIcon />}
+              loading={isCheckingPipelineStatus}
+              disabled={!canCreate}
+              asChild={canLinkToWizard}
+              onClick={canLinkToWizard ? undefined : handleAddPipeline}
+            >
+              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
+            </ButtonTooltip>
+          </Shortcut>
+        </div>
+      </div>
+
+      <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
+        {/* Mounted whether or not it has anything to say, so the update is announced */}
+        <p role="status" aria-live="polite" className="sr-only">
+          {isDestinationsLoading ? 'Loading pipelines' : ''}
+        </p>
+
+        {isSourcesError && (
+          <AlertError
+            layout="responsive"
+            projectRef={projectRef}
+            error={sourcesError}
+            subject={sourceErrorTitle}
+            hideContactSupport={checkLocalETLNotSetUp(sourcesError)}
+            description={
+              checkLocalETLNotSetUp(sourcesError)
+                ? 'Configure the replication API to manage pipelines in local development.'
+                : undefined
+            }
+            additionalActions={<Button onClick={() => refetchSources()}>Retry</Button>}
+          />
+        )}
+
+        {hasErrorsFetchingData && (
+          <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
+        )}
+
+        {isDestinationsLoading && (
+          <GenericTableLoader headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]} />
+        )}
+
+        {!isDestinationsLoading && hasDestinations && (
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead key="type" className="w-[40px]" />
+                    <TableHead key="name" className="w-[250px]" aria-sort={getAriaSort('name')}>
+                      <TableHeadSort
+                        column="name"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Name
+                      </TableHeadSort>
+                    </TableHead>
+                    <TableHead key="status" className="w-[150px]" aria-sort={getAriaSort('status')}>
+                      <TableHeadSort
+                        column="status"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Status
+                      </TableHeadSort>
+                    </TableHead>
+                    <TableHead key="lag" className="w-[150px]">
+                      Lag
+                    </TableHead>
+                    <TableHead key="publication">Publication</TableHead>
+                    <TableHead key="actions" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedDestinations.map((destination) => (
+                    <DestinationRow key={destination.id} destinationId={destination.id} />
+                  ))}
+
+                  {!isDestinationsLoading &&
+                    filteredDestinations.length === 0 &&
+                    hasDestinations && <TableRowNoResults colSpan={6} search={filterString} />}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+
+        {!isDestinationsLoading && !hasDestinations && !hasErrorsFetchingData && (
+          <EmptyStatePresentational
+            icon={WorkflowIcon}
+            title="Add a pipeline"
+            description="Send tables to an external destination for analytics workloads."
+          >
+            <ButtonTooltip
+              tooltip={{
+                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+              }}
+              variant="default"
+              icon={<PlusIcon />}
+              loading={isCheckingPipelineStatus}
+              disabled={!canCreate}
+              asChild={canLinkToWizard}
+              onClick={canLinkToWizard ? undefined : handleAddPipeline}
+            >
+              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
+            </ButtonTooltip>
+          </EmptyStatePresentational>
+        )}
+      </div>
+
+      <DestinationPanel />
+
+      <EnablePipelinesModal
+        open={showEnablePipelinesDialog}
+        onOpenChange={handleEnableDialogOpenChange}
+        onSuccess={handlePipelinesEnabled}
+      />
+
+      <DisablePipelinesDialog
+        open={showDisablePipelinesDialog}
+        setOpen={setShowDisablePipelinesDialog}
+      />
+    </div>
+  )
+}

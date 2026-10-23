@@ -1,0 +1,340 @@
+/*
+ * Custom Tailwind v4 utilities migrated from packages/config/ui.config.js
+ * (addUtilities + matchUtilities) and packages/config/tailwind.config.js
+ * (the .bg legacy shim).
+ */
+
+/*
+ * The `bg` class worked in Tailwind v3 but stopped working in v4. Restored as
+ * an alias for `bg-default` to avoid a wide rename across the codebase.
+ * Should be deprecated in favor of `bg-default`.
+ */
+@utility bg {
+  background-color: var(--background);
+}
+
+/* Contrast 0.5 produces (0.05 + 0.95 * 0.5)² = 0.275625. */
+@utility control-surface-shadows {
+  --button-shadow-opacity: 0.04;
+  --button-edge-strength: calc(var(--contrast-border, 0.275625) / 0.275625 * 0.6);
+  --button-edge-color: var(--colors-black);
+  --button-shadow-drop: 0 1px 3px 0 hsl(var(--colors-black) / var(--button-shadow-opacity));
+  --button-shadow-raised:
+    var(--button-shadow-drop),
+    inset 0 1px 0 0 hsl(var(--button-edge-color) / calc(0.04 * var(--button-edge-strength))),
+    inset 0 0 0 1px hsl(var(--button-edge-color) / calc(0.06 * var(--button-edge-strength))),
+    inset 0 0 0 1px hsl(var(--button-edge-color) / calc(0.1 * var(--button-edge-strength)));
+  --button-shadow-default:
+    var(--button-shadow-drop),
+    inset 0 1px 0 0 hsl(var(--button-edge-color) / calc(0.04 * var(--button-edge-strength))),
+    inset 0 0 0 1px hsl(var(--colors-black) / calc(0.06 * var(--button-edge-strength))),
+    inset 0 -1px 0 0 hsl(var(--colors-black) / calc(0.06 * var(--button-edge-strength))),
+    inset 0 0 0 1px hsl(var(--button-edge-color) / calc(0.1 * var(--button-edge-strength)));
+
+  @variant dark {
+    --button-shadow-opacity: 0.2;
+    --button-edge-strength: calc(var(--contrast-border, 0.275625) / 0.275625);
+    --button-edge-color: var(--colors-white);
+  }
+}
+
+@utility raised-control-surface {
+  @apply text-foreground bg-card shadow-[var(--button-shadow-default)];
+
+  @variant hover {
+    @apply bg-muted;
+  }
+
+  &[data-state='open'] {
+    @apply bg-muted;
+  }
+
+  @variant dark {
+    @apply bg-muted;
+    background-image: linear-gradient(
+      to bottom,
+      hsl(var(--colors-white) / 0.015),
+      hsl(var(--colors-black) / 0.01)
+    );
+
+    @variant hover {
+      @apply bg-accent;
+    }
+
+    &[data-state='open'] {
+      @apply bg-accent;
+    }
+  }
+}
+
+/*
+ * Soft shimmer gradient used by LoadingLine.
+ */
+@utility line-loading-bg {
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+@utility line-loading-bg-light {
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(33, 33, 33, 0.65) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* may be unused — verify before pruning */
+@utility mask-fadeout-right {
+  -webkit-mask-image: linear-gradient(to right, white 98%, transparent 100%);
+  mask-image: linear-gradient(to right, white 98%, transparent 100%);
+}
+/* may be unused — verify before pruning */
+@utility mask-fadeout-left {
+  -webkit-mask-image: linear-gradient(to left, white 98%, transparent 100%);
+  mask-image: linear-gradient(to left, white 98%, transparent 100%);
+}
+
+/*
+ * Fades the left or right edge of a horizontal scroll area when more content is on that side
+ */
+@property --scroll-fade-start {
+  syntax: '<length>';
+  initial-value: 0px;
+  inherits: false;
+}
+
+@property --scroll-fade-end {
+  syntax: '<length>';
+  initial-value: 0px;
+  inherits: false;
+}
+
+/* each fade changes size over the first or last 48px of the scroll */
+@keyframes scroll-fade-start {
+  from {
+    --scroll-fade-start: 0px;
+  }
+  to {
+    --scroll-fade-start: 32px;
+  }
+}
+
+@keyframes scroll-fade-end {
+  from {
+    --scroll-fade-end: 32px;
+  }
+  to {
+    --scroll-fade-end: 0px;
+  }
+}
+
+@utility scroll-fade-x {
+  --scroll-shadow: rgb(0 0 0 / 0.05);
+  background:
+    linear-gradient(to right, var(--background) 40%, transparent) left / 40px 100% local,
+    linear-gradient(to left, var(--background) 40%, transparent) right / 40px 100% local,
+    linear-gradient(to right, var(--scroll-shadow), transparent) left / 24px 100% scroll,
+    linear-gradient(to left, var(--scroll-shadow), transparent) right / 24px 100% scroll;
+  background-repeat: no-repeat;
+
+  @variant dark {
+    --scroll-shadow: rgb(0 0 0 / 0.2);
+  }
+
+  @supports (animation-timeline: scroll()) {
+    background: none;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      rgb(0 0 0 / 0.15) calc(var(--scroll-fade-start) * 0.25),
+      rgb(0 0 0 / 0.5) calc(var(--scroll-fade-start) * 0.5),
+      rgb(0 0 0 / 0.85) calc(var(--scroll-fade-start) * 0.75),
+      #000 var(--scroll-fade-start),
+      #000 calc(100% - var(--scroll-fade-end)),
+      rgb(0 0 0 / 0.85) calc(100% - var(--scroll-fade-end) * 0.75),
+      rgb(0 0 0 / 0.5) calc(100% - var(--scroll-fade-end) * 0.5),
+      rgb(0 0 0 / 0.15) calc(100% - var(--scroll-fade-end) * 0.25),
+      transparent 100%
+    );
+    /* use longhands. the kb build merges the shorthand and the timeline, and browsers reject the result */
+    animation-name: scroll-fade-start, scroll-fade-end;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(self inline);
+    animation-range:
+      0 48px,
+      calc(100% - 48px) 100%;
+  }
+}
+
+/*
+ * Functional color utilities. The `--value(--color-*)` token accepts any
+ * registered --color-* design token (e.g. highlight-foreground-light).
+ */
+/* may be unused — verify before pruning */
+@utility highlight-* {
+  box-shadow: inset 0 1px 0 0 --value(--color-*);
+}
+/* may be unused — verify before pruning */
+@utility subhighlight-* {
+  box-shadow: inset 0 -1px 0 0 --value(--color-*);
+}
+
+/*
+ * Inline-SVG grid background. Used by ProjectLinker as bg-grid-black/5 and
+ * bg-grid-white/5 for the integrations onboarding visuals.
+ */
+@utility bg-grid-* {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='--value(--color-*)'><path d='M0 .5H31.5V32'/></svg>");
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
+
+/*
+ * Text shimmer (shadcn shimmer utility, inlined so we don't pull in the full
+ * shadcn CSS package). Apply `shimmer` to text to draw attention.
+ */
+@property --shimmer-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 20deg;
+}
+@property --shimmer-image {
+  syntax: '*';
+  inherits: false;
+}
+@property --shimmer-text-fill {
+  syntax: '*';
+  inherits: false;
+}
+
+@utility shimmer {
+  --_spread: var(--shimmer-spread, calc(3ch + 40px));
+  --_base: currentColor;
+  --_highlight: var(--shimmer-color, oklch(from currentColor l c h / calc(alpha* 0.2)));
+
+  background-image: var(
+    --shimmer-image,
+    linear-gradient(
+      calc(90deg + var(--shimmer-angle)),
+      var(--_base) calc(50% - var(--_spread)),
+      color-mix(in oklch, var(--_highlight), var(--_base) 50%) calc(50% - var(--_spread) * 0.5),
+      var(--_highlight) 50%,
+      color-mix(in oklch, var(--_highlight), var(--_base) 50%) calc(50% + var(--_spread) * 0.5),
+      var(--_base) calc(50% + var(--_spread))
+    )
+  );
+  background-repeat: no-repeat;
+  background-size: calc(200% + var(--_spread) * 2) 100%;
+  background-position: 0 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: var(--shimmer-text-fill, transparent);
+  animation: tw-shimmer var(--shimmer-duration, 2s) linear infinite;
+  transition: -webkit-text-fill-color 0.5s ease;
+
+  /* Fade to solid text on dismiss — keep the gradient until fill is opaque */
+  &[data-shimmer-fading] {
+    -webkit-text-fill-color: currentColor;
+    animation-play-state: paused;
+  }
+
+  @variant dark {
+    --_highlight: var(
+      --shimmer-color,
+      oklch(from currentColor max(0.8, calc(l + 0.4)) c h / calc(alpha + 0.4))
+    );
+  }
+
+  &:where([dir='rtl'], [dir='rtl'] *) {
+    animation-direction: reverse;
+  }
+}
+
+@utility shimmer-once {
+  animation-iteration-count: 1;
+}
+
+@utility shimmer-reverse {
+  animation-direction: reverse;
+}
+
+@utility shimmer-none {
+  --shimmer-image: none;
+  --shimmer-text-fill: currentColor;
+  background-image: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+@utility shimmer-color-* {
+  --shimmer-color: --value(--color-*, [color]);
+  --shimmer-color: color-mix(
+    in oklch,
+    --value(--color-*, [color]) calc(--modifier(integer) * 1%),
+    transparent
+  );
+}
+
+@utility shimmer-duration-* {
+  --shimmer-duration: calc(--value(integer) * 1ms);
+}
+
+@utility shimmer-spread-* {
+  --shimmer-spread: calc(var(--spacing) * --value(integer));
+  --shimmer-spread: --value([length], [percentage]);
+}
+
+@utility shimmer-angle-* {
+  --shimmer-angle: calc(--value(integer) * 1deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
+/*
+ * Canonical keyboard focus rings. Prefer these over inventing local ring/outline
+ * stacks.
+ *
+ * - focus-ring: default offset ring (buttons, inputs, most controls).
+ *   `outline-hidden` stays always-on so mouse click does not show the browser
+ *   default; the ring is `:focus-visible` only.
+ * - focus-inset: dense/flush surfaces such as interactive <tr>s. Must use
+ *   outline (not ring/box-shadow) — box-shadow on table-row is unreliable,
+ *   especially in Safari. Do NOT pair with outline-hidden: that sets
+ *   outline-style: none and suppresses the focus outline.
+ */
+@utility focus-ring {
+  @apply outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+@utility focus-inset {
+  /* Reserve outline geometry up front so focus never flashes the browser default. */
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  /* Call sites often add `transition`/`transition-all`; keep outline instant. */
+  transition-property:
+    color, background-color, border-color, text-decoration-color, fill, stroke, opacity, transform,
+    filter, backdrop-filter, box-shadow;
+
+  &:focus-visible {
+    outline-color: var(--ring);
+    border-radius: var(--radius-md, 0.375rem);
+  }
+}

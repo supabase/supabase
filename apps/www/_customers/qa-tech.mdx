@@ -1,0 +1,91 @@
+---
+name: QA.tech
+title: How QA.tech built enterprise-ready AI testing agents on Supabase
+description: QA.tech is an autonomous AI testing platform whose QA agents run end-to-end testing of web and mobile products by goal and intent. Three years on Supabase took QA.tech from three founders to a global customer base, enterprise-scale daily test volume, and SOC 2 compliance.
+author: wendie_cheung
+author_title: Product Marketing
+logo: /images/customers/logos/on-light/qa-tech.png
+logo_inverse: /images/customers/logos/on-dark/qa-tech.png
+tags:
+  - supabase
+date: '2026-08-04'
+company_url: https://qa.tech
+stats: []
+misc:
+  [
+    { label: 'Use case', text: 'Autonomous AI agents for end-to-end software QA testing' },
+    { label: 'Solutions', text: 'Database, Auth, Realtime, Storage' },
+  ]
+about: 'QA.tech is an agentic quality assurance (QA) platform: its QA agents test software for enterprises through the UI, by user goal rather than scripted steps, so engineering teams catch bugs before they ship.'
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['ai', 'saas', 'developer-tools']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'startup'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'Europe'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database', 'auth', 'realtime', 'storage']
+---
+
+> Supabase is compelling to us because it's a complete solution. You get features you'd normally lack in a simple Postgres setup, and when you're a lean team that wants to focus on building instead of infrastructure ops, those extra features matter to us.
+>
+> _— Vilhelm von Ehrenheim, Chief AI Officer and co-founder, [QA.tech](https://qa.tech)_
+
+QA.tech is an agentic quality assurance (QA) platform: its QA agents test software for enterprises through the UI, by user goal rather than scripted steps, so engineering teams catch bugs before they ship. QA.tech was founded three years ago and today supports customers around the globe, growing sevenfold last year alone as engineering teams adopt autonomous QA agents.
+
+Supabase has supported QA.tech's growth as its backend infrastructure since day one. As QA.tech has grown, and especially as it has moved into serving large enterprise customers, Supabase has scaled alongside it and helped it reliably meet the growing demands of its own customers.
+
+## The challenge
+
+When Vilhelm von Ehrenheim and his co-founders started QA.tech, AI agents in general were barely capable of reliably clicking through a web interface, let alone testing one. Building a reliable product on top of immature technology, one that had to keep pace with a fast-changing AI industry, was hard enough on its own. Rather than spend their limited engineering resources building and maintaining a backend, the team chose to invest time into QA.tech's core product instead.
+
+Their future customers faced a version of the same tradeoff. Most had already tried to solve QA some other way: a manual QA team that couldn't keep pace with engineering, or scripted browser tests that broke every time a button moved or a workflow got redesigned. QA.tech calls this the "maintenance tax," with engineering time spent babysitting brittle scripts instead of shipping the product, and it's the same tax QA.tech avoided for itself by choosing not to build its own backend.
+
+## Why they chose Supabase
+
+Before choosing Supabase, the team had looked at hosting a backend on a hyperscaler instead, which was a more common practice at the time. Supabase was preferred as it bundled everything the team needed into one platform: a managed Postgres database, authentication, and Realtime channels for building responsive interfaces, without needing to stitch together separate vendors.
+
+Embeddings for search were also available, which QA.tech adopted quickly. In the first year and a half, while QA.tech's product itself was still being built and pivoted in different directions, Supabase's flexibility mattered as much as its features.
+
+> There was a lot of experimentation and pivoting in that first year and a half. Supabase let us try things and iterate fast, and it scaled with us the whole way, through the pivots and after we finally committed to a direction.
+>
+> _— Vilhelm von Ehrenheim, Chief AI Officer and co-founder, [QA.tech](https://qa.tech)_
+
+## How QA.tech runs on Supabase
+
+QA.tech's product lets customers watch QA agents work in real time: configuring tests, chatting with AI to create new ones, and following along as agents click through an interface. That live view depends on Supabase Realtime, since a single regression run can spawn many agents at once and customers need to see them as they run.
+
+Auth and Row Level Security (RLS) handle permissions, and QA.tech added SSO on top as it started working with larger enterprises. Postgres tables store test runs, configurations, and metadata, the parts of the system that map cleanly onto a relational database.
+
+QA.tech originally kept everything, including full agent traces with screenshots and video inside Supabase. As customer volume grew, those tables became too large, and the team had to re-architect how it stored that data. Supabase stayed at the core of the system; large trace payloads now post to a message queue and land in blob storage outside Supabase, while Supabase's Realtime channels still notify the interface, carrying an ID the UI uses to fetch the trace from blob storage when needed.
+
+## Growing into the enterprise
+
+As QA.tech started landing bigger customers, including those in data-sensitive industries like finance and pharmaceuticals, security certifications became a requirement to win their business. QA.tech pursued SOC 2, leaning on Supabase's existing security controls to achieve compliance.
+
+> When we started working with larger enterprise customers, especially banks, we needed certifications to show we had a strong security posture. Supabase already had a lot of that in place, which made it much easier for us to get certified.
+>
+> _— Vilhelm von Ehrenheim, Chief AI Officer and co-founder, [QA.tech](https://qa.tech)_
+
+Some of QA.tech's enterprise customers also cared about where their data lived, wanting European data to stay in Europe. Supabase's region support handled that without QA.tech needing to rethink its core backend.
+
+## The results
+
+- QA.tech now serves a growing global customer base and runs QA agents at enterprise scale every day, handling load spikes during large regression runs.
+- The founding team was able to move quickly and build a product without needing to build a backend from scratch.
+- QA.tech achieved SOC 2 compliance quickly, helped by security controls Supabase already had in place.
+- QA.tech continues to scale with Supabase as enterprise demand grows.
+
+> Without Supabase, we'd have needed at least two engineers to get the same functionality. That's time we'd rather spend building what we sell to customers.
+>
+> _— Vilhelm von Ehrenheim, Chief AI Officer and co-founder, [QA.tech](https://qa.tech)_
+
+## What's next
+
+QA.tech continues its mission to free developers from the "maintenance tax," the repetitive work of QA that keeps engineers from building. The team plans to keep scaling its customer base and processing capacity, help customers shift testing earlier in development, and expand the verification layer to cover more of what needs to be checked before code reaches production.
+
+Vilhelm's advice to other early-stage founders evaluating a backend today is the same lesson QA.tech learned three years ago.
+
+> Don't try to build everything yourself, even though you can build a lot with agents today. There are cool solutions out there, like Supabase. Use them, and focus on building your product instead.
+>
+> _— Vilhelm von Ehrenheim, Chief AI Officer and co-founder, [QA.tech](https://qa.tech)_

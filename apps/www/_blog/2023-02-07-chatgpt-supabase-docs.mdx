@@ -2,8 +2,8 @@
 title: 'Supabase Clippy: ChatGPT for Supabase Docs'
 description: Creating a ChatGPT interface for the Supabase documentation.
 author: paul_copplestone
-image: docsgpt/og_supabase_clippy.png
-thumb: docsgpt/og_supabase_clippy.png
+imgSocial: docsgpt/og_supabase_clippy.png
+imgThumb: docsgpt/og_supabase_clippy.png
 categories:
   - product
 tags:
@@ -54,7 +54,7 @@ It's built with Supabase/Postgres, and consists of several key parts:
 
 1. Parsing the Supabase docs into sections.
 2. Creating embeddings for each section using OpenAI's embeddings API.
-3. Storing the embeddings in Postgres using the pgvector extension.
+3. Storing the embeddings in Postgres using the [pgvector extension](https://supabase.com/docs/guides/database/extensions/pgvector).
 4. Getting a user's question.
 5. Query the Postgres database for the most relevant documents related to the question.
 6. Inject these documents as context for GPT-3 to reference in its answer.

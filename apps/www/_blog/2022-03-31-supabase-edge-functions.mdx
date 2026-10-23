@@ -2,8 +2,8 @@
 title: Edge Functions are now available in Supabase
 description: Today we're launching Edge Functions. Edge Functions let you execute Typescript code close to your users, no matter where they're located.
 author: inian
-image: launch-week-4/thursday-functions/functions-thumb.png
-thumb: launch-week-4/thursday-functions/functions-thumb.png
+imgSocial: launch-week-4/thursday-functions/functions-thumb.png
+imgThumb: launch-week-4/thursday-functions/functions-thumb.png
 categories:
   - product
 tags:
@@ -75,7 +75,7 @@ The primary goal of this architecture is to reduce the amount of work done in th
 
 Supabase Edge Functions are deployed to one region - Earth (and we're exploring Mars as an additional region 👽). Edge Functions are deployed to over 30 data centers in a matter of seconds, ensuring fast response times no matter where your users are located.
 
-[Database Functions](https://supabase.com/docs/guides/database/functions) (also served via our [REST and GraphQL APIs](https://supabase.com/docs/guides/database/api)) are colocated with your Postgres database, making them ideal for DB-intensive operations. These APIs can also be called seamlessly from your Supabase Edge Functions, making for a powerful combination.
+[Database Functions](https://supabase.com/docs/guides/database/functions) (also served via our [REST and GraphQL APIs](https://supabase.com/docs/guides/api)) are colocated with your Postgres database, making them ideal for DB-intensive operations. These APIs can also be called seamlessly from your Supabase Edge Functions, making for a powerful combination.
 
 ### Scale to zero
 
@@ -135,7 +135,7 @@ When researching use-cases with all of you, [processing payments](https://github
 
 Even though Deno supports [rendering `jsx` and `tsx` files](https://deno.land/manual/jsx_dom/jsx), we don't plan on becoming a website hosting provider with Edge Functions. For now, Edge Functions can only be invoked via the `POST` method. Offering secure and fast web hosting with a good developer experience is a hard problem to solve and there are [other](https://www.netlify.com/) [fantastic](https://vercel.com/) [providers](https://pages.cloudflare.com/) which do exactly that.
 
-From our experience launching Supabase Storage last year, becoming a hosting provider is not something you want to take lightly. Malicious folks will upload their phishing sites whenever they get a chance and this can quickly spiral out of control, causing you to land on the denylist in the [Safe Browsing dataset](https://safebrowsing.google.com/). Even though we removed the project within minutes after being notified, various ISPs had already cached the information from the Safe browsing dataset and were “helping” their users by restricting access to the Supabase domain. This isn't something we're planning to repeat. But as always, we'd love to hear your use cases and feature requests, we're just one [GitHub discussion](https://github.com/supabase/supabase/discussions) away!
+From our experience launching [Supabase Storage](/storage) last year, becoming a hosting provider is not something you want to take lightly. Malicious folks will upload their phishing sites whenever they get a chance and this can quickly spiral out of control, causing you to land on the denylist in the [Safe Browsing dataset](https://safebrowsing.google.com/). Even though we removed the project within minutes after being notified, various ISPs had already cached the information from the Safe browsing dataset and were “helping” their users by restricting access to the Supabase domain. This isn't something we're planning to repeat. But as always, we'd love to hear your use cases and feature requests, we're just one [GitHub discussion](https://github.com/supabase/supabase/discussions) away!
 
 ## Roadmap
 

@@ -1,0 +1,186 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { PlusIcon } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  Form,
+  FormControl,
+  FormField,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
+
+interface CreateCredentialModalProps {
+  visible: boolean
+  onOpenChange: (value: boolean) => void
+}
+
+export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentialModalProps) => {
+  const { ref: projectRef } = useParams()
+  const isProjectActive = useIsProjectActive()
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  const { can: canCreateCredentials } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
+  )
+
+  const { data: config } = useProjectStorageConfigQuery({ projectRef })
+  const isS3ConnectionEnabled = config?.features.s3Protocol.enabled
+  const disableCreation = !isProjectActive || !canCreateCredentials || !isS3ConnectionEnabled
+
+  const FormSchema = z.object({
+    description: z.string().min(3, {
+      message: 'Name must be at least 3 characters long',
+    }),
+  })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      description: '',
+    },
+  })
+
+  const {
+    data: createS3KeyData,
+    mutate: createS3AccessKey,
+    isPending: isCreating,
+  } = useS3AccessKeyCreateMutation({
+    onSuccess: () => {
+      setShowSuccess(true)
+      form.reset()
+    },
+  })
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    createS3AccessKey({ projectRef, ...data })
+  }
+
+  return (
+    <Dialog
+      open={visible}
+      onOpenChange={(open) => {
+        onOpenChange(open)
+        if (!open) setShowSuccess(false)
+      }}
+    >
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button
+              icon={<PlusIcon size={14} />}
+              disabled={disableCreation}
+              className="pointer-events-auto"
+            >
+              New access key
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        {disableCreation && (
+          <TooltipContent side="bottom">
+            {!isProjectActive
+              ? 'Restore your project to create new access keys'
+              : !isS3ConnectionEnabled
+                ? 'Connection via S3 protocol is currently disabled'
+                : !canCreateCredentials
+                  ? 'You need additional permissions to create new access keys'
+                  : ''}
+          </TooltipContent>
+        )}
+      </Tooltip>
+
+      <DialogContent
+        size="small"
+        onInteractOutside={(e) => {
+          if (showSuccess) e.preventDefault()
+        }}
+      >
+        {showSuccess ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>Save your new access key</DialogTitle>
+              <DialogDescription>
+                Copy the access key ID and secret now. The secret won't be shown again. If you lose
+                it, create a new access key.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogSectionSeparator />
+            <DialogSection className="flex flex-col gap-4">
+              <FormItemLayout label="Access key ID" isReactForm={false}>
+                <Input className="input-mono" readOnly copy value={createS3KeyData?.access_key} />
+              </FormItemLayout>
+              <FormItemLayout label="Secret access key" isReactForm={false}>
+                <Input className="input-mono" readOnly copy value={createS3KeyData?.secret_key} />
+              </FormItemLayout>
+            </DialogSection>
+            <DialogFooter>
+              <Button
+                onClick={() => {
+                  onOpenChange(false)
+                  setShowSuccess(false)
+                }}
+              >
+                Done
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle>Create new access key</DialogTitle>
+              <DialogDescription>
+                This access key grants full access to every bucket and bypasses RLS policies.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogSectionSeparator />
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <DialogSection>
+                  <FormField
+                    name="description"
+                    render={({ field }) => (
+                      <FormItemLayout label="Name">
+                        <FormControl>
+                          <Input
+                            autoComplete="off"
+                            placeholder="My test key"
+                            type="text"
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </DialogSection>
+                <DialogFooter>
+                  <Button variant="primary" type="submit" loading={isCreating}>
+                    Create
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}

@@ -1,3 +1,12 @@
+import {
+  data,
+  Link,
+  redirect,
+  useFetcher,
+  useSearchParams,
+  type ActionFunctionArgs,
+} from 'react-router'
+
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -9,14 +18,6 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import {
-  type ActionFunctionArgs,
-  Link,
-  data,
-  redirect,
-  useFetcher,
-  useSearchParams,
-} from 'react-router'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
@@ -58,7 +59,9 @@ export default function ForgotPassword() {
           {success ? (
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Check Your Email</CardTitle>
+                <CardTitle className="font-medium text-lg tracking-normal">
+                  Check Your Email
+                </CardTitle>
                 <CardDescription>Password reset instructions sent</CardDescription>
               </CardHeader>
               <CardContent>
@@ -71,7 +74,9 @@ export default function ForgotPassword() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+                <CardTitle className="font-medium text-lg tracking-normal">
+                  Reset Your Password
+                </CardTitle>
                 <CardDescription>
                   Type in your email and we&apos;ll send you a link to reset your password
                 </CardDescription>
@@ -97,7 +102,7 @@ export default function ForgotPassword() {
                   <div className="mt-4 text-center text-sm">
                     Already have an account?{' '}
                     <Link to="/login" className="underline underline-offset-4">
-                      Login
+                      Sign in
                     </Link>
                   </div>
                 </fetcher.Form>

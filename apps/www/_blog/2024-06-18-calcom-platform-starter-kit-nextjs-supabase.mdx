@@ -2,8 +2,8 @@
 title: 'Cal.com launches Expert Marketplace built with Next.js and Supabase.'
 description: Cal.com and Supabase team up to build an open-source platform starter kit for developers.
 author: p6l-richard,PeerRich,thor_schaeff
-image: calcom_platform_starter/calcom_platform_starter_og.png
-thumb: calcom_platform_starter/calcom_platform_starter_og.png
+imgSocial: calcom_platform_starter/calcom_platform_starter_og.png
+imgThumb: calcom_platform_starter/calcom_platform_starter_og.png
 categories:
   - developers
 tags:
@@ -52,7 +52,7 @@ POSTGRES_URL_NON_POOLING="postgres://postgres.YOUR-PROJECT-REF:[YOUR-PASSWORD]@a
 
 You can find the values in the [project connect page](/dashboard/project/_?showConnect=true) of your Supabase Dashboard.
 
-For more details on using Prisma with Supabase, read the [official docs](/partners/integrations/prisma).
+For more details on using Prisma with Supabase, read the [official docs](/partners/catalog/prisma).
 
 ### Multischema support in Prisma
 
@@ -80,7 +80,7 @@ model Account {
 
 [Supabase Storage](/storage) is an S3 compatible cloud-based object store that allows you to store files securely. It is conveniently integrated with [Supabase Auth](https://supabase.com/auth) allowing you to easily limit access for uploads and downloads.
 
-Cal.com's Platforms Starter Kit runs their authentication on Next.js' [Auth.js](https://authjs.dev/). Luckily though, Supabase Storage is supa flexible, allowing you to easily create signed upload URLs server-side to then upload assets from the client-side -- no matter which tech you choose to use for handling authentication for your app.
+Cal.com's Platforms Starter Kit runs their authentication on Next.js' [Auth.js](https://authjs.dev/). Luckily though, [Supabase Storage](/storage) is supa flexible, allowing you to easily create signed upload URLs server-side to then upload assets from the client-side -- no matter which tech you choose to use for handling authentication for your app.
 
 To facilitate this, we can create an API route in Next.js to generate these signed URLs:
 

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+
 import { BaseInjector } from './../base-injector'
 
 export const metadata: Metadata = {
@@ -10,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <BaseInjector />
-      <div>
+      <div className="preview min-h-svh">
         <div>{children}</div>
       </div>
     </>

@@ -6,6 +6,12 @@ module.exports = [
     pathname: '**',
   },
   {
+    protocol: 'http',
+    hostname: 'localhost',
+    port: '3030',
+    pathname: '**',
+  },
+  {
     protocol: 'https',
     hostname: 'avatars.githubusercontent.com',
     port: '',
@@ -39,7 +45,7 @@ module.exports = [
     protocol: 'https',
     hostname: 'img.youtube.com',
     port: '',
-    pathname: '/vi/*',
+    pathname: '/vi/**',
   },
   {
     protocol: 'https',
@@ -57,6 +63,12 @@ module.exports = [
     protocol: 'https',
     hostname: 'obuldanrptloktxcffvn.supabase.co',
     port: '',
+    pathname: '**',
+  },
+  {
+    protocol: 'http',
+    hostname: '127.0.0.1',
+    port: '54321',
     pathname: '**',
   },
   {
@@ -94,5 +106,26 @@ module.exports = [
     hostname: 'media.licdn.com',
     port: '',
     pathname: '/dms/image/**',
+  },
+  // OG Edge Function
+  {
+    protocol: 'https',
+    hostname: 'zhfonblqamxferhoguzj.supabase.co',
+    port: '',
+    pathname: '/functions/v1/generate-og',
+  },
+  // Marketplace DB staging
+  {
+    protocol: 'https',
+    hostname: 'fgxbxpvumhvzrhqngsyu.supabase.co',
+    port: '',
+    pathname: '**',
+  },
+  // Marketplace DB prod
+  {
+    protocol: 'https',
+    hostname: 'otqhrpbxhxkrhrnjqbba.supabase.co',
+    port: '',
+    pathname: '**',
   },
 ]

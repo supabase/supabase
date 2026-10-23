@@ -2,8 +2,8 @@
 title: 'AI Inference now available in Supabase Edge Functions'
 description: 'Use embeddings and large language models on the edge with Supabase Edge Functions.'
 author: laktek
-image: ga-week/ai-inference-now-available-in-supabase-edge-functions/og.jpg
-thumb: ga-week/ai-inference-now-available-in-supabase-edge-functions/thumb.jpg
+imgSocial: ga-week/ai-inference-now-available-in-supabase-edge-functions/og.jpg
+imgThumb: ga-week/ai-inference-now-available-in-supabase-edge-functions/thumb.jpg
 categories:
   - product
 tags:
@@ -29,7 +29,7 @@ console.log(output)
 
 With this new API you can:
 
-- Generate embeddings using models like `gte-small` to store and retrieve with pgvector. This is available today.
+- Generate embeddings using models like `gte-small` to store and retrieve with [pgvector](https://supabase.com/docs/guides/database/extensions/pgvector). This is available today.
 - Use Large Language Models like `llama2` and `mistral` for GenAI workloads. This will be progressively rolled out as we get our hands on more GPUs.
 
 In our previous Launch Week we [announced](/blog/hugging-face-supabase) support for AI inference via Transformers.js. This was a good start but had some shortcomings: it takes time to “boot” because it needs to instantiate a WASM runtime and build the inference pipeline. We increased CPU limits to mitigate this, but we knew we wanted a better Developer Experience.
@@ -48,7 +48,7 @@ In this post we'll cover some of the improvements to remove cold starts using [O
 
 ## Generating Text Embeddings in Edge Functions
 
-Embeddings capture the "relatedness" of text, images, video, or other types of information. Embeddings are stored in the database as an array of floating point numbers, known as vectors. Since we [released](/openai-embeddings-postgres-vector) pgvector on the platform, Postgres has become a popular vector database.
+Embeddings capture the "relatedness" of text, images, video, or other types of information. Embeddings are stored in the database as an array of floating point numbers, known as vectors. Since we [released](/blog/openai-embeddings-postgres-vector) pgvector on the platform, Postgres has become a popular vector database.
 
 Today's release solves a few technical challenges for developers who want to generate embeddings from the content in their database, giving them the ability to offload this compute-intensive task to background workers.
 

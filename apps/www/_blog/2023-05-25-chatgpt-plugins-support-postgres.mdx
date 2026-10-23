@@ -10,8 +10,8 @@ tags:
 date: '2023-05-25'
 toc_depth: 2
 author: egor_romanov,paul_copplestone
-image: 2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugins-support-postgres.jpeg
-thumb: 2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugins-support-postgres.jpeg
+imgSocial: 2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugins-support-postgres.jpeg
+imgThumb: 2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugins-support-postgres.jpeg
 ---
 
 One of the challenges that ChatGPT faces is being able to answer questions from a private dataset. We can solve this with “retrieval plugins”, which allow ChatGPT to access information from a database.
@@ -40,7 +40,7 @@ You can choose your preferred vector database provider from a list of [supported
 We've implemented two vector provider options: one for Postgres and one for Supabase. The main differences are:
 
 - The Postgres version uses the `psycopg2` python library to directly connect to the database.
-- The Supabase version interacts with the database via PostgREST. This is helpful if you want to use [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) or if you are planning to use the data in the Retrieval store beyond ChatGPT.
+- The Supabase version interacts with the database via PostgREST. This is helpful if you want to use [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) or if you are planning to use the data in the Retrieval store beyond ChatGPT.
 
 The Postgres implementation is great to start with because there are now a [large number of providers](https://github.com/pgvector/pgvector/issues/54) supporting pgvector.
 
@@ -133,7 +133,7 @@ This will require several steps:
 
 <Img
   alt="diagram reference"
-  className="!m-0"
+  className="m-0!"
   src={{
     light:
       '/images/blog/2023-05-25-chatgpt-plugins-support-postgres/chatgpt-plugin-scheme--light.png',
@@ -175,7 +175,7 @@ export PG_PASSWORD=<postgres_password>
 
 ### Step 4: Run Postgres Locally
 
-To start quicker you may use Supabase CLI to spin everything up locally as it already includes pgvector from the start. Install `supabase-cli`, go to the `examples/providers` folder in the repo and run:
+To start quicker you may use [Supabase CLI](https://supabase.com/docs/reference/cli/introduction) to spin everything up locally as it already includes pgvector from the start. Install `supabase-cli`, go to the `examples/providers` folder in the repo and run:
 
 ```bash
 supabase start

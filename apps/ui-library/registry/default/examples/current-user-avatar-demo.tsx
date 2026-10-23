@@ -1,7 +1,8 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/registry/default/components/ui/avatar'
 import { useUser } from 'common'
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/registry/default/components/ui/avatar'
 
 const CurrentUserAvatarDemo = () => {
   // this demo only works on supabase.com because all apps are on the same domain and share cookies
@@ -29,7 +30,7 @@ const CurrentUserAvatarDemo = () => {
             target="_blank"
             rel="noopener noreferrer"
             href="https://supabase.com/dashboard/sign-in"
-            className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2"
+            className="text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2"
           >
             Dashboard
           </a>{' '}

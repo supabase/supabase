@@ -1,9 +1,9 @@
 import type { TsDoc } from '../../generator/legacy/definitions'
 
-import { values, mapValues } from 'lodash'
+import { mapValues, values } from 'lodash-es'
 import type { OpenAPIV3 } from 'openapi-types'
-import { flattenSections } from '../helpers'
 import type { ICommonItem } from '~/components/reference/Reference.types'
+import { flattenSections } from '../helpers'
 
 export function extractTsDocNode(nodeToFind: string, definition: any) {
   const nodePath = nodeToFind.split('.')
@@ -24,17 +24,17 @@ export function extractTsDocNode(nodeToFind: string, definition: any) {
 }
 
 export function generateParameters(tsDefinition: any) {
-  let functionDeclaration = null
+  let functionDeclaration: any = null
   if (tsDefinition.kindString == 'Method') {
     functionDeclaration = tsDefinition
   } else if (tsDefinition.kindString == 'Constructor') {
     functionDeclaration = tsDefinition
   } else functionDeclaration = tsDefinition?.type?.declaration
-  if (!functionDeclaration) return ''
+  if (!functionDeclaration || !functionDeclaration.signatures) return ''
 
   // Functions can have multiple signatures - select the last one since that
   // tends to be closer to primitive types (citation needed).
-  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures.at(-1).parameters
+  const paramDefinitions: TsDoc.TypeDefinition[] = functionDeclaration.signatures.at(-1)?.parameters
   if (!paramDefinitions) return ''
 
   // const paramsComments: TsDoc.CommentTag = tsDefinition.comment?.tags?.filter(x => x.tag == 'param')
@@ -46,7 +46,7 @@ function recurseThroughParams(paramDefinition: any) {
   const param = { ...paramDefinition }
   const labelParams = generateLabelParam(param)
 
-  let children: any[]
+  let children: any[] | undefined
   if (param.type?.type === 'literal') {
     // skip: literal types have no children
   } else if (param.type?.type === 'intrinsic') {
@@ -241,7 +241,7 @@ export function gen_v3(
     toArrayWithKey(val!, 'operation').forEach((o) => {
       const operation = o as v3OperationWithPath
       const operationId =
-        type === 'mgmt-api' && isValidSlug(operation.operationId)
+        type === 'mgmt-api' && operation.operationId && isValidSlug(operation.operationId)
           ? operation.operationId
           : slugify(operation.summary!)
       const enriched = {

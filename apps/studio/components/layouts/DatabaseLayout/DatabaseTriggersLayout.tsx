@@ -1,0 +1,44 @@
+import { useParams } from 'common'
+import { PropsWithChildren } from 'react'
+
+import { DatabaseLayout } from './DatabaseLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+
+type DatabaseTriggersLayoutProps = PropsWithChildren
+
+export const DatabaseTriggersLayout = ({ children }: DatabaseTriggersLayoutProps) => {
+  const { ref } = useParams()
+  const { can: canReadTriggers, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_READ
+  )
+
+  const navigationItems = [
+    {
+      label: 'Data',
+      href: `/project/${ref}/database/triggers/data`,
+    },
+    {
+      label: 'Event',
+      href: `/project/${ref}/database/triggers/event`,
+    },
+  ]
+
+  return (
+    <DatabaseLayout title="Triggers">
+      {isPermissionsLoaded && !canReadTriggers ? (
+        <NoPermission isFullPage resourceText="view database triggers" />
+      ) : (
+        <PageLayout
+          title="Database Triggers"
+          subtitle="Execute actions automatically when database events occur"
+          navigationItems={navigationItems}
+          size="large"
+        >
+          {children}
+        </PageLayout>
+      )}
+    </DatabaseLayout>
+  )
+}

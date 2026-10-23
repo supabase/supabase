@@ -1,7 +1,7 @@
 import { MDXProvider } from '@mdx-js/react'
-import { NextSeo } from 'next-seo'
 import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
+import { NextSeo } from 'next-seo'
 
 export default function ContentsLayout({ context, meta }: any) {
   return (

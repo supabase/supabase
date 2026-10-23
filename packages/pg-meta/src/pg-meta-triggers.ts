@@ -1,17 +1,25 @@
-import { ident, literal } from './pg-format'
 import { z } from 'zod'
+
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
+import {
+  ident,
+  joinSqlFragments,
+  keyword,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from './pg-format'
 import { TRIGGERS_SQL } from './sql/triggers'
 
 type TriggerIdentifier = Pick<PGTrigger, 'id'> | Pick<PGTrigger, 'name' | 'schema' | 'table'>
 
-function getIdentifierWhereClause(identifier: TriggerIdentifier): string {
+function getIdentifierWhereClause(identifier: TriggerIdentifier): SafeSqlFragment {
   if ('id' in identifier && identifier.id) {
-    return `${ident('id')} = ${literal(identifier.id)}`
+    return safeSql`${ident('id')} = ${literal(identifier.id)}`
   }
   if ('name' in identifier && identifier.name && identifier.table && identifier.schema) {
-    return `${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)} and ${ident('table')} = ${literal(identifier.table)}`
+    return safeSql`${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)} and ${ident('table')} = ${literal(identifier.table)}`
   }
   throw new Error('Must provide either id or name, schema and table')
 }
@@ -25,8 +33,8 @@ export const pgTriggerZod = z.object({
   table: z.string(),
   schema: z.string(),
   condition: z.string().nullable(),
-  orientation: z.string(),
-  activation: z.string(),
+  orientation: z.enum(['ROW', 'STATEMENT']),
+  activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),
   events: z.array(z.string()),
   function_name: z.string(),
   function_schema: z.string(),
@@ -50,23 +58,23 @@ export function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgTriggerArrayZod
 } {
-  let sql = `with triggers as (${TRIGGERS_SQL}) select * from triggers`
+  let sql = safeSql`with triggers as (${TRIGGERS_SQL}) select * from triggers`
   const filter = filterByList(
     includedSchemas,
     excludedSchemas,
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql += ` where schema ${filter}`
+    sql = safeSql`${sql} where schema ${filter}`
   }
   if (limit) {
-    sql += ` limit ${limit}`
+    sql = safeSql`${sql} limit ${literal(limit)}`
   }
   if (offset) {
-    sql += ` offset ${offset}`
+    sql = safeSql`${sql} offset ${literal(offset)}`
   }
   return {
     sql,
@@ -75,14 +83,14 @@ export function list({
 }
 
 type TriggersRetrieveReturn = {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgTriggerOptionalZod
 }
 
 export function retrieve(identifier: TriggerIdentifier): TriggersRetrieveReturn
 export function retrieve(params: TriggerIdentifier): TriggersRetrieveReturn {
   const whereIdentifierCondition = getIdentifierWhereClause(params)
-  const sql = `with triggers as (${TRIGGERS_SQL}) select * from triggers where ${whereIdentifierCondition};`
+  const sql = safeSql`with triggers as (${TRIGGERS_SQL}) select * from triggers where ${whereIdentifierCondition};`
   return {
     sql,
     zod: pgTriggerOptionalZod,
@@ -102,7 +110,13 @@ export const pgTriggerCreateZod = z.object({
   condition: z.string().optional(),
 })
 
-export type PGTriggerCreate = z.infer<typeof pgTriggerCreateZod>
+// Zod validates `condition` as a runtime string; the SafeSqlFragment brand is a
+// separate compile-time trust check. A parsed string is not automatically safe —
+// callers must promote untrusted input via acceptUntrustedSql/rawSql before it can
+// satisfy this type.
+export type PGTriggerCreate = Omit<z.infer<typeof pgTriggerCreateZod>, 'condition'> & {
+  condition?: SafeSqlFragment
+}
 
 export function create({
   name,
@@ -116,19 +130,18 @@ export function create({
   orientation,
   condition,
 }: PGTriggerCreate): {
-  sql: string
+  sql: SafeSqlFragment
   zod: z.ZodType<void>
 } {
-  const qualifiedTableName = `${ident(schema)}.${ident(table)}`
-  const qualifiedFunctionName = `${ident(function_schema)}.${ident(function_name)}`
-  const triggerEvents = events.join(' OR ')
-  const triggerOrientation = orientation ? `FOR EACH ${orientation}` : ''
-  const triggerCondition = condition ? `WHEN (${condition})` : ''
-  const functionArgsStr = function_args.map(literal).join(',')
+  const qualifiedTableName = safeSql`${ident(schema)}.${ident(table)}`
+  const qualifiedFunctionName = safeSql`${ident(function_schema)}.${ident(function_name)}`
+  const triggerEvents = joinSqlFragments(events.map(keyword), ' or ')
+  const triggerOrientation = orientation ? safeSql`for each ${keyword(orientation)}` : safeSql``
+  const triggerCondition = condition ? safeSql`when (${condition})` : safeSql``
+  const functionArgsFragment =
+    function_args.length > 0 ? joinSqlFragments(function_args.map(literal), ',') : safeSql``
 
-  const sql = `CREATE TRIGGER ${ident(
-    name
-  )} ${activation} ${triggerEvents} ON ${qualifiedTableName} ${triggerOrientation} ${triggerCondition} EXECUTE FUNCTION ${qualifiedFunctionName}(${functionArgsStr});`
+  const sql = safeSql`create trigger ${ident(name)} ${keyword(activation)} ${triggerEvents} on ${qualifiedTableName} ${triggerOrientation} ${triggerCondition} execute function ${qualifiedFunctionName}(${functionArgsFragment});`
 
   return {
     sql,
@@ -144,82 +157,55 @@ export const pgTriggerUpdateZod = z.object({
 export type PGTriggerUpdate = z.infer<typeof pgTriggerUpdateZod>
 
 export function update(
-  identifier: TriggerIdentifier,
+  id: { name: string; schema: string; table: string },
   params: PGTriggerUpdate
 ): {
-  sql: string
+  sql: SafeSqlFragment
+  zod: z.ZodType<void>
 } {
-  const whereIdentifierCondition = getIdentifierWhereClause(identifier)
+  const qualifiedTableName = safeSql`${ident(id.schema)}.${ident(id.table)}`
 
-  const sql = `
-do $$
-declare
-  old record;
-begin
-  with triggers as (${TRIGGERS_SQL})
-  select * into old from triggers where ${whereIdentifierCondition};
-  
-  if old is null then
-    raise exception 'Cannot find trigger: %', ${literal(whereIdentifierCondition)};
-  end if;
+  let enabledModeSql = safeSql``
 
-  ${
-    params.enabled_mode
-      ? `
-  execute(format('alter table %I.%I ${
-    params.enabled_mode === 'DISABLED'
-      ? 'DISABLE'
-      : 'ENABLE' +
-        (params.enabled_mode === 'ALWAYS' || params.enabled_mode === 'REPLICA'
-          ? ' ' + params.enabled_mode
-          : '')
-  } TRIGGER %I', 
-    old.schema, old.table, old.name));`
-      : ''
+  switch (params.enabled_mode) {
+    case 'ORIGIN':
+      enabledModeSql = safeSql`alter table ${qualifiedTableName} enable trigger ${ident(id.name)};`
+      break
+    case 'DISABLED':
+      enabledModeSql = safeSql`alter table ${qualifiedTableName} disable trigger ${ident(id.name)};`
+      break
+    case 'REPLICA':
+    case 'ALWAYS':
+      enabledModeSql = safeSql`alter table ${qualifiedTableName} enable ${keyword(params.enabled_mode)} trigger ${ident(id.name)};`
+      break
+    default:
+      break
   }
 
-  ${
-    params.name
-      ? `
-    -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
-  if ${literal(params.name)} != old.name then
-    execute(format('alter trigger %I on %I.%I rename to %I;', old.name, old.schema, old.table, ${literal(params.name)}));
-  end if;`
-      : ''
-  }
-end
-$$;`
+  const updateNameSql =
+    params.name && params.name !== id.name
+      ? safeSql`alter trigger ${ident(id.name)} on ${qualifiedTableName} rename to ${ident(params.name)};`
+      : safeSql``
+
+  // updateNameSql must be last
+  const sql = safeSql`begin; ${enabledModeSql}; ${updateNameSql}; commit;`
 
   return {
     sql,
+    zod: z.void(),
   }
 }
 
 export function remove(
-  identifier: TriggerIdentifier,
+  id: { name: string; schema: string; table: string },
   { cascade = false } = {}
 ): {
-  sql: string
+  sql: SafeSqlFragment
   zod: z.ZodType<void>
 } {
-  const whereIdentifierCondition = getIdentifierWhereClause(identifier)
+  const qualifiedTableName = safeSql`${ident(id.schema)}.${ident(id.table)}`
 
-  const sql = `
-do $$
-declare
-  old record;
-begin
-  with triggers as (${TRIGGERS_SQL})
-  select * into old from triggers where ${whereIdentifierCondition};
-  
-  if old is null then
-    raise exception 'Cannot find trigger';
-  end if;
-
-  execute(format('DROP TRIGGER %I ON %I.%I ${cascade ? 'CASCADE' : ''}',
-    old.name, old.schema, old.table));
-end
-$$;`
+  const sql = safeSql`drop trigger ${ident(id.name)} on ${qualifiedTableName} ${cascade ? safeSql`cascade` : safeSql``};`
 
   return {
     sql,

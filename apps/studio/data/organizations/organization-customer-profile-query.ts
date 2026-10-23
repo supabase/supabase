@@ -1,10 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 
-import { get, handleError } from 'data/fetchers'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
@@ -39,21 +39,25 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData> = {}
+  }: UseCustomQueryOptions<
+    OrganizationCustomerProfileData,
+    OrganizationCustomerProfileError,
+    TData
+  > = {}
 ) => {
   // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
   // unnecessary requests, although this behaviour still needs handling on the UI
-  const canReadCustomerProfile = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.customer'
-  )
-
-  return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>(
-    organizationKeys.customerProfile(slug),
-    ({ signal }) => getOrganizationCustomerProfile({ slug }, signal),
+  const { can: canReadCustomerProfile } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ,
     {
-      enabled: enabled && canReadCustomerProfile && typeof slug !== 'undefined',
-      ...options,
+      organizationSlug: slug,
     }
   )
+
+  return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>({
+    queryKey: organizationKeys.customerProfile(slug),
+    queryFn: ({ signal }) => getOrganizationCustomerProfile({ slug }, signal),
+    enabled: IS_PLATFORM && enabled && canReadCustomerProfile && typeof slug !== 'undefined',
+    ...options,
+  })
 }

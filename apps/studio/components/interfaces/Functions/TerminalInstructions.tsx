@@ -1,28 +1,25 @@
-import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { useParams } from 'common'
+import { ExternalLinkIcon, Maximize2Icon, Minimize2Icon, TerminalIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
-import { useParams } from 'common'
-import CommandRender from 'components/interfaces/Functions/CommandRender'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import {
-  Button,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-} from 'ui'
 import type { Commands } from './Functions.types'
+import CommandRender from '@/components/interfaces/Functions/CommandRender'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { DOCS_URL } from '@/lib/constants'
 
-interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
+interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible> {
   closable?: boolean
   removeBorder?: boolean
 }
 
 export const TerminalInstructions = forwardRef<
-  ElementRef<typeof Collapsible_Shadcn_>,
+  ElementRef<typeof Collapsible>,
   TerminalInstructionsProps
 >(({ closable = false, removeBorder = false, ...props }, ref) => {
   const router = useRouter()
@@ -30,22 +27,16 @@ export const TerminalInstructions = forwardRef<
   const [showInstructions, setShowInstructions] = useState(!closable)
 
   const { data: tokens } = useAccessTokensQuery()
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
+  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { anonKey, publishableKey } = apiKeyData ?? {}
 
-  const { anonKey } = getAPIKeys(settings)
-  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
+  const { data: endpoint } = useProjectApiUrl({ projectRef })
+  const functionsEndpoint = `${endpoint}/functions/v1`
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const endpoint = settings?.app_config?.endpoint ?? ''
-  const functionsEndpoint =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain.hostname}/functions/v1`
-      : `${protocol}://${endpoint}/functions/v1`
-
-  // get the .co or .net TLD from the restUrl
-  const restUrl = `https://${endpoint}`
-  const restUrlTld = !!endpoint ? new URL(restUrl).hostname.split('.').pop() : 'co'
+  const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   const commands: Commands[] = [
     {
@@ -74,15 +65,14 @@ export const TerminalInstructions = forwardRef<
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H 'Authorization: Bearer ${
-        apiKey ?? '[YOUR ANON KEY]'
-      }' --data '{"name":"Functions"}'`,
+      command: `curl -L -X POST '${functionsEndpoint}/hello-world' -H 'Authorization: Bearer ${apiKey}'${anonKey?.type === 'publishable' ? ` -H 'apikey: ${apiKey}'` : ''} --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
         return (
           <>
             <span className="text-brand-600">curl</span> -L -X POST '{functionsEndpoint}
-            /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'{' '}
+            /hello-world' -H 'Authorization: Bearer [YOUR ANON KEY]'
+            {anonKey?.type === 'publishable' ? " -H 'apikey: [YOUR ANON KEY]' " : ''}
             {`--data '{"name":"Functions"}'`}
           </>
         )
@@ -92,43 +82,41 @@ export const TerminalInstructions = forwardRef<
   ]
 
   return (
-    <Collapsible_Shadcn_
+    <Collapsible
       ref={ref}
       open={showInstructions}
       className="w-full"
       onOpenChange={() => setShowInstructions(!showInstructions)}
       {...props}
     >
-      <CollapsibleTrigger_Shadcn_ className="flex w-full justify-between" disabled={!closable}>
+      <CollapsibleTrigger className="flex w-full justify-between" disabled={!closable}>
         <div className="flex items-center gap-x-3">
-          <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-alternative">
-            <Terminal strokeWidth={2} />
+          <div className="flex items-center justify-center w-8 h-8 p-2 border rounded-sm bg-alternative">
+            <TerminalIcon strokeWidth={2} />
           </div>
           <h4>Create your first Edge Function via the CLI</h4>
         </div>
         {closable && (
           <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
             {showInstructions ? (
-              <Minimize2 size={16} strokeWidth={1.5} />
+              <Minimize2Icon size={16} strokeWidth={1.5} />
             ) : (
-              <Maximize2 size={16} strokeWidth={1.5} />
+              <Maximize2Icon size={16} strokeWidth={1.5} />
             )}
           </div>
         )}
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="w-full transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+      </CollapsibleTrigger>
+      <CollapsibleContent className="w-full transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
         <CommandRender commands={commands} className="my-4" />
         {tokens && tokens.length === 0 ? (
-          <div className="px-8 py-4 space-y-3 border-t">
+          <div className="py-4 space-y-3 border-t">
             <div>
               <p className="text-sm text-foreground">You may need to create an access token</p>
               <p className="text-sm text-foreground-light">
                 You can create a secure access token in your account section
               </p>
             </div>
-            <Button type="default" onClick={() => router.push('/account/tokens')}>
-              Access tokens
-            </Button>
+            <Button onClick={() => router.push('/account/tokens')}>Access tokens</Button>
           </div>
         ) : (
           <div className="py-4 space-y-3 border-t">
@@ -139,8 +127,8 @@ export const TerminalInstructions = forwardRef<
               </p>
             </div>
             <div className="flex gap-2">
-              <DocsButton href="https://supabase.com/docs/guides/functions" />
-              <Button asChild type="default" icon={<ExternalLink />}>
+              <DocsButton href={`${DOCS_URL}/guides/functions`} />
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -152,8 +140,8 @@ export const TerminalInstructions = forwardRef<
             </div>
           </div>
         )}
-      </CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleContent>
+    </Collapsible>
   )
 })
 

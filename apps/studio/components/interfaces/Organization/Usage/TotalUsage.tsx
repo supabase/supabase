@@ -1,23 +1,27 @@
+import { useBreakpoint } from 'common'
 import { useMemo } from 'react'
+import { cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AlertError from 'components/ui/AlertError'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
+import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
+import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
+import { SectionContent } from './SectionContent'
+import { AlertError } from '@/components/ui/AlertError'
 import {
   ComputeUsageMetric,
   computeUsageMetricLabel,
   PricingMetric,
-} from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { cn } from 'ui'
-import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
-import BillingMetric from '../BillingSettings/BillingBreakdown/BillingMetric'
-import ComputeMetric from '../BillingSettings/BillingBreakdown/ComputeMetric'
-import SectionContent from './SectionContent'
+} from '@/data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface ComputeProps {
   orgSlug: string
-  projectRef?: string
+  projectRef?: string | null
   startDate: string | undefined
   endDate: string | undefined
   subscription: OrgSubscription | undefined
@@ -30,9 +34,14 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_SIZE_GB_HOURS_GP3,
   PricingMetric.DISK_SIZE_GB_HOURS_IO2,
   PricingMetric.DISK_THROUGHPUT_GP3,
+  PricingMetric.LOG_STORAGE,
+  PricingMetric.ACTIVE_COMPUTE_HOURS,
+  PricingMetric.ETL_PIPELINE,
+  PricingMetric.ETL_REPLICATED_DATA,
+  PricingMetric.ETL_COPY_BACKFILL_DATA,
 ]
 
-const TotalUsage = ({
+export const TotalUsage = ({
   orgSlug,
   projectRef,
   subscription,
@@ -40,12 +49,16 @@ const TotalUsage = ({
   endDate,
   currentBillingCycleSelected,
 }: ComputeProps) => {
+  const isMobile = useBreakpoint('md')
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
+  const { billingAll } = useIsFeatureEnabled(['billing:all'])
+  const { data: org } = useSelectedOrganizationQuery()
+  const hasActiveRestriction = Boolean(org?.restriction_status)
 
   const {
     data: usage,
     error: usageError,
-    isLoading: isLoadingUsage,
+    isPending: isLoadingUsage,
     isError: isErrorUsage,
     isSuccess: isSuccessUsage,
   } = useOrgUsageQuery({
@@ -58,6 +71,8 @@ const TotalUsage = ({
   // When the user filters by project ref or selects a custom timeframe, we only display usage+project breakdown, but no costs/limits
   const showRelationToSubscription = currentBillingCycleSelected && !projectRef
 
+  const isOnHigherPlan = ['team', 'enterprise', 'platform'].includes(subscription?.plan.id ?? '')
+
   const hasExceededAnyLimits =
     showRelationToSubscription &&
     Boolean(
@@ -65,6 +80,9 @@ const TotalUsage = ({
         (usageItem) =>
           // Filter out compute as compute has no quota and is always being charged for
           !usageItem.metric.startsWith('COMPUTE_') &&
+          // Log metrics should not trigger the exceeded limits alert for now (soft rollout)
+          usageItem.metric !== PricingMetric.LOG_INGESTION &&
+          usageItem.metric !== PricingMetric.LOG_QUERYING &&
           !usageItem.unlimited &&
           usageItem.usage > (usageItem?.pricing_free_units ?? 0)
       )
@@ -73,17 +91,28 @@ const TotalUsage = ({
   const sortedBillingMetrics = useMemo(() => {
     if (!usage) return []
 
-    const breakdownMetrics = BILLING_BREAKDOWN_METRICS.filter((metric) =>
-      usage.usages.some((usage) => usage.metric === metric.key)
-    ).filter((metric) => {
-      if (!METRICS_TO_HIDE_WITH_NO_USAGE.includes(metric.key as PricingMetric)) return true
+    const breakdownMetrics = BILLING_BREAKDOWN_METRICS(subscription)
+      .filter((metric) => usage.usages.some((usage) => usage.metric === metric.key))
+      .filter((metric) => {
+        if (!METRICS_TO_HIDE_WITH_NO_USAGE.includes(metric.key as PricingMetric)) return true
 
-      const metricUsage = usage.usages.find((it) => it.metric === metric.key)
+        const metricUsage = usage.usages.find((it) => it.metric === metric.key)
 
-      return metricUsage && metricUsage.usage > 0
-    })
+        return metricUsage && metricUsage.usage > 0
+      })
+
+    const PINNED_METRICS = [PricingMetric.LOG_INGESTION, PricingMetric.LOG_QUERYING]
 
     return breakdownMetrics.slice().sort((a, b) => {
+      const pinnedIndexA = PINNED_METRICS.indexOf(a.key as PricingMetric)
+      const pinnedIndexB = PINNED_METRICS.indexOf(b.key as PricingMetric)
+
+      if (pinnedIndexA !== -1 || pinnedIndexB !== -1) {
+        if (pinnedIndexA === -1) return 1
+        if (pinnedIndexB === -1) return -1
+        return pinnedIndexA - pinnedIndexB
+      }
+
       const usageMetaA = usage.usages.find((x) => x.metric === a.key)
       const usageRatioA =
         typeof usageMetaA !== 'number'
@@ -103,7 +132,7 @@ const TotalUsage = ({
         usageRatioB - usageRatioA
       )
     })
-  }, [usage])
+  }, [usage, subscription])
 
   const computeMetrics = (usage?.usages || [])
     .filter((it) => it.metric.startsWith('COMPUTE'))
@@ -117,16 +146,18 @@ const TotalUsage = ({
           description: isUsageBillingEnabled
             ? `Your plan includes a limited amount of usage. If exceeded, you will be charged for the overages. It may take up to 1 hour to refresh.`
             : `Your plan includes a limited amount of usage. If exceeded, you may experience restrictions, as you are currently not billed for overages. It may take up to 1 hour to refresh.`,
-          links: [
-            {
-              name: 'How billing works',
-              url: 'https://supabase.com/docs/guides/platform/billing-on-supabase',
-            },
-            {
-              name: 'Supabase Plans',
-              url: 'https://supabase.com/pricing',
-            },
-          ],
+          links: billingAll
+            ? [
+                {
+                  name: 'How billing works',
+                  url: `${DOCS_URL}/guides/platform/billing-on-supabase`,
+                },
+                {
+                  name: 'Supabase Plans',
+                  url: 'https://supabase.com/pricing',
+                },
+              ]
+            : [],
         }}
       >
         {isLoadingUsage && (
@@ -141,7 +172,7 @@ const TotalUsage = ({
 
         {isSuccessUsage && subscription && (
           <div>
-            {showRelationToSubscription && (
+            {showRelationToSubscription && !isOnHigherPlan && !hasActiveRestriction && (
               <p className="text-sm">
                 {!hasExceededAnyLimits ? (
                   <span>
@@ -180,16 +211,16 @@ const TotalUsage = ({
                 )}
               </p>
             )}
-            <div className="grid grid-cols-12 mt-3">
+
+            <div className="grid grid-cols-2 mt-3 gap-px bg-border">
               {sortedBillingMetrics.map((metric, i) => {
                 return (
                   <div
-                    className={cn(
-                      'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                      i % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
-                      'border-b'
-                    )}
                     key={metric.key}
+                    className={cn(
+                      'col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4',
+                      i % 2 === 0 ? 'md:pr-4' : 'md:pl-4'
+                    )}
                   >
                     <BillingMetric
                       idx={i}
@@ -203,30 +234,35 @@ const TotalUsage = ({
                 )
               })}
 
-              {computeMetrics.map((metric, i) => (
-                <div
-                  className={cn(
-                    'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
-                    (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
-                    'border-b'
-                  )}
-                  key={metric}
-                >
-                  <ComputeMetric
-                    slug={orgSlug}
-                    metric={{
-                      key: metric,
-                      name: computeUsageMetricLabel(metric) + ' Compute Hours' || metric,
-                      units: 'hours',
-                      anchor: 'compute',
-                      category: 'Compute',
-                      unitName: 'GB',
-                    }}
-                    relativeToSubscription={showRelationToSubscription}
-                    usage={usage}
-                  />
-                </div>
-              ))}
+              {computeMetrics.map((metric, i) => {
+                return (
+                  <div
+                    key={metric}
+                    className={cn('col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4')}
+                  >
+                    <ComputeMetric
+                      slug={orgSlug}
+                      metric={{
+                        key: metric,
+                        name: computeUsageMetricLabel(metric) + ' Compute Hours' || metric,
+                        units: 'hours',
+                        anchor: 'compute',
+                        category: 'Compute',
+                        unitName: 'GB',
+                      }}
+                      relativeToSubscription={showRelationToSubscription}
+                      usage={usage}
+                      className={cn(
+                        (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:pr-4' : 'md:pl-4'
+                      )}
+                    />
+                  </div>
+                )
+              })}
+
+              {!isMobile && (sortedBillingMetrics.length + computeMetrics.length) % 2 === 1 && (
+                <div className="col-span-2 md:col-span-1 bg-sidebar" />
+              )}
             </div>
           </div>
         )}
@@ -234,5 +270,3 @@ const TotalUsage = ({
     </div>
   )
 }
-
-export default TotalUsage

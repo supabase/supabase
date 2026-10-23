@@ -1,11 +1,10 @@
 // @ts-check
 
 /**
- * This file is for utils needed in both the Next.js app build and the
- * troubleshooting sync script. Because of unsolved problems with imports, the
- * script is a mjs file instead of a ts file. Any dependencies that are needed
- * in both places are defined here, and then typed in Troubleshooting.utils.ts
- * as required.
+ * This file is for utils needed in both the Next.js app build and other
+ * scripts that read troubleshooting entries (e.g. search embeddings
+ * generation). Any dependencies that are needed in both places are defined
+ * here, and then typed in Troubleshooting.utils.ts as required.
  */
 
 import matter from 'gray-matter'
@@ -17,7 +16,7 @@ import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { readdir, readFile, stat } from 'node:fs/promises'
 import { join, sep } from 'node:path'
-import toml from 'toml'
+import { parse } from 'smol-toml'
 import { visit } from 'unist-util-visit'
 import { v4 as uuidv4 } from 'uuid'
 import { z } from 'zod'
@@ -60,6 +59,8 @@ export const TroubleshootingSchema = z
     topics: z.array(
       z.enum([
         'ai',
+        'ai-tools',
+        'api',
         'auth',
         'branching',
         'cli',
@@ -123,17 +124,15 @@ export async function getAllTroubleshootingEntriesInternal() {
     const fileContents = await readFile(filePath, 'utf-8')
     const { content, data: frontmatter } = matter(fileContents, {
       language: 'toml',
-      engines: { toml: toml.parse.bind(toml) },
+      engines: { toml: parse },
     })
 
     const parseResult = validateTroubleshootingMetadata(frontmatter)
     if ('error' in parseResult) {
-      console.error(
-        `Error validating troubleshooting metadata\nEntry:%O\nError:%O`,
-        frontmatter,
-        parseResult.error
+      throw Error(
+        `Error validating troubleshooting metadata for ${filePath}`,
+        { cause: parseResult.error }
       )
-      return null
     }
 
     const mdxTree = fromMarkdown(content, {

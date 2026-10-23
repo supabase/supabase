@@ -1,23 +1,14 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import jsonLogic from 'json-logic-js'
+import type { PermissionAction } from '@supabase/shared-types/out/constants'
+import type jsonLogic from 'json-logic-js'
 
-export interface Organization {
-  id: number
-  slug: string
-  name: string
-  billing_email: string
-  is_owner?: boolean
-  opt_in_tags: string[]
-  subscription_id?: string | null
-  restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
-  restriction_data: Record<string, string> | null
-  managed_by: 'supabase' | 'vercel-marketplace' | 'aws-marketplace'
+import type { OrganizationBase } from '@/data/organizations/organizations-query'
+import type { PlanId } from '@/data/subscriptions/types'
+import type { ManagedBy } from '@/lib/constants/infrastructure'
+
+export interface Organization extends OrganizationBase {
+  managed_by: ManagedBy
   partner_id?: string
-  plan: {
-    id: 'free' | 'pro' | 'team' | 'enterprise'
-    name: string
-  }
-  usage_billing_enabled: boolean
+  plan: { id: PlanId; name: string }
 }
 
 /**
@@ -41,7 +32,7 @@ export interface ProjectBase {
  */
 export interface Project extends ProjectBase {
   // available after projects.fetchDetail
-  connectionString?: string
+  connectionString?: string | null
   dbVersion?: string
   restUrl?: string
   lastDatabaseResizeAt?: string | null
@@ -86,7 +77,11 @@ export interface Permission {
   organization_slug: string
   resources: string[]
   restrictive?: boolean
-  project_refs: string[]
+  /**
+   * Projects the row is limited to. Organization-wide rows arrive as [] or null — the API
+   * contract is nullable and some view-synthesized rows serialize as null.
+   */
+  project_refs: string[] | null
 }
 
 export interface ResponseFailure {
@@ -95,14 +90,40 @@ export interface ResponseFailure {
 
 export type SupaResponse<T> = T | ResponseFailure
 
+// [Joshen] Trialing returning metadata for the error object. It's meant to be generic
+// but typed properly here, and we can create more types if needed with the | operator
+type CostMetadata = {
+  cost: number
+  sql: string
+}
+
+export type ErrorMetadata = CostMetadata
+
 export class ResponseError extends Error {
   code?: number
   requestId?: string
+  retryAfter?: number
+  requestPathname?: string
+  metadata?: CostMetadata
+  errorType?: string
+  formattedError?: string
 
-  constructor(message: string | undefined, code?: number, requestId?: string) {
+  constructor(
+    message: string | undefined,
+    code?: number,
+    requestId?: string,
+    retryAfter?: number,
+    requestPathname?: string,
+    metadata?: CostMetadata,
+    formattedError?: string
+  ) {
     super(message || 'API error happened while trying to communicate with the server.')
     this.code = code
     this.requestId = requestId
+    this.retryAfter = retryAfter
+    this.requestPathname = requestPathname
+    this.metadata = metadata
+    this.formattedError = formattedError
   }
 }
 

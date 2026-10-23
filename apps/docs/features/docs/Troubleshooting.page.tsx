@@ -1,26 +1,32 @@
-import { cn } from 'ui'
-
+import { AiTools } from '~/components/AiTools'
 import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import Link from 'next/link'
+import { cn, GithubIcon } from 'ui'
+
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
-import Link from 'next/link'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
 
 export default async function TroubleshootingPage({ entry }: { entry: ITroubleshootingEntry }) {
   const dateUpdated = entry.data.database_id.startsWith('pseudo-')
     ? new Date()
     : (await getTroubleshootingUpdatedDates()).get(entry.data.database_id)
+  const errorCodes = [...new Set(entry.data.errors?.map(formatError).filter(Boolean) ?? [])]
 
   return (
     <SidebarSkeleton
       hideSideNav
-      className="@container/troubleshooting-entry-layout w-full max-w-screen-lg mx-auto lg:py-8 lg:px-5"
+      className="@container/troubleshooting-entry-layout w-full max-w-(--breakpoint-lg) mx-auto lg:py-8 lg:px-5"
     >
       <div className="px-5 py-8 lg:px-0 lg:py-0">
         <Breadcrumbs minLength={1} forceDisplayOnMobile />
-        <article className="prose max-w-none mt-4">
+        <article
+          id="sb-docs-troubleshooting-main-article"
+          data-testid="sb-docs-troubleshooting-main-article"
+          className="prose max-w-none mt-4"
+        >
           <h1>{entry.data.title}</h1>
           {dateUpdated && (
             <p className="text-sm text-foreground-lighter">
@@ -28,8 +34,8 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
             </p>
           )}
           <hr className="my-7" aria-hidden />
-          <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr,250px]">
-            <div className="min-w-0">
+          <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr_250px]">
+            <div id="sb-docs-troubleshooting-article-body" className="min-w-0">
               <MDXRemoteBase source={entry.content} />
             </div>
             <aside aria-labelledby="heading--metadata" className="not-prose mt-5">
@@ -58,17 +64,17 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.errors?.length > 0 && (
+              {errorCodes.length > 0 && (
                 <>
                   <h3 className="text-sm text-foreground-lighter mb-3">Related error codes</h3>
                   <div className="flex flex-wrap gap-0.5">
-                    {entry.data.errors.map((error, index) => (
+                    {errorCodes.map((errorCode) => (
                       <Link
-                        key={index}
-                        href={`/guides/troubleshooting${serializeTroubleshootingSearchParams({ errorCodes: [formatError(error)] })}`}
+                        key={errorCode}
+                        href={`/guides/troubleshooting${serializeTroubleshootingSearchParams({ errorCodes: [errorCode] })}`}
                       >
                         <PillTag className="hover:bg-200 focus-visible:bg-foreground-muted hover:border-control focus-visible:border-control transition-colors">
-                          {formatError(error)}
+                          {errorCode}
                         </PillTag>
                       </Link>
                     ))}
@@ -76,9 +82,9 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
-              {entry.data.keywords?.length > 0 && (
+              {!!entry.data.keywords?.length && (
                 <>
-                  <h3 className="text-sm text-foreground-lighter mb-3">Tags</h3>
+                  <h3 className="text-sm text-foreground-lighter mb-3">Keywords</h3>
                   <div className="flex flex-wrap gap-0.5">
                     {entry.data.keywords.map((keyword) => (
                       <Link
@@ -94,7 +100,25 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
+              <AiTools
+                pageType="troubleshooting"
+                articleId="sb-docs-troubleshooting-article-body"
+              />
+              <hr className="my-6" aria-hidden />
               <Feedback className="px-0 mb-6 lg:mb-8" />
+              {entry.data.github_url && (
+                <>
+                  <hr className="my-6" aria-hidden />
+                  <Link
+                    target="_blank"
+                    href={entry.data.github_url}
+                    className="flex items-center gap-2 text-sm text-foreground-lighter"
+                  >
+                    <GithubIcon size={14} />
+                    View discussion on GitHub
+                  </Link>
+                </>
+              )}
             </aside>
           </div>
         </article>

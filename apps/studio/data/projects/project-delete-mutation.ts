@@ -1,10 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
-import { organizationKeys } from 'data/organizations/keys'
+import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
+import { del, handleError } from '@/data/fetchers'
+import { organizationKeys } from '@/data/organizations/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ProjectDeleteVariables = {
   projectRef: string
@@ -27,33 +28,47 @@ export const useProjectDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ProjectDeleteData, ResponseError, ProjectDeleteVariables>,
+  UseCustomMutationOptions<ProjectDeleteData, ResponseError, ProjectDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
-  return useMutation<ProjectDeleteData, ResponseError, ProjectDeleteVariables>(
-    (vars) => deleteProject(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(projectKeys.list())
+  return useMutation<ProjectDeleteData, ResponseError, ProjectDeleteVariables>({
+    mutationFn: (vars) => deleteProject(vars),
+    async onSuccess(data, variables, context) {
+      // Free project limits are shared across all of a user's orgs, so clear the cached
+      // check for every org, not just the one the deleted project belonged to.
+      const freeProjectLimitCheckQueries = queryClient
+        .getQueryCache()
+        .findAll({ queryKey: ['organizations'] })
+        .filter((query) => query.queryKey[2] === 'free-project-limit-check')
 
-        if (variables.organizationSlug) {
-          queryClient.invalidateQueries(
-            organizationKeys.freeProjectLimitCheck(variables.organizationSlug)
-          )
-        }
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: projectKeys.detail(data.ref) }),
+        ...freeProjectLimitCheckQueries.map((query) =>
+          queryClient.invalidateQueries({ queryKey: query.queryKey })
+        ),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete project: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      if (variables.organizationSlug) {
+        await Promise.all([
+          invalidateProjectsQuery(),
+          queryClient.invalidateQueries({
+            queryKey: organizationKeys.detail(variables.organizationSlug),
+          }),
+        ])
+      }
+
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

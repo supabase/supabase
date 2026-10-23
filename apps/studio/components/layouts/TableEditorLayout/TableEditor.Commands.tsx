@@ -1,14 +1,14 @@
-import { Table2 } from 'lucide-react'
-
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { Table2Icon } from 'lucide-react'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
 export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
-  let project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
   useRegisterCommands(
@@ -18,7 +18,7 @@ export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
         id: 'create-table',
         name: 'Create new table',
         route: `/project/${ref}/editor?create=table`,
-        icon: () => <Table2 />,
+        icon: () => <Table2Icon />,
       },
     ],
     {
@@ -42,7 +42,7 @@ export function useTableEditorGotoCommands(options?: CommandOptions) {
         id: 'view-tables',
         name: 'View your tables',
         route: `/project/${ref}/editor`,
-        icon: () => <Table2 />,
+        icon: () => <Table2Icon />,
       },
     ],
     {

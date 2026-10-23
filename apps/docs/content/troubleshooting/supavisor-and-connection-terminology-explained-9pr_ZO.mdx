@@ -7,7 +7,7 @@ keywords = [ "connections", "pooler", "transaction", "session", "pgbouncer" ]
 database_id = "e008e056-453d-44b5-8a8a-27c2d70681fe"
 ---
 
-I'll be the first to admit that the official naming conventions in the Postgres community can be a bit confusing, so here's a basic rundown. It's a bit long, so feel free to just jump to the portion relevant to you:
+I'll be the first to admit that the official naming conventions in the Postgres community can be a bit confusing, so here's a basic rundown. It's a bit long, so feel free to jump to the portion relevant to you:
 
 ## Clients:
 
@@ -54,7 +54,7 @@ postgres://postgres.obfwhevidiamwdwki:[YPASSWORD]@aws-0-ca-central-1.pooler.supa
 
 Postgres connections use the Postgres Wire Protocol (PWP) rather than HTTP. PWP acts like a WebSocket: once a connection is made, it stays open and active until the client disconnects.
 
-If too many connections are held by idle or greedy clients, other application servers won’t be able to connect to your database. Transaction mode helps avoid this problem by allowing clients to access the database connections only when they are running a query. This reduces the chances of hitting the maximum direct connection limit.
+If too many connections are held by idle or greedy clients, other application servers won’t be able to [connect to your database](/docs/guides/database/connecting-to-postgres). Transaction mode helps avoid this problem by allowing clients to access the database connections only when they are running a query. This reduces the chances of hitting the maximum direct connection limit.
 
 ## Session mode:
 

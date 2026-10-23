@@ -1,8 +1,10 @@
 import { paths } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+import { apiWrapper } from '@/lib/api/apiWrapper'
+import { getFolders, getSnippets } from '@/lib/api/snippets.utils'
+
+const wrappedHandler = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -18,17 +20,37 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
+type GetRequestData =
+  paths['/platform/projects/{ref}/content/folders/{id}']['get']['parameters']['query']
 type GetResponseData =
   paths['/platform/projects/{ref}/content/folders/{id}']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
-  return res.status(200).json({ data: { folders: [] } })
+  const params = req.query as GetRequestData
+  const folderId = (req.query.id as string) ?? null
+
+  const folders = await getFolders(folderId)
+  // Folder listings return metadata only (no SQL body) to match the Management API contract; the
+  // editor loads each snippet's content on demand via the item endpoint.
+  const { cursor, snippets } = await getSnippets({
+    searchTerm: params?.name,
+    cursor: params?.cursor,
+    folderId: folderId,
+    limit: params?.limit ? Number(params.limit) : undefined,
+    sort: params?.sort_by,
+    sortOrder: params?.sort_order,
+    includeContent: false,
+  })
+
+  return res.status(200).json({ data: { folders: folders, contents: snippets }, cursor })
 }
 
 type PatchResponseData =
   paths['/platform/projects/{ref}/content/folders/{id}']['patch']['responses']['200']['content']
 
-const handlePatch = async (req: NextApiRequest, res: NextApiResponse<PatchResponseData>) => {
+const handlePatch = async (_req: NextApiRequest, res: NextApiResponse<PatchResponseData>) => {
   // Platform specific endpoint
   return res.status(200).json({} as never)
 }
+
+export default wrappedHandler

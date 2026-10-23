@@ -2,8 +2,8 @@
 title: 'GraphQL is now available in Supabase'
 description: GraphQL support is now in general availability on the Supabase platform via our open source PostgreSQL extension, pg_graphql.
 author: oli_rice,dthyresson
-image: launch-week-4/tuesday-graphql/graphql-thumb-og.png
-thumb: launch-week-4/tuesday-graphql/graphql-thumb.png
+imgSocial: launch-week-4/tuesday-graphql/graphql-thumb-og.png
+imgThumb: launch-week-4/tuesday-graphql/graphql-thumb.png
 categories:
   - product
 tags:
@@ -22,7 +22,7 @@ toc_depth: 3
 
 </div>
 
-GraphQL support is now in general availability on the Supabase platform via our [open source](https://github.com/supabase/pg_graphql/) PostgreSQL extension, [`pg_graphql`](https://supabase.github.io/pg_graphql/).
+[GraphQL](/docs/guides/graphql) support is now in general availability on the Supabase platform via our [open source](https://github.com/supabase/pg_graphql/) PostgreSQL extension, [`pg_graphql`](https://supabase.github.io/pg_graphql/).
 
 `pg_graphql` enables you to query existing PostgreSQL databases using GraphQL, either from within SQL or over HTTP:
 
@@ -129,7 +129,7 @@ An advantage to embedding GraphQL directly in the database is that we can lean o
 
 The GraphQL types exposed by `pg_graphql` are filtered according to the SQL role's [INSERT/UPDATE/DELETE permissions](https://www.postgresql.org/docs/current/sql-grant.html). At Supabase, each API request is resolved in the database using the role in the request's JWT.
 
-Anonymous users receive the `anon` role, and logged in users get the `authenticated` role. In either case, pg_graphql resolves requests according to the SQL permissions.
+Anonymous users receive the `anon` role, and logged in users get the `authenticated` role. In either case, [pg_graphql](/docs/guides/database/extensions/pg_graphql) resolves requests according to the SQL permissions.
 The [introspection schema](https://graphql.org/learn/introspection/) is similarly filtered to limit exposed types and fields to those that the user has permission to access.
 That means we can serve multiple GraphQL schemas for users of differing privilege levels from a single endpoint!
 
@@ -271,7 +271,7 @@ The [demo application](https://supabase-graphql-example.vercel.app/) showcases:
 
 ![graph-ql-example-app-2.png](/images/blog/launch-week-4/tuesday-graphql/graph-ql-example-app-2.png)
 
-Now instead of using the Supabase PostgREST API to query your database ...
+Now instead of using the Supabase [PostgREST](/docs/guides/api) API to query your database ...
 
 ```jsx
 // using Supabase PostgREST

@@ -1,62 +1,54 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import pgMeta, { type PGMaterializedView } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 
-import { PostgresMaterializedView } from '@supabase/postgres-meta'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { executeSql } from '../sql/execute-sql-mutation'
 import { materializedViewKeys } from './keys'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type MaterializedViewsVariables = {
   projectRef?: string
-  connectionString?: string
-  schema?: string
+  connectionString?: string | null
+  schemas?: string[]
 }
 
 export async function getMaterializedViews(
-  { projectRef, connectionString, schema }: MaterializedViewsVariables,
+  { projectRef, connectionString, schemas }: MaterializedViewsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql } = pgMeta.materializedViews.list({ includedSchemas: schemas })
 
-  const { data, error } = await get('/platform/pg-meta/{ref}/materialized-views', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-      query: {
-        included_schemas: schema || '',
-        include_columns: true,
-      } as any,
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['materialized-views', schemas].filter(Boolean),
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data as PostgresMaterializedView[]
+  return result as PGMaterializedView[]
 }
 
 export type MaterializedViewsData = Awaited<ReturnType<typeof getMaterializedViews>>
 export type MaterializedViewsError = ResponseError
 
 export const useMaterializedViewsQuery = <TData = MaterializedViewsData>(
-  { projectRef, connectionString, schema }: MaterializedViewsVariables,
+  { projectRef, connectionString, schemas }: MaterializedViewsVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
+  }: UseCustomQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
 ) =>
-  useQuery<MaterializedViewsData, MaterializedViewsError, TData>(
-    schema
-      ? materializedViewKeys.listBySchema(projectRef, schema)
+  useQuery<MaterializedViewsData, MaterializedViewsError, TData>({
+    queryKey: schemas
+      ? materializedViewKeys.listBySchema(projectRef, schemas)
       : materializedViewKeys.list(projectRef),
-    ({ signal }) => getMaterializedViews({ projectRef, connectionString, schema }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      // We're using a staleTime of 0 here because the only way to create a
-      // materialized view is via SQL, which we don't know about
-      staleTime: 0,
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) =>
+      getMaterializedViews({ projectRef, connectionString, schemas }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    staleTime: 0,
+    ...options,
+  })

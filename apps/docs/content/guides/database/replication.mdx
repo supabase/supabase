@@ -1,93 +1,95 @@
 ---
 id: 'replication'
-title: 'Replication'
-slug: 'replication'
+title: 'Database replication'
+description: 'Compare read replicas, Supabase Pipelines, and manual replication.'
+subtitle: 'An introduction to database replication and change data capture.'
+sidebar_label: 'Overview'
 ---
 
-Replication is a technique for copying the data from one database to another. Supabase uses replication functionality to provide a real-time API. Replication is useful for:
+Replication keeps data synchronized with another location. Logical replication products such as Supabase Pipelines use change data capture (CDC) to read database changes and apply them to a destination.
 
-- Spreading out the "load." For example, if your database has a lot of reads, you might want to split it between two databases.
-- Reducing latency. For example, you may want one database in London to serve your European customers, and one in New York to serve the US.
+## Replication methods
 
-Replication is done through _publications_, a method of choosing which changes to send to other systems (usually another Postgres database). Publications can be managed in the [Dashboard](https://supabase.com/dashboard) or with SQL.
+Supabase supports three replication methods. Choose based on whether you need another Supabase Postgres database, a managed replication pipeline to a destination system, or full control over your own logical replication setup.
 
-## Manage publications in the dashboard
+### Read replicas
 
-1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
-2. Click on **Publications** in the sidebar.
-3. Control which database events are sent by toggling **Insert**, **Update**, and **Delete**.
-4. Control which tables broadcast changes by selecting **Source** and toggling each table.
+Read replicas are additional Supabase Postgres databases kept in sync with your primary database. Use them when you want read-only query capacity, lower latency in another region, or to isolate analytical reads from application writes while staying inside Supabase Postgres.
 
-<video width="99%" muted playsInline controls={true}>
-  <source
-    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-realtime.mp4"
-    type="video/mp4"
-  />
-</video>
+See [Set up read replicas](/docs/guides/platform/read-replicas).
 
-## Create a publication
+### Pipelines
 
-This publication contains changes to all tables.
+<$Partial path="pipelines-public-alpha.mdx" />
 
-```sql
-create publication publication_name
-for all tables;
-```
+Supabase Pipelines is a managed CDC product for moving data from Supabase Postgres to supported destination systems. It uses Postgres logical replication with the open-source [Supabase ETL engine](https://github.com/supabase/etl). A destination is where your replicated data is stored; a pipeline copies existing rows for the tables selected for initial sync, then uses ongoing replication (CDC) to send subsequent database changes to that destination.
 
-## Create a publication to listen to individual tables
+See [Set up Pipelines](/docs/guides/database/replication/pipelines).
 
-```sql
-create publication publication_name
-for table table_one, table_two;
-```
+### Manual replication
 
-## Add tables to an existing publication
+Manual replication uses the same underlying Postgres logical replication features as Pipelines, but you configure and operate the pieces yourself. Use this path when you want to connect tools such as Airbyte, Estuary, Fivetran, Materialize, Stitch, AWS DMS, or another system that supports Postgres logical replication.
 
-```sql
-alter publication publication_name
-add table table_name;
-```
+See [Set up manual replication](/docs/guides/database/replication/manual-replication-setup).
 
-## Listen to `insert`
+## Supported destinations
 
-```sql
-create publication publication_name
-for all tables
-with (publish = 'insert');
-```
+| Destination                                                          | Status       |
+| -------------------------------------------------------------------- | ------------ |
+| [BigQuery](/docs/guides/database/replication/pipelines/bigquery)     | Public alpha |
+| [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse) | Public alpha |
+| [DuckLake](/docs/guides/database/replication/pipelines/ducklake)     | Public alpha |
+| [Snowflake](/docs/guides/database/replication/pipelines/snowflake)   | Public alpha |
 
-## Listen to `update`
+## Use cases
 
-```sql
-create publication publication_name
-for all tables
-with (publish = 'update');
-```
+You might use database replication for:
 
-## Listen to `delete`
+- **Analytics and data warehousing**: Run analytical queries on replicated data in a separate platform. Initial sync and ongoing replication still use resources on the source database.
+- **Data integration**: Keep your data synchronized across different systems and services in your tech stack.
+- **Operational reporting**: Maintain a copy of selected application data that you can query in another system.
 
-```sql
-create publication publication_name
-for all tables
-with (publish = 'delete');
-```
+## Related features
 
-## Remove a publication
+For realtime features and syncing data to browsers and mobile apps, see [Realtime](/docs/guides/realtime).
 
-```sql
-drop publication if exists publication_name;
-```
+Realtime also uses [Postgres changes](/docs/guides/realtime/postgres-changes), but it is intended for broadcasting database updates to clients rather than maintaining a copy of your database in another system.
 
-## Recreate a publication
+## Concepts and terms
 
-If you're recreating a publication, it's best to do it in a transaction to ensure the operation succeeds.
+### Write-Ahead Log (WAL)
 
-```sql
-begin;
-  -- remove the realtime publication
-  drop publication if exists publication_name;
+Postgres records database changes in the Write-Ahead Log (WAL) before writing them to data files. WAL is stored in files called segments. A checkpoint writes modified data pages to disk so crash recovery can start from a recent position. Older WAL segments can be recycled or removed once they are no longer needed for recovery, archiving, or replication.
 
-  -- re-create the publication but don't enable it for any tables
-  create publication publication_name;
-commit;
-```
+### Logical replication and WAL
+
+Logical replication is a method of replication where Postgres uses WAL files to transmit changes to another Postgres database, or to a system that supports reading WAL files.
+
+### LSN
+
+LSN is a Log Sequence Number that identifies a position in the WAL. It is often used to determine the progress of replication in subscribers and calculate the lag of a replication slot.
+
+## Logical replication architecture
+
+Logical replication uses these components:
+
+- **Publication**: Defines the source tables and change types to publish, with optional column lists and row filters.
+- **Replication slot**: Tracks a consumer's progress and retains WAL it still needs. A slot uses an output plugin to decode changes; it is not tied to a single publication.
+- **Consumer**: Reads decoded changes and applies them to a destination. Another Postgres database can use a subscription to manage this connection and its publications. Pipelines connects directly to the replication stream without creating a Postgres subscription.
+
+## Logical replication output format
+
+Logical replication is typically output in two forms, `pgoutput` and `wal2json`. The output method is how Postgres sends changes to any active replication slot.
+
+## Logical replication configuration
+
+Logical replication slots retain WAL until their consumers confirm that they no longer need it. If Postgres removes required WAL before a consumer catches up, the slot can become unusable and the consumer may need a new initial copy.
+
+Postgres settings control replication capacity and WAL retention. Higher retention limits reduce the risk of losing required WAL, but can consume more database storage. Treat these settings as advanced configuration and check available disk before changing them. On Supabase, configure the supported settings with the [Supabase CLI](/docs/guides/database/custom-postgres-config#managing-postgres-configuration-with-the-cli).
+
+| Setting                                                                                                                        | Description                                                                                                                                                                          | Supabase configuration |
+| ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
+| [`max_replication_slots`](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-REPLICATION-SLOTS)   | Maximum number of replication slots. Pipelines needs one main slot and can temporarily use one additional slot per active table-sync worker.                                         | CLI only               |
+| [`wal_keep_size`](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-WAL-KEEP-SIZE)                   | Minimum amount of old WAL retained for standby servers. This setting is separate from the per-slot retention limit.                                                                  | CLI only               |
+| [`max_slot_wal_keep_size`](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-SLOT-WAL-KEEP-SIZE) | Maximum WAL that replication slots can retain at checkpoint time. `-1` lets slots retain unlimited WAL. A finite limit can invalidate a slot when its consumer falls too far behind. | CLI only               |
+| [`checkpoint_timeout`](https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-CHECKPOINT-TIMEOUT)                 | Maximum time between automatic WAL checkpoints. Slot WAL limits are enforced at checkpoint time.                                                                                     | CLI only               |

@@ -2,8 +2,8 @@
 title: Partial data dumps using Postgres Row Level Security
 description: Using RLS to create seed files for local PostgreSQL testing.
 author: paul_copplestone
-image: partial-dumps/og-partial-dumps-with-rls.png
-thumb: partial-dumps/og-partial-dumps-with-rls.png
+imgSocial: partial-dumps/og-partial-dumps-with-rls.png
+imgThumb: partial-dumps/og-partial-dumps-with-rls.png
 categories:
   - postgres
 tags:
@@ -19,7 +19,7 @@ When working with databases, it's common to create a `seed.sql` file which conta
 During early development, it's fine to dump the entire database and restore it on your development machine.
 However, once you have production users this becomes a security issue - do you really want to dump your users' data onto your local machines?
 
-There are many ways to solve this, but recently I stumbled upon a neat way to do it using PostgreSQL's Row Level Security (RLS).
+There are many ways to solve this, but recently I stumbled upon a neat way to do it using PostgreSQL's [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS).
 
 The concept is simple:
 
@@ -186,7 +186,7 @@ If you want to try out the steps we described in this article, fire up a full Po
 
 - [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
 - [Postgres Views](https://supabase.com/blog/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/postgres-audit)
 - [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
 - [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
 - [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

@@ -1,34 +1,57 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import * as Sentry from '@sentry/nextjs'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { LockIcon } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { object, string } from 'yup'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
 
-import { useLastSignIn } from 'hooks/misc/useLastSignIn'
-import { BASE_PATH } from 'lib/constants'
-import { auth, buildPathWithParams } from 'lib/gotrue'
-import { Button, Form, Input } from 'ui'
+import { LastSignInWrapper } from './LastSignInWrapper'
+import { resolveCaptchaToken } from './SignIn.utils'
+import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
+import { BASE_PATH } from '@/lib/constants'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, buildPathWithParams } from '@/lib/gotrue'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
-const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
+const schema = z.object({
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
+})
 
-const SignInSSOForm = () => {
+const formId = 'sso-sign-in-form'
+
+export const SignInSSOForm = () => {
   const queryClient = useQueryClient()
   const captchaRef = useRef<HCaptcha>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [_, setLastSignInUsed] = useLastSignIn()
-
-  const signInSchema = object({
-    email: string().email('Must be a valid email').required('Email is required'),
+  const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '' },
   })
+  const isSubmitting = form.formState.isSubmitting
 
-  const onSignIn = async ({ email }: { email: string }) => {
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ email }) => {
     const toastId = toast.loading('Signing in...')
 
     let token = captchaToken
     if (!token) {
-      const captchaResponse = await captchaRef.current?.execute({ async: true })
-      token = captchaResponse?.response ?? null
+      const captcha = await resolveCaptchaToken(captchaRef, trackFunnelError, toastId)
+      if (!captcha.ok) {
+        setCaptchaToken(null)
+        captchaRef.current?.resetCaptcha()
+        return
+      }
+      token = captcha.token
     }
 
     // redirects to /sign-in to check if the user has MFA setup (handled in SignInLayout.tsx)
@@ -59,62 +82,74 @@ const SignInSSOForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign in: ${error.message}`, { id: toastId })
-
-      if (!WHITELIST_ERRORS.includes(error.message)) {
-        Sentry.captureMessage('[CRITICAL] Failed to sign in via SSO: ' + error.message)
-      }
+      trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
+      captureCriticalError(error, 'sign in via SSO')
     }
   }
 
   return (
-    <Form
-      validateOnBlur
-      id="signIn-form"
-      initialValues={{ email: '' }}
-      validationSchema={signInSchema}
-      onSubmit={onSignIn}
-    >
-      {({ isSubmitting }: { isSubmitting: boolean }) => {
-        return (
-          <div className="flex flex-col gap-4">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="gavin@hooli.com"
-              disabled={isSubmitting}
-            />
+    <Form {...form}>
+      <form
+        id={formId}
+        method="POST"
+        className="flex flex-col gap-4"
+        onSubmit={(e) => {
+          track('sign_in_submitted', { category: 'account', method: 'sso' })
+          return form.handleSubmit(onSubmit, (errors) =>
+            trackFunnelError('signin', classifyValidationError('signin', errors), 'form')
+          )(e)
+        }}
+      >
+        <FormField
+          key="email"
+          name="email"
+          control={form.control}
+          render={({ field }) => (
+            <FormItemLayout label="Email">
+              <FormControl>
+                <Input type="email" autoComplete="email" {...field} placeholder="gavin@hooli.com" />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
 
-            <div className="self-center">
-              <HCaptcha
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-                size="invisible"
-                onVerify={(token) => {
-                  setCaptchaToken(token)
-                }}
-                onExpire={() => {
-                  setCaptchaToken(null)
-                }}
-              />
-            </div>
+        <div className="self-center">
+          <HCaptcha
+            ref={captchaRef}
+            sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+            size="invisible"
+            onVerify={(token) => {
+              setCaptchaToken(token)
+            }}
+            onExpire={() => {
+              setCaptchaToken(null)
+            }}
+          />
+        </div>
 
-            <Button
-              block
-              form="signIn-form"
-              htmlType="submit"
-              size="large"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
-              Sign In
-            </Button>
-          </div>
-        )
-      }}
+        <Button
+          variant="primary"
+          block
+          form={formId}
+          type="submit"
+          size="large"
+          loading={isSubmitting}
+        >
+          Sign in
+        </Button>
+      </form>
     </Form>
   )
 }
 
-export default SignInSSOForm
+export const SignInWithSSOButton = () => {
+  const router = useRouter()
+
+  return (
+    <LastSignInWrapper type="sso">
+      <Button asChild block size="large" variant="outline" icon={<LockIcon />}>
+        <Link href={{ pathname: '/sign-in-sso', query: router.query }}>Continue with SSO</Link>
+      </Button>
+    </LastSignInWrapper>
+  )
+}

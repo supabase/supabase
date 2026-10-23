@@ -1,0 +1,135 @@
+import { Column } from 'react-data-grid'
+import { cn } from 'ui'
+import z from 'zod'
+
+import {
+  QueueCreatedAtCell,
+  QueueNameCell,
+  QueueRLSCell,
+  QueueSizeCell,
+  QueueTypeCell,
+  QueueWithMetrics,
+} from './QueueCells'
+import { PostgresQueue } from '@/data/database-queues/database-queues-query'
+
+export const formatQueueColumns = (): Column<QueueWithMetrics>[] => {
+  return [
+    {
+      key: 'queue_name',
+      name: 'Name',
+      resizable: true,
+      minWidth: 200,
+      headerCellClass: undefined,
+      renderHeaderCell: () => {
+        return (
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full ml-8')}>
+            <p className="text-foreground!">Name</p>
+          </div>
+        )
+      },
+      renderCell: (props) => {
+        return <QueueNameCell queue={props.row} />
+      },
+    },
+    {
+      key: 'type',
+      name: 'Type',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: undefined,
+      renderHeaderCell: () => {
+        return (
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
+            <p className="text-foreground!">Type</p>
+          </div>
+        )
+      },
+      renderCell: (props) => {
+        return <QueueTypeCell queue={props.row} />
+      },
+    },
+    {
+      key: 'rls_enabled',
+      name: 'RLS enabled',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: undefined,
+      renderHeaderCell: () => {
+        return (
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
+            <p className="text-foreground!">RLS enabled</p>
+          </div>
+        )
+      },
+      renderCell: (props) => {
+        return <QueueRLSCell queue={props.row} />
+      },
+    },
+    {
+      key: 'created_at',
+      name: 'Created at',
+      resizable: true,
+      minWidth: 180,
+      headerCellClass: undefined,
+      renderHeaderCell: () => {
+        return (
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
+            <p className="text-foreground!">Created at</p>
+          </div>
+        )
+      },
+      renderCell: (props) => {
+        return <QueueCreatedAtCell queue={props.row} />
+      },
+    },
+    {
+      key: 'queue_size',
+      name: 'Size',
+      resizable: true,
+      minWidth: 120,
+      headerCellClass: undefined,
+      renderHeaderCell: () => {
+        return (
+          <div className={cn('flex items-center justify-between font-normal text-xs w-full')}>
+            <p className="text-foreground!">Size</p>
+          </div>
+        )
+      },
+      renderCell: (props) => {
+        return <QueueSizeCell queue={props.row} />
+      },
+    },
+  ]
+}
+
+export const prepareQueuesForDataGrid = (queues: PostgresQueue[]): QueueWithMetrics[] => {
+  return queues.map((queue) => ({
+    ...queue,
+    id: queue.queue_name, // Use queue_name as unique id
+  }))
+}
+
+// pgmq stores queue names as-provided in pgmq.meta and lowercases them only when
+// building the underlying q_/a_ relations, so uppercase queue names are fine —
+// the user-facing name is preserved and table-name lookups go through
+// pgmqQueueTable / pgmqArchiveTable which lowercase to match pgmq's behavior.
+export const QueueNameSchema = z
+  .string()
+  .trim()
+  .min(1, 'Please provide a name for your queue')
+  .max(47, "The name can't be longer than 47 characters")
+  .regex(
+    /^[a-zA-Z0-9_-]+$/,
+    'Name must contain only alphanumeric characters, underscores, and hyphens'
+  )
+
+export const isQueueNameValid = (queueName: string) => {
+  return QueueNameSchema.safeParse(queueName).success
+}
+
+// pgmq.format_table_name() lowercases its input, so the actual relations in the
+// pgmq schema are always q_/a_ followed by the lowercased queue name — even when
+// pgmq.meta stores the original casing. Use these helpers anywhere a queue name
+// is mapped to a relname.
+export const pgmqQueueTable = (queueName: string) => `q_${queueName.toLowerCase()}`
+export const pgmqArchiveTable = (queueName: string) => `a_${queueName.toLowerCase()}`

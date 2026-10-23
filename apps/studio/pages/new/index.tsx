@@ -1,35 +1,35 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { Elements } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
-import { useTheme } from 'next-themes'
+import Head from 'next/head'
 import { useCallback, useEffect, useState } from 'react'
 
-import { NewOrgForm } from 'components/interfaces/Organization'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import WizardLayout from 'components/layouts/WizardLayout'
-import { SetupIntentResponse, useSetupIntent } from 'data/stripe/setup-intent-mutation'
-import { STRIPE_PUBLIC_KEY } from 'lib/constants'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
-import type { NextPageWithLayout } from 'types'
-
-const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
+import { NewOrgForm } from '@/components/interfaces/Organization/NewOrg/NewOrgForm'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import WizardLayout from '@/components/layouts/WizardLayout'
+import { SetupIntentResponse, useSetupIntent } from '@/data/stripe/setup-intent-mutation'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import type { NextPageWithLayout } from '@/types'
 
 /**
  * No org selected yet, create a new one
  */
 const Wizard: NextPageWithLayout = () => {
-  const { resolvedTheme } = useTheme()
-
   const [intent, setIntent] = useState<SetupIntentResponse>()
-  const captchaLoaded = useIsHCaptchaLoaded()
+  const { appTitle } = useCustomContent(['app:title'])
+  const pageTitle = buildStudioPageTitle({
+    section: 'New Organization',
+    brand: appTitle || 'Supabase',
+  })
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+
   const { mutate: setupIntent } = useSetupIntent({ onSuccess: (res) => setIntent(res) })
 
-  const captchaRefCallback = useCallback((node: any) => {
+  const captchaRefCallback = useCallback((node: HCaptcha) => {
     setCaptchaRef(node)
   }, [])
 
@@ -37,17 +37,16 @@ const Wizard: NextPageWithLayout = () => {
     if (!hcaptchaToken) return console.error('Hcaptcha token is required')
 
     // Force a reload of Elements, necessary for Stripe
+    // Also mitigates card testing to some extent as we generate a new captcha token
     setIntent(undefined)
     setupIntent({ hcaptchaToken })
   }
 
-  const options = {
-    clientSecret: intent ? intent.client_secret : '',
-    appearance: { theme: resolvedTheme?.includes('dark') ? 'night' : 'flat', labels: 'floating' },
-  } as const
+  const loadPaymentForm = async (force = false) => {
+    if (selectedPlan == null || selectedPlan === 'FREE') return
+    if (intent != null && !force) return
 
-  const loadPaymentForm = async () => {
-    if (captchaRef && captchaLoaded) {
+    if (captchaRef) {
       let token = captchaToken
 
       try {
@@ -66,10 +65,11 @@ const Wizard: NextPageWithLayout = () => {
 
   useEffect(() => {
     loadPaymentForm()
-  }, [captchaRef, captchaLoaded])
+  }, [captchaRef, selectedPlan])
 
   const resetSetupIntent = () => {
-    return loadPaymentForm()
+    setIntent(undefined)
+    return loadPaymentForm(true)
   }
 
   const onLocalCancel = () => {
@@ -83,6 +83,11 @@ const Wizard: NextPageWithLayout = () => {
 
   return (
     <>
+      {/* Wizard layouts set the visual header but not the browser tab title. */}
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content="Supabase Studio" />
+      </Head>
       <HCaptcha
         ref={captchaRefCallback}
         sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
@@ -96,21 +101,19 @@ const Wizard: NextPageWithLayout = () => {
         }}
       />
 
-      {intent && (
-        <Elements stripe={stripePromise} options={options}>
-          <NewOrgForm onPaymentMethodReset={() => resetSetupIntent()} />
-        </Elements>
-      )}
+      <NewOrgForm
+        setupIntent={intent}
+        onPaymentMethodReset={() => resetSetupIntent()}
+        onPlanSelected={(plan) => setSelectedPlan(plan)}
+      />
     </>
   )
 }
 
 Wizard.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout headerTitle="New organization">
-      <WizardLayout organization={null} project={null}>
-        {page}
-      </WizardLayout>
+    <DefaultLayout hideMobileMenu headerTitle="New organization">
+      <WizardLayout>{page}</WizardLayout>
     </DefaultLayout>
   </AppLayout>
 )

@@ -1,52 +1,3 @@
-import type { components } from 'data/api'
-
-export type VercelFramework =
-  | (
-      | 'blitzjs'
-      | 'nextjs'
-      | 'gatsby'
-      | 'remix'
-      | 'astro'
-      | 'hexo'
-      | 'eleventy'
-      | 'docusaurus-2'
-      | 'docusaurus'
-      | 'preact'
-      | 'solidstart'
-      | 'dojo'
-      | 'ember'
-      | 'vue'
-      | 'scully'
-      | 'ionic-angular'
-      | 'angular'
-      | 'polymer'
-      | 'svelte'
-      | 'sveltekit'
-      | 'sveltekit-1'
-      | 'ionic-react'
-      | 'create-react-app'
-      | 'gridsome'
-      | 'umijs'
-      | 'sapper'
-      | 'saber'
-      | 'stencil'
-      | 'nuxtjs'
-      | 'redwoodjs'
-      | 'hugo'
-      | 'jekyll'
-      | 'brunch'
-      | 'middleman'
-      | 'zola'
-      | 'hydrogen'
-      | 'vite'
-      | 'vitepress'
-      | 'vuepress'
-      | 'parcel'
-      | 'sanity'
-      | 'storybook'
-    )
-  | null
-
 export type VercelGitLink =
   | {
       /**
@@ -144,7 +95,7 @@ export type Imetadata = {
   }
   link?: VercelGitLink
   name: string
-  framework: VercelFramework
+  framework: string | null
 }
 
 export type IntegrationProjectConnection = {
@@ -257,16 +208,30 @@ export type IntegrationConnectionsCreateVariables = {
   }
 }
 
-export type GitHubConnectionCreateVariables = {
-  organizationId: number
-  connection: components['schemas']['CreateGitHubConnectionsBody']
-}
-
 export type EnvironmentTargets = 'production' | 'preview' | 'development'
 
-export type UpdateConnectionPayload = {
-  id: string
-  organizationIntegrationId: string
-  envSyncTargets: EnvironmentTargets[]
-  publicEnvVarPrefix?: string
+// GitHub specific connection type based on the API response
+export type GitHubConnection = {
+  id: number
+  inserted_at: string
+  updated_at: string
+  branch_limit: number
+  installation_id: number
+  new_branch_per_pr: boolean
+  supabase_changes_only: boolean
+  workdir: string
+  project: {
+    id: number
+    name: string
+    ref: string
+  }
+  repository: {
+    id: number
+    name: string
+  }
+  user: {
+    id: number
+    primary_email: string | null
+    username: string
+  } | null
 }

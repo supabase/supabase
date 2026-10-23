@@ -1,15 +1,17 @@
-import matter from 'gray-matter'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-
 import CliGlobalFlagsHandler from '~/components/reference/enrichments/cli/CliGlobalFlagsHandler'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { components } from '~/features/docs/MdxBase.shared'
 import { RefSubLayout } from '~/features/docs/Reference.ui'
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
 import { REF_DOCS_DIRECTORY } from '~/lib/docs'
+import matter from 'gray-matter'
+import { type ComponentProps } from 'react'
 
-async function getRefMarkdownInternal(relPath: string) {
+import { CodeBlock } from '../ui/CodeBlock/CodeBlock'
+
+async function readRefMdx(relPath: string) {
   const fullPath = join(REF_DOCS_DIRECTORY, relPath + '.mdx')
 
   try {
@@ -18,11 +20,10 @@ async function getRefMarkdownInternal(relPath: string) {
     }
 
     const mdx = await readFile(fullPath, 'utf-8')
-    const { content } = matter(mdx)
-    return content
+    return matter(mdx)
   } catch (err) {
     console.error(`Error fetching reference markdown from file: ${fullPath}:\n\n${err}`)
-    return ''
+    return { content: '', data: {} as Record<string, unknown> }
   }
 }
 
@@ -32,19 +33,36 @@ async function getRefMarkdownInternal(relPath: string) {
  * here: this is just reading the public MDX files from the codebase.
  */
 const getRefMarkdown = cache_fullProcess_withDevCacheBust(
-  getRefMarkdownInternal,
+  async (relPath: string) => (await readRefMdx(relPath)).content,
+  REF_DOCS_DIRECTORY,
+  (filename: string) => JSON.stringify([filename.replace(/\.mdx$/, '')])
+)
+
+const getRefFrontmatter = cache_fullProcess_withDevCacheBust(
+  async (relPath: string) => (await readRefMdx(relPath)).data,
   REF_DOCS_DIRECTORY,
   (filename: string) => JSON.stringify([filename.replace(/\.mdx$/, '')])
 )
 
 interface MDXRemoteRefsProps {
   source: string
+  codeBlockProps?: Partial<ComponentProps<typeof CodeBlock>>
 }
 
-function MDXRemoteRefs({ source }: MDXRemoteRefsProps) {
-  const refComponents = { ...components, RefSubLayout, CliGlobalFlagsHandler }
+function MDXRemoteRefs({ source, codeBlockProps }: MDXRemoteRefsProps) {
+  const refComponents = {
+    ...components,
+    // Override the CodeBlock used for normal guides to skip type generation
+    // because it is too resource-intensive
+    pre: (props: ComponentProps<typeof CodeBlock>) => (
+      <CodeBlock {...props} {...codeBlockProps} skipTypeGeneration />
+    ),
+    RefSubLayout,
+    CliGlobalFlagsHandler,
+  }
 
+  // @ts-expect-error: Gildas - This is because RefSubLayout is a namespace containing multiple components. It works but the MDXClient types are stricter
   return <MDXRemoteBase source={source} components={refComponents} />
 }
 
-export { getRefMarkdown, MDXRemoteRefs }
+export { getRefFrontmatter, getRefMarkdown, MDXRemoteRefs }

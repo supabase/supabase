@@ -1,9 +1,8 @@
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Github } from 'lucide-react'
+import { Button, GithubIcon } from 'ui'
 import {
-  CommandInput,
-  CommandList,
   CommandMenu,
+  CommandMenuInput,
+  CommandMenuList,
   CommandMenuTrigger as CommandMenuTriggerPrimitive,
   CommandProvider,
   useRegisterCommands,
@@ -15,7 +14,7 @@ function Commands() {
       id: 'github',
       name: 'Go to repo',
       route: 'https://github.com/supabase/supabase',
-      icon: () => <Github />,
+      icon: () => <GithubIcon />,
     },
   ])
 
@@ -35,8 +34,8 @@ export default function CommandMenuDemo() {
     <CommandProvider openKey="">
       <Commands />
       <CommandMenu trigger={<CommandMenuTrigger />}>
-        <CommandInput />
-        <CommandList />
+        <CommandMenuInput />
+        <CommandMenuList />
       </CommandMenu>
     </CommandProvider>
   )

@@ -3,24 +3,23 @@
 import Link, { LinkProps } from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
+import { Badge, cn } from 'ui'
 
 import { useFramework } from '@/context/framework-context'
 import { useMobileMenu } from '@/hooks/use-mobile-menu'
 import { SidebarNavItem } from '@/types/nav'
-import { Badge, cn } from 'ui'
 
 // We extend:
 // 1. LinkProps - for Next.js Link component props (prefetch, etc)
 // 2. AnchorHTMLAttributes - for standard HTML anchor props (className, etc)
 // We omit href from both since we compute it internally from item.href
 interface NavigationItemProps
-  extends Omit<LinkProps, 'href'>,
-    Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+  extends Omit<LinkProps, 'href'>, Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   item: SidebarNavItem
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
 }
 
-const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props }) => {
+export const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props }) => {
   const { setOpen } = useMobileMenu()
   const { framework } = useFramework()
   const pathname = usePathname()
@@ -36,7 +35,9 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
     // An item supports the current framework if either:
     // 1. It has no framework restrictions (supports all frameworks)
     // 2. The current framework is in its list of supported frameworks
-    return !hasFrameworkRestrictions || supportedFrameworks.includes(framework as any)
+    return (
+      !hasFrameworkRestrictions || supportedFrameworks.some((supported) => supported === framework)
+    )
   }
 
   // Build URL with priority:
@@ -86,37 +87,25 @@ const NavigationItem: React.FC<NavigationItemProps> = ({ item, onClick, ...props
       href={href || '#'}
       {...props}
       onClick={handleClick}
+      aria-current={isActive ? 'page' : undefined}
       className={cn(
         'relative',
         'flex',
         'items-center justify-between',
-        'h-6',
+        'min-h-8 rounded-md py-1.5',
         'text-sm',
-        'text-foreground-lighter px-6',
-        !isActive && 'hover:bg-surface-100 hover:text-foreground',
-        isActive && 'bg-surface-200 text-foreground',
+        'px-3',
         'transition-all',
+        isActive
+          ? 'bg-selection text-foreground'
+          : 'text-foreground-light hover:bg-surface-200 hover:text-foreground',
         props.className
       )}
     >
-      {/* Active indicator bar */}
-      <div
-        className={cn(
-          'transition',
-          'absolute left-0 w-1 h-full bg-foreground',
-          isActive ? 'opacity-100' : 'opacity-0'
-        )}
-      />
       {item.title}
-      {item.new && (
-        <Badge variant="brand" className="capitalize">
-          NEW
-        </Badge>
-      )}
+      {item.new && <Badge variant="success">New</Badge>}
     </Link>
   )
 }
 
 NavigationItem.displayName = 'NavigationItem'
-
-export default NavigationItem

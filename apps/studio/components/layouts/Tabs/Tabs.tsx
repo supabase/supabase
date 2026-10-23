@@ -7,33 +7,63 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Plus, X } from 'lucide-react'
-import { useRouter } from 'next/router'
-
 import { useParams } from 'common'
-import { useAppStateSnapshot } from 'state/app-state'
+import { PlusIcon, XIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useRouter } from 'next/router'
+import { ReactNode, useState } from 'react'
 import {
-  editorEntityTypes,
-  handleTabClose,
-  handleTabDragEnd,
-  handleTabNavigation,
-  useTabsStore,
-  type Tab,
-} from 'state/tabs'
-import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+  Checkbox,
+  cn,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { CollapseButton } from './CollapseButton'
 import { SortableTab } from './SortableTab'
 import { TabPreview } from './TabPreview'
+import { useTabsScroll } from './Tabs.utils'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import {
+  editorEntityTypes,
+  useTabsStateSnapshot,
+  type Tab,
+  type TabCloseConfirmation,
+} from '@/state/tabs'
 
-export const EditorTabs = () => {
+interface EditorTabsProps {
+  customTabs?: ReactNode
+  newTabButton?: ReactNode
+  isCollapseButtonHidden?: boolean
+  onTabChange?: (id: string) => void
+}
+
+// [Joshen] Will be adjusting this component to support Explorer
+// Will require quite a bit of cleaning up once Explorer supersedes SQL Editor
+export const EditorTabs = ({
+  customTabs,
+  newTabButton,
+  isCollapseButtonHidden,
+  onTabChange,
+}: EditorTabsProps) => {
   const { ref } = useParams()
   const router = useRouter()
-  const appSnap = useAppStateSnapshot()
+  const { setLastVisitedSnippet, setLastVisitedTable, setLastVisitedExplorerTab } =
+    useDashboardHistory()
 
   const editor = useEditorType()
-  const tabs = useTabsStore(ref)
+  const tabs = useTabsStateSnapshot()
+  const [pendingClose, setPendingClose] = useState<(() => void) | null>(null)
+  const [pendingConfirmation, setPendingConfirmation] = useState<TabCloseConfirmation | null>(null)
+  const [isOptOutChecked, setIsOptOutChecked] = useState(false)
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -52,6 +82,7 @@ export const EditorTabs = () => {
   const editorTabs = !!editor
     ? openTabs.filter((tab) => editorEntityTypes[editor]?.includes(tab.type))
     : []
+  const editorTabIds = editorTabs.map((tab) => tab.id)
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -61,115 +92,266 @@ export const EditorTabs = () => {
     const newIndex = tabs.openTabs.indexOf(over.id.toString())
 
     if (oldIndex !== newIndex) {
-      handleTabDragEnd(ref, oldIndex, newIndex, active.id.toString(), router)
+      tabs.handleTabDragEnd(oldIndex, newIndex, active.id.toString(), router)
     }
   }
 
-  const handleClose = (id: string) => {
-    const onClearDashboardHistory = () => {
-      if (ref && editor) {
-        appSnap.setDashboardHistory(ref, editor === 'table' ? 'editor' : editor, undefined)
-      }
+  const onClearDashboardHistory = () => {
+    if (editor === 'table') {
+      setLastVisitedTable(undefined)
     }
-    handleTabClose({ ref, id, router, editor, onClearDashboardHistory })
+    if (editor === 'sql') {
+      setLastVisitedSnippet(undefined)
+    }
+    if (editor === 'explorer') {
+      setLastVisitedExplorerTab(undefined)
+    }
+  }
+
+  // Runs `performClose` immediately unless one of the tabs' registered close
+  // handlers asks to confirm first (e.g. a SQL snippet with unsaved edits), in
+  // which case a confirmation dialog is shown and `performClose` only runs if
+  // the user confirms. The layout stays agnostic of per-type close semantics.
+  const closeWithConfirmation = (tabIdsToClose: string[], performClose: () => void) => {
+    const confirmation = tabs.getCloseConfirmation(tabIdsToClose)
+    if (confirmation) {
+      setPendingConfirmation(confirmation)
+      setPendingClose(() => performClose)
+    } else {
+      performClose()
+    }
+  }
+
+  const resetPendingClose = () => {
+    setPendingClose(null)
+    setPendingConfirmation(null)
+    setIsOptOutChecked(false)
+  }
+
+  const handleClose = (tabId: string) => {
+    closeWithConfirmation([tabId], () => {
+      tabs.handleTabClose({ id: tabId, router, editor, onClearDashboardHistory })
+    })
+  }
+
+  const handleCloseAll = () => {
+    if (editor) {
+      const tabsToClose = editorTabIds
+
+      closeWithConfirmation(tabsToClose, () => {
+        tabs.closeTabs(tabsToClose)
+        onClearDashboardHistory()
+        const editorPath = editor === 'table' ? 'editor' : editor
+        router.push(`/project/${ref}/${editorPath}`)
+      })
+    }
+  }
+
+  const handleCloseOthers = (tabId: string) => {
+    if (editor) {
+      const tabsToClose = editorTabIds.filter((id) => id !== tabId)
+
+      closeWithConfirmation(tabsToClose, () => {
+        tabs.closeTabs(tabsToClose)
+        onClearDashboardHistory()
+
+        if (tabs.activeTab !== tabId) tabs.handleTabNavigation(tabId, router)
+      })
+    }
+  }
+
+  const handleCloseRight = (tabId: string) => {
+    if (editor) {
+      const openedTabs = editorTabIds
+      const tabIdx = openedTabs.indexOf(tabId)
+      const activeTabIdx = openedTabs.indexOf(tabs.activeTab!)
+      const tabsToClose = openedTabs.slice(tabIdx + 1)
+
+      closeWithConfirmation(tabsToClose, () => {
+        tabs.closeTabs(tabsToClose)
+
+        const isActiveTabClosed = tabIdx < activeTabIdx
+        if (isActiveTabClosed) {
+          tabs.handleTabNavigation(tabId, router)
+        }
+      })
+    }
   }
 
   const handleTabChange = (id: string) => {
-    handleTabNavigation(ref, id, router)
+    onTabChange?.(id)
+    tabs.handleTabNavigation(id, router)
   }
 
+  const { tabsListRef } = useTabsScroll({ activeTab: tabs.activeTab, tabCount: editorTabs.length })
+
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <Tabs_Shadcn_
-        className="w-full flex"
-        value={hasNewTab ? 'new' : tabs.activeTab ?? undefined}
-        onValueChange={handleTabChange}
-      >
-        <CollapseButton hideTabs={false} />
-        <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center w-full z-[1] border-none overflow-clip overflow-x-auto ">
-          <SortableContext
-            items={editorTabs.map((tab) => tab.id)}
-            strategy={horizontalListSortingStrategy}
-          >
-            {editorTabs.map((tab, index) => (
-              <SortableTab
-                key={tab.id}
-                tab={tab}
-                index={index}
-                openTabs={openTabs}
-                onClose={() => handleClose(tab.id)}
-              />
-            ))}
-          </SortableContext>
+    <>
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <Tabs
+          className="w-full flex"
+          value={hasNewTab ? 'new' : (tabs.activeTab ?? undefined)}
+          onValueChange={handleTabChange}
+        >
+          {!isCollapseButtonHidden && <CollapseButton hideTabs={false} />}
 
-          {/* Non-draggable new tab */}
-          {hasNewTab && (
-            <>
-              <TabsTrigger_Shadcn_
-                value="new"
-                className={cn(
-                  'flex items-center gap-2 px-3 text-xs',
-                  'bg-dash-sidebar/50 dark:bg-surface-100/50',
-                  'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                  'relative group h-full border-t-2 !border-b-0',
-                  'hover:bg-surface-300 dark:hover:bg-surface-100'
-                )}
-              >
-                <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
-                <div className="flex items-center gap-0">
-                  <span>New</span>
-                </div>
-                <span
-                  role="button"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  onPointerDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleClose('new')
-                  }}
-                >
-                  <X size={12} className="text-foreground-light" />
-                </span>{' '}
-                <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
-              </TabsTrigger_Shadcn_>
-            </>
-          )}
-
-          <AnimatePresence initial={false}>
-            {!hasNewTab && (
-              <motion.button
-                className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
-                onClick={() =>
-                  router.push(
-                    `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
-                  )
-                }
-                initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Plus
-                  size={16}
-                  strokeWidth={1.5}
-                  className="text-foreground-lighter hover:text-foreground-light"
-                />
-              </motion.button>
+          <TabsList
+            className={cn(
+              'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
+              'bg-surface-200 dark:bg-alternative border-none text-clip'
             )}
-          </AnimatePresence>
-          <div className="grow h-full border-b pr-6" />
-        </TabsList_Shadcn_>
-      </Tabs_Shadcn_>
-      <DragOverlay dropAnimation={null}>
-        {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
-      </DragOverlay>
-    </DndContext>
+          >
+            {/* Pinned outside the scrollable segment below, so it never scrolls out of view. */}
+            {customTabs}
+
+            <div
+              ref={tabsListRef}
+              className="flex items-center min-w-0 flex-1 h-full overflow-x-auto"
+            >
+              <SortableContext
+                items={editorTabs.map((tab) => tab.id)}
+                strategy={horizontalListSortingStrategy}
+              >
+                {editorTabs.map((tab, index) => (
+                  <ContextMenu key={tab.id}>
+                    <ContextMenuTrigger>
+                      <SortableTab
+                        key={tab.id}
+                        tab={tab}
+                        index={index}
+                        openTabs={openTabs}
+                        onClose={() => handleClose(tab.id)}
+                      />
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                      <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
+                      <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
+                        Close Others
+                      </ContextMenuItem>
+                      <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
+                        Close to the Right
+                      </ContextMenuItem>
+                      <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                ))}
+              </SortableContext>
+
+              {/* Non-draggable new tab */}
+              {hasNewTab && (
+                <div className="group/new-tab relative flex h-full items-center">
+                  <TabsTrigger
+                    value="new"
+                    onKeyDown={(e) => {
+                      if (e.key !== 'Delete' && e.key !== 'Backspace') return
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleClose('new')
+                    }}
+                    className={cn(
+                      'flex items-center gap-2 px-3 text-xs',
+                      'bg-dash-sidebar/50 dark:bg-surface-100/50',
+                      'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+                      'relative group h-full border-t-2 border-b-0!',
+                      'hover:bg-surface-300 dark:hover:bg-surface-100'
+                    )}
+                  >
+                    <PlusIcon size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
+                    <div className="flex items-center gap-0">
+                      <span>New</span>
+                    </div>
+                    {/* Reserve close-icon width; close is a sibling overlay. */}
+                    <span className="ml-1 inline-flex size-3 shrink-0" aria-hidden />
+                    <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+                  </TabsTrigger>
+                  <button
+                    type="button"
+                    tabIndex={0}
+                    aria-label="Close new tab"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleClose('new')
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
+                    onPointerDown={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
+                    className={cn(
+                      'absolute top-1/2 right-3 z-10 flex -translate-y-1/2 items-center justify-center rounded-xs',
+                      'opacity-0 group-hover/new-tab:opacity-100 group-focus-within/new-tab:opacity-100 focus-visible:opacity-100',
+                      'hover:bg-200 focus-ring',
+                      'cursor-pointer'
+                    )}
+                  >
+                    <XIcon size={12} className="text-foreground-light" />
+                  </button>
+                </div>
+              )}
+
+              <AnimatePresence initial={false}>
+                {!hasNewTab &&
+                  (newTabButton ?? (
+                    <motion.button
+                      className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
+                      onClick={() =>
+                        router.push(
+                          `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
+                        )
+                      }
+                      initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                      animate={{ opacity: 1, scale: 1, x: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <PlusIcon
+                        size={16}
+                        strokeWidth={1.5}
+                        className="text-foreground-lighter hover:text-foreground-light"
+                      />
+                    </motion.button>
+                  ))}
+              </AnimatePresence>
+              <div className="grow h-full border-b pr-6" />
+            </div>
+          </TabsList>
+        </Tabs>
+
+        <DragOverlay dropAnimation={null}>
+          {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
+        </DragOverlay>
+      </DndContext>
+
+      <DiscardChangesConfirmationDialog
+        visible={pendingClose !== null}
+        onClose={() => {
+          if (isOptOutChecked) pendingConfirmation?.optOut?.onOptOut()
+          pendingClose?.()
+          resetPendingClose()
+        }}
+        onCancel={resetPendingClose}
+        title={pendingConfirmation?.title ?? 'Unsaved changes'}
+        description={pendingConfirmation?.description}
+      >
+        {pendingConfirmation?.optOut && (
+          <FormItemLayout
+            isReactForm={false}
+            layout="flex"
+            name="optOutOfCloseConfirmation"
+            label={pendingConfirmation.optOut.label}
+            className="[&>div:first-child>button]:translate-y-0.5"
+          >
+            <Checkbox
+              id="optOutOfCloseConfirmation"
+              checked={isOptOutChecked}
+              onCheckedChange={(value) => setIsOptOutChecked(!!value)}
+            />
+          </FormItemLayout>
+        )}
+      </DiscardChangesConfirmationDialog>
+    </>
   )
 }

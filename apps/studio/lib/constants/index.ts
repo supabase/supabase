@@ -4,7 +4,36 @@ export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 
+/**
+ * Server-side flag for Supabase CLI (local development) runs. Detected via
+ * CURRENT_CLI_VERSION, which the CLI sets when launching Studio. The browser
+ * cannot read this directly — use the /platform/deployment-mode endpoint.
+ */
+export const IS_CLI = !IS_PLATFORM && !!process.env.CURRENT_CLI_VERSION
+
+/**
+ * Indicates that the app is running in a test environment (E2E tests).
+ * Set via NEXT_PUBLIC_NODE_ENV=test in the generateLocalEnv.js script.
+ */
+export const IS_TEST_ENV = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
+/**
+ * True when running against the staging or local environments. Used to gate
+ * staff-only debugging affordances (e.g. the unified logs OTEL toggle) that
+ * should never be visible to customers on production.
+ */
+export const IS_STAGING_OR_LOCAL =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+
+/**
+ * Base URL for the internal Admin Studio tool (kept out of source since this
+ * repo is public).
+ */
+export const ADMIN_STUDIO_URL = process.env.NEXT_PUBLIC_ADMIN_STUDIO_URL
+
 export const API_URL = (() => {
+  if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
   //  If running in platform, use API_URL from the env var
   if (IS_PLATFORM) return process.env.NEXT_PUBLIC_API_URL!
   // If running in browser, let it add the host
@@ -38,71 +67,17 @@ export const STRIPE_PUBLIC_KEY =
 
 export const USAGE_APPROACHING_THRESHOLD = 0.75
 
-export const LOCAL_STORAGE_KEYS = {
-  AI_ASSISTANT_STATE: (projectRef: string | undefined) =>
-    `supabase-ai-assistant-state-${projectRef}`,
-  SIDEBAR_BEHAVIOR: 'supabase-sidebar-behavior',
-  EDITOR_PANEL_STATE: 'supabase-editor-panel-state',
-
-  UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
-  UI_PREVIEW_CLS: 'supabase-ui-cls',
-  UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
-  UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
-
-  UI_TABLE_EDITOR_TABS: 'supabase-ui-table-editor-tabs',
-  UI_SQL_EDITOR_TABS: 'supabase-ui-sql-editor-tabs',
-  UI_NEW_LAYOUT_PREVIEW: 'supabase-ui-new-layout-preview',
-
-  NEW_LAYOUT_NOTICE_ACKNOWLEDGED: 'new-layout-notice-acknowledge',
-
-  DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
-
-  SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
-  SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
-  SQL_EDITOR_AI_PANEL_SPLIT_SIZE: 'supabase_sql-editor-ai-panel-split-size',
-  // Key to track which schemas are ok to be sent to AI. The project ref is intentionally put at the end for easier search in the browser console.
-  SQL_EDITOR_AI_SCHEMA: (ref: string) => `supabase_sql-editor-ai-schema-enabled-${ref}`,
-  SQL_EDITOR_AI_OPEN: 'supabase_sql-editor-ai-open',
-  SQL_EDITOR_LAST_SELECTED_DB: (ref: string) => `sql-editor-last-selected-db-${ref}`,
-  SQL_EDITOR_SQL_BLOCK_ACKNOWLEDGED: (ref: string) => `sql-editor-sql-block-acknowledged-${ref}`,
-  SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
-  SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
-
-  LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
-  GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
-  CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
-  CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
-  QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
-  // Key to track account deletion requests
-  ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
-  // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
-  SENTRY_USER_ID: 'supabase-sentry-user-id',
-  // Used for storing the last sign in method used by the user
-  LAST_SIGN_IN_METHOD: 'supabase-last-sign-in-method',
-  // Key to track the last selected schema. The project ref is intentionally put at the end for easier search in the browser console.
-  LAST_SELECTED_SCHEMA: (ref: string) => `last-selected-schema-${ref}`,
-  // Track position of nodes for schema visualizer
-  SCHEMA_VISUALIZER_POSITIONS: (ref: string, schemaId: number) =>
-    `schema-visualizer-positions-${ref}-${schemaId}`,
-  // Used for allowing the main nav panel to expand on hover
-  EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
-  GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
-  // Notice banner keys
-  FLY_POSTGRES_DEPRECATION_WARNING: 'fly-postgres-deprecation-warning-dismissed',
-  AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
-
-  // api keys view switcher for new and legacy api keys
-  API_KEYS_VIEW: (ref: string) => `supabase-api-keys-view-${ref}`,
-
-  // last visited logs page
-  LAST_VISITED_LOGS_PAGE: 'supabase-last-visited-logs-page',
-  LAST_VISITED_ORGANIZATION: 'last-visited-organization',
-}
+export const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://supabase.com/docs'
+export const SPECIAL_SYMBOLS_IN_PASSWORDS_DOCS_URL = `${DOCS_URL}/guides/database/postgres/roles#special-symbols-in-passwords`
 
 export const OPT_IN_TAGS = {
   AI_SQL: 'AI_SQL_GENERATOR_OPT_IN',
+  AI_DATA: 'AI_DATA_GENERATOR_OPT_IN',
+  AI_LOG: 'AI_LOG_GENERATOR_OPT_IN',
 }
 
 export const GB = 1024 * 1024 * 1024
 export const MB = 1024 * 1024
 export const KB = 1024
+
+export const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i

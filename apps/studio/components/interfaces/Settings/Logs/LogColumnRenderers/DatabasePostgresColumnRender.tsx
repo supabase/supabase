@@ -1,13 +1,15 @@
 import { Column } from 'react-data-grid'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import type { LogData } from '../Logs.types'
 import { RowLayout, SeverityFormatter, TextFormatter } from '../LogsFormatters'
 import { defaultRenderCell } from './DefaultPreviewColumnRenderer'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 const columns: Column<LogData>[] = [
   {
     name: 'database-postgres-first-column',
     key: 'database-postgres-first-column',
+    renderHeaderCell: () => null,
     renderCell: (props) => {
       if (!props.row.error_severity) {
         return defaultRenderCell(props)

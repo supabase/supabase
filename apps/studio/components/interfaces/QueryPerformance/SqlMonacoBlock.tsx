@@ -1,0 +1,50 @@
+import { CheckIcon, CopyIcon } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Button, cn, copyToClipboard, FloatingPlate } from 'ui'
+
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+
+type SqlMonacoBlockProps = {
+  value?: string
+  wrapperClassName?: string
+}
+
+// [Joshen] This is technically a duplicate of CodeBlock from `ui-patterns`
+// Should decide which is the preferred and consolidate - although rendering CodeEditor
+// is much heavier due to Monaco Editor. I'd rather we use CodeBlock (or improve that)
+// for read-only rendering of code contents
+export const SqlMonacoBlock = ({ value, wrapperClassName }: SqlMonacoBlockProps) => {
+  const [copied, setCopied] = useState(false)
+
+  const content = useMemo(() => value ?? '', [value])
+
+  const handleCopy = (value: string) => {
+    setCopied(true)
+    copyToClipboard(value)
+    setTimeout(() => setCopied(false), 1000)
+  }
+
+  return (
+    <div
+      className={cn('group relative border rounded-md overflow-hidden w-full', wrapperClassName)}
+    >
+      <CodeEditor
+        hideLineNumbers
+        language="pgsql"
+        value={content}
+        className="h-[322px] pl-2"
+        options={{ padding: { top: 12, bottom: 12 } }}
+      />
+
+      <FloatingPlate className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+        <Button
+          className="px-1.5"
+          icon={copied ? <CheckIcon /> : <CopyIcon />}
+          onClick={() => handleCopy(content)}
+        >
+          {copied ? 'Copied' : ''}
+        </Button>
+      </FloatingPlate>
+    </div>
+  )
+}

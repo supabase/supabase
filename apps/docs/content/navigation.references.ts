@@ -1,3 +1,13 @@
+import { isFeatureEnabled } from 'common/enabled-features'
+
+const {
+  sdkCsharp: sdkCsharpEnabled,
+  sdkDart: sdkDartEnabled,
+  sdkKotlin: sdkKotlinEnabled,
+  sdkPython: sdkPythonEnabled,
+  sdkSwift: sdkSwiftEnabled,
+} = isFeatureEnabled(['sdk:csharp', 'sdk:dart', 'sdk:kotlin', 'sdk:python', 'sdk:swift'])
+
 export const REFERENCES = {
   javascript: {
     type: 'sdk',
@@ -9,12 +19,42 @@ export const REFERENCES = {
     icon: 'reference-javascript',
     meta: {
       v2: {
+        // JS v2 is driven by the new reference pipeline
+        // (`scripts/build-reference-content.ts` + `spec/reference/javascript/v2/`).
+        // It intentionally has no `specFile` — the legacy YAML loader skips it.
         libId: 'reference_javascript_v2',
-        specFile: 'supabase_js_v2',
       },
       v1: {
         libId: 'reference_javascript_v1',
         specFile: 'supabase_js_v1',
+      },
+    },
+  },
+  server: {
+    type: 'sdk',
+    name: 'Server',
+    library: '@supabase/server',
+    libPath: 'server',
+    versions: ['v1'],
+    typeSpec: true,
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        libId: 'reference_server_v1',
+      },
+    },
+  },
+  middleware: {
+    type: 'sdk',
+    name: 'Middleware',
+    library: '@supabase/middleware',
+    libPath: 'middleware',
+    versions: ['v1'],
+    typeSpec: true,
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        libId: 'reference_middleware_v1',
       },
     },
   },
@@ -27,23 +67,30 @@ export const REFERENCES = {
     icon: 'reference-dart',
     meta: {
       v2: {
+        // Dart v2 is driven by the new reference pipeline
+        // (`scripts/build-reference-content.ts` + `spec/reference/dart/v2/`).
+        // It intentionally has no `specFile`, so the legacy YAML loader skips it.
         libId: 'reference_dart_v2',
-        specFile: 'supabase_dart_v2',
       },
       v1: {
         libId: 'reference_dart_v1',
         specFile: 'supabase_dart_v1',
       },
     },
+    enabled: sdkDartEnabled,
   },
   csharp: {
     type: 'sdk',
     name: 'C#',
     library: 'supabase-csharp',
     libPath: 'csharp',
-    versions: ['v1', 'v0'],
+    versions: ['v8', 'v1', 'v0'],
     icon: 'reference-csharp',
     meta: {
+      v8: {
+        libId: 'reference_csharp_v8',
+        specFile: 'supabase_csharp_v8',
+      },
       v1: {
         libId: 'reference_csharp_v1',
         specFile: 'supabase_csharp_v1',
@@ -53,6 +100,7 @@ export const REFERENCES = {
         specFile: 'supabase_csharp_v0',
       },
     },
+    enabled: sdkCsharpEnabled,
   },
   swift: {
     type: 'sdk',
@@ -71,6 +119,7 @@ export const REFERENCES = {
         specFile: 'supabase_swift_v1',
       },
     },
+    enabled: sdkSwiftEnabled,
   },
   kotlin: {
     type: 'sdk',
@@ -93,6 +142,7 @@ export const REFERENCES = {
         specFile: 'supabase_kt_v1',
       },
     },
+    enabled: sdkKotlinEnabled,
   },
   python: {
     type: 'sdk',
@@ -107,6 +157,7 @@ export const REFERENCES = {
         specFile: 'supabase_py_v2',
       },
     },
+    enabled: sdkPythonEnabled,
   },
   cli: {
     type: 'cli',
@@ -160,7 +211,7 @@ export const REFERENCES = {
 } as const
 
 export const clientSdkIds = Object.keys(REFERENCES).filter(
-  (reference) => REFERENCES[reference].type === 'sdk'
+  (reference) => REFERENCES[reference].type === 'sdk' && REFERENCES[reference].enabled !== false
 )
 
 export const selfHostingServices = Object.keys(REFERENCES).filter(

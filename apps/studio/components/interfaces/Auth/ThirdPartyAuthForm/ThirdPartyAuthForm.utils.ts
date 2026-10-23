@@ -1,10 +1,22 @@
-import { ThirdPartyAuthIntegration } from 'data/third-party-auth/integrations-query'
-import { BASE_PATH } from 'lib/constants'
+import { ThirdPartyAuthIntegration } from '@/data/third-party-auth/integrations-query'
+import { BASE_PATH } from '@/lib/constants'
 
-export const INTEGRATION_TYPES = ['firebase', 'auth0', 'awsCognito', 'clerk', 'custom'] as const
+export const INTEGRATION_TYPES = [
+  'firebase',
+  'auth0',
+  'awsCognito',
+  'clerk',
+  'workos',
+  'custom',
+] as const
 export type INTEGRATION_TYPES = (typeof INTEGRATION_TYPES)[number]
 
 export const getIntegrationType = (integration?: ThirdPartyAuthIntegration): INTEGRATION_TYPES => {
+  if (integration?.type === 'workos') {
+    return 'workos'
+  }
+
+  // TODO(hf): Move these to check type as well.
   if (integration?.oidc_issuer_url?.startsWith('https://securetoken.google.com/')) {
     return 'firebase'
   }
@@ -37,9 +49,11 @@ export const getIntegrationTypeLabel = (type: INTEGRATION_TYPES) => {
       return 'Amazon Cognito'
     case 'clerk':
       return 'Clerk'
+    case 'workos':
+      return 'WorkOS'
     case 'custom':
     default:
-      return 'Custom'
+      return 'Custom OIDC'
   }
 }
 
@@ -53,9 +67,21 @@ export const getIntegrationTypeIcon = (type: INTEGRATION_TYPES) => {
       return `${BASE_PATH}/img/icons/cognito-icon.svg`
     case 'clerk':
       return `${BASE_PATH}/img/icons/clerk-icon.svg`
-
+    case 'workos':
+      return `${BASE_PATH}/img/icons/workos-icon.svg`
     case 'custom':
     default:
-      return `${BASE_PATH}/img/icons/cognito-icon.svg`
+      return `${BASE_PATH}/img/icons/badge-check-icon.svg`
+  }
+}
+
+export const isValidOidcIssuerUrl = (value: string) => {
+  if (value.includes('?') || value.includes('#')) return false
+
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:' && url.hostname.length > 0 && !url.username && !url.password
+  } catch {
+    return false
   }
 }

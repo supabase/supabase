@@ -2,8 +2,8 @@
 title: 'pgvector 0.6.0: 30x faster with parallel index builds'
 description: 'pgvector 0.6.0 brings a significant improvement: parallel index builds for HNSW. Building an HNSW index is now up to 30x faster for unlogged tables.'
 author: egor_romanov
-image: 2024-01-30-pgvector-fast-builds/pgvector6.png
-thumb: 2024-01-30-pgvector-fast-builds/pgvector6.png
+imgSocial: 2024-01-30-pgvector-fast-builds/pgvector6.png
+imgThumb: 2024-01-30-pgvector-fast-builds/pgvector6.png
 categories:
   - engineering
 tags:
@@ -134,7 +134,7 @@ You can further improve index build performance using a more powerful instance (
 
 The index build time is not linearly proportional to the number of cores used. A sensible default for `max_parallel_maintenance_workers` is `CPU count / 2` , the default we set on the Supabase platform. Accuracy and QPS are not affected by `max_parallel_maintenance_workers`.
 
-<Admonition type="note" label="Pro tip: optimizing your bills">
+<Admonition type="note" title="Pro tip: optimizing your bills">
 
 The trick is to use a large database while you build the index and then switch back to a cheaper instance after the index is built.
 

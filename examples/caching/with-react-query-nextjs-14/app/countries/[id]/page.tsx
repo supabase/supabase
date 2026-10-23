@@ -6,11 +6,7 @@ import { useQuery } from '@supabase-cache-helpers/postgrest-react-query'
 
 export default function CountryPage({ params }: { params: { id: number } }) {
   const supabase = useSupabaseBrowser()
-  const {
-    data: country,
-    isLoading,
-    isError,
-  } = useQuery(getCountryById(supabase, params.id))
+  const { data: country, isLoading, isError } = useQuery(getCountryById(supabase, params.id))
 
   if (isLoading) {
     return <div>Loading...</div>

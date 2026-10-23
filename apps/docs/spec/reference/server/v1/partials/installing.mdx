@@ -1,0 +1,111 @@
+---
+id: installing
+title: Installing
+slug: installing
+---
+
+### Install as a package
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Install `@supabase/server` via your package manager.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="npm"
+      queryGroup="platform"
+    >
+      <TabPanel id="npm" label="npm">
+
+        ```sh Terminal
+        npm install @supabase/server
+        ```
+
+      </TabPanel>
+      <TabPanel id="yarn" label="Yarn">
+
+        ```sh Terminal
+        yarn add @supabase/server
+        ```
+
+      </TabPanel>
+      <TabPanel id="pnpm" label="pnpm">
+
+        ```sh Terminal
+        pnpm add @supabase/server
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Use via JSR (Deno / Bun)
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    `@supabase/server` is also published to [JSR](https://jsr.io/@supabase/server) for Deno and Bun environments.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="deno"
+      queryGroup="platform"
+    >
+      <TabPanel id="deno" label="Deno">
+
+        ```sh Terminal
+        deno add jsr:@supabase/server
+        ```
+
+      </TabPanel>
+      <TabPanel id="bun" label="Bun">
+
+        ```sh Terminal
+        bunx jsr add @supabase/server
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Optional peer dependencies on Deno
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Some entry points rely on optional peer dependencies. `@supabase/server/middleware/postgres` and `@supabase/server/middleware/postgres-admin` need `pg`. Deno resolves an optional peer only when your own code imports it. A pin in `deno.json` alone is not enough: `deno check` passes and the function fails at startup with `Could not find package 'pg'`.
+
+    Add a bare import once, at the top of your entry module — no separate `deno add npm:pg` or `package.json` entry is needed. `deno info` lists `npm:/pg@...` once the package is in the module graph.
+
+    Deno 2.9 and later apply a minimum dependency age to npm packages. To use a release published the same day, pass `--minimum-dependency-age 0` to `deno check`.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```ts index.ts
+    import 'pg'
+    import { withPostgresClient } from '@supabase/server/middleware/postgres'
+    ```
+
+    ```sh Terminal
+    deno info index.ts | grep "npm:/pg@"
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>

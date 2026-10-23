@@ -1,24 +1,21 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import dayjs from 'dayjs'
-import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { Handle, NodeProps, Position } from 'reactflow'
-
+import { Handle, Node, NodeProps, Position } from '@xyflow/react'
 import { useParams } from 'common'
-import SparkBar from 'components/ui/SparkBar'
+import dayjs from 'dayjs'
 import {
-  DatabaseInitEstimations,
-  ReplicaInitializationStatus,
-  useReadReplicasStatusesQuery,
-} from 'data/read-replicas/replicas-status-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+  DatabaseBackupIcon,
+  DatabaseIcon,
+  HelpCircleIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+} from 'lucide-react'
+import Link from 'next/link'
+import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
+  cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -27,57 +24,48 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
+import { ComputeMetricsFooter } from './ComputeMetricsFooter'
 import {
   ERROR_STATES,
   INIT_PROGRESS,
+  LoadBalancerData,
   NODE_SEP,
   NODE_WIDTH,
-  REPLICA_STATUS,
-  Region,
+  PrimaryNodeData,
+  REGION_NODE_HEIGHT,
+  ReplicaNodeData,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
+import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
+import { RegionFlag } from '@/components/ui/RegionFlag'
+import { SparkBar } from '@/components/ui/SparkBar'
+import {
+  DatabaseInitEstimations,
+  ReplicaInitializationStatus,
+  useReadReplicasStatusesQuery,
+} from '@/data/read-replicas/replicas-status-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
-interface NodeData {
-  id: string
-  provider: string
-  region: Region
-  computeSize: string
-  status: string
-  inserted_at: string
-}
-
-interface PrimaryNodeData extends NodeData {
-  numReplicas: number
-  numRegions: number
-  hasLoadBalancer: boolean
-}
-
-interface LoadBalancerData extends NodeData {
-  numDatabases: number
-}
-
-interface ReplicaNodeData extends NodeData {
-  onSelectRestartReplica: () => void
-  onSelectResizeReplica: () => void
-  onSelectDropReplica: () => void
-}
-
-export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
+export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) => {
   const { ref } = useParams()
   const { numDatabases } = data
 
   return (
     <>
-      <div className="flex flex-col rounded bg-surface-100 border border-default">
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
         <div
           className="flex items-start justify-between p-3 gap-x-4"
           style={{ width: NODE_WIDTH / 2 - 10 }}
         >
           <div className="flex gap-x-3">
             <div className="min-w-8 h-8 bg-blue-600 border border-blue-800 rounded-md flex items-center justify-center">
-              <Database size={16} />
+              <DatabaseIcon size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <p className="text-sm">API Load Balancer</p>
@@ -89,11 +77,13 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="text" icon={<MoreVertical />} className="px-1" />
+              <Button variant="text" icon={<MoreVerticalIcon />} className="px-1" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40" side="bottom" align="end">
               <DropdownMenuItem asChild className="gap-x-2">
-                <Link href={`/project/${ref}/settings/api?source=loadbalancer`}>View API URL</Link>
+                <Link href={`/project/${ref}/integrations/data_api/overview?source=load-balancer`}>
+                  View API URL
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -104,9 +94,13 @@ export const LoadBalancerNode = ({ data }: NodeProps<LoadBalancerData>) => {
   )
 }
 
-export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
+export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
-  const { provider, region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+  const { region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
+
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
 
   return (
     <>
@@ -116,14 +110,14 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
         className={!hasLoadBalancer ? 'opacity-0' : ''}
         style={{ background: 'transparent' }}
       />
-      <div className="flex flex-col rounded bg-surface-100 border border-default">
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
         <div
           className="flex items-start justify-between p-3"
           style={{ width: NODE_WIDTH / 2 - 10 }}
         >
           <div className="flex gap-x-3">
             <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
-              <Database size={16} />
+              <DatabaseIcon size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <p className="text-sm">Primary Database</p>
@@ -131,17 +125,29 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
                 <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-sm text-foreground-light">{provider}</span>
-                <span className="text-sm text-foreground-light">•</span>
-                <span className="text-sm text-foreground-light">{computeSize}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="text-sm transition text-foreground-light hover:text-foreground"
+                      onClick={async () =>
+                        await copyToClipboard(region.region, () => toast('Copied project region'))
+                      }
+                    >
+                      {region.region}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Click to copy</TooltipContent>
+                </Tooltip>
+                {projectHomepageShowInstanceSize && (
+                  <>
+                    <span className="text-sm text-foreground-lighter">·</span>
+                    <span className="text-sm text-foreground-light">{computeSize}</span>
+                  </>
+                )}
               </p>
             </div>
           </div>
-          <img
-            alt="region icon"
-            className="w-8 rounded-sm mt-0.5"
-            src={`${BASE_PATH}/img/regions/${region.key}.svg`}
-          />
+          <RegionFlag className="mt-0.5 w-8" region={region.region} />
         </div>
         {numReplicas > 0 && (
           <div className="border-t p-3 py-2">
@@ -156,6 +162,7 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
             </p>
           </div>
         )}
+        <ComputeMetricsFooter />
       </div>
       <Handle
         type="source"
@@ -167,22 +174,18 @@ export const PrimaryNode = ({ data }: NodeProps<PrimaryNodeData>) => {
   )
 }
 
-export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
-  const {
-    id,
-    provider,
-    region,
-    computeSize,
-    status,
-    inserted_at,
-    onSelectRestartReplica,
-    onSelectResizeReplica,
-    onSelectDropReplica,
-  } = data
+export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
   const { ref } = useParams()
-  const dbSelectorState = useDatabaseSelectorStateSnapshot()
-  const canManageReplicas = useCheckPermissions(PermissionAction.CREATE, 'projects')
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const { id, region, computeSize, status, inserted_at } = data
+  const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
+    'project_homepage:show_instance_size',
+  ])
+
+  const state = useDatabaseSelectorStateSnapshot()
+  const [, setConnect] = useQueryStates({
+    showConnect: parseAsBoolean.withDefault(false),
+    source: parseAsString,
+  })
 
   const { data: databaseStatuses } = useReadReplicasStatusesQuery({ projectRef: ref })
   const { replicaInitializationStatus } =
@@ -221,7 +224,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
     <>
       <Handle type="target" position={Position.Top} style={{ background: 'transparent' }} />
       <div
-        className="flex justify-between items-start rounded bg-surface-100 border border-default p-3"
+        className="flex justify-between items-start rounded-sm bg-surface-100 border border-default p-3"
         style={{ width: NODE_WIDTH / 2 - 10 }}
       >
         <div className="flex gap-x-3">
@@ -235,9 +238,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             )}
           >
             {isInTransition ? (
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2Icon className="animate-spin" size={16} />
             ) : (
-              <DatabaseBackup size={16} />
+              <DatabaseBackupIcon size={16} />
             )}
           </div>
           <div className="flex flex-col gap-y-0.5">
@@ -256,7 +259,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                   <Badge variant="destructive">Init failed</Badge>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle size={16} />
+                      <HelpCircleIcon size={16} />
                     </TooltipTrigger>
                     <TooltipContent
                       side="bottom"
@@ -274,9 +277,8 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 <Badge>Restarting</Badge>
               ) : status === REPLICA_STATUS.RESIZING ? (
                 <Badge>Resizing</Badge>
-              ) : initStatus === ReplicaInitializationStatus.Completed &&
-                status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                <Badge variant="brand">Healthy</Badge>
+              ) : status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
+                <Badge variant="success">Healthy</Badge>
               ) : (
                 <Badge variant="warning">Unhealthy</Badge>
               )}
@@ -284,10 +286,22 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
             <div className="my-0.5">
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
-                <span>{provider}</span>
-                {!!computeSize && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="text-sm transition text-foreground-light hover:text-foreground"
+                      onClick={async () =>
+                        await copyToClipboard(region.region, () => toast('Copied replica region'))
+                      }
+                    >
+                      {region.region}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Click to copy</TooltipContent>
+                </Tooltip>
+                {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
-                    <span>•</span>
+                    <span className="text-foreground-lighter">·</span>
                     <span>{computeSize}</span>
                   </>
                 )}
@@ -299,11 +313,11 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                   <div className="w-56">
                     <SparkBar
                       labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
-                      labelBottomClass="text-xs !normal-nums text-foreground-light"
+                      labelBottomClass="text-xs normal-nums! text-foreground-light"
                       type="horizontal"
                       value={stagePercent * 100}
                       max={100}
-                      barClass="bg-brand"
+                      barClass="bg-primary-bright"
                     />
                   </div>
                 </TooltipTrigger>
@@ -332,62 +346,31 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 Error: {ERROR_STATES[error as keyof typeof ERROR_STATES]}
               </p>
             ) : (
-              <p className="text-sm text-foreground-light">Created: {created}</p>
+              <p className="text-sm text-foreground-light">
+                Created:{' '}
+                <TimestampInfo className="text-sm" utcTimestamp={inserted_at} label={created} />
+              </p>
             )}
           </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" icon={<MoreVertical />} className="px-1" />
+            <Button variant="text" icon={<MoreVerticalIcon />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40" side="bottom" align="end">
             <DropdownMenuItem
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
               onClick={() => {
-                setShowConnect(true)
-                dbSelectorState.setSelectedDatabaseId(id)
+                setConnect({ showConnect: true, source: id })
+                state.setSelectedDatabaseId(id)
               }}
             >
               View connection string
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="gap-x-2"
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
-            >
-              <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
-                View replication lag
-              </Link>
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="gap-x-2"
-              onClick={() => onSelectRestartReplica()}
-              disabled={status !== REPLICA_STATUS.ACTIVE_HEALTHY}
-            >
-              Restart replica
+            <DropdownMenuItem className="gap-x-2" asChild>
+              <Link href={getReadReplicaPath(ref, id)}>Manage replica</Link>
             </DropdownMenuItem>
-            {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
-                Resize replica
-              </DropdownMenuItem> */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuItem
-                  className="gap-x-2 !pointer-events-auto"
-                  disabled={!canManageReplicas}
-                  onClick={() => {
-                    if (canManageReplicas) onSelectDropReplica()
-                  }}
-                >
-                  Drop replica
-                </DropdownMenuItem>
-              </TooltipTrigger>
-              {!canManageReplicas && (
-                <TooltipContent side="left">
-                  You need additional permissions to drop replicas
-                </TooltipContent>
-              )}
-            </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -402,15 +385,11 @@ export const RegionNode = ({ data }: any) => {
 
   return (
     <div
-      className="relative flex justify-between rounded bg-black/10 border border-default border-white/10 border-2 p-3"
-      style={{ width: regionNodeWidth, height: 162 }}
+      className="relative flex justify-between rounded-sm bg-black/10 border border-default border-white/10 border-2 p-3"
+      style={{ width: regionNodeWidth, height: REGION_NODE_HEIGHT }}
     >
       <div className="absolute bottom-2 flex items-center justify-between gap-x-2">
-        <img
-          alt="region icon"
-          className="w-5 rounded-sm"
-          src={`${BASE_PATH}/img/regions/${region.key}.svg`}
-        />
+        <RegionFlag className="w-5" region={region.region} />
         <p className="text-sm">{region.name}</p>
       </div>
     </div>

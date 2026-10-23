@@ -1,15 +1,17 @@
+import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
+import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
+import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
+import { BASE_PATH } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { fromMarkdown } from 'mdast-util-from-markdown'
-import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
+import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import type { Metadata, ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
 import { visit } from 'unist-util-visit'
 
-import { REFERENCES, clientSdkIds, selfHostingServices } from '~/content/navigation.references'
-import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
-import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
-import { BASE_PATH } from '~/lib/constants'
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 export interface AbbrevApiReferenceSection {
   id: string
@@ -30,15 +32,21 @@ export function parseReferencePath(slug: Array<string>) {
   const isSelfHostingReference = slug[0].startsWith('self-hosting-')
 
   if (isClientSdkReference) {
-    let [sdkId, maybeVersion, maybeCrawlers, ...path] = slug
-    if (!/v\d+/.test(maybeVersion)) {
+    let sdkId: string
+    let maybeVersion: string | null
+    let maybeCrawlers: string | null
+    let path: string[]
+    ;[sdkId, maybeVersion, maybeCrawlers, ...path] = slug
+    if (!/^v\d+$/.test(maybeVersion)) {
       maybeVersion = null
-      maybeCrawlers = maybeVersion
       path = [maybeCrawlers, ...path]
+      maybeCrawlers = maybeVersion
     }
     if (maybeCrawlers !== 'crawlers') {
+      if (typeof maybeCrawlers === 'string') {
+        path = [maybeCrawlers, ...path]
+      }
       maybeCrawlers = null
-      path = [maybeCrawlers, ...path]
     }
 
     return {
@@ -75,7 +83,7 @@ export function parseReferencePath(slug: Array<string>) {
 async function generateStaticParamsForSdkVersion(sdkId: string, version: string) {
   const flattenedSections = await getFlattenedSections(sdkId, version)
 
-  return flattenedSections
+  return (flattenedSections || [])
     .filter((section) => section.type !== 'category' && !!section.slug)
     .map((section) => ({
       slug: [
@@ -84,6 +92,21 @@ async function generateStaticParamsForSdkVersion(sdkId: string, version: string)
         'crawlers',
         section.slug,
       ].filter(Boolean),
+    }))
+}
+
+// Spike (DOCS-1268): one static page per Management API endpoint, in addition
+// to the existing bare `/reference/api` monolith. Deliberately does not reuse
+// generateStaticParamsForSdkVersion's output shape — that function bakes in a
+// 'crawlers' path segment for a separate crawler-only mechanism unrelated to
+// these human-facing per-operation URLs.
+async function generateStaticParamsForApi() {
+  const flattenedSections = await getFlattenedSections('api', 'latest')
+
+  return (flattenedSections || [])
+    .filter((section) => section.type !== 'category' && !!section.slug)
+    .map((section) => ({
+      slug: ['api', section.slug],
     }))
 }
 
@@ -109,6 +132,7 @@ export async function generateReferenceStaticParams() {
     {
       slug: ['api'],
     },
+    ...(await generateStaticParamsForApi()),
   ]
 
   const selfHostingPages = selfHostingServices.map((service) => ({
@@ -119,9 +143,10 @@ export async function generateReferenceStaticParams() {
 }
 
 export async function generateReferenceMetadata(
-  { params: { slug } }: { params: { slug: Array<string> } },
+  props: { params: Promise<{ slug: Array<string> }> },
   resolvingParent: ResolvingMetadata
 ): Promise<Metadata> {
+  const { slug } = await props.params
   const { alternates: parentAlternates, openGraph: parentOg } = await resolvingParent
 
   const parsedPath = parseReferencePath(slug)
@@ -130,7 +155,7 @@ export async function generateReferenceMetadata(
   const isApiReference = parsedPath.__type === 'api'
   const isSelfHostingReference = parsedPath.__type === 'self-hosting'
   if (isClientSdkReference) {
-    const { sdkId, maybeVersion } = parsedPath
+    const { sdkId, maybeVersion, path } = parsedPath
     const version = maybeVersion ?? REFERENCES[sdkId].versions[0]
 
     const flattenedSections = await getFlattenedSections(sdkId, version)
@@ -138,9 +163,9 @@ export async function generateReferenceMetadata(
     const displayName = REFERENCES[sdkId].name
     const sectionTitle =
       slug.length > 0
-        ? flattenedSections.find((section) => section.slug === slug[0])?.title
+        ? flattenedSections?.find((section) => section.slug === slug[0])?.title
         : undefined
-    const url = [BASE_PATH, 'reference', sdkId, maybeVersion, slug[0]].filter(Boolean).join('/')
+    const url = [BASE_PATH, 'reference', sdkId, path[0]].filter(Boolean).join('/')
 
     const images = generateOpenGraphImageMeta({
       type: 'API Reference',
@@ -148,12 +173,11 @@ export async function generateReferenceMetadata(
     })
 
     return {
-      title: `${displayName} API Reference | Supabase Docs`,
+      title: `${displayName} API Reference | ${metadataTitle || 'Supabase'}`,
       description: `API reference for the ${displayName} Supabase SDK`,
       ...(slug.length > 0
         ? {
             alternates: {
-              ...parentAlternates,
               canonical: url,
             },
           }
@@ -170,9 +194,35 @@ export async function generateReferenceMetadata(
       description: 'CLI reference for the Supabase CLI',
     }
   } else if (isApiReference) {
+    const { path } = parsedPath
+    const operationSlug = path[0]
+
+    const flattenedSections = operationSlug
+      ? await getFlattenedSections('api', 'latest')
+      : undefined
+    const sectionTitle = flattenedSections?.find((section) => section.slug === operationSlug)?.title
+
+    const url = [BASE_PATH, 'reference', 'api', operationSlug].filter(Boolean).join('/')
+    const images = generateOpenGraphImageMeta({
+      type: 'API Reference',
+      title: `Management API${sectionTitle ? `: ${sectionTitle}` : ''}`,
+    })
+
     return {
-      title: 'Management API Reference | Supabase Docs',
-      description: 'Management API reference for the Supabase API',
+      title: `${sectionTitle ? `${sectionTitle} | ` : ''}Management API Reference | Supabase Docs`,
+      description: `Management API reference for the Supabase API${sectionTitle ? `: ${sectionTitle}` : ''}`,
+      ...(operationSlug
+        ? {
+            alternates: {
+              canonical: url,
+            },
+          }
+        : {}),
+      openGraph: {
+        ...parentOg,
+        url,
+        images,
+      },
     }
   } else if (isSelfHostingReference) {
     return {
@@ -218,8 +268,8 @@ export function normalizeMarkdown(markdownUnescaped: string): string {
   visit(markdownTree, ['code', 'inlineCode'], (node) => {
     codeBlocks.push({
       type: node.type,
-      start: node.position.start.offset,
-      end: node.position.end.offset,
+      start: node.position?.start?.offset || 0,
+      end: node.position?.end?.offset || 0,
     })
   })
   // Sort code blocks by start offset in descending order
@@ -261,3 +311,5 @@ export function normalizeMarkdown(markdownUnescaped: string): string {
 
   return content
 }
+
+export { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'

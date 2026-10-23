@@ -1,42 +1,57 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
-import { Pause } from 'lucide-react'
+import { CirclePauseIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
 import {
-  useIsProjectActive,
-  useProjectContext,
-} from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PROJECT_STATUS } from 'lib/constants'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
 
-const PauseProjectButton = () => {
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useProjectPauseMutation } from '@/data/projects/project-pause-mutation'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import {
+  useIsHighAvailability,
+  useIsProjectActive,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+
+export const PauseProjectButton = () => {
   const router = useRouter()
-  const queryClient = useQueryClient()
-  const { project } = useProjectContext()
-  const organization = useSelectedOrganization()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { setProjectStatus } = useSetProjectStatus()
+
   const isProjectActive = useIsProjectActive()
+  const isHighAvailability = useIsHighAvailability()
+  const isProjectUnhealthy = project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const projectRef = project?.ref ?? ''
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-  const canPauseProject = useCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_jobs.projects.pause'
-  )
+  const { can: canPauseProject } = useAsyncCheckPermissionsV2([FGA_PERMISSIONS.PROJECT.ADMIN_WRITE])
 
   const isFreePlan = organization?.plan.id === 'free'
+  const isBranch = Boolean(project?.parent_project_ref)
+  const entityLabel = isBranch ? 'branch' : 'project'
+  const { hasAccess: projectPausingAllowedInOrg } = useCheckEntitlements(
+    'project_pausing',
+    organization?.slug
+  )
 
-  const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
-    onSuccess: (res, variables) => {
-      setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.PAUSING)
+  const { mutate: pauseProject, isPending: isPausing } = useProjectPauseMutation({
+    onSuccess: (_, variables) => {
+      setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.PAUSING })
       toast.success('Pausing project...')
       router.push(`/project/${projectRef}`)
     },
@@ -44,57 +59,71 @@ const PauseProjectButton = () => {
 
   const requestPauseProject = () => {
     if (!canPauseProject) {
-      return toast.error('You do not have the required permissions to pause this project')
+      return toast.error(`You do not have the required permissions to pause this ${entityLabel}`)
     }
     pauseProject({ ref: projectRef })
   }
 
   const buttonDisabled =
-    !isFreePlan || project === undefined || isPaused || !canPauseProject || !isProjectActive
+    (!isBranch && !projectPausingAllowedInOrg) ||
+    project === undefined ||
+    isPaused ||
+    !canPauseProject ||
+    !isProjectActive ||
+    isHighAvailability
+
+  function getTooltipText() {
+    if (isPaused) {
+      return `Your ${entityLabel} is already paused`
+    } else if (isHighAvailability) {
+      return 'Pausing is unavailable on High Availability projects'
+    } else if (!canPauseProject) {
+      return `You need additional permissions to pause this ${entityLabel}`
+    } else if (isProjectUnhealthy) {
+      return `Your ${entityLabel} is unhealthy — restart it instead to restore normal operation`
+    } else if (!isProjectActive) {
+      return `Unable to pause ${entityLabel} as ${entityLabel} is not active`
+    } else if (!isBranch && !projectPausingAllowedInOrg && !isFreePlan) {
+      return 'Projects on a paid plan will always be running'
+    } else {
+      return undefined
+    }
+  }
 
   return (
     <>
       <ButtonTooltip
-        type="default"
-        icon={<Pause />}
+        icon={<CirclePauseIcon />}
         onClick={() => setIsModalOpen(true)}
         loading={isPausing}
         disabled={buttonDisabled}
         tooltip={{
           content: {
             side: 'bottom',
-            text: isPaused
-              ? 'Your project is already paused'
-              : !canPauseProject
-                ? 'You need additional permissions to pause this project'
-                : !isProjectActive
-                  ? 'Unable to pause project as project is not active'
-                  : !isFreePlan
-                    ? 'Projects on a paid plan will always be running'
-                    : undefined,
+            text: getTooltipText(),
           },
         }}
       >
-        Pause project
+        Pause {entityLabel}
       </ButtonTooltip>
 
-      <ConfirmationModal
-        variant={'destructive'}
-        visible={isModalOpen}
-        loading={isPausing}
-        title="Pause this project?"
-        confirmLabel="Pause project"
-        confirmLabelLoading="Pausing project"
-        onCancel={() => setIsModalOpen(false)}
-        onConfirm={requestPauseProject}
-      >
-        <p className="text-foreground-light text-sm">
-          Are you sure you want to pause this project? It will not be accessible until you unpause
-          it.
-        </p>
-      </ConfirmationModal>
+      <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Pause {entityLabel}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This {entityLabel} will be unavailable while paused. Paused {entityLabel} can be
+              resumed for up to 1 year. After that, backups remain available to download.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPausing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction disabled={isPausing} onClick={requestPauseProject} variant="danger">
+              {isPausing ? `Pausing ${entityLabel}...` : `Pause ${entityLabel}`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
-
-export default PauseProjectButton

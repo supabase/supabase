@@ -1,7 +1,7 @@
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
-import { Database } from '../common/database-types.ts'
+import { Database } from '../../../packages/common/database-types.ts'
 import { ApplicationError, UserError } from '../common/errors.ts'
 
 const openAiKey = Deno.env.get('OPENAI_API_KEY')
@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
       throw new UserError('Missing request data')
     }
 
-    const { query } = requestData
+    const { query, useAlternateSearchIndex } = requestData
 
     if (!query) {
       throw new UserError('Missing query in request data')
@@ -76,7 +76,11 @@ Deno.serve(async (req) => {
     }
 
     const [{ embedding }] = embeddingResponse.data.data
-    const { error: matchError, data: pages } = await supabaseClient.rpc('docs_search_embeddings', {
+
+    const searchFunction = useAlternateSearchIndex
+      ? 'docs_search_embeddings_nimbus'
+      : 'docs_search_embeddings'
+    const { error: matchError, data: pages } = await supabaseClient.rpc(searchFunction, {
       embedding,
       match_threshold: 0.78,
     })

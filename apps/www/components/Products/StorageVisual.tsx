@@ -1,4 +1,4 @@
-import { range } from 'lodash'
+import { range } from 'lib/helpers'
 import { File, Image, Video } from 'lucide-react'
 import { cn } from 'ui'
 

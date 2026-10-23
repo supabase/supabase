@@ -1,11 +1,11 @@
-import { Forward, Wrench, Building } from 'lucide-react'
-import { useMemo } from 'react'
-
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 import { IS_PLATFORM } from 'common'
+import { BuildingIcon, ForwardIcon, WrenchIcon } from 'lucide-react'
+import { useMemo } from 'react'
+import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'
 const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
@@ -13,11 +13,11 @@ const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
 export function useProjectSwitchCommand() {
   const setPage = useSetPage()
 
-  const { data: _projects } = useProjectsQuery({ enabled: IS_PLATFORM })
-  const projects = useMemo(
-    () => (_projects ?? []).map(({ name, ref }) => ({ name, ref })),
-    [_projects]
-  )
+  // [Joshen] Using paginated data here which means we won't be showing all projects
+  // Ideally we somehow support searching with Cmd K if we want to make this ideal
+  // e.g Cmd K input to support async searching while in "switch project" state
+  const { data } = useProjectsInfiniteQuery({}, { enabled: IS_PLATFORM })
+  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects), [data?.pages]) || []
 
   useRegisterPage(
     PROJECT_SWITCHER_PAGE_NAME,
@@ -32,7 +32,7 @@ export function useProjectSwitchCommand() {
             name,
             value: `${name} (${ref})`,
             route: `/project/${ref}`,
-            icon: () => <Forward />,
+            icon: () => <ForwardIcon />,
           })),
         },
       ],
@@ -45,10 +45,10 @@ export function useProjectSwitchCommand() {
     [
       {
         id: 'switch-project',
-        name: 'Switch project',
+        name: 'Switch project...',
         value: 'Switch project, Change project, Select project',
         action: () => setPage(PROJECT_SWITCHER_PAGE_NAME),
-        icon: () => <Wrench />,
+        icon: () => <WrenchIcon />,
       },
     ],
     { enabled: !!projects && projects.length > 0 }
@@ -74,12 +74,12 @@ export function useConfigureOrganizationCommand() {
               name,
               value: `${name} (${slug})`,
               route: `/org/${slug}/general`,
-              icon: () => <Building />,
+              icon: () => <BuildingIcon />,
             })) ?? [],
         },
       ],
     },
-    { deps: [organizations], enabled: !!organizations && organizations.length > 0 }
+    { deps: [organizations], enabled: IS_PLATFORM && !!organizations && organizations.length > 0 }
   )
 
   useRegisterCommands(
@@ -87,12 +87,12 @@ export function useConfigureOrganizationCommand() {
     [
       {
         id: 'configure-organization',
-        name: 'Configure organization',
+        name: 'Configure organization...',
         value: 'Configure organization, Change organization, Select organization',
         action: () => setPage(ORGANIZATION_SWITCHER_PAGE_NAME),
-        icon: () => <Building />,
+        icon: () => <BuildingIcon />,
       },
     ],
-    { enabled: !!organizations && organizations.length > 0 }
+    { enabled: IS_PLATFORM && !!organizations && organizations.length > 0 }
   )
 }

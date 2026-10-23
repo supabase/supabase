@@ -1,10 +1,11 @@
 // @ts-check
+import configureBundleAnalyzer from '@next/bundle-analyzer'
 import nextMdx from '@next/mdx'
+import { withSentryConfig } from '@sentry/nextjs'
+import withYaml from 'next-plugin-yaml'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
-
-import configureBundleAnalyzer from '@next/bundle-analyzer'
-import withYaml from 'next-plugin-yaml'
+import { parse as parseToml } from 'smol-toml'
 
 import remotePatterns from './lib/remotePatterns.js'
 
@@ -22,7 +23,6 @@ const withMDX = nextMdx({
 })
 
 /** @type {import('next').NextConfig} nextConfig */
-
 const nextConfig = {
   assetPrefix: getAssetPrefix(),
   // Append the default value with md extensions
@@ -31,37 +31,45 @@ const nextConfig = {
   // swcMinify: true,
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
-    dangerouslyAllowSVG: true,
+    dangerouslyAllowSVG: false,
+    // Some guides add `?v=N` to local image paths for cache busting, which Next.js rejects unless
+    // `localPatterns` allows it. Omitting `search` allows any query string.
+    localPatterns: [{ pathname: '/**' }],
     // @ts-ignore
     remotePatterns,
-  },
-  // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
-  // mdxRs: true,
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}',
-    },
   },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.include$/,
       type: 'asset/source',
     })
+    config.module.rules.push({
+      test: /\.toml$/,
+      type: 'json',
+      parser: {
+        parse: parseToml,
+      },
+    })
     return config
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
-  experimental: {
-    outputFileTracingIncludes: {
-      '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-      '/guides/**/*': [
-        './content/guides/**/*',
-        './content/troubleshooting/**/*',
-        './examples/**/*',
-      ],
-      '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-    },
-    serverComponentsExternalPackages: ['libpg-query', 'twoslash'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'docs-search',
+    'dayjs',
+    'shared-data',
+    'api-types',
+    'icons',
+    'next-mdx-remote',
+  ],
+  outputFileTracingIncludes: {
+    '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+    '/api/guides-md/**/*': ['./public/markdown/guides/**/*'],
+    '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
+    '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
+  serverExternalPackages: ['libpg-query', 'twoslash'],
   async headers() {
     return [
       {
@@ -128,6 +136,16 @@ const nextConfig = {
    */
   async redirects() {
     return [
+      {
+        source: '/guides/observability/access-data',
+        destination: '/guides/observability',
+        permanent: true,
+      },
+      {
+        source: '/guides/observability/access-data.md',
+        destination: '/guides/observability.md',
+        permanent: true,
+      },
       // Redirect root to docs base path in dev/preview envs
       {
         source: '/',
@@ -151,16 +169,75 @@ const nextConfig = {
         basePath: false,
         permanent: false,
       },
+
+      // Redirect old managed pipeline slugs in dev/preview envs
+      {
+        source: '/guides/database/replication/bigquery',
+        destination: '/guides/database/replication/pipelines/bigquery',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/clickhouse',
+        destination: '/guides/database/replication/pipelines/clickhouse',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/ducklake',
+        destination: '/guides/database/replication/pipelines/ducklake',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/snowflake',
+        destination: '/guides/database/replication/pipelines/snowflake',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/external-replication-setup',
+        destination: '/guides/database/replication/pipelines',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/external-replication-monitoring',
+        destination: '/guides/database/replication/pipelines-monitoring',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/external-replication-faq',
+        destination: '/guides/database/replication/pipelines-faq',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/replication-setup',
+        destination: '/guides/database/replication/pipelines',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/replication-monitoring',
+        destination: '/guides/database/replication/pipelines-monitoring',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/replication-faq',
+        destination: '/guides/database/replication/pipelines-faq',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/inspect',
+        destination: '/guides/monitoring-and-debugging/inspect',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/database-advisors',
+        destination: '/guides/observability/advisors',
+        permanent: true,
+      },
     ]
   },
   typescript: {
-    // WARNING: production builds can successfully complete even there are type errors
-    // Typechecking is checked separately via .github/workflows/typecheck.yml
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
+    // On previews, typechecking is run via GitHub Action only for efficiency
+    // On production, we turn it on to prevent errors from conflicting PRs getting into
+    // prod
+    ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
   },
 }
 
@@ -170,7 +247,35 @@ const configExport = () => {
   return plugins.reduce((acc, next) => next(acc), nextConfig)
 }
 
-export default configExport
+export default withSentryConfig(configExport, {
+  // For all available options, see:
+  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
+
+  org: 'supabase',
+  project: 'docs',
+  applicationKey: 'supabase-docs',
+  webpack: {
+    treeshake: {
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      removeDebugLogging: true,
+    },
+  },
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  widenClientFileUpload: true,
+
+  // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+  // This can increase your server load as well as your hosting bill.
+  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+  // side errors will fail.
+  // tunnelRoute: "/monitoring",
+})
 
 function getAssetPrefix() {
   // If not force enabled, but not production env, disable CDN

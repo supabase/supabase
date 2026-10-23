@@ -40,7 +40,7 @@ npx supabase secrets set --env-file ./supabase/.env --project-ref <PROJECT REF>
 npx supabase secrets list
 ```
 
-For security reasons, it is not advised to log secrets, but you can log a truncated version just for the reassurance that they're being updated:
+For security reasons, it is not advised to log secrets, but you can log a truncated version for the reassurance that they're being updated:
 
 ```typescript
 //logs the function call and the secrets
@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
 })
 ```
 
-After calling your function, you can check your [edge function logs](https://supabase.com/dashboard/project/_/functions/hello-world/logs?s=logging) to observe the logged values. It should look something like this:
+After calling your function, you can check your [edge function logs](/dashboard/project/_/functions/hello-world/logs?s=logging) to observe the logged values. It should look something like this:
 
 > Note: search filters are case sensitive and must be present in the event message.
 

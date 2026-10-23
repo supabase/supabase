@@ -1,0 +1,52 @@
+---
+title: Realtime Avatar Stack
+description: Avatar stack in realtime
+preview: |-
+  <BlockOverview name="realtime-avatar-stack-nuxtjs" showFiles>
+    <BlockPreview name="realtime-avatar-stack-demo" />
+  </BlockOverview>
+---
+
+## Installation
+
+### Set up the Supabase client
+
+This block requires a Supabase client for Nuxt.js. If your project already has one, reuse it and update the block's imports to match your client. Otherwise, install the client:
+
+<BlockItem name="supabase-client-nuxtjs" framework="vue" showOpenInV0={false} />
+
+Configure the environment variables described in the [Nuxt.js client guide](/library/docs/nuxtjs/client#getting-started) before using the block.
+
+### Install the block
+
+<BlockItem name="realtime-avatar-stack-nuxtjs" framework="vue" />
+
+## Usage
+
+The `RealtimeAvatarStack` component renders stacked avatars which are connected to Supabase Realtime. It uses the Presence feature of Supabase Realtime. You can use this to show currently online users in a chatroom, game session or collaborative app.
+
+```vue
+<script setup lang="ts">
+// Assumes you have Header component created
+import Header from '@/components/Header.vue'
+import RealtimeAvatarStack from '@/components/RealtimeAvatarStack.vue'
+</script>
+
+<template>
+  <Header class="flex items-center justify-between">
+    <h1>Lumon Industries</h1>
+    <RealtimeAvatarStack roomName="break_room" />
+  </Header>
+</template>
+```
+
+## Props
+
+| Prop       | Type     | Default | Description                                          |
+| ---------- | -------- | ------- | ---------------------------------------------------- |
+| `roomName` | `string` | `null`  | The name of the Supabase Realtime room to connect to |
+
+## Further reading
+
+- [Realtime Presence](https://supabase.com/docs/guides/realtime/presence)
+- [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)

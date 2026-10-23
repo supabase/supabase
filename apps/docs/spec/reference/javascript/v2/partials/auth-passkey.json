@@ -1,0 +1,6 @@
+{
+  "id": "auth-passkey",
+  "title": "Auth Passkey",
+  "description": "This section contains methods for WebAuthn passkey registration, authentication, and management. Methods are invoked behind the `supabase.auth.passkey` namespace.\n\nPasskey support is an experimental feature. Enable it when creating the client:",
+  "code": "```js\nconst supabase = createClient(supabaseUrl, publishableKey, {\n  auth: {\n    experimental: { passkey: true },\n  },\n})\n```"
+}

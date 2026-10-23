@@ -1,33 +1,38 @@
-import dayjs from 'dayjs'
-import { Rewind } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useState } from 'react'
-
 import { useParams } from 'common'
-import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import useLogsPreview from 'hooks/analytics/useLogsPreview'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
-import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
-import useSingleLog from 'hooks/analytics/useSingleLog'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import dayjs from 'dayjs'
+import { RewindIcon } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
-import LogTable from './LogTable'
-import { DatePickerValue } from './Logs.DatePickers'
+
 import {
-  LOGS_TABLES,
   LOG_ROUTES_WITH_REPLICA_SUPPORT,
+  LOGS_TABLES,
   LogsTableName,
   PREVIEWER_DATEPICKER_HELPERS,
 } from './Logs.constants'
+import { DatePickerValue } from './Logs.DatePickers'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
-import { maybeShowUpgradePrompt } from './Logs.utils'
+import { maybeShowUpgradePromptIfNotEntitled } from './Logs.utils'
+import { calculateBarClickTimeRange } from './LogsBarChart.utils'
+import { LogTable } from './LogTable'
 import UpgradePrompt from './UpgradePrompt'
+import { useLogsPreviewShortcuts } from './useLogsPreviewShortcuts'
+import { PreviewFilterPanel } from '@/components/interfaces/Settings/Logs/PreviewFilterPanel'
+import LoadingOpacity from '@/components/ui/LoadingOpacity'
+import ShimmerLine from '@/components/ui/ShimmerLine'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import useLogsPreview from '@/hooks/analytics/useLogsPreview'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
+import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
+import useSingleLog from '@/hooks/analytics/useSingleLog'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 /**
  * Acts as a container component for the entire log display
@@ -60,9 +65,10 @@ export const LogsPreviewer = ({
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { db } = useParams()
-  const organization = useSelectedOrganization()
+  const { data: organization } = useSelectedOrganizationQuery()
   const state = useDatabaseSelectorStateSnapshot()
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [showChart, setShowChart] = useState(true)
   const [selectedDatePickerValue, setSelectedDatePickerValue] = useState<DatePickerValue>(
     getDefaultDatePickerValue()
@@ -70,6 +76,18 @@ export const LogsPreviewer = ({
 
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange, filters, setFilters } =
     useLogsUrlState()
+
+  useEffect(() => {
+    if (timestampStart && timestampEnd) {
+      setSelectedDatePickerValue({
+        to: timestampEnd,
+        from: timestampStart,
+        text: `${dayjs(timestampStart).format('DD MMM, HH:mm')} - ${dayjs(timestampEnd).format('DD MMM, HH:mm')}`,
+        isHelper: false,
+      })
+    }
+  }, [timestampStart, timestampEnd])
+
   const [selectedLogId, setSelectedLogId] = useSelectedLog()
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
 
@@ -140,21 +158,29 @@ export const LogsPreviewer = ({
         setTimeRange(newTimestampStart, timestampEnd)
       }
     }
+    setSelectedLogId(null)
     refresh()
   }
+
+  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementNumericValue()
 
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
       setSearch(query || '')
       setSelectedLogId(null)
     } else if (event === 'event-chart-bar-click') {
+      setSelectedLogId(null)
       setTimeRange(from || '', to || '')
     } else if (event === 'datepicker-change') {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(from || '', organization?.plan?.id)
-
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        from || '',
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       } else {
+        setSelectedLogId(null)
         setTimeRange(from || '', to || '')
       }
     }
@@ -163,7 +189,10 @@ export const LogsPreviewer = ({
   // Show the prompt on page load based on query params
   useEffect(() => {
     if (timestampStart) {
-      const shouldShowUpgradePrompt = maybeShowUpgradePrompt(timestampStart, organization?.plan?.id)
+      const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
+        timestampStart,
+        entitledToAuditLogDays
+      )
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       }
@@ -186,39 +215,56 @@ export const LogsPreviewer = ({
     }
   }, [db, isSuccess])
 
+  // Common props shared between both filter panel components to avoid duplication
+  const filterPanelProps = {
+    className: filterPanelClassName,
+    csvData: logData,
+    isLoading,
+    newCount,
+    onRefresh: handleRefresh,
+    onSearch: handleSearch,
+    defaultSearchValue: search,
+    defaultToValue: timestampEnd,
+    defaultFromValue: timestampStart,
+    queryUrl: `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
+      params.sql || ''
+    )}&its=${encodeURIComponent(timestampStart)}&ite=${encodeURIComponent(timestampEnd)}`,
+    onSelectTemplate,
+    filters,
+    onFiltersChange: setFilters,
+    table,
+    condensedLayout,
+    isShowingEventChart: showChart,
+    onToggleEventChart: () => setShowChart(!showChart),
+    onSelectedDatabaseChange: (id: string) => {
+      setFilters({ ...filters, database: id !== projectRef ? id : undefined })
+      const { db, ...params } = router.query
+      router.push({
+        pathname: router.pathname,
+        query: id !== projectRef ? { ...router.query, db: id } : params,
+      })
+    },
+    selectedDatePickerValue,
+    setSelectedDatePickerValue,
+    searchInputRef,
+  }
+
+  useLogsPreviewShortcuts({
+    searchInputRef,
+    hasSearch: search.length > 0,
+    onResetSearch: () => {
+      setSearch('')
+      setSelectedLogId(null)
+    },
+    onRefresh: handleRefresh,
+    onToggleChart: () => setShowChart((prev) => !prev),
+    onLoadOlder: loadOlder,
+    canLoadOlder: !error && logData.length > 0 && !isLoadingOlder,
+  })
+
   return (
     <div className="flex-1 flex flex-col h-full">
-      <PreviewFilterPanel
-        className={filterPanelClassName}
-        csvData={logData}
-        isLoading={isLoading}
-        newCount={newCount}
-        onRefresh={handleRefresh}
-        onSearch={handleSearch}
-        defaultSearchValue={search}
-        defaultToValue={timestampEnd}
-        defaultFromValue={timestampStart}
-        queryUrl={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(
-          params.sql || ''
-        )}&its=${encodeURIComponent(timestampStart)}&ite=${encodeURIComponent(timestampEnd)}`}
-        onSelectTemplate={onSelectTemplate}
-        filters={filters}
-        onFiltersChange={setFilters}
-        table={table}
-        condensedLayout={condensedLayout}
-        isShowingEventChart={showChart}
-        onToggleEventChart={() => setShowChart(!showChart)}
-        onSelectedDatabaseChange={(id: string) => {
-          setFilters({ ...filters, database: id !== projectRef ? id : undefined })
-          const { db, ...params } = router.query
-          router.push({
-            pathname: router.pathname,
-            query: id !== projectRef ? { ...router.query, db: id } : params,
-          })
-        }}
-        selectedDatePickerValue={selectedDatePickerValue}
-        setSelectedDatePickerValue={setSelectedDatePickerValue}
-      />
+      <PreviewFilterPanel {...filterPanelProps} />
       {children}
       <div
         className={
@@ -233,10 +279,11 @@ export const LogsPreviewer = ({
               onBarClick={(datum) => {
                 if (!datum?.timestamp) return
 
-                const datumTimestamp = dayjs(datum.timestamp).toISOString()
-
-                const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
-                const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+                const { start, end } = calculateBarClickTimeRange(
+                  timestampStart,
+                  timestampEnd,
+                  datum.timestamp
+                )
 
                 handleSearch('event-chart-bar-click', {
                   query: filters.search_query?.toString(),
@@ -246,7 +293,7 @@ export const LogsPreviewer = ({
               }}
               EmptyState={
                 <div className="flex flex-col items-center justify-center h-[67px]">
-                  <h2 className="text-foreground-light text-xs">No data</h2>
+                  <p className="text-foreground-light text-xs">No data</p>
                   <p className="text-foreground-lighter text-xs">
                     It may take up to 24 hours for data to refresh
                   </p>
@@ -256,7 +303,7 @@ export const LogsPreviewer = ({
           )}
         </div>
       </div>
-      <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
+      <div className="relative flex flex-col grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
@@ -277,15 +324,16 @@ export const LogsPreviewer = ({
       </div>
       {!error && logData.length > 0 && (
         <div className="border-t flex flex-row items-center gap-3 p-2">
-          <Button
-            onClick={loadOlder}
-            icon={<Rewind />}
-            type="default"
-            loading={isLoadingOlder}
-            disabled={isLoadingOlder}
-          >
-            Load older
-          </Button>
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_LOAD_OLDER} side="top">
+            <Button
+              onClick={loadOlder}
+              icon={<RewindIcon />}
+              loading={isLoadingOlder}
+              disabled={isLoadingOlder}
+            >
+              Load older
+            </Button>
+          </ShortcutTooltip>
           <div className="text-sm text-foreground-lighter">
             Showing <span className="font-mono">{logData.length}</span> results
           </div>
@@ -297,5 +345,3 @@ export const LogsPreviewer = ({
     </div>
   )
 }
-
-export default LogsPreviewer

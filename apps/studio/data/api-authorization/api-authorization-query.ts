@@ -1,8 +1,9 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
 import { resourceKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomQueryOptions } from '@/types'
 
 export type ApiAuthorizationVariables = {
   id?: string
@@ -13,10 +14,12 @@ export type ApiAuthorizationResponse = {
   website: string
   icon: string | null
   domain: string
+  redirect_uri?: string
   scopes: OAuthScope[]
   expires_at: string
   approved_at: string | null
   approved_organization_slug?: string
+  registration_type: string
 }
 
 export async function getApiAuthorizationDetails(
@@ -39,13 +42,11 @@ export type ResourceError = { errorEventId: string; message: string }
 
 export const useApiAuthorizationQuery = <TData = ResourceData>(
   { id }: ApiAuthorizationVariables,
-  { enabled = true, ...options }: UseQueryOptions<ResourceData, ResourceError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<ResourceData, ResourceError, TData> = {}
 ) =>
-  useQuery<ResourceData, ResourceError, TData>(
-    resourceKeys.resource(id),
-    ({ signal }) => getApiAuthorizationDetails({ id }, signal),
-    {
-      enabled: enabled && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ResourceData, ResourceError, TData>({
+    queryKey: resourceKeys.resource(id),
+    queryFn: ({ signal }) => getApiAuthorizationDetails({ id }, signal),
+    enabled: enabled && typeof id !== 'undefined',
+    ...options,
+  })

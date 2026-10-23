@@ -2,8 +2,8 @@
 title: 'Supabase Edge Functions: Introducing Background Tasks, Ephemeral Storage, and WebSockets'
 description: Edge functions can be used for workloads outside the request-response lifecycle
 author: laktek,nyannyacha
-image: launch-week-13/day-2-functions-background-tasks/og.jpg
-thumb: launch-week-13/day-2-functions-background-tasks/thumb.jpg
+imgSocial: launch-week-13/day-2-functions-background-tasks/og.jpg
+imgThumb: launch-week-13/day-2-functions-background-tasks/thumb.jpg
 categories:
   - product
 tags:
@@ -30,9 +30,9 @@ Starting today, you can use these features in any project. Let's explore what ex
 
 ## Background Tasks
 
-Sometimes you need a backend logic to do more than respond to a request. For example, you might want to process a batch of files and upload the results to Supabase Storage. Or read multiple entries from a database table and generate embeddings for each entry.
+Sometimes you need a backend logic to do more than respond to a request. For example, you might want to process a batch of files and upload the results to [Supabase Storage](/storage). Or read multiple entries from a database table and generate embeddings for each entry.
 
-With the introduction of background tasks, executing these long-running workloads with Edge Functions is super easy.
+With the introduction of background tasks, executing these long-running workloads with [Edge Functions](/edge-functions) is super easy.
 
 We've introduced a new method called `EdgeRuntime.waitUntil` , which accepts a promise. This ensures that the function isn't terminated until the promise is resolved.
 

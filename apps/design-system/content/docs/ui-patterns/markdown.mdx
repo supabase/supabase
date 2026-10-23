@@ -1,0 +1,101 @@
+---
+title: Markdown
+description: Composable Markdown renderer
+---
+
+A composable `react-markdown` component with defaults for all standard markdown elements (headings, paragraphs, lists, blockquotes, links, images, tables, code). Customize any element via the `components` prop and import optional components such as Quote or Avatar.
+All components are lazy-loaded.
+
+<ComponentPreview name="markdown-full-example" peekCode />
+
+## API
+
+| Prop            | Type                  | Default       | Description                                                            |
+| --------------- | --------------------- | ------------- | ---------------------------------------------------------------------- |
+| `children`      | `string`              | -             | Markdown content to render                                             |
+| `content`       | `string`              | `''`          | **Deprecated**: Use `children` instead                                 |
+| `codeBlock`     | `boolean`             | `false`       | Enable syntax highlighting for code blocks (lazy-loaded via CodeBlock) |
+| `components`    | `Partial<Components>` | -             | Override or add specific markdown elements                             |
+| `className`     | `string`              | -             | CSS class for the wrapper div                                          |
+| `remarkPlugins` | `PluggableList`       | `[remarkGfm]` | Additional remark plugins (GFM is included by default)                 |
+
+All other `react-markdown` options are supported via spread props.
+
+## Customization
+
+Override any element or add new ones via the `components` prop.
+
+<ComponentPreview name="markdown-customization" peekCode />
+
+## Primitive Components
+
+```tsx
+import {
+  Anchor,
+  Avatar,
+  Blockquote,
+  Code,
+  CodeBlockPre,
+  DefaultPre,
+  Hr,
+  Img,
+  Paragraph,
+  Quote,
+  SimplePre,
+  Table,
+  Td,
+  Th,
+  Tr,
+  UnorderedList,
+} from 'ui-patterns/Markdown'
+```
+
+### Headings
+
+<ComponentPreview name="markdown-headings" />
+
+### Paragraphs
+
+<ComponentPreview name="markdown-paragraphs" />
+
+### Lists
+
+<ComponentPreview name="markdown-lists" />
+
+### Links
+
+<ComponentPreview name="markdown-links" />
+
+### Inline Code
+
+<ComponentPreview name="markdown-inline-code" />
+
+### Blockquotes
+
+<ComponentPreview name="markdown-blockquotes" />
+
+### Code Blocks
+
+<ComponentPreview name="markdown-code-blocks" />
+
+### Tables
+
+<ComponentPreview name="markdown-tables" />
+
+### Images
+
+<ComponentPreview name="markdown-images" />
+
+### Horizontal Rules
+
+<ComponentPreview name="markdown-horizontal-rules" />
+
+## Optional Components
+
+### Quote
+
+<ComponentPreview name="markdown-quote-component" peekCode />
+
+### Avatar
+
+<ComponentPreview name="markdown-avatar-component" peekCode />

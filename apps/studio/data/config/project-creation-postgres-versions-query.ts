@@ -1,32 +1,31 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
-import { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
+import { useQuery } from '@tanstack/react-query'
 import { CloudProvider } from 'shared-data'
-import type { ResponseError } from 'types'
+
 import { configKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectCreationPostgresVersionsVariables = {
   cloudProvider: CloudProvider
   dbRegion: string
   organizationSlug: string | undefined
-}
-
-export type ProjectCreationPostgresVersion = components['schemas']['ProjectCreationVersionInfo']
-
-export type ProjectCreationPostgresVersionsResponse = {
-  available_versions: ProjectCreationPostgresVersion[]
+  highAvailability?: boolean
 }
 
 export async function getPostgresCreationVersions(
-  { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
+  {
+    cloudProvider,
+    dbRegion,
+    organizationSlug,
+    highAvailability,
+  }: ProjectCreationPostgresVersionsVariables,
   signal?: AbortSignal
 ) {
   if (!organizationSlug) throw new Error('organizationSlug is required')
 
   const { data, error } = await post('/platform/organizations/{slug}/available-versions', {
     params: { path: { slug: organizationSlug } },
-    body: { provider: cloudProvider, region: dbRegion },
+    body: { provider: cloudProvider, region: dbRegion, high_availability: highAvailability },
     signal,
   })
 
@@ -40,42 +39,62 @@ export type ProjectCreationPostgresVersionData = Awaited<
 export type ProjectCreationPostgresVersionError = ResponseError
 
 export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationPostgresVersionData>(
-  { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
+  {
+    cloudProvider,
+    dbRegion,
+    organizationSlug,
+    highAvailability,
+  }: ProjectCreationPostgresVersionsVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     ProjectCreationPostgresVersionData,
     ProjectCreationPostgresVersionError,
     TData
   > = {}
 ) => {
-  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>(
-    configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
-    ({ signal }) =>
-      getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
-    {
-      enabled:
-        enabled &&
-        typeof organizationSlug !== 'undefined' &&
-        organizationSlug !== '_' &&
-        typeof dbRegion !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>({
+    queryKey: configKeys.projectCreationPostgresVersions(
+      organizationSlug,
+      cloudProvider,
+      dbRegion,
+      highAvailability
+    ),
+    queryFn: ({ signal }) =>
+      getPostgresCreationVersions(
+        { organizationSlug, cloudProvider, dbRegion, highAvailability },
+        signal
+      ),
+    enabled:
+      enabled && typeof organizationSlug !== 'undefined' && organizationSlug !== '_' && !!dbRegion,
+    ...options,
+  })
 }
 
 export const useAvailableOrioleImageVersion = (
-  { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
-  { enabled }: { enabled?: boolean }
+  {
+    cloudProvider,
+    dbRegion,
+    organizationSlug,
+    highAvailability,
+  }: ProjectCreationPostgresVersionsVariables,
+  { enabled = true }: { enabled?: boolean } = {}
 ) => {
   const { data } = useProjectCreationPostgresVersionsQuery(
     {
       cloudProvider,
       dbRegion,
       organizationSlug,
+      highAvailability,
     },
-    { enabled }
+    {
+      enabled,
+      select(data) {
+        return (data?.available_versions ?? []).find((x) => x.postgres_engine === '17-oriole')
+      },
+    }
   )
-  return (data?.available_versions ?? []).find((x) => x.postgres_engine === '17-oriole')
+
+  return data
 }

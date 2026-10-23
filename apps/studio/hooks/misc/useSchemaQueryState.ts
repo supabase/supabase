@@ -1,8 +1,6 @@
+import { LOCAL_STORAGE_KEYS, safeLocalStorage, useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
-
-import { useParams } from 'common'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 /**
  * This hook wraps useQueryState because useQueryState imports app router for some reason which breaks the SSR in
@@ -13,7 +11,12 @@ const useIsomorphicUseQueryState = (defaultSchema: string) => {
     return [defaultSchema, () => {}] as const
   } else {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useQueryState('schema', parseAsString.withDefault(defaultSchema))
+    return useQueryState(
+      'schema',
+      parseAsString.withDefault(defaultSchema).withOptions({
+        clearOnDefault: false,
+      })
+    )
   }
 }
 
@@ -21,8 +24,8 @@ export const useQuerySchemaState = () => {
   const { ref } = useParams()
 
   const defaultSchema =
-    typeof window !== 'undefined' && ref && ref.length > 0
-      ? window.localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref)) || 'public'
+    ref && ref.length > 0
+      ? safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref)) || 'public'
       : 'public'
 
   // cache the original default schema so that it's not changed by another tab and cause issues in the app (saving a
@@ -32,8 +35,8 @@ export const useQuerySchemaState = () => {
 
   useEffect(() => {
     // Update the schema in local storage on every change
-    if (typeof window !== 'undefined' && ref && ref.length > 0) {
-      window.localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref), schema)
+    if (ref && ref.length > 0) {
+      safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.LAST_SELECTED_SCHEMA(ref), schema)
     }
   }, [schema, ref])
 

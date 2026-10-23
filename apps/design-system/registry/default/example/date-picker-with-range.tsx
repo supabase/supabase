@@ -1,14 +1,17 @@
 'use client'
 
-import * as React from 'react'
 import { addDays, format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
-// @ts-expect-error
+import * as React from 'react'
 import { DateRange } from 'react-day-picker'
-import { cn } from '@/lib/utils'
-import { Button } from 'ui'
 import { Calendar } from 'ui'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import {
+  DatePicker,
+  DatePickerButton,
+  DatePickerContent,
+  DatePickerTrigger,
+} from 'ui-patterns/DatePicker'
+
+import { cn } from '@/lib/utils'
 
 export default function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const [date, setDate] = React.useState<DateRange | undefined>({
@@ -18,17 +21,9 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
 
   return (
     <div className={cn('grid gap-2', className)}>
-      <Popover_Shadcn_>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            id="date"
-            type={'outline'}
-            className={cn(
-              'w-[300px] justify-start text-left font-normal',
-              !date && 'text-muted-foreground'
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+      <DatePicker>
+        <DatePickerTrigger asChild>
+          <DatePickerButton variant="outline" className="w-[300px]">
             {date?.from ? (
               date.to ? (
                 <>
@@ -40,9 +35,9 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
             ) : (
               <span>Pick a date</span>
             )}
-          </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+          </DatePickerButton>
+        </DatePickerTrigger>
+        <DatePickerContent>
           <Calendar
             initialFocus
             mode="range"
@@ -51,8 +46,8 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
             onSelect={setDate}
             numberOfMonths={2}
           />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </DatePickerContent>
+      </DatePicker>
     </div>
   )
 }

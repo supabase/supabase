@@ -19,7 +19,7 @@ const { data, error } = await supabase
                                 .select('*')`
 
 const ConnectToDBPanel = () => (
-  <CodeWindow className="[&_.synthax-highlighter]:!min-h-[200px]" code={code} showLineNumbers />
+  <CodeWindow className="[&_.synthax-highlighter]:min-h-[200px]!" code={code} showLineNumbers />
 )
 
 export default ConnectToDBPanel

@@ -1,31 +1,60 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
-import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
-import { Snippet } from 'data/content/sql-folders-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useLatest from 'hooks/misc/useLatest'
-import { useProfile } from 'lib/profile'
-import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
+import {
+  CopyIcon,
+  DownloadIcon,
+  EditIcon,
+  ExternalLinkIcon,
+  HeartIcon,
+  LockIcon,
+  MoveIcon,
+  PlusIcon,
+  ShareIcon,
+  TrashIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, useEffect } from 'react'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
-  ContextMenu_Shadcn_,
+  cn,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   TreeViewItem,
 } from 'ui'
 
-interface SQLEditorTreeViewItemProps
-  extends Omit<ComponentProps<typeof TreeViewItem>, 'name' | 'xPadding'> {
+import { getSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
+import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { LogsSnippetIcon } from '@/components/ui/EntityTypeIcon'
+import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
+import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
+import { Snippet } from '@/data/content/sql-folders-query'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
+import { useLatest } from '@/hooks/misc/useLatest'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import {
+  isFolderEditing,
+  isFolderSaving,
+  type FolderStatus,
+} from '@/state/sql-editor/sql-editor-lifecycle'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
+
+interface SQLEditorTreeViewItemProps extends Omit<
+  ComponentProps<typeof TreeViewItem>,
+  'name' | 'xPadding'
+> {
   element: any
   isMultiSelected?: boolean
-  status?: 'editing' | 'saving' | 'idle'
+  status?: FolderStatus
   getNodeProps: () => any
   onSelectCreate?: () => void
   onSelectDelete?: () => void
@@ -34,7 +63,6 @@ interface SQLEditorTreeViewItemProps
   onSelectShare?: () => void
   onSelectUnshare?: () => void
   onSelectDownload?: () => void
-  onSelectDuplicate?: () => void
   onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
@@ -65,7 +93,6 @@ export const SQLEditorTreeViewItem = ({
   onSelectShare,
   onSelectUnshare,
   onSelectDownload,
-  onSelectDuplicate,
   onEditSave,
   onMultiSelect,
   isLastItem,
@@ -80,19 +107,27 @@ export const SQLEditorTreeViewItem = ({
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
   const { profile } = useProfile()
+  const { data: project } = useSelectedProjectQuery()
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const { saveFavorite } = useSqlEditorSaveCoordinator()
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
+  const isFavorite = element.metadata.favorite
 
-  const isEditing = status === 'editing'
-  const isSaving = status === 'saving'
+  const isLogsSnippet = getSnippetSource(element.metadata) === 'logs'
 
-  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
-    resource: { type: 'sql', owner_id: profile?.id },
-    subject: { id: profile?.id },
-  })
+  const isEditing = isFolderEditing(status)
+  const isSaving = isFolderSaving(status)
+
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    {
+      mode: 'create',
+      type: 'sql',
+    }
+  )
 
   const parentId = element.parent === 0 ? undefined : element.parent
 
@@ -105,7 +140,7 @@ export const SQLEditorTreeViewItem = ({
     isFetchingNextPage: isFetchingNextPageInFolder,
     hasNextPage: hasNextPageInFolder,
     fetchNextPage: fetchNestPageInFolder,
-    isPreviousData,
+    isPlaceholderData,
     isFetching,
   } = useSQLSnippetFolderContentsQuery(
     {
@@ -116,7 +151,7 @@ export const SQLEditorTreeViewItem = ({
     },
     {
       enabled: isEnabled,
-      keepPreviousData: true,
+      placeholderData: keepPreviousData,
     }
   )
   useEffect(() => {
@@ -136,11 +171,11 @@ export const SQLEditorTreeViewItem = ({
   useEffect(() => {
     if (isEnabled) {
       onFolderContentsChangeRef.current?.({
-        isLoading: isLoading || (isPreviousData && isFetching),
+        isLoading: isLoading || (isPlaceholderData && isFetching),
         snippets: data?.pages.flatMap((page) => page.contents ?? []),
       })
     }
-  }, [data?.pages, isFetching, isLoading, isPreviousData, isEnabled])
+  }, [data?.pages, isFetching, isLoading, isPlaceholderData, isEnabled])
 
   const isInFolder = parentId !== undefined
 
@@ -154,10 +189,60 @@ export const SQLEditorTreeViewItem = ({
     }
   }
 
+  const onToggleFavorite = async () => {
+    const snippetId = element.metadata.id
+    if (!snippetId) return
+    if (!projectRef) return console.error('Project ref is required')
+
+    // Persisting a favorite goes through the full content upsert, so the
+    // snippet's content must be loaded first — otherwise the PUT endpoint
+    // rejects the update. Snippets listed in the nav that have never been
+    // opened have no content loaded yet, so fetch it before toggling.
+    const storeSnippet = snapV2.snippets[snippetId]
+    if (!storeSnippet?.snippet.content) {
+      const snippet = await getSqlSnippetById({ projectRef, id: snippetId })
+      snapV2.setSnippet(projectRef, snippet)
+    }
+
+    saveFavorite(snippetId, !isFavorite)
+  }
+
+  const onSelectDuplicate = async () => {
+    if (!profile) return console.error('Profile is required')
+    if (!project) return console.error('Project is required')
+    if (!projectRef) return console.error('Project ref is required')
+    if (!id) return console.error('Snippet ID is required')
+
+    const snippet = element.metadata
+    let sql: string = ''
+
+    if (snippet.content && snippet.content.unchecked_sql) {
+      sql = snippet.content.unchecked_sql
+    } else {
+      // Fetch the content first
+      const { content } = await getContentById({ projectRef, id: snippet.id })
+      if ('unchecked_sql' in content) {
+        sql = content.unchecked_sql
+      }
+    }
+
+    const snippetCopy = createSqlSnippetSkeletonV2({
+      name: `${snippet.name} (Duplicate)`,
+      sql,
+      owner_id: profile?.id,
+      project_id: project?.id,
+      source: getSnippetSource(snippet),
+    })
+
+    snapV2.addSnippet({ projectRef, snippet: snippetCopy })
+    snapV2.addNeedsSaving(snippetCopy.id!)
+    router.push(`/project/${projectRef}/sql/${snippetCopy.id}`)
+  }
+
   return (
     <>
-      <ContextMenu_Shadcn_ modal={false}>
-        <ContextMenuTrigger_Shadcn_ asChild>
+      <ContextMenu modal={false}>
+        <ContextMenuTrigger asChild>
           <TreeViewItem
             className={className}
             level={level}
@@ -167,6 +252,14 @@ export const SQLEditorTreeViewItem = ({
             isPreview={props.isPreview}
             isEditing={isEditing}
             isLoading={(isEnabled && isLoading) || isSaving}
+            icon={
+              isLogsSnippet ? (
+                <LogsSnippetIcon
+                  size={16}
+                  className="w-5 h-5 shrink-0 text-foreground-muted group-aria-selected:text-foreground"
+                />
+              ) : undefined
+            }
             onEditSubmit={(value) => {
               if (onEditSave !== undefined) onEditSave(value)
             }}
@@ -191,161 +284,184 @@ export const SQLEditorTreeViewItem = ({
             }}
             {...props}
             name={element.name}
+            nameForTitle={props.nameForTitle}
+            description={element.metadata?.description || undefined}
             xPadding={16}
           />
-        </ContextMenuTrigger_Shadcn_>
-        <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
+        </ContextMenuTrigger>
+        <ContextMenuContent onCloseAutoFocus={(e) => e.stopPropagation()}>
           {isBranch ? (
             <>
               {onSelectCreate !== undefined && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectCreate()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Plus size={14} />
+                  <PlusIcon size={14} />
                   Create new snippet
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectRename !== undefined && isOwner && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectRename()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Edit size={14} />
+                  <EditIcon size={14} />
                   Rename folder
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectDelete !== undefined && isOwner && (
                 <>
-                  <ContextMenuSeparator_Shadcn_ />
-                  <ContextMenuItem_Shadcn_
+                  <ContextMenuSeparator />
+                  <ContextMenuItem
                     className="gap-x-2"
                     onSelect={() => onSelectDelete()}
                     onFocusCapture={(e) => e.stopPropagation()}
                   >
-                    <Trash size={14} />
+                    <TrashIcon size={14} />
                     Delete folder
-                  </ContextMenuItem_Shadcn_>
+                  </ContextMenuItem>
                 </>
               )}
             </>
           ) : isMultiSelected ? (
             <>
               {onSelectMove !== undefined && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectMove()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Move size={14} />
+                  <MoveIcon size={14} />
                   Move selected queries
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
-              <ContextMenuSeparator_Shadcn_ />
+              <ContextMenuSeparator />
               {onSelectDelete !== undefined && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectDelete()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Trash size={14} />
+                  <TrashIcon size={14} />
                   Delete selected queries
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
             </>
           ) : (
             <>
-              <ContextMenuItem_Shadcn_
+              <ContextMenuItem
                 asChild
                 className="gap-x-2"
-                onSelect={() => {}}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
                 <Link
-                  href={`/project/${projectRef}/sql/${element.id}`}
-                  target="_blank"
+                  target="_self"
                   rel="noreferrer"
+                  href={`/project/${projectRef}/sql/${element.id}`}
                 >
-                  <ExternalLink size={14} />
+                  <ExternalLinkIcon size={14} />
                   Open in new tab
                 </Link>
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuSeparator_Shadcn_ />
+              </ContextMenuItem>
+              <ContextMenuSeparator />
               {onSelectRename !== undefined && isOwner && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectRename()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Edit size={14} />
+                  <EditIcon size={14} />
                   Rename query
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectMove !== undefined && isOwner && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectMove()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Move size={14} />
+                  <MoveIcon size={14} />
                   Move query
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
-              {onSelectShare !== undefined && !isSharedSnippet && canCreateSQLSnippet && (
-                <ContextMenuItem_Shadcn_
-                  className="gap-x-2"
-                  onSelect={() => onSelectShare()}
-                  onFocusCapture={(e) => e.stopPropagation()}
-                >
-                  <Share size={14} />
-                  Share query with team
-                </ContextMenuItem_Shadcn_>
-              )}
+              {onSelectShare !== undefined &&
+                !isSharedSnippet &&
+                canCreateSQLSnippet &&
+                IS_PLATFORM && (
+                  <ContextMenuItem
+                    className="gap-x-2"
+                    onSelect={() => onSelectShare()}
+                    onFocusCapture={(e) => e.stopPropagation()}
+                  >
+                    <ShareIcon size={14} />
+                    Share query with team
+                  </ContextMenuItem>
+                )}
               {onSelectUnshare !== undefined && isSharedSnippet && isOwner && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectUnshare()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Lock size={14} />
+                  <LockIcon size={14} />
                   Unshare query with team
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
               {onSelectDuplicate !== undefined && canCreateSQLSnippet && (
-                <ContextMenuItem_Shadcn_
+                <ContextMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectDuplicate()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Copy size={14} />
+                  <CopyIcon size={14} />
                   Duplicate query
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )}
-              {onSelectDownload !== undefined && IS_PLATFORM && (
-                <ContextMenuItem_Shadcn_
+              {IS_PLATFORM && (
+                <ContextMenuItem
                   className="gap-x-2"
-                  onSelect={() => onSelectDownload()}
+                  onSelect={() => onToggleFavorite()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Download size={14} />
-                  Download as migration file
-                </ContextMenuItem_Shadcn_>
+                  <HeartIcon
+                    size={14}
+                    className={cn(
+                      isFavorite
+                        ? 'fill-primary-bright stroke-none'
+                        : 'fill-none stroke-foreground-light'
+                    )}
+                  />
+                  {isFavorite ? 'Remove from' : 'Add to'} favorites
+                </ContextMenuItem>
               )}
+              {onSelectDownload !== undefined &&
+                IS_PLATFORM &&
+                getSnippetSource(element.metadata) !== 'logs' && (
+                  <ContextMenuItem
+                    className="gap-x-2"
+                    onSelect={() => onSelectDownload()}
+                    onFocusCapture={(e) => e.stopPropagation()}
+                  >
+                    <DownloadIcon size={14} />
+                    Export query
+                  </ContextMenuItem>
+                )}
               {onSelectDelete !== undefined && isOwner && (
                 <>
-                  <ContextMenuSeparator_Shadcn_ />
-                  <ContextMenuItem_Shadcn_ className="gap-x-2" onSelect={() => onSelectDelete()}>
-                    <Trash size={14} />
+                  <ContextMenuSeparator />
+                  <ContextMenuItem className="gap-x-2" onSelect={() => onSelectDelete()}>
+                    <TrashIcon size={14} />
                     Delete query
-                  </ContextMenuItem_Shadcn_>
+                  </ContextMenuItem>
                 </>
               )}
             </>
           )}
-        </ContextMenuContent_Shadcn_>
-      </ContextMenu_Shadcn_>
+        </ContextMenuContent>
+      </ContextMenu>
 
       {hasNextPage && typeof element.id === 'string' && isLastItem && (
         <div
@@ -356,7 +472,7 @@ export const SQLEditorTreeViewItem = ({
           }}
         >
           <Button
-            type="outline"
+            variant="outline"
             size="tiny"
             block
             loading={isInFolder ? isFetchingNextPageInFolder : _isFetchingNextPage}

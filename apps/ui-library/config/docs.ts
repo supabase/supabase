@@ -1,4 +1,4 @@
-import { SidebarNavGroup } from 'types/nav'
+import { SidebarNavGroup } from '@/types/nav'
 
 export const gettingStarted: SidebarNavGroup = {
   title: 'Getting Started',
@@ -10,10 +10,10 @@ export const gettingStarted: SidebarNavGroup = {
       commandItemLabel: 'Introduction',
     },
     {
-      title: 'Quick Start',
+      title: 'Quickstart',
       href: '/docs/getting-started/quickstart',
       items: [],
-      commandItemLabel: 'Quick Start',
+      commandItemLabel: 'Quickstart',
     },
     {
       title: 'FAQ',
@@ -24,14 +24,49 @@ export const gettingStarted: SidebarNavGroup = {
   ],
 }
 
-export const aiEditorsRules: SidebarNavGroup = {
-  title: 'AI Editors Rules',
+export const platformBlocks: SidebarNavGroup = {
+  title: 'Platform',
   items: [
     {
-      title: 'Prompts',
-      href: '/docs/ai-editors-rules/prompts',
+      title: 'Platform Kit',
+      href: '/docs/platform/platform-kit',
       items: [],
-      commandItemLabel: 'AI Editors Rules',
+      commandItemLabel: 'Platform Kit',
+    },
+  ],
+}
+
+export const oauthBlocks: SidebarNavGroup = {
+  title: 'OAuth',
+  items: [
+    {
+      title: 'OAuth Consent',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/oauth-consent',
+      items: [],
+      new: true,
+      commandItemLabel: 'OAuth Consent',
+    },
+  ],
+}
+
+export const mcpBlocks: SidebarNavGroup = {
+  title: 'MCP',
+  items: [
+    {
+      title: 'MCP Server',
+      href: '/docs/headless/mcp',
+      items: [],
+      new: true,
+      commandItemLabel: 'MCP Server',
+    },
+    {
+      title: 'Headless App',
+      supportedFrameworks: ['tanstack'],
+      href: '/docs/tanstack/headless-app',
+      items: [],
+      new: true,
+      commandItemLabel: 'Headless App',
     },
   ],
 }
@@ -42,21 +77,21 @@ export const componentPages: SidebarNavGroup = {
   items: [
     {
       title: 'Client',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/client',
       items: [],
       commandItemLabel: 'Supabase Client',
     },
     {
       title: 'Password-Based Auth',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/password-based-auth',
       items: [],
       commandItemLabel: 'Password-Based Auth',
     },
     {
       title: 'Social Auth',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/social-auth',
       items: [],
       new: true,
@@ -64,64 +99,65 @@ export const componentPages: SidebarNavGroup = {
     },
     {
       title: 'Dropzone',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/dropzone',
       items: [],
       commandItemLabel: 'Dropzone (File Upload)',
     },
     {
       title: 'Realtime Cursor',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-cursor',
       items: [],
       commandItemLabel: 'Realtime Cursor',
     },
     {
-      title: 'Current User Avatar',
+      title: 'Realtime Monaco',
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-monaco',
+      items: [],
+      new: true,
+      commandItemLabel: 'Realtime Monaco',
+    },
+    {
+      title: 'Realtime Flow',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-flow',
+      items: [],
+      new: true,
+      commandItemLabel: 'Realtime Flow',
+    },
+    {
+      title: 'Current User Avatar',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/current-user-avatar',
       items: [],
       commandItemLabel: 'Current User Avatar',
     },
     {
       title: 'Realtime Avatar Stack',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-avatar-stack',
       items: [],
       commandItemLabel: 'Realtime Avatar Stack',
     },
     {
       title: 'Realtime Chat',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-chat',
       items: [],
       commandItemLabel: 'Realtime Chat',
     },
     {
-      title: 'Infinite Query Hook',
-      supportedFrameworks: [],
-      href: '/docs/infinite-query-hook',
+      title: 'Infinite Query',
+      supportedFrameworks: ['react', 'vue'],
+      href: '/docs/react/infinite-query',
       new: true,
       items: [],
-      commandItemLabel: 'Infinite Query Hook',
+      commandItemLabel: 'Infinite Query',
     },
   ],
 }
-
-export const COMMAND_ITEMS = [
-  ...gettingStarted.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...aiEditorsRules.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...componentPages.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-]
 
 // Framework titles for display
 export const frameworkTitles: Record<string, string> = {
@@ -129,4 +165,6 @@ export const frameworkTitles: Record<string, string> = {
   'react-router': 'React Router',
   tanstack: 'TanStack Start',
   react: 'React SPA',
+  vue: 'Vue',
+  nuxtjs: 'Nuxt.js',
 }

@@ -1,0 +1,5 @@
+{
+  "id": "passkey-admin",
+  "title": "Passkey admin",
+  "description": "Contains passkey administration methods. Requires a secret key."
+}

@@ -1,11 +1,14 @@
-import Link from 'next/link'
+'use client'
 
-import { Check } from 'lucide-react'
-import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
-import { Button, cn } from 'ui'
 import { Organization } from '~/data/organizations'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { Check } from 'lucide-react'
+import Link from 'next/link'
+import { plans } from 'shared-data/plans'
+import { Button, cn } from 'ui'
+
 import UpgradePlan from './UpgradePlan'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 interface PricingPlansProps {
   organizations?: Organization[]
@@ -14,6 +17,7 @@ interface PricingPlansProps {
 
 const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansProps) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const orgSlug = organizations?.[0]?.slug
 
   return (
     <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
@@ -23,8 +27,8 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
             const isProPlan = plan.name === 'Pro'
             const isTeamPlan = plan.name === 'Team'
             const isUpgradablePlan = isProPlan || isTeamPlan
-            const features = pickFeatures(plan)
-            const footer = pickFooter(plan)
+            const features = plan.features
+            const footer = plan.footer
 
             const sendPricingEvent = () => {
               sendTelemetryEvent({
@@ -34,6 +38,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                   showUpgradeText: isUpgradablePlan && hasExistingOrganizations ? true : false,
                   section: 'main',
                 },
+                ...(orgSlug && { groups: { organization: orgSlug } }),
               })
             }
 
@@ -42,7 +47,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                 key={`row-${plan.name}`}
                 className={cn(
                   'flex flex-col border xl:border-r-0 last:border-r bg-surface-75 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
-                  isProPlan && 'border-foreground-muted !border-2 !rounded-xl xl:-my-8',
+                  isProPlan && 'border-foreground-muted border-2! rounded-xl! xl:-my-8',
                   isTeamPlan && 'xl:border-l-0'
                 )}
               >
@@ -64,26 +69,33 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                       )}
                     </div>
                   </div>
-                  <p
-                    className={cn(
-                      'text-foreground-light mb-4 text-sm 2xl:pr-4',
-                      isProPlan && 'xl:mb-12'
-                    )}
-                  >
-                    {plan.description}
-                  </p>
+                  <div className={cn('flex flex-col', isProPlan && 'xl:mb-12')}>
+                    <p className="text-foreground-light text-sm 2xl:pr-4 mb-4">
+                      {plan.description}
+                    </p>
+                  </div>
                   {isUpgradablePlan && hasExistingOrganizations ? (
-                    <UpgradePlan organizations={organizations} onClick={sendPricingEvent} />
+                    <UpgradePlan
+                      planId={plan.planId}
+                      organizations={organizations}
+                      onClick={sendPricingEvent}
+                    />
                   ) : (
                     <Button
                       block
                       size="large"
-                      type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                      variant={plan.name === 'Enterprise' ? 'default' : 'primary'}
                       asChild
                     >
-                      <Link href={plan.href} onClick={sendPricingEvent}>
-                        {plan.cta}
-                      </Link>
+                      {isCrossZoneHref(plan.href) ? (
+                        <a href={plan.href} onClick={sendPricingEvent}>
+                          {plan.cta}
+                        </a>
+                      ) : (
+                        <Link href={plan.href} onClick={sendPricingEvent}>
+                          {plan.cta}
+                        </Link>
+                      )}
                     </Button>
                   )}
 
@@ -107,6 +119,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                               className={`mt-2 pb-1 font-mono ${
                                 plan.name !== 'Enterprise' ? 'text-5xl' : 'text-4xl'
                               }`}
+                              translate="no"
                             >
                               {plan.name !== 'Enterprise' ? '$' : ''}
                               {plan.priceMonthly}
@@ -116,24 +129,26 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                             </p>
                           </div>
 
-                          {plan.warning && (
+                          {isUpgradablePlan ? (
                             <div className="mt-4 flex flex-col gap-1">
-                              <span
-                                className={cn(
-                                  'text-[13px] leading-4 inline-flex gap-1 items-center'
-                                )}
-                              >
-                                {plan.warning}
+                              <span className="text-[13px] leading-4">
+                                First project included. Additional projects from $10/mo.
                               </span>
-                              {(plan.name === 'Pro' || plan.name === 'Team') && (
-                                <Link
-                                  href="#addon-compute"
-                                  className="hover:underline text-foreground-lighter text-[13px] m-0 p-0 leading-3"
-                                >
-                                  Need more compute?
-                                </Link>
-                              )}
+                              <Link
+                                href="#addon-compute"
+                                className="hover:underline text-foreground-lighter text-[13px] m-0 p-0 leading-3"
+                              >
+                                See how pricing scales
+                              </Link>
                             </div>
+                          ) : (
+                            plan.warning && (
+                              <div className="mt-4 flex flex-col gap-1">
+                                <span className="text-[13px] leading-4 inline-flex gap-1 items-center">
+                                  {plan.warning}
+                                </span>
+                              </div>
+                            )
                           )}
                         </div>
                       </div>
@@ -160,7 +175,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                             <Check
                               className={cn(
                                 'h-4 w-4',
-                                plan.name === 'Enterprise' ? 'text-foreground' : 'text-brand'
+                                plan.name === 'Enterprise' ? 'text-foreground' : 'text-primary'
                               )}
                               aria-hidden="true"
                               strokeWidth={3}

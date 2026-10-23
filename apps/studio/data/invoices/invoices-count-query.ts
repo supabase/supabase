@@ -1,7 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { head } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { useQuery } from '@tanstack/react-query'
+
 import { invoicesKeys } from './keys'
+import { head } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type InvoicesCountVariables = {
   slug?: string
@@ -25,13 +26,14 @@ export type InvoicesCountError = ResponseError
 
 export const useInvoicesCountQuery = <TData = InvoicesCountData>(
   { slug }: InvoicesCountVariables,
-  { enabled = true, ...options }: UseQueryOptions<InvoicesCountData, InvoicesCountError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<InvoicesCountData, InvoicesCountError, TData> = {}
 ) =>
-  useQuery<InvoicesCountData, InvoicesCountError, TData>(
-    invoicesKeys.count(slug),
-    ({ signal }) => getInvoicesCount({ slug }, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<InvoicesCountData, InvoicesCountError, TData>({
+    queryKey: invoicesKeys.count(slug),
+    queryFn: ({ signal }) => getInvoicesCount({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })

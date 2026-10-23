@@ -1,0 +1,54 @@
+---
+title: Current User Avatar
+description: Supabase Auth-aware avatar
+preview: |-
+  <BlockOverview name="current-user-avatar-vue" showFiles>
+    <ComponentPreview name="current-user-avatar-demo" showCode={false} />
+  </BlockOverview>
+---
+
+## Installation
+
+### Set up the Supabase client
+
+This block requires a Supabase client for Vue. If your project already has one, reuse it and update the block's imports to match your client. Otherwise, install the client:
+
+<BlockItem name="supabase-client-vue" framework="vue" showOpenInV0={false} />
+
+Configure the environment variables described in the [Vue client guide](/library/docs/vue/client#getting-started) before using the block.
+
+### Install the block
+
+<BlockItem name="current-user-avatar-vue" framework="vue" />
+
+## Introduction
+
+The `CurrentUserAvatar` component connects to Supabase Auth to fetch the user data and show an avatar. It uses the `user_metadata`
+property which gets populated automatically by Supabase Auth if the user logged in via a provider. If the user doesn't have a profile image, it renders their initials. If the user is logged out, it renders a `?` as a fallback, which you can change.
+
+## Usage
+
+The `CurrentUserAvatar` component is designed to be used anywhere in your app. Add the `<CurrentUserAvatar />` component to your page and it will render the avatar of the current user, with a fallback.
+
+```vue
+<script setup lang="ts">
+// Assumes you have Header component created
+import CurrentUserAvatar from '@/components/CurrentUserAvatar.vue'
+import Header from '@/components/Header.vue'
+</script>
+
+<template>
+  <Header class="flex items-center justify-between">
+    <h1>Lumon Industries</h1>
+    <CurrentUserAvatar />
+  </Header>
+</template>
+```
+
+## Props
+
+This component doesn't accept any props. If you wish to change the fallback, you can do so by changing the `CurrentUserAvatar` component directly.
+
+## Further reading
+
+- [Auth users](https://supabase.com/docs/guides/auth/users)

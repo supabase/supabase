@@ -4,10 +4,20 @@ services:
   studio:
     build:
       context: ..
-      dockerfile: studio/Dockerfile
+      dockerfile: apps/studio/Dockerfile
       target: dev
     ports:
       - 8082:8082
+    develop:
+      watch:
+        - action: sync
+          path: ../apps/studio
+          target: /app/apps/studio
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+
   mail:
     container_name: supabase-mail
     image: inbucket/inbucket:3.0.3

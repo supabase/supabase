@@ -1,20 +1,19 @@
 'use client'
 
+import ButtonCard from '~/components/ButtonCard'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useDocsSearch, type DocsSearchResult } from 'common'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
-
-import { useDocsSearch, type DocsSearchResult } from 'common'
 import { Button, cn } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-
-import ButtonCard from '~/components/ButtonCard'
 
 function SearchButton() {
   const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
-    <Button type="primary" size="small" onClick={() => setCommandMenuOpen(true)}>
+    <Button variant="primary" size="small" onClick={() => setCommandMenuOpen(true)}>
       Search for page
     </Button>
   )
@@ -65,6 +64,9 @@ function RecommendationsList({
 }: {
   recommendations: Array<Omit<DocsSearchResult, 'sections'>>
 }) {
+  const pathname = usePathname()
+  const sendTelemetryEvent = useSendTelemetryEvent()
+
   return (
     <ul className={cn('not-prose', 'grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4')}>
       {recommendations
@@ -76,6 +78,12 @@ function RecommendationsList({
             to={path}
             title={title}
             description={subtitle || description || undefined}
+            onClick={() =>
+              sendTelemetryEvent({
+                action: 'docs_404_recommendation_clicked',
+                properties: { destinationPath: path, sourcePath: pathname ?? '' },
+              })
+            }
           />
         ))}
     </ul>

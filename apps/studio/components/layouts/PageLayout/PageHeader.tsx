@@ -1,9 +1,7 @@
-import { ChevronLeft } from 'lucide-react'
+import { useParams } from 'common'
+import { ChevronLeftIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, ReactNode } from 'react'
-
-import { useParams } from 'common'
-import { cn } from 'ui'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,12 +9,14 @@ import {
   BreadcrumbList,
   BreadcrumbPage as BreadcrumbPageItem,
   BreadcrumbSeparator,
-} from 'ui/src/components/shadcn/ui/breadcrumb'
+  cn,
+} from 'ui'
+
 import { ScaffoldDescription, ScaffoldTitle } from '../Scaffold'
 
 interface PageHeaderProps {
-  title?: string
-  subtitle?: string
+  title?: string | ReactNode
+  subtitle?: string | ReactNode
   icon?: ReactNode
   breadcrumbs?: Array<{
     label?: string
@@ -48,10 +48,12 @@ export const PageHeader = ({
       {(displayBreadcrumbs.length > 0 ||
         (isCompact && (title || primaryActions || secondaryActions))) && (
         <div className={cn('flex items-center gap-4', isCompact ? 'justify-between' : 'mb-4')}>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-1 min-w-0">
             {breadcrumbs.length > 0 ? (
-              <Breadcrumb className={cn('text-foreground-muted', isCompact && 'text-base')}>
-                <BreadcrumbList className={isCompact ? 'text-base' : 'text-xs'}>
+              <Breadcrumb
+                className={cn('text-foreground-muted', isCompact && 'text-base', 'min-w-0 flex-1')}
+              >
+                <BreadcrumbList className={cn(isCompact ? 'text-base' : 'text-xs', 'min-w-0')}>
                   {breadcrumbs.map((item, index) => (
                     <Fragment key={item.label || `breadcrumb-${index}`}>
                       <BreadcrumbItem>
@@ -61,7 +63,7 @@ export const PageHeader = ({
                           <BreadcrumbLink asChild className="flex items-center gap-2">
                             <Link href={!!ref ? item.href.replace('[ref]', ref) : item.href}>
                               {breadcrumbs.length === 1 && !isCompact && (
-                                <ChevronLeft size={16} strokeWidth={1.5} />
+                                <ChevronLeftIcon size={16} strokeWidth={1.5} />
                               )}
                               {item.label}
                             </Link>
@@ -69,7 +71,7 @@ export const PageHeader = ({
                         ) : (
                           <BreadcrumbPageItem className="flex items-center gap-2">
                             {breadcrumbs.length === 1 && (
-                              <ChevronLeft size={16} strokeWidth={1.5} />
+                              <ChevronLeftIcon size={16} strokeWidth={1.5} />
                             )}
                             {item.label}
                           </BreadcrumbPageItem>
@@ -81,19 +83,19 @@ export const PageHeader = ({
                   {isCompact && title && (
                     <>
                       <BreadcrumbSeparator />
-                      <BreadcrumbItem>
-                        <BreadcrumbPageItem>{title}</BreadcrumbPageItem>
+                      <BreadcrumbItem className="min-w-0 flex-1">
+                        <BreadcrumbPageItem className="min-w-0">{title}</BreadcrumbPageItem>
                       </BreadcrumbItem>
                     </>
                   )}
                 </BreadcrumbList>
               </Breadcrumb>
             ) : isCompact ? (
-              title
+              <div className="min-w-0 flex-1">{title}</div>
             ) : null}
           </div>
           {isCompact && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               {secondaryActions && (
                 <div className="flex items-center gap-2">{secondaryActions}</div>
               )}
@@ -109,12 +111,16 @@ export const PageHeader = ({
             <div className="flex items-center gap-4">
               {icon && <div className="text-foreground-light">{icon}</div>}
               <div className="space-y-1">
-                {title && <ScaffoldTitle>{title}</ScaffoldTitle>}
-                {subtitle && (
-                  <ScaffoldDescription className="text-sm text-foreground-light">
-                    {subtitle}
-                  </ScaffoldDescription>
-                )}
+                {title &&
+                  (typeof title === 'string' ? <ScaffoldTitle>{title}</ScaffoldTitle> : title)}
+                {subtitle &&
+                  (typeof subtitle === 'string' ? (
+                    <ScaffoldDescription className="text-sm text-foreground-light">
+                      {subtitle}
+                    </ScaffoldDescription>
+                  ) : (
+                    subtitle
+                  ))}
               </div>
             </div>
           </div>

@@ -1,0 +1,51 @@
+import { resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import react from '@vitejs/plugin-react'
+import { configDefaults, defineConfig } from 'vitest/config'
+
+// Some tools like Vitest VSCode extensions, have trouble with resolving relative paths,
+// as they use the directory of the test file as `cwd`, which makes them believe that
+// `setupFiles` live next to the test file itself. This forces them to always resolve correctly.
+const dirname = fileURLToPath(new URL('.', import.meta.url))
+
+const IS_CI = !!process.env.CI
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    tsconfigPaths: true,
+    alias: {
+      '@ui': resolve(__dirname, './../../packages/ui/src'),
+    },
+  },
+  test: {
+    globals: true,
+    // Retry flaky tests in CI only; failures locally should surface immediately.
+    retry: IS_CI ? 2 : 0,
+    // The DOM setup files (`dom.ts`, `radix.js`) no-op when there's no jsdom environment.
+    setupFiles: [
+      resolve(dirname, './tests/setup/dom.ts'),
+      resolve(dirname, './tests/vitestSetup.ts'),
+      resolve(dirname, './tests/setup/radix.js'),
+    ],
+    // Don't look for tests in the nextjs output directory
+    exclude: [...configDefaults.exclude, `.next/*`],
+    // jsdom costs ~1s of setup per file, so pure-logic `.test.ts` files run in node.
+    // A `.test.ts` file that needs the DOM (e.g. `renderHook`) opts in with a
+    // `// @vitest-environment jsdom` docblock at the top of the file.
+    projects: [
+      { extends: true, test: { name: 'node', environment: 'node', include: ['**/*.test.ts'] } },
+      { extends: true, test: { name: 'jsdom', environment: 'jsdom', include: ['**/*.test.tsx'] } },
+    ],
+    reporters: [['default']],
+    coverage: {
+      reporter: ['text', 'text-summary', 'lcov'],
+      exclude: [
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/base64url.ts', // [Jordi] Tests for this file exist in https://github.com/supabase-community/base64url-js/blob/main/src/base64url.test.ts so we can ignore.
+      ],
+      include: ['lib/**/*.ts'],
+    },
+  },
+})

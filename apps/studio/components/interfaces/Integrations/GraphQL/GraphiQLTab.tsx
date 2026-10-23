@@ -1,43 +1,105 @@
-import '@graphiql/react/dist/style.css'
-import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
-import { useTheme } from 'next-themes'
-import { useMemo } from 'react'
-import { toast } from 'sonner'
+import 'graphiql/setup-workers/webpack'
+import './graphiql-styles.css'
 
+import { useMonaco, type GraphiQLPlugin } from '@graphiql/react'
+import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { useParams } from 'common'
-import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCard'
-import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Loading } from 'components/ui/Loading'
-import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { getRoleImpersonationJWT } from 'lib/role-impersonation'
-import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
+import { GraphiQL, HISTORY_PLUGIN } from 'graphiql'
+import { UserIcon } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
+import { LogoLoader } from 'ui'
+
+import { DEFAULT_INTROSPECTION_SCHEMA } from './constants'
+import styles from './graphiql.module.css'
+import { IntrospectionDisabledNotice } from './IntrospectionDisabledNotice'
+import { IntrospectionEnabledNotice } from './IntrospectionEnabledNotice'
+import { usePgGraphqlIntrospectionStatus } from './usePgGraphqlIntrospectionStatus'
+import { getTheme } from '@/components/interfaces/App/MonacoThemeProvider'
+import { RoleImpersonationSelector } from '@/components/interfaces/RoleImpersonationSelector'
+import { BASE_MONACO_EDITOR_OPTIONS } from '@/components/ui/CodeEditor/CodeEditor.utils'
+import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { API_URL, IS_PLATFORM } from '@/lib/constants'
+import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
+import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
+
+const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
+  title: 'Role Impersonation',
+  icon: () => <UserIcon />,
+  content: () => <RoleImpersonationSelector />,
+}
+
+/**
+ * GraphiQL (@graphiql/react) bundles its own Monaco instance, separate from the AMD-loaded one
+ * the rest of Studio uses — they only share the global `.monaco-*` CSS class names, not JS state.
+ * So theme/options applied here via @graphiql/react's `useMonaco` touch GraphiQL's editors only
+ * and never leak onto Studio's editors
+ */
+const GraphiQLEditorSettings = ({ theme }: { theme: 'dark' | 'light' }) => {
+  const { monaco } = useMonaco()
+
+  useEffect(() => {
+    if (!monaco) return
+    monaco.editor.defineTheme('supabase', getTheme(theme))
+    monaco.editor.setTheme('supabase')
+  }, [monaco, theme])
+
+  useEffect(() => {
+    if (!monaco) return
+    const options = {
+      ...BASE_MONACO_EDITOR_OPTIONS,
+      padding: { top: 16, bottom: 16 },
+      glyphMargin: true,
+    }
+    const applyToEditor = (editor: ReturnType<typeof monaco.editor.getEditors>[number]) =>
+      editor.updateOptions(options)
+
+    monaco.editor.getEditors().forEach(applyToEditor)
+    const disposable = monaco.editor.onDidCreateEditor(applyToEditor)
+
+    return () => disposable.dispose()
+  }, [monaco])
+
+  return null
+}
 
 export const GraphiQLTab = () => {
-  const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
+
+  const { resolvedTheme } = useTheme()
   const currentTheme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
 
-  const { data, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const pgGraphqlExtension = (data ?? []).find((ext) => ext.name === 'pg_graphql')
-
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const { data: settings, isFetched } = useProjectSettingsV2Query({ projectRef })
-
-  const { serviceKey } = getAPIKeys(settings)
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const jwtSecret = config?.jwt_secret
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
+
+  const { can: canReadJWTSecret } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_READ,
+    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_SECRET_READ,
+  ])
+
+  const { notice, schemaComment } = usePgGraphqlIntrospectionStatus({
+    projectRef,
+    connectionString: project?.connectionString,
+    schema: DEFAULT_INTROSPECTION_SCHEMA,
+  })
+
+  // Bumped to force GraphiQL to re-mount and re-run introspection after the
+  // introspection setting changes in either direction.
+  const [graphiqlKey, setGraphiqlKey] = useState(0)
+
+  const plugins = useMemo<GraphiQLPlugin[]>(
+    () => (canReadJWTSecret ? [HISTORY_PLUGIN, ROLE_IMPERSONATION_PLUGIN] : [HISTORY_PLUGIN]),
+    [canReadJWTSecret]
+  )
 
   const fetcher = useMemo(() => {
     const fetcherFn = createGraphiQLFetcher({
@@ -74,35 +136,49 @@ export const GraphiQLTab = () => {
             opts?.headers?.['Authorization'] ??
             opts?.headers?.['authorization'] ??
             userAuthorization ??
-            `Bearer ${serviceKey?.api_key}`,
+            accessToken,
         },
       })
     }
 
     return customFetcher
-  }, [projectRef, getImpersonatedRoleState, jwtSecret, accessToken, serviceKey])
+  }, [projectRef, getImpersonatedRoleState, jwtSecret, accessToken])
 
-  if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
-    return <Loading />
+  const handleIntrospectionChanged = useCallback(() => {
+    setGraphiqlKey((k) => k + 1)
+  }, [])
+
+  if (IS_PLATFORM && !accessToken) {
+    return <LogoLoader />
   }
 
-  if (pgGraphqlExtension?.installed_version === null) {
-    return (
-      <div className="flex flex-col items-center justify-center flex-1 px-4">
-        <div className="w-full max-w-md">
-          <div className="mb-6">
-            <h1 className="mt-8 mb-2 text-2xl">Enable the GraphQL Extension</h1>
-            <h2 className="text-sm text-foreground-light">
-              Toggle the switch below to enable the GraphQL extension. You can then use the GraphQL
-              API with your Supabase Database.
-            </h2>
-          </div>
-
-          <ExtensionCard extension={pgGraphqlExtension} />
-        </div>
+  return (
+    <div className="flex flex-col h-full">
+      <GraphiQLEditorSettings theme={currentTheme} />
+      {notice === 'opt-in' && (
+        <IntrospectionDisabledNotice
+          schema={DEFAULT_INTROSPECTION_SCHEMA}
+          currentSchemaComment={schemaComment}
+          onEnabled={handleIntrospectionChanged}
+        />
+      )}
+      {notice === 'opt-out' && (
+        <IntrospectionEnabledNotice
+          schema={DEFAULT_INTROSPECTION_SCHEMA}
+          currentSchemaComment={schemaComment}
+          onDisabled={handleIntrospectionChanged}
+        />
+      )}
+      <div className="flex-1 min-h-0">
+        <GraphiQL
+          key={graphiqlKey}
+          fetcher={fetcher}
+          forcedTheme={currentTheme}
+          editorTheme={{ dark: 'supabase', light: 'supabase' }}
+          className={styles.root}
+          plugins={plugins}
+        />
       </div>
-    )
-  }
-
-  return <GraphiQL fetcher={fetcher} theme={currentTheme} />
+    </div>
+  )
 }

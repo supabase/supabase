@@ -1,0 +1,354 @@
+'use client'
+
+import dayjs from 'dayjs'
+import { useTheme } from 'next-themes'
+import { ReactNode, useId, useState } from 'react'
+import {
+  Area,
+  CartesianGrid,
+  AreaChart as RechartAreaChart,
+  ReferenceArea,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+} from 'recharts'
+import type { CategoricalChartState } from 'recharts/types/chart/types'
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
+
+const CHART_COLORS = {
+  TICK: 'var(--background-overlay-hover)',
+  AXIS: 'var(--background-overlay-hover)',
+  PRIMARY: 'var(--primary-bright)',
+  PRIMARY_HOVER: 'var(--primary-bright-hover)',
+}
+
+export type ChartLineTick =
+  | {
+      timestamp: string
+      [key: string]: string | number
+    }
+  | {
+      [key: string]: string | number
+    }
+
+export type ChartHighlight = {
+  handleMouseDown: (e: { activeLabel?: string; coordinates?: string }) => void
+  handleMouseMove: (e: { activeLabel?: string; coordinates?: string }) => void
+  handleMouseUp: (e: { chartX?: number; chartY?: number }) => void
+  coordinates: { left?: string; right?: string }
+  clearHighlight?: () => void
+}
+
+export type ChartHighlightAction = {
+  id: string
+  label: string | ((ctx: { start: string; end: string; clear: () => void }) => string)
+  icon?: ReactNode
+  isDisabled?: (ctx: { start: string; end: string; clear: () => void }) => boolean
+  onSelect: (ctx: { start: string; end: string; clear: () => void }) => void
+}
+
+export type ChartReferenceLine = {
+  y: number
+  label?: string
+  stroke?: string
+  strokeWidth?: number
+  strokeDasharray?: string
+}
+
+export interface ChartLineProps {
+  data: ChartLineTick[]
+  xKey?: string
+  dataKey: string
+  dataKeys?: string[]
+  config?: ChartConfig
+  tooltipDetails?: (datum: ChartLineTick, key: string, value: unknown) => ReactNode
+  onLineClick?: (datum: ChartLineTick, tooltipData?: CategoricalChartState) => void
+  DateTimeFormat?: string
+  isFullHeight?: boolean
+  className?: string
+  color?: string
+  chartHighlight?: ChartHighlight
+  syncId?: string
+  showHighlightArea?: boolean
+  cursor?: string
+  showGrid?: boolean
+  showXAxis?: boolean
+  showYAxis?: boolean
+  XAxisProps?: {
+    tick?: boolean
+    tickFormatter?: (value: any) => string
+    height?: number
+    [key: string]: any
+  }
+  YAxisProps?: {
+    tick?: boolean
+    tickFormatter?: (value: any) => string
+    width?: number
+    [key: string]: any
+  }
+  strokeWidth?: number
+  referenceLines?: ChartReferenceLine[]
+}
+
+// [Joshen] JFYI - shouldn't rely on xKey's value to determine if its a time-based format
+// Preferably provide an additional param like xFormat to be more deterministic
+
+export const ChartLine = ({
+  data,
+  xKey = 'timestamp',
+  dataKey,
+  dataKeys,
+  config,
+  tooltipDetails,
+  onLineClick,
+  DateTimeFormat = 'MMM D, YYYY, hh:mma',
+  isFullHeight = false,
+  className,
+  color = CHART_COLORS.PRIMARY,
+  chartHighlight,
+  syncId,
+  showHighlightArea = true,
+  cursor,
+  showGrid = false,
+  showXAxis = false,
+  showYAxis = false,
+  XAxisProps,
+  YAxisProps,
+  strokeWidth = 1.5,
+  referenceLines,
+}: ChartLineProps) => {
+  const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+  const gradientPrefix = `chart-line-fill-${useId().replace(/:/g, '')}`
+  const { resolvedTheme } = useTheme()
+  const isDarkMode = resolvedTheme?.includes('dark')
+
+  if (data.length === 0) {
+    return null
+  }
+
+  const keysToRender = dataKeys || [dataKey]
+
+  const chartConfig: ChartConfig =
+    config ||
+    keysToRender.reduce((acc, key) => {
+      acc[key] = { label: key }
+      return acc
+    }, {} as ChartConfig)
+
+  const showHighlightActions =
+    showHighlightArea &&
+    chartHighlight?.coordinates.left &&
+    chartHighlight?.coordinates.right &&
+    chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
+
+  const chartCursor = cursor || (chartHighlight ? 'crosshair' : 'default')
+
+  const xAxisConfig = {
+    angle: 0,
+    dataKey: xKey,
+    tick: showXAxis
+      ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
+      : false,
+    hide: !showXAxis,
+    interval: 'preserveStartEnd' as const,
+    tickMargin: showXAxis ? (XAxisProps?.tickMargin ?? 4) : 0,
+    height: showXAxis ? (XAxisProps?.height ?? 24) : 0,
+    axisLine: { stroke: CHART_COLORS.AXIS },
+    tickLine: { stroke: CHART_COLORS.AXIS },
+    ...XAxisProps,
+  }
+
+  const yAxisWidth = showYAxis ? (YAxisProps?.width ?? 60) : 0
+
+  const yAxisConfig = {
+    tick: showYAxis
+      ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
+      : false,
+    hide: !showYAxis,
+    tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
+    width: yAxisWidth,
+    axisLine: { stroke: CHART_COLORS.AXIS },
+    tickLine: { stroke: CHART_COLORS.AXIS },
+    ...YAxisProps,
+  }
+
+  const hasDateRangeFooter = xKey === 'timestamp' && data.length > 0
+
+  const resolveSeriesColor = (key: string) => {
+    const keyConfig = chartConfig[key]
+    return (
+      keyConfig?.color ||
+      (keyConfig?.theme ? (isDarkMode ? keyConfig.theme.dark : keyConfig.theme.light) : color)
+    )
+  }
+
+  const margin = {
+    top: 0,
+    right: 0,
+    left: 0,
+    bottom: 0,
+  }
+
+  const formatTooltipValue = (value: unknown) => {
+    if (typeof value === 'number') {
+      return YAxisProps?.tickFormatter ? YAxisProps.tickFormatter(value) : value.toLocaleString()
+    }
+
+    return String(value)
+  }
+
+  return (
+    <div
+      data-testid="chart-line"
+      className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
+    >
+      <ChartContainer
+        className={cn('w-full!', hasDateRangeFooter ? 'h-[calc(100%-28px)]' : 'h-full')}
+        config={chartConfig}
+      >
+        <RechartAreaChart
+          data={data}
+          syncId={syncId}
+          margin={margin}
+          style={{ cursor: chartCursor }}
+          onMouseMove={(e: any) => {
+            if (e.activeTooltipIndex !== focusDataIndex) {
+              setFocusDataIndex(e.activeTooltipIndex)
+            }
+
+            if (chartHighlight) {
+              const activeTimestamp = data[e.activeTooltipIndex]?.[xKey]
+              chartHighlight.handleMouseMove({
+                activeLabel: activeTimestamp?.toString(),
+                coordinates: e.activeLabel,
+              })
+            }
+          }}
+          onMouseDown={(e: any) => {
+            if (chartHighlight && e.activeTooltipIndex !== undefined) {
+              const activeTimestamp = data[e.activeTooltipIndex]?.[xKey]
+              chartHighlight.handleMouseDown({
+                activeLabel: activeTimestamp?.toString(),
+                coordinates: e.activeLabel,
+              })
+            }
+          }}
+          onMouseUp={(e: any) => {
+            if (chartHighlight) {
+              chartHighlight.handleMouseUp({
+                chartX: e?.chartX,
+                chartY: e?.chartY,
+              })
+            }
+          }}
+          onMouseLeave={() => {
+            setFocusDataIndex(null)
+            if (chartHighlight?.clearHighlight) {
+              chartHighlight.clearHighlight()
+            }
+          }}
+          onClick={(tooltipData) => {
+            const datum = tooltipData?.activePayload?.[0]?.payload
+            if (onLineClick) onLineClick(datum, tooltipData)
+          }}
+        >
+          <defs>
+            {keysToRender.map((key, index) => (
+              <linearGradient
+                key={key}
+                id={`${gradientPrefix}-${index}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="5%" stopColor={resolveSeriesColor(key)} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={resolveSeriesColor(key)} stopOpacity={0} />
+              </linearGradient>
+            ))}
+          </defs>
+          {showGrid && <CartesianGrid vertical={false} stroke={CHART_COLORS.AXIS} />}
+          <YAxis {...yAxisConfig} />
+          <XAxis {...xAxisConfig} />
+          <ChartTooltip
+            content={
+              <ChartTooltipContent
+                className="text-foreground-light -mt-5"
+                labelFormatter={(v: string) =>
+                  xKey === 'timestamp' ? dayjs(v).format(DateTimeFormat) : 'Value'
+                }
+                formatter={(value, name, item) => {
+                  const key = String(item.dataKey || name || dataKey)
+                  const itemConfig = chartConfig[key]
+                  const indicatorColor = item.payload.fill || item.color || color
+                  const detail = tooltipDetails?.(item.payload as ChartLineTick, key, value)
+
+                  return (
+                    <>
+                      <div
+                        className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                        style={{ backgroundColor: indicatorColor }}
+                      />
+                      <div className="flex flex-1 justify-between gap-3 leading-none">
+                        <div className="grid gap-1">
+                          <span className="text-foreground-light">
+                            {itemConfig?.label || name || key}
+                          </span>
+                          {detail}
+                        </div>
+                        <span className="font-mono font-medium tabular-nums text-foreground">
+                          {formatTooltipValue(value)}
+                        </span>
+                      </div>
+                    </>
+                  )
+                }}
+              />
+            }
+          />
+          {showHighlightActions && (
+            <ReferenceArea
+              x1={chartHighlight?.coordinates.left}
+              x2={chartHighlight?.coordinates.right}
+              strokeOpacity={0.5}
+              stroke={isDarkMode ? '#FFFFFF' : '#0C3925'}
+              fill={isDarkMode ? '#FFFFFF' : '#0C3925'}
+              fillOpacity={0.2}
+            />
+          )}
+          {referenceLines?.map((line, index) => (
+            <ReferenceLine
+              key={`${line.y}-${index}`}
+              y={line.y}
+              stroke={line.stroke ?? CHART_COLORS.TICK}
+              strokeWidth={line.strokeWidth ?? 1.5}
+              strokeDasharray={line.strokeDasharray ?? '4 4'}
+            />
+          ))}
+          {keysToRender.map((key, index) => (
+            <Area
+              key={key}
+              type="step"
+              dataKey={key}
+              fill={`url(#${gradientPrefix}-${index})`}
+              fillOpacity={0.1}
+              stroke={resolveSeriesColor(key)}
+              strokeWidth={strokeWidth}
+              stackId={keysToRender.length > 1 ? `stack-${key}` : undefined}
+            />
+          ))}
+        </RechartAreaChart>
+      </ChartContainer>
+
+      {hasDateRangeFooter && (
+        <div
+          className="text-foreground-lighter flex h-4 items-center justify-between text-[10px] font-mono"
+          style={{ paddingLeft: yAxisWidth + margin.left }}
+        >
+          <span>{dayjs(data[0][xKey]).format(DateTimeFormat)}</span>
+          <span>{dayjs(data[data.length - 1]?.[xKey]).format(DateTimeFormat)}</span>
+        </div>
+      )}
+    </div>
+  )
+}

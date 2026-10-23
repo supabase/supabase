@@ -1,24 +1,33 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { realtimeKeys } from './keys'
+import type { components } from '@/data/api'
+import { configKeys } from '@/data/config/keys'
+import { handleError, patch } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type RealtimeConfigurationUpdateBody = components['schemas']['UpdateRealtimeConfigBody'] & {
+  postgres_changes_pool?: number
+}
 
 export type RealtimeConfigurationUpdateVariables = {
   ref: string
-} & components['schemas']['UpdateRealtimeConfigBodyDto']
+} & RealtimeConfigurationUpdateBody
 
 export async function updateRealtimeConfiguration({
   ref,
   private_only,
   connection_pool,
+  postgres_changes_pool,
   max_concurrent_users,
   max_events_per_second,
   max_bytes_per_second,
   max_channels_per_client,
   max_joins_per_second,
+  max_presence_events_per_second,
+  max_payload_size_in_kb,
+  suspend,
 }: RealtimeConfigurationUpdateVariables) {
   if (!ref) return console.error('Project ref is required')
 
@@ -27,11 +36,15 @@ export async function updateRealtimeConfiguration({
     body: {
       private_only,
       connection_pool,
+      postgres_changes_pool,
       max_concurrent_users,
       max_events_per_second,
       max_bytes_per_second,
       max_channels_per_client,
       max_joins_per_second,
+      max_presence_events_per_second,
+      max_payload_size_in_kb,
+      suspend,
     },
   })
 
@@ -46,7 +59,7 @@ export const useRealtimeConfigurationUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     RealtimeConfigurationUpdateData,
     ResponseError,
     RealtimeConfigurationUpdateVariables
@@ -59,10 +72,14 @@ export const useRealtimeConfigurationUpdateMutation = ({
     RealtimeConfigurationUpdateData,
     ResponseError,
     RealtimeConfigurationUpdateVariables
-  >((vars) => updateRealtimeConfiguration(vars), {
+  >({
+    mutationFn: (vars) => updateRealtimeConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
-      await queryClient.invalidateQueries(realtimeKeys.configuration(ref))
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: realtimeKeys.configuration(ref) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(ref) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

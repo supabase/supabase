@@ -1,0 +1,63 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { databaseCronJobsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type DatabaseCronJobRunVariables = {
+  projectRef: string
+  connectionString?: string | null
+  jobId: number
+}
+
+// [Joshen] JFYI pg_cron doesn't support a run job function OOB just yet
+// So this is just merely running the command from within the cron job, will not reset the cron job's timer
+// https://github.com/citusdata/pg_cron/issues/226
+export async function runDatabaseCronJobCommand({
+  projectRef,
+  connectionString,
+  jobId,
+}: DatabaseCronJobRunVariables) {
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql: safeSql`DO $$
+DECLARE
+  job_command text;
+BEGIN
+  select command into job_command from cron.job where jobid = ${literal(jobId)};
+  EXECUTE job_command;
+END $$;`,
+    queryKey: databaseCronJobsKeys.create(),
+  })
+
+  return result
+}
+
+type DatabaseCronJobRunData = Awaited<ReturnType<typeof runDatabaseCronJobCommand>>
+
+export const useDatabaseCronJobRunCommandMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>,
+  'mutationFn'
+> = {}) => {
+  return useMutation<DatabaseCronJobRunData, ResponseError, DatabaseCronJobRunVariables>({
+    mutationFn: (vars) => runDatabaseCronJobCommand(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to run cron job command: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

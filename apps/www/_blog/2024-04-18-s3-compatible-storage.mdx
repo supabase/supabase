@@ -2,8 +2,8 @@
 title: 'Supabase Storage: now supports the S3 protocol'
 description: 'Supabase Storage is now officially an S3-Compatible Storage Provider.'
 author: fabrizio
-image: ga-week/s3-compatible-storage/og.png?v=2
-thumb: ga-week/s3-compatible-storage/thumb.png?v=2
+imgSocial: ga-week/s3-compatible-storage/og.png?v=2
+imgThumb: ga-week/s3-compatible-storage/thumb.png?v=2
 categories:
   - product
 tags:
@@ -14,7 +14,7 @@ toc_depth: 3
 launchweek: '11'
 ---
 
-Supabase Storage is now officially an S3-Compatible Storage Provider. This is one of the most-requested features and is available today in public alpha. Resumable Uploads are also transitioning from Beta to Generally Available.
+[Supabase Storage](/docs/guides/storage) is now officially an S3-Compatible Storage Provider. This is one of the most-requested features and is available today in public alpha. Resumable Uploads are also transitioning from Beta to Generally Available.
 
 The [Supabase Storage Engine](https://github.com/supabase/storage) is fully open source and is one of the few storage solutions that offer 3 interoperable protocols to manage your files:
 
@@ -44,11 +44,11 @@ The protocol works on the cloud, local development, and self-hosting. Check out 
 
 To authenticate with Supabase S3 you have 2 options:
 
-1. **The standard `access_key` and `secret_key` credentials.** You can generate these from the [storage settings page](/dashboard/project/_/settings/storage). This authentication method is widely compatible with tools supporting the S3 protocol. It is also meant to be used _exclusively serverside_ since it provides full access to your Storage resources.
+1. **The standard `access_key` and `secret_key` credentials.** You can generate these from the [storage settings page](/dashboard/project/_/storage/files/settings). This authentication method is widely compatible with tools supporting the S3 protocol. It is also meant to be used _exclusively serverside_ since it provides full access to your Storage resources.
 
    We will add scoped access key credentials in the near future which can have access to specific buckets.
 
-2. **User-scoped credentials with RLS.** This takes advantage of a well-adopted concept across all Supabase services, [Row Level Security](/docs/guides/auth/auth-deep-dive/auth-row-level-security). It allows you to interact with the S3 protocol by scoping storage operations to a particular authenticated user or role, respecting your existing RLS policies. This method is made possible by using the Session token header which the S3 protocol supports. You can find more information on how to use the Session token mechanism in the [doc](/docs/guides/storage/s3/authentication#session-token).
+2. **User-scoped credentials with RLS.** This takes advantage of a well-adopted concept across all Supabase services, [Row Level Security](/docs/guides/database/postgres/row-level-security). It allows you to interact with the S3 protocol by scoping storage operations to a particular authenticated user or role, respecting your existing RLS policies. This method is made possible by using the Session token header which the S3 protocol supports. You can find more information on how to use the Session token mechanism in the [doc](/docs/guides/storage/s3/authentication#session-token).
 
 ### S3-compatible Integrations
 
@@ -63,7 +63,7 @@ You can use popular tools for backups and migrations, such as:
 
 ![Supabase Cyberduck](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/cyberduck/cyberduck-files.png?t=2024-04-18T08%3A39%3A48.575Z)
 
-Check out our Cyberduck guide [here](/partners/integrations/cyberduck).
+Check out our Cyberduck guide [here](/partners/catalog/cyberduck).
 
 ### S3 for Data Engineers
 
@@ -110,7 +110,7 @@ These features were essential for Supabase, and since the [TUS node server](http
 # Getting started
 
 - Check out the S3 API compatibility [in our docs](/docs/guides/storage/s3/compatibility)
-- Request a feature on the [Storage Github repo](https://github.com/supabase/storage)
+- Request a feature on the [Storage GitHub repo](https://github.com/supabase/storage)
 - Learn about [S3 Authentication](/docs/guides/storage/s3/authentication)
-- Try S3 with Cyberduck: follow our [integration guide](/partners/integrations/cyberduck)
+- Try S3 with Cyberduck: follow our [integration guide](/partners/catalog/cyberduck)
 - Try S3 with DuckDB: follow the guide [on YouTube](https://www.youtube.com/watch?v=diL00ZZ-q50)

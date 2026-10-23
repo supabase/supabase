@@ -1,0 +1,83 @@
+'use client'
+
+import * as React from 'react'
+
+import { cn } from '../../lib/utils/cn'
+import { useHorizontalScroll } from '../hooks/use-horizontal-scroll'
+
+interface ShadowScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode
+  containerClassName?: string
+  stickyLastColumn?: boolean
+  outerContainerRef?: React.Ref<HTMLDivElement>
+}
+
+/**
+ * [Joshen] Leaving feedback here to address in the future
+   We should pull out all the sticky column logic, shift them to Table component where we can declare
+   sticky columns via a prop. ShadowScrollArea here should purely handle the shadow styling
+ */
+
+const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>(
+  (
+    { className, containerClassName, children, stickyLastColumn, outerContainerRef, ...props },
+    _ref
+  ) => {
+    const containerRef = React.useRef<HTMLDivElement | null>(null)
+    const { hasHorizontalScroll, canScrollLeft, canScrollRight } = useHorizontalScroll(containerRef)
+
+    const stickyColumnShadow = cn(
+      '[&_td:last-child]:before:absolute [&_td:last-child]:before:top-0 [&_td:last-child]:before:-left-6',
+      '[&_td:last-child]:before:bottom-0 [&_td:last-child]:before:w-6 [&_td:last-child]:before:bg-linear-to-l',
+      '[&_td:last-child]:before:from-black/5 dark:[&_td:last-child]:before:from-black/20 [&_td:last-child]:before:to-transparent',
+      '[&_td:last-child]:before:opacity-0 [&_td:last-child]:before:z-39',
+      '[&_th:last-child]:before:absolute [&_th:last-child]:before:top-0 [&_th:last-child]:before:-left-6',
+      '[&_th:last-child]:before:bottom-0 [&_th:last-child]:before:w-6 [&_th:last-child]:before:bg-linear-to-l',
+      '[&_th:last-child]:before:from-black/5 dark:[&_th:last-child]:before:from-black/20 [&_th:last-child]:before:to-transparent',
+      '[&_th:last-child]:before:opacity-0 [&_th:last-child]:before:z-39'
+    )
+
+    return (
+      <div ref={outerContainerRef} className={cn(containerClassName, 'relative')}>
+        <div
+          className={cn(
+            'absolute inset-0 pointer-events-none z-38',
+            'before:absolute before:top-0 before:right-0 before:bottom-0 before:w-6 before:bg-linear-to-l before:from-black/5 dark:before:from-black/20 before:to-transparent before:opacity-0',
+            'after:absolute after:top-0 after:left-0 after:bottom-0 after:w-6 after:bg-linear-to-r after:from-black/5 dark:after:from-black/20 after:to-transparent after:opacity-0',
+            hasHorizontalScroll && 'hover:before:opacity-100 hover:after:opacity-100',
+            canScrollRight && 'before:opacity-100',
+            canScrollLeft && 'after:opacity-100'
+          )}
+        />
+        <div
+          ref={containerRef}
+          className={cn(
+            'w-full overflow-auto',
+            stickyLastColumn && [
+              '[&_tr>*:last-child]:sticky [&_tr>*:last-child]:z-38 [&_tr>*:last-child]:right-0',
+              // Sticky cells need an opaque base. `bg-surface-200` / `--muted` is alpha-based,
+              // so using it alone lets scrolled row content show through on hover. Keep the
+              // opaque surface-100 base and composite muted via background-image so hover
+              // matches TableRow without becoming transparent.
+              '[&_td:last-child]:bg-surface-100',
+              '[&_tr:hover>td:last-child]:!bg-surface-100',
+              '[&_tr:hover>td:last-child]:![background-image:linear-gradient(var(--background-surface-200),var(--background-surface-200))]',
+              '[&_th:last-child]:bg-200',
+              stickyColumnShadow,
+            ],
+            canScrollRight &&
+              '[&_td]:before:opacity-100 [&_tr>*:last-child]:before:opacity-100 [&_th:last-child]:before:opacity-100',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </div>
+    )
+  }
+)
+
+ShadowScrollArea.displayName = 'ShadowScrollArea'
+
+export { ShadowScrollArea }

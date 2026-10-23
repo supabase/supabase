@@ -11,9 +11,12 @@
 # next.js
 /.next/
 /out/
+next-env.d.ts
 
 # production
 /build
+/dist
+/.output
 
 # misc
 .DS_Store
@@ -37,3 +40,5 @@ yarn-error.log*
 /public/dashboard
 # Sentry Auth Token
 .sentryclirc
+
+certificates
