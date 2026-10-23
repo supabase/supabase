@@ -19,6 +19,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -169,17 +172,22 @@ export const SigningKeyRow = ({
     <TableCell className="text-right">
       {(signingKey.status !== 'in_use' || signingKey.algorithm !== 'HS256') && (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <ButtonTooltip
-              variant="default"
-              aria-label="More options"
-              className="px-1.5"
-              loading={isLoading}
-              icon={<MoreVerticalIcon className="size-4" />}
-              tooltip={{ content: { side: 'bottom', text: 'More options' } }}
-            />
-          </DropdownMenuTrigger>
-
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="text"
+                  className="px-1.5"
+                  loading={isLoading}
+                  icon={<MoreVerticalIcon className="size-4" />}
+                  aria-label="Manage key"
+                  // Tooltip repeats the label; screen readers would read it twice
+                  aria-describedby={undefined}
+                />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Manage key</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent align="end" className="w-52">
             {signingKey.algorithm !== 'HS256' && (
               <DropdownMenuItem
