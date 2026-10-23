@@ -1,7 +1,7 @@
 'use client'
 
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Loader2 } from 'lucide-react'
 import { ScrollArea as ScrollAreaPrimitive } from 'radix-ui'
 import type { ComponentProps, KeyboardEvent } from 'react'
 import { createContext, use, useEffect, useMemo, useRef, useState } from 'react'
@@ -11,7 +11,7 @@ import { useTrace, useView } from './Trace'
 import type { SpanContextValue } from './types'
 import { flattenTree, formatDuration } from './utils'
 
-const ROW_HEIGHT = 28
+const ROW_HEIGHT = 24
 const OVERSCAN = 8
 const INDENT = 14
 
@@ -138,7 +138,7 @@ export function Rows({
                   data-trace-row
                   data-trace-row-id={id}
                   data-state={isSelected ? 'selected' : undefined}
-                  className="absolute left-0 top-0 flex w-full cursor-pointer items-stretch border-b border-muted outline-none hover:bg-surface-200 focus-visible:bg-surface-200 data-[state=selected]:bg-selection"
+                  className="absolute left-0 top-0 flex w-full cursor-pointer items-stretch divide-x divide-default outline-none hover:bg-foreground/5 focus-visible:bg-foreground/5 data-[state=selected]:bg-brand/10"
                   style={{ height: item.size, transform: `translateY(${item.start}px)` }}
                   onClick={() => {
                     select(id)
@@ -166,7 +166,7 @@ export function Cell({ className, style, ...props }: ComponentProps<'div'>) {
     <div
       data-trace-cell
       className={cn(
-        'flex w-(--trace-tree-width) shrink-0 items-center gap-1.5 overflow-hidden border-r border-muted pr-2',
+        'flex w-(--trace-tree-width) shrink-0 items-center gap-1.5 overflow-hidden pr-2',
         className
       )}
       style={{ paddingLeft: row.depth * INDENT + 4, ...style }}
@@ -198,6 +198,16 @@ export function Cell({ className, style, ...props }: ComponentProps<'div'>) {
       <span data-trace-name className="min-w-0 flex-1 truncate font-mono text-xs">
         {row.span.name}
       </span>
+      {row.span.endMs === null && (
+        <>
+          <Loader2
+            aria-hidden
+            data-trace-spinner
+            className="size-3 shrink-0 text-foreground-muted motion-safe:animate-spin"
+          />
+          <span className="sr-only">Running</span>
+        </>
+      )}
       <Duration />
     </div>
   )
