@@ -19,6 +19,7 @@ import {
   TableHeader,
   TableRow,
   Tabs,
+  TabsContent,
   TabsList,
   TabsTrigger,
 } from 'ui'
@@ -99,26 +100,25 @@ export function DatabaseSizeTable({ relations }: { relations: DatabaseSizeRelati
   })
 
   return (
-    <div className="space-y-3">
+    <Tabs
+      value={view}
+      onValueChange={(value) => {
+        const next = views.find((item) => item.value === value)
+        if (next) {
+          setView(next.value)
+          table.setPageIndex(0)
+        }
+      }}
+      className="space-y-3"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Tabs
-          value={view}
-          onValueChange={(value) => {
-            const next = views.find((item) => item.value === value)
-            if (next) {
-              setView(next.value)
-              table.setPageIndex(0)
-            }
-          }}
-        >
-          <TabsList className="flex-wrap h-auto">
-            {views.map((item) => (
-              <TabsTrigger key={item.value} value={item.value}>
-                {item.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+        <TabsList className="flex-wrap h-auto">
+          {views.map((item) => (
+            <TabsTrigger key={item.value} value={item.value}>
+              {item.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
         <Input
           aria-label="Search objects"
           placeholder="Search objects..."
@@ -131,69 +131,72 @@ export function DatabaseSizeTable({ relations }: { relations: DatabaseSizeRelati
           className="w-full sm:w-64"
         />
       </div>
-      <p className="text-xs text-foreground-light">
-        {view === 'all'
-          ? 'Each object is counted once. Table rows exclude indexes and TOAST; TOAST includes its own indexes.'
-          : 'Table and schema totals include their indexes and TOAST. Percentages use the total size of listed database objects.'}
-      </p>
-      <div className="overflow-x-auto rounded border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((group) => (
-              <TableRow key={group.id}>
-                {group.headers.map((header) => (
-                  <TableHead key={header.id} aria-sort={getAriaSort(header.column.getIsSorted())}>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="text-xs whitespace-nowrap">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+      <TabsContent value={view} className="space-y-3">
+        <p className="text-xs text-foreground-light">
+          {view === 'all'
+            ? 'Each object is counted once. Table rows exclude indexes and TOAST; TOAST includes its own indexes.'
+            : 'Table and schema totals include their indexes and TOAST. Percentages use the total size of listed database objects.'}
+        </p>
+        <div className="overflow-x-auto rounded border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((group) => (
+                <TableRow key={group.id}>
+                  {group.headers.map((header) => (
+                    <TableHead key={header.id} aria-sort={getAriaSort(header.column.getIsSorted())}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="text-xs whitespace-nowrap">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+              {table.getRowModel().rows.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center text-foreground-light"
+                  >
+                    No matching objects found
                   </TableCell>
-                ))}
-              </TableRow>
-            ))}
-            {table.getRowModel().rows.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-foreground-light"
-                >
-                  No matching objects found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-between text-xs text-foreground-light">
-        <span>{table.getFilteredRowModel().rows.length} objects</span>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            disabled={!table.getCanPreviousPage()}
-            onClick={() => table.previousPage()}
-          >
-            Previous
-          </Button>
-          <span>
-            Page {table.getState().pagination.pageIndex + 1} of {Math.max(1, table.getPageCount())}
-          </span>
-          <Button
-            variant="outline"
-            disabled={!table.getCanNextPage()}
-            onClick={() => table.nextPage()}
-          >
-            Next
-          </Button>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
-      </div>
-    </div>
+        <div className="flex items-center justify-between text-xs text-foreground-light">
+          <span>{table.getFilteredRowModel().rows.length} objects</span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              disabled={!table.getCanPreviousPage()}
+              onClick={() => table.previousPage()}
+            >
+              Previous
+            </Button>
+            <span>
+              Page {table.getState().pagination.pageIndex + 1} of{' '}
+              {Math.max(1, table.getPageCount())}
+            </span>
+            <Button
+              variant="outline"
+              disabled={!table.getCanNextPage()}
+              onClick={() => table.nextPage()}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
   )
 }
