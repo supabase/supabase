@@ -230,6 +230,12 @@ export const PlanUpdateSidePanel = () => {
     />
   )
 
+  const showAwsMarketplacePurchase =
+    canUpdateSubscription &&
+    selectedOrganization?.managed_by === MANAGED_BY.SUPABASE &&
+    !isPartnerBilledOrganization &&
+    !['enterprise', 'platform'].includes(subscription?.plan?.id ?? '')
+
   const planCards = (
     <PlanCards
       availablePlans={availablePlans}
@@ -241,6 +247,7 @@ export const PlanUpdateSidePanel = () => {
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
       entryDelay={contentDelay}
+      showAwsMarketplacePurchase={showAwsMarketplacePurchase}
       onSelectTier={setSelectedTier}
     />
   )
