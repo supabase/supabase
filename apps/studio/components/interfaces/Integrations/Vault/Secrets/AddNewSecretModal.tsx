@@ -13,11 +13,11 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  ExpandingTextArea,
   Form,
   FormControl,
   FormField,
   Input,
-  Textarea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -123,49 +123,38 @@ export const AddNewSecretModal = () => {
                 name="secret"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Secret value">
-                    <FormControl className="col-span-6">
-                      <div className="relative">
-                        <Textarea
+                    <div className="relative">
+                      <FormControl className="col-span-6">
+                        <ExpandingTextArea
                           {...field}
-                          rows={1}
-                          ref={(el) => {
-                            field.ref(el)
-                            if (el) {
-                              el.style.height = 'auto'
-                              el.style.height = Math.max(40, el.scrollHeight) + 'px'
-                            }
-                          }}
-                          className="min-h-0 resize-none"
+                          value={field.value ?? ''}
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                          className="max-h-[320px] overflow-y-auto"
                           style={
                             {
                               WebkitTextSecurity: isSecretVisible ? undefined : 'disc',
                             } as React.CSSProperties
                           }
-                          onChange={(e) => {
-                            field.onChange(e)
-                            e.currentTarget.style.height = 'auto'
-                            e.currentTarget.style.height =
-                              Math.max(40, e.currentTarget.scrollHeight) + 'px'
-                          }}
                         />
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="text"
-                              className="absolute right-1 top-1 px-1"
-                              aria-label={
-                                isSecretVisible ? 'Hide secret value' : 'Show secret value'
-                              }
-                              icon={isSecretVisible ? <EyeOffIcon /> : <EyeIcon />}
-                              onClick={() => setIsSecretVisible((prev) => !prev)}
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            {isSecretVisible ? 'Hide value' : 'Show value'}
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </FormControl>
+                      </FormControl>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="text"
+                            className="absolute right-1 top-1 px-1"
+                            aria-label={isSecretVisible ? 'Hide secret value' : 'Show secret value'}
+                            icon={isSecretVisible ? <EyeOffIcon /> : <EyeIcon />}
+                            onClick={() => setIsSecretVisible((prev) => !prev)}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {isSecretVisible ? 'Hide value' : 'Show value'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
                   </FormItemLayout>
                 )}
               />
