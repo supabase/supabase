@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getSizeRows,
   getTreemapGroups,
+  getTreemapLabelLines,
   partitionTreemap,
   relationSize,
   sizePercentage,
@@ -116,5 +117,12 @@ describe('database size accounting', () => {
     }
     expect(partitionTreemap([])).toEqual([])
     expect(partitionTreemap([{ size: 0 }, { size: 0 }])).toEqual([])
+  })
+  it('hides treemap labels unless complete lines fit in a tile', () => {
+    expect(getTreemapLabelLines(71, 100)).toBe(0)
+    expect(getTreemapLabelLines(100, 39)).toBe(0)
+    expect(getTreemapLabelLines(100, 40)).toBe(1)
+    expect(getTreemapLabelLines(100, 56)).toBe(2)
+    expect(getTreemapLabelLines(100, 72)).toBe(3)
   })
 })

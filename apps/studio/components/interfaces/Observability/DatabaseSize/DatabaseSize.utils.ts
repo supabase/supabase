@@ -150,3 +150,10 @@ export function partitionTreemap<T extends { size: number }>(
     ),
   ]
 }
+
+export function getTreemapLabelLines(width: number, height: number) {
+  if (width < 72 || height < 40) return 0
+  if (height < 56) return 1
+  if (height < 72) return 2
+  return 3
+}

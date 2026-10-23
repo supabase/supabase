@@ -112,9 +112,13 @@ export function DatabaseSizeTable({ relations }: { relations: DatabaseSizeRelati
       className="space-y-3"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <TabsList className="flex-wrap h-auto">
+        <TabsList className="flex-wrap h-auto gap-1 rounded-lg border bg-surface-200 p-1">
           {views.map((item) => (
-            <TabsTrigger key={item.value} value={item.value}>
+            <TabsTrigger
+              key={item.value}
+              value={item.value}
+              className="rounded-md border-b-0 px-3 py-1.5 data-[state=active]:bg-surface-100 data-[state=active]:shadow-sm"
+            >
               {item.label}
             </TabsTrigger>
           ))}
