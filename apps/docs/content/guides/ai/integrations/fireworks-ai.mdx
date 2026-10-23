@@ -48,8 +48,8 @@ Create an Edge Function that sends a prompt to a Fireworks chat model and return
 2. Replace the contents of `supabase/functions/fireworks-chat/index.ts` with the following code. It points the OpenAI SDK at the Fireworks base URL and calls the `glm-5p3-flash` model:
 
    ```ts supabase/functions/fireworks-chat/index.ts
-   import OpenAI from 'jsr:@openai/openai@^6'
    import { withSupabase } from 'npm:@supabase/server@^1'
+   import OpenAI from 'npm:openai@^6'
 
    const fireworks = new OpenAI({
      apiKey: Deno.env.get('FIREWORKS_API_KEY'),
@@ -155,8 +155,8 @@ Create an Edge Function that embeds text and inserts it into the `documents` tab
 3. Replace the contents of `supabase/functions/fireworks-embed/index.ts` with the following code:
 
    ```ts supabase/functions/fireworks-embed/index.ts
-   import OpenAI from 'jsr:@openai/openai@^6'
    import { withSupabase } from 'npm:@supabase/server@^1'
+   import OpenAI from 'npm:openai@^6'
 
    const fireworks = new OpenAI({
      apiKey: Deno.env.get('FIREWORKS_API_KEY'),
@@ -206,8 +206,8 @@ Create an Edge Function that embeds a search query with the same model and dimen
 2. Replace the contents of `supabase/functions/fireworks-search/index.ts` with the following code:
 
    ```ts supabase/functions/fireworks-search/index.ts
-   import OpenAI from 'jsr:@openai/openai@^6'
    import { withSupabase } from 'npm:@supabase/server@^1'
+   import OpenAI from 'npm:openai@^6'
 
    const fireworks = new OpenAI({
      apiKey: Deno.env.get('FIREWORKS_API_KEY'),
@@ -275,10 +275,10 @@ The function composes the authenticated pipeline from [Deploy MCP servers](/docs
 3. Replace the contents of `supabase/functions/mcp/index.ts` with the following code. It reads the `FIREWORKS_API_KEY` secret from [Store your API key](#store-your-api-key) and registers one tool to search the table and one to read a single row:
 
    ```ts supabase/functions/mcp/index.ts
-   import OpenAI from 'npm:openai@^6'
    import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0'
    import { pipeline } from 'npm:@supabase/middleware@1'
    import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1'
+   import OpenAI from 'npm:openai@^6'
    import { z } from 'npm:zod@^4.3.6'
 
    const fireworks = new OpenAI({
