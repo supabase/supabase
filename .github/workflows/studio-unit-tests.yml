@@ -81,7 +81,9 @@ jobs:
         env:
           # Default is 2 GB, increase to have less frequent OOM errors
           NODE_OPTIONS: '--max_old_space_size=3072'
-        run: pnpm run test:ci --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+          SHARD: ${{ matrix.shard }}
+          SHARD_TOTAL: ${{ strategy.job-total }}
+        run: pnpm run test:ci --shard="$SHARD/$SHARD_TOTAL"
         working-directory: ./apps/studio
       - name: Upload coverage artifact
         if: steps.filter.outputs.relevant == 'true'
