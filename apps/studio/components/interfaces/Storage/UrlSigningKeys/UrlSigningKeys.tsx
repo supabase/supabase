@@ -8,7 +8,7 @@ import {
   ShieldOffIcon,
   TimerIcon,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState, type Ref } from 'react'
 import { toast } from 'sonner'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -49,6 +49,8 @@ export const UrlSigningKeys = () => {
   const isProjectActive = useIsProjectActive()
   const track = useTrack()
   const [dialog, setDialog] = useState<DialogState>()
+  const returnFocusRef = useRef<HTMLElement | null>(null)
+  const createButtonRef = useRef<HTMLButtonElement>(null)
 
   const { can: canReadKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_READ,
@@ -77,7 +79,22 @@ export const UrlSigningKeys = () => {
   const hasStandbyKey = standbyKeys.length > 0
   const canCreateStandbyKey = canUpdateKeys && !hasStandbyKey
 
-  const closeDialog = () => setDialog(undefined)
+  const openDialog = (state: DialogState, trigger: HTMLElement | null) => {
+    returnFocusRef.current = trigger
+    setDialog(state)
+  }
+
+  const closeDialog = () => {
+    setDialog(undefined)
+    // The dialogs are controlled, so Radix has no trigger to return focus to. Restore it
+    // ourselves, falling back to the create button when the trigger is gone (e.g. after a
+    // rotation moves the key to another table). Deferred so it runs after Radix's own cleanup.
+    setTimeout(() => {
+      const trigger = returnFocusRef.current
+      const target = trigger?.isConnected ? trigger : createButtonRef.current
+      target?.focus()
+    })
+  }
 
   if (isLoadingPermissions) return <GenericSkeletonLoader />
   if (!canReadKeys) {
@@ -140,10 +157,11 @@ export const UrlSigningKeys = () => {
                 </PageSectionSummary>
                 <PageSectionAside>
                   <ButtonTooltip
+                    ref={createButtonRef}
                     variant="primary"
                     icon={<TimerIcon />}
                     disabled={!canCreateStandbyKey}
-                    onClick={() => setDialog({ type: 'create' })}
+                    onClick={(event) => openDialog({ type: 'create' }, event.currentTarget)}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -167,8 +185,8 @@ export const UrlSigningKeys = () => {
                   renderActions={(key) => (
                     <StandbyKeyActions
                       canUpdateKeys={canUpdateKeys}
-                      onRotate={() => setDialog({ type: 'rotate', key })}
-                      onRevoke={() => setDialog({ type: 'revoke', key })}
+                      onRotate={(trigger) => openDialog({ type: 'rotate', key }, trigger)}
+                      onRevoke={(trigger) => openDialog({ type: 'revoke', key }, trigger)}
                     />
                   )}
                 />
@@ -229,9 +247,18 @@ export const UrlSigningKeys = () => {
   )
 }
 
-const MoreOptionsTrigger = ({ disabled, loading }: { disabled?: boolean; loading?: boolean }) => (
+const MoreOptionsTrigger = ({
+  triggerRef,
+  disabled,
+  loading,
+}: {
+  triggerRef?: Ref<HTMLButtonElement>
+  disabled?: boolean
+  loading?: boolean
+}) => (
   <DropdownMenuTrigger asChild>
     <ButtonTooltip
+      ref={triggerRef}
       variant="default"
       aria-label="More options"
       className="px-1.5"
@@ -249,35 +276,39 @@ const StandbyKeyActions = ({
   onRevoke,
 }: {
   canUpdateKeys: boolean
-  onRotate: () => void
-  onRevoke: () => void
-}) => (
-  <>
-    <ButtonTooltip
-      variant="default"
-      icon={<RotateCwIcon />}
-      disabled={!canUpdateKeys}
-      onClick={onRotate}
-      tooltip={{
-        content: {
-          side: 'bottom',
-          text: canUpdateKeys ? undefined : 'You need additional permissions to rotate keys',
-        },
-      }}
-    >
-      Rotate key
-    </ButtonTooltip>
-    <DropdownMenu>
-      <MoreOptionsTrigger disabled={!canUpdateKeys} />
-      <DropdownMenuContent side="bottom" align="end" className="w-52">
-        <DropdownMenuItem className="gap-x-2" onSelect={onRevoke}>
-          <ShieldOffIcon size={14} />
-          Revoke key
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  </>
-)
+  onRotate: (trigger: HTMLElement) => void
+  onRevoke: (trigger: HTMLElement | null) => void
+}) => {
+  const moreOptionsRef = useRef<HTMLButtonElement>(null)
+
+  return (
+    <>
+      <ButtonTooltip
+        variant="default"
+        icon={<RotateCwIcon />}
+        disabled={!canUpdateKeys}
+        onClick={(event) => onRotate(event.currentTarget)}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: canUpdateKeys ? undefined : 'You need additional permissions to rotate keys',
+          },
+        }}
+      >
+        Rotate key
+      </ButtonTooltip>
+      <DropdownMenu>
+        <MoreOptionsTrigger triggerRef={moreOptionsRef} disabled={!canUpdateKeys} />
+        <DropdownMenuContent side="bottom" align="end" className="w-52">
+          <DropdownMenuItem className="gap-x-2" onSelect={() => onRevoke(moreOptionsRef.current)}>
+            <ShieldOffIcon size={14} />
+            Revoke key
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  )
+}
 
 const RevokedKeyActions = ({
   canUpdateKeys,

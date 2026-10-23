@@ -11,6 +11,8 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type ListJwksResponse = components['schemas']['ListJwksResponse_Output']
 type Jwk = ListJwksResponse['data'][number]
+type CreateStandbyJwkResponse = components['schemas']['CreateStandbyJwkResponse_Output']
+type ToggleJwkResponse = components['schemas']['ToggleJwkResponse_Output']
 
 const mockTrack = vi.hoisted(() => vi.fn())
 const mockPermissions = vi.hoisted(() => ({ can: true }))
@@ -106,7 +108,7 @@ describe('UrlSigningKeys', () => {
       path: '/platform/storage/:ref/jwks/url-signing/standby',
       response: async ({ request }) => {
         bodies.push(await request.json())
-        return HttpResponse.json({ kid: 'new-key' }, { status: 201 })
+        return HttpResponse.json<CreateStandbyJwkResponse>({ kid: 'new-key' }, { status: 201 })
       },
     })
     customRender(<UrlSigningKeys />)
@@ -131,7 +133,7 @@ describe('UrlSigningKeys', () => {
       path: '/platform/storage/:ref/jwks/url-signing/standby/:kid/swap',
       response: ({ params }) => {
         swapped.push(params.kid as string | undefined)
-        return HttpResponse.json({}, { status: 201 })
+        return HttpResponse.json<Record<string, never>>({}, { status: 201 })
       },
     })
     customRender(<UrlSigningKeys />)
@@ -157,7 +159,7 @@ describe('UrlSigningKeys', () => {
       path: '/platform/storage/:ref/jwks/:kid',
       response: async ({ request }) => {
         bodies.push(await request.json())
-        return HttpResponse.json({ result: true })
+        return HttpResponse.json<ToggleJwkResponse>({ result: true })
       },
     })
     customRender(<UrlSigningKeys />)
@@ -195,7 +197,7 @@ describe('UrlSigningKeys', () => {
       path: '/platform/storage/:ref/jwks/:kid',
       response: async ({ request }) => {
         bodies.push(await request.json())
-        return HttpResponse.json({ result: true })
+        return HttpResponse.json<ToggleJwkResponse>({ result: true })
       },
     })
     customRender(<UrlSigningKeys />)
@@ -221,5 +223,47 @@ describe('UrlSigningKeys', () => {
 
     const item = await screen.findByRole('menuitem', { name: 'Move to standby key' })
     expect(item).toHaveAttribute('aria-disabled', 'true')
+  })
+
+  test('returns focus to the create button when its dialog is cancelled', async () => {
+    mockKeys([ACTIVE])
+    customRender(<UrlSigningKeys />)
+
+    const create = await screen.findByRole('button', { name: 'Create standby key' })
+    await userEvent.click(create)
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() => expect(create).toHaveFocus())
+  })
+
+  test('returns focus to the rotate button when its dialog is cancelled', async () => {
+    mockKeys([ACTIVE, STANDBY])
+    customRender(<UrlSigningKeys />)
+
+    const standby = await getRow('standby-key')
+    const rotate = standby.getByRole('button', { name: 'Rotate key' })
+    await userEvent.click(rotate)
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() => expect(rotate).toHaveFocus())
+  })
+
+  test('returns focus to the more options button when the revoke dialog is cancelled', async () => {
+    mockKeys([ACTIVE, STANDBY])
+    customRender(<UrlSigningKeys />)
+
+    const standby = await getRow('standby-key')
+    const moreOptions = standby.getByRole('button', { name: 'More options' })
+    await userEvent.click(moreOptions)
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Revoke key' }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() => expect(moreOptions).toHaveFocus())
   })
 })
