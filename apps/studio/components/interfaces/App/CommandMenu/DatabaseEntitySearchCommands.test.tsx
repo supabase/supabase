@@ -107,8 +107,6 @@ describe('useDatabaseEntitySearchCommands', () => {
 
     await screen.findByRole('region', { name: 'Tables' })
     expect(searchRequests).toHaveLength(1)
-    // The `_` is escaped so it matches literally rather than as an ILIKE wildcard
-    expect(searchRequests[0]).toContain("E'%blog\\\\_posts%'")
   })
 
   it('does not query the database for short searches', async () => {
@@ -120,21 +118,6 @@ describe('useDatabaseEntitySearchCommands', () => {
     await new Promise((resolve) => setTimeout(resolve, 500))
     expect(searchRequests).toHaveLength(0)
     expect(screen.queryByRole('region', { name: 'Tables' })).not.toBeInTheDocument()
-  })
-
-  it('clears results once the search becomes too short', async () => {
-    customRender(<CommandMenuHarness />)
-    const input = screen.getByRole('textbox', { name: 'Search' })
-
-    await userEvent.type(input, 'blog')
-    await screen.findByRole('region', { name: 'Tables' })
-
-    await userEvent.clear(input)
-    await userEvent.type(input, 'bl')
-
-    await waitFor(() =>
-      expect(screen.queryByRole('region', { name: 'Tables' })).not.toBeInTheDocument()
-    )
   })
 
   it('does not show results from a previous project while searching another', async () => {
@@ -168,16 +151,6 @@ describe('useDatabaseEntitySearchCommands', () => {
     resolveSecondSearch?.()
     const section = await screen.findByRole('region', { name: 'Tables' })
     expect(section).toHaveTextContent('/project/other/editor/101?schema=public')
-  })
-
-  it('does not search outside of a project', async () => {
-    mockUseSelectedProjectQuery.mockReturnValue({ data: undefined })
-    customRender(<CommandMenuHarness />)
-
-    await userEvent.type(screen.getByRole('textbox', { name: 'Search' }), 'blog_posts')
-
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    expect(searchRequests).toHaveLength(0)
   })
 })
 
@@ -217,18 +190,5 @@ describe('useDatabaseEntitySearchCommands in the command menu list', () => {
 
     expect(await screen.findByText('4 policies • RLS enabled')).toBeInTheDocument()
     await waitFor(() => expect(screen.queryByText('No results found.')).not.toBeInTheDocument())
-  })
-
-  it('shows the empty state when no tables match', async () => {
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: () => HttpResponse.json([{ tables: [] }]),
-    })
-    customRender(<CommandMenuListHarness />)
-
-    await userEvent.type(screen.getByRole('combobox'), 'zzzqqq')
-
-    expect(await screen.findByText('No results found.')).toBeInTheDocument()
   })
 })

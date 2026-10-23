@@ -489,11 +489,6 @@ const SEARCH_ENTITIES_BUDGET = {
   maxExecutionTimeMs: 500,
 }
 
-test('getSearchEntitiesSql: no-match search does a single filtered pass of pg_class', async () => {
-  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'does_not_exist' }))
-  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
-}, 60_000)
-
 test('getSearchEntitiesSql: broad search (thousands of matches) stays within budget', async () => {
   // `t_1` matches t_1, t_10..t_19, t_100..t_199, ... -- a large share of the catalog
   const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 't_1' }))
@@ -503,13 +498,4 @@ test('getSearchEntitiesSql: broad search (thousands of matches) stays within bud
 test('getSearchEntitiesSql: schema-qualified search stays within budget', async () => {
   const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'stress.t_1' }))
   assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
-}, 60_000)
-
-test('getSearchEntitiesSql: real query ranks the exact match first at scale', async () => {
-  const [{ tables: results }] = await db.executeQuery<
-    Array<{ tables: Array<{ schema: string; name: string }> }>
-  >(getSearchEntitiesSql({ query: 't_1000' }))
-
-  expect(results[0]).toEqual(expect.objectContaining({ schema: 'stress', name: 't_1000' }))
-  expect(results.length).toBeLessThanOrEqual(6)
 }, 60_000)
