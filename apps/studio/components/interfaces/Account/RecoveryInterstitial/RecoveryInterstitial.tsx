@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useUser } from 'common'
+import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -37,46 +37,58 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
   const user = useUser()
   const queryClient = useQueryClient()
   const track = useTrack()
+  const { hasLoaded, isConfigCatStale } = useFeatureFlags()
+  const flagsReady = hasLoaded === true && !isConfigCatStale
   const isEnabled = useFlag('enableAuthRecoveryCodes')
   const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
   const { findings, isPending, isError, verifiedFactorCount } = useAccountRecovery({
-    enabled: isEnabled && hasSecuritySettings,
+    enabled: flagsReady && isEnabled && hasSecuritySettings,
   })
-  const gap = isError || isPending ? null : getRecoveryGap(findings)
+  const isLoading = !flagsReady || isPending
+  const isUnavailable = flagsReady && (!isEnabled || !hasSecuritySettings)
+  const gap = isError || isLoading || isUnavailable ? null : getRecoveryGap(findings)
+  let announcement = 'Account recovery check complete'
+  if (gap) announcement = 'Account recovery action needed'
+  if (isUnavailable) announcement = 'Account recovery check unavailable'
+  if (isLoading) announcement = 'Checking account recovery'
+  if (isError) announcement = ''
   return (
-    <RecoveryReminder
-      key={user?.id}
-      gap={gap}
-      destination={destination}
-      isLoading={isPending}
-      isError={isError}
-      hasAuthenticatorTask={verifiedFactorCount === 1}
-      onAction={(actionType) => track('account_recovery_action_clicked', { actionType })}
-      onTaskComplete={(taskType) => track('account_recovery_task_completed', { taskType })}
-      onExit={({ gap: activeGap, areCodesSaved, isFactorComplete }) => {
-        if (user?.id) {
-          // Completed mutations can precede the refreshed status response.
-          const remainingGap = getRemainingRecoveryGap({
-            currentGap: getRecoveryGap(findings),
-            activeGap,
-            isReadUnavailable: isPending || isError,
-            areCodesSaved,
-            isFactorComplete,
-          })
-          if (remainingGap) writeRecoveryReminderSnooze(user.id, remainingGap)
-          else clearRecoveryReminderSnooze(user.id)
-        }
-        track('account_recovery_reminder_closed', {
-          hasCompletedTask: areCodesSaved || isFactorComplete,
-        })
-      }}
-      onCodesComplete={() => {
-        queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status(user?.id) })
-      }}
-      onFactorComplete={() => {
-        queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors(user?.id) })
-      }}
-    />
+    <>
+      <span className="sr-only" role="status">
+        {announcement}
+      </span>
+      <RecoveryReminder
+        key={user?.id}
+        gap={gap}
+        destination={destination}
+        isLoading={isLoading}
+        isUnavailable={isUnavailable}
+        hasAuthenticatorTask={verifiedFactorCount === 1}
+        isError={isError}
+        onAction={(actionType) => track('account_recovery_action_clicked', { actionType })}
+        onTaskComplete={(taskType) => track('account_recovery_task_completed', { taskType })}
+        onExit={({ gap: activeGap, areCodesSaved, isFactorComplete }) => {
+          if (user?.id) {
+            // Completed mutations can precede the refreshed status response.
+            const remainingGap = getRemainingRecoveryGap({
+              currentGap: getRecoveryGap(findings),
+              activeGap,
+              isReadUnavailable: isPending || isError,
+              areCodesSaved,
+              isFactorComplete,
+            })
+            if (remainingGap) writeRecoveryReminderSnooze(user.id, remainingGap)
+            else clearRecoveryReminderSnooze(user.id)
+          }
+        }}
+        onCodesComplete={() => {
+          queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status(user?.id) })
+        }}
+        onFactorComplete={() => {
+          queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors(user?.id) })
+        }}
+      />
+    </>
   )
 }
 
@@ -85,6 +97,7 @@ export const RecoveryReminder = ({
   destination,
   isLoading = false,
   isError = false,
+  isUnavailable = false,
   hasAuthenticatorTask = true,
   onCodesComplete,
   onFactorComplete,
@@ -96,6 +109,7 @@ export const RecoveryReminder = ({
   destination: string
   isLoading?: boolean
   isError?: boolean
+  isUnavailable?: boolean
   hasAuthenticatorTask?: boolean
   onCodesComplete?: () => void
   onFactorComplete?: () => void
@@ -111,7 +125,7 @@ export const RecoveryReminder = ({
   const [isFactorComplete, setIsFactorComplete] = useState(false)
   // Preserve all task dialogs and completed rows during background status updates.
   const activeGap = startedGap ?? gap
-  if (!activeGap && isError) {
+  if (!activeGap && (isError || isUnavailable)) {
     return (
       <InterstitialLayout
         logo={<SupabaseLogo />}
@@ -119,7 +133,13 @@ export const RecoveryReminder = ({
         widthClassName="max-w-md"
       >
         <div className="px-6">
-          <AlertError subject="Failed to check account recovery" />
+          {isError ? (
+            <AlertError subject="Failed to check account recovery" />
+          ) : (
+            <p className="text-sm text-foreground-lighter">
+              Account recovery checks are not enabled for this account.
+            </p>
+          )}
         </div>
         <CardFooter className="justify-center">
           <Button asChild size="tiny">

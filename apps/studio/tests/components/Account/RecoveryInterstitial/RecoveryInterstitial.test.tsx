@@ -81,6 +81,14 @@ async function confirmRegeneration() {
 }
 
 describe('RecoveryReminder', () => {
+  test('does not claim success when checks are disabled', () => {
+    customRender(<RecoveryReminder gap={null} destination="/organizations" isUnavailable />)
+    expect(
+      screen.getByRole('heading', { name: 'Account recovery check unavailable' })
+    ).toBeInTheDocument()
+    expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
+  })
+
   beforeEach(() => vi.mocked(useFlag).mockReturnValue(false))
   test('shimmers while checking and hides Continue until resolved', () => {
     const { rerender } = customRender(
