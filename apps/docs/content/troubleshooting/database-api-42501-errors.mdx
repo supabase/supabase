@@ -37,7 +37,7 @@ They tend to be caused by one of the following factors.
 
 ## Attempted to access a forbidden schema
 
-API roles cannot access certain schemas, most notably `auth` and `vault`. This restriction extends to Foreign Data Wrappers relying on `vault`. While you can bypass it using a [security definer function](/docs/guides/database/functions?queryGroups=language&language=sql&queryGroups=example-view&example-view=sql#security-definer-vs-invoker), these schemas are intentionally restricted for security reasons.
+API roles cannot access certain schemas, most notably `auth` and `vault`. This restriction extends to [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) relying on `vault`. While you can bypass it using a [security definer function](/docs/guides/database/functions?queryGroups=language&language=sql&queryGroups=example-view&example-view=sql#security-definer-vs-invoker), these schemas are intentionally restricted for security reasons.
 
 ## Attempted to access a custom schema
 

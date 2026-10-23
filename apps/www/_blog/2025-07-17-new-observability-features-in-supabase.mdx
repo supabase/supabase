@@ -21,7 +21,7 @@ Today, we are announcing:
 
 - New Logging Interface (coming soon!)
 - Advanced Product Reports
-- Supabase AI Assistant with debugging capabilities (coming soon!)
+- [Supabase AI Assistant](/features/ai-assistant) with debugging capabilities (coming soon!)
 
 <Admonition type='note'>
 
@@ -43,7 +43,7 @@ These updates mark the first step toward unified, end-to-end observability. You 
 
 ## New logging Interface
 
-Supabase is a collection of seamlessly integrated services. Storage talks to Postgres via the dedicated connection pooler. Edge Functions can talk to Auth and Realtime. If Storage uploads fail, you must determine whether the problem lies with the Storage server, the dedicated connection pooler, or the database. Previously, pinpointing the root cause meant jumping between multiple log streams.
+Supabase is a collection of seamlessly integrated services. Storage talks to Postgres via the dedicated connection pooler. [Edge Functions](/edge-functions) can talk to Auth and Realtime. If Storage uploads fail, you must determine whether the problem lies with the Storage server, the dedicated connection pooler, or the database. Previously, pinpointing the root cause meant jumping between multiple log streams.
 
 Now, there is one interleaved stream of logs across all services. You can trace a single request across the entire Supabase stack. No more jumping between tabs to diagnose errors.
 

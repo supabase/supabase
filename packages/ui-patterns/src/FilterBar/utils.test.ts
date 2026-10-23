@@ -135,6 +135,23 @@ describe('FilterBar Utils', () => {
         conditions: [],
       })
     })
+
+    it('uses the given logical operator for the new group', () => {
+      const result = addGroupToGroup(sampleFilterGroup, [], 'OR')
+      expect(result.conditions[2]).toEqual({ logicalOperator: 'OR', conditions: [] })
+    })
+
+    it('uses the given logical operator for a nested new group', () => {
+      const nested = {
+        logicalOperator: 'AND' as const,
+        conditions: [{ logicalOperator: 'AND' as const, conditions: [] }],
+      }
+      const result = addGroupToGroup(nested, [0], 'OR')
+      expect((result.conditions[0] as typeof nested).conditions[0]).toEqual({
+        logicalOperator: 'OR',
+        conditions: [],
+      })
+    })
   })
 
   describe('removeFromGroup', () => {

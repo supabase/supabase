@@ -1,5 +1,6 @@
 'use client'
 
+import { parseProjectRef } from '~/lib/compute-project-ref'
 import { CircleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -15,6 +16,7 @@ import {
   Separator,
   TextArea,
 } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 
 interface FormData {
@@ -22,6 +24,7 @@ interface FormData {
   lastName: string
   email: string
   company: string
+  projectRef: string
   useCase: string
   details: string
 }
@@ -31,6 +34,7 @@ const defaultFormValue: FormData = {
   lastName: '',
   email: '',
   company: '',
+  projectRef: '',
   useCase: '',
   details: '',
 }
@@ -64,6 +68,8 @@ export function WaitlistForm() {
     if (!formData.lastName) newErrors.lastName = 'This field is required'
     if (!formData.email) newErrors.email = 'This field is required'
     else if (!isValidEmail(formData.email)) newErrors.email = 'Invalid email address'
+    if (formData.projectRef.trim() && !parseProjectRef(formData.projectRef))
+      newErrors.projectRef = 'Invalid project ID'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -85,7 +91,11 @@ export function WaitlistForm() {
       const response = await fetch('/api-v2/submit-form-compute-waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, honeypot }),
+        body: JSON.stringify({
+          ...formData,
+          projectRef: parseProjectRef(formData.projectRef),
+          honeypot,
+        }),
       })
 
       if (response.ok) {
@@ -129,13 +139,16 @@ export function WaitlistForm() {
               >
                 First name
                 {errors.firstName && (
-                  <span className="text-foreground-muted text-xs">{errors.firstName}</span>
+                  <span className="text-foreground-muted text-xs leading-3">
+                    {errors.firstName}
+                  </span>
                 )}
               </Label>
               <Input
                 id="firstName"
                 name="firstName"
                 value={formData.firstName}
+                className={errors.firstName ? 'border-destructive!' : ''}
                 onChange={handleChange}
                 placeholder="Jane"
               />
@@ -147,13 +160,14 @@ export function WaitlistForm() {
               >
                 Last name
                 {errors.lastName && (
-                  <span className="text-foreground-muted text-xs">{errors.lastName}</span>
+                  <span className="text-foreground-muted text-xs leading-3">{errors.lastName}</span>
                 )}
               </Label>
               <Input
                 id="lastName"
                 name="lastName"
                 value={formData.lastName}
+                className={errors.lastName ? 'border-destructive!' : ''}
                 onChange={handleChange}
                 placeholder="Doe"
               />
@@ -163,7 +177,7 @@ export function WaitlistForm() {
             <Label htmlFor="email" className="text-foreground-light flex justify-between text-left">
               Work email
               {errors.email && (
-                <span className="text-foreground-muted text-xs">{errors.email}</span>
+                <span className="text-foreground-muted text-xs leading-3">{errors.email}</span>
               )}
             </Label>
             <Input
@@ -171,6 +185,7 @@ export function WaitlistForm() {
               name="email"
               type="email"
               value={formData.email}
+              className={errors.email ? 'border-destructive!' : ''}
               onChange={handleChange}
               placeholder="jane@company.com"
             />
@@ -186,6 +201,47 @@ export function WaitlistForm() {
               onChange={handleChange}
               placeholder="Company name"
             />
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="w-full flex gap-2 justify-between text-left">
+              <Label
+                htmlFor="projectRef"
+                className="text-foreground-light flex items-center gap-1.5 text-left"
+              >
+                <span>Project ID</span>
+                <InfoTooltip className="max-w-[450px] text-foreground-light text-pretty">
+                  <p>
+                    The 20-letter ID in your project URL: https://
+                    <span className="text-foreground">your-project-ref</span>.supabase.co (shown as
+                    Project ID in{' '}
+                    <a
+                      className="hover:text-foreground underline"
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://supabase.com/dashboard/project/_/settings/general"
+                    >
+                      Settings → General
+                    </a>
+                    )
+                  </p>
+                </InfoTooltip>
+              </Label>
+              {errors.projectRef && (
+                <span className="text-foreground-muted text-xs leading-3">{errors.projectRef}</span>
+              )}
+            </div>
+            <Input
+              id="projectRef"
+              name="projectRef"
+              value={formData.projectRef}
+              className={errors.projectRef ? 'border-destructive!' : ''}
+              onChange={handleChange}
+              placeholder="abcdefghijklmnopqrst"
+              aria-describedby="projectRef-description"
+            />
+            <p id="projectRef-description" className="text-foreground-lighter text-xs">
+              Only projects created in us-west-2 can access Compute during private alpha.
+            </p>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="useCase" className="text-foreground-light text-left">
@@ -216,6 +272,7 @@ export function WaitlistForm() {
               onChange={handleChange}
               placeholder="What are you building, and what would you run on Compute?"
               rows={3}
+              className={errors.details ? 'border-destructive!' : ''}
             />
           </div>
 

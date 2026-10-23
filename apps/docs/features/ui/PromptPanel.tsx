@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown'
 // shadcn tabs from packages/ui/src/components/shadcn/ui/tabs.tsx
 import { cn, Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger } from 'ui'
 
-import { CodeCopyButton } from './CodeBlock/CodeBlock.client'
+import { CodeCopyButton } from 'ui-patterns/CodeBlock/CodeBlockControls'
 
 type PromptTitleProps = {
   children: ReactNode
@@ -227,11 +227,7 @@ function PromptMarkdown({ children }: { children: string }) {
 
 /** Inline code chip for prompt bodies; opts out of the text shimmer. */
 function PromptCode({ children }: { children?: ReactNode }) {
-  return (
-    <code className="shimmer-none rounded bg-surface-200 px-1 py-0.5 font-mono text-xs text-foreground">
-      {children}
-    </code>
-  )
+  return <code className="shimmer-none">{children}</code>
 }
 
 const MARKDOWN_COMPONENTS = { code: PromptCode }

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Logs } from 'icons'
-import { BookOpen } from 'lucide-react'
+import { BookOpenIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -44,7 +44,7 @@ export const OverviewLearnMore = () => {
         {
           label: 'Docs',
           href: `${DOCS_URL}/guides/auth`,
-          icon: <BookOpen />,
+          icon: <BookOpenIcon />,
         },
       ],
     },

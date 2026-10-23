@@ -1,3 +1,4 @@
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import {
   buildClickhouseLogsSchemaSection,
   CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
@@ -45,6 +46,7 @@ export function buildAssistantContextMessages({
   schemasString,
   supportMode,
   includesLogsSnippets,
+  aiOptInLevel,
   now = new Date(),
 }: {
   projectRef?: string
@@ -53,6 +55,8 @@ export function buildAssistantContextMessages({
   supportMode?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
+  /** The organization's current opt-in level, so the model doesn't ask for access it already has. */
+  aiOptInLevel?: AiOptInLevel
   /** Injected so tests can pin the clock. Lives here, not the system prompt, so Bedrock can cache the system prompt. */
   now?: Date
 }): AssistantContextMessage[] {
@@ -63,6 +67,13 @@ export function buildAssistantContextMessages({
     messages.push({
       role: 'assistant',
       content: `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}. The current time is ${now.toISOString()} (UTC). Use this clock when converting relative ranges such as "last hour" into iso_timestamp_start and iso_timestamp_end.`,
+    })
+  }
+
+  if (aiOptInLevel) {
+    messages.push({
+      role: 'assistant',
+      content: `The organization's AI opt-in level is ${aiOptInLevel}. Only call update_opt_in_level when the user asks to review or change it, or when a tool you need requires a higher level than this. Never call it for access the organization already has.`,
     })
   }
 

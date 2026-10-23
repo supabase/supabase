@@ -6,6 +6,7 @@ import {
   getEntityTypesSQL,
   getForeignKeyConstraintsSql,
   getIndexesSQL,
+  getSearchEntitiesSql,
   getTableColumnsSql,
   getTableConstraintsSql,
   getTableDefinitionSql,
@@ -31,17 +32,8 @@ import { cleanupRoot, createTestDatabase } from '../../db/utils'
  * unavoidable scans carrying a written justification (see test/db/plan-guard.ts
  * for THE RULE).
  *
- * Context: a real production catalog had ~267K pg_class rows. Before
- * https://github.com/supabase/supabase/pull/47894, unscoped CTEs in the Table
- * Editor query full-scanned pg_index/pg_constraint on every open -- O(catalog)
- * work regardless of which table was opened, taking 30-58s at incident scale.
- *
- * NOTE: the scoped introspection behavior from PR #47894 defaults to OFF and is
- * gated behind a `scoped` flag so Studio can enable it progressively via a
- * feature flag. The legacy (scoped:false) path is intentionally NOT exercised
- * here -- this guard tests the SCOPED path, so every builder below is called
- * with `scoped: true`. Once the rollout completes, drop the legacy path and the
- * flag, and this guard becomes the only shape.
+ * Unscoped CTEs here once full-scanned pg_index/pg_constraint on every Table
+ * Editor open, so cost grew with the whole catalog instead of the opened table.
  */
 
 let db: Awaited<ReturnType<typeof createTestDatabase>>
@@ -86,18 +78,18 @@ const TABLE_EDITOR_BUDGET = {
 }
 
 test('getTableEditorSql: plan stays scoped for a mid-chain table (stress.t_1000)', async () => {
-  const result = await explainAnalyze(db, getTableEditorSql({ id: midChainTableId, scoped: true }))
+  const result = await explainAnalyze(db, getTableEditorSql({ id: midChainTableId }))
   assertPlanWithinBudget(result, TABLE_EDITOR_BUDGET)
 }, 60_000)
 
 test('getTableEditorSql: plan stays scoped for the hub table with many incoming FKs (stress.t_0)', async () => {
-  const result = await explainAnalyze(db, getTableEditorSql({ id: hubTableId, scoped: true }))
+  const result = await explainAnalyze(db, getTableEditorSql({ id: hubTableId }))
   assertPlanWithinBudget(result, TABLE_EDITOR_BUDGET)
 }, 60_000)
 
 test('getTableEditorSql: real (non-EXPLAIN) query returns a well-formed entity for t_1000', async () => {
   const [{ entity }] = await db.executeQuery<Array<{ entity: any }>>(
-    getTableEditorSql({ id: midChainTableId, scoped: true })
+    getTableEditorSql({ id: midChainTableId })
   )
 
   expect(entity.schema).toBe('stress')
@@ -253,7 +245,7 @@ test('getIndexesSQL: plan stays scoped for a schema', async () => {
 // setup on the (single, pooled) connection first, then EXPLAIN only the tail
 // SELECT -- which is the part whose plan we actually care about.
 async function explainDefinitionQuery(fullSql: string) {
-  const setup = createPgGetTabledefSql({ scoped: true }) as unknown as string
+  const setup = createPgGetTabledefSql() as unknown as string
   const tail = fullSql.slice(fullSql.indexOf(setup) + setup.length)
   await db.executeQuery(setup)
   return explainAnalyze(db, tail)
@@ -263,9 +255,7 @@ async function explainDefinitionQuery(fullSql: string) {
 // Only the outer table_info lookup is planned (pg_get_tabledef is an opaque
 // plpgsql function); it resolves the table by oid, so no scaling seq scans.
 test('getTableDefinitionSql: plan stays scoped for a single table', async () => {
-  const result = await explainDefinitionQuery(
-    getTableDefinitionSql({ id: midChainTableId, scoped: true })
-  )
+  const result = await explainDefinitionQuery(getTableDefinitionSql({ id: midChainTableId }))
   assertPlanWithinBudget(result, {})
 }, 60_000)
 
@@ -284,7 +274,7 @@ test('getTableDefinitionSql: plan stays scoped for a single table', async () => 
 // on a 12K-table catalog measured ~0.9s post-fix.
 test('getEntityDefinitionsSql: plan stays scoped for a schema', async () => {
   const result = await explainDefinitionQuery(
-    getEntityDefinitionsSql({ schemas: ['stress'], limit: 100, scoped: true })
+    getEntityDefinitionsSql({ schemas: ['stress'], limit: 100 })
   )
   assertPlanWithinBudget(result, {
     // ~0.3s measured at 2000 tables post-fix for a 100-entity page; loose
@@ -320,15 +310,12 @@ const TYPES_LIST_BUDGET = {
   },
 }
 test('types.list: scoped plan stays scoped for a schema', async () => {
-  const result = await explainAnalyze(
-    db,
-    types.list({ includedSchemas: ['stress'], scoped: true }).sql
-  )
+  const result = await explainAnalyze(db, types.list({ includedSchemas: ['stress'] }).sql)
   assertPlanWithinBudget(result, TYPES_LIST_BUDGET)
 }, 60_000)
 
 test('types.list: scoped real query returns the schema’s enums and composites', async () => {
-  const { sql, zod } = types.list({ includedSchemas: ['stress'], scoped: true })
+  const { sql, zod } = types.list({ includedSchemas: ['stress'] })
   const rows = zod.parse(await db.executeQuery(sql))
   // stress has enums (mood/priority/e_*) and composites (addr/pair/ct_*).
   const mood = rows.find((t) => t.name === 'mood')
@@ -357,10 +344,7 @@ const TABLE_PRIVILEGES_BUDGET = {
 // Scoped pushes the schema filter into the base WHERE (before the aclexplode
 // lateral / GROUP BY) so pg_class is pruned before privileges are exploded.
 test('tablePrivileges.list: scoped plan stays scoped for a schema', async () => {
-  const result = await explainAnalyze(
-    db,
-    tablePrivileges.list({ includedSchemas: ['stress'], scoped: true }).sql
-  )
+  const result = await explainAnalyze(db, tablePrivileges.list({ includedSchemas: ['stress'] }).sql)
   assertPlanWithinBudget(result, TABLE_PRIVILEGES_BUDGET)
 }, 60_000)
 
@@ -370,7 +354,7 @@ test('tablePrivileges.list: scoped plan stays scoped for a schema', async () => 
 test('tablePrivileges.retrieve: scoped plan stays scoped for a single relation', async () => {
   const result = await explainAnalyze(
     db,
-    tablePrivileges.retrieve({ name: 't_1000', schema: 'stress', scoped: true }).sql
+    tablePrivileges.retrieve({ name: 't_1000', schema: 'stress' }).sql
   )
   assertPlanWithinBudget(result, TABLE_PRIVILEGES_BUDGET)
 }, 60_000)
@@ -402,7 +386,6 @@ test('columnPrivileges.list: scoped plan stays scoped for a single table', async
     columnPrivileges.list({
       includedSchemas: ['stress'],
       relationName: 't_1000',
-      scoped: true,
     }).sql
   )
   assertPlanWithinBudget(result, COLUMN_PRIVILEGES_TABLE_SCOPED_BUDGET)
@@ -426,7 +409,7 @@ const COLUMN_PRIVILEGES_SCHEMA_SCOPED_BUDGET = {
 test('columnPrivileges.list: scoped plan stays scoped for a schema', async () => {
   const result = await explainAnalyze(
     db,
-    columnPrivileges.list({ includedSchemas: ['stress'], scoped: true }).sql
+    columnPrivileges.list({ includedSchemas: ['stress'] }).sql
   )
   assertPlanWithinBudget(result, COLUMN_PRIVILEGES_SCHEMA_SCOPED_BUDGET)
 }, 60_000)
@@ -456,28 +439,22 @@ const TABLES_RETRIEVE_BUDGET = {
 }
 
 test('tables.retrieve: scoped plan stays scoped for a single table by id', async () => {
-  const result = await explainAnalyze(
-    db,
-    tables.retrieve({ id: midChainTableId, scoped: true }).sql
-  )
+  const result = await explainAnalyze(db, tables.retrieve({ id: midChainTableId }).sql)
   assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
 }, 60_000)
 
 test('tables.retrieve: scoped plan stays scoped for a single table by name+schema', async () => {
-  const result = await explainAnalyze(
-    db,
-    tables.retrieve({ name: 't_1000', schema: 'stress', scoped: true }).sql
-  )
+  const result = await explainAnalyze(db, tables.retrieve({ name: 't_1000', schema: 'stress' }).sql)
   assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
 }, 60_000)
 
 test('tables.retrieve: scoped plan stays scoped for a composite-FK hub', async () => {
-  const result = await explainAnalyze(db, tables.retrieve({ id: hubTableId, scoped: true }).sql)
+  const result = await explainAnalyze(db, tables.retrieve({ id: hubTableId }).sql)
   assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
 }, 60_000)
 
 test('tables.retrieve: composite FKs stay ordinally paired at stress scale', async () => {
-  const { sql, zod } = tables.retrieve({ id: midChainTableId, scoped: true })
+  const { sql, zod } = tables.retrieve({ id: midChainTableId })
   const row = zod.parse((await db.executeQuery(sql))[0])
   const chainRelationships = row.relationships.filter(
     ({ source_table_name, target_table_name }) =>
@@ -493,4 +470,32 @@ test('tables.retrieve: composite FKs stay ordinally paired at stress scale', asy
     ['fk_id', 'id'],
     ['fk_tenant_id', 'tenant_id'],
   ])
+}, 60_000)
+
+// ── getSearchEntitiesSql (database/search-entities.ts) — command menu search ─
+// Runs on debounced keystrokes, so every case below must stay cheap at scale.
+// A substring (leading-wildcard) ILIKE cannot use pg_class_relname_nsp_index,
+// so one filtered seq scan of pg_class is structurally unavoidable. Everything
+// downstream (privilege checks, policy counts) is capped by the materialized
+// candidate CTE, so no other scaling catalog may be scanned.
+const SEARCH_ENTITIES_BUDGET = {
+  allowedSeqScans: {
+    pg_class: {
+      max: 1,
+      reason:
+        'substring name search: a leading-wildcard ILIKE cannot use pg_class_relname_nsp_index, so one filtered pass of pg_class is unavoidable',
+    },
+  },
+  maxExecutionTimeMs: 500,
+}
+
+test('getSearchEntitiesSql: broad search (thousands of matches) stays within budget', async () => {
+  // `t_1` matches t_1, t_10..t_19, t_100..t_199, ... -- a large share of the catalog
+  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 't_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 60_000)
+
+test('getSearchEntitiesSql: schema-qualified search stays within budget', async () => {
+  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'stress.t_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
 }, 60_000)

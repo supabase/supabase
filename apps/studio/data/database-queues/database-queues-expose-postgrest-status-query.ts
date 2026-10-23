@@ -21,6 +21,7 @@ export async function getDatabaseQueuesExposePostgrestStatus({
     projectRef,
     connectionString,
     sql,
+    queryKey: ['queues-postgrest-expose'],
   })
   return result[0].exists as boolean
 }

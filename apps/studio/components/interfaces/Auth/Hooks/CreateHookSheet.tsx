@@ -510,13 +510,12 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                         description={
                           <div className="flex items-center gap-x-2">
                             <p>
-                              Should be a base64 encoded secret with a prefix{' '}
-                              <code className="text-code-inline">v1,whsec_</code>.
+                              Should be a base64 encoded secret with a prefix <code>v1,whsec_</code>
+                              .
                             </p>
                             <InfoTooltip side="bottom" className="w-60 text-center">
-                              <code className="text-code-inline">v1</code> denotes the signature
-                              version and <code className="text-code-inline">whsec_</code> signifies
-                              a symmetric secret.
+                              <code>v1</code> denotes the signature version and <code>whsec_</code>{' '}
+                              signifies a symmetric secret.
                             </InfoTooltip>
                           </div>
                         }

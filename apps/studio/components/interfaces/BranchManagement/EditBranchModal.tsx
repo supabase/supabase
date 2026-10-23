@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Check, Loader2 } from 'lucide-react'
+import { CheckIcon, Loader2Icon } from 'lucide-react'
 import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -297,9 +297,9 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
                             {field.value ? (
                               isChecking ? (
-                                <Loader2 size={14} className="animate-spin" />
+                                <Loader2Icon size={14} className="animate-spin" />
                               ) : isGitBranchValid ? (
-                                <Check size={14} className="text-primary" strokeWidth={2} />
+                                <CheckIcon size={14} className="text-primary" strokeWidth={2} />
                               ) : null
                             ) : null}
                           </div>

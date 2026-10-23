@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { Copy, Eye, EyeOff, Play } from 'lucide-react'
+import { CopyIcon, EyeIcon, EyeOffIcon, PlayIcon } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, {
   Column,
@@ -47,8 +46,10 @@ import { MultiSelectActionBar, type LogCopyFormat } from './MultiSelectActionBar
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useProfile } from '@/lib/profile'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { ResponseError } from '@/types'
@@ -148,7 +149,6 @@ export const LogTable = ({
   columnRenderers,
 }: Props) => {
   const { ref } = useParams()
-  const { profile } = useProfile()
   const [selectedLogId] = useSelectedLog()
   const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
@@ -175,13 +175,9 @@ export const LogTable = ({
     )
   }, [])
 
-  const { can: canCreateLogQuery } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    {
-      resource: { type: 'log_sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
-    }
+  const { can: canCreateLogQuery } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'log_sql' }
   )
 
   const firstRow = data[0]
@@ -500,7 +496,10 @@ export const LogTable = ({
 
       {showHistogramToggle && (
         <div className="flex items-center gap-2">
-          <Button icon={isHistogramShowing ? <Eye /> : <EyeOff />} onClick={onHistogramToggle}>
+          <Button
+            icon={isHistogramShowing ? <EyeIcon /> : <EyeOffIcon />}
+            onClick={onHistogramToggle}
+          >
             Histogram
           </Button>
         </div>
@@ -529,7 +528,7 @@ export const LogTable = ({
           variant="primary"
           disabled={!hasEditorValue}
           onClick={onRun}
-          iconRight={<Play size={12} />}
+          iconRight={<PlayIcon size={12} />}
           loading={isLoading}
         >
           Run
@@ -614,7 +613,7 @@ export const LogTable = ({
                     }
                   }}
                 >
-                  <Copy size={14} />
+                  <CopyIcon size={14} />
                   <span className="text-xs">Copy event message</span>
                 </ContextMenuItem>
               </ContextMenuContent>

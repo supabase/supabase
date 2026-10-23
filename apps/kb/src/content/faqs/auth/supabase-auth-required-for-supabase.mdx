@@ -1,0 +1,10 @@
+---
+title: Do I have to move my users to Supabase Auth to use Supabase?
+topics: ['Auth']
+---
+
+No, you do not have to move your users to Supabase Auth to use Supabase.
+
+If you want to use Supabase features (like the [Data API (REST and GraphQL)](/docs/guides/database/overview), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime) and [Edge Functions](/docs/guides/functions)), Supabase provides first-class support for several [third-party authentication providers](https://supabase.com/docs/guides/auth/third-party/overview), so your existing users can stay where they are. These providers (Clerk, Firebase Auth, WorkOS, etc.) can then access Supabase features from your existing apps. For details about how this affects pricing, refer to [Manage Monthly Active Third-Party Users usage](https://supabase.com/docs/guides/platform/manage-your-usage/monthly-active-users-third-party).
+
+You can also use Supabase as a standalone Postgres database, setting up your own authentication and authorization flows as needed.

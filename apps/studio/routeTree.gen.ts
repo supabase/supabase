@@ -41,11 +41,8 @@ import { Route as ApiGetDeploymentCommitRouteImport } from './routes/api/get-dep
 import { Route as ApiGetIpAddressRouteImport } from './routes/api/get-ip-address'
 import { Route as ApiGetS3KeysRouteImport } from './routes/api/get-s3-keys'
 import { Route as ApiGetUtcTimeRouteImport } from './routes/api/get-utc-time'
-import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
-import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiParseQueryRouteImport } from './routes/api/parse-query'
 import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
-import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiStatusPageRouteImport } from './routes/api/status-page'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as McpSecretsRouteImport } from './routes/mcp/secrets'
@@ -53,6 +50,8 @@ import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
 import { Route as ProjectChar91_Char93RouteImport } from './routes/project.[_]'
+import { Route as SupportCsatRouteImport } from './routes/support/csat'
+import { Route as AppAccountAppsRouteImport } from './routes/_app/account/apps'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as AppAccountSecurityRouteImport } from './routes/_app/account/security'
@@ -249,6 +248,7 @@ import { Route as ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport } from
 import { Route as ProjectRefDatabaseBackupsScheduledRouteImport } from './routes/project/$ref/database/backups/scheduled'
 import { Route as ProjectRefDatabasePipelinesIndexRouteImport } from './routes/project/$ref/database/pipelines/index'
 import { Route as ProjectRefDatabasePipelinesPipelineIdRouteImport } from './routes/project/$ref/database/pipelines/$pipelineId'
+import { Route as ProjectRefDatabasePipelinesNewRouteImport } from './routes/project/$ref/database/pipelines/new'
 import { Route as ProjectRefDatabasePublicationsIndexRouteImport } from './routes/project/$ref/database/publications/index'
 import { Route as ProjectRefDatabasePublicationsIdRouteImport } from './routes/project/$ref/database/publications/$id'
 import { Route as ProjectRefDatabaseTablesIndexRouteImport } from './routes/project/$ref/database/tables/index'
@@ -495,16 +495,6 @@ const ApiGetUtcTimeRoute = ApiGetUtcTimeRouteImport.update({
   path: '/api/get-utc-time',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiIncidentBannerRoute = ApiIncidentBannerRouteImport.update({
-  id: '/api/incident-banner',
-  path: '/api/incident-banner',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiIncidentStatusRoute = ApiIncidentStatusRouteImport.update({
-  id: '/api/incident-status',
-  path: '/api/incident-status',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiParseQueryRoute = ApiParseQueryRouteImport.update({
   id: '/api/parse-query',
   path: '/api/parse-query',
@@ -516,11 +506,6 @@ const ApiScopedAccessTokenPermissionsRoute =
     path: '/api/scoped-access-token-permissions',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
-  id: '/api/status-override',
-  path: '/api/status-override',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiStatusPageRoute = ApiStatusPageRouteImport.update({
   id: '/api/status-page',
   path: '/api/status-page',
@@ -555,6 +540,16 @@ const ProjectChar91_Char93Route = ProjectChar91_Char93RouteImport.update({
   id: '/project/_',
   path: '/project/_',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SupportCsatRoute = SupportCsatRouteImport.update({
+  id: '/support/csat',
+  path: '/support/csat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppAccountAppsRoute = AppAccountAppsRouteImport.update({
+  id: '/apps',
+  path: '/apps',
+  getParentRoute: () => AppAccountRoute,
 } as any)
 const AppAccountAuditRoute = AppAccountAuditRouteImport.update({
   id: '/audit',
@@ -1640,6 +1635,12 @@ const ProjectRefDatabasePipelinesPipelineIdRoute =
     path: '/$pipelineId',
     getParentRoute: () => ProjectRefDatabasePipelinesRoute,
   } as any)
+const ProjectRefDatabasePipelinesNewRoute =
+  ProjectRefDatabasePipelinesNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => ProjectRefDatabasePipelinesRoute,
+  } as any)
 const ProjectRefDatabasePublicationsIndexRoute =
   ProjectRefDatabasePublicationsIndexRouteImport.update({
     id: '/publications/',
@@ -2176,11 +2177,8 @@ export interface FileRoutesByFullPath {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
-  '/api/incident-banner': typeof ApiIncidentBannerRoute
-  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
-  '/api/status-override': typeof ApiStatusOverrideRoute
   '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
@@ -2188,6 +2186,8 @@ export interface FileRoutesByFullPath {
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/support/csat': typeof SupportCsatRoute
+  '/account/apps': typeof AppAccountAppsRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
   '/account/security': typeof AppAccountSecurityRoute
@@ -2379,6 +2379,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/pipelines/$pipelineId': typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  '/project/$ref/database/pipelines/new': typeof ProjectRefDatabasePipelinesNewRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
@@ -2499,17 +2500,16 @@ export interface FileRoutesByTo {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
-  '/api/incident-banner': typeof ApiIncidentBannerRoute
-  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
-  '/api/status-override': typeof ApiStatusOverrideRoute
   '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/support/csat': typeof SupportCsatRoute
+  '/account/apps': typeof AppAccountAppsRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
   '/account/security': typeof AppAccountSecurityRoute
@@ -2688,6 +2688,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/pipelines/$pipelineId': typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  '/project/$ref/database/pipelines/new': typeof ProjectRefDatabasePipelinesNewRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
@@ -2812,11 +2813,8 @@ export interface FileRoutesById {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
-  '/api/incident-banner': typeof ApiIncidentBannerRoute
-  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
-  '/api/status-override': typeof ApiStatusOverrideRoute
   '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
@@ -2824,6 +2822,8 @@ export interface FileRoutesById {
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/support/csat': typeof SupportCsatRoute
+  '/_app/account/apps': typeof AppAccountAppsRoute
   '/_app/account/audit': typeof AppAccountAuditRoute
   '/_app/account/me': typeof AppAccountMeRoute
   '/_app/account/security': typeof AppAccountSecurityRoute
@@ -3015,6 +3015,7 @@ export interface FileRoutesById {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/pipelines/$pipelineId': typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  '/project/$ref/database/pipelines/new': typeof ProjectRefDatabasePipelinesNewRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
@@ -3138,11 +3139,8 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
-    | '/api/incident-banner'
-    | '/api/incident-status'
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
-    | '/api/status-override'
     | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
@@ -3150,6 +3148,8 @@ export interface FileRouteTypes {
     | '/org/_'
     | '/project/$ref'
     | '/project/_'
+    | '/support/csat'
+    | '/account/apps'
     | '/account/audit'
     | '/account/me'
     | '/account/security'
@@ -3341,6 +3341,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/pipelines/$pipelineId'
+    | '/project/$ref/database/pipelines/new'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
@@ -3461,17 +3462,16 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
-    | '/api/incident-banner'
-    | '/api/incident-status'
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
-    | '/api/status-override'
     | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
     | '/new/$slug'
     | '/org/_'
     | '/project/_'
+    | '/support/csat'
+    | '/account/apps'
     | '/account/audit'
     | '/account/me'
     | '/account/security'
@@ -3650,6 +3650,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/pipelines/$pipelineId'
+    | '/project/$ref/database/pipelines/new'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
@@ -3773,11 +3774,8 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
-    | '/api/incident-banner'
-    | '/api/incident-status'
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
-    | '/api/status-override'
     | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
@@ -3785,6 +3783,8 @@ export interface FileRouteTypes {
     | '/org/_'
     | '/project/$ref'
     | '/project/_'
+    | '/support/csat'
+    | '/_app/account/apps'
     | '/_app/account/audit'
     | '/_app/account/me'
     | '/_app/account/security'
@@ -3976,6 +3976,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/pipelines/$pipelineId'
+    | '/project/$ref/database/pipelines/new'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
@@ -4088,11 +4089,8 @@ export interface RootRouteChildren {
   ApiGetIpAddressRoute: typeof ApiGetIpAddressRoute
   ApiGetS3KeysRoute: typeof ApiGetS3KeysRoute
   ApiGetUtcTimeRoute: typeof ApiGetUtcTimeRoute
-  ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
-  ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiParseQueryRoute: typeof ApiParseQueryRoute
   ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
-  ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   ApiStatusPageRoute: typeof ApiStatusPageRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   McpSecretsRoute: typeof McpSecretsRoute
@@ -4100,6 +4098,7 @@ export interface RootRouteChildren {
   OrgChar91_Char93Route: typeof OrgChar91_Char93RouteWithChildren
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
   ProjectChar91_Char93Route: typeof ProjectChar91_Char93RouteWithChildren
+  SupportCsatRoute: typeof SupportCsatRoute
   ApiAiDocsRoute: typeof ApiAiDocsRoute
   ApiContentGraphqlRoute: typeof ApiContentGraphqlRoute
   ApiEdgeFunctionsTestRoute: typeof ApiEdgeFunctionsTestRoute
@@ -4420,20 +4419,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGetUtcTimeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/incident-banner': {
-      id: '/api/incident-banner'
-      path: '/api/incident-banner'
-      fullPath: '/api/incident-banner'
-      preLoaderRoute: typeof ApiIncidentBannerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/incident-status': {
-      id: '/api/incident-status'
-      path: '/api/incident-status'
-      fullPath: '/api/incident-status'
-      preLoaderRoute: typeof ApiIncidentStatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/parse-query': {
       id: '/api/parse-query'
       path: '/api/parse-query'
@@ -4446,13 +4431,6 @@ declare module '@tanstack/react-router' {
       path: '/api/scoped-access-token-permissions'
       fullPath: '/api/scoped-access-token-permissions'
       preLoaderRoute: typeof ApiScopedAccessTokenPermissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/status-override': {
-      id: '/api/status-override'
-      path: '/api/status-override'
-      fullPath: '/api/status-override'
-      preLoaderRoute: typeof ApiStatusOverrideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/status-page': {
@@ -4503,6 +4481,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/_'
       preLoaderRoute: typeof ProjectChar91_Char93RouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/support/csat': {
+      id: '/support/csat'
+      path: '/support/csat'
+      fullPath: '/support/csat'
+      preLoaderRoute: typeof SupportCsatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/account/apps': {
+      id: '/_app/account/apps'
+      path: '/apps'
+      fullPath: '/account/apps'
+      preLoaderRoute: typeof AppAccountAppsRouteImport
+      parentRoute: typeof AppAccountRoute
     }
     '/_app/account/audit': {
       id: '/_app/account/audit'
@@ -5876,6 +5868,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefDatabasePipelinesPipelineIdRouteImport
       parentRoute: typeof ProjectRefDatabasePipelinesRoute
     }
+    '/project/$ref/database/pipelines/new': {
+      id: '/project/$ref/database/pipelines/new'
+      path: '/new'
+      fullPath: '/project/$ref/database/pipelines/new'
+      preLoaderRoute: typeof ProjectRefDatabasePipelinesNewRouteImport
+      parentRoute: typeof ProjectRefDatabasePipelinesRoute
+    }
     '/project/$ref/database/publications/': {
       id: '/project/$ref/database/publications/'
       path: '/publications'
@@ -6468,6 +6467,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppAccountRouteChildren {
+  AppAccountAppsRoute: typeof AppAccountAppsRoute
   AppAccountAuditRoute: typeof AppAccountAuditRoute
   AppAccountMeRoute: typeof AppAccountMeRoute
   AppAccountSecurityRoute: typeof AppAccountSecurityRoute
@@ -6476,6 +6476,7 @@ interface AppAccountRouteChildren {
 }
 
 const AppAccountRouteChildren: AppAccountRouteChildren = {
+  AppAccountAppsRoute: AppAccountAppsRoute,
   AppAccountAuditRoute: AppAccountAuditRoute,
   AppAccountMeRoute: AppAccountMeRoute,
   AppAccountSecurityRoute: AppAccountSecurityRoute,
@@ -6717,6 +6718,7 @@ const ProjectRefComputeRouteWithChildren =
 
 interface ProjectRefDatabasePipelinesRouteChildren {
   ProjectRefDatabasePipelinesPipelineIdRoute: typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  ProjectRefDatabasePipelinesNewRoute: typeof ProjectRefDatabasePipelinesNewRoute
   ProjectRefDatabasePipelinesIndexRoute: typeof ProjectRefDatabasePipelinesIndexRoute
 }
 
@@ -6724,6 +6726,7 @@ const ProjectRefDatabasePipelinesRouteChildren: ProjectRefDatabasePipelinesRoute
   {
     ProjectRefDatabasePipelinesPipelineIdRoute:
       ProjectRefDatabasePipelinesPipelineIdRoute,
+    ProjectRefDatabasePipelinesNewRoute: ProjectRefDatabasePipelinesNewRoute,
     ProjectRefDatabasePipelinesIndexRoute:
       ProjectRefDatabasePipelinesIndexRoute,
   }
@@ -7222,11 +7225,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGetIpAddressRoute: ApiGetIpAddressRoute,
   ApiGetS3KeysRoute: ApiGetS3KeysRoute,
   ApiGetUtcTimeRoute: ApiGetUtcTimeRoute,
-  ApiIncidentBannerRoute: ApiIncidentBannerRoute,
-  ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiParseQueryRoute: ApiParseQueryRoute,
   ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
-  ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   ApiStatusPageRoute: ApiStatusPageRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   McpSecretsRoute: McpSecretsRoute,
@@ -7234,6 +7234,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgChar91_Char93Route: OrgChar91_Char93RouteWithChildren,
   ProjectRefRoute: ProjectRefRouteWithChildren,
   ProjectChar91_Char93Route: ProjectChar91_Char93RouteWithChildren,
+  SupportCsatRoute: SupportCsatRoute,
   ApiAiDocsRoute: ApiAiDocsRoute,
   ApiContentGraphqlRoute: ApiContentGraphqlRoute,
   ApiEdgeFunctionsTestRoute: ApiEdgeFunctionsTestRoute,
