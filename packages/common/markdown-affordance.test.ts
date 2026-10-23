@@ -3,13 +3,14 @@ import { describe, expect, it } from 'vitest'
 import { askAiPrompt, askAiUrls } from './markdown-affordance'
 
 describe('askAiUrls', () => {
-  it('embeds the encoded prompt for both agents', () => {
-    const { chatgpt, claude } = askAiUrls('https://supabase.com/blog/some-post')
+  it('embeds the encoded prompt for every agent', () => {
+    const { chatgpt, claude, grok } = askAiUrls('https://supabase.com/blog/some-post')
     const prompt = encodeURIComponent(
       'Read from https://supabase.com/blog/some-post so I can ask questions about its contents'
     )
     expect(chatgpt).toBe(`https://chatgpt.com/?hint=search&q=${prompt}`)
     expect(claude).toBe(`https://claude.ai/new?q=${prompt}`)
+    expect(grok).toBe(`https://grok.com/?q=${prompt}`)
   })
 
   it('encodes spaces and slashes so the prompt survives as a single query param', () => {

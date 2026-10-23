@@ -19,6 +19,7 @@ export { default as FilesBucket } from './files-bucket';
 export { default as Google } from './google';
 export { default as Grafana } from './grafana';
 export { default as Graphql } from './graphql';
+export { default as Grok } from './grok';
 export { default as Home } from './home';
 export { default as InsertCode } from './insert-code';
 export { default as Integrations } from './integrations';
