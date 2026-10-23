@@ -121,6 +121,65 @@ withTestDatabase('returns schema, RLS status and policy count', async (db) => {
   expect(typeof tables[0].id).toBe('number')
 })
 
+withTestDatabase('matches schema-qualified searches', async (db) => {
+  await db.executeQuery(`
+    create schema blog;
+    create table blog.colors (id int);
+    create table public.colors (id int);
+    create table public.colors_archive (id int);
+  `)
+
+  const tables = await search(db, 'public.colors')
+
+  expect(tables.map((t) => `${t.schema}.${t.name}`)).toEqual([
+    'public.colors',
+    'public.colors_archive',
+  ])
+})
+
+withTestDatabase('matches a partial schema name', async (db) => {
+  await db.executeQuery(`create table public.colors (id int);`)
+
+  const tables = await search(db, 'pub.col')
+
+  expect(tables.map((t) => `${t.schema}.${t.name}`)).toEqual(['public.colors'])
+})
+
+withTestDatabase('lists tables in a schema when the name part is empty', async (db) => {
+  await db.executeQuery(`
+    create schema blog;
+    create table blog.posts (id int);
+    create table blog.authors (id int);
+    create table public.posts (id int);
+  `)
+
+  const tables = await search(db, 'blog.')
+
+  expect(tables.map((t) => `${t.schema}.${t.name}`).sort()).toEqual(['blog.authors', 'blog.posts'])
+})
+
+withTestDatabase('still matches table names that contain a dot', async (db) => {
+  await db.executeQuery(`create table public."v1.colors" (id int);`)
+
+  const tables = await search(db, 'v1.colors')
+
+  expect(tables.map((t) => t.name)).toEqual(['v1.colors'])
+})
+
+withTestDatabase('escapes wildcards in both parts of a schema-qualified search', async (db) => {
+  await db.executeQuery(`
+    create schema my_app;
+    create schema myxapp;
+    create table my_app.blog_posts (id int);
+    create table myxapp.blog_posts (id int);
+    create table my_app.blogxposts (id int);
+  `)
+
+  const tables = await search(db, 'my_app.blog_posts')
+
+  expect(tables.map((t) => `${t.schema}.${t.name}`)).toEqual(['my_app.blog_posts'])
+})
+
 withTestDatabase('returns an empty array when nothing matches', async (db) => {
   expect(await search(db, 'does_not_exist')).toEqual([])
 })

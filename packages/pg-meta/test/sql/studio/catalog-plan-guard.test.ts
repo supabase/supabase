@@ -500,6 +500,11 @@ test('getSearchEntitiesSql: broad search (thousands of matches) stays within bud
   assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
 }, 60_000)
 
+test('getSearchEntitiesSql: schema-qualified search stays within budget', async () => {
+  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'stress.t_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 60_000)
+
 test('getSearchEntitiesSql: real query ranks the exact match first at scale', async () => {
   const [{ tables: results }] = await db.executeQuery<
     Array<{ tables: Array<{ schema: string; name: string }> }>

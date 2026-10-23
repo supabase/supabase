@@ -36,6 +36,11 @@ export type SearchEntitiesResult = {
  * - Policy counts are index probes on pg_policy (polrelid, polname).
  * - No size functions, column/constraint enrichment, or definition rendering.
  *
+ * A query containing a dot is also treated as `schema.name`: the schema must
+ * start with the part before the first dot and the name must contain the part
+ * after it, so `public.colors` and `pub.colors` both find `public.colors`. The
+ * full query is still matched against names too, since names may contain dots.
+ *
  * Returns a single row with one JSON array per entity type, so other entity
  * types (policies, functions, triggers) can be added without changing the
  * response shape.
@@ -47,10 +52,25 @@ export const getSearchEntitiesSql = ({
   query: string
   limit?: number
 }): SafeSqlFragment => {
-  const escaped = escapeIlikeLiteral(query)
-  const containsPattern = literal(`%${escaped}%`)
-  const prefixPattern = literal(`${escaped}%`)
-  const exactName = literal(query.toLowerCase())
+  const dotIndex = query.indexOf('.')
+  const schemaPart = dotIndex === -1 ? undefined : query.slice(0, dotIndex)
+  const namePart = dotIndex === -1 ? query : query.slice(dotIndex + 1)
+
+  const nameFilter = safeSql`c.relname ilike ${literal(`%${escapeIlikeLiteral(query)}%`)}`
+  const matchFilter =
+    schemaPart === undefined
+      ? nameFilter
+      : safeSql`(
+          ${nameFilter}
+          or (
+            nc.nspname ilike ${literal(`${escapeIlikeLiteral(schemaPart)}%`)}
+            and c.relname ilike ${literal(`%${escapeIlikeLiteral(namePart)}%`)}
+          )
+        )`
+
+  // Rank on the name part, so `public.colors` ranks the `colors` table first
+  const prefixPattern = literal(`${escapeIlikeLiteral(namePart)}%`)
+  const exactName = literal(namePart.toLowerCase())
   const excludedSchemas = joinSqlFragments(
     DEFAULT_SYSTEM_SCHEMAS.map((schema) => literal(schema)),
     ', '
@@ -75,7 +95,7 @@ export const getSearchEntitiesSql = ({
         and not c.relispartition
         and nc.nspname not in (${excludedSchemas})
         and not pg_is_other_temp_schema(nc.oid)
-        and c.relname ilike ${containsPattern}
+        and ${matchFilter}
       order by rank, length(c.relname), c.relname
       limit ${literal(CANDIDATE_LIMIT)}
     ),
