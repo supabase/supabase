@@ -15,6 +15,14 @@ const SOURCE_PATH = join(redirectsDir, 'static-redirects.json')
 const OUTPUT_PATH = join(redirectsDir, 'generated', 'static-redirects-md-variants.json')
 
 const source = JSON.parse(readFileSync(SOURCE_PATH, 'utf8'))
+for (const redirect of source) {
+  if (typeof redirect.source !== 'string' || typeof redirect.destination !== 'string') {
+    throw new Error(`Invalid entry in static-redirects.json: ${JSON.stringify(redirect)}`)
+  }
+  if (/[:*()]/.test(redirect.source) || 'has' in redirect || 'missing' in redirect) {
+    throw new Error(`${redirect.source} is not static. Move it to dynamic-redirects.js.`)
+  }
+}
 const sources = new Set(source.map((redirect) => redirect.source))
 if (sources.size !== source.length) {
   throw new Error('Duplicate source in static-redirects.json')
