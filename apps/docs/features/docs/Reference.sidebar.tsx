@@ -57,7 +57,8 @@ export function ReferenceSidebar({ className, links = [] }: ReferenceSidebarProp
             <Feedback key={pathname} />
           </div>
         )}
-        {toc.length !== 0 && <TocSection items={toc} />}
+        {/* `static`: the default sticky offset pins the list while the links below scroll over it */}
+        {toc.length !== 0 && <TocSection items={toc} className="static" />}
         {links.length !== 0 && <ReferenceLinks links={links} className="pl-5" />}
       </div>
     </div>
