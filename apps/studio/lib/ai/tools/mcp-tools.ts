@@ -84,7 +84,7 @@ export const getMcpTools = async ({
     const availableMcpTools: ToolSet = { ...remoteTools }
     for (const contract of Object.values(REMOTE_TOOL_CONTRACTS)) {
       const remoteTool = remoteTools[contract.name]
-      if (remoteTool) {
+      if (remoteTool && typeof remoteTool === 'object') {
         availableMcpTools[contract.name] = { ...remoteTool, needsApproval: contract.needsApproval }
       }
     }

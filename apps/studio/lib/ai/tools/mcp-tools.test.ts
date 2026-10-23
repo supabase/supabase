@@ -56,7 +56,16 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
   it('takes needsApproval from the contract', async () => {
     const result = await getMcpTools(BASE_PARAMS)
 
-    expect(result.list_extensions?.needsApproval).toBe(false)
+    for (const name of [
+      'list_tables',
+      'list_extensions',
+      'list_edge_functions',
+      'list_branches',
+      'get_advisors',
+      'query_logs',
+    ] as const) {
+      expect(result[name]?.needsApproval).toBe(false)
+    }
   })
 
   it('warns when the remote server is missing an expected tool (contract drift)', async () => {
