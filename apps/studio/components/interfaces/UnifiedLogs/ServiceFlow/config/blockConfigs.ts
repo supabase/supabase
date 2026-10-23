@@ -29,6 +29,9 @@ import {
   postgrestResponseFields,
   storageDetailsFields,
   storagePrimaryFields,
+  supavisorNodeFields,
+  supavisorPrimaryFields,
+  supavisorSourceFields,
   techDetailsFields,
   userAdditionalFields,
   userPrimaryField,
@@ -121,6 +124,24 @@ export const postgresBlockConfig: BlockConfig = {
       title: 'Connection & Session Details',
       icon: CableIcon,
       fields: postgresDetailsFields,
+    },
+  ],
+}
+
+export const supavisorBlockConfig: BlockConfig = {
+  title: 'Supavisor',
+  icon: CableIcon,
+  primaryFields: supavisorPrimaryFields,
+  sections: [
+    {
+      title: 'Node Details',
+      icon: ServerIcon,
+      fields: supavisorNodeFields,
+    },
+    {
+      title: 'Source',
+      icon: CodeIcon,
+      fields: supavisorSourceFields,
     },
   ],
 }
