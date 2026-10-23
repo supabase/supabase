@@ -53,8 +53,10 @@ export const getUnifiedLogsISOStartEnd = (
 
 // Live mode re-reads this much before the newest row it already has, so logs
 // that are ingested late still show up. Rows it already has are de-duplicated
-// by id in UnifiedLogs.tsx.
-export const LIVE_MODE_OVERLAP_MS = 60 * 1000
+// by id in UnifiedLogs.tsx. A longer overlap catches more late logs but makes
+// every poll scan more recent data parts; logs that arrive later than this
+// don't appear until the page reloads.
+export const LIVE_MODE_OVERLAP_MS = 2 * 60 * 1000
 
 /**
  * Time range for one page of the unified logs list:
