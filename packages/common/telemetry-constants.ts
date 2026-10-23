@@ -4231,16 +4231,10 @@ export interface AccountRecoveryReminderClosed {
  * @hidden
  */
 export type TelemetryEvent =
-<<<<<<< HEAD
   | AccountRecoveryReminderExposed
-  | AccountRecoveryActionEvent
-  | AccountRecoveryTaskEvent
-  | AccountRecoveryClosedEvent
-=======
   | AccountRecoveryActionClicked
   | AccountRecoveryTaskCompleted
   | AccountRecoveryReminderClosed
->>>>>>> dnywh/recovery-reminder-snooze
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
