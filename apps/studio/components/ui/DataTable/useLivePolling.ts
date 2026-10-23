@@ -2,19 +2,21 @@ import { useEffect, useRef } from 'react'
 
 import {
   getLivePollDelay,
-  isEmptyLivePoll,
+  hasNoNewRows,
   LIVE_MODE_IDLE_TIMEOUT_MS,
   LIVE_POLL_BASE_INTERVAL_MS,
 } from './LiveButton.utils'
 
-const ACTIVITY_EVENTS = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'scroll'] as const
+// No `scroll`: the browser fires it for scroll anchoring when new rows are prepended, which
+// would count each poll as activity. Wheel, key, and pointer events cover user scrolling.
+const ACTIVITY_EVENTS = ['pointerdown', 'pointermove', 'keydown', 'wheel'] as const
 const ACTIVITY_THROTTLE_MS = 1_000
 
 interface UseLivePollingOptions {
   isEnabled: boolean
   /** Fetches new rows. Its resolved value is inspected to back off when nothing new arrives. */
   poll: () => Promise<unknown>
-  /** Called once the page has been visible with no user activity for the idle timeout. */
+  /** Called once the page has been visible for the idle timeout with no user activity. */
   onIdle: () => void
 }
 
@@ -22,7 +24,8 @@ interface UseLivePollingOptions {
  * Runs live-mode polling while `isEnabled`:
  * - Polls every 10s, backing off to 60s while polls find no new rows.
  * - Stops while the tab is hidden, and polls immediately when it becomes visible again.
- * - Calls `onIdle` after 15 minutes of visible time without pointer, key, wheel, or scroll activity.
+ * - Calls `onIdle` after 15 minutes visible without pointer, key, or wheel activity. Hiding the
+ *   tab stops the idle timer, and showing it again restarts the full 15 minutes.
  * Activity and becoming visible reset the backoff.
  */
 export function useLivePolling({ isEnabled, poll, onIdle }: UseLivePollingOptions) {
@@ -41,6 +44,7 @@ export function useLivePolling({ isEnabled, poll, onIdle }: UseLivePollingOption
     let isPolling = false
     let consecutiveEmptyPolls = 0
     let pollTimeoutId: ReturnType<typeof setTimeout> | undefined
+    let nextPollAt = 0
     let idleTimeoutId: ReturnType<typeof setTimeout> | undefined
     let lastActivityAt = 0
 
@@ -48,6 +52,7 @@ export function useLivePolling({ isEnabled, poll, onIdle }: UseLivePollingOption
 
     const schedulePoll = (delay: number) => {
       clearTimeout(pollTimeoutId)
+      nextPollAt = Date.now() + delay
       pollTimeoutId = setTimeout(runPoll, delay)
     }
 
@@ -56,7 +61,7 @@ export function useLivePolling({ isEnabled, poll, onIdle }: UseLivePollingOption
       isPolling = true
       try {
         const result = await pollRef.current()
-        consecutiveEmptyPolls = isEmptyLivePoll(result) ? consecutiveEmptyPolls + 1 : 0
+        consecutiveEmptyPolls = hasNoNewRows(result) ? consecutiveEmptyPolls + 1 : 0
       } catch {
         // A failed poll shouldn't end live mode; retry at the current backoff.
       } finally {
@@ -77,10 +82,13 @@ export function useLivePolling({ isEnabled, poll, onIdle }: UseLivePollingOption
       if (now - lastActivityAt < ACTIVITY_THROTTLE_MS) return
       lastActivityAt = now
       startIdleTimer()
-      // Someone is watching again: return to the base interval instead of waiting out a backoff.
+      // Someone is watching again: return to the base interval instead of waiting out a backoff,
+      // without delaying a poll that was already due sooner.
       if (consecutiveEmptyPolls > 0) {
         consecutiveEmptyPolls = 0
-        if (!isPolling && !isHidden()) schedulePoll(LIVE_POLL_BASE_INTERVAL_MS)
+        if (!isPolling && !isHidden()) {
+          schedulePoll(Math.min(Math.max(nextPollAt - now, 0), LIVE_POLL_BASE_INTERVAL_MS))
+        }
       }
     }
 

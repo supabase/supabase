@@ -21,14 +21,26 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 /**
  * Whether a live-mode poll found no new rows. A poll is `fetchPreviousPage`, which prepends
- * the new page, so its result's first page holds the rows that poll returned. Anything
- * unrecognized counts as not empty, so polling never slows down on unexpected data.
+ * the new page, so its result's first page holds the rows that poll returned. Each poll
+ * re-reads a short overlap before the newest loaded row, so it usually returns rows the table
+ * already has: only rows whose ids aren't in the older pages count as new. Anything
+ * unrecognized counts as new, so polling never slows down on unexpected data.
  */
-export function isEmptyLivePoll(result: unknown): boolean {
+export function hasNoNewRows(result: unknown): boolean {
   if (!isRecord(result) || !isRecord(result.data)) return false
   const pages = result.data.pages
   if (!Array.isArray(pages) || pages.length === 0) return false
-  const newestPage = pages[0]
+  const [newestPage, ...olderPages] = pages
   if (!isRecord(newestPage) || !Array.isArray(newestPage.data)) return false
-  return newestPage.data.length === 0
+
+  const loadedIds = new Set<string>()
+  for (const page of olderPages) {
+    if (!isRecord(page) || !Array.isArray(page.data)) return false
+    for (const row of page.data) {
+      if (isRecord(row) && typeof row.id === 'string') loadedIds.add(row.id)
+    }
+  }
+  return newestPage.data.every(
+    (row) => isRecord(row) && typeof row.id === 'string' && loadedIds.has(row.id)
+  )
 }

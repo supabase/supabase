@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getLivePollDelay,
-  isEmptyLivePoll,
+  hasNoNewRows,
   LIVE_POLL_BASE_INTERVAL_MS,
   LIVE_POLL_MAX_INTERVAL_MS,
 } from './LiveButton.utils'
@@ -33,15 +33,27 @@ describe('getLivePollDelay', () => {
   })
 })
 
-describe('isEmptyLivePoll', () => {
+describe('hasNoNewRows', () => {
   const pollResult = (pages: unknown) => ({ data: { pages } })
 
   it('is true when the newest page has no rows', () => {
-    expect(isEmptyLivePoll(pollResult([{ data: [] }, { data: [{ id: 'a' }] }]))).toBe(true)
+    expect(hasNoNewRows(pollResult([{ data: [] }, { data: [{ id: 'a' }] }]))).toBe(true)
   })
 
-  it('is false when the newest page has rows', () => {
-    expect(isEmptyLivePoll(pollResult([{ data: [{ id: 'b' }] }, { data: [] }]))).toBe(false)
+  it('is true when the newest page only re-reads rows already loaded', () => {
+    const pages = [
+      { data: [{ id: 'b' }, { id: 'a' }] },
+      { data: [{ id: 'b' }] },
+      { data: [{ id: 'a' }] },
+    ]
+    expect(hasNoNewRows(pollResult(pages))).toBe(true)
+  })
+
+  it('is false when the newest page has a row not loaded yet', () => {
+    expect(
+      hasNoNewRows(pollResult([{ data: [{ id: 'c' }, { id: 'b' }] }, { data: [{ id: 'b' }] }]))
+    ).toBe(false)
+    expect(hasNoNewRows(pollResult([{ data: [{ id: 'b' }] }, { data: [] }]))).toBe(false)
   })
 
   it('is false for missing or malformed results', () => {
@@ -54,8 +66,10 @@ describe('isEmptyLivePoll', () => {
       pollResult([]),
       pollResult([null]),
       pollResult([{ data: 'rows' }]),
+      pollResult([{ data: [] }, null]),
+      pollResult([{ data: [{ id: 1 }] }, { data: [{ id: 1 }] }]),
     ]) {
-      expect(isEmptyLivePoll(result)).toBe(false)
+      expect(hasNoNewRows(result)).toBe(false)
     }
   })
 })

@@ -7,9 +7,13 @@ import { useLivePolling } from './useLivePolling'
 const SECOND = 1_000
 const MINUTE = 60 * SECOND
 
-const pageResult = (rows: unknown[]) => ({ data: { pages: [{ data: rows }] } })
+const pageResult = (rows: unknown[], loadedRows: unknown[] = []) => ({
+  data: { pages: [{ data: rows }, { data: loadedRows }] },
+})
 const NEW_ROWS = pageResult([{ id: 'a' }])
 const NO_ROWS = pageResult([])
+// Live polls re-read a short overlap, so a quiet poll usually returns rows already loaded.
+const ONLY_LOADED_ROWS = pageResult([{ id: 'a' }], [{ id: 'a' }])
 
 let visibilityState: DocumentVisibilityState = 'visible'
 
@@ -95,6 +99,15 @@ describe('useLivePolling', () => {
     expect(poll).toHaveBeenCalledTimes(5)
   })
 
+  it('backs off when polls only return rows that are already loaded', async () => {
+    const { poll } = setup({ result: ONLY_LOADED_ROWS })
+    await advance(0)
+    await advance(20 * SECOND)
+    expect(poll).toHaveBeenCalledTimes(2)
+    await advance(39 * SECOND)
+    expect(poll).toHaveBeenCalledTimes(2)
+  })
+
   it('returns to the base interval once a poll finds rows again', async () => {
     const { poll } = setup({ result: NO_ROWS })
     await advance(0)
@@ -115,6 +128,19 @@ describe('useLivePolling', () => {
 
     await interact()
     await advance(10 * SECOND)
+    expect(poll).toHaveBeenCalledTimes(4)
+  })
+
+  it('does not delay a backed-off poll that is due sooner than the base interval', async () => {
+    const { poll } = setup({ result: NO_ROWS })
+    await advance(0)
+    await advance(20 * SECOND)
+    await advance(40 * SECOND) // three empty polls; next poll due in 60s
+    await advance(55 * SECOND)
+    expect(poll).toHaveBeenCalledTimes(3)
+
+    await interact()
+    await advance(5 * SECOND)
     expect(poll).toHaveBeenCalledTimes(4)
   })
 
@@ -156,6 +182,16 @@ describe('useLivePolling', () => {
     await advance(14 * MINUTE)
     expect(onIdle).not.toHaveBeenCalled()
     await advance(MINUTE)
+    expect(onIdle).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not count scroll events as activity', async () => {
+    const { onIdle } = setup()
+    await advance(10 * MINUTE)
+    await act(async () => {
+      window.dispatchEvent(new Event('scroll'))
+    })
+    await advance(5 * MINUTE)
     expect(onIdle).toHaveBeenCalledTimes(1)
   })
 
