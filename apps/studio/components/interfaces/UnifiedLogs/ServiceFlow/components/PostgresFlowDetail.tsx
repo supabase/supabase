@@ -1,5 +1,5 @@
 import { Table } from '@tanstack/react-table'
-import { Cable, ChevronDown, Clock, Database } from 'lucide-react'
+import { CableIcon, ChevronDownIcon, ClockIcon, DatabaseIcon } from 'lucide-react'
 import { memo } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
@@ -73,14 +73,18 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
       <DetailSectionHeader
         title="Request started"
         className="border-b"
-        icon={Clock}
+        icon={ClockIcon}
         summary={formattedTime ?? undefined}
       />
 
       <Collapsible defaultOpen className="border-b">
         <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
-          <DetailSectionHeader title="Postgres" icon={Database} />
-          <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
+          <DetailSectionHeader title="Postgres" icon={DatabaseIcon} />
+          <ChevronDownIcon
+            className="transition-transform duration-200"
+            strokeWidth={1.5}
+            size={14}
+          />
         </CollapsibleTrigger>
         <CollapsibleContent>
           {postgresPrimaryFields.map((field) => (
@@ -99,8 +103,12 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
 
       <Collapsible defaultOpen className="border-b">
         <CollapsibleTrigger className="w-full flex items-center justify-between pr-4 [&[data-state=open]>svg]:-rotate-180! transition hover:bg-surface-100">
-          <DetailSectionHeader title="Connection & Session Details" icon={Cable} />
-          <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
+          <DetailSectionHeader title="Connection & Session Details" icon={CableIcon} />
+          <ChevronDownIcon
+            className="transition-transform duration-200"
+            strokeWidth={1.5}
+            size={14}
+          />
         </CollapsibleTrigger>
         <CollapsibleContent>
           {postgresDetailsFields.map((field) => (
@@ -119,7 +127,7 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
 
       <DetailSectionHeader
         title="Operation result"
-        icon={Clock}
+        icon={ClockIcon}
         className="border-b"
         summary={
           severity ? (

@@ -1,18 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from '@/types'
 
 const LogsPage: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { can: canReadAuthLogs } = useAsyncCheckPermissions(
-    PermissionAction.ANALYTICS_READ,
-    'logflare'
+  const { can: canReadAuthLogs } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ANALYTICS_LOGS_READ
   )
 
   return !canReadAuthLogs ? (

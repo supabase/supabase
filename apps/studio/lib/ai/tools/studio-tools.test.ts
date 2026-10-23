@@ -1,9 +1,9 @@
 import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getStudioTools } from './studio-tools'
+import { getOptInTools, getStudioTools } from './studio-tools'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
+import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/execute-sql-output'
 
 vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: vi.fn(),
@@ -16,35 +16,35 @@ describe('ai/tools/studio-tools', () => {
 
   describe('getStudioTools', () => {
     it('should return an object with tool definitions', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
 
       expect(tools).toBeDefined()
       expect(typeof tools).toBe('object')
     })
 
     it('should include execute_sql tool', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
 
       expect(tools.execute_sql).toBeDefined()
       expect(tools.execute_sql.description).toContain('execute a SQL statement')
     })
 
     it('should include deploy_edge_function tool', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
 
       expect(tools.deploy_edge_function).toBeDefined()
       expect(tools.deploy_edge_function.description).toContain('deploy a Supabase Edge Function')
     })
 
     it('should include rename_chat tool', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
 
       expect(tools.rename_chat).toBeDefined()
       expect(tools.rename_chat.description).toContain('Rename the current chat session')
     })
 
     it('should have exactly 4 tools', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
       const toolNames = Object.keys(tools)
 
       expect(toolNames).toHaveLength(4)
@@ -55,7 +55,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should include logs in the load_knowledge schema', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
       const schema = tools.load_knowledge.inputSchema
 
       if ('safeParse' in schema) {
@@ -68,7 +68,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should return ClickHouse logs knowledge for load_knowledge logs', async () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
       if (!tools.load_knowledge.execute) throw new Error('execute is undefined')
 
       const result = await tools.load_knowledge.execute(
@@ -83,7 +83,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should have execute_sql with correct input schema fields', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
       const executeSqlTool = tools.execute_sql
 
       // Check that the tool has an input schema
@@ -96,7 +96,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should have deploy_edge_function with input schema', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
       const deployTool = tools.deploy_edge_function
 
       expect(deployTool.inputSchema).toBeDefined()
@@ -107,7 +107,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should have rename_chat with execute function', async () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
       const renameTool = tools.rename_chat
 
       expect(renameTool.execute).toBeDefined()
@@ -123,7 +123,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should validate execute_sql input schema correctly', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
       const schema = tools.execute_sql.inputSchema
 
       // Check if schema is a Zod schema with safeParse
@@ -159,7 +159,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should require approval for read and write SQL queries', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
 
       expect(tools.execute_sql.needsApproval).toBe(true)
     })
@@ -189,14 +189,14 @@ describe('ai/tools/studio-tools', () => {
         {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
-          sql: 'SELECT email FROM users',
+          sql: 'SELECT email FROM users limit 101;',
         },
         undefined,
         undefined
       )
-      expect(result).toEqual(rows)
+      expect(result).toEqual({ rows, totalRows: 1, optInLevel: 'schema' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
-        type: 'text',
+        type: 'json',
         value: NO_DATA_PERMISSIONS,
       })
     })
@@ -226,20 +226,108 @@ describe('ai/tools/studio-tools', () => {
         {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
-          sql: 'SELECT email FROM users',
+          sql: 'SELECT email FROM users limit 101;',
         },
         undefined,
         undefined
       )
-      expect(result).toEqual(rows)
+      expect(result).toEqual({ rows, totalRows: 1, optInLevel: 'schema_and_log_and_data' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
         type: 'json',
         value: rows,
       })
     })
 
+    it('should push a row limit into read queries but leave write queries untouched', async () => {
+      vi.mocked(executeSql).mockResolvedValue({ result: [] })
+      const tools = getStudioTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const options = { toolCallId: 'test', messages: [], context: {} }
+      const base = { label: 'Query', chartConfig: { view: 'table' as const } }
+
+      await tools.execute_sql.execute(
+        { ...base, sql: 'SELECT * FROM users', isWriteQuery: false },
+        options
+      )
+      await tools.execute_sql.execute(
+        { ...base, sql: 'SELECT cron.schedule(1)', isWriteQuery: true },
+        options
+      )
+
+      const sqls = vi.mocked(executeSql).mock.calls.map(([vars]) => vars.sql)
+      expect(sqls).toEqual(['SELECT * FROM users limit 101;', 'SELECT cron.schedule(1)'])
+    })
+
+    it('should cap rows and say the total is unknown when the limit ran in the database', async () => {
+      const rows = Array.from({ length: 101 }, (_, i) => ({ id: i }))
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
+      const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
+      const input = {
+        sql: 'SELECT id FROM users',
+        label: 'Get ids',
+        chartConfig: { view: 'table' as const },
+        isWriteQuery: false,
+      }
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const result = await tools.execute_sql.execute(input, {
+        toolCallId: 'test',
+        messages: [],
+        context: {},
+      })
+
+      const truncatedOutput = {
+        rows: rows.slice(0, 100),
+        hasMoreRows: true as const,
+        optInLevel: 'schema_and_log_and_data' as const,
+      }
+      expect(result).toEqual(truncatedOutput)
+      const modelOutput = await tools.execute_sql.toModelOutput?.({
+        toolCallId: 'test',
+        input,
+        output: truncatedOutput,
+      })
+      expect(modelOutput).toMatchObject({
+        type: 'json',
+        value: { rows: rows.slice(0, 100), note: expect.stringContaining('more than 100 rows') },
+      })
+      expect(JSON.stringify(modelOutput)).toContain('Do not state a specific total')
+    })
+
+    it('should report the real total when the query could not be limited in the database', async () => {
+      const rows = Array.from({ length: 150 }, (_, i) => ({ id: i }))
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
+      const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
+      const input = {
+        sql: 'SELECT id FROM users; SELECT id FROM users',
+        label: 'Get ids',
+        chartConfig: { view: 'table' as const },
+        isWriteQuery: false,
+      }
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const result = await tools.execute_sql.execute(input, {
+        toolCallId: 'test',
+        messages: [],
+        context: {},
+      })
+
+      const output = {
+        rows: rows.slice(0, 100),
+        totalRows: 150,
+        optInLevel: 'schema_and_log_and_data' as const,
+      }
+      expect(result).toEqual(output)
+      expect(
+        await tools.execute_sql.toModelOutput?.({ toolCallId: 'test', input, output })
+      ).toEqual({
+        type: 'json',
+        value: { rows: rows.slice(0, 100), note: 'Only the first 100 of 150 rows are included.' },
+      })
+    })
+
     it('should validate rename_chat input schema correctly', () => {
-      const tools = getStudioTools()
+      const tools = getStudioTools({ aiOptInLevel: 'schema' })
       const schema = tools.rename_chat.inputSchema
 
       // Check if schema is a Zod schema with safeParse
@@ -257,5 +345,11 @@ describe('ai/tools/studio-tools', () => {
         expect(schema).toBeDefined()
       }
     })
+  })
+})
+
+describe('ai/tools/studio-tools getOptInTools', () => {
+  it('registers update_opt_in_level for the level', () => {
+    expect(Object.keys(getOptInTools({ aiOptInLevel: 'schema' }))).toEqual(['update_opt_in_level'])
   })
 })

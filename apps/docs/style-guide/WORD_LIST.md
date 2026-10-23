@@ -539,6 +539,10 @@ Write _microservices_, not _micro-services_.
 
 Use _might_ for possibility or an uncertain outcome.
 
+### Multigres
+
+Use _Multigres_ for the product name. Don't write _multi-gres_ or _MultiGres_.
+
 ### must
 
 Use _must_ or _need to_ for a requirement. Don't use _must_ for a recommendation.
@@ -706,8 +710,10 @@ _sign-in_, _sign-out_, and _sign-up_ as nouns or adjectives. Match the product U
 labels **Sign in**, **Sign out**, and **Sign up**.
 
 Keep _login_, _log in_, _logout_, _log out_, and `logOut` when quoting
-third-party UI or when they are part of code, routes, URL slugs, CLI commands, or
-established feature names such as _social login_.
+third-party UI or when they are part of code, routes, URL slugs, or CLI commands.
+
+Feature names follow the same rule: _social sign-in_, _phone sign-in_, and
+_anonymous sign-in_.
 
 ### singular they
 
@@ -977,6 +983,10 @@ Don't use these phrases:
 
 Don't use _tl;dr_, _ymmv_, _rtfm_, _imo_, or _fwiw_. Write out the
 meaning or remove the aside.
+
+## Further reference
+
+- [Microsoft Writing Style Guide](https://learn.microsoft.com/style-guide/welcome/)
 
 ## Attribution
 

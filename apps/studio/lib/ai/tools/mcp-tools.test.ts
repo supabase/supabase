@@ -53,6 +53,12 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
     expect(result).not.toHaveProperty('deploy_edge_function')
   })
 
+  it('takes needsApproval from the contract', async () => {
+    const result = await getMcpTools(BASE_PARAMS)
+
+    expect(result.list_extensions?.needsApproval).toBe(false)
+  })
+
   it('warns when the remote server is missing an expected tool (contract drift)', async () => {
     const { list_branches, ...withoutBranches } = FULL_REMOTE_TOOLS
     tools.mockResolvedValueOnce(withoutBranches)

@@ -55,7 +55,7 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
 
 ## Configure user access
 
-Once temporary access has been enabled, project users must be authorized and mapped to Postgres roles they are allowed to access. Each user can be authorized to "assume" one or more Postgres roles using temporary access.
+Once temporary access has been enabled, project users must be authorized and mapped to [Postgres roles](/docs/guides/database/postgres/roles) they are allowed to access. Each user can be authorized to "assume" one or more Postgres roles using temporary access.
 
 When a user is authorized to assume a Postgres role, the user's Personal Access Token (PAT) will be used as the password for the Postgres role.
 

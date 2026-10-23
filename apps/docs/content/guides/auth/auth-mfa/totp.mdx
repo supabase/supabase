@@ -38,7 +38,7 @@ In the **sign-in flow**, the user signs in (upgrading the session to AAL1) and t
 
 <Admonition type="note">
 
-[TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is free to use and is enabled on all Supabase projects by default.
+[TOTP MFA API](/docs/reference/javascript/auth-mfa) is free to use and is enabled on all Supabase projects by default.
 
 </Admonition>
 
@@ -171,7 +171,7 @@ export function EnrollMFA({
 
 ### Add a challenge step to sign in
 
-Once a user has signed in via their first factor (email+password, magic link, one-time password, social login etc.) you need to perform a check if any additional factors need to be verified.
+Once a user has signed in via their first factor (email+password, magic link, one-time password, social sign-in etc.) you need to perform a check if any additional factors need to be verified.
 
 This can be done by using the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` API. When the user signs in and is redirected back to your app, you should call this method to extract the user's current and next authenticator assurance level (AAL).
 

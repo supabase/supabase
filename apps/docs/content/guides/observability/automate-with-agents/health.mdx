@@ -1,8 +1,8 @@
 ---
 id: 'automate-with-agents-health'
-title: 'Health monitor'
+title: 'Health'
 subtitle: 'A read-only agent that checks API and Auth errors and Postgres connection pressure once per hour.'
-description: 'Hourly monitoring for server errors and connection pressure'
+description: 'Hourly checks for server errors and connection pressure'
 ---
 
 ```mermaid
@@ -28,7 +28,7 @@ It uses `query_logs` and read-only `execute_sql` on project-scoped [Supabase MCP
 
 ## What it will output
 
-Health monitor reports new or changed problems with the affected service, measured error rate or connection usage, and a next investigation step. See [what triggers a health report](/docs/guides/observability/detecting#health).
+This prompt reports new or changed problems with the affected service, measured error rate or connection usage, and a next investigation step. See [what triggers a health report](/docs/guides/observability/detecting#health).
 
 If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
 

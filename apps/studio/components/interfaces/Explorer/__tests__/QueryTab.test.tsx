@@ -15,11 +15,14 @@ import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 
 const testContext = vi.hoisted(() => ({
+  track: vi.fn(),
   flags: { otelLegacyLogs: true } as Record<string, boolean>,
   params: { ref: 'default', id: 'query-test' } as { ref?: string; id?: string },
   /** Simulated editor selection — the mocked CodeEditor's fake editor reads this. */
   selectedText: undefined as string | undefined,
 }))
+
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => testContext.track }))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -218,6 +221,7 @@ const createDraft = (
 }
 
 beforeEach(() => {
+  testContext.track.mockClear()
   setupSqlEditorMocks()
   testContext.flags.otelLegacyLogs = true
   testContext.params = { ref: 'default', id: 'query-test' }
@@ -248,6 +252,20 @@ describe('QueryTab execution', () => {
     await waitFor(() => expect(explorerQueryState.results['query-test']).toBeDefined())
     expect(explorerQueryState.results['query-test']).toMatchObject({ rows: [] })
     expect(explorerQueryState.drafts['query-test']?.pendingAutoRun).toBe(false)
+    const queryEvents = testContext.track.mock.calls.filter(([action]) =>
+      action.startsWith('explorer_query_')
+    )
+    expect(queryEvents.map(([action]) => action)).toEqual([
+      'explorer_query_submitted',
+      'explorer_query_completed',
+    ])
+    expect(queryEvents[0][1]).toMatchObject({
+      surface: 'query_tab',
+      queryId: 'query-test',
+      source: 'database',
+    })
+    expect(queryEvents[1][1].runId).toBe(queryEvents[0][1].runId)
+    expect(queryEvents[0][1]).not.toHaveProperty('sql')
   })
 
   it('does not auto-run a draft created without autoRun', async () => {
@@ -285,6 +303,53 @@ describe('QueryTab execution', () => {
       await screen.findByText("Error: Querying logs isn't available for this project yet.")
     ).toBeInTheDocument()
     expect(requests).toHaveLength(0)
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_query_'))
+    ).toEqual([
+      [
+        'explorer_query_submitted',
+        expect.objectContaining({ source: 'logs', surface: 'query_tab' }),
+        expect.objectContaining({ project: 'default' }),
+      ],
+      [
+        'explorer_query_failed',
+        expect.objectContaining({ failureReason: 'logs_unavailable' }),
+        expect.objectContaining({ project: 'default' }),
+      ],
+    ])
+  })
+
+  it('records a terminal failure when database execution rejects', async () => {
+    createDraft({ _tag: 'database' })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: ({ request }) =>
+        new URL(request.url).searchParams.get('key') === ''
+          ? HttpResponse.json({ message: 'Query failed' }, { status: 500 })
+          : HttpResponse.json([]),
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    await waitFor(() =>
+      expect(
+        testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_query_'))
+      ).toHaveLength(2)
+    )
+    const [submitted, failed] = testContext.track.mock.calls.filter(([action]) =>
+      action.startsWith('explorer_query_')
+    )
+    expect(submitted[0]).toBe('explorer_query_submitted')
+    expect(failed[0]).toBe('explorer_query_failed')
+    expect(failed[1]).toMatchObject({
+      runId: submitted[1].runId,
+      failureReason: 'execution_error',
+    })
+    expect(failed[1]).not.toHaveProperty('message')
   })
 
   it('exposes and persists the shared notebook result view options', async () => {
@@ -443,6 +508,9 @@ describe('QueryTab execution', () => {
 
     expect(await screen.findByText('Potential issue detected')).toBeInTheDocument()
     expect(executedQueries).toHaveLength(0)
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_query_'))
+    ).toEqual([])
 
     await userEvent.click(screen.getByRole('button', { name: 'Run query' }))
 

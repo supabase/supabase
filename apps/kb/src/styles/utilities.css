@@ -1,0 +1,40 @@
+.cover-notch {
+  mask:
+    linear-gradient(#000 0 0),
+    var(--notch-mask) right -2px bottom -2px / calc(var(--notch-width) + 10px) 42px no-repeat;
+  mask-composite: exclude;
+  mask-clip: no-clip;
+  box-shadow: none;
+}
+
+@utility section-container {
+  @apply w-full mx-auto max-w-6xl px-6;
+}
+
+.tab-flares {
+  --tab-flare-ring:
+    transparent 6.75px, var(--border-color-default) 7.25px, var(--border-color-default) 7.75px,
+    transparent 8.25px;
+  --tab-flare-fill: transparent 6.75px, var(--background-color-200) 7.25px;
+  --tab-flare-left:
+    radial-gradient(circle at 0 0, var(--tab-flare-ring)),
+    radial-gradient(circle at 0 0, var(--tab-flare-fill));
+  --tab-flare-right:
+    radial-gradient(circle at 100% 0, var(--tab-flare-ring)),
+    radial-gradient(circle at 100% 0, var(--tab-flare-fill));
+}
+
+@utility grain-mask {
+  mask: url('../assets/grain.webp') 0 0 / 132px 132px;
+}
+
+/* --flank-span is how wide the bands above and below the copy show.
+   the grid columns pass calc(100% - 20rem), so they stop at the copy frame */
+@utility grain-mask-flank {
+  mask:
+    url('../assets/grain.webp') 0 0 / 132px 132px,
+    linear-gradient(#000 0 0) top left / var(--flank-span, 100%) 100vh no-repeat,
+    linear-gradient(#000, transparent 10rem) bottom left / var(--flank-span, 100%) 100vh no-repeat,
+    linear-gradient(#000 0 0) top left / calc(100% - 20rem) calc(100% - 100vh) no-repeat;
+  mask-composite: intersect, add, add, add;
+}

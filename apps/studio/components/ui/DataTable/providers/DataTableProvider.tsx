@@ -25,6 +25,7 @@ interface DataTableStateContextType<TSearchParams = unknown> {
   pagination: PaginationState
   enableColumnOrdering: boolean
   searchParameters: TSearchParams
+  hasPendingFilterChange?: boolean
   openRowId: string | undefined
   setOpenRowId: (id: string | undefined) => void
   onSelectRow?: (id: string, modifiers?: RowSelectionModifiers) => void

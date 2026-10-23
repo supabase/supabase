@@ -6,9 +6,9 @@ import { sanitizeNotebookRunOutput, type NotebookRunOutput } from './notebook-ru
 import {
   decodeNotebookToolError,
   encodeNotebookToolError,
-  getNotebookTools,
   NotebookToolError,
-} from './notebook-tools'
+} from './notebook-tool-error'
+import { getNotebookTools } from './notebook-tools'
 import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -113,7 +113,7 @@ function mockGetNotebook() {
 describe('ai/tools/notebook-tools', () => {
   describe('getNotebookTools', () => {
     it('should return all notebook tools', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
 
       expect(Object.keys(tools)).toEqual([
         'list_databases',
@@ -127,14 +127,15 @@ describe('ai/tools/notebook-tools', () => {
     })
 
     it('should not require approval to read notebooks', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
 
-      expect(tools.list_notebooks.needsApproval).toBeUndefined()
-      expect(tools.get_notebook.needsApproval).toBeUndefined()
+      expect(tools.list_databases.needsApproval).toBe(false)
+      expect(tools.list_notebooks.needsApproval).toBe(false)
+      expect(tools.get_notebook.needsApproval).toBe(false)
     })
 
     it('should require approval to run, create, update, or delete a notebook', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
 
       expect(tools.run_notebook.needsApproval).toBe(true)
       expect(tools.create_notebook.needsApproval).toBe(true)
@@ -183,7 +184,7 @@ describe('ai/tools/notebook-tools', () => {
           ]),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.list_databases.execute) throw new Error('execute is undefined')
 
       const result = await tools.list_databases.execute(
@@ -362,6 +363,7 @@ describe('ai/tools/notebook-tools', () => {
         id: 'notebook-1',
         name: 'Signup funnel',
         updated_at: '2026-01-01T00:00:00.000Z',
+        optInLevel: 'schema_and_log_and_data',
         cells: [
           {
             cell_id: 'primary-cell',
@@ -390,7 +392,7 @@ describe('ai/tools/notebook-tools', () => {
 
     it('rejects the run when the notebook changed after it was read', async () => {
       mockGetNotebook()
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.run_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -408,6 +410,7 @@ describe('ai/tools/notebook-tools', () => {
         id: 'notebook-1',
         name: 'Signup funnel',
         updated_at: '2026-01-01T00:00:00.000Z',
+        optInLevel: 'schema_and_log_and_data',
         cells: [
           {
             cell_id: 'database-cell',
@@ -520,6 +523,7 @@ describe('ai/tools/notebook-tools', () => {
       const tools = getNotebookTools({
         projectRef: 'test-project',
         authorization: 'Bearer token',
+        aiOptInLevel: 'schema',
       })
       if (!tools.list_notebooks.execute) throw new Error('execute is undefined')
 
@@ -565,7 +569,7 @@ describe('ai/tools/notebook-tools', () => {
         },
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.list_notebooks.execute) throw new Error('execute is undefined')
 
       await tools.list_notebooks.execute(
@@ -600,7 +604,7 @@ describe('ai/tools/notebook-tools', () => {
           } as unknown as GetUserContentByIdResponse),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_notebook.execute) throw new Error('execute is undefined')
 
       const result = await tools.get_notebook.execute(
@@ -655,7 +659,7 @@ describe('ai/tools/notebook-tools', () => {
           }),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -673,7 +677,7 @@ describe('ai/tools/notebook-tools', () => {
         response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -687,7 +691,7 @@ describe('ai/tools/notebook-tools', () => {
 
   describe('create_notebook', () => {
     it('should reject content whose cells carry an agent-supplied id', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
       const schema = tools.create_notebook.inputSchema
 
       if (!('safeParse' in schema)) throw new Error('inputSchema has no safeParse')
@@ -704,7 +708,7 @@ describe('ai/tools/notebook-tools', () => {
     })
 
     it('should accept a valid id-less notebook with all three cell types', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
       const schema = tools.create_notebook.inputSchema
 
       if (!('safeParse' in schema)) throw new Error('inputSchema has no safeParse')
@@ -729,7 +733,7 @@ describe('ai/tools/notebook-tools', () => {
         },
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
       await tools.create_notebook.execute(
@@ -763,7 +767,7 @@ describe('ai/tools/notebook-tools', () => {
         },
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
       const result = await tools.create_notebook.execute(
@@ -778,7 +782,7 @@ describe('ai/tools/notebook-tools', () => {
     it('should throw an assistant-exposable error instead of PUTting when a database_cell carries an unknown database_identifier', async () => {
       mockDatabases(['test-project', 'test-project-replica-1'])
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
       const execute = tools.create_notebook.execute(
@@ -807,7 +811,7 @@ describe('ai/tools/notebook-tools', () => {
     it('should throw an assistant-exposable error instead of PUTting when a database_cell carries an empty database_identifier', async () => {
       mockDatabases(['test-project', 'test-project-replica-1'])
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
       const execute = tools.create_notebook.execute(
@@ -836,7 +840,7 @@ describe('ai/tools/notebook-tools', () => {
       mockDatabases(['test-project', 'test-project-replica-1'])
       mockCreateNotebookPut()
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -863,7 +867,7 @@ describe('ai/tools/notebook-tools', () => {
     it('should succeed without ever calling the databases endpoint when no cell sets database_identifier', async () => {
       mockCreateNotebookPut()
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
       // No mock registered for GET /platform/projects/:ref/databases: MSW fails the test
@@ -890,7 +894,7 @@ describe('ai/tools/notebook-tools', () => {
         },
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       const result = await tools.update_notebook.execute(
@@ -955,7 +959,7 @@ describe('ai/tools/notebook-tools', () => {
     it('should throw a descriptive, assistant-exposable error instead of PUTting when an operation targets an unknown cell id', async () => {
       mockGetNotebook()
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       const execute = tools.update_notebook.execute(
@@ -975,7 +979,7 @@ describe('ai/tools/notebook-tools', () => {
     it('should throw an assistant-exposable error instead of PUTting when the notebook changed since expected_updated_at', async () => {
       mockGetNotebook()
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       const execute = tools.update_notebook.execute(
@@ -996,7 +1000,7 @@ describe('ai/tools/notebook-tools', () => {
       mockGetNotebook()
       mockDatabases(['test-project'])
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       const execute = tools.update_notebook.execute(
@@ -1033,7 +1037,7 @@ describe('ai/tools/notebook-tools', () => {
         response: () => new HttpResponse(null),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -1063,7 +1067,7 @@ describe('ai/tools/notebook-tools', () => {
       mockGetNotebook()
       mockDatabases(['test-project'])
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       const execute = tools.update_notebook.execute(
@@ -1100,7 +1104,7 @@ describe('ai/tools/notebook-tools', () => {
         response: () => new HttpResponse(null),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -1162,7 +1166,7 @@ describe('ai/tools/notebook-tools', () => {
         response: () => new HttpResponse(null),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       // No mock registered for GET /platform/projects/:ref/databases: MSW fails the test
@@ -1193,7 +1197,7 @@ describe('ai/tools/notebook-tools', () => {
         },
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.delete_notebook.execute) throw new Error('execute is undefined')
 
       const result = await tools.delete_notebook.execute(
@@ -1214,7 +1218,7 @@ describe('ai/tools/notebook-tools', () => {
         response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.delete_notebook.execute) throw new Error('execute is undefined')
 
       // No mock registered for DELETE /platform/projects/:ref/content: MSW fails the test
