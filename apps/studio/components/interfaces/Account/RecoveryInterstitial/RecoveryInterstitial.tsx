@@ -1,4 +1,4 @@
-import { useFlag, useUser } from 'common'
+import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -26,21 +26,36 @@ export const RecoveryInterstitial = () => {
 
 const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
   const user = useUser()
+  const { hasLoaded, isConfigCatStale } = useFeatureFlags()
+  const flagsReady = hasLoaded === true && !isConfigCatStale
   const isEnabled = useFlag('enableAuthRecoveryCodes')
   const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
   const { findings, isPending, isError, verifiedFactorCount } = useAccountRecovery({
-    enabled: isEnabled && hasSecuritySettings,
+    enabled: flagsReady && isEnabled && hasSecuritySettings,
   })
-  const gap = isError || isPending ? null : getRecoveryGap(findings)
+  const isLoading = !flagsReady || isPending
+  const isUnavailable = flagsReady && (!isEnabled || !hasSecuritySettings)
+  const gap = isError || isLoading || isUnavailable ? null : getRecoveryGap(findings)
+  let announcement = 'Account recovery check complete'
+  if (gap) announcement = 'Account recovery action needed'
+  if (isUnavailable) announcement = 'Account recovery check unavailable'
+  if (isLoading) announcement = 'Checking account recovery'
+  if (isError) announcement = ''
   return (
-    <RecoveryReminder
-      key={user?.id}
-      gap={gap}
-      destination={destination}
-      isLoading={isPending}
-      isError={isError}
-      hasAuthenticatorTask={verifiedFactorCount === 1}
-    />
+    <>
+      <span className="sr-only" role="status">
+        {announcement}
+      </span>
+      <RecoveryReminder
+        key={user?.id}
+        gap={gap}
+        destination={destination}
+        isLoading={isLoading}
+        isUnavailable={isUnavailable}
+        hasAuthenticatorTask={verifiedFactorCount === 1}
+        isError={isError}
+      />
+    </>
   )
 }
 
@@ -49,6 +64,7 @@ export const RecoveryReminder = ({
   destination,
   isLoading = false,
   isError = false,
+  isUnavailable = false,
   hasAuthenticatorTask = true,
   onCodesComplete,
   onFactorComplete,
@@ -60,6 +76,7 @@ export const RecoveryReminder = ({
   destination: string
   isLoading?: boolean
   isError?: boolean
+  isUnavailable?: boolean
   hasAuthenticatorTask?: boolean
   onCodesComplete?: () => void
   onFactorComplete?: () => void
@@ -75,7 +92,7 @@ export const RecoveryReminder = ({
   const [isFactorComplete, setIsFactorComplete] = useState(false)
   // Preserve all task dialogs and completed rows during background status updates.
   const activeGap = startedGap ?? gap
-  if (!activeGap && isError) {
+  if (!activeGap && (isError || isUnavailable)) {
     return (
       <InterstitialLayout
         logo={<SupabaseLogo />}
@@ -83,7 +100,13 @@ export const RecoveryReminder = ({
         widthClassName="max-w-md"
       >
         <div className="px-6">
-          <AlertError subject="Failed to check account recovery" />
+          {isError ? (
+            <AlertError subject="Failed to check account recovery" />
+          ) : (
+            <p className="text-sm text-foreground-lighter">
+              Account recovery checks are not enabled for this account.
+            </p>
+          )}
         </div>
         <CardFooter className="justify-center">
           <Button asChild size="tiny">
