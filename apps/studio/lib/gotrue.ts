@@ -58,7 +58,11 @@ export const validateReturnTo = (
     return fallback
   }
 
-  const safePathPattern = /^\/[a-zA-Z0-9/\-_]*(?:\?[a-zA-Z0-9\-_=&%+./?]*)?(?:#[a-zA-Z0-9\-_/%]*)?$/
+  // For internal paths:
+  // 1. Must start with /
+  // 2. Only allow alphanumeric chars, slashes, hyphens, underscores
+  // 3. For query params, also allow =, &, and ?
+  const safePathPattern = /^\/[a-zA-Z0-9/\-_]*(?:\?[a-zA-Z0-9\-_=&]*)?$/
   return safePathPattern.test(returnTo) ? returnTo : fallback
 }
 
@@ -129,8 +133,9 @@ export const getReturnToPath = (fallback = DEFAULT_FALLBACK_PATH) => {
   const remainingSearchParams = searchParams.toString()
   const validReturnTo = validateReturnTo(returnTo, fallback)
 
-  const destination = new URL(validReturnTo, 'https://studio.local')
-  const finalSearchParams = destination.searchParams
+  const [path, existingQuery] = validReturnTo.split('?')
+
+  const finalSearchParams = new URLSearchParams(existingQuery || '')
 
   // Add all remaining search params to the final search params
   if (remainingSearchParams) {
@@ -141,5 +146,5 @@ export const getReturnToPath = (fallback = DEFAULT_FALLBACK_PATH) => {
   }
 
   const finalQuery = finalSearchParams.toString()
-  return destination.pathname + (finalQuery ? `?${finalQuery}` : '') + destination.hash
+  return path + (finalQuery ? `?${finalQuery}` : '')
 }

@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { getAuthRedirectSearch } from './withAuth.utils'
 import { SessionTimeoutModal } from '@/components/interfaces/SignIn/SessionTimeoutModal'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from '@/data/profile/mfa-authenticator-assurance-level-query'
@@ -84,7 +83,8 @@ export function withAuth<T>(
         return
       }
 
-      const searchParams = getAuthRedirectSearch(pathname, location.search, location.hash)
+      const searchParams = new URLSearchParams(location.search)
+      searchParams.set('returnTo', pathname)
 
       if (needsMfaElevation) {
         // Session is valid at AAL1 but needs to be elevated to AAL2. Preserve the session
