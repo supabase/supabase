@@ -135,6 +135,95 @@ describe('SearchV2 telemetry', () => {
     expect(resetSearch).toHaveBeenCalledTimes(1)
   })
 
+  it('trims the query before searching', () => {
+    openDialog()
+
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: '  auth  ' } })
+
+    expect(handleDocsSearchDebounced).toHaveBeenCalledTimes(1)
+    expect(handleDocsSearchDebounced).toHaveBeenCalledWith('auth')
+  })
+
+  it('holds the search back until the third character', () => {
+    openDialog()
+    const input = screen.getByRole('combobox')
+
+    fireEvent.change(input, { target: { value: 'a' } })
+    fireEvent.change(input, { target: { value: 'au' } })
+
+    expect(handleDocsSearchDebounced).not.toHaveBeenCalled()
+
+    fireEvent.change(input, { target: { value: 'aut' } })
+    expect(handleDocsSearchDebounced).toHaveBeenCalledWith('aut')
+  })
+
+  it('resets the search when deleting back under the threshold, so its results cannot report later', () => {
+    openDialog()
+    const input = screen.getByRole('combobox')
+    fireEvent.change(input, { target: { value: 'aut' } })
+    expect(resetSearch).not.toHaveBeenCalled()
+
+    fireEvent.change(input, { target: { value: 'au' } })
+
+    expect(resetSearch).toHaveBeenCalledTimes(1)
+    expect(handleDocsSearchDebounced).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not count whitespace toward the third character', () => {
+    openDialog()
+    const input = screen.getByRole('combobox')
+
+    fireEvent.change(input, { target: { value: ' au ' } })
+    fireEvent.change(input, { target: { value: '     ' } })
+
+    expect(handleDocsSearchDebounced).not.toHaveBeenCalled()
+  })
+
+  it('does not search again when only the surrounding whitespace changes', () => {
+    openDialog()
+    const input = screen.getByRole('combobox')
+
+    fireEvent.change(input, { target: { value: 'auth' } })
+    fireEvent.change(input, { target: { value: 'auth ' } })
+    fireEvent.change(input, { target: { value: ' auth ' } })
+
+    expect(handleDocsSearchDebounced).toHaveBeenCalledTimes(1)
+    expect(handleDocsSearchDebounced).toHaveBeenCalledWith('auth')
+  })
+
+  it('does not reset again while the query stays under the threshold', () => {
+    openDialog()
+    const input = screen.getByRole('combobox')
+    fireEvent.change(input, { target: { value: 'auth' } })
+
+    fireEvent.change(input, { target: { value: 'au' } })
+    fireEvent.change(input, { target: { value: 'a' } })
+    fireEvent.change(input, { target: { value: '' } })
+
+    expect(resetSearch).toHaveBeenCalledTimes(1)
+  })
+
+  it('searches the same query again once it was cleared in between', () => {
+    openDialog()
+    const input = screen.getByRole('combobox')
+
+    fireEvent.change(input, { target: { value: 'auth' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Clear' }))
+    fireEvent.change(input, { target: { value: 'auth' } })
+
+    expect(handleDocsSearchDebounced).toHaveBeenCalledTimes(2)
+    expect(resetSearch).toHaveBeenCalledTimes(1)
+  })
+
+  it('sends no docs_search_v2_search_submitted while the query is too short', () => {
+    openDialog()
+    sendTelemetryEvent.mockClear()
+
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'au' } })
+
+    expect(eventActions()).not.toContain('docs_search_v2_search_submitted')
+  })
+
   it('resets the search from the Clear button', () => {
     openDialog()
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'auth' } })
