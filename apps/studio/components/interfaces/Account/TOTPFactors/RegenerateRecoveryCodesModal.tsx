@@ -1,35 +1,61 @@
 import { RefreshCwIcon } from 'lucide-react'
-import { ComponentProps } from 'react'
+import { useState } from 'react'
 import { Button } from 'ui'
 
-import { RecoveryCodesFlow } from './RecoveryCodesFlow'
+import type { GenerateRecoveryCodesModalProps } from './GenerateRecoveryCodesModal'
+import { RecoveryCodesModal } from './RecoveryCodesModal'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useRecoveryCodesRegenerateMutation } from '@/data/recovery-codes/recovery-codes-regenerate-mutation'
-
-type RegenerateRecoveryCodesModalProps = Partial<
-  Pick<
-    ComponentProps<typeof RecoveryCodesFlow>,
-    'children' | 'onComplete' | 'onStart' | 'showSecurityLink'
-  >
->
 
 export const RegenerateRecoveryCodesModal = ({
   children,
-  ...props
-}: RegenerateRecoveryCodesModalProps = {}) => {
+  onComplete,
+  onStart,
+  showSecurityLink,
+}: GenerateRecoveryCodesModalProps = {}) => {
   const mutation = useRecoveryCodesRegenerateMutation()
+  const [stage, setStage] = useState<'idle' | 'confirm' | 'codes'>('idle')
+  const handleStart = () => {
+    onStart?.()
+    setStage('confirm')
+  }
   return (
-    <RecoveryCodesFlow
-      action="regenerate"
-      mutation={mutation}
-      onGenerate={() => mutation.mutate()}
-      {...props}
-    >
-      {children ??
+    <>
+      {(
+        children ??
         (({ onClick, isPending }) => (
           <Button icon={<RefreshCwIcon />} onClick={onClick} loading={isPending}>
             Regenerate
           </Button>
-        ))}
-    </RecoveryCodesFlow>
+        ))
+      )({ onClick: handleStart, isPending: mutation.isPending })}
+      <TextConfirmModal
+        visible={stage === 'confirm'}
+        size="small"
+        variant="warning"
+        title="Regenerate my recovery codes"
+        confirmPlaceholder="REGENERATE"
+        confirmString="REGENERATE"
+        confirmLabel="Regenerate"
+        loading={mutation.isPending}
+        onConfirm={() => {
+          setStage('codes')
+          mutation.mutate()
+        }}
+        onCancel={() => setStage('idle')}
+      >
+        <p className="text-sm">Your existing recovery codes won't work anymore.</p>
+      </TextConfirmModal>
+      <RecoveryCodesModal
+        open={stage === 'codes'}
+        mutation={mutation}
+        showSecurityLink={showSecurityLink}
+        onOpenChange={(open) => {
+          if (open) return
+          setStage('idle')
+          if (mutation.isSuccess) onComplete?.()
+        }}
+      />
+    </>
   )
 }
