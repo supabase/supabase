@@ -82,7 +82,7 @@ export async function findBrokenAnchors({
   const broken: BrokenAnchor[] = []
   for (const [page, anchors] of removedByPage) {
     const route = toRoute(page)
-    const linkers = await findFiles(`${route}#`)
+    const linkers = await findFiles(route)
     const links = (
       await Promise.all([
         collectSamePageLinks(page, readHead),
@@ -285,6 +285,7 @@ const SEARCH_PATHSPEC = [
   '*.yml',
   '*.yaml',
   ':!**/*.test.*',
+  ':!**/*.spec.*',
   ':!**/__snapshots__/**',
   ':!**/__generated__/**',
   ':!**/.generated/**',

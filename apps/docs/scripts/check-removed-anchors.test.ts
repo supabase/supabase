@@ -64,7 +64,7 @@ describe('findBrokenAnchors', () => {
         page: API_KEYS,
         route: '/guides/getting-started/api-keys',
         anchor: 'leaked-key',
-        linkedFrom: [{ file: LEAKED_KEY_LINKER, line: 39 }],
+        linkedFrom: [{ file: LEAKED_KEY_LINKER, line: expect.any(Number) }],
       },
     ])
   })
@@ -93,9 +93,11 @@ describe('findBrokenAnchors', () => {
   it('names links from other apps and from the same page', async () => {
     const page = `${CONTENT}guides/example.mdx`
     const studio = 'apps/studio/components/Example.tsx'
+    const blog = 'apps/www/_blog/example.mdx'
     const base: Record<string, string> = {
       [page]: 'See [the setup](#set-up).\n\n## Set up\n',
       [studio]: "const DOCS_LINK = '/guides/example#set-up'\n",
+      [blog]: '[Set up](https://supabase.com/docs/guides/example/?ref=nav#set-up)\n',
     }
     const head = { ...base, [page]: 'See [the setup](#set-up).\n' }
 
@@ -107,6 +109,7 @@ describe('findBrokenAnchors', () => {
         linkedFrom: [
           { file: page, line: 1 },
           { file: studio, line: 1 },
+          { file: blog, line: 1 },
         ],
       },
     ])

@@ -24,11 +24,6 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /*
-            !/*/
-            /apps/
-            /packages/
-            /patches/
-            /examples/
             !*.png
             !*.jpg
             !*.jpeg
