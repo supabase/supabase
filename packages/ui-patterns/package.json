@@ -551,6 +551,10 @@
       "import": "./src/MobileNav/MobileNavDrawer.tsx",
       "types": "./src/MobileNav/MobileNavDrawer.tsx"
     },
+    "./MobileNav/MobileNavLock": {
+      "import": "./src/MobileNav/MobileNavLock.tsx",
+      "types": "./src/MobileNav/MobileNavLock.tsx"
+    },
     "./MobileNav/MobileNavTabs": {
       "import": "./src/MobileNav/MobileNavTabs.tsx",
       "types": "./src/MobileNav/MobileNavTabs.tsx"

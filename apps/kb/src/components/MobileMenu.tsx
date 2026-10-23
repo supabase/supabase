@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from 'react'
+import { useState, type RefObject } from 'react'
 import { Button } from 'ui'
 import { MobileNavDrawer } from 'ui-patterns/MobileNav/MobileNavDrawer'
 import { MobileNavTabs } from 'ui-patterns/MobileNav/MobileNavTabs'
@@ -11,6 +11,7 @@ export interface MobileMenuProps {
   open: boolean
   menus: NavMenu[]
   currentPath: string
+  toggleRef: RefObject<HTMLElement | null>
   onClose: () => void
   className?: string
 }
@@ -20,6 +21,7 @@ export const MobileMenu = ({
   open,
   menus,
   currentPath,
+  toggleRef,
   onClose,
   className,
 }: MobileMenuProps) => {
@@ -37,10 +39,6 @@ export const MobileMenu = ({
   const selectedLabel = pickedLabel ?? currentLabel ?? menus[0]?.label
   const selectedMenu = menus.find((menu) => menu.label === selectedLabel)
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape') onClose()
-  }
-
   // the menu only exists below lg, so close it once the viewport grows past that
   const bindDesktopClose = (drawer: HTMLDivElement | null) => {
     if (!drawer) return
@@ -57,7 +55,7 @@ export const MobileMenu = ({
       ref={bindDesktopClose}
       id={id}
       open={open}
-      onKeyDown={handleKeyDown}
+      toggleRef={toggleRef}
       className={className}
       footer={
         <Button variant="primary" size="large" block asChild>

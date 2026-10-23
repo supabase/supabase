@@ -17,8 +17,17 @@ import { MobileHeaderSlotsContext } from '~/layouts/MobileHeaderSlots'
 import { isFeatureEnabled } from 'common'
 import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
-import { memo, useEffect, useState, type PropsWithChildren, type ReactNode } from 'react'
+import {
+  memo,
+  useEffect,
+  useRef,
+  useState,
+  type PropsWithChildren,
+  type ReactNode,
+  type RefObject,
+} from 'react'
 import { cn } from 'ui'
+import { MobileNavLock } from 'ui-patterns/MobileNav/MobileNavLock'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
 const GlobalMenuDrawerSection = dynamic(() =>
@@ -87,7 +96,10 @@ const Container = memo(function Container({
   )
 })
 
-const NavContainer = memo(function NavContainer({ children }: PropsWithChildren) {
+const NavContainer = memo(function NavContainer({
+  children,
+  toggleRef,
+}: PropsWithChildren<{ toggleRef: RefObject<HTMLElement | null> }>) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
@@ -106,6 +118,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
         'lg:overflow-y-auto'
       )}
     >
+      {mobileMenuOpen ? <MobileNavLock toggleRef={toggleRef} /> : null}
       <div
         className={cn(
           'top-0',
@@ -190,10 +203,12 @@ function SidebarSkeleton({
     menuState.setMenuMobileOpen(!mobileMenuOpen)
   }
 
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+
   return (
     <div className={cn('flex flex-row h-full relative', className)}>
       {!hideSideNav && (
-        <NavContainer>
+        <NavContainer toggleRef={menuButtonRef}>
           <GlobalMenuDrawerSection
             selectedLabel={selectedGroupLabel}
             currentLabel={currentGroupLabel}
@@ -214,11 +229,11 @@ function SidebarSkeleton({
             isMenuOpen={mobileMenuOpen}
             onMenuToggle={hideSideNav ? undefined : handleMenuToggle}
             scrolledTitle={mobileMenuOpen ? null : scrolledTitle}
+            menuButtonRef={menuButtonRef}
           />
-          <div ref={setTocSlot} inert={mobileMenuOpen} className="md:hidden" />
+          <div ref={setTocSlot} className="md:hidden" />
         </div>
-        {/* the drawer covers the page, so tab stays in the header and the drawer */}
-        <div inert={mobileMenuOpen} className="grow">
+        <div className="grow">
           <MobileHeaderSlotsContext value={{ tocSlot, onTitleScroll: setScrolledTitle }}>
             {children}
           </MobileHeaderSlotsContext>

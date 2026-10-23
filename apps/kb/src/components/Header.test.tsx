@@ -68,6 +68,19 @@ describe('Header', () => {
     expect(['#toc', 'main', 'footer'].map(isInert)).toEqual([false, false, false])
   })
 
+  it('closes on escape, moves focus to the menu button and restores scroll', () => {
+    root = mountPage()
+
+    act(() => menuButton().click())
+    expect(document.documentElement.style.overflow).toBe('hidden')
+
+    act(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })))
+    expect(menuButton().getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(menuButton())
+    expect(document.documentElement.style.overflow).toBe('')
+    expect(isInert('main')).toBe(false)
+  })
+
   it('rolls the logo to the article title once the title scrolls under the header', () => {
     root = mountPage()
     const header = () => document.querySelector('nav [data-roll-role="current"]')!.textContent

@@ -26,15 +26,9 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
   const [scrolledTitle, setScrolledTitle] = useState<string | null>(null)
   const shownTitle = isMenuOpen ? null : scrolledTitle
 
-  const setMenuOpen = (isOpen: boolean) => {
-    setIsMenuOpen(isOpen)
-    document.documentElement.toggleAttribute('data-mobile-menu-open', isOpen)
-    // the drawer covers the page, so tab stays in the header and the drawer
-    setOutsideInert(menuButtonRef.current?.closest('nav')?.parentElement, isOpen)
-  }
-  const handleMenuToggle = () => setMenuOpen(!isMenuOpen)
+  const handleMenuToggle = () => setIsMenuOpen(!isMenuOpen)
   const handleMenuClose = () => {
-    setMenuOpen(false)
+    setIsMenuOpen(false)
     menuButtonRef.current?.focus()
   }
 
@@ -125,17 +119,10 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
         open={isMenuOpen}
         menus={menus}
         currentPath={currentPath}
+        toggleRef={menuButtonRef}
         onClose={handleMenuClose}
         className="lg:hidden"
       />
     </>
   )
-}
-
-const setOutsideInert = (element: Element | null | undefined, isInert: boolean) => {
-  for (let node = element; node && node !== document.body; node = node.parentElement) {
-    for (const sibling of node.parentElement?.children ?? []) {
-      if (sibling !== node) sibling.toggleAttribute('inert', isInert)
-    }
-  }
 }

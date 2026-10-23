@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import type { FC } from 'react'
+import type { FC, Ref } from 'react'
 import { memo, useState } from 'react'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
@@ -32,9 +32,15 @@ interface TopNavBarProps {
   onMenuToggle?: () => void
   // the page title after it scrolls under the bar, null while the title is in view
   scrolledTitle?: string | null
+  menuButtonRef?: Ref<HTMLButtonElement>
 }
 
-const TopNavBar: FC<TopNavBarProps> = ({ isMenuOpen = false, onMenuToggle, scrolledTitle }) => {
+const TopNavBar: FC<TopNavBarProps> = ({
+  isMenuOpen = false,
+  onMenuToggle,
+  scrolledTitle,
+  menuButtonRef,
+}) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -87,6 +93,7 @@ const TopNavBar: FC<TopNavBarProps> = ({ isMenuOpen = false, onMenuToggle, scrol
                 />
               )}
               <button
+                ref={menuButtonRef}
                 tabIndex={0}
                 title="Menu dropdown button"
                 aria-label={isOpen ? 'Close menu' : 'Open menu'}
