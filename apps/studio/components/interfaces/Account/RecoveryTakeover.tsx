@@ -12,7 +12,10 @@ export const RecoveryTakeover = ({
         aria-label="Account recovery"
         aria-describedby={undefined}
         className="w-full max-w-none sm:max-w-none md:max-w-none border-0 rounded-none sm:rounded-none shadow-none outline-none data-[state=open]:animate-none data-[state=closed]:animate-none"
-        dialogOverlayProps={{ className: 'block p-0 bg-studio backdrop-blur-none' }}
+        dialogOverlayProps={{
+          className:
+            'block p-0 bg-studio backdrop-blur-none data-[state=open]:animate-in data-[state=open]:fade-in-0 duration-200 ease-enter motion-reduce:animate-none',
+        }}
         onKeyDown={(event) => event.stopPropagation()}
         onKeyUp={(event) => event.stopPropagation()}
         onEscapeKeyDown={(event) => event.preventDefault()}
