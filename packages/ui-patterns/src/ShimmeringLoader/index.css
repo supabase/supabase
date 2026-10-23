@@ -1,18 +1,19 @@
 @import './dither-gifs.css';
 
 /*
- * Loaders: a muted block with a faint, drifting film grain. The motion is baked into a tiny looping
- * GIF used as a luminance mask, so the browser animates it without any JavaScript or main-thread
- * work, and the grain follows the theme's foreground color.
+ * Fallback for raw `className="shimmering-loader"` elements: a muted block with a faint, drifting
+ * film grain. The motion is baked into a tiny looping GIF used as a luminance mask, so the browser
+ * animates it without any JavaScript or main-thread work. `ShimmeringLoader` renders
+ * `DitheredSkeletonGif` instead, which adds the shine, so it's excluded here.
  */
-.shimmering-loader {
+.shimmering-loader:not([data-dithered-skeleton]) {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   background-color: var(--background-muted);
 }
 
-.shimmering-loader::after {
+.shimmering-loader:not([data-dithered-skeleton])::after {
   content: '';
   position: absolute;
   inset: 0;

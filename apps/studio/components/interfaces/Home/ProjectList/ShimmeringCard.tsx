@@ -1,3 +1,5 @@
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import CardButton from '@/components/ui/CardButton'
 
 export const ShimmeringCard = () => {
@@ -6,8 +8,8 @@ export const ShimmeringCard = () => {
       className="h-44 px-0! pt-5 pb-0"
       title={
         <div className="w-full justify-between space-y-1.5 px-5">
-          <p className="shrink truncate text-sm pr-4 shimmering-loader h-5 w-20" />
-          <p className="text-sm lowercase text-foreground-light h-4 w-40 shimmering-loader" />
+          <ShimmeringLoader className="h-5 w-20 py-0" />
+          <ShimmeringLoader className="h-4 w-40 py-0" />
         </div>
       }
     />

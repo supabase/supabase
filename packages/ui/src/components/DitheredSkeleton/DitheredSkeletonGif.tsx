@@ -1,6 +1,13 @@
 'use client'
 
-import { useLayoutEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
+import {
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  type CSSProperties,
+  type HTMLAttributes,
+  type Ref,
+} from 'react'
 
 import { cn } from '../../lib/utils/cn'
 import {
@@ -96,6 +103,7 @@ export interface DitheredSkeletonGifProps extends HTMLAttributes<HTMLDivElement>
    * motion comes from the GIFs and the skeleton costs nothing per frame.
    */
   shine?: boolean
+  ref?: Ref<HTMLDivElement>
 }
 
 /**
@@ -108,9 +116,11 @@ export function DitheredSkeletonGif({
   pixelSize = 1,
   shine = true,
   style,
+  ref,
   ...props
 }: DitheredSkeletonGifProps) {
   const rootRef = useRef<HTMLDivElement>(null)
+  useImperativeHandle(ref, () => rootRef.current as HTMLDivElement)
 
   useLayoutEffect(() => {
     const root = rootRef.current
@@ -131,7 +141,8 @@ export function DitheredSkeletonGif({
       animation?.cancel()
       animation = null
       if (!sweep) return
-      if (reducedMotion.matches) {
+      // Without the Web Animations API (e.g. jsdom), the shine stays parked like reduced motion.
+      if (reducedMotion.matches || typeof sweep.animate !== 'function') {
         sweep.style.transform = `translateX(${SWEEP_PERIOD_PX * 0.35}px)`
         return
       }
@@ -166,6 +177,7 @@ export function DitheredSkeletonGif({
   return (
     <div
       ref={rootRef}
+      data-dithered-skeleton
       className={cn('relative overflow-hidden rounded-md bg-muted isolate', className)}
       style={
         {

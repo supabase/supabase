@@ -16,6 +16,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   getCustomDomainDisabledReason,
@@ -241,7 +242,7 @@ export const Addons = () => {
                 className="flex min-h-[128px] items-center gap-4 border-b px-6 py-4 last:border-b-none"
               >
                 <div className="hidden @lg:flex h-24 w-40 shrink-0 items-center justify-center rounded-lg border">
-                  <div className="shimmering-loader h-full w-full rounded-lg" />
+                  <ShimmeringLoader className="h-full w-full rounded-lg py-0" />
                 </div>
                 <div className="flex-1">
                   <HorizontalShimmerWithIcon />

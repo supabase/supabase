@@ -1,5 +1,15 @@
 import { forwardRef, type CSSProperties } from 'react'
-import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import {
+  Card,
+  cn,
+  DitheredSkeletonGif,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 
 export interface ShimmeringLoader {
   className?: string
@@ -13,7 +23,13 @@ export interface ShimmeringLoader {
 export const ShimmeringLoader = forwardRef<HTMLDivElement, ShimmeringLoader>(
   ({ className, style }, ref) => {
     return (
-      <div ref={ref} className={cn('shimmering-loader rounded-sm py-3', className)} style={style} />
+      // Experimental: the GIF-masked dithered skeleton with its compositor-driven shine. The
+      // `shimmering-loader` class stays as a stable hook for existing selectors and tests.
+      <DitheredSkeletonGif
+        ref={ref}
+        className={cn('shimmering-loader rounded-sm py-3', className)}
+        style={style}
+      />
     )
   }
 )

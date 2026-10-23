@@ -1,9 +1,8 @@
 import { DitheredSkeletonGif } from '../../DitheredSkeleton/DitheredSkeletonGif'
 
-// Experimental: renders the GIF-masked dithered skeleton without the shine, so the only motion is
-// the GIF itself and loading states cost no JavaScript or main-thread work per frame.
+// Experimental: renders the GIF-masked dithered skeleton with its compositor-driven shine.
 function Skeleton(props: React.HTMLAttributes<HTMLDivElement>) {
-  return <DitheredSkeletonGif data-slot="skeleton" shine={false} {...props} />
+  return <DitheredSkeletonGif data-slot="skeleton" {...props} />
 }
 
 export { Skeleton }

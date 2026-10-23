@@ -45,6 +45,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { SidePanelEditor } from '../../TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { DefaultEdge } from './DefaultEdge'
@@ -385,9 +386,7 @@ export const SchemaGraph = () => {
   return (
     <>
       <div className="flex items-center justify-between p-4 border-b border-muted h-(--header-height)">
-        {isLoadingSchemas && (
-          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded-sm shimmering-loader" />
-        )}
+        {isLoadingSchemas && <ShimmeringLoader className="h-[34px] w-[260px] py-0" />}
 
         {isErrorSchemas && <AlertError error={errorSchemas} subject="Failed to retrieve schemas" />}
 

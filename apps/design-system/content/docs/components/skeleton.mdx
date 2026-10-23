@@ -58,7 +58,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 ## Experimental skeletons
 
-The sections below are experimental loading placeholders that could replace `Skeleton` and `ShimmeringLoader`. They're for evaluation only. The dithered variants share the same API (`className` plus `pixelSize`), use page coordinates so neighboring skeletons read as one surface, and respect reduced motion.
+The sections below are experimental loading placeholders that could replace `Skeleton` and `ShimmeringLoader`. They're for evaluation only. On this branch, `Skeleton` and `ShimmeringLoader` (including `GenericSkeletonLoader` and `GenericTableLoader`) render `DitheredSkeletonGif` with its shine, so the experiment can be seen across Studio and the other apps. The dithered variants share the same API (`className` plus `pixelSize`), use page coordinates so neighboring skeletons read as one surface, and respect reduced motion.
 
 | Variant                             | Texture                                   | Shine                                | Per-frame cost                            |
 | ----------------------------------- | ----------------------------------------- | ------------------------------------ | ----------------------------------------- |

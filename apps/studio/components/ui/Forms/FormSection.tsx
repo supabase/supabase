@@ -1,5 +1,6 @@
 import { Children } from 'react'
 import { cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const FormSection = ({
   children,
@@ -56,9 +57,9 @@ export const FormSectionLabel = ({
 
 const Shimmer = () => (
   <div className="flex w-full flex-col gap-2">
-    <div className="shimmering-loader h-2 w-1/3 rounded-sm"></div>
+    <ShimmeringLoader className="h-2 w-1/3 py-0" />
     <div className="flex flex-col justify-between space-y-2">
-      <div className="shimmering-loader h-[34px] w-2/3 rounded-sm" />
+      <ShimmeringLoader className="h-[34px] w-2/3 py-0" />
     </div>
   </div>
 )
