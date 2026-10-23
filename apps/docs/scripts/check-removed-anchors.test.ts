@@ -32,6 +32,15 @@ function checkRealContent(edits: Record<string, (source: string) => string>) {
   })
 }
 
+function checkFixtures(base: Record<string, string>, head: Record<string, string>) {
+  return findBrokenAnchors({
+    changedFiles: Object.keys(head).filter((file) => base[file] !== head[file]),
+    readBase: async (file) => base[file],
+    readHead: async (file) => head[file],
+    findFiles: async (needle) => Object.keys(head).filter((file) => head[file].includes(needle)),
+  })
+}
+
 const replaceOrThrow = (search: string | RegExp, replacement: string) => (source: string) => {
   const result = source.replace(search, replacement)
   if (result === source) throw new Error(`Test fixture is stale: ${search} not found`)
@@ -81,23 +90,25 @@ describe('findBrokenAnchors', () => {
     ])
   })
 
-  it('names links from other apps', async () => {
-    const bigquery = `${CONTENT}guides/database/replication/pipelines/bigquery.mdx`
-    const broken = await checkRealContent({
-      [bigquery]: replaceOrThrow(section('## Configure BigQuery as a destination'), ''),
-    })
+  it('names links from other apps and from the same page', async () => {
+    const page = `${CONTENT}guides/example.mdx`
+    const studio = 'apps/studio/components/Example.tsx'
+    const base: Record<string, string> = {
+      [page]: 'See [the setup](#set-up).\n\n## Set up\n',
+      [studio]: "const DOCS_LINK = '/guides/example#set-up'\n",
+    }
+    const head = { ...base, [page]: 'See [the setup](#set-up).\n' }
 
-    expect(broken).toEqual([
-      expect.objectContaining({
-        anchor: 'configure-bigquery-as-a-destination',
+    expect(await checkFixtures(base, head)).toEqual([
+      {
+        page,
+        route: '/guides/example',
+        anchor: 'set-up',
         linkedFrom: [
-          { file: bigquery, line: 11 },
-          {
-            file: 'apps/studio/components/interfaces/Database/Replication/DestinationPanel/DestinationPanel.tsx',
-            line: 36,
-          },
+          { file: page, line: 1 },
+          { file: studio, line: 1 },
         ],
-      }),
+      },
     ])
   })
 
@@ -105,7 +116,7 @@ describe('findBrokenAnchors', () => {
     const broken = await checkRealContent({
       [API_KEYS]: replaceOrThrow(
         section(LEAKED_KEY_HEADING),
-        `${LEAKED_KEY_HEADING}\n\nThis moved to [Rotate API keys](/docs/guides/api/rotate-keys).\n\n`
+        `${LEAKED_KEY_HEADING}\n\nFor more information about rotating a leaked key, see [Rotate API keys](/docs/guides/api/rotate-keys).\n\n`
       ),
     })
 
@@ -140,14 +151,7 @@ describe('findBrokenAnchors', () => {
     }
     const head: Record<string, string> = { ...shared, [inner]: '## Other section\n' }
 
-    const broken = await findBrokenAnchors({
-      changedFiles: [inner],
-      readBase: async (file) => base[file],
-      readHead: async (file) => head[file],
-      findFiles: async (needle) => Object.keys(head).filter((file) => head[file].includes(needle)),
-    })
-
-    expect(broken).toEqual([
+    expect(await checkFixtures(base, head)).toEqual([
       {
         page,
         route: '/guides/example',

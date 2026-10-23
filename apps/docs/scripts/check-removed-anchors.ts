@@ -229,11 +229,16 @@ function formatReport(broken: BrokenAnchor[]) {
     lines.push('')
   }
   lines.push(
-    'To fix, do one of these:',
-    '  - Keep the heading. Replace its body with a short summary and a link to where the content went.',
-    '  - If you renamed the heading, keep the old anchor: `## New title [#old-anchor]`.',
-    '  - Update the links listed above to point somewhere else.',
-    `  - If the removal is deliberate, add the \`${BYPASS_LABEL}\` label to the PR.`
+    'To fix:',
+    '  1. If the content moved, point the links above to its new home.',
+    '  2. Or keep the heading and replace its body with a cross-reference:',
+    '',
+    '       ### Rotate a leaked or compromised key [#leaked-key]',
+    '',
+    '       For more information about rotating a leaked key, see [Rotate API keys](/docs/guides/api/rotate-keys).',
+    '',
+    'Renamed the heading? Keep the old anchor: `## New title [#old-anchor]`.',
+    `To merge anyway, add the \`${BYPASS_LABEL}\` label. See apps/docs/CONTRIBUTING.md.`
   )
   return lines.join('\n')
 }
