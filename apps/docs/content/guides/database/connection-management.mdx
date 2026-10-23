@@ -170,7 +170,7 @@ Which one to use depends on the session's state:
 - For a session that's `idle in transaction`, cancelling does nothing - there's no running query to cancel, and the open transaction stays open regardless. Terminating the session is the only way to force the transaction closed and release its locks.
 - For a session that's `idle in transaction (aborted)`, its ordinary locks were already released when the transaction aborted. The correct fix is for the client to issue `rollback`, which closes the transaction cleanly. Reserve `pg_terminate_backend` for a client that's unresponsive or a connection that needs to close regardless - it won't release anything further in this case, aside from a session-level advisory lock, which persists until the session ends.
 
-Both functions require you to either be a superuser, hold the `pg_signal_backend` role, or be signalling your own session - and even `pg_signal_backend` can't be used to stop a session belonging to an actual superuser role. If you hit a permission error while terminating a session, see [this troubleshooting guide](/docs/guides/troubleshooting/high-cpu-and-slow-queries-with-error-must-be-a-superuser-to-terminate-superuser-process).
+Both functions require you to either be a superuser, hold the `pg_signal_backend` role, or be signalling your own session - and even `pg_signal_backend` can't be used to stop a session belonging to an actual superuser role. If you hit a permission error while terminating a session, see [this troubleshooting guide](/kb/troubleshooting/high-cpu-and-slow-queries-with-error-must-be-a-superuser-to-terminate-superuser-process).
 
 ---
 

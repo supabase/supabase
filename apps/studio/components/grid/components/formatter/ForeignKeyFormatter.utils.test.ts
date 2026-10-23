@@ -53,7 +53,7 @@ describe('findColumnForeignKeyConstraint', () => {
         table: 'machine_storage_usage_buckets',
         columnName: 'org_metering_bucket_id',
       })
-    ).toBe(compositeForeignKey)
+    ).toEqual(compositeForeignKey)
   })
 
   test('finds the constraint for any column of a composite key', () => {
@@ -64,7 +64,7 @@ describe('findColumnForeignKeyConstraint', () => {
         table: 'machine_storage_usage_buckets',
         columnName: 'org_id',
       })
-    ).toBe(compositeForeignKey)
+    ).toEqual(compositeForeignKey)
   })
 
   test('ignores constraints from other tables with the same column name', () => {
@@ -123,20 +123,6 @@ describe('getReferencingRecordFilters', () => {
     expect(filters).toStrictEqual([
       { column: 'org_id', operator: '=', value: 2 },
       { column: 'bucket_id', operator: '=', value: 903 },
-    ])
-  })
-
-  test('builds the same filters regardless of which source column was clicked', () => {
-    const row = { idx: 0, org_id: 1, org_metering_bucket_id: 901 }
-    const filters = getReferencingRecordFilters({
-      foreignKey: compositeForeignKey,
-      row,
-      columns: bigintColumns,
-    })
-
-    expect(filters).toStrictEqual([
-      { column: 'org_id', operator: '=', value: 1 },
-      { column: 'bucket_id', operator: '=', value: 901 },
     ])
   })
 

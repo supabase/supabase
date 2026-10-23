@@ -3,8 +3,8 @@ import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { Eraser, Pencil, X } from 'lucide-react'
+import { EraserIcon, PencilIcon, XIcon } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -29,6 +29,7 @@ import {
   ConversationScrollButton,
 } from './elements/Conversation'
 import { Message } from './Message'
+import { groupMessageParts } from './Message.Parts.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
@@ -293,7 +294,14 @@ export const AssistantChat = ({
     (error.message?.includes('context_length_exceeded') ||
       error.message?.includes('exceeds the context window'))
 
-  const isTimedOut = !error && !isChatLoading && isTimedOutMessage(chatMessages.at(-1))
+  const lastMessage = chatMessages.at(-1)
+  // A running tool group shimmers already, so the cursor would be a second loading indicator
+  const isToolGroupRunning =
+    isChatLoading &&
+    lastMessage?.role === 'assistant' &&
+    groupMessageParts(lastMessage.parts).at(-1)?.type === 'tool-group'
+
+  const isTimedOut = !error && !isChatLoading && isTimedOutMessage(lastMessage)
   let displayError = IS_PLATFORM ? ASSISTANT_ERRORS['default'] : error
   if (isContextExceededError) displayError = ASSISTANT_ERRORS['context-exceeded']
   if (isTimedOut) displayError = { message: ASSISTANT_TIMEOUT_MESSAGE }
@@ -611,7 +619,7 @@ export const AssistantChat = ({
                               size="tiny"
                               onClick={handleClearMessages}
                               className="w-7 h-7"
-                              icon={<Eraser />}
+                              icon={<EraserIcon />}
                               tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
                             />
                           </>
@@ -620,7 +628,7 @@ export const AssistantChat = ({
                     }
                   />
                 )}
-                {isChatLoading && (
+                {isChatLoading && !isToolGroupRunning && (
                   <motion.span
                     animate={shouldReduceMotion ? { opacity: 1 } : { opacity: [1, 0] }}
                     transition={
@@ -663,13 +671,13 @@ export const AssistantChat = ({
                 >
                   <div className="-translate-x-1/2 bg-alternative dark:bg-muted border rounded-md px-3 py-2 min-w-[180px] flex items-center justify-between gap-x-2">
                     <div className="flex items-center gap-x-2 text-sm text-foreground">
-                      <Pencil size={14} />
+                      <PencilIcon size={14} />
                       <span>Editing message</span>
                     </div>
                     <ButtonTooltip
                       variant="outline"
                       size="tiny"
-                      icon={<X size={14} />}
+                      icon={<XIcon size={14} />}
                       onClick={cancelEdit}
                       className="w-6 h-6 p-0"
                       title="Cancel editing"

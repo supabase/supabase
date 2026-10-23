@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { ExternalLink, Loader2, Megaphone } from 'lucide-react'
+import { ExternalLinkIcon, Loader2Icon, MegaphoneIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
@@ -16,7 +15,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -36,9 +35,8 @@ const NoResultAlert = ({
 }) => {
   const { ref } = useParams()
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
 
   const broadcastButton = <Button onClick={showSendMessage}>Broadcast a message</Button>
@@ -86,7 +84,7 @@ const NoResultAlert = ({
                 </p>
               </div>
               <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
-                <Button iconRight={<ExternalLink />}>Open inspector</Button>
+                <Button iconRight={<ExternalLinkIcon />}>Open inspector</Button>
               </Link>
             </div>
 
@@ -100,7 +98,7 @@ const NoResultAlert = ({
                 <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
               <Link href={`/project/${ref}/database/publications`} target="_blank" rel="noreferrer">
-                <Button iconRight={<ExternalLink />}>Publications settings</Button>
+                <Button iconRight={<ExternalLinkIcon />}>Publications settings</Button>
               </Link>
             </div>
             <div className="w-full px-5 py-4 items-center gap-4 inline-flex rounded-b-md bg-studio">
@@ -163,7 +161,7 @@ const MessagesTable = ({
               {enabled && (
                 <div className="w-full h-9 px-4 bg-surface-100 items-center inline-flex justify-between text-foreground-light">
                   <div className="inline-flex gap-2.5 text-xs">
-                    <Loader2 size="16" aria-hidden="true" className="animate-spin" />
+                    <Loader2Icon size="16" aria-hidden="true" className="animate-spin" />
                     <div>Listening</div>
                     <div aria-hidden="true">•</div>
                     <div>
@@ -175,7 +173,7 @@ const MessagesTable = ({
                     </div>
                   </div>
                   <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
-                    <Button onClick={showSendMessage} icon={<Megaphone strokeWidth={1.5} />}>
+                    <Button onClick={showSendMessage} icon={<MegaphoneIcon strokeWidth={1.5} />}>
                       <span>Broadcast a message</span>
                     </Button>
                   </ShortcutTooltip>
@@ -184,7 +182,7 @@ const MessagesTable = ({
             </div>
 
             <DataGrid
-              className="data-grid--simple-logs h-full border-t-0! border-b-0!"
+              className="data-grid--simple-logs h-full! border-t-0! border-b-0!"
               rowHeight={40}
               headerRowHeight={0}
               columns={ColumnRenderer}

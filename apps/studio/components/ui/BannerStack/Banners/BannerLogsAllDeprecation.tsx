@@ -34,8 +34,8 @@ export const BannerLogsAllDeprecation = () => {
         <div className="flex flex-col gap-y-1 mb-2">
           <p className="text-sm font-medium">Logs endpoint retires September 23</p>
           <p className="text-xs text-foreground-lighter text-balance">
-            Scripts that call the <code className="text-code-inline break-keep!">logs.all</code>{' '}
-            Management API endpoint need to migrate. Dashboard logs are unchanged.
+            Scripts that call the <code className="break-keep!">logs.all</code> Management API
+            endpoint need to migrate. Dashboard logs are unchanged.
           </p>
         </div>
         <Button size="tiny" className="w-min" asChild>

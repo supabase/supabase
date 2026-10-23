@@ -1,9 +1,12 @@
+import { act, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { ToolUIPart } from 'ai'
 import { type PropsWithChildren } from 'react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { MessageProvider } from './Message.Context'
-import { MessagePartSwitcher } from './Message.Parts'
+import { MessagePartSwitcher, MessagePartToolGroup } from './Message.Parts'
+import type { CompactPart } from './Message.Parts.utils'
 import { customRender } from '@/tests/lib/custom-render'
 
 type MessagePart = Parameters<typeof MessagePartSwitcher>[0]['part']
@@ -115,5 +118,88 @@ describe('MessagePartSwitcher', () => {
     )
     expect(getByText('Response interrupted')).toBeInTheDocument()
     expect(container.querySelector('.animate-spin')).toBeNull()
+  })
+})
+
+describe('MessagePartToolGroup', () => {
+  const reasoning = (text = 'Looking at the schema'): CompactPart => ({
+    type: 'reasoning',
+    state: 'done',
+    text,
+  })
+  const streamingReasoning: CompactPart = { type: 'reasoning', state: 'streaming', text: '' }
+  const tool: CompactPart = {
+    type: 'tool-load_knowledge',
+    toolCallId: 'knowledge-1',
+    state: 'output-available',
+    input: {},
+    output: {},
+  }
+  const runningTool: CompactPart = {
+    type: 'tool-load_knowledge',
+    toolCallId: 'knowledge-1',
+    state: 'input-available',
+    input: {},
+  }
+
+  afterEach(() => vi.useRealTimers())
+
+  // A group only runs while its message streams
+  const toolGroup = (parts: CompactPart[], isRunning: boolean) => (
+    <Provider isLoading={isRunning}>
+      <MessagePartToolGroup parts={parts} isRunning={isRunning} />
+    </Provider>
+  )
+
+  it('folds its rows behind a summary until expanded', async () => {
+    const { container } = customRender(toolGroup([reasoning(), tool], false))
+    expect(container.querySelectorAll('.tool-item')).toHaveLength(0)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Read up' }))
+
+    expect(container.querySelectorAll('.tool-item')).toHaveLength(2)
+    expect(screen.getByText('Reasoned')).toBeInTheDocument()
+  })
+
+  it('hides finished reasoning rows with nothing to expand', async () => {
+    const { container } = customRender(toolGroup([reasoning(''), tool], false))
+    await userEvent.click(screen.getByRole('button', { name: 'Read up' }))
+    expect(container.querySelectorAll('.tool-item')).toHaveLength(1)
+  })
+
+  it('holds each running header long enough to read', () => {
+    vi.useFakeTimers()
+    const { rerender } = customRender(toolGroup([streamingReasoning], true))
+    const trigger = screen.getByRole('button', { name: 'Thinking...' })
+
+    rerender(toolGroup([reasoning(), runningTool], true))
+    expect(trigger).toHaveAccessibleName('Thinking...')
+    act(() => vi.advanceTimersByTime(1000))
+    expect(trigger).toHaveAccessibleName('Reading up...')
+
+    // The call finished right away, but its label stays up before going back to thinking
+    rerender(toolGroup([reasoning(), tool], true))
+    expect(trigger).toHaveAccessibleName('Reading up...')
+    act(() => vi.advanceTimersByTime(1000))
+    expect(trigger).toHaveAccessibleName('Thinking...')
+
+    // The summary replaces the header as soon as the group stops
+    rerender(toolGroup([reasoning(), tool], false))
+    expect(trigger).toHaveAccessibleName('Read up')
+    expect(trigger.querySelector('.shimmer')).toBeNull()
+  })
+
+  it('shimmers every row still in progress', async () => {
+    const { container, rerender } = customRender(
+      toolGroup([reasoning(), runningTool, tool, runningTool], true)
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Reading up...' }))
+
+    const shimmeringRows = () =>
+      [...container.querySelectorAll('.tool-item')].map((row) => !!row.querySelector('.shimmer'))
+    expect(shimmeringRows()).toEqual([false, true, false, true])
+
+    rerender(toolGroup([reasoning(), tool, tool, tool, streamingReasoning], true))
+    expect(shimmeringRows()).toEqual([false, false, false, false, true])
   })
 })

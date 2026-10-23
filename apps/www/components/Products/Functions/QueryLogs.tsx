@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
-import { AnimatePresence, motion } from 'framer-motion'
 import { AlertCircle, Info } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { useInterval } from 'react-use'
 import { cn } from 'ui'
@@ -120,7 +120,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
         )}
         style={{
           background:
-            'linear-gradient(to bottom, hsl(var(--background-surface-75)) 0%, transparent 100%)',
+            'linear-gradient(to bottom, var(--background-surface-75) 0%, transparent 100%)',
         }}
       />
       <div

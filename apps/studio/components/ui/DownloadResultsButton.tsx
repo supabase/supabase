@@ -1,6 +1,6 @@
 import { IS_PLATFORM, useParams } from 'common'
 import saveAs from 'file-saver'
-import { ChevronDown, Copy, Download, Settings } from 'lucide-react'
+import { ChevronDownIcon, CopyIcon, DownloadIcon, SettingsIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useMemo } from 'react'
@@ -133,13 +133,13 @@ export const DownloadResultsButton = ({
             variant={variant}
             aria-label="Download results"
             aria-describedby={undefined}
-            icon={<Download />}
+            icon={<DownloadIcon />}
             disabled={results.length === 0}
             className="w-7"
             tooltip={{ content: { side: 'bottom', text: 'Download results' } }}
           />
         ) : (
-          <Button variant={variant} iconRight={<ChevronDown />} disabled={results.length === 0}>
+          <Button variant={variant} iconRight={<ChevronDownIcon />} disabled={results.length === 0}>
             {text}
           </Button>
         )}
@@ -148,13 +148,13 @@ export const DownloadResultsButton = ({
         {isLogs && IS_PLATFORM && (
           <DropdownMenuItem asChild className="gap-x-2">
             <Link href={`/project/${ref}/settings/log-drains`}>
-              <Settings size={14} />
+              <SettingsIcon size={14} />
               <p>Add a Log Drain</p>
             </Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={copyAsMarkdown} className="gap-x-2">
-          <Copy size={14} />
+          <CopyIcon size={14} />
           <p>Copy as Markdown</p>
           {enableCopyShortcuts && (
             <span className="ml-auto">
@@ -163,7 +163,7 @@ export const DownloadResultsButton = ({
           )}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyAsJSON} className="gap-x-2">
-          <Copy size={14} />
+          <CopyIcon size={14} />
           <p>Copy as JSON</p>
           {enableCopyShortcuts && (
             <span className="ml-auto">
@@ -172,7 +172,7 @@ export const DownloadResultsButton = ({
           )}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyAsCSV} className="gap-x-2">
-          <Copy size={14} />
+          <CopyIcon size={14} />
           <p>Copy as CSV</p>
           {enableCopyShortcuts && (
             <span className="ml-auto">
@@ -181,7 +181,7 @@ export const DownloadResultsButton = ({
           )}
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => downloadAsCSV()}>
-          <Download size={14} />
+          <DownloadIcon size={14} />
           <p>Download CSV</p>
           {enableCopyShortcuts && (
             <span className="ml-auto">

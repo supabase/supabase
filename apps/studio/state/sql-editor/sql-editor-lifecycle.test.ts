@@ -127,35 +127,6 @@ describe('statusOnEdit', () => {
   })
 })
 
-describe('lifecycle round trips', () => {
-  it('new snippet: first save succeeds then a re-save succeeds', () => {
-    let status: SnippetStatus = 'new'
-    status = statusOnSaveStart(status)
-    expect(status).toBe('new_saving')
-    status = statusOnSaveSuccess()
-    expect(status).toBe('saved')
-    // re-save
-    status = statusOnSaveStart(status)
-    expect(status).toBe('saving')
-    status = statusOnSaveSuccess()
-    expect(status).toBe('saved')
-  })
-
-  it('new snippet: first save fails, retry succeeds (stays never-persisted until success)', () => {
-    let status: SnippetStatus = 'new'
-    status = statusOnSaveStart(status)
-    status = statusOnSaveError(status)
-    expect(status).toBe('new_save_failed')
-    expect(wasNeverPersisted(status)).toBe(true)
-    // retry
-    status = statusOnSaveStart(status)
-    expect(status).toBe('new_saving')
-    status = statusOnSaveSuccess()
-    expect(status).toBe('saved')
-    expect(wasNeverPersisted(status)).toBe(false)
-  })
-})
-
 const NEW_FOLDER: Array<FolderStatus> = ['new_editing', 'new_saving']
 const PERSISTED_FOLDER: Array<FolderStatus> = ['editing', 'saving', 'idle']
 

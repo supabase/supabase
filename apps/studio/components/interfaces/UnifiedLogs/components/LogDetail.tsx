@@ -22,7 +22,7 @@ export function LogDetail({
   searchParameters,
 }: {
   row: ColumnSchema
-  tab: string
+  tab: 'overview' | 'raw-json'
   searchParameters: QuerySearchParamsType
 }) {
   const { ref: projectRef } = useParams()

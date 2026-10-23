@@ -1,0 +1,59 @@
+---
+title: AI Tools
+description: Page actions that copy the current page as Markdown or open it in an AI assistant.
+fragment: true
+---
+
+AI Tools renders a short list of page actions under an "AI tools" heading. Readers can copy the page as Markdown, or open ChatGPT or Claude with a prompt that points to the page URL. Two optional links connect readers to the AI agent setup guide and to Google's preferred sources setting.
+
+Docs guides, docs troubleshooting pages, and knowledge base guides use AI Tools in their sidebars.
+
+<ComponentPreview name="ai-tools-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { AiTools } from 'ui-patterns/AiTools'
+```
+
+```tsx
+<AiTools
+  pageUrl="https://supabase.com/docs/guides/getting-started"
+  markdownUrl="/docs/guides/getting-started.md"
+  markdownFallback={() => document.querySelector('article')?.innerHTML ?? ''}
+/>
+```
+
+Pass the canonical page URL as `pageUrl`. The Ask ChatGPT and Ask Claude links include it in their prompt, so it must be publicly reachable.
+
+Copy as Markdown fetches `markdownUrl`. If the response isn't OK, it copies the string that `markdownFallback` returns instead, such as the rendered article HTML.
+
+## Examples
+
+### Required props only
+
+Without `agentSetupHref` and `preferredSourceHref`, AI Tools renders Copy as Markdown, Ask ChatGPT, and Ask Claude.
+
+<ComponentPreview name="ai-tools-minimal" peekCode wide />
+
+## Analytics
+
+AI Tools doesn't send telemetry. Each surface passes callbacks and sends its own events from them. For example, the docs wrapper in `apps/docs/components/AiTools.tsx` sends `copy_as_markdown_clicked` from `onMarkdownCopy` and `ask_ai_clicked` from `onAskAiClick`.
+
+`onMarkdownCopy` fires only after the clipboard write succeeds.
+
+## Props
+
+| Prop                     | Type                                     | Default     | Description                                                                       |
+| ------------------------ | ---------------------------------------- | ----------- | --------------------------------------------------------------------------------- |
+| `pageUrl`                | `string`                                 | —           | Canonical URL of the page. Used in the Ask ChatGPT and Ask Claude prompts.        |
+| `markdownUrl`            | `string`                                 | —           | URL of the page's Markdown version. Copy as Markdown fetches it.                  |
+| `markdownFallback`       | `() => string`                           | `undefined` | Returns the text to copy when `markdownUrl` doesn't return an OK response.        |
+| `agentSetupHref`         | `string`                                 | `undefined` | Shows the Connect your AI agent link when set.                                    |
+| `preferredSourceHref`    | `string`                                 | `undefined` | Shows the Prefer on Google link when set.                                         |
+| `onAgentSetupClick`      | `() => void`                             | —           | Fires when the Connect your AI agent link is clicked.                             |
+| `onPreferredSourceClick` | `() => void`                             | —           | Fires when the Prefer on Google link is clicked.                                  |
+| `onMarkdownCopy`         | `() => void`                             | —           | Fires after the page is copied to the clipboard.                                  |
+| `onAskAiClick`           | `(agent: 'chatgpt' \| 'claude') => void` | —           | Fires when an Ask link is clicked, with the assistant it opens.                   |
+| `titleClassName`         | `string`                                 | —           | Extra classes on the "AI tools" heading. Use it to match the surrounding sidebar. |
+| `className`              | `string`                                 | —           | Extra classes on the root `section`.                                              |
