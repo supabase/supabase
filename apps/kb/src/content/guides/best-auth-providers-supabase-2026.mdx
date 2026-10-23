@@ -1,0 +1,64 @@
+---
+title: 'Best Authentication Providers to use with Supabase in 2026'
+description: 'Learn which authentication providers you can use with Supabase in 2026.'
+topics: ['Rundowns']
+date: 2026-10-18
+---
+
+Authentication is the part of an app that decides who a user is before any data is read or written. Supabase ships its own authentication service and it also accepts JWTs from several dedicated identity providers.
+
+## Supabase Auth
+
+[Supabase Auth](/docs/guides/auth) is the built-in authentication service for Supabase projects. It supports email and password sign-in, magic links, phone sign-in, OAuth providers, and more. Additionally, its tokens work directly with the Data API, Storage, and Row Level Security policies without an extra integration step.
+
+If you are starting a new Supabase project, Supabase Auth is the best fit.
+
+## Clerk
+
+Clerk is a user management platform for web and mobile apps. It provides prebuilt sign-in components, session management, and organization support for multi-tenant apps.
+
+You can use Clerk with Supabase as a third-party authentication provider alongside [Supabase Auth](/docs/guides/auth), or standalone, to access the [Data API (REST and GraphQL)](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime) and [Functions](/docs/guides/functions) from your existing apps.
+
+If you already have a production app using Clerk and want access to the rest of the Supabase platform, use the [Clerk integration with Supabase](/docs/guides/auth/third-party/clerk).
+
+## Firebase Auth
+
+Firebase Auth can be used as a third-party authentication provider alongside [Supabase Auth](/docs/guides/auth), or standalone, with your Supabase project.
+
+Firebase Auth is Google's identity service within the Firebase platform. It supports email and password, phone, and federated sign-in with social providers.
+
+If you already have a production app using Firebase and want access to the rest of the Supabase platform, start with the [Firebase Auth integration with Supabase](https://supabase.com/docs/guides/auth/third-party/firebase-auth).
+
+> [!NOTE]
+> If you want to migrate from Firebase Auth to Supabase Auth, refer to the [Firebase Auth migration guide](/kb/guides/migrate-from-firebase-auth).
+
+## Auth0
+
+Auth0 can be used as a third-party authentication provider alongside [Supabase Auth](https://supabase.com/docs/guides/auth), or standalone, with your Supabase project.
+
+Auth0, owned by Okta, is an identity platform for consumer and enterprise applications. It offers hosted login pages, social and enterprise connections, and multi-factor authentication, and it suits teams that want a configurable identity layer.
+
+If you already have a production app using Auth0 and want access to the rest of the Supabase platform, start with the [Auth0 integration with Supabase](https://supabase.com/docs/guides/auth/third-party/auth0).
+
+> [!NOTE]
+> If you want to migrate from Auth0 to Supabase Auth, refer to the [Auth0 migration guide](/kb/guides/migrate-from-auth0).
+
+## Amazon Cognito
+
+Amazon Cognito can be used as a third-party authentication provider alongside [Supabase Auth](https://supabase.com/docs/guides/auth), or standalone, with your Supabase project.
+
+Amazon Cognito is AWS's identity service. Its user pools handle sign-up and sign-in, and it works with AWS Amplify on the client. It fits teams whose infrastructure already runs on AWS.
+
+If you already have a production app using Amazon Cognito and want access to the rest of the Supabase platform, use the [Amazon Cognito integration with Supabase](https://supabase.com/docs/guides/auth/third-party/aws-cognito).
+
+## WorkOS
+
+WorkOS can be used as a third-party authentication provider alongside [Supabase Auth](https://supabase.com/docs/guides/auth), or standalone, with your Supabase project.
+
+WorkOS provides enterprise features for B2B software, including single sign-on, directory sync, and AuthKit for user authentication. It suits SaaS products that need to meet enterprise customers' identity requirements.
+
+If you already have a production app using WorkOS and want access to the rest of the Supabase platform, use the [WorkOS integration with Supabase](https://supabase.com/docs/guides/auth/third-party/workos).
+
+## Other providers
+
+You can also use Supabase as a [standalone Postgres database](https://supabase.com/database), entirely separate from the rest of the Supabase platform. In this case, you can set up your own authentication and authorization flows using any provider.
