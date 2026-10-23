@@ -5,11 +5,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import Subscription from './Subscription'
 import { render } from '@/tests/helpers'
 
-const { mockSubscription, mockSetPanelKey, mockSelectedOrganization } = vi.hoisted(() => ({
-  mockSubscription: vi.fn(),
-  mockSetPanelKey: vi.fn(),
-  mockSelectedOrganization: vi.fn(),
-}))
+const { mockSubscription, mockSetPanelKey, mockSelectedOrganization, mockPermissions } = vi.hoisted(
+  () => ({
+    mockSubscription: vi.fn(),
+    mockSetPanelKey: vi.fn(),
+    mockSelectedOrganization: vi.fn(),
+    mockPermissions: vi.fn(),
+  })
+)
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
@@ -26,7 +29,7 @@ vi.mock('@/data/subscriptions/org-subscription-query', () => ({
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
-  useAsyncCheckPermissionsV2: () => ({ can: true, isSuccess: true }),
+  useAsyncCheckPermissionsV2: () => mockPermissions(),
 }))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
@@ -56,6 +59,7 @@ vi.mock('./PlanUpdateSidePanel', () => ({
 describe('Subscription', () => {
   beforeEach(() => {
     mockSelectedOrganization.mockReturnValue({ managed_by: 'supabase' })
+    mockPermissions.mockReturnValue({ can: true, isSuccess: true })
     mockSubscription.mockReturnValue({
       data: {
         plan: { id: 'free', name: 'Free' },
@@ -154,6 +158,15 @@ describe('Subscription', () => {
 
     render(<Subscription />)
 
+    expect(screen.queryByRole('link', { name: /AWS Marketplace/ })).not.toBeInTheDocument()
+  })
+
+  it('hides the AWS Marketplace link when billing-read is denied even if subscription is cached', () => {
+    mockPermissions.mockReturnValue({ can: false, isSuccess: true })
+
+    render(<Subscription />)
+
+    expect(screen.getByText(/you need additional permissions/i)).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /AWS Marketplace/ })).not.toBeInTheDocument()
   })
 })
