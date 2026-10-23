@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { GitMerge } from 'lucide-react'
+import { GitMergeIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
@@ -73,9 +73,9 @@ export const MergeRequestButton = () => {
       icon={
         <div className="relative">
           {hasReviewRequested && (
-            <span className="w-1 h-1 absolute top-0 right-0 rounded-full bg-brand-default" />
+            <span className="w-1 h-1 absolute top-0 right-0 rounded-full bg-primary-bright" />
           )}
-          <GitMerge size={16} strokeWidth={1.5} />
+          <GitMergeIcon size={16} strokeWidth={1.5} />
         </div>
       }
     />

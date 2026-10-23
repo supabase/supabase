@@ -34,10 +34,10 @@ Prepare your destination, then enable and configure Pipelines in the Dashboard. 
 
 Follow your destination guide to prepare its resources and credentials, and check its source table requirements:
 
-- [BigQuery](/docs/guides/database/replication/bigquery)
-- [ClickHouse](/docs/guides/database/replication/clickhouse)
-- [DuckLake](/docs/guides/database/replication/ducklake)
-- [Snowflake](/docs/guides/database/replication/snowflake)
+- [BigQuery](/docs/guides/database/replication/pipelines/bigquery)
+- [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse)
+- [DuckLake](/docs/guides/database/replication/pipelines/ducklake)
+- [Snowflake](/docs/guides/database/replication/pipelines/snowflake)
 
 ### Step 2: Enable Pipelines
 
@@ -47,7 +47,7 @@ Pipelines installs an `etl` schema and a database event trigger to track replica
 
 </Admonition>
 
-1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
+1. Navigate to the [**Database > Pipelines**](/dashboard/project/_/database/pipelines) section of the Dashboard
 2. Click **Add pipeline** to show the replication side panel
 3. Select a destination available to your organization
 4. If Pipelines is not yet enabled, click **Enable Pipelines**, review the dialog, and confirm **Enable Pipelines**.
@@ -175,7 +175,7 @@ If the main replication slot is lost and **Recreate slot** is enabled, startup r
 
 ### Disabling Pipelines
 
-Delete all pipelines first. Then open the three-dot actions menu on the Replication page and click **Disable Pipelines**.
+Delete all pipelines first. Then open the three-dot actions menu on the Pipelines page and click **Disable Pipelines**.
 
 For cleanup details, see [What happens when you disable Pipelines?](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines).
 
@@ -331,7 +331,7 @@ Wait for initial sync to finish before changing its filter; changing a filter do
 
 ## Schema change support
 
-Pipelines applies supported changes to replicated columns as replication progresses. It does not mirror every Postgres DDL operation. Check the supported changes and destination behavior for [BigQuery](/docs/guides/database/replication/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/snowflake#schema-change-support) before altering replicated tables.
+Pipelines applies supported changes to replicated columns as replication progresses. It does not mirror every Postgres DDL operation. Check the supported changes and destination behavior for [BigQuery](/docs/guides/database/replication/pipelines/bigquery#schema-change-support), [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse#schema-change-support), [DuckLake](/docs/guides/database/replication/pipelines/ducklake#schema-change-support), or [Snowflake](/docs/guides/database/replication/pipelines/snowflake#schema-change-support) before altering replicated tables.
 
 Unsupported changes have different outcomes:
 

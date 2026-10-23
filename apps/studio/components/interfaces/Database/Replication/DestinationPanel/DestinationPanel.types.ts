@@ -5,6 +5,8 @@ export type DestinationType =
   | 'Snowflake'
   | 'ClickHouse'
 
+export type FlowDestination = Exclude<DestinationType, 'Analytics Bucket'>
+
 export type ExistingDestination = {
   sourceId?: number
   destinationId: number

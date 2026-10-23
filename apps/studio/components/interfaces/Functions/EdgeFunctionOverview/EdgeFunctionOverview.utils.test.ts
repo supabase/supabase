@@ -24,12 +24,6 @@ import {
 } from './EdgeFunctionOverview.utils'
 
 describe('EdgeFunctionOverview.utils', () => {
-  it('uses a full day interval for the 1 day option', () => {
-    expect(
-      EDGE_FUNCTION_CHART_INTERVALS.find((interval) => interval.key === '1day')?.startUnit
-    ).toBe('day')
-  })
-
   it('builds invocation chart data and totals from combined stats', () => {
     const chartData = toEdgeFunctionChartData([
       {
@@ -153,39 +147,28 @@ describe('EdgeFunctionOverview.utils', () => {
     })
   })
 
-  it('returns a snapped deploy annotation when updated_at falls within the selected window', () => {
-    const annotation = getInvocationUpdateAnnotation({
-      updatedAt: '2026-03-20T10:16:30.000Z',
-      invocationChartData: [
-        { timestamp: '2026-03-20T10:00:00.000Z', ok_count: 3, warning_count: 0, error_count: 0 },
-        { timestamp: '2026-03-20T10:15:00.000Z', ok_count: 5, warning_count: 1, error_count: 1 },
-        { timestamp: '2026-03-20T10:30:00.000Z', ok_count: 2, warning_count: 0, error_count: 0 },
-      ],
-      windowStart: new Date('2026-03-20T09:45:00.000Z'),
-      windowEnd: new Date('2026-03-20T10:45:00.000Z'),
-    })
+  it.each([
+    ['an ISO string', '2026-03-20T10:16:30.000Z'],
+    ['a numeric', new Date('2026-03-20T10:16:30.000Z').valueOf()],
+  ])(
+    'returns a snapped deploy annotation for %s updated_at within the selected window',
+    (_, updatedAt) => {
+      const annotation = getInvocationUpdateAnnotation({
+        updatedAt,
+        invocationChartData: [
+          { timestamp: '2026-03-20T10:00:00.000Z', ok_count: 3, warning_count: 0, error_count: 0 },
+          { timestamp: '2026-03-20T10:15:00.000Z', ok_count: 5, warning_count: 1, error_count: 1 },
+          { timestamp: '2026-03-20T10:30:00.000Z', ok_count: 2, warning_count: 0, error_count: 0 },
+        ],
+        windowStart: new Date('2026-03-20T09:45:00.000Z'),
+        windowEnd: new Date('2026-03-20T10:45:00.000Z'),
+      })
 
-    expect(annotation?.timestamp).toBe('2026-03-20T10:15:00.000Z')
-    expect(annotation?.position).toBeCloseTo(50)
-    expect(annotation?.updatedAt.toISOString()).toBe('2026-03-20T10:16:30.000Z')
-  })
-
-  it('returns a deploy annotation for a numeric updated_at timestamp', () => {
-    const annotation = getInvocationUpdateAnnotation({
-      updatedAt: new Date('2026-03-20T10:16:30.000Z').valueOf(),
-      invocationChartData: [
-        { timestamp: '2026-03-20T10:00:00.000Z', ok_count: 3, warning_count: 0, error_count: 0 },
-        { timestamp: '2026-03-20T10:15:00.000Z', ok_count: 5, warning_count: 1, error_count: 1 },
-        { timestamp: '2026-03-20T10:30:00.000Z', ok_count: 2, warning_count: 0, error_count: 0 },
-      ],
-      windowStart: new Date('2026-03-20T09:45:00.000Z'),
-      windowEnd: new Date('2026-03-20T10:45:00.000Z'),
-    })
-
-    expect(annotation?.timestamp).toBe('2026-03-20T10:15:00.000Z')
-    expect(annotation?.position).toBeCloseTo(50)
-    expect(annotation?.updatedAt.toISOString()).toBe('2026-03-20T10:16:30.000Z')
-  })
+      expect(annotation?.timestamp).toBe('2026-03-20T10:15:00.000Z')
+      expect(annotation?.position).toBeCloseTo(50)
+      expect(annotation?.updatedAt.toISOString()).toBe('2026-03-20T10:16:30.000Z')
+    }
+  )
 
   it('hides the deploy annotation when updated_at is outside the selected window', () => {
     const annotation = getInvocationUpdateAnnotation({

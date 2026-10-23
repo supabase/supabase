@@ -1,7 +1,7 @@
 import MotionNumber from '@number-flow/react'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Info } from 'lucide-react'
+import { InfoIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
 import { UseFormReturn, useWatch } from 'react-hook-form'
@@ -101,7 +101,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
         <div
           className={cn(
             'h-[35px] relative border rounded-xs w-full transition overflow-visible',
-            showNewSize ? 'bg-selection border border-brand-default' : 'bg-surface-300'
+            showNewSize ? 'bg-selection border border-primary-bright' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>
@@ -185,7 +185,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center cursor-help text-foreground-lighter hover:text-foreground transition-colors">
-                    <Info size={14} />
+                    <InfoIcon size={14} />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent

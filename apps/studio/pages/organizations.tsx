@@ -1,4 +1,4 @@
-import { Plus, Search } from 'lucide-react'
+import { PlusIcon, SearchIcon } from 'lucide-react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -57,14 +57,14 @@ const OrganizationsPage: NextPageWithLayout = () => {
               <Input
                 size="tiny"
                 placeholder="Search for an organization"
-                icon={<Search />}
+                icon={<SearchIcon />}
                 className="w-full flex-1 md:w-64"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
 
               {organizationCreationEnabled && (
-                <Button asChild icon={<Plus />} variant="primary" className="w-min">
+                <Button asChild icon={<PlusIcon />} variant="primary" className="w-min">
                   <Link href={`/new`}>New organization</Link>
                 </Button>
               )}

@@ -311,7 +311,7 @@ export const Grid = memo(
                         'flex flex-col items-center justify-center w-full h-full mt-9 transition',
                         isTableEmpty &&
                           isDraggedOver &&
-                          'border-2 border-dashed border-brand-default'
+                          'border-2 border-dashed border-primary-bright'
                       )}
                     >
                       <p className="text-sm text-light pointer-events-auto">This table is empty</p>

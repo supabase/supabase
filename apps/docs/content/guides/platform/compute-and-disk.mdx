@@ -31,7 +31,7 @@ In paid organizations, Nano Compute are billed at the same price as Micro Comput
 | 16XL         | <Price price="5.12" />    | ~<Price price="3" />,730                                                                                | Dedicated · 64 vCPUs | 256 GB       | 10 TB                         |
 | >16XL        | -                         | [Contact Us](/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes) | Custom               | Custom       | Custom                        |
 
-[^1]: Database max connections are recommended values and can be [customized via `max_connections`](/docs/guides/database/custom-postgres-config) depending on your use case. Be aware of [these considerations](/docs/guides/troubleshooting/how-to-change-max-database-connections-_BQ8P5) before modifying.
+[^1]: Database max connections are recommended values and can be [customized via `max_connections`](/docs/guides/database/custom-postgres-config) depending on your use case. Be aware of [these considerations](/kb/troubleshooting/how-to-change-max-database-connections-_BQ8P5) before modifying.
 
 [^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/deployment/shared-responsibility-model) for more information.
 
@@ -48,8 +48,8 @@ Compute sizes can be changed by first selecting your project in the dashboard [h
 
 className="max-w-[500px]"
 
-width={2122}
-height={1302}
+width={2026}
+height={1060}
 />
 
 We charge hourly for additional compute based on your usage. Read more about [usage-based billing for compute](/docs/guides/platform/manage-your-usage/compute).
@@ -98,7 +98,9 @@ Larger compute instances (4XL and above) are designed for sustained, high perfor
 
 ### Choosing the right compute instance for consistent disk performance
 
-If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](/dashboard/project/_/observability). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has exceeded the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget. Projects that use any disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
+If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure how much throughput or IOPS your application requires, load test your project and inspect **Disk IO balance** in [Observability](/dashboard/project/_/observability). The metric uses the lower remaining balance of throughput and IOPS. A value of 100% means the balance is full, and 0% means it is exhausted.
+
+Observability shows the average balance for the selected time window, so it can hide periods when the balance was exhausted. To see the lowest sampled balance over the last seven days and its chart, open [Infrastructure settings](/dashboard/project/_/settings/infrastructure). Projects that use disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
 
 ### Provisioned disk throughput and IOPS
 
@@ -166,5 +168,5 @@ As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/para
 
 ### Constraints
 
-- You can modify disk attributes up to **four times** within a rolling 24-hour window. A new modification can be initiated as soon as the previous one completes. If you reach this limit, you will encounter throttling and must wait for the rolling 24-hour window to permit further adjustments.
+- After **any** disk attribute change, there is a cooldown period of approximately four hours before you can make further adjustments. During this time, no changes are allowed. If you encounter throttling, you’ll need to wait until the cooldown period concludes before making additional modifications.
 - You can increase disk size but cannot decrease it.

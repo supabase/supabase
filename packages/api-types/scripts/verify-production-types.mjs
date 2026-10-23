@@ -5,6 +5,8 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 
+import { generateFgaRequirementsSource } from './fga-requirements.mjs'
+
 const run = promisify(execFile)
 const packageDirectory = dirname(dirname(fileURLToPath(import.meta.url)))
 const typesDirectory = process.env.API_TYPES_DIRECTORY ?? join(packageDirectory, 'types')
@@ -12,7 +14,9 @@ const platformApiUrl =
   process.env.PLATFORM_API_OPENAPI_URL ?? 'https://api.supabase.com/api/platform-json'
 const fetchTimeout = 30_000
 
-const specifications = [
+export const FGA_REQUIREMENTS_FILENAME = 'fga-requirements.ts'
+
+export const specifications = [
   { name: 'api-v1', url: 'https://api.supabase.com/api/v1-json' },
   { name: 'api-v2', url: 'https://api.supabase.com/api/v2-json' },
   { name: 'platform', url: platformApiUrl },
@@ -51,9 +55,9 @@ export async function findMismatchedTypes(
   specifications,
   { readFileImpl = readFile, generatedTypesDirectory, typesDirectory }
 ) {
+  const filenames = [...specifications.map(({ name }) => `${name}.d.ts`), FGA_REQUIREMENTS_FILENAME]
   const mismatches = await Promise.all(
-    specifications.map(async ({ name }) => {
-      const filename = `${name}.d.ts`
+    filenames.map(async (filename) => {
       const [generated, committed] = await Promise.all([
         readFileImpl(join(generatedTypesDirectory, filename), 'utf8'),
         readFileImpl(join(typesDirectory, filename), 'utf8'),
@@ -116,53 +120,85 @@ export async function reportTypeDifferences(
   if (summaryPath) await appendFile(summaryPath, `${summary.join('\n')}\n`)
 }
 
+// Fetches the given OpenAPI specifications and generates types for them into
+// `generatedTypesDirectory`, formatted with the repository's Prettier config. Shared by
+// `verifyProductionTypes` (which generates into a throwaway directory to diff against the
+// committed types) and `generate-production-types.mjs` (which generates directly into the
+// committed types directory).
+export async function generateTypes(
+  specifications,
+  {
+    temporaryDirectory,
+    generatedTypesDirectory,
+    runImpl = run,
+    fetchImpl,
+    writeFileImpl,
+    readFileImpl = readFile,
+  }
+) {
+  const config = await fetchOpenApiSpecifications(specifications, {
+    temporaryDirectory,
+    generatedTypesDirectory,
+    fetchImpl,
+    writeFileImpl,
+  })
+
+  const parsedSpecifications = await Promise.all(
+    specifications.map(async ({ name }) => ({
+      name,
+      spec: JSON.parse(await readFileImpl(join(temporaryDirectory, `${name}.json`), 'utf8')),
+    }))
+  )
+  await writeFile(
+    join(generatedTypesDirectory, FGA_REQUIREMENTS_FILENAME),
+    generateFgaRequirementsSource(parsedSpecifications)
+  )
+
+  await writeFile(join(temporaryDirectory, 'redocly.yaml'), `apis:\n${config.join('\n')}`)
+  await runImpl(
+    'pnpm',
+    [
+      'exec',
+      'openapi-typescript',
+      '--redocly',
+      join(temporaryDirectory, 'redocly.yaml'),
+      '--alphabetize',
+      '--default-non-nullable=false',
+    ],
+    { cwd: packageDirectory }
+  )
+
+  // Prettier resolves its config from the formatted file's location. The generated files live
+  // in a temporary directory outside the repository, so pass the repository config explicitly
+  // or they are formatted with Prettier's defaults and never match the committed files.
+  const { stdout: prettierConfigPath } = await runImpl(
+    'pnpm',
+    ['exec', 'prettier', '--find-config-path', join(packageDirectory, 'package.json')],
+    { cwd: packageDirectory }
+  )
+
+  await runImpl(
+    'pnpm',
+    [
+      'exec',
+      'prettier',
+      '--config',
+      prettierConfigPath.trim(),
+      '--write',
+      ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
+      join(generatedTypesDirectory, FGA_REQUIREMENTS_FILENAME),
+    ],
+    { cwd: packageDirectory }
+  )
+}
+
 export async function verifyProductionTypes() {
   const temporaryDirectory = await mkdtemp(join(tmpdir(), 'api-types-'))
   const generatedTypesDirectory = join(temporaryDirectory, 'types')
 
   try {
     await mkdir(generatedTypesDirectory)
-
-    const config = await fetchOpenApiSpecifications(specifications, {
-      temporaryDirectory,
-      generatedTypesDirectory,
-    })
-
-    await writeFile(join(temporaryDirectory, 'redocly.yaml'), `apis:\n${config.join('\n')}`)
-    await run(
-      'pnpm',
-      [
-        'exec',
-        'openapi-typescript',
-        '--redocly',
-        join(temporaryDirectory, 'redocly.yaml'),
-        '--alphabetize',
-        '--default-non-nullable=false',
-      ],
-      { cwd: packageDirectory }
-    )
-
-    // Prettier resolves its config from the formatted file's location. The generated files live
-    // in a temporary directory outside the repository, so pass the repository config explicitly
-    // or they are formatted with Prettier's defaults and never match the committed files.
-    const { stdout: prettierConfigPath } = await run(
-      'pnpm',
-      ['exec', 'prettier', '--find-config-path', join(packageDirectory, 'package.json')],
-      { cwd: packageDirectory }
-    )
-
-    await run(
-      'pnpm',
-      [
-        'exec',
-        'prettier',
-        '--config',
-        prettierConfigPath.trim(),
-        '--write',
-        ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
-      ],
-      { cwd: packageDirectory }
-    )
+    await generateTypes(specifications, { temporaryDirectory, generatedTypesDirectory })
 
     const changedTypes = await findMismatchedTypes(specifications, {
       generatedTypesDirectory,

@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRightIcon } from 'lucide-react'
 
 import { useIsAdvisorRulesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type {
@@ -51,7 +51,7 @@ export const generateAdvisorsMenu = ({
       key: 'query-performance',
       url: `/project/${ref}/observability/query-performance`,
       items: [],
-      rightIcon: <ArrowUpRight size={14} strokeWidth={1.5} className="h-4 w-4" />,
+      rightIcon: <ArrowUpRightIcon size={14} strokeWidth={1.5} className="h-4 w-4" />,
     },
   ]
 

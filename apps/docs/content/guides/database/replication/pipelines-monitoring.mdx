@@ -12,7 +12,7 @@ Use the Dashboard to check [replication progress](#viewing-detailed-pipeline-met
 
 ## Viewing pipeline status
 
-Open [**Database > Replication**](/dashboard/project/_/database/replication) to see each destination's pipeline status.
+Open [**Database > Pipelines**](/dashboard/project/_/database/pipelines) to see each destination's pipeline status.
 
 ### Pipeline states
 
@@ -56,17 +56,18 @@ Click a pipeline in the list to inspect its metrics and table states.
 
 ### Replication lag metrics
 
-These metrics come from Postgres replication slot state. The pipeline list also shows a byte-based lag value: **Caught up** means no gap between the confirmed flush position and current WAL position at measurement time. It does not guarantee that every table has finished initial sync or that data is visible to destination queries.
+These metrics come from Postgres replication slot state. **Lag** measures the gap between WAL flushed on a primary, or replayed on a standby, and the slot's confirmed flush position. It includes unrelated database activity and can trail the pipeline's local progress until Postgres receives feedback. WAL bytes do not measure destination payload size or elapsed delay.
 
-| Metric                      | Meaning                                                                                            | Investigate when                                               |
-| --------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| **Waiting to sync**         | WAL bytes between the confirmed flush position and current Postgres WAL position                   | The value keeps growing                                        |
-| **WAL retention remaining** | WAL that can accumulate before the slot risks becoming unusable, based on `max_slot_wal_keep_size` | The value is small or shrinking                                |
-| **Last check-in**           | Time since the last replication feedback to Postgres                                               | Feedback is old or missing                                     |
-| **Connected**               | Whether the replication slot is active                                                             | It says **Not connected** while the pipeline should be running |
-| **Slot status**             | Whether required WAL is still retained                                                             | The slot is **Unreserved** or **Lost**                         |
+**Caught up** means this gap is zero at measurement time. It does not guarantee that every table has finished initial sync or that data is visible to destination queries. Missing lag is shown as **Unavailable**.
 
-The Dashboard displays **Unlimited** when Postgres returns no `safe_wal_size`. That happens both with unlimited retention and with a **Lost** slot, so always check slot status. See [Postgres replication slot metrics](https://www.postgresql.org/docs/current/view-pg-replication-slots.html).
+| Metric                      | Meaning                                                                                            | Investigate when                       |
+| --------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| **Lag**                     | WAL bytes available for replication but not yet acknowledged on the main slot                      | The value keeps growing                |
+| **WAL retention remaining** | WAL that can accumulate before the slot risks becoming unusable, based on `max_slot_wal_keep_size` | The value is small or shrinking        |
+| **Last check-in**           | Source time minus the client's last feedback timestamp; clock skew can make this negative          | Feedback is old or missing             |
+| **Slot status**             | Whether required WAL is still retained                                                             | The slot is **Unreserved** or **Lost** |
+
+The Dashboard displays **Unavailable** when Postgres returns no `safe_wal_size`. This can mean unlimited retention or unavailable headroom, including a **Lost** slot. A negative value is shown as **Budget exceeded**. Check slot status alongside retention headroom. See [Postgres replication slot metrics](https://www.postgresql.org/docs/current/view-pg-replication-slots.html).
 
 Pipelines keeps sending feedback during slow writes and while WAL reading is paused. It repeats the last safe position without acknowledging unfinished writes. A recent check-in and an active connection can therefore coexist with growing lag.
 
@@ -106,8 +107,8 @@ Lag grows when Postgres produces WAL faster than Pipelines confirms progress. So
 
 ### Investigate the lag
 
-1. Open the pipeline and compare **Waiting to sync** with **WAL retention remaining** and **Slot status**.
-2. Check **Connected** and **Last check-in** for connection or feedback problems.
+1. Open the pipeline and compare **Lag** with **WAL retention remaining** and **Slot status**.
+2. Check **Last check-in** for connection or feedback problems.
 3. Check table states for initial sync or table errors.
 4. Open [replication logs](#viewing-logs) and look for destination errors, rate limits, retries, or repeated restarts.
 5. Compare the lag trend with source activity, such as bulk imports, large transactions, or long-running writes.
@@ -117,6 +118,8 @@ Common causes include a slow destination, source or pipeline resource limits, ne
 ### Initial sync and table-sync slots
 
 Pipelines uses one main slot plus up to one temporary slot per active table-sync worker. These slots retain changes made while rows are copied. After copying and catch-up finish, the temporary slot is removed and the table continues through the main slot.
+
+During copying, the table's **WAL backlog** grows from its snapshot boundary. Copying more rows does not advance this WAL position. After copying finishes, the table-sync worker applies accumulated changes and acknowledges progress. The table state distinguishes copying from this catch-up phase; the main slot's lag covers ongoing replication separately.
 
 If a table-sync slot is lost, that table must repeat its initial sync. Automatic retries can recover individual tables; a manual [table restart](#restarting-tables) temporarily stops the whole pipeline.
 
@@ -163,7 +166,7 @@ When you restart table replication:
 
 The pipeline stops temporarily to apply the table restart. The Dashboard restarts it automatically, or starts it if it was stopped. Replication for other tables is paused during this process, and their unfinished initial syncs can restart from scratch.
 
-Before restarting, use **Edit pipeline** to check the **Initial sync** selection. Include any affected tables whose existing source rows you need to copy again, then apply your changes. Open the pipeline from the list on **Database > Replication**.
+Before restarting, use **Edit pipeline** to check the **Initial sync** selection. Include any affected tables whose existing source rows you need to copy again, then apply your changes. Open the pipeline from the list on **Database > Pipelines**.
 
 ### Restart a single table
 

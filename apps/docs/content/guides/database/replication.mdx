@@ -34,14 +34,12 @@ See [Set up manual replication](/docs/guides/database/replication/manual-replica
 
 ## Supported destinations
 
-| Destination                                                | Status        |
-| ---------------------------------------------------------- | ------------- |
-| [BigQuery](/docs/guides/database/replication/bigquery)     | Public alpha  |
-| [ClickHouse](/docs/guides/database/replication/clickhouse) | Private alpha |
-| [DuckLake](/docs/guides/database/replication/ducklake)     | Private alpha |
-| [Snowflake](/docs/guides/database/replication/snowflake)   | Private alpha |
-
-[Request access](/go/supabase-pipelines-new-destinations) to destinations in private alpha.
+| Destination                                                          | Status       |
+| -------------------------------------------------------------------- | ------------ |
+| [BigQuery](/docs/guides/database/replication/pipelines/bigquery)     | Public alpha |
+| [ClickHouse](/docs/guides/database/replication/pipelines/clickhouse) | Public alpha |
+| [DuckLake](/docs/guides/database/replication/pipelines/ducklake)     | Public alpha |
+| [Snowflake](/docs/guides/database/replication/pipelines/snowflake)   | Public alpha |
 
 ## Use cases
 
@@ -55,7 +53,7 @@ You might use database replication for:
 
 For realtime features and syncing data to browsers and mobile apps, see [Realtime](/docs/guides/realtime).
 
-Realtime also uses Postgres changes, but it is intended for broadcasting database updates to clients rather than maintaining a copy of your database in another system.
+Realtime also uses [Postgres changes](/docs/guides/realtime/postgres-changes), but it is intended for broadcasting database updates to clients rather than maintaining a copy of your database in another system.
 
 ## Concepts and terms
 

@@ -32,6 +32,9 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
     dangerouslyAllowSVG: false,
+    // Some guides add `?v=N` to local image paths for cache busting, which Next.js rejects unless
+    // `localPatterns` allows it. Omitting `search` allows any query string.
+    localPatterns: [{ pathname: '/**' }],
     // @ts-ignore
     remotePatterns,
   },
@@ -53,6 +56,7 @@ const nextConfig = {
     'ui',
     'ui-patterns',
     'common',
+    'docs-search',
     'dayjs',
     'shared-data',
     'api-types',
@@ -168,6 +172,26 @@ const nextConfig = {
 
       // Redirect old managed pipeline slugs in dev/preview envs
       {
+        source: '/guides/database/replication/bigquery',
+        destination: '/guides/database/replication/pipelines/bigquery',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/clickhouse',
+        destination: '/guides/database/replication/pipelines/clickhouse',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/ducklake',
+        destination: '/guides/database/replication/pipelines/ducklake',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/snowflake',
+        destination: '/guides/database/replication/pipelines/snowflake',
+        permanent: true,
+      },
+      {
         source: '/guides/database/replication/external-replication-setup',
         destination: '/guides/database/replication/pipelines',
         permanent: true,
@@ -215,10 +239,6 @@ const nextConfig = {
     // prod
     ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
   },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
-  },
 }
 
 const configExport = () => {
@@ -233,8 +253,12 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'docs',
-  unstable_sentryWebpackPluginOptions: {
-    applicationKey: 'supabase-docs',
+  applicationKey: 'supabase-docs',
+  webpack: {
+    treeshake: {
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      removeDebugLogging: true,
+    },
   },
 
   // Only print logs for uploading source maps in CI
@@ -251,9 +275,6 @@ export default withSentryConfig(configExport, {
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
   // tunnelRoute: "/monitoring",
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
 })
 
 function getAssetPrefix() {

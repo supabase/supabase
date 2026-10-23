@@ -1,4 +1,4 @@
-import { Copy } from 'lucide-react'
+import { CopyIcon } from 'lucide-react'
 import { cn } from 'ui'
 
 import { PANEL_PADDING } from './Users.constants'
@@ -21,7 +21,7 @@ export const UserHeader = ({ user }: { user: User }) => {
           <CopyButton
             iconOnly
             variant="text"
-            icon={<Copy />}
+            icon={<CopyIcon />}
             className="px-1"
             text={user?.phone ?? ''}
           />
@@ -34,7 +34,7 @@ export const UserHeader = ({ user }: { user: User }) => {
             <CopyButton
               iconOnly
               variant="text"
-              icon={<Copy />}
+              icon={<CopyIcon />}
               className="px-1"
               text={user?.id ?? ''}
             />
@@ -50,7 +50,7 @@ export const UserHeader = ({ user }: { user: User }) => {
             <CopyButton
               iconOnly
               variant="text"
-              icon={<Copy />}
+              icon={<CopyIcon />}
               className="px-1"
               text={user?.email ?? ''}
             />

@@ -8,7 +8,7 @@ import { getMcpTools } from './mcp-tools'
 import { getNotebookTools } from './notebook-tools'
 import { getReportTools } from './report-tools'
 import { getSchemaTools } from './schema-tools'
-import { getStudioTools } from './studio-tools'
+import { getOptInTools, getStudioTools } from './studio-tools'
 import { getSupportLifecycleTools } from './support-tools'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
@@ -39,7 +39,11 @@ export const getTools = async ({
   signal: AbortSignal
 }) => {
   // Always include studio tools
-  let tools: ToolSet = getStudioTools({ projectRef, connectionString, authorization, aiOptInLevel })
+  let tools: ToolSet = {
+    ...getStudioTools({ projectRef, connectionString, authorization, aiOptInLevel }),
+    // Opt-in levels only apply on platform
+    ...(IS_PLATFORM ? getOptInTools({ aiOptInLevel }) : {}),
+  }
 
   // If self-hosted, only add fallback tools
   if (!IS_PLATFORM) {
@@ -49,6 +53,7 @@ export const getTools = async ({
         projectRef,
         connectionString,
         authorization,
+        aiOptInLevel,
         includeSchemaMetadata: aiOptInLevel !== 'disabled',
       }),
     }
@@ -75,8 +80,10 @@ export const getTools = async ({
       ...getSchemaTools({
         projectRef,
         connectionString,
+        authorization,
+        aiOptInLevel,
       }),
-      ...getReportTools({ projectRef, authorization }),
+      ...getReportTools({ projectRef, authorization, aiOptInLevel }),
       ...(isExplorerEnabled
         ? getNotebookTools({
             projectRef,
@@ -85,12 +92,14 @@ export const getTools = async ({
             aiOptInLevel,
           })
         : {}),
-      ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
+      ...(baseUrl ? getIncidentTools({ baseUrl, aiOptInLevel }) : {}),
     }
   }
 
   // Filter all tools based on the (potentially modified) AI opt-in level
-  const toolsWithSupport = supportMode ? { ...tools, ...getSupportLifecycleTools() } : tools
+  const toolsWithSupport = supportMode
+    ? { ...tools, ...getSupportLifecycleTools({ aiOptInLevel }) }
+    : tools
   const filteredTools: ToolSet = filterToolsByOptInLevel(toolsWithSupport, aiOptInLevel)
 
   return filteredTools

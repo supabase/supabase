@@ -1,4 +1,4 @@
-import { Lightbulb } from 'lucide-react'
+import { LightbulbIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -65,7 +65,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
           },
         }}
       >
-        <Lightbulb
+        <LightbulbIcon
           size={16}
           strokeWidth={1.5}
           className={cn(
@@ -86,7 +86,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
       ) : hasWarningIssues ? (
         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-warning" />
       ) : hasUnreadNotifications ? (
-        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand-default" />
+        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary-bright" />
       ) : null}
     </div>
   )

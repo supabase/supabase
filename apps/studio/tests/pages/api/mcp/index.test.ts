@@ -32,7 +32,7 @@ describe('/api/mcp', () => {
   })
 
   describe('Method handling', async () => {
-    it('should handle POST requests', async () => {
+    it('should handle POST requests without a features parameter', async () => {
       const { req, res } = createMocks({
         method: 'POST',
         query: {},
@@ -42,6 +42,7 @@ describe('/api/mcp', () => {
       await handler(req, res)
 
       expect(res._getStatusCode()).not.toBe(405)
+      expect(res._getStatusCode()).not.toBe(400)
     })
 
     it('should return 405 for non-POST methods', async () => {
@@ -83,18 +84,6 @@ describe('/api/mcp', () => {
 
       expect(res._getStatusCode()).toBe(400)
       expect(JSON.parse(res._getData())).toHaveProperty('error')
-    })
-
-    it('should work without features parameter', async () => {
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: {},
-        body: {},
-      })
-
-      await handler(req, res)
-
-      expect(res._getStatusCode()).not.toBe(400)
     })
   })
 })

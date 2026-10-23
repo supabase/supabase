@@ -6,6 +6,7 @@
   "types": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./forms": "./src/forms/index.ts",
     "./crm": "./src/crm/index.ts"
   },
   "scripts": {
@@ -17,7 +18,7 @@
     "react": "catalog:",
     "react-markdown": "^10.1.0",
     "server-only": "^0.0.1",
-    "shiki": "^4.0.1",
+    "shiki": "catalog:",
     "ui": "workspace:*",
     "zod": "catalog:"
   },

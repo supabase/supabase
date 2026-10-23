@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM, useParams } from 'common'
-import { Check, Code, Plus } from 'lucide-react'
+import { CheckIcon, CodeIcon, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -233,7 +233,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                       size="small"
                       className="pr-2 justify-between"
                       iconRight={
-                        <Code
+                        <CodeIcon
                           className="text-foreground-light rotate-90"
                           strokeWidth={2}
                           size={12}
@@ -272,7 +272,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                                   snippets[0].folder_id === null &&
                                   ` (Current)`}
                               </span>
-                              {selectedId === 'root' && <Check size={14} />}
+                              {selectedId === 'root' && <CheckIcon size={14} />}
                             </CommandItem>
                             {folders?.map((folder) => (
                               <CommandItem
@@ -294,7 +294,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                                     snippets[0].folder_id === folder.id &&
                                     ` (Current)`}
                                 </span>
-                                {folder.id === selectedId && <Check size={14} />}
+                                {folder.id === selectedId && <CheckIcon size={14} />}
                               </CommandItem>
                             ))}
                           </ScrollArea>
@@ -312,7 +312,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                               setSelectedId('new-folder')
                             }}
                           >
-                            <Plus size={14} strokeWidth={1.5} />
+                            <PlusIcon size={14} strokeWidth={1.5} />
                             <p>New folder</p>
                           </CommandItem>
                         </CommandGroup>

@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -38,7 +38,7 @@ export const AccessTokenNewBanner = <T,>({
             <Button
               variant="text"
               aria-label="Close token banner"
-              icon={<X />}
+              icon={<XIcon />}
               className="w-7 h-7 absolute top-2.5 right-2.5"
               onClick={onClose}
             />

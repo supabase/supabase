@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Plus, X } from 'lucide-react'
+import { PlusIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Control, SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -178,7 +178,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                             {namespaces.length > 0 && <SelectSeparator />}
                             <SelectItem value={NEW_NAMESPACE_MARKER}>
                               <div className="flex items-center gap-x-2">
-                                <Plus size={14} />
+                                <PlusIcon size={14} />
                                 <p>Create a new namespace</p>
                               </div>
                             </SelectItem>
@@ -223,7 +223,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                     <div className="flex items-center justify-between">
                       <p className="text-sm">Columns</p>
                       <Button
-                        icon={<Plus />}
+                        icon={<PlusIcon />}
                         onClick={() => appendColumn({ name: '', type: 'string' })}
                       >
                         Add column
@@ -330,7 +330,7 @@ const ColumnRow = ({ control, idx, isCreating, onRemove }: ColumnRowProps) => {
           aria-label="Remove"
           variant="text"
           size="tiny"
-          icon={<X strokeWidth={1.5} size={14} />}
+          icon={<XIcon strokeWidth={1.5} size={14} />}
           className="w-6 h-6"
           onClick={onRemove}
         />
