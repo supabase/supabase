@@ -1,6 +1,6 @@
 /**
- * Bakes the drifting, ordered-dither texture of `DitheredSkeleton` into two tiny looping GIFs
- * that `DitheredSkeletonGif` uses as masks: a sparse resting layer and a dense highlight layer.
+ * Bakes a drifting, dithered grain texture into two tiny looping GIFs that `DitheredSkeletonGif`
+ * and `.shimmering-loader` use as masks: a sparse resting layer and a denser highlight layer.
  *
  * Run with: pnpm tsx packages/ui/src/components/DitheredSkeleton/scripts/generate-dither-gifs.mts
  */
@@ -9,20 +9,23 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { format, resolveConfig } from 'prettier'
 
-import { BAYER_8, hash } from '../dither'
+import { hash } from '../dither'
 
-// One GIF pixel is one dither cell, the component scales it up with `image-rendering: pixelated`.
-const TILE = 64
-const FRAMES = 60
-// GIF delays are in hundredths of a second: 60 frames at 8cs is a 4.8s seamless loop at 12.5fps.
-const DELAY_CS = 8
+// One GIF pixel is one grain cell: one CSS pixel by default, scaled with `image-rendering: pixelated`.
+const TILE = 96
+const FRAMES = 40
+// GIF delays are in hundredths of a second: 40 frames at 12cs is a 4.8s seamless loop at ~8fps.
+const DELAY_CS = 12
 // Over one loop each octave drifts by a whole number of tiles, so the animation wraps seamlessly.
-const COARSE = { cells: 11, shift: [1, -1] }
-const FINE = { cells: 3.5, shift: [-1, 1] }
+const COARSE = { cells: 22, shift: [1, -1] }
+const FINE = { cells: 7, shift: [-1, 1] }
+// Share of cells lit at rest: a floor plus a slow mottling from the drifting noise.
+const RESTING_FLOOR = 0.05
+const RESTING_RANGE = 0.04
 const HIGHLIGHT_BAND = 0.75
 // The opacity pulse is baked in as a density pulse: two breaths per loop, so no CSS animation is needed.
 const PULSES_PER_LOOP = 2
-const PULSE_DEPTH = 0.3
+const PULSE_DEPTH = 0.2
 
 const OUTPUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'dither-gifs.ts')
 // The CSS-only `.shimmering-loader` in ui-patterns uses the base layer through a global variable.
@@ -52,7 +55,73 @@ function tileableNoise(cells: number) {
   }
 }
 
+// A tileable blue-noise threshold map, built with Ulichney's void-and-cluster method. At any
+// density it spreads lit cells evenly with no clumps, so the texture reads as fine, uniform grain
+// and the tile repeats invisibly, where white noise clumps and an ordered matrix shows a lattice.
+function blueNoiseThresholds(sigma = 1.5) {
+  const size = TILE * TILE
+  const kernel = new Float64Array(size)
+  for (let y = 0; y < TILE; y++) {
+    for (let x = 0; x < TILE; x++) {
+      const dx = Math.min(x, TILE - x)
+      const dy = Math.min(y, TILE - y)
+      kernel[y * TILE + x] = Math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma))
+    }
+  }
+  const energy = new Float64Array(size)
+  const bits = new Uint8Array(size)
+  const toggle = (index: number, on: boolean) => {
+    bits[index] = on ? 1 : 0
+    const ix = index % TILE
+    const iy = (index - ix) / TILE
+    const sign = on ? 1 : -1
+    for (let y = 0; y < TILE; y++) {
+      const row = ((y - iy + TILE) % TILE) * TILE
+      for (let x = 0; x < TILE; x++)
+        energy[y * TILE + x] += sign * kernel[row + ((x - ix + TILE) % TILE)]
+    }
+  }
+  // Tightest cluster among lit cells, or largest void among unlit ones.
+  const extreme = (lit: number, pickMax: boolean) => {
+    let best = -1
+    for (let i = 0; i < size; i++) {
+      if (bits[i] !== lit) continue
+      if (best === -1 || (pickMax ? energy[i] > energy[best] : energy[i] < energy[best])) best = i
+    }
+    return best
+  }
+
+  // Seed about 10% of cells deterministically, then relax into an even pattern.
+  for (let i = 0; i < size; i++) if (hash(i, 7919) < 0.1) toggle(i, true)
+  for (;;) {
+    const cluster = extreme(1, true)
+    toggle(cluster, false)
+    const gap = extreme(0, false)
+    toggle(gap, true)
+    if (gap === cluster) break
+  }
+
+  const ranks = new Float32Array(size)
+  const seedBits = bits.slice()
+  const seedEnergy = energy.slice()
+  let lit = seedBits.reduce((count, bit) => count + bit, 0)
+  for (let rank = lit - 1; rank >= 0; rank--) {
+    const cluster = extreme(1, true)
+    toggle(cluster, false)
+    ranks[cluster] = rank
+  }
+  bits.set(seedBits)
+  energy.set(seedEnergy)
+  for (; lit < size; lit++) {
+    const gap = extreme(0, false)
+    toggle(gap, true)
+    ranks[gap] = lit
+  }
+  return ranks.map((rank) => (rank + 0.5) / size)
+}
+
 function renderFrames() {
+  const thresholds = blueNoiseThresholds()
   const coarse = tileableNoise(COARSE.cells)
   const fine = tileableNoise(FINE.cells)
   const base: Uint8Array[] = []
@@ -69,8 +138,8 @@ function renderFrames() {
           coarse(x + COARSE.shift[0] * TILE * progress, y + COARSE.shift[1] * TILE * progress) *
             0.65 +
           fine(x + FINE.shift[0] * TILE * progress, y + FINE.shift[1] * TILE * progress) * 0.35
-        const threshold = BAYER_8[(y & 7) * 8 + (x & 7)]
-        const resting = 0.05 + grain * 0.14
+        const threshold = thresholds[y * TILE + x]
+        const resting = RESTING_FLOOR + grain * RESTING_RANGE
         const index = y * TILE + x
         baseFrame[index] = resting * pulse > threshold ? 1 : 0
         highlightFrame[index] =
@@ -206,7 +275,7 @@ if (process.argv.includes('--out')) {
 }
 
 const source = `// Generated by scripts/generate-dither-gifs.mts. Do not edit by hand.
-// ${TILE}x${TILE} cells, ${FRAMES} frames at ${100 / DELAY_CS}fps, ${baseGif.length + highlightGif.length} bytes total.
+// ${TILE}x${TILE} cells, ${FRAMES} frames at ${(100 / DELAY_CS).toFixed(1)}fps, ${baseGif.length + highlightGif.length} bytes total.
 
 export const DITHER_GIF_TILE = ${TILE}
 export const DITHER_BASE_GIF = 'data:image/gif;base64,${baseGif.toString('base64')}'
@@ -218,6 +287,7 @@ writeFileSync(OUTPUT, await format(source, { ...(await resolveConfig(OUTPUT)), f
 
 const css = `/* Generated by packages/ui/src/components/DitheredSkeleton/scripts/generate-dither-gifs.mts. Do not edit by hand. */
 :root {
+  --dithered-skeleton-tile-size: ${TILE}px;
   --dithered-skeleton-base: url(data:image/gif;base64,${baseGif.toString('base64')});
 }
 

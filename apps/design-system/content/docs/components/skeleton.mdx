@@ -118,7 +118,7 @@ import { DitheredSkeletonLite } from 'ui'
 
 ## Experimental: GIF
 
-`DitheredSkeletonGif` brings back the drifting texture without any per-frame JavaScript. The canvas version's noise is pre-rendered into two tiny looping GIFs (64×64 cells, 60 frames at 12.5 fps, about 21KB together), and used as luminance masks over the theme color:
+`DitheredSkeletonGif` brings back the drifting texture without any per-frame JavaScript. The canvas version's drifting noise is pre-rendered as fine film grain into two tiny looping GIFs (96×96 one-pixel cells, 40 frames at about 8 fps, about 26KB together), and used as luminance masks over the theme color. Cells are lit against a blue-noise threshold map rather than an ordered-dither matrix, so the grains stay evenly spread with no clumps or visible lattice, and the tile repeats invisibly:
 
 - **Base:** the sparse resting texture, always visible. Its dither density breathes twice per loop, which gives the opacity pulse for free.
 - **Highlight:** a denser version of the same drifting texture, revealed only under the shine.

@@ -105,7 +105,7 @@ export interface DitheredSkeletonGifProps extends HTMLAttributes<HTMLDivElement>
  */
 export function DitheredSkeletonGif({
   className,
-  pixelSize = 2,
+  pixelSize = 1,
   shine = true,
   style,
   ...props
@@ -176,7 +176,7 @@ export function DitheredSkeletonGif({
       {...props}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 text-foreground-lighter">
-        <div className="dithered-skeleton-gif-layer dithered-skeleton-gif-base absolute inset-0 bg-current opacity-30" />
+        <div className="dithered-skeleton-gif-layer dithered-skeleton-gif-base absolute inset-0 bg-current opacity-25" />
         {shine && (
           <div className="dithered-skeleton-gif-layer dithered-skeleton-gif-highlight absolute inset-0 opacity-50">
             <div
