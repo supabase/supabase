@@ -19,7 +19,7 @@ const options = vi.hoisted(() => ({
   tanStack: false,
   navigate: vi.fn(),
   push: vi.fn(),
-  legacy: false,
+  bigQueryEnabled: true,
   hasAccess: true,
   isLoading: false,
   failEnable: false,
@@ -48,8 +48,7 @@ vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () =
   }),
 }))
 vi.mock('./useIsETLPrivateAlpha', () => ({
-  useIsETLBigQueryPrivateAlpha: () => !options.legacy,
-  useIsETLIcebergPrivateAlpha: () => options.legacy,
+  useIsETLBigQueryPrivateAlpha: () => options.bigQueryEnabled,
   useIsETLDucklakePrivateAlpha: () => false,
   useIsETLSnowflakePrivateAlpha: () => false,
   useIsETLClickHousePrivateAlpha: () => false,
@@ -74,7 +73,7 @@ beforeEach(() => {
   options.push.mockClear()
   isEnabled = false
   enableGate = undefined
-  options.legacy = false
+  options.bigQueryEnabled = true
   options.hasAccess = true
   options.isLoading = false
   options.failRefresh = false
@@ -216,8 +215,8 @@ test('dismissal during enablement prevents a late response opening creation', as
   expect(await screen.findByRole('menuitem', { name: 'Disable Pipelines' })).toBeInTheDocument()
   expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
 })
-test('creation defaults to BigQuery regardless of legacy destination flags', async () => {
-  options.legacy = true
+test('creation defaults to BigQuery when destination flags are disabled', async () => {
+  options.bigQueryEnabled = false
   isEnabled = true
   await renderList()
   addPipeline()
@@ -330,7 +329,7 @@ test.each(['previewLoading', 'flagsLoaded'] as const)(
 
 test('keeps request-access creation in the sheet when no wizard destination is available', async () => {
   options.wizard = true
-  options.legacy = true
+  options.bigQueryEnabled = false
   isEnabled = true
   await renderList()
   addPipeline()

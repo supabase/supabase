@@ -1,4 +1,4 @@
-import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
+import { BigQuery, ClickHouse, Database } from 'icons'
 import { SnowflakeIcon } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
 
@@ -8,7 +8,6 @@ type DestinationIconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?:
 
 const destinationIconByType: Record<DestinationType, DestinationIconComponent> = {
   BigQuery,
-  'Analytics Bucket': AnalyticsBucket,
   DuckLake: Database,
   Snowflake: SnowflakeIcon,
   ClickHouse,

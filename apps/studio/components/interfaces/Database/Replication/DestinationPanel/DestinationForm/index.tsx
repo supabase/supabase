@@ -19,13 +19,10 @@ import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '../../useIsETLPrivateAlpha'
 import { type DestinationType, type ExistingDestination } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
-import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
-import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
 import {
   BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
   getBigQueryValidationIssues,
@@ -59,15 +56,11 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const formId = 'destination-editor'
 
@@ -93,20 +86,12 @@ export const DestinationForm = ({
   const { ref: projectRef } = useParams()
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    // api keys reveal = true will require this perms
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
-  ])
-
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
-  const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
@@ -121,19 +106,11 @@ export const DestinationForm = ({
   const availableDestinations = useMemo(() => {
     const destinations = []
     if (etlEnableBigQuery) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
-    if (etlEnableIceberg)
-      destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
     if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
     if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
     if (etlEnableClickHouse) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
     return destinations
-  }, [
-    etlEnableBigQuery,
-    etlEnableDucklake,
-    etlEnableIceberg,
-    etlEnableSnowflake,
-    etlEnableClickHouse,
-  ])
+  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableSnowflake, etlEnableClickHouse])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const sourceId = useReplicationSourceId({ projectRef })
@@ -161,18 +138,6 @@ export const DestinationForm = ({
   const isErrorExistingConfig = editMode && (isErrorDestination || isErrorPipeline)
   const isExistingConfigReady = !editMode || (isSuccessDestination && isSuccessPipeline)
 
-  // Revealed API keys are only ever consumed as the default catalog token for
-  // Analytics Bucket (Iceberg) destinations, so don't fetch them for other
-  // destination types.
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys && selectedType === 'Analytics Bucket' && !editMode }
-  )
-  const { serviceKey } = apiKeysData ?? {}
-  const catalogToken = serviceKey?.api_key ?? ''
-
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
-
   const {
     isValidating,
     validateConfiguration,
@@ -189,11 +154,9 @@ export const DestinationForm = ({
       generateDefaultValues({
         destinationData,
         pipelineData,
-        catalogToken,
-        region: projectSettings?.region,
         editMode,
       }),
-    [destinationData, pipelineData, catalogToken, projectSettings, editMode]
+    [destinationData, pipelineData, editMode]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -220,13 +183,6 @@ export const DestinationForm = ({
           getBigQueryValidationIssues(data, {
             secretsOptional: editMode,
             validateJson: false,
-          }).forEach(({ path, message }) => {
-            addRequiredFieldError(path, message)
-          })
-        } else if (selectedType === 'Analytics Bucket') {
-          getAnalyticsBucketValidationIssues(data, {
-            secretsOptional: editMode,
-            storedS3AccessKeyId: editMode ? defaultValues.s3AccessKeyId : undefined,
           }).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
@@ -468,13 +424,6 @@ export const DestinationForm = ({
       {selectedType === 'BigQuery' && etlEnableBigQuery && (
         <BigQueryFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
-        <AnalyticsBucketFields
-          form={form}
-          editMode={editMode}
-          onSelectNewBucket={() => setNewBucketSheetVisible(true)}
-        />
-      )}
       {selectedType === 'DuckLake' && etlEnableDucklake && (
         <DuckLakeFields form={form} editMode={editMode} />
       )}
@@ -640,11 +589,6 @@ export const DestinationForm = ({
           }
           setPublicationPanelVisible(false)
         }}
-      />
-
-      <CreateAnalyticsBucketSheet
-        open={newBucketSheetVisible}
-        onOpenChange={setNewBucketSheetVisible}
       />
 
       <ValidationWarningsDialog
