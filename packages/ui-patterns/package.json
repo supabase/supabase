@@ -159,6 +159,10 @@
       "import": "./src/CommandMenu/api/TextHighlighter.tsx",
       "types": "./src/CommandMenu/api/TextHighlighter.tsx"
     },
+    "./CommandMenu/api/commandScore": {
+      "import": "./src/CommandMenu/api/commandScore.ts",
+      "types": "./src/CommandMenu/api/commandScore.ts"
+    },
     "./CommandMenu/api/hooks/commandsHooks": {
       "import": "./src/CommandMenu/api/hooks/commandsHooks.ts",
       "types": "./src/CommandMenu/api/hooks/commandsHooks.ts"
@@ -194,6 +198,10 @@
     "./CommandMenu/api/hooks/viewHooks": {
       "import": "./src/CommandMenu/api/hooks/viewHooks.ts",
       "types": "./src/CommandMenu/api/hooks/viewHooks.ts"
+    },
+    "./CommandMenu/api/sortSectionsByRelevance": {
+      "import": "./src/CommandMenu/api/sortSectionsByRelevance.ts",
+      "types": "./src/CommandMenu/api/sortSectionsByRelevance.ts"
     },
     "./CommandMenu/api/types": {
       "import": "./src/CommandMenu/api/types.ts",
