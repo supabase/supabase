@@ -6,6 +6,8 @@ breadcrumb: 'Framework Quickstarts'
 
 <AiPrompt id="reflex" />
 
+Build a Python web app that reads data from Supabase, then extend it with [create, update, and delete operations](#create-update-and-delete-instruments-optional). For an introduction to the framework, see the [Reflex website](https://reflex.dev/).
+
 <$Partial path="quickstart_db_setup.mdx" />
 
 ## 3. Create a Reflex app
@@ -121,10 +123,438 @@ Run the Reflex development server, go to http://localhost:3000 in a browser, and
 uv run reflex run
 ```
 
+## Create, update, and delete instruments (Optional)
+
+Extend the app with a form to add instruments and controls to edit or delete each row. This demonstrates create, read, update, and delete operations, also called CRUD.
+
+The finished app has an add form, editable instrument names, and **Save** and **Delete** buttons for each row. It displays a confirmation after a successful write.
+
+![Instrument manager with an add form, violin, viola, cello, and Flute rows, Save and Delete buttons, and an Instrument added confirmation.](/docs/img/guides/getting-started/reflex-instruments-crud.png)
+
+When you submit a form, Reflex passes its values to a Python event handler. The handler writes to Supabase, fetches the updated records, and updates state so the browser displays the result.
+
+### Allow writes to the sample table
+
+In the [SQL Editor](/dashboard/project/_/sql/new), run the following to grant write privileges and add Row Level Security policies. Keep the read policy from the database setup step.
+
+```sql SQL_EDITOR
+grant insert, update, delete on public.instruments to anon;
+
+create policy "public can insert instruments"
+on public.instruments for insert to anon
+with check (true);
+
+create policy "public can update instruments"
+on public.instruments for update to anon
+using (true) with check (true);
+
+create policy "public can delete instruments"
+on public.instruments for delete to anon
+using (true);
+```
+
+<Admonition type="caution">
+
+These policies let anyone with your publishable key modify the `instruments` table. They exist so you can try the forms against sample data. Scope writes to authenticated users before you put real data in this table.
+
+</Admonition>
+
+### Add the forms and event handlers
+
+Keep the imports, environment setup, and `get_supabase` function from [Create the Supabase client](#7-create-the-supabase-client). Replace the code from [Query data from the app](#8-query-data-from-the-app), including `State`, `index`, and the page registration, with the following pieces in order. The assembled file is also available under [Complete app code](#complete-app-code).
+
+#### 1. Store and load instruments
+
+Add the following row type and state class. `instruments` holds the rows displayed on the page. The other fields hold feedback and track whether a request is in progress.
+
+`_fetch_instruments` reads the table in ID order and assigns the result to state. `load_instruments` calls it when the page opens or you click **Refresh**. The `yield` sends the busy state to the browser before waiting for the database response.
+
+```python name=my_app/my_app.py
+from typing import TypedDict
+
+from postgrest import APIError
+
+
+class Instrument(TypedDict):
+    id: int
+    name: str
+
+
+class State(rx.State):
+    instruments: list[Instrument] = []
+    error: str = ""
+    message: str = ""
+    busy: bool = False
+
+    async def _fetch_instruments(self):
+        try:
+            supabase = await get_supabase()
+            response = await (
+                supabase.table("instruments").select("*").order("id").execute()
+            )
+            self.instruments = response.data
+        except APIError as error:
+            self.error = f"Could not refresh instruments: {error.message}"
+
+    @rx.event
+    async def load_instruments(self):
+        self.error = self.message = ""
+        self.busy = True
+        yield
+        try:
+            await self._fetch_instruments()
+        finally:
+            self.busy = False
+```
+
+#### 2. Add and edit instruments
+
+Inside `State`, add `save_instrument` after `load_instruments`, keeping the indentation shown.
+
+Both forms submit a name. The edit form also submits an ID, so the handler updates that row; without an ID, it inserts a new row. The handler trims whitespace and rejects names shorter than 1 or longer than 100 characters before making a database request. After saving, it fetches the rows again so the page reflects the stored data.
+
+```python name=my_app/my_app.py
+    @rx.event
+    async def save_instrument(self, form_data: dict):
+        self.error = self.message = ""
+        name = form_data.get("name", "").strip()
+        if not name or len(name) > 100:
+            self.error = "Enter an instrument name between 1 and 100 characters."
+            return
+        self.busy = True
+        yield
+        try:
+            supabase = await get_supabase()
+            instrument_id = form_data.get("id")
+            if instrument_id:
+                response = await (
+                    supabase.table("instruments")
+                    .update({"name": name})
+                    .eq("id", instrument_id)
+                    .execute()
+                )
+            else:
+                response = await (
+                    supabase.table("instruments").insert({"name": name}).execute()
+                )
+            if response.data:
+                self.message = (
+                    "Instrument updated." if instrument_id else "Instrument added."
+                )
+            else:
+                self.error = "Instrument was not saved. Refresh the list and try again."
+            await self._fetch_instruments()
+        except APIError as error:
+            self.error = f"Could not save instrument: {error.message}"
+        finally:
+            self.busy = False
+```
+
+#### 3. Delete an instrument
+
+Inside `State`, add `delete_instrument` after `save_instrument`.
+
+The `eq("id", instrument_id)` filter limits deletion to the selected row. The handler refreshes the list after deletion and reports whether a row was removed. As with saving, `finally` clears the busy state even if the API returns an error.
+
+```python name=my_app/my_app.py
+    @rx.event
+    async def delete_instrument(self, instrument_id: int):
+        self.error = self.message = ""
+        self.busy = True
+        yield
+        try:
+            supabase = await get_supabase()
+            response = await (
+                supabase.table("instruments").delete().eq("id", instrument_id).execute()
+            )
+            self.message = (
+                "Instrument deleted." if response.data else "Instrument was already deleted."
+            )
+            await self._fetch_instruments()
+        except APIError as error:
+            self.error = f"Could not delete instrument: {error.message}"
+        finally:
+            self.busy = False
+```
+
+#### 4. Connect each row to its handlers
+
+After the `State` class, add `instrument_row` as a top-level function.
+
+The hidden input includes the row's ID in the submitted form data. **Save** submits that form to `save_instrument`; **Delete** calls `delete_instrument` directly with the same ID. Controls are disabled while a request is in progress.
+
+The form key includes the ID and name. When a saved name changes, Reflex recreates the row form so its `default_value` matches the refreshed record.
+
+```python name=my_app/my_app.py
+def instrument_row(instrument: Instrument) -> rx.Component:
+    return rx.form(
+        rx.hstack(
+            rx.el.input(name="id", type="hidden", value=instrument["id"].to_string()),
+            rx.input(
+                name="name",
+                aria_label="Instrument name",
+                default_value=instrument["name"],
+                required=True,
+                max_length=100,
+                disabled=State.busy,
+            ),
+            rx.button("Save", type="submit", disabled=State.busy),
+            rx.button(
+                "Delete",
+                type="button",
+                color_scheme="red",
+                disabled=State.busy,
+                on_click=State.delete_instrument(instrument["id"]),
+            ),
+        ),
+        on_submit=State.save_instrument,
+        key=instrument["id"].to_string() + instrument["name"],
+    )
+```
+
+#### 5. Assemble the page
+
+Add `index` and the page registration below `instrument_row`.
+
+The add form has no ID field, so it creates an instrument. `rx.foreach` renders an edit form for each record, and `rx.cond` displays progress, errors, and success messages when their state values are set. Registering `load_instruments` with `on_load` fetches the records when the page opens.
+
+```python name=my_app/my_app.py
+def index() -> rx.Component:
+    return rx.container(
+        rx.vstack(
+            rx.heading("Instruments"),
+            rx.form(
+                rx.hstack(
+                    rx.input(
+                        name="name",
+                        aria_label="New instrument name",
+                        placeholder="Instrument name",
+                        required=True,
+                        max_length=100,
+                        disabled=State.busy,
+                    ),
+                    rx.button("Add instrument", type="submit", disabled=State.busy),
+                ),
+                on_submit=State.save_instrument,
+            ),
+            rx.button("Refresh", on_click=State.load_instruments, disabled=State.busy),
+            rx.text(
+                rx.cond(State.busy, "Updating instruments...", State.message),
+                role="status",
+            ),
+            rx.cond(State.error, rx.text(State.error, color="red", role="alert")),
+            rx.foreach(State.instruments, instrument_row),
+            spacing="4",
+        ),
+        padding_y="2em",
+    )
+
+
+app = rx.App()
+app.add_page(index, on_load=State.load_instruments)
+```
+
+For more about the form values passed to `on_submit`, see the [Reflex form documentation](https://reflex.dev/docs/library/forms/form/).
+
+The client stays anonymous throughout this example. If you add sign-in, create clients scoped to each user's session instead of signing users into this shared client.
+
+### Complete app code
+
+Expand the following to copy the assembled `my_app/my_app.py`, including the [Create the Supabase client](#7-create-the-supabase-client) setup.
+
+<details>
+<summary>Show complete app code</summary>
+
+```python name=my_app/my_app.py
+import os
+import reflex as rx
+from supabase import acreate_client, AsyncClient
+from dotenv import load_dotenv
+
+load_dotenv()
+
+_supabase: AsyncClient | None = None
+
+
+async def get_supabase() -> AsyncClient:
+    global _supabase
+    if _supabase is None:
+        _supabase = await acreate_client(
+            os.environ.get("SUPABASE_URL"),
+            os.environ.get("SUPABASE_PUBLISHABLE_KEY"),
+        )
+    return _supabase
+
+from typing import TypedDict
+
+from postgrest import APIError
+
+
+class Instrument(TypedDict):
+    id: int
+    name: str
+
+
+class State(rx.State):
+    instruments: list[Instrument] = []
+    error: str = ""
+    message: str = ""
+    busy: bool = False
+
+    async def _fetch_instruments(self):
+        try:
+            supabase = await get_supabase()
+            response = await (
+                supabase.table("instruments").select("*").order("id").execute()
+            )
+            self.instruments = response.data
+        except APIError as error:
+            self.error = f"Could not refresh instruments: {error.message}"
+
+    @rx.event
+    async def load_instruments(self):
+        self.error = self.message = ""
+        self.busy = True
+        yield
+        try:
+            await self._fetch_instruments()
+        finally:
+            self.busy = False
+
+    @rx.event
+    async def save_instrument(self, form_data: dict):
+        self.error = self.message = ""
+        name = form_data.get("name", "").strip()
+        if not name or len(name) > 100:
+            self.error = "Enter an instrument name between 1 and 100 characters."
+            return
+        self.busy = True
+        yield
+        try:
+            supabase = await get_supabase()
+            instrument_id = form_data.get("id")
+            if instrument_id:
+                response = await (
+                    supabase.table("instruments")
+                    .update({"name": name})
+                    .eq("id", instrument_id)
+                    .execute()
+                )
+            else:
+                response = await (
+                    supabase.table("instruments").insert({"name": name}).execute()
+                )
+            if response.data:
+                self.message = (
+                    "Instrument updated." if instrument_id else "Instrument added."
+                )
+            else:
+                self.error = "Instrument was not saved. Refresh the list and try again."
+            await self._fetch_instruments()
+        except APIError as error:
+            self.error = f"Could not save instrument: {error.message}"
+        finally:
+            self.busy = False
+
+    @rx.event
+    async def delete_instrument(self, instrument_id: int):
+        self.error = self.message = ""
+        self.busy = True
+        yield
+        try:
+            supabase = await get_supabase()
+            response = await (
+                supabase.table("instruments").delete().eq("id", instrument_id).execute()
+            )
+            self.message = (
+                "Instrument deleted." if response.data else "Instrument was already deleted."
+            )
+            await self._fetch_instruments()
+        except APIError as error:
+            self.error = f"Could not delete instrument: {error.message}"
+        finally:
+            self.busy = False
+
+
+def instrument_row(instrument: Instrument) -> rx.Component:
+    return rx.form(
+        rx.hstack(
+            rx.el.input(name="id", type="hidden", value=instrument["id"].to_string()),
+            rx.input(
+                name="name",
+                aria_label="Instrument name",
+                default_value=instrument["name"],
+                required=True,
+                max_length=100,
+                disabled=State.busy,
+            ),
+            rx.button("Save", type="submit", disabled=State.busy),
+            rx.button(
+                "Delete",
+                type="button",
+                color_scheme="red",
+                disabled=State.busy,
+                on_click=State.delete_instrument(instrument["id"]),
+            ),
+        ),
+        on_submit=State.save_instrument,
+        key=instrument["id"].to_string() + instrument["name"],
+    )
+
+
+def index() -> rx.Component:
+    return rx.container(
+        rx.vstack(
+            rx.heading("Instruments"),
+            rx.form(
+                rx.hstack(
+                    rx.input(
+                        name="name",
+                        aria_label="New instrument name",
+                        placeholder="Instrument name",
+                        required=True,
+                        max_length=100,
+                        disabled=State.busy,
+                    ),
+                    rx.button("Add instrument", type="submit", disabled=State.busy),
+                ),
+                on_submit=State.save_instrument,
+            ),
+            rx.button("Refresh", on_click=State.load_instruments, disabled=State.busy),
+            rx.text(
+                rx.cond(State.busy, "Updating instruments...", State.message),
+                role="status",
+            ),
+            rx.cond(State.error, rx.text(State.error, color="red", role="alert")),
+            rx.foreach(State.instruments, instrument_row),
+            spacing="4",
+        ),
+        padding_y="2em",
+    )
+
+
+app = rx.App()
+app.add_page(index, on_load=State.load_instruments)
+```
+
+</details>
+
+### Try the complete flow
+
+With the development server running, open [your local app](http://localhost:3000):
+
+1. Enter `Flute` and click **Add instrument**.
+2. Change that row's name to `Clarinet` and click **Save**.
+3. Reload the page to check that the change persists.
+4. In the `Clarinet` row, click **Delete**. The row disappears from the app and the database.
+
+You can also check the records in the [Table Editor](/dashboard/project/_/editor). If a write fails with a permission error, check the grants and policies in [Allow writes to the sample table](#allow-writes-to-the-sample-table).
+
 <$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 
-- Set up [Auth](/docs/guides/auth) for your app
-- [Insert more data](/docs/guides/database/import-data) into your database
-- Upload and serve static files using [Storage](/docs/guides/storage)
+- Add sign-in and replace the sample's public-write policies with rules for your users; see [Supabase Auth](/docs/guides/auth) and [Row Level Security](/docs/guides/database/postgres/row-level-security).
+- Expand the interface with tables and charts; see the [Reflex dashboard tutorial](https://reflex.dev/docs/getting-started/dashboard-tutorial/) and adapt its examples to your Supabase data.
+- Attach instrument photos to your records. For receiving files in an event handler, see the [Reflex upload guide](https://reflex.dev/docs/library/forms/upload/). Store those files in a bucket and save their paths with the records. For storage and file-access policies, see [Supabase Storage](/docs/guides/storage).
+- Publish the app with its Supabase environment variables configured; see the [Reflex deployment quickstart](https://reflex.dev/docs/hosting/deploy-quick-start/).
