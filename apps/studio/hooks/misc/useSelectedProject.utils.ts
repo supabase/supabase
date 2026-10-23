@@ -36,7 +36,10 @@ export function appVersionAtLeast(version: string, threshold: string): boolean {
   return compareAppVersions(version, threshold) >= 0
 }
 
+export const isOrioleDbVersion = (dbVersion: string | undefined): dbVersion is string =>
+  !!dbVersion && /-orioledb(?:-|$)/.test(dbVersion)
+
 export const isOrioleDbVersionAtLeast = (dbVersion: string | undefined, threshold: string) => {
-  if (!dbVersion?.endsWith('orioledb') || !threshold.endsWith('orioledb')) return false
+  if (!isOrioleDbVersion(dbVersion) || !isOrioleDbVersion(threshold)) return false
   return appVersionAtLeast(dbVersion, threshold)
 }

@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 
 import {
+  isOrioleDbVersion,
   isOrioleDbVersionAtLeast,
   ORIOLEDB_PUBLIC_BETA_VERSION,
   type OrioleDbReleaseStage,
@@ -48,14 +49,14 @@ export const useIsAwsNimbusCloudProvider = () => {
 
 export const useIsOrioleDb = () => {
   const { data: project } = useSelectedProjectQuery()
-  const isOrioleDb = project?.dbVersion?.endsWith('orioledb')
+  const isOrioleDb = isOrioleDbVersion(project?.dbVersion)
   return isOrioleDb
 }
 
 export const useIsOrioleDbInAws = () => {
   const { data: project } = useSelectedProjectQuery()
   const isOrioleDbInAws =
-    project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS.id
+    isOrioleDbVersion(project?.dbVersion) && project?.cloud_provider === PROVIDERS.AWS.id
   return isOrioleDbInAws
 }
 
@@ -63,7 +64,7 @@ export const useIsOrioleDbInAws = () => {
 // PITR remains unsupported for every OrioleDB version regardless of stage.
 export const useOrioleDbReleaseStage = (): OrioleDbReleaseStage | undefined => {
   const { data: project } = useSelectedProjectQuery()
-  if (!project?.dbVersion?.endsWith('orioledb')) return undefined
+  if (!project || !isOrioleDbVersion(project.dbVersion)) return undefined
   return isOrioleDbVersionAtLeast(project.dbVersion, ORIOLEDB_PUBLIC_BETA_VERSION)
     ? 'beta'
     : 'alpha'
