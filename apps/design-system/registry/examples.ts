@@ -933,6 +933,76 @@ export const examples: Registry = [
     files: ['example/skeleton-card.tsx'],
   },
   {
+    name: 'dithered-skeleton-demo',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-demo.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-list',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-list.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-pixel-size',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-pixel-size.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-fine-grain',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-fine-grain.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-lite-demo',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-lite-demo.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-lite-list',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-lite-list.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-gif-demo',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-gif-demo.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-gif-list',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-gif-list.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-gif-no-shine',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-gif-no-shine.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-comparison',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-comparison.tsx'],
+  },
+  {
+    name: 'dithered-skeleton-stress',
+    type: 'components:example',
+    files: ['example/dithered-skeleton-stress.tsx'],
+  },
+  {
+    name: 'gradient-skeleton-demo',
+    type: 'components:example',
+    files: ['example/gradient-skeleton-demo.tsx'],
+  },
+  {
+    name: 'gradient-skeleton-table',
+    type: 'components:example',
+    files: ['example/gradient-skeleton-table.tsx'],
+  },
+  {
+    name: 'gradient-skeleton-speed',
+    type: 'components:example',
+    files: ['example/gradient-skeleton-speed.tsx'],
+  },
+  {
     name: 'slider-demo',
     type: 'components:example',
     registryDependencies: ['slider'],
