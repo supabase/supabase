@@ -22,6 +22,7 @@ import {
   getRemainingRecoveryGap,
   writeRecoveryReminderSnooze,
 } from '@/lib/account-recovery/recovery-reminder'
+import { useTrack } from '@/lib/telemetry/track'
 
 // Anchor the header while the card grows from checking to actionable tasks.
 const recoveryContainerClassName = 'items-start pt-16 sm:pt-[max(4rem,calc(50svh-16rem))]'
@@ -33,6 +34,7 @@ export const RecoveryInterstitial = ({ onDismiss }: { onDismiss: () => void }) =
 const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
   const user = useUser()
   const queryClient = useQueryClient()
+  const track = useTrack()
   const { hasLoaded, isConfigCatStale } = useFeatureFlags()
   const flagsReady = hasLoaded === true && !isConfigCatStale
   const isEnabled = useFlag('enableAuthRecoveryCodes')
@@ -61,6 +63,8 @@ const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
         isUnavailable={isUnavailable}
         hasAuthenticatorTask={verifiedFactorCount === 1}
         isError={isError}
+        onAction={(actionType) => track('account_recovery_action_clicked', { actionType })}
+        onTaskComplete={(taskType) => track('account_recovery_task_completed', { taskType })}
         onExit={({ gap: activeGap, areCodesSaved, isFactorComplete }) => {
           if (user?.id) {
             // Completed mutations can precede the refreshed status response.
@@ -74,6 +78,9 @@ const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
             if (remainingGap) writeRecoveryReminderSnooze(user.id, remainingGap)
             else clearRecoveryReminderSnooze(user.id)
           }
+          track('account_recovery_reminder_closed', {
+            hasCompletedTask: areCodesSaved || isFactorComplete,
+          })
         }}
         onCodesComplete={() => {
           queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status(user?.id) })
