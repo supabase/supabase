@@ -148,7 +148,7 @@ describe('SupportAssistantSuccessCard', () => {
 
     expect(await screen.findByRole('heading', { name: 'While you wait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /open assistant response/i })).toBeInTheDocument()
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
+    expect(container.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
   })
 
   it('renders the full assistant response preview inside the clipped content area', async () => {

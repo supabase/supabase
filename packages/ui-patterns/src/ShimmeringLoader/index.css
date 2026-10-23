@@ -1,38 +1,30 @@
-/* Loaders */
+@import './dither-gifs.css';
+
+/*
+ * Loaders: a muted block with a drifting, pulsing ordered-dither texture. The motion is baked into a
+ * tiny looping GIF used as a luminance mask, so the browser animates it without any JavaScript or
+ * main-thread work, and the texture follows the theme's foreground color.
+ */
 .shimmering-loader {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    var(--border-default) 4%,
-    var(--background-surface-200) 25%,
-    var(--border-default) 36%
-  );
-  background-size: 1000px 100%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--background-muted);
 }
 
-.dark .shimmering-loader {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    var(--border-default) 4%,
-    var(--border-control) 25%,
-    var(--border-default) 36%
-  );
-  background-size: 1000px 100%;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .shimmering-loader,
-  .dark .shimmering-loader {
-    animation: none;
-  }
+.shimmering-loader::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-color: var(--foreground-lighter);
+  opacity: 0.3;
+  -webkit-mask-image: var(--dithered-skeleton-base, linear-gradient(transparent, transparent));
+  mask-image: var(--dithered-skeleton-base, linear-gradient(transparent, transparent));
+  -webkit-mask-size: 128px 128px;
+  mask-size: 128px 128px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+  mask-mode: luminance;
+  image-rendering: pixelated;
 }

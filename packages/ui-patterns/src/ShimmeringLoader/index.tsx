@@ -4,22 +4,16 @@ import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 export interface ShimmeringLoader {
   className?: string
   style?: CSSProperties
+  /** Has no effect: every loader shares one GIF-driven animation, so there's nothing to stagger. */
   delayIndex?: number
+  /** Has no effect: every loader shares one GIF-driven animation, so there's nothing to stagger. */
   animationDelay?: number
 }
 
 export const ShimmeringLoader = forwardRef<HTMLDivElement, ShimmeringLoader>(
-  ({ className, style, delayIndex = 0, animationDelay = 150 }, ref) => {
+  ({ className, style }, ref) => {
     return (
-      <div
-        ref={ref}
-        className={cn('shimmering-loader rounded-sm py-3', className)}
-        style={{
-          ...style,
-          animationFillMode: 'backwards',
-          animationDelay: `${delayIndex * animationDelay}ms`,
-        }}
-      />
+      <div ref={ref} className={cn('shimmering-loader rounded-sm py-3', className)} style={style} />
     )
   }
 )

@@ -1,7 +1,9 @@
-import { cn } from '../../../lib/utils/cn'
+import { DitheredSkeletonGif } from '../../DitheredSkeleton/DitheredSkeletonGif'
 
-function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('animate-pulse rounded-md bg-muted', className)} {...props} />
+// Experimental: renders the GIF-masked dithered skeleton without the shine, so the only motion is
+// the GIF itself and loading states cost no JavaScript or main-thread work per frame.
+function Skeleton(props: React.HTMLAttributes<HTMLDivElement>) {
+  return <DitheredSkeletonGif data-slot="skeleton" shine={false} {...props} />
 }
 
 export { Skeleton }
