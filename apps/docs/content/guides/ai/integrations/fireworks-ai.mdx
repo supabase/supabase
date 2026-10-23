@@ -252,6 +252,131 @@ Create an Edge Function that embeds a search query with the same model and dimen
 
 The response lists the five closest documents, each with a `similarity` score between -1 and 1. Higher scores mean closer matches.
 
+## Bonus: expose your documents as MCP tools
+
+Expose the `documents` table as an MCP server, so clients such as Claude, ChatGPT, and Cursor can search it and read what they find. The server is another Edge Function, and it reuses the table, the `match_documents` function, and the `FIREWORKS_API_KEY` secret from [Search with embeddings](#search-with-embeddings).
+
+Two tools cover the flow. `search_document` embeds the agent's query with Fireworks and returns the closest matches as IDs, previews, and similarity scores. `fetch_document` returns the full content of one of those IDs. Keeping them separate keeps a search result small, so an AI agent spends context only on the documents it decides to read.
+
+Every tool call runs as the signed-in user, so the `select` policy on `documents` decides what an agent can reach. [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp#add-authentication) covers the authentication this depends on: Supabase Auth as an OAuth 2.1 server, dynamic client registration, and a consent screen hosted on your frontend. Your project also needs [asymmetric JWT signing keys](/docs/guides/auth/signing-keys), Supabase CLI 2.117.0 or later, and `@supabase/server` 1.6.0 or later.
+
+1. Create the function. Name it `mcp`. Edge Functions prefix every request path with the function name, so the name is what puts the server on `/functions/v1/mcp`:
+
+   ```bash
+   supabase functions new mcp
+   ```
+
+2. In `supabase/config.toml`, turn off the platform JWT check for the function. The function verifies the user's token itself, and the gateway would otherwise reject the unauthenticated discovery request before the OAuth middleware can answer it:
+
+   ```toml
+   [functions.mcp]
+   verify_jwt = false
+   ```
+
+3. Replace the contents of `supabase/functions/mcp/index.ts` with the following code:
+
+   ```ts supabase/functions/mcp/index.ts
+   import OpenAI from 'jsr:@openai/openai@^6'
+   import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0'
+   import { pipeline } from 'npm:@supabase/middleware@1'
+   import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1'
+   import { z } from 'npm:zod@^4.3.6'
+
+   type Match = { id: number; content: string; similarity: number }
+
+   const fireworks = new OpenAI({
+     apiKey: Deno.env.get('FIREWORKS_API_KEY'),
+     baseURL: 'https://api.fireworks.ai/inference/v1',
+   })
+
+   export default {
+     fetch: pipeline(
+       [withOAuthProtectedResource(), withSupabase({ auth: 'user' })],
+       async (req, ctx) => {
+         // Edge Functions are stateless, so build a server for each request
+         const handler = createMcpHandler(() => {
+           const server = new McpServer({ name: 'fireworks-documents', version: '0.1.0' })
+
+           server.registerTool(
+             'search_document',
+             {
+               description:
+                 'Search documents by meaning. Returns the closest matches as IDs, previews, and similarity scores.',
+               inputSchema: z.object({
+                 query: z.string().min(1),
+                 match_count: z.number().int().min(1).max(20).default(5),
+               }),
+               annotations: { readOnlyHint: true },
+             },
+             async ({ query, match_count }) => {
+               const response = await fireworks.embeddings.create({
+                 model: 'fireworks/qwen3-embedding-8b',
+                 input: query,
+                 dimensions: 1024,
+               })
+
+               const { data, error } = await ctx.supabase.rpc('match_documents', {
+                 query_embedding: JSON.stringify(response.data[0].embedding),
+                 match_count,
+               })
+               if (error) throw new Error(error.message)
+
+               const matches = (data as Match[]).map((match) => ({
+                 id: match.id,
+                 similarity: match.similarity,
+                 preview: match.content.slice(0, 200),
+               }))
+               return { content: [{ type: 'text', text: JSON.stringify(matches) }] }
+             }
+           )
+
+           server.registerTool(
+             'fetch_document',
+             {
+               description: 'Fetch the full content of one document by ID',
+               inputSchema: z.object({ id: z.number().int() }),
+               annotations: { readOnlyHint: true },
+             },
+             async ({ id }) => {
+               // Row Level Security scopes this query to the signed-in user
+               const { data, error } = await ctx.supabase
+                 .from('documents')
+                 .select('id, content')
+                 .eq('id', id)
+                 .single()
+               if (error) throw new Error(error.message)
+
+               return { content: [{ type: 'text', text: JSON.stringify(data) }] }
+             }
+           )
+
+           return server
+         })
+
+         return handler.fetch(req)
+       }
+     ),
+   }
+   ```
+
+4. Push the Auth settings and deploy the function:
+
+   ```bash
+   supabase config push
+   supabase functions deploy mcp
+   ```
+
+5. Add the server to an MCP client. In Claude Code:
+
+   ```bash
+   claude mcp add --transport http fireworks-docs \
+     https://<your-project-ref>.supabase.co/functions/v1/mcp
+   ```
+
+The client discovers your Auth server from the server URL, registers itself, and opens the sign-in and consent screens. Once the user approves, ask the agent a question about your documents. It calls `search_document`, then `fetch_document` for the matches it wants to read in full.
+
+For the other clients, and for testing the server locally with MCP Inspector, see [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp#connect-from-mcp-clients).
+
 ## Resources
 
 - [Fireworks OpenAI compatibility](https://docs.fireworks.ai/tools-sdks/openai-compatibility)
@@ -259,3 +384,5 @@ The response lists the five closest documents, each with a `similarity` score be
 - [Vector columns](/docs/guides/ai/vector-columns)
 - [Vector indexes](/docs/guides/ai/vector-indexes)
 - [Securing Edge Functions](/docs/guides/functions/auth)
+- [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp)
+- [MCP Server block](/library/docs/headless/mcp)
