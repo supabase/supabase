@@ -31,7 +31,6 @@ import {
   redirect,
   Scripts,
   useLocation,
-  useNavigate,
   type AnyRouter,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
@@ -334,7 +333,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootComponent() {
   const recoveryLocation = useLocation()
-  const recoveryNavigate = useNavigate()
   useThemeSandbox()
 
   return (
@@ -355,15 +353,7 @@ function RootComponent() {
                               <BannerStackProvider>
                                 <FeaturePreviewContextProvider>
                                   <MainScrollContainerProvider>
-                                    <RecoveryReminderController
-                                      href={recoveryLocation.href}
-                                      onNavigate={(href) => {
-                                        void recoveryNavigate({
-                                          ...splitInternalUrl(href),
-                                          replace: true,
-                                        })
-                                      }}
-                                    >
+                                    <RecoveryReminderController href={recoveryLocation.href}>
                                       <ClientOnly fallback={<ShellFallback />}>
                                         <Outlet />
                                       </ClientOnly>

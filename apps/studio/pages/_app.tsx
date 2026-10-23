@@ -241,12 +241,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                   <BannerStackProvider>
                                     <FeaturePreviewContextProvider>
                                       <MainScrollContainerProvider>
-                                        <RecoveryReminderController
-                                          href={recoveryRouter.asPath}
-                                          onNavigate={(href) => {
-                                            void recoveryRouter.replace(href)
-                                          }}
-                                        >
+                                        <RecoveryReminderController href={recoveryRouter.asPath}>
                                           {getLayout(<Component {...pageProps} />)}
                                         </RecoveryReminderController>
                                       </MainScrollContainerProvider>
