@@ -80,6 +80,9 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
             if (remainingGap) writeRecoveryReminderSnooze(user.id, remainingGap)
             else clearRecoveryReminderSnooze(user.id)
           }
+          track('account_recovery_reminder_closed', {
+            hasCompletedTask: areCodesSaved || isFactorComplete,
+          })
         }}
         onCodesComplete={() => {
           queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status(user?.id) })
