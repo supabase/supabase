@@ -63,7 +63,7 @@ From `apps/studio`, start the Docker services:
 
 ```
 cd ../../docker
-docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up
+docker compose -f docker-compose.yml up
 ```
 
 In another terminal in `apps/studio`, create `.env.local` and set these variables to the matching values from `../../docker/.env`:
@@ -77,7 +77,7 @@ SUPABASE_SERVICE_KEY=
 
 Use `ANON_KEY` for `SUPABASE_ANON_KEY` and `SERVICE_ROLE_KEY` for `SUPABASE_SERVICE_KEY`. The crypto key must match so postgres-meta can decrypt Studio's connection string.
 
-From `apps/studio`, install dependencies and start the dashboard on an available port other than 8082, which the Docker Studio service uses. Keep the Docker services running for the API gateway.
+From `apps/studio`, install dependencies and start the source dashboard on port 8083. Keep the Docker services running for the API gateway.
 
 ```bash
 pnpm install
