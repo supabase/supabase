@@ -155,7 +155,7 @@ export function Cursor({ className, ...props }: ComponentProps<'div'>) {
   if (!isLive || fraction < 0 || fraction > 1) return null
 
   return (
-    <div data-trace-cursor-anchor className="relative z-0 h-0 shrink-0">
+    <div data-trace-cursor-anchor className="relative z-10 h-0 shrink-0">
       <div
         aria-hidden
         data-trace-cursor-track

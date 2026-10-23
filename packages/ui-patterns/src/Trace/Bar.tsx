@@ -6,7 +6,12 @@ import { Badge, cn } from 'ui'
 import { Duration, useSpan } from './Rows'
 import { useTrace } from './Trace'
 import type { SpanStatus } from './types'
-import { collapsedChildMidpoints, effectiveEndMs, formatDuration } from './utils'
+import {
+  collapsedChildMidpoints,
+  effectiveEndMs,
+  formatDuration,
+  getTimingPlacement,
+} from './utils'
 import { useWaterfallScale } from './Waterfall'
 
 const TIMING_GAP = 6
@@ -34,7 +39,7 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
       data-status={span.status}
       data-state={isSelected ? 'selected' : undefined}
       className={cn(
-        'absolute top-1/2 h-[55%] min-w-0.5 -translate-y-1/2 rounded-sm',
+        'absolute top-1/2 h-[50%] min-w-0.5 -translate-y-1/2 rounded-sm',
         STATUS_CLASS[span.status],
         isSelected && 'ring-1 ring-foreground',
         span.endMs === null &&
@@ -61,13 +66,13 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
   const visibleEnd = Math.min(endFraction, 1)
   const labelPx = formatDuration(endMs - span.startMs).length * TIMING_CHAR_PX + TIMING_CHIP_PX
   const reserved = span.id === slowestId ? SLOWEST_PX : 0
-  const barPx = (visibleEnd - visibleStart) * scale.width
-  const placement =
-    visibleEnd * scale.width + TIMING_GAP + labelPx <= scale.width
-      ? 'after'
-      : barPx >= labelPx + reserved + 8
-        ? 'inside'
-        : 'before'
+  const placement = getTimingPlacement({
+    startPx: visibleStart * scale.width,
+    endPx: visibleEnd * scale.width,
+    laneWidth: scale.width,
+    labelPx,
+    gapPx: TIMING_GAP,
+  })
 
   const position = {
     after: { left: `calc(${visibleEnd * 100}% + ${TIMING_GAP}px)` },
@@ -108,7 +113,7 @@ export function Markers() {
             key={i}
             data-trace-marker
             title={event.name}
-            className="absolute top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border border-foreground bg-background"
+            className="absolute top-1/2 size-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 border border-foreground bg-background"
             style={{ left: `${fraction * 100}%` }}
           />
         )
@@ -154,7 +159,7 @@ export function CollapsedChildren() {
           key={i}
           aria-hidden
           data-trace-collapsed-mark
-          className="pointer-events-none absolute top-1/2 h-[30%] w-px -translate-y-1/2 bg-background/70"
+          className="pointer-events-none absolute top-1/2 h-[25%] w-px -translate-y-1/2 bg-background/70"
           style={{ left: `${scale.toFraction(ms) * 100}%` }}
         />
       ))}
