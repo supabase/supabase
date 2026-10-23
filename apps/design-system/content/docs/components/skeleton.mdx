@@ -56,16 +56,17 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 <ComponentPreview name="skeleton-card" />
 
-## Experimental: Dithered skeletons
+## Experimental skeletons
 
-The sections below are experimental implementations of a dithered loading texture that could replace `Skeleton` and `ShimmeringLoader`. They're for evaluation only. They share the same API (`className` plus `pixelSize`), use page coordinates so neighboring skeletons read as one surface, and respect reduced motion.
+The sections below are experimental loading placeholders that could replace `Skeleton` and `ShimmeringLoader`. They're for evaluation only. The dithered variants share the same API (`className` plus `pixelSize`), use page coordinates so neighboring skeletons read as one surface, and respect reduced motion.
 
-| Variant                             | Texture                                | Shine                                | Per-frame cost                            |
-| ----------------------------------- | -------------------------------------- | ------------------------------------ | ----------------------------------------- |
-| `DitheredSkeleton`                  | Procedural, drawn per cell on a canvas | Procedural, rippled edge             | Main-thread JavaScript, scales with area  |
-| `DitheredSkeletonLite`              | Static, baked once into mask tiles     | Stepped `transform`, 3 dither levels | 3 compositor layers per instance          |
-| `DitheredSkeletonGif`               | Drifting and pulsing, two GIF masks    | Soft `transform` sweep               | 1 compositor layer per instance           |
-| `DitheredSkeletonGif shine={false}` | Drifting and pulsing, one GIF mask     | None                                 | None, the browser animates the GIF itself |
+| Variant                             | Texture                                   | Shine                                | Per-frame cost                            |
+| ----------------------------------- | ----------------------------------------- | ------------------------------------ | ----------------------------------------- |
+| `DitheredSkeleton`                  | Procedural, drawn per cell on a canvas    | Procedural, rippled edge             | Main-thread JavaScript, scales with area  |
+| `DitheredSkeletonLite`              | Static, baked once into mask tiles        | Stepped `transform`, 3 dither levels | 3 compositor layers per instance          |
+| `DitheredSkeletonGif`               | Drifting and pulsing, two GIF masks       | Soft `transform` sweep               | 1 compositor layer per instance           |
+| `DitheredSkeletonGif shine={false}` | Drifting and pulsing, one GIF mask        | None                                 | None, the browser animates the GIF itself |
+| `GradientSkeleton`                  | Smooth drifting pools of light, no dither | CSS `background-position` sweep      | Repaints every instance, even offscreen   |
 
 Compositor layers don't run JavaScript, but every extra animated layer makes each main-thread frame on the page more expensive (Chrome's layerization step), and costs more on devices that composite in software. That's why the GIF variant without shine is the cheapest option.
 
@@ -141,6 +142,35 @@ import { DitheredSkeletonGif } from 'ui'
 ### List
 
 <ComponentPreview name="dithered-skeleton-gif-list" peekCode />
+
+## Experimental: Gradient
+
+`GradientSkeleton` is pure CSS, with no JavaScript, canvas, or dither. A soft band of light sweeps across slow, drifting pools of light, all in a single tone. It works in Server Components.
+
+- **Continuous across a page:** Every gradient uses `background-attachment: fixed`, so it's positioned against the viewport. Neighboring skeletons show slices of the same light instead of each running its own shimmer.
+- **Layered light:** A long soft tail leads into a bright crest and a quick falloff, over two pools of light that drift on a slower, independent cycle.
+- **No banding:** A faint static grain breaks up the color steps in the soft gradient falloff.
+- **Reduced motion:** When the user prefers reduced motion, the light stays still.
+
+Animating a fixed background repaints each skeleton on the main thread on every frame, including skeletons that are scrolled out of view or hidden, so the cost grows with the total number of instances on the page. Some mobile browsers ignore `background-attachment: fixed`, so on those each skeleton shows its own sweep rather than a shared one.
+
+<ComponentPreview name="gradient-skeleton-demo" peekCode wide />
+
+```tsx
+import { GradientSkeleton } from 'ui'
+
+;<GradientSkeleton className="h-4 w-[200px]" />
+```
+
+### Table
+
+<ComponentPreview name="gradient-skeleton-table" peekCode />
+
+### Speed
+
+Use `speed` to change how fast the sweep moves. The default is `1`. The drifting light underneath keeps its pace.
+
+<ComponentPreview name="gradient-skeleton-speed" peekCode />
 
 ## Experimental: Comparison
 

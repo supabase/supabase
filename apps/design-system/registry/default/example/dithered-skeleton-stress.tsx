@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, type HTMLAttributes } from 'react'
-import { Button, DitheredSkeleton, DitheredSkeletonGif, DitheredSkeletonLite } from 'ui'
+import {
+  Button,
+  DitheredSkeleton,
+  DitheredSkeletonGif,
+  DitheredSkeletonLite,
+  GradientSkeleton,
+} from 'ui'
 
 const DitheredSkeletonGifWithoutShine = (props: HTMLAttributes<HTMLDivElement>) => (
   <DitheredSkeletonGif shine={false} {...props} />
@@ -12,6 +18,7 @@ const VARIANTS = {
   Lite: DitheredSkeletonLite,
   GIF: DitheredSkeletonGif,
   'GIF, no shine': DitheredSkeletonGifWithoutShine,
+  Gradient: GradientSkeleton,
 }
 
 type Variant = keyof typeof VARIANTS

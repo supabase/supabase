@@ -1,14 +1,15 @@
-import { DitheredSkeleton, DitheredSkeletonGif, DitheredSkeletonLite } from 'ui'
+import { DitheredSkeleton, DitheredSkeletonGif, DitheredSkeletonLite, GradientSkeleton } from 'ui'
 
 const VARIANTS = [
   { label: 'Canvas', Component: DitheredSkeleton },
   { label: 'Lite', Component: DitheredSkeletonLite },
   { label: 'GIF', Component: DitheredSkeletonGif },
+  { label: 'Gradient', Component: GradientSkeleton },
 ]
 
 export default function DitheredSkeletonComparison() {
   return (
-    <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-3">
+    <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {VARIANTS.map(({ label, Component }) => (
         <div key={label} className="flex flex-col gap-2">
           <span className="font-mono text-xs text-foreground-lighter">{label}</span>
