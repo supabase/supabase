@@ -1,0 +1,59 @@
+---
+title: 'How do I develop locally and deploy Postgres migrations?'
+description: 'Run Supabase locally with the CLI, write schema changes as migration files in your repository, test them with a reset, then push them to your hosted project.'
+topics: ['Database', 'Supabase Platform']
+---
+
+Run a local Supabase stack with the CLI, keep every schema change as a migration file in your repository, and push those migrations to your hosted project when they're ready.
+
+## 1. Start a local stack
+
+Install the Supabase CLI and a Docker-compatible container runtime, then:
+
+```shell
+supabase init
+supabase start
+```
+
+This runs Postgres and the rest of the stack on your machine, with a local dashboard. See [Local development](https://supabase.com/docs/guides/local-development).
+
+## 2. Write migrations
+
+Create a migration file and put your SQL in it:
+
+```shell
+supabase migration new create_projects_table
+```
+
+If you prefer to change the schema in the local dashboard, generate a migration from the difference instead:
+
+```shell
+supabase db diff -f create_projects_table
+```
+
+Commit the files in `supabase/migrations` with the rest of your code.
+
+## 3. Test from a clean slate
+
+Rebuild the local database from your migrations and seed data:
+
+```shell
+supabase db reset
+```
+
+If this works, the migrations will produce the same schema anywhere. Add database tests and run them with `supabase test db`. See [Testing your database](https://supabase.com/docs/guides/database/testing).
+
+## 4. Deploy
+
+Link the CLI to your hosted project and push the migrations:
+
+```shell
+supabase link
+supabase db push
+```
+
+To deploy through pull requests instead, use [Branching](https://supabase.com/docs/guides/deployment/branching), which applies migrations when you merge. See [Database migrations](https://supabase.com/docs/guides/deployment/database-migrations).
+
+## Already using an ORM's migrations?
+
+Drizzle, Prisma, and other ORMs have their own migration tools, and they work against Supabase over the direct connection. Pick one tool as the source of truth for your schema, and don't mix both on the same tables.

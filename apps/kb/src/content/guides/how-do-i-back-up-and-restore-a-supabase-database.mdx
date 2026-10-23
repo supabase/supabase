@@ -1,0 +1,52 @@
+---
+title: 'How do I back up and restore a Supabase database?'
+description: 'Paid plans include daily backups you can restore from the dashboard, Point-in-Time Recovery is an add-on, and you can always export your own copy with the Supabase CLI.'
+topics: ['Supabase Platform', 'Database']
+---
+
+Paid plans back up your database every day, and you can restore from the dashboard. For recovery to an exact moment, add Point-in-Time Recovery. On any plan, you can export your own copy with the Supabase CLI.
+
+## Daily backups
+
+- **Pro:** the last 7 days of daily backups
+- **Team:** the last 14 days
+- **Enterprise:** up to 30 days
+
+Find them under **Database**, then **Backups**, in the dashboard, and restore the project to any of them. Daily backups don't store passwords for custom database roles, so reset those after a restore.
+
+## Point-in-Time Recovery
+
+Point-in-Time Recovery (PITR) lets you restore to any moment, down to seconds, instead of the last daily snapshot. It's an add-on for Pro, Team, and Enterprise projects and requires at least the Small compute size.
+
+## Your own exports
+
+The Free plan doesn't include daily backups, so export regularly and keep copies somewhere else. A complete export takes three dumps, because `supabase db dump` exports only the schema by default:
+
+```shell
+supabase db dump --db-url "$DB_URL" -f roles.sql --role-only
+supabase db dump --db-url "$DB_URL" -f schema.sql
+supabase db dump --db-url "$DB_URL" -f data.sql --use-copy --data-only -x "storage.buckets_vectors" -x "storage.vector_indexes"
+```
+
+Set `DB_URL` to your connection string from **Connect** in the dashboard. The three files hold your custom roles, your schema, and your data.
+
+This is worth doing on paid plans too if you need backups that live outside Supabase.
+
+See [Database backups](https://supabase.com/docs/guides/platform/backups).
+
+## Restore into another database
+
+The three dumps are standard Postgres SQL. Restore them with `psql` in one transaction, roles first, then the schema, then the data:
+
+```shell
+psql \
+  --single-transaction \
+  --variable ON_ERROR_STOP=1 \
+  --file roles.sql \
+  --file schema.sql \
+  --command 'SET session_replication_role = replica' \
+  --file data.sql \
+  --dbname "$DB_URL"
+```
+
+If you use Supabase Vault or column encryption, there are extra steps for the encryption key. See [Backup and restore using the CLI](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore).
