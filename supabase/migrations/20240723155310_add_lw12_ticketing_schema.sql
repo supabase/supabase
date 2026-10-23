@@ -19,7 +19,7 @@ insert into public.launch_weeks (id) values ('lw12');
 
 create table
   public.tickets (
-    id uuid not null default uuid_generate_v4(),
+    id uuid not null default extensions.uuid_generate_v4(),
     created_at timestamp with time zone not null default timezone('utc'::text, now()),
     launch_week text not null references public.launch_weeks (id),
     user_id uuid not null references auth.users (id),
@@ -119,7 +119,7 @@ from
 -- Create meetups table
 create table
   public.meetups (
-    id uuid not null default uuid_generate_v4(),
+    id uuid not null default extensions.uuid_generate_v4(),
     created_at timestamp with time zone not null default now(),
     launch_week text not null references public.launch_weeks (id),
     title text null,

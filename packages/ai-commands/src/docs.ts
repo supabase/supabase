@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from 'common'
 import { codeBlock, oneLine } from 'common-tags'
 import type OpenAI from 'openai'
 
@@ -16,7 +17,7 @@ interface PageSection {
 
 export async function clippy(
   openai: OpenAI,
-  supabaseClient: SupabaseClient<any, 'public', any>,
+  supabaseClient: SupabaseClient<Database>,
   messages: Message[],
   options?: { useAltSearchIndex?: boolean }
 ) {
@@ -72,7 +73,8 @@ export async function clippy(
 
   const { error: matchError, data: pageSections } = (await supabaseClient
     .rpc(searchFunction, {
-      embedding,
+      // The generated type for `vector` args is `string`, but the array is serialized as JSON either way
+      embedding: embedding as unknown as string,
       match_threshold: 0.78,
       min_content_length: 50,
     })

@@ -54,7 +54,7 @@ export default function LW15TicketShare() {
             metadata: { ...metadata, theme: resolvedTheme },
           })
           .eq('launch_week', 'lw15')
-          .eq('username', username)
+          .eq('username', username!)
       } else if (social === 'linkedin') {
         await supabase
           .from(TICKETS_TABLE)
@@ -63,7 +63,7 @@ export default function LW15TicketShare() {
             metadata: { ...metadata, theme: resolvedTheme },
           })
           .eq('launch_week', 'lw15')
-          .eq('username', username)
+          .eq('username', username!)
       }
 
       if (userData.shared_on_linkedin && userData.shared_on_twitter) {
