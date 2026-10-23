@@ -296,6 +296,14 @@ const renderLayout = () =>
     </MobileSheetProvider>
   )
 
+beforeEach(() => {
+  mockUseLocalStorageQuery.mockImplementation(() => [
+    mockBannerDismissedState.current,
+    vi.fn(),
+    { isSuccess: true },
+  ])
+})
+
 describe('ProjectLayout title', () => {
   beforeEach(() => {
     mockViewport.isMobile = false
@@ -311,15 +319,24 @@ describe('ProjectLayout title', () => {
       integration_source: null,
     }
     mockBannerDismissedState.current = false
-    mockUseLocalStorageQuery.mockImplementation(() => [
-      mockBannerDismissedState.current,
-      vi.fn(),
-      { isSuccess: true },
-    ])
   })
 
   afterEach(() => {
     document.title = ''
+  })
+
+  it('renders the model dashboard when PostgREST is offline', () => {
+    mockRouter.pathname = '/project/[ref]/model'
+    mockRouter.asPath = '/project/default/model'
+    mockProjectState.current.postgrestStatus = 'OFFLINE'
+    render(
+      <MobileSheetProvider>
+        <ProjectLayout>
+          <p>Dashboard metrics</p>
+        </ProjectLayout>
+      </MobileSheetProvider>
+    )
+    expect(screen.getByText('Dashboard metrics')).toBeInTheDocument()
   })
 
   it('updates the open mobile menu when resource navigation changes without replacing other sheets', () => {
