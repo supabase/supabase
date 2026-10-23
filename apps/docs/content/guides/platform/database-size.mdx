@@ -107,10 +107,30 @@ Due to restrictions on the underlying cloud provider, disk expansions can occur 
 
 ### Free Plan behavior
 
-Free Plan projects enter [read-only](#read-only-mode) mode when your **database size** exceeds 500 MB. Note that this is the _database size_ limit (the size of your actual Postgres data), not the _disk size_. Free Plan projects include 1 GB of disk space, but read-only mode is triggered by the 500 MB database size quota. Once in read-only mode, you have these options:
+Free Plan projects have a fixed disk size of 2 GB. The disk does not autoscale.
 
-- [Upgrade to the Pro Plan](/dashboard/org/_/billing) to increase the database size quota. [Disable the Spend Cap](https://app.supabase.com/org/_/billing?panel=costControl) if you want your Pro instance to autoscale beyond the 8 GB disk size limit.
+When disk usage reaches 95%, Supabase puts your database into [read-only mode](#read-only-mode). This stops the disk from filling completely. When disk usage goes below 95%, Supabase turns off read-only mode automatically.
+
+<Admonition type="danger">
+
+If the disk becomes full, Postgres shuts down. It stays down until you upgrade to the Pro Plan. Read-only mode at 95% is a best-effort safeguard. Writes that are already in progress, and WAL, can continue to fill the disk after read-only mode starts.
+
+To prevent this, keep disk usage well below 95%, or upgrade to the Pro Plan before you reach the limit.
+
+</Admonition>
+
+Read-only mode depends on _disk usage_. The 500 MB _database size_ quota does not trigger it. The database size quota is a billing quota for your organization. For more information, see [Fair use database size restriction](#fair-use-database-size-restriction).
+
+If your project is in read-only mode and Postgres is still running, you have these options:
+
+- [Upgrade to the Pro Plan](/dashboard/org/_/billing) to get an 8 GB disk that autoscales. To autoscale beyond 8 GB, [disable the Spend Cap](/dashboard/org/_/billing?panel=costControl).
 - [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
+
+If your database is down because the disk is full:
+
+1. [Upgrade to the Pro Plan](/dashboard/org/_/billing).
+2. On the [General settings page](/dashboard/project/_/settings/general), select **Restart project**.
+3. Wait about 10 minutes for the project to recover.
 
 ### Fair use database size restriction
 
