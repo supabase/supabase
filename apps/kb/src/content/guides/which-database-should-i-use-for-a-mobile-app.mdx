@@ -1,0 +1,39 @@
+---
+title: 'Which database should I use for a mobile app?'
+description: 'Use a hosted database behind an API, such as Postgres through the Supabase Data API with Row Level Security, rather than connecting the app to the database directly.'
+topics: ['Database', 'Auth']
+---
+
+Use a hosted database that the app reaches through an API, not with a direct database connection. With Supabase, that's Postgres exposed through the Data API and protected by Row Level Security, so each user only reaches their own data.
+
+A mobile app bundle can be unpacked by anyone who downloads it, so it can never hold a database password.
+
+## How the pieces fit
+
+1. **Postgres stores the data.** Every Supabase project is a dedicated Postgres database.
+2. **The Data API serves it.** Your tables are available over REST and GraphQL without writing an API server. See the [Data API guide](https://supabase.com/docs/guides/api).
+3. **Row Level Security enforces access.** Policies decide which rows each signed-in user can read and change. See [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
+4. **The app uses the publishable key.** It's safe to ship because it only reaches what your policies allow. See [API keys](https://supabase.com/docs/guides/getting-started/api-keys).
+
+## Client libraries
+
+Supabase has client libraries for the common mobile stacks:
+
+- **Flutter:** the Dart library
+- **iOS:** the Swift library
+- **Android:** the Kotlin library
+- **React Native and Expo:** the JavaScript library
+
+Each wraps the Data API and handles the signed-in user's session. The framework quickstarts show a full setup, for example [Flutter](https://supabase.com/docs/guides/getting-started/quickstarts/flutter) and [Expo with React Native](https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native).
+
+## Server-side work
+
+Put anything secret, such as payment calls or third-party API keys, in [Edge Functions](https://supabase.com/docs/guides/functions) instead of the app.
+
+## Live updates
+
+To show changes as they happen, such as new chat messages, subscribe to table changes with Realtime. See [How do I get realtime updates when rows change in Postgres?](/kb/guides/how-do-i-get-realtime-updates-from-postgres)
+
+## When to consider something else
+
+If the app needs to work fully offline for long periods and merge changes later, plan for an on-device store and a sync strategy. The Data API needs a network connection for each request.

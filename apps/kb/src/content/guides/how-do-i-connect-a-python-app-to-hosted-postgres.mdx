@@ -1,0 +1,32 @@
+---
+title: 'How do I connect a Python app to hosted Postgres?'
+description: 'Use a Postgres driver or SQLAlchemy with the connection string from your Supabase project, choosing the connection mode based on whether the app runs as a server or as serverless functions.'
+topics: ['Database']
+---
+
+Use a Postgres driver such as psycopg or asyncpg, or an ORM such as SQLAlchemy or the Django ORM, with the connection string from your Supabase project. Store the string in an environment variable and choose the connection mode based on how the app runs.
+
+## Pick the connection string
+
+Open **Connect** in the Supabase dashboard:
+
+- **A long-running server,** such as a Django, Flask, or FastAPI app in a container: the direct connection, or the shared pooler in session mode if the host only supports IPv4.
+- **Serverless functions:** the shared pooler in transaction mode, on port `6543`.
+
+Add `sslmode=require` so the driver refuses unencrypted connections. See [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
+
+## Configure the driver
+
+Read the connection string from the environment, for example `DATABASE_URL`, and pass it to your driver or engine.
+
+- **SQLAlchemy** keeps its own pool of connections. On a long-running server, a small pool over a direct or session mode connection is the usual setup.
+- **Django** reads its database settings from `DATABASES` in your settings file. Point the host, port, user, password, and database name at your project.
+- **asyncpg** with transaction mode needs `statement_cache_size=0`, because transaction mode doesn't support prepared statements.
+
+## Migrations
+
+Run migrations from your machine or CI over the direct connection, using your framework's tool, such as Django migrations or Alembic.
+
+## Don't need a Postgres connection?
+
+The `supabase-py` client library talks to the Data API over HTTP instead of opening Postgres connections. The [Flask quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/flask) uses it. Choose it when you also want Auth, Storage, or Realtime from Python. For plain database access, a Postgres driver is enough.

@@ -1,0 +1,40 @@
+---
+title: 'How do I connect a Spring Boot app to hosted Postgres?'
+description: 'Copy the JDBC connection string from your Supabase project into an environment variable, reference it from application.properties, and use the Postgres JDBC driver.'
+topics: ['Database']
+---
+
+Copy the JDBC connection string from your Supabase project, store it in an environment variable, and reference it from `application.properties`. Spring Data JPA and Hibernate then work with the hosted database through the Postgres JDBC driver.
+
+## 1. Get the JDBC string
+
+In the Supabase dashboard, click **Connect** and select the **JDBC** tab. It formats the string for Java:
+
+```shell
+export SUPABASE_DB_URL='jdbc:postgresql://[POOLER-HOST]:5432/postgres?user=postgres.[PROJECT-REF]&password=[YOUR-PASSWORD]&sslmode=require'
+```
+
+The string contains your password, and `application.properties` is committed with your project, so keep the string in the environment instead.
+
+## 2. Configure Spring
+
+Reference the variable and the driver in `src/main/resources/application.properties`:
+
+```properties
+spring.datasource.url=${SUPABASE_DB_URL}
+spring.datasource.driver-class-name=org.postgresql.Driver
+```
+
+Create your project with the Spring Data JPA and Postgres driver dependencies. See the [Spring Boot quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/spring-boot).
+
+## 3. Manage the schema
+
+Letting Hibernate update the schema automatically is convenient in development. For production, keep schema changes in versioned migrations so every environment matches.
+
+## If the app won't start
+
+An error like `Unable to determine Dialect without JDBC metadata` means Hibernate couldn't connect at all. The real cause is earlier in the logs, most often a wrong password or a network that can't reach the host.
+
+## Using the transaction pooler
+
+Spring Boot apps are long-running, so session mode or a direct connection fits best. If you connect through transaction mode, on port `6543`, add `prepareThreshold=0` to the JDBC URL, because transaction mode doesn't support prepared statements.
