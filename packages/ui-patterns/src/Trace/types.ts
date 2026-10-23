@@ -63,4 +63,5 @@ export interface RootProps {
 
 export interface WaterfallProps extends ComponentProps<'div'> {
   treeWidth?: number
+  controlsWidth?: number
 }
