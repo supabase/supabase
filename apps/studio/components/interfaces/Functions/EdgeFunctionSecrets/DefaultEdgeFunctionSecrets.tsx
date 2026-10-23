@@ -52,8 +52,8 @@ const SecretRow = ({ secret }: { secret: DefaultEdgeFunctionSecret }) => {
                 toast.success(`Copied ${secret.name}`)
               }}
             >
-              <p className="truncate">
-                <code className="text-code-inline">{secret.name}</code>
+              <p className="truncate py-1">
+                <code>{secret.name}</code>
               </p>
             </TooltipTrigger>
             <TooltipContent side="bottom">Click to copy</TooltipContent>

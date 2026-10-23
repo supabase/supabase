@@ -102,6 +102,7 @@ Davide Pellegatta
 Deepthi Sigireddi
 Deji I
 Dennis Senn
+Dhruv Sehgal
 Dimitrios Liappis
 Div Arora
 Dion Zeneli
@@ -112,6 +113,7 @@ Douglas Hunley
 Drew McLellan
 Eduardo Gurgel
 Eleftheria Trivyzaki
+Eliot Daigneault-Mestre
 Eliot Whalan
 Emmett Folger
 Erfi Anugrah
@@ -134,7 +136,9 @@ Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
+Glauber Costa
 Gonzalo Servat
+Graeme Gillies
 Greg Kress
 Greg P
 Greg Richardson
@@ -159,6 +163,7 @@ Jamie Boyd
 Jake Ng
 Jared Patterson
 Jason Farber
+Jason Harley
 Jason Voegele
 Jean-Paul Argudo
 Jeff Smick
@@ -171,6 +176,7 @@ Jesse White
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joanna Lisiewicz
 Joanna Michniewicz
 Joaquim Moreno
 Joel Low
@@ -248,13 +254,14 @@ Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
+Mikaël Francoeur
 Mike Donnalley
 Mike Podobnik
 Miranda Limonczenko
-Mo Khan
 Monica Khoury
 Mrinal Paliwal
 Mykhailo Mischa Lieibenson
+Nara Kasbergen Kwon
 Natalie Roberge
 Nick B
 Nick Littman
@@ -262,6 +269,7 @@ Nick Nowlan
 Nicola Ferraro
 Nicolas Nosenzo
 Nik Richers
+Nikita Sivukhin
 Noah Moss
 Nyannyacha
 Oli R
@@ -283,9 +291,11 @@ Prashansa Kulshrestha
 Qiao Han
 Quintin Willison
 Rafael Chacón
+Rakesh Patel
 Raminder Singh
 Rand Arete
 Raúl Barroso
+Ricardo Tavares
 Riccardo Busetti
 Richard Kasprzak
 Rob Shields
@@ -294,6 +304,7 @@ Rodrigo Mansueli
 Román Cuellar
 Roman Hernandez
 Ronan Lehane
+Rory Hunter
 Rory Wilding
 Ryan Goulet
 Ryan Senior

@@ -1,0 +1,24 @@
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes draw-out {
+  from {
+    scale: 0;
+  }
+}

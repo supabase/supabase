@@ -35,7 +35,7 @@ import { formatBytes } from '@/lib/helpers'
 const USAGE_ATTRIBUTES = [
   'max_cpu_usage',
   'ram_usage',
-  'disk_io_consumption',
+  'disk_io_budget',
   'disk_fs_used_system',
   'disk_fs_used_wal',
   'pg_database_size',
@@ -62,8 +62,8 @@ const COMPUTE_CHART_CONFIG = {
     label: 'Memory',
     color: 'hsl(var(--warning-default))',
   },
-  diskIoConsumption: {
-    label: 'Disk IO',
+  diskIoBalance: {
+    label: 'Disk IO balance',
     color: 'hsl(var(--destructive-500))',
   },
 } satisfies ChartConfig
@@ -140,7 +140,8 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
   const {
     peakCpuUsage,
     peakMemoryUsage,
-    peakDiskIoUsage,
+    minDiskIoBalance,
+    diskIoStatus,
     peakComputeUsage,
     status: computeUsageStatus,
   } = useMemo(
@@ -174,7 +175,7 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
                 label="Compute"
                 tooltip={
                   supportsBurstableIO
-                    ? 'Peak CPU, memory, and disk IO usage over the last 7 days. Sustained high usage may require a larger compute size.'
+                    ? 'Highest CPU usage, memory usage, or consumed disk IO burst balance over the last 7 days; sustained high usage may require a larger compute size.'
                     : 'Peak CPU and memory usage over the last 7 days. Sustained high usage may require a larger compute size.'
                 }
                 value={formatUsagePercent(peakComputeUsage)}
@@ -195,9 +196,10 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
                 />
                 {supportsBurstableIO && (
                   <ChartMetric
-                    label="Disk IO"
-                    value={formatUsagePercent(peakDiskIoUsage)}
-                    status={getUsageMetricStatus(peakDiskIoUsage)}
+                    label="Disk IO balance"
+                    tooltip="Lowest sampled remaining disk IO burst balance over the last 7 days, using the lower of throughput and IOPS balances; 100% is full and 0% is exhausted."
+                    value={formatUsagePercent(minDiskIoBalance)}
+                    status={diskIoStatus}
                     align="end"
                   />
                 )}
@@ -229,7 +231,7 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
                   dataKey="maxCpuUsage"
                   dataKeys={
                     supportsBurstableIO
-                      ? ['maxCpuUsage', 'ramUsage', 'diskIoConsumption']
+                      ? ['maxCpuUsage', 'ramUsage', 'diskIoBalance']
                       : ['maxCpuUsage', 'ramUsage']
                   }
                   DateTimeFormat="MMM D"

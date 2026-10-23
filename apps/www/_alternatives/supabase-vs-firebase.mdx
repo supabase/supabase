@@ -41,7 +41,7 @@ Firestore’s schemaless design makes it easy to prototype. As data relationship
 | **Offline auth**    | The client SDK persists auth tokens locally and handles session renewal                                                                                                 | Session management integrates with Postgres; tokens are validated on the server                        |
 | **Customization**   | Custom auth requires writing Cloud Functions or backend services                                                                                                        | You can write custom policies and logic in SQL; column‑level security enables field‑level restrictions |
 
-Firebase Authentication is easy to set up for email/password and social logins. Enterprise features such as SAML/OIDC and blocking functions require upgrading to the Identity Platform and come with new usage limits[.](https://firebase.google.com/docs/auth#:~:text=iOS%20%20%20135%20Web,192%20Unity) Supabase Auth integrates with Postgres, so you can enforce complex policies using SQL and upgrade to SSO or enterprise auth features without changing products.
+Firebase Authentication is easy to set up for email/password and social sign-in. Enterprise features such as SAML/OIDC and blocking functions require upgrading to the Identity Platform and come with new usage limits[.](https://firebase.google.com/docs/auth#:~:text=iOS%20%20%20135%20Web,192%20Unity) Supabase Auth integrates with Postgres, so you can enforce complex policies using SQL and upgrade to SSO or enterprise auth features without changing products.
 
 ## Serverless functions and backend logic
 

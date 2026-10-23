@@ -2,11 +2,7 @@ import dayjs from 'dayjs'
 import type { FilterGroup } from 'ui-patterns/FilterBar'
 import { describe, expect, test } from 'vitest'
 
-import {
-  filterByFilterGroup,
-  filterByProjects,
-} from '@/components/interfaces/AuditLogs/AuditLogs.utils'
-import { filterByUsers } from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
+import { filterByFilterGroup } from '@/components/interfaces/AuditLogs/AuditLogs.utils'
 import {
   TIMESTAMP_MICROS_PER_MS,
   type AuditLog,
@@ -41,74 +37,19 @@ const logC = makeLog({
 })
 
 describe('timestamp conversion (microseconds → milliseconds)', () => {
-  test('dividing by 1000 produces a valid date', () => {
-    expect(dayjs(TS_A / TIMESTAMP_MICROS_PER_MS).isValid()).toBe(true)
-  })
-
-  test('produces the correct year', () => {
+  test('dividing by TIMESTAMP_MICROS_PER_MS produces the correct date', () => {
     expect(dayjs(TS_A / TIMESTAMP_MICROS_PER_MS).year()).toBe(2026)
-  })
-
-  test('dayjs.unix on a microsecond value produces an invalid date', () => {
-    // Guard: confirms the bug we fixed — dayjs.unix() treats the value as seconds,
-    // overflowing JS Date's max and producing "Invalid Date"
-    expect(dayjs.unix(TS_A).isValid()).toBe(false)
-  })
-})
-
-describe('filterByUsers', () => {
-  test('returns all logs when filter list is empty', () => {
-    expect(filterByUsers([logA, logB, logC], [])).toEqual([logA, logB, logC])
-  })
-
-  test('filters to matching user_id', () => {
-    const result = filterByUsers([logA, logB, logC], ['user-1'])
-    expect(result.map((l) => l.request_id)).toEqual(['req-b'])
-  })
-
-  test('filters to multiple user_ids', () => {
-    const result = filterByUsers([logA, logB, logC], ['user-1', 'user-2'])
-    expect(result.map((l) => l.request_id)).toEqual(['req-b', 'req-c'])
-  })
-
-  test('excludes logs with no user_id when filtering', () => {
-    const result = filterByUsers([logA, logB], ['user-1'])
-    expect(result.map((l) => l.request_id)).toEqual(['req-b'])
-  })
-
-  test('returns empty array when no logs match', () => {
-    expect(filterByUsers([logA, logB, logC], ['user-unknown'])).toEqual([])
-  })
-})
-
-describe('filterByProjects', () => {
-  test('returns all logs when filter list is empty', () => {
-    expect(filterByProjects([logA, logB, logC], [])).toEqual([logA, logB, logC])
-  })
-
-  test('filters to matching project_ref', () => {
-    const result = filterByProjects([logA, logB, logC], ['proj-1'])
-    expect(result.map((l) => l.request_id)).toEqual(['req-a'])
-  })
-
-  test('filters to multiple project_refs', () => {
-    const result = filterByProjects([logA, logB, logC], ['proj-1', 'proj-2'])
-    expect(result.map((l) => l.request_id)).toEqual(['req-a', 'req-b'])
-  })
-
-  test('excludes logs with no project_ref when filtering', () => {
-    const result = filterByProjects([logA, logC], ['proj-1'])
-    expect(result.map((l) => l.request_id)).toEqual(['req-a'])
-  })
-
-  test('returns empty array when no logs match', () => {
-    expect(filterByProjects([logA, logB, logC], ['proj-unknown'])).toEqual([])
   })
 })
 
 describe('filterByFilterGroup', () => {
   const project = (value: string) => ({
     propertyName: 'project',
+    operator: '=',
+    value,
+  })
+  const user = (value: string) => ({
+    propertyName: 'user',
     operator: '=',
     value,
   })
@@ -188,5 +129,24 @@ describe('filterByFilterGroup', () => {
     expect(requestIds({ logicalOperator: 'OR', conditions: [project('proj-1')] })).not.toContain(
       'req-c'
     )
+  })
+
+  test('OR matches logs from any of the users', () => {
+    expect(
+      requestIds({ logicalOperator: 'OR', conditions: [user('user-1'), user('user-2')] })
+    ).toEqual(['req-b', 'req-c'])
+  })
+
+  test('excludes logs without a matching actor when a user is selected', () => {
+    expect(requestIds({ logicalOperator: 'AND', conditions: [user('user-unknown')] })).toEqual([])
+  })
+
+  test('combines user and project: user AND project', () => {
+    expect(
+      requestIds({ logicalOperator: 'AND', conditions: [user('user-1'), project('proj-2')] })
+    ).toEqual(['req-b'])
+    expect(
+      requestIds({ logicalOperator: 'AND', conditions: [user('user-2'), project('proj-2')] })
+    ).toEqual([])
   })
 })

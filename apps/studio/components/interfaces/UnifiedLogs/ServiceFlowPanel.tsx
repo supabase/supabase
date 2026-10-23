@@ -103,7 +103,7 @@ export function ServiceFlowPanel({
                 <TabsTrigger value="raw-json">Raw JSON</TabsTrigger>
                 <TabsIndicator />
               </TabsList>
-              {['overview', 'raw-json'].map((tab) => (
+              {(['overview', 'raw-json'] as const).map((tab) => (
                 <TabsContent
                   key={`${tab}-${selectedRow?.id}`}
                   value={tab}

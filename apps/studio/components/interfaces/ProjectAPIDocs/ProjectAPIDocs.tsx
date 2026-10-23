@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { Button, SidePanel } from 'ui'
@@ -19,7 +18,7 @@ import LanguageSelector from './LanguageSelector'
 import { SecondLevelNav } from './SecondLevelNav'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 /**
@@ -44,7 +43,9 @@ export const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
   const { data: apiKeysData } = useAPIKeys(
     { projectRef: ref },
     { enabled: snap.showProjectApiDocs && canReadAPIKeys }

@@ -101,6 +101,79 @@
 }
 
 /*
+ * Fades the left or right edge of a horizontal scroll area when more content is on that side
+ */
+@property --scroll-fade-start {
+  syntax: '<length>';
+  initial-value: 0px;
+  inherits: false;
+}
+
+@property --scroll-fade-end {
+  syntax: '<length>';
+  initial-value: 0px;
+  inherits: false;
+}
+
+/* each fade changes size over the first or last 48px of the scroll */
+@keyframes scroll-fade-start {
+  from {
+    --scroll-fade-start: 0px;
+  }
+  to {
+    --scroll-fade-start: 32px;
+  }
+}
+
+@keyframes scroll-fade-end {
+  from {
+    --scroll-fade-end: 32px;
+  }
+  to {
+    --scroll-fade-end: 0px;
+  }
+}
+
+@utility scroll-fade-x {
+  --scroll-shadow: rgb(0 0 0 / 0.05);
+  background:
+    linear-gradient(to right, var(--background) 40%, transparent) left / 40px 100% local,
+    linear-gradient(to left, var(--background) 40%, transparent) right / 40px 100% local,
+    linear-gradient(to right, var(--scroll-shadow), transparent) left / 24px 100% scroll,
+    linear-gradient(to left, var(--scroll-shadow), transparent) right / 24px 100% scroll;
+  background-repeat: no-repeat;
+
+  @variant dark {
+    --scroll-shadow: rgb(0 0 0 / 0.2);
+  }
+
+  @supports (animation-timeline: scroll()) {
+    background: none;
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      rgb(0 0 0 / 0.15) calc(var(--scroll-fade-start) * 0.25),
+      rgb(0 0 0 / 0.5) calc(var(--scroll-fade-start) * 0.5),
+      rgb(0 0 0 / 0.85) calc(var(--scroll-fade-start) * 0.75),
+      #000 var(--scroll-fade-start),
+      #000 calc(100% - var(--scroll-fade-end)),
+      rgb(0 0 0 / 0.85) calc(100% - var(--scroll-fade-end) * 0.75),
+      rgb(0 0 0 / 0.5) calc(100% - var(--scroll-fade-end) * 0.5),
+      rgb(0 0 0 / 0.15) calc(100% - var(--scroll-fade-end) * 0.25),
+      transparent 100%
+    );
+    /* use longhands. the kb build merges the shorthand and the timeline, and browsers reject the result */
+    animation-name: scroll-fade-start, scroll-fade-end;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(self inline);
+    animation-range:
+      0 48px,
+      calc(100% - 48px) 100%;
+  }
+}
+
+/*
  * Functional color utilities. The `--value(--color-*)` token accepts any
  * registered --color-* design token (e.g. highlight-foreground-light).
  */

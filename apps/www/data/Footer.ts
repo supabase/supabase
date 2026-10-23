@@ -101,6 +101,10 @@ const footerData = [
         url: '/partners/catalog',
       },
       {
+        text: 'Knowledge Base',
+        url: '/kb',
+      },
+      {
         text: 'Brand Assets',
         url: '/brand-assets',
       },

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
@@ -14,8 +13,7 @@ import {
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 export type LogicalBackupCliInstructionsProps = {
@@ -33,15 +31,8 @@ export const LogicalBackupCliInstructions = ({
 }: LogicalBackupCliInstructionsProps) => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const { can: canResetDbPassword } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canResetDbPassword } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_WRITE
   )
 
   const {
@@ -70,46 +61,46 @@ export const LogicalBackupCliInstructions = ({
       <div className="space-y-1">
         <p className="text-sm text-foreground-light">
           Use your direct connection string to backup your database, replacing{' '}
-          <code className="text-code-inline !break-keep">{DB_PASSWORD_PLACEHOLDER}</code> with your
-          database password. Percent-encode any reserved character in your password before using it
-          in the URL
+          <code className="!break-keep">{DB_PASSWORD_PLACEHOLDER}</code> with your database
+          password. Percent-encode any reserved character in your password before using it in the
+          URL
           <span className="inline-flex align-text-bottom ml-2">
             <InfoTooltip side="bottom" className="max-w-64">
               <p>Examples:</p>
               <ul className="list-disc pl-6">
                 <li>
                   <span className="flex items-center gap-x-1">
-                    <code className="text-code-inline">%</code>
+                    <code>%</code>
                     <span>&nbsp;→&nbsp;</span>
-                    <code className="text-code-inline">%25</code>
+                    <code>%25</code>
                   </span>
                 </li>
                 <li>
                   <span className="flex items-center gap-x-1">
-                    <code className="text-code-inline">@</code>
+                    <code>@</code>
                     <span>&nbsp;→&nbsp;</span>
-                    <code className="text-code-inline">%40</code>
+                    <code>%40</code>
                   </span>
                 </li>
                 <li>
                   <span className="flex items-center gap-x-1">
-                    <code className="text-code-inline">:</code>
+                    <code>:</code>
                     <span>&nbsp;→&nbsp;</span>
-                    <code className="text-code-inline">%3A</code>
+                    <code>%3A</code>
                   </span>
                 </li>
                 <li>
                   <span className="flex items-center gap-x-1">
-                    <code className="text-code-inline">/</code>
+                    <code>/</code>
                     <span>&nbsp;→&nbsp;</span>
-                    <code className="text-code-inline">%2F</code>
+                    <code>%2F</code>
                   </span>
                 </li>
                 <li>
                   <span className="flex items-center gap-x-1">
-                    <code className="text-code-inline">#</code>
+                    <code>#</code>
                     <span>&nbsp;→&nbsp;</span>
-                    <code className="text-code-inline">%23</code>
+                    <code>%23</code>
                   </span>
                 </li>
               </ul>

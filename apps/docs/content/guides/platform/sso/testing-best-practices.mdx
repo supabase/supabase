@@ -281,7 +281,7 @@ Test with 2-3 additional users to verify:
    - Create a new invitation
    - Select **"Non-SSO"** option
    - Send invitation
-   - Recipient can use password or social login to accept
+   - Recipient can use password or social sign-in to accept
 
 3. **Test SSO mismatch scenario**:
    - Create an SSO-required invitation
@@ -348,7 +348,7 @@ SSO accounts have specific restrictions to prevent accidental organization locko
 ### Testing with non-SSO owner account
 
 1. **Sign in with non-SSO owner:**
-   - Use password or social auth account
+   - Use a password or social sign-in account
    - Must be organization owner
    - Navigate to [SSO settings](/dashboard/org/_/sso)
 
@@ -457,7 +457,7 @@ This behavior prevents "orphaned" SSO accounts that can no longer authenticate.
 
 - Organization with only SSO accounts
 - All owners authenticate via SSO
-- No password or social auth owners exist
+- No password or social sign-in owners exist
 
 **Test procedure:**
 
@@ -490,7 +490,7 @@ This behavior prevents "orphaned" SSO accounts that can no longer authenticate.
 **Setup:**
 
 1. **Add non-SSO owner:**
-   - Create or invite a non-SSO user (password or social login)
+   - Create or invite a non-SSO user (password or social sign-in)
    - Promote to owner role
    - **Critical:** Verify non-SSO owner can sign in BEFORE deletion
    - Store credentials securely

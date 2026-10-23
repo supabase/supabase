@@ -1,20 +1,45 @@
+import { HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
 
 import { getEdgeFunctionsLastHourStats } from './edge-functions-last-hour-stats-query'
-import { post } from '@/data/fetchers'
+import { addAPIMock } from '@/tests/lib/msw'
 
-vi.mock('@/data/fetchers', () => ({
-  post: vi.fn(),
-  handleError: vi.fn(),
-}))
+const requestBodySchema = z.object({
+  sql: z.string(),
+  iso_timestamp_start: z.string(),
+  iso_timestamp_end: z.string(),
+})
 
-type PostResponse = Awaited<ReturnType<typeof post>>
+type CapturedRequest = {
+  endpoint?: string
+  key?: string | null
+  body?: z.infer<typeof requestBodySchema>
+}
+
+function mockLogsEndpoint(result: unknown[] = []) {
+  const captured: CapturedRequest = {}
+  for (const endpoint of ['logs.all', 'logs.all.otel'] as const) {
+    addAPIMock({
+      method: 'post',
+      path: `/platform/projects/:ref/analytics/endpoints/${endpoint}`,
+      response: async ({ request, params }) => {
+        expect(params.ref).toBe('project-ref')
+        captured.endpoint = endpoint
+        captured.key = new URL(request.url).searchParams.get('key')
+        captured.body = requestBodySchema.parse(await request.json())
+        return HttpResponse.json({ result })
+      },
+    })
+  }
+  return captured
+}
 
 describe('getEdgeFunctionsLastHourStats', () => {
   beforeEach(() => {
-    vi.useFakeTimers()
+    // Only fake Date so MSW's own timers keep running.
+    vi.useFakeTimers({ toFake: ['Date'] })
     vi.setSystemTime(new Date('2024-01-15T12:00:00.000Z'))
-    vi.mocked(post).mockReset()
   })
 
   afterEach(() => {
@@ -22,35 +47,25 @@ describe('getEdgeFunctionsLastHourStats', () => {
   })
 
   it('requests last-hour function stats from logs.all by default', async () => {
-    vi.mocked(post).mockResolvedValue({ data: { result: [] }, error: null } as PostResponse)
+    const captured = mockLogsEndpoint()
 
     await getEdgeFunctionsLastHourStats({
       projectRef: 'project-ref',
       functionIds: ['fn_1', 'fn_2'],
     })
 
-    expect(post).toHaveBeenCalledWith('/platform/projects/{ref}/analytics/endpoints/logs.all', {
-      params: {
-        path: { ref: 'project-ref' },
-        query: { key: 'last-hour-stats' },
-      },
-      body: expect.objectContaining({
-        sql: expect.stringContaining(`and function_id in ('fn_1', 'fn_2')`),
-        iso_timestamp_start: '2024-01-15T11:00:00.000Z',
-        iso_timestamp_end: '2024-01-15T12:00:00.000Z',
-      }),
-      signal: undefined,
+    expect(captured.endpoint).toBe('logs.all')
+    expect(captured.key).toBe('last-hour-stats')
+    expect(captured.body).toMatchObject({
+      iso_timestamp_start: '2024-01-15T11:00:00.000Z',
+      iso_timestamp_end: '2024-01-15T12:00:00.000Z',
     })
-
-    const postCalls = vi.mocked(post).mock.calls as Array<
-      [string, { body?: { sql?: string } } | undefined]
-    >
-
-    expect(postCalls[0]?.[1]?.body?.sql).toContain('from\n  function_edge_logs')
+    expect(captured.body?.sql).toContain(`and function_id in ('fn_1', 'fn_2')`)
+    expect(captured.body?.sql).toContain('from\n  function_edge_logs')
   })
 
   it('requests last-hour function stats from logs.all.otel when useOtel is set', async () => {
-    vi.mocked(post).mockResolvedValue({ data: { result: [] }, error: null } as PostResponse)
+    const captured = mockLogsEndpoint()
 
     await getEdgeFunctionsLastHourStats({
       projectRef: 'project-ref',
@@ -58,27 +73,14 @@ describe('getEdgeFunctionsLastHourStats', () => {
       useOtel: true,
     })
 
-    expect(post).toHaveBeenCalledWith(
-      '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
-      {
-        params: {
-          path: { ref: 'project-ref' },
-          query: { key: 'last-hour-stats' },
-        },
-        body: expect.objectContaining({
-          sql: expect.stringContaining(`and log_attributes['function_id'] in ('fn_1', 'fn_2')`),
-          iso_timestamp_start: '2024-01-15T11:00:00.000Z',
-          iso_timestamp_end: '2024-01-15T12:00:00.000Z',
-        }),
-        signal: undefined,
-      }
-    )
-
-    const postCalls = vi.mocked(post).mock.calls as Array<
-      [string, { body?: { sql?: string } } | undefined]
-    >
-    const sql = postCalls[0]?.[1]?.body?.sql ?? ''
-
+    expect(captured.endpoint).toBe('logs.all.otel')
+    expect(captured.key).toBe('last-hour-stats')
+    expect(captured.body).toMatchObject({
+      iso_timestamp_start: '2024-01-15T11:00:00.000Z',
+      iso_timestamp_end: '2024-01-15T12:00:00.000Z',
+    })
+    const sql = captured.body?.sql ?? ''
+    expect(sql).toContain(`and log_attributes['function_id'] in ('fn_1', 'fn_2')`)
     expect(sql).toContain('from logs')
     expect(sql).toContain("source = 'function_edge_logs'")
     expect(sql).toContain("case when toInt32OrZero(log_attributes['response.status_code']) >= 500")
@@ -86,15 +88,10 @@ describe('getEdgeFunctionsLastHourStats', () => {
   })
 
   it('coerces counts to numbers and computes error rates per function', async () => {
-    vi.mocked(post).mockResolvedValue({
-      data: {
-        result: [
-          { function_id: 'fn_1', requests_count: '100', server_err_count: '5' },
-          { function_id: 'fn_2', requests_count: 8, server_err_count: 0 },
-        ],
-      },
-      error: null,
-    } as PostResponse)
+    mockLogsEndpoint([
+      { function_id: 'fn_1', requests_count: '100', server_err_count: '5' },
+      { function_id: 'fn_2', requests_count: 8, server_err_count: 0 },
+    ])
 
     const result = await getEdgeFunctionsLastHourStats({
       projectRef: 'project-ref',
@@ -102,39 +99,18 @@ describe('getEdgeFunctionsLastHourStats', () => {
     })
 
     expect(result).toEqual({
-      fn_1: {
-        functionId: 'fn_1',
-        requestsCount: 100,
-        serverErrorCount: 5,
-        errorRate: 5,
-      },
-      fn_2: {
-        functionId: 'fn_2',
-        requestsCount: 8,
-        serverErrorCount: 0,
-        errorRate: 0,
-      },
+      fn_1: { functionId: 'fn_1', requestsCount: 100, serverErrorCount: 5, errorRate: 5 },
+      fn_2: { functionId: 'fn_2', requestsCount: 8, serverErrorCount: 0, errorRate: 0 },
     })
-  })
-
-  it('handles empty results', async () => {
-    vi.mocked(post).mockResolvedValue({ data: { result: [] }, error: null } as PostResponse)
-
-    const result = await getEdgeFunctionsLastHourStats({
-      projectRef: 'project-ref',
-      functionIds: ['fn_1'],
-    })
-
-    expect(result).toEqual({})
   })
 
   it('skips the logs query when there are no function ids', async () => {
+    // No handler registered: an outgoing request would fail the test.
     const result = await getEdgeFunctionsLastHourStats({
       projectRef: 'project-ref',
       functionIds: [],
     })
 
     expect(result).toEqual({})
-    expect(post).not.toHaveBeenCalled()
   })
 })

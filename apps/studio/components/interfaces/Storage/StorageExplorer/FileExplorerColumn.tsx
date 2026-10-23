@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { get, noop, sum, uniqBy } from 'lodash'
 import {
   ChevronsDownIcon,
@@ -37,7 +36,7 @@ import { FileExplorerRow } from './FileExplorerRow'
 import { FileExplorerRowContextMenuProvider } from './FileExplorerRowContextMenu'
 import { useStoragePreference } from './useStoragePreference'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { BASE_PATH } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -105,7 +104,9 @@ export const FileExplorerColumn = ({
 
   const snap = useStorageExplorerStateSnapshot()
   const { view, setSortByOrder, setSortBy, setView } = useStoragePreference(snap.projectRef)
-  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_WRITE
+  )
 
   useEffect(() => {
     if (fileExplorerColumnRef) {

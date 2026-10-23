@@ -16,7 +16,10 @@ import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
-import { prepareMessagesForModel } from '@/lib/ai/generate-assistant-response.utils'
+import {
+  hideToolErrorsFromModel,
+  prepareMessagesForModel,
+} from '@/lib/ai/generate-assistant-response.utils'
 import {
   CHAT_PROMPT,
   GENERAL_PROMPT,
@@ -149,6 +152,9 @@ export async function generateAssistantResponse({
       instructions: systemMessage,
       stopWhen: isStepCount(20),
       messages: coreMessages,
+      prepareStep: ({ messages }) => ({
+        messages: hideToolErrorsFromModel(messages, aiOptInLevel),
+      }),
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),

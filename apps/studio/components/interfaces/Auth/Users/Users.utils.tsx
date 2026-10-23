@@ -111,7 +111,7 @@ const providers = {
 
 // [Joshen] Just FYI this is not stress tested as I'm not sure what
 // all the potential values for each provider is under user.raw_app_meta_data.provider
-// Will need to go through one by one to properly verify https://supabase.com/docs/guides/auth/social-login
+// Will need to go through one by one to properly verify https://supabase.com/docs/guides/auth/social-sign-in
 // But I've made the UI handle to not render any icon if nothing matches in this map
 export const providerIconMap: { [key: string]: string } = Object.values([
   ...providers.social,

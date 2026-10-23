@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content'
+import remarkParse from 'remark-parse'
+import { Admonition } from 'ui-patterns/Admonition'
+import { unified } from 'unified'
+import { visit } from 'unist-util-visit'
+
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+
+export async function getStaticPaths() {
+	const faqs = await getCollection('faqs')
+	return faqs.map((faq) => ({
+		params: { slug: faq.id },
+		props: { faq },
+	}))
+}
+
+const { faq } = Astro.props
+const { title, topics } = faq.data
+const { Content } = await render(faq)
+
+// faq.filePath is relative to the kb app root, e.g. "src/content/faqs/auth/foo.mdx"
+const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb/${faq.filePath}`
+
+// Plain text of the answer's paragraphs and headings, for the schema below.
+const blocks: string[] = []
+visit(unified().use(remarkParse).parse(faq.body ?? ''), (node) => {
+	if (node.type !== 'paragraph' && node.type !== 'heading') return
+	let text = ''
+	visit(node, (child) => {
+		if (child.type === 'text' || child.type === 'inlineCode') text += child.value
+	})
+	if (text) blocks.push(text)
+})
+
+// https://schema.org/FAQPage for this page's single question. "<" is escaped so
+// the JSON can't close the script tag early.
+const faqPageJsonLd = JSON.stringify({
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: [
+		{
+			'@type': 'Question',
+			name: title,
+			acceptedAnswer: { '@type': 'Answer', text: blocks.join('\n\n') },
+		},
+	],
+}).replace(/</g, '\\u003c')
+---
+
+<ArticleLayout title={title} topics={topics} viewGitHubLink={viewGitHubLink}>
+	<script type="application/ld+json" set:html={faqPageJsonLd} />
+	<Content components={{ Admonition }} />
+</ArticleLayout>
