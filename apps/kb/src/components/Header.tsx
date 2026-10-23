@@ -1,7 +1,8 @@
 import { Menu, X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Button, buttonVariants, cn } from 'ui'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
+import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 
 import { getNavMenus, SIGN_UP_URL } from '../lib/nav'
 import type { Topic } from '../lib/topics'
@@ -22,6 +23,8 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { choice, onChoiceChange } = useThemeChoice()
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const [scrolledTitle, setScrolledTitle] = useState<string | null>(null)
+  const shownTitle = isMenuOpen ? null : scrolledTitle
 
   const setMenuOpen = (isOpen: boolean) => {
     setIsMenuOpen(isOpen)
@@ -35,13 +38,39 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
     menuButtonRef.current?.focus()
   }
 
+  // the article title is static html, so the island finds it once the header mounts
+  const observePageTitle = useCallback((nav: HTMLElement | null) => {
+    const title = document.querySelector<HTMLElement>('[data-page-title]')
+    if (!nav || !title) return
+    // the title counts as hidden once it is under the header and the toc bar
+    const coveredHeight = Math.max(
+      nav.getBoundingClientRect().bottom,
+      document.querySelector('[data-toc-menu]')?.getBoundingClientRect().bottom ?? 0
+    )
+    const observer = new IntersectionObserver(
+      ([entry]) =>
+        setScrolledTitle(entry.isIntersecting ? null : (title.dataset.pageTitle ?? null)),
+      { rootMargin: `-${coveredHeight}px 0px 0px 0px` }
+    )
+    observer.observe(title)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <>
-      <nav className="relative h-(--header-height) border-b border-default bg-background/90 backdrop-blur-xs dark:bg-background/95">
-        <div className="section-container flex h-full items-center justify-between">
-          <div className="flex h-full items-center">
-            <div className="lg:w-[calc(var(--nav-inset)-0.625rem-1px)]">
-              <Logo />
+      <nav
+        ref={observePageTitle}
+        className="relative h-(--header-height) border-b border-default bg-background/90 backdrop-blur-xs dark:bg-background/95"
+      >
+        <div className="section-container flex h-full items-center justify-between gap-3">
+          <div className="flex h-full min-w-0 items-center">
+            <div className="min-w-0 lg:w-[calc(var(--nav-inset)-0.625rem-1px)]">
+              <Logo className="max-lg:hidden" />
+              <div className="flex h-11 min-w-0 items-center text-sm font-medium text-foreground lg:hidden">
+                <HeadingReel id={shownTitle ?? 'logo'} index={shownTitle ? 1 : 0}>
+                  {shownTitle ? <a href={import.meta.env.BASE_URL}>{shownTitle}</a> : <Logo />}
+                </HeadingReel>
+              </div>
             </div>
             <Nav menus={menus} className="hidden lg:flex" />
           </div>
