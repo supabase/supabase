@@ -38,38 +38,224 @@ To give a member no project access by default and grant access project by projec
 
 ## Manage organization members
 
-To invite someone, go to your organization's [team settings](/dashboard/org/_/team) and send an invite link to their email address. The invite is valid for 24 hours.
+You can invite members, change their roles, and list them in your organization's [team settings in the Supabase Dashboard](/dashboard/org/_/team) or programmatically with the [Management API](/docs/reference/api/introduction).
 
-An invite with a project-scoped role can assign that role on only one project. After the person accepts, you can assign roles on more projects.
-
-<Admonition type="note">
-
-Only a SAML SSO account from the same identity provider can accept an invite sent from a SAML SSO account.
-
-This security measure prevents accidental invites to accounts that your enterprise's identity provider doesn't manage.
-
-</Admonition>
-
-### List organization members with the Management API
-
-You can list organization members with the Management API:
+To use the Management API examples in this section, set the following variables:
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
 export SUPABASE_ACCESS_TOKEN="your-access-token"
 # Find your organization slug in your organization's general settings
 export ORG_SLUG="your-organization-slug"
+```
 
-# List organization members
-curl "https://api.supabase.com/v1/organizations/$ORG_SLUG/members" \
+Each example names the permission a scoped access token needs. For more information, see [Permission scopes](/docs/guides/platform/personal-access-tokens#permission-scopes).
+
+### Invite a member
+
+An invite is valid for 24 hours. The person gets access only after they accept it.
+
+<Admonition type="note">
+
+Only a SAML SSO account from the same identity provider can accept an invite sent from a SAML SSO account. This security measure prevents accidental invites to accounts that your enterprise's identity provider doesn't manage.
+
+</Admonition>
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
+
+To invite someone in the Supabase Dashboard:
+
+1. In your organization's [team settings](/dashboard/org/_/team), click **Invite members**.
+2. Select a **Role**.
+3. To limit the role to one project, turn off **Grant this role on all projects**. In **Select a project**, select the project. An invite can grant a project-scoped role on only one project.
+4. In **Email addresses**, enter the person's email address.
+5. Click **Send invitation**.
+
+After the person accepts, you can assign roles on more projects.
+
+If an invite expires before the person accepts it, send a new one. Next to the invite, click **More options**, then click **Resend invitation**.
+
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
+
+<Admonition type="note">
+
+The Management API endpoint for creating invites is available only on the [Team and Enterprise plans](/pricing).
+
+</Admonition>
+
+To invite someone with the Management API, call [Create organization invitations](/docs/reference/api/v2-create-organization-invitations). The token needs the **Organization Members** permission with **Read-write** access. Set `role` to `owner`, `administrator`, `developer`, `read-only`, or `no-access`.
+
+Without `projects`, the role applies to the whole organization:
+
+```bash
+curl -X POST "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invitations" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": [
+      {
+        "type": "organization_invitation",
+        "attributes": { "email": "person@example.com", "role": "developer" }
+      }
+    ]
+  }'
+```
+
+To limit the role to a project, add `projects` with the project's reference ID:
+
+```bash
+curl -X POST "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invitations" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": [
+      {
+        "type": "organization_invitation",
+        "attributes": {
+          "email": "person@example.com",
+          "role": "developer",
+          "projects": [{ "ref": "your-project-ref" }]
+        }
+      }
+    ]
+  }'
+```
+
+An email address can have only one invite at a time, even after that invite expires. Creating another invite for the same email returns a `409` error. To send a new invite, call [Delete organization invitations](/docs/reference/api/v2-delete-organization-invitations) with the same permission, then create the invite again:
+
+```bash
+curl -X DELETE "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invitations" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": [
+      {
+        "type": "organization_invitation",
+        "attributes": { "email": "person@example.com" }
+      }
+    ]
+  }'
+```
+
+</TabPanel>
+</Tabs>
+
+### Change a member's role
+
+You can change a member's role after they accept their invite.
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
+
+To change a member's role in the Supabase Dashboard:
+
+1. In your organization's [team settings](/dashboard/org/_/team), next to the member, click **Manage access**.
+2. Choose where the role applies:
+   - To give the member one role across the organization, turn on **Apply roles to all projects in the organization**, then select the role.
+   - To limit the member to specific projects, turn off **Apply roles to all projects in the organization**. Click **Add project**, select a project, and select a role for it. Repeat for each project.
+3. Click **Save roles**. In the confirmation dialog, click **Update roles**.
+
+The Supabase Dashboard replaces the member's previous roles with the roles you save.
+
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
+
+<Admonition type="note">
+
+The Management API endpoint for changing roles is available only on the [Team and Enterprise plans](/pricing).
+
+</Admonition>
+
+To change a member's role with the Management API, call [Assign organization member role](/docs/reference/api/v2-assign-organization-member-role) with the member's user ID. Only an organization **Owner** can call this endpoint. The token needs the **Organization Settings** permission with **Read-write** access. To find a member's user ID, list the organization's members.
+
+Without `projects`, the call assigns an organization-wide role:
+
+```bash
+export USER_ID="member-user-id"
+
+curl -X PATCH "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/$USER_ID/roles" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "type": "organization_member_role",
+      "attributes": { "role": "read-only" }
+    }
+  }'
+```
+
+With `projects`, the call assigns a project-scoped role:
+
+```bash
+curl -X PATCH "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/$USER_ID/roles" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": {
+      "type": "organization_member_role",
+      "attributes": {
+        "role": "developer",
+        "projects": [{ "ref": "your-project-ref" }]
+      }
+    }
+  }'
+```
+
+After a change, [list the member's roles](#list-organization-members) to check which roles and projects they have.
+
+</TabPanel>
+</Tabs>
+
+### List organization members
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
+
+To see your organization's members in the Supabase Dashboard, go to your organization's [team settings](/dashboard/org/_/team). The **Role** column shows where each role applies: **Organization** for an organization-wide role, or the projects for a project-scoped role. Pending invites are marked **Invited**, or **Expired** after 24 hours.
+
+To narrow the list, search with **Filter members**, or filter by **MFA status** or **Roles**.
+
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
+
+To list members and their roles, call [List organization members](/docs/reference/api/v2-list-organization-members). The token needs the **Organization Members** permission with **Read** access.
+
+```bash
+curl "https://api.supabase.com/v2/organizations/$ORG_SLUG/members" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
+Each member's `roles` array shows every role they have. A role's `scope` is `organization` or `project`, and a project-scoped role lists the projects it applies to:
+
+```json
+{
+  "roles": [
+    {
+      "name": "developer",
+      "scope": "project",
+      "projects": [{ "ref": "abcdefghijklmnopqrst", "name": "staging" }]
+    }
+  ]
+}
+```
+
+The results are paginated. The endpoint's reference page lists the pagination parameters.
+
+</TabPanel>
+</Tabs>
+
 ### Transfer ownership of an organization
 
-Each Supabase organization must have at least one owner. If your organization has other owners, you can give up ownership and leave the organization. In your organization's [team settings](/dashboard/org/_/team), click **Leave team**.
+Each Supabase organization must have at least one **Owner**. If you're the only **Owner**, make another member an **Owner** before you leave. Members with the **Administrator** role can't take over, because they can't update organization settings or add **Owners**.
 
-If you're the only owner, make another member an **Owner** before you leave. Either promote an existing member to **Owner**, or invite someone as **Owner** and wait for them to accept.
+To leave an organization:
+
+1. If you're the only **Owner**, make another member an **Owner** in one of these ways:
+   - Promote an existing member. In team settings, next to the member, click **Manage access**. Turn on **Apply roles to all projects in the organization**, select **Owner**, and save the roles. With the Management API, [assign the role](#change-a-members-role) `owner` without `projects`.
+   - Invite someone as **Owner**, and wait for them to accept.
+2. In your organization's team settings, click **Leave team**.
 
 ## Permissions across roles
 
