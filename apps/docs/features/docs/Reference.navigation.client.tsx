@@ -188,7 +188,7 @@ function getLinkStyles(isActive: boolean, className?: string) {
   return cn(
     'text-sm text-foreground-lighter',
     !isActive && 'hover:text-foreground',
-    isActive && 'text-brand',
+    isActive && 'text-primary',
     'transition-colors',
     className
   )

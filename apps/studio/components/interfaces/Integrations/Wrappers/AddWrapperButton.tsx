@@ -1,22 +1,22 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useMemo } from 'react'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const WRAPPER_REQUIRED_EXTENSION_NAMES = ['wrappers', 'supabase_vault']
 
 interface AddWrapperButtonProps {
   variant?: 'default' | 'primary' | 'outline'
-  onClick: () => void
 }
 
-export const AddWrapperButton = ({ variant = 'default', onClick }: AddWrapperButtonProps) => {
-  const { can: canCreateWrapper } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'wrappers'
+export const AddWrapperButton = ({ variant = 'default' }: AddWrapperButtonProps) => {
+  const { ref, id } = useParams()
+  const { can: canCreateWrapper } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data: project } = useSelectedProjectQuery()
@@ -33,20 +33,27 @@ export const AddWrapperButton = ({ variant = 'default', onClick }: AddWrapperBut
     [extensions]
   )
 
+  const label = needsExtensions ? 'Install wrapper' : 'Add new wrapper'
+
   return (
     <ButtonTooltip
+      asChild={canCreateWrapper}
       variant={variant}
-      onClick={onClick}
       disabled={!canCreateWrapper}
       tooltip={{
         content: {
+          side: 'bottom',
           text: !canCreateWrapper
             ? 'You need additional permissions to create a foreign data wrapper'
             : undefined,
         },
       }}
     >
-      {needsExtensions ? 'Install wrapper' : 'Add new wrapper'}
+      {canCreateWrapper ? (
+        <Link href={`/project/${ref}/integrations/${id}/wrappers?new=true`}>{label}</Link>
+      ) : (
+        label
+      )}
     </ButtonTooltip>
   )
 }

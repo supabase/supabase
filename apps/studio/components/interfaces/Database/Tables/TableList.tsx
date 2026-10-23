@@ -1,18 +1,17 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import {
-  Check,
-  ChevronDown,
-  Copy,
-  Edit,
-  Eye,
-  MoreVertical,
-  Plus,
-  Search,
-  Trash,
-  X,
+  CheckIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  EditIcon,
+  EyeIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  SearchIcon,
+  TrashIcon,
+  XIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -62,7 +61,7 @@ import { useMaterializedViewsQuery } from '@/data/materialized-views/materialize
 import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useViewsQuery } from '@/data/views/views-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -98,9 +97,8 @@ export const TableList = ({
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canUpdateTables } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canUpdateTables } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const {
@@ -284,7 +282,7 @@ export const TableList = ({
           value={filterString}
           onChange={(e) => setFilterString(e.target.value)}
           onKeyDown={onSearchInputEscape(filterString, setFilterString)}
-          icon={<Search />}
+          icon={<SearchIcon />}
         />
 
         <Popover>
@@ -292,7 +290,7 @@ export const TableList = ({
             <Button
               size="tiny"
               variant={hasFiltersApplied ? 'default' : 'dashed'}
-              iconRight={<ChevronDown />}
+              iconRight={<ChevronDownIcon />}
             >
               Entity Type
             </Button>
@@ -345,7 +343,7 @@ export const TableList = ({
               <Button
                 variant="primary"
                 className="w-auto ml-auto"
-                icon={<Plus />}
+                icon={<PlusIcon />}
                 onClick={() => onAddTable()}
               >
                 New table
@@ -355,7 +353,7 @@ export const TableList = ({
             <ButtonTooltip
               variant="primary"
               className="w-auto ml-auto"
-              icon={<Plus />}
+              icon={<PlusIcon />}
               disabled
               tooltip={{
                 content: {
@@ -498,12 +496,12 @@ export const TableList = ({
                             (table) => table.id === x.id
                           ) ? (
                             <div className="flex items-center gap-x-2">
-                              <Check size={16} strokeWidth={2} className="text-brand-link" />
+                              <CheckIcon size={16} strokeWidth={2} className="text-primary" />
                               <p className="text-foreground-light">Enabled</p>
                             </div>
                           ) : (
                             <div className="flex items-center gap-x-2">
-                              <X size={16} strokeWidth={2} className="text-foreground-muted" />
+                              <XIcon size={16} strokeWidth={2} className="text-foreground-muted" />
                               <p className="text-foreground-lighter">Disabled</p>
                             </div>
                           )}
@@ -523,7 +521,7 @@ export const TableList = ({
                                     <DropdownMenuTrigger asChild>
                                       <Button
                                         className="px-1"
-                                        icon={<MoreVertical />}
+                                        icon={<MoreVerticalIcon />}
                                         aria-label={`Table ${x.name} actions`}
                                       />
                                     </DropdownMenuTrigger>
@@ -548,7 +546,7 @@ export const TableList = ({
                                       })
                                     }
                                   >
-                                    <Eye size={12} />
+                                    <EyeIcon size={12} />
                                     <p>View in Table Editor</p>
                                   </DropdownMenuItem>
 
@@ -568,7 +566,7 @@ export const TableList = ({
                                           },
                                         }}
                                       >
-                                        <Edit size={12} />
+                                        <EditIcon size={12} />
                                         <p>Edit table</p>
                                       </DropdownMenuItemTooltip>
                                       <DropdownMenuItemTooltip
@@ -585,7 +583,7 @@ export const TableList = ({
                                           },
                                         }}
                                       >
-                                        <Copy size={12} />
+                                        <CopyIcon size={12} />
                                         <span>Duplicate Table</span>
                                       </DropdownMenuItemTooltip>
                                       <DropdownMenuSeparator />
@@ -604,7 +602,7 @@ export const TableList = ({
                                           },
                                         }}
                                       >
-                                        <Trash size={12} />
+                                        <TrashIcon size={12} />
                                         <p>Delete table</p>
                                       </DropdownMenuItemTooltip>
                                     </>

@@ -252,12 +252,13 @@ type PrefetchOptions = {
 export function useRouter() {
   const router = useTanStackRouter()
   const location = useLocation()
-  const matches = useMatches()
+  // Pending match updates must not replace the shim and restart legacy redirect effects.
+  const leafRouteId =
+    useMatches({ select: (matches) => matches[matches.length - 1]?.routeId }) ?? location.pathname
   const params = useParams({ strict: false })
   const search = useSearch({ strict: false })
 
   return useMemo(() => {
-    const leafRouteId = matches[matches.length - 1]?.routeId ?? location.pathname
     const pathPattern = toNextPathPattern(leafRouteId)
 
     // Both push and replace accept Next's (url, as?, options?) signature.
@@ -397,7 +398,7 @@ export function useRouter() {
       // ---- events ----
       events: getRouterEventsProxy(router),
     }
-  }, [router, location.href, location.pathname, matches, params, search])
+  }, [router, location.href, location.pathname, leafRouteId, params, search])
 }
 
 // Normalise an optional-catch-all route's params across both frameworks.

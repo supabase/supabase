@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { toast } from 'sonner'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -11,7 +10,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const WebhooksContent = () => {
@@ -28,9 +27,8 @@ const WebhooksContent = () => {
   })
 
   const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
-  const { can: canReadWebhooks, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_READ,
-    'triggers'
+  const { can: canReadWebhooks, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_READ
   )
 
   const { mutate: enableHooks, isPending: isEnablingHooks } = useHooksEnableMutation({

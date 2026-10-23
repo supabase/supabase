@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -26,6 +25,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { SuspensionNotice } from '../Settings/SuspensionNotice'
 import { AlertError } from '@/components/ui/AlertError'
 import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
@@ -37,7 +37,7 @@ import {
   useRealtimeConfigurationQuery,
 } from '@/data/realtime/realtime-config-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -56,9 +56,8 @@ export const RealtimeSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: organization, isSuccess: isSuccessOrganization } = useSelectedOrganizationQuery()
-  const { can: canUpdateConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.REALTIME_ADMIN_READ,
-    '*'
+  const { can: canUpdateConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.REALTIME_CONFIG_WRITE
   )
 
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
@@ -67,9 +66,7 @@ export const RealtimeSettings = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data, error, isError, isPending } = useRealtimeConfigurationQuery({
-    projectRef,
-  })
+  const { data, error, isError, isPending } = useRealtimeConfigurationQuery({ projectRef })
 
   const { data: policies, isSuccess: isSuccessPolicies } = useDatabasePoliciesQuery({
     projectRef,
@@ -119,6 +116,7 @@ export const RealtimeSettings = () => {
   const isFreePlan = organization?.plan.id === 'free'
   const isUsageBillingEnabled = organization?.usage_billing_enabled
   const isRealtimeDisabled = data?.suspend ?? REALTIME_DEFAULT_CONFIG.suspend
+  const isAdminSuspended = Boolean(data?.admin_suspended_at)
   // Check if RLS policies exist for realtime.messages table
   const realtimeMessagesPolicies = policies?.filter(
     (policy) => policy.schema === 'realtime' && policy.table === 'messages'
@@ -325,6 +323,8 @@ export const RealtimeSettings = () => {
 
   return (
     <>
+      {isAdminSuspended && <SuspensionNotice suspendedAt={data?.admin_suspended_at} />}
+
       <Form {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           {isError ? (
@@ -421,8 +421,8 @@ export const RealtimeSettings = () => {
                                   <p className="prose max-w-full text-sm">
                                     Private mode is {isSettingToPrivate ? 'being ' : ''}
                                     enabled, but no RLS policies exist on the{' '}
-                                    <code className="text-code-inline">realtime.messages</code>{' '}
-                                    table. No messages will be received by users.
+                                    <code>realtime.messages</code> table. No messages will be
+                                    received by users.
                                   </p>
                                 }
                                 actions={

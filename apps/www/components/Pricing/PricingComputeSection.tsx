@@ -1,7 +1,6 @@
 'use client'
 
 import { ChevronDownIcon } from '@heroicons/react/outline'
-import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { plans as allPlans } from 'shared-data/plans'
@@ -129,9 +128,9 @@ const PricingComputeSection = () => {
           </div>
 
           <Button asChild size="tiny">
-            <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
+            <a href="https://supabase.com/docs/guides/platform/compute-add-ons">
               Learn about Compute add-ons
-            </Link>
+            </a>
           </Button>
         </div>
         <div
@@ -161,21 +160,21 @@ const PricingComputeSection = () => {
                 </p>
                 <p className="text-[13px] text-foreground-lighter">
                   Read more on{' '}
-                  <Link
+                  <a
                     href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     usage-based billing for compute
-                  </Link>{' '}
+                  </a>{' '}
                   or{' '}
-                  <Link
+                  <a
                     href="https://supabase.com/docs/guides/platform/compute-add-ons"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     Compute Add-ons
-                  </Link>
+                  </a>
                   .
                 </p>
               </div>

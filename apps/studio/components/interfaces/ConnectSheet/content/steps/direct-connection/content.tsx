@@ -1,4 +1,4 @@
-import { Check, KeyRound } from 'lucide-react'
+import { CheckIcon, KeyRoundIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -158,7 +158,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
             {showResetInTitle && (
               <ResetDbPasswordDialog
                 triggerLabel="Reset database password"
-                triggerIcon={<KeyRound />}
+                triggerIcon={<KeyRoundIcon />}
                 onPasswordReset={setTemporaryDatabasePassword}
               />
             )}
@@ -178,7 +178,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
         </div>
         {deploymentMode.isPlatform && temporaryDatabasePassword && (
           <div className="flex items-center gap-2 border-t px-4 py-3 text-sm text-foreground-light">
-            <Check size={16} className="text-brand shrink-0" />
+            <CheckIcon size={16} className="text-primary shrink-0" />
             <span>New password shown until refresh.</span>
           </div>
         )}

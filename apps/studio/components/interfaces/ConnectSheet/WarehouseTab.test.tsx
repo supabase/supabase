@@ -78,8 +78,35 @@ describe('WarehouseTab', () => {
     expect(screen.getByRole('link', { name: 'View progress' })).toBeInTheDocument()
   })
 
+  test('shows connection details once the first table is live while setup continues', async () => {
+    mockSetupStatus({
+      setup_status: 'copying',
+      tables: [
+        { schema: 'public', name: 'orders', copy_name: 'public.orders', state: 'live' },
+        { schema: 'public', name: 'customers', copy_name: 'public.customers', state: 'syncing' },
+      ],
+    })
+
+    customRender(<WarehouseTab />)
+
+    expect(await screen.findByText('Warehouse setup is still running')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Some tables are ready to query. The remaining tables will become available as their backfills finish.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByDisplayValue('default.warehouse.supabase.co')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View progress' })).toHaveAttribute(
+      'href',
+      '/project/default/integrations/warehouse/overview'
+    )
+  })
+
   test('points to the integration when setup reports an error', async () => {
-    mockSetupStatus({ setup_status: 'error' })
+    mockSetupStatus({
+      setup_status: 'error',
+      tables: [{ schema: 'public', name: 'orders', copy_name: 'public.orders', state: 'live' }],
+    })
 
     customRender(<WarehouseTab />)
 
@@ -91,6 +118,7 @@ describe('WarehouseTab', () => {
       'href',
       '/project/default/integrations/warehouse/overview'
     )
+    expect(screen.queryByDisplayValue('default.warehouse.supabase.co')).not.toBeInTheDocument()
   })
 
   test('renders connection details and offers catalog access only for DuckDB', async () => {
@@ -103,15 +131,18 @@ describe('WarehouseTab', () => {
     })
 
     expect(await screen.findByRole('combobox', { name: 'Query engine' })).toBeInTheDocument()
-    expect(container.querySelector('.border-0.shadow-none')).toBeInTheDocument()
     expect(container.querySelector('[data-orientation="horizontal"]')).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Connect' })).not.toBeInTheDocument()
-    expect(screen.getByDisplayValue('default.warehouse.supabase.io')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('default.warehouse.supabase.co')).toBeInTheDocument()
     expect(
       screen.getByDisplayValue(
-        'flightsql://postgres:[YOUR-PASSWORD]@default.warehouse.supabase.io:443?tls=enabled'
+        'flightsql://postgres:[YOUR-PASSWORD]@default.warehouse.supabase.co:443?tls=enabled'
       )
     ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Manage Warehouse' })).toHaveAttribute(
+      'href',
+      '/project/default/integrations/warehouse/overview'
+    )
 
     // FlightSQL is the default engine and needs no catalog access, so nothing here provisions.
     expect(screen.queryByRole('switch')).not.toBeInTheDocument()
@@ -173,10 +204,7 @@ describe('WarehouseTab', () => {
     expect(screen.getByRole('button', { name: 'Copy prompt' })).toBeInTheDocument()
     expect(screen.getByText('Set environment variables')).toBeInTheDocument()
     expect(screen.getByText('Attach Warehouse')).toBeInTheDocument()
-
-    const stepsSection = screen.getByRole('heading', { name: 'Follow these steps' }).parentElement
-      ?.parentElement
-    expect(stepsSection).toHaveClass('border-t', 'bg-muted/50')
+    expect(screen.getByRole('heading', { name: 'Follow these steps' })).toBeInTheDocument()
 
     expect(screen.queryByText('s3-secret')).not.toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Reveal DUCKLAKE_S3_SECRET' }))

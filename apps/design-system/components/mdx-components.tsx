@@ -87,7 +87,7 @@ const components = {
   a: ({ className, ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
     <a
       className={cn(
-        'text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2',
+        'text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2',
         className
       )}
       {...props}
@@ -195,15 +195,6 @@ const components = {
       </StyleWrapper>
     )
   },
-  code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <code
-      className={cn(
-        'relative rounded-sm bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm',
-        className
-      )}
-      {...props}
-    />
-  ),
   Image,
   Callout,
   ComponentPreview,

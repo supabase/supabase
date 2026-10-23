@@ -18,7 +18,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             href="https://claude.com/plugins/supabase"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
+            className="text-primary hover:underline"
           >
             official Anthropic marketplace
           </a>
@@ -53,7 +53,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
               href="https://developers.openai.com/codex/plugins#plugin-directory-in-the-codex-app"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-link hover:underline"
+              className="text-primary hover:underline"
             >
               Codex desktop app plugin directory
             </a>
@@ -83,7 +83,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             href="https://cursor.com/marketplace/supabase"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
+            className="text-primary hover:underline"
           >
             Supabase
           </a>{' '}
@@ -95,6 +95,35 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           focusable={false}
           className="block"
         />
+      </div>
+    )
+  }
+
+  if (client.key === 'antigravity') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          Install the Supabase plugin with the Antigravity CLI by running the following command in
+          your terminal.
+        </p>
+        <CodeBlock
+          value="agy plugin install https://github.com/supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          To manage installed plugins, use the <code>/plugin</code> slash command. See the{' '}
+          <a
+            href="https://antigravity.google/docs/plugins/#managing-plugins-by-surface"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Antigravity plugin documentation
+          </a>
+          .
+        </p>
       </div>
     )
   }
@@ -118,7 +147,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             href="https://geminicli.com/extensions/?name=supabase-communitysupabase-plugin"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
+            className="text-primary hover:underline"
           >
             Gemini CLI extensions directory
           </a>
@@ -178,7 +207,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             href="https://github.com/anthropics/claude-plugins-official"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
+            className="text-primary hover:underline"
           >
             official Anthropic marketplace
           </a>
@@ -222,7 +251,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             href="https://github.com/vercel-labs/open-plugin-spec"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
+            className="text-primary hover:underline"
           >
             Open Plugin
           </a>{' '}
@@ -243,7 +272,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
               href="https://github.com/supabase-community/supabase-plugin"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-link hover:underline"
+              className="text-primary hover:underline"
             >
               GitHub repository
             </a>
@@ -290,7 +319,7 @@ export function AgentPluginsPanel() {
               href={selectedClient.docsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-link hover:underline inline-flex items-center"
+              className="text-primary hover:underline inline-flex items-center"
             >
               {selectedClient.docsLinkText ?? `View ${selectedClient.label} extensions docs`}
               <ExternalLink className="h-3 w-3 ml-1" />
@@ -302,7 +331,7 @@ export function AgentPluginsPanel() {
             href={selectedClient.repoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-link hover:underline inline-flex items-center"
+            className="text-primary hover:underline inline-flex items-center"
           >
             Give feedback
             <ExternalLink className="h-3 w-3 ml-1" />

@@ -1,7 +1,7 @@
 import type { PGTable } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Key } from 'lucide-react'
+import { KeyIcon } from 'lucide-react'
 import { useMemo, useRef } from 'react'
 import DataGrid, { CalculatedColumn, Column } from 'react-data-grid'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -91,7 +91,7 @@ export const ReferenceRecordPeek = ({ table, filters }: ReferenceRecordPeekProps
             {isPrimaryKey && (
               <Tooltip>
                 <TooltipTrigger>
-                  <Key size={14} strokeWidth={2} className="text-brand rotate-45" />
+                  <KeyIcon size={14} strokeWidth={2} className="text-primary rotate-45" />
                 </TooltipTrigger>
                 <TooltipContent side="bottom">Primary key</TooltipContent>
               </Tooltip>

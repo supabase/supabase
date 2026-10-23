@@ -1,16 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '../misc/useCheckPermissionsV2'
 import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { getAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getAiOptInLevel, type AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from '@/lib/constants'
 import type { ResponseError } from '@/types'
@@ -28,12 +27,11 @@ export type AIOptInFormValues = z.infer<typeof AIOptInSchema>
  * Hook to manage the AI Opt-In form state and submission logic.
  * Optionally takes an onSuccess callback (e.g., to close a modal).
  */
-export const useAIOptInForm = (onSuccessCallback?: () => void) => {
+export const useAIOptInForm = (onSuccessCallback?: (level: AiOptInLevel) => void) => {
   const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canUpdateOrganization } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE
   )
 
   const [, setUpdatedOptInSinceMCP] = useLocalStorageQuery(
@@ -93,7 +91,7 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
           invalidateOrganizationsQuery(queryClient)
           toast.success('Successfully updated AI opt-in settings')
           setUpdatedOptInSinceMCP(true)
-          onSuccessCallback?.() // Call optional callback on success
+          onSuccessCallback?.(values.aiOptInLevel)
         },
         onError: (error: ResponseError) => {
           toast.error(`Failed to update settings: ${error.message}`)

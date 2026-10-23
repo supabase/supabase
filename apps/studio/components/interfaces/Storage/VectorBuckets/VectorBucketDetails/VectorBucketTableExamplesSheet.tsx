@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SqlEditor } from 'icons'
-import { ChevronDown, ListPlus } from 'lucide-react'
+import { ChevronDownIcon, ListPlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -30,7 +29,7 @@ import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 
@@ -58,7 +57,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
     <Sheet open={open} onOpenChange={setOpen}>
       {/* Move into overflow menu after vectors added */}
       <SheetTrigger asChild>
-        <Button icon={<ListPlus size={12} className="text-foreground-lighter" />}>
+        <Button icon={<ListPlusIcon size={12} className="text-foreground-lighter" />}>
           Insert vectors
         </Button>
       </SheetTrigger>
@@ -66,8 +65,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
             <SheetTitle>
-              Insert vectors into{' '}
-              <code className="text-code-inline text-sm!">{index.indexName}</code>
+              Insert vectors into <code className="text-sm!">{index.indexName}</code>
             </SheetTitle>
           </SheetHeader>
 
@@ -139,9 +137,8 @@ function VectorBucketIndexExamples({
 }: VectorBucketIndexExamplesProps) {
   const { ref: projectRef, bucketId } = useParams()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
   const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { secretKey } = apiKeysData ?? {}
@@ -206,9 +203,8 @@ const result = await index.putVectors({
   return (
     <SheetSection className="flex flex-col gap-6">
       <p className="text-sm text-foreground-light">
-        Use the following code snippet to insert vectors into your table. The{' '}
-        <code className="text-code-inline">data</code> property should contain all of your vector
-        data.
+        Use the following code snippet to insert vectors into your table. The <code>data</code>{' '}
+        property should contain all of your vector data.
       </p>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between">
@@ -219,7 +215,7 @@ const result = await index.putVectors({
                   Language
                 </span>
                 <Button
-                  iconRight={<ChevronDown size={14} strokeWidth={2} />}
+                  iconRight={<ChevronDownIcon size={14} strokeWidth={2} />}
                   className="rounded-l-none"
                 >
                   {language === 'javascript' ? 'JavaScript' : 'SQL'}

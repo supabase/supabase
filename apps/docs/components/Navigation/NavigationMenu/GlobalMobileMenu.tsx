@@ -1,7 +1,7 @@
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { X } from 'lucide-react'
+import { AnimatePresence, domAnimation, LazyMotion, m } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -137,7 +137,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
                   height={24}
                   alt="Supabase Logo"
                 />
-                <span className="font-mono text-sm font-medium text-brand-link mb-px">DOCS</span>
+                <span className="font-mono text-sm font-medium text-primary mb-px">DOCS</span>
               </Link>
               <div className="flex gap-4 items-center">
                 <ThemeToggle contentClassName="bg-surface-200" />

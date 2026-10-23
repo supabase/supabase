@@ -267,7 +267,7 @@
     }
 
     a:hover {
-      @apply text-brand-600;
+      @apply text-primary;
     }
 
     p:last-child {
@@ -293,7 +293,7 @@
     }
 
     .is-highlighted {
-      @apply text-brand;
+      @apply text-primary;
     }
   }
   .codeblock-container + .codeblock-container {
@@ -301,15 +301,14 @@
   }
 }
 
-::-moz-selection {
-  /* Code for Firefox */
-  @apply bg-brand;
-  color: #333 !important;
+::selection {
+  background-color: oklch(from var(--primary-bright) l c h / 40%);
+  color: var(--foreground) !important;
 }
 
-::selection {
-  background-color: #6ee7b7;
-  color: #333 !important;
+::-moz-selection {
+  background-color: oklch(from var(--primary-bright) l c h / 40%);
+  color: var(--foreground) !important;
 }
 
 .has-hidden-children {
@@ -404,7 +403,7 @@
 
 .form-field-markdown {
   a {
-    @apply text-brand transition opacity-75 hover:opacity-100 underline;
+    @apply text-primary transition opacity-75 hover:opacity-100 underline;
   }
 }
 

@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -12,6 +11,7 @@ import { analyticsLiteral as lit, safeSql, type SafeLogSqlFragment } from './saf
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
 import {
   getAuthServiceFlowQuery,
@@ -31,6 +31,7 @@ export const SERVICE_FLOW_TYPES = [
   'edge-function',
   'storage',
   'postgres',
+  'supavisor',
 ] as const
 
 export type ServiceFlowType = (typeof SERVICE_FLOW_TYPES)[number]
@@ -47,6 +48,7 @@ const SERVICE_FLOW_TYPE_SOURCE: Record<ServiceFlowType, SafeLogSqlFragment> = {
   'edge-function': lit(LOG_TYPE_TO_SOURCE['edge function']),
   storage: lit(LOG_TYPE_TO_SOURCE.storage),
   postgres: lit(LOG_TYPE_TO_SOURCE.postgres),
+  supavisor: lit(LOG_TYPE_TO_SOURCE.supavisor),
 }
 
 export type UnifiedLogInspectionVariables = {
@@ -254,6 +256,21 @@ LIMIT 1
     return { result: [] }
   }
 
+  // Supavisor rows aren't HTTP requests, so skip the flattened HTTP-shaped entry and
+  // return the raw attributes as `metadata` for the supavisor block and Raw JSON tab.
+  if (type === 'supavisor') {
+    return {
+      result: [
+        {
+          id: row.id,
+          timestamp: row.timestamp,
+          event_message: row.event_message,
+          metadata: row.log_attributes ?? {},
+        },
+      ],
+    }
+  }
+
   const entry = flattenOtelInspectionRow(row) as UnifiedLogInspectionEntry & Record<string, unknown>
 
   // For edge function rows, fetch and aggregate the related `function_logs`
@@ -301,7 +318,7 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend()
   return useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
     queryKey: [...logsKeys.serviceFlow(projectRef, search, logId), { otel: useOtel }],
     queryFn: ({ signal }) =>

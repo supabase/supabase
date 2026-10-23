@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { Edit, Trash } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
   Form,
   FormControl,
   FormField,
@@ -22,26 +22,22 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import InputField from './InputField'
+import { ForeignTablesSelector } from './ForeignTablesSelector'
+import { InputField } from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
   FormattedWrapperTable,
-  getRequiredExtensionsToInstall,
   getWrapperCreationFormSchema,
   hasForeignSchemaSupport,
-  NewTable,
 } from './Wrappers.utils'
-import WrapperTableEditor from './WrapperTableEditor'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { getExtensionDefaultSchema } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/IntegrationOverviewTabV2.utils'
 import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
-import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
+import { useInstallRequiredExtensions } from '@/components/interfaces/Integrations/Integration/useInstallRequiredExtensions'
 import {
   FormSection,
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
 import { invalidateSchemasQuery, useSchemasQuery } from '@/data/database/schemas-query'
@@ -67,26 +63,23 @@ export const CreateWrapperSheet = ({
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
-  const { integration } = useIntegrationDetail()
 
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
 
+  const {
+    requiredExtensionsToInstall,
+    needsExtensions,
+    isExtensionDataLoading,
+    installRequiredExtensions,
+  } = useInstallRequiredExtensions()
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  // null while the query is in flight — distinct from [] which means "all installed"
-  const requiredExtensionsToInstall = useMemo(
-    () => getRequiredExtensionsToInstall(extensions, integration?.requiredExtensions ?? []),
-    [extensions, integration?.requiredExtensions]
-  )
-
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
   const hasRequiredVersionForeignSchema = hasForeignSchemaSupport(wrappersExtension)
-  const needsExtensions = isMarketplaceEnabled && (requiredExtensionsToInstall?.length ?? 0) > 0
-  const isExtensionDataLoading = isMarketplaceEnabled && requiredExtensionsToInstall === null
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref!,
@@ -94,7 +87,6 @@ export const CreateWrapperSheet = ({
   })
 
   const initialValues = {
-    wrapper_name: '',
     server_name: '',
     mode: wrapperMeta.tables.length > 0 ? 'tables' : 'schema',
     source_schema: wrapperMeta.sourceSchemaOption?.defaultValue ?? '',
@@ -115,58 +107,18 @@ export const CreateWrapperSheet = ({
   const { getValues, setError } = form
   const { errors, isDirty, isSubmitting } = form.formState
 
-  useEffect(() => {
-    onDirty(isDirty)
-  }, [onDirty, isDirty])
-
   const {
     fields: tablesField,
     append: appendTable,
     remove: removeTable,
-    insert: insertTable,
+    update: updateTable,
   } = useFieldArray({
     control: form.control,
     name: 'tables',
   })
 
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<FormattedWrapperTable | undefined>(
-    undefined
-  )
-
-  const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation({ onError: () => {} })
   const { mutateAsync: createSchema } = useSchemaCreateMutation({ onError: () => {} })
   const { mutateAsync: createFDW } = useFDWCreateMutation({ onError: () => {} })
-
-  const installRequiredExtensions = async () => {
-    if (!project) return
-    const { ref: projectRef, connectionString } = project
-    const results = await Promise.allSettled(
-      (requiredExtensionsToInstall ?? []).map((ext) => {
-        const schema = getExtensionDefaultSchema(ext) ?? 'extensions'
-        return enableExtension({
-          projectRef,
-          connectionString,
-          schema,
-          name: ext.name,
-          version: ext.default_version,
-          cascade: true,
-          createSchema: false,
-        })
-      })
-    )
-    const failure = results.find((r) => r.status === 'rejected')
-    if (failure) throw new Error((failure as PromiseRejectedResult).reason.message)
-  }
-
-  const onUpdateTable = (values: FormattedWrapperTable) => {
-    if (values.index !== undefined) {
-      removeTable(values.index)
-      insertTable(values.index, values)
-    } else {
-      appendTable(values)
-    }
-    setSelectedTableToEdit(undefined)
-  }
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
     const { mode, tables = [], ...wrapperValues } = values
@@ -218,7 +170,6 @@ export const CreateWrapperSheet = ({
         wrapperMeta,
         formState: {
           ...wrapperValues,
-          server_name: `${wrapperValues.wrapper_name}_server`,
           supabase_target_schema: mode === 'schema' ? wrapperValues.target_schema : undefined,
         },
         mode: mode === 'schema' ? (wrapperMeta.sourceSchemaOption ? 'schema' : 'skip') : 'tables',
@@ -245,8 +196,11 @@ export const CreateWrapperSheet = ({
     }
   }
 
-  const wrapper_name = useWatch({ name: 'wrapper_name', control: form.control })
   const mode = useWatch({ name: 'mode', control: form.control })
+
+  useEffect(() => {
+    onDirty(isDirty)
+  }, [onDirty, isDirty])
 
   return (
     <>
@@ -258,8 +212,9 @@ export const CreateWrapperSheet = ({
             className="flex flex-col h-full"
           >
             <SheetHeader>
-              <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
+              <SheetTitle>Create a {wrapperMeta.label} wrapper connection</SheetTitle>
             </SheetHeader>
+
             <div className="grow overflow-y-auto">
               {isMarketplaceEnabled && (
                 <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
@@ -273,26 +228,17 @@ export const CreateWrapperSheet = ({
                   <RequiredExtensionsSection hideSeparator />
                 </div>
               )}
-              <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+
+              <FormSection
+                className="p-5!"
+                header={<FormSectionLabel>Server configuration</FormSectionLabel>}
+              >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
-                    name="wrapper_name"
+                    name="server_name"
                     render={({ field }) => (
-                      <FormItemLayout
-                        layout="vertical"
-                        label="Wrapper Name"
-                        description={
-                          wrapper_name.length > 0 ? (
-                            <>
-                              Your wrapper's server name will be{' '}
-                              <code className="text-code-inline">{wrapper_name}_server</code>
-                            </>
-                          ) : (
-                            ''
-                          )
-                        }
-                      >
+                      <FormItemLayout layout="horizontal" label="Server Name">
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -301,26 +247,39 @@ export const CreateWrapperSheet = ({
                   />
                 </FormSectionContent>
               </FormSection>
+
               <Separator />
+
               <FormSection
-                header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
+                className="p-5!"
+                header={<FormSectionLabel>{wrapperMeta.label} configuration</FormSectionLabel>}
               >
-                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                <FormSectionContent className="flex flex-col space-y-2 gap-y-4" loading={false}>
                   {wrapperMeta.server.options
                     .filter((option) => !option.hidden)
                     .map((option) => (
-                      <InputField option={option} control={form.control} key={option.name} />
+                      <InputField
+                        key={option.name}
+                        option={option}
+                        control={form.control}
+                        placeholder={option.defaultValue}
+                      />
                     ))}
                 </FormSectionContent>
               </FormSection>
+
               <Separator />
-              <FormSection header={<FormSectionLabel>Data target</FormSectionLabel>}>
+
+              <FormSection
+                className="p-5!"
+                header={<FormSectionLabel>Data target</FormSectionLabel>}
+              >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
                     name="mode"
                     render={({ field }) => (
-                      <FormItemLayout layout="vertical">
+                      <FormItemLayout label="Import as" layout="horizontal">
                         <FormControl>
                           <RadioGroupStacked
                             value={field.value as string}
@@ -372,7 +331,7 @@ export const CreateWrapperSheet = ({
                                     <WarningIcon />
                                     <span className="text-xs text-left">
                                       This feature requires the{' '}
-                                      <span className="text-brand">wrappers</span> extension to be
+                                      <span className="text-primary">wrappers</span> extension to be
                                       of minimum version of 0.5.0.
                                     </span>
                                   </div>
@@ -393,114 +352,67 @@ export const CreateWrapperSheet = ({
                   />
                 </FormSectionContent>
               </FormSection>
-              <Separator />
-              {mode === 'tables' && (
-                <FormSection
-                  header={
-                    <FormSectionLabel>
-                      <p>Foreign Tables</p>
-                      <p className="text-foreground-light mt-2 w-[90%]">
-                        You can query your data from these foreign tables after the wrapper is
-                        created
-                      </p>
-                    </FormSectionLabel>
-                  }
-                >
-                  <FormSectionContent className="flex flex-col space-y-2" loading={false}>
-                    <div className="flex flex-col space-y-2">
-                      {tablesField.map((t, tableIndex) => {
-                        // FIXME: make inference work
-                        const table = t as unknown as FormattedWrapperTable
-                        return (
-                          <div
-                            key={t.id}
-                            className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
-                          >
-                            <div>
-                              <p className="text-sm">
-                                {table.schema_name}.{table.table_name}
-                              </p>
-                              <p className="text-sm text-foreground-light">
-                                Columns:{' '}
-                                {(table.columns ?? []).map((column: any) => column.name).join(', ')}
-                              </p>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                className="px-1"
-                                icon={<Edit />}
-                                onClick={() => {
-                                  setSelectedTableToEdit(table)
-                                }}
-                              />
-                              <Button
-                                className="px-1"
-                                icon={<Trash />}
-                                onClick={() => {
-                                  removeTable(tableIndex)
-                                }}
-                              />
-                            </div>
-                          </div>
-                        )
-                      })}
 
-                      <div className="flex justify-end">
-                        <Button onClick={() => setSelectedTableToEdit(NewTable)}>
-                          Add foreign table
-                        </Button>
-                      </div>
-                      {tablesField.length === 0 && errors.tables && (
-                        <p className="text-sm text-right text-red-900">
-                          {errors.tables.message?.toString()}
-                        </p>
-                      )}
-                    </div>
+              <Separator />
+
+              {mode === 'tables' && (
+                <FormSection className="p-5!">
+                  <FormSectionContent loading={false}>
+                    <ForeignTablesSelector
+                      // getWrapperCreationFormSchema's option fields are dynamic (index
+                      // signature), which defeats RHF's field-array type inference.
+                      tables={tablesField as unknown as FormattedWrapperTable[]}
+                      wrapperTables={wrapperMeta.tables}
+                      errorMessage={errors.tables?.message?.toString()}
+                      onAppend={appendTable}
+                      onUpdate={updateTable}
+                      onRemove={removeTable}
+                    />
                   </FormSectionContent>
                 </FormSection>
               )}
-              <Separator />
+
               {mode === 'schema' && (
-                <FormSection
-                  header={
-                    <FormSectionLabel>
-                      <p>Foreign Schema</p>
-                      <p className="text-foreground-light mt-2 w-[90%]">
-                        You can query your data from the foreign tables in the specified schema
-                        after the wrapper is created.
-                      </p>
-                    </FormSectionLabel>
-                  }
-                >
+                <FormSection className="p-5!">
                   <FormSectionContent className="flex flex-col space-y-2" loading={false}>
-                    {wrapperMeta.sourceSchemaOption &&
-                      !wrapperMeta.sourceSchemaOption?.readOnly && (
-                        // Hide the field if the source schema is read-only
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="horizontal"
+                      label="Foreign schema"
+                      labelOptional="You can query your data from the foreign tables in the specified schema after the wrapper is created."
+                      className={cn('[&>div>span]:text-balance')}
+                    >
+                      {wrapperMeta.sourceSchemaOption &&
+                        !wrapperMeta.sourceSchemaOption?.readOnly && (
+                          // Hide the field if the source schema is read-only
+                          <InputField
+                            key="source_schema"
+                            option={wrapperMeta.sourceSchemaOption}
+                            control={form.control}
+                          />
+                        )}
+                      <div className="flex flex-col gap-2">
                         <InputField
-                          key="source_schema"
-                          option={wrapperMeta.sourceSchemaOption}
+                          key="target_schema"
+                          layout="vertical"
+                          option={{
+                            name: 'target_schema',
+                            label: 'Specify a new schema to create all wrapper tables in',
+                            description:
+                              'A new schema will be created. For security purposes, the wrapper tables from the foreign schema cannot be created within an existing schema.',
+                            required: true,
+                            encrypted: false,
+                            secureEntry: false,
+                          }}
                           control={form.control}
                         />
-                      )}
-                    <div className="flex flex-col gap-2">
-                      <InputField
-                        key="target_schema"
-                        option={{
-                          name: 'target_schema',
-                          label: 'Specify a new schema to create all wrapper tables in',
-                          description:
-                            'A new schema will be created. For security purposes, the wrapper tables from the foreign schema cannot be created within an existing schema.',
-                          required: true,
-                          encrypted: false,
-                          secureEntry: false,
-                        }}
-                        control={form.control}
-                      />
-                    </div>
+                      </div>
+                    </FormItemLayout>
                   </FormSectionContent>
                 </FormSection>
               )}
             </div>
+
             <SheetFooter>
               <Button
                 size="tiny"
@@ -524,16 +436,6 @@ export const CreateWrapperSheet = ({
           </form>
         </Form>
       </div>
-
-      <WrapperTableEditor
-        visible={selectedTableToEdit != null}
-        tables={wrapperMeta.tables}
-        onCancel={() => {
-          setSelectedTableToEdit(undefined)
-        }}
-        onSave={onUpdateTable}
-        initialData={selectedTableToEdit}
-      />
     </>
   )
 }

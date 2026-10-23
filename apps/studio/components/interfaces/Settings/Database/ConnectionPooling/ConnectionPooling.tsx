@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import Link from 'next/link'
@@ -46,9 +45,10 @@ import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { usePgbouncerConfigurationUpdateMutation } from '@/data/database/pgbouncer-config-update-mutation'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsAwsCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
@@ -67,14 +67,18 @@ const PoolingConfigurationFormSchema = z.object({
  */
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
+  const isAws = useIsAwsCloudProvider()
   const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
   const canLoadPoolingConfig = !isHighAvailability && !isHighAvailabilityPending
-  const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
+
+  const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_WRITE
   )
+
+  const { projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
+    'project_addons:dedicated_ipv4_address',
+  ])
 
   const {
     data: pgbouncerConfig,
@@ -122,6 +126,14 @@ export const ConnectionPooling = () => {
   const connectionPoolingUnavailable = pgbouncerConfig?.pool_mode === null
   const ignoreStartupParameters = pgbouncerConfig?.ignore_startup_parameters
 
+  const showIpv4Callout =
+    isAws &&
+    projectAddonsDedicatedIpv4Address &&
+    isSuccessAddons &&
+    !isHighAvailability &&
+    !disablePoolModeSelection &&
+    !hasIpv4Addon
+
   const onSubmit: SubmitHandler<z.infer<typeof PoolingConfigurationFormSchema>> = async (data) => {
     if (!projectRef || isHighAvailability) return
 
@@ -129,7 +141,7 @@ export const ConnectionPooling = () => {
     updatePoolerConfig(
       {
         ref: projectRef,
-        default_pool_size: default_pool_size === undefined ? defaultPoolSize : default_pool_size,
+        default_pool_size: default_pool_size === undefined ? null : default_pool_size,
         ignore_startup_parameters: ignoreStartupParameters ?? '',
       },
       {
@@ -187,7 +199,7 @@ export const ConnectionPooling = () => {
           />
         )}
 
-        {isSuccessAddons && !isHighAvailability && !disablePoolModeSelection && !hasIpv4Addon && (
+        {showIpv4Callout && (
           <Admonition
             type="default"
             layout="responsive"

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -75,12 +76,6 @@ describe('SupportAssistant utils', () => {
     expect(parseSupportAssistantPrompt('<support></support>')).toBeNull()
   })
 
-  it('round-trips a request through store/consume', () => {
-    storeAssistantHandoff('token-1', supportRequest)
-
-    expect(consumeAssistantHandoff('token-1')).toEqual(supportRequest)
-  })
-
   it('preserves literal percent characters in the message (no URL encoding involved)', () => {
     const request = { ...supportRequest, message: '100% CPU, literal %20 text' }
     storeAssistantHandoff('token-1', request)
@@ -88,7 +83,7 @@ describe('SupportAssistant utils', () => {
     expect(consumeAssistantHandoff('token-1')?.message).toBe('100% CPU, literal %20 text')
   })
 
-  it('removes the entry after consuming it, so it cannot be replayed', () => {
+  it('round-trips a request and removes the entry after consuming it, so it cannot be replayed', () => {
     storeAssistantHandoff('token-1', supportRequest)
 
     expect(consumeAssistantHandoff('token-1')).toEqual(supportRequest)

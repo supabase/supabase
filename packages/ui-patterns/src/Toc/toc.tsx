@@ -58,6 +58,19 @@ export function TOCScrollArea({
   )
 }
 
+export function TocSection({ items, className }: { items: TOCItemType[]; className?: string }) {
+  return (
+    <Toc className={cn('-ml-[calc(0.25rem+6px)]', className)}>
+      <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-7.5">
+        On this page
+      </h3>
+      <TOCScrollArea>
+        <TOCItems items={items} />
+      </TOCScrollArea>
+    </Toc>
+  )
+}
+
 export function TOCItems({
   items,
   showTrack = false,
@@ -131,16 +144,14 @@ function TOCItem({ item }: { item: TOCItemType }) {
     <Primitive.TOCItem
       href={`#${formatSlug(item.url)}`}
       className={cn(
-        'text-foreground-lighter hover:text-brand-link transition-colors py-1 wrap-anywhere first:pt-0 last:pb-0 data-[active=true]:text-foreground',
+        'text-foreground-lighter hover:text-primary transition-colors py-1 wrap-anywhere first:pt-0 last:pb-0 data-[active=true]:text-foreground',
         item.depth <= 2 && 'ps-3',
         item.depth === 3 && 'ps-6',
         item.depth >= 4 && 'ps-8'
       )}
     >
       {formatTOCHeader(removeAnchor(item.title)).map((x, index) => (
-        <Fragment key={index}>
-          {x.type === 'code' ? <code className="text-code-inline">{x.value}</code> : x.value}
-        </Fragment>
+        <Fragment key={index}>{x.type === 'code' ? <code>{x.value}</code> : x.value}</Fragment>
       ))}
     </Primitive.TOCItem>
   )

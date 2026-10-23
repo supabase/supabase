@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon, WarningIcon } from 'ui'
@@ -21,6 +21,9 @@ export const Restriction = () => {
     usage?.usages.find(
       (metric) =>
         metric.metric !== PricingMetric.DISK_SIZE_GB_HOURS_GP3 &&
+        // Log metrics should not trigger the exceeded limits alert for now (soft rollout)
+        metric.metric !== PricingMetric.LOG_INGESTION &&
+        metric.metric !== PricingMetric.LOG_QUERYING &&
         !metric.unlimited &&
         metric.capped &&
         metric.usage > (metric?.pricing_free_units ?? 0)
@@ -85,7 +88,7 @@ export const Restriction = () => {
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}>About spend cap</a>
               </Button>
             </div>
@@ -128,7 +131,7 @@ export const Restriction = () => {
                 </Button>
               )}
 
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
@@ -169,7 +172,7 @@ export const Restriction = () => {
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
@@ -209,7 +212,7 @@ export const Restriction = () => {
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>

@@ -19,12 +19,11 @@ import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
-import StepHikeCompact from '~/components/StepHikeCompact'
-import Table from '~/components/Table'
+import { StepHikeCompact } from '~/components/StepHikeCompact'
 import { TerraformProviderSchema } from '~/components/TerraformProviderSchema'
 import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegration'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
-import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
+import { CodeTabs, NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
@@ -34,7 +33,7 @@ import { YouTube } from '~/features/ui/YouTube'
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
-import { Badge, Button, Heading } from 'ui'
+import { Badge, Button, Heading, Table } from 'ui'
 import { Admonition, type AdmonitionProps } from 'ui-patterns/Admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
@@ -42,7 +41,7 @@ import SqlToRest from 'ui-patterns/SqlToRest'
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { AgentSetup } from '../ui/AgentSetup'
 import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
-import { AiPrompt } from '../ui/AiPrompt'
+import { AiPrompt, type AiPromptProps } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 
@@ -74,7 +73,9 @@ const components = {
   AgentPluginsPanel,
   AgentSetup,
   AgentWatchSchedule,
-  AiPrompt,
+  AiPrompt: (props: Omit<AiPromptProps, 'telemetry'>) => (
+    <AiPrompt {...props} telemetry={{ source: 'guide' }} />
+  ),
   AiPromptsIndex,
   AiSkillsIndex,
   AuthSmsProviderConfig,
@@ -85,6 +86,7 @@ const components = {
   ButtonCard,
   CodeSampleDummy,
   CodeSampleWrapper,
+  CodeTabs,
   ComputeDiskLimitsTable,
   CustomContent,
   ContentListings,
@@ -134,7 +136,7 @@ const components = {
     </Heading>
   ),
   pre: Pre,
-  table: Table,
+  table: (props: ComponentPropsWithoutRef<'table'>) => <Table prose {...props} />,
   /**
    * Force inline code tags to go sync, this prevents Heading anchor resolution fail due to
    * our CodeBlock component being async. We need to find a better solution for more future

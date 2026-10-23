@@ -1,6 +1,8 @@
 'use client'
 
-import { mergeRefs, useAnchorObserver, useOnChange } from 'common'
+import { mergeRefs } from 'common/helpers'
+import { useAnchorObserver } from 'common/hooks/useAnchorObserver'
+import { useOnChange } from 'common/hooks/useOnChange'
 import { createContext, forwardRef, useContext, useMemo, useRef } from 'react'
 import type { AnchorHTMLAttributes, ReactNode, RefObject } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'

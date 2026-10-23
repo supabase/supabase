@@ -219,6 +219,11 @@ install_docker() {
     log "Enabling and starting docker service"
     $SUDO systemctl enable --now docker || warn "Could not enable docker via systemctl; start it manually."
 
+    # Only relevant when a non-root user just installed Docker (requires re-login).
+    if [ -n "$SUDO" ]; then
+        $SUDO usermod -aG docker "$(id -un)" || warn "Could not add $(id -un) to the docker group; run docker with sudo or add it manually."
+    fi
+
     docker_present || die "Docker installation finished but 'docker compose' is still unavailable."
 }
 
@@ -359,6 +364,13 @@ if [ "$WITH_AWS" = "1" ]; then
     install_aws
 fi
 
+# A user added to the docker group above cannot use it until the next login.
+DOCKER="docker"
+if [ -n "$SUDO" ] && ! docker info >/dev/null 2>&1; then
+    DOCKER="$SUDO docker"
+fi
+export DOCKER
+
 # Idempotent re-run: if CWD is already a set-up project, skip bootstrap.
 # A clone has docker-compose.yml + utils/ but only .env.example;
 # a set-up project also has a real .env.
@@ -436,14 +448,18 @@ write_version_stamp "$RESOLVED_REF"
 
 log "Pulling Docker images"
 if [ "$NON_INTERACTIVE" = "1" ]; then
-    docker compose --progress quiet pull || warn "docker compose pull failed; you can retry later."
+    $DOCKER compose --progress quiet pull || warn "docker compose pull failed; you can retry later."
 else
-    docker compose pull || warn "docker compose pull failed; you can retry later."
+    $DOCKER compose pull || warn "docker compose pull failed; you can retry later."
 fi
 
 echo ""
 echo "Setup complete. Project ready at: $(pwd)"
 echo ""
+if [ "$DOCKER" != "docker" ]; then
+    echo "Re-log in to pick up the docker group before the next steps, or use sudo."
+    echo ""
+fi
 echo "Next steps:"
 echo "  cd $(pwd)"
 echo "  sh run.sh config"

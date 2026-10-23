@@ -1,4 +1,4 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
@@ -17,7 +17,7 @@ import {
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const Subscription = () => {
@@ -25,9 +25,8 @@ const Subscription = () => {
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
   const {
@@ -79,7 +78,7 @@ const Subscription = () => {
               {isSuccess && (
                 <div className="space-y-6 w-full">
                   <div className="flex justify-between items-center">
-                    <p className="text-2xl text-brand leading-none">
+                    <p className="text-2xl text-primary leading-none">
                       {currentPlan?.name ?? 'Unknown'} Plan
                     </p>
 
