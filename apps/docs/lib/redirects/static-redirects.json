@@ -740,6 +740,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/guides/auth/quickstarts/with-expo-react-native",
+    "destination": "/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in",
+    "permanent": true
+  },
+  {
     "source": "/docs/guides/auth/row-level-security",
     "destination": "/docs/guides/database/postgres/row-level-security",
     "permanent": true
