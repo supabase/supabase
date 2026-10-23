@@ -1,5 +1,6 @@
 'use client'
 
+import { useFlag } from 'common'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { FC, Fragment, useEffect, useState } from 'react'
@@ -58,6 +59,13 @@ export const useActiveMenuLabel = (menu: typeof GLOBAL_MENU_ITEMS) => {
 
 const GlobalNavigationMenu: FC = () => {
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
+
+  // Feature-flag demo: relabel the "Build" nav item to "For Developers".
+  // Falls back to "Build" when the flag is off/unset (useFlag returns false).
+  const forDevelopersNavEnabled = useFlag('docs_nav_for_developers')
+  const getSectionLabel = (label: string) =>
+    forDevelopersNavEnabled && label === 'Build' ? 'For Developers' : label
+
   const triggerClassName =
     'h-(--header-height) p-2 bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-light hover:bg-transparent hover:text-foreground data-open:bg-transparent! data-open:text-foreground! focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
 
@@ -88,7 +96,7 @@ const GlobalNavigationMenu: FC = () => {
                     {section[0].label === 'Home' ? (
                       <MenuIconPicker icon={section[0].icon || ''} />
                     ) : (
-                      section[0].label
+                      getSectionLabel(section[0].label)
                     )}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="top-[calc(100%+4px)]! min-w-56 max-h-[calc(100vh-4rem)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md duration-0!">
@@ -145,7 +153,7 @@ const GlobalNavigationMenu: FC = () => {
                       {section[0].label === 'Home' ? (
                         <MenuIconPicker icon={section[0].icon || ''} />
                       ) : (
-                        section[0].label
+                        getSectionLabel(section[0].label)
                       )}
                     </Link>
                   </NavigationMenuLink>
