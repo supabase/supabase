@@ -61,10 +61,10 @@ const KEYWORD_MATCH_SCORE = 0.5
 // don't produce scattered-character matches (e.g. "blog" against "Branch integration, ...").
 const filterWithMinScore: typeof defaultFilter = (value, search, keywords) => {
   const score = defaultFilter(value, search)
-  const normalizedSearch = search.toLowerCase()
-  const hasKeywordMatch = keywords?.some((keyword) =>
-    keyword.toLowerCase().includes(normalizedSearch)
-  )
+  const normalizedSearch = search.trim().toLowerCase()
+  const hasKeywordMatch =
+    normalizedSearch.length > 0 &&
+    keywords?.some((keyword) => keyword.toLowerCase().includes(normalizedSearch))
   const valueScore = score < MIN_FILTER_SCORE ? 0 : score
   return hasKeywordMatch ? Math.max(valueScore, KEYWORD_MATCH_SCORE) : valueScore
 }
