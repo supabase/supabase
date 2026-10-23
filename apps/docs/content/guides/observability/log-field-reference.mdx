@@ -71,6 +71,8 @@ Response headers:
 
 ## Fields by source
 
+<QueryParamAnchor param="source" />
+
 <SharedData data="logConstants">
   {(logConstants) =>
     logConstants.schemas.map((schema) => (
@@ -82,36 +84,27 @@ Response headers:
           Source: <code>{schema.reference}</code>
         </p>
         <div className="mt-4 flex flex-col">
-          {schema.fields
-            .sort((a, b) => a.path.localeCompare(b.path))
-            .map((field) => {
-              const shortName = field.path.replace(/^metadata\./, '')
-              const isTopLevel = field.queryField === field.path
-              return (
-                <div key={field.path} className="border-t last:border-b py-4 flex flex-col gap-2">
-                  <div className="flex gap-3 items-center flex-wrap">
-                    <span className="text-sm text-foreground font-mono font-medium">
-                      {shortName}
-                    </span>
-                    <Badge variant="default">{field.type}</Badge>
-                    {field.containsPii && <Badge variant="warning">PII</Badge>}
-                  </div>
-                  {field.description && (
-                    <p className="text-sm text-foreground-lighter m-0">{field.description}</p>
-                  )}
-                  {!isTopLevel && (
-                    <p className="text-[10px] text-foreground-muted font-mono m-0 break-all">
-                      select {field.queryField} from logs
-                    </p>
-                  )}
-                  {field.example && (
-                    <p className="text-xs text-foreground-muted m-0 break-all">
-                      Example: <code>{field.example}</code>
-                    </p>
-                  )}
+          {schema.fields.map((field) => {
+            const shortName = field.path.replace(/^metadata\./, '')
+            const isTopLevel = field.queryField === field.path
+            return (
+              <div key={field.path} className="border-t last:border-b py-4 flex flex-col gap-2">
+                <div className="flex gap-3 items-center flex-wrap">
+                  <span className="text-sm text-foreground font-mono font-medium">{shortName}</span>
+                  <Badge variant="default">{field.type}</Badge>
+                  {field.containsPii && <Badge variant="warning">PII</Badge>}
                 </div>
-              )
-            })}
+                {field.description && (
+                  <p className="text-sm text-foreground-lighter m-0">{field.description}</p>
+                )}
+                {!isTopLevel && (
+                  <p className="text-[10px] text-foreground-muted font-mono m-0 break-all">
+                    select {field.queryField} from logs where source = '{schema.reference}'
+                  </p>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     ))
