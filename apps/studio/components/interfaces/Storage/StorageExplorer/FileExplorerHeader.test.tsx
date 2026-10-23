@@ -128,7 +128,7 @@ describe('FileExplorerHeader', () => {
     expect(screen.queryByRole('button', { name: 'Navigate' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'my-bucket' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'images' })).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Search in 2024...')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Search my-bucket...')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Go up one level' }))
 
