@@ -211,6 +211,12 @@ These steps cover a manual logical restore (`pg_dump` / `psql`) into a project y
 
 </StepHikeCompact>
 
+### Prepare the restored database
+
+After the restore completes, follow [Update statistics](/docs/guides/platform/migrating-to-supabase/postgres#update-statistics-important) to run `VACUUM ANALYZE` on the restored database, including partitioned parents. Set `SUPABASE_DB_URL` to the new project's connection string before running the maintenance command. Run maintenance separately from the restore command that uses `--single-transaction`.
+
+Check for skipped application tables, verify the restored data, and test representative queries before switching application traffic.
+
 ### Special considerations
 
 #### Preserving migration history

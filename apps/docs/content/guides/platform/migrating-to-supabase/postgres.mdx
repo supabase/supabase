@@ -230,26 +230,40 @@ If restore fails with extension errors, check that errors are only extension-rel
 
 #### Update statistics (important)
 
+After the restore completes, run `VACUUM ANALYZE` before sending application traffic to the new database. Allow time and I/O capacity for these operations; vacuuming can also generate write-ahead log (WAL) data.
+
+`ANALYZE` collects statistics for the query planner. `VACUUM` updates the [visibility map](https://www.postgresql.org/docs/current/storage-vm.html), which helps index-only scans avoid fetching table rows. Importing planner statistics does not recreate the source database's visibility map.
+
+Use the destination connection string from the restore step:
+
 ```bash
-psql "$SUPABASE_DB_URL" -c "VACUUM VERBOSE ANALYZE;"
+psql "$SUPABASE_DB_URL" -X --set ON_ERROR_STOP=1 --command 'vacuum (verbose, analyze);'
 ```
+
+Run this command after the restore transaction finishes. Do not add `--single-transaction`: `VACUUM` cannot run inside a transaction block.
+
+This database-wide SQL command also analyzes partitioned parent tables. [Autovacuum does not analyze partitioned parents](https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-STATISTICS), so waiting for autovacuum does not replace this step.
+
+Check the output for errors and skipped tables. The command processes tables your connection role can maintain; `ON_ERROR_STOP` does not turn permission warnings into errors. Resolve skipped application tables before proceeding. Supabase-managed tables can have different owners and permissions.
 
 <Admonition type="note">
 
-For Postgres 18+, pg_dump includes statistics with `--with-statistics`, but you should still run VACUUM for optimal performance.
+The Postgres 18 `pg_dump` client adds an opt-in [`--statistics` option](https://www.postgresql.org/docs/18/app-pgdump.html). Use it only with compatible restore tools and a destination that supports statistics import. It does not include all statistics, such as collected extended statistics in Postgres 18. The maintenance command here also works when the dump contains no statistics.
 
 </Admonition>
 
 #### Verify migration
 
+Use the estimated live-row counts for an initial overview:
+
 ```sql
--- Check row counts
-select schemaname, tablename, n_live_tup
+select schemaname, relname as table_name, n_live_tup as estimated_live_rows
 from pg_stat_user_tables
 order by n_live_tup desc
 limit 20;
--- Verify data with application-specific queries
 ```
+
+`n_live_tup` is an estimate, not an exact row count. Verify restored data with application-specific checks and exact counts where required. Test representative application queries before switching traffic.
 
 #### Re-enable writes on source (if keeping it)
 
