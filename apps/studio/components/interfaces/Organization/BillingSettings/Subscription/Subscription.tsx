@@ -50,8 +50,10 @@ const Subscription = () => {
   const canChangeTier =
     !projectUpdateDisabled && !['enterprise', 'platform'].includes(currentPlan?.id ?? '')
   const isDirectlyManaged = selectedOrganization?.managed_by === MANAGED_BY.SUPABASE
+  // Fail closed until subscription succeeds: unresolved plans look like Free and
+  // `billing_via_partner !== true` is true when the field is still undefined.
   const canPurchaseThroughAws =
-    canChangeTier && isDirectlyManaged && subscription?.billing_via_partner !== true
+    isSuccess && canChangeTier && isDirectlyManaged && subscription.billing_via_partner === false
 
   return (
     <>

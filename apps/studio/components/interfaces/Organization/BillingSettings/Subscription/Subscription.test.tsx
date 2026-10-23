@@ -60,6 +60,7 @@ describe('Subscription', () => {
       data: {
         plan: { id: 'free', name: 'Free' },
         usage_billing_enabled: true,
+        billing_via_partner: false,
       },
       error: null,
       isPending: false,
@@ -98,6 +99,7 @@ describe('Subscription', () => {
       data: {
         plan: { id: 'enterprise', name: 'Enterprise' },
         usage_billing_enabled: true,
+        billing_via_partner: false,
       },
       error: null,
       isPending: false,
@@ -112,6 +114,46 @@ describe('Subscription', () => {
     ).not.toBeInTheDocument()
     expect(screen.getByText('Unable to update plan from Enterprise')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Compare plans/ })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /AWS Marketplace/ })).not.toBeInTheDocument()
+  })
+
+  it('hides the AWS Marketplace link while subscription is loading', () => {
+    mockSubscription.mockReturnValue({
+      data: undefined,
+      error: null,
+      isPending: true,
+      isError: false,
+      isSuccess: false,
+    })
+
+    render(<Subscription />)
+
+    expect(screen.queryByRole('link', { name: /AWS Marketplace/ })).not.toBeInTheDocument()
+  })
+
+  it('hides the AWS Marketplace link for partner-billed organizations', () => {
+    mockSubscription.mockReturnValue({
+      data: {
+        plan: { id: 'free', name: 'Free' },
+        usage_billing_enabled: true,
+        billing_via_partner: true,
+      },
+      error: null,
+      isPending: false,
+      isError: false,
+      isSuccess: true,
+    })
+
+    render(<Subscription />)
+
+    expect(screen.queryByRole('link', { name: /AWS Marketplace/ })).not.toBeInTheDocument()
+  })
+
+  it('hides the AWS Marketplace link when the organization is not Supabase-managed', () => {
+    mockSelectedOrganization.mockReturnValue({ managed_by: 'aws_marketplace' })
+
+    render(<Subscription />)
+
     expect(screen.queryByRole('link', { name: /AWS Marketplace/ })).not.toBeInTheDocument()
   })
 })
