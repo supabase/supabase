@@ -129,6 +129,39 @@ describe('useDatabaseEntitySearchCommands', () => {
     )
   })
 
+  it('does not show results from a previous project while searching another', async () => {
+    let project = { id: 1, ref: 'default', name: 'default', connectionString: 'encrypted' }
+    mockUseSelectedProjectQuery.mockImplementation(() => ({ data: project }))
+    let resolveSecondSearch: (() => void) | undefined
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ params }) => {
+        // Hold the second project's search in flight until the test releases it
+        if (params.ref === 'other') {
+          await new Promise<void>((resolve) => (resolveSecondSearch = resolve))
+        }
+        return HttpResponse.json([SEARCH_RESULT])
+      },
+    })
+
+    const { rerender } = customRender(<CommandMenuHarness />)
+    const input = screen.getByRole('textbox', { name: 'Search' })
+    await userEvent.type(input, 'blog')
+    await screen.findByRole('region', { name: 'Tables' })
+
+    project = { id: 2, ref: 'other', name: 'other', connectionString: 'encrypted' }
+    rerender(<CommandMenuHarness />)
+    await userEvent.type(input, '_posts')
+
+    await waitFor(() => expect(resolveSecondSearch).toBeDefined())
+    expect(screen.queryByRole('region', { name: 'Tables' })).not.toBeInTheDocument()
+
+    resolveSecondSearch?.()
+    const section = await screen.findByRole('region', { name: 'Tables' })
+    expect(section).toHaveTextContent('/project/other/editor/101?schema=public')
+  })
+
   it('does not search outside of a project', async () => {
     mockUseSelectedProjectQuery.mockReturnValue({ data: undefined })
     customRender(<CommandMenuHarness />)

@@ -1,5 +1,5 @@
 import { getSearchEntitiesSql } from '@supabase/pg-meta'
-import { keepPreviousData, queryOptions } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseKeys } from './keys'
@@ -59,8 +59,10 @@ export const entitySearchQueryOptions = (
     // Results are keyed per search string; reuse them briefly so backspacing or
     // retyping a query doesn't hit the database again.
     staleTime: 30 * 1000,
-    // Keep showing the previous results while the next search is in flight.
-    placeholderData: keepPreviousData,
+    // Keep showing the previous results while the next search is in flight,
+    // but never carry them over from another project.
+    placeholderData: (previousData, previousQuery) =>
+      previousQuery?.queryKey[1] === projectRef ? previousData : undefined,
     // A failed search isn't worth retrying against the user's database; the
     // next keystroke issues a fresh one anyway.
     retry: false,
