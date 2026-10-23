@@ -7,6 +7,8 @@ import { approvalGatedToolFromContract } from './tool-from-contract'
 import type { ApprovalGatedToolFactory } from './types'
 import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { hideSpanErrorFromTrace } from '@/lib/ai/braintrust-logger'
+import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
 
 export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
   const { projectRef, connectionString, aiOptInLevel } = ctx
@@ -24,7 +26,10 @@ export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
         { projectRef, connectionString, sql: limitedSql },
         abortSignal,
         authHeaders
-      )
+      ).catch((error: unknown) => {
+        if (!isOptInLevelAtLeast(aiOptInLevel, 'schema_and_log_and_data')) hideSpanErrorFromTrace()
+        throw error
+      })
       const rows = Array.isArray(result) ? result : []
       const isCapped = rows.length > DEFAULT_CELL_ROW_LIMIT
       const hasMoreRows = isCappedInDatabase && isCapped

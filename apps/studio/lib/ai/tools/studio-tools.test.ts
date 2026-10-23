@@ -139,6 +139,30 @@ describe('ai/tools/studio-tools', () => {
       })
     })
 
+    it('preserves execute_sql errors below the data level', async () => {
+      const error = new Error('duplicate key (email)=(test@example.com)')
+      vi.mocked(executeSql).mockRejectedValue(error)
+
+      const tools = getStudioTools({
+        projectRef: 'test-project',
+        connectionString: 'encrypted-connection-string',
+        aiOptInLevel: 'schema',
+      })
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      await expect(
+        tools.execute_sql.execute(
+          {
+            sql: 'INSERT INTO users (email) VALUES (1)',
+            label: 'Insert',
+            chartConfig: { view: 'table' },
+            isWriteQuery: true,
+          },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
+      ).rejects.toBe(error)
+    })
+
     it('should return execute_sql rows with data opt-in', async () => {
       const rows = [{ email: 'test@example.com' }]
       vi.mocked(executeSql).mockResolvedValue({ result: rows })
