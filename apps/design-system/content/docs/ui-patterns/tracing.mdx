@@ -46,7 +46,7 @@ import { Trace } from 'ui-patterns/Trace'
 
 `Trace.Header` is a layout container for the controls above the waterfall. `Trace.Title` shows the name of the trace's first root span. `Trace.Status` shows Live while any span is still running, Failed when the root span has an error status, and Done otherwise. It also announces changes to screen readers.
 
-`Trace.CollapseAll` and `Trace.ResetZoom` are icon buttons that go at the right end of the ruler's tree cell, as children of `Trace.Ruler`. `Trace.CollapseAll` collapses every span that has children, and expands them all again when they are already collapsed. `Trace.ResetZoom` restores the full window and is disabled until you zoom.
+`Trace.CollapseAll` and `Trace.ResetZoom` are icon buttons with tooltips that go at the right end of the ruler's tree cell, as children of `Trace.Ruler`. `Trace.CollapseAll` collapses every span that has children, and expands them all again when they are already collapsed. `Trace.ResetZoom` restores the full window and is disabled until you zoom.
 
 ## Waterfall and ruler
 
