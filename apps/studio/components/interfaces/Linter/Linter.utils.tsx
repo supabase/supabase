@@ -18,11 +18,46 @@ import {
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
+import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewContext'
+import { Filters } from '../Settings/Logs/Logs.types'
+import { LogsFilter } from '../UnifiedLogs/UnifiedLogs.filters'
+import { buildUnifiedLogsUrl } from '../UnifiedLogs/UnifiedLogs.utils'
 import { asGraphqlExposureLint, GraphqlExposureLintCTA } from './GraphqlExposureLintCTA'
 import { LINTER_LEVELS, LintInfo } from '@/components/interfaces/Linter/Linter.constants'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { Lint, LINT_TYPES } from '@/data/lint/lint-query'
 import { DOCS_URL } from '@/lib/constants'
+
+const healthLogDestinations = {
+  postgres: { route: 'postgres-logs', filters: {} },
+  edge: {
+    route: 'edge-logs',
+    filters: { product: { database: true }, status_code: { error: true } },
+  },
+  auth: { route: 'auth-logs', filters: { severity: { error: true } } },
+  storage: {
+    route: 'edge-logs',
+    filters: { product: { storage: true }, status_code: { error: true } },
+  },
+  'edge function': { route: 'edge-functions-logs', filters: { status_code: { error: true } } },
+} satisfies Record<string, { route: string; filters: Filters }>
+
+const getHealthLogsUrl = (
+  { projectRef, isUnifiedLogsEnabled }: Parameters<LintInfo['link']>[0],
+  logType: keyof typeof healthLogDestinations
+) => {
+  if (isUnifiedLogsEnabled) {
+    const filters: LogsFilter[] = []
+    if (logType !== 'postgres') filters.push({ column: 'level', operator: '=', value: 'error' })
+    if (logType === 'edge') filters.push({ column: 'pathname', operator: '=', value: '/rest/v1' })
+    return buildUnifiedLogsUrl({ projectRef, logType, filters })
+  }
+
+  const { route, filters } = healthLogDestinations[logType]
+  const path = `/project/${projectRef}/logs/${route}`
+  if (logType === 'postgres') return path
+  return `${path}?${new URLSearchParams({ f: JSON.stringify(filters) })}`
+}
 
 export const lintInfoMap: LintInfo[] = [
   {
@@ -403,7 +438,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'instance_db_down',
     title: 'Database process is down',
     icon: <DatabaseIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/postgres-logs`,
+    link: (args) => getHealthLogsUrl(args, 'postgres'),
     linkText: 'View database logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
     category: 'health',
@@ -430,7 +465,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'log_data_api_error_rate_high',
     title: 'Data API error rate is persistently high',
     icon: <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
+    link: (args) => getHealthLogsUrl(args, 'edge'),
     linkText: 'View logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
     category: 'health',
@@ -439,7 +474,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'log_auth_error_rate_high',
     title: 'Auth error rate is persistently high',
     icon: <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
+    link: (args) => getHealthLogsUrl(args, 'auth'),
     linkText: 'View logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
     category: 'health',
@@ -448,7 +483,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'log_storage_error_rate_high',
     title: 'Storage error rate is persistently high',
     icon: <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
+    link: (args) => getHealthLogsUrl(args, 'storage'),
     linkText: 'View logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
     category: 'health',
@@ -457,7 +492,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'log_edge_function_error_rate_high',
     title: 'Edge Function error rate is persistently high',
     icon: <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
-    link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
+    link: (args) => getHealthLogsUrl(args, 'edge function'),
     linkText: 'View logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
     category: 'health',
@@ -484,6 +519,7 @@ export const LintCTA = ({
   metadata: Lint['metadata']
   onAfterAction?: () => void
 }) => {
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const lintInfo = lintInfoMap.find((item) => item.name === title)
 
   if (!lintInfo) {
@@ -502,7 +538,7 @@ export const LintCTA = ({
     )
   }
 
-  const link = lintInfo.link({ projectRef, metadata })
+  const link = lintInfo.link({ projectRef, metadata, isUnifiedLogsEnabled })
   const linkText = lintInfo.linkText
 
   return (

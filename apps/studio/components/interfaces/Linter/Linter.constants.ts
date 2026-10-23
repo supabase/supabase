@@ -13,7 +13,11 @@ export type LintInfo = {
   name: string
   title: string
   icon: ReactNode
-  link: (args: { projectRef: string; metadata: Lint['metadata'] }) => string
+  link: (args: {
+    projectRef: string
+    metadata: Lint['metadata']
+    isUnifiedLogsEnabled?: boolean
+  }) => string
   linkText: string
   docsLink: string
   category: 'security' | 'performance' | 'health'

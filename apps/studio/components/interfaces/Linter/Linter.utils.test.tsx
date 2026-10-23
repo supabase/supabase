@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { SEARCH_PARAMS_PARSER } from '../UnifiedLogs/UnifiedLogs.constants'
+import { parseLogsFilterUrlParams } from '../UnifiedLogs/UnifiedLogs.filters'
 import { lintInfoMap, parseLinterLevel } from './Linter.utils'
 import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
 import { Lint } from '@/data/lint/lint-query'
@@ -92,4 +94,105 @@ describe('parseLinterLevel', () => {
     expect(parseLinterLevel('SOMETHING_ELSE')).toBeUndefined()
     expect(parseLinterLevel(undefined)).toBeUndefined()
   })
+})
+
+describe('health advisor log links', () => {
+  const errorAdvisors = [
+    {
+      name: 'log_data_api_error_rate_high',
+      logType: 'edge',
+      route: 'edge-logs',
+      legacyFilters: { product: { database: true }, status_code: { error: true } },
+      serviceFilters: [{ column: 'pathname', operator: '=', value: '/rest/v1' }],
+    },
+    {
+      name: 'log_auth_error_rate_high',
+      logType: 'auth',
+      route: 'auth-logs',
+      legacyFilters: { severity: { error: true } },
+      serviceFilters: [],
+    },
+    {
+      name: 'log_storage_error_rate_high',
+      logType: 'storage',
+      route: 'edge-logs',
+      legacyFilters: { product: { storage: true }, status_code: { error: true } },
+      serviceFilters: [],
+    },
+    {
+      name: 'log_edge_function_error_rate_high',
+      logType: 'edge function',
+      route: 'edge-functions-logs',
+      legacyFilters: { status_code: { error: true } },
+      serviceFilters: [],
+    },
+  ]
+
+  const getLink = (name: string, isUnifiedLogsEnabled?: boolean) => {
+    const info = lintInfoMap.find((entry) => entry.name === name)
+    if (!info) throw new Error(`Missing advisor ${name}`)
+    return new URL(
+      info.link({ projectRef, metadata: {}, isUnifiedLogsEnabled }),
+      'https://example.com'
+    )
+  }
+
+  it.each(errorAdvisors)(
+    'shows $name errors for its service in unified logs',
+    ({ name, logType, serviceFilters }) => {
+      const url = getLink(name, true)
+      expect(url.pathname).toBe('/project/abc/logs')
+      const filter = SEARCH_PARAMS_PARSER.filter.parse(url.searchParams.get('filter') ?? '')
+      expect(parseLogsFilterUrlParams(filter)).toEqual([
+        { column: 'log_type', operator: '=', value: logType },
+        { column: 'level', operator: '=', value: 'error' },
+        ...serviceFilters,
+      ])
+    }
+  )
+
+  it.each(errorAdvisors)(
+    'keeps $name filtered when unified logs are disabled',
+    ({ name, route, legacyFilters }) => {
+      const url = getLink(name, false)
+      expect(url.pathname).toBe(`/project/abc/logs/${route}`)
+      expect(JSON.parse(url.searchParams.get('f') ?? '{}')).toEqual(legacyFilters)
+      expect(url.searchParams.has('filter')).toBe(false)
+    }
+  )
+
+  it.each([true, false, undefined])(
+    'keeps all database diagnostic levels with unified preference %s',
+    (isUnifiedLogsEnabled) => {
+      const url = getLink('instance_db_down', isUnifiedLogsEnabled)
+      if (isUnifiedLogsEnabled) {
+        expect(url.pathname).toBe('/project/abc/logs')
+        const filter = SEARCH_PARAMS_PARSER.filter.parse(url.searchParams.get('filter') ?? '')
+        expect(parseLogsFilterUrlParams(filter)).toEqual([
+          { column: 'log_type', operator: '=', value: 'postgres' },
+        ])
+      } else {
+        expect(url.pathname).toBe('/project/abc/logs/postgres-logs')
+        expect(url.search).toBe('')
+      }
+    }
+  )
+
+  it.each([true, false])(
+    'preserves non-log advisor destinations with unified preference %s',
+    (isUnifiedLogsEnabled) => {
+      expect(getLink('db_not_reachable', isUnifiedLogsEnabled).pathname).toBe(
+        '/project/abc/database/settings'
+      )
+      expect(getLink('db_connection_limit_reached', isUnifiedLogsEnabled).pathname).toBe(
+        '/project/abc/observability/connections'
+      )
+      expect(getLink('instance_alert_firing', isUnifiedLogsEnabled).pathname).toBe(
+        '/project/abc/settings/infrastructure'
+      )
+      expect(getLink('pitr_archiving_stale', isUnifiedLogsEnabled).pathname).toBe(
+        '/project/abc/database/backups/pitr'
+      )
+    }
+  )
 })
