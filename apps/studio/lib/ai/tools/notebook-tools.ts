@@ -7,7 +7,7 @@ import { createTool as createRunNotebookTool } from './run-notebook.server'
 import type { ToolContext } from './types'
 import { createTool as createUpdateNotebookTool } from './update-notebook.server'
 
-export const getNotebookTools = (ctx: ToolContext = {}) => {
+export const getNotebookTools = (ctx: ToolContext) => {
   return {
     list_databases: createListDatabasesTool(ctx),
     list_notebooks: createListNotebooksTool(ctx),

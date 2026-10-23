@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache'
 import { connection } from 'next/server'
 
 import IntegrationsContent from './IntegrationsContent'
+import { canonicalAlternates } from '@/lib/canonical'
 
 export const revalidate = 1800
 
@@ -14,6 +15,7 @@ const META_DESCRIPTION =
   'Browse companies that build on Supabase, integrate with Supabase, or both.'
 
 export const metadata: Metadata = {
+  alternates: canonicalAlternates('/partners/catalog'),
   title: META_TITLE,
   description: META_DESCRIPTION,
   openGraph: {

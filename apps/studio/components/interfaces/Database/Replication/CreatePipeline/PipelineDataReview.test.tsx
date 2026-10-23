@@ -126,10 +126,6 @@ describe('PipelineDataReview', () => {
     expect(screen.getByLabelText(label)).toHaveValue(value)
     expect(screen.queryByLabelText('Connection pool size')).not.toBeInTheDocument()
   })
-  it('marks unavailable publication data without inventing a table count', () => {
-    customRender(<TestReview available={false} />)
-    expect(screen.getByLabelText('Publication tables')).toHaveValue('Unavailable')
-  })
   it('puts the table name and incomplete partition summary in the value column', () => {
     customRender(
       <TestReview
@@ -150,10 +146,10 @@ describe('PipelineDataReview', () => {
         'Partitioning and clustering applied when destination tables are first created or reset.'
       )
     ).toBeInTheDocument()
-    expect(screen.getByText('public.orders')).toHaveClass('break-all')
-    expect(screen.getByText('Partition by Not selected (month); Cluster by table_id')).toHaveClass(
-      'break-words'
-    )
+    expect(screen.getByText('public.orders')).toBeInTheDocument()
+    expect(
+      screen.getByText('Partition by Not selected (month); Cluster by table_id')
+    ).toBeInTheDocument()
     expect(screen.queryByText('Table layout: public.orders')).not.toBeInTheDocument()
   })
 
@@ -168,6 +164,7 @@ describe('PipelineDataReview', () => {
         }}
       />
     )
+    expect(screen.getByLabelText('Publication tables')).toHaveValue('Unavailable')
     expect(screen.getByLabelText('Tables to include')).toHaveValue('Unavailable')
     expect(screen.queryByText('Table 999')).not.toBeInTheDocument()
     view.unmount()

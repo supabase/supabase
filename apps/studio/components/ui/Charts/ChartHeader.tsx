@@ -37,6 +37,14 @@ export interface ChartHeaderProps {
   data?: any[]
   xAxisKey?: string
   yAxisKey?: string
+  thresholdZoneAttribute?: string
+  thresholdZoneWarning?: {
+    label: string
+    color: string
+    textColor?: string
+    badgeLabel?: string
+    tooltip: string
+  }
   xAxisIsDate?: boolean
   valuePrecision?: number
   shouldFormatBytes?: boolean
@@ -67,6 +75,8 @@ export const ChartHeader = ({
   data,
   xAxisKey,
   yAxisKey,
+  thresholdZoneAttribute,
+  thresholdZoneWarning,
   xAxisIsDate = true,
   displayDateInUtc,
   customDateFormat,
@@ -123,10 +133,13 @@ export const ChartHeader = ({
       if (activeDataPoint) {
         // For stacked charts, we need to calculate the total of all attributes
         // that should be included in the total (excluding reference lines, max values, etc.)
-        let newValue = activeDataPoint[yAxisKey]
+        const isThresholdValueMissing =
+          thresholdZoneAttribute !== undefined &&
+          !Number.isFinite(activeDataPoint[thresholdZoneAttribute])
+        let newValue = isThresholdValueMissing ? 'Unavailable' : activeDataPoint[yAxisKey]
 
         // If this is a stacked chart with multiple attributes, calculate the total
-        if (attributes && attributes.length > 1) {
+        if (!isThresholdValueMissing && attributes && attributes.length > 1) {
           const attributesToIgnore =
             attributes
               ?.filter((a) => a.omitFromTotal || a.isMaxValue || a.provider === 'reference-line')
@@ -175,6 +188,7 @@ export const ChartHeader = ({
     data,
     xAxisKey,
     yAxisKey,
+    thresholdZoneAttribute,
     xAxisIsDate,
     displayDateInUtc,
     customDateFormat,
@@ -294,6 +308,30 @@ export const ChartHeader = ({
           </ButtonTooltip>
         ) : null}
 
+        {thresholdZoneWarning && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge
+                tabIndex={0}
+                className="cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={`Warning: ${thresholdZoneWarning.label}`}
+                style={{
+                  color: thresholdZoneWarning.textColor ?? thresholdZoneWarning.color,
+                  borderColor: thresholdZoneWarning.color,
+                  backgroundColor: `color-mix(in srgb, ${thresholdZoneWarning.color} 10%, transparent)`,
+                }}
+              >
+                {thresholdZoneWarning.badgeLabel ?? 'Warning'}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs" side="top">
+              <p className="font-medium">
+                {thresholdZoneWarning.label} threshold crossed in this time range.
+              </p>
+              <p>{thresholdZoneWarning.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
             className="px-1.5"

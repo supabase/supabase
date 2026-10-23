@@ -20,20 +20,22 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
     // Retry flaky tests in CI only; failures locally should surface immediately.
     retry: IS_CI ? 2 : 0,
+    // The DOM setup files (`dom.ts`, `radix.js`) no-op when there's no jsdom environment.
     setupFiles: [
-      resolve(dirname, './tests/setup/polyfills.ts'),
+      resolve(dirname, './tests/setup/dom.ts'),
       resolve(dirname, './tests/vitestSetup.ts'),
       resolve(dirname, './tests/setup/radix.js'),
     ],
     // Don't look for tests in the nextjs output directory
-    exclude: [
-      ...configDefaults.exclude,
-      `.next/*`,
-      'tests/features/logs/logs-query.test.tsx',
-      'tests/features/reports/storage-report.test.tsx',
+    exclude: [...configDefaults.exclude, `.next/*`],
+    // jsdom costs ~1s of setup per file, so pure-logic `.test.ts` files run in node.
+    // A `.test.ts` file that needs the DOM (e.g. `renderHook`) opts in with a
+    // `// @vitest-environment jsdom` docblock at the top of the file.
+    projects: [
+      { extends: true, test: { name: 'node', environment: 'node', include: ['**/*.test.ts'] } },
+      { extends: true, test: { name: 'jsdom', environment: 'jsdom', include: ['**/*.test.tsx'] } },
     ],
     reporters: [['default']],
     coverage: {

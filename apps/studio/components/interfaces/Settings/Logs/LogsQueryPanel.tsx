@@ -253,13 +253,10 @@ export const LogsQueryPanel = ({
                   {useOtel ? (
                     <SheetDescription>
                       The following table shows the fields available on each source. Nested fields
-                      live in the{' '}
-                      <code className="text-code-inline text-xs !break-keep">log_attributes</code>{' '}
-                      map and are read with{' '}
-                      <code className="text-code-inline text-xs !break-keep">
-                        log_attributes['key']
-                      </code>{' '}
-                      — no unnesting joins needed.
+                      live in the <code className="text-xs !break-keep">log_attributes</code> map
+                      and are read with{' '}
+                      <code className="text-xs !break-keep">log_attributes['key']</code> — no
+                      unnesting joins needed.
                     </SheetDescription>
                   ) : (
                     <SheetDescription>

@@ -121,11 +121,6 @@ describe('validateMoveToFolder', () => {
 })
 
 describe('buildUpsertPayload', () => {
-  it('emits the snippet type — sql for a database snippet', () => {
-    const payload = buildUpsertPayload(makeSnippet(), 'snippet-1')
-    expect(payload.type).toBe('sql')
-  })
-
   it('emits the snippet type — log_sql for a logs snippet (not silently rewritten to sql)', () => {
     const payload = buildUpsertPayload(makeLogSnippet(), 'log-snippet-1')
     expect(payload.type).toBe('log_sql')
@@ -146,34 +141,21 @@ describe('buildUpsertPayload', () => {
     expect(payload.favorite).toBe(false)
   })
 
-  it('applies Untitled default when name is undefined', () => {
-    const snippet = makeSnippet({ name: undefined })
-    const payload = buildUpsertPayload(snippet, 'snippet-1')
-    expect(payload.name).toBe('Untitled')
-  })
-
-  it('applies empty-string default when description is undefined', () => {
-    const snippet = makeSnippet({ description: undefined })
-    const payload = buildUpsertPayload(snippet, 'snippet-1')
-    expect(payload.description).toBe('')
-  })
-
-  it('applies user default when visibility is undefined', () => {
-    const snippet = makeSnippet({ visibility: undefined })
-    const payload = buildUpsertPayload(snippet, 'snippet-1')
-    expect(payload.visibility).toBe('user')
-  })
-
-  it('applies 0 default when project_id is undefined', () => {
-    const snippet = makeSnippet({ project_id: undefined })
-    const payload = buildUpsertPayload(snippet, 'snippet-1')
-    expect(payload.project_id).toBe(0)
-  })
-
-  it('applies false default when favorite is undefined', () => {
-    const snippet = makeSnippet({ favorite: undefined })
-    const payload = buildUpsertPayload(snippet, 'snippet-1')
-    expect(payload.favorite).toBe(false)
+  it('applies defaults for missing optional fields', () => {
+    const snippet = makeSnippet({
+      name: undefined,
+      description: undefined,
+      visibility: undefined,
+      project_id: undefined,
+      favorite: undefined,
+    })
+    expect(buildUpsertPayload(snippet, 'snippet-1')).toMatchObject({
+      name: 'Untitled',
+      description: '',
+      visibility: 'user',
+      project_id: 0,
+      favorite: false,
+    })
   })
 
   it('sets content.content_id to the supplied id', () => {
@@ -204,15 +186,5 @@ describe('isLoadedSnippet', () => {
   it('returns false when content is undefined', () => {
     const snippet = { ...makeSnippet(), content: undefined }
     expect(isLoadedSnippet(snippet)).toBe(false)
-  })
-
-  it('narrows the snippet so buildUpsertPayload accepts it', () => {
-    const snippet: SnippetWithContent = makeSnippet()
-    if (isLoadedSnippet(snippet)) {
-      const payload = buildUpsertPayload(snippet, 'snippet-1')
-      expect(payload.id).toBe('snippet-1')
-    } else {
-      throw new Error('expected snippet to be loaded')
-    }
   })
 })

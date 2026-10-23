@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
@@ -6,6 +5,7 @@ import { HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import type { ProfileContextType } from '@/lib/profile'
 import InfrastructurePage from '@/pages/project/[ref]/settings/infrastructure'
 import { createMockOrganizationResponse } from '@/tests/helpers'
@@ -14,7 +14,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse_Output']
-type PermissionResponse = components['schemas']['AccessControlPermission']
+type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 const PROJECT_REF = 'project-ref'
 const ORGANIZATION_SLUG = 'acme'
@@ -180,19 +180,28 @@ function mockInfrastructureEndpoints() {
   })
   addAPIMock({
     method: 'get',
-    path: '/platform/profile/permissions',
-    response: [
-      {
-        actions: [PermissionAction.UPDATE],
-        condition: null,
-        organization_id: 1,
-        organization_slug: ORGANIZATION_SLUG,
-        project_ids: [PROJECT.id],
-        project_refs: [PROJECT_REF],
-        resources: ['projects'],
-        restrictive: false,
-      } satisfies PermissionResponse,
-    ],
+    path: '/platform/profile/permissions/v2',
+    response: {
+      organizations: [
+        {
+          slug: ORGANIZATION_SLUG,
+          role: 'administrator',
+          permissions: [],
+          projects: [
+            {
+              ref: PROJECT_REF,
+              role: 'administrator',
+              permissions: [
+                FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+                FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE,
+                FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE,
+                FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE,
+              ],
+            },
+          ],
+        },
+      ],
+    } satisfies PermissionsV2Response,
   })
   addAPIMock({
     method: 'get',
@@ -311,7 +320,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
   })
 
   test('loads the complete infrastructure page through MSW and resets an interaction', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     renderInfrastructurePage()
 
     expect(screen.getByRole('heading', { name: 'Infrastructure', level: 1 })).toBeInTheDocument()
@@ -334,6 +343,12 @@ describe('/project/[ref]/settings/infrastructure', () => {
     expect(screen.getByText('Dedicated · 2 vCPUs')).toBeInTheDocument() // Large
     expect(screen.queryByText(/-core/)).not.toBeInTheDocument()
 
+    // Compute stays editable for non High Availability projects
+    expect(
+      screen.queryByText("Compute size can't be changed on High Availability projects")
+    ).not.toBeInTheDocument()
+    expect(screen.getByText('Contact Us')).toBeInTheDocument()
+
     await user.click(screen.getByText('Small'))
     expect(screen.getByRole('button', { name: 'Review changes' })).toBeEnabled()
 
@@ -344,7 +359,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
   })
 
   test('focuses the recommended compute option after closing the add replica dialog', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     renderInfrastructurePage()
 
     await user.click(await screen.findByRole('button', { name: 'Add read replica' }))
@@ -356,7 +371,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
   })
 
   test('reviews and confirms a compute resize through the add-on API', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     let addonRequest: unknown
 
     addAPIMock({
@@ -389,7 +404,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
   })
 
   test('renders compute as read-only for High Availability projects', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
 
     addAPIMock({
       method: 'get',
@@ -444,22 +459,6 @@ describe('/project/[ref]/settings/infrastructure', () => {
     await user.click(smallCompute)
     expect(largeCompute).toBeChecked()
     expect(screen.queryByRole('button', { name: 'Review changes' })).not.toBeInTheDocument()
-  })
-
-  test('keeps compute editable for non High Availability projects', async () => {
-    const user = userEvent.setup()
-    renderInfrastructurePage()
-
-    expect(
-      screen.queryByText("Compute size can't be changed on High Availability projects")
-    ).not.toBeInTheDocument()
-
-    const smallCompute = await screen.findByRole('radio', { name: /Small/ })
-    expect(smallCompute).toBeEnabled()
-    expect(screen.getByText('Contact Us')).toBeInTheDocument()
-
-    await user.click(smallCompute)
-    expect(screen.getByRole('button', { name: 'Review changes' })).toBeEnabled()
   })
 
   test('submits disk and autoscaling changes to both infrastructure APIs', async () => {

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ArrowRightIcon, GitMergeIcon, MoreVerticalIcon, ShieldIcon, XIcon } from 'lucide-react'
@@ -33,7 +32,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -50,9 +49,8 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'preview_branches'
+  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ
   )
 
   const {

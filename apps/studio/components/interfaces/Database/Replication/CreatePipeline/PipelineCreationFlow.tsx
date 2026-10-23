@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -13,29 +14,37 @@ import { generateDefaultValues } from '../DestinationPanel/DestinationForm/Desti
 import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fields'
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
+import { DESTINATION_DOCS_PATHS } from '../DestinationPanel/DestinationPanel.constants'
+import type { FlowDestination } from '../DestinationPanel/DestinationPanel.types'
 import { PipelineConnectionSection } from './PipelineConnectionSection'
+import { PIPELINE_CREATION_STEPS as steps } from './PipelineCreationFlow.constants'
 import { PipelineCreationHeader } from './PipelineCreationHeader'
 import { PipelineDataReview } from './PipelineDataReview'
 import { PipelineDataSection } from './PipelineDataSection'
 import { PipelineDestinationReview } from './PipelineDestinationReview'
 import { PipelineDestinationSelection } from './PipelineDestinationSelection'
 import { PipelineReviewCosts } from './PipelineReviewCosts'
-import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
+import {
+  PipelineValidationAdmonition,
+  SANDWICHED_ADMONITION_CLASS,
+} from './PipelineValidationAdmonition'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
 import { usePipelineCreationSubmission } from './usePipelineCreationSubmission'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
 import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
+import { usePipelineReviewCosts } from './usePipelineReviewCosts'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
+import { DOCS_URL } from '@/lib/constants'
 
-type FlowDestination = 'BigQuery' | 'DuckLake' | 'Snowflake' | 'ClickHouse'
-const steps = [
-  { id: 'destination', label: 'Destination', title: 'Choose a destination' },
-  { id: 'connection', label: 'Connection', title: 'Authorize the destination' },
-  { id: 'data', label: 'Data', title: 'Choose what to replicate' },
-  { id: 'review', label: 'Review', title: 'Review and create' },
-]
+const getDocsUrl = (step: string, destination: FlowDestination) => {
+  if (step === 'connection') return `${DOCS_URL}${DESTINATION_DOCS_PATHS[destination]}`
+  if (step === 'data')
+    return `${DOCS_URL}/guides/database/replication/pipelines#choosing-which-tables-to-copy`
+  return undefined
+}
 
 const stepParser = parseAsStringEnum(steps.map(({ id }) => id))
   .withDefault('destination')
@@ -48,6 +57,7 @@ export const PipelineCreationFlow = ({
   availableDestinations: FlowDestination[]
   onClose: () => void
 }) => {
+  const router = useRouter()
   const [step, setStep] = useQueryState('step', stepParser)
   const hasInitializedStepRef = useRef(false)
 
@@ -70,12 +80,19 @@ export const PipelineCreationFlow = ({
   const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
     usePipelineConnectionValidation({ projectRef, type, form })
   const sourceId = useReplicationSourceId({ projectRef })
-  const { validateData, isValidatingData, isDataVerified, dataError, publication } =
-    usePipelineDataValidation({ projectRef, sourceId, type, form })
+  const {
+    validateData,
+    isValidatingData,
+    isDataVerified,
+    dataError,
+    hasPublicationLoadError,
+    publication,
+  } = usePipelineDataValidation({ projectRef, sourceId, type, form })
   const {
     handleSubmit,
     isSubmitting,
-    failures: submissionFailures,
+    destinationValidationFailures,
+    pipelineValidationFailures,
     submitLabel,
   } = usePipelineCreationSubmission({
     type,
@@ -83,6 +100,17 @@ export const PipelineCreationFlow = ({
     validateData,
     onCreated: () => completeNavigation(onClose),
   })
+  const submissionFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
+  const hasCriticalFailures = submissionFailures.some(
+    ({ failure_type }) => failure_type === 'critical'
+  )
+  const hasWarnings = submissionFailures.some(({ failure_type }) => failure_type === 'warning')
+  let validationMessage = 'Review the warnings above before starting the pipeline.'
+  if (hasCriticalFailures) {
+    validationMessage = hasWarnings
+      ? 'Fix the above issues and review warnings before starting the pipeline.'
+      : 'Fix the above issues before starting the pipeline.'
+  }
   const isBusy = isValidating || isValidatingData || isSubmitting
   const accessibleStep = (() => {
     if (isSubmitting) return step
@@ -90,6 +118,11 @@ export const PipelineCreationFlow = ({
     if (step === 'review' && !isDataVerified) return 'data'
     return step
   })()
+  const costs = usePipelineReviewCosts({
+    control: form.control,
+    publication,
+    enabled: accessibleStep === 'review',
+  })
   const handleNext = async () => {
     if (accessibleStep === 'connection' && !isConnectionVerified && !(await validateConnection()))
       return
@@ -98,6 +131,7 @@ export const PipelineCreationFlow = ({
     if (next) void setStep(next.id)
   }
   const currentStep = steps.find((item) => item.id === accessibleStep) ?? steps[0]
+  const docsUrl = getDocsUrl(accessibleStep, type)
   const canSelectDestination = availableDestinations.includes(type)
 
   useEffect(() => {
@@ -114,7 +148,7 @@ export const PipelineCreationFlow = ({
       <PipelineCreationHeader
         onClose={handleClose}
         onNavigate={(href) => {
-          if (!isSubmitting) requestNavigation(() => window.location.assign(href))
+          if (!isSubmitting) requestNavigation(() => void router.push(href))
         }}
       />
       <main className="flex-1">
@@ -134,9 +168,14 @@ export const PipelineCreationFlow = ({
                 label: submitLabel,
                 onClick: handleSubmit,
                 loading: isSubmitting,
+                disabled: costs.isInitialCostEstimateLoading,
               }}
             >
-              <SteppedFlowHeader title={currentStep.title} />
+              <SteppedFlowHeader
+                title={currentStep.title}
+                description={currentStep.description(type)}
+                actions={docsUrl && <DocsButton href={docsUrl} />}
+              />
               {accessibleStep === 'destination' && (
                 <div className="p-5">
                   <PipelineDestinationSelection
@@ -171,15 +210,21 @@ export const PipelineCreationFlow = ({
                     form={form}
                     onSelectNewPublication={() => setIsPublicationPanelVisible(true)}
                     revealInvalidSettings
+                    showLoadError={false}
                   />
-                  {dataError && (
+                  {(hasPublicationLoadError || dataError) && (
                     <Admonition
-                      type="destructive"
-                      title="Check data settings"
-                      className="mb-0 rounded-none border-x-0 border-t border-b-0 border-default"
-                    >
-                      {dataError}
-                    </Admonition>
+                      type="danger"
+                      title={
+                        hasPublicationLoadError
+                          ? 'Publication tables could not be loaded'
+                          : 'Check data settings'
+                      }
+                      description={
+                        hasPublicationLoadError ? 'Click Continue to try again.' : dataError
+                      }
+                      className={SANDWICHED_ADMONITION_CLASS}
+                    />
                   )}
                 </>
               )}
@@ -190,6 +235,7 @@ export const PipelineCreationFlow = ({
                     control={form.control}
                     onEditDestination={() => void setStep('destination')}
                     onEditConnection={() => void setStep('connection')}
+                    validationFailures={destinationValidationFailures}
                   />
                   <Separator />
                   <PipelineDataReview
@@ -197,10 +243,19 @@ export const PipelineCreationFlow = ({
                     control={form.control}
                     publication={publication}
                     onEdit={() => void setStep('data')}
+                    validationFailures={pipelineValidationFailures}
                   />
                   <Separator />
                   <PipelineReviewCosts control={form.control} publication={publication} />
-                  <PipelineValidationAdmonition failures={submissionFailures} />
+                  <div role="status" aria-label="Pipeline validation status">
+                    {submissionFailures.length > 0 && (
+                      <Admonition
+                        className={SANDWICHED_ADMONITION_CLASS}
+                        type={hasCriticalFailures ? 'danger' : 'warning'}
+                        description={validationMessage}
+                      />
+                    )}
+                  </div>
                 </>
               )}
             </SteppedFlow>

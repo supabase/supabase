@@ -1,6 +1,5 @@
 import { AuthError } from '@supabase/auth-js'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { describe, expect, test, vi } from 'vitest'
 
 import { formatRecoveryCode } from './RecoveryCodesModal.utils'
@@ -31,6 +30,14 @@ const codes = [
   'kyyfsp3eqjydj53t',
 ]
 
+const confirmRegenerate = async () => {
+  const dialog = within(await screen.findByRole('dialog'))
+  fireEvent.change(await dialog.findByRole('textbox', { name: /Type REGENERATE to confirm./ }), {
+    target: { value: 'REGENERATE' },
+  })
+  fireEvent.click(await dialog.findByRole('button', { name: 'Regenerate' }))
+}
+
 describe('RegenerateRecoveryCodesModal', () => {
   test('regenerate the recovery codes after confirmation and allow users to copy them', async () => {
     vi.spyOn(auth.mfa.recoveryCodes, 'regenerate').mockResolvedValue({
@@ -46,15 +53,7 @@ describe('RegenerateRecoveryCodesModal', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Regenerate' }))
 
     // Confirm regeneration
-    await userEvent.type(
-      await within(await screen.findByRole('dialog')).findByRole('textbox', {
-        name: /Type REGENERATE to confirm./,
-      }),
-      'REGENERATE'
-    )
-    fireEvent.click(
-      await within(await screen.findByRole('dialog')).findByRole('button', { name: 'Regenerate' })
-    )
+    await confirmRegenerate()
 
     // Codes are generated
     await screen.findByText('Save your recovery codes')
@@ -99,15 +98,7 @@ describe('RegenerateRecoveryCodesModal', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Regenerate' }))
 
     // Confirm regeneration
-    await userEvent.type(
-      await within(await screen.findByRole('dialog')).findByRole('textbox', {
-        name: /Type REGENERATE to confirm./,
-      }),
-      'REGENERATE'
-    )
-    fireEvent.click(
-      await within(await screen.findByRole('dialog')).findByRole('button', { name: 'Regenerate' })
-    )
+    await confirmRegenerate()
     await screen.findByText('Unable to generate recovery codes')
     expect(await screen.findByText(/Try refreshing your browser/)).toHaveTextContent(
       'Try refreshing your browser, but if the issue persists for more than a few minutes, contact support.'
@@ -119,15 +110,7 @@ describe('RegenerateRecoveryCodesModal', () => {
     // Retry
     fireEvent.click(await screen.findByRole('button', { name: 'Regenerate' }))
     // Confirm regeneration
-    await userEvent.type(
-      await within(await screen.findByRole('dialog')).findByRole('textbox', {
-        name: /Type REGENERATE to confirm./,
-      }),
-      'REGENERATE'
-    )
-    fireEvent.click(
-      await within(await screen.findByRole('dialog')).findByRole('button', { name: 'Regenerate' })
-    )
+    await confirmRegenerate()
     // Codes are generated
     await screen.findByText('Save your recovery codes')
     await screen.findByText('WTO2-4T5X-BEUL-VJMI')

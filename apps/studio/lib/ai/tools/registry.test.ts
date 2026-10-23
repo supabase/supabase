@@ -106,7 +106,7 @@ describe('notebook mutation contracts', () => {
   )
 })
 
-describe('read-only notebook contracts', () => {
+describe('read-only contracts', () => {
   const cells = [
     { _tag: 'markdown_cell', _id: 'cell-1', text: '# Signup funnel' },
     {
@@ -136,6 +136,54 @@ describe('read-only notebook contracts', () => {
       ],
       cursor: 'next',
     },
+    list_policies: 'Policy Name: "Users can read own rows"',
+    list_reports: [
+      {
+        id: 'report-1',
+        name: 'Home',
+        description: null,
+        visibility: 'project',
+        updated_at: '2026-01-01T00:00:00.000Z',
+        chart_count: 1,
+      },
+    ],
+    get_report: {
+      id: 'report-1',
+      name: 'Home',
+      visibility: 'project',
+      period_start: { time_period: '7d' },
+      period_end: { time_period: 'today' },
+      interval: '1d',
+      layout: [
+        {
+          id: 'chart-1',
+          x: 0,
+          y: 0,
+          w: 6,
+          h: 4,
+          label: 'Signups',
+          attribute: 'snippet_chart-1',
+          provider: 'daily-stats',
+          chart_type: 'bar',
+          sql: 'select 1',
+          chartConfig: { type: 'bar', cumulative: false, xKey: 'day', yKey: 'count' },
+        },
+      ],
+    },
+    get_active_incidents: {
+      incidents: [
+        {
+          kind: 'incident',
+          name: 'Elevated errors',
+          status: 'investigating',
+          impact: 'partial_outage',
+          affected_components: ['Database / API'],
+          last_update_message: null,
+          url: 'https://status.supabase.com/incidents/1',
+        },
+      ],
+      message: 'There is 1 active incident on Supabase infrastructure.',
+    },
     get_notebook: {
       id: 'notebook-1',
       name: 'Signup funnel',
@@ -162,21 +210,32 @@ describe('read-only notebook contracts', () => {
       output,
     } as ToolUIPart
 
-    it.each(levels)('shows the output unchanged on replay at %s', (level) => {
+    it.each(levels)('shows the output unchanged, live and on replay, at %s', (level) => {
+      const contract: ToolContract = TOOL_CONTRACTS[name as keyof typeof outputs]
+      expect(contract.toModelOutput(output, level)).toEqual(output)
       expect(sanitizeContractPart(part, level)?.output).toEqual(output)
     })
 
     it('drops an output that does not match the schema', () => {
-      expect(
-        sanitizeContractPart({ ...part, output: 'oops' } as ToolUIPart, 'schema')?.output
-      ).toBe(undefined)
-    })
-
-    it.each(levels)('shows the live output unchanged at %s', (level) => {
-      const contract: ToolContract = TOOL_CONTRACTS[name as keyof typeof outputs]
-      expect(contract.toModelOutput(output, level)).toEqual(output)
+      expect(sanitizeContractPart({ ...part, output: 12345 } as ToolUIPart, 'schema')?.output).toBe(
+        undefined
+      )
     })
   })
+
+  it.each(['escalate_to_human', 'resolve_support_conversation'] as const)(
+    '%s output is limited to status on replay',
+    (name) => {
+      const part = {
+        type: `tool-${name}`,
+        toolCallId: 'call-6',
+        state: 'output-available',
+        input: {},
+        output: { status: 'sent', extra: 'ignored' },
+      } as ToolUIPart
+      expect(sanitizeContractPart(part, 'disabled')?.output).toEqual({ status: 'sent' })
+    }
+  )
 
   it('accepts a notebook list without a cursor or description', () => {
     const output = {

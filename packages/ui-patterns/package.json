@@ -34,6 +34,10 @@
       "import": "./src/Admonition/index.tsx",
       "types": "./src/Admonition/index.tsx"
     },
+    "./AiTools": {
+      "import": "./src/AiTools/index.tsx",
+      "types": "./src/AiTools/index.tsx"
+    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"
@@ -82,6 +86,18 @@
       "import": "./src/Chart/index.tsx",
       "types": "./src/Chart/index.tsx"
     },
+    "./CodeBlock/CodeBlock.highlight": {
+      "import": "./src/CodeBlock/CodeBlock.highlight.ts",
+      "types": "./src/CodeBlock/CodeBlock.highlight.ts"
+    },
+    "./CodeBlock/CodeBlock.theme": {
+      "import": "./src/CodeBlock/CodeBlock.theme.ts",
+      "types": "./src/CodeBlock/CodeBlock.theme.ts"
+    },
+    "./CodeBlock/CodeBlock.tokens": {
+      "import": "./src/CodeBlock/CodeBlock.tokens.ts",
+      "types": "./src/CodeBlock/CodeBlock.tokens.ts"
+    },
     "./CodeBlock/CodeBlock": {
       "import": "./src/CodeBlock/CodeBlock.tsx",
       "types": "./src/CodeBlock/CodeBlock.tsx"
@@ -89,6 +105,23 @@
     "./CodeBlock/CodeBlock.utils": {
       "import": "./src/CodeBlock/CodeBlock.utils.ts",
       "types": "./src/CodeBlock/CodeBlock.utils.ts"
+    },
+    "./CodeBlock/CodeBlockAnnotation": {
+      "import": "./src/CodeBlock/CodeBlockAnnotation.tsx",
+      "types": "./src/CodeBlock/CodeBlockAnnotation.tsx"
+    },
+    "./CodeBlock/CodeBlockControls": {
+      "import": "./src/CodeBlock/CodeBlockControls.tsx",
+      "types": "./src/CodeBlock/CodeBlockControls.tsx"
+    },
+    "./CodeBlock/CodeBlockFrame": {
+      "import": "./src/CodeBlock/CodeBlockFrame.tsx",
+      "types": "./src/CodeBlock/CodeBlockFrame.tsx"
+    },
+    "./CodeBlock/code-block.css": {
+      "style": "./src/CodeBlock/code-block.css",
+      "import": "./src/CodeBlock/code-block.css",
+      "types": "./src/CodeBlock/code-block.css"
     },
     "./CodeBlock": {
       "import": "./src/CodeBlock/index.tsx",
@@ -126,6 +159,10 @@
       "import": "./src/CommandMenu/api/TextHighlighter.tsx",
       "types": "./src/CommandMenu/api/TextHighlighter.tsx"
     },
+    "./CommandMenu/api/commandScore": {
+      "import": "./src/CommandMenu/api/commandScore.ts",
+      "types": "./src/CommandMenu/api/commandScore.ts"
+    },
     "./CommandMenu/api/hooks/commandsHooks": {
       "import": "./src/CommandMenu/api/hooks/commandsHooks.ts",
       "types": "./src/CommandMenu/api/hooks/commandsHooks.ts"
@@ -161,6 +198,10 @@
     "./CommandMenu/api/hooks/viewHooks": {
       "import": "./src/CommandMenu/api/hooks/viewHooks.ts",
       "types": "./src/CommandMenu/api/hooks/viewHooks.ts"
+    },
+    "./CommandMenu/api/sortSectionsByRelevance": {
+      "import": "./src/CommandMenu/api/sortSectionsByRelevance.ts",
+      "types": "./src/CommandMenu/api/sortSectionsByRelevance.ts"
     },
     "./CommandMenu/api/types": {
       "import": "./src/CommandMenu/api/types.ts",
@@ -518,6 +559,10 @@
       "import": "./src/MultipleCodeBlock/index.tsx",
       "types": "./src/MultipleCodeBlock/index.tsx"
     },
+    "./Notch": {
+      "import": "./src/Notch/index.ts",
+      "types": "./src/Notch/index.ts"
+    },
     "./PageBreadcrumbs": {
       "import": "./src/PageBreadcrumbs/index.tsx",
       "types": "./src/PageBreadcrumbs/index.tsx"
@@ -559,6 +604,7 @@
       "types": "./src/PromoToast/index.ts"
     },
     "./PromoToast/styles.css": {
+      "style": "./src/PromoToast/styles.css",
       "import": "./src/PromoToast/styles.css",
       "types": "./src/PromoToast/styles.css"
     },
@@ -579,6 +625,7 @@
       "types": "./src/SelectionListState/index.ts"
     },
     "./ShimmeringLoader/index.css": {
+      "style": "./src/ShimmeringLoader/index.css",
       "import": "./src/ShimmeringLoader/index.css",
       "types": "./src/ShimmeringLoader/index.css"
     },
@@ -666,6 +713,10 @@
       "import": "./src/TimestampInfo/index.tsx",
       "types": "./src/TimestampInfo/index.tsx"
     },
+    "./Toc/heading-reel": {
+      "import": "./src/Toc/heading-reel.tsx",
+      "types": "./src/Toc/heading-reel.tsx"
+    },
     "./Toc": {
       "import": "./src/Toc/index.ts",
       "types": "./src/Toc/index.ts"
@@ -681,6 +732,15 @@
     "./Toc/server/get-toc": {
       "import": "./src/Toc/server/get-toc.tsx",
       "types": "./src/Toc/server/get-toc.tsx"
+    },
+    "./Toc/toc-menu.css": {
+      "style": "./src/Toc/toc-menu.css",
+      "import": "./src/Toc/toc-menu.css",
+      "types": "./src/Toc/toc-menu.css"
+    },
+    "./Toc/toc-menu": {
+      "import": "./src/Toc/toc-menu.tsx",
+      "types": "./src/Toc/toc-menu.tsx"
     },
     "./Toc/toc-primitive": {
       "import": "./src/Toc/toc-primitive.tsx",
@@ -791,6 +851,7 @@
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
     "scroll-into-view-if-needed": "^3.1.0",
+    "shiki": "catalog:",
     "smol-toml": "^1.6.1",
     "sonner": "^1.5.0",
     "sql-formatter": "^15.0.0",
