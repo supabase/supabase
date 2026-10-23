@@ -2096,23 +2096,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/migrations/firestore-data',
-    destination: '/kb/guides/migrate-from-firestore-data',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/migrations/firebase-auth',
-    destination: '/kb/guides/migrate-from-firebase-auth',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/migrations/firebase-storage',
-    destination: '/kb/guides/migrate-from-firebase-storage',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/migrations/heroku',
-    destination: '/kb/guides/migrate-from-heroku',
+    source: '/docs/guides/migrations/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
   },
   {
     permanent: true,
@@ -3153,31 +3138,26 @@ module.exports = [
     source: '/docs/guides/resources/migrating-to-supabase',
     destination: '/kb/topics/migration',
   },
-  ...[
-    'amazon-rds',
-    'auth0',
-    'firebase-auth',
-    'firebase-storage',
-    'firestore-data',
-    'heroku',
-    'mssql',
-    'mysql',
-    'neon',
-    'postgres',
-    'render',
-    'vercel-postgres',
-  ].flatMap((slug) => [
-    {
-      permanent: true,
-      source: `/docs/guides/platform/migrating-to-supabase/${slug}`,
-      destination: `/kb/guides/migrate-from-${slug}`,
-    },
-    {
-      permanent: true,
-      source: `/docs/guides/resources/migrating-to-supabase/${slug}`,
-      destination: `/kb/guides/migrate-from-${slug}`,
-    },
-  ]),
+  {
+    permanent: true,
+    source: '/docs/guides/platform/migrating-to-supabase/vercel-postgres',
+    destination: '/kb/guides/migrate-from-vercel-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase/vercel-postgres',
+    destination: '/kb/guides/migrate-from-vercel-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/migrating-to-supabase/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
+  },
   {
     permanent: true,
     source: '/docs/guides/platform/migrating-and-upgrading-projects',
