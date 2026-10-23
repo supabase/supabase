@@ -1846,6 +1846,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/quickstarts/with-expo-react-native',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/social-login',
     destination: '/docs/guides/auth/social-sign-in',
   },

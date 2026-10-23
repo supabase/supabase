@@ -333,10 +333,10 @@ Note that these functions are only called on new sign-ups and sign-ins. Existing
 You need to run a script that will assign the `role: 'authenticated'` custom claim to all of your existing Firebase Authentication users. You can do this by combining the [list users](https://firebase.google.com/docs/auth/admin/manage-users#list_all_users) and [set custom user claims](https://firebase.google.com/docs/auth/admin/create-custom-tokens) admin APIs. An example script is provided below:
 
 ```javascript
-'use strict';
-const { initializeApp } = require('firebase-admin/app');
-const { getAuth } = require('firebase-admin/auth');
-initializeApp();
+'use strict'
+const { initializeApp } = require('firebase-admin/app')
+const { getAuth } = require('firebase-admin/auth')
+initializeApp()
 
 async function setRoleCustomClaim() {
   let nextPageToken = undefined
@@ -346,17 +346,19 @@ async function setRoleCustomClaim() {
 
     nextPageToken = listUsersResult.pageToken
 
-    await Promise.all(listUsersResult.users.map(async (userRecord) => {
-      try {
-        await getAuth().setCustomUserClaims(userRecord.id, {
-          role: 'authenticated'
-        })
-      } catch (error) {
-        console.error('Failed to set custom role for user', userRecord.id)
-      }
-    })
-  } while (nextPageToken);
-};
+    await Promise.all(
+      listUsersResult.users.map(async (userRecord) => {
+        try {
+          await getAuth().setCustomUserClaims(userRecord.uid, {
+            role: 'authenticated',
+          })
+        } catch (error) {
+          console.error('Failed to set custom role for user', userRecord.uid)
+        }
+      })
+    )
+  } while (nextPageToken)
+}
 
 setRoleCustomClaim().then(() => process.exit(0))
 ```

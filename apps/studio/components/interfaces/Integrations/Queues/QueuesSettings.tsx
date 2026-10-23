@@ -7,8 +7,10 @@ import { Button, Form, FormControl, FormField, FormItem, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageSection } from 'ui-patterns/PageSection'
 import { z } from 'zod'
 
+import { useIntegrationDetail } from '../Landing/useIntegrationDetail'
 import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
@@ -29,12 +31,16 @@ import { useTablesQuery } from '@/data/tables/tables-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { getErrorMessage } from '@/lib/get-error-message'
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
   const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE
   )
+
+  const { isInstalled } = useIntegrationDetail()
+
   const [isToggling, setIsToggling] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)
   const [isUpdatingRls, setIsUpdatingRls] = useState(false)
@@ -48,44 +54,59 @@ export const QueuesSettings = () => {
   const { formState } = form
   const enable = useWatch({ control: form.control, name: 'enable' })
 
-  const { data: queueTables } = useTablesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: 'pgmq',
-  })
+  const { data: queueTables } = useTablesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: 'pgmq',
+    },
+    { enabled: isInstalled }
+  )
   const tablesWithoutRLS =
     queueTables?.filter((x) => x.name.startsWith('q_') && !x.rls_enabled) ?? []
 
   // pgmq lowercases queue names when building q_/a_ relations, but pgmq.meta keeps
   // the original casing. Look up each relname in list_queues() so we render the
   // user-provided name rather than the lowercased relname slice.
-  const { data: queues } = useQueuesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: queues } = useQueuesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: isInstalled }
+  )
   const queueDisplayName = (relname: string) => {
     const stripped = relname.slice(2)
     return queues?.find((q) => q.queue_name.toLowerCase() === stripped)?.queue_name ?? stripped
   }
 
-  const { data: config, error: configError } = useProjectPostgrestConfigQuery({
-    projectRef: project?.ref,
-  })
+  const { data: config, error: configError } = useProjectPostgrestConfigQuery(
+    {
+      projectRef: project?.ref,
+    },
+    { enabled: isInstalled }
+  )
 
   const {
     data: isExposed,
     isSuccess,
     isPending: isLoading,
-  } = useQueuesExposePostgrestStatusQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useQueuesExposePostgrestStatusQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: isInstalled }
+  )
   const schemas = config?.db_schema.replace(/ /g, '').split(',') ?? []
 
-  const { data: pgmqVersion } = useDatabaseQueuesVersionQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: pgmqVersion } = useDatabaseQueuesVersionQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: isInstalled }
+  )
 
   const { mutateAsync: updateTable } = useTableUpdateMutation()
 
@@ -160,9 +181,9 @@ export const QueuesSettings = () => {
         `Successfully enabled RLS on ${tablesWithoutRLS.length === 1 ? tablesWithoutRLS[0].name : `${tablesWithoutRLS.length} queue${tablesWithoutRLS.length > 1 ? 's' : ''}`} `
       )
       setRlsConfirmModalOpen(false)
-    } catch (error: any) {
+    } catch (error) {
       setIsUpdatingRls(false)
-      toast.error(`Failed to enable RLS on queues: ${error.message}`)
+      toast.error(`Failed to enable RLS on queues: ${getErrorMessage(error)}`)
     }
   }
 
@@ -189,6 +210,18 @@ export const QueuesSettings = () => {
   useEffect(() => {
     if (isSuccess) form.reset({ enable: isExposed })
   }, [isSuccess])
+
+  if (!isInstalled) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-6 xl:px-10">
+        <ConstrainedIntegrationTabScaffold>
+          <PageSection className="py-0">
+            <Admonition type="default" description="Queues is not installed." />
+          </PageSection>
+        </ConstrainedIntegrationTabScaffold>
+      </div>
+    )
+  }
 
   return (
     <>

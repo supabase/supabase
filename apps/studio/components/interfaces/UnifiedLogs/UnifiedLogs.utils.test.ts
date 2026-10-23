@@ -29,18 +29,10 @@ describe('buildUnifiedLogsUrl', () => {
     expect(params.get('filter')).toBe('log_type:eq:edge function')
   })
 
-  it('adds the date range as an epoch-ms pair when start and end are provided', () => {
-    const start = new Date('2026-05-08T00:00:00.000Z')
-    const end = new Date('2026-05-08T01:00:00.000Z')
-    const { params } = parse(
-      buildUnifiedLogsUrl({ projectRef: 'abc', logType: 'auth', start, end })
-    )
-    expect(params.get('date')).toBe(`${start.valueOf()}-${end.valueOf()}`)
-  })
-
-  it('accepts ISO strings for the date range', () => {
-    const start = '2026-05-08T00:00:00.000Z'
-    const end = '2026-05-08T01:00:00.000Z'
+  it.each([
+    ['Date objects', new Date('2026-05-08T00:00:00.000Z'), new Date('2026-05-08T01:00:00.000Z')],
+    ['ISO strings', '2026-05-08T00:00:00.000Z', '2026-05-08T01:00:00.000Z'],
+  ])('adds the date range as an epoch-ms pair from %s', (_, start, end) => {
     const { params } = parse(
       buildUnifiedLogsUrl({ projectRef: 'abc', logType: 'auth', start, end })
     )
@@ -220,59 +212,38 @@ describe('getComputeLogsAvailability', () => {
     expect(availability.readyToSyncFilters).toBe(false)
   })
 
-  it('allows Compute filters and queries when the platform flag is enabled', () => {
-    const availability = getComputeLogsAvailability({
-      isPlatform: true,
-      flagsLoaded: true,
-      computeEnabled: true,
-    })
-
-    expect(availability).toEqual({
-      canQueryCompute: true,
-      preserveComputeFilter: true,
-      readyToSyncFilters: true,
-    })
-  })
-
-  it('removes Compute filters and queries when the platform flag is disabled', () => {
-    const availability = getComputeLogsAvailability({
-      isPlatform: true,
-      flagsLoaded: true,
-      computeEnabled: false,
-    })
-
-    expect(availability).toEqual({
-      canQueryCompute: false,
-      preserveComputeFilter: false,
-      readyToSyncFilters: true,
-    })
-  })
-
-  it('syncs generic filters immediately while keeping Compute unavailable on self-hosted', () => {
-    const availability = getComputeLogsAvailability({
-      isPlatform: false,
-      computeEnabled: false,
-    })
-
-    expect(availability).toEqual({
-      canQueryCompute: false,
-      preserveComputeFilter: false,
+  it.each([
+    [
+      'allows Compute when the platform flag is enabled',
+      { isPlatform: true, flagsLoaded: true, computeEnabled: true },
+      true,
+    ],
+    [
+      'removes Compute when the platform flag is disabled',
+      { isPlatform: true, flagsLoaded: true, computeEnabled: false },
+      false,
+    ],
+    [
+      'syncs generic filters immediately while keeping Compute unavailable on self-hosted',
+      { isPlatform: false, computeEnabled: false },
+      false,
+    ],
+  ])('%s', (_, input, computeAvailable) => {
+    expect(getComputeLogsAvailability(input)).toEqual({
+      canQueryCompute: computeAvailable,
+      preserveComputeFilter: computeAvailable,
       readyToSyncFilters: true,
     })
   })
 })
 
 describe('wrapIlikePattern', () => {
-  it('wraps a bare value in %...% for a contains match', () => {
-    expect(wrapIlikePattern('foo')).toBe('%foo%')
-  })
-
-  it('leaves the value untouched when it already contains a % wildcard', () => {
-    expect(wrapIlikePattern('foo%')).toBe('foo%')
-    expect(wrapIlikePattern('%foo')).toBe('%foo')
-  })
-
-  it('leaves the value untouched when it already contains a _ wildcard', () => {
-    expect(wrapIlikePattern('fo_bar')).toBe('fo_bar')
+  it.each([
+    ['foo', '%foo%'],
+    ['foo%', 'foo%'],
+    ['%foo', '%foo'],
+    ['fo_bar', 'fo_bar'],
+  ])('wraps %s only when it has no %% or _ wildcard', (value, expected) => {
+    expect(wrapIlikePattern(value)).toBe(expected)
   })
 })

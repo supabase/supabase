@@ -1,7 +1,11 @@
-import type { ToolUIPart, UIMessage } from 'ai'
+import type { ModelMessage, ToolUIPart, UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
-import { prepareMessagesForModel } from './generate-assistant-response.utils'
+import {
+  hideToolErrorsFromModel,
+  prepareMessagesForModel,
+} from './generate-assistant-response.utils'
+import { NO_DATA_ERROR } from './tools/execute-sql-output'
 import { encodeNotebookToolError, NotebookToolError } from './tools/notebook-tool-error'
 
 function assistantMessage(parts: UIMessage['parts']): UIMessage {
@@ -145,5 +149,44 @@ describe('prepareMessagesForModel', () => {
     const result = prepareMessagesForModel(messages, 'schema')
 
     expect(result[0].parts).toEqual([{ type: 'text', text: 'hello' }])
+  })
+})
+
+describe('hideToolErrorsFromModel', () => {
+  const toolError = (toolName: string): ModelMessage => ({
+    role: 'tool',
+    content: [
+      {
+        type: 'tool-result',
+        toolCallId: 'call-1',
+        toolName,
+        output: { type: 'error-text', value: 'duplicate key (email)=(a@b.c)' },
+      },
+    ],
+  })
+
+  it('hides execute_sql errors below the data level', () => {
+    expect(hideToolErrorsFromModel([toolError('execute_sql')], 'schema')).toEqual([
+      {
+        role: 'tool',
+        content: [
+          {
+            type: 'tool-result',
+            toolCallId: 'call-1',
+            toolName: 'execute_sql',
+            output: { type: 'error-text', value: NO_DATA_ERROR },
+          },
+        ],
+      },
+    ])
+  })
+
+  it('keeps errors at the data level and from other tools', () => {
+    const messages = [toolError('execute_sql'), toolError('search_docs')]
+
+    expect(hideToolErrorsFromModel(messages, 'schema_and_log_and_data')).toEqual(messages)
+    expect(hideToolErrorsFromModel([toolError('search_docs')], 'schema')).toEqual([
+      toolError('search_docs'),
+    ])
   })
 })
