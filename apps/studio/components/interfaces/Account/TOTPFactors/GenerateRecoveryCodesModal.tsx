@@ -12,6 +12,20 @@ export interface GenerateRecoveryCodesModalProps {
   showSecurityLink?: boolean
 }
 
+const DefaultTrigger = ({ onClick, isPending }: { onClick: () => void; isPending: boolean }) => (
+  <Admonition
+    type="warning"
+    layout="horizontal"
+    title="No recovery codes generated"
+    description="Recovery codes let you access your account if you lose access to your MFA device"
+    actions={
+      <Button onClick={onClick} loading={isPending}>
+        {isPending ? 'Generating codes' : 'Generate recovery codes'}
+      </Button>
+    }
+  />
+)
+
 export const GenerateRecoveryCodesModal = ({
   children,
   onComplete,
@@ -25,24 +39,11 @@ export const GenerateRecoveryCodesModal = ({
     setIsOpen(true)
     mutation.mutate({})
   }
+  const triggerProps = { onClick: handleGenerate, isPending: mutation.isPending }
+
   return (
     <>
-      {(
-        children ??
-        (({ onClick, isPending }) => (
-          <Admonition
-            type="warning"
-            layout="horizontal"
-            title="No recovery codes generated"
-            description="Recovery codes let you access your account if you lose access to your MFA device"
-            actions={
-              <Button onClick={onClick} loading={isPending}>
-                {isPending ? 'Generating codes' : 'Generate recovery codes'}
-              </Button>
-            }
-          />
-        ))
-      )({ onClick: handleGenerate, isPending: mutation.isPending })}
+      {children ? children(triggerProps) : <DefaultTrigger {...triggerProps} />}
       <RecoveryCodesModal
         open={isOpen}
         mutation={mutation}
