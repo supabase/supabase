@@ -1,5 +1,6 @@
 'use client'
 
+import { defaultFilter } from 'cmdk'
 import { useBreakpoint } from 'common'
 import useDragToClose from 'common/hooks/useDragToClose'
 import { AlertTriangle, ArrowLeft, Search } from 'lucide-react'
@@ -48,6 +49,25 @@ function Breadcrumb({ className }: { className?: string }) {
   )
 }
 
+// cmdk's default scorer fuzzy-matches scattered characters across long values, e.g. "colors"
+// matches "Branch integration, Vercel integration, ..." with a score around 0.00002. Genuine
+// prefix/substring/word matches score well above this threshold.
+const MIN_FILTER_SCORE = 0.01
+
+const KEYWORD_MATCH_SCORE = 0.5
+
+// `value` is fuzzy-matched; `keywords` only match as a substring so that long keyword strings
+// don't produce scattered-character matches (e.g. "blog" against "Branch integration, ...").
+const filterWithMinScore: typeof defaultFilter = (value, search, keywords) => {
+  const score = defaultFilter(value, search)
+  const normalizedSearch = search.trim().toLowerCase()
+  const hasKeywordMatch =
+    normalizedSearch.length > 0 &&
+    keywords?.some((keyword) => keyword.toLowerCase().includes(normalizedSearch))
+  const valueScore = score < MIN_FILTER_SCORE ? 0 : score
+  return hasKeywordMatch ? Math.max(valueScore, KEYWORD_MATCH_SCORE) : valueScore
+}
+
 const CommandWrapper = forwardRef<
   React.ElementRef<typeof Command>,
   React.ComponentPropsWithoutRef<typeof Command>
@@ -55,6 +75,7 @@ const CommandWrapper = forwardRef<
   return (
     <Command
       ref={ref}
+      filter={filterWithMinScore}
       className={cn(
         'h-full w-full flex flex-col overflow-hidden',
         '**:[[cmdk-group]]:px-2 **:[[cmdk-group]]:bg-transparent! **:[[cmdk-group-heading]]:bg-transparent! **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger **:[[cmdk-input]]:h-12',
@@ -63,7 +84,6 @@ const CommandWrapper = forwardRef<
         '[&_[cmdk-item]_svg]:stroke-1',
         '[&_[cmdk-input-wrapper]_svg]:h-5',
         '[&_[cmdk-input-wrapper]_svg]:w-5',
-
         '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
         className
       )}
