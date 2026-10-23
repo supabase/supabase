@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { awsAccountKeys } from './keys'
-import { get, handleError, unguarded } from '@/data/fetchers'
+import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
 
@@ -29,7 +29,6 @@ async function getAWSAccounts({ projectRef }: AWSAccountsVariables, signal?: Abo
       path: { ref: projectRef },
     },
     signal,
-    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

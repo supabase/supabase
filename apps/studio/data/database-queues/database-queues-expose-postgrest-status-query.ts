@@ -23,6 +23,7 @@ export async function getDatabaseQueuesExposePostgrestStatus({
     connectionString,
     sql,
     queryKey: ['queues-postgrest-expose'],
+    grant: unguarded.migrating,
   })
   return result[0].exists as boolean
 }

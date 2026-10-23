@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { logDrainsKeys } from './keys'
-import { get, handleError, unguarded } from '@/data/fetchers'
+import { get, handleError } from '@/data/fetchers'
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -17,7 +17,6 @@ export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSi
   const { data, error } = await get(`/platform/projects/{ref}/analytics/log-drains`, {
     params: { path: { ref: ref } },
     signal,
-    grant: unguarded.migrating,
   })
 
   if (error) {

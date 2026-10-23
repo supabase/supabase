@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { awsAccountKeys } from './keys'
-import { del, handleError, unguarded } from '@/data/fetchers'
+import { del, handleError } from '@/data/fetchers'
 import type { ResponseError } from '@/types'
 
 export type AWSAccountDeleteVariables = {

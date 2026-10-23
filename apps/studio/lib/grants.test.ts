@@ -121,7 +121,7 @@ beforeEach(() => {
 })
 
 describe('getGrant', () => {
-  const scope = { organizationSlug: ORG_SLUG, projectRef: 'proj' }
+  const scope = { organizationSlug: ORG_SLUG, projectRef: 'proj', permissionsProjectRef: 'proj' }
 
   test('mints from any satisfied group of an OR-of-AND requirement', () => {
     const dev = permissionsFor({ permissions: ['branching_development_read'] })
@@ -180,7 +180,13 @@ describe('getGrant', () => {
       expect(result.grant.permissionsProjectRef).toBe('parent-ref')
     }
 
-    expect(getGrant(data, BRANCHES, { ...scope, projectRef: 'branch-ref' }).status).toBe('denied')
+    expect(
+      getGrant(data, BRANCHES, {
+        ...scope,
+        projectRef: 'branch-ref',
+        permissionsProjectRef: 'branch-ref',
+      }).status
+    ).toBe('denied')
   })
 
   test('supports an explicit project scope for endpoints without the project in the path', () => {
@@ -190,13 +196,21 @@ describe('getGrant', () => {
     })
 
     expect(getGrant(data, DELETE_BRANCH, scope).status).toBe('granted')
-    expect(getGrant(data, DELETE_BRANCH, { ...scope, projectRef: 'other' }).status).toBe('denied')
+    expect(
+      getGrant(data, DELETE_BRANCH, {
+        ...scope,
+        projectRef: 'other',
+        permissionsProjectRef: 'other',
+      }).status
+    ).toBe('denied')
   })
 
   test('mints without permission data when self-hosted', () => {
     mocks.isPlatform = false
 
-    expect(getGrant(undefined, BRANCHES, { projectRef: 'proj' }).status).toBe('granted')
+    expect(
+      getGrant(undefined, BRANCHES, { projectRef: 'proj', permissionsProjectRef: 'proj' }).status
+    ).toBe('granted')
   })
 
   test('denies an unknown variant at runtime', () => {

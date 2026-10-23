@@ -1,5 +1,12 @@
 import { fgaRequirements, type FgaGuardedEndpoint } from 'api-types'
 import type { FetchOptions, FetchResponse } from 'openapi-fetch'
+import type {
+  FilterKeys,
+  HttpMethod,
+  MediaType,
+  PathsWithMethod,
+  RequiredKeysOf,
+} from 'openapi-typescript-helpers'
 
 import {
   fgaRefinements,
@@ -7,18 +14,8 @@ import {
   type FgaRefinements,
   type RefinableInit,
 } from '@/lib/fga-refinements'
-import type { Grant, VariantOf } from '@/lib/grants'
+import type { EndpointKey, Grant, VariantOf } from '@/lib/grants'
 
-type HttpMethod = 'get' | 'put' | 'post' | 'delete' | 'patch'
-type MediaType = `${string}/${string}`
-type PathsWithMethod<Paths, M extends HttpMethod> = {
-  [P in keyof Paths]: Paths[P] extends { [K in M]: unknown } ? P : never
-}[keyof Paths]
-type FilterKeys<Obj, Matchers> = Obj[keyof Obj & Matchers]
-type RequiredKeysOfHelper<T> = {
-  [K in keyof T]: {} extends Pick<T, K> ? never : K
-}[keyof T]
-type RequiredKeysOf<T> = RequiredKeysOfHelper<T> extends undefined ? never : RequiredKeysOfHelper<T>
 type InitParam<Init> =
   RequiredKeysOf<Init> extends never
     ? [(Init & { [key: string]: unknown })?]
@@ -38,8 +35,6 @@ export const unguarded = {
   /** Intentionally skips the grant check, for example to call optimistically and let the backend gate the request. */
   byDesign: (reason: string): Unguarded => ({ unguarded: 'byDesign', reason }) as Unguarded,
 }
-
-type EndpointKey<M extends HttpMethod, P> = `${Uppercase<M>} ${P & string}`
 
 type GrantForVariant<K extends FgaGuardedEndpoint, V> = V extends VariantOf<K> ? Grant<K, V> : never
 
@@ -84,12 +79,15 @@ export type GuardedClientMethod<
 > = <
   Path extends PathsWithMethod<Paths, M>,
   Init extends MaybeOptional<
-    OmitOwned<FetchOptions<FilterKeys<Paths[Path], M>>, OwnedQueryKeys<EndpointKey<M, Path>>>
+    OmitOwned<
+      FetchOptions<FilterKeys<Paths[Path], M>>,
+      OwnedQueryKeys<EndpointKey<M, Path & string>>
+    >
   >,
 >(
   url: Path,
   ...init: InitParam<
-    CheckedInit<Init, GrantOption<EndpointKey<M, NoInfer<Path>>>> & ParseAsContext<Init>
+    CheckedInit<Init, GrantOption<EndpointKey<M, NoInfer<Path> & string>>> & ParseAsContext<Init>
   >
 ) => Promise<FetchResponse<FilterKeys<Paths[Path], M>, Init, Media>>
 

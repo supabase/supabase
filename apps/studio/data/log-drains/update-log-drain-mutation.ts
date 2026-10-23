@@ -28,7 +28,6 @@ export async function updateLogDrain(payload: LogDrainUpdateVariables) {
       type: payload.type,
       config: payload.config as any,
     },
-    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
