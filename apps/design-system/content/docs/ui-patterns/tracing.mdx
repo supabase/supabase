@@ -7,7 +7,7 @@ description: Composable primitives for distributed-trace views built on the shar
 import { Trace } from 'ui-patterns/Trace'
 ```
 
-`Trace.Root` indexes a list of OpenTelemetry-style spans and shares the result with the parts inside it. `Trace.Waterfall` is the layout container and measures its width so time can be mapped to pixels. `Trace.Ruler` draws the time axis and `Trace.Grid` draws the vertical gridlines below it, and `Trace.Cursor` draws the live cursor. The waterfall has three columns: the tree (`treeWidth`), the timeline, and a controls gutter (`controlsWidth`, 56 by default) that renders the children of `Trace.Ruler`.
+`Trace.Root` indexes a list of OpenTelemetry-style spans and shares the result with the parts inside it. `Trace.Waterfall` is the layout container and measures its width so time can be mapped to pixels. `Trace.Ruler` draws the time axis and `Trace.Grid` draws the vertical gridlines below it, and `Trace.Cursor` draws the live cursor. The waterfall has two columns: the tree (`treeWidth`) and the timeline. The children of `Trace.Ruler` render at the right end of the ruler's tree cell, next to the "Span" label.
 
 ## Waterfall and Ruler
 
