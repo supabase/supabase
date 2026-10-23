@@ -266,7 +266,7 @@ LIMIT 1
           timestamp: row.timestamp,
           event_message: row.event_message,
           metadata: row.log_attributes ?? {},
-        } as unknown as UnifiedLogInspectionEntry,
+        },
       ],
     }
   }
