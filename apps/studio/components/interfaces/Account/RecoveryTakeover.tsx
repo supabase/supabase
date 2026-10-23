@@ -14,7 +14,7 @@ export const RecoveryTakeover = ({
         className="w-full max-w-none sm:max-w-none md:max-w-none border-0 rounded-none sm:rounded-none shadow-none outline-none data-[state=open]:animate-none data-[state=closed]:animate-none"
         dialogOverlayProps={{
           className:
-            'block p-0 bg-studio backdrop-blur-none motion-safe:data-[state=open]:animate-in data-[state=open]:fade-in-0 duration-200 ease-enter motion-reduce:animate-none',
+            'block p-0 bg-studio backdrop-blur-none motion-safe:data-[state=open]:animate-in data-[state=open]:fade-in-0 duration-100 ease-enter motion-reduce:animate-none',
         }}
         onKeyDown={(event) => event.stopPropagation()}
         onKeyUp={(event) => event.stopPropagation()}
@@ -30,7 +30,9 @@ export const RecoveryTakeover = ({
         }}
       >
         <DialogTitle className="sr-only">Account recovery</DialogTitle>
-        {children}
+        <div className="motion-safe:animate-in fade-in-0 duration-250 delay-100 fill-mode-both ease-enter motion-reduce:animate-none">
+          {children}
+        </div>
       </DialogContent>
     </Dialog>
   )
