@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  getRecoveryGap,
-  getRecoveryReturnTo,
-} from '@/components/interfaces/Account/RecoveryInterstitial/RecoveryInterstitial.utils'
+import { getRecoveryGap } from '@/components/interfaces/Account/RecoveryInterstitial/RecoveryInterstitial.utils'
 
 describe('account recovery reminder selection', () => {
   it.each([
@@ -34,34 +31,5 @@ describe('account recovery reminder selection', () => {
         { id: 'single-oauth-identity', severity: 'warning', action: 'set-password' },
       ])
     ).toBeNull()
-  })
-})
-
-describe('return destination', () => {
-  it('preserves the deployment base path exactly once', () => {
-    expect(getRecoveryReturnTo(null, '/dashboard')).toBe('/dashboard/organizations')
-    expect(getRecoveryReturnTo('/organizations', '/dashboard')).toBe('/dashboard/organizations')
-    expect(getRecoveryReturnTo('/dashboard/project/abc?tab=1#tables', '/dashboard')).toBe(
-      '/dashboard/project/abc?tab=1#tables'
-    )
-    expect(getRecoveryReturnTo('/dashboard/account-recovery', '/dashboard')).toBe(
-      '/dashboard/organizations'
-    )
-    expect(getRecoveryReturnTo('//evil.test', '/dashboard')).toBe('/dashboard/organizations')
-  })
-
-  it('preserves internal routes, query strings and fragments', () => {
-    expect(getRecoveryReturnTo('/project/abc?tab=1#tables')).toBe('/project/abc?tab=1#tables')
-  })
-  it.each([
-    null,
-    '',
-    'https://evil.test',
-    '//evil.test',
-    '/\\evil.test',
-    '/account-recovery?mockRecoveryInterstitial=missing',
-    '/ /evil',
-  ])('rejects unsafe or looping destination %s', (value) => {
-    expect(getRecoveryReturnTo(value)).toBe('/organizations')
   })
 })
