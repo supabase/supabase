@@ -81,6 +81,16 @@ async function confirmRegeneration() {
 }
 
 describe('RecoveryReminder', () => {
+  test('dismisses an untouched reminder only after the resolved check finishes', async () => {
+    const onDismiss = vi.fn()
+    const { rerender } = customRender(<RecoveryReminder gap="missing" onDismiss={onDismiss} />)
+    rerender(<RecoveryReminder gap={null} isLoading onDismiss={onDismiss} />)
+    expect(onDismiss).not.toHaveBeenCalled()
+    rerender(<RecoveryReminder gap={null} onDismiss={onDismiss} />)
+    await waitFor(() => expect(onDismiss).toHaveBeenCalledOnce())
+    expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
+  })
+
   test('does not claim success when checks are disabled', () => {
     customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isUnavailable />)
     expect(
@@ -90,25 +100,17 @@ describe('RecoveryReminder', () => {
   })
 
   beforeEach(() => vi.mocked(useFlag).mockReturnValue(false))
-  test('shimmers while checking and hides Continue until resolved', () => {
-    const { rerender } = customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isLoading />)
+  test('shimmers until a resolved check dismisses the untouched reminder', async () => {
+    const onDismiss = vi.fn()
+    const { rerender } = customRender(
+      <RecoveryReminder gap={null} onDismiss={onDismiss} isLoading />
+    )
     expect(screen.getByRole('status', { name: 'Checking account recovery' })).toBeInTheDocument()
+    expect(onDismiss).not.toHaveBeenCalled()
+    rerender(<RecoveryReminder gap={null} onDismiss={onDismiss} />)
+    await waitFor(() => expect(onDismiss).toHaveBeenCalledOnce())
     expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
     expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
-    rerender(<RecoveryReminder gap={null} onDismiss={vi.fn()} />)
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
-    expect(
-      screen.queryByRole('status', { name: 'Checking account recovery' })
-    ).not.toBeInTheDocument()
-  })
-
-  test('dismisses the resolved state without navigating', () => {
-    const onDismiss = vi.fn()
-    customRender(<RecoveryReminder gap={null} onDismiss={onDismiss} />)
-    expect(screen.getByRole('heading', { name: 'You’re all set' })).toBeInTheDocument()
-    expect(screen.getByText('No account recovery reminder is available.')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    expect(onDismiss).toHaveBeenCalledOnce()
   })
 
   test('completes optional authenticator independently and preserves codes task on cancellation', async () => {
@@ -203,15 +205,16 @@ describe('RecoveryReminder', () => {
   })
 
   test('keeps newly generated codes visible through a live status update until acknowledged', async () => {
+    const onDismiss = vi.fn()
     vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue(response)
     const { rerender } = customRender(
-      <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />
+      <RecoveryReminder gap="missing" onDismiss={onDismiss} hasAuthenticatorTask={false} />
     )
     fireEvent.click(screen.getByRole('button', { name: 'Generate codes' }))
     await screen.findByText('WTO2-4T5X-BEUL-VJMI')
 
     // A refetch sees new codes before the user has saved them.
-    rerender(<RecoveryReminder gap={null} onDismiss={vi.fn()} hasAuthenticatorTask={false} />)
+    rerender(<RecoveryReminder gap={null} onDismiss={onDismiss} hasAuthenticatorTask={false} />)
     expect(screen.getByText('WTO2-4T5X-BEUL-VJMI')).toBeInTheDocument()
     expect(screen.queryByText('Recovery codes saved')).not.toBeInTheDocument()
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
@@ -220,6 +223,7 @@ describe('RecoveryReminder', () => {
     await acknowledgeCodes()
     await screen.findByText('Recovery codes saved')
     expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
+    expect(onDismiss).not.toHaveBeenCalled()
   })
 
   test('keeps the pending dialog open and prevents premature completion', async () => {

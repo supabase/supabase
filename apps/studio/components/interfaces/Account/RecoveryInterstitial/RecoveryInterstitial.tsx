@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, CardFooter } from 'ui'
 import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -39,12 +39,12 @@ const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
   const flagsReady = hasLoaded === true && !isConfigCatStale
   const isEnabled = useFlag('enableAuthRecoveryCodes')
   const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-  const { findings, isPending, isError, verifiedFactorCount } = useAccountRecovery({
+  const { findings, isPending, isFetching, isError, verifiedFactorCount } = useAccountRecovery({
     enabled: flagsReady && isEnabled && hasSecuritySettings,
   })
-  const isLoading = !flagsReady || isPending
+  const isLoading = !flagsReady || isPending || isFetching
   const isUnavailable = flagsReady && (!isEnabled || !hasSecuritySettings)
-  const gap = isError || isLoading || isUnavailable ? null : getRecoveryGap(findings)
+  const gap = isError || !flagsReady || isPending || isUnavailable ? null : getRecoveryGap(findings)
   let announcement = 'Account recovery check complete'
   if (gap) announcement = 'Account recovery action needed'
   if (isUnavailable) announcement = 'Account recovery check unavailable'
@@ -126,6 +126,11 @@ export const RecoveryReminder = ({
   const [isFactorComplete, setIsFactorComplete] = useState(false)
   // Preserve all task dialogs and completed rows during background status updates.
   const activeGap = startedGap ?? gap
+  useEffect(() => {
+    if (!activeGap && !isLoading && !isError && !isUnavailable) onDismiss()
+  }, [activeGap, isLoading, isError, isUnavailable, onDismiss])
+
+  if (!activeGap && !isLoading && !isError && !isUnavailable) return null
   if (!activeGap && (isError || isUnavailable)) {
     return (
       <InterstitialLayout
@@ -154,42 +159,17 @@ export const RecoveryReminder = ({
   if (!activeGap) {
     return (
       <InterstitialLayout
-        logo={
-          <div className="relative">
-            <SupabaseLogo />
-            {!isLoading && (
-              <span className="absolute -top-2 -right-2 scale-80">
-                <AdmonitionTypeIcon type="success" />
-              </span>
-            )}
-          </div>
-        }
+        logo={<SupabaseLogo />}
         title={
-          isLoading ? (
-            <div role="status" aria-label="Checking account recovery">
-              <ShimmeringLoader className="h-7 w-40 py-0" />
-            </div>
-          ) : (
-            'You’re all set'
-          )
+          <div role="status" aria-label="Checking account recovery">
+            <ShimmeringLoader className="h-7 w-40 py-0" />
+          </div>
         }
         widthClassName="max-w-md"
         containerClassName={recoveryContainerClassName}
-        description={
-          isLoading ? (
-            <ShimmeringLoader className="h-5 w-64 max-w-full py-0" />
-          ) : (
-            'No account recovery reminder is available.'
-          )
-        }
+        description={<ShimmeringLoader className="h-5 w-64 max-w-full py-0" />}
       >
-        <CardFooter className="justify-center px-6 py-5 min-h-16">
-          {!isLoading && (
-            <Button size="tiny" onClick={onDismiss}>
-              Continue
-            </Button>
-          )}
-        </CardFooter>
+        <CardFooter className="justify-center px-6 py-5 min-h-16" />
       </InterstitialLayout>
     )
   }
