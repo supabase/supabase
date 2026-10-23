@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { getUnifiedLogsPageRange, LIVE_MODE_OVERLAP_MS } from './unified-logs-infinite-query'
+import {
+  getUnifiedLogsPageRange,
+  getUnifiedLogsPrevCursor,
+  LIVE_MODE_OVERLAP_MS,
+} from './unified-logs-infinite-query'
 
 const RANGE_START = '2026-09-29T11:00:00.000Z'
 const RANGE_END = '2026-09-29T12:00:00.000Z'
@@ -71,5 +75,27 @@ describe('getUnifiedLogsPageRange', () => {
       isoTimestampStart: new Date(cursor - LIVE_MODE_OVERLAP_MS).toISOString(),
       isoTimestampEnd: NOW.toISOString(),
     })
+  })
+})
+
+describe('getUnifiedLogsPrevCursor', () => {
+  const rowMs = ms('2026-09-29T12:10:00.000Z')
+  const cursor = ms('2026-09-29T12:05:00.000Z')
+
+  it('uses the newest row when the page has rows', () => {
+    expect(getUnifiedLogsPrevCursor(rowMs, { cursor, direction: 'prev' }, NOW)).toBe(rowMs)
+    expect(getUnifiedLogsPrevCursor(rowMs, null, NOW)).toBe(rowMs)
+  })
+
+  it('keeps the incoming cursor when a live-mode poll finds no rows', () => {
+    expect(getUnifiedLogsPrevCursor(null, { cursor, direction: 'prev' }, NOW)).toBe(cursor)
+  })
+
+  it('falls back to now for an empty first page or an unusable cursor', () => {
+    expect(getUnifiedLogsPrevCursor(null, null, NOW)).toBe(NOW.getTime())
+    expect(getUnifiedLogsPrevCursor(null, { cursor, direction: 'next' }, NOW)).toBe(NOW.getTime())
+    expect(getUnifiedLogsPrevCursor(null, { cursor: NaN, direction: 'prev' }, NOW)).toBe(
+      NOW.getTime()
+    )
   })
 })

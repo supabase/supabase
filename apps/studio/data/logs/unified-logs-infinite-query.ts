@@ -94,6 +94,25 @@ export const getUnifiedLogsPageRange = (
   return { isoTimestampStart, isoTimestampEnd }
 }
 
+/**
+ * Cursor the next live-mode poll starts from: the newest row's timestamp in milliseconds.
+ * A live-mode poll that finds no rows keeps the cursor it was given, so the next poll's
+ * range still comes from a row timestamp, not the browser's clock (which may be skewed).
+ * Only a first page with no rows falls back to `now`.
+ */
+export const getUnifiedLogsPrevCursor = (
+  firstRowMs: number | null,
+  pageParam: PageParam | null,
+  now: Date = new Date()
+): number => {
+  if (firstRowMs !== null) return firstRowMs
+  const cursor = Number(pageParam?.cursor)
+  if (pageParam?.direction === 'prev' && pageParam.cursor != null && Number.isFinite(cursor)) {
+    return cursor
+  }
+  return now.getTime()
+}
+
 export async function getUnifiedLogs(
   {
     projectRef,
@@ -151,7 +170,7 @@ export async function getUnifiedLogs(
   // Cursors are stored as milliseconds (Date.getTime()) so the OTEL endpoint's
   // wire format (ISO string vs numeric microseconds) doesn't bleed into pagination.
   const nextCursor = lastRow ? lastRow.date.getTime() : null
-  const prevCursor = firstRow ? firstRow.date.getTime() : new Date().getTime()
+  const prevCursor = getUnifiedLogsPrevCursor(firstRow ? firstRow.date.getTime() : null, pageParam)
 
   return {
     data: result,
