@@ -1,0 +1,92 @@
+---
+id: 'storage-lifecycle-policies'
+title: 'Lifecycle Policies'
+description: 'Expire noncurrent object versions automatically with a bucket lifecycle policy.'
+subtitle: 'Expire noncurrent object versions automatically'
+sidebar_label: 'Lifecycle Policies'
+---
+
+A lifecycle policy deletes noncurrent versions of objects after a period you choose. Use one to keep the history that [object versioning](/docs/guides/storage/buckets/object-versioning) provides without storing every version forever.
+
+<Admonition type="caution" title="Private alpha">
+
+Lifecycle policies are in private alpha. If you're interested in trying them, request access through the [lifecycle policies access request form](https://supabase.com/go/storage-object-versioning-early-access).
+
+</Admonition>
+
+A policy applies to file buckets and has no effect until you turn on versioning for the bucket.
+
+## Set a policy
+
+To set a policy, call `updateBucketLifecycle` with a list of rules.
+
+<Admonition type="caution">
+
+`updateBucketLifecycle` replaces the entire policy, and removes any rule you leave out. Include every rule you want to keep in each call.
+
+</Admonition>
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+const { data, error } = await supabase.storage.updateBucketLifecycle('avatars', {
+  rules: [
+    {
+      id: 'expire-history',
+      status: 'Enabled',
+      filter: {},
+      noncurrentVersionExpiration: {
+        noncurrentDays: 30,
+        newerNoncurrentVersions: 2,
+      },
+    },
+  ],
+})
+```
+
+This rule keeps the 2 newest noncurrent versions of each object. It expires the others after they've been noncurrent for 30 days. Both conditions in a rule must be true for a version to expire. If a policy has more than one rule, a version expires when any enabled rule matches it.
+
+Noncurrent delete markers count toward `newerNoncurrentVersions` and expire like other noncurrent versions. Storage applies lifecycle rules about once a day, so a version can be deleted up to a day after it meets a rule's conditions.
+
+## Get or delete a policy
+
+To read the policy, call `getBucketLifecycle`. If the bucket has no policy, the call fails with `NoSuchLifecycleConfiguration`.
+
+To remove the policy, call `deleteBucketLifecycle`.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+const { data, error } = await supabase.storage.getBucketLifecycle('avatars')
+
+await supabase.storage.deleteBucketLifecycle('avatars')
+```
+
+## Rule options
+
+A policy holds 1 to 1,000 rules. Each rule has the following fields.
+
+| Field                         | Type    | Required | Description                                                                                |
+| ----------------------------- | ------- | -------- | ------------------------------------------------------------------------------------------ |
+| `id`                          | String  | No       | A unique name for the rule, up to 255 characters. Storage generates one if you omit it.    |
+| `status`                      | String  | Yes      | `Enabled` runs the rule. `Disabled` keeps the rule stored without running it.              |
+| `filter`                      | Object  | Yes      | Must be `{}`. A rule applies to every object in the bucket.                                |
+| `noncurrentVersionExpiration` | Object  | Yes      | Holds `noncurrentDays` and `newerNoncurrentVersions`.                                      |
+| `noncurrentDays`              | Integer | Yes      | The number of days a version must be noncurrent before it expires. Must be 1 or more.      |
+| `newerNoncurrentVersions`     | Integer | No       | The number of the newest noncurrent versions to keep whatever their age. Accepts 1 to 100. |
+
+Storage rejects any other `filter` value. Prefix, tag, and size filters aren't supported.
+
+Expiring noncurrent versions is the only action a rule supports.
+
+<Admonition type="danger">
+
+An expired version is deleted permanently and can't be restored. Choose `noncurrentDays` and `newerNoncurrentVersions` so that the history you need is kept.
+
+</Admonition>

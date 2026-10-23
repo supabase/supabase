@@ -6,7 +6,7 @@ subtitle: 'Learn about deleting objects'
 sidebar_label: 'Delete Objects'
 ---
 
-When you delete one or more objects from a bucket, the files are permanently removed and not recoverable. You can delete a single object or multiple objects at once.
+Deleting an object removes it permanently. In a bucket with [object versioning](/docs/guides/storage/buckets/object-versioning) turned on, a delete adds a delete marker and keeps earlier versions so you can restore them. You can delete a single object or multiple objects at once.
 
 <Admonition type="note">
 
@@ -35,7 +35,16 @@ When deleting objects, there is a limit of 1000 objects at a time using the `rem
 
 ## Emptying large buckets
 
-Deleting objects via the Supabase Dashboard or Storage API has a hard limit of 200,000 objects per bucket. If a bucket contains more than 200,000 objects, the empty bucket operation will fail.
+Deleting objects via the Supabase Dashboard or Storage API has a hard limit of 200,000 objects per bucket. If a bucket contains more than 200,000 objects, the empty bucket operation will fail. In a bucket with object versioning turned on, the limit counts every version and delete marker.
+
+<Admonition type="caution">
+
+In a bucket with object versioning turned on, `aws s3 sync --delete` adds a delete marker for each object and keeps every version, so storage usage stays the same. To delete the versions, use one of these options:
+
+- If the bucket is under the 200,000-object limit, call `emptyBucket`.
+- Set a [lifecycle policy](/docs/guides/storage/buckets/lifecycle-policies) to delete noncurrent versions on a schedule.
+
+</Admonition>
 
 The recommended approach for emptying large buckets is to use the AWS CLI with Supabase's S3 protocol support. You can delete all objects by using the `sync` command to sync your bucket with an empty local directory, which will safely delete all objects.
 

@@ -1,0 +1,232 @@
+---
+id: 'storage-object-versioning'
+title: 'Object Versioning'
+description: 'Keep multiple versions of each object in a bucket, and read or restore any of them.'
+subtitle: 'Keep multiple versions of each object in a bucket'
+sidebar_label: 'Object Versioning'
+---
+
+Object versioning keeps multiple versions of each object in a bucket. Turn it on for a bucket to read or restore an earlier version of an object, and to undo a delete.
+
+<Admonition type="caution" title="Private alpha">
+
+Object versioning is in private alpha. If you're interested in trying it, request access through the [object versioning access request form](https://supabase.com/go/storage-object-versioning-early-access).
+
+</Admonition>
+
+## How versioning works
+
+In a bucket with versioning `ENABLED`, each upload to an existing path with `upsert: true` keeps the earlier version of the object. The most recent version is the _current version_. Earlier versions are _noncurrent versions_.
+
+Deleting an object without a version ID adds a _delete marker_ as the current version and keeps the earlier versions. This protects your data against accidental deletes, because you can restore any earlier version.
+
+Each version has a version ID, which is the `version` value of the object. Versioning follows the model of S3 object versioning.
+
+### Versioning status
+
+A bucket has one of three versioning statuses:
+
+| Status      | Meaning                                                   | Can change to |
+| ----------- | --------------------------------------------------------- | ------------- |
+| `DISABLED`  | Versioning has never been turned on. This is the default. | `ENABLED`     |
+| `ENABLED`   | Every write keeps the earlier version.                    | `SUSPENDED`   |
+| `SUSPENDED` | Versioning was turned on and then paused for new writes.  | `ENABLED`     |
+
+A bucket can move between `ENABLED` and `SUSPENDED` as often as you like. It can never return to `DISABLED`, and it can't change directly from `DISABLED` to `SUSPENDED`.
+
+### Writes and deletes by status
+
+Each version records whether it's protected in its `is_versioned` field. A version written while the bucket is `ENABLED` has `is_versioned` set to `true`. A version written while the bucket is `DISABLED` or `SUSPENDED` has it set to `false`.
+
+The following table shows what happens to the current version when you upload to an existing path, or delete without a version ID:
+
+| Status      | Upload to an existing path                                                                            | Delete without a version ID                                                                                               |
+| ----------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `DISABLED`  | Overwrites the current version.                                                                       | Removes the object.                                                                                                       |
+| `ENABLED`   | Keeps the current version as a noncurrent version.                                                    | Adds a delete marker and keeps the current version as a noncurrent version.                                               |
+| `SUSPENDED` | Keeps the current version if it was written while versioning was turned on. Otherwise, overwrites it. | Adds a delete marker. Keeps the current version if it was written while versioning was turned on. Otherwise, replaces it. |
+
+A delete that has a version ID removes that version permanently, whatever the bucket status.
+
+## Set the versioning status
+
+To create a bucket with versioning on, set `versioningStatus` to `ENABLED`. To change the status of a bucket, call `updateBucket`. `createBucket` accepts `DISABLED` or `ENABLED`, and `updateBucket` accepts `ENABLED` or `SUSPENDED`.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+// Create a bucket with versioning on
+await supabase.storage.createBucket('avatars', { public: false, versioningStatus: 'ENABLED' })
+
+// Turn on versioning for a bucket
+await supabase.storage.updateBucket('avatars', { public: false, versioningStatus: 'ENABLED' })
+
+// Pause versioning for new writes
+await supabase.storage.updateBucket('avatars', { public: false, versioningStatus: 'SUSPENDED' })
+```
+
+<Admonition type="caution">
+
+The JavaScript SDK requires `public` when you call `updateBucket`. To keep the bucket's visibility unchanged, pass its current `public` value, which `getBucket` returns.
+
+</Admonition>
+
+## Find versions
+
+To get the version ID of the current version, call `info`. The response includes `version`, `archivedAt`, `isDeleteMarker`, and `isVersioned`.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+const { data } = await supabase.storage.from('avatars').info('public/avatar1.png')
+
+console.log(data?.version)
+```
+
+To list every version of one object, call `listV2` with `exactMatch`, `noncurrentVersions`, and `deleteMarkers`.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+const { data, error } = await supabase.storage.from('avatars').listV2({
+  prefix: 'public/avatar1.png',
+  exactMatch: true,
+  noncurrentVersions: 'include',
+  deleteMarkers: 'include',
+})
+```
+
+`exactMatch: true` treats `prefix` as a full object path and returns only entries with that exact path. Without it, `prefix` matches every path that starts with it, so listing `public/avatar1.png` also returns entries for `public/avatar1.png.backup`.
+
+Both `noncurrentVersions` and `deleteMarkers` accept `exclude`, `include`, or `only`, and default to `exclude`. `only` returns just that kind of entry. For example, `deleteMarkers: 'only'` with the default `noncurrentVersions: 'exclude'` lists the currently deleted objects. `list` accepts the same options.
+
+Each entry is a row from `storage.objects` and includes the following versioning fields:
+
+| Field              | Description                                                         |
+| ------------------ | ------------------------------------------------------------------- |
+| `version`          | The version ID.                                                     |
+| `archived_at`      | Null for the current version. A timestamp for a noncurrent version. |
+| `is_delete_marker` | Whether the entry is a delete marker.                               |
+| `is_versioned`     | Whether the version was written while versioning was turned on.     |
+
+## Read, restore, and delete versions
+
+The following sections take the version ID from [Find versions](#find-versions).
+
+### Read a version
+
+To read a specific version, pass `versionId` to `download`, `info`, `createSignedUrl`, or `getPublicUrl`.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+const versionId = 'a1f2e3d4-5b6c-4d7e-8f9a-0b1c2d3e4f5a'
+
+const { data } = await supabase.storage
+  .from('avatars')
+  .download('public/avatar1.png', { versionId })
+
+const { data: signed } = await supabase.storage
+  .from('avatars')
+  .createSignedUrl('public/avatar1.png', 3600, { versionId })
+
+const { data: publicUrl } = supabase.storage.from('avatars').getPublicUrl('public/avatar1.png', {
+  versionId,
+})
+```
+
+A read fails with a `NoSuchKey` error when the current version is a delete marker.
+
+### Restore a version
+
+To restore a version, move it to the path it came from with `sourceVersionId`. This also restores an object whose current version is a delete marker.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+await supabase.storage.from('avatars').move('public/avatar1.png', 'public/avatar1.png', {
+  sourceVersionId: 'a1f2e3d4-5b6c-4d7e-8f9a-0b1c2d3e4f5a',
+})
+```
+
+The restored object becomes the current version with a new version ID, because versions can't be changed after they're written. `move` then permanently deletes the source version.
+
+To undo a delete, delete the delete marker. For more information, see [Delete a version](#delete-a-version).
+
+### Delete a version
+
+To delete a specific version, pass `{ path, versionId }` to `remove`. An array can mix plain paths and version entries. A plain path adds a delete marker.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+await supabase.storage
+  .from('avatars')
+  .remove([
+    'public/avatar2.png',
+    { path: 'public/avatar1.png', versionId: 'a1f2e3d4-5b6c-4d7e-8f9a-0b1c2d3e4f5a' },
+  ])
+```
+
+If the deleted version was the current version, the newest remaining version becomes the current version. Deleting a delete marker this way undoes the delete. To delete noncurrent versions automatically, see [Lifecycle policies](/docs/guides/storage/buckets/lifecycle-policies).
+
+<Admonition type="danger">
+
+Deleting a version with a `versionId` permanently deletes it, and you can't recover it. Check the version ID before you call `remove`.
+
+</Admonition>
+
+### Empty or delete a bucket
+
+`emptyBucket` deletes every object in the bucket, including all noncurrent versions and delete markers. The deletion runs in the background and can take up to an hour to finish. The [empty bucket limit](/docs/guides/storage/management/delete-objects#emptying-large-buckets) of 200,000 objects counts every version and delete marker.
+
+<Admonition type="danger">
+
+`emptyBucket` adds no delete markers, so you can't recover anything it deletes.
+
+</Admonition>
+
+To delete a versioned bucket, call `emptyBucket` first. `deleteBucket` fails with `ResourceNotEmpty` while the bucket has any noncurrent version or delete marker, even if listing the bucket returns no current objects.
+
+## Permissions
+
+Row Level Security (RLS) policies on `storage.objects` apply to every version of an object. A `select` policy that lets a user read an object also lets them read its noncurrent versions with a `versionId`. To limit reads to current versions, add `archived_at is null` to the policy:
+
+```sql
+create policy "Users can read current versions of their own objects"
+on storage.objects
+for select
+to authenticated
+using (
+  bucket_id = 'avatars'
+  and owner_id = (select auth.uid()::text)
+  and archived_at is null
+);
+```
+
+With this policy, users can't restore a version with `copy` or `move`, because those calls read the source version. For the other permissions those calls need, see [Copy and move permissions](/docs/guides/storage/management/copy-move-objects#permissions).
+
+Your `delete` policy governs deletes with and without a version ID. A delete without a version ID adds a delete marker, and needs `delete` permission on the object's path.
+
+## Limitations
+
+- Versioning is available for file buckets only.
+- The S3 protocol doesn't currently support versioning semantics. S3 support for versioning is in development. Until then, use the client libraries to read, restore, or delete versions.
