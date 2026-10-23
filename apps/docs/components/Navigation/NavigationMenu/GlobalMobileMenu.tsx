@@ -12,7 +12,7 @@ import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
-import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
+import { useNavItems } from '@/features/IaNav'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 
@@ -31,9 +31,13 @@ const listItem = {
 const itemClassName =
   'block py-2 pl-2 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-ring rounded-sm'
 
-const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
-  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
-
+const AccordionMenuItem = ({
+  section,
+  activeLabel,
+}: {
+  section: DropdownMenuItem[]
+  activeLabel: string
+}) => {
   return section[0].menuItems ? (
     <AccordionItem
       value={section[0].label}
@@ -82,13 +86,18 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
   )
 }
 
-const Menu = () => (
-  <Accordion type="multiple" className="space-y-1 mt-2.5">
-    {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
-      <AccordionMenuItem key={index} section={section} />
-    ))}
-  </Accordion>
-)
+const Menu = () => {
+  const { GLOBAL_MENU_ITEMS } = useNavItems()
+  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
+
+  return (
+    <Accordion type="multiple" className="space-y-1 mt-2.5">
+      {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
+        <AccordionMenuItem key={index} section={section} activeLabel={activeLabel} />
+      ))}
+    </Accordion>
+  )
+}
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
