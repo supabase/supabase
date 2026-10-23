@@ -9,6 +9,14 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 describe('RecoveryReminder', () => {
+  test('does not claim success when checks are disabled', () => {
+    customRender(<RecoveryReminder gap={null} destination="/organizations" isUnavailable />)
+    expect(
+      screen.getByRole('heading', { name: 'Account recovery check unavailable' })
+    ).toBeInTheDocument()
+    expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
+  })
+
   test('does not claim success when the recovery check fails', () => {
     addAPIMock({
       method: 'get',

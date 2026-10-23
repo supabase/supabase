@@ -1,4 +1,4 @@
-import { useFlag, useUser } from 'common'
+import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -24,20 +24,35 @@ export const RecoveryInterstitial = () => {
 
 const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
   const user = useUser()
+  const { hasLoaded, isConfigCatStale } = useFeatureFlags()
+  const flagsReady = hasLoaded === true && !isConfigCatStale
   const isEnabled = useFlag('enableAuthRecoveryCodes')
   const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
   const { findings, isPending, isError } = useAccountRecovery({
-    enabled: isEnabled && hasSecuritySettings,
+    enabled: flagsReady && isEnabled && hasSecuritySettings,
   })
-  const gap = isError || isPending ? null : getRecoveryGap(findings)
+  const isLoading = !flagsReady || isPending
+  const isUnavailable = flagsReady && (!isEnabled || !hasSecuritySettings)
+  const gap = isError || isLoading || isUnavailable ? null : getRecoveryGap(findings)
+  let announcement = 'Account recovery check complete'
+  if (gap) announcement = 'Account recovery action needed'
+  if (isUnavailable) announcement = 'Account recovery check unavailable'
+  if (isLoading) announcement = 'Checking account recovery'
+  if (isError) announcement = ''
   return (
-    <RecoveryReminder
-      key={user?.id}
-      gap={gap}
-      destination={destination}
-      isLoading={isPending}
-      isError={isError}
-    />
+    <>
+      <span className="sr-only" role="status">
+        {announcement}
+      </span>
+      <RecoveryReminder
+        key={user?.id}
+        gap={gap}
+        destination={destination}
+        isLoading={isLoading}
+        isUnavailable={isUnavailable}
+        isError={isError}
+      />
+    </>
   )
 }
 
@@ -46,6 +61,7 @@ export const RecoveryReminder = ({
   destination,
   isLoading = false,
   isError = false,
+  isUnavailable = false,
   onCodesComplete,
   onAction,
   onTaskComplete,
@@ -55,6 +71,7 @@ export const RecoveryReminder = ({
   destination: string
   isLoading?: boolean
   isError?: boolean
+  isUnavailable?: boolean
   onCodesComplete?: () => void
   onAction?: (action: 'generate_codes' | 'regenerate_codes' | 'add_factor') => void
   onTaskComplete?: (task: 'recovery_codes' | 'authenticator') => void
@@ -65,32 +82,24 @@ export const RecoveryReminder = ({
   const isFactorComplete = false
   // Preserve all task dialogs and completed rows during background status updates.
   const activeGap = startedGap ?? gap
-  if (!activeGap && isError) {
-    return (
-      <InterstitialLayout
-        logo={<SupabaseLogo />}
-        title="Account recovery check unavailable"
-        widthClassName="max-w-md"
-      >
-        <div className="px-6">
-          <AlertError subject="Failed to check account recovery" />
-        </div>
-        <CardFooter className="justify-center">
-          <Button asChild size="tiny">
-            <a href={destination}>Continue</a>
-          </Button>
-        </CardFooter>
-      </InterstitialLayout>
-    )
-  }
+  const emptyTitle =
+    isError || isUnavailable ? 'Account recovery check unavailable' : 'You’re all set'
+  const emptyDescription = isUnavailable
+    ? 'Account recovery checks are not enabled for this account.'
+    : 'No account recovery reminder is available.'
   if (!activeGap) {
     return (
       <InterstitialLayout
         logo={<SupabaseLogo />}
-        title={isLoading ? 'Checking account recovery' : 'You’re all set'}
-        description={isLoading ? undefined : 'No account recovery reminder is available.'}
+        title={isLoading ? 'Checking account recovery' : emptyTitle}
+        description={isLoading || isError ? undefined : emptyDescription}
         widthClassName="max-w-md"
       >
+        {isError && (
+          <div className="px-6">
+            <AlertError subject="Failed to check account recovery" />
+          </div>
+        )}
         <CardFooter className="justify-center min-h-12">
           {!isLoading && (
             <Button asChild size="tiny">
