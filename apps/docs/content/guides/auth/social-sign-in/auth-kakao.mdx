@@ -10,74 +10,77 @@ To enable Kakao Auth for your project, you need to set up a Kakao OAuth applicat
 
 Kakao OAuth consists of six broad steps:
 
-- Create and configure your app in the [Kakao Developers Portal](https://developers.kakao.com/changeLang?lang=en).
-- Obtain a `REST API key` - this serves as the `client_id`.
-- Obtain a `Kakao Login Client Secret code` - this serves as the `client_secret`.
-- Configure additional settings in the Kakao Developers Portal.
-- Add your `client id` and `client secret` keys to your [Supabase Project](/dashboard).
-- Add the sign-in code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
+1. Create and configure your app in the [Kakao Developers Portal](https://developers.kakao.com/changeLang?lang=en).
+2. Obtain a **REST API key**. This serves as the `client_id`.
+3. Obtain a **Kakao Login Client Secret code**. This serves as the `client_secret`.
+4. Configure additional settings in the Kakao Developers Portal.
+5. Add your client ID and client secret to your [Supabase project](/dashboard).
+6. Add the sign-in code to your client app.
 
 ## Access your Kakao Developer account
 
-- Go to [Kakao Developers Portal](https://developers.kakao.com/changeLang?lang=en).
-- Click on **Login** at the top right to sign in.
+1. Go to the [Kakao Developers Portal](https://developers.kakao.com/changeLang?lang=en).
+2. At the top right, click **Login** to sign in.
 
-![Kakao Developers Portal](/docs/img/guides/auth-kakao/kakao-developers-page.png)
+![Kakao Developers Portal home page with the Login button at the top right of the navigation bar](/docs/img/guides/auth-kakao/kakao-developers-page.png)
 
 ## Create and configure your app
 
-- Go to **App**.
-- Click on **Create app** at the top.
-- Fill out your app information:
-  - App icon.
-  - App name.
-  - Company name.
-  - Category.
-  - App primary domain.
-- Click **Save** at the bottom right.
+1. Go to **App**.
+2. At the top, click **Create app**.
+3. Fill out your app information:
+   - App icon
+   - App name
+   - Company name
+   - Category
+   - App primary domain
+4. At the bottom right, click **Save**.
 
 ## Obtain a REST API key
 
-This serves as the `client_id` when you make API calls to authenticate the user.
+The REST API key serves as the `client_id` when you make API calls to authenticate the user.
 
-- Go to **App**.
-- Click on your app.
-- Go to **App Settings** > **App** > **Platform Key**.
-- In the **Platform Key** section is `REST API key`. This will become your `client_id` later.
+1. Go to **App** and click your app.
+2. Go to **App Settings** > **App** > **Platform Key**.
+3. In the **Platform Key** section, copy the **REST API key**.
 
 ## Find your callback URL
 
 <$Partial path="social_provider_setup.mdx" variables={{ "provider": "Kakao" }} />
 
-- To add a callback URL on Kakao, go to **App Settings** > **App** > **Platform Key**.
-- Click on the REST API key you want to use.
-- In the edit page, enter your callback URL in the **Kakao Login Redirect URI** field.
-- Click **Save** in the bottom right.
+To add the callback URL on Kakao:
+
+1. Go to **App Settings** > **App** > **Platform Key**.
+2. Click the REST API key you want to use.
+3. On the edit page, enter your callback URL in the **Kakao Login Redirect URI** field.
+4. At the bottom right, click **Save**.
 
 ## Obtain a client secret
 
-- Go to **App Settings** > **App** > **Platform Key**.
-- Click on the REST API key you want to use.
-- Note the **Kakao Login Client Secret code**. This serves as a `client_secret` for your Supabase project.
-- Make sure you activate **Kakao Login Client Secret**.
+The client secret serves as the `client_secret` for your Supabase project.
 
-## Additional configurations on Kakao Developers portal
+1. Go to **App Settings** > **App** > **Platform Key**.
+2. Click the REST API key you want to use.
+3. Copy the **Kakao Login Client Secret code**.
+4. Activate **Kakao Login Client Secret**.
 
-- Go to **Product Settings** > **Kakao Login** > **General**.
-- Set **State** to "ON" in the **Usage settings** section to enable Kakao Login.
-- Go to **Product Settings** > **Kakao Login** > **Consent Items**.
-- Set the following scopes under the **Consent Items**:
-  - account_email (optional)
-  - profile_image
-  - profile_nickname
+## Additional configurations on Kakao Developers Portal
 
-If you don't need an email address (or `account_email` isn't available for your app), you can omit `account_email` and enable **Allow users without an email** in the Supabase Kakao provider settings.
+1. Go to **Product Settings** > **Kakao Login** > **General**.
+2. In the **Usage settings** section, set **State** to "ON" to enable Kakao Login.
+3. Go to **Product Settings** > **Kakao Login** > **Consent Items**.
+4. Set the following scopes under **Consent Items**:
+   - `account_email` (optional)
+   - `profile_image`
+   - `profile_nickname`
 
-![Kakao consent items configuration](/docs/img/guides/auth-kakao/kakao-developers-consent-items-set.png)
+If you don't need an email address, or `account_email` isn't available for your app, omit `account_email`.
+
+![Consent Items page under Product Settings > Kakao Login, with profile_nickname and profile_image set to Required consent and account_email set to Optional consent](/docs/img/guides/auth-kakao/kakao-developers-consent-items-set.png)
 
 <Admonition type="note">
 
-In the Kakao Developers Portal, the "account_email" consent item is only available for apps that are registered as "Biz App". To convert your app to a "Biz App", go to **App Settings** > **App** > **General**, and complete the required fields in the **Business Information** section.
+The `account_email` consent item is only available to Biz apps in the Kakao Developers Portal. To convert your app to a Biz app, go to **App Settings** > **App** > **General** and complete the **Business Information** section.
 
 </Admonition>
 
@@ -216,17 +219,15 @@ await supabase.Auth.SignOut();
 </$Show>
 </Tabs>
 
-## Using Kakao Login JS SDK
+## Using Kakao SDK for JavaScript
 
-[Kakao Login JS SDK](https://developers.kakao.com/docs/latest/en/kakaologin/js) is an official Kakao SDK for authenticating Kakao users on websites.
+The [Kakao SDK for JavaScript](https://developers.kakao.com/docs/latest/en/kakaologin/js) is an official Kakao SDK for authenticating Kakao users on websites.
 
-Exchange the [authorization code returned by Kakao API](https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#request-code) for an [ID Token](https://developers.kakao.com/docs/latest/en/kakaologin/common#login-with-oidc).
+Exchange the [authorization code returned by the Kakao API](https://developers.kakao.com/docs/latest/en/kakaologin/rest-api#request-code) for an [ID Token](https://developers.kakao.com/docs/latest/en/kakaologin/common#login-with-oidc). For example, the following code gets an ID Token:
 
-For example, this code shows a how to get ID Token:
-
-```
-const requestUrl = new URL(request.url);
-const code = requestUrl.searchParams.get('code');
+```js
+const requestUrl = new URL(request.url)
+const code = requestUrl.searchParams.get('code')
 
 if (code) {
   const res = await fetch('https://kauth.kakao.com/oauth/token', {
@@ -241,26 +242,26 @@ if (code) {
       code,
       client_secret: '<CLIENT_SECRET>',
     }),
-  });
+  })
 
-  const {id_token} = await res.json();
+  const { id_token } = await res.json()
 }
 ```
 
 Use the ID Token to sign in:
 
-```
-const res = await auth.signInWithIdToken({
+```js
+const res = await supabase.auth.signInWithIdToken({
   provider: 'kakao',
   token: id_token,
-});
+})
 ```
 
 ### Configuration
 
-1. Set **State** to "ON" under [OpenID Connect Activation](https://developers.kakao.com/docs/latest/en/kakaologin/prerequisite#kakao-login-oidc) on the Kakao Developers portal.
-2. Add `openid` to [scope](https://developers.kakao.com/docs/latest/en/kakaologin/prerequisite#scope) along with the scope values you wish to obtain consent for.
+1. On the Kakao Developers Portal, set **State** to "ON" under [OpenID Connect Activation](https://developers.kakao.com/docs/latest/en/kakaologin/prerequisite#kakao-login-oidc).
+2. Add `openid` to [scope](https://developers.kakao.com/docs/latest/en/kakaologin/prerequisite#scope-setting) along with the scope values you want to request consent for.
 
 ## Resources
 
-- [Kakao Developers Portal](https://developers.kakao.com/changeLang?lang=en).
+- [Kakao Developers Portal](https://developers.kakao.com/changeLang?lang=en)
