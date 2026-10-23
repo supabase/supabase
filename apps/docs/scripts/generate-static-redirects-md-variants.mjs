@@ -51,9 +51,12 @@ for (const variant of variants) {
 const base = (path) => path.replace(/\.md$/, '')
 const isMd = (path) => path.endsWith('.md')
 const compareBase = (a, b) => (base(a) < base(b) ? -1 : base(a) > base(b) ? 1 : 0)
-const output = [...source, ...variants].sort(
-  (a, b) => compareBase(a.source, b.source) || Number(isMd(a.source)) - Number(isMd(b.source))
-)
+// Next.js redirects kept the incoming query string. Bulk redirects drop it unless this is set.
+const output = [...source, ...variants]
+  .map((r) => ({ ...r, preserveQueryParams: true }))
+  .sort(
+    (a, b) => compareBase(a.source, b.source) || Number(isMd(a.source)) - Number(isMd(b.source))
+  )
 const json = JSON.stringify(output, null, 2) + '\n'
 
 mkdirSync(dirname(OUTPUT_PATH), { recursive: true })
