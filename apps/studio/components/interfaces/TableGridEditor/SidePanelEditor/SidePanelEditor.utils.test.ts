@@ -1,8 +1,34 @@
+import { Query } from '@supabase/pg-meta/src/query'
 import { describe, expect, test } from 'vitest'
 
-import { formatRowsForInsert, getRowFromSidePanel } from './SidePanelEditor.utils'
+import {
+  buildImportInsertBatches,
+  formatRowsForInsert,
+  getRowFromSidePanel,
+  IMPORT_SQL_SIZE_LIMIT,
+} from './SidePanelEditor.utils'
 import type { SupaRow } from '@/components/grid/types'
+import { wrapWithRoleImpersonation, type RoleImpersonationState } from '@/lib/role-impersonation'
 import type { SidePanel } from '@/state/table-editor'
+
+const mockTable = {
+  id: 1,
+  name: 'import_test',
+  schema: 'public',
+  columns: [
+    { id: '1', name: 'id', data_type: 'bigint', format: 'int8', is_nullable: false },
+    { id: '2', name: 'name', data_type: 'text', format: 'text', is_nullable: true },
+    { id: '3', name: 'geom', data_type: 'USER-DEFINED', format: 'geometry', is_nullable: true },
+  ],
+} as any
+
+function getByteSize(value: string) {
+  return new Blob([value]).size
+}
+
+function makeLargeWktCoordinate(index: number) {
+  return `-111.${String(index).padStart(12, '0')} 34.${String(index).padStart(12, '0')}`
+}
 
 describe('SidePanelEditor.utils.test.ts', () => {
   test('formatRowsForInsert should for format rows with basic data types correctly', () => {
@@ -112,6 +138,173 @@ describe('SidePanelEditor.utils.test.ts', () => {
 
     const formattedRows = formatRowsForInsert({ rows, headers, columns: columns as any })
     expect(formattedRows).toEqual([{ id: 1, value: ['item1', 'item2', 'item3'] }])
+  })
+})
+
+describe('import insert batching', () => {
+  test('buildImportInsertBatches keeps a large geometry row under the SQL size limit', () => {
+    const largeWkt = `MULTIPOLYGON(((${Array.from({ length: 8_000 }, (_, index) =>
+      makeLargeWktCoordinate(index)
+    ).join(',')})))`
+
+    expect(getByteSize(largeWkt)).toBeGreaterThan(260_000)
+
+    const batches = buildImportInsertBatches({
+      table: mockTable,
+      rows: [{ id: '1', name: 'large shape', geom: largeWkt }],
+    })
+
+    expect(batches).toHaveLength(1)
+    expect(batches[0].rows).toHaveLength(1)
+    expect(getByteSize(batches[0].sql)).toBeLessThan(IMPORT_SQL_SIZE_LIMIT)
+  })
+
+  test('buildImportInsertBatches groups small rows into a single batch when possible', () => {
+    const rows = Array.from({ length: 3 }, (_, index) => ({
+      id: String(index + 1),
+      name: `row ${index + 1}`,
+      geom: `POINT(${index} ${index})`,
+    }))
+
+    const batches = buildImportInsertBatches({ table: mockTable, rows })
+
+    expect(batches).toHaveLength(1)
+    expect(batches[0].rows).toEqual(rows)
+  })
+
+  test('buildImportInsertBatches splits rows by generated SQL byte size', () => {
+    const rows = [
+      { id: '1', name: 'first'.repeat(20), geom: 'POINT(0 0)' },
+      { id: '2', name: 'second'.repeat(20), geom: 'POINT(1 1)' },
+      { id: '3', name: 'third'.repeat(20), geom: 'POINT(2 2)' },
+    ]
+
+    const batches = buildImportInsertBatches({ table: mockTable, rows, maxSqlBytes: 500 })
+
+    expect(batches.length).toBeGreaterThan(1)
+    expect(batches.flatMap((batch) => batch.rows)).toEqual(rows)
+    expect(batches.every((batch) => getByteSize(batch.sql) <= 500)).toBe(true)
+  })
+
+  test('buildImportInsertBatches rejects a single row that exceeds the SQL byte limit', () => {
+    expect(() =>
+      buildImportInsertBatches({
+        table: mockTable,
+        rows: [{ id: '1', name: 'too large', geom: 'POINT(0 0)'.repeat(100) }],
+        maxSqlBytes: 100,
+      })
+    ).toThrow(/too large/i)
+  })
+
+  test('buildImportInsertBatches includes role impersonation SQL in each batch size', () => {
+    const rows = [
+      { id: '1', name: 'é'.repeat(500) },
+      { id: '2', name: 'é'.repeat(500) },
+    ]
+    const maxSqlBytes = getByteSize(buildImportInsertBatches({ table: mockTable, rows })[0].sql)
+    const batches = buildImportInsertBatches({
+      table: mockTable,
+      rows,
+      roleImpersonationState: {
+        role: { type: 'custom', role: 'import_role' },
+        claims: undefined,
+      },
+      maxSqlBytes,
+    })
+
+    expect(batches).toHaveLength(2)
+    expect(batches.flatMap((batch) => batch.rows)).toEqual(rows)
+    for (const batch of batches) {
+      expect(batch.sql).toContain("set local role 'import_role'")
+      expect(getByteSize(batch.sql)).toBeLessThanOrEqual(maxSqlBytes)
+    }
+  })
+
+  test('buildImportInsertBatches rejects a row when its role wrapper exceeds the limit', () => {
+    const rows = [{ id: '1', name: 'large row' }]
+    const maxSqlBytes = getByteSize(buildImportInsertBatches({ table: mockTable, rows })[0].sql)
+
+    expect(() =>
+      buildImportInsertBatches({
+        table: mockTable,
+        rows,
+        roleImpersonationState: {
+          role: { type: 'custom', role: 'import_role' },
+          claims: undefined,
+        },
+        maxSqlBytes,
+      })
+    ).toThrow(/too large/i)
+  })
+
+  test.each([false, true])(
+    'accounts for SQL literal escaping when backslashes appear first: %s',
+    (backslashFirst) => {
+      const escaped = { name: "O'Reilly\\path\n\té😀", json: { nested: ["quote'", '\\'] } }
+      const plain = { name: 'plain', json: { nested: [] } }
+      const rows = backslashFirst ? [escaped, plain] : [plain, escaped]
+      const expectedSql = new Query().from(mockTable.name, mockTable.schema).insert(rows).toSql()
+      const maxSqlBytes = getByteSize(expectedSql)
+
+      const exactBatches = buildImportInsertBatches({ table: mockTable, rows, maxSqlBytes })
+      expect(exactBatches).toHaveLength(1)
+      expect(exactBatches[0].sql).toBe(expectedSql)
+
+      const splitBatches = buildImportInsertBatches({
+        table: mockTable,
+        rows,
+        maxSqlBytes: maxSqlBytes - 1,
+      })
+      expect(splitBatches).toHaveLength(2)
+      expect(splitBatches.flatMap((batch) => batch.rows)).toEqual(rows)
+      expect(splitBatches.every((batch) => getByteSize(batch.sql) < maxSqlBytes)).toBe(true)
+    }
+  )
+
+  test('serializes many small rows a bounded number of times', () => {
+    let reads = 0
+    const rows = Array.from({ length: 20_000 }, (_, id) => ({
+      id,
+      get name() {
+        reads += 1
+        return 'small row'
+      },
+    }))
+
+    const batches = buildImportInsertBatches({ table: mockTable, rows })
+
+    expect(batches).toHaveLength(1)
+    expect(batches[0].rows).toEqual(rows)
+    expect(getByteSize(batches[0].sql)).toBeLessThanOrEqual(IMPORT_SQL_SIZE_LIMIT)
+    expect(reads).toBeLessThanOrEqual(rows.length * 3)
+  })
+
+  test('counts escaped role claims separately from the JSON payload prefix', () => {
+    const roleImpersonationState: RoleImpersonationState = {
+      role: { type: 'postgrest', role: 'anon' },
+      claims: { role: 'anon', exp: 0, iat: 0, iss: "O'Reilly\\é😀", ref: 'default' },
+    }
+    const rows = [{ name: 'plain' }, { name: "quote'\\é😀" }]
+    const insertSql = new Query().from(mockTable.name, mockTable.schema).insert(rows).toSql()
+    const maxSqlBytes = getByteSize(wrapWithRoleImpersonation(insertSql, roleImpersonationState))
+
+    const exactBatches = buildImportInsertBatches({
+      table: mockTable,
+      rows,
+      roleImpersonationState,
+      maxSqlBytes,
+    })
+    expect(exactBatches).toHaveLength(1)
+    expect(getByteSize(exactBatches[0].sql)).toBe(maxSqlBytes)
+
+    const splitBatches = buildImportInsertBatches({
+      table: mockTable,
+      rows,
+      roleImpersonationState,
+      maxSqlBytes: maxSqlBytes - 1,
+    })
+    expect(splitBatches).toHaveLength(2)
+    expect(splitBatches.every((batch) => getByteSize(batch.sql) < maxSqlBytes)).toBe(true)
   })
 })
 
