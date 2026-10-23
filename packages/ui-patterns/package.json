@@ -713,6 +713,10 @@
       "import": "./src/TimestampInfo/index.tsx",
       "types": "./src/TimestampInfo/index.tsx"
     },
+    "./Toc/heading-reel": {
+      "import": "./src/Toc/heading-reel.tsx",
+      "types": "./src/Toc/heading-reel.tsx"
+    },
     "./Toc": {
       "import": "./src/Toc/index.ts",
       "types": "./src/Toc/index.ts"
@@ -728,6 +732,15 @@
     "./Toc/server/get-toc": {
       "import": "./src/Toc/server/get-toc.tsx",
       "types": "./src/Toc/server/get-toc.tsx"
+    },
+    "./Toc/toc-menu.css": {
+      "style": "./src/Toc/toc-menu.css",
+      "import": "./src/Toc/toc-menu.css",
+      "types": "./src/Toc/toc-menu.css"
+    },
+    "./Toc/toc-menu": {
+      "import": "./src/Toc/toc-menu.tsx",
+      "types": "./src/Toc/toc-menu.tsx"
     },
     "./Toc/toc-primitive": {
       "import": "./src/Toc/toc-primitive.tsx",
