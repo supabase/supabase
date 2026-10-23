@@ -2,8 +2,8 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
 import { DefaultLayout } from '../DefaultLayout'
+import { IssuesLayout } from '../IssuesLayout/IssuesLayout'
 import { PageLayout } from '../PageLayout/PageLayout'
-import AdvisorsLayout from './AdvisorsLayout'
 import { useIsAdvisorRulesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 
@@ -12,17 +12,17 @@ export const AdvisorRulesLayout = ({ children }: PropsWithChildren<{}>) => {
   const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
   return (
     <DefaultLayout>
-      <AdvisorsLayout>
+      <IssuesLayout>
         <PageLayout
           title={
             <span className="flex items-center gap-x-4">
-              Advisor Settings
+              Check settings
               {isAdvisorRulesEnabled && (
                 <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES} />
               )}
             </span>
           }
-          subtitle="Disable specific advisor categories or rules"
+          subtitle="Turn off specific advisor checks or categories"
           navigationItems={[
             {
               label: 'Security',
@@ -36,7 +36,7 @@ export const AdvisorRulesLayout = ({ children }: PropsWithChildren<{}>) => {
         >
           {children}
         </PageLayout>
-      </AdvisorsLayout>
+      </IssuesLayout>
     </DefaultLayout>
   )
 }

@@ -43,7 +43,7 @@ export const SecurityDefinerViewPopover = ({
               <Link
                 target="_blank"
                 rel="noopener noreferrer"
-                href={`/project/${ref}/advisors/security?preset=${lint?.level}&id=${lint?.cache_key}`}
+                href={`/project/${ref}/issues?category=security&q=${encodeURIComponent(lint?.title ?? '')}`}
               >
                 Learn more
               </Link>

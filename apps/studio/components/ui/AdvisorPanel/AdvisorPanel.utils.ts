@@ -8,8 +8,6 @@ import type { Lint } from '@/data/lint/lint-query'
 import type { Notification, NotificationData } from '@/data/notifications/notifications-v2-query'
 import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
 
-export const MAX_HOMEPAGE_ADVISOR_ITEMS = 4
-
 export const severityOrder: Record<AdvisorSeverity, number> = {
   critical: 0,
   warning: 1,

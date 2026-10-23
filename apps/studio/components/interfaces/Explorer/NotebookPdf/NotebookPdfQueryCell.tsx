@@ -6,6 +6,7 @@ import { type QueryResult } from '../types'
 import { NotebookPdfChart } from './NotebookPdfChart'
 import { NotebookPdfTable } from './NotebookPdfTable'
 import { pdfStyles } from './theme'
+import { anchorLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { formatTimeRange } from '@/components/ui/AIAssistantPanel/AssistantNotebookPreview.utils'
 import { type QueryCell } from '@/data/content/notebooks/notebook-schema'
 import { pluralize } from '@/lib/helpers'
@@ -73,10 +74,12 @@ function QueryResultsSection({
 
 interface NotebookPdfQueryCellProps {
   cell: Snapshot<QueryCell>
+  // The notebook's `as_of`, which relative log ranges count back from
+  asOf?: string | null
   result: QueryResult | undefined
 }
 
-export function NotebookPdfQueryCell({ cell, result }: NotebookPdfQueryCellProps) {
+export function NotebookPdfQueryCell({ cell, asOf, result }: NotebookPdfQueryCellProps) {
   const view = cell.view ?? 'table'
   const rowCount = result?.rows?.length ?? 0
   const rowLimit = cell._tag === 'database_cell' ? cell.row_limit : undefined
@@ -88,7 +91,7 @@ export function NotebookPdfQueryCell({ cell, result }: NotebookPdfQueryCellProps
         {cell._tag === 'log_cell' && (
           // react-pdf's default font (Helvetica) can't render the '→' from formatTimeRange
           <Text style={pdfStyles.footerText}>
-            {formatTimeRange(cell.time_range).replace('→', '-')}
+            {formatTimeRange(anchorLogTimeRange(cell.time_range, asOf)).replace('→', '-')}
           </Text>
         )}
       </View>

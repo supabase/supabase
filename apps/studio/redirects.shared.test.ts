@@ -70,6 +70,44 @@ describe('matchRedirect moved Studio routes', () => {
     })
   })
 
+  it.each(['security', 'performance', 'health'])(
+    'redirects old %s advisors before rendering',
+    (category) => {
+      for (const isPlatform of [true, false]) {
+        expect(
+          matchRedirect({
+            pathname: `/project/${ref}/advisors/${category}`,
+            search: { severity: 'critical' },
+            isPlatform,
+          })
+        ).toEqual({
+          destination: `/project/${ref}/issues?category=${category}&severity=critical`,
+          permanent: true,
+        })
+      }
+    }
+  )
+
+  it('redirects the advisor root while leaving check settings and Issues alone', () => {
+    expect(
+      matchRedirect({ pathname: `/project/${ref}/advisors`, search: {}, isPlatform: true })
+    ).toEqual({ destination: `/project/${ref}/issues`, permanent: true })
+    expect(
+      matchRedirect({
+        pathname: `/project/${ref}/advisors/rules/security`,
+        search: {},
+        isPlatform: true,
+      })
+    ).toBeNull()
+    expect(
+      matchRedirect({
+        pathname: `/project/${ref}/issues`,
+        search: { category: 'security' },
+        isPlatform: true,
+      })
+    ).toBeNull()
+  })
+
   it('preserves the incoming query and hash', () => {
     expect(
       matchRedirect({

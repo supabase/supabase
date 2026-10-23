@@ -337,7 +337,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     <Button asChild>
                       <Link
                         target="_blank"
-                        href={`/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
+                        href={`/project/${ref}/issues?category=security&q=${encodeURIComponent(matchingMaterializedViewLint?.title ?? '')}`}
                       >
                         Learn more
                       </Link>

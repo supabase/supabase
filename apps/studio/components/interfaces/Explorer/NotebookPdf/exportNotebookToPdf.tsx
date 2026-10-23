@@ -10,6 +10,8 @@ export interface ExportNotebookToPdfParams {
   name: string
   projectName?: string
   cells: readonly Snapshot<Cell>[]
+  // The notebook's `as_of`, which relative log ranges count back from
+  asOf?: string | null
   getResult: (cellId: string) => QueryResult | undefined
 }
 
@@ -23,6 +25,7 @@ export async function exportNotebookToPdf({
   name,
   projectName,
   cells,
+  asOf,
   getResult,
 }: ExportNotebookToPdfParams): Promise<void> {
   const results = new Map<string, QueryResult>()
@@ -32,7 +35,13 @@ export async function exportNotebookToPdf({
   })
 
   const blob = await pdf(
-    <NotebookPdfDocument name={name} projectName={projectName} cells={cells} results={results} />
+    <NotebookPdfDocument
+      name={name}
+      projectName={projectName}
+      cells={cells}
+      asOf={asOf}
+      results={results}
+    />
   ).toBlob()
 
   saveAs(blob, `${name}.pdf`)

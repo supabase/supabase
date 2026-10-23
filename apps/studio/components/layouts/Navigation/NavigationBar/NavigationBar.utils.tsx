@@ -9,7 +9,7 @@ import {
   Storage,
   TableEditor,
 } from 'icons'
-import { BlocksIcon, LightbulbIcon, ListIcon, SettingsIcon, TelescopeIcon } from 'lucide-react'
+import { BlocksIcon, CircleDotIcon, ListIcon, SettingsIcon, TelescopeIcon } from 'lucide-react'
 
 import {
   useIsExplorerEnabled,
@@ -210,11 +210,11 @@ export const generateOtherRoutes = (
 
   return [
     {
-      key: 'advisors',
-      label: 'Advisors',
+      key: 'issues',
+      label: 'Issues',
       disabled: !isProjectActive,
-      icon: <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+      icon: <CircleDotIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/issues`),
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
     ...(reportsEnabled

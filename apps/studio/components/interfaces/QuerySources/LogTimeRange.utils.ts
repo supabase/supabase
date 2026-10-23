@@ -104,13 +104,29 @@ export function logTimeRangesEqual(a: TimeRange, b: TimeRange): boolean {
   return false
 }
 
-export function resolveLogTimeRange(range: TimeRange): ResolvedLogDateRange {
-  if (range._tag === 'relative_time_range') {
+/**
+ * A log time range as it applies within a document. A relative range counts back from the
+ * document's `as_of` when it has one, so a document about a past moment keeps showing that
+ * moment; without one it's left relative, counting back from now.
+ */
+export function anchorLogTimeRange(range: TimeRange, asOf?: string | null): TimeRange {
+  if (range._tag !== 'relative_time_range' || !asOf) return range
+  const end = dayjs(asOf)
+  return {
+    _tag: 'absolute_time_range',
+    start: toIsoDateTime(end.subtract(range.amount, range.unit)),
+    end: toIsoDateTime(end),
+  }
+}
+
+export function resolveLogTimeRange(range: TimeRange, asOf?: string | null): ResolvedLogDateRange {
+  const anchored = anchorLogTimeRange(range, asOf)
+  if (anchored._tag === 'relative_time_range') {
     const now = dayjs()
     return {
-      from: now.subtract(range.amount, range.unit).toISOString(),
+      from: now.subtract(anchored.amount, anchored.unit).toISOString(),
       to: now.toISOString(),
     }
   }
-  return { from: range.start, to: range.end }
+  return { from: anchored.start, to: anchored.end }
 }

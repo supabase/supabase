@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 
@@ -43,7 +43,7 @@ export const HomeCard = ({
     <CardContent className="pt-0 flex flex-col justify-end flex-1 min-h-0">
       <h3 className="mb-1">
         {href !== undefined ? (
-          <Link href={href} className={STRETCHED_TARGET_CLASS}>
+          <Link to={href} className={STRETCHED_TARGET_CLASS}>
             {title}
           </Link>
         ) : (

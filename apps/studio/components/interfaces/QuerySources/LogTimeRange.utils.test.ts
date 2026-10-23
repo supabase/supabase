@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  anchorLogTimeRange,
   customDateRangeToLogTimeRange,
   datePickerValueToLogTimeRange,
   logTimeRangesEqual,
@@ -121,5 +122,42 @@ describe('LogTimeRange.utils', () => {
       start: dayjs(from).startOf('day').toISOString(),
       end: '2025-01-08T12:00:00.000Z',
     })
+  })
+})
+
+describe('anchorLogTimeRange and resolveLogTimeRange with as_of', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2025-01-08T12:00:00.000Z'))
+  })
+
+  afterEach(() => vi.useRealTimers())
+
+  const lastDay: TimeRange = { _tag: 'relative_time_range', amount: 24, unit: 'hour' }
+
+  it('counts a relative range back from as_of', () => {
+    expect(anchorLogTimeRange(lastDay, '2025-01-05T09:30:00.000Z')).toEqual(
+      absolute('2025-01-04T09:30:00.000Z', '2025-01-05T09:30:00.000Z')
+    )
+    expect(resolveLogTimeRange(lastDay, '2025-01-05T09:30:00.000Z')).toEqual({
+      from: '2025-01-04T09:30:00.000Z',
+      to: '2025-01-05T09:30:00.000Z',
+    })
+  })
+
+  it.each([null, undefined, ''])(
+    'leaves a relative range counting back from now for %j',
+    (asOf) => {
+      expect(anchorLogTimeRange(lastDay, asOf)).toBe(lastDay)
+      expect(resolveLogTimeRange(lastDay, asOf)).toEqual({
+        from: '2025-01-07T12:00:00.000Z',
+        to: '2025-01-08T12:00:00.000Z',
+      })
+    }
+  )
+
+  it('never moves an absolute range', () => {
+    const range = absolute('2025-01-01T00:00:00.000Z', '2025-01-02T00:00:00.000Z')
+    expect(anchorLogTimeRange(range, '2025-01-05T09:30:00.000Z')).toBe(range)
   })
 })

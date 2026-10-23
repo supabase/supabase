@@ -223,4 +223,22 @@ describe('toQueryModel', () => {
       time_range: LOG_CELL.time_range,
     })
   })
+
+  it('counts a log cell’s relative range back from the document’s as_of', () => {
+    expect(toQueryModel(LOG_CELL, 'select 4', '2025-01-05T09:30:00.000Z')).toEqual({
+      _tag: 'logs',
+      uncheckedSql: 'select 4',
+      time_range: {
+        _tag: 'absolute_time_range',
+        start: '2025-01-05T08:30:00.000Z',
+        end: '2025-01-05T09:30:00.000Z',
+      },
+    })
+  })
+
+  it('ignores as_of for a database cell, which always reads current state', () => {
+    expect(toQueryModel(DATABASE_CELL, 'select 3', '2025-01-05T09:30:00.000Z')).toEqual(
+      toQueryModel(DATABASE_CELL, 'select 3')
+    )
+  })
 })

@@ -4,9 +4,8 @@ import AdvisorsPerformancePage from '@/pages/project/[ref]/advisors/performance'
 
 export const Route = createFileRoute('/project/$ref/advisors/performance')({
   component: AdvisorsPerformanceRoute,
-  staticData: {
-    advisorsLayoutTitle: 'Linter',
-  },
+  // Page is a useEffect redirect to /issues that returns null
+  staticData: { skipAdvisorsLayout: true },
 })
 
 function AdvisorsPerformanceRoute() {

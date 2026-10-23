@@ -70,6 +70,14 @@ export const logsSourceSchema = z.object({
   time_range: timeRangeSchema,
 })
 
+// The moment a document's relative log time ranges count back from. Absent or null means
+// now, so the document stays live. Setting it keeps a document about a past moment showing
+// that moment, e.g. an issue that has stopped failing.
+export const notebookAsOfSchema = isoDateTimeSchema
+  .nullable()
+  .optional()
+  .describe('ISO-8601 time that relative log time ranges count back from. Omit or null for now.')
+
 const markdownFieldsSchema = z.object({
   text: z.string(),
 })
@@ -118,6 +126,7 @@ const cellSchema = z.discriminatedUnion('_tag', [
 
 export const notebookSchema = z.object({
   schema_version: z.literal(1),
+  as_of: notebookAsOfSchema,
   cells: z.array(cellSchema),
 })
 
@@ -137,6 +146,7 @@ const writableCellSchema = z.discriminatedUnion('_tag', [
 
 export const writableNotebookSchema = z.object({
   schema_version: z.literal(1),
+  as_of: notebookAsOfSchema,
   cells: z.array(writableCellSchema),
 })
 
@@ -168,6 +178,7 @@ export const agentCellSchema = z.discriminatedUnion('_tag', [
 
 export const agentNotebookSchema = z.object({
   schema_version: z.literal(1),
+  as_of: notebookAsOfSchema,
   cells: z.array(agentCellSchema),
 })
 
@@ -213,6 +224,7 @@ const cellDomainSchema = cellSchema.transform((cell) => {
 
 export const notebookDomainSchema = z.object({
   schema_version: z.literal(1),
+  as_of: notebookAsOfSchema,
   cells: z.array(cellDomainSchema),
 })
 
@@ -235,7 +247,11 @@ export function toWireCell(cell: Cell): CellWire {
 }
 
 export function toWireNotebook(content: NotebookContent): NotebookWire {
-  return { schema_version: content.schema_version, cells: content.cells.map(toWireCell) }
+  return {
+    schema_version: content.schema_version,
+    ...(content.as_of && { as_of: content.as_of }),
+    cells: content.cells.map(toWireCell),
+  }
 }
 
 export function toWireWritableCell(cell: WritableCell): WritableCellWire {
@@ -256,7 +272,11 @@ export function toWireWritableCell(cell: WritableCell): WritableCellWire {
 }
 
 export function toWireWritableNotebook(content: WritableNotebook): WritableNotebookWire {
-  return { schema_version: content.schema_version, cells: content.cells.map(toWireWritableCell) }
+  return {
+    schema_version: content.schema_version,
+    ...(content.as_of && { as_of: content.as_of }),
+    cells: content.cells.map(toWireWritableCell),
+  }
 }
 
 export type MarkdownCell = Extract<Cell, { _tag: 'markdown_cell' }>

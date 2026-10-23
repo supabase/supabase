@@ -28,6 +28,9 @@ interface MarkdownEditorProps {
   placeholder?: string
   autoFocus?: boolean
   className?: string
+  ariaLabel?: string
+  /** Renders the markdown without editing, e.g. an issue body or a comment */
+  isReadOnly?: boolean
 }
 
 const MarkdownClassName = cn(
@@ -77,6 +80,12 @@ const EditorKeyboardShortcutsPlugin = () => {
   return null
 }
 
+const EditablePlugin = ({ isReadOnly }: { isReadOnly: boolean }) => {
+  const [editor] = useLexicalComposerContext()
+  useEffect(() => editor.setEditable(!isReadOnly), [editor, isReadOnly])
+  return null
+}
+
 const SyncExternalValuePlugin = ({
   value,
   isFocused,
@@ -110,6 +119,8 @@ export const MarkdownEditor = ({
   placeholder,
   autoFocus,
   className,
+  ariaLabel,
+  isReadOnly = false,
 }: MarkdownEditorProps) => {
   const isFocusedRef = useRef(false)
   const editorRef = useRef<LexicalEditor | null>(null)
@@ -117,6 +128,7 @@ export const MarkdownEditor = ({
 
   const initialConfig = {
     namespace: 'MarkdownEditor',
+    editable: !isReadOnly,
     theme: markdownEditorTheme,
     nodes: MARKDOWN_EDITOR_NODES,
     onError: (error: Error) => {
@@ -148,11 +160,13 @@ export const MarkdownEditor = ({
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
+      <EditablePlugin isReadOnly={isReadOnly} />
       <EditorRefPlugin editorRef={editorRef} />
       <div className="relative">
         <RichTextPlugin
           contentEditable={
             <ContentEditable
+              aria-label={ariaLabel}
               autoFocus={autoFocus}
               className={cn(MarkdownClassName, className)}
               onFocus={() => {

@@ -12,6 +12,7 @@ interface NotebookPdfDocumentProps {
   name: string
   projectName?: string
   cells: readonly Snapshot<Cell>[]
+  asOf?: string | null
   results: ReadonlyMap<string, QueryResult>
 }
 
@@ -34,6 +35,7 @@ export function NotebookPdfDocument({
   name,
   projectName,
   cells,
+  asOf,
   results,
 }: NotebookPdfDocumentProps) {
   const exportedDate = dayjs().format('MMM D, YYYY')
@@ -61,7 +63,12 @@ export function NotebookPdfDocument({
 
         {cells.map((cell) =>
           isQueryCell(cell) ? (
-            <NotebookPdfQueryCell key={cell._id} cell={cell} result={results.get(cell._id)} />
+            <NotebookPdfQueryCell
+              key={cell._id}
+              cell={cell}
+              asOf={asOf}
+              result={results.get(cell._id)}
+            />
           ) : (
             <NotebookPdfMarkdown key={cell._id} markdown={cell.text} />
           )

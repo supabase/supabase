@@ -98,6 +98,10 @@
       "import": "./src/CodeBlock/index.tsx",
       "types": "./src/CodeBlock/index.tsx"
     },
+    "./CodeCopyButton": {
+      "import": "./src/CodeCopyButton.tsx",
+      "types": "./src/CodeCopyButton.tsx"
+    },
     "./CollapsibleCardSection": {
       "import": "./src/CollapsibleCardSection.tsx",
       "types": "./src/CollapsibleCardSection.tsx"
@@ -289,6 +293,10 @@
     "./CountdownWidget": {
       "import": "./src/CountdownWidget/index.tsx",
       "types": "./src/CountdownWidget/index.tsx"
+    },
+    "./CrossfadeIcon": {
+      "import": "./src/CrossfadeIcon.tsx",
+      "types": "./src/CrossfadeIcon.tsx"
     },
     "./DataInputs/Input": {
       "import": "./src/DataInputs/Input.tsx",
@@ -569,6 +577,10 @@
     "./PromoToast/styles.css": {
       "import": "./src/PromoToast/styles.css",
       "types": "./src/PromoToast/styles.css"
+    },
+    "./PromptPanel": {
+      "import": "./src/PromptPanel.tsx",
+      "types": "./src/PromptPanel.tsx"
     },
     "./Row/Row.utils": {
       "import": "./src/Row/Row.utils.ts",

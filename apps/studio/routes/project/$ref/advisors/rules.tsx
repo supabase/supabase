@@ -2,13 +2,13 @@ import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 
 import { useIsAdvisorRulesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import AdvisorsLayout from '@/components/layouts/AdvisorsLayout/AdvisorsLayout'
+import { IssuesLayout } from '@/components/layouts/IssuesLayout/IssuesLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 
 export const Route = createFileRoute('/project/$ref/advisors/rules')({
   component: AdvisorRulesShell,
-  // Opt out of the parent advisors.tsx shell's <AdvisorsLayout> wrap
+  // Opt out of the parent advisors.tsx shell's <IssuesLayout> wrap
   // — we render our own with no title, plus a PageLayout tab strip,
   // mirroring the existing AdvisorRulesLayout component.
   staticData: {
@@ -28,17 +28,17 @@ function AdvisorRulesShell() {
   const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
 
   return (
-    <AdvisorsLayout>
+    <IssuesLayout>
       <PageLayout
         title={
           <span className="flex items-center gap-x-4">
-            Advisor Settings
+            Check settings
             {isAdvisorRulesEnabled && (
               <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES} />
             )}
           </span>
         }
-        subtitle="Disable specific advisor categories or rules"
+        subtitle="Turn off specific advisor checks or categories"
         navigationItems={[
           {
             label: 'Security',
@@ -52,6 +52,6 @@ function AdvisorRulesShell() {
       >
         <Outlet />
       </PageLayout>
-    </AdvisorsLayout>
+    </IssuesLayout>
   )
 }

@@ -73,7 +73,7 @@ export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
             const result = await executeLogsSql({
               projectRef: projectRef ?? '',
               sql: gate.acceptUntrustedLogsSql(cell.unchecked_sql),
-              range: resolveLogTimeRange(cell.time_range),
+              range: resolveLogTimeRange(cell.time_range, notebook.content.as_of),
               endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
               signal: abortSignal,
               headers: authHeaders,

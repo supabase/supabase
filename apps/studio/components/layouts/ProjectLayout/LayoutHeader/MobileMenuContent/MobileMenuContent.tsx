@@ -118,7 +118,6 @@ export function MobileMenuContent({
   const SectionMenuContent = sectionKeyToShow ? getProductMenuComponent(sectionKeyToShow) : null
   const hasCurrentProductHeader =
     viewLevel === 'section' && sectionKeyToShow === currentSectionKey && !!currentProductMenuHeader
-  const pageSegment = getPathSegment(pathname, 4)
 
   const renderRoute = (route: Route, isActive: boolean) => (
     <TopLevelRouteItem
@@ -193,13 +192,7 @@ export function MobileMenuContent({
               currentProductMenu
             ) : SectionMenuContent ? (
               <React.Suspense fallback={<GenericSkeletonLoader className="p-4" />}>
-                {sectionKeyToShow === 'advisors' ? (
-                  <SectionMenuContent
-                    {...({ page: pageSegment } as React.ComponentProps<typeof SectionMenuContent>)}
-                  />
-                ) : (
-                  <SectionMenuContent />
-                )}
+                <SectionMenuContent />
               </React.Suspense>
             ) : null}
           </div>

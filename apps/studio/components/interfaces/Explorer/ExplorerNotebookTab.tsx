@@ -333,6 +333,7 @@ export const ExplorerNotebookTab = () => {
         notebookToMarkdown({
           name: name ?? '',
           cells,
+          asOf: content?.as_of,
           getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
         }),
         () => toast.success('Copied notebook as Markdown to clipboard')
@@ -351,6 +352,7 @@ export const ExplorerNotebookTab = () => {
         name: name ?? 'Untitled notebook',
         projectName: project?.name,
         cells,
+        asOf: content?.as_of,
         getResult: (cellId) => queryCellRefs.current.get(cellId)?.getResult(),
       })
     } catch (err: unknown) {

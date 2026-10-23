@@ -32,10 +32,10 @@ export const AdvisorRulesPreview = () => {
               href={
                 isAdvisorRulesEnabled
                   ? `/project/${ref}/advisors/rules/security`
-                  : `/project/${ref}/advisors/security`
+                  : `/project/${ref}/issues?category=security`
               }
             >
-              Advisors section.
+              Issues section.
             </InlineLink>
           </li>
         </ul>

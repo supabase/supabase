@@ -142,9 +142,9 @@ describe('generateProductRoutes', () => {
 })
 
 describe('generateOtherRoutes', () => {
-  it('always includes advisors, logs, and integrations', () => {
+  it('always includes issues, logs, and integrations', () => {
     const routes = generateOtherRoutes(REF, activeProject)
-    expect(keys(routes)).toContain('advisors')
+    expect(keys(routes)).toContain('issues')
     expect(keys(routes)).toContain('logs')
     expect(keys(routes)).toContain('integrations')
   })
@@ -191,8 +191,8 @@ describe('generateOtherRoutes', () => {
 
   it('marks routes as disabled when project is not active', () => {
     const routes = generateOtherRoutes(REF, inactiveProject)
-    const advisorsRoute = routes.find((r) => r.key === 'advisors')
-    expect(advisorsRoute?.disabled).toBe(true)
+    const issuesRoute = routes.find((r) => r.key === 'issues')
+    expect(issuesRoute?.disabled).toBe(true)
   })
 })
 

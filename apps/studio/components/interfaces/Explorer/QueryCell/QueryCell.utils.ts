@@ -4,6 +4,7 @@ import { type Snapshot } from 'valtio'
 
 import { type ExplorerQueryModel } from '../QueryEditor'
 import { type QueryDisplay } from '../types'
+import { anchorLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { type ChartConfig, type QueryCell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import {
@@ -159,9 +160,21 @@ export function setCellRowLimit(cell: Snapshot<QueryCell>, rowLimit: number): Qu
  * the buffer is the editor boundary the safe-SQL model expects; which brand applies is
  * decided by the cell's tag, so the dialect can't drift from the cell it belongs to.
  */
-export function toQueryModel(cell: Snapshot<QueryCell>, sql: string): ExplorerQueryModel {
+/**
+ * The runnable query for a cell. `asOf` is the cell's document's `as_of`: a relative log
+ * range counts back from it, so the editor shows and runs the period the document is about.
+ */
+export function toQueryModel(
+  cell: Snapshot<QueryCell>,
+  sql: string,
+  asOf?: string | null
+): ExplorerQueryModel {
   if (cell._tag === 'log_cell') {
-    return { ...getQuerySourceBinding(cell), uncheckedSql: untrustedLogSql(sql) }
+    const time_range = anchorLogTimeRange(cell.time_range, asOf)
+    return {
+      ...getQuerySourceBinding({ _tag: 'log_cell', time_range }),
+      uncheckedSql: untrustedLogSql(sql),
+    }
   }
 
   return {

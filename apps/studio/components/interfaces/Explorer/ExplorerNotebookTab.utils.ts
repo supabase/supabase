@@ -1,6 +1,7 @@
 import { type Snapshot } from 'valtio'
 
 import { type QueryResult } from './types'
+import { anchorLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { convertResultsToMarkdown } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import { formatTimeRange } from '@/components/ui/AIAssistantPanel/AssistantNotebookPreview.utils'
 import { type Cell } from '@/data/content/notebooks/notebook-schema'
@@ -101,10 +102,13 @@ function getCodeFence(content: string): string {
 export function notebookToMarkdown({
   name,
   cells,
+  asOf,
   getResult,
 }: {
   name: string
   cells: readonly Snapshot<Cell>[]
+  // The notebook's `as_of`, which relative log ranges count back from
+  asOf?: string | null
   getResult?: (cellId: string) => QueryResult | undefined
 }): string {
   const sections = cells.map((cell) => {
@@ -116,7 +120,7 @@ export function notebookToMarkdown({
         const header =
           cell._tag === 'database_cell'
             ? `### ${cell.title ?? 'Untitled query'} (Postgres)`
-            : `### ${cell.title ?? 'Untitled query'} (Logs — ClickHouse)\n\n_Time range: ${formatTimeRange(cell.time_range)}_`
+            : `### ${cell.title ?? 'Untitled query'} (Logs — ClickHouse)\n\n_Time range: ${formatTimeRange(anchorLogTimeRange(cell.time_range, asOf))}_`
 
         const fence = getCodeFence(cell.unchecked_sql)
 

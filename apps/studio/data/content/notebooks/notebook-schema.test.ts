@@ -8,6 +8,7 @@ import {
   notebookDomainSchema,
   notebookSchema,
   timeRangeSchema,
+  toWireNotebook,
   toWireWritableNotebook,
   writableNotebookSchema,
 } from './notebook-schema'
@@ -460,5 +461,40 @@ describe('toWireWritableNotebook', () => {
     expect(logCell).toMatchObject({ sql: 'select 1' })
     expect(logCell).not.toHaveProperty('_id')
     expect(logCell).not.toHaveProperty('unchecked_sql')
+  })
+})
+
+describe('as_of', () => {
+  it.each([
+    ['absent', {}],
+    ['null', { as_of: null }],
+    ['a time', { as_of: '2026-10-21T11:40:00.000Z' }],
+  ])('accepts a document with as_of %s on every document schema', (_, asOf) => {
+    expect(notebookSchema.safeParse({ ...FULL_NOTEBOOK, ...asOf }).success).toBe(true)
+    expect(notebookDomainSchema.safeParse({ ...FULL_NOTEBOOK, ...asOf }).success).toBe(true)
+    expect(writableNotebookSchema.safeParse({ ...FULL_NOTEBOOK, ...asOf }).success).toBe(true)
+    expect(
+      agentNotebookSchema.safeParse({
+        schema_version: 1,
+        cells: [{ _tag: 'markdown_cell', text: 'hi' }],
+        ...asOf,
+      }).success
+    ).toBe(true)
+  })
+
+  it('rejects an as_of that is not an ISO-8601 time', () => {
+    expect(notebookSchema.safeParse({ ...FULL_NOTEBOOK, as_of: 'yesterday' }).success).toBe(false)
+  })
+
+  it('sends as_of to the backend only when it is set', () => {
+    const content = notebookDomainSchema.parse(FULL_NOTEBOOK)
+    expect(toWireNotebook(content)).not.toHaveProperty('as_of')
+    expect(toWireNotebook({ ...content, as_of: null })).not.toHaveProperty('as_of')
+
+    const anchored = notebookDomainSchema.parse({ ...FULL_NOTEBOOK, as_of: '2026-10-21T11:40:00Z' })
+    expect(toWireNotebook(anchored).as_of).toBe(anchored.as_of)
+    expect(
+      toWireWritableNotebook({ schema_version: 1, as_of: anchored.as_of, cells: [] }).as_of
+    ).toBe(anchored.as_of)
   })
 })

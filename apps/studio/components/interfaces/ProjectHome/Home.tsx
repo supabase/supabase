@@ -17,10 +17,10 @@ import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
-import { AdvisorSection } from './AdvisorSection'
 import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
+import { IssuesSection } from './IssuesSection'
 import { NotebooksSection } from './NotebooksSection'
 import { ProjectUsageSection } from './ProjectUsageSection'
 import { ProjectUsageSectionDeltas } from './ProjectUsageSectionDeltas'
@@ -141,14 +141,14 @@ export const ProjectHome = () => {
                         </SortableSection>
                       )
                     }
-                    if (id === 'advisor') {
+                    if (id === 'issues') {
                       return (
                         <div
                           key={id}
                           className={cn(isComingUp && 'opacity-60 pointer-events-none')}
                         >
                           <SortableSection gripClassName={SORT_GRIP_CLASS} id={id}>
-                            <AdvisorSection showEmptyState={isComingUp} />
+                            <IssuesSection showEmptyState={isComingUp} />
                           </SortableSection>
                         </div>
                       )

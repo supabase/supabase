@@ -130,7 +130,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
         variant="embedded"
         className="min-h-0"
         title={title}
-        query={toQueryModel(cell, sql)}
+        query={toQueryModel(cell, sql, currentNotebook?.notebook.content?.as_of)}
         result={result}
         showQuery={showQuery}
         onShowQueryChange={(showQuery) => snap.setQueryVisibility({ cellId: cell._id, showQuery })}

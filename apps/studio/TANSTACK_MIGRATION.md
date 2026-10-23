@@ -95,7 +95,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/logs.tsx` — LogsLayout (reads `logsLayoutTitle` from leaf staticData). Honours `skipLogsLayout: true` for `logs/index` (page handles its own ProjectLayout-wrapped content for the UnifiedLogs / no-permission cases). Refactored `pages/.../logs/index.tsx` to move the inline `<DefaultLayout>` into `getLayout` so it isn't duplicated when the TanStack project shell already provides DefaultLayout.
 - [x] `routes/project/$ref/observability.tsx` — ObservabilityLayout (reads `observabilityLayoutTitle` from leaf staticData)
 - [x] `routes/project/$ref/compute.tsx` — ComputeLayout (reads `computeLayoutTitle` from leaf `staticData`). Flag-gated: `ComputeLayout` itself redirects to the project home when `useFlag('compute')` is off, so the shell needs no extra guard.
-- [x] `routes/project/$ref/advisors.tsx` — AdvisorsLayout (reads `advisorsLayoutTitle` from leaf staticData). Honours `skipAdvisorsLayout: true` opt-out for the rules sub-shell, which provides its own AdvisorsLayout-less-DefaultLayout wrap. Scans whole match chain (same pattern as functions.tsx).
+- [x] `routes/project/$ref/advisors.tsx` — IssuesLayout. Honours `skipAdvisorsLayout: true` opt-out for the rules sub-shell, which provides its own wrap, and for the old health/performance/security pages, which only redirect to `/issues`. Scans whole match chain (same pattern as functions.tsx).
 - [x] `routes/project/$ref/advisors/rules.tsx` — sub-shell that inlines the inner body of `AdvisorRulesLayout` (AdvisorsLayout + PageLayout with title/tabs/feature-preview badge), minus the outer DefaultLayout (already provided by the parent project shell). Sets `skipAdvisorsLayout: true` on its own staticData. **Delta vs plan:** the existing `AdvisorRulesLayout` component wraps in DefaultLayout + AdvisorsLayout internally, so reusing it as-is would double-wrap both. Inlined the inner part; the Next-side component is untouched.
 - [x] `routes/project/$ref/settings.tsx` — SettingsLayout (reads `settingsLayoutTitle` from leaf staticData). Honours `skipSettingsLayout: true` for `settings/api` (redirect-only page). Adds a sub-shell at `routes/project/$ref/settings/api-keys.tsx` providing `ApiKeysLayout` for both api-keys leaves; `jwt/index` wraps in `JWTKeysLayout` inline since `jwt/legacy` doesn't share it.
 - [x] `routes/project/$ref/integrations.tsx` — ProjectIntegrationsLayout (no staticData; all 4 leaves share identical layout). Layout is `withAuth(({ children }) => <ProjectLayout>{children}</ProjectLayout>)`, so the shell just wraps `<Outlet />` once.
@@ -290,6 +290,13 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/observability/query-performance.tsx` ← `pages/project/[ref]/observability/query-performance.tsx`
 - [x] A `routes/project/$ref/observability/realtime.tsx` ← `pages/project/[ref]/observability/realtime.tsx`
 - [x] A `routes/project/$ref/observability/storage.tsx` ← `pages/project/[ref]/observability/storage.tsx`
+
+### Project shell — `/issues/*`
+
+- [x] `routes/project/$ref/issues.tsx` — IssuesLayout (issue list in the product sidebar).
+- [x] A `routes/project/$ref/issues/index.tsx` ← `pages/project/[ref]/issues/index.tsx`
+- [x] A `routes/project/$ref/issues/$id.tsx` ← `pages/project/[ref]/issues/[id].tsx`
+- [x] A `routes/project/$ref/issues/settings.tsx` ← `pages/project/[ref]/issues/settings.tsx`
 
 ### Project shell — `/advisors/*`
 
