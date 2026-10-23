@@ -1,8 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { Button, Dialog, DialogContent, DialogTitle, DialogTrigger } from 'ui'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RecoveryReminderController } from './RecoveryReminderController'
+import { profileKeys } from '@/data/profile/keys'
 import { writeRecoveryReminderSnooze } from '@/lib/account-recovery/recovery-reminder'
 
 const mock = vi.hoisted(() => ({
@@ -46,23 +49,42 @@ vi.mock('@/lib/constants', async (importOriginal) => ({
 }))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mock.track }))
 
+vi.mock('./RecoveryInterstitial/RecoveryInterstitial', () => ({
+  RecoveryInterstitial: ({ onDismiss }: { onDismiss: () => void }) => (
+    <>
+      <Button
+        onClick={() => {
+          writeRecoveryReminderSnooze(mock.userId, 'exhausted')
+          onDismiss()
+        }}
+      >
+        Skip for now
+      </Button>
+      <Dialog>
+        <DialogTrigger>Open recovery dialog</DialogTrigger>
+        <DialogContent aria-describedby={undefined}>
+          <DialogTitle>Recovery codes</DialogTitle>
+          <input aria-label="Code confirmation" />
+        </DialogContent>
+      </Dialog>
+    </>
+  ),
+}))
+
 function renderController(href = '/organizations') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  const onNavigate = vi.fn()
   const createTree = (destination: string) => (
     <QueryClientProvider client={client}>
-      <RecoveryReminderController href={destination} onNavigate={onNavigate}>
-        <div>Dashboard content</div>
+      <RecoveryReminderController href={destination}>
+        <input aria-label="Unsaved editor" defaultValue="Unsaved work" />
       </RecoveryReminderController>
     </QueryClientProvider>
   )
   const view = render(createTree(href))
-  return {
-    client,
-    onNavigate,
-    rerender: (destination = href) => view.rerender(createTree(destination)),
-  }
+  return { client, rerender: (destination = href) => view.rerender(createTree(destination)) }
 }
+const takeover = () => screen.queryByRole('dialog', { name: 'Account recovery' })
+const waitForTakeover = () => screen.findByRole('dialog', { name: 'Account recovery' })
 
 async function settle(client: QueryClient) {
   await waitFor(() => expect(client.isFetching()).toBe(0))
@@ -93,141 +115,151 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks())
 
 describe('RecoveryReminderController', () => {
-  it('shows the dashboard immediately while flags and the entry check resolve', async () => {
-    mock.flagsLoaded = false
-    const { client, rerender, onNavigate } = renderController()
-    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
-    expect(screen.queryByRole('status', { name: 'Loading dashboard' })).not.toBeInTheDocument()
-    mock.flagsLoaded = true
-    mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
+  it('keeps the page mounted and its URL intact through opening and dismissal', async () => {
+    const href = '/dashboard/project/ref/editor?schema=private#row-2'
+    history.replaceState(null, '', href)
+    const historyLength = history.length
+    const { rerender } = renderController(href)
+    const editor = screen.getByRole('textbox')
+    editor.focus()
+    fireEvent.change(editor, { target: { value: 'Edited draft' } })
+    await waitForTakeover()
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+    expect(editor.isConnected).toBe(true)
     rerender()
-    await screen.findByText('Dashboard content')
-    await settle(client)
-    expect(onNavigate).not.toHaveBeenCalled()
+    expect(mock.track).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'Skip for now' }))
+    await waitFor(() => expect(takeover()).not.toBeInTheDocument())
+    expect(screen.getByRole('textbox')).toBe(editor)
+    expect(editor).toHaveValue('Edited draft')
+    await waitFor(() => expect(editor).toHaveFocus())
+    expect(location.pathname + location.search + location.hash).toBe(href)
+    expect(history.length).toBe(historyLength)
   })
-  it('shows the dashboard while checking and then redirects an eligible account', async () => {
-    const { onNavigate } = renderController()
-    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
-    await waitFor(() => expect(onNavigate).toHaveBeenCalledOnce())
-    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
+
+  it('does not send takeover keyboard events to dashboard window handlers', async () => {
+    renderController()
+    await waitForTakeover()
+    const handler = vi.fn()
+    window.addEventListener('keydown', handler)
+    window.addEventListener('keyup', handler)
+    try {
+      await userEvent.tab()
+      expect(takeover()?.contains(document.activeElement)).toBe(true)
+      const skip = screen.getByRole('button', { name: 'Skip for now' })
+      fireEvent.keyDown(skip, { key: 'Escape' })
+      expect(takeover()).toBeInTheDocument()
+      fireEvent.keyDown(skip, { key: 'k', metaKey: true })
+      fireEvent.keyUp(skip, { key: 'k', metaKey: true })
+      expect(handler).not.toHaveBeenCalled()
+      fireEvent.click(screen.getByRole('button', { name: 'Open recovery dialog' }))
+      const confirmation = screen.getByRole('textbox', { name: 'Code confirmation' })
+      fireEvent.keyDown(confirmation, { key: 'k', metaKey: true })
+      fireEvent.keyUp(confirmation, { key: 'k', metaKey: true })
+      fireEvent.keyDown(confirmation, { key: 'Escape' })
+      await waitFor(() =>
+        expect(screen.queryByRole('dialog', { name: 'Recovery codes' })).not.toBeInTheDocument()
+      )
+      expect(takeover()).toBeInTheDocument()
+      expect(handler).not.toHaveBeenCalled()
+    } finally {
+      window.removeEventListener('keydown', handler)
+      window.removeEventListener('keyup', handler)
+    }
   })
-  it('keeps the dashboard visible during background reads', async () => {
-    mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
+
+  it('waits for an existing dialog to close', async () => {
+    const existing = document.createElement('div')
+    existing.setAttribute('role', 'dialog')
+    existing.setAttribute('data-state', 'open')
+    document.body.append(existing)
+    try {
+      const { client } = renderController()
+      await waitFor(() => expect(mock.getStatus).toHaveBeenCalled())
+      await settle(client)
+      expect(takeover()).not.toBeInTheDocument()
+      existing.setAttribute('data-state', 'closed')
+      await waitForTakeover()
+    } finally {
+      existing.remove()
+    }
+  })
+
+  it('ignores permanent navigation menus and closed mounted dialogs', async () => {
+    const sidebar = document.createElement('div')
+    sidebar.innerHTML = '<nav role="menu"></nav><div role="dialog" data-state="closed"></div>'
+    document.body.append(sidebar)
+    try {
+      renderController()
+      await waitForTakeover()
+    } finally {
+      sidebar.remove()
+    }
+  })
+
+  it('retains the takeover while background recovery state refreshes', async () => {
     const { client } = renderController()
-    await screen.findByText('Dashboard content')
+    await waitForTakeover()
+    mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
+    await act(() => client.invalidateQueries({ queryKey: ['recovery-code-status-query'] }))
     await settle(client)
-    mock.getStatus.mockReturnValue(new Promise(() => {}))
-    act(() => {
-      void client.invalidateQueries({ queryKey: ['recovery-code-status-query'] })
-    })
-    await waitFor(() => expect(mock.getStatus).toHaveBeenCalledTimes(2))
-    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
+    expect(takeover()).toBeInTheDocument()
   })
-  it('can interrupt the same account after sign-out and clearing snooze', async () => {
-    const { client, onNavigate, rerender } = renderController()
-    await waitFor(() => expect(onNavigate).toHaveBeenCalledOnce())
+
+  it('isolates snooze between users and removes the takeover on sign-out', async () => {
     writeRecoveryReminderSnooze(mock.userId, 'exhausted')
+    const { client, rerender } = renderController()
+    await waitFor(() => expect(mock.getStatus).toHaveBeenCalled())
+    await settle(client)
+    expect(takeover()).not.toBeInTheDocument()
+    mock.userId = 'other-controller-user'
+    rerender()
+    await waitForTakeover()
     mock.userId = ''
     rerender()
-    await settle(client)
-    localStorage.removeItem('account-recovery-reminder:controller-user')
-    mock.userId = 'controller-user'
-    rerender()
-    await waitFor(() => expect(onNavigate).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(takeover()).not.toBeInTheDocument())
   })
 
-  it('preserves the full destination and avoids duplicate redirects', async () => {
-    const href = '/project/ref/editor?schema=private&table=notes#row-2'
-    const { client, onNavigate, rerender } = renderController(href)
-    await waitFor(() => expect(onNavigate).toHaveBeenCalledOnce())
-    const redirect = new URL(onNavigate.mock.calls[0][0], 'https://studio.local')
-    expect(redirect.pathname).toBe('/account-recovery')
-    expect(redirect.searchParams.get('returnTo')).toBe(href)
-    rerender()
-    await settle(client)
-    expect(onNavigate).toHaveBeenCalledOnce()
-    expect(mock.track).toHaveBeenCalledWith('account_recovery_reminder_exposed', {
-      gap: 'exhausted',
+  it('checks the next user even when their verified session is cached', async () => {
+    const { client, rerender } = renderController()
+    await waitForTakeover()
+    client.setQueryData(profileKeys.aaLevel('cached-user'), {
+      currentLevel: 'aal2',
+      nextLevel: 'aal2',
     })
-  })
-
-  it('recognizes the deployment base path and retains the complete return URL', async () => {
-    const href = '/dashboard/project/ref/editor?schema=private#row-2'
-    const { onNavigate } = renderController(href)
-    await waitFor(() => expect(onNavigate).toHaveBeenCalledOnce())
-    expect(
-      new URL(onNavigate.mock.calls[0][0], 'https://studio.local').searchParams.get('returnTo')
-    ).toBe(href)
-    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
-  })
-
-  it('does not interrupt when rollout is disabled', async () => {
-    mock.rolloutEnabled = false
-    const { client, onNavigate } = renderController()
-    await settle(client)
-    expect(onNavigate).not.toHaveBeenCalled()
-    expect(mock.getStatus).not.toHaveBeenCalled()
-  })
-
-  it('waits for MFA verification', async () => {
-    mock.getAssurance.mockResolvedValue({
-      data: { currentLevel: 'aal1', nextLevel: 'aal2' },
-      error: null,
-    })
-    const { client, onNavigate } = renderController()
-    await settle(client)
-    expect(onNavigate).not.toHaveBeenCalled()
-    expect(mock.getStatus).not.toHaveBeenCalled()
-  })
-
-  it('waits for authentication loading to finish', async () => {
-    mock.isAuthLoading = true
-    const { client, onNavigate } = renderController()
-    await settle(client)
-    expect(onNavigate).not.toHaveBeenCalled()
-    expect(mock.getStatus).not.toHaveBeenCalled()
-  })
-
-  it('does not turn failed recovery reads into interruptions', async () => {
-    mock.getStatus.mockResolvedValue({ data: null, error: new Error('Unavailable') })
-    const { client, onNavigate } = renderController()
-    await waitFor(() => expect(mock.getStatus).toHaveBeenCalled())
-    await settle(client)
-    expect(onNavigate).not.toHaveBeenCalled()
-  })
-
-  it('waits for recovery reads to finish', async () => {
-    mock.getStatus.mockReturnValue(new Promise(() => {}))
-    const { onNavigate } = renderController()
-    await waitFor(() => expect(mock.getStatus).toHaveBeenCalled())
-    expect(onNavigate).not.toHaveBeenCalled()
-    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
-  })
-
-  it('does not interrupt for an authenticator recommendation alone', async () => {
-    mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
-    const { client, onNavigate } = renderController()
-    await waitFor(() => expect(mock.getStatus).toHaveBeenCalled())
-    await settle(client)
-    expect(onNavigate).not.toHaveBeenCalled()
-  })
-
-  it('honors snooze without sharing it with another user', async () => {
-    writeRecoveryReminderSnooze('controller-user', 'exhausted')
-    const { client, onNavigate, rerender } = renderController()
-    await waitFor(() => expect(mock.getStatus).toHaveBeenCalledOnce())
-    await settle(client)
-    expect(onNavigate).not.toHaveBeenCalled()
-    mock.userId = 'controller-other-user'
+    mock.userId = 'cached-user'
     rerender()
-    await waitFor(() => expect(onNavigate).toHaveBeenCalledOnce())
-    expect(mock.getStatus).toHaveBeenCalledTimes(2)
+    await waitFor(() => expect(mock.track).toHaveBeenCalledTimes(2))
+    await waitForTakeover()
   })
 
-  it('does not interrupt the account recovery route', async () => {
-    const { client, onNavigate } = renderController('/account-recovery')
-    await settle(client)
-    expect(onNavigate).not.toHaveBeenCalled()
-    expect(mock.getStatus).not.toHaveBeenCalled()
+  it.each([
+    'flags',
+    'rollout',
+    'auth loading',
+    'MFA',
+    'failed read',
+    'pending read',
+    'no gap',
+    'route',
+  ])('does not interrupt for %s', async (reason) => {
+    if (reason === 'flags') mock.flagsLoaded = false
+    if (reason === 'rollout') mock.rolloutEnabled = false
+    if (reason === 'auth loading') mock.isAuthLoading = true
+    if (reason === 'MFA')
+      mock.getAssurance.mockResolvedValue({
+        data: { currentLevel: 'aal1', nextLevel: 'aal2' },
+        error: null,
+      })
+    if (reason === 'failed read')
+      mock.getStatus.mockResolvedValue({ data: null, error: new Error('Unavailable') })
+    if (reason === 'pending read') mock.getStatus.mockReturnValue(new Promise(() => {}))
+    if (reason === 'no gap')
+      mock.getStatus.mockResolvedValue({ data: { remaining: 10 }, error: null })
+    const { client } = renderController(reason === 'route' ? '/account/security' : undefined)
+    if (reason === 'pending read') await waitFor(() => expect(mock.getStatus).toHaveBeenCalled())
+    else await settle(client)
+    expect(takeover()).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
   })
 })
