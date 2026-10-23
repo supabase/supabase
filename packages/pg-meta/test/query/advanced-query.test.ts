@@ -596,5 +596,49 @@ describe('Advanced Query Tests', () => {
       expect(result[0].id).toBe(1)
       expect(result[0].name).toBe('Not Null')
     })
+
+    withTestDatabase('should handle "is" operator with an uppercase NULL value', async (db) => {
+      await db.executeQuery(`
+        DELETE FROM "public"."normal_table";
+        INSERT INTO "public"."normal_table" (id, name)
+        VALUES
+          (1, 'Not Null'),
+          (2, NULL);
+      `)
+
+      const query = new Query()
+      const sql = query.from('normal_table', 'public').select().filter('name', 'is', 'NULL').toSql()
+
+      expect(sql).toMatchInlineSnapshot(`"select * from public.normal_table where name is null;"`)
+      const result = await validateSql(db, sql)
+      expect(result.length).toBe(1)
+      expect(result[0].id).toBe(2)
+      expect(result[0].name).toBeNull()
+    })
+
+    withTestDatabase('should handle "is" operator with an uppercase NOT NULL value', async (db) => {
+      await db.executeQuery(`
+        DELETE FROM "public"."normal_table";
+        INSERT INTO "public"."normal_table" (id, name)
+        VALUES
+          (1, 'Not Null'),
+          (2, NULL);
+      `)
+
+      const query = new Query()
+      const sql = query
+        .from('normal_table', 'public')
+        .select()
+        .filter('name', 'is', 'NOT NULL')
+        .toSql()
+
+      expect(sql).toMatchInlineSnapshot(
+        `"select * from public.normal_table where name is not null;"`
+      )
+      const result = await validateSql(db, sql)
+      expect(result.length).toBe(1)
+      expect(result[0].id).toBe(1)
+      expect(result[0].name).toBe('Not Null')
+    })
   })
 })
