@@ -10,7 +10,7 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 describe('RecoveryReminder', () => {
   test('does not claim success when checks are disabled', () => {
-    customRender(<RecoveryReminder gap={null} destination="/organizations" isUnavailable />)
+    customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isUnavailable />)
     expect(
       screen.getByRole('heading', { name: 'Account recovery check unavailable' })
     ).toBeInTheDocument()
@@ -24,12 +24,12 @@ describe('RecoveryReminder', () => {
       response: () =>
         HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
     })
-    customRender(<RecoveryReminder gap={null} destination="/organizations" isError />)
+    customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isError />)
     expect(
       screen.getByRole('heading', { name: 'Account recovery check unavailable' })
     ).toBeInTheDocument()
     expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Continue' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
   })
 
   test.each(['missing', 'exhausted'] as const)(
@@ -46,9 +46,8 @@ describe('RecoveryReminder', () => {
       }
       const generate = vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue(result)
       const regenerate = vi.spyOn(auth.mfa.recoveryCodes, 'regenerate').mockResolvedValue(result)
-      const { rerender } = customRender(
-        <RecoveryReminder gap={gap} destination="/organizations?view=all" />
-      )
+      const onDismiss = vi.fn()
+      const { rerender } = customRender(<RecoveryReminder gap={gap} onDismiss={onDismiss} />)
       fireEvent.click(
         screen.getByRole('button', {
           name: gap === 'missing' ? 'Generate codes' : 'Regenerate codes',
@@ -63,17 +62,15 @@ describe('RecoveryReminder', () => {
         fireEvent.click(within(dialog).getByRole('button', { name: 'Regenerate' }))
       }
       await screen.findByText('WTO2-4T5X-BEUL-VJMI')
-      rerender(<RecoveryReminder gap={null} destination="/organizations?view=all" />)
+      rerender(<RecoveryReminder gap={null} onDismiss={onDismiss} />)
       expect(screen.getByRole('button', { name: 'Done' })).toBeDisabled()
       fireEvent.click(
         screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
       )
       fireEvent.click(screen.getByRole('button', { name: 'Done' }))
       await screen.findByText('Recovery codes saved')
-      expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute(
-        'href',
-        '/organizations?view=all'
-      )
+      fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+      expect(onDismiss).toHaveBeenCalledOnce()
       expect(generate).toHaveBeenCalledTimes(gap === 'missing' ? 1 : 0)
       expect(regenerate).toHaveBeenCalledTimes(gap === 'exhausted' ? 1 : 0)
     }
