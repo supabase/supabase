@@ -1,28 +1,23 @@
 import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, CardFooter } from 'ui'
 import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
 
 import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryCodesModal'
-import { getRecoveryGap, getRecoveryReturnTo, type RecoveryGap } from './RecoveryInterstitial.utils'
+import { getRecoveryGap, type RecoveryGap } from './RecoveryInterstitial.utils'
 import { RecoveryTaskRow } from './RecoveryTaskRow'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from '@/lib/constants'
 
-export const RecoveryInterstitial = () => {
-  const [returnTo] = useQueryState('returnTo', parseAsString)
-  const destination = getRecoveryReturnTo(returnTo, BASE_PATH)
-
-  return <LiveRecoveryReminder destination={destination} />
+export const RecoveryInterstitial = ({ onDismiss }: { onDismiss: () => void }) => {
+  return <LiveRecoveryReminder onDismiss={onDismiss} />
 }
 
-const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
+const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
   const user = useUser()
   const { hasLoaded, isConfigCatStale } = useFeatureFlags()
   const flagsReady = hasLoaded === true && !isConfigCatStale
@@ -47,7 +42,7 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
       <RecoveryReminder
         key={user?.id}
         gap={gap}
-        destination={destination}
+        onDismiss={onDismiss}
         isLoading={isLoading}
         isUnavailable={isUnavailable}
         isError={isError}
@@ -58,7 +53,7 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
 
 export const RecoveryReminder = ({
   gap,
-  destination,
+  onDismiss,
   isLoading = false,
   isError = false,
   isUnavailable = false,
@@ -68,7 +63,7 @@ export const RecoveryReminder = ({
   onExit,
 }: {
   gap: RecoveryGap | null
-  destination: string
+  onDismiss: () => void
   isLoading?: boolean
   isError?: boolean
   isUnavailable?: boolean
@@ -102,8 +97,8 @@ export const RecoveryReminder = ({
         )}
         <CardFooter className="justify-center min-h-12">
           {!isLoading && (
-            <Button asChild size="tiny">
-              <a href={destination}>Continue</a>
+            <Button size="tiny" onClick={onDismiss}>
+              Continue
             </Button>
           )}
         </CardFooter>
@@ -159,9 +154,12 @@ export const RecoveryReminder = ({
       </div>
       <CardFooter className="justify-center px-6 py-5 border-t">
         <Button
-          asChild
           variant="text"
           size="tiny"
+          onClick={() => {
+            onExit?.({ gap: activeGap, areCodesSaved, isFactorComplete })
+            onDismiss()
+          }}
           className={areCodesSaved || isFactorComplete ? '' : 'text-foreground-lighter'}
           iconRight={
             areCodesSaved || isFactorComplete ? (
@@ -169,12 +167,7 @@ export const RecoveryReminder = ({
             ) : undefined
           }
         >
-          <a
-            href={destination}
-            onClick={() => onExit?.({ gap: activeGap, areCodesSaved, isFactorComplete })}
-          >
-            {areCodesSaved || isFactorComplete ? 'Continue' : 'Skip for now'}
-          </a>
+          {areCodesSaved || isFactorComplete ? 'Continue' : 'Skip for now'}
         </Button>
       </CardFooter>
     </InterstitialLayout>

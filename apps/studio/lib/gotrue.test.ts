@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import {
   buildSignUpReturnPath,
@@ -9,7 +9,6 @@ import {
   getSignUpReturnTo,
   validateReturnTo,
 } from './gotrue'
-import { getAuthRedirectSearch } from '@/hooks/misc/withAuth.utils'
 
 describe('getSignUpReturnTo', () => {
   it('defaults to /new when returnTo is missing', () => {
@@ -108,17 +107,6 @@ describe('buildSignUpReturnPath', () => {
 })
 
 describe('getReturnToPath', () => {
-  it.each([
-    ['/project/ref', '?tab=1', '#table'],
-    ['/account-recovery', '?returnTo=%2Fproject%2Fref%3Ftab%3D1%23table', ''],
-  ])(
-    'round-trips %s without duplicating its query or losing its fragment',
-    (pathname, search, hash) => {
-      vi.stubGlobal('location', { search: `?${getAuthRedirectSearch(pathname, search, hash)}` })
-      expect(getReturnToPath()).toBe(`${pathname}${search}${hash}`)
-    }
-  )
-
   it('rebuilds a nested returnTo path with the params that rode alongside it', () => {
     // @ts-ignore
     delete window.location
