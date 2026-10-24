@@ -78,14 +78,15 @@ export const supabaseWayRealtimeBuild: ContentListingGroup = {
   columns: 3,
   items: [
     {
-      title: 'Postgres Changes',
-      href: '/guides/realtime/postgres-changes',
-      description: 'Subscribe to inserts, updates, and deletes on your tables.',
+      title: 'Broadcast from database',
+      href: '/guides/realtime/subscribing-to-database-changes#using-broadcast',
+      description:
+        'Send database changes to subscribed clients with Broadcast, the scalable option.',
     },
     {
-      title: 'Broadcast',
-      href: '/guides/realtime/broadcast',
-      description: 'Send low-latency messages between clients.',
+      title: 'Postgres Changes',
+      href: '/guides/realtime/postgres-changes',
+      description: 'Subscribe to table changes directly. Simpler to set up, with scaling limits.',
     },
     {
       title: 'Presence',

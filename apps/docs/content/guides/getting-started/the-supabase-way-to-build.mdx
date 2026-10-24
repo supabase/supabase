@@ -12,7 +12,7 @@ The [Architecture](/docs/guides/getting-started/architecture) page tells you wha
 
 | Your app needs to …          | Reach for                                                    | Keep in mind                                  |
 | ---------------------------- | ------------------------------------------------------------ | --------------------------------------------- |
-| Store data and expose an API | [Postgres + auto APIs](#start-with-your-database)            | Your schema is your API                       |
+| Store data and expose an API | [Postgres + auto API](#start-with-your-database)             | Your schema is your API                       |
 | Know who is calling          | [Auth](#add-users-auth)                                      | An identity the database can read             |
 | Scope data to each user      | [Row Level Security](#add-authorization-in-the-database-rls) | Authorization enforced by Postgres            |
 | Handle files and uploads     | [Storage](#add-files-storage)                                | Files get their own RLS policies              |
@@ -24,11 +24,13 @@ You don't need all of these things to start. Most apps start at the first row an
 
 ## Start with your database
 
-Every Supabase project is a full Postgres database, and Supabase generates a [REST API](/docs/guides/api) and a [GraphQL API](/docs/guides/graphql/api) from your schema automatically. Design your tables well and you have a working backend with no server code.
+Every Supabase project is a full Postgres database, and Supabase generates a [REST API](/docs/guides/api) from your schema automatically. Design your tables well and you have a working backend with no server code.
 
 **Mental model:** your schema is your API. The shape of your data is the shape of what clients can do.
 
-**Enough on its own for:** internal tools, prototypes, read-heavy apps, and anything single-user or trusted-client.
+**Enough on its own for:** internal tools, prototypes, and read-heavy apps.
+
+Any table a browser or mobile client can reach still needs [Row Level Security](#add-authorization-in-the-database-rls), even for public data. Reserve unprotected tables for server-side callers. A single-user or trusted-client assumption is not a security boundary.
 
 Avoid hand-writing a REST server that only forwards create, read, update, and delete calls to the database. That rebuilds what PostgREST already generates for you. Put your effort into the schema instead.
 
@@ -50,7 +52,7 @@ Once email and password sign-in works, add [social login](/docs/guides/auth/soci
 
 ## Add authorization in the database: RLS
 
-Once you have users, each user needs to see only their own data. With [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS), you write that rule once, as a policy on the table, and Postgres enforces it on every query, from every client.
+Once you have users, each user needs to see only their own data. With [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS), you write that rule once, as a policy on the table, and Postgres enforces it on every request made with your publishable (anon) or user keys. The secret (`service_role`) key bypasses RLS, so keep it server-side and enforce authorization there yourself.
 
 **Mental model:** authorization is data, enforced by Postgres, not logic scattered across your app. The policy lives next to the rows it protects.
 
@@ -66,13 +68,13 @@ App-layer filtering leaks data the moment one query forgets the filter, a new cl
 
 ## Add files: Storage
 
-For uploads, images, and documents, [Storage](/docs/guides/storage) gives you S3-compatible object storage that keeps its metadata in Postgres, so the same access rules that guard your rows also guard your files.
+For uploads, images, and documents, [Storage](/docs/guides/storage) gives you S3-compatible object storage that keeps its metadata in Postgres, so you secure files with RLS, the same model you use for your rows.
 
-**Mental model:** files are governed by the same authorization model as your data. Access to an object is a policy, not a separate access-control system to keep in sync.
+**Mental model:** files are secured by RLS too, but with their own policies on the `storage.objects` table. They don't inherit your app-table policies, and a public bucket serves files to anyone.
 
 **Trigger:** user avatars, attachments, media, and any binary a user owns.
 
-Keep object access on the same RLS foundation as your data. File rules that live in a separate system, disconnected from your users table, drift out of sync with your data rules.
+Write and review Storage policies alongside your data policies. They don't sync automatically, and a public bucket or a missing policy exposes files regardless of your table rules.
 
 When you serve images, resize them with [image transformations](/docs/guides/storage/serving/image-transformations).
 
@@ -84,11 +86,17 @@ Some logic can't live in the client, because it needs secrets, and isn't a good 
 
 **Mental model:** put data-shaped logic in Postgres (triggers, [database functions](/docs/guides/database/functions), and RPC) and integration-shaped logic at the edge (webhooks, third-party calls, and anything holding a secret key). For logic that's really about your data, prefer a Postgres function, closer to the data and easier to secure.
 
+<Admonition type="note" title="Long-running or non-TypeScript workloads">
+
+[Supabase Compute](https://supabase.com/compute) runs long-running jobs, always-on services, and code in any language next to your database. Compute is in Private Alpha. Existing Edge Functions keep running unchanged.
+
+</Admonition>
+
 **Trigger:** payment webhooks, calls to an external API, sending email, and any code that must hold a credential the browser can't see.
 
 <Admonition type="danger" title="Never ship a secret key in client code">
 
-A secret key in frontend code is exposed to anyone who opens the browser. Keep credentials in an Edge Function or a database function, where the client can't read them. See [API keys](/docs/guides/getting-started/api-keys) for which key belongs in the browser and which key stays on the server.
+A secret key in frontend code is exposed to anyone who opens the browser. Keep credentials in Edge Function secrets or [Supabase Vault](/docs/guides/database/vault), never in client code. See [API keys](/docs/guides/getting-started/api-keys) for which key belongs in the browser and which key stays on the server.
 
 </Admonition>
 
