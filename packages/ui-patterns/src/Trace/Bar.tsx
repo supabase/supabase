@@ -90,9 +90,10 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
       className={cn(
         'pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-sm px-1',
         placement === 'inside' && '[&>span]:text-background',
-        placement === 'after' &&
+        span.endMs === null &&
+          placement !== 'before' &&
           !isZoomed &&
-          'transition-[left] duration-300 ease-linear motion-reduce:transition-none',
+          'transition-[left,right] duration-300 ease-linear motion-reduce:transition-none',
         className
       )}
       style={{ ...position, ...style }}
