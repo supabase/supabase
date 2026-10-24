@@ -669,6 +669,14 @@ describe('Query.utils', () => {
         expect(result).toBe("select * from public.users where tags = ARRAY['tag1','tag2'];")
       })
 
+      test('preserves unquoted NULL array elements without changing quoted strings', () => {
+        const filters: Filter[] = [
+          { column: 'tags', operator: '=', value: "ARRAY['NULL',null,'tag''one']" },
+        ]
+        const result = QueryUtils.selectQuery(table, safeSql`*`, { filters })
+        expect(result).toBe("select * from public.users where tags = ARRAY['NULL',NULL,'tag''one'];")
+      })
+
       test('should correctly handle non-string values', () => {
         const filters: Filter[] = [{ column: 'active', operator: '=', value: true }]
         const result = QueryUtils.selectQuery(table, safeSql`*`, { filters: filters })
