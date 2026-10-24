@@ -18,7 +18,7 @@ Branching without Git is now the default for all Supabase projects.
 
 Supabase has supported database branching through a git-based workflow since [Launch Week X](https://supabase.com/blog/supabase-branching). That workflow connects your GitHub repo to Supabase, tracks migrations in version control, and creates preview branches automatically when you open a pull request. It works well for teams that manage their database schema as code. But it requires a GitHub connection, which rules out anyone who doesn't work that way.
 
-[Branching 2.0](https://supabase.com/blog/branching-2-0) removed that requirement. You create a branch from the dashboard, make changes using the SQL Editor or Table Editor, review a schema diff, and merge. No git configuration required. It shipped behind a feature preview. Today, that preview is gone.
+[Branching 2.0](https://supabase.com/blog/branching-2-0) removed that requirement. You create a branch from the dashboard, make changes using the [SQL Editor](/features/sql-editor) or Table Editor, review a schema diff, and merge. No git configuration required. It shipped behind a feature preview. Today, that preview is gone.
 
 Branching without Git is on by default for every project. It adds a second path for developers who want to iterate on their schema without setting up a Git integration. Both approaches are fully supported, and you can switch between them or use them together. If you're already using git-based branching, nothing changes.
 
@@ -91,7 +91,7 @@ pg-delta is alpha software. If you discover any bugs related to diff review, ple
 
 ## Built for AI workflows
 
-Every branch created through the Supabase MCP server uses dashboard branching automatically. When an AI tool needs to iterate on your database schema, it can create a branch, make changes, and merge, all without touching git. The branch exists for as long as the agent needs it and gets cleaned up when the work is done.
+Every branch created through the [Supabase MCP server](/docs/guides/ai-tools/mcp) uses dashboard branching automatically. When an AI tool needs to iterate on your database schema, it can create a branch, make changes, and merge, all without touching git. The branch exists for as long as the agent needs it and gets cleaned up when the work is done.
 
 ## Getting started
 

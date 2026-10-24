@@ -95,6 +95,41 @@ limit 100;
 
 Combine predicates with `and`, `or`, and `not`. Select only the fields needed for the investigation. To correlate sources, use an identifier present in both; a shared timestamp alone does not establish that events belong to the same request.
 
+## Filter by Postgres error code [#sqlstate-filtering]
+
+Filter `postgres_logs` by SQLSTATE to surface errors at a specific category rather than by message text. The code lives in `log_attributes['parsed.sql_state_code']`.
+
+To see which error codes are occurring across a time window:
+
+```sql
+select
+  log_attributes['parsed.sql_state_code'] as sqlstate,
+  count() as occurrences
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.sql_state_code'] != ''
+group by sqlstate
+order by occurrences desc
+limit 50;
+```
+
+During a platform-level incident (such as the database entering read-only mode), codes like `25006` (`read_only_sql_transaction`) and `53100` (`disk_full`) will dominate the results. To focus on application errors while a platform incident is active, exclude the known platform codes:
+
+```sql
+select
+  timestamp,
+  log_attributes['parsed.sql_state_code'] as sqlstate,
+  event_message
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.sql_state_code'] not in ('25006', '53100', '57P03')
+  and log_attributes['parsed.error_severity'] = 'ERROR'
+order by timestamp desc
+limit 50;
+```
+
+SQLSTATE codes starting with `25` or `53` usually indicate platform-level resource events rather than application bugs. See the [PostgREST error codes reference](/docs/guides/api/rest/postgrest-error-codes#database-level-errors) and [Database size guide](/docs/guides/platform/database-size#read-only-mode) for context.
+
 ## Query limits [#limit-and-result-row-limitations]
 
 Use an explicit `limit` and narrow time range. The logs query surface rejects `select *` and `count(*)`; list columns and use `count()`. A result limit bounds returned rows, not the time range scanned.

@@ -1,5 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import type {
   PermissionCatalogEntry,
   PermissionMode,
@@ -7,8 +5,7 @@ import type {
   ResourceAccessMode,
 } from './AccessToken.permissions'
 import { getCatalogEntry, getEntryScopes } from './AccessToken.permissions'
-import { doPermissionsCheck } from '@/hooks/misc/useCheckPermissions'
-import type { Permission } from '@/types'
+import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 
 /**
  * Client-side estimation of what a scoped token can actually do, given its owner's current role.
@@ -77,6 +74,11 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   // organization
   organization_admin_read: 'member',
   organization_admin_write: 'owner',
+  organization_config_read: 'administrator',
+  organization_config_write: 'administrator',
+  audit_logs_read: 'administrator',
+  billing_read: 'administrator',
+  billing_write: 'administrator',
   organization_projects_read: 'member',
   organization_projects_create: 'administrator',
   members_read: 'readonly',
@@ -99,6 +101,10 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   api_gateway_keys_write: 'administrator',
   auth_config_read: 'readonly',
   auth_config_write: 'developer',
+  auth_hooks_read: 'readonly',
+  auth_hooks_write: 'developer',
+  auth_users_read: 'readonly',
+  auth_users_write: 'developer',
   auth_signing_keys_read: 'developer',
   auth_signing_keys_write: 'developer',
   backups_read: 'readonly',
@@ -146,6 +152,7 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   infra_disk_config_write: 'administrator',
   infra_read_replicas_read: 'readonly',
   infra_read_replicas_write: 'administrator',
+  project_operations_write: 'developer',
   project_notebooks_read: 'readonly',
   project_notebooks_write: 'developer',
   project_snippets_read: 'readonly',
@@ -165,62 +172,34 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
 }
 
 /**
- * ABAC checks that identify the user's base role from their own permission rows (the ungated
- * /platform/profile/permissions response). Base roles inherit each other's rows
- * (Owner ⊃ Administrator ⊃ Developer ⊃ Read-only), so the first probe that passes, walking
- * top-down, is the user's level. Each probe is a permission only that role and above holds.
+ * The user's base role in an organization, or on a specific project. Read directly
+ * from the v2 permissions response (which reports FGA role tuples).
+ * Project entries are additive on top of the org-level role, so the project-level answer is the max of both.
  */
-const ROLE_PROBES: { role: TokenRoleLevel; action: string; resource: string }[] = [
-  { role: 'owner', action: PermissionAction.UPDATE, resource: 'organizations' },
-  { role: 'administrator', action: PermissionAction.CREATE, resource: 'projects' },
-  { role: 'developer', action: PermissionAction.FUNCTIONS_WRITE, resource: 'functions' },
-  { role: 'readonly', action: PermissionAction.TENANT_SQL_SELECT, resource: 'sql' },
-]
-
-/**
- * Estimates the user's base role in an organization (or on a specific project, when the user's
- * access is project-scoped). Custom roles resolve to the nearest base role by capability, which
- * matches how they behave in the FGA model.
- */
-export const estimateRoleLevel = (
-  permissions: Permission[],
+export const getRoleLevel = (
+  data: PermissionsV2Data,
   organizationSlug: string,
   projectRef?: string
 ): TokenRoleLevel => {
-  for (const probe of ROLE_PROBES) {
-    if (
-      doPermissionsCheck(
-        permissions,
-        probe.action,
-        probe.resource,
-        undefined,
-        organizationSlug,
-        projectRef
-      )
-    ) {
-      return probe.role
-    }
-  }
-  const isMember = permissions.some(
-    (permission) => permission.organization_slug === organizationSlug
-  )
-  return isMember ? 'member' : 'none'
+  const org = data.organizations.find((o) => o.slug === organizationSlug)
+  if (!org) return 'none'
+
+  // project-scoped users hold the org-level 'member' role; null only on malformed data
+  const orgRole: TokenRoleLevel = org.role ?? 'member'
+  if (!projectRef) return orgRole
+
+  const projectRole = org.projects.find((p) => p.ref === projectRef)?.role
+  return projectRole ? maxRole(orgRole, projectRole) : orgRole
 }
 
-/**
- * True when every permission row the user holds in the org is limited to specific projects.
- * Org-wide rows arrive as [] or null (the API contract is nullable) — both mean not scoped.
- */
+/** True when the user's access in the org is only through project scoped roles. */
 export const getIsProjectScopedOnly = (
-  permissions: Permission[],
+  data: PermissionsV2Data,
   organizationSlug: string
 ): boolean => {
-  const orgRows = permissions.filter(
-    (permission) => permission.organization_slug === organizationSlug
-  )
-  if (orgRows.length === 0) return false
-  return orgRows.every(
-    (permission) => Array.isArray(permission.project_refs) && permission.project_refs.length > 0
+  const org = data.organizations.find((o) => o.slug === organizationSlug)
+  return (
+    org !== undefined && (org.role === null || org.role === 'member') && org.projects.length > 0
   )
 }
 
@@ -306,7 +285,7 @@ export interface TokenRoleContextArgs {
   /** Token-bound project refs (project mode). */
   projectRefs: string[]
   /** The user's own ABAC permission rows; undefined while loading. */
-  permissions: Permission[] | undefined
+  permissions: PermissionsV2Data | undefined
   /** Organizations the user can currently access. */
   organizations: { slug: string; name?: string }[]
   /** Projects the user can currently access. */
@@ -413,7 +392,7 @@ export const computeTokenRoleContext = ({
     const cacheKey = `${slug}|${ref ?? ''}`
     const cached = roleCache.get(cacheKey)
     if (cached !== undefined) return cached
-    const role = estimateRoleLevel(permissions, slug, ref)
+    const role = getRoleLevel(permissions, slug, ref)
     roleCache.set(cacheKey, role)
     return role
   }
@@ -436,14 +415,19 @@ export const computeTokenRoleContext = ({
     orgRole: TokenRoleLevel
   ): FailingResource['projectScopedRoles'] => {
     if (rankOf(orgRole) >= ROLE_RANK.readonly) return undefined
-    const candidates =
+    const org = permissions.organizations.find((o) => o.slug === slug)
+    if (!org) return undefined
+
+    const boundRefs =
       resourceAccess === 'project'
-        ? accessibleProjects.filter((project) => project.organization_slug === slug)
-        : projects.filter((project) => project.organization_slug === slug)
-    const roles = candidates.flatMap((project) => {
-      const role = roleFor(slug, project.ref)
-      if (rankOf(role) < ROLE_RANK.readonly) return []
-      return [{ label: project.name ?? project.ref, role }]
+        ? new Set(accessibleProjects.map((project) => project.ref))
+        : undefined
+
+    const roles = org.projects.flatMap((entry) => {
+      if (boundRefs && !boundRefs.has(entry.ref)) return []
+      if (rankOf(entry.role) < ROLE_RANK.readonly) return []
+      const project = projectsByRef.get(entry.ref)
+      return [{ label: project?.name ?? entry.ref, role: entry.role }]
     })
     return roles.length > 0 ? roles : undefined
   }

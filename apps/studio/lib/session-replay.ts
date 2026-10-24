@@ -315,9 +315,6 @@ const RENDER_CRITICAL_ATTRIBUTES = new Set([
   // Integer index, selected on by monaco-editor's quick-input CSS
   // (`[data-index="0"] .quick-in...`) to drop the separator border on the first row.
   'data-index',
-  // 0 to 4, selected on by `Select26Promotion.module.css` as `.cell[data-band='N']`.
-  // The banner ships in Studio through `BannerSelect2026.tsx`.
-  'data-band',
   // Selected on by Studio's own stylesheets and by Radix's portal positioning.
   'data-footnote-ref',
   'data-radix-portal',

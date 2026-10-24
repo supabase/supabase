@@ -1,7 +1,7 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'

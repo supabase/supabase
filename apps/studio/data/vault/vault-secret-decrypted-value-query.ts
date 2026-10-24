@@ -89,7 +89,7 @@ export const getDecryptedValues = async (
 ) => {
   const sql = vaultSecretDecryptedValuesQuery(ids)
   const { result } = await executeSql<{ id: string; decrypted_secret: string }[]>(
-    { projectRef, connectionString, sql },
+    { projectRef, connectionString, sql, queryKey: ['decrypt-secret'] },
     signal
   )
   return result.reduce(

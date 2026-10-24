@@ -99,6 +99,35 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     )
   }
 
+  if (client.key === 'antigravity') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          Install the Supabase plugin with the Antigravity CLI by running the following command in
+          your terminal.
+        </p>
+        <CodeBlock
+          value="agy plugin install https://github.com/supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          To manage installed plugins, use the <code>/plugin</code> slash command. See the{' '}
+          <a
+            href="https://antigravity.google/docs/plugins/#managing-plugins-by-surface"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Antigravity plugin documentation
+          </a>
+          .
+        </p>
+      </div>
+    )
+  }
+
   if (client.key === 'gemini-cli') {
     return (
       <div className="space-y-3">

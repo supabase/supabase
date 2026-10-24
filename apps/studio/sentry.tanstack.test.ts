@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import type { AnyRouter } from '@tanstack/react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 

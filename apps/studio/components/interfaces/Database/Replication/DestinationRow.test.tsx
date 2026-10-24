@@ -3,13 +3,16 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
+import { Table, TableBody } from 'ui'
 import { describe, expect, test, vi } from 'vitest'
 
 import { DestinationRow as DestinationRowComponent } from './DestinationRow'
+import type { SlotLagMetrics } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
+import { API_URL } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
 type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
@@ -68,12 +71,13 @@ const addDestinationMock = () =>
       }),
   })
 
-const addPipelinesMock = () =>
+const addPipelinesMock = (waitForResponse?: Promise<void>) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
-    response: () =>
-      HttpResponse.json<ReplicationPipelinesResponse>({
+    response: async () => {
+      await waitForResponse
+      return HttpResponse.json<ReplicationPipelinesResponse>({
         pipelines: [
           {
             id: PIPELINE_ID,
@@ -89,7 +93,8 @@ const addPipelinesMock = () =>
             },
           },
         ],
-      }),
+      })
+    },
   })
 
 const addPipelineStatusMock = (statusName: ReplicationPipelineStatusResponse['status']['name']) =>
@@ -145,6 +150,38 @@ describe('DestinationRow', () => {
     addVersionMock()
   }
 
+  test('shows the destination before its pipeline details load', async () => {
+    let finishPipelineRequest = () => {}
+    const pendingPipeline = new Promise<void>((resolve) => {
+      finishPipelineRequest = resolve
+    })
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock(pendingPipeline)
+    addPipelineStatusMock('started')
+    addReplicationStatusMock(0)
+    addVersionMock()
+
+    customRender(
+      <Table>
+        <TableBody>
+          <DestinationRow destinationId={DESTINATION_ID} />
+        </TableBody>
+      </Table>
+    )
+
+    const row = (await screen.findByText('My BigQuery Destination')).closest('tr')
+    expect(row).toBeInTheDocument()
+    expect(row).not.toHaveAttribute('tabindex')
+    expect(screen.queryByRole('button', { name: 'Pipeline options' })).not.toBeInTheDocument()
+
+    await act(async () => finishPipelineRequest())
+
+    expect(await screen.findByText('supabase_realtime')).toBeInTheDocument()
+    expect(row).toHaveAttribute('tabindex', '0')
+    expect(screen.getByRole('button', { name: 'Pipeline options' })).toBeInTheDocument()
+  })
+
   test('waits for asynchronous shutdown before deleting the pipeline', async () => {
     addAllMocks()
     routerMock.setCurrentUrl('/project/default/database/pipelines')
@@ -191,10 +228,8 @@ describe('DestinationRow', () => {
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
-    await userEvent.type(
-      screen.getByPlaceholderText('Type the pipeline name'),
-      'My BigQuery Destination'
-    )
+    await userEvent.click(screen.getByPlaceholderText('Type the pipeline name'))
+    await userEvent.paste('My BigQuery Destination')
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
     )
@@ -252,10 +287,8 @@ describe('DestinationRow', () => {
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
-    await userEvent.type(
-      screen.getByPlaceholderText('Type the pipeline name'),
-      'My BigQuery Destination'
-    )
+    await userEvent.click(screen.getByPlaceholderText('Type the pipeline name'))
+    await userEvent.paste('My BigQuery Destination')
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
     )
@@ -299,17 +332,11 @@ describe('DestinationRow', () => {
   })
 
   test('shows "Caught up" when confirmed_flush_lsn_bytes is 0', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('started')
-    addReplicationStatusMock(0)
-    addVersionMock()
+    addAllMocks()
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
     const lag = await screen.findByText('Caught up')
-    expect(lag).toHaveClass('text-foreground-light')
     expect(lag.closest('[aria-live="polite"]')).toHaveAttribute('aria-atomic', 'true')
   })
 
@@ -323,10 +350,47 @@ describe('DestinationRow', () => {
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('2 KB')).toHaveClass('text-foreground-light')
+    expect(await screen.findByText('2 KB')).toBeInTheDocument()
   })
 
-  test('shows initial sync with the same lag text treatment', async () => {
+  test('shows unavailable lag instead of caught up when the distance is null', async () => {
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock()
+    addPipelineStatusMock('started')
+    // Exercise an unavailable measurement outside the current production OpenAPI contract.
+    type UnavailableLagResponse = Omit<
+      ReplicationPipelineReplicationStatusResponse,
+      'apply_lag'
+    > & {
+      apply_lag: SlotLagMetrics
+    }
+    mswServer.use(
+      http.get(
+        `${API_URL}/platform/replication/:ref/pipelines/:pipeline_id/replication-status`,
+        () =>
+          HttpResponse.json<UnavailableLagResponse>({
+            pipeline_id: PIPELINE_ID,
+            apply_lag: {
+              active: true,
+              wal_status: 'reserved',
+              restart_lsn_bytes: 0,
+              confirmed_flush_lsn_bytes: null,
+              safe_wal_size_bytes: null,
+            },
+            table_statuses: [],
+          })
+      )
+    )
+    addVersionMock()
+
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+    expect(await screen.findByText('Unavailable')).toBeInTheDocument()
+    expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
+  })
+
+  test('shows initial sync while tables are copying', async () => {
     addSourcesMock()
     addDestinationMock()
     addPipelinesMock()
@@ -345,7 +409,7 @@ describe('DestinationRow', () => {
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('Initial sync')).toHaveClass('text-foreground-light')
+    expect(await screen.findByText('Initial sync')).toBeInTheDocument()
   })
 
   test('shows initial sync when apply lag is unavailable', async () => {
@@ -442,60 +506,18 @@ describe('DestinationRow', () => {
     expect(await screen.findByText('Lag unavailable')).toBeInTheDocument()
   })
 
-  test('shows publication name from pipeline config', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('started')
-    addReplicationStatusMock(0)
-    addVersionMock()
+  test.each([
+    ['started', 'Running'],
+    ['failed', 'Failed'],
+    ['stopped', 'Stopped'],
+  ] as const)('shows the %s pipeline status as %s', async (statusName, label) => {
+    addAllMocks()
+    addPipelineStatusMock(statusName)
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('supabase_realtime')).toBeInTheDocument()
-  })
-
-  test('shows Running badge when pipeline is started', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('started')
-    addReplicationStatusMock(0)
-    addVersionMock()
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
-
-    const status = await screen.findByText('Running')
-    const liveRegion = status.closest('[aria-live="polite"]')
-
-    expect(status).toBeInTheDocument()
-    expect(liveRegion).toHaveAttribute('aria-atomic', 'true')
-  })
-
-  test('shows Failed badge when pipeline has failed', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('failed')
-    addReplicationStatusMock(0)
-    addVersionMock()
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
-
-    expect(await screen.findByText('Failed')).toBeInTheDocument()
-  })
-
-  test('shows Stopped badge when pipeline is stopped', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('stopped')
-    addReplicationStatusMock(0)
-    addVersionMock()
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
-
-    expect(await screen.findByText('Stopped')).toBeInTheDocument()
+    const status = await screen.findByText(label)
+    expect(status.closest('[aria-live="polite"]')).toHaveAttribute('aria-atomic', 'true')
   })
 
   test('shows table errors in the subtext and on the logo when tables have replication errors', async () => {

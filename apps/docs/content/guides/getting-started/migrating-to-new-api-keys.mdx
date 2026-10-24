@@ -149,7 +149,7 @@ Wrap your existing `Deno.serve` handler with `withSupabase` and declare an `auth
 For a function your users call from the client, use `auth: 'user'`. The SDK validates the user's session JWT and gives you a client scoped to their Row Level Security policies.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
   withSupabase({ auth: 'user' }, async (_req, ctx) => {
@@ -162,7 +162,7 @@ Deno.serve(
 For a function called by your own backend, a worker, or `pg_net`, use `auth: 'secret'`. The SDK validates the secret key and gives you a client that bypasses Row Level Security.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
   withSupabase({ auth: 'secret' }, async (_req, ctx) => {
@@ -177,7 +177,7 @@ To accept a specific named key instead of `default`, add its name after the mode
 `withSupabase` returns a standard request handler, so you can also export it as a `fetch` handler instead of passing it to `Deno.serve`:
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {
@@ -212,7 +212,7 @@ A few behaviors differ from the legacy JWT-based keys. Plan for them during the 
 
 - Send publishable and secret keys on the `apikey` header. For migration compatibility the `verify_jwt` check also accepts them on `Authorization: Bearer ...`, but passing that check doesn't authenticate the caller, and the keys aren't JWTs, so nothing downstream can verify them as one.
 - Edge Functions need to authorize API keys in code. The `verify_jwt` platform check alone doesn't authenticate a caller that sends only an API key, so authorize the key in your handler, as shown in [Step 4](#step-4-update-edge-functions).
-- Public Realtime connections are limited to 24 hours unless the connection is upgraded with user-level authentication through Supabase Auth or a supported third-party auth provider.
+- Public Realtime connections are limited to 24 hours unless the connection is upgraded with user-level authentication through Supabase Auth or a supported [third-party auth provider](/docs/guides/auth/third-party/overview).
 
 ## Next steps
 

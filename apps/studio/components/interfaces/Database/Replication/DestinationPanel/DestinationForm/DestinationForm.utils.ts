@@ -66,14 +66,12 @@ export const generateDefaultValues = ({
   pipelineData,
   catalogToken,
   region,
-  projectRef,
   editMode,
 }: {
   destinationData?: ReplicationDestinationByIdData
   pipelineData?: ReplicationPipelineByIdData
   catalogToken: string
   region?: string
-  projectRef?: string
   editMode: boolean
 }): DestinationPanelSchemaType => {
   const config = destinationData?.config
@@ -131,12 +129,10 @@ export const generateDefaultValues = ({
     s3SecretAccessKey: '',
     s3Region: region ?? icebergConfig?.s3_region ?? '',
     // DuckLake fields
-    // New destinations default to the managed "Use Supabase" mode with the current project
-    // pre-selected as both catalog and storage. Existing destinations always read back as the
-    // resolved/custom shape, so edit mode is locked to "Custom parameters".
+    // New destinations default to the managed mode, which keeps the catalog and storage in the
+    // current project. Existing destinations always read back as the resolved/custom shape, so
+    // edit mode is locked to custom connection details.
     ducklakeMode: (editMode ? DUCKLAKE_MODE_CUSTOM : DUCKLAKE_MODE_SUPABASE) as DucklakeMode,
-    ducklakeCatalogProjectRef: editMode ? '' : (projectRef ?? ''),
-    ducklakeStorageProjectRef: editMode ? '' : (projectRef ?? ''),
     ducklakeStorageBucket: '',
     ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
     ducklakeDataPath: ducklakeConfig?.data_path ?? '',
@@ -175,7 +171,11 @@ export const buildTableSyncCopyConfig = ({
   if (mode === 'include_all_tables' || mode === 'skip_all_tables') return { type: mode }
 
   if (selectedTableIds.length === 0) {
-    throw new Error('Select at least one table for the initial sync.')
+    throw new Error(
+      mode === 'skip_tables'
+        ? 'Select at least one table to exclude from the initial sync.'
+        : 'Select at least one table for the initial sync.'
+    )
   }
 
   const tableIds = selectedTableIds.map(Number)
@@ -322,17 +322,17 @@ const buildClickHouseConfig = (
   engine: data.clickhouseEngine,
 })
 
-// Builds the studio-side DuckLake config from form data, picking the right shape for the
-// selected mode. The create / update / validate mutations convert this to the API payload.
+// Managed mode always uses the current project for both the catalog and storage.
 const buildDucklakeConfig = (
-  data: z.infer<typeof DestinationPanelFormSchema>
+  data: z.infer<typeof DestinationPanelFormSchema>,
+  projectRef: string
 ): DucklakeDestinationConfig => {
   if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
     const supabaseConfig: DucklakeSupabaseDestinationConfig = {
-      catalogProjectRef: normalizeRequiredString(data.ducklakeCatalogProjectRef),
-      storageProjectRef: normalizeRequiredString(data.ducklakeStorageProjectRef),
+      catalogProjectRef: projectRef,
+      storageProjectRef: projectRef,
       bucket: normalizeRequiredString(data.ducklakeStorageBucket),
-      poolSize: data.ducklakePoolSize,
+      poolSize: data.ducklakePoolSize === '' ? undefined : data.ducklakePoolSize,
       metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
     }
     return supabaseConfig
@@ -341,7 +341,7 @@ const buildDucklakeConfig = (
   const manualConfig: DucklakeManualDestinationConfig = {
     catalogUrl: data.ducklakeCatalogUrl ?? '',
     dataPath: data.ducklakeDataPath ?? '',
-    poolSize: data.ducklakePoolSize,
+    poolSize: data.ducklakePoolSize === '' ? undefined : data.ducklakePoolSize,
     s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
     s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
     s3Region: normalizeRequiredString(data.ducklakeS3Region),
@@ -393,7 +393,7 @@ export const buildDestinationConfigForValidation = ({
       },
     }
   } else if (selectedType === 'DuckLake') {
-    return { ducklake: buildDucklakeConfig(data) }
+    return { ducklake: buildDucklakeConfig(data, projectRef) }
   } else if (selectedType === 'Snowflake') {
     return { snowflake: buildSnowflakeConfig(data) }
   } else if (selectedType === 'ClickHouse') {
@@ -454,7 +454,7 @@ export const buildDestinationConfig = async ({
     }
     destinationConfig = { iceberg: icebergConfig }
   } else if (selectedType === 'DuckLake') {
-    destinationConfig = { ducklake: buildDucklakeConfig(data) }
+    destinationConfig = { ducklake: buildDucklakeConfig(data, projectRef) }
   } else if (selectedType === 'Snowflake') {
     destinationConfig = { snowflake: buildSnowflakeConfig(data) }
   } else if (selectedType === 'ClickHouse') {

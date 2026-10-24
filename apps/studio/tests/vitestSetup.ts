@@ -1,7 +1,5 @@
-import '@testing-library/jest-dom/vitest'
 import './lib/disabled-matchers'
 
-import { cleanup } from '@testing-library/react'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
@@ -63,7 +61,6 @@ beforeAll(() => {
 
 afterEach(() => {
   mswServer.resetHandlers()
-  cleanup()
 })
 
 afterAll(() => {

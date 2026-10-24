@@ -156,7 +156,7 @@ Existing projects on lower versions of Postgres are not impacted, and the extens
 
 During the Supabase project upgrade, the `pg_cron` extension gets dropped and recreated. Before this process, the `cron.job_run_details` table is duplicated to avoid losing historical logs. The instantaneous disk pressure created by duplicating an extremely large details table can cause at best unnecessary performance degradation, or at worst, upgrade process failures.
 
-### Upgrading to pg_graphql 1.6.0
+### Upgrading to pg_graphql 1.6.0 [#upgrading-to-pg_graphql-160]
 
 Starting with pg_graphql 1.6.0, GraphQL introspection is disabled by default. After the upgrade, queries to `__schema` and `__type` will return an error unless introspection is explicitly enabled. See the [pg_graphql configuration docs](https://supabase.github.io/pg_graphql/configuration/#introspection) for full details.
 
@@ -170,7 +170,7 @@ This affects tools that rely on introspection:
 
 Regular data queries (e.g. `accountCollection`, `insertIntoAccountCollection`) are not affected.
 
-To re-enable introspection on a schema, run the following SQL in the SQL editor:
+Re-enable introspection on a schema. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 comment on schema public is e'@graphql({"introspection": true})';

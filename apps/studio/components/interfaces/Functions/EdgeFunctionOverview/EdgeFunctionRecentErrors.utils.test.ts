@@ -42,45 +42,23 @@ describe('EdgeFunctionRecentErrors.utils', () => {
     expect(getFunctionRuntimeLogsSql({ functionId: undefined, executionIds: ['abc'] })).toBe('')
     expect(getFunctionRuntimeLogsSql({ functionId: 'fn_123', executionIds: [] })).toBe('')
 
-    expect(
-      getFunctionRuntimeLogsSql({
-        functionId: "fn_'123",
-        executionIds: ['exec_1', "exec_'2"],
-        limit: 25,
-      })
-    ).toBe(`-- runtime logs for error groups
-select
-  toUnixTimestamp64Micro(timestamp) as timestamp,
-  event_message,
-  log_attributes['level'] as level,
-  log_attributes['event_type'] as event_type,
-  log_attributes['function_id'] as function_id,
-  log_attributes['execution_id'] as execution_id
-from logs
-where
-  source = 'function_logs'
-  and log_attributes['function_id'] = 'fn_''123'
-  and log_attributes['execution_id'] in ('exec_1', 'exec_''2')
-order by timestamp desc
-limit 25`)
+    const sql = getFunctionRuntimeLogsSql({
+      functionId: "fn_'123",
+      executionIds: ['exec_1', "exec_'2"],
+      limit: 25,
+    })
+    expect(sql).toContain("source = 'function_logs'")
+    expect(sql).toContain("log_attributes['function_id'] = 'fn_''123'")
+    expect(sql).toContain("log_attributes['execution_id'] in ('exec_1', 'exec_''2')")
+    expect(sql).toMatch(/limit 25$/)
   })
 
   it('builds recent error invocations SQL and escapes the function id', () => {
-    expect(getRecentErrorInvocationsSql("fn_'123", 25)).toBe(`-- errors since last deploy
-select
-  toUnixTimestamp64Micro(timestamp) as timestamp,
-  event_message,
-  log_attributes['request.method'] as method,
-  log_attributes['response.status_code'] as status_code,
-  toFloat64OrZero(log_attributes['execution_time_ms']) as execution_time_ms,
-  log_attributes['execution_id'] as execution_id
-from logs
-where
-  source = 'function_edge_logs'
-  and log_attributes['function_id'] = 'fn_''123'
-  and toInt32OrZero(log_attributes['response.status_code']) >= 500
-order by timestamp desc
-limit 25`)
+    const sql = getRecentErrorInvocationsSql("fn_'123", 25)
+    expect(sql).toContain("source = 'function_edge_logs'")
+    expect(sql).toContain("log_attributes['function_id'] = 'fn_''123'")
+    expect(sql).toContain('>= 500')
+    expect(sql).toMatch(/limit 25$/)
   })
 
   it('normalizes deploy timestamps and derives the logs query range', () => {

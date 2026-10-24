@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AlertCircle, ChevronDown, Globe, Lock } from 'lucide-react'
+import { AlertCircleIcon, ChevronDownIcon, GlobeIcon, LockIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Badge,
@@ -14,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionAside,
@@ -24,7 +24,7 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AddRestrictionModal from './AddRestrictionModal'
+import { AddRestrictionModal } from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
 import DisallowAllModal from './DisallowAllModal'
 import RemoveRestrictionModal from './RemoveRestrictionModal'
@@ -32,14 +32,15 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const HA_DISABLED_TITLE = 'Network restrictions unavailable on High Availability projects'
 const HA_DISABLED_DESCRIPTION =
   "We're working to bring network restrictions to High Availability projects. Contact support if this is blocking your work."
+const AWS_K8S_DISABLED_TITLE = 'Network restrictions are not yet supported on this project'
 
 interface AccessButtonProps {
   disabled: boolean
@@ -84,6 +85,7 @@ export const NetworkRestrictions = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { isHighAvailability } = useHighAvailability()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
   const [isAddingAddress, setIsAddingAddress] = useState<undefined | 'IPv4' | 'IPv6'>()
   const [isAllowingAll, setIsAllowingAll] = useState(false)
   const [isDisallowingAll, setIsDisallowingAll] = useState(false)
@@ -93,20 +95,16 @@ export const NetworkRestrictions = () => {
     { projectRef: ref },
     { enabled: Boolean(project) }
   )
-  const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canUpdateNetworkRestrictions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_RESTRICTIONS_WRITE
   )
 
-  const isSectionDisabled = isHighAvailability || !canUpdateNetworkRestrictions
+  const isSectionDisabled = isHighAvailability || isAwsK8s || !canUpdateNetworkRestrictions
   const sectionDisabledReason = isHighAvailability
     ? HA_DISABLED_TITLE
-    : 'You need additional permissions to update network restrictions'
+    : isAwsK8s
+      ? AWS_K8S_DISABLED_TITLE
+      : 'You need additional permissions to update network restrictions'
 
   const hasAccessToRestrictions = data?.entitlement === 'allowed'
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
@@ -131,7 +129,7 @@ export const NetworkRestrictions = () => {
           </PageSectionSummary>
           <PageSectionAside className="flex items-center gap-x-2">
             <DocsButton href={`${DOCS_URL}/guides/platform/network-restrictions`} />
-            {!canUpdateNetworkRestrictions || isHighAvailability ? (
+            {isSectionDisabled ? (
               <ButtonTooltip
                 disabled
                 variant="primary"
@@ -150,7 +148,7 @@ export const NetworkRestrictions = () => {
                   <Button
                     variant="primary"
                     disabled={isSectionDisabled}
-                    iconRight={<ChevronDown size={14} />}
+                    iconRight={<ChevronDownIcon size={14} />}
                   >
                     Add restriction
                   </Button>
@@ -184,7 +182,13 @@ export const NetworkRestrictions = () => {
               />
             </div>
           )}
+          {!isHighAvailability && isAwsK8s && (
+            <div className="mb-4">
+              <Admonition type="default" title={AWS_K8S_DISABLED_TITLE} />
+            </div>
+          )}
           {!isHighAvailability &&
+            !isAwsK8s &&
             (isLoading ? (
               <Card>
                 <CardContent>
@@ -201,7 +205,7 @@ export const NetworkRestrictions = () => {
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
-                        <AlertCircle
+                        <AlertCircleIcon
                           size={20}
                           strokeWidth={1.5}
                           className="text-foreground-light"
@@ -255,7 +259,7 @@ export const NetworkRestrictions = () => {
                 ) : isDisallowedAll ? (
                   <CardContent className="flex items-center justify-between">
                     <div className="flex items-start space-x-4">
-                      <Lock size={20} className="text-foreground-light" strokeWidth={1.5} />
+                      <LockIcon size={20} className="text-foreground-light" strokeWidth={1.5} />
                       <div className="space-y-1">
                         <p className="text-foreground-light text-sm">
                           Your database <span className="text-amber-900 opacity-80">cannot</span> be
@@ -312,7 +316,7 @@ export const NetworkRestrictions = () => {
                           return (
                             <div key={ip} className="py-4 flex items-center justify-between">
                               <div className="flex items-center space-x-5">
-                                <Globe size={16} className="text-foreground-lighter" />
+                                <GlobeIcon size={16} className="text-foreground-lighter" />
                                 <Badge>{ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}</Badge>
                                 <p className="text-sm font-mono">{ip}</p>
                               </div>

@@ -96,8 +96,7 @@ export const RunQueryWarningModal = ({
       id: 'update-without-where',
       summary: (
         <>
-          This query runs an <code className="text-code-inline">UPDATE</code> without a{' '}
-          <code className="text-code-inline">WHERE</code> clause
+          This query runs an <code>UPDATE</code> without a <code>WHERE</code> clause
         </>
       ),
       description: 'It may update every row in the target table.',
@@ -126,7 +125,7 @@ export const RunQueryWarningModal = ({
       description: (
         <>
           Clients using anon or authenticated keys may be able to access{' '}
-          {tableName ? <code className="text-code-inline">{tableName}</code> : 'these tables'}.
+          {tableName ? <code>{tableName}</code> : 'these tables'}.
         </>
       ),
     })

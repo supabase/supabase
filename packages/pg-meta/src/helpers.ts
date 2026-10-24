@@ -50,3 +50,7 @@ export function getDoBlockDelimiter(values: string[]): SafeSqlFragment {
     suffix += 1
   }
 }
+// Escape LIKE/ILIKE wildcards so user input is matched literally. ILIKE's
+// default escape character is `\`, so we escape `\`, `%`, and `_` and let the
+// pattern carry its own surrounding `%`s as wildcards.
+export const escapeIlikeLiteral = (value: string) => value.replace(/([\\%_])/g, '\\$1')
