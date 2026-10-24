@@ -22,6 +22,7 @@ import {
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsAwsCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getComputeSizeLabel } from '@/lib/compute-labels'
 
 const nodeTypes = {
   PRIMARY: PrimaryNode,
@@ -36,7 +37,7 @@ const edgeTypes = {
 
 const InstanceConfigurationUI = () => {
   const { ref: projectRef } = useParams()
-  const { isPending: isLoadingProject } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
 
   const isAws = useIsAwsCloudProvider()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
@@ -115,9 +116,10 @@ const InstanceConfigurationUI = () => {
             primary,
             replicas,
             loadBalancers: loadBalancers ?? [],
+            computeSize: getComputeSizeLabel(project?.infra_compute_size),
           })
         : [],
-    [isSuccessReplicas, isSuccessLoadBalancers, primary, replicas, loadBalancers]
+    [isSuccessReplicas, isSuccessLoadBalancers, primary, replicas, loadBalancers, project]
   )
 
   const edges: Edge[] = useMemo(
