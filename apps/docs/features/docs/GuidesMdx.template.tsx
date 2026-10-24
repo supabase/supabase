@@ -1,6 +1,6 @@
 import Breadcrumbs from '~/components/Breadcrumbs'
 import GuidesSidebar from '~/components/GuidesSidebar'
-import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
+import { GuideTocMenu, TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
@@ -125,6 +125,7 @@ const GuideTemplate = ({
                 </div>
               )}
             </header>
+            {hideToc ? null : <GuideTocMenu />}
 
             {content && (
               <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />

@@ -117,7 +117,7 @@ drop table if exists old_analytics;
 
 <Admonition type="caution">
 
-`DROP TABLE` acquires an `ACCESS EXCLUSIVE` lock, which blocks **all** other operations on the table, including reads. On a busy table, this can queue up behind long-running queries. See [Monitoring locks](#monitoring-locks) below.
+`DROP TABLE` acquires an `ACCESS EXCLUSIVE` lock, which blocks **all** other operations on the table, including reads. On a busy table, this can queue up behind long-running queries. See [Check for blocked queries](#check-for-blocked-queries) below.
 
 </Admonition>
 
