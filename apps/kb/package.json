@@ -18,7 +18,9 @@
     "sync:troubleshooting-updates": "tsx ./scripts/federated-content/sync-troubleshooting-updates.ts",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "lint": "eslint .",
+    "lint:ratchet": "tsx node_modules/eslint-config-supabase/ratchet-eslint-rules.ts --rules-file node_modules/eslint-config-supabase/ratchet-rules.json"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "7.2.4",
@@ -53,8 +55,11 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@typescript-eslint/parser": "^8.48.0",
+    "astro-eslint-parser": "^1.4.0",
     "config": "workspace:*",
     "dotenv": "^16.5.0",
+    "eslint-config-supabase": "workspace:*",
     "lodash-es": "catalog:",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",
