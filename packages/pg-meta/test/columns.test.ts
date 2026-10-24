@@ -1003,7 +1003,6 @@ withTestDatabase(
   }
 )
 
-
 withTestDatabase(
   'column creation rolls back when a later constraint statement fails',
   async ({ executeQuery }) => {
@@ -1035,31 +1034,34 @@ withTestDatabase(
   }
 )
 
-withTestDatabase('column updates can be composed in a caller transaction', async ({ executeQuery }) => {
-  await executeQuery('CREATE TABLE t (c int4)')
-  const { sql: retrieveSql, zod } = pgMeta.columns.retrieve({
-    schema: 'public',
-    table: 't',
-    name: 'c',
-  })
-  const column = zod.parse((await executeQuery(retrieveSql))[0])!
+withTestDatabase(
+  'column updates can be composed in a caller transaction',
+  async ({ executeQuery }) => {
+    await executeQuery('CREATE TABLE t (c int4)')
+    const { sql: retrieveSql, zod } = pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 't',
+      name: 'c',
+    })
+    const column = zod.parse((await executeQuery(retrieveSql))[0])!
 
-  const { sql: defaultUpdateSql } = pgMeta.columns.update(column, { name: 'c1' })
-  expect(defaultUpdateSql).toContain('BEGIN;')
-  expect(defaultUpdateSql).toContain('COMMIT;')
+    const { sql: defaultUpdateSql } = pgMeta.columns.update(column, { name: 'c1' })
+    expect(defaultUpdateSql).toContain('BEGIN;')
+    expect(defaultUpdateSql).toContain('COMMIT;')
 
-  const { sql: updateSql } = pgMeta.columns.update(column, {
-    name: 'c1',
-    no_transaction: true,
-  })
-  expect(updateSql).not.toContain('BEGIN;')
-  expect(updateSql).not.toContain('COMMIT;')
+    const { sql: updateSql } = pgMeta.columns.update(column, {
+      name: 'c1',
+      no_transaction: true,
+    })
+    expect(updateSql).not.toContain('BEGIN;')
+    expect(updateSql).not.toContain('COMMIT;')
 
-  await executeQuery(`BEGIN; ${updateSql} COMMIT;`)
-  const { sql: updatedColumnSql, zod: updatedColumnZod } = pgMeta.columns.retrieve({
-    schema: 'public',
-    table: 't',
-    name: 'c1',
-  })
-  expect(updatedColumnZod.parse((await executeQuery(updatedColumnSql))[0])).toBeDefined()
-})
+    await executeQuery(`BEGIN; ${updateSql} COMMIT;`)
+    const { sql: updatedColumnSql, zod: updatedColumnZod } = pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 't',
+      name: 'c1',
+    })
+    expect(updatedColumnZod.parse((await executeQuery(updatedColumnSql))[0])).toBeDefined()
+  }
+)
