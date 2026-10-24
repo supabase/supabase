@@ -2,7 +2,7 @@ import { IQueryModifier, QueryModifier } from './QueryModifier'
 import type { ActionConfig, Dictionary, Filter, FilterOperator, QueryTable, Sort } from './types'
 
 export interface IQueryFilter {
-  filter: (column: string, operator: FilterOperator, value: string) => IQueryFilter
+  filter: (column: string | string[], operator: FilterOperator, value: any) => IQueryFilter
   match: (criteria: Dictionary<any>) => IQueryFilter
   order: (table: string, column: string, ascending?: boolean, nullsFirst?: boolean) => IQueryFilter
 }
