@@ -22,11 +22,12 @@ Use `PutObject` to upload smaller files, where retrying the entire upload won't 
 For example, using JavaScript and the `aws-sdk` client:
 
 ```javascript
+import { createReadStream } from 'node:fs'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 
 const s3Client = new S3Client({...})
 
-const file = fs.createReadStream('path/to/file')
+const file = createReadStream('path/to/file')
 
 const uploadCommand = new PutObjectCommand({
   Bucket: 'bucket-name',
@@ -49,21 +50,25 @@ This method is preferable over [Resumable Upload](/docs/guides/storage/uploads/r
 Use the `Upload` class from an S3 client to upload a file in parts. For example, using JavaScript:
 
 ```javascript
+import { createReadStream } from 'node:fs'
 import { S3Client } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 
 const s3Client = new S3Client({...})
 
-const file = fs.createReadStream('path/to/very-large-file')
+const file = createReadStream('path/to/very-large-file')
 
-const upload = new Upload(s3Client, {
-  Bucket: 'bucket-name',
-  Key: 'path/to/file',
-  ContentType: 'image/jpeg',
-  Body: file,
+const upload = new Upload({
+  client: s3Client,
+  params: {
+    Bucket: 'bucket-name',
+    Key: 'path/to/file',
+    ContentType: 'image/jpeg',
+    Body: file,
+  },
 })
 
-await uploader.done()
+await upload.done()
 ```
 
 ### Aborting multipart uploads
