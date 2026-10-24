@@ -2856,8 +2856,8 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
             },
             {
-              name: 'Enterprise-Managed Authentication for MCP',
-              url: '/guides/platform/sso/enterprise-mcp-authentication' as `/${string}`,
+              name: 'Enterprise-Managed Authorization for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authorization' as `/${string}`,
             },
           ],
         },

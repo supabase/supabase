@@ -4255,4 +4255,9 @@ module.exports = [
     source: '/docs/deployment/branching/dashboard',
     destination: '/docs/guides/deployment/branching/dashboard',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/sso/enterprise-mcp-authentication',
+    destination: '/docs/guides/platform/sso/enterprise-mcp-authorization',
+  },
 ]
