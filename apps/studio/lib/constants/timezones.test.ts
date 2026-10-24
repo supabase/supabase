@@ -97,6 +97,23 @@ describe('findTimezoneByIana', () => {
   it('returns undefined for an unknown IANA name', () => {
     expect(findTimezoneByIana('Not/A/Real_Zone')).toBeUndefined()
   })
+
+  // The catalog came from a snapshot that predates several IANA renames. It
+  // already carries both spellings for some of them (America/Nuuk beside
+  // America/Godthab, Asia/Kolkata beside Asia/Calcutta), and these are the
+  // ones that were still listed under the old name only.
+  it.each([
+    ['Europe/Kyiv', 'Europe/Kiev'],
+    ['Pacific/Kanton', 'Pacific/Enderbury'],
+    ['Asia/Yangon', 'Asia/Rangoon'],
+    ['Asia/Ho_Chi_Minh', 'Asia/Saigon'],
+    ['Atlantic/Faroe', 'Atlantic/Faeroe'],
+    ['America/Argentina/Buenos_Aires', 'America/Buenos_Aires'],
+  ])('resolves %s, the current name for %s', (current, legacy) => {
+    const entry = findTimezoneByIana(current)
+    expect(entry).toBeDefined()
+    expect(entry).toBe(findTimezoneByIana(legacy))
+  })
 })
 
 const getTimezone = (zone: string) => {
