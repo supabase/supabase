@@ -32,7 +32,8 @@ export const STRESS_TABLE_COUNT = Number(
  * has a composite FK to t_0, making t_0 a hub with many incoming FKs (the
  * structurally unavoidable pg_constraint seq scan, since there is no index on
  * pg_constraint.confrelid). Using composite FKs exercises ordinal column
- * pairing across the full stress catalog.
+ * pairing across the full stress catalog. Every other table also has RLS
+ * enabled with one policy, so pg_policy scales with the catalog.
  *
  * The catalog is built via a server-side procedure with batched commits every
  * 100 tables -- a single transaction creating thousands of tables/indexes/
@@ -55,6 +56,13 @@ export async function buildStressCatalog(
           case when i > 0 then format(', fk_id int, fk_tenant_id int, foreign key (fk_id, fk_tenant_id) references stress.t_%s(id, tenant_id)', i - 1) else '' end,
           case when i > 0 and i % 10 = 0 then ', hub_id int, hub_tenant_id int, foreign key (hub_id, hub_tenant_id) references stress.t_0(id, tenant_id)' else '' end
         );
+        -- Every other table gets RLS + a policy so pg_policy grows with the
+        -- catalog (as it does in real projects) and planners don't treat it
+        -- as an empty table.
+        if i % 2 = 0 then
+          execute format('alter table stress.t_%s enable row level security', i);
+          execute format('create policy p_%s on stress.t_%s for select using (true)', i, i);
+        end if;
         if i % 100 = 99 then commit; end if;
       end loop;
     end $$;

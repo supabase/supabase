@@ -105,10 +105,14 @@ response: () => HttpResponse.json<MyResponse>({}, { status: 201 })
 The convention `<Button form={FORM_ID} type="submit" />` (button
 outside the form, associated by id) doesn't reliably trigger submission
 under `userEvent.click` in jsdom. Use `fireEvent.click` for the submit
-button. Continue to use `userEvent.type` for inputs.
+button. If that still doesn't submit, call
+`fireEvent.submit(document.getElementById(FORM_ID)!)` directly. Fill inputs
+with `user.paste` rather than `user.type` (see "Keep Tests Fast" in
+`studio-testing`).
 
 ```ts
-await userEvent.type(screen.getByPlaceholderText('value'), 'hello')
+await user.click(screen.getByPlaceholderText('value'))
+await user.paste('hello')
 fireEvent.click(await screen.findByRole('button', { name: 'Save' }))
 ```
 

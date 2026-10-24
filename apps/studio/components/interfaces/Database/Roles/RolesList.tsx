@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { PlusIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -19,7 +18,7 @@ import { SparkBar } from '@/components/ui/SparkBar'
 import { useDatabaseRoleDeleteMutation } from '@/data/database-roles/database-role-delete-mutation'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -34,10 +33,7 @@ export const RolesList = () => {
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canUpdateRoles } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'roles'
-  )
+  const { can: canUpdateRoles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
@@ -248,9 +244,11 @@ export const RolesList = () => {
       </div>
 
       <div className="space-y-4">
-        <div>
+        <section aria-labelledby="supabase-service-roles">
           <div className="bg-surface-100 border border-default px-card py-3 rounded-t flex items-center space-x-4">
-            <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
+            <h2 id="supabase-service-roles" className="text-sm text-foreground-light">
+              Supabase service roles
+            </h2>
             <Badge variant="success">Protected</Badge>
           </div>
 
@@ -264,11 +262,18 @@ export const RolesList = () => {
                   onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
-        </div>
+        </section>
 
-        <div>
+        <section aria-labelledby="project-database-roles">
           <div className="bg-surface-100 border border-default px-card py-3 rounded-t">
-            <p className="text-sm text-foreground-light">Other database roles</p>
+            <div className="space-y-1">
+              <h2 id="project-database-roles" className="text-sm text-foreground-light">
+                Project database roles
+              </h2>
+              <p className="text-xs text-foreground-lighter">
+                Includes the <code>postgres</code> administrator role and custom roles.
+              </p>
+            </div>
           </div>
 
           {isLoading
@@ -281,7 +286,7 @@ export const RolesList = () => {
                   onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
-        </div>
+        </section>
       </div>
 
       {filterString.length > 0 && filteredRoles.length === 0 && (

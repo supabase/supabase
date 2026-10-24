@@ -20,23 +20,11 @@ const object: ArchivedObject = {
 }
 
 describe('getMergedArchivedVersions', () => {
-  it('puts the version that was live at archive time first', () => {
-    const [first] = getMergedArchivedVersions(object)
-    expect(first.versionId).toBe('v-current')
-    expect(first.wasCurrentAtArchive).toBe(true)
-  })
-
-  it('follows it with the retained noncurrent versions, newest first', () => {
-    expect(getMergedArchivedVersions(object).map((v) => v.versionId)).toEqual([
-      'v-current',
-      'v-2',
-      'v-1',
-    ])
-  })
-
-  it('flags only the first row as having been current', () => {
+  it('puts the version that was live at archive time first, then the retained versions newest first', () => {
     const rows = getMergedArchivedVersions(object)
-    expect(rows.filter((v) => v.wasCurrentAtArchive)).toHaveLength(1)
+    expect(rows.map((v) => v.versionId)).toEqual(['v-current', 'v-2', 'v-1'])
+    // Only the first row was current
+    expect(rows.map((v) => v.wasCurrentAtArchive)).toEqual([true, false, false])
   })
 
   it('preserves each version’s own size and action rather than inventing them', () => {

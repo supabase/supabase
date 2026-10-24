@@ -318,8 +318,7 @@ export const Indexes = () => {
         visible={!!selectedIndexToDelete}
         title={
           <>
-            Confirm to delete index{' '}
-            <code className="text-code-inline">{selectedIndexToDelete?.name}</code>
+            Confirm to delete index <code>{selectedIndexToDelete?.name}</code>
           </>
         }
         confirmLabel="Confirm delete"

@@ -58,3 +58,30 @@ content, creates a GitHub Discussion for any guide that doesn't have one yet
 (`sync:troubleshooting-entries`), and pushes title/content updates to discussions whose guide has since
 changed (`sync:troubleshooting-updates`). This is separate from kb's own build — it has real side effects
 (creating/updating Discussions, writing DB rows), so it never runs as part of `pnpm build`/`prebuild`.
+
+## Tests
+
+Unit tests (vitest) live next to the code they cover, including the search API (`api/search/_search.test.ts`;
+the `_` prefix keeps Vercel from deploying it as a function). Run them from `apps/kb`:
+
+```sh
+pnpm test
+```
+
+`.github/workflows/kb-tests.yml` runs them on pull requests that touch `apps/kb`.
+
+Functional smoke tests (Playwright) live in `e2e/kb` and cover the key `/kb` journeys: home → topic → guide,
+troubleshooting articles, the markdown export (`.md` and `Accept: text/markdown`), and the search API
+(production only, since previews don't have search configured). They run against
+production by default. Install the browser once, then run from the repository root:
+
+```sh
+pnpm -C e2e/kb exec playwright install chromium
+pnpm e2e:kb
+
+# Against a preview or local build
+PLAYWRIGHT_BASE_URL=https://<preview-url> pnpm e2e:kb
+```
+
+`.github/workflows/kb-e2e.yml` runs the smoke tests on pull requests against the PR's Vercel kb preview (or
+production, when only `e2e/kb` changed), and daily against production. Run it manually with a `base_url` to test any other deployment.

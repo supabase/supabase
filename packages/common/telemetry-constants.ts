@@ -456,13 +456,6 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     freeTierGeneralRegionExperiment?: 'control' | 'test'
     /**
-     * Org's arm in the projectCreationSpecificRegionsLink experiment at submission time.
-     * Omitted when the org isn't in the eligible population (paid plan, or smart regions
-     * disabled for the selected cloud provider) — the link can never show for them regardless
-     * of the ConfigCat flag.
-     */
-    specificRegionsLinkExperiment?: 'control' | 'test'
-    /**
      * How the submitted region was arrived at. 'auto' = the user never touched the region field
      * and kept the auto-assigned default. 'general' = the user picked a smart region group (e.g.
      * Americas). 'specific' = the user picked an exact region (e.g. us-east-1). Only set when
@@ -559,6 +552,18 @@ export interface FreeTierGeneralRegionExperimentExposedEvent {
  */
 export interface FreeTierGeneralRegionUpgradeClickedEvent {
   action: 'free_tier_general_region_upgrade_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "specific region" docs link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionDocsLinkClickedEvent {
+  action: 'free_tier_general_region_docs_link_clicked'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -1018,6 +1023,7 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
+  | 'troubleshooting'
 
 /**
  * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
@@ -1044,6 +1050,22 @@ export interface CopyAsMarkdownClickedEvent {
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
+}
+
+/**
+ * User clicked the sidebar link to add Supabase as a preferred source on Google.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface PreferredSourceClickedEvent {
+  action: 'preferred_source_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
 }
 
 /**
@@ -4195,6 +4217,7 @@ export type TelemetryEvent =
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
+  | FreeTierGeneralRegionDocsLinkClickedEvent
   | ProjectCreationSpecificRegionLinkClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
@@ -4224,6 +4247,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
+  | PreferredSourceClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent

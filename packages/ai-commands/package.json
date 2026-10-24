@@ -17,7 +17,6 @@
     "ai": "5.0.52",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
-    "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
     "openai": "^4.75.1",
     "zod": "catalog:"

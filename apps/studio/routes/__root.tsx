@@ -180,8 +180,23 @@ const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const MetricsTab = IS_DEV_TOOLBAR_ENABLED
+  ? lazy(() =>
+      import('@/components/ui/DevToolbar/MetricsTab').then((m) => ({ default: m.MetricsTab }))
+    )
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [
+      {
+        id: 'metrics',
+        label: 'Metrics',
+        content: (
+          <Suspense fallback={null}>
+            <MetricsTab />
+          </Suspense>
+        ),
+      },
       {
         id: 'warnings',
         label: 'Warnings',
@@ -276,7 +291,7 @@ function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
       scope.setTag('routerErrorComponent', true)
       const eventId = Sentry.captureException(error)
       if (eventId && error && typeof error === 'object') {
-        ;(error as Error & { sentryId?: string }).sentryId = eventId
+        Object.assign(error, { sentryId: eventId })
       }
     })
     console.error(error instanceof Error ? error.stack : error)

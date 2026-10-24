@@ -348,7 +348,7 @@ With `pg_cron` enabled, declare each job in a SQL file under `supabase/schemas/`
 
 Two checks gate `sync` on a schema tree the CLI didn't generate:
 
-- If your migrations call `pg_net` (for example, database webhooks), add `[experimental.webhooks]` with `enabled = true` to `config.toml` first. The section isn't part of the default `init` template.
+- If your migrations call `pg_net` (for example, [database webhooks](/docs/guides/database/webhooks)), add `[experimental.webhooks]` with `enabled = true` to `config.toml` first. The section isn't part of the default `init` template.
 - Declare the extensions your schema files depend on. The check trips for `pg_net` and for extensions your own migrations create. When it does, interactive `sync` offers to add the missing declaration and re-plan, or to stage a fresh export into a sibling `-next` directory and print the commands to adopt it. A non-interactive run only prints those commands. Extensions the local stack already ships, such as `pgcrypto` and `uuid-ossp`, don't trip the check even when undeclared, so declare them yourself.
 
 ## Declarative schemas on the legacy `migra` engine [#declarative-schemas-on-the-legacy-migra-engine]

@@ -18,10 +18,10 @@ import {
   buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
   getSchemaTableKey,
-  getSelectedTableCount,
   hasSelectionChanged,
   type SchemaTableSelection,
   type SchemaWithTables,
+  type WarehouseSetupTable,
   type WarehouseSetupTarget,
 } from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
@@ -31,7 +31,6 @@ import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
-import type { ResponseError } from '@/types'
 
 export interface WarehouseSchemaTablePickerProps {
   onSubmit: (targets: WarehouseSetupTarget[]) => void
@@ -39,7 +38,8 @@ export interface WarehouseSchemaTablePickerProps {
   /** Set when editing an already-enabled Warehouse rather than setting one up for the first time. */
   isEditing?: boolean
   /** Failure from the submit itself, rendered inline rather than as a toast the user can lose. */
-  error?: ResponseError | null
+  error?: { message: string } | null
+  initialTables?: Pick<WarehouseSetupTable, 'schema' | 'name'>[]
 }
 
 export const WarehouseSchemaTablePicker = ({
@@ -47,6 +47,7 @@ export const WarehouseSchemaTablePicker = ({
   isSubmitting,
   isEditing = false,
   error,
+  initialTables,
 }: WarehouseSchemaTablePickerProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -102,8 +103,11 @@ export const WarehouseSchemaTablePicker = ({
       (sourceId !== undefined && publication === undefined && !isPublicationsError))
 
   const initialSelection = useMemo(
-    () => (isEditing ? buildSelectionFromPublicationTables(publication?.tables ?? []) : {}),
-    [isEditing, publication]
+    () =>
+      buildSelectionFromPublicationTables(
+        isEditing ? (publication?.tables ?? []) : (initialTables ?? [])
+      ),
+    [isEditing, publication, initialTables]
   )
 
   const schemasWithTables: SchemaWithTables[] = useMemo(() => {
@@ -115,8 +119,8 @@ export const WarehouseSchemaTablePicker = ({
     tables.map((table) => getSchemaTableKey(schema, table))
   )
   const selection = selectionOverride ?? initialSelection
-  const selectedCount = getSelectedTableCount(selection)
   const selectedTableKeys = tableKeys.filter((key) => selection[key])
+  const selectedCount = selectedTableKeys.length
   const hasChanges = hasSelectionChanged(selection, initialSelection)
 
   const updateSelection = (updater: (current: SchemaTableSelection) => SchemaTableSelection) => {
@@ -215,6 +219,8 @@ export const WarehouseSchemaTablePicker = ({
             }
             error={error}
             projectRef={projectRef}
+            showInstructions={false}
+            hideContactSupport
           />
         )}
         <Card>
@@ -321,7 +327,7 @@ export const WarehouseSchemaTablePicker = ({
             )}
             <Button
               variant="primary"
-              disabled={selectedCount === 0 || !hasChanges}
+              disabled={selectedCount === 0 || (isEditing && !hasChanges)}
               loading={isSubmitting}
               onClick={handleSubmit}
             >

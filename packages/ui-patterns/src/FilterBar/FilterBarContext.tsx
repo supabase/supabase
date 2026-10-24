@@ -98,6 +98,8 @@ export type FilterBarRootProps = {
   actions?: FilterBarAction[]
   isLoading?: boolean
   supportsOperators?: boolean
+  /** Logical operator for groups created via "New filter group". Defaults to 'AND'. */
+  defaultGroupOperator?: FilterGroup['logicalOperator']
   variant?: FilterBarVariant
   icon?: React.ReactNode
   freeformDefaultProperty?: string
@@ -121,6 +123,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     actions,
     isLoading: externalLoading,
     supportsOperators = false,
+    defaultGroupOperator,
     variant = 'default',
     icon,
     freeformDefaultProperty,
@@ -205,6 +208,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     handleOperatorChange,
     newPathRef,
     setIsCommandMenuVisible,
+    defaultGroupOperator,
   })
 
   const { handleKeyDown } = useKeyboardNavigation({
@@ -411,7 +415,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   return (
     <FilterBarContext.Provider value={contextValue}>
-      <div ref={rootRef} data-filterbar-root className="h-full min-h-[32px] flex items-stretch">
+      <div ref={rootRef} data-filterbar-root className="h-full min-h-[26px] flex items-stretch">
         {children}
       </div>
     </FilterBarContext.Provider>

@@ -125,30 +125,18 @@ describe('BucketVersioningFields', () => {
     await waitForElementToBeRemoved(() => screen.queryByText('Expire a noncurrent version when'))
   })
 
-  test('warns when neither lifecycle condition is set', async () => {
-    renderFields({
-      defaultValues: {
-        enable_versioning: true,
-        version_expiry_days: '',
-        max_noncurrent_versions: '',
-      },
-    })
+  test.each([
+    { isPublicBucket: true, shouldWarn: true },
+    { isPublicBucket: false, shouldWarn: false },
+  ])(
+    'warns that a public bucket serves every version (public: $isPublicBucket)',
+    ({ isPublicBucket, shouldWarn }) => {
+      renderFields({ defaultValues: { enable_versioning: true }, isPublicBucket })
 
-    expect(screen.getByText('No lifecycle policy')).toBeInTheDocument()
-  })
-
-  test('warns that a public bucket serves every version', () => {
-    renderFields({ defaultValues: { enable_versioning: true }, isPublicBucket: true })
-
-    expect(screen.getByText('A public bucket serves every version')).toBeInTheDocument()
-  })
-
-  test('does not warn about public exposure for a private bucket', () => {
-    renderFields({ defaultValues: { enable_versioning: true }, isPublicBucket: false })
-
-    expect(screen.getByText('Lifecycle policy')).toBeInTheDocument()
-    expect(screen.queryByText('A public bucket serves every version')).not.toBeInTheDocument()
-  })
+      expect(screen.getByText('Lifecycle policy')).toBeInTheDocument()
+      expect(screen.queryByText('A public bucket serves every version') !== null).toBe(shouldWarn)
+    }
+  )
 
   test('explains that turning the switch off suspends rather than disables', async () => {
     renderFields({
@@ -197,7 +185,7 @@ describe('BucketVersioningFields', () => {
     expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
   })
 
-  test('shows the policy fields once it has resolved', () => {
+  test('shows the policy fields once it has resolved, warning when neither condition is set', () => {
     renderFields({
       defaultValues: {
         enable_versioning: true,
@@ -240,7 +228,8 @@ describe('BucketVersioningFields', () => {
 
   test('leaves a policy it cannot represent alone instead of offering to edit it', () => {
     renderFields({
-      defaultValues: { enable_versioning: true },
+      // A tighter value than the partly-read initial policy must not trigger the tightening warning
+      defaultValues: { enable_versioning: true, version_expiry_days: 7 },
       initialVersioningState: 'enabled',
       initialRetentionDays: 30,
       initialMaxVersions: 10,
@@ -250,17 +239,6 @@ describe('BucketVersioningFields', () => {
     expect(screen.getByText('Lifecycle policy set outside the dashboard')).toBeInTheDocument()
     expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
     expect(screen.queryByText('No lifecycle policy')).not.toBeInTheDocument()
-  })
-
-  test('does not warn about tightening a policy it only partly read', async () => {
-    renderFields({
-      defaultValues: { enable_versioning: true, version_expiry_days: 7 },
-      initialVersioningState: 'enabled',
-      initialRetentionDays: 30,
-      initialMaxVersions: 10,
-      isUnsupportedPolicy: true,
-    })
-
     expect(screen.queryByText('Tightening retention expires some versions')).not.toBeInTheDocument()
   })
 

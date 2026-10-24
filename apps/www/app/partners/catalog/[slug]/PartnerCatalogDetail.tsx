@@ -166,11 +166,11 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
               {/* Listings tabs */}
               <div className="flex">
                 {allListings.map((listing, i) => (
-                  <button
-                    tabIndex={0}
+                  <Link
                     key={listing.slug}
-                    type="button"
-                    onClick={() => {
+                    href={`?tab=${encodeURIComponent(listing.slug)}`}
+                    onNavigate={(event) => {
+                      event.preventDefault()
                       setActiveSlug(listing.slug)
                       setFocusedImage(null)
                     }}
@@ -182,7 +182,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                     )}
                   >
                     {listing.label}
-                  </button>
+                  </Link>
                 ))}
               </div>
             </SectionContainerWithCn>
