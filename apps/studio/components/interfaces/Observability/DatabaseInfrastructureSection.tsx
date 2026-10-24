@@ -14,6 +14,8 @@ import {
   DatabaseInfrastructureMetric,
   INFRASTRUCTURE_METRIC_ATTRIBUTES,
 } from './DatabaseInfrastructureMetric'
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -119,7 +121,19 @@ export const DatabaseInfrastructureSection = ({
   return (
     <div>
       <h2 className="mb-4">Database</h2>
-      {/* First row: Metrics */}
+      {infraQuery.isError && (
+        <AlertError
+          projectRef={projectRef}
+          subject="Failed to load database metrics"
+          className="mb-4"
+        >
+          <p>
+            Check the{' '}
+            <InlineLink href="https://status.supabase.com/">Supabase status page</InlineLink> for
+            service updates.
+          </p>
+        </AlertError>
+      )}
       <div className="grid grid-cols-3 gap-2">
         <Link
           href={`/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(JSON.stringify({ operator: '>', value: 1000 }))}`}
@@ -137,15 +151,16 @@ export const DatabaseInfrastructureSection = ({
           </MetricCard>
         </Link>
 
-        {(['connections', 'disk', 'diskIo', 'ram', 'cpu'] as const).map((metric) => (
-          <DatabaseInfrastructureMetric
-            key={metric}
-            metric={metric}
-            infraQuery={infraQuery}
-            href={databaseReportUrl}
-            maxConnectionsQuery={maxConnectionsQuery}
-          />
-        ))}
+        {!infraQuery.isError &&
+          (['connections', 'disk', 'diskIo', 'ram', 'cpu'] as const).map((metric) => (
+            <DatabaseInfrastructureMetric
+              key={metric}
+              metric={metric}
+              infraQuery={infraQuery}
+              href={databaseReportUrl}
+              maxConnectionsQuery={maxConnectionsQuery}
+            />
+          ))}
       </div>
     </div>
   )
