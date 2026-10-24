@@ -8,13 +8,15 @@ import { buildTraceIndex } from './utils'
 const TraceContext = createContext<TraceIndex | null>(null)
 const ViewContext = createContext<ViewContextValue | null>(null)
 
-export function Root({ trace, minRangeMs, children }: RootProps) {
+export function Root({ trace, minRangeMs, defaultCollapsed, children }: RootProps) {
   const index = useMemo(
     () => buildTraceIndex(trace.spans, trace.nowMs, minRangeMs),
     [trace.spans, trace.nowMs, minRangeMs]
   )
   const [selectedId, select] = useState<string | null>(null)
-  const [collapsed, setCollapsedIds] = useState<ReadonlySet<string>>(() => new Set())
+  const [collapsed, setCollapsedIds] = useState<ReadonlySet<string>>(
+    () => defaultCollapsed ?? new Set()
+  )
 
   const setCollapsed = useCallback((id: string, isCollapsed: boolean) => {
     setCollapsedIds((previous) => {
