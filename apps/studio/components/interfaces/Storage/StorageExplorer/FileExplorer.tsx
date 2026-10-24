@@ -45,7 +45,6 @@ const compareItems =
 export interface FileExplorerProps {
   columns: StorageColumn[]
   selectedItems: StorageItemWithColumn[]
-  itemSearchString: string
   isLoading?: boolean
   onFilesUpload: (event: any, index: number) => void
   onSelectAllItemsInColumn: (index: number) => void
@@ -56,7 +55,6 @@ export interface FileExplorerProps {
 export const FileExplorer = ({
   columns = [],
   selectedItems = [],
-  itemSearchString,
   isLoading = false,
   onFilesUpload = noop,
   onSelectAllItemsInColumn = noop,
@@ -115,7 +113,6 @@ export const FileExplorer = ({
               index={index}
               column={column}
               selectedItems={selectedItems}
-              itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}
@@ -131,7 +128,6 @@ export const FileExplorer = ({
               index={overlaidColumns.length - 1}
               column={overlaidColumns[overlaidColumns.length - 1]}
               selectedItems={selectedItems}
-              itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}
               onSelectAllItemsInColumn={onSelectAllItemsInColumn}
               onSelectColumnEmptySpace={onSelectColumnEmptySpace}

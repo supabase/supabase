@@ -9,6 +9,7 @@ import {
   type BucketVersioningState,
 } from '../StorageVersioning.constants'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
+import { EMPTY_FOLDER_PLACEHOLDER_FILE_NAME } from '@/data/storage/bucket-util'
 import { BASE_PATH } from '@/lib/constants'
 import type { StorageExplorerState } from '@/state/storage-explorer'
 
@@ -21,7 +22,6 @@ type UploadProgress = {
 }
 
 const CORRUPTED_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
-export const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 
 /**
  * Returns the path to the current folder, optionally prefixed with the bucket name.
@@ -36,6 +36,11 @@ export function getPathAlongOpenedFolders(
       : state.selectedBucket.name
   }
   return state.openedFolders.map((folder) => folder.name).join('/')
+}
+
+export function getParentPathLabel(itemPath: string, bucketName: string): string {
+  const parentSegments = itemPath.split('/').slice(0, -1)
+  return parentSegments.length > 0 ? parentSegments.join('/') : bucketName
 }
 
 /**
