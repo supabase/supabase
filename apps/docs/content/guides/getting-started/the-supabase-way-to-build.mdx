@@ -4,25 +4,19 @@ subtitle: 'Which building block to reach for, and when.'
 description: 'Which Supabase building blocks to add as your app grows, from a single database to a production system.'
 ---
 
-Supabase is more than hosted Postgres. It's a set of composable building blocks you grow into. Start with the database, add a building block only when a real need appears, and keep as much logic as possible in Postgres.
+Supabase is more than hosted Postgres. It's a set of composable building blocks you grow into. Start with a database, add more features as you need them, and keep as much logic as possible in Postgres.
 
-The [Architecture](/docs/guides/getting-started/architecture) page tells you what the pieces are. This page tells you which to reach for, and when. Each stage below names the need that triggers it, the block you add, the mental model to hold, and a common mistake to avoid. Follow the links to build each piece.
+The [Architecture](/docs/guides/getting-started/architecture) page tells you what the pieces are. This page tells you which piece to reach for, how to uses it as a building block, and when. As you read though this page, each section explains what you are adding and why, the mental model to hold, and a common mistake to avoid. Follow the links to build each piece.
 
 ## The progression at a glance
 
-| Your app needs to …          | Reach for                                                    | Keep in mind                                  |
-| ---------------------------- | ------------------------------------------------------------ | --------------------------------------------- |
-| Store data and expose an API | [Postgres + auto API](#start-with-your-database)             | Your schema is your API                       |
-| Know who is calling          | [Auth](#add-users-auth)                                      | An identity the database can read             |
-| Scope data to each user      | [Row Level Security](#add-authorization-in-the-database-rls) | Authorization enforced by Postgres            |
-| Handle files and uploads     | [Storage](#add-files-storage)                                | Files get their own RLS policies              |
-| Run server-side logic        | [Edge Functions](#add-server-side-logic-edge-functions)      | Data logic in Postgres, edge for integrations |
-| Reflect changes live         | [Realtime](#add-live-updates-realtime)                       | Subscribe, don't poll                         |
-| Serve real traffic safely    | [Harden for production](#harden-for-production)              | Verify, pool, observe, back up                |
+Follow the path from the first need you have. Each step names the block to add and the idea to keep in mind, and opens that section.
 
-You don't need all of these things to start. Most apps start at the first row and add each block when a concrete need shows up, not before. Over time, many apps end up using all of them.
+<ContentListings id="supabase-way-progression" />
+You don't need all of these things to start. Most apps start at the first step and add each block
+when a concrete need shows up, not before. Over time, many apps end up using all of them.
 
-## Start with your database
+## Start with a database: Postgres + API
 
 Every Supabase project is a full Postgres database, and Supabase generates a [REST API](/docs/guides/api) from your schema automatically. Design your tables well and you have a working backend with no server code.
 
@@ -30,7 +24,7 @@ Every Supabase project is a full Postgres database, and Supabase generates a [RE
 
 **Enough on its own for:** internal tools, prototypes, and read-heavy apps.
 
-Any table a browser or mobile client can reach still needs [Row Level Security](#add-authorization-in-the-database-rls), even for public data. Reserve unprotected tables for server-side callers. A single-user or trusted-client assumption is not a security boundary.
+Any table a browser or mobile client can reach still needs [Row Level Security](#scope-data-to-each-user-row-level-security), even for public data. Reserve unprotected tables for server-side callers. A single-user or trusted-client assumption is not a security boundary.
 
 Avoid hand-writing a REST server that only forwards create, read, update, and delete calls to the database. That rebuilds what PostgREST already generates for you. Put your effort into the schema instead.
 
@@ -50,7 +44,7 @@ Once email and password sign-in works, add [social login](/docs/guides/auth/soci
 
 <ContentListings id="supabase-way-auth-build" />
 
-## Add authorization in the database: RLS
+## Scope data to each user: Row-Level Security
 
 Once you have users, each user needs to see only their own data. With [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS), you write that rule once, as a policy on the table, and Postgres enforces it on every request made with your publishable (anon) or user keys. The secret (`service_role`) key bypasses RLS, so keep it server-side and enforce authorization there yourself.
 
@@ -66,7 +60,7 @@ App-layer filtering leaks data the moment one query forgets the filter, a new cl
 
 <ContentListings id="supabase-way-rls-build" />
 
-## Add files: Storage
+## Handle files and uploads: Storage
 
 For uploads, images, and documents, [Storage](/docs/guides/storage) gives you S3-compatible object storage that keeps its metadata in Postgres, so you secure files with RLS, the same model you use for your rows.
 
@@ -102,7 +96,7 @@ A secret key in frontend code is exposed to anyone who opens the browser. Keep c
 
 <ContentListings id="supabase-way-functions-build" />
 
-## Add live updates: Realtime
+## Reflect changes live: Realtime
 
 When your UI has to reflect changes as they happen, [Realtime](/docs/guides/realtime) streams database changes, broadcasts messages, and tracks presence over WebSockets.
 
@@ -116,7 +110,7 @@ Authorize Broadcast and Presence with [Realtime Authorization](/docs/guides/real
 
 <ContentListings id="supabase-way-realtime-build" />
 
-## Harden for production
+## Serve real traffic: Harden for production
 
 Before real traffic, confirm the app is secure and ready to scale. Run the [advisors](/docs/guides/observability/advisors), review every RLS policy, pool connections with [Supavisor](/docs/guides/database/connecting-to-postgres), set up observability and [backups](/docs/guides/platform/backups), and check query and index performance.
 

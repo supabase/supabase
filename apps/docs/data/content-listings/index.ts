@@ -44,6 +44,7 @@ import {
   supabaseWayDatabaseBuild,
   supabaseWayFunctionsBuild,
   supabaseWayProductionBuild,
+  supabaseWayProgression,
   supabaseWayRealtimeBuild,
   supabaseWayRlsBuild,
   supabaseWayStorageBuild,
@@ -52,6 +53,7 @@ import {
 const ALL_GROUPS: readonly ContentListingGroup[] = [
   aiToolsSupportedAgents,
   aiToolsBuildingIntoApp,
+  supabaseWayProgression,
   supabaseWayDatabaseBuild,
   supabaseWayAuthBuild,
   supabaseWayRlsBuild,

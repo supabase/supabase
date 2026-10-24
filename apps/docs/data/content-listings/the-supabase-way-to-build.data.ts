@@ -1,5 +1,54 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
+export const supabaseWayProgression: ContentListingGroup = {
+  id: 'supabase-way-progression',
+  type: 'progression',
+  items: [
+    {
+      title: 'Start with a database',
+      subtitle: 'Postgres + API',
+      href: '#start-with-a-database-postgres--api',
+      icon: 'database',
+    },
+    {
+      title: 'Add users',
+      subtitle: 'Auth',
+      href: '#add-users-auth',
+      icon: 'auth',
+    },
+    {
+      title: 'Scope data to each user',
+      subtitle: 'Row-Level Security',
+      href: '#scope-data-to-each-user-row-level-security',
+      icon: 'rls',
+    },
+    {
+      title: 'Handle files and uploads',
+      subtitle: 'Storage',
+      href: '#handle-files-and-uploads-storage',
+      icon: 'storage',
+    },
+    {
+      title: 'Add server-side logic',
+      subtitle: 'Edge Functions',
+      href: '#add-server-side-logic-edge-functions',
+      icon: 'functions',
+    },
+    {
+      title: 'Reflect changes live',
+      subtitle: 'Realtime',
+      href: '#reflect-changes-live-realtime',
+      icon: 'realtime',
+    },
+    {
+      title: 'Serve real traffic',
+      subtitle: 'Harden for production',
+      href: '#serve-real-traffic-harden-for-production',
+      icon: 'production',
+    },
+  ],
+}
+
 export const supabaseWayDatabaseBuild: ContentListingGroup = {
   id: 'supabase-way-database-build',
   heading: 'Build it',
