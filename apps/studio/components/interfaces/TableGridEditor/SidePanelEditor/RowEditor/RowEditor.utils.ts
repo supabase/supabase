@@ -260,10 +260,15 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
       }
     } else if (type !== undefined && JSON_TYPES.includes(type)) {
       // don't update if the value is truncated. This is to enable the user to change cell values on rows which have
-      // truncated JSON values. If the user
+      // truncated JSON values.
       const isTruncated = isValueTruncated(field?.value, field?.format)
-      if (!isTruncated) {
-        payload[property] = rowObject[property]
+      const originalRaw = originalRow?.[property]
+      const originalValue =
+        typeof originalRaw === 'string' ? (tryParseJson(originalRaw) ?? originalRaw) : originalRaw
+      const newValue = rowObject[property]
+
+      if (!isTruncated && !isEqual(originalValue, newValue)) {
+        payload[property] = newValue
       }
     } else {
       const originalValue = originalRow[property]
