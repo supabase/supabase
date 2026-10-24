@@ -40,6 +40,9 @@ services:
       POSTGRES_USER_READ_WRITE: postgres
 
       PG_META_CRYPTO_KEY: ${PG_META_CRYPTO_KEY}
+      # Bearer token required by Studio before /api/mcp will run a tool.
+      # Leave empty to keep the endpoint closed. Generate with: openssl rand -base64 24
+      MCP_ACCESS_TOKEN: ${MCP_ACCESS_TOKEN:-}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
       PGRST_DB_MAX_ROWS: ${PGRST_DB_MAX_ROWS:-1000}
       PGRST_DB_EXTRA_SEARCH_PATH: ${PGRST_DB_EXTRA_SEARCH_PATH:-public}
