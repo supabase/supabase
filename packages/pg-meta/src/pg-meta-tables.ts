@@ -199,6 +199,7 @@ type TableUpdateParams = {
   replica_identity_index?: string
   primary_keys?: Array<{ name: string }>
   comment?: string | null
+  no_transaction?: boolean
 }
 
 function update(
@@ -212,6 +213,7 @@ function update(
     replica_identity_index,
     primary_keys,
     comment,
+    no_transaction = false,
   }: TableUpdateParams
 ): { sql: SafeSqlFragment } {
   const alter = safeSql`ALTER TABLE ${ident(old.schema)}.${ident(old.name)}`
@@ -280,16 +282,15 @@ $$;
       : safeSql`COMMENT ON TABLE ${ident(old.schema)}.${ident(old.name)} IS ${literal(comment)};`
 
   // nameSql must be last, right below schemaSql
-  const sql = safeSql`
-BEGIN;
+  const statements = safeSql`
   ${enableRls}
   ${forceRls}
   ${replicaSql}
   ${primaryKeysSql}
   ${commentSql}
   ${schemaSql}
-  ${nameSql}
-COMMIT;`
+  ${nameSql}`
+  const sql = no_transaction ? statements : safeSql`BEGIN; ${statements} COMMIT;`
 
   return { sql }
 }

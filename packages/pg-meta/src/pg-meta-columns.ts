@@ -236,6 +236,7 @@ function update(
     is_unique,
     comment,
     check,
+    no_transaction = false,
   }: {
     name?: string
     type?: ColumnTypeRef
@@ -248,6 +249,7 @@ function update(
     is_unique?: boolean
     comment?: string | null
     check?: SafeSqlFragment | null
+    no_transaction?: boolean
   }
 ): { sql: SafeSqlFragment } {
   const nameSql: SafeSqlFragment =
@@ -373,8 +375,7 @@ $$;`
   // and another to set default).
   // NOTE: nameSql must be last. defaultValueSql must be after typeSql.
   // identitySql must be after isNullableSql.
-  const sql = safeSql`
-BEGIN;
+  const statements = safeSql`
   ${isNullableSql}
   ${typeSql}
   ${defaultValueSql}
@@ -382,10 +383,13 @@ BEGIN;
   ${isUniqueSql}
   ${commentSql}
   ${checkSql}
-  ${nameSql}
-COMMIT;`
+  ${nameSql}`
 
-  return { sql }
+  if (no_transaction) {
+    return { sql: statements }
+  }
+
+  return { sql: safeSql`BEGIN; ${statements} COMMIT;` }
 }
 
 function remove(
