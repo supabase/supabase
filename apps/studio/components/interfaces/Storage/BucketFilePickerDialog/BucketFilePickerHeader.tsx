@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import {
@@ -33,7 +32,7 @@ import { useBucketFilePickerStateSnapshot } from './BucketFilePickerState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { storageKeys } from '@/data/storage/keys'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
@@ -137,7 +136,9 @@ export const BucketFilePickerHeader = () => {
     setSelectedFilePreview,
   } = useBucketFilePickerStateSnapshot()
 
-  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_WRITE
+  )
 
   const breadcrumbs = columns
   const backDisabled = columns.length < 1

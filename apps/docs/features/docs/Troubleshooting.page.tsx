@@ -1,10 +1,10 @@
-import { Github } from 'lucide-react'
-import Link from 'next/link'
-import { cn } from 'ui'
 import { AiTools } from '~/components/AiTools'
 import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import Link from 'next/link'
+import { cn, GithubIcon } from 'ui'
+
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
@@ -114,7 +114,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                     href={entry.data.github_url}
                     className="flex items-center gap-2 text-sm text-foreground-lighter"
                   >
-                    <Github size={14} />
+                    <GithubIcon size={14} />
                     View discussion on GitHub
                   </Link>
                 </>

@@ -1,34 +1,18 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, test } from 'vitest'
 
 import { convertPoolSize, isAllocationUnit } from './PerformanceSettingsForm.utils'
 
 describe('isAllocationUnit', () => {
-  it('accepts "percent"', () => {
-    expect(isAllocationUnit('percent')).toBe(true)
-  })
-
-  it('accepts "connections"', () => {
-    expect(isAllocationUnit('connections')).toBe(true)
-  })
-
-  it('rejects an empty string', () => {
-    expect(isAllocationUnit('')).toBe(false)
-  })
-
-  it('rejects undefined', () => {
-    expect(isAllocationUnit(undefined)).toBe(false)
-  })
-
-  it('rejects null', () => {
-    expect(isAllocationUnit(null)).toBe(false)
-  })
-
-  it('rejects an unrelated string', () => {
-    expect(isAllocationUnit('bytes')).toBe(false)
-  })
-
-  it('rejects a non-string value', () => {
-    expect(isAllocationUnit(15)).toBe(false)
+  test.each([
+    ['percent', true],
+    ['connections', true],
+    ['', false],
+    [undefined, false],
+    [null, false],
+    ['bytes', false],
+    [15, false],
+  ])('%s -> %s', (value, expected) => {
+    expect(isAllocationUnit(value)).toBe(expected)
   })
 })
 

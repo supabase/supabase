@@ -1,5 +1,4 @@
 import type { PGColumn } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { AlertTriangleIcon, CodeIcon, Loader2Icon, Table2Icon } from 'lucide-react'
@@ -33,9 +32,11 @@ import {
   usePrefetchTables,
   type TablesData,
 } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProfile } from '@/lib/profile'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -101,13 +102,11 @@ function RunSnippetPage() {
 
   const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
-  const { profile } = useProfile()
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
     {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
+      mode: 'create',
+      type: 'sql',
     }
   )
 
@@ -259,19 +258,30 @@ export function useQueryTableCommands(options?: CommandOptions) {
   const setPage = useSetPage()
 
   const commandMenuOpen = useCommandMenuOpen()
-  const commandMenuPreviouslyOpen = useRef(commandMenuOpen)
-  const commandMenuJustOpened = commandMenuOpen && !commandMenuPreviouslyOpen.current
-  commandMenuPreviouslyOpen.current = commandMenuOpen
+  // the ref prefetched for this open. unset until that prefetch runs, so a
+  // menu that mounts already open still prefetches once the project exists.
+  // a new ref prefetches while the menu stays open. cleared on close.
+  const prefetchedProjectRef = useRef<string | undefined>(undefined)
 
   const prefetchTables = usePrefetchTables({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   useEffect(() => {
-    if (project && commandMenuJustOpened) {
-      prefetchTables(undefined, true)
+    if (!commandMenuOpen) {
+      prefetchedProjectRef.current = undefined
+      return
     }
-  }, [project, prefetchTables, commandMenuJustOpened])
+
+    const shouldPrefetch = prefetchedProjectRef.current !== project?.ref && !!project
+
+    if (!shouldPrefetch) {
+      return
+    }
+
+    prefetchedProjectRef.current = project?.ref
+    prefetchTables(undefined, true)
+  }, [commandMenuOpen, project, prefetchTables])
 
   useRegisterPage(
     QUERY_TABLE_PAGE_NAME,

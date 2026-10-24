@@ -13,7 +13,7 @@ imgThumb: 'select-rewind-2026-declarative-schemas-2-blog/thumb.png'
 toc_depth: 2
 ---
 
-On October 2 at Supabase Select we shipped Declarative Schemas 2.0. The Supabase CLI now generates migrations with `pg-delta`, a Postgres diff tool we wrote and open sourced, in place of `migra`, the technology behind our original implementation. Generated migrations now include RLS policy changes, grants, view settings, partitions, domains, and objects that extensions manage.
+On October 2 at Supabase Select we shipped Declarative Schemas 2.0. The [Supabase CLI](/docs/guides/local-development/cli/getting-started) now generates migrations with `pg-delta`, a Postgres diff tool we wrote and open sourced, in place of `migra`, the technology behind our original implementation. Generated migrations now include RLS policy changes, grants, view settings, partitions, domains, and objects that extensions manage.
 
 Declarative schemas [first launched in April 2025](https://supabase.com/blog/declarative-schemas). You keep your schema in SQL files under `supabase/schemas/`, edit them, and the CLI writes the migration. In 2.0 that workflow is the same: edit a file, generate the migration, review it, and apply it. New CLI projects get 2.0 by default. Existing projects opt in with one config block.
 

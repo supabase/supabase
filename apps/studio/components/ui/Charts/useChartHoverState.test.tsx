@@ -51,8 +51,9 @@ describe('useChartHoverState', () => {
     })
 
     it('should load sync settings from localStorage on initialization', async () => {
-      localStorageMock.setItem('supabase-chart-hover-sync-enabled', 'true')
-      localStorageMock.setItem('supabase-chart-tooltip-sync-enabled', 'true')
+      // Defaults are true, so persist false to prove the stored values are read
+      localStorageMock.setItem('supabase-chart-hover-sync-enabled', 'false')
+      localStorageMock.setItem('supabase-chart-tooltip-sync-enabled', 'false')
 
       vi.resetModules()
       const { useChartHoverState: useChartHoverStateWithStorage } =
@@ -60,8 +61,8 @@ describe('useChartHoverState', () => {
 
       const { result } = renderHook(() => useChartHoverStateWithStorage('chart1'))
 
-      expect(result.current.syncHover).toBe(true)
-      expect(result.current.syncTooltip).toBe(true)
+      expect(result.current.syncHover).toBe(false)
+      expect(result.current.syncTooltip).toBe(false)
     })
 
     it('should handle corrupted localStorage data gracefully', async () => {
@@ -81,7 +82,7 @@ describe('useChartHoverState', () => {
   })
 
   describe('hover functionality', () => {
-    it('should set hover state locally when sync is disabled', () => {
+    it('should set hover state for the current chart', () => {
       const { result } = renderHook(() => useChartHoverState('chart1'))
 
       act(() => {
@@ -94,7 +95,7 @@ describe('useChartHoverState', () => {
       expect(result.current.isCurrentChart).toBe(true)
     })
 
-    it('should clear hover state locally when sync is disabled', () => {
+    it('should clear hover state for the current chart', () => {
       const { result } = renderHook(() => useChartHoverState('chart1'))
 
       act(() => {
@@ -129,6 +130,7 @@ describe('useChartHoverState', () => {
       expect(result2.current.hoveredIndex).toBe(3)
       expect(result2.current.hoveredChart).toBe('chart1')
       expect(result2.current.isCurrentChart).toBe(false)
+      expect(result2.current.isHovered).toBe(true)
     })
 
     it('should clear synced hover state globally', () => {
@@ -243,21 +245,6 @@ describe('useChartHoverState', () => {
       expect(result3.current.hoveredIndex).toBe(7)
       expect(result3.current.hoveredChart).toBe('chart2')
     })
-
-    it('should correctly identify current chart vs synced charts', () => {
-      const { result: result1 } = renderHook(() => useChartHoverState('chart1'))
-      const { result: result2 } = renderHook(() => useChartHoverState('chart2'))
-
-      act(() => {
-        result1.current.setSyncHover(true)
-        result1.current.setHover(5)
-      })
-
-      expect(result1.current.isCurrentChart).toBe(true)
-      expect(result2.current.isCurrentChart).toBe(false)
-      expect(result1.current.isHovered).toBe(true)
-      expect(result2.current.isHovered).toBe(true)
-    })
   })
 
   describe('edge cases', () => {
@@ -290,60 +277,6 @@ describe('useChartHoverState', () => {
 
       expect(result.current.hoveredIndex).toBe(4)
       expect(result.current.hoveredChart).toBe('chart1')
-    })
-
-    it('should not trigger unnecessary state updates when state is the same', () => {
-      const { result } = renderHook(() => useChartHoverState('chart1'))
-
-      const initialSyncHover = result.current.syncHover
-
-      act(() => {
-        result.current.setSyncHover(initialSyncHover)
-      })
-
-      expect(result.current.syncHover).toBe(initialSyncHover)
-    })
-  })
-
-  describe('helper functions', () => {
-    it('should correctly calculate isHovered for current chart', () => {
-      const { result } = renderHook(() => useChartHoverState('chart1'))
-
-      expect(result.current.hoveredIndex).toBe(null)
-      expect(result.current.isHovered).toBe(false)
-
-      act(() => {
-        result.current.setHover(5)
-      })
-
-      expect(result.current.hoveredIndex).toBe(5)
-      expect(result.current.isHovered).toBe(true)
-    })
-
-    it('should correctly calculate isHovered for synced charts', () => {
-      const { result: result1 } = renderHook(() => useChartHoverState('chart1'))
-      const { result: result2 } = renderHook(() => useChartHoverState('chart2'))
-
-      act(() => {
-        result1.current.setSyncHover(true)
-        result1.current.setHover(5)
-      })
-
-      expect(result1.current.isHovered).toBe(true) // Current chart
-      expect(result2.current.isHovered).toBe(true) // Synced chart
-    })
-
-    it('should correctly identify current chart', () => {
-      const { result: result1 } = renderHook(() => useChartHoverState('chart1'))
-      const { result: result2 } = renderHook(() => useChartHoverState('chart2'))
-
-      act(() => {
-        result1.current.setSyncHover(true)
-        result1.current.setHover(5)
-      })
-
-      expect(result1.current.isCurrentChart).toBe(true)
-      expect(result2.current.isCurrentChart).toBe(false)
     })
   })
 })

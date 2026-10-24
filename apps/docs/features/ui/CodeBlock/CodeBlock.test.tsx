@@ -3,13 +3,14 @@ import { type ComponentProps, type PropsWithChildren } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { highlightCode } from 'ui-patterns/CodeBlock/CodeBlock.highlight'
+import { type CodeToken } from 'ui-patterns/CodeBlock/CodeBlockFrame'
+
 import { CodeBlock } from './CodeBlock'
-import { type CodeToken } from './CodeBlock.client'
-import { highlightCode } from './CodeBlock.highlight'
 
 const { twoslasher } = vi.hoisted(() => ({ twoslasher: vi.fn() }))
 
-vi.mock('./CodeBlock.highlight', () => ({ highlightCode: vi.fn() }))
+vi.mock('ui-patterns/CodeBlock/CodeBlock.highlight', () => ({ highlightCode: vi.fn() }))
 vi.mock('twoslash', () => ({ createTwoslasher: () => twoslasher }))
 vi.mock('./types/lib.deno.d.ts.include', () => ({ default: '' }))
 
@@ -26,9 +27,14 @@ vi.mock('ui', async () => {
     copyToClipboard: vi.fn(),
   }
 })
+vi.mock('ui/src/components/shadcn/ui/tooltip', () => ({
+  Tooltip: ({ children }: PropsWithChildren) => children,
+  TooltipTrigger: ({ children }: PropsWithChildren) => children,
+  TooltipContent: () => null,
+}))
 
 function getLines(block: Awaited<ReturnType<typeof CodeBlock>>): Array<Array<CodeToken>> {
-  return block.props.children[0].props.children.props.lines
+  return block.props.children.props.lines
 }
 
 describe('code block serialization and rendering', () => {

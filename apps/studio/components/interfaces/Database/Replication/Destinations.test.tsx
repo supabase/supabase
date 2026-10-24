@@ -13,11 +13,39 @@ import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
 const options = vi.hoisted(() => ({
+  wizard: false,
+  previewLoading: false,
+  flagsLoaded: true,
+  tanStack: false,
+  navigate: vi.fn(),
+  push: vi.fn(),
   legacy: false,
   hasAccess: true,
   isLoading: false,
   failEnable: false,
   failRefresh: false,
+}))
+vi.mock('@/lib/constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/constants')>()),
+  IS_PLATFORM: true,
+}))
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useParams: () => ({ ref: 'default' }),
+  useFeatureFlags: () => ({ hasLoaded: options.flagsLoaded }),
+}))
+vi.mock('@tanstack/react-router', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tanstack/react-router')>()),
+  useRouter: () => (options.tanStack ? { navigate: options.navigate } : undefined),
+}))
+vi.mock('next/compat/router', () => ({
+  useRouter: () => ({ push: options.push, events: { on: vi.fn(), off: vi.fn() } }),
+}))
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  usePipelineCreationPreview: () => ({
+    isEnabled: options.wizard,
+    isLoading: options.previewLoading,
+  }),
 }))
 vi.mock('./useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => !options.legacy,
@@ -38,6 +66,12 @@ vi.mock('./DestinationPanel/DestinationPanel', () => ({
 let isEnabled = false
 let enableGate: Promise<void> | undefined
 beforeEach(() => {
+  options.wizard = false
+  options.previewLoading = false
+  options.flagsLoaded = true
+  options.tanStack = false
+  options.navigate.mockClear()
+  options.push.mockClear()
   isEnabled = false
   enableGate = undefined
   options.legacy = false
@@ -235,4 +269,74 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
   )
   addPipeline()
   expect(await screen.findByRole('dialog')).toHaveTextContent('Enable Pipelines')
+})
+
+test('renders both wizard entry controls as links', async () => {
+  options.wizard = true
+  isEnabled = true
+  await renderList()
+  const links = screen.getAllByRole('link', { name: 'Add pipeline' })
+  expect(links).toHaveLength(2)
+  links.forEach((link) =>
+    expect(link).toHaveAttribute('href', '/project/default/database/pipelines/new')
+  )
+  fireEvent.click(links[0], { ctrlKey: true })
+  expect(options.push).not.toHaveBeenCalled()
+  expect(options.navigate).not.toHaveBeenCalled()
+})
+test.each([false, true])('opens the wizard with the shortcut (TanStack: %s)', async (tanStack) => {
+  options.wizard = true
+  options.tanStack = tanStack
+  isEnabled = true
+  await renderList()
+  fireEvent.keyDown(document, { key: 'N', shiftKey: true })
+  if (tanStack)
+    expect(options.navigate).toHaveBeenCalledWith({
+      to: '/project/$ref/database/pipelines/new',
+      params: { ref: 'default' },
+    })
+  else expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
+})
+test('enables Pipelines before opening the wizard', async () => {
+  options.wizard = true
+  await renderList()
+  addPipeline()
+  expect(options.push).not.toHaveBeenCalled()
+  fireEvent.click(await screen.findByRole('button', { name: 'Enable' }))
+  await waitFor(() =>
+    expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
+  )
+})
+test.each(['previewLoading', 'flagsLoaded'] as const)(
+  'waits for %s before choosing a creation flow',
+  async (gate) => {
+    options.previewLoading = gate === 'previewLoading'
+    options.flagsLoaded = gate !== 'flagsLoaded'
+    isEnabled = true
+    const view = await renderList()
+    expect(screen.getAllByRole('button', { name: 'Add pipeline' })[0]).toBeDisabled()
+    addPipeline()
+    fireEvent.keyDown(document, { key: 'N', shiftKey: true })
+    expect(options.push).not.toHaveBeenCalled()
+    expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
+    options.previewLoading = false
+    options.flagsLoaded = true
+    options.wizard = true
+    view.rerender(<Destinations />)
+    fireEvent.keyDown(document, { key: 'N', shiftKey: true })
+    expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
+  }
+)
+
+test('keeps request-access creation in the sheet when no wizard destination is available', async () => {
+  options.wizard = true
+  options.legacy = true
+  isEnabled = true
+  await renderList()
+  addPipeline()
+  expect(
+    await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
+  ).toBeInTheDocument()
+  expect(options.push).not.toHaveBeenCalled()
+  expect(options.navigate).not.toHaveBeenCalled()
 })

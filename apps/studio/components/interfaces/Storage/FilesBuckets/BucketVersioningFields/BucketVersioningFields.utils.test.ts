@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  getRetentionTightening,
-  RETENTION_TIGHTENING_DESCRIPTION,
-  toNullableNumber,
-} from './BucketVersioningFields.utils'
+import { getRetentionTightening, toNullableNumber } from './BucketVersioningFields.utils'
 
 const params = (overrides: Partial<Parameters<typeof getRetentionTightening>[0]> = {}) => ({
   initialVersioningState: 'enabled' as const,
@@ -17,113 +13,88 @@ const params = (overrides: Partial<Parameters<typeof getRetentionTightening>[0]>
 })
 
 describe('getRetentionTightening', () => {
-  it('reports no tightening when nothing changed', () => {
-    expect(getRetentionTightening(params())).toBe('none')
-  })
-
-  it('detects a shorter retention window', () => {
-    expect(getRetentionTightening(params({ nextRetentionDays: 7 }))).toBe('days')
-  })
-
-  it('detects a lower version cap', () => {
-    expect(getRetentionTightening(params({ nextMaxVersions: 3 }))).toBe('versions')
-  })
-
-  it('detects both bounds tightening at once', () => {
-    expect(getRetentionTightening(params({ nextRetentionDays: 7, nextMaxVersions: 3 }))).toBe(
-      'both'
-    )
-  })
-
-  it('does not warn when a bound is raised', () => {
-    expect(getRetentionTightening(params({ nextRetentionDays: 90, nextMaxVersions: 20 }))).toBe(
-      'none'
-    )
-  })
-
-  it('does not warn when a bound is cleared, which retains more rather than less', () => {
-    expect(getRetentionTightening(params({ nextRetentionDays: null, nextMaxVersions: null }))).toBe(
-      'none'
-    )
-  })
-
-  it('warns when a bound is newly added where none existed, which was keeping them forever', () => {
-    expect(
-      getRetentionTightening(params({ initialRetentionDays: null, nextRetentionDays: 7 }))
-    ).toBe('days')
-  })
-
-  it('warns when a cap is newly added where none existed', () => {
-    expect(getRetentionTightening(params({ initialMaxVersions: null, nextMaxVersions: 3 }))).toBe(
-      'versions'
-    )
-  })
-
-  it('does not warn when both bounds stay unbounded', () => {
-    expect(
-      getRetentionTightening(
-        params({
-          initialRetentionDays: null,
-          initialMaxVersions: null,
-          nextRetentionDays: null,
-          nextMaxVersions: null,
-        })
-      )
-    ).toBe('none')
-  })
-
-  it('does not warn while the initial bounds are still loading', () => {
-    expect(
-      getRetentionTightening(
-        params({ initialRetentionDays: undefined, initialMaxVersions: undefined })
-      )
-    ).toBe('none')
-  })
-
-  it('does not warn when versioning is being turned off', () => {
-    // Suspending never expires what is already retained, so there is nothing to lose.
-    expect(
-      getRetentionTightening(params({ isVersioningEnabled: false, nextRetentionDays: 7 }))
-    ).toBe('none')
-  })
-
-  it('does not warn when versioning is being enabled for the first time', () => {
-    expect(
-      getRetentionTightening(
-        params({
-          initialVersioningState: 'disabled',
-          initialRetentionDays: null,
-          initialMaxVersions: null,
-          nextRetentionDays: 7,
-        })
-      )
-    ).toBe('none')
-  })
-
-  it('does not warn when re-enabling a suspended bucket', () => {
-    // A suspended bucket's stored bounds are cleared, so there is nothing to tighten from.
-    expect(
-      getRetentionTightening(params({ initialVersioningState: 'suspended', nextRetentionDays: 7 }))
-    ).toBe('none')
-  })
-
-  it('has a description for every tightening kind it can report', () => {
-    for (const kind of ['days', 'versions', 'both'] as const) {
-      expect(RETENTION_TIGHTENING_DESCRIPTION[kind], kind).toBeTruthy()
-    }
+  it.each([
+    { scenario: 'nothing changed', overrides: {}, expected: 'none' },
+    {
+      scenario: 'a shorter retention window',
+      overrides: { nextRetentionDays: 7 },
+      expected: 'days',
+    },
+    { scenario: 'a lower version cap', overrides: { nextMaxVersions: 3 }, expected: 'versions' },
+    {
+      scenario: 'both bounds tightening at once',
+      overrides: { nextRetentionDays: 7, nextMaxVersions: 3 },
+      expected: 'both',
+    },
+    {
+      scenario: 'a bound is raised',
+      overrides: { nextRetentionDays: 90, nextMaxVersions: 20 },
+      expected: 'none',
+    },
+    {
+      scenario: 'a bound is cleared, which retains more rather than less',
+      overrides: { nextRetentionDays: null, nextMaxVersions: null },
+      expected: 'none',
+    },
+    {
+      scenario: 'a bound is newly added where none existed, which was keeping them forever',
+      overrides: { initialRetentionDays: null, nextRetentionDays: 7 },
+      expected: 'days',
+    },
+    {
+      scenario: 'a cap is newly added where none existed',
+      overrides: { initialMaxVersions: null, nextMaxVersions: 3 },
+      expected: 'versions',
+    },
+    {
+      scenario: 'both bounds stay unbounded',
+      overrides: {
+        initialRetentionDays: null,
+        initialMaxVersions: null,
+        nextRetentionDays: null,
+        nextMaxVersions: null,
+      },
+      expected: 'none',
+    },
+    {
+      scenario: 'the initial bounds are still loading',
+      overrides: { initialRetentionDays: undefined, initialMaxVersions: undefined },
+      expected: 'none',
+    },
+    {
+      // Suspending never expires what is already retained, so there is nothing to lose.
+      scenario: 'versioning is being turned off',
+      overrides: { isVersioningEnabled: false, nextRetentionDays: 7 },
+      expected: 'none',
+    },
+    {
+      scenario: 'versioning is being enabled for the first time',
+      overrides: {
+        initialVersioningState: 'disabled' as const,
+        initialRetentionDays: null,
+        initialMaxVersions: null,
+        nextRetentionDays: 7,
+      },
+      expected: 'none',
+    },
+    {
+      // A suspended bucket's stored bounds are cleared, so there is nothing to tighten from.
+      scenario: 're-enabling a suspended bucket',
+      overrides: { initialVersioningState: 'suspended' as const, nextRetentionDays: 7 },
+      expected: 'none',
+    },
+  ])('reports $expected when $scenario', ({ overrides, expected }) => {
+    expect(getRetentionTightening(params(overrides))).toBe(expected)
   })
 })
 
 describe('toNullableNumber', () => {
-  it('maps the empty sentinel to null', () => {
-    expect(toNullableNumber('')).toBeNull()
-  })
-
-  it('preserves zero rather than treating it as empty', () => {
-    expect(toNullableNumber(0)).toBe(0)
-  })
-
-  it('passes numbers through', () => {
-    expect(toNullableNumber(30)).toBe(30)
+  it.each([
+    { input: '' as const, expected: null },
+    // Zero is a real value, not empty
+    { input: 0, expected: 0 },
+    { input: 30, expected: 30 },
+  ])('maps $input to $expected', ({ input, expected }) => {
+    expect(toNullableNumber(input)).toBe(expected)
   })
 })

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { isEqual } from 'lodash'
 import { AlertCircleIcon, CornerDownLeftIcon, Loader2Icon } from 'lucide-react'
@@ -7,7 +6,10 @@ import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
 import { DeployEdgeFunctionWarningModal } from '@/components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
-import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import {
+  formatFunctionBodyToFiles,
+  getDefaultSelectedFileId,
+} from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -18,7 +20,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
@@ -33,7 +35,9 @@ const CodePage = () => {
   const track = useTrack()
   const [showDeployWarning, setShowDeployWarning] = useState(false)
 
-  const { can: canDeployFunction } = useAsyncCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const { can: canDeployFunction } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_WRITE
+  )
 
   const { data: selectedFunction } = useEdgeFunctionQuery({
     projectRef: ref,
@@ -73,6 +77,12 @@ const CodePage = () => {
         })
       : []
   }, [functionBody, selectedFunction?.entrypoint_path])
+
+  const [selectedFileId, setSelectedFileId] = useState<number>()
+  const defaultSelectedFileId = getDefaultSelectedFileId(
+    initialFiles,
+    functionBody?.metadata?.deno2_entrypoint_path ?? selectedFunction?.entrypoint_path
+  )
 
   const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
@@ -169,10 +179,7 @@ const CodePage = () => {
               <ol className="text-left space-y-1">
                 <li>1. Update to the latest Supabase CLI version</li>
                 <li>
-                  2. Redeploy your function using:{' '}
-                  <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                    supabase functions deploy
-                  </code>
+                  2. Redeploy your function using: <code>supabase functions deploy</code>
                 </li>
                 <li>
                   3. Or use the{' '}
@@ -190,6 +197,8 @@ const CodePage = () => {
         <>
           <FileExplorerAndEditor
             files={files}
+            selectedFileId={selectedFileId ?? defaultSelectedFileId}
+            setSelectedFileId={setSelectedFileId}
             onFilesChange={(files) => {
               const formattedFiles: FileData[] = files.map((f) => {
                 const originalFile = initialFiles.find((x) => x.id === f.id)

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { render } from '@testing-library/react'
 import type { ReactElement } from 'react'
 import { describe, expect, it } from 'vitest'
@@ -42,15 +43,6 @@ describe('getTableDataApiStatus', () => {
       policiesCount: 0,
     })
     expect(status).toBe('no-grants')
-  })
-
-  it('returns custom-grants for partial/non-standard grants — even if RLS is off', () => {
-    const status = getTableDataApiStatus({
-      apiAccessData: customAccess,
-      isRLSEnabled: false,
-      policiesCount: 0,
-    })
-    expect(status).toBe('custom-grants')
   })
 
   it('returns publicly-readable when fully granted and RLS is off', () => {

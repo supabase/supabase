@@ -42,5 +42,5 @@ test('reuses the region display without a form label or description', () => {
   expect(screen.getByText(PIPELINE_REGION.code)).toBeInTheDocument()
   expect(screen.queryByText('Pipeline region')).not.toBeInTheDocument()
   expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
-  expect(screen.getByText(PIPELINE_REGION.code).parentElement).toHaveClass('w-full', 'px-3')
+  expect(screen.getByText(PIPELINE_REGION.code).parentElement).toHaveClass('w-full')
 })

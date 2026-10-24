@@ -247,7 +247,15 @@ async function renderMarkdownSection(mdxDir: string, section: Section): Promise<
     return null
   }
   const { content, data } = matter(raw)
-  const body = stripMdxJsx(content)
+  const links: Array<{ title: string; href: string }> = Array.isArray(data.links) ? data.links : []
+  const body = [
+    stripMdxJsx(content),
+    links.length
+      ? `## Additional links\n\n${links.map((l) => `- [${l.title}](${l.href})`).join('\n')}`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('\n\n')
   if (!body) return null
   const heading = data.hideTitle
     ? null

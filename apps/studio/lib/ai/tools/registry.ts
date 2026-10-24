@@ -3,9 +3,34 @@ import type { InferUITools, Tool, ToolUIPart, UIDataTypes, UIMessage } from 'ai'
 import type { ToolName } from '../tool-filter'
 import { contract as createNotebook } from './create-notebook'
 import { contract as deleteNotebook } from './delete-notebook'
+import { contract as deployEdgeFunction } from './deploy-edge-function'
+import { contract as escalateToHuman } from './escalate-to-human'
+import { contract as executeSql } from './execute-sql'
+import { contract as getActiveIncidents } from './get-active-incidents'
+import { contract as getAdvisors } from './get-advisors'
+import { contract as getNotebook } from './get-notebook'
+import { contract as getReport } from './get-report'
+import { contract as listBranches } from './list-branches'
+import { contract as listDatabases } from './list-databases'
+import { contract as listEdgeFunctions } from './list-edge-functions'
+import { contract as listExtensions } from './list-extensions'
+import { contract as listNotebooks } from './list-notebooks'
+import { contract as listPolicies } from './list-policies'
+import { contract as listReports } from './list-reports'
+import { contract as listTables } from './list-tables'
+import { contract as loadKnowledge } from './load-knowledge'
+import { contract as queryLogs } from './query-logs'
+import { contract as renameChat } from './rename-chat'
+import { contract as resolveSupportConversation } from './resolve-support-conversation'
 import { contract as runNotebook } from './run-notebook'
-import type { ToolContract, ToolContractInput, ToolContractOutput } from './types'
+import type {
+  RemoteToolContract,
+  ToolContract,
+  ToolContractInput,
+  ToolContractOutput,
+} from './types'
 import { contract as updateNotebook } from './update-notebook'
+import { contract as updateOptInLevel } from './update-opt-in-level'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 /**
@@ -15,8 +40,22 @@ import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 export const TOOL_CONTRACTS = {
   create_notebook: createNotebook,
   delete_notebook: deleteNotebook,
+  deploy_edge_function: deployEdgeFunction,
+  escalate_to_human: escalateToHuman,
+  execute_sql: executeSql,
+  get_active_incidents: getActiveIncidents,
+  get_notebook: getNotebook,
+  get_report: getReport,
+  list_databases: listDatabases,
+  list_notebooks: listNotebooks,
+  list_policies: listPolicies,
+  list_reports: listReports,
+  load_knowledge: loadKnowledge,
+  rename_chat: renameChat,
+  resolve_support_conversation: resolveSupportConversation,
   run_notebook: runNotebook,
   update_notebook: updateNotebook,
+  update_opt_in_level: updateOptInLevel,
 } as const satisfies Partial<Record<ToolName, ToolContract>>
 
 export type ContractToolName = keyof typeof TOOL_CONTRACTS
@@ -42,6 +81,27 @@ export function getToolContract(toolName: string): ToolContract | undefined {
   return Object.hasOwn(TOOL_CONTRACTS, toolName)
     ? TOOL_CONTRACTS[toolName as ContractToolName]
     : undefined
+}
+
+/**
+ * Remote MCP tools whose access Studio declares. Their parts stay `dynamic-tool`, so they aren't
+ * part of `StudioUIMessage`.
+ */
+export const REMOTE_TOOL_CONTRACTS = {
+  get_advisors: getAdvisors,
+  list_branches: listBranches,
+  list_edge_functions: listEdgeFunctions,
+  list_extensions: listExtensions,
+  list_tables: listTables,
+  query_logs: queryLogs,
+} as const satisfies Partial<Record<ToolName, RemoteToolContract>>
+
+export type RemoteContractToolName = keyof typeof REMOTE_TOOL_CONTRACTS
+
+/** The contract for a migrated remote tool, or `undefined` if the tool hasn't been migrated. */
+export function getRemoteToolContract(toolName: string): RemoteToolContract | undefined {
+  const contracts: Partial<Record<string, RemoteToolContract>> = REMOTE_TOOL_CONTRACTS
+  return Object.hasOwn(contracts, toolName) ? contracts[toolName] : undefined
 }
 
 /**

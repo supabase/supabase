@@ -1,9 +1,8 @@
 import dayjs from 'dayjs'
-import { GithubIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { GithubIcon, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 

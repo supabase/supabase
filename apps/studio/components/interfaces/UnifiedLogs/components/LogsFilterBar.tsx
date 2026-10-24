@@ -15,11 +15,13 @@ import {
   buildFilterGroup,
   buildFilterProperties,
   getUserFilterValue,
-  parseTimeRange,
-  serializeTimeRange,
   TIME_RANGE_PROPERTY,
   USER_PROPERTY,
 } from './LogsFilterBar.utils'
+import {
+  parseTimeRange,
+  serializeTimeRange,
+} from '@/components/interfaces/Settings/Logs/Logs.timeRange'
 import { searchAuthUsers } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
 import { DataTableFilterTimerange } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterTimerange'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'

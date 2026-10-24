@@ -124,9 +124,7 @@ export const ReportsSelectFilter = ({
                           <span className="text-foreground-lighter">{option.description}</span>
                         )}
                       </div>
-                      {!!option.quantity && (
-                        <code className="p-0 px-1 text-code-inline">{option.quantity}</code>
-                      )}
+                      {!!option.quantity && <code className="p-0 px-1">{option.quantity}</code>}
                     </div>
                   </Label>
                 </CommandItem>

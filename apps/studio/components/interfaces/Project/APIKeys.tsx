@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
 import { LoaderIcon } from 'lucide-react'
@@ -16,11 +15,13 @@ import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const APIKeys = () => {
   const { ref: projectRef } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
 
   const {
     data: settings,
@@ -145,8 +146,8 @@ export const APIKeys = () => {
                   <div className="space-y-2">
                     <p className="text-sm">API Key</p>
                     <div className="flex items-center space-x-1 -ml-1">
-                      <code className="text-code-inline">{anonKey?.name}</code>
-                      <code className="text-code-inline">public</code>
+                      <code>{anonKey?.name}</code>
+                      <code>public</code>
                     </div>
                   </div>
                 )

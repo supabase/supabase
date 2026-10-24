@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
@@ -57,7 +56,7 @@ import { projectKeys } from '@/data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
@@ -76,9 +75,8 @@ export const CreateBranchModal = () => {
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
-  const { can: canCreateBranch } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'preview_branches'
+  const { can: canCreateBranch } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_CREATE
   )
 
   const { hasAccess: hasAccessToBranching, isLoading: isLoadingEntitlement } =
@@ -595,9 +593,9 @@ export const CreateBranchModal = () => {
                   <p className="text-sm text-foreground-light">
                     {withData ? (
                       <>
-                        <code className="text-code-inline">{branchComputeSize.label}</code> compute
-                        size is automatically selected to match your production branch. You may
-                        downgrade after creation or pause the branch when not in use to save cost.
+                        <code>{branchComputeSize.label}</code> compute size is automatically
+                        selected to match your production branch. You may downgrade after creation
+                        or pause the branch when not in use to save cost.
                       </>
                     ) : (
                       <>This cost will continue for as long as the branch has not been removed.</>

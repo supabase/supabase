@@ -24,7 +24,7 @@
     "date-fns": "^2.30.0",
     "input-otp": "^1.4.2",
     "lodash": "catalog:",
-    "lucide-react": "^0.436.0",
+    "lucide-react": "catalog:",
     "motion": "catalog:",
     "prop-types": "^15.7.2",
     "radix-ui": "catalog:",

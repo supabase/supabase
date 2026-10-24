@@ -1,5 +1,5 @@
-import { useFeatureFlags, useFlag, useParams } from 'common'
-import { Loader2Icon } from 'lucide-react'
+import { useFeatureFlags, useParams } from 'common'
+import { EarthIcon, Loader2Icon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
@@ -26,16 +26,13 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import {
+  AUTO_REGION_VALUE,
   filterHighAvailabilityRegions,
   getAvailableRegions,
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
 import { ProjectCreationStatusAdmonition } from './ProjectCreationStatusAdmonition'
-import {
-  getRegionRestrictionCopy,
-  regionMatches,
-  SELECT_DIFFERENT_REGION,
-} from './RegionSelector.utils'
+import { getRegionRestrictionCopy, SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
 import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -43,7 +40,6 @@ import Panel from '@/components/ui/Panel'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
-import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -74,6 +70,12 @@ const getDisplayNameForSmartRegion = (name: string): string => {
 
 const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
 
+const BestAvailableRegionIcon = () => (
+  <div className="w-5 h-4 border border-brand-500 rounded-xs bg-brand-300 flex items-center justify-center">
+    <EarthIcon size={10} className="text-brand" />
+  </div>
+)
+
 export const RegionSelector = ({
   form,
   hasSelectedOrganization,
@@ -93,13 +95,9 @@ export const RegionSelector = ({
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
-  const isStatusPageEnabled = useFlag('incidentIoStatusPage') === true
   const isSpecificRegionsLinkEnabled = isFreePlan && !hideSpecificRegions
 
   const { getRegionRestriction } = useRegionRestriction()
-
-  const { data: statusData } = useIncidentStatusQuery({ enabled: !isStatusPageEnabled })
-  const { incidents = [] } = statusData ?? {}
 
   const { isPending: isLoadingDefaultRegion } = useDefaultRegionQuery(
     { cloudProvider },
@@ -125,12 +123,21 @@ export const RegionSelector = ({
     highAvailability && !isLocal && highAvailabilityRegionCode !== undefined
   const smartRegions = highAvailability ? [] : allSmartRegions
 
+  const hasAutoOption = !highAvailability && availableRegionsData?.all.auto !== undefined
+  const isAutoRecommended =
+    hasAutoOption && availableRegionsData?.recommendations.auto !== undefined
+
+  // Auto takes precedence, so the other recommendations are ignored while it's recommended
   const recommendedSmartRegions = new Set(
-    [availableRegionsData?.recommendations.smartGroup.code].filter(Boolean)
+    isAutoRecommended
+      ? []
+      : [availableRegionsData?.recommendations.smartGroup?.code].filter(Boolean)
   )
 
   const recommendedSpecificRegions = new Set(
-    availableRegionsData?.recommendations.specific.map((region) => region.code)
+    isAutoRecommended
+      ? []
+      : availableRegionsData?.recommendations.specific?.map((region) => region.code)
   )
 
   const availableRegions = getAvailableRegions(cloudProvider)
@@ -160,32 +167,6 @@ export const RegionSelector = ({
 
   const allSelectableRegions = [...smartRegions, ...regionOptions]
 
-  // react-hook-form intermittently drops this field's value when its Controller
-  // remounts (e.g. a sibling section mounting/unmounting in the same update, such as
-  // toggling high availability), so a one-shot effect isn't enough. Instead this effect
-  // re-asserts off the watched value: a region present in the current list is kept (and
-  // remembered in lastValidRegionRef), and when it's missing or cleared out from under us
-  // it restores the last valid region. allSelectableRegions is intentionally omitted from
-  // deps — it's a new array every render, and comparing it by reference would defeat the
-  // point of reacting to genuine content changes on every render where they occur.
-  const lastValidRegionRef = useRef<string | undefined>(undefined)
-  useEffect(() => {
-    if (allSelectableRegions.length === 0) return
-    const isRegionAvailable = (name: string | undefined) =>
-      !!name && allSelectableRegions.some((region) => region.name === name)
-
-    if (isRegionAvailable(dbRegion)) {
-      lastValidRegionRef.current = dbRegion
-      return
-    }
-
-    const lastValidRegion = lastValidRegionRef.current
-    if (lastValidRegion !== undefined && isRegionAvailable(lastValidRegion)) {
-      form.setValue('dbRegion', lastValidRegion)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dbRegion, form])
-
   const hasGeneralRegions = smartRegionEnabled && !highAvailability
   const isSpecificRegionSelected = regionOptions.some((region) => region.name === dbRegion)
   const [isOpen, setIsOpen] = useState(false)
@@ -203,6 +184,26 @@ export const RegionSelector = ({
     setIsOpen(true)
   }
 
+  const lastValidRegionRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (allSelectableRegions.length === 0) return
+    const isRegionAvailable = (name: string | undefined) =>
+      !!name &&
+      ((hasAutoOption && name === AUTO_REGION_VALUE) ||
+        allSelectableRegions.some((region) => region.name === name))
+
+    if (isRegionAvailable(dbRegion)) {
+      lastValidRegionRef.current = dbRegion
+      return
+    }
+
+    const lastValidRegion = lastValidRegionRef.current
+    if (lastValidRegion !== undefined && isRegionAvailable(lastValidRegion)) {
+      form.setValue('dbRegion', lastValidRegion)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dbRegion, form])
+
   if (isErrorAvailableRegions) {
     return <AlertError subject="Error loading available regions" error={errorAvailableRegions} />
   }
@@ -217,9 +218,11 @@ export const RegionSelector = ({
             return !!region.name && region.name === dbRegion
           })
 
-          const selectedRegionLabel = selectedRegion?.name
+          const isAutoSelected = hasAutoOption && dbRegion === AUTO_REGION_VALUE
+          const selectedRegionName = selectedRegion?.name
             ? getDisplayNameForSmartRegion(selectedRegion.name)
             : dbRegion
+          const selectedRegionLabel = isAutoSelected ? 'Auto' : selectedRegionName
           const selectedRestriction = regionOptionsWithRestriction.find(
             (region) => region.name === dbRegion
           )?.restriction
@@ -228,15 +231,6 @@ export const RegionSelector = ({
               ? getRegionRestrictionCopy(selectedRestriction)
               : undefined
           const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
-
-          const affectingIncidents = incidents.filter((incident) => {
-            const affectedRegions = incident.cache?.affected_regions ?? []
-            if (affectedRegions.length === 0 || selectedRegion?.code === undefined) return false
-
-            return affectedRegions.some((affectedRegion) =>
-              regionMatches(selectedRegion.code, affectedRegion)
-            )
-          })
 
           return (
             <>
@@ -294,6 +288,7 @@ export const RegionSelector = ({
                           {!!dbRegion && (
                             <div className="flex items-center gap-x-3">
                               {isLoading && <Loader2Icon size={14} className="animate-spin" />}
+                              {isAutoSelected && <BestAvailableRegionIcon />}
                               {selectedRegion?.code && (
                                 <RegionFlag className="w-5" region={selectedRegion.code} />
                               )}
@@ -303,6 +298,30 @@ export const RegionSelector = ({
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
+                        {hasAutoOption && (
+                          <>
+                            <SelectGroup>
+                              <SelectLabel>Recommendation</SelectLabel>
+                              <SelectItem
+                                value={AUTO_REGION_VALUE}
+                                className="w-full [&>:nth-child(2)]:w-full"
+                              >
+                                <div className="flex flex-row items-center justify-between w-full">
+                                  <div className="flex items-center gap-x-3">
+                                    <BestAvailableRegionIcon />
+                                    <span className="text-foreground">Auto</span>
+                                  </div>
+                                  {isAutoRecommended && (
+                                    <Badge variant="success" className="mr-1">
+                                      Recommended
+                                    </Badge>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            </SelectGroup>
+                            <SelectSeparator />
+                          </>
+                        )}
                         {hasGeneralRegions && (
                           <>
                             <SelectGroup>
@@ -392,22 +411,28 @@ export const RegionSelector = ({
                         )}
 
                         {hideSpecificRegions && (
-                          <div
-                            className="border-t px-3 py-2.5 text-xs text-foreground-light"
-                            onPointerDown={(e) => e.stopPropagation()}
-                          >
-                            <InlineLink
-                              href={`/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`}
-                              onClick={() => track('free_tier_general_region_upgrade_clicked')}
+                          <>
+                            <SelectSeparator />
+                            <div
+                              className="px-3 py-2.5 text-xs text-foreground-light"
+                              onPointerDown={(e) => e.stopPropagation()}
                             >
-                              Upgrade to Pro
-                            </InlineLink>{' '}
-                            to choose a{' '}
-                            <InlineLink href={`${DOCS_URL}/guides/platform/regions`}>
-                              specific region
-                            </InlineLink>
-                            .
-                          </div>
+                              <InlineLink
+                                href={`/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`}
+                                onClick={() => track('free_tier_general_region_upgrade_clicked')}
+                              >
+                                Upgrade to Pro
+                              </InlineLink>{' '}
+                              to choose a{' '}
+                              <InlineLink
+                                href={`${DOCS_URL}/guides/platform/regions`}
+                                onClick={() => track('free_tier_general_region_docs_link_clicked')}
+                              >
+                                specific region
+                              </InlineLink>
+                              .
+                            </div>
+                          </>
                         )}
                       </SelectContent>
                     </Select>
@@ -428,29 +453,7 @@ export const RegionSelector = ({
                 </div>
               </FormItemLayout>
 
-              {isStatusPageEnabled ? (
-                <ProjectCreationStatusAdmonition selectedRegionCode={selectedRegion?.code} />
-              ) : (
-                affectingIncidents.length > 0 && (
-                  <FormItemLayout layout="horizontal">
-                    <Admonition
-                      type="warning"
-                      title="Incident in progress for this region"
-                      description={
-                        <>
-                          We're currently investigating an issue that may impact projects in this
-                          region. Follow updates on{' '}
-                          <InlineLink href="https://status.supabase.com">
-                            status.supabase.com
-                          </InlineLink>
-                          .
-                        </>
-                      }
-                      className="mt-3"
-                    />
-                  </FormItemLayout>
-                )
-              )}
+              <ProjectCreationStatusAdmonition selectedRegionCode={selectedRegion?.code} />
 
               {selectedRestrictionCopy !== undefined && (
                 <FormItemLayout layout="horizontal" isReactForm={false}>

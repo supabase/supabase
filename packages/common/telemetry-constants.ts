@@ -556,6 +556,18 @@ export interface FreeTierGeneralRegionUpgradeClickedEvent {
 }
 
 /**
+ * User clicked the "specific region" docs link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionDocsLinkClickedEvent {
+  action: 'free_tier_general_region_docs_link_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User clicked the "Need a specific region?" link to reveal the specific regions
  * list in the project creation region selector.
  *
@@ -1038,6 +1050,22 @@ export interface CopyAsMarkdownClickedEvent {
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
+}
+
+/**
+ * User clicked the sidebar link to add Supabase as a preferred source on Google.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface PreferredSourceClickedEvent {
+  action: 'preferred_source_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
 }
 
 /**
@@ -4189,6 +4217,7 @@ export type TelemetryEvent =
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
+  | FreeTierGeneralRegionDocsLinkClickedEvent
   | ProjectCreationSpecificRegionLinkClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
@@ -4218,6 +4247,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
+  | PreferredSourceClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent

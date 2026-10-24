@@ -25,12 +25,15 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  test-shard:
+    name: 'Unit tests (shard ${{ matrix.shard }}/${{ strategy.job-total }})'
     # Uses larger hosted runner as it significantly decreases build times
     runs-on: blacksmith-4vcpu-ubuntu-2404
     strategy:
+      # Let every shard report its failures instead of cancelling the others
+      fail-fast: false
       matrix:
-        test_number: [1]
+        shard: [1, 2, 3, 4]
     outputs:
       tests_ran: ${{ steps.filter.outputs.relevant }}
 
@@ -78,15 +81,39 @@ jobs:
         env:
           # Default is 2 GB, increase to have less frequent OOM errors
           NODE_OPTIONS: '--max_old_space_size=3072'
-        run: pnpm run test:ci
+          SHARD: ${{ matrix.shard }}
+          SHARD_TOTAL: ${{ strategy.job-total }}
+        run: pnpm run test:ci --shard="$SHARD/$SHARD_TOTAL"
         working-directory: ./apps/studio
       - name: Upload coverage artifact
         if: steps.filter.outputs.relevant == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: studio-coverage
+          name: studio-coverage-${{ matrix.shard }}
           path: ./apps/studio/coverage/lcov.info
           retention-days: 1
+
+  # Single pass/fail result across all shards. Keeps the `test (1)` check name that
+  # branch protection requires, so changing the shard count doesn't touch protection rules.
+  test:
+    needs: test-shard
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions: {}
+    strategy:
+      matrix:
+        test_number: [1]
+    outputs:
+      tests_ran: ${{ needs.test-shard.outputs.tests_ran }}
+    steps:
+      - name: Check all shards passed
+        env:
+          SHARDS_RESULT: ${{ needs.test-shard.result }}
+        run: |
+          if [ "$SHARDS_RESULT" != "success" ]; then
+            echo "One or more unit test shards did not pass (result: $SHARDS_RESULT)"
+            exit 1
+          fi
 
   coveralls:
     needs: test
@@ -100,17 +127,21 @@ jobs:
           sparse-checkout: |
             apps/studio
             patches
-      - name: Download coverage artifact
+      - name: Download coverage artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: studio-coverage
+          pattern: studio-coverage-*
           path: ./coverage
+      - name: List shard coverage files
+        id: coverage
+        run: echo "files=$(ls ./coverage/*/lcov.info | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
       - name: Upload coverage results to Coveralls
         uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
         continue-on-error: true
         with:
           flag-name: studio-tests
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ./coverage/lcov.info
+          # Coveralls merges the per-shard reports into one result
+          files: ${{ steps.coverage.outputs.files }}
           base-path: './apps/studio'
           fail-on-error: false

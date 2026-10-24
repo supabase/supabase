@@ -43,7 +43,6 @@ const ChooseFunctionForm = ({ visible, onChange, setVisible }: ChooseFunctionFor
       header="Pick a function"
       visible={visible}
       onCancel={() => setVisible(!visible)}
-      className="hooks-sidepanel"
     >
       <div className="py-6">
         {hasPublicSchemaFunctions ? (

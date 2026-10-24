@@ -13,7 +13,6 @@
       "features/docs/Reference.sections.tsx": 4,
       "features/docs/Reference.ui.tsx": 4,
       "features/ui/AgentWatchSchedule.tsx": 2,
-      "features/ui/CodeBlock/CodeBlock.client.tsx": 7,
       "features/ui/PromptPanel.tsx": 3
     },
     "shadcn/no-unknown-classes": {
