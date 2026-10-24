@@ -762,6 +762,10 @@
       "import": "./src/Trace/Trace.tsx",
       "types": "./src/Trace/Trace.tsx"
     },
+    "./Trace/Waterfall": {
+      "import": "./src/Trace/Waterfall.tsx",
+      "types": "./src/Trace/Waterfall.tsx"
+    },
     "./Trace": {
       "import": "./src/Trace/index.ts",
       "types": "./src/Trace/index.ts"

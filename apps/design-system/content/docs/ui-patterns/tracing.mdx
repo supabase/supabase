@@ -1,0 +1,16 @@
+---
+title: Tracing
+description: Composable primitives for distributed-trace views built on the shared design system
+---
+
+```tsx
+import { Trace } from 'ui-patterns/Trace'
+```
+
+`Trace.Root` indexes a list of OpenTelemetry-style spans and shares the result with the parts inside it. `Trace.Waterfall` is the layout container and measures its width so time can be mapped to pixels. `Trace.Ruler` draws the time axis and `Trace.Grid` draws the vertical gridlines below it, and `Trace.Cursor` draws the live cursor. The waterfall has two columns: the tree (`treeWidth`) and the timeline. The children of `Trace.Ruler` render at the right end of the ruler's tree cell, next to the "Span" label.
+
+## Waterfall and Ruler
+
+The ruler adapts its ticks to the visible range. While a trace is live (any span has no end), `Trace.Cursor` also draws a line at `nowMs` from the top of the ruler to the bottom of the waterfall, with a dot on the ruler's bottom edge. Pass `nowMs` on the trace to pin it, and `minRangeMs` to keep a minimum visible duration while live.
+
+<ComponentPreview name="trace-waterfall-demo" peekCode wide squared />
