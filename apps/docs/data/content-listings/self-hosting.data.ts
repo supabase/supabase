@@ -61,6 +61,14 @@ export const selfHostingThirdPartyGuides: ContentListingGroup = {
       description:
         'Keep Studio and Postgres off the public internet with NetBird network access controls.',
     },
+    {
+      title: 'Back up self-hosted Supabase and test the restore',
+      href: 'https://backupdrill.com/guides/self-hosted-supabase-backup',
+      icon: { kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' },
+      subtitle: 'By BackupDrill',
+      description:
+        'Back up Postgres, Storage files and the Vault key to S3-compatible storage, then test the restore in a throwaway container.',
+    },
   ],
 }
 
