@@ -13,7 +13,7 @@ interface ProfileImageProps {
 export const ProfileImage = ({ alt, src, placeholder, className }: ProfileImageProps) => {
   const [hasInvalidImg, setHasInvalidImg] = useState(false)
 
-  return !!src && !hasInvalidImg ? (
+  return typeof src === 'string' && !hasInvalidImg ? (
     <Image
       alt={alt ?? ''}
       src={src}
