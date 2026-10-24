@@ -29,12 +29,11 @@ export function Rows({
   ...props
 }: ComponentProps<typeof ScrollAreaPrimitive.Root>) {
   const index = useTrace()
-  const { selectedId, collapsed, select, setCollapsed } = useView()
+  const { selectedId, collapsed, select, setCollapsed, treeRef } = useView()
   const rows = useMemo(() => flattenTree(index, collapsed), [index, collapsed])
   const rowIndexById = useMemo(() => new Map(rows.map((row, i) => [row.span.id, i])), [rows])
 
   const viewportRef = useRef<HTMLDivElement>(null)
-  const treeRef = useRef<HTMLDivElement>(null)
   const pendingFocus = useRef(false)
   const [focusedId, setFocusedId] = useState<string | null>(null)
 
@@ -68,6 +67,11 @@ export function Rows({
     focusRow(0)
     return () => cancelAnimationFrame(frame)
   }, [focusedId])
+
+  useEffect(() => {
+    const selectedIndex = selectedId === null ? undefined : rowIndexById.get(selectedId)
+    if (selectedIndex !== undefined) virtualizer.scrollToIndex(selectedIndex)
+  }, [selectedId])
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return
