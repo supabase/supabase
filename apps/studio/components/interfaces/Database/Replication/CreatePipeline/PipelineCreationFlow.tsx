@@ -64,7 +64,7 @@ export const PipelineCreationFlow = ({
   const [type, setType] = useState<FlowDestination>(availableDestinations[0] ?? 'BigQuery')
   const [isPublicationPanelVisible, setIsPublicationPanelVisible] = useState(false)
   const form = useForm<DestinationPanelSchemaType>({
-    defaultValues: generateDefaultValues({ catalogToken: '', editMode: false }),
+    defaultValues: generateDefaultValues({ editMode: false }),
     shouldUnregister: false,
   })
   const initialTypeRef = useRef(type)

@@ -86,7 +86,7 @@ describe('PipelineConnectionSection', () => {
     }
   )
 
-  it.each<DestinationType>(['ClickHouse', 'Analytics Bucket'])(
+  it.each<DestinationType>(['ClickHouse'])(
     'does not show an empty connection accordion for %s',
     (type) => {
       customRender(<TestSection type={type} />)

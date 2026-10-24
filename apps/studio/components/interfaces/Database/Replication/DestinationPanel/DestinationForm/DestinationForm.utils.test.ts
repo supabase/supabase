@@ -1,8 +1,6 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
-import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import {
   buildBatchConfig,
   buildDestinationConfig,
@@ -31,13 +29,6 @@ const baseDucklakeFormData = {
   serviceAccountKey: undefined,
   connectionPoolSize: 1,
   maxStalenessMins: undefined,
-  warehouseName: undefined,
-  namespace: undefined,
-  newNamespaceName: undefined,
-  catalogToken: undefined,
-  s3AccessKeyId: undefined,
-  s3SecretAccessKey: undefined,
-  s3Region: undefined,
   ducklakeCatalogUrl: 'postgres://user:pass@host:5432/catalog',
   ducklakeDataPath: 's3://bucket/path',
   ducklakePoolSize: 4,
@@ -64,13 +55,6 @@ const baseSnowflakeFormData = {
   serviceAccountKey: undefined,
   connectionPoolSize: 1,
   maxStalenessMins: undefined,
-  warehouseName: undefined,
-  namespace: undefined,
-  newNamespaceName: undefined,
-  catalogToken: undefined,
-  s3AccessKeyId: undefined,
-  s3SecretAccessKey: undefined,
-  s3Region: undefined,
   ducklakeCatalogUrl: undefined,
   ducklakeDataPath: undefined,
   ducklakePoolSize: undefined,
@@ -158,21 +142,11 @@ describe('DestinationForm.utils table copy selection', () => {
 
     const defaults = generateDefaultValues({
       pipelineData,
-      catalogToken: '',
       editMode: true,
     })
 
     expect(defaults.tableSyncCopyMode).toBe('include_tables')
     expect(defaults.tableSyncCopyTableIds).toEqual(['202', '101'])
-  })
-
-  it('never hydrates an edit form with a newly revealed catalog token', () => {
-    const defaults = generateDefaultValues({
-      catalogToken: 'newly-revealed-token',
-      editMode: true,
-    })
-
-    expect(defaults.catalogToken).toBe('')
   })
 
   it('drops selected ids that are no longer in the publication', () => {
@@ -292,13 +266,6 @@ const baseClickHouseFormData = {
   serviceAccountKey: undefined,
   connectionPoolSize: 1,
   maxStalenessMins: undefined,
-  warehouseName: undefined,
-  namespace: undefined,
-  newNamespaceName: undefined,
-  catalogToken: undefined,
-  s3AccessKeyId: undefined,
-  s3SecretAccessKey: undefined,
-  s3Region: undefined,
   ducklakeCatalogUrl: undefined,
   ducklakeDataPath: undefined,
   ducklakePoolSize: undefined,
@@ -353,16 +320,11 @@ describe('DestinationForm.utils DuckLake', () => {
     })
   })
 
-  it('builds DuckLake submit config with normalized values', async () => {
-    const createS3AccessKey = vi.fn()
-    const resolveNamespace = vi.fn()
-
-    const config = await buildDestinationConfig({
+  it('builds DuckLake submit config with normalized values', () => {
+    const config = buildDestinationConfig({
       projectRef: 'project-ref',
       selectedType: 'DuckLake',
       data: baseDucklakeFormData,
-      createS3AccessKey,
-      resolveNamespace,
     })
 
     expect(config).toEqual({
@@ -379,8 +341,6 @@ describe('DestinationForm.utils DuckLake', () => {
         metadataSchema: 'ducklake_metadata',
       },
     })
-    expect(createS3AccessKey).not.toHaveBeenCalled()
-    expect(resolveNamespace).not.toHaveBeenCalled()
   })
 
   it('returns required-field errors for missing DuckLake settings', () => {
@@ -532,16 +492,11 @@ describe('DestinationForm.utils DuckLake (managed)', () => {
     })
   })
 
-  it('uses the current project for the catalog and storage during submission', async () => {
-    const createS3AccessKey = vi.fn()
-    const resolveNamespace = vi.fn()
-
-    const config = await buildDestinationConfig({
+  it('uses the current project for the catalog and storage during submission', () => {
+    const config = buildDestinationConfig({
       projectRef: 'project-ref',
       selectedType: 'DuckLake',
       data: baseDucklakeSupabaseFormData,
-      createS3AccessKey,
-      resolveNamespace,
     })
 
     expect(config).toEqual({
@@ -553,8 +508,6 @@ describe('DestinationForm.utils DuckLake (managed)', () => {
         metadataSchema: 'ducklake_metadata',
       },
     })
-    expect(createS3AccessKey).not.toHaveBeenCalled()
-    expect(resolveNamespace).not.toHaveBeenCalled()
   })
 
   it('requires a bucket and ignores connection fields', () => {
@@ -616,16 +569,11 @@ describe('DestinationForm.utils Snowflake', () => {
     })
   })
 
-  it('builds Snowflake submit config with normalized values', async () => {
-    const createS3AccessKey = vi.fn()
-    const resolveNamespace = vi.fn()
-
-    const config = await buildDestinationConfig({
+  it('builds Snowflake submit config with normalized values', () => {
+    const config = buildDestinationConfig({
       projectRef: 'project-ref',
       selectedType: 'Snowflake',
       data: baseSnowflakeFormData,
-      createS3AccessKey,
-      resolveNamespace,
     })
 
     expect(config).toEqual({
@@ -639,8 +587,6 @@ describe('DestinationForm.utils Snowflake', () => {
         role: 'PIPELINES_ROLE',
       },
     })
-    expect(createS3AccessKey).not.toHaveBeenCalled()
-    expect(resolveNamespace).not.toHaveBeenCalled()
   })
 
   it('returns required-field errors for missing Snowflake settings', () => {
@@ -699,16 +645,11 @@ describe('DestinationForm.utils ClickHouse', () => {
     })
   })
 
-  it('builds ClickHouse submit config with normalized values', async () => {
-    const createS3AccessKey = vi.fn()
-    const resolveNamespace = vi.fn()
-
-    const config = await buildDestinationConfig({
+  it('builds ClickHouse submit config with normalized values', () => {
+    const config = buildDestinationConfig({
       projectRef: 'project-ref',
       selectedType: 'ClickHouse',
       data: baseClickHouseFormData,
-      createS3AccessKey,
-      resolveNamespace,
     })
 
     expect(config).toEqual({
@@ -720,8 +661,6 @@ describe('DestinationForm.utils ClickHouse', () => {
         engine: 'replacing_merge_tree',
       },
     })
-    expect(createS3AccessKey).not.toHaveBeenCalled()
-    expect(resolveNamespace).not.toHaveBeenCalled()
   })
 
   it('returns required-field errors for missing ClickHouse settings', () => {
@@ -806,134 +745,5 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseDatabase: 'analytics',
       })
     ).toEqual([])
-  })
-})
-
-describe('DestinationForm.utils Analytics Bucket', () => {
-  it('returns required-field errors for an empty configuration', () => {
-    const issues = getAnalyticsBucketValidationIssues({
-      warehouseName: '',
-      namespace: '',
-      newNamespaceName: '',
-      s3Region: '',
-      s3AccessKeyId: '',
-      s3SecretAccessKey: '',
-    })
-
-    expect(issues).toEqual([
-      { path: 'warehouseName', message: 'Bucket is required.' },
-      { path: 's3Region', message: 'S3 region is required.' },
-      { path: 's3AccessKeyId', message: 'S3 access key ID is required.' },
-      { path: 'namespace', message: 'Namespace is required.' },
-      { path: 's3SecretAccessKey', message: 'S3 secret access key is required.' },
-    ])
-  })
-
-  it('treats whitespace-only values as missing', () => {
-    const issues = getAnalyticsBucketValidationIssues({
-      warehouseName: '   ',
-      namespace: '  ',
-      newNamespaceName: '',
-      s3Region: '\t',
-      s3AccessKeyId: ' ',
-      s3SecretAccessKey: '  ',
-    })
-
-    expect(issues).toEqual([
-      { path: 'warehouseName', message: 'Bucket is required.' },
-      { path: 's3Region', message: 'S3 region is required.' },
-      { path: 's3AccessKeyId', message: 'S3 access key ID is required.' },
-      { path: 'namespace', message: 'Namespace is required.' },
-      { path: 's3SecretAccessKey', message: 'S3 secret access key is required.' },
-    ])
-  })
-
-  it('requires a name when creating a new namespace', () => {
-    const issues = getAnalyticsBucketValidationIssues({
-      warehouseName: 'bucket',
-      namespace: CREATE_NEW_NAMESPACE,
-      newNamespaceName: '',
-      s3Region: 'us-east-1',
-      s3AccessKeyId: 'key',
-      s3SecretAccessKey: 'secret',
-    })
-
-    expect(issues).toEqual([{ path: 'newNamespaceName', message: 'Namespace name is required.' }])
-  })
-
-  it('skips the S3 secret when creating a new access key', () => {
-    const issues = getAnalyticsBucketValidationIssues({
-      warehouseName: 'bucket',
-      namespace: 'analytics',
-      newNamespaceName: '',
-      s3Region: 'us-east-1',
-      s3AccessKeyId: CREATE_NEW_KEY,
-      s3SecretAccessKey: '',
-    })
-
-    expect(issues).toEqual([])
-  })
-
-  it('allows omitted S3 key fields in edit mode', () => {
-    const issues = getAnalyticsBucketValidationIssues(
-      {
-        warehouseName: 'bucket',
-        namespace: 'analytics',
-        newNamespaceName: '',
-        s3Region: 'us-east-1',
-        s3AccessKeyId: '',
-        s3SecretAccessKey: '',
-      },
-      { secretsOptional: true }
-    )
-
-    expect(issues).toEqual([])
-  })
-
-  it('allows an omitted S3 secret for an unchanged Analytics Bucket key in edit mode', () => {
-    const issues = getAnalyticsBucketValidationIssues(
-      {
-        warehouseName: 'bucket',
-        namespace: 'analytics',
-        newNamespaceName: '',
-        s3Region: 'us-east-1',
-        s3AccessKeyId: 'stored-key',
-        s3SecretAccessKey: '',
-      },
-      { secretsOptional: true, storedS3AccessKeyId: 'stored-key' }
-    )
-
-    expect(issues).toEqual([])
-  })
-
-  it('requires an S3 secret when replacing an Analytics Bucket key in edit mode', () => {
-    const issues = getAnalyticsBucketValidationIssues(
-      {
-        warehouseName: 'bucket',
-        namespace: 'analytics',
-        newNamespaceName: '',
-        s3Region: 'us-east-1',
-        s3AccessKeyId: 'new-key',
-        s3SecretAccessKey: '',
-      },
-      { secretsOptional: true, storedS3AccessKeyId: 'stored-key' }
-    )
-
-    expect(issues).toEqual([
-      { path: 's3SecretAccessKey', message: 'S3 secret access key is required.' },
-    ])
-  })
-
-  it('returns no issues for a complete configuration', () => {
-    const issues = getAnalyticsBucketValidationIssues({
-      warehouseName: 'bucket',
-      namespace: CREATE_NEW_NAMESPACE,
-      newNamespaceName: 'new_namespace',
-      s3Region: 'us-east-1',
-      s3AccessKeyId: 'key',
-      s3SecretAccessKey: 'secret',
-    })
-
-    expect(issues).toEqual([])
   })
 })

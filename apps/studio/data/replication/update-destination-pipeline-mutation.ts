@@ -97,32 +97,6 @@ export const buildUpdateDestinationApiConfig = (
     return buildBigQueryUpdateApiConfig(destinationConfig.bigQuery)
   }
 
-  if ('iceberg' in destinationConfig) {
-    const {
-      projectRef,
-      warehouseName,
-      namespace,
-      catalogToken,
-      s3AccessKeyId,
-      s3SecretAccessKey,
-      s3Region,
-    } = destinationConfig.iceberg
-
-    return {
-      iceberg: {
-        supabase: {
-          project_ref: projectRef,
-          warehouse_name: warehouseName,
-          namespace,
-          catalog_token: optionalSecret(catalogToken),
-          s3_access_key_id: optionalSecret(s3AccessKeyId),
-          s3_secret_access_key: optionalSecret(s3SecretAccessKey),
-          s3_region: s3Region,
-        },
-      },
-    }
-  }
-
   if ('ducklake' in destinationConfig) {
     return buildDucklakeUpdateApiConfig(destinationConfig.ducklake)
   }
@@ -159,7 +133,7 @@ export const buildUpdateDestinationApiConfig = (
   }
 
   throw new Error(
-    'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
+    'Invalid destination config: must specify bigQuery, ducklake, snowflake, or clickHouse'
   )
 }
 
