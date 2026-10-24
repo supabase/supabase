@@ -15,6 +15,47 @@ import type { RowField } from './RowEditor.types'
 import { minifyJSON, tryParseJson } from '@/lib/helpers'
 import type { Dictionary } from '@/types'
 
+const GRID_ROW_META_KEYS = new Set(['idx', '__tempId', '__isDeleted'])
+
+export type DuplicateRowTable = {
+  primary_keys?: Array<{ name: string }> | null
+  columns?: Array<{
+    name: string
+    is_identity?: boolean
+    is_generated?: boolean
+  }> | null
+}
+
+/**
+ * Copy an existing grid row into an insert payload for the row editor.
+ * Drops grid metadata plus primary-key, identity, and generated columns so
+ * Postgres can assign fresh values on insert.
+ */
+export const prepareRowForDuplication = (
+  row: Dictionary<any>,
+  table: DuplicateRowTable
+): Dictionary<any> => {
+  const excludedColumns = new Set<string>()
+
+  for (const key of table.primary_keys ?? []) {
+    excludedColumns.add(key.name)
+  }
+
+  for (const column of table.columns ?? []) {
+    if (column.is_identity || column.is_generated) {
+      excludedColumns.add(column.name)
+    }
+  }
+
+  const duplicated: Dictionary<any> = {}
+  for (const [key, value] of Object.entries(row)) {
+    if (GRID_ROW_META_KEYS.has(key)) continue
+    if (excludedColumns.has(key)) continue
+    duplicated[key] = value
+  }
+  return duplicated
+}
+
 const getRowValue = ({ column, row }: { column: PGColumn; row?: Dictionary<any> }) => {
   const isNewRow = row === undefined
 
