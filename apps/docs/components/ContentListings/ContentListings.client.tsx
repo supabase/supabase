@@ -48,7 +48,7 @@ function useContentListingClickHandler(group: ContentListingGroup) {
   return { trackClick }
 }
 
-const PROGRESSION_COLUMNS = 3
+const PROGRESSION_COLUMNS = 2
 
 type FlowDirection = 'right' | 'wrap' | 'none'
 
@@ -80,11 +80,11 @@ function ProgressionConnector({ direction }: { direction: Exclude<FlowDirection,
         </span>
       )}
       {direction === 'wrap' && (
-        <span className="absolute top-full right-0 hidden h-(--flow-gap) w-[calc(300%+2*var(--flow-gap))] [--elbow:50%] @md:block">
-          <span className="absolute top-0 right-[calc(100%/6-var(--flow-gap)/3)] h-(--elbow) w-px bg-brand-500/15 dark:bg-brand-500/40" />
-          <span className="absolute top-(--elbow) right-[calc(100%/6-var(--flow-gap)/3)] left-[calc(100%/6-var(--flow-gap)/3)] h-px bg-brand-500/15 dark:bg-brand-500/40" />
-          <span className="absolute top-(--elbow) bottom-0 left-[calc(100%/6-var(--flow-gap)/3)] w-px bg-brand-500/15 dark:bg-brand-500/40" />
-          <span className="absolute bottom-0 left-[calc(100%/6-var(--flow-gap)/3)] -translate-x-1/2">
+        <span className="absolute top-full right-0 hidden h-(--flow-gap) w-[calc(200%+var(--flow-gap))] [--elbow:50%] @md:block">
+          <span className="absolute top-0 right-[calc(25%-var(--flow-gap)/4)] h-(--elbow) w-px bg-brand-500/15 dark:bg-brand-500/40" />
+          <span className="absolute top-(--elbow) right-[calc(25%-var(--flow-gap)/4)] left-[calc(25%-var(--flow-gap)/4)] h-px bg-brand-500/15 dark:bg-brand-500/40" />
+          <span className="absolute top-(--elbow) bottom-0 left-[calc(25%-var(--flow-gap)/4)] w-px bg-brand-500/15 dark:bg-brand-500/40" />
+          <span className="absolute bottom-0 left-[calc(25%-var(--flow-gap)/4)] -translate-x-1/2">
             <FlowArrow icon={ChevronDown} />
           </span>
         </span>
@@ -103,7 +103,7 @@ function ContentListingProgression({ group }: { group: ContentListingGroup }) {
     <div className="@container [--flow-gap:calc(2rem*4/3)]">
       <ol
         aria-label={group.heading ?? 'Progression'}
-        className="m-0 grid list-none grid-cols-1 gap-(--flow-gap) p-0 @md:grid-cols-3"
+        className="m-0 grid list-none grid-cols-1 gap-(--flow-gap) p-0 @md:grid-cols-2"
       >
         {items.map((item, index) => {
           const direction = progressionDirection(index, items.length)
