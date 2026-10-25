@@ -8249,12 +8249,14 @@ functions:
         name: Create Signed URL with upsert option
         code: |
           ```python
+          from storage3.types import CreateSignedUploadUrlOptions
+
           response = (
               supabase.storage
               .from_("avatars")
               .create_signed_upload_url(
                   "folder/avatar1.png",
-                  options={"upsert": "true"}
+                  options=CreateSignedUploadUrlOptions(upsert="true"),
               )
           )
           ```
