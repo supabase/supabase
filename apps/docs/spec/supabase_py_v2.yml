@@ -8700,7 +8700,7 @@ functions:
           print(response["content_type"])
           ```
 
-  - id: from-list-v2
+  - id: storagefile-list-v2
     title: 'from_.list_v2()'
     description: |
       Lists files within a bucket using cursor-based pagination. Returns separate lists for folders and objects along with pagination metadata.
