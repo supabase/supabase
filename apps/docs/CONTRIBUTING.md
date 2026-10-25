@@ -115,13 +115,31 @@ To add a new function, manually add an entry to this common file.
 
 ### Specific spec file
 
-Each library also has its own spec file containing library-specific details. For example, see the [JavaScript SDK spec file](https://github.com/supabase/supabase/blob/master/apps/docs/spec/supabase_js_v2.yml).
+Each library has its own reference source depending on the pipeline it's using. The JavaScript v2 SDKs (supabase-js, auth-js, postgrest-js, realtime-js, storage-js, and functions-js) use the new TypeDoc-based pipeline, while other SDKs may still use the legacy YAML pipeline.
 
-The functions listed in this file match the ones defined in the common spec file.
+#### For JavaScript v2 (new pipeline)
 
-Each function contains a description, code examples, and optional notes. The parameters are pulled from the source code via the `$ref` property, which references a function definition in the source code repo. These references are pulled down and transformed using commands in the spec [Makefile](https://github.com/supabase/supabase/blob/master/apps/docs/spec/Makefile). Unless you're a library maintainer, you don't need to worry about this.
+The JavaScript v2 reference docs are generated from TypeDoc JSON dumps combined with hand-authored overrides. The source files live in `apps/docs/spec/reference/javascript/v2/`. See the [reference pipeline README](https://github.com/supabase/supabase/blob/master/apps/docs/spec/reference/README.md) for full details.
 
-If you're a library maintainer, follow these steps when updating function parameters or return values:
+- **TypeDoc dumps**: Downloaded artifacts placed in `apps/docs/spec/reference/javascript/v2/*.json` (gitignored). Refresh with `cd apps/docs/spec && make download.tsdoc.v2`.
+- **Config & partials**: Hand-authored `config.json` and `partials/` in `apps/docs/spec/reference/javascript/v2/` (committed). These control ordering and add/override content.
+
+Unless you're a library maintainer, you don't need to worry about these files.
+
+If you're a library maintainer updating function parameters or return values:
+
+1. Update JSDoc comments and types in the relevant `supabase-js` package source.
+2. Merge changes into the package's `master` branch. The package release workflow publishes updated TypeDoc JSON.
+3. Regenerate the docs locally by running `cd apps/docs/spec && make download.tsdoc.v2` and starting the docs app (or just let `pnpm dev` fetch them).
+4. Verify the changes on your local documentation site.
+
+#### For other libraries (legacy YAML pipeline)
+
+Libraries not yet migrated use their own YAML spec files. For example, see [older spec files in `apps/docs/spec/`](https://github.com/supabase/supabase/tree/master/apps/docs/spec).
+
+The functions listed in these files match those defined in the common spec file. Parameters are pulled from the source code via `$ref` properties, which are dereferenced using commands in the spec [Makefile](https://github.com/supabase/supabase/blob/master/apps/docs/spec/Makefile).
+
+If you're a library maintainer working with the legacy pipeline:
 
 1. Merge your changes into the library's `master` branch.
 2. Wait for the action to update the specification in the `gh-pages` branch.
