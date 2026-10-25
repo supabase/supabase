@@ -1,7 +1,12 @@
+import {
+  REALTIME_CHANNEL_STATES,
+  REALTIME_SUBSCRIBE_STATES,
+  type SupabaseClient,
+} from '@supabase/supabase-js'
 import { useCallback, useEffect, useState } from 'react'
-import useLw14ConfData from './use-conf-data'
+
 import supabase from '../supabase'
-import { REALTIME_CHANNEL_STATES, REALTIME_SUBSCRIBE_STATES } from '@supabase/supabase-js'
+import useLw14ConfData from './use-conf-data'
 
 const LW14_TOPIC = 'lw14'
 const GAUGES_UPDATES_EVENT = 'gauges-update'
@@ -68,10 +73,13 @@ export const usePartymode = () => {
   }, [createChannelAndSubscribe, dispatch, state.partymodeStatus, state.realtimeGaugesChannel])
 
   const fetchGaugesData = useCallback(async () => {
+    // `get_payload_data_for_lw14` and `get_meetups_data_for_lw14` are not in the generated
+    // `Database` types, so call them through an untyped client.
+    const untypedSupabase = supabase as unknown as SupabaseClient
     const [{ data: payloadData, error: payloadError }, { data: meetupsData, error: meetupsError }] =
       await Promise.all([
-        supabase.rpc('get_payload_data_for_lw14'),
-        supabase.rpc('get_meetups_data_for_lw14'),
+        untypedSupabase.rpc('get_payload_data_for_lw14'),
+        untypedSupabase.rpc('get_meetups_data_for_lw14'),
       ])
 
     if (payloadError || meetupsError) {

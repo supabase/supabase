@@ -70,6 +70,10 @@ The skills in `.agents/skills/` are the source of truth for conventions. Load th
 - `react-hook-form` — writing or modifying any form code, anywhere in the monorepo
 - `vitest` / `vercel-composition-patterns` — generic unit-testing and React composition references
 
+## Supabase project
+
+Before changing the database (anything under `supabase/schemas/`, `supabase/migrations/`, or `supabase/config.toml`), read `supabase/AGENTS.md`. Schema changes are made in the declarative schema (`supabase/schemas/`) and migrations are generated from it.
+
 ## Studio
 
 Before working on anything in `apps/studio`, read `apps/studio/AGENTS.md` if it isn't already in context — it maps Studio tasks to required skills and covers the TanStack Start migration rules.

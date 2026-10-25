@@ -2,17 +2,16 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import util, { styleText } from 'node:util'
 import { type PostgrestError } from '@supabase/supabase-js'
+import { type Database } from 'common'
 
 import { Service } from '../../__generated__/graphql'
 import { extractMessageFromAnyError, MultiError } from '../../app/api/utils'
 import { Result } from '../../features/helpers.fn'
 import { DOCS_DIRECTORY } from '../../lib/docs'
-import { DatabaseCorrected } from '../../lib/supabase'
 import { supabaseAdmin } from '../../lib/supabaseAdmin'
 import { type ErrorCodeDefinition } from './errorTypes'
 
-type ErrorCodeUploadParameters =
-  DatabaseCorrected['content']['Functions']['update_error_code']['Args']
+type ErrorCodeUploadParameters = Database['content']['Functions']['update_error_code']['Args']
 
 const ERROR_CODES_DIRECTORY = path.join(DOCS_DIRECTORY, 'data', 'errorCodes')
 

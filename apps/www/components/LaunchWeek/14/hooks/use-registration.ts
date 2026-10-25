@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
 import { REALTIME_CHANNEL_STATES, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
-
-import useConfData from './use-conf-data'
 import { LW14_URL } from '~/lib/constants'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
 import supabase from '../supabase'
+import useConfData, { type UserTicketData } from './use-conf-data'
 
 function subscribeToTicketChanges(
   username: string,
@@ -95,7 +95,9 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
         return
       }
 
-      dispatch({ type: 'USER_TICKET_FETCH_SUCCESS', payload: data })
+      // `tickets_view` columns are all nullable and `metadata` is untyped `Json` in the generated
+      // types, which `UserTicketData` narrows.
+      dispatch({ type: 'USER_TICKET_FETCH_SUCCESS', payload: data as UserTicketData })
 
       await prefetchData(username)
     }
@@ -192,9 +194,9 @@ export const useRegistration = ({ onError, onRegister }: RegistrationProps = {})
 
       const { error } = await supabase
         .from('tickets')
-        .update({ game_won_at: new Date() })
+        .update({ game_won_at: new Date().toISOString() })
         .eq('launch_week', 'lw14')
-        .eq('username', userData.username)
+        .eq('username', userData.username!)
 
       if (error) {
         return console.error('Failed to upgrade user ticket', error)
