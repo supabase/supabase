@@ -51,6 +51,7 @@ import {
   getFacetedUniqueValues,
   getLevelRowClassName,
 } from './UnifiedLogs.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -253,7 +254,7 @@ export const UnifiedLogs = () => {
   >(
     row: Row<TData>
   ) => {
-    const rowTimestamp = Number(row.original.timestamp)
+    const rowTimestamp = row.original.date.getTime()
     const isPast = rowTimestamp <= (liveMode.timestamp || -1)
     const levelClassName = getLevelRowClassName(row.original.level)
     return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
@@ -441,6 +442,13 @@ export const UnifiedLogs = () => {
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
             <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
+              {isError && flatData.length > 0 && (
+                <AlertError
+                  error={error}
+                  subject="Failed to refresh logs"
+                  projectRef={projectRef}
+                />
+              )}
               <div className="flex flex-wrap items-center gap-2 px-2 border-b">
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
                   <Button
