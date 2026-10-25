@@ -536,7 +536,7 @@ DROP PUBLICATION supabase_migration;
 
 -- Check and remove any remaining replication slots
 SELECT * FROM pg_replication_slots;
-DROP REPLICATION SLOT slot_name;  -- if any remain
+SELECT pg_drop_replication_slot('supabase_subscription');  -- drop only the slot created for this migration
 
 -- The source database should remain read-only or be decommissioned
 -- Do NOT re-enable writes to avoid a split-brain scenario!
