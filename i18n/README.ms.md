@@ -58,7 +58,7 @@ Anda juga boleh [host sendiri](https://supabase.com/docs/guides/hosting/overview
 - [PostgREST](http://postgrest.org/) adalah pelayan web yang mengubah pangkalan data PostgreSQL anda secara langsung menjadi API RESTful
 - [Storage](https://github.com/supabase/storage-api) menyediakan antara muka RESTful untuk menguruskan Fail yang disimpan di S3, menggunakan Postgres untuk menguruskan kebenaran akses.
 - [postgres-meta](https://github.com/supabase/postgres-meta) adalah API RESTful untuk menguruskan Postgres anda, yang membolehkan anda mengambil jadual, menambah peranan, dan menjalankan query dan lain-lain.
-- [GoTrue](https://github.com/netlify/gotrue) adalah API berasaskan SWT untuk mengurus pengguna dan mengeluarkan token SWT.
+- [GoTrue](https://github.com/supabase/gotrue) adalah API berasaskan JWT untuk mengurus pengguna dan mengeluarkan token JWT.
 - [Kong](https://github.com/Kong/kong) adalah gerbang API cloud-native.
 
 #### Librari Klien
@@ -68,7 +68,7 @@ Librari klien kami adalah modular. Setiap sub-librari adalah pelaksanaan standal
 - **`supabase-{lang}`**: Menggabungkan librari dan menambahkan pengayaan.
   - `postgrest-{lang}`: Librari klien untuk bekerjasama [PostgREST](https://github.com/postgrest/postgrest)
   - `realtime-{lang}`: Librari klien untuk bekerjasama [Realtime](https://github.com/supabase/realtime)
-  - `gotrue-{lang}`: Librari klien untuk bekerjasama [GoTrue](https://github.com/netlify/gotrue)
+  - `gotrue-{lang}`: Librari klien untuk bekerjasama [GoTrue](https://github.com/supabase/gotrue)
 
 | Repo                  | Rasmi                                                                                  | Komuniti                                                                                                                                                                                                                                                                                                                             |
 | --------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

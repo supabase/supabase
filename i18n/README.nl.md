@@ -66,7 +66,7 @@ U kunt ook [zelf hosten](https://supabase.com/docs/guides/hosting/overview) en [
 - [pg_graphql](http://github.com/supabase/pg_graphql/) een PostgreSQL uitbreiding die een GraphQL API blootstelt
 - [Storage](https://github.com/supabase/storage-api) biedt een RESTful interface voor het beheren van bestanden opgeslagen in S3, met behulp van Postgres om machtigingen te beheren.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is een RESTful API voor het beheer van uw Postgres, waarmee u tabellen kunt ophalen, rollen kunt toevoegen, en queries kunt uitvoeren, enz.
-- [GoTrue](https://github.com/netlify/gotrue) is een SWT gebaseerde API voor het beheren van gebruikers en het uitgeven van SWT tokens.
+- [GoTrue](https://github.com/supabase/gotrue) is een JWT gebaseerde API voor het beheren van gebruikers en het uitgeven van JWT tokens.
 - [Kong](https://github.com/Kong/kong) is een cloud-native API gateway.
 
 #### Client bibliotheken
