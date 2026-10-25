@@ -674,7 +674,9 @@ describe('Query.utils', () => {
           { column: 'tags', operator: '=', value: "ARRAY['NULL',null,'tag''one']" },
         ]
         const result = QueryUtils.selectQuery(table, safeSql`*`, { filters })
-        expect(result).toBe("select * from public.users where tags = ARRAY['NULL',NULL,'tag''one'];")
+        expect(result).toBe(
+          "select * from public.users where tags = ARRAY['NULL',NULL,'tag''one'];"
+        )
       })
 
       test('should correctly handle non-string values', () => {
