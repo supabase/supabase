@@ -752,7 +752,7 @@ export const SidePanelEditor = ({
       } else if (action === 'update' && selectedTable) {
         toastId = toast.loading(`Updating table: ${selectedTable.name}...`)
 
-        const { table, hasError } = await updateTable({
+        const { table } = await updateTable({
           projectRef: project?.ref!,
           connectionString: project?.connectionString,
           toastId,
@@ -778,18 +778,12 @@ export const SidePanelEditor = ({
           }
         }
 
-        if (hasError) {
-          toast.warning(
-            `Table ${table.name} has been updated but there were some errors. Please check these errors separately.`
-          )
-        } else {
-          if (ref && payload.name) {
-            // [Joshen] Only table entities can be updated via the dashboard
-            const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
-            tabsSnap.updateTab(tabId, { label: payload.name })
-          }
-          toast.success(`Successfully updated ${table.name}!`, { id: toastId })
+        if (ref && payload.name) {
+          // [Joshen] Only table entities can be updated via the dashboard
+          const tabId = createTabId(ENTITY_TYPE.TABLE, { id: selectedTable.id })
+          tabsSnap.updateTab(tabId, { label: payload.name })
         }
+        toast.success(`Successfully updated ${table.name}!`, { id: toastId })
       }
     } catch (error: any) {
       saveTableError = true

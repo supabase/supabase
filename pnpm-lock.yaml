@@ -1411,6 +1411,9 @@ importers:
       '@babel/core':
         specifier: '*'
         version: 7.29.7(supports-color@8.1.1)
+      '@electric-sql/pglite':
+        specifier: 0.4.5
+        version: 0.4.5
       '@eslint/compat':
         specifier: ^2.1.0
         version: 2.1.0(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))
@@ -20557,8 +20560,7 @@ snapshots:
 
   '@edge-runtime/cookies@5.0.2': {}
 
-  '@electric-sql/pglite@0.4.5':
-    optional: true
+  '@electric-sql/pglite@0.4.5': {}
 
   '@emnapi/core@1.11.1':
     dependencies:

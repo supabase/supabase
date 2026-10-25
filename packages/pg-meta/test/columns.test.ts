@@ -1002,3 +1002,66 @@ withTestDatabase(
     expect(column?.format_schema).toBe('pg_catalog')
   }
 )
+
+withTestDatabase(
+  'column creation rolls back when a later constraint statement fails',
+  async ({ executeQuery }) => {
+    await executeQuery('CREATE TABLE t ()')
+
+    const { sql: createColumnSql } = pgMeta.columns.create({
+      schema: 'public',
+      table: 't',
+      name: 'id',
+      type: { name: 'int4' },
+      no_transaction: true,
+    })
+    expect(createColumnSql).not.toContain('BEGIN;')
+    expect(createColumnSql).not.toContain('COMMIT;')
+
+    await expect(
+      executeQuery(
+        `BEGIN; ${createColumnSql} ALTER TABLE public.t ADD CONSTRAINT invalid_fk FOREIGN KEY (id) REFERENCES public.missing(id); COMMIT;`
+      )
+    ).rejects.toThrow()
+    await executeQuery('ROLLBACK;')
+
+    const { sql: retrieveSql, zod } = pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 't',
+      name: 'id',
+    })
+    expect(zod.parse((await executeQuery(retrieveSql))[0])).toBeUndefined()
+  }
+)
+
+withTestDatabase(
+  'column updates can be composed in a caller transaction',
+  async ({ executeQuery }) => {
+    await executeQuery('CREATE TABLE t (c int4)')
+    const { sql: retrieveSql, zod } = pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 't',
+      name: 'c',
+    })
+    const column = zod.parse((await executeQuery(retrieveSql))[0])!
+
+    const { sql: defaultUpdateSql } = pgMeta.columns.update(column, { name: 'c1' })
+    expect(defaultUpdateSql).toContain('BEGIN;')
+    expect(defaultUpdateSql).toContain('COMMIT;')
+
+    const { sql: updateSql } = pgMeta.columns.update(column, {
+      name: 'c1',
+      no_transaction: true,
+    })
+    expect(updateSql).not.toContain('BEGIN;')
+    expect(updateSql).not.toContain('COMMIT;')
+
+    await executeQuery(`BEGIN; ${updateSql} COMMIT;`)
+    const { sql: updatedColumnSql, zod: updatedColumnZod } = pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 't',
+      name: 'c1',
+    })
+    expect(updatedColumnZod.parse((await executeQuery(updatedColumnSql))[0])).toBeDefined()
+  }
+)

@@ -1607,3 +1607,26 @@ for (const testCase of errorTests) {
     await expect(executeQuery(sql)).rejects.toThrow(testCase.expectedError)
   })
 }
+
+withTestDatabase(
+  'table updates can be composed in a caller transaction',
+  async ({ executeQuery }) => {
+    await executeQuery('CREATE TABLE t ()')
+    const table = { id: 0, name: 't', schema: 'public' }
+
+    const { sql: defaultUpdateSql } = pgMeta.tables.update(table, { name: 't1' })
+    expect(defaultUpdateSql).toContain('BEGIN;')
+    expect(defaultUpdateSql).toContain('COMMIT;')
+
+    const { sql: updateSql } = pgMeta.tables.update(table, {
+      name: 't1',
+      no_transaction: true,
+    })
+    expect(updateSql).not.toContain('BEGIN;')
+    expect(updateSql).not.toContain('COMMIT;')
+
+    await executeQuery('BEGIN; ' + updateSql + ' COMMIT;')
+    const { sql: retrieveSql, zod } = pgMeta.tables.retrieve({ name: 't1', schema: 'public' })
+    expect(zod.parse((await executeQuery(retrieveSql))[0]).name).toBe('t1')
+  }
+)
