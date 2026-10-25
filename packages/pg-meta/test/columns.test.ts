@@ -295,6 +295,44 @@ withTestDatabase('retrieve, create, update, delete column', async ({ executeQuer
 })
 
 withTestDatabase(
+  'update keeps GENERATED ALWAYS when identity_generation is omitted',
+  async ({ executeQuery }) => {
+    await executeQuery(
+      'create table public.t (id bigint generated always as identity primary key, name text);'
+    )
+
+    const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 't',
+      name: 'id',
+    })
+    const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(column?.identity_generation).toBe('ALWAYS')
+
+    // Studio only sends the fields that changed, e.g. a new description
+    const { sql: updateSql } = await pgMeta.columns.update(column!, { comment: 'Primary key' })
+    await executeQuery(updateSql)
+
+    const updated = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(updated?.comment).toBe('Primary key')
+    expect(updated?.identity_generation).toBe('ALWAYS')
+
+    // Adding a new identity without a generation still defaults to BY DEFAULT
+    await executeQuery('alter table public.t add column n bigint not null;')
+    const { sql: retrieveNSql } = await pgMeta.columns.retrieve({
+      schema: 'public',
+      table: 't',
+      name: 'n',
+    })
+    const n = retrieveZod.parse((await executeQuery(retrieveNSql))[0])
+    const { sql: addIdentitySql } = await pgMeta.columns.update(n!, { is_identity: true })
+    await executeQuery(addIdentitySql)
+    const nUpdated = retrieveZod.parse((await executeQuery(retrieveNSql))[0])
+    expect(nUpdated?.identity_generation).toBe('BY DEFAULT')
+  }
+)
+
+withTestDatabase(
   'update column default value to NULL via expression format',
   async ({ executeQuery }) => {
     // Create test table using pure SQL
