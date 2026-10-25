@@ -455,6 +455,7 @@
   "functions/examples/telegram-bot",
   "functions/examples/upstash-redis",
   "getting-started/quickstarts/astrojs",
+  "getting-started/quickstarts/capacitor",
   "getting-started/quickstarts/expo-react-native",
   "getting-started/quickstarts/flask",
   "getting-started/quickstarts/flutter",

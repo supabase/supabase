@@ -423,6 +423,10 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
         },
         {
+          name: 'Capacitor',
+          url: '/guides/getting-started/quickstarts/capacitor',
+        },
+        {
           name: 'Expo React Native',
           url: '/guides/getting-started/quickstarts/expo-react-native',
         },

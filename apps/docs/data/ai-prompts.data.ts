@@ -61,6 +61,22 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/astrojs.md`,
+  capacitor: `Help me add Supabase to my Capacitor project. Create a Supabase project at
+database.new and run the instruments table SQL. Then:
+1. Run \`npm create vite@latest my-app -- --template react-ts\`.
+   Run \`npm install @capacitor/core @capacitor/android\`.
+   Run \`npm install -D @capacitor/cli\`.
+   Run \`npx cap init\` and \`npx cap add android\`.
+2. Run \`npm install @supabase/supabase-js\`.
+3. Create \`.env.local\` and set \`VITE_SUPABASE_URL\` and
+   \`VITE_SUPABASE_PUBLISHABLE_KEY\`.
+4. Create \`src/lib/supabase.ts\` with a Supabase client.
+5. Update \`src/App.tsx\` to fetch and display instruments with \`useEffect\`.
+6. Run \`npm run dev\` for the browser, or \`npm run build\`, \`npx cap sync\`, and
+   \`npx cap run android\` for Android.
+
+REFERENCE
+https://supabase.com/docs/guides/getting-started/quickstarts/capacitor.md`,
   'expo-react-native': `Help me add Supabase to my Expo React Native project. Create a Supabase project
 at database.new and run the instruments table SQL. Then:
 1. Run \`npx create-expo-app my-app --template blank-typescript\` to scaffold the

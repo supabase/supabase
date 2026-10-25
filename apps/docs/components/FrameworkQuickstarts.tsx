@@ -80,6 +80,11 @@ const frameworks = [
     enabled: sdkKotlinEnabled,
   },
   {
+    name: 'Capacitor',
+    icon: '/docs/img/icons/ionic-icon',
+    href: '/guides/getting-started/quickstarts/capacitor',
+  },
+  {
     name: 'Expo React Native',
     icon: '/docs/img/icons/expo-icon',
     href: '/guides/getting-started/quickstarts/expo-react-native',
