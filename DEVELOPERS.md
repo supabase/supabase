@@ -188,9 +188,9 @@ We support "federating" docs, meaning doc content can come directly from externa
 - It's flexible - you can "embed" external docs nearly anywhere at any level in Supabase docs, but they will feel native.
 - If you are maintaining a repo containing docs that you think could also live in Supabase docs, feel free to create an issue and we can work together to integrate.
 
-Federated docs work using Next.js's build pipeline. We use `getStaticProps()` to fetch remote documentation (ie. markdown) at build time which is processed and passed to the respective page within the docs.
+The docs prebuild runs `build:federated-content` to fetch remote Markdown into `apps/docs/content/guides/`. App Router pages then render that content; the Python route reads it with `getGuidesMarkdown()`.
 
-See the [Vecs Python source code](https://github.com/supabase/supabase/tree/master/apps/docs/app/guides/ai/python/%5Bslug%5D) to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
+See the [Vecs Python source configuration](apps/docs/scripts/federated-content/sources/python.ts) and [Python route](apps/docs/app/guides/ai/python/%5B%5B...slug%5D%5D/page.tsx) for an example. Use these as a starting point for federating other docs.
 
 Some things to consider:
 
