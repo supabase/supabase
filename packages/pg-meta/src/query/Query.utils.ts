@@ -70,14 +70,15 @@ export function insertQuery(
   table: QueryTable,
   values: Dictionary<any>[],
   options?: {
-    returning?: boolean
+    returning?: boolean | 'count'
     enumArrayColumns?: string[]
+    onConflict?: 'ignore'
   }
 ) {
   if (!values || values.length === 0) {
     throw new Error('no value to insert')
   }
-  const { returning, enumArrayColumns } = options ?? {}
+  const { returning, enumArrayColumns, onConflict } = options ?? {}
   const queryColumns = joinSqlFragments(
     Object.keys(values[0]).map((x) => ident(x)),
     ','
@@ -96,6 +97,13 @@ export function insertQuery(
       queryColumns,
       literal(JSON.stringify(values))
     )
+  }
+  if (onConflict === 'ignore') {
+    // `where true` keeps Postgres from parsing ON CONFLICT as a join condition of the SELECT
+    query = safeSql`${query} where true on conflict do nothing`
+  }
+  if (returning === 'count') {
+    return safeSql`with inserted as (${query} returning 1) select count(*) as inserted_count from inserted;`
   }
   if (returning) {
     const returningStatement =

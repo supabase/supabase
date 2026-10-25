@@ -146,6 +146,7 @@ describe('createTable', () => {
 
     expect(result).toStrictEqual({
       table: mockTableResult,
+      importResult: undefined,
     })
   })
 

@@ -11,7 +11,7 @@ import {
   UPLOAD_FILE_EXTENSIONS,
   UPLOAD_FILE_TYPES,
 } from './SpreadsheetImport.constants'
-import type { SpreadsheetData } from './SpreadsheetImport.types'
+import type { ImportResult, SpreadsheetData } from './SpreadsheetImport.types'
 import { DOCS_URL } from '@/lib/constants'
 import { isObject, tryParseJson } from '@/lib/helpers'
 
@@ -288,4 +288,24 @@ export function flagInvalidFileImport(file: File): boolean {
   }
 
   return false
+}
+
+export function getImportResultMessage(result: ImportResult): string {
+  const rows = result.insertedCount === 1 ? 'row' : 'rows'
+  const counts = `${result.insertedCount.toLocaleString()} ${rows} imported, ${result.skippedCount.toLocaleString()} skipped`
+  if (result.status === 'success') return counts
+
+  const error = result.error instanceof Error ? result.error.message : 'Unknown import error'
+  // Every batch was inserted; only the follow-up sequence update failed.
+  if (result.phase === 'sequence') {
+    return `${counts}. The identity sequence could not be updated: ${error}`
+  }
+  const warnings = []
+  if (result.outcome === 'unknown') {
+    warnings.push('The final row counts could not be confirmed. Check the table before retrying.')
+  }
+  if (result.sequenceError !== undefined) {
+    warnings.push('The identity sequence could not be updated.')
+  }
+  return `${counts} before the import stopped. ${error}${warnings.length > 0 ? ` ${warnings.join(' ')}` : ''}`
 }
