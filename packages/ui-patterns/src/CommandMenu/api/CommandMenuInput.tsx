@@ -45,112 +45,136 @@ function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) 
 const CommandMenuInput = forwardRef<
   React.ElementRef<typeof CommandInput>,
   React.ComponentPropsWithoutRef<typeof CommandInput>
->(({ className, wrapperClassName, onKeyDown, ...props }, ref) => {
-  const inputRef = useFocusInputOnWiderScreens(ref)
+>(
+  (
+    {
+      className,
+      wrapperClassName,
+      onKeyDown,
+      value: propValue,
+      onValueChange: propOnValueChange,
+      ...props
+    },
+    ref
+  ) => {
+    const inputRef = useFocusInputOnWiderScreens(ref)
 
-  const page = useCurrentPage()
-  const popPage = usePopPage()
+    const page = useCurrentPage()
+    const popPage = usePopPage()
 
-  const query = useQuery()
-  const setQuery = useSetQuery()
+    const query = useQuery()
+    const setQuery = useSetQuery()
 
-  const [inputValue, setInputValue] = useState(query)
-  useEffect(() => {
-    setInputValue(query)
-    previousValueRef.current = query
-  }, [query])
+    const isControlled = propValue !== undefined
+    const [inputValue, setInputValue] = useState(propValue ?? query)
 
-  // Get telemetry context
-  const telemetryContext = useCommandMenuTelemetryContext()
-  const previousValueRef = useRef<string>(inputValue)
+    useEffect(() => {
+      if (isControlled) {
+        setInputValue(propValue)
+        previousValueRef.current = propValue
+      } else {
+        setInputValue(query)
+        previousValueRef.current = query
+      }
+    }, [isControlled, propValue, query])
 
-  const inputTelemetryEvent = useCallback(
-    (value: string) => {
-      if (telemetryContext?.onTelemetry) {
-        const event = {
-          action: 'command_menu_search_submitted' as const,
-          properties: {
-            value: value,
-            app: telemetryContext.app,
-          },
-          groups: {},
+    const currentValue = isControlled ? propValue : inputValue
+
+    // Get telemetry context
+    const telemetryContext = useCommandMenuTelemetryContext()
+    const previousValueRef = useRef<string>(currentValue)
+
+    const inputTelemetryEvent = useCallback(
+      (value: string) => {
+        if (telemetryContext?.onTelemetry) {
+          const event = {
+            action: 'command_menu_search_submitted' as const,
+            properties: {
+              value: value,
+              app: telemetryContext.app,
+            },
+            groups: {},
+          }
+          telemetryContext.onTelemetry(event)
         }
-        telemetryContext.onTelemetry(event)
+      },
+      [telemetryContext]
+    )
+
+    const debouncedTelemetry = useDebounce(
+      useCallback(() => {
+        inputTelemetryEvent(currentValue)
+        previousValueRef.current = currentValue
+      }, [inputTelemetryEvent, currentValue]),
+      INPUT_TYPED_EVENT_DEBOUNCE_TIME
+    )
+
+    const handleValueChange = useCallback(
+      (value: string) => {
+        if (!isControlled) {
+          setInputValue(value)
+        }
+        propOnValueChange?.(value)
+
+        // Only trigger telemetry if the user is adding characters (not removing with backspace)
+        const isAddingCharacters = value.length > previousValueRef.current.length
+
+        if (!isAddingCharacters) {
+          previousValueRef.current = value
+          return
+        }
+
+        // Trigger debounced telemetry
+        debouncedTelemetry()
+      },
+      [debouncedTelemetry, isControlled, propOnValueChange]
+    )
+
+    // To handle CJK input
+    const [imeComposing, setImeComposing] = useState(false)
+    useEffect(() => {
+      if (!imeComposing) {
+        setQuery(currentValue)
       }
-    },
-    [telemetryContext]
-  )
+    }, [currentValue, imeComposing, setQuery])
 
-  const debouncedTelemetry = useDebounce(
-    useCallback(() => {
-      inputTelemetryEvent(inputValue)
-      previousValueRef.current = inputValue
-    }, [inputTelemetryEvent, inputValue]),
-    INPUT_TYPED_EVENT_DEBOUNCE_TIME
-  )
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      onKeyDown?.(event)
+      if (event.defaultPrevented) return
 
-  const handleValueChange = useCallback(
-    (value: string) => {
-      setInputValue(value)
-
-      // Only trigger telemetry if the user is adding characters (not removing with backspace)
-      const isAddingCharacters = value.length > previousValueRef.current.length
-
-      if (!isAddingCharacters) {
-        previousValueRef.current = value
-        return
+      // Backspace on an empty input steps back to the previous page
+      if (event.key === 'Backspace' && !currentValue && !imeComposing && page) {
+        event.preventDefault()
+        popPage()
       }
-
-      // Trigger debounced telemetry
-      debouncedTelemetry()
-    },
-    [debouncedTelemetry]
-  )
-
-  // To handle CJK input
-  const [imeComposing, setImeComposing] = useState(false)
-  useEffect(() => {
-    if (!imeComposing) {
-      setQuery(inputValue)
     }
-  }, [inputValue, imeComposing])
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    onKeyDown?.(event)
-    if (event.defaultPrevented) return
-
-    // Backspace on an empty input steps back to the previous page
-    if (event.key === 'Backspace' && !inputValue && !imeComposing && page) {
-      event.preventDefault()
-      popPage()
-    }
+    return (
+      <div className="relative w-full" cmdk-input-wrapper="">
+        <CommandInput
+          // Focus needs to be manually handled to check breakpoint first, due to
+          // delays from useEffect
+          autoFocus={false}
+          ref={inputRef}
+          value={currentValue}
+          onValueChange={handleValueChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Run a command or search..."
+          onCompositionStart={() => setImeComposing(true)}
+          onCompositionEnd={() => setImeComposing(false)}
+          wrapperClassName={cn('px-4', wrapperClassName)}
+          className={cn(
+            'flex h-11 w-full rounded-md bg-transparent px-2 y-4 md:py-7 outline-hidden',
+            'focus:shadow-none focus:ring-transparent',
+            'text-sm text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
+            className
+          )}
+          {...props}
+        />
+      </div>
+    )
   }
-
-  return (
-    <div className="relative w-full" cmdk-input-wrapper="">
-      <CommandInput
-        // Focus needs to be manually handled to check breakpoint first, due to
-        // delays from useEffect
-        autoFocus={false}
-        ref={inputRef}
-        value={inputValue}
-        onValueChange={handleValueChange}
-        onKeyDown={handleKeyDown}
-        placeholder="Run a command or search..."
-        onCompositionStart={() => setImeComposing(true)}
-        onCompositionEnd={() => setImeComposing(false)}
-        wrapperClassName={cn('px-4', wrapperClassName)}
-        className={cn(
-          'flex h-11 w-full rounded-md bg-transparent px-2 y-4 md:py-7 outline-hidden',
-          'focus:shadow-none focus:ring-transparent',
-          'text-sm text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
-          className
-        )}
-        {...props}
-      />
-    </div>
-  )
-})
+)
 
 CommandMenuInput.displayName = 'CommandMenuInput'
 

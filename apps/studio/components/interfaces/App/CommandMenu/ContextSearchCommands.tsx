@@ -4,7 +4,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { IS_PLATFORM } from 'common'
 import { Auth, EdgeFunctions, Storage } from 'icons'
 import { DatabaseIcon } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   CommandHeader,
@@ -71,18 +71,12 @@ function ContextSearchPage({
   placeholder: string
 }) {
   const query = useQuery()
-
-  const [filterString, setFilterString] = useState('')
-  const debouncedFilterString = useDebounce(filterString, 300)
+  const debouncedFilterString = useDebounce(query, 300)
 
   return (
     <CommandWrapper shouldFilter={context !== 'database-tables'}>
       <CommandHeader>
-        <CommandMenuInput
-          placeholder={placeholder}
-          value={filterString}
-          onValueChange={setFilterString}
-        />
+        <CommandMenuInput placeholder={placeholder} />
       </CommandHeader>
       <ContextSearchResults
         context={context}
