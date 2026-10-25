@@ -140,7 +140,7 @@ const mockProjectResources = ({
 
 describe('MarketplaceIntegrationSettingsTab', () => {
   describe('section visibility follows the integration definition', () => {
-    test('renders the secret API key section when the integration declares a secret key prefix', async () => {
+    test('renders the secret API key section with a Remove action and generic warning when the integration declares a secret key prefix', async () => {
       setIntegration({ secretKeyPrefix: 'custom_' })
       mockProjectResources({ apiKeys: [secretApiKey('custom_metrics_key')] })
 
@@ -148,6 +148,13 @@ describe('MarketplaceIntegrationSettingsTab', () => {
 
       expect(await screen.findByRole('heading', { name: 'Secret API key' })).toBeInTheDocument()
       expect(screen.getByText('custom_metrics_key')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+      // No integration-specific override, so the generic removal warning is used.
+      expect(
+        screen.getByText(
+          'Removing this key takes effect immediately and can interrupt the integration.'
+        )
+      ).toBeInTheDocument()
     })
 
     test('does not render a secret API key section when the integration declares no prefix, even if secret keys exist', async () => {
@@ -212,29 +219,6 @@ describe('MarketplaceIntegrationSettingsTab', () => {
   })
 
   describe('resource section states', () => {
-    test('a present resource shows the Connected badge and a Remove action', async () => {
-      setIntegration({ secretKeyPrefix: 'custom_' })
-      mockProjectResources({ apiKeys: [secretApiKey('custom_key')] })
-
-      customRender(<MarketplaceIntegrationSettingsTab />)
-
-      expect(await screen.findByText('custom_key')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
-    })
-
-    test('uses the generic removal warning when the integration has no override copy', async () => {
-      setIntegration({ secretKeyPrefix: 'custom_' })
-      mockProjectResources({ apiKeys: [secretApiKey('custom_key')] })
-
-      customRender(<MarketplaceIntegrationSettingsTab />)
-
-      expect(
-        await screen.findByText(
-          'Removing this key takes effect immediately and can interrupt the integration.'
-        )
-      ).toBeInTheDocument()
-    })
-
     test('uses the integration-specific removal warning override when one is defined', async () => {
       setIntegration({ id: 'grafana', name: 'Grafana' })
       mockProjectResources({ apiKeys: [secretApiKey('grafana_cloud_integration_metrics')] })

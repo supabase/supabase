@@ -39,7 +39,6 @@ describe('CreateKeyDialog', () => {
         id: SHORTCUT_IDS.JWT_KEYS_SUBMIT_STANDBY,
         onTrigger: expect.any(Function),
         options: { enabled: true },
-        side: 'top',
       }),
       undefined
     )

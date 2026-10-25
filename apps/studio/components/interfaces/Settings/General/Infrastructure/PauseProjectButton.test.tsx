@@ -62,14 +62,11 @@ describe('PauseProjectButton', () => {
     const button = screen.getByRole('button', { name: 'Pause project' })
     expect(button).toBeAriaDisabled()
 
-    // Radix opens the tooltip on pointermove; focusable disabled buttons support this
-    fireEvent.pointerMove(button)
+    // aria-disabled keeps the button focusable; Radix opens the tooltip on focus without the
+    // hover delay
+    fireEvent.focus(button)
     expect(
-      await screen.findAllByText(
-        'Pausing is unavailable on High Availability projects',
-        {},
-        { timeout: 2000 }
-      )
+      await screen.findAllByText('Pausing is unavailable on High Availability projects')
     ).not.toHaveLength(0)
   })
 })

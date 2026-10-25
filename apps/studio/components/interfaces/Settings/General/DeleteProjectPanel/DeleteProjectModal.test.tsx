@@ -1,5 +1,4 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { toast } from 'sonner'
@@ -89,10 +88,10 @@ const mockSurveyAndDelete = ({ surveyStatus }: { surveyStatus: 201 | 403 }) => {
 const deleteProject = async () => {
   const [reason] = await screen.findAllByRole('radio', { hidden: true })
   fireEvent.click(reason)
-  await userEvent.type(screen.getByPlaceholderText('Type the project name in here'), PROJECT.name)
+  fireEvent.change(screen.getByPlaceholderText('Type the project name in here'), {
+    target: { value: PROJECT.name },
+  })
   fireEvent.click(screen.getByRole('button', { name: 'I understand, delete this project' }))
-  await new Promise((r) => setTimeout(r, 300))
-  await new Promise((r) => setTimeout(r, 500))
 }
 
 describe('DeleteProjectModal', () => {
