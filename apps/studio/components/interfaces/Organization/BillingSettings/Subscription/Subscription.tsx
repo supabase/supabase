@@ -75,9 +75,9 @@ const Subscription = () => {
                 usage quotas.
               </p>
             </div>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-y-2">
               <p className="text-sm text-foreground-light m-0">More information</p>
-              <div className="space-y-1">
+              <div className="flex flex-col gap-y-1">
                 <Link href={COMPARE_PLANS_URL} target="_blank" rel="noreferrer">
                   <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
                     <p className="m-0 text-sm">Compare plans</p>
