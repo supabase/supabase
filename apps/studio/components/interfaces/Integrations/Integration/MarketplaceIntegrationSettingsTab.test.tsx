@@ -12,12 +12,13 @@ import { type ProjectSecret } from '@/data/secrets/secrets-query'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
 type OAuthAppResponse = components['schemas']['OAuthAppResponse_Output']
 type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse_Output']
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 // `useIntegrationDetail` resolves the integration definition from the route, the marketplace query
 // and feature flags — none of which is the subject of this test. Mock it so each test can drive a
@@ -103,11 +104,7 @@ const mockProjectResources = ({
   oauthApps = [] as OAuthAppResponse[],
   smtpHost = null as string | null,
 } = {}) => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: () => HttpResponse.json<PermissionsV2Response>(CAN_READ_OAUTH_APPS_PERMISSIONS),
-  })
+  mockPermissions(CAN_READ_OAUTH_APPS_PERMISSIONS)
   addAPIMock({
     method: 'get',
     path: '/v1/projects/:ref/api-keys',

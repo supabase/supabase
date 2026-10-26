@@ -18,13 +18,12 @@ import { contract as listDatabasesContract } from './tools/list-databases'
 import { contract as listNotebooksContract } from './tools/list-notebooks'
 import { contract as listPoliciesContract } from './tools/list-policies'
 import { contract as listReportsContract } from './tools/list-reports'
-import { getToolContract } from './tools/registry'
+import { getRemoteToolContract, getToolContract } from './tools/registry'
 import { contract as runNotebookContract } from './tools/run-notebook'
 import { contract as updateNotebookContract } from './tools/update-notebook'
 
 describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
-    expect(TOOL_CATEGORY_MAP['search_docs']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['getSchemaTables']).toBe(TOOL_CATEGORIES.SCHEMA)
   })
 })
@@ -63,18 +62,19 @@ describe('tools with a contract', () => {
 })
 
 describe('always-available tools with a contract', () => {
-  it.each(['escalate_to_human', 'resolve_support_conversation', 'get_active_incidents'])(
-    '%s is allowed at every opt-in level',
-    (name) => {
-      const tools = {
-        [name]: { description: 'A tool', execute: vitest.fn() },
-      } as unknown as ToolSet
+  it.each([
+    'escalate_to_human',
+    'resolve_support_conversation',
+    'get_active_incidents',
+    'search_docs',
+  ])('%s is allowed at every opt-in level', (name) => {
+    const tools = {
+      [name]: { description: 'A tool', execute: vitest.fn() },
+    } as unknown as ToolSet
 
-      expect(getToolContract(name)?.minOptInLevel).toBeNull()
-      expect(Object.hasOwn(TOOL_CATEGORY_MAP, name)).toBe(false)
-      expect(filterToolsByOptInLevel(tools, 'disabled')[name].description).toBe('A tool')
-    }
-  )
+    expect((getToolContract(name) ?? getRemoteToolContract(name))?.minOptInLevel).toBeNull()
+    expect(filterToolsByOptInLevel(tools, 'disabled')[name].description).toBe('A tool')
+  })
 })
 
 describe('tool allowance by opt-in level', () => {

@@ -62,8 +62,20 @@ export const dynamicRedirects = [
   {
     basePath: false,
     permanent: true,
-    source: '/docs/guides/resources/migrating-to-supabase/:path*',
-    destination: '/docs/guides/platform/migrating-to-supabase/:path*',
+    source: '/docs/guides/platform/migrating-to-supabase/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
+  },
+  {
+    basePath: false,
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
+  },
+  {
+    basePath: false,
+    permanent: true,
+    source: '/docs/guides/migrations/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
   },
   {
     basePath: false,

@@ -1067,4 +1067,9 @@ module.exports = [
     destination:
       '/changelog/48235-migration-of-supabase-management-api-logs-all-analytics-endpoint-to-logs-endpoint',
   },
+  {
+    permanent: true,
+    source: '/changelog/rss.xml',
+    destination: '/changelog-rss.xml',
+  },
 ]

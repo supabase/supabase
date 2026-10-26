@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { fdwKeys } from './keys'
 import type { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
@@ -30,6 +31,7 @@ export async function deleteFDW({
     connectionString,
     sql,
     queryKey: ['delete-fdw'],
+    grant: unguarded.migrating,
   })
   return result
 }

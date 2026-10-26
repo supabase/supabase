@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -33,6 +34,7 @@ export async function readDatabaseQueueMessage({
     connectionString,
     sql: safeSql`select * from pgmq.set_vt(${literal(queueName)}, ${literal(messageId)}, ${literal(duration)})`,
     queryKey: databaseQueuesKeys.create(),
+    grant: unguarded.migrating,
   })
 
   return result
