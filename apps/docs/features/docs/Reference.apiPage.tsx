@@ -68,7 +68,7 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
                     libraryId="api"
                     version="latest"
                     section={section}
-                    headingTag="h1"
+                    headingTag="h2"
                   />
                   {/* The sidebar is hidden below `md`, so keep the links reachable */}
                   {additionalLinks.length !== 0 && (
