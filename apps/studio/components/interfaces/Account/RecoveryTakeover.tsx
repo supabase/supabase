@@ -9,7 +9,7 @@ export const RecoveryTakeover = ({
     <Dialog open>
       <DialogContent
         hideClose
-        aria-label="Account recovery"
+        aria-label="Secure your account"
         aria-describedby={undefined}
         className="w-full max-w-none sm:max-w-none md:max-w-none border-0 rounded-none sm:rounded-none shadow-none outline-none data-[state=open]:animate-none data-[state=closed]:animate-none"
         dialogOverlayProps={{
@@ -29,7 +29,7 @@ export const RecoveryTakeover = ({
           if (restoreFocusTo?.isConnected) restoreFocusTo.focus()
         }}
       >
-        <DialogTitle className="sr-only">Account recovery</DialogTitle>
+        <DialogTitle className="sr-only">Secure your account</DialogTitle>
         <div className="motion-safe:animate-in fade-in-0 duration-250 delay-100 fill-mode-both ease-enter motion-reduce:animate-none">
           {children}
         </div>

@@ -19,12 +19,13 @@ describe('RecoveryReminder', () => {
     expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
   })
 
-  test('does not claim success when checks are disabled', () => {
-    customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isUnavailable />)
-    expect(
-      screen.getByRole('heading', { name: 'Account recovery check unavailable' })
-    ).toBeInTheDocument()
-    expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
+  test('dismisses unavailable checks without displaying a warning', async () => {
+    const onDismiss = vi.fn()
+    const { container } = customRender(
+      <RecoveryReminder gap="missing" onDismiss={onDismiss} isUnavailable />
+    )
+    await waitFor(() => expect(onDismiss).toHaveBeenCalledOnce())
+    expect(container).toBeEmptyDOMElement()
   })
 
   test('does not claim success when the recovery check fails', () => {

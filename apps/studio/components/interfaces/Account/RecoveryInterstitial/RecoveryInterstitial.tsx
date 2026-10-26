@@ -78,18 +78,15 @@ export const RecoveryReminder = ({
   // Preserve all task dialogs and completed rows during background status updates.
   const activeGap = startedGap ?? gap
   useEffect(() => {
-    if (!activeGap && !isLoading && !isError && !isUnavailable) onDismiss()
+    if (isUnavailable || (!activeGap && !isLoading && !isError)) onDismiss()
   }, [activeGap, isLoading, isError, isUnavailable, onDismiss])
 
-  if (!activeGap && !isLoading && !isError && !isUnavailable) return null
+  if (isUnavailable || (!activeGap && !isLoading && !isError)) return null
   if (!activeGap) {
     return (
       <InterstitialLayout
         logo={<SupabaseLogo />}
         title={isLoading ? 'Checking account recovery' : 'Account recovery check unavailable'}
-        description={
-          isUnavailable ? 'Account recovery checks are not enabled for this account.' : undefined
-        }
         widthClassName="max-w-md"
       >
         {isError && (
