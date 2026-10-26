@@ -11,13 +11,13 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-const { mockUser, timelineAvailability } = vi.hoisted(() => ({
+const { mockUser, recentLogsAvailability } = vi.hoisted(() => ({
   mockUser: {
     id: '11111111-1111-1111-1111-111111111111',
     email: 'user@example.com',
     providers: ['email'],
   } as unknown as User,
-  timelineAvailability: { otel: false, unifiedLogs: false },
+  recentLogsAvailability: { otel: false, unifiedLogs: false },
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -25,12 +25,15 @@ vi.mock('common', async (importOriginal) => {
   return {
     ...actual,
     useParams: () => ({ ref: 'project-ref' }),
-    useFlag: (name: string) => name === 'otelUnifiedLogs' && timelineAvailability.otel,
+    useFlag: (name: string) => name === 'otelUnifiedLogs' && recentLogsAvailability.otel,
   }
 })
 
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
-  useUnifiedLogsPreview: () => ({ isEnabled: timelineAvailability.unifiedLogs, isLoading: false }),
+  useUnifiedLogsPreview: () => ({
+    isEnabled: recentLogsAvailability.unifiedLogs,
+    isLoading: false,
+  }),
 }))
 
 // Project resolution is pure scaffolding here (it only supplies `ref` to the
@@ -50,16 +53,16 @@ vi.mock('./UserOverview', () => ({
 vi.mock('./UserLogs', () => ({
   UserLogs: () => <div data-testid="user-logs" />,
 }))
-vi.mock('@/components/interfaces/UnifiedLogs/components/UserLogTimeline', () => ({
-  UserLogTimeline: () => <div data-testid="user-log-timeline" />,
+vi.mock('@/components/interfaces/UnifiedLogs/components/UserRecentLogs', () => ({
+  UserRecentLogs: () => <div data-testid="user-recent-logs" />,
 }))
 
 const renderPanel = (
   disabledFeatures: string[] = [],
   { otel = false, unifiedLogs = false } = {}
 ) => {
-  timelineAvailability.otel = otel
-  timelineAvailability.unifiedLogs = unifiedLogs
+  recentLogsAvailability.otel = otel
+  recentLogsAvailability.unifiedLogs = unifiedLogs
   // The user query flows through pg-meta SQL; mock it at the network boundary.
   addAPIMock({
     method: 'post',
@@ -120,7 +123,7 @@ describe('UserPanel', () => {
     expect(screen.queryByPlaceholderText('Filter...')).not.toBeInTheDocument()
   })
 
-  it('moves Logs last and shows the user timeline when unified logs can filter by user', async () => {
+  it('moves Logs last and shows recent logs when unified logs can filter by user', async () => {
     const user = userEvent.setup()
     renderPanel([], { otel: true, unifiedLogs: true })
 
@@ -131,7 +134,7 @@ describe('UserPanel', () => {
       'Logs',
     ])
     await user.click(screen.getByRole('tab', { name: 'Logs' }))
-    expect(await screen.findByTestId('user-log-timeline')).toBeInTheDocument()
+    expect(await screen.findByTestId('user-recent-logs')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'View logs' })).not.toBeInTheDocument()
   })
 })

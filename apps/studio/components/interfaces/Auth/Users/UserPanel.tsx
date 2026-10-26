@@ -19,21 +19,21 @@ import { UserCard } from './UserCard'
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { UserLogTimeline } from '@/components/interfaces/UnifiedLogs/components/UserLogTimeline'
+import { UserRecentLogs } from '@/components/interfaces/UnifiedLogs/components/UserRecentLogs'
 import { RawJsonView } from '@/components/ui/RawJsonView'
 import { useUserQuery } from '@/data/auth/user-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-type UserPanelView = 'overview' | 'raw' | 'logs' | 'timeline'
+type UserPanelView = 'overview' | 'raw' | 'logs' | 'recent-logs'
 
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
   const showLogs = useIsFeatureEnabled('logs:all')
-  // The timeline reads unified logs filtered by user, which only the ClickHouse path supports
+  // Recent logs read unified logs filtered by user, which only the ClickHouse path supports
   const isOtelUnifiedLogs = !!useFlag('otelUnifiedLogs')
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
-  const showTimeline = showLogs && isOtelUnifiedLogs && isUnifiedLogsEnabled
+  const showRecentLogs = showLogs && isOtelUnifiedLogs && isUnifiedLogsEnabled
 
   const [selectedId, setSelectedId] = useQueryState(
     'show',
@@ -90,9 +90,9 @@ export const UserPanel = () => {
               />
               <TabsList className="shrink-0 gap-x-4 px-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
-                {showLogs && !showTimeline && <TabsTrigger value="logs">Logs</TabsTrigger>}
+                {showLogs && !showRecentLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}
                 <TabsTrigger value="raw">Raw JSON</TabsTrigger>
-                {showTimeline && <TabsTrigger value="timeline">Logs</TabsTrigger>}
+                {showRecentLogs && <TabsTrigger value="recent-logs">Logs</TabsTrigger>}
                 <TabsIndicator />
               </TabsList>
 
@@ -101,12 +101,15 @@ export const UserPanel = () => {
                   <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
                 )}
               </TabsContent>
-              {showTimeline && selectedUser.id && (
-                <TabsContent value="timeline" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
-                  <UserLogTimeline userId={selectedUser.id} />
+              {showRecentLogs && selectedUser.id && (
+                <TabsContent
+                  value="recent-logs"
+                  className={cn('mt-0 grow min-h-0 overflow-y-auto')}
+                >
+                  <UserRecentLogs userId={selectedUser.id} />
                 </TabsContent>
               )}
-              {showLogs && !showTimeline && (
+              {showLogs && !showRecentLogs && (
                 <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
                   {selectedUser && <UserLogs user={selectedUser} />}
                 </TabsContent>
