@@ -139,9 +139,33 @@ function hasChildContract(node) {
   )
 }
 
+function isPassedToCall(node) {
+  for (let ancestor = node.parent; ancestor; ancestor = ancestor.parent) {
+    if (
+      ancestor.type === 'FunctionDeclaration' ||
+      ancestor.type === 'FunctionExpression' ||
+      ancestor.type === 'ArrowFunctionExpression'
+    ) {
+      return false
+    }
+    if (
+      (ancestor.type === 'CallExpression' || ancestor.type === 'NewExpression') &&
+      ancestor.arguments.some((argument) => {
+        for (let current = node; current && current !== ancestor; current = current.parent) {
+          if (current === argument) return true
+        }
+        return false
+      })
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
 function textContext(node) {
   let parent
-  let canFix = true
+  let canFix = !isPassedToCall(node)
   for (let ancestor = node.parent; ancestor; ancestor = ancestor.parent) {
     if (
       ancestor.type === 'JSXExpressionContainer' &&

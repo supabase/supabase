@@ -79,6 +79,7 @@ describe('wrap-jsx-text', () => {
     '<div>\n  \n</div>',
     '<div> </div>',
     '<div title="Hello" />',
+    '<>Hello</>',
     '<><span>Hello</span><span>World</span></>',
     '<svg><text>Hello</text><foreignObject><div>Hello</div></foreignObject></svg>',
     '<math><mtext>Hello</mtext></math>',
@@ -96,6 +97,8 @@ describe('wrap-jsx-text', () => {
     '<Button asChild><div>Hello</div></Button>',
     '<Slot><div>Hello</div></Slot>',
     '<Primitive.Slot><div>Hello</div></Primitive.Slot>',
+    '<svg>{items.map(() => <a>Hello</a>)}</svg>',
+    '<Button asChild>{() => <div>Hello</div>}</Button>',
   ])('leaves protected or unsupported text unchanged: %s', (input) => {
     const result = lint(input)
     expect(result.messages).toEqual([])
@@ -117,12 +120,23 @@ describe('wrap-jsx-text', () => {
     '<div>{show ? "Hello" : unknown}</div>',
     '<div>{show ? "Hello" : 0}</div>',
     '<div>{show ? "Hello" : getLabel()}</div>',
+    'transform(<div>Hello</div>)',
+    'React.cloneElement(<div>Hello</div>, { className: "flex" })',
+    'transform?.(<div>Hello</div>)',
+    'new Transform(<div>Hello</div>)',
+    'transform({ children: [<div>Hello</div>] })',
   ])('reports without a fix when safety needs review: %s', (input) => {
     const result = lint(input)
     expect(result.messages).toHaveLength(1)
     expect(result.messages[0].messageId).toBe('review')
     expect(result.messages[0].fix).toBeUndefined()
     expect(result.output).toBe(input)
+  })
+
+  it('keeps JSX returned from a function argument eligible for fixes', () => {
+    const result = lint('useMemo(() => <div>Hello</div>, [])')
+    expect(result.output).toBe('useMemo(() => <div><span>Hello</span></div>, [])')
+    expect(result.messages).toEqual([])
   })
 
   it('keeps mixed React element branches for manual review', () => {
