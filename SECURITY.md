@@ -8,10 +8,6 @@ Please report suspected vulnerabilities through our HackerOne program:
 <https://hackerone.com/supabase>. Please do not open public GitHub issues or
 pull requests for security problems.
 
-The program-wide rules are repeated below, under "Out of scope for every
-Supabase asset" and "Testing and disclosure". They also live at
-<https://supabase.com/.well-known/security.txt>.
-
 This repository is the main Supabase monorepo. It contains Supabase Studio (the
 dashboard), the documentation and marketing sites, the Docker-based
 self-hosting stack (the API gateway configuration, `.env` templates and
@@ -78,7 +74,9 @@ informative or not applicable.
 - **Studio has no login of its own when self-hosted.** The gateway in front of
   it provides authentication, and it is not meant to be exposed to untrusted
   networks. Reaching Studio or its internal APIs by exposing it to the internet,
-  or from inside the container network, is a deployment matter.
+  or from inside the container network, is a deployment matter. Put it behind
+  the gateway, change every placeholder secret, and restrict egress, as the
+  self-hosting guide describes.
 - **Placeholder credentials and keys.** The passwords, JWT secrets and keys in
   `.env.example` and the Docker templates are documented sample values that
   operators must replace. Reports that they exist, or that a deployment which
@@ -108,11 +106,13 @@ informative or not applicable.
 - **Outbound requests made on your behalf.** Edge Functions are user-deployed
   code and can make requests to the public internet, and so can the database
   with extensions like `http` or `pg_net` when you enable them. On the hosted
-  platform internal networks and metadata services are not reachable. Studio
-  features such as the Edge Function test proxy require dashboard access, which
-  already allows running SQL and deploying functions. A report must show a
-  bypass of the hosted protections, or access to something the caller could not
-  otherwise reach.
+  platform internal networks and metadata services are not reachable.
+  Self-hosted functions may live on any endpoint and may need to reach internal
+  networks, so restricting egress is the operator's job. Studio features such
+  as the Edge Function test proxy require dashboard access, which already
+  allows running SQL and deploying functions. A report must show a bypass of
+  the hosted protections, or access to something the caller could not otherwise
+  reach.
 - **Customer configuration.** Tables without Row Level Security, an extension
   installed into an exposed schema, and a `service_role` key shipped in a
   client are the customer's responsibility. An RLS bypass must be reproduced on
@@ -181,26 +181,13 @@ you do not need to leave this repository to find them.
 - Dead links.
 - User enumeration.
 
-## Known and documented behavior
-
-These are described in our documentation or in the shipped configuration.
-Please check them before reporting.
-
-- **Self-hosting hardening.** Self-hosted Studio is not designed to be exposed
-  to untrusted networks. Put it behind the gateway, change every placeholder
-  secret, and restrict egress. See the self-hosting guide.
-- **Edge Functions self-hosted.** Self-hosted functions may live on any endpoint
-  and may need to reach internal networks, so egress restriction is the
-  operator's job.
-
 ## Hosted vs. self-hosted
 
-If your finding only applies when someone self-hosts with an insecure setting
-(an exposed Studio, unchanged secrets, a removed gateway plugin), label it
-"self-hosted, custom configuration" and list the settings you changed (see
-below). We accept self-hosted findings when the shipped defaults or the
-documented setup lead to the problem, and we treat them as lower severity when
-the operator has to misconfigure the deployment first.
+We accept self-hosted findings when the shipped defaults or the documented
+setup lead to the problem, and we treat them as lower severity when the
+operator has to misconfigure the deployment first, such as by exposing Studio,
+keeping unchanged secrets, or removing a gateway plugin. Label your report as
+described in the next section.
 
 ## How to write a report that gets triaged quickly
 
@@ -221,6 +208,7 @@ the operator has to misconfigure the deployment first.
   Reports that do not say which of the three they are about are slower to
   triage, and are often closed with a request to retest. A finding that works
   only on a custom configuration is not a finding against production.
+
 - **Test a real deployment.** Code reading alone is rarely enough. Static
   analysis findings need a working proof of concept against one of the targets
   above, and for the self-hosted stack, the documented Docker setup and not just
@@ -273,12 +261,6 @@ tools acting on your behalf.
 - Do not take advantage of a vulnerability you find, for example by downloading
   more data than necessary to demonstrate it, or by deleting or modifying other
   people's data.
-
-**Reporting**
-
-- File a report through our HackerOne program at
-  <https://hackerone.com/supabase>.
-- Give enough information for us to reproduce the problem.
 
 **Disclosure**
 
