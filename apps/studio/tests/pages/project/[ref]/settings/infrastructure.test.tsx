@@ -285,6 +285,29 @@ function mockInfrastructureEndpoints() {
   })
   addAPIMock({
     method: 'get',
+    path: '/platform/stripe/invoices/overdue',
+    response: [],
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/v1/projects/:ref/upgrade/eligibility',
+    response: {
+      eligible: true,
+      current_app_version: 'supabase-postgres-17.6.1.100',
+      current_app_version_release_channel: 'ga',
+      latest_app_version: 'supabase-postgres-17.6.1.100',
+      target_upgrade_versions: [],
+      duration_estimate_hours: 1,
+      legacy_auth_custom_roles: [],
+      objects_to_be_dropped: [],
+      unsupported_extensions: [],
+      user_defined_objects_in_internal_schemas: [],
+      validation_errors: [],
+      warnings: [],
+    },
+  })
+  addAPIMock({
+    method: 'get',
     path: '/platform/projects/:ref/infra-monitoring',
     response: () =>
       HttpResponse.json({

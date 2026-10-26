@@ -1,11 +1,14 @@
 import { type Table as TTable } from '@tanstack/react-table'
+import { createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
-import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
+import { LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
-import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
+import { ColumnSchema, FacetMetadataSchema, querySearchParamsSchema } from './UnifiedLogs.schema'
+import type { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
+import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 
 export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 
@@ -27,6 +30,36 @@ export function getComputeLogsAvailability({
   }
 }
 
+export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
+
+export function toQuerySearchParams(search: Partial<SearchParamsType>): QuerySearchParamsType {
+  const query = Object.fromEntries(
+    Object.entries(search).filter(([, value]) => value !== null && value !== undefined)
+  )
+  const result = querySearchParamsSchema.safeParse(query)
+  if (!result.success) {
+    throw new Error('Invalid unified logs search parameters', { cause: result.error })
+  }
+  return result.data
+}
+
+export const createUnifiedLogsSearch = (params: Partial<SearchParamsType> = {}) =>
+  toQuerySearchParams(params)
+
+export function getUniqueLogRows<T extends { id: string }>(
+  pages: { data?: T[] }[] | undefined
+): T[] {
+  return deduplicateUnifiedLogs((pages ?? []).flatMap((page) => page.data ?? []))
+}
+
+export function getLogRowClassName(
+  row: Pick<ColumnSchema, 'level' | 'timestamp'>,
+  liveTimestamp?: number
+): string {
+  const isPast = Number(row.timestamp) <= (liveTimestamp || -1)
+  return cn(getLevelRowClassName(row.level), isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
+}
+
 export const buildUnifiedLogsUrl = ({
   projectRef,
   logType,
@@ -40,15 +73,12 @@ export const buildUnifiedLogsUrl = ({
   user?: string
   start?: string | Date
   end?: string | Date
-}) => {
-  const params = new URLSearchParams()
-  if (logType) params.append('filter', `log_type:eq:${logType}`)
-  if (user) params.set('user', user)
-  if (start && end) {
-    params.set('date', `${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
-  }
-  return `/project/${projectRef}/logs?${params.toString()}`
-}
+}) =>
+  serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
+    filter: logType ? [`log_type:eq:${logType}`] : null,
+    user: user ?? null,
+    date: start && end ? [new Date(start), new Date(end)] : null,
+  })
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {

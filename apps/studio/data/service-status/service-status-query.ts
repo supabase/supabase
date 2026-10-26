@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { serviceStatusKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectServiceStatusVariables = {
@@ -30,6 +30,7 @@ export async function getProjectServiceStatus(
       },
     },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
