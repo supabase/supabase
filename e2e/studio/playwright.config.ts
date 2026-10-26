@@ -60,7 +60,7 @@ export default defineConfig({
     baseURL: env.STUDIO_URL,
     screenshot: 'off',
     video: 'retain-on-failure',
-    headless: true || IS_CI,
+    headless: true,
     trace: 'retain-on-failure',
     permissions: ['clipboard-read', 'clipboard-write'],
     extraHTTPHeaders: {
