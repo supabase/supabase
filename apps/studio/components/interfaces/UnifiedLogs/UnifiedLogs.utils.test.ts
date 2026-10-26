@@ -215,7 +215,10 @@ describe('getLogTypeVisibility', () => {
   })
 
   it('only shows the edge function log types in a function-scoped view', () => {
-    const visibility = getLogTypeVisibility({ compute: true }, { functionId: 'fn-123' })
+    const visibility = getLogTypeVisibility(
+      { compute: true },
+      { type: 'edge-function', functionId: 'fn-123' }
+    )
     const visibleLogTypes = Object.entries(visibility)
       .filter(([, isVisible]) => isVisible)
       .map(([logType]) => logType)
@@ -229,7 +232,7 @@ describe('getLogTypeVisibility', () => {
     expect(
       gateLogTypeFilters(
         ['log_type:eq:postgres', 'log_type:eq:edge function runtime', 'level:eq:error'],
-        getLogTypeVisibility({}, { functionId: 'fn-123' })
+        getLogTypeVisibility({}, { type: 'edge-function', functionId: 'fn-123' })
       )
     ).toEqual(['log_type:eq:edge function runtime', 'level:eq:error'])
   })
@@ -237,8 +240,8 @@ describe('getLogTypeVisibility', () => {
 
 describe('createUnifiedLogsSearch', () => {
   it('attaches the scope', () => {
-    const search = createUnifiedLogsSearch({}, { functionId: 'fn-123' })
-    expect(search.scope).toEqual({ functionId: 'fn-123' })
+    const search = createUnifiedLogsSearch({}, { type: 'edge-function', functionId: 'fn-123' })
+    expect(search.scope).toEqual({ type: 'edge-function', functionId: 'fn-123' })
   })
 
   it('leaves the scope off unscoped searches', () => {

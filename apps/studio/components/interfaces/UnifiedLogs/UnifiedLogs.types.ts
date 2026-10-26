@@ -15,9 +15,10 @@ export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
 
 /**
  * Narrows every unified logs query to a single resource. Set by embedded views
- * (e.g. an edge function's Logs tab) rather than read from the URL.
+ * (e.g. an edge function's Logs tab) rather than read from the URL. What each
+ * type narrows to lives in `UNIFIED_LOGS_SCOPES`.
  */
-export type UnifiedLogsScope = { functionId: string }
+export type UnifiedLogsScope = { type: 'edge-function'; functionId: string }
 
 export type QuerySearchParamsType = Omit<SearchParamsType, 'uuid' | 'live'> & {
   scope?: UnifiedLogsScope

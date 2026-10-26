@@ -20,7 +20,7 @@ const withFilters = (...entries: string[]) => ({ ...baseSearch, filter: entries 
 // Helper: build a search scoped to one edge function, plus optional `filter` entries.
 const withFunctionScope = (...entries: string[]): QuerySearchParamsType => ({
   ...baseSearch,
-  scope: { functionId: 'fn-123' },
+  scope: { type: 'edge-function', functionId: 'fn-123' },
   filter: entries,
 })
 

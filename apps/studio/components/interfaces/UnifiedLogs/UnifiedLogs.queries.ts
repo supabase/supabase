@@ -1,15 +1,12 @@
 import dayjs from 'dayjs'
 
-import {
-  DEFAULT_LOG_TYPES,
-  EDGE_FUNCTION_LOG_TYPES,
-  LOG_TYPE_TO_SOURCE,
-} from './UnifiedLogs.constants'
+import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import {
   groupLogsFiltersByColumn,
   parseLogsFilterUrlParams,
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
+import { UNIFIED_LOGS_SCOPES } from './UnifiedLogs.scopes'
 import { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
@@ -255,12 +252,13 @@ const translateFilter = (
 }
 
 /**
- * Restricts rows to one edge function: its invocations and runtime output. Applied to every
- * query, facet scans included, so a scoped view never counts rows from outside the scope.
+ * Restricts rows to the scope's log types and resource. Applied to every query, facet scans
+ * included, so a scoped view never counts rows from outside the scope.
  */
 const scopeCondition = (scope?: UnifiedLogsScope): SafeLogSqlFragment | null => {
   if (!scope) return null
-  return safeSql`(${logTypeWhereCondition([...EDGE_FUNCTION_LOG_TYPES])} AND log_attributes['function_id'] = ${lit(scope.functionId)})`
+  const { logTypes, sqlCondition } = UNIFIED_LOGS_SCOPES[scope.type]
+  return safeSql`(${logTypeWhereCondition([...logTypes])} AND ${sqlCondition(scope)})`
 }
 
 const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>

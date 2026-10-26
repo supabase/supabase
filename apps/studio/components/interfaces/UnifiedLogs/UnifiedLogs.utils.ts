@@ -2,14 +2,10 @@ import { type Table as TTable } from '@tanstack/react-table'
 import { createLoader, createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
-import {
-  EDGE_FUNCTION_LOG_TYPES,
-  LOG_TYPES,
-  LOG_TYPES_LABELS,
-  SEARCH_PARAMS_PARSER,
-} from './UnifiedLogs.constants'
+import { LOG_TYPES, LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
+import { UNIFIED_LOGS_SCOPES } from './UnifiedLogs.scopes'
 import type { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -46,7 +42,7 @@ export function getLogTypeVisibility(
 ): Partial<Record<UnifiedLogType, boolean>> {
   if (!scope) return { ...visibility, 'edge function runtime': false }
 
-  const scopeLogTypes: readonly UnifiedLogType[] = EDGE_FUNCTION_LOG_TYPES
+  const scopeLogTypes: readonly UnifiedLogType[] = UNIFIED_LOGS_SCOPES[scope.type].logTypes
   return Object.fromEntries(LOG_TYPES.map((logType) => [logType, scopeLogTypes.includes(logType)]))
 }
 

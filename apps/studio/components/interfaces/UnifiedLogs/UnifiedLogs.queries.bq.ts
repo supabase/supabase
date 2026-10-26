@@ -6,8 +6,9 @@
 
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES, EDGE_FUNCTION_LOG_TYPES } from './UnifiedLogs.constants'
+import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { groupLogsFiltersByColumn, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
+import { UNIFIED_LOGS_SCOPES } from './UnifiedLogs.scopes'
 import { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
@@ -36,7 +37,7 @@ const ALL_LOG_TYPES = ['edge', 'postgrest', 'storage', 'postgres', 'edge functio
 export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
   const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
   const scopeLogTypes: string[] | undefined = search.scope
-    ? [...EDGE_FUNCTION_LOG_TYPES]
+    ? [...UNIFIED_LOGS_SCOPES[search.scope.type].logTypes]
     : undefined
   if (filters.length === 0) return scopeLogTypes ?? [...DEFAULT_LOG_TYPES]
   const included = filters.filter((f) => f.operator === '=').map((f) => f.value)
@@ -411,7 +412,9 @@ export const getUnifiedLogsCTE = (
   logTypes?: string[],
   scope?: UnifiedLogsScope
 ): SafeLogSqlFragment => {
-  const allowedLogTypes: readonly string[] = scope ? EDGE_FUNCTION_LOG_TYPES : DEFAULT_LOG_TYPES
+  const allowedLogTypes: readonly string[] = scope
+    ? UNIFIED_LOGS_SCOPES[scope.type].logTypes
+    : DEFAULT_LOG_TYPES
   const requested = (logTypes ?? allowedLogTypes).filter(
     (type) => !scope || allowedLogTypes.includes(type)
   )

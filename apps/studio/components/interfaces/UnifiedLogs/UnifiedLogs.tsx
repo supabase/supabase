@@ -149,22 +149,25 @@ export const UnifiedLogs = () => {
   const { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder } =
     useLogsTableColumns()
 
+  // Log types the queries, filters and facets may use
+  const queryLogTypeVisibility = useMemo(
+    () =>
+      getLogTypeVisibility({
+        multigres: showMultigresLogs,
+        compute: computeAvailability.canQueryCompute,
+      }),
+    [showMultigresLogs, computeAvailability.canQueryCompute]
+  )
+
   // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = useMemo(() => {
     const parameters = toQuerySearchParams(search)
     if (parameters.filter) {
-      parameters.filter =
-        gateLogTypeFilters(
-          parameters.filter,
-          getLogTypeVisibility({
-            multigres: showMultigresLogs,
-            compute: computeAvailability.canQueryCompute,
-          })
-        ) ?? null
+      parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? null
     }
     return parameters
-  }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [search, queryLogTypeVisibility])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
 
   useEffect(() => setLocalFilterOrigin(null), [urlFilterScope])
@@ -300,13 +303,7 @@ export const UnifiedLogs = () => {
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
-    const gatedFields = gateLogTypeOptions(
-      defaultFilterFields,
-      getLogTypeVisibility({
-        multigres: showMultigresLogs,
-        compute: computeAvailability.canQueryCompute,
-      })
-    )
+    const gatedFields = gateLogTypeOptions(defaultFilterFields, queryLogTypeVisibility)
 
     return gatedFields.map((field) => {
       const facetsField = facets?.[field.value]
@@ -334,18 +331,12 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [facets, queryLogTypeVisibility])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)
     if (Array.isArray(update.filter)) {
-      update.filter = gateLogTypeFilters(
-        update.filter.map(String),
-        getLogTypeVisibility({
-          multigres: showMultigresLogs,
-          compute: computeAvailability.canQueryCompute,
-        })
-      )
+      update.filter = gateLogTypeFilters(update.filter.map(String), queryLogTypeVisibility)
     }
     setSearch(update)
   }
