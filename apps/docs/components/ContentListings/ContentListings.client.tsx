@@ -102,7 +102,8 @@ function ContentListingProgression({ group }: { group: ContentListingGroup }) {
   return (
     <div className="@container [--flow-gap:calc(2rem*4/3)]">
       <ol
-        aria-label={group.heading ?? 'Progression'}
+        aria-labelledby={group.labelledBy}
+        aria-label={group.labelledBy ? undefined : (group.heading ?? 'Progression')}
         className="m-0 grid list-none grid-cols-1 gap-(--flow-gap) p-0 @md:grid-cols-2"
       >
         {items.map((item, index) => {
@@ -119,7 +120,7 @@ function ContentListingProgression({ group }: { group: ContentListingGroup }) {
             <li key={`${group.id}-${item.href}`} className="relative">
               <a
                 href={item.href}
-                className="block h-full no-underline"
+                className="focus-ring block h-full rounded-lg no-underline"
                 onClick={() => trackClick(item)}
               >
                 {panel}

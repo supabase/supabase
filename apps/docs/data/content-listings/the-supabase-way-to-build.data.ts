@@ -3,6 +3,7 @@ import type { ContentListingGroup } from '~/lib/content-listings.schema'
 export const supabaseWayProgression: ContentListingGroup = {
   id: 'supabase-way-progression',
   type: 'progression',
+  labelledBy: 'the-progression-at-a-glance',
   items: [
     {
       title: 'Start with a database',
@@ -18,7 +19,7 @@ export const supabaseWayProgression: ContentListingGroup = {
     },
     {
       title: 'Scope data to each user',
-      subtitle: 'Row-Level Security',
+      subtitle: 'Row Level Security',
       href: '#scope-data-to-each-user-row-level-security',
       icon: 'rls',
     },
