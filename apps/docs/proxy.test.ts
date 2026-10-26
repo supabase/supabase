@@ -37,6 +37,15 @@ describe('docs proxy — /guides/* content negotiation', () => {
     }
   })
 
+  it('rewrites an unknown /<slug>.md to the markdown 404, but not an Accept-only miss', () => {
+    const md = makeRequest('/docs/guides/doesnotexist.md')
+    expect(proxy(md).headers.get(REWRITE_HEADER)).toBe(
+      'https://supabase.com/docs/api/md-404/guides/doesnotexist.md'
+    )
+    const accept = makeRequest('/docs/guides/doesnotexist', { accept: 'text/markdown' })
+    expect(proxy(accept).headers.get(REWRITE_HEADER)).toBeNull()
+  })
+
   it('serves HTML for browser-style Accept', () => {
     const req = makeRequest('/docs/guides/auth', {
       accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',

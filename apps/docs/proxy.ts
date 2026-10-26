@@ -39,6 +39,10 @@ export function proxy(request: NextRequest) {
       rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
       return NextResponse.rewrite(rewriteUrl)
     }
+
+    if (isMdSuffix) {
+      return rewriteToMarkdownNotFound(url)
+    }
   }
 
   if (!pathname.startsWith(REFERENCE_PATH)) {
