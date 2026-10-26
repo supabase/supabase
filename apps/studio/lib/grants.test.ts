@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { QueryClient } from '@tanstack/react-query'
 import { waitFor } from '@testing-library/react'
-import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, expectTypeOf, test, vi } from 'vitest'
 
@@ -18,9 +17,10 @@ import type { ProjectDetailData } from '@/data/projects/project-detail-query'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRenderHook } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { mockPermissions, mockPermissionsError } from '@/tests/lib/msw-permissions'
+import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 type OrganizationResponse = ReturnType<typeof createMockOrganizationResponse>
 
 const mocks = vi.hoisted((): { isPlatform: boolean; params: { ref?: string } } => ({
@@ -58,14 +58,6 @@ function permissionsFor(
   return {
     organizations: [{ slug: ORG_SLUG, role: 'developer', permissions: [], projects: [], ...org }],
   }
-}
-
-function mockPermissions(response: PermissionsV2Response) {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: () => HttpResponse.json<PermissionsV2Response>(response),
-  })
 }
 
 function mockOrganizations(details: Partial<OrganizationResponse> = {}) {
@@ -254,11 +246,7 @@ describe('useGrant', () => {
   })
 
   test('reports an error when the permissions request fails', async () => {
-    addAPIMock({
-      method: 'get',
-      path: '/platform/profile/permissions/v2',
-      response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
-    })
+    mockPermissionsError({ message: 'Boom' })
 
     const { result } = customRenderHook(
       () => useGrant(BRANCHES, { organizationSlug: ORG_SLUG, projectRef: 'proj' }),
@@ -344,11 +332,7 @@ describe('ensureGrant', () => {
   })
 
   test('returns an error when permissions cannot be fetched', async () => {
-    addAPIMock({
-      method: 'get',
-      path: '/platform/profile/permissions/v2',
-      response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
-    })
+    mockPermissionsError({ message: 'Boom' })
 
     const result = await ensureGrant(new QueryClient(), BRANCHES, scope)
 
