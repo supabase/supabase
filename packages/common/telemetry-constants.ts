@@ -1148,7 +1148,7 @@ export interface DocsSearchV2OpenedEvent {
     /**
      * The trigger that opened the Search V2 dialog.
      */
-    triggerType: 'keyboard_shortcut' | 'search_input'
+    triggerType: 'keyboard_shortcut' | 'search_input' | 'not_found_button'
   }
 }
 
