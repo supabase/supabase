@@ -1,9 +1,3 @@
-import { components } from 'api-types'
-
-import { PROJECT_STATUS } from '@/lib/constants'
-
-export const STATUS_REFRESH_FREQUENCY_MS: number = 10000 // 10 seconds
-
 export enum PipelineStatusName {
   FAILED = 'failed',
   STARTING = 'starting',
@@ -11,12 +5,4 @@ export enum PipelineStatusName {
   STOPPED = 'stopped',
   STOPPING = 'stopping',
   UNKNOWN = 'unknown',
-}
-
-export const REPLICA_STATUS: {
-  [key: string]: components['schemas']['DatabaseStatusResponse']['status']
-} = {
-  ...PROJECT_STATUS,
-  INIT_READ_REPLICA: 'INIT_READ_REPLICA',
-  INIT_READ_REPLICA_FAILED: 'INIT_READ_REPLICA_FAILED',
 }

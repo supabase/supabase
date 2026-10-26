@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertTriangle, ExternalLink } from 'lucide-react'
+import { AlertTriangleIcon, ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
@@ -25,7 +25,7 @@ export const DatabaseReadOnlyAlert = () => {
     <>
       {isReadOnlyMode && (
         <Alert variant="destructive">
-          <AlertTriangle />
+          <AlertTriangleIcon />
           <AlertTitle>
             Project is in read-only mode and database is no longer accepting write requests
           </AlertTitle>
@@ -59,10 +59,8 @@ export const DatabaseReadOnlyAlert = () => {
             </ul>
           </AlertDescription>
           <div className="mt-4 flex items-center space-x-2">
-            <Button variant="default" onClick={() => setShowConfirmationModal(true)}>
-              Disable read-only mode
-            </Button>
-            <Button asChild variant="default" icon={<ExternalLink />}>
+            <Button onClick={() => setShowConfirmationModal(true)}>Disable read-only mode</Button>
+            <Button asChild icon={<ExternalLinkIcon />}>
               <a
                 href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                 target="_blank"

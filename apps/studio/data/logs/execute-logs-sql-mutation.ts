@@ -94,6 +94,7 @@ export interface ExecuteLogsSqlVariables {
    */
   endpoint: AnalyticsSqlEndpoint
   signal?: AbortSignal
+  headers?: HeadersInit
 }
 
 export interface ExecuteLogsSqlResult {
@@ -115,6 +116,7 @@ export async function executeLogsSql({
   range,
   endpoint,
   signal,
+  headers,
 }: ExecuteLogsSqlVariables): Promise<ExecuteLogsSqlResult> {
   const data = await executeAnalyticsSql({
     projectRef,
@@ -124,6 +126,7 @@ export async function executeLogsSql({
     iso_timestamp_end: range.to,
     key: 'sql-editor',
     signal,
+    headers,
   })
 
   const body = (data ?? {}) as { result?: unknown[]; error?: unknown }

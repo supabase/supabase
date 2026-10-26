@@ -16,6 +16,7 @@ import LW13Summary from '@/components/LaunchWeek/13/Releases/LWSummary'
 import LW14Summary from '@/components/LaunchWeek/14/Releases/LWSummary'
 import LW15Summary from '@/components/LaunchWeek/15/LWSummary'
 import LWXSummary from '@/components/LaunchWeek/X/LWXSummary'
+import { MarkdownActions } from '@/components/MarkdownActions'
 import { getBlogThumbnailImage } from '@/lib/blog-images'
 import { compileBlogMdx } from '@/lib/mdx/compileBlogMdx'
 import mdxComponents from '@/lib/mdx/mdxComponents'
@@ -108,7 +109,7 @@ const BlogPostRenderer = async ({
            */}
           <div className="flex justify-center lg:grid grid-cols-12 gap-x-8">
             {/* Main container — indented 1 col at lg, alongside back button at xl */}
-            <div className="max-w-[65ch] lg:max-w-none col-span-12 lg:col-start-2 lg:col-span-10 xl:col-start-2 xl:col-span-11">
+            <div className="min-w-0 w-full max-w-[65ch] lg:max-w-none col-span-12 lg:col-start-2 lg:col-span-10 xl:col-start-2 xl:col-span-11">
               {/* Article header — spans the full main container width */}
               <div className="py-8 md:py-12 space-y-4">
                 <div className="flex items-center gap-1.5 text-foreground-lighter text-sm">
@@ -201,7 +202,7 @@ const BlogPostRenderer = async ({
                   )}
 
                   <article>
-                    <div className="prose prose-docs">
+                    <div className="prose prose-docs wrap-break-word">
                       {blogMetaData.youtubeHero ? (
                         <iframe
                           title="YouTube video player"
@@ -225,7 +226,8 @@ const BlogPostRenderer = async ({
                   {isLaunchWeek14 && <LW14Summary />}
                   {isLaunchWeek15 && <LW15Summary />}
 
-                  <div className="block lg:hidden py-8">
+                  <div className="lg:hidden py-8 flex flex-col gap-6">
+                    <MarkdownActions pagePath={`/blog/${blogMetaData.slug}`} pageType="blog" />
                     <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                   </div>
 
@@ -291,7 +293,8 @@ const BlogPostRenderer = async ({
                       On this page
                     </p>
                     <div className="overflow-y-auto min-h-0 flex-1">{toc}</div>
-                    <div className="shrink-0">
+                    <div className="shrink-0 flex flex-col gap-6">
+                      <MarkdownActions pagePath={`/blog/${blogMetaData.slug}`} pageType="blog" />
                       <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                     </div>
                   </div>

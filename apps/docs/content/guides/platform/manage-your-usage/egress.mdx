@@ -5,7 +5,7 @@ title: 'Manage Egress usage'
 
 ## What you are charged for
 
-You are charged for the network data transmitted out of the system to a connected client. Egress is incurred by all services - Database, Auth, Storage, Edge Functions, Realtime and Log Drains.
+You are charged for the network data transmitted out of the system to a connected client. Egress is incurred by all services - Database, Auth, Storage, Edge Functions, Realtime and [Log Drains](/docs/guides/observability/log-drains).
 
 ### Database Egress
 
@@ -47,7 +47,7 @@ Data pushed to clients via Supabase Realtime for subscribed events.
 
 Data sent to the client when using the shared connection pooler (Supavisor) to access your database. When using the shared connection pooler, we do not count database egress, as this would otherwise count double (Database -> Shared Pooler + Shared Pooler -> Client).
 
-**Example:** You are using our [shared connection pooler](/docs/guides/database/connecting-to-postgres#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
+**Example:** You are using our [shared connection pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
 
 ### Log Drain Egress
 
@@ -120,6 +120,8 @@ The organization's Egress usage exceeds the uncached egress quota by 50 GB and t
 ### Usage page
 
 You can view Egress usage on the [organization's usage page](/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+
+Each [Preview branch](/docs/guides/deployment/branching) records its own Egress, which counts toward the organization total but is not included in the parent project's usage. To see a branch's Egress, select the parent project, then select the branch from the branch list.
 
 <Image
   alt="Usage page navigation bar"
@@ -195,7 +197,7 @@ height={510}
 
 ### Most requested API endpoints
 
-In the [Logs Explorer](/dashboard/project/_/logs/explorer) you can access Edge Logs, and review the top paths to identify heavily queried endpoints. These logs currently do not include response byte data. That data will be available in the future too.
+In [Explorer](/dashboard/project/_/explorer), select query source **Logs** and [query API Gateway events](/docs/guides/observability/advanced-log-filtering) to identify heavily queried paths. These logs currently do not include response byte data. That data will be available in the future too.
 
 <Image
   alt="Top paths"

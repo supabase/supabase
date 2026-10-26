@@ -1,4 +1,9 @@
-import { getCreateFDWSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import {
+  getCreateFDWSql,
+  getCreateForeignDataWrapperSql,
+  joinSqlFragments,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -6,6 +11,7 @@ import { toast } from 'sonner'
 import { fdwKeys } from './keys'
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
@@ -27,8 +33,18 @@ export type FDWCreateVariables = {
 }
 
 export async function createFDW({ projectRef, connectionString, ...rest }: FDWCreateVariables) {
-  const sql = wrapWithTransaction(getCreateFDWSql(rest))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const createForeignDataWrapperSql = getCreateForeignDataWrapperSql(rest.wrapperMeta)
+  const createServerSql = getCreateFDWSql(rest)
+  const sql = wrapWithTransaction(
+    joinSqlFragments([createForeignDataWrapperSql, createServerSql], '\n\n')
+  )
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['create-fdw'],
+    grant: unguarded.migrating,
+  })
   return result
 }
 

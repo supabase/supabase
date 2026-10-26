@@ -5,21 +5,21 @@ import { describe, expect, it } from 'vitest'
 import { getReportTools } from './report-tools'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdResponse']
+type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdResponse_Output']
 
 describe('ai/tools/report-tools', () => {
   describe('getReportTools', () => {
     it('should return list_reports and get_report tools', () => {
-      const tools = getReportTools()
+      const tools = getReportTools({ aiOptInLevel: 'schema' })
 
       expect(Object.keys(tools)).toEqual(['list_reports', 'get_report'])
     })
 
     it('should not require approval to read reports', () => {
-      const tools = getReportTools()
+      const tools = getReportTools({ aiOptInLevel: 'schema' })
 
-      expect(tools.list_reports.needsApproval).toBeUndefined()
-      expect(tools.get_report.needsApproval).toBeUndefined()
+      expect(tools.list_reports.needsApproval).toBe(false)
+      expect(tools.get_report.needsApproval).toBe(false)
     })
   })
 
@@ -61,12 +61,16 @@ describe('ai/tools/report-tools', () => {
         },
       })
 
-      const tools = getReportTools({ projectRef: 'test-project', authorization: 'Bearer token' })
+      const tools = getReportTools({
+        projectRef: 'test-project',
+        authorization: 'Bearer token',
+        aiOptInLevel: 'schema',
+      })
       if (!tools.list_reports.execute) throw new Error('execute is undefined')
 
       const result = await tools.list_reports.execute(
         { limit: 20 },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(capturedRequest?.headers.get('authorization')).toBe('Bearer token')
@@ -164,12 +168,12 @@ describe('ai/tools/report-tools', () => {
         },
       })
 
-      const tools = getReportTools({ projectRef: 'test-project' })
+      const tools = getReportTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_report.execute) throw new Error('execute is undefined')
 
       const result = (await tools.get_report.execute(
         { id: 'report-1' },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )) as { layout: Array<{ id: string; attribute: string; sql?: string }> }
 
       expect(result.layout).toEqual([
@@ -204,11 +208,14 @@ describe('ai/tools/report-tools', () => {
           }),
       })
 
-      const tools = getReportTools({ projectRef: 'test-project' })
+      const tools = getReportTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_report.execute) throw new Error('execute is undefined')
 
       await expect(
-        tools.get_report.execute({ id: 'snippet-1' }, { toolCallId: 'test', messages: [] })
+        tools.get_report.execute(
+          { id: 'snippet-1' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
       ).rejects.toThrow('is not a report')
     })
   })

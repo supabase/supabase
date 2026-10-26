@@ -1,5 +1,5 @@
 import { useHotkeyRegistrations, type SequenceRegistrationView } from '@tanstack/react-hotkeys'
-import { CircleX } from 'lucide-react'
+import { CircleXIcon } from 'lucide-react'
 import { Fragment, useMemo, useState } from 'react'
 import {
   Button,
@@ -205,7 +205,7 @@ function ShortcutsReferenceSheetContent() {
                 aria-label="Clear search"
                 size="tiny"
                 variant="text"
-                icon={<CircleX size={14} />}
+                icon={<CircleXIcon size={14} />}
                 onClick={() => setSearch('')}
                 className="h-5 w-5 p-0"
               />

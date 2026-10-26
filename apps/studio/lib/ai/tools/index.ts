@@ -5,9 +5,10 @@ import { filterToolsByOptInLevel } from '../tool-filter'
 import { getFallbackTools } from './fallback-tools'
 import { getIncidentTools } from './incident-tools'
 import { getMcpTools } from './mcp-tools'
+import { getNotebookTools } from './notebook-tools'
 import { getReportTools } from './report-tools'
 import { getSchemaTools } from './schema-tools'
-import { getStudioTools } from './studio-tools'
+import { getOptInTools, getStudioTools } from './studio-tools'
 import { getSupportLifecycleTools } from './support-tools'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
@@ -19,6 +20,7 @@ export const getTools = async ({
   accessToken,
   baseUrl,
   supportMode,
+  isExplorerEnabled,
   signal,
 }: {
   projectRef: string
@@ -28,12 +30,20 @@ export const getTools = async ({
   accessToken?: string
   baseUrl?: string
   supportMode?: boolean
+  // Notebooks haven't shipped yet — they live behind the Explorer feature flag, so the
+  // assistant must not advertise list_notebooks/get_notebook until the caller confirms the
+  // flag is on for this user.
+  isExplorerEnabled?: boolean
   // Required: tools fetched from the remote MCP server hold an HTTP connection
   // that is closed when this signal aborts (i.e. when the request ends).
   signal: AbortSignal
 }) => {
   // Always include studio tools
-  let tools: ToolSet = getStudioTools({ projectRef, connectionString, authorization, aiOptInLevel })
+  let tools: ToolSet = {
+    ...getStudioTools({ projectRef, connectionString, authorization, aiOptInLevel }),
+    // Opt-in levels only apply on platform
+    ...(IS_PLATFORM ? getOptInTools({ aiOptInLevel }) : {}),
+  }
 
   // If self-hosted, only add fallback tools
   if (!IS_PLATFORM) {
@@ -43,15 +53,15 @@ export const getTools = async ({
         projectRef,
         connectionString,
         authorization,
+        aiOptInLevel,
         includeSchemaMetadata: aiOptInLevel !== 'disabled',
       }),
     }
   } else if (accessToken) {
     // If platform, fetch MCP and other platform specific tools. The MCP tools
-    // may be fetched from the remote MCP server over the network (see
-    // `USE_REMOTE_MCP`), so a failure there (outage, timeout, auth) should
-    // degrade gracefully to the remaining tools rather than break the entire
-    // assistant.
+    // are fetched from the remote MCP server over the network, so a failure
+    // there (outage, timeout, auth) should degrade gracefully to the remaining
+    // tools rather than break the entire assistant.
     let mcpTools: ToolSet = {}
     try {
       mcpTools = await getMcpTools({
@@ -70,14 +80,26 @@ export const getTools = async ({
       ...getSchemaTools({
         projectRef,
         connectionString,
+        authorization,
+        aiOptInLevel,
       }),
-      ...getReportTools({ projectRef, authorization }),
-      ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
+      ...getReportTools({ projectRef, authorization, aiOptInLevel }),
+      ...(isExplorerEnabled
+        ? getNotebookTools({
+            projectRef,
+            connectionString,
+            authorization,
+            aiOptInLevel,
+          })
+        : {}),
+      ...(baseUrl ? getIncidentTools({ baseUrl, aiOptInLevel }) : {}),
     }
   }
 
   // Filter all tools based on the (potentially modified) AI opt-in level
-  const toolsWithSupport = supportMode ? { ...tools, ...getSupportLifecycleTools() } : tools
+  const toolsWithSupport = supportMode
+    ? { ...tools, ...getSupportLifecycleTools({ aiOptInLevel }) }
+    : tools
   const filteredTools: ToolSet = filterToolsByOptInLevel(toolsWithSupport, aiOptInLevel)
 
   return filteredTools

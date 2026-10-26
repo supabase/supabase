@@ -79,7 +79,7 @@ const handleForgotPassword = async (e: Event) => {
           </div>
           <div class="mt-4 text-center text-sm">
             Already have an account?
-            <a href="/login" class="underline underline-offset-4">Login</a>
+            <a href="/login" class="underline underline-offset-4">Sign in</a>
           </div>
         </form>
       </CardContent>

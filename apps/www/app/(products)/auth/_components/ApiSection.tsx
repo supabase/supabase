@@ -203,7 +203,7 @@ try await supabase.auth.signInWithOTP(
   {
     icon: 'Globe' as const,
     title: 'OAuth logins',
-    description: 'Social login with 20+ providers and custom scopes for extended permissions.',
+    description: 'Social sign-in with 20+ providers and custom scopes for extended permissions.',
     code: {
       JavaScript: `// Sign in with GitHub
 const { data, error } = await supabase.auth.signInWithOAuth({

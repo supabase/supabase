@@ -1,0 +1,23 @@
+{
+  "name": "oauth-consent-nextjs",
+  "type": "registry:block",
+  "title": "OAuth Consent for Next.js",
+  "description": "OAuth 2.1 consent screen and route for an existing authenticated application.",
+  "docs": "After installation, set the following in `supabase/config.toml`. Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false` \u2014 edit that section rather than adding a second one:\n\n```toml\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent\"\n```",
+  "registryDependencies": ["button", "card", "https://supabase.com/library/r/safe-next-path.json"],
+  "files": [
+    {
+      "path": "registry/default/blocks/oauth-consent/components/oauth-consent.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/oauth-consent/hooks/use-oauth-consent.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/oauth-consent-nextjs/app/oauth/consent/page.tsx",
+      "type": "registry:page",
+      "target": "app/oauth/consent/page.tsx"
+    }
+  ]
+}

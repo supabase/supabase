@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { z } from 'zod'
 
 import { scopedAccessTokenKeys } from './keys'
 import { BASE_PATH } from '@/lib/constants'
@@ -28,17 +29,35 @@ export interface ScopeMapEntry {
   }
 */
 export type ScopeMap = Record<string, ScopeMapEntry>
-// e.g { 'GET /v2/projects/{ref}/analytics/log-drains': ['analytics_config_read'] }
-export type EndpointMap = Record<string, string[]>
-// e.g { 'deploy_edge_function': ['edge_functions_write'] }
-export type McpMap = Record<string, string[]>
+
+/** A set of scopes that must ALL be granted (conjunctive). */
+export type ScopeGroup = string[]
+/**
+ * Alternative scope groups, mirroring the mgmt-api `x-fga-permissions` semantics: a token satisfies
+ * the requirement when it holds ALL scopes of at least ONE group — OR between groups, AND within a
+ * group. `GET /v1/projects/{ref}/branches` is annotated
+ * `[['branching_development_read'], ['branching_production_read']]`, and either alternative alone
+ * authorizes the call.
+ *
+ * Standard disjunctive-normal-form semantics apply at the edges, so no special cases are needed:
+ * `[[]]` — one empty group — is satisfied by every token (an empty AND is true), which is how MCP
+ * tools that make no Management API call are recorded. `[]` — no alternatives at all — is satisfied
+ * by nobody (an empty OR is false), so an item that somehow loses its groups is hidden rather than
+ * advertised to everyone.
+ */
+export type ScopeGroupAlternatives = ScopeGroup[]
+
+// e.g { 'GET /v1/projects/{ref}/branches': [['branching_development_read'], ['branching_production_read']] }
+export type EndpointMap = Record<string, ScopeGroupAlternatives>
+// e.g { 'deploy_edge_function': [['edge_functions_write']] }
+export type McpMap = Record<string, ScopeGroupAlternatives>
 
 export interface PermissionScopeMap {
   /** scope id -> the endpoints / MCP tools it (partially) authorizes */
   scopes: ScopeMap
-  /** endpoint -> ALL scopes it requires (conjunctive) */
+  /** endpoint -> alternative scope groups (OR between groups, AND within a group) */
   endpoints: EndpointMap
-  /** MCP tool -> ALL scopes it requires (conjunctive) */
+  /** MCP tool -> alternative scope groups (OR between groups, AND within a group) */
   mcp_tools: McpMap
 }
 
@@ -57,10 +76,15 @@ const splitEndpoint = (raw: string): EnabledEndpoint => {
   return { method: raw.slice(0, spaceIndex), path: raw.slice(spaceIndex + 1), raw }
 }
 
+// Plain disjunctive-normal-form evaluation: some group where every scope is granted. An empty
+// group is vacuously satisfied, which is exactly what "nothing gates this" should mean.
+const isSatisfied = (groups: ScopeGroupAlternatives, granted: Set<string>) =>
+  groups.some((group) => group.every((scope) => granted.has(scope)))
+
 /**
  * Given the set of granted scope ids, returns the Management API endpoints the token can call.
- * An endpoint is only enabled when ALL of its required scopes are granted (conjunctive), which is
- * how the mgmt-api `FgaPermissionsGuard` evaluates the `@AuthWithFgaPermissions` decorator.
+ * An endpoint is enabled when ALL scopes of at least ONE of its alternative groups are granted,
+ * matching the `x-fga-permissions` contract described on `ScopeGroupAlternatives`.
  */
 export const getEnabledEndpoints = ({
   grantedScopes,
@@ -73,13 +97,15 @@ export const getEnabledEndpoints = ({
 
   const granted = new Set(grantedScopes)
   return Object.entries(permissionScopeMap.endpoints)
-    .filter(([, required]) => required.length > 0 && required.every((scope) => granted.has(scope)))
+    .filter(([, groups]) => isSatisfied(groups, granted))
     .map(([raw]) => splitEndpoint(raw))
 }
 
 /**
- * Given the set of granted scope ids, returns the MCP tools the token can call. As with endpoints,
- * a tool is only enabled when ALL of its required scopes are granted.
+ * Given the set of granted scope ids, returns the MCP tools the token can call: those with at least
+ * one fully-granted scope group. Ungated tools — recorded as one empty group (`[[]]`), see
+ * ScopeGroupAlternatives — are vacuously satisfied and so reported for every token. A tool with no
+ * alternatives at all (`[]`) is reported for nobody.
  */
 export const getEnabledMcpTools = ({
   grantedScopes,
@@ -92,15 +118,18 @@ export const getEnabledMcpTools = ({
 
   const granted = new Set(grantedScopes)
   return Object.entries(permissionScopeMap.mcp_tools)
-    .filter(([, required]) => required.length > 0 && required.every((scope) => granted.has(scope)))
+    .filter(([, groups]) => isSatisfied(groups, granted))
     .map(([tool]) => tool)
 }
 
 /**
- * Endpoints that (a) are fully satisfied by the complete granted-scope set AND (b) require at least
- * one of `capabilityScopes`. Used by the review step to group enabled endpoints under the capability
- * that contributes them, while still honouring dual-scope requirements (a dual-scope endpoint only
+ * Endpoints that are enabled by the complete granted-scope set AND owe that to `capabilityScopes`:
+ * some fully-granted group must contain at least one capability scope. Used by the review step to
+ * group enabled endpoints under the capability that contributes them (a multi-scope group only
  * appears once all its scopes are granted, and shows under each contributing capability).
+ *
+ * An endpoint enabled purely through a group that holds none of `capabilityScopes` is not
+ * attributed to this capability, and an ungated item is never attributed to any capability.
  */
 export const getEnabledEndpointsForCapability = ({
   capabilityScopes,
@@ -116,34 +145,66 @@ export const getEnabledEndpointsForCapability = ({
   const granted = new Set(allGrantedScopes)
   const capability = new Set(capabilityScopes)
   return Object.entries(permissionScopeMap.endpoints)
-    .filter(
-      ([, required]) =>
-        required.length > 0 &&
-        required.every((scope) => granted.has(scope)) &&
-        required.some((scope) => capability.has(scope))
+    .filter(([, groups]) =>
+      groups.some(
+        (group) =>
+          group.some((scope) => capability.has(scope)) && group.every((scope) => granted.has(scope))
+      )
     )
     .map(([raw]) => splitEndpoint(raw))
 }
 
 /**
- * Informational lookup for the per-permission risk tooltip: the MCP tools associated with any of
- * the given scopes. Unlike getEnabledMcpTools this is not conjunctive — it surfaces every tool that
- * lists one of these scopes, so users can see what a capability relates to before granting it.
+ * The endpoint's payload changed endpoint/tool requirements from a flat conjunctive scope list
+ * (string[]) to alternative groups (string[][], ScopeGroupAlternatives) at the same URL, and the
+ * response is CDN-cached (s-maxage + stale-while-revalidate). Right after a deploy a new client
+ * can still receive a stale flat payload; evaluating it as groups would call group.every on a
+ * string and crash the render. Interpret a flat list as what it was — a single conjunctive group.
  */
-export const getMcpToolsForScopes = ({
-  scopeIds,
-  permissionScopeMap,
-}: {
-  scopeIds: Iterable<string>
-  permissionScopeMap: PermissionScopeMap | undefined
-}): string[] => {
-  if (permissionScopeMap == null) return []
+const isScopeGroup = (value: unknown): value is ScopeGroup =>
+  Array.isArray(value) && value.every((scope) => typeof scope === 'string')
 
-  const tools = new Set<string>()
-  for (const id of scopeIds) {
-    permissionScopeMap.scopes[id]?.mcp_tools.forEach((tool) => tools.add(tool))
+const normalizeGroups = (groups: unknown): ScopeGroupAlternatives => {
+  // A non-array value is not a shape any server ever emitted — fail closed (nobody) rather
+  // than crash the defense itself.
+  if (!Array.isArray(groups)) return []
+  if (groups.every(isScopeGroup)) return groups
+  if (groups.every((scope): scope is string => typeof scope === 'string')) return [groups]
+  return []
+}
+
+const scopeMapEntrySchema = z.object({
+  endpoints: z.array(z.string()),
+  mcp_tools: z.array(z.string()),
+})
+
+// Group values stay unknown here — normalizeGroups upgrades legacy flat payloads and fails closed
+// per entry, which a strict schema would turn into all-or-nothing. `.catch({})` empties a field
+// whose record shape is wrong without discarding the salvageable rest of the payload.
+const rawPermissionScopeMapSchema = z.object({
+  scopes: z.record(scopeMapEntrySchema).catch({}),
+  endpoints: z.record(z.unknown()).catch({}),
+  mcp_tools: z.record(z.unknown()).catch({}),
+})
+
+const EMPTY_PERMISSION_SCOPE_MAP: PermissionScopeMap = { scopes: {}, endpoints: {}, mcp_tools: {} }
+
+export const normalizePermissionScopeMap = (raw: unknown): PermissionScopeMap => {
+  const parsed = rawPermissionScopeMapSchema.safeParse(raw)
+  // A non-object body (null, an error string) has nothing salvageable — fail closed (empty map)
+  // instead of throwing out of the query fn.
+  if (!parsed.success) return EMPTY_PERMISSION_SCOPE_MAP
+
+  const { scopes, endpoints, mcp_tools } = parsed.data
+  return {
+    scopes,
+    endpoints: Object.fromEntries(
+      Object.entries(endpoints).map(([endpoint, groups]) => [endpoint, normalizeGroups(groups)])
+    ),
+    mcp_tools: Object.fromEntries(
+      Object.entries(mcp_tools).map(([tool, groups]) => [tool, normalizeGroups(groups)])
+    ),
   }
-  return Array.from(tools)
 }
 
 export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal) {
@@ -175,13 +236,14 @@ export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal)
     )
   }
 
-  return await response.json()
+  const payload: unknown = await response.json()
+  return normalizePermissionScopeMap(payload)
 }
 
 export type ScopedAccessTokenPermissionsForScopeError = ResponseError
 
-export const useGetEnabledEndpointsForCapability = <TData = PermissionScopeMap>() => {
-  return useQuery<TData, ScopedAccessTokenPermissionsForScopeError, TData>({
+export const useGetEnabledEndpointsForCapability = () => {
+  return useQuery<PermissionScopeMap, ScopedAccessTokenPermissionsForScopeError>({
     queryKey: scopedAccessTokenKeys.permissions(),
     queryFn: ({ signal }) => getGetScopedTokenPermissionsForScope(signal),
   })

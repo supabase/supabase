@@ -2,7 +2,7 @@ import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
-import { databaseGetStarted, databaseNextSteps } from './database.data'
+import { databaseGetStarted, databaseMultigresWhatYouGet, databaseNextSteps } from './database.data'
 import {
   functionsExamplesAiMedia,
   functionsExamplesMessaging,
@@ -18,6 +18,10 @@ import {
   gettingStartedUseCases,
   gettingStartedWebAppDemos,
 } from './getting-started.data'
+import {
+  localDevelopmentParallelProjectsLearnMore,
+  localDevelopmentRuntimesLearnMore,
+} from './local-development.data'
 import { logDrainsDestinations } from './log-drains.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
 import { resourcesMigrate, resourcesOverview, resourcesPostgres } from './resources.data'
@@ -25,9 +29,16 @@ import {
   selfHostingCommunity,
   selfHostingGetStarted,
   selfHostingSupport,
+  selfHostingThirdPartyGuides,
 } from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
-import { telemetryDebugging, telemetryMonitoring } from './telemetry.data'
+import {
+  telemetryAccessWhat,
+  telemetryDetect,
+  telemetryDiagnose,
+  telemetryExport,
+  telemetryHireAgent,
+} from './telemetry.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
   aiToolsSupportedAgents,
@@ -36,6 +47,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   authPricing,
   authNextSteps,
   databaseGetStarted,
+  databaseMultigresWhatYouGet,
   databaseNextSteps,
   functionsGetStarted,
   functionsExamplesSupabase,
@@ -48,6 +60,8 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   gettingStartedFrameworkQuickstarts,
   gettingStartedWebAppDemos,
   gettingStartedMobileTutorials,
+  localDevelopmentParallelProjectsLearnMore,
+  localDevelopmentRuntimesLearnMore,
   logDrainsDestinations,
   realtimeGetStarted,
   realtimeExamples,
@@ -57,12 +71,16 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   resourcesPostgres,
   selfHostingGetStarted,
   selfHostingCommunity,
+  selfHostingThirdPartyGuides,
   selfHostingSupport,
   storageGetStarted,
   storageExamples,
   storageResources,
-  telemetryDebugging,
-  telemetryMonitoring,
+  telemetryAccessWhat,
+  telemetryDetect,
+  telemetryDiagnose,
+  telemetryHireAgent,
+  telemetryExport,
 ]
 
 export const CONTENT_LISTINGS: Readonly<Record<string, ContentListingGroup>> = Object.fromEntries(

@@ -65,12 +65,10 @@ const page: GoPageInput = {
             The day before Supabase Select 2026
           </p>
           <p className="mt-4 text-lg font-medium text-foreground">Location</p>
-          <p>San Francisco, CA</p>
-          <p className="text-sm text-foreground-lighter italic">
-            Venue details will be shared soon
-          </p>
+          <p>580 20th St, San Francisco, CA</p>
           <p className="mt-4 text-lg font-medium text-foreground">Time</p>
           <p>Doors open at 2:30 PM</p>
+          <p>Program runs from 3:00 to 4:30 PM</p>
           <p>Happy hour from 4:30 PM</p>
         </div>
       ),
@@ -153,8 +151,8 @@ const page: GoPageInput = {
         {
           type: 'select',
           name: 'attending',
-          label:
-            'Are you attending Supabase Select on October 2? (your Partner Day invite covers it)',
+          label: 'Would you like to attend Supabase Select on October 2?',
+          hint: 'Your Partner Day invite covers it',
           placeholder: 'Select an option',
           required: true,
           options: [

@@ -11,16 +11,16 @@ updateNotifier: false
 enableGlobalVirtualStore: false
 
 catalog:
-  '@monaco-editor/react': ^4.7.0
+  '@monaco-editor/react': 4.8.0-rc.3
   '@sentry/nextjs': ^10.59.0
   '@sentry/tanstackstart-react': ^10.59.0
-  '@supabase/auth-js': 2.110.9
-  '@supabase/postgrest-js': 2.110.9
-  '@supabase/realtime-js': 2.110.9
-  '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.110.9
-  '@tanstack/react-router': ^1.169.2
-  '@tanstack/react-start': ^1.167.65
+  '@supabase/auth-js': 2.117.3
+  '@supabase/postgrest-js': 2.117.3
+  '@supabase/realtime-js': 2.117.3
+  '@supabase/ssr': 0.12.7
+  '@supabase/supabase-js': 2.117.3
+  '@tanstack/react-router': ^1.170.44
+  '@tanstack/react-start': ^1.169.2
   '@tanstack/react-table': ^8.21.3
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
@@ -32,25 +32,32 @@ catalog:
   # https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
   '@typescript/native': npm:typescript@~7.0.2
   '@vitejs/plugin-react': ^6.0.1
-  '@vitest/coverage-v8': ^4.1.4
-  '@vitest/ui': ^4.1.4
+  '@vitest/coverage-v8': ^5.0.0
+  '@vitest/ui': ^5.0.0
+  cn: ^0.4.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
+  # Latest v1.x that satisfies minimumReleaseAge (72h). Newer patch releases
+  # (1.56+) will be picked up automatically once they age in.
+  lucide-react: ^1.55.0
   monaco-editor: 0.52.2
-  next: ^16.2.11
+  motion: ^11.18.2
+  next: ^16.3.6
   next-themes: ^0.4.6
   postcss: ^8.5.18
   radix-ui: ^1.4.3
   react: ^19.2.6
   react-dom: ^19.2.6
   recharts: ^2.15.4
+  rehype-pretty-code: ^0.14.5
+  shiki: ^4.5.0
   tailwindcss: ^4.2.4
   tsx: ^4.22.0
   typescript: ~6.0.2
   valtio: ^2.3.2
   vite: ^8.0.16
-  vite-tsconfig-paths: ^6.1.1
-  vitest: ^4.1.4
+  velite: ^0.4.0
+  vitest: ^5.0.0
   zod: 3.25.76
 
 allowBuilds:
@@ -60,6 +67,7 @@ allowBuilds:
   '@supabase/pg-meta@file:packages/pg-meta': set this to true or false
   ai-commands@file:packages/ai-commands: set this to true or false
   api-types@file:packages/api-types: set this to true or false
+  braintrust: false
   common@file:packages/common: set this to true or false
   config@file:packages/config: set this to true or false
   contentlayer2: false
@@ -69,6 +77,7 @@ allowBuilds:
   esbuild: false
   icons@file:packages/icons: set this to true or false
   libpg-query: false
+  msgpackr-extract: false
   msw: false
   node-pty: true
   protobufjs: false
@@ -90,6 +99,8 @@ minimumReleaseAgeExclude:
   - mdast-jsx
   # The following are excluded to fix vulnerablities.
   - react-use
+  - '@astrojs/markdown-satteri@0.3.8'
+  - astro@7.2.6
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
@@ -114,7 +125,6 @@ overrides:
   postcss: 'catalog:'
   qs: ^6.15.2
   refractor>prismjs: ^1.30.0
-  supabase>tar: ^7.5.21
   tmp: ^0.2.7
   vite>esbuild: ^0.28.1
   webpack: ^5.104.1

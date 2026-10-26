@@ -7,11 +7,11 @@ import { projectKeys } from './keys'
 import { OrgProjectsResponse } from './org-projects-infinite-query'
 import { getProjectStatusOverride } from './project-status-override'
 import type { components } from '@/data/api'
-import { get, handleError, isValidConnString, post } from '@/data/fetchers'
+import { get, handleError, isValidConnString, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string; skipWake?: boolean }
-export type ProjectDetail = components['schemas']['ProjectDetailResponse']
+export type ProjectDetail = components['schemas']['ProjectDetailResponse_Output']
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
    * postgrestStatus is available on client side only.
@@ -43,12 +43,13 @@ export async function getProjectDetail(
    * To prevent odd side effects like pg-meta queries failing or the likes, we wake up the project proactively and wait for it
    * to be back online before returning the project details.
    */
-  if (data?.is_hibernating && !skipWake) {
+  if (data?.status === 'ACTIVE_HEALTHY' && data?.is_hibernating && !skipWake) {
     // In case project was scaled down, explicitly wake it up before continuing to return the project details
     const { error: errorWaking, data: wakeResponse } = await post('/platform/projects/{ref}/wake', {
       params: { path: { ref } },
       signal,
       headers,
+      grant: unguarded.migrating,
     })
 
     // We will still let the user load the page in case of a wake error, but log it for debugging purposes

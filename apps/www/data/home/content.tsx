@@ -154,7 +154,7 @@ export default () => {
             },
             {
               label: '20+ Third-party Logins',
-              link: '/docs/guides/auth/social-login#set-up-a-social-provider-with-supabase-auth',
+              link: '/docs/guides/auth/social-sign-in#set-up-a-social-provider-with-supabase-auth',
             },
             {
               label: 'Custom Access Policies via RLS',
@@ -172,7 +172,7 @@ export default () => {
       heading: 'Join the community',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
-        <Button asChild variant="default" size="small" icon={<IconDiscord />}>
+        <Button asChild size="small" icon={<IconDiscord />}>
           <Link
             href={'https://discord.supabase.com/'}
             target="_blank"

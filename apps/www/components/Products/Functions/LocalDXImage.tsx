@@ -1,7 +1,7 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
 import { Check, Copy } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
@@ -121,7 +121,7 @@ const LocalDXImage = ({ isHovered = false }: { isHovered?: boolean }) => {
 
           <div className="text-foreground rounded p-1.5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
             {copied ? (
-              <span className="text-brand">
+              <span className="text-primary">
                 <Check className="w-3.5 h-3.5" />
               </span>
             ) : (

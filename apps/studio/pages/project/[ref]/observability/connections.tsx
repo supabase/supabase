@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { CirclePause, CirclePlay } from 'lucide-react'
+import { CirclePauseIcon, CirclePlayIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -43,7 +43,10 @@ export const DatabaseConnections: NextPageWithLayout = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
+    {
+      refetchOnWindowFocus: live,
+      refetchInterval: live ? 3000 : false,
+    }
   )
 
   function handleToggleLive() {
@@ -90,9 +93,9 @@ export const DatabaseConnections: NextPageWithLayout = () => {
           <h1 className="w-max">Database Connections</h1>
           {live && (
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger className="flex items-center">
                 <Badge variant="success">
-                  <span className="h-1.5 w-1.5 bg-brand rounded-full animate-pulse" />
+                  <span className="h-1.5 w-1.5 bg-brand-default rounded-full animate-pulse" />
                   <span>Live</span>
                 </Badge>
               </TooltipTrigger>
@@ -100,6 +103,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             </Tooltip>
           )}
         </div>
+
         <div className="flex items-center gap-x-2">
           <ShortcutTooltip
             shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE}
@@ -109,7 +113,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             <Button
               variant={live ? 'default' : 'primary'}
               onClick={handleToggleLive}
-              icon={live ? <CirclePause /> : <CirclePlay />}
+              icon={live ? <CirclePauseIcon /> : <CirclePlayIcon />}
             >
               {live ? 'Pause' : 'Live'}
             </Button>

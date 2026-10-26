@@ -22,12 +22,16 @@ export type UpsertContentVariables = {
 
 export async function upsertContent(
   { projectRef, payload }: UpsertContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ): Promise<SnippetWithContent | null> {
+  const headers = new Headers(headersInit)
+  headers.set('Version', '2')
+
   const { data, error } = await put('/platform/projects/{ref}/content', {
     params: { path: { ref: projectRef } },
     body: unmapSqlContentField(payload),
-    headers: { Version: '2' },
+    headers,
     signal,
   })
   if (error) handleError(error)

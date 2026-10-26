@@ -1,56 +1,45 @@
 import dayjs from 'dayjs'
-import { Badge } from 'ui'
+import duration from 'dayjs/plugin/duration'
 
 import { getPipelineDisplayState, normalizePipelineStatusName } from '../Pipeline.utils'
-import { RetryPolicy, SlotWalStatus, TableState } from './ReplicationPipelineStatus.types'
+import {
+  RetryPolicy,
+  SlotLagMetrics,
+  SlotWalStatus,
+  TableState,
+} from './ReplicationPipelineStatus.types'
+import type { StateDotVariant } from '@/components/ui/StateDot'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { formatBytes } from '@/lib/helpers'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
-export const getStatusConfig = (state: TableState['state']) => {
+dayjs.extend(duration)
+
+export const getStatusConfig = (
+  state: TableState['state']
+): { variant: StateDotVariant; label: string; description: string; isPulsing?: boolean } => {
   switch (state.name) {
     case 'queued':
-      return {
-        badge: <Badge variant="warning">Queued</Badge>,
-        description: 'Table is waiting for the pipeline to pick it up for replication.',
-        tooltip: 'Table is waiting for the pipeline to pick it up for replication.',
-        color: 'text-warning',
-      }
+      return { variant: 'default', label: 'Queued', description: 'Waiting to copy' }
     case 'copying_table':
       return {
-        badge: <Badge variant="success">Copying</Badge>,
-        description: "Table's existing rows are being copied during the initial sync.",
-        tooltip: "Table's existing rows are being copied during the initial sync.",
-        color: 'text-brand-600',
+        variant: 'default',
+        label: 'Copying',
+        description: 'Copying existing rows',
+        isPulsing: true,
       }
     case 'copied_table':
       return {
-        badge: <Badge variant="success">Copied</Badge>,
-        description: 'Initial sync is complete and the table is preparing for ongoing replication.',
-        tooltip: 'Initial sync is complete and the table is preparing for ongoing replication.',
-        color: 'text-success-600',
+        variant: 'default',
+        label: 'Copied',
+        description: 'Copy finished, about to start streaming',
       }
     case 'following_wal':
-      return {
-        badge: <Badge variant="success">Live</Badge>,
-        description: 'Table is receiving ongoing changes from the WAL.',
-        tooltip: 'Table is receiving ongoing changes from the WAL.',
-        color: 'text-success-600',
-      }
+      return { variant: 'success', label: 'Live', description: 'Streaming changes as they happen' }
     case 'error':
-      return {
-        badge: <Badge variant="destructive">Error</Badge>,
-        description: 'Replication is paused because the table encountered an error.',
-        tooltip: 'Replication is paused because the table encountered an error.',
-        color: 'text-destructive-600',
-      }
+      return { variant: 'destructive', label: 'Error', description: 'Stopped after an error' }
     default:
-      return {
-        badge: <Badge variant="warning">Unknown</Badge>,
-        description: 'Table status is unavailable.',
-        tooltip: 'Table status is unavailable.',
-        color: 'text-warning',
-      }
+      return { variant: 'warning', label: 'Unknown', description: 'Table status is unavailable' }
   }
 }
 
@@ -82,9 +71,9 @@ export const isValidRetryPolicy = (policy: any): policy is RetryPolicy => {
   }
 }
 
-const formatLagBytesValue = (value?: number) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    return { display: 'n/a', detail: undefined }
+const formatLagBytesValue = (value?: number | null) => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return { display: 'Unavailable', detail: undefined }
   }
 
   // Scale to the most readable unit (e.g. "4 GB"). We intentionally don't surface the raw byte
@@ -94,9 +83,9 @@ const formatLagBytesValue = (value?: number) => {
 }
 
 // Scale to a single readable unit (ms, s, min, h) based on size, with no precise sub-line.
-const formatLagDurationValue = (value?: number) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    return { display: 'n/a', detail: undefined }
+const formatLagDurationValue = (value?: number | null) => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return { display: 'Unavailable', detail: undefined }
   }
 
   const sign = value < 0 ? '-' : ''
@@ -121,8 +110,29 @@ const formatLagDurationValue = (value?: number) => {
   return { display: `${sign}${hours.toFixed(hours >= 10 ? 1 : 2)} h`, detail: undefined }
 }
 
-export const getFormattedLagValue = (type: 'bytes' | 'duration', value?: number) =>
+export const getFormattedLagValue = (type: 'bytes' | 'duration', value?: number | null) =>
   type === 'bytes' ? formatLagBytesValue(value) : formatLagDurationValue(value)
+
+const COPYING_STATES: TableState['state']['name'][] = ['queued', 'copying_table', 'copied_table']
+
+/**
+ * How much of the initial copy is left. A pipeline can be caught up on its ongoing change stream
+ * while tables are still copying, so several surfaces need to know this to stay honest.
+ */
+export const getInitialSyncProgress = (
+  tableStatuses: { state: { name: TableState['state']['name'] } }[]
+) => {
+  const count = (name: TableState['state']['name']) =>
+    tableStatuses.filter((table) => table.state.name === name).length
+
+  return {
+    // Everything not yet streaming, whatever stage of the initial sync it is at
+    syncingCount: tableStatuses.filter((table) => COPYING_STATES.includes(table.state.name)).length,
+    copyingCount: count('copying_table'),
+    queuedCount: count('queued'),
+    totalCount: tableStatuses.length,
+  }
+}
 
 export type LagSeverity = 'normal' | 'warning' | 'critical'
 
@@ -146,8 +156,7 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     label: 'Reserved',
     variant: 'success',
     severity: 'normal',
-    description:
-      "Healthy. Your database is keeping the WAL files this pipeline's replication slot needs, and they are within the normal WAL size limit.",
+    description: 'Postgres is retaining the WAL this slot needs within the normal WAL size limit.',
     tableDescription:
       "Healthy. Your database is keeping the WAL files this table's replication slot needs, and they are within the normal WAL size limit.",
   },
@@ -156,16 +165,15 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     variant: 'warning',
     severity: 'normal',
     description:
-      "Healthy, but growing. This pipeline's replication slot is holding on to more WAL than usual, but your database is still keeping everything it needs.",
+      'Postgres is retaining WAL beyond the normal size limit, and the slot’s required changes are still available.',
     tableDescription:
-      "Healthy, but growing. This table's replication slot is holding on to more WAL than usual, but your database is still keeping everything it needs.",
+      "Available. This table's slot needs WAL beyond the normal size limit, and Postgres is still retaining it.",
   },
   unreserved: {
     label: 'Unreserved',
     variant: 'warning',
     severity: 'warning',
-    description:
-      "At risk. Your database is no longer reserving all WAL files this pipeline's replication slot needs. If the pipeline does not catch up soon, those files may be removed.",
+    description: 'Postgres may remove WAL this replication slot still needs.',
     tableDescription:
       "At risk. Your database is no longer reserving all WAL files this table's replication slot needs. If the pipeline does not catch up soon, those files may be removed.",
   },
@@ -174,7 +182,7 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     variant: 'destructive',
     severity: 'critical',
     description:
-      "Broken. Some WAL files this pipeline's replication slot needs have already been removed. The pipeline can no longer continue from this slot. You can recreate a new pipeline, or set the invalidation behavior to recreate and restart the pipeline.",
+      'Postgres already discarded WAL this pipeline needed. Replication cannot continue from here.',
     tableDescription:
       "Broken. Some WAL files this table's replication slot needs have already been removed. The pipeline can no longer continue from this slot. You can recreate a new pipeline, or set the invalidation behavior to recreate and restart the pipeline.",
   },
@@ -182,15 +190,14 @@ export const WAL_STATUS_META: Record<SlotWalStatus, WalStatusMeta> = {
     label: 'Unknown',
     variant: 'default',
     severity: 'normal',
-    description:
-      "Unknown. Your database reported an unknown state for this pipeline's replication slot.",
+    description: 'Postgres did not report a recognized status for this pipeline’s slot.',
     tableDescription:
       "Unknown. Your database reported an unknown state for this table's replication slot.",
   },
 }
 
 // Postgres reports no WAL status (restart_lsn is null) as "unknown" too, so fall back to it.
-export const getWalStatusMeta = (status?: SlotWalStatus): WalStatusMeta =>
+export const getWalStatusMeta = (status?: SlotWalStatus | null): WalStatusMeta =>
   WAL_STATUS_META[status ?? 'unknown']
 
 // Legend entries from healthiest to most severe, ending with the unknown/unavailable case.
@@ -202,32 +209,29 @@ export const WAL_STATUS_LEGEND: WalStatusMeta[] = [
   WAL_STATUS_META.unknown,
 ]
 
-export const getWalStatusSeverity = (status?: SlotWalStatus): LagSeverity =>
+export const getWalStatusSeverity = (status?: SlotWalStatus | null): LagSeverity =>
   getWalStatusMeta(status).severity
 
 // Slot-loss risk from how much of the slot's WAL budget has been consumed, rather than fixed byte
 // thresholds: max_slot_wal_keep_size ≈ retained WAL (restart_lsn_bytes) + remaining headroom
 // (safe_wal_size_bytes), so the consumed fraction is how close the slot is to the "lost" state.
-// A null/absent safe_wal_size_bytes now means unlimited retention, so it carries no budget risk.
+// Missing headroom alone cannot establish whether retention is unlimited or unavailable.
 export const SLOT_LOSS_WARNING_RATIO = 0.75
 export const SLOT_LOSS_CRITICAL_RATIO = 0.9
 
 export const getSlotBudgetSeverity = (
-  retainedBytes?: number,
+  retainedBytes?: number | null,
   safeWalSizeBytes?: number | null
 ): LagSeverity => {
-  if (
-    typeof retainedBytes !== 'number' ||
-    typeof safeWalSizeBytes !== 'number' ||
-    !Number.isFinite(retainedBytes) ||
-    !Number.isFinite(safeWalSizeBytes)
-  ) {
+  if (typeof safeWalSizeBytes !== 'number' || !Number.isFinite(safeWalSizeBytes)) return 'normal'
+  if (safeWalSizeBytes <= 0) return 'critical'
+
+  if (typeof retainedBytes !== 'number' || !Number.isFinite(retainedBytes)) {
     return 'normal'
   }
 
   const total = retainedBytes + safeWalSizeBytes
-  // Nothing retained and no headroom left: nothing to flag (also avoids a 0/0 division). When the
-  // headroom is 0 but WAL is still retained, the ratio is 1 and the slot is correctly critical.
+  // A positive budget is needed to calculate its consumed fraction.
   if (total <= 0) return 'normal'
 
   const consumedRatio = retainedBytes / total
@@ -244,13 +248,50 @@ const maxSeverity = (a: LagSeverity, b: LagSeverity): LagSeverity =>
 // Overall slot health = the worse of the reported WAL status and how close the WAL budget is to
 // running out. Used to color/flag the lag value in the destinations list.
 export const getSlotHealthSeverity = (slot?: {
-  restart_lsn_bytes?: number
+  restart_lsn_bytes?: number | null
   safe_wal_size_bytes?: number | null
-  wal_status?: SlotWalStatus
+  wal_status?: SlotWalStatus | null
 }): LagSeverity => {
   if (!slot) return 'normal'
   return maxSeverity(
     getWalStatusSeverity(slot.wal_status),
     getSlotBudgetSeverity(slot.restart_lsn_bytes, slot.safe_wal_size_bytes)
   )
+}
+
+/**
+ * A table's own replication slot, as a short list of phrases for one table cell. Skips anything
+ * that carries no signal, such as a zero backlog or a reserved WAL status, so the line only ever
+ * says what's worth reading. Connection is skipped on purpose: a copying table's slot is inactive
+ * until the copy finishes, so flagging it would look like a fault.
+ */
+export const getTableSyncLagLabel = (metrics: SlotLagMetrics): string[] => {
+  const parts: string[] = []
+
+  const pendingBytes = metrics.confirmed_flush_lsn_bytes
+  if (typeof pendingBytes === 'number' && pendingBytes > 0) {
+    parts.push(`${formatBytes(pendingBytes, pendingBytes < 1024 ? 0 : 1)} WAL backlog`)
+  } else if (pendingBytes == null) {
+    parts.push('Lag unavailable')
+  }
+
+  const safeWalSizeBytes = metrics.safe_wal_size_bytes
+  if (typeof safeWalSizeBytes === 'number' && Number.isFinite(safeWalSizeBytes)) {
+    if (safeWalSizeBytes < 0) {
+      parts.push('WAL retention budget exceeded')
+    } else {
+      const formattedBytes = formatBytes(safeWalSizeBytes, safeWalSizeBytes < 1024 ? 0 : 1)
+      parts.push(`${formattedBytes} WAL retention remaining`)
+    }
+  }
+
+  if (metrics.wal_status === 'unreserved') parts.push('Some changes at risk')
+  if (metrics.wal_status === 'lost') parts.push('Some changes lost')
+
+  const replyLag = metrics.reply_time_lag
+  if (typeof replyLag === 'number' && replyLag > 0) {
+    parts.push(`Last check-in ${getFormattedLagValue('duration', replyLag).display}`)
+  }
+
+  return parts
 }

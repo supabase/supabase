@@ -2,7 +2,7 @@
 
 import { ChevronRight, Expand } from 'lucide-react'
 import * as React from 'react'
-import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, FloatingPlate } from 'ui'
 
 import { Index } from '@/__registry__'
 import { useConfig } from '@/hooks/use-config'
@@ -51,11 +51,7 @@ export function ComponentPreview({
     if (!Component) {
       return (
         <p className="text-sm text-muted-foreground">
-          Component{' '}
-          <code className="relative rounded-sm bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
-            {name}
-          </code>{' '}
-          not found in registry.
+          Component <code>{name}</code> not found in registry.
         </p>
       )
     }
@@ -97,7 +93,7 @@ export function ComponentPreview({
       <div className={cn('@container mt-4 mb-12', wideClasses)}>
         <div
           className={cn(
-            'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
+            'relative overflow-hidden rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
           )}
         >
           {showGrid && (
@@ -122,14 +118,15 @@ export function ComponentPreview({
           >
             {Code}
             <div className="absolute bottom-0 w-full flex justify-center mb-4">
-              <Button
-                className="rounded-full"
-                onClick={() => setExpandState(!expand)}
-                variant="default"
-                icon={<Expand className="text-foreground-lighter" />}
-              >
-                {expand ? 'Collapse code' : 'Expand code'}
-              </Button>
+              <FloatingPlate rounded="full">
+                <Button
+                  className="rounded-full"
+                  onClick={() => setExpandState(!expand)}
+                  icon={<Expand className="text-foreground-lighter" />}
+                >
+                  {expand ? 'Collapse code' : 'Expand code'}
+                </Button>
+              </FloatingPlate>
             </div>
           </div>
         </div>
@@ -140,7 +137,7 @@ export function ComponentPreview({
   return (
     <div className={cn('mt-4 mb-12', wideClasses)}>
       <div
-        className={cn('relative bg-studio', {
+        className={cn('relative overflow-hidden bg-studio', {
           'rounded-tl-md rounded-tr-md border-t border-l border-r': !hideCode,
           'rounded-md border': hideCode,
         })}

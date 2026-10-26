@@ -1,5 +1,6 @@
 'use client'
 
+import { defaultFilter } from 'cmdk'
 import { useBreakpoint } from 'common'
 import useDragToClose from 'common/hooks/useDragToClose'
 import { AlertTriangle, ArrowLeft, Search } from 'lucide-react'
@@ -19,7 +20,6 @@ import {
 } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
-import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
 import {
   useCommandMenuOpen,
@@ -49,6 +49,25 @@ function Breadcrumb({ className }: { className?: string }) {
   )
 }
 
+// cmdk's default scorer fuzzy-matches scattered characters across long values, e.g. "colors"
+// matches "Branch integration, Vercel integration, ..." with a score around 0.00002. Genuine
+// prefix/substring/word matches score well above this threshold.
+const MIN_FILTER_SCORE = 0.01
+
+const KEYWORD_MATCH_SCORE = 0.5
+
+// `value` is fuzzy-matched; `keywords` only match as a substring so that long keyword strings
+// don't produce scattered-character matches (e.g. "blog" against "Branch integration, ...").
+const filterWithMinScore: typeof defaultFilter = (value, search, keywords) => {
+  const score = defaultFilter(value, search)
+  const normalizedSearch = search.trim().toLowerCase()
+  const hasKeywordMatch =
+    normalizedSearch.length > 0 &&
+    keywords?.some((keyword) => keyword.toLowerCase().includes(normalizedSearch))
+  const valueScore = score < MIN_FILTER_SCORE ? 0 : score
+  return hasKeywordMatch ? Math.max(valueScore, KEYWORD_MATCH_SCORE) : valueScore
+}
+
 const CommandWrapper = forwardRef<
   React.ElementRef<typeof Command>,
   React.ComponentPropsWithoutRef<typeof Command>
@@ -56,6 +75,7 @@ const CommandWrapper = forwardRef<
   return (
     <Command
       ref={ref}
+      filter={filterWithMinScore}
       className={cn(
         'h-full w-full flex flex-col overflow-hidden',
         '**:[[cmdk-group]]:px-2 **:[[cmdk-group]]:bg-transparent! **:[[cmdk-group-heading]]:bg-transparent! **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger **:[[cmdk-input]]:h-12',
@@ -64,7 +84,6 @@ const CommandWrapper = forwardRef<
         '[&_[cmdk-item]_svg]:stroke-1',
         '[&_[cmdk-input-wrapper]_svg]:h-5',
         '[&_[cmdk-input-wrapper]_svg]:w-5',
-
         '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
         className
       )}
@@ -188,9 +207,9 @@ function CommandMenuTriggerInput({
           'grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
           'pl-1.5 md:pl-2 pr-1',
           'flex items-center justify-between',
-          // Match Button default (Connect): selection hover fill, stronger border.
+          // Match Button default (Connect): opaque popover hover fill, shared control-hover border.
           'bg-transparent text-foreground-lighter border border-strong',
-          'hover:bg-selection hover:border-stronger',
+          'hover:bg-popover hover:border-control-hover',
           'focus-ring',
           'transition-colors',
           className
@@ -229,12 +248,6 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
 
   const size = useCommandMenuSize()
 
-  const page = useCurrentPage()
-  const popPage = usePopPage()
-
-  const query = useQuery()
-  const setQuery = useSetQuery()
-
   const telemetryContext = useCommandMenuTelemetryContext()
 
   const { ref: contentRef } = useTouchGestures({ toggleOpen: () => setOpen(!open) })
@@ -262,11 +275,12 @@ function CommandMenu({ children, trigger }: CommandMenuProps) {
         onInteractOutside={() => handleOpenChange(false)}
         onEscapeKeyDown={(e) => {
           e.preventDefault()
-          return query ? setQuery('') : page ? popPage() : handleOpenChange(false)
+          handleOpenChange(false)
         }}
         size={size}
         className={cn(
           'relative flex flex-col my-0 mx-auto rounded-t-lg',
+          'focus:outline-none focus-visible:outline-none',
           'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
           '!animate-in !slide-in-from-bottom-[85%] duration-300!',
           'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',

@@ -1,0 +1,81 @@
+# Disposable compose project for /test-the-docs.
+# Host only starts/stops this project; MDX fences run inside the runner.
+#
+# Profiles:
+#   stack    — privileged DinD + runner sharing DinD network (supabase start uses 127.0.0.1)
+#   examples — runner only; copies /examples into /work/example for npm install (no DinD)
+
+services:
+  dind:
+    image: docker:27-dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: ''
+    command: ['dockerd', '--host=tcp://0.0.0.0:2375', '--host=unix:///var/run/docker.sock']
+    healthcheck:
+      test: ['CMD', 'docker', 'info']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    profiles:
+      - stack
+
+  runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /work
+    user: '1001:1001'
+    environment:
+      TTD_IN_CONTAINER: '1'
+    command: ['sleep', 'infinity']
+    volumes:
+      - type: bind
+        source: ${TTD_WORK_DIR:?set TTD_WORK_DIR}
+        target: /work
+      - type: bind
+        source: ${TTD_OUTPUT_DIR:?set TTD_OUTPUT_DIR}
+        target: /output
+      - type: bind
+        source: ${TTD_EXAMPLE_DIR:-./.empty}
+        target: /examples
+        read_only: true
+    networks:
+      - ttd
+    profiles:
+      - examples
+
+  runner-stack:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /work
+    user: '1001:1001'
+    # Share DinD's network namespace so supabase healthchecks on 127.0.0.1 succeed
+    network_mode: 'service:dind'
+    environment:
+      TTD_IN_CONTAINER: '1'
+      DOCKER_HOST: tcp://127.0.0.1:2375
+    command: ['sleep', 'infinity']
+    volumes:
+      - type: bind
+        source: ${TTD_WORK_DIR:?set TTD_WORK_DIR}
+        target: /work
+      - type: bind
+        source: ${TTD_OUTPUT_DIR:?set TTD_OUTPUT_DIR}
+        target: /output
+      - type: bind
+        source: ${TTD_EXAMPLE_DIR:-./.empty}
+        target: /examples
+        read_only: true
+    depends_on:
+      dind:
+        condition: service_healthy
+    profiles:
+      - stack
+
+networks:
+  ttd:
+    driver: bridge
+    name: ${TTD_NETWORK_NAME:-ttd-sandbox}

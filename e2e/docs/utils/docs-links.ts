@@ -6,10 +6,6 @@ export const TROUBLESHOOTING_ARTICLE_SELECTOR =
 const DOCS_PATH_PREFIX = '/docs'
 const TROUBLESHOOTING_PATH_PREFIX = '/docs/guides/troubleshooting/'
 
-/**
- * Pick the main article selector for a docs page path.
- * Both guides and troubleshooting entries expose a stable data-testid.
- */
 export function articleSelectorForPagePath(pagePath: string): string {
   const pathname = pagePath.startsWith('http') ? new URL(pagePath).pathname : pagePath
 
@@ -23,31 +19,33 @@ export function articleSelectorForPagePath(pagePath: string): string {
   return GUIDE_ARTICLE_SELECTOR
 }
 
-/**
- * Collect unique docs-owned links from the main article.
- *
- * Cross-app paths such as `/ui` and `/dashboard` are excluded because the
- * docs preview does not own those routes.
- */
-export async function collectDocsOwnedLinks(
-  page: Page,
-  baseURL: string,
-  articleSelector: string = GUIDE_ARTICLE_SELECTOR
-): Promise<string[]> {
+export type LinkTarget = {
+  url: string
+  anchor?: string
+}
+
+function decodeAnchor(hash: string): string {
+  try {
+    return decodeURIComponent(hash)
+  } catch {
+    return hash
+  }
+}
+
+export function docsOwnedLinkTargets(
+  hrefs: string[],
+  pageUrl: string,
+  baseURL: string
+): LinkTarget[] {
   const origin = new URL(baseURL).origin
-  const hrefs = await page
-    .locator(`${articleSelector} a[href]`)
-    .evaluateAll((anchors) =>
-      anchors.map((anchor) => (anchor as HTMLAnchorElement).getAttribute('href') ?? '')
-    )
-  const links = new Set<string>()
+  const links = new Map<string, LinkTarget>()
 
   for (const href of hrefs) {
-    if (!href || href.startsWith('#')) continue
+    if (!href || href === '#') continue
 
     let url: URL
     try {
-      url = new URL(href, baseURL)
+      url = new URL(href, pageUrl)
     } catch {
       continue
     }
@@ -58,33 +56,90 @@ export async function collectDocsOwnedLinks(
       continue
     }
 
+    const anchor = decodeAnchor(url.hash.slice(1))
     url.hash = ''
-    links.add(url.toString())
+    const target: LinkTarget = anchor ? { url: url.toString(), anchor } : { url: url.toString() }
+    links.set(`${target.url}#${anchor}`, target)
   }
 
-  return [...links].sort()
+  return [...links.keys()].sort().map((key) => links.get(key)!)
 }
 
-/**
- * Playwright's headless Chromium reports a `HeadlessChrome` UA string, which
- * Vercel's bot protection blocks on some routes (notably /docs/reference/*)
- * even though the same page loads fine for a real browser. Stripping
- * `Headless` avoids that false positive when checking links out-of-band via
- * page.request rather than an actual navigation.
- */
-export async function browserLikeUserAgent(page: Page): Promise<string> {
-  const userAgent = await page.evaluate(() => navigator.userAgent)
-  return userAgent.replace('HeadlessChrome', 'Chrome')
+export async function collectDocsOwnedLinks(
+  page: Page,
+  baseURL: string,
+  articleSelector: string = GUIDE_ARTICLE_SELECTOR
+): Promise<LinkTarget[]> {
+  const hrefs = await page
+    .locator(`${articleSelector} a[href]`)
+    .evaluateAll((anchors) =>
+      anchors.map((anchor) => (anchor as HTMLAnchorElement).getAttribute('href') ?? '')
+    )
+
+  return docsOwnedLinkTargets(hrefs, page.url(), baseURL)
 }
 
-/**
- * Parse DOCS_E2E_PAGE_PATHS (comma- or newline-separated /docs/... paths).
- */
-export function parseDocsE2EPagePaths(raw: string | undefined): string[] {
-  if (!raw?.trim()) return []
-  return raw
-    .split(/[\n,]/)
-    .map((path) => path.trim())
-    .filter(Boolean)
-    .map((path) => (path.startsWith('/') ? path : `/${path}`))
+export type LinkCheckResult = {
+  ok: boolean
+  status: number
+  error?: string
+  anchors: string[]
+}
+
+const linkChecks = new Map<string, Promise<LinkCheckResult>>()
+
+// The docs middleware rewrites /reference/* requests whose user agent looks like a bot
+// (isbot, which matches HeadlessChrome) to /api/crawlers. Fetching from inside the page
+// keeps the browser's own user agent and network stack, so a link resolves the same way
+// page.goto resolves it in this suite.
+// Reading the body is slow for large reference pages, so only do it when an anchor needs it.
+export function checkLinkFromBrowser(
+  page: Page,
+  url: string,
+  withAnchors: boolean
+): Promise<LinkCheckResult> {
+  const key = `${withAnchors}:${url}`
+  let check = linkChecks.get(key) ?? (withAnchors ? undefined : linkChecks.get(`true:${url}`))
+  if (!check) {
+    check = page.evaluate(
+      async ({ linkUrl, readAnchors, articleSelector }) => {
+        try {
+          const response = await fetch(linkUrl)
+          if (!response.ok || !readAnchors) {
+            return { ok: response.ok, status: response.status, anchors: [] }
+          }
+
+          const doc = new DOMParser().parseFromString(await response.text(), 'text/html')
+          const root = doc.querySelector(articleSelector) ?? doc
+          const anchors = [
+            ...[...root.querySelectorAll('[id]')].map((element) => element.id),
+            ...[...root.querySelectorAll('a[name]')].map(
+              (element) => element.getAttribute('name')!
+            ),
+          ]
+          return { ok: true, status: response.status, anchors }
+        } catch (error) {
+          return {
+            ok: false,
+            status: 0,
+            error: error instanceof Error ? error.message : String(error),
+            anchors: [],
+          }
+        }
+      },
+      {
+        linkUrl: url,
+        readAnchors: withAnchors,
+        articleSelector: articleSelectorForPagePath(new URL(url).pathname),
+      }
+    )
+    check.then(
+      (result) => {
+        if (!result.ok) linkChecks.delete(key)
+      },
+      () => linkChecks.delete(key)
+    )
+    linkChecks.set(key, check)
+  }
+  return check
 }

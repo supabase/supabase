@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
+import { ExternalLinkIcon, EyeIcon, EyeOffIcon, FlaskConicalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
@@ -20,36 +20,36 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from 'ui/src/components/shadcn/ui/select'
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
-import { DatabaseConnectionsPreview } from './DatabaseConnectionsPreview'
+import { ExplorerPreview } from './ExplorerPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
+import { PipelineCreationPreview } from './PipelineCreationPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
+import { StorageVersioningPreview } from './StorageVersioningPreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
-import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
+import { FeaturePreview, useVisibleFeaturePreviewsByCategory } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
 } = {
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION]: <PipelineCreationPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]: <PgDeltaDiffPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]: <AdvisorRulesPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
@@ -58,14 +58,15 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]: <DatabaseConnectionsPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]: <ExplorerPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]: <StorageVersioningPreview />,
 }
 
 export const FeaturePreviewModal = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { dismissBanner } = useBannerStack()
-  const featurePreviews = useFeaturePreviews()
+  const previewsByCategory = useVisibleFeaturePreviewsByCategory()
   const {
     showFeaturePreviewModal,
     selectedFeatureKey,
@@ -76,9 +77,7 @@ export const FeaturePreviewModal = () => {
   const track = useTrack()
 
   const { flags, onUpdateFlag } = featurePreviewContext
-  const allFeaturePreviews = (
-    IS_PLATFORM ? featurePreviews : featurePreviews.filter((x) => !x.isPlatformOnly)
-  ).filter((x) => x.enabled)
+  const allFeaturePreviews = previewsByCategory.flatMap(({ previews }) => previews)
 
   const selectedFeature =
     allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
@@ -88,10 +87,6 @@ export const FeaturePreviewModal = () => {
 
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
-
-  const categories = (
-    [...new Set(allFeaturePreviews.map((preview) => preview.category).filter(Boolean))] as string[]
-  ).concat(['others'])
 
   const toggleFeature = () => {
     if (!selectedFeature) return
@@ -141,34 +136,27 @@ export const FeaturePreviewModal = () => {
             <div className="max-h-full flex-1 min-h-0 h-full flex flex-col gap-y-1 md:gap-y-4 md:flex-row">
               <div>
                 <ScrollArea className="hidden md:block h-[550px] w-[280px] border-r">
-                  <Accordion type="multiple" defaultValue={categories}>
-                    {categories.map((category) => {
-                      const items =
-                        category === 'others'
-                          ? allFeaturePreviews.filter((x) => x.category === undefined)
-                          : allFeaturePreviews.filter((x) => x.category === category)
-                      return (
-                        <AccordionItem
-                          key={category}
-                          value={category}
-                          className="data-[state=open]:border-b-0"
-                        >
-                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2">
-                            {category}
-                          </AccordionTrigger>
-                          <AccordionContent className="[&>div]:pb-0">
-                            {items.map((feature) => (
-                              <FeaturePreviewItem
-                                key={feature.key}
-                                feature={feature}
-                                selectedFeature={selectedFeature}
-                                selectFeaturePreview={selectFeaturePreview}
-                              />
-                            ))}
-                          </AccordionContent>
-                        </AccordionItem>
-                      )
-                    })}
+                  <Accordion
+                    type="multiple"
+                    defaultValue={previewsByCategory.map(({ category }) => category ?? 'others')}
+                  >
+                    {previewsByCategory.map(({ category, previews }) => (
+                      <AccordionItem key={category ?? 'others'} value={category ?? 'others'}>
+                        <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2 bg-tertiary dark:bg-transparent">
+                          {category ?? 'others'}
+                        </AccordionTrigger>
+                        <AccordionContent className="[&>div]:pb-0">
+                          {previews.map((feature) => (
+                            <FeaturePreviewItem
+                              key={feature.key}
+                              feature={feature}
+                              selectedFeature={selectedFeature}
+                              selectFeaturePreview={selectFeaturePreview}
+                            />
+                          ))}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
                   </Accordion>
 
                   {/* {allFeaturePreviews.map((feature) => (
@@ -190,9 +178,9 @@ export const FeaturePreviewModal = () => {
                   <SelectTrigger id="feature-preview-select">
                     <div className="flex items-center gap-x-2">
                       {(flags[selectedFeature.key] ?? false) ? (
-                        <Eye size={14} strokeWidth={2} className="text-brand" />
+                        <EyeIcon size={14} strokeWidth={2} className="text-primary" />
                       ) : (
-                        <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+                        <EyeOffIcon size={14} strokeWidth={1.5} className="text-foreground-light" />
                       )}
                       <p>{selectedFeature.name}</p>
                       {selectedFeature.isNew && <Badge variant="success">New</Badge>}
@@ -221,7 +209,7 @@ export const FeaturePreviewModal = () => {
                   <p>{selectedFeature?.name}</p>
                   <div className="flex items-center gap-x-2">
                     {selectedFeature?.discussionsUrl !== undefined && (
-                      <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
                         <Link
                           href={selectedFeature.discussionsUrl}
                           target="_blank"
@@ -233,7 +221,6 @@ export const FeaturePreviewModal = () => {
                     )}
                     {isSelectedFeatureEnabled && (
                       <ButtonTooltip
-                        variant="default"
                         disabled={!canDisableSelectedFeature}
                         onClick={() => toggleFeature()}
                         tooltip={{
@@ -252,9 +239,7 @@ export const FeaturePreviewModal = () => {
                     {!isSelectedFeatureEnabled && (
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="default" onClick={() => toggleFeature()}>
-                            Enable feature
-                          </Button>
+                          <Button onClick={() => toggleFeature()}>Enable feature</Button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom" className="max-w-64 text-center">
                           {hasRoute
@@ -272,14 +257,14 @@ export const FeaturePreviewModal = () => {
             </div>
           ) : (
             <div className="h-[550px] flex flex-col items-center justify-center">
-              <FlaskConical size={30} strokeWidth={1.5} className="text-foreground-light" />
+              <FlaskConicalIcon size={30} strokeWidth={1.5} className="text-foreground-light" />
               <div className="mt-1 mb-3 flex flex-col items-center gap-y-0.5">
                 <p className="text-sm">No feature previews available</p>
                 <p className="text-sm text-foreground-light">
                   Have an idea for the dashboard? Let us know via GitHub Discussions!
                 </p>
               </div>
-              <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
                 <Link
                   href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
                   target="_blank"
@@ -318,16 +303,18 @@ const FeaturePreviewItem = ({
       key={feature.key}
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(
-        'w-full! flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
-        selectedFeature?.key === feature.key ? 'bg-accent' : 'bg-card',
+        'w-full! flex-1 flex items-center justify-between p-4 cursor-pointer bg transition',
+        selectedFeature?.key === feature.key
+          ? 'bg-muted dark:bg-accent text-foreground'
+          : 'bg-card text-foreground-light',
         className
       )}
     >
       <div className="flex items-center gap-x-3">
         {isEnabled ? (
-          <Eye size={14} strokeWidth={2} className="text-brand" />
+          <EyeIcon size={14} strokeWidth={2} className="text-primary" />
         ) : (
-          <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+          <EyeOffIcon size={14} strokeWidth={1.5} className="text-foreground-light" />
         )}
         <p className="text-sm truncate" title={feature.name}>
           {feature.name}

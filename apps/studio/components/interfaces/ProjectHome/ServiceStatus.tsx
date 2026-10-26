@@ -1,11 +1,17 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
+import {
+  AlertTriangleIcon,
+  CheckCircle2Icon,
+  ChevronRightIcon,
+  Loader2Icon,
+  MinusCircleIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
 import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewContext'
-import { resolveRealtimeServiceStatus, type ProjectServiceStatus } from './ServiceStatus.utils'
+import type { ProjectServiceStatus } from './ServiceStatus.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { SingleStat } from '@/components/ui/SingleStat'
 import { useBranchesQuery } from '@/data/branches/branches-query'
@@ -14,20 +20,23 @@ import {
   useProjectServiceStatusQuery,
   type ServiceHealthResponse,
 } from '@/data/service-status/service-status-query'
-import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
+const SERVICE_ROW_CLASS =
+  'px-3 py-2 text-xs flex items-center justify-between border-b last:border-none'
+
 const iconProps = {
   size: 18,
   strokeWidth: 1.5,
 }
-const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
-const AlertIcon = () => <AlertTriangle {...iconProps} />
-const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
+const LoaderIcon = () => <Loader2Icon {...iconProps} className="animate-spin" />
+const AlertIcon = () => <AlertTriangleIcon {...iconProps} />
+const CheckIcon = () => <CheckCircle2Icon {...iconProps} className="text-primary" />
+const DisabledIcon = () => <MinusCircleIcon {...iconProps} className="text-foreground-lighter" />
 
 export const StatusIcon = ({
   isLoading,
@@ -40,7 +49,7 @@ export const StatusIcon = ({
 }) => {
   //
   if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
-  if (projectStatus === 'DISABLED') return <AlertIcon />
+  if (projectStatus === 'DISABLED') return <DisabledIcon />
   if (projectStatus === 'COMING_UP') return <LoaderIcon />
   if (isLoading) return <LoaderIcon />
   // isProjectNew has to be above UNHEALTHY because in the first few minutes, some services might be starting up and show as UNHEALTHY
@@ -100,7 +109,6 @@ const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
 export const ServiceStatus = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const {
@@ -136,9 +144,6 @@ export const ServiceStatus = () => {
       refetchInterval: (query) => {
         const data = query.state.data
         const isServiceUnhealthy = data?.some((service) => {
-          if (isHighAvailability && service.name === 'realtime') {
-            return false
-          }
           // if the postgrest service has an empty schema, postgrest has been disabled
           if (service.name === 'rest' && extractDbSchema(service) === '') {
             return false
@@ -216,7 +221,7 @@ export const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            status: resolveRealtimeServiceStatus(isHighAvailability, realtimeStatus?.status),
+            status: realtimeStatus?.status ?? 'UNHEALTHY',
             logsUrl: isUnifiedLogsEnabled
               ? '/logs?filter=log_type:eq:realtime'
               : '/logs/realtime-logs',
@@ -315,7 +320,7 @@ export const ServiceStatus = () => {
           icon={
             // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
             isProjectComingUp ? (
-              <Loader2 className="animate-spin" size={18} />
+              <Loader2Icon className="animate-spin" size={18} />
             ) : (
               <div className="grid grid-cols-3 gap-1">
                 {services.map((service, index) => (
@@ -328,7 +333,7 @@ export const ServiceStatus = () => {
                         (isProjectNew && service.status !== 'ACTIVE_HEALTHY')
                         ? 'bg-foreground-lighter animate-pulse'
                         : service.status === 'ACTIVE_HEALTHY'
-                          ? 'bg-brand'
+                          ? 'bg-brand-default'
                           : 'bg-selection'
                     )}
                   />
@@ -341,12 +346,8 @@ export const ServiceStatus = () => {
         />
       </HoverCardTrigger>
       <HoverCardContent className="p-0 w-60" side="bottom" align="start">
-        {services.map((service) => (
-          <Link
-            href={`/project/${ref}${service.logsUrl}`}
-            key={service.name}
-            className="transition px-3 py-2 text-xs flex items-center justify-between border-b last:border-none group relative hover:bg-surface-300"
-          >
+        {services.map((service) => {
+          const serviceInfo = (
             <div className="flex gap-x-2">
               <StatusIcon
                 isLoading={service.isLoading}
@@ -368,12 +369,31 @@ export const ServiceStatus = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100">
-              <span className="text-xs text-foreground">View logs</span>
-              <ChevronRight size={14} className="text-foreground" />
-            </div>
-          </Link>
-        ))}
+          )
+
+          // Disabled services have no logs to link out to
+          if (service.status === 'DISABLED') {
+            return (
+              <div key={service.name} className={SERVICE_ROW_CLASS}>
+                {serviceInfo}
+              </div>
+            )
+          }
+
+          return (
+            <Link
+              href={`/project/${ref}${service.logsUrl}`}
+              key={service.name}
+              className={cn(SERVICE_ROW_CLASS, 'transition group relative hover:bg-surface-300')}
+            >
+              {serviceInfo}
+              <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100">
+                <span className="text-xs text-foreground">View logs</span>
+                <ChevronRightIcon size={14} className="text-foreground" />
+              </div>
+            </Link>
+          )
+        })}
         {!allServicesOperational && (
           <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
             <div className="mt-0.5">

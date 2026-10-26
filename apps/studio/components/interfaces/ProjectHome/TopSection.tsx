@@ -1,4 +1,3 @@
-import { ReactFlowProvider } from '@xyflow/react'
 import Link from 'next/link'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -96,9 +95,7 @@ export const TopSection = () => {
                 'w-full h-[400px] md:h-[500px] border border-muted rounded-md overflow-hidden flex flex-col relative'
               )}
             >
-              <ReactFlowProvider>
-                <InstanceConfiguration />
-              </ReactFlowProvider>
+              <InstanceConfiguration />
             </div>
           </div>
         )}

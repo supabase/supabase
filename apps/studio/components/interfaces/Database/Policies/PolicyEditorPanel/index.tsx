@@ -9,7 +9,6 @@ import {
   type DisplayableSqlFragment,
   type SafeSqlFragment,
 } from '@supabase/pg-meta/src/pg-format'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
@@ -49,8 +48,9 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { unguarded } from '@/data/fetchers'
 import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -97,9 +97,8 @@ export const PolicyEditorPanel = memo(function ({
   const queryClient = useQueryClient()
   const { data: selectedProject } = useSelectedProjectQuery()
 
-  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canUpdatePolicies } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
@@ -225,6 +224,7 @@ export const PolicyEditorPanel = memo(function ({
         handleError: (error) => {
           throw error
         },
+        grant: unguarded.migrating,
       })
     } else if (selectedProject !== undefined) {
       const updatedRoles = roles.length === 0 ? ['public'] : roles.split(', ')
@@ -536,15 +536,12 @@ export const PolicyEditorPanel = memo(function ({
                       <QueryError error={error} open={errorPanelOpen} setOpen={setErrorPanelOpen} />
                     )}
                     <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
-                      <Button
-                        variant="default"
-                        disabled={isExecuting || isUpdating}
-                        onClick={confirmOnClose}
-                      >
+                      <Button disabled={isExecuting || isUpdating} onClick={confirmOnClose}>
                         Cancel
                       </Button>
 
                       <ButtonTooltip
+                        variant="primary"
                         form={FORM_ID}
                         type="submit"
                         loading={isExecuting || isUpdating}

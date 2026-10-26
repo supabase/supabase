@@ -3,7 +3,7 @@ import { codeBlock, oneLine } from 'common-tags'
 import type OpenAI from 'openai'
 
 import { ApplicationError, UserError } from './errors'
-import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from './tokenizer'
+import { estimateTokenCount, getChatRequestTokenCount, getMaxTokenCount } from './tokenizer'
 import type { Message } from './types'
 
 interface PageSection {
@@ -92,8 +92,7 @@ export async function clippy(
   for (let i = 0; i < pageSections.length; i++) {
     const pageSection = pageSections[i]
     const content = pageSection.content
-    const encoded = tokenizer.encode(content)
-    tokenCount += encoded.length
+    tokenCount += estimateTokenCount(content)
 
     if (tokenCount >= 1500) {
       break

@@ -1,10 +1,10 @@
-import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
-import { Check, Lightbulb, Table2 } from 'lucide-react'
+import { CheckIcon, LightbulbIcon, Table2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
+  AccordionTrigger,
   Alert,
   AlertDescription,
   AlertTitle,
@@ -258,7 +258,7 @@ export const QueryIndexes = ({
                   className="flex items-center gap-x-4 bg-surface-100 border first:rounded-tl first:rounded-tr border-b-0 last:border-b last:rounded-b px-2 py-2"
                 >
                   <div className="flex items-center gap-x-2">
-                    <Table2 size={14} className="text-foreground-light" />
+                    <Table2Icon size={14} className="text-foreground-light" />
                     <span className="text-xs font-mono text-foreground-light">
                       {index.schema}.{index.table}
                     </span>
@@ -300,7 +300,7 @@ export const QueryIndexes = ({
                     />
                   ) : (index_statements ?? []).length === 0 ? (
                     <Alert className="[&>svg]:rounded-full">
-                      <Check />
+                      <CheckIcon />
                       <AlertTitle>This query is optimized</AlertTitle>
                       <AlertDescription>
                         Recommendations for indexes will show here
@@ -311,16 +311,16 @@ export const QueryIndexes = ({
                       {isLinterWarning ? (
                         <Alert
                           variant="default"
-                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand my-3"
+                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-primary my-3"
                         >
-                          <Lightbulb />
+                          <LightbulbIcon />
                           <AlertTitle>
                             We have {index_statements.length} index recommendation
                             {index_statements.length > 1 ? 's' : ''}
                           </AlertTitle>
                           <AlertDescription>
                             You can improve this query's performance by{' '}
-                            <span className="text-brand">{totalImprovement.toFixed(2)}%</span> by
+                            <span className="text-primary">{totalImprovement.toFixed(2)}%</span> by
                             adding the following suggested{' '}
                             {index_statements.length > 1 ? 'indexes' : 'index'}
                           </AlertDescription>

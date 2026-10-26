@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion'
-import { ChevronLeft, MessageSquare, NotebookText } from 'lucide-react'
+import { MessageSquareIcon, NotebookTextIcon } from 'lucide-react'
+import { motion } from 'motion/react'
 import { type ComponentType, type PropsWithChildren } from 'react'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
 
 export type ExplorerResourceType = 'notebook' | 'chat'
@@ -18,15 +18,15 @@ export const EXPLORER_SECTIONS: Array<{
   {
     type: 'notebook',
     label: 'Notebooks',
-    icon: NotebookText,
+    icon: NotebookTextIcon,
     searchPlaceholder: 'Search notebooks',
   },
-  { type: 'chat', label: 'Chats', icon: MessageSquare, searchPlaceholder: 'Search chats' },
+  { type: 'chat', label: 'Chats', icon: MessageSquareIcon, searchPlaceholder: 'Search chats' },
 ]
 
 export const rowClassName = (isActive: boolean) =>
   cn(
-    'group relative flex h-7 w-full items-center gap-2 rounded-md pl-3 pr-2 text-sm',
+    'group relative flex h-7 w-full items-center gap-2 rounded-md pl-2 pr-2 text-sm',
     isActive
       ? 'bg-selection text-foreground'
       : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
@@ -39,14 +39,12 @@ export const ExplorerNavResourceWrapper = ({
   children,
   search,
   setSearch,
-  onBack,
 }: PropsWithChildren<{
   type: ExplorerResourceType
   label?: string
   className?: string
   search?: string
   setSearch: (value: string) => void
-  onBack: () => void
 }>) => {
   const searchPlaceholder = EXPLORER_SECTIONS.find((x) => x.type === type)?.searchPlaceholder
 
@@ -60,15 +58,7 @@ export const ExplorerNavResourceWrapper = ({
       transition={LEVEL_TRANSITION}
       className={cn('absolute inset-0 flex flex-col', className)}
     >
-      <div className="flex items-center gap-1 p-3 pb-2">
-        <Button
-          variant="outline"
-          size="tiny"
-          aria-label="Back to all resources"
-          onClick={onBack}
-          className="size-7 shrink-0 px-0"
-          icon={<ChevronLeft size={16} />}
-        />
+      <div className="px-3 pt-3">
         <span id="explorer-sidebar-search-label" className="sr-only">
           {searchPlaceholder}
         </span>

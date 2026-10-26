@@ -14,7 +14,7 @@ export type DucklakeApiConfig = {
   metadata_schema?: string
 }
 
-// Fields entered when configuring DuckLake manually (always present in the validation data).
+// Fields entered when connecting to an existing DuckLake catalog and storage.
 const DUCKLAKE_INPUT_FIELD_PATHS = [
   'ducklakeCatalogUrl',
   'ducklakeDataPath',
@@ -25,12 +25,8 @@ const DUCKLAKE_INPUT_FIELD_PATHS = [
   'ducklakeMetadataSchema',
 ] as const
 
-// Fields entered only in "Use Supabase" mode (optional in the validation data).
-const DUCKLAKE_SUPABASE_FIELD_PATHS = [
-  'ducklakeCatalogProjectRef',
-  'ducklakeStorageProjectRef',
-  'ducklakeStorageBucket',
-] as const
+// Fields entered only in managed mode.
+const DUCKLAKE_SUPABASE_FIELD_PATHS = ['ducklakeStorageBucket'] as const
 
 type DucklakeFieldPath =
   | (typeof DUCKLAKE_INPUT_FIELD_PATHS)[number]
@@ -52,21 +48,19 @@ type DucklakeValidationData = Pick<
     >
   >
 
-// Required fields per mode. "Use Supabase" only needs project refs + a bucket; the catalog URL and
-// S3 credentials are resolved by the platform API.
+// Managed mode only needs a bucket. The platform API resolves the current project's catalog and
+// storage credentials.
 const DUCKLAKE_SUPABASE_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
-  { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required' },
-  { path: 'ducklakeStorageProjectRef', message: 'Storage project is required' },
-  { path: 'ducklakeStorageBucket', message: 'Bucket is required' },
+  { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
 ]
 
 const DUCKLAKE_CUSTOM_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
-  { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
-  { path: 'ducklakeDataPath', message: 'Data path is required' },
-  { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required' },
-  { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
-  { path: 'ducklakeS3Region', message: 'S3 region is required' },
-  { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required' },
+  { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required.' },
+  { path: 'ducklakeDataPath', message: 'Data path is required.' },
+  { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required.' },
+  { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required.' },
+  { path: 'ducklakeS3Region', message: 'S3 region is required.' },
+  { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required.' },
 ]
 
 const DUCKLAKE_CUSTOM_SECRET_FIELDS = new Set<DucklakeFieldPath>([
@@ -79,7 +73,7 @@ const DUCKLAKE_CUSTOM_SECRET_FIELDS = new Set<DucklakeFieldPath>([
 const METADATA_SCHEMA_PATTERN = /^[A-Za-z0-9_]+$/
 const METADATA_SCHEMA_ISSUE: DucklakeValidationIssue = {
   path: 'ducklakeMetadataSchema',
-  message: 'DuckLake metadata schema must contain only letters, numbers, and underscores',
+  message: 'DuckLake metadata schema must contain only letters, numbers, and underscores.',
 }
 
 const getMissingRequiredFieldIssues = (
@@ -113,7 +107,7 @@ export const getDucklakeValidationIssues = (
   ) {
     issues.push({
       path: 'ducklakeS3AccessKeyId',
-      message: 'S3 access key ID is required',
+      message: 'S3 access key ID is required.',
     })
   }
 
@@ -124,7 +118,7 @@ export const getDucklakeValidationIssues = (
   ) {
     issues.push({
       path: 'ducklakeS3SecretAccessKey',
-      message: 'S3 secret access key is required',
+      message: 'S3 secret access key is required.',
     })
   }
 
@@ -136,7 +130,7 @@ export const getDucklakeValidationIssues = (
   ) {
     issues.push({
       path: 'ducklakeCatalogUrl',
-      message: 'DuckLake catalog URL must be a PostgreSQL-compatible URL',
+      message: 'DuckLake catalog URL must be a PostgreSQL-compatible URL.',
     })
   }
 
@@ -146,7 +140,7 @@ export const getDucklakeValidationIssues = (
   ) {
     issues.push({
       path: 'ducklakeDataPath',
-      message: 'DuckLake data path must start with s3:// and cannot contain file://',
+      message: 'DuckLake data path must start with s3:// and cannot contain file://.',
     })
   }
 
@@ -157,7 +151,7 @@ export const getDucklakeValidationIssues = (
   ) {
     issues.push({
       path: 'ducklakeS3Endpoint',
-      message: 'S3 endpoint must not contain the protocol scheme',
+      message: 'S3 endpoint must not contain the protocol scheme.',
     })
   }
 

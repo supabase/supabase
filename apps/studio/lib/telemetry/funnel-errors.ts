@@ -1,6 +1,6 @@
 import type { FieldErrors } from 'react-hook-form'
 
-export type FunnelOrigin = 'signup' | 'project_creation' | 'org_creation'
+export type FunnelOrigin = 'signup' | 'signin' | 'project_creation' | 'org_creation'
 export type ErrorCategory = 'validation' | 'api' | 'network' | 'payment' | 'unknown'
 
 export interface FunnelErrorClassification {
@@ -17,6 +17,16 @@ const API_REASON_PATTERNS = {
     [/rate limit|too many requests|after \d+ second/i, 'rate_limited'],
     [/captcha/i, 'captcha_failed'],
     [/password/i, 'password_rejected'],
+    [/valid email|invalid email|email address/i, 'email_invalid'],
+  ],
+  signin: [
+    [/invalid login credentials/i, 'invalid_credentials'],
+    [/email not confirmed/i, 'email_not_confirmed'],
+    [/rate limit|too many requests|after \d+ second/i, 'rate_limited'],
+    [/captcha/i, 'captcha_failed'],
+    [/sso provider/i, 'sso_provider_not_found'],
+    [/redirect|requested path is invalid/i, 'redirect_not_allowed'],
+    [/provider is not enabled|unsupported provider/i, 'provider_not_enabled'],
     [/valid email|invalid email|email address/i, 'email_invalid'],
   ],
   project_creation: [
@@ -36,6 +46,10 @@ const API_REASON_PATTERNS = {
 
 const VALIDATION_FIELD_REASONS = {
   signup: {
+    email: 'email_invalid',
+    password: 'password_invalid',
+  },
+  signin: {
     email: 'email_invalid',
     password: 'password_invalid',
   },
@@ -67,6 +81,7 @@ const STRIPE_DECLINE_REASONS = {
 } as const satisfies Record<string, string>
 
 const GENERIC_REASONS = [
+  'captcha_challenge_failed',
   'rate_limited',
   'server_error',
   'connection_timeout',
@@ -95,8 +110,16 @@ const STATUS_REASONS: Readonly<Partial<Record<number, FunnelErrorReason>>> = {
 }
 
 export function classifyApiError(origin: FunnelOrigin, error: unknown): FunnelErrorClassification {
-  const err = error as { code?: unknown; errorType?: unknown; message?: unknown }
-  const code = typeof err?.code === 'number' ? err.code : undefined
+  const err = error as { code?: unknown; status?: unknown; errorType?: unknown; message?: unknown }
+  // GoTrue AuthErrors carry a numeric `status` and a string `code` slug; auth-js uses
+  // status 0 for transport failures (AuthRetryableFetchError), which must classify as
+  // network_error, so the fallback only accepts positive statuses.
+  const code =
+    typeof err?.code === 'number'
+      ? err.code
+      : typeof err?.status === 'number' && err.status > 0
+        ? err.status
+        : undefined
   const message = typeof err?.message === 'string' ? err.message : ''
 
   if (err?.errorType === 'connection-timeout') {

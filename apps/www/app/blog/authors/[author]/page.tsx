@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 
 import AuthorClient from './AuthorClient'
 import blogAuthors from '@/lib/authors.json'
+import { canonicalAlternates } from '@/lib/canonical'
 import { getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
 
@@ -34,7 +35,10 @@ export async function generateMetadata({
 
   return {
     title: author ? `Blog | ${author.author}` : 'Blog | Author',
-    description: author ? `Blog posts by ${author.author}` : 'Latest news from the Supabase team.',
+    description: author ? `Blog posts by ${author.author}.` : 'Latest news from the Supabase team.',
+    alternates: author
+      ? canonicalAlternates(`/blog/authors/${encodeURIComponent(author.author_id)}`)
+      : undefined,
   }
 }
 

@@ -1,5 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import type {
   PermissionCatalogEntry,
   PermissionMode,
@@ -7,8 +5,7 @@ import type {
   ResourceAccessMode,
 } from './AccessToken.permissions'
 import { getCatalogEntry, getEntryScopes } from './AccessToken.permissions'
-import { doPermissionsCheck } from '@/hooks/misc/useCheckPermissions'
-import type { Permission } from '@/types'
+import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 
 /**
  * Client-side estimation of what a scoped token can actually do, given its owner's current role.
@@ -77,6 +74,11 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   // organization
   organization_admin_read: 'member',
   organization_admin_write: 'owner',
+  organization_config_read: 'administrator',
+  organization_config_write: 'administrator',
+  audit_logs_read: 'administrator',
+  billing_read: 'administrator',
+  billing_write: 'administrator',
   organization_projects_read: 'member',
   organization_projects_create: 'administrator',
   members_read: 'readonly',
@@ -95,9 +97,14 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   analytics_logs_read: 'readonly',
   analytics_usage_read: 'readonly',
   api_gateway_keys_read: 'developer',
+  api_gateway_keys_secret_read: 'developer',
   api_gateway_keys_write: 'administrator',
   auth_config_read: 'readonly',
   auth_config_write: 'developer',
+  auth_hooks_read: 'readonly',
+  auth_hooks_write: 'developer',
+  auth_users_read: 'readonly',
+  auth_users_write: 'developer',
   auth_signing_keys_read: 'developer',
   auth_signing_keys_write: 'developer',
   backups_read: 'readonly',
@@ -113,6 +120,7 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   custom_domain_read: 'readonly',
   custom_domain_write: 'administrator',
   data_api_config_read: 'readonly',
+  data_api_config_secret_read: 'developer',
   data_api_config_write: 'administrator',
   database_read: 'readonly',
   database_write: 'developer',
@@ -144,6 +152,9 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   infra_disk_config_write: 'administrator',
   infra_read_replicas_read: 'readonly',
   infra_read_replicas_write: 'administrator',
+  project_operations_write: 'developer',
+  project_notebooks_read: 'readonly',
+  project_notebooks_write: 'developer',
   project_snippets_read: 'readonly',
   project_snippets_write: 'readonly',
   realtime_config_read: 'readonly',
@@ -156,62 +167,39 @@ export const FGA_SCOPE_MINIMUM_ROLE: Record<string, TokenRoleLevel> = {
   vanity_subdomain_write: 'administrator',
   platform_webhooks_projects_read: 'member',
   platform_webhooks_projects_write: 'administrator',
+  workers_read: 'readonly',
+  workers_write: 'developer',
 }
 
 /**
- * ABAC checks that identify the user's base role from their own permission rows (the ungated
- * /platform/profile/permissions response). Base roles inherit each other's rows
- * (Owner ⊃ Administrator ⊃ Developer ⊃ Read-only), so the first probe that passes, walking
- * top-down, is the user's level. Each probe is a permission only that role and above holds.
+ * The user's base role in an organization, or on a specific project. Read directly
+ * from the v2 permissions response (which reports FGA role tuples).
+ * Project entries are additive on top of the org-level role, so the project-level answer is the max of both.
  */
-const ROLE_PROBES: { role: TokenRoleLevel; action: string; resource: string }[] = [
-  { role: 'owner', action: PermissionAction.UPDATE, resource: 'organizations' },
-  { role: 'administrator', action: PermissionAction.CREATE, resource: 'projects' },
-  { role: 'developer', action: PermissionAction.FUNCTIONS_WRITE, resource: 'functions' },
-  { role: 'readonly', action: PermissionAction.TENANT_SQL_SELECT, resource: 'sql' },
-]
-
-/**
- * Estimates the user's base role in an organization (or on a specific project, when the user's
- * access is project-scoped). Custom roles resolve to the nearest base role by capability, which
- * matches how they behave in the FGA model.
- */
-export const estimateRoleLevel = (
-  permissions: Permission[],
+export const getRoleLevel = (
+  data: PermissionsV2Data,
   organizationSlug: string,
   projectRef?: string
 ): TokenRoleLevel => {
-  for (const probe of ROLE_PROBES) {
-    if (
-      doPermissionsCheck(
-        permissions,
-        probe.action,
-        probe.resource,
-        undefined,
-        organizationSlug,
-        projectRef
-      )
-    ) {
-      return probe.role
-    }
-  }
-  const isMember = permissions.some(
-    (permission) => permission.organization_slug === organizationSlug
-  )
-  return isMember ? 'member' : 'none'
+  const org = data.organizations.find((o) => o.slug === organizationSlug)
+  if (!org) return 'none'
+
+  // project-scoped users hold the org-level 'member' role; null only on malformed data
+  const orgRole: TokenRoleLevel = org.role ?? 'member'
+  if (!projectRef) return orgRole
+
+  const projectRole = org.projects.find((p) => p.ref === projectRef)?.role
+  return projectRole ? maxRole(orgRole, projectRole) : orgRole
 }
 
-/** True when every permission row the user holds in the org is limited to specific projects. */
+/** True when the user's access in the org is only through project scoped roles. */
 export const getIsProjectScopedOnly = (
-  permissions: Permission[],
+  data: PermissionsV2Data,
   organizationSlug: string
 ): boolean => {
-  const orgRows = permissions.filter(
-    (permission) => permission.organization_slug === organizationSlug
-  )
-  if (orgRows.length === 0) return false
-  return orgRows.every(
-    (permission) => permission.project_refs !== undefined && permission.project_refs.length > 0
+  const org = data.organizations.find((o) => o.slug === organizationSlug)
+  return (
+    org !== undefined && (org.role === null || org.role === 'member') && org.projects.length > 0
   )
 }
 
@@ -231,7 +219,12 @@ export const requiredRoleForEntry = (
 ): TokenRoleLevel =>
   mode === 'none' ? 'member' : requiredRoleForScopes(getEntryScopes(entry, mode))
 
-export type EntryAccessStatus = 'ok' | 'exceeds-role' | 'unknown'
+/**
+ * 'unavailable-for-scope': the entry's permission level can never be exercised through this
+ * token's resource binding, regardless of the owner's role — platform rejects project-scoped
+ * tokens outright on organization endpoints.
+ */
+export type EntryAccessStatus = 'ok' | 'exceeds-role' | 'unavailable-for-scope' | 'unknown'
 
 /** A token-bound resource where the user's current role can't exercise the selected mode. */
 export interface FailingResource {
@@ -275,7 +268,13 @@ export interface TokenAccessEvaluation {
   entries: Record<string, EntryAccess>
   /** Entry keys whose selected mode exceeds the user's current role. */
   exceedingEntryKeys: string[]
-  /** Selection reduced to what the user's current role can exercise. */
+  /** Entry keys the token's resource binding can never exercise (org entries on project tokens). */
+  unavailableEntryKeys: string[]
+  /**
+   * Selection reduced to what the user's current role can exercise. Always normalized to
+   * catalog-known, non-'none' entries — including on the 'unknown' and account paths, where no
+   * reduction applies.
+   */
   effectiveSelection: PermissionSelection
 }
 
@@ -286,7 +285,7 @@ export interface TokenRoleContextArgs {
   /** Token-bound project refs (project mode). */
   projectRefs: string[]
   /** The user's own ABAC permission rows; undefined while loading. */
-  permissions: Permission[] | undefined
+  permissions: PermissionsV2Data | undefined
   /** Organizations the user can currently access. */
   organizations: { slug: string; name?: string }[]
   /** Projects the user can currently access. */
@@ -307,7 +306,11 @@ export interface TokenRoleContext {
   hasNoAccessibleResource: boolean
   /** Per bound organization (or parent org in project mode). */
   orgLevels: FailingResource[]
-  /** Per bound project in project mode; mirrors orgLevels otherwise (org roles cascade). */
+  /**
+   * Per bound project in project mode; per accessible project of the bound orgs in organization
+   * mode (platform checks project permissions against the project object, so project-scoped
+   * roles count). Orgs with no accessible projects contribute their org level instead.
+   */
   projectLevels: FailingResource[]
   /** Weakest role across orgLevels / projectLevels. */
   orgLevel: TokenRoleLevel
@@ -389,7 +392,7 @@ export const computeTokenRoleContext = ({
     const cacheKey = `${slug}|${ref ?? ''}`
     const cached = roleCache.get(cacheKey)
     if (cached !== undefined) return cached
-    const role = estimateRoleLevel(permissions, slug, ref)
+    const role = getRoleLevel(permissions, slug, ref)
     roleCache.set(cacheKey, role)
     return role
   }
@@ -412,14 +415,19 @@ export const computeTokenRoleContext = ({
     orgRole: TokenRoleLevel
   ): FailingResource['projectScopedRoles'] => {
     if (rankOf(orgRole) >= ROLE_RANK.readonly) return undefined
-    const candidates =
+    const org = permissions.organizations.find((o) => o.slug === slug)
+    if (!org) return undefined
+
+    const boundRefs =
       resourceAccess === 'project'
-        ? accessibleProjects.filter((project) => project.organization_slug === slug)
-        : projects.filter((project) => project.organization_slug === slug)
-    const roles = candidates.flatMap((project) => {
-      const role = roleFor(slug, project.ref)
-      if (rankOf(role) < ROLE_RANK.readonly) return []
-      return [{ label: project.name ?? project.ref, role }]
+        ? new Set(accessibleProjects.map((project) => project.ref))
+        : undefined
+
+    const roles = org.projects.flatMap((entry) => {
+      if (boundRefs && !boundRefs.has(entry.ref)) return []
+      if (rankOf(entry.role) < ROLE_RANK.readonly) return []
+      const project = projectsByRef.get(entry.ref)
+      return [{ label: project?.name ?? entry.ref, role: entry.role }]
     })
     return roles.length > 0 ? roles : undefined
   }
@@ -435,15 +443,27 @@ export const computeTokenRoleContext = ({
     }
   })
 
+  const toProjectLevel = (project: { ref: string; organization_slug: string; name?: string }) => ({
+    type: 'project' as const,
+    id: project.ref,
+    label: project.name ?? project.ref,
+    role: roleFor(project.organization_slug, project.ref),
+  })
+
+  // In organization mode the token's scope cascades to every project of the bound orgs, and
+  // platform checks the owner's permission against the project object — so a project-scoped
+  // Developer really can exercise e.g. database_write on their project through an org-bound
+  // token. Evaluate project-level entries per accessible project rather than by the org-level
+  // role, falling back to the org level for orgs with no accessible projects. Future projects
+  // only ever inherit the org-level role; the per-project view can't warn about those.
   const projectLevels: FailingResource[] =
     resourceAccess === 'project'
-      ? accessibleProjects.map((project) => ({
-          type: 'project' as const,
-          id: project.ref,
-          label: project.name ?? project.ref,
-          role: roleFor(project.organization_slug, project.ref),
-        }))
-      : orgLevels
+      ? accessibleProjects.map(toProjectLevel)
+      : orgSlugsForLevels.flatMap((slug) => {
+          const orgProjects = projects.filter((project) => project.organization_slug === slug)
+          if (orgProjects.length === 0) return orgLevels.filter((level) => level.id === slug)
+          return orgProjects.map(toProjectLevel)
+        })
 
   return {
     status: 'evaluated',
@@ -468,6 +488,15 @@ export const applySelectionToRoleContext = (
   context: TokenRoleContext,
   selection: PermissionSelection
 ): TokenAccessEvaluation => {
+  // Every path reports entries and effectiveSelection over the same normalized key set, so
+  // consumers can iterate either without special-casing 'none' modes or unknown catalog keys.
+  const selectedKeys = Object.keys(selection).filter(
+    (key) => selection[key] !== 'none' && getCatalogEntry(key) !== undefined
+  )
+  const normalizedSelection: PermissionSelection = Object.fromEntries(
+    selectedKeys.map((key) => [key, selection[key]])
+  )
+
   const base = {
     status: context.status,
     inaccessibleOrgSlugs: context.inaccessibleOrgSlugs,
@@ -475,10 +504,9 @@ export const applySelectionToRoleContext = (
     hasNoBoundResources: context.hasNoBoundResources,
     hasNoAccessibleResource: context.hasNoAccessibleResource,
     exceedingEntryKeys: [] as string[],
-    effectiveSelection: selection,
+    unavailableEntryKeys: [] as string[],
+    effectiveSelection: normalizedSelection,
   }
-
-  const selectedKeys = Object.keys(selection).filter((key) => selection[key] !== 'none')
 
   // Account-scoped (legacy/user) tokens track the owner's access by definition — every entry is
   // exercisable, so requiredRole/failingResources (only read for 'exceeds-role' entries) stay inert.
@@ -509,12 +537,30 @@ export const applySelectionToRoleContext = (
   const { orgLevel, projectLevel, orgLevels, projectLevels } = context
   const entries: Record<string, EntryAccess> = {}
   const exceedingEntryKeys: string[] = []
+  const unavailableEntryKeys: string[] = []
   const effectiveSelection: PermissionSelection = {}
 
   for (const key of selectedKeys) {
     const mode = selection[key]
     const entry = getCatalogEntry(key)
     if (!entry) continue
+
+    // Platform rejects project-scoped tokens outright on organization endpoints (getChecks
+    // throws before any FGA evaluation), so the owner's org role is irrelevant there and
+    // role-based evaluation would wrongly report these entries as exercisable. The one
+    // exception — organization_admin_write is additionally enforced on a few project-ref
+    // routes via the model's `from parent_organization` indirection — is deliberately
+    // ignored: this advisory UI fails closed.
+    if (context.resourceAccess === 'project' && entry.level === 'organization') {
+      entries[key] = {
+        status: 'unavailable-for-scope',
+        effectiveMode: 'none',
+        requiredRole: requiredRoleForEntry(entry, mode),
+        failingResources: [],
+      }
+      unavailableEntryKeys.push(key)
+      continue
+    }
 
     const availableLevel =
       entry.level === 'user' ? 'owner' : entry.level === 'organization' ? orgLevel : projectLevel
@@ -544,7 +590,7 @@ export const applySelectionToRoleContext = (
     if (effectiveMode !== 'none') effectiveSelection[key] = effectiveMode
   }
 
-  return { ...base, entries, exceedingEntryKeys, effectiveSelection }
+  return { ...base, entries, exceedingEntryKeys, unavailableEntryKeys, effectiveSelection }
 }
 
 export interface FailingResourceGroup {

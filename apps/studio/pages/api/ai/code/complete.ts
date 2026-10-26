@@ -1,13 +1,14 @@
 import pgMeta, { getEntityDefinitionsSql } from '@supabase/pg-meta'
-import { generateText, ModelMessage, stepCountIs, tool } from 'ai'
+import { generateText, isStepCount, ModelMessage, tool } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { getOrgAIDetails } from '@/lib/ai/ai-details'
+import { getAIDetails } from '@/lib/ai/ai-details'
 import {
   buildClickhouseLogsSchemaSection,
   CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
@@ -50,7 +51,7 @@ async function fetchSchemas(
   if (!includeSchema) return { schemas: [], error: false }
   try {
     const { result } = await executeSql<Schemas>(
-      { projectRef, connectionString, sql: pgMetaSchemasList.sql },
+      { projectRef, connectionString, sql: pgMetaSchemasList.sql, grant: unguarded.migrating },
       undefined,
       headers,
       IS_PLATFORM ? undefined : executeQuery
@@ -68,7 +69,12 @@ async function fetchSchemaDDL(
   if (schemas.length === 0) return { error: false, sqlDefinitions: [] }
   try {
     const { result } = await executeSql<EntityDefinitionRow[]>(
-      { projectRef, connectionString, sql: getEntityDefinitionsSql({ schemas }) },
+      {
+        projectRef,
+        connectionString,
+        sql: getEntityDefinitionsSql({ schemas }),
+        grant: unguarded.migrating,
+      },
       undefined,
       headers,
       IS_PLATFORM ? undefined : executeQuery
@@ -176,11 +182,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     let aiOptInLevel: AiOptInLevel = IS_PLATFORM ? 'disabled' : 'schema'
 
     if (IS_PLATFORM && orgSlug && authorization && projectRef) {
-      const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-      })
-      aiOptInLevel = orgAIOptInLevel
+      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
+      aiOptInLevel = aiDetails.aiOptInLevel
     }
 
     const {
@@ -292,11 +295,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
     const coreMessages: ModelMessage[] = [
       {
-        role: 'system',
-        content: system,
-        ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
-      },
-      {
         role: 'user',
         content: userMessage,
       },
@@ -304,7 +302,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const { text } = await generateText({
       ...modelParams,
-      stopWhen: stepCountIs(5),
+      instructions: {
+        role: 'system',
+        content: system,
+        ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
+      },
+      stopWhen: isStepCount(5),
       messages: coreMessages,
       tools:
         includeSchema && !schemaListResult.error

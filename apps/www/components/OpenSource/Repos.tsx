@@ -1,5 +1,5 @@
-import { AnimatePresence } from 'framer-motion'
 import { Pencil, Users, Users2 } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -32,7 +32,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
           viewBox="0 0 16 16"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={cn('text-foreground-light shrink-0', isActive && 'text-brand')}
+          className={cn('text-foreground-light shrink-0', isActive && 'text-primary')}
         >
           <path
             d={icon}

@@ -1,11 +1,19 @@
 import { Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { AlignLeft, Check, ChevronDown, Heart, Keyboard, MoreVertical } from 'lucide-react'
+import {
+  AlignLeftIcon,
+  ChevronDownIcon,
+  HeartIcon,
+  KeyboardIcon,
+  MoreVerticalIcon,
+  TriangleAlertIcon,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Button,
   cn,
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuRadioGroup,
@@ -18,7 +26,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { type QuerySource } from '../querySource'
 import { ROWS_PER_PAGE_OPTIONS } from '../SQLEditor.constants'
 import { AutosaveStatus } from './AutosaveStatus'
 import { QuerySourceMenu } from './QuerySourceMenu/QuerySourceMenu'
@@ -30,16 +37,23 @@ import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonat
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
+// DropdownMenuCheckboxItem puts its check indicator on the left. These menus show
+// it on the right, matching the other toggle items, so move the indicator over.
+const CHECKBOX_ITEM_CHECK_ON_RIGHT =
+  'gap-x-2 pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2 [&>span:first-child_svg]:text-primary'
+
 export type UtilityActionsProps = {
   id: string
-  runSource: QuerySource
+  runSource: QuerySourceBinding
   isExecuting?: boolean
   isDisabled?: boolean
   hasSelection?: boolean
@@ -62,11 +76,12 @@ export const UtilityActions = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
   const isManualSaveEnabled = useIsSqlEditorManualSaveEnabled()
+  const { saveFavorite } = useSqlEditorSaveCoordinator()
 
   const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
 
-  const isLogs = runSource.type === 'logs'
+  const isLogs = runSource._tag === 'logs'
   const canCreateLogsSnippet = isLogsSourceEnabled && isOtelLogsEnabled
   const canShowSourceIndicator = isLogs || canCreateLogsSnippet
   const isLogsRunBlocked = isLogs && !isOtelLogsEnabled
@@ -74,6 +89,10 @@ export const UtilityActions = ({
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    true
+  )
+  const [confirmUnsavedChanges, setConfirmUnsavedChanges] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_CONFIRM_UNSAVED_CHANGES,
     true
   )
   const [lastSelectedDb, setLastSelectedDb] = useLocalStorageQuery(
@@ -95,10 +114,6 @@ export const UtilityActions = ({
     )
   }
 
-  const addFavorite = () => snapV2.addFavorite(id)
-
-  const removeFavorite = () => snapV2.removeFavorite(id)
-
   const onSelectDatabase = (databaseId: string) => {
     sessionSnap.resetResult(id)
     setLastSelectedDb(databaseId)
@@ -118,37 +133,43 @@ export const UtilityActions = ({
               <Button
                 aria-label="More actions"
                 data-testid="sql-editor-utility-actions"
-                variant="default"
-                className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
-                icon={<MoreVertical className="text-foreground-light" />}
+                className={cn('px-1', isAiOpen ? 'flex 2xl:hidden' : 'hidden')}
+                icon={<MoreVerticalIcon className="text-foreground-light" />}
               />
             </DropdownMenuTrigger>
           </TooltipTrigger>
           <TooltipContent side="bottom">More actions</TooltipContent>
         </Tooltip>
-        <DropdownMenuContent className="w-48">
-          <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
-            <span className="flex items-center gap-x-2">
-              <Keyboard size={14} className="text-foreground-light" />
-              Intellisense enabled
-            </span>
-            {intellisenseEnabled && <Check className="text-brand" size={16} />}
-          </DropdownMenuItem>
+        <DropdownMenuContent className="w-56">
+          <DropdownMenuCheckboxItem
+            className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
+            checked={intellisenseEnabled}
+            onCheckedChange={toggleIntellisense}
+          >
+            <KeyboardIcon size={14} className="text-foreground-light" />
+            Intellisense enabled
+          </DropdownMenuCheckboxItem>
+          {isManualSaveEnabled && (
+            <DropdownMenuCheckboxItem
+              className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
+              checked={confirmUnsavedChanges}
+              onCheckedChange={setConfirmUnsavedChanges}
+            >
+              <TriangleAlertIcon size={14} className="text-foreground-light" />
+              Confirm on discard
+            </DropdownMenuCheckboxItem>
+          )}
           {IS_PLATFORM && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="gap-x-2"
-                onClick={() => {
-                  if (isFavorite) removeFavorite()
-                  else addFavorite()
-                }}
-              >
-                <Heart
+              <DropdownMenuItem className="gap-x-2" onClick={() => saveFavorite(id, !isFavorite)}>
+                <HeartIcon
                   size={14}
                   strokeWidth={2}
                   className={
-                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                    isFavorite
+                      ? 'fill-primary-bright stroke-none'
+                      : 'fill-none stroke-foreground-light'
                   }
                 />
                 {isFavorite ? 'Remove from' : 'Add to'} favorites
@@ -167,7 +188,7 @@ export const UtilityActions = ({
             }}
           >
             <span className="flex items-center gap-x-2">
-              <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
+              <AlignLeftIcon size={14} strokeWidth={2} className="text-foreground-light" />
               Prettify SQL
             </span>
             {formatKeys && <KeyboardShortcut keys={formatKeys} />}
@@ -183,18 +204,32 @@ export const UtilityActions = ({
                 <Button
                   variant="text"
                   className="px-1"
-                  icon={<Keyboard className="text-foreground-light" />}
-                  aria-label="Enable Intellisense"
+                  icon={<MoreVerticalIcon className="text-foreground-light" />}
+                  aria-label="More actions"
                 />
               </DropdownMenuTrigger>
             </TooltipTrigger>
-            <TooltipContent side="bottom">Enable Intellisense</TooltipContent>
+            <TooltipContent side="bottom">More actions</TooltipContent>
           </Tooltip>
-          <DropdownMenuContent className="w-48">
-            <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuCheckboxItem
+              className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
+              checked={intellisenseEnabled}
+              onCheckedChange={toggleIntellisense}
+            >
+              <KeyboardIcon size={14} className="text-foreground-light" />
               Intellisense enabled
-              {intellisenseEnabled && <Check className="text-brand" size={16} />}
-            </DropdownMenuItem>
+            </DropdownMenuCheckboxItem>
+            {isManualSaveEnabled && (
+              <DropdownMenuCheckboxItem
+                className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
+                checked={confirmUnsavedChanges}
+                onCheckedChange={setConfirmUnsavedChanges}
+              >
+                <TriangleAlertIcon size={14} className="text-foreground-light" />
+                Confirm on discard
+              </DropdownMenuCheckboxItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -205,18 +240,18 @@ export const UtilityActions = ({
                 <Button
                   variant="text"
                   size="tiny"
-                  onClick={removeFavorite}
+                  onClick={() => saveFavorite(id, false)}
                   className="px-1"
-                  icon={<Heart className="fill-brand stroke-none" />}
+                  icon={<HeartIcon className="fill-primary-bright stroke-none" />}
                   aria-label="Remove from favorites"
                 />
               ) : (
                 <Button
                   variant="text"
                   size="tiny"
-                  onClick={addFavorite}
+                  onClick={() => saveFavorite(id, true)}
                   className="px-1"
-                  icon={<Heart className="fill-none stroke-foreground-light" />}
+                  icon={<HeartIcon className="fill-none stroke-foreground-light" />}
                   aria-label="Add to favorites"
                 />
               )}
@@ -232,7 +267,7 @@ export const UtilityActions = ({
           onClick={prettifyQuery}
           disabled={isLogs}
           className="px-1"
-          icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
+          icon={<AlignLeftIcon strokeWidth={2} className="text-foreground-light" />}
           aria-label="Prettify SQL"
           tooltip={{
             content: {
@@ -277,10 +312,7 @@ export const UtilityActions = ({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="default"
-                  iconRight={<ChevronDown size={14} className="text-foreground-light" />}
-                >
+                <Button iconRight={<ChevronDownIcon size={14} className="text-foreground-light" />}>
                   <span className="text-foreground-light">Limit</span>{' '}
                   {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)?.label}
                 </Button>

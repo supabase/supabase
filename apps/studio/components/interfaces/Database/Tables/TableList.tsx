@@ -1,18 +1,17 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import {
-  Check,
-  ChevronDown,
-  Copy,
-  Edit,
-  Eye,
-  MoreVertical,
-  Plus,
-  Search,
-  Trash,
-  X,
+  CheckIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  EditIcon,
+  EyeIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  SearchIcon,
+  TrashIcon,
+  XIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -54,6 +53,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from '@/data/foreign-tables/foreign-tables-query'
@@ -61,7 +61,7 @@ import { useMaterializedViewsQuery } from '@/data/materialized-views/materialize
 import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useViewsQuery } from '@/data/views/views-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -97,9 +97,8 @@ export const TableList = ({
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canUpdateTables } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canUpdateTables } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const {
@@ -283,7 +282,7 @@ export const TableList = ({
           value={filterString}
           onChange={(e) => setFilterString(e.target.value)}
           onKeyDown={onSearchInputEscape(filterString, setFilterString)}
-          icon={<Search />}
+          icon={<SearchIcon />}
         />
 
         <Popover>
@@ -291,7 +290,7 @@ export const TableList = ({
             <Button
               size="tiny"
               variant={hasFiltersApplied ? 'default' : 'dashed'}
-              iconRight={<ChevronDown />}
+              iconRight={<ChevronDownIcon />}
             >
               Entity Type
             </Button>
@@ -321,7 +320,6 @@ export const TableList = ({
                     </div>
                     <Button
                       size="tiny"
-                      variant="default"
                       onClick={() => setVisibleTypes([value])}
                       className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
                     >
@@ -342,14 +340,20 @@ export const TableList = ({
               onTrigger={() => onAddTable()}
               side="bottom"
             >
-              <Button className="w-auto ml-auto" icon={<Plus />} onClick={() => onAddTable()}>
+              <Button
+                variant="primary"
+                className="w-auto ml-auto"
+                icon={<PlusIcon />}
+                onClick={() => onAddTable()}
+              >
                 New table
               </Button>
             </Shortcut>
           ) : (
             <ButtonTooltip
+              variant="primary"
               className="w-auto ml-auto"
-              icon={<Plus />}
+              icon={<PlusIcon />}
               disabled
               tooltip={{
                 content: {
@@ -424,14 +428,7 @@ export const TableList = ({
                     </TableRow>
                   )}
                   {entities.length === 0 && filterString.length > 0 && (
-                    <TableRow key={selectedSchema}>
-                      <TableCell colSpan={7}>
-                        <p className="text-sm text-foreground">No results found</p>
-                        <p className="text-sm text-foreground-light">
-                          Your search for "{filterString}" did not return any results
-                        </p>
-                      </TableCell>
-                    </TableRow>
+                    <TableRowNoResults key={selectedSchema} colSpan={7} search={filterString} />
                   )}
                   {entities.length > 0 &&
                     entities.map((x) => (
@@ -499,19 +496,19 @@ export const TableList = ({
                             (table) => table.id === x.id
                           ) ? (
                             <div className="flex items-center gap-x-2">
-                              <Check size={16} strokeWidth={2} className="text-brand-link" />
+                              <CheckIcon size={16} strokeWidth={2} className="text-primary" />
                               <p className="text-foreground-light">Enabled</p>
                             </div>
                           ) : (
                             <div className="flex items-center gap-x-2">
-                              <X size={16} strokeWidth={2} className="text-foreground-muted" />
+                              <XIcon size={16} strokeWidth={2} className="text-foreground-muted" />
                               <p className="text-foreground-lighter">Disabled</p>
                             </div>
                           )}
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button asChild variant="default">
+                            <Button asChild>
                               <Link href={`/project/${ref}/database/tables/${x.id}`}>
                                 View columns
                               </Link>
@@ -523,9 +520,8 @@ export const TableList = ({
                                   <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
                                       <Button
-                                        variant="default"
                                         className="px-1"
-                                        icon={<MoreVertical />}
+                                        icon={<MoreVerticalIcon />}
                                         aria-label={`Table ${x.name} actions`}
                                       />
                                     </DropdownMenuTrigger>
@@ -550,7 +546,7 @@ export const TableList = ({
                                       })
                                     }
                                   >
-                                    <Eye size={12} />
+                                    <EyeIcon size={12} />
                                     <p>View in Table Editor</p>
                                   </DropdownMenuItem>
 
@@ -570,7 +566,7 @@ export const TableList = ({
                                           },
                                         }}
                                       >
-                                        <Edit size={12} />
+                                        <EditIcon size={12} />
                                         <p>Edit table</p>
                                       </DropdownMenuItemTooltip>
                                       <DropdownMenuItemTooltip
@@ -587,7 +583,7 @@ export const TableList = ({
                                           },
                                         }}
                                       >
-                                        <Copy size={12} />
+                                        <CopyIcon size={12} />
                                         <span>Duplicate Table</span>
                                       </DropdownMenuItemTooltip>
                                       <DropdownMenuSeparator />
@@ -606,7 +602,7 @@ export const TableList = ({
                                           },
                                         }}
                                       >
-                                        <Trash size={12} />
+                                        <TrashIcon size={12} />
                                         <p>Delete table</p>
                                       </DropdownMenuItemTooltip>
                                     </>

@@ -1,6 +1,6 @@
 import SectionContainer from 'components/Layouts/SectionContainer'
-import { motion, useInView } from 'framer-motion'
 import { DEFAULT_EASE } from 'lib/animations'
+import { motion, useInView } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { FC } from 'react'

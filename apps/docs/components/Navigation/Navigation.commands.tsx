@@ -62,7 +62,7 @@ const navCommands = [
   {
     id: 'nav-local-cli',
     name: 'Go to Local Dev / CLI',
-    route: '/guides/cli',
+    route: '/guides/local-development',
     icon: () => <ArrowRight />,
   },
   {
@@ -153,8 +153,8 @@ const navCommands = [
   },
   {
     id: 'nav-ui',
-    name: 'Go to Supabase UI Library',
-    route: 'https://supabase.com/ui',
+    name: 'Go to Supabase Library',
+    route: 'https://supabase.com/library',
     icon: () => <ArrowRight />,
   },
 ] satisfies Array<ICommand & { enabled?: boolean }>

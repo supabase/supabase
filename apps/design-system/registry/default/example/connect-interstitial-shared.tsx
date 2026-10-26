@@ -133,5 +133,5 @@ export function InterstitialActionError({ error }: { error?: React.ReactNode }) 
 }
 
 export function SignOutButton() {
-  return <Button variant="default" icon={<LogOut />} className="px-2" aria-label="Sign out" />
+  return <Button icon={<LogOut />} className="px-2" aria-label="Sign out" />
 }

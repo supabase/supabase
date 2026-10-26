@@ -46,7 +46,7 @@ VUE_APP_SUPABASE_KEY=YOUR_SUPABASE_KEY
 
 </$CodeTabs>
 
-With the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed on the browser, and that's fine since Supabase enables [Row Level Security](/docs/guides/auth#row-level-security) on Databases by default.
+With the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed on the browser, and that's fine since Supabase enables [Row Level Security](/docs/guides/database/postgres/row-level-security) on Databases by default.
 
 <$CodeSample
 path="/user-management/ionic-vue-user-management/src/supabase.ts"
@@ -54,9 +54,9 @@ lines={[[1, -1]]}
 meta="name=src/supabase.ts"
 />
 
-### Set up a login route
+### Set up a sign-in route
 
-Create a Vue component to manage logins and sign ups that uses Magic Links, so users can sign in with their email without using passwords.
+Create a Vue component to manage sign-ins and sign-ups that uses Magic Links, so users can sign in with their email without using passwords.
 
 <$CodeSample
 path="/user-management/ionic-vue-user-management/src/views/Login.vue"

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
+import { MCP_SECRETS_ROUTE } from '@/components/interfaces/MCP/Secrets/McpSecrets.constants'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
@@ -20,7 +21,8 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserMFAEnabled = useIsMFAEnabled()
 
-  const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
+  const { setLastVisitedSnippet, setLastVisitedTable, setLastVisitedExplorerTab } =
+    useDashboardHistory()
   const { lastVisitedOrganization, setLastVisitedOrganization } = useLastVisitedOrganization()
 
   const DEFAULT_HOME = IS_PLATFORM
@@ -38,6 +40,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     // this is used by database.dev, usually as /new/new-project
     '/new/[slug]',
     '/join',
+    MCP_SECRETS_ROUTE,
   ]
 
   /**
@@ -95,10 +98,22 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
         setLastVisitedSnippet(id)
       } else if (router.pathname.endsWith('/editor/[id]')) {
         setLastVisitedTable(id)
+      } else if (router.pathname.endsWith('/explorer/notebook/[id]')) {
+        setLastVisitedExplorerTab({ type: 'notebook', id })
+      } else if (router.pathname.endsWith('/explorer/query/[id]')) {
+        setLastVisitedExplorerTab({ type: 'query', id })
+      } else if (router.pathname.endsWith('/explorer/chat/[id]')) {
+        setLastVisitedExplorerTab({ type: 'chat', id })
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref, id])
+  }, [
+    ref,
+    id,
+    router.pathname,
+    setLastVisitedSnippet,
+    setLastVisitedTable,
+    setLastVisitedExplorerTab,
+  ])
 
   useEffect(() => {
     if (organization) {
