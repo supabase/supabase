@@ -563,11 +563,6 @@
       "import": "./src/MultipleCodeBlock/index.tsx",
       "types": "./src/MultipleCodeBlock/index.tsx"
     },
-    "./Notch/notch.css": {
-      "style": "./src/Notch/notch.css",
-      "import": "./src/Notch/notch.css",
-      "types": "./src/Notch/notch.css"
-    },
     "./Notch/NotchOutline": {
       "import": "./src/Notch/NotchOutline.tsx",
       "types": "./src/Notch/NotchOutline.tsx"
@@ -575,6 +570,11 @@
     "./Notch": {
       "import": "./src/Notch/index.ts",
       "types": "./src/Notch/index.ts"
+    },
+    "./Notch/notch.css": {
+      "style": "./src/Notch/notch.css",
+      "import": "./src/Notch/notch.css",
+      "types": "./src/Notch/notch.css"
     },
     "./PageBreadcrumbs": {
       "import": "./src/PageBreadcrumbs/index.tsx",
