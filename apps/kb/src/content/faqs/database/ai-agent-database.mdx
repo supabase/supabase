@@ -9,6 +9,6 @@ The MCP server gives you more control over agentic actions, including:
 
 - Limiting what the agent can reach, by scoping the server to one project with the `project_ref` option and turning on read-only mode with `read_only=true`, so every query runs as a read-only Postgres user.
 - Supporting manual approval for potential costs and destructive SQL commands.
-- Providing back Supabase Dashboard URLs for Edge Function secret entry (to avoid leaking secrets to your AI agent).
+- Providing back Supabase Dashboard URLs for Edge Function secret entry (when your client supports URL elicitation and the connection is not read-only).
 
 An agent can also use the Supabase CLI or connect with a plain connection string like any other client.
