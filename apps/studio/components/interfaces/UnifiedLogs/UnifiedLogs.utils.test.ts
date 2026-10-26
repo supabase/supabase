@@ -256,9 +256,19 @@ describe('getLogTypeVisibility', () => {
 })
 
 describe('createUnifiedLogsSearch', () => {
-  it('attaches the scope', () => {
+  it('retains fixed filters when a preview creates its query search', () => {
     const search = createUnifiedLogsSearch({}, FUNCTION_SCOPE)
     expect(search.scope).toEqual(FUNCTION_SCOPE)
+  })
+
+  it.each([
+    '{"filters":[{"column":"function_id","operator":"="}]}',
+    '{"filters":[{"column":"","operator":"=","value":""}]}',
+  ])('rejects invalid fixed filters instead of opening an unscoped view: %s', (payload) => {
+    const scope = JSON.parse(payload)
+    expect(() => createUnifiedLogsSearch({}, scope)).toThrow(
+      'Invalid unified logs search parameters'
+    )
   })
 
   it('leaves the scope off unscoped searches', () => {

@@ -85,7 +85,7 @@ export type TimelineChartSchema = z.infer<typeof timelineChartSchema>
 export const unifiedLogsScopeSchema = z.object({
   filters: z.array(
     z.object({
-      column: z.string(),
+      column: z.string().min(1),
       operator: z.enum(['=', '<>', '~~*', '!~~*']),
       value: z.string(),
     })

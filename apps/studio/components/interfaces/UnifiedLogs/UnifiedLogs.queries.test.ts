@@ -8,16 +8,16 @@ import {
   isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
-import type { QuerySearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
+import type { UnifiedLogsScope } from './UnifiedLogs.types'
+import { createUnifiedLogsSearch } from './UnifiedLogs.utils'
 
-const baseSearch = {
+const baseSearch = createUnifiedLogsSearch({
   date: [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')],
-} as any
+})
 
-// Helper: build a search with extra `filter` URL entries on top of the base.
-const withFilters = (...entries: string[]) => ({ ...baseSearch, filter: entries }) as any
+const withFilters = (...entries: string[]) =>
+  createUnifiedLogsSearch({ ...baseSearch, filter: entries })
 
-// A scope's fixed filters for one edge function's invocations and runtime logs
 const FUNCTION_SCOPE: UnifiedLogsScope = {
   filters: [
     { column: 'log_type', operator: '=', value: 'edge function' },
@@ -26,17 +26,12 @@ const FUNCTION_SCOPE: UnifiedLogsScope = {
   ],
 }
 
-// Helper: build a search with a scope (one edge function by default), plus optional `filter` entries.
-const withScope = (scope: UnifiedLogsScope, ...entries: string[]): QuerySearchParamsType => ({
-  ...baseSearch,
-  scope,
-  filter: entries,
-})
+const withScope = (scope: UnifiedLogsScope, ...entries: string[]) =>
+  createUnifiedLogsSearch({ ...baseSearch, filter: entries }, scope)
 const withFunctionScope = (...entries: string[]) => withScope(FUNCTION_SCOPE, ...entries)
 
-// Helper: build a search with the cross-cutting `user` filter set, plus optional `filter` entries.
 const withUser = (user: string, ...entries: string[]) =>
-  ({ ...baseSearch, user, filter: entries }) as any
+  createUnifiedLogsSearch({ ...baseSearch, user, filter: entries })
 
 describe('UnifiedLogs.queries (OTEL flat)', () => {
   describe('getUnifiedLogsQuery', () => {
@@ -86,8 +81,6 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
     })
 
-    // The Logs page shows a function's console output inside each invocation's detail panel, so
-    // excluding some other log type mustn't add those lines to the list as rows of their own
     it('keeps edge function runtime output out of the list when a log type is excluded', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:neq:postgres'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
@@ -484,7 +477,6 @@ describe('scope', () => {
       expect(where).toContain(FUNCTION_SCOPE_CONDITION)
     })
 
-    // A function's Logs tab lists its console output as rows, unlike the project-wide Logs page
     it('still lists runtime output when the user excludes invocations from a function scope', () => {
       const sql = getUnifiedLogsQuery(withFunctionScope('log_type:neq:edge function'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
@@ -542,20 +534,14 @@ describe('scope', () => {
       )
     })
 
-    // Dropping the scope instead, like an unusable user filter, would show logs from outside it,
-    // e.g. every function's logs on one function's page
-    it.each<[string, UnifiedLogsScope]>([
-      ['has no filters', { filters: [] }],
-      [
-        "has a filter that can't be turned into SQL",
-        {
-          filters: [
-            { column: 'function_id', operator: '=', value: undefined as unknown as string },
-          ],
-        },
-      ],
-    ])('matches no rows when the scope %s', (_, scope) => {
-      const where = getUnifiedLogsQuery(withScope(scope)).split(/\bWHERE\b/)[1] ?? ''
+    it('matches no rows when the fixed scope has no filters', () => {
+      const where = getUnifiedLogsQuery(withScope({ filters: [] })).split(/\bWHERE\b/)[1] ?? ''
+      expect(where.trim()).toBe('0')
+    })
+
+    it('matches no rows when an unvalidated scope filter omits its value', () => {
+      const scope = JSON.parse('{"filters":[{"column":"function_id","operator":"="}]}')
+      const where = getUnifiedLogsQuery({ ...baseSearch, scope }).split(/\bWHERE\b/)[1] ?? ''
       expect(where.trim()).toBe('0')
     })
   })
