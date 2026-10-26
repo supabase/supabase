@@ -6,6 +6,7 @@ import { contract } from './execute-sql'
 import { approvalGatedToolFromContract } from './tool-from-contract'
 import type { ApprovalGatedToolFactory } from './types'
 import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { hideSpanErrorFromTrace } from '@/lib/ai/braintrust-logger'
 import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
@@ -23,7 +24,7 @@ export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
         ? { sql: approvedSql, isCappedInDatabase: false }
         : capReadQuery(approvedSql, DEFAULT_CELL_ROW_LIMIT + 1)
       const { result } = await executeSql(
-        { projectRef, connectionString, sql: limitedSql },
+        { projectRef, connectionString, sql: limitedSql, grant: unguarded.migrating },
         abortSignal,
         authHeaders
       ).catch((error: unknown) => {

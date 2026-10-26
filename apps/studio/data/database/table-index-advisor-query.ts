@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import { filterProtectedSchemaIndexStatements } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -94,6 +95,7 @@ export async function getTableIndexAdvisorSuggestions({
     projectRef,
     connectionString,
     sql,
+    grant: unguarded.migrating,
   })
 
   const suggestions: IndexAdvisorSuggestion[] = (result || [])

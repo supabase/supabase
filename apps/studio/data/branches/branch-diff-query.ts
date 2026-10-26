@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { branchKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -30,6 +30,7 @@ export async function getBranchDiff({
       Accept: 'text/plain',
     },
     parseAs: 'text',
+    grant: unguarded.migrating,
   })
 
   if (error) {

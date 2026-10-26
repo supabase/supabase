@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { sslEnforcementKeys } from './keys'
 import { configKeys } from '@/data/config/keys'
-import { handleError, put } from '@/data/fetchers'
+import { handleError, put, unguarded } from '@/data/fetchers'
 import { jitDbAccessKeys } from '@/data/jit-db-access/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -27,6 +27,7 @@ export async function updateSSLEnforcement({
   const { data, error } = await put(`/v1/projects/{ref}/ssl-enforcement`, {
     params: { path: { ref: projectRef } },
     body: { requestedConfig },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
