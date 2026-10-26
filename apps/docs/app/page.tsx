@@ -211,7 +211,7 @@ const additionalResources = [
     title: 'Troubleshooting',
     description: 'Our troubleshooting guide for solutions to common Supabase issues.',
     icon: 'troubleshooting',
-    href: '/kb/topics/troubleshooting',
+    href: 'https://supabase.com/kb/topics/troubleshooting',
   },
 ]
 
