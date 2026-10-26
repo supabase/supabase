@@ -62,7 +62,7 @@ const LegacyEdgeFunctionOverview = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
 
-  const [interval, setInterval] = useState<string>('15min')
+  const [interval, setInterval] = useState<string>('1hr')
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
   const { data: selectedFunction } = useEdgeFunctionQuery({
     projectRef,

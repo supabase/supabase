@@ -39,7 +39,7 @@ export const EdgeFunctionOverview = () => {
   const { ref: projectRef, functionSlug } = useParams()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
-  const [interval, setInterval] = useState<string>('15min')
+  const [interval, setInterval] = useState<string>('1hr')
   const selectedInterval =
     EDGE_FUNCTION_CHART_INTERVALS.find((item) => item.key === interval) ||
     EDGE_FUNCTION_CHART_INTERVALS[1]
