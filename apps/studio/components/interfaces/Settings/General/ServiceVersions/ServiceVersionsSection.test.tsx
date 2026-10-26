@@ -28,7 +28,6 @@ vi.mock('common', () => ({
 
 vi.mock('ui', () => ({
   Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
-  Button: ({ children }: { children: ReactNode }) => <>{children}</>,
   Card: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   CardContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   Input: (props: InputHTMLAttributes<HTMLInputElement>) => <input {...props} />,
@@ -44,28 +43,34 @@ vi.mock('ui-patterns/Admonition', () => ({
   Admonition: ({
     title,
     description,
-    actions,
     children,
   }: {
     title?: ReactNode
     description?: ReactNode
-    actions?: ReactNode
     children?: ReactNode
   }) => (
     <div>
       <div>{title}</div>
       <div>{description}</div>
-      {actions}
       {children}
     </div>
   ),
 }))
 
 vi.mock('ui-patterns/form/FormItemLayout/FormItemLayout', () => ({
-  FormItemLayout: ({ label, children }: { label: ReactNode; children: ReactNode }) => (
+  FormItemLayout: ({
+    label,
+    description,
+    children,
+  }: {
+    label: ReactNode
+    description?: ReactNode
+    children: ReactNode
+  }) => (
     <label>
       {label}
       {children}
+      {description && <div>{description}</div>}
     </label>
   ),
 }))
@@ -105,6 +110,12 @@ vi.mock('@/components/ui/AlertError', () => ({
   AlertError: ({ subject }: { subject: string }) => <div>{subject}</div>,
 }))
 
+vi.mock('@/components/ui/InlineLink', () => ({
+  InlineLink: ({ href, children }: { href: string; children: ReactNode }) => (
+    <a href={href}>{children}</a>
+  ),
+}))
+
 vi.mock('@/data/config/project-upgrade-eligibility-query', () => ({
   useProjectUpgradeEligibilityQuery: mockUseUpgradeEligibility,
 }))
@@ -126,6 +137,22 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: mockUseProject,
   useIsAwsK8sCloudProvider: mockIsAwsK8sCloudProvider,
 }))
+
+const LATEST_VERSION_HINT = 'This project is already on the latest version of Postgres'
+
+const latestVersionEligibility = {
+  data: {
+    current_app_version: 'supabase-postgres-17.4.1.060',
+    latest_app_version: 'supabase-postgres-17.4.1.060',
+    eligible: false,
+    validation_errors: [],
+    warnings: [],
+  },
+  error: undefined,
+  isPending: false,
+  isError: false,
+  isSuccess: true,
+}
 
 describe('ServiceVersionsSection', () => {
   beforeEach(() => {
@@ -202,7 +229,6 @@ describe('ServiceVersionsSection', () => {
     expect(screen.getAllByText('OrioleDB').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Latest').length).toBeGreaterThan(0)
     expect(screen.getByText('Project upgrade available')).toBeInTheDocument()
-    expect(screen.queryByText('Postgres upgrades appear here')).not.toBeInTheDocument()
   })
 
   it('shows the read-replica upgrade block instead of the upgrade action', () => {
@@ -214,7 +240,7 @@ describe('ServiceVersionsSection', () => {
 
     expect(screen.getByText('Read replicas block upgrade to 17.4.1.060')).toBeInTheDocument()
     expect(screen.queryByText('Project upgrade available')).not.toBeInTheDocument()
-    expect(screen.queryByText('Postgres upgrades appear here')).not.toBeInTheDocument()
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
   })
 
   it('renders upgrade validation errors and warnings for an ineligible project', () => {
@@ -239,7 +265,7 @@ describe('ServiceVersionsSection', () => {
       screen.getByText('Validation warnings: Review extension compatibility')
     ).toBeInTheDocument()
     expect(screen.queryByText('Project upgrade available')).not.toBeInTheDocument()
-    expect(screen.queryByText('Postgres upgrades appear here')).not.toBeInTheDocument()
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
   })
 
   it('preserves eligibility and service-version loading and error states', () => {
@@ -288,40 +314,37 @@ describe('ServiceVersionsSection', () => {
     expect(screen.getByText('Failed to retrieve versions')).toBeInTheDocument()
   })
 
-  it('shows the upgrade hint with a docs link when there is no upgrade, alert, or warning to display', () => {
-    mockUseUpgradeEligibility.mockReturnValue({
-      data: {
-        current_app_version: 'supabase-postgres-17.4.1.060',
-        latest_app_version: 'supabase-postgres-17.4.1.060',
-        eligible: false,
-        validation_errors: [],
-        warnings: [],
-      },
-      error: undefined,
-      isPending: false,
-      isError: false,
-      isSuccess: true,
-    })
+  it('shows the latest-version description with a docs link when on the latest version', () => {
+    mockUseUpgradeEligibility.mockReturnValue(latestVersionEligibility)
 
     render(<ServiceVersionsSection />)
 
-    expect(
-      screen.getByText(
-        'When a newer Postgres version is available, an upgrade option shows in this section.'
-      )
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Learn about upgrading' })).toHaveAttribute(
+    expect(screen.getByText(LATEST_VERSION_HINT, { exact: false })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Learn more' })).toHaveAttribute(
       'href',
       expect.stringContaining('/guides/platform/upgrading')
     )
   })
 
+  it('hides the latest-version description when database upgrades are disabled', () => {
+    mockUseFeatures.mockReturnValue({
+      projectAuthAll: true,
+      projectSettingsDatabaseUpgrades: false,
+    })
+    mockUseUpgradeEligibility.mockReturnValue(latestVersionEligibility)
+
+    render(<ServiceVersionsSection />)
+
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
+  })
+
   it('does not offer upgrade for v3 projects', () => {
     mockIsAwsK8sCloudProvider.mockReturnValue(true)
+    mockUseUpgradeEligibility.mockReturnValue(latestVersionEligibility)
 
     render(<ServiceVersionsSection />)
 
     expect(screen.queryByText('Project upgrade available')).not.toBeInTheDocument()
-    expect(screen.queryByText('Postgres upgrades appear here')).not.toBeInTheDocument()
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
   })
 })

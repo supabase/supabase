@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import {
   Badge,
-  Button,
   Card,
   CardContent,
   Input,
@@ -31,6 +30,7 @@ import {
 } from '../../Infrastructure/UpgradeWarnings'
 import { ProjectUpgradeAlert } from '../Infrastructure/ProjectUpgradeAlert'
 import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade-eligibility-query'
 import { useProjectServiceVersionsQuery } from '@/data/projects/project-service-versions'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -91,14 +91,7 @@ export const ServiceVersionsSection = () => {
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
 
-  const hasValidationErrors = (data?.validation_errors ?? []).length > 0
-  const hasValidationWarnings = (data?.warnings ?? []).length > 0
-  const canShowUpgradeHint =
-    showDatabaseUpgrades &&
-    !isAwsK8s &&
-    !data?.eligible &&
-    !hasValidationErrors &&
-    !hasValidationWarnings
+  const canShowLatestVersionHint = isOnLatestVersion && showDatabaseUpgrades && !isAwsK8s
 
   return (
     <PageSection id="service-versions">
@@ -157,6 +150,17 @@ export const ServiceVersionsSection = () => {
                           label="Postgres version"
                           layout="vertical"
                           isReactForm={false}
+                          description={
+                            canShowLatestVersionHint ? (
+                              <>
+                                This project is already on the latest version of Postgres that
+                                Supabase supports. Updates will appear here when available.{' '}
+                                <InlineLink href={`${DOCS_URL}/guides/platform/upgrading`}>
+                                  Learn more
+                                </InlineLink>
+                              </>
+                            ) : undefined
+                          }
                         >
                           <InputGroup>
                             <InputGroupInput
@@ -211,25 +215,6 @@ export const ServiceVersionsSection = () => {
                           </InputGroup>
                         </FormItemLayout>
                       </>
-                    )}
-
-                    {canShowUpgradeHint && (
-                      <Admonition
-                        type="note"
-                        title="Postgres upgrades appear here"
-                        description="When a newer Postgres version is available, an upgrade option shows in this section."
-                        actions={
-                          <Button size="tiny" asChild>
-                            <a
-                              href={`${DOCS_URL}/guides/platform/upgrading`}
-                              target="_blank"
-                              rel="noreferrer noopener"
-                            >
-                              Learn about upgrading
-                            </a>
-                          </Button>
-                        }
-                      />
                     )}
 
                     {showDatabaseUpgrades && data && data.eligible && !isAwsK8s ? (
