@@ -30,6 +30,8 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   emptyStateMessage?: string | ReactNode
   /** Overrides the subject shown in the error state, e.g. "Failed to retrieve X" */
   errorSubject?: string
+  footer?: ReactNode
+  skeletonRowCount?: number
 }
 
 // [Joshen] JFYI this component is NOT virtualized and hence will struggle handling many data points
@@ -45,10 +47,14 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   setColumnVisibility,
   emptyStateMessage = 'No results found',
   errorSubject = 'Failed to retrieve data',
+  footer,
+  skeletonRowCount = 15,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const tableRef = useRef<HTMLTableElement>(null)
   const { table, error, isError, isLoading, isFetching, openRowId, setOpenRowId, onSelectRow } =
     useDataTable()
+
+  const hasCustomFooter = footer !== undefined
 
   const headerGroups = table.getHeaderGroups()
   const headers = headerGroups[0].headers
@@ -62,11 +68,12 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         Math.ceil(e.currentTarget.scrollTop + e.currentTarget.clientHeight) >=
         e.currentTarget.scrollHeight - BOTTOM_BUFFER_PX
 
-      if (onPageBottom && !isFetching && hasNextPage) {
+      const shouldFetchNextPage = onPageBottom && !isFetching && hasNextPage && !hasCustomFooter
+      if (shouldFetchNextPage) {
         fetchNextPage()
       }
     },
-    [fetchNextPage, isFetching, hasNextPage]
+    [fetchNextPage, isFetching, hasNextPage, hasCustomFooter]
   )
 
   useShortcut(
@@ -155,7 +162,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             ))
           ) : isLoading ? (
             <Fragment>
-              {new Array(15).fill(0).map((_, x) => (
+              {new Array(skeletonRowCount).fill(0).map((_, x) => (
                 <TableRow
                   key={x}
                   className={cn(
@@ -203,8 +210,21 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             </Fragment>
           )}
 
+          {hasCustomFooter && !!footer && !isLoading && (
+            <TableRow
+              className={cn(
+                TableRowClassName,
+                'hover:bg-transparent data-[state=selected]:bg-transparent'
+              )}
+            >
+              <TableCell colSpan={columns.length} className="p-0!">
+                {footer}
+              </TableCell>
+            </TableRow>
+          )}
+
           {/* Only show load more section if we have rows OR if we're not in initial loading state */}
-          {(rows.length > 0 || (!isLoading && !rows.length)) && (
+          {!hasCustomFooter && (rows.length > 0 || (!isLoading && !rows.length)) && (
             <TableRow
               className={cn(
                 TableRowClassName,
