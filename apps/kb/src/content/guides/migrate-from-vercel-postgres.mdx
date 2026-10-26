@@ -1,35 +1,42 @@
 ---
-title: 'Migrate from Neon to Supabase'
-description: 'Migrate your existing Neon database to Supabase.'
-subtitle: 'Migrate your existing Neon database to Supabase.'
+title: 'Migrate from Vercel Postgres to Supabase'
+description: 'Migrate your existing Vercel Postgres database to Supabase.'
+topics: ['Migration', 'Database']
 ---
 
-This guide demonstrates how to migrate your Neon database to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
+This guide demonstrates how to migrate your Vercel Postgres database to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
 
-## Retrieve your Neon database credentials [#retrieve-credentials]
+## Retrieve your Vercel Postgres database credentials
 
-1. Sign in to your Neon Console [https://console.neon.tech/login](https://console.neon.tech/login).
-1. Select **Projects** on the left.
-1. Click on your project in the list.
-1. From your Project Dashboard find your **Connection string** and click **Copy snippet** to copy it to the clipboard (do not check "pooled connection").
+1. Sign in to your Vercel Dashboard [https://vercel.com/login](https://vercel.com/login).
+1. Click on the **Storage** tab.
+1. Click on your Postgres Database.
+1. Under the **Quickstart** section, select **psql** then click **Show Secret** to reveal your database password.
+1. Copy the string after `psql ` to the clipboard.
 
 Example:
 
 ```bash
-postgresql://neondb_owner:xxxxxxxxxxxxxxx-random-word-yyyyyyyy.us-west-2.aws.neon.tech/neondb?sslmode=require
+psql "postgres://default:xxxxxxxxxxxx@yy-yyyyy-yyyyyy-yyyyyyy.us-west-2.aws.neon.tech:5432/verceldb?sslmode=require"
+```
+
+Copy this part to your clipboard:
+
+```bash
+"postgres://default:xxxxxxxxxxxx@yy-yyyyy-yyyyyy-yyyyyyy.us-west-2.aws.neon.tech:5432/verceldb?sslmode=require"
 ```
 
 ## Set your `OLD_DB_URL` environment variable
 
-Set the **OLD_DB_URL** environment variable at the command line using your Neon database credentials from the clipboard.
+Set the **OLD_DB_URL** environment variable at the command line using your Vercel Postgres Database credentials.
 
 Example:
 
 ```bash
-export OLD_DB_URL="postgresql://neondb_owner:xxxxxxxxxxxxxxx-random-word-yyyyyyyy.us-west-2.aws.neon.tech/neondb?sslmode=require"
+export OLD_DB_URL="postgres://default:xxxxxxxxxxxx@yy-yyyyy-yyyyyy-yyyyyyy.us-west-2.aws.neon.tech:5432/verceldb?sslmode=require"
 ```
 
-## Retrieve your Supabase connection string [#retrieve-supabase-connection-string]
+## Retrieve your Supabase connection string
 
 1. If you're new to Supabase, [create a project](/dashboard).
    Make a note of your password, you will need this later. If you forget it, you can [reset it here](/dashboard/project/_/database/settings).
@@ -82,7 +89,10 @@ Additional options
 
 Run `pg_dump --help` for a full list of options.
 
-<$Partial path="migration_warnings.mdx" />
+> [!CAUTION]
+>
+> - If you're planning to migrate a database larger than 6 GB, we recommend [upgrading to at least a Large compute add-on](/docs/guides/platform/compute-and-disk). This will ensure you have the necessary resources to handle the migration efficiently.
+> - We strongly advise you to pre-provision the disk space you will need for your migration. On paid projects, you can do this by navigating to the [Infrastructure settings](/dashboard/project/_/settings/infrastructure) page. For more information on disk scaling and disk limits, check out our [disk settings](/docs/guides/platform/compute-and-disk#disk) documentation.
 
 ## Enterprise
 

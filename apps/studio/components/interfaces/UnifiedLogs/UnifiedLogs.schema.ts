@@ -82,7 +82,18 @@ export const timelineChartSchema = z.object({
 
 export type TimelineChartSchema = z.infer<typeof timelineChartSchema>
 
+export const unifiedLogsScopeSchema = z.object({
+  filters: z.array(
+    z.object({
+      column: z.string().min(1),
+      operator: z.enum(['=', '<>', '~~*', '!~~*']),
+      value: z.string(),
+    })
+  ),
+})
+
 export const querySearchParamsSchema = z.object({
+  scope: unifiedLogsScopeSchema.optional(),
   filter: z.array(z.string()).optional(),
   latency: z.array(z.number()).optional(),
   'timing.dns': z.array(z.number()).optional(),

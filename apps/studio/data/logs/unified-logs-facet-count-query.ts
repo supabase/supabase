@@ -89,7 +89,7 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) => {
-  const useOtel = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend(search)
   const scopedSearch =
     facet === 'pathname'
       ? {

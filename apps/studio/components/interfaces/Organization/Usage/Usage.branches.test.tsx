@@ -12,6 +12,7 @@ import { createMockOrganizationResponse, createMockProject } from '@/tests/helpe
 import { createTestBranch } from '@/tests/lib/branch-test-utils'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
 
@@ -141,20 +142,15 @@ describe('Usage branch URLs', () => {
           createMockOrganizationResponse({ slug: 'test-org' }),
         ]),
     })
-    addAPIMock({
-      method: 'get',
-      path: '/platform/profile/permissions/v2',
-      response: () =>
-        HttpResponse.json<components['schemas']['UserPermissionsResponse_Output']>({
-          organizations: [
-            {
-              slug: 'test-org',
-              role: 'owner',
-              permissions: [FGA_PERMISSIONS.ORGANIZATION.BILLING_READ],
-              projects: [],
-            },
-          ],
-        }),
+    mockPermissions({
+      organizations: [
+        {
+          slug: 'test-org',
+          role: 'owner',
+          permissions: [FGA_PERMISSIONS.ORGANIZATION.BILLING_READ],
+          projects: [],
+        },
+      ],
     })
     addAPIMock({
       method: 'get',
@@ -190,13 +186,8 @@ describe('Usage branch URLs', () => {
           pagination: { count: 0, limit: 96, offset: 0 },
         }),
     })
-    addAPIMock({
-      method: 'get',
-      path: '/platform/profile/permissions/v2',
-      response: () =>
-        HttpResponse.json<components['schemas']['UserPermissionsResponse_Output']>({
-          organizations: [{ slug: 'test-org', role: 'readonly', permissions: [], projects: [] }],
-        }),
+    mockPermissions({
+      organizations: [{ slug: 'test-org', role: 'readonly', permissions: [], projects: [] }],
     })
     const subscriptionRequested = vi.fn()
     addAPIMock({

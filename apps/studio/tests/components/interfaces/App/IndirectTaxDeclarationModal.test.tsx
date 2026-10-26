@@ -11,10 +11,10 @@ import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 const ORG_SLUG = 'test-org'
 const PROFILE_CONTEXT = createMockProfileContext()

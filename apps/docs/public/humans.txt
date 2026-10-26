@@ -38,6 +38,7 @@ Ariuna K
 Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
+Avinash Sajjanshetty
 Aziz Quadri
 Barco Fourie
 Barry Roodt
@@ -250,6 +251,7 @@ Matt Rossman
 Matt Smiley
 Matthias Luft
 Mats Kindahl
+Meg Corren
 Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
@@ -299,6 +301,7 @@ Ricardo Tavares
 Riccardo Busetti
 Richard Kasprzak
 Rob Shields
+Robert Vojta
 Rodrigo Esteves
 Rodrigo Mansueli
 Román Cuellar

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { UnifiedLogsScope } from './UnifiedLogs.types'
 import {
   buildUnifiedLogsUrl,
   createUnifiedLogsSearch,
@@ -8,6 +9,7 @@ import {
   getComputeLogsAvailability,
   getEventMessageDisplay,
   getLogRowClassName,
+  getLogTypeVisibility,
   getRawLogData,
   getUniqueLogRows,
   parseMultigresEventMessage,
@@ -206,7 +208,79 @@ describe('gateLogTypeFilters', () => {
   })
 })
 
+const FUNCTION_SCOPE: UnifiedLogsScope = {
+  filters: [
+    { column: 'log_type', operator: '=', value: 'edge function' },
+    { column: 'log_type', operator: '=', value: 'edge function runtime' },
+    { column: 'function_id', operator: '=', value: 'fn-123' },
+  ],
+}
+
+describe('getLogTypeVisibility', () => {
+  it('hides edge function runtime logs from the project-wide view and keeps other gates', () => {
+    expect(getLogTypeVisibility({ compute: false })).toEqual({
+      compute: false,
+      'edge function runtime': false,
+    })
+  })
+
+  it('only shows the edge function log types in a function-scoped view', () => {
+    const visibility = getLogTypeVisibility({ compute: true }, FUNCTION_SCOPE)
+    const visibleLogTypes = Object.entries(visibility)
+      .filter(([, isVisible]) => isVisible)
+      .map(([logType]) => logType)
+
+    expect(visibleLogTypes).toEqual(['edge function', 'edge function runtime'])
+    expect(visibility.compute).toBe(false)
+    expect(visibility.postgres).toBe(false)
+  })
+
+  it('treats a scope that fixes no log types like the project-wide view', () => {
+    const attributeScope: UnifiedLogsScope = {
+      filters: [{ column: 'function_id', operator: '=', value: 'fn-123' }],
+    }
+    expect(getLogTypeVisibility({ compute: false }, attributeScope)).toEqual({
+      compute: false,
+      'edge function runtime': false,
+    })
+  })
+
+  it('drops out-of-scope log type filters from a function-scoped view', () => {
+    expect(
+      gateLogTypeFilters(
+        ['log_type:eq:postgres', 'log_type:eq:edge function runtime', 'level:eq:error'],
+        getLogTypeVisibility({}, FUNCTION_SCOPE)
+      )
+    ).toEqual(['log_type:eq:edge function runtime', 'level:eq:error'])
+  })
+})
+
 describe('createUnifiedLogsSearch', () => {
+  it('preserves fixed function filters for log previews', () => {
+    const search = createUnifiedLogsSearch({}, FUNCTION_SCOPE)
+    expect(search.scope).toEqual(FUNCTION_SCOPE)
+  })
+
+  it.each([
+    {
+      scenario: 'a missing filter value',
+      payload: '{"filters":[{"column":"function_id","operator":"="}]}',
+    },
+    {
+      scenario: 'an empty filter column',
+      payload: '{"filters":[{"column":"","operator":"=","value":""}]}',
+    },
+  ])('rejects a fixed scope with $scenario instead of opening an unscoped view', ({ payload }) => {
+    const scope = JSON.parse(payload)
+    expect(() => createUnifiedLogsSearch({}, scope)).toThrow(
+      'Invalid unified logs search parameters'
+    )
+  })
+
+  it('does not restrict project-wide searches to a resource', () => {
+    expect(createUnifiedLogsSearch({})).not.toHaveProperty('scope')
+  })
+
   it('keeps preview filters while excluding view state from query keys', () => {
     const search = createUnifiedLogsSearch({
       filter: ['level:eq:error'],

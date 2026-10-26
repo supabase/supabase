@@ -924,6 +924,7 @@ export const auth: NavMenuConstant = {
           ],
         },
         { name: 'Custom SMTP', url: '/guides/auth/auth-smtp' },
+        { name: 'Test Auth Flows', url: '/guides/auth/testing-auth-flows' },
         { name: 'User Management', url: '/guides/auth/managing-user-data' },
       ],
     },
@@ -2607,74 +2608,6 @@ export const contributing: NavMenuConstant = {
   items: [{ name: 'Overview', url: '/contributing' }],
 }
 
-export const MIGRATION_PAGES: Partial<
-  NavMenuSection & { icon?: string; hasLightIcon?: boolean }
->[] = [
-  {
-    name: 'Auth0',
-    icon: '/docs/img/icons/auth0-icon',
-    url: '/guides/platform/migrating-to-supabase/auth0',
-    hasLightIcon: true,
-  },
-  {
-    name: 'Firebase Auth',
-    icon: '/docs/img/icons/firebase-icon',
-    url: '/guides/platform/migrating-to-supabase/firebase-auth',
-  },
-  {
-    name: 'Firestore Data',
-    icon: '/docs/img/icons/firebase-icon',
-    url: '/guides/platform/migrating-to-supabase/firestore-data',
-  },
-  {
-    name: 'Firebase Storage',
-    icon: '/docs/img/icons/firebase-icon',
-    url: '/guides/platform/migrating-to-supabase/firebase-storage',
-  },
-  {
-    name: 'Heroku',
-    icon: '/docs/img/icons/heroku-icon',
-    url: '/guides/platform/migrating-to-supabase/heroku',
-  },
-  {
-    name: 'Render',
-    icon: '/docs/img/icons/render-icon',
-    url: '/guides/platform/migrating-to-supabase/render',
-  },
-  {
-    name: 'Amazon RDS',
-    icon: '/docs/img/icons/aws-rds-icon',
-    url: '/guides/platform/migrating-to-supabase/amazon-rds',
-  },
-  {
-    name: 'Postgres',
-    icon: '/docs/img/icons/postgres-icon',
-    url: '/guides/platform/migrating-to-supabase/postgres',
-  },
-  {
-    name: 'Vercel Postgres',
-    icon: '/docs/img/icons/vercel-icon',
-    url: '/guides/platform/migrating-to-supabase/vercel-postgres',
-    hasLightIcon: true,
-  },
-  {
-    name: 'Neon',
-    icon: '/docs/img/icons/neon-icon',
-    url: '/guides/platform/migrating-to-supabase/neon',
-    hasLightIcon: true,
-  },
-  {
-    name: 'MySQL',
-    icon: '/docs/img/icons/mysql-icon',
-    url: '/guides/platform/migrating-to-supabase/mysql',
-  },
-  {
-    name: 'MSSQL',
-    icon: '/docs/img/icons/mssql-icon',
-    url: '/guides/platform/migrating-to-supabase/mssql',
-  },
-]
-
 export const security: NavMenuConstant = {
   icon: 'security',
   title: 'Security',
@@ -2770,14 +2703,6 @@ export const platform: NavMenuConstant = {
               name: 'Backup and restore using CLI',
               url: '/guides/platform/migrating-within-supabase/backup-restore' as `/${string}`,
             },
-          ],
-        },
-        {
-          name: 'Migrating to Supabase',
-          url: '/guides/platform/migrating-to-supabase',
-          items: [
-            { name: 'Overview', url: '/guides/platform/migrating-to-supabase' as `/${string}` },
-            ...MIGRATION_PAGES,
           ],
         },
       ],
@@ -3772,7 +3697,6 @@ export const references = [
 ]
 
 export const navDataForMdx = {
-  migrationPages: MIGRATION_PAGES,
   nativeMobileLoginItems: NativeMobileLoginItems,
   phoneLoginsItems: PhoneLoginsItems,
   socialSignInItems: SocialSignInItems,
