@@ -1,4 +1,4 @@
-import { CreditCardIcon, MoreHorizontalIcon } from 'lucide-react'
+import { MoreHorizontalIcon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { getCardBrandIconUrl } from './PaymentMethods.utils'
+import { CardBrandIcon } from './CardBrandIcon'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { OrganizationPaymentMethod } from '@/data/organizations/organization-payment-methods-query'
@@ -90,22 +90,12 @@ const CreditCard = ({
 
   if (!paymentMethod.card) return null
 
-  const brandIconUrl = getCardBrandIconUrl(paymentMethod.card.brand)
-
   return (
     <div key={paymentMethod.id} className="space-y-3">
       <div className="flex items-center justify-between gap-8">
         <div className="flex items-center gap-8">
           <div className="relative shrink-0">
-            {brandIconUrl ? (
-              <img alt="Credit card brand" src={brandIconUrl} width="32" />
-            ) : (
-              <CreditCardIcon
-                aria-label="Credit card"
-                strokeWidth={1.5}
-                className="h-6 w-8 text-foreground-lighter"
-              />
-            )}
+            <CardBrandIcon brand={paymentMethod.card.brand} />
             {isSpt && (
               <Tooltip>
                 <TooltipTrigger asChild>

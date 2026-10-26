@@ -2,7 +2,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { CreditCardIcon, LoaderIcon, PlusIcon } from 'lucide-react'
+import { LoaderIcon, PlusIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
   forwardRef,
@@ -19,11 +19,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
+import { CardBrandIcon } from '@/components/interfaces/Billing/Payment/PaymentMethods/CardBrandIcon'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
 } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
-import { getCardBrandIconUrl } from '@/components/interfaces/Billing/Payment/PaymentMethods/PaymentMethods.utils'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
@@ -342,19 +342,10 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               <SelectContent>
                 {paymentMethods?.data.map((method) => {
                   const label = `•••• •••• •••• ${method.card?.last4}`
-                  const brandIconUrl = getCardBrandIconUrl(method.card?.brand)
                   return (
                     <SelectItem key={method.id} value={method.id}>
                       <div className="flex gap-2">
-                        {brandIconUrl ? (
-                          <img alt="Credit Card Brand" src={brandIconUrl} width="32" />
-                        ) : (
-                          <CreditCardIcon
-                            aria-label="Credit card"
-                            strokeWidth={1.5}
-                            className="h-6 w-8 text-foreground-lighter"
-                          />
-                        )}
+                        <CardBrandIcon brand={method.card?.brand} />
                         {label}
                       </div>
                     </SelectItem>
