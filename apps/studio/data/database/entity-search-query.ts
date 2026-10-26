@@ -3,6 +3,7 @@ import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError } from '@/types'
 
@@ -36,6 +37,7 @@ async function getEntitySearch(
       connectionString,
       sql: getSearchEntitiesSql({ query }),
       queryKey: ['entity-search'],
+      grant: unguarded.migrating,
     },
     signal
   )
