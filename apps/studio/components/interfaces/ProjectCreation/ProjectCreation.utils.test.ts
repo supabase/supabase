@@ -206,17 +206,25 @@ describe('getRegionSelectionType', () => {
   }
 
   it('classifies a smart group region as general', () => {
-    expect(getRegionSelectionType({ dbRegion: 'Americas', availableRegions })).toBe('general')
+    expect(
+      getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })
+    ).toBe('general')
   })
 
   it('classifies a specific region as specific', () => {
-    expect(getRegionSelectionType({ dbRegion: 'East US (North Virginia)', availableRegions })).toBe(
-      'specific'
-    )
+    expect(
+      getRegionSelectionType({
+        dbRegion: 'East US (North Virginia)',
+        availableRegions,
+        isDbRegionDirty: true,
+      })
+    ).toBe('specific')
   })
 
   it('returns undefined when the region matches neither list', () => {
-    expect(getRegionSelectionType({ dbRegion: 'Nonexistent', availableRegions })).toBeUndefined()
+    expect(
+      getRegionSelectionType({ dbRegion: 'Nonexistent', availableRegions, isDbRegionDirty: true })
+    ).toBeUndefined()
   })
 
   it('classifies the Auto option as auto when it is available', () => {
@@ -227,23 +235,34 @@ describe('getRegionSelectionType', () => {
           ...availableRegions,
           auto: { code: 'auto', name: 'Auto', type: 'auto' },
         },
+        isDbRegionDirty: true,
       })
     ).toBe('auto')
   })
 
   it('returns undefined for the Auto option when it is not available', () => {
     expect(
-      getRegionSelectionType({ dbRegion: AUTO_REGION_VALUE, availableRegions })
+      getRegionSelectionType({
+        dbRegion: AUTO_REGION_VALUE,
+        availableRegions,
+        isDbRegionDirty: true,
+      })
     ).toBeUndefined()
   })
 
   it('returns undefined when dbRegion is undefined', () => {
-    expect(getRegionSelectionType({ dbRegion: undefined, availableRegions })).toBeUndefined()
+    expect(
+      getRegionSelectionType({ dbRegion: undefined, availableRegions, isDbRegionDirty: true })
+    ).toBeUndefined()
   })
 
   it('returns undefined when availableRegions is undefined', () => {
     expect(
-      getRegionSelectionType({ dbRegion: 'Americas', availableRegions: undefined })
+      getRegionSelectionType({
+        dbRegion: 'Americas',
+        availableRegions: undefined,
+        isDbRegionDirty: true,
+      })
     ).toBeUndefined()
   })
 
@@ -254,6 +273,12 @@ describe('getRegionSelectionType', () => {
         availableRegions,
         isDbRegionDirty: false,
       })
+    ).toBe('auto')
+  })
+
+  it('classifies an untouched field as auto, even if it resolved to a smart group region', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: false })
     ).toBe('auto')
   })
 

@@ -153,8 +153,8 @@ export type AvailableRegions = NonNullable<OrganizationAvailableRegionsData>['al
 type GetRegionSelectionTypeArgs = {
   dbRegion: string | undefined
   availableRegions: AvailableRegions | undefined
-  /** Whether the user ever touched the region field. Defaults to true for untracked callers. */
-  isDbRegionDirty?: boolean
+  /** Whether the user ever touched the region field. */
+  isDbRegionDirty: boolean
 }
 
 /**
@@ -166,7 +166,7 @@ type GetRegionSelectionTypeArgs = {
 export function getRegionSelectionType({
   dbRegion,
   availableRegions,
-  isDbRegionDirty = true,
+  isDbRegionDirty,
 }: GetRegionSelectionTypeArgs): 'general' | 'auto' | 'specific' | undefined {
   if (!dbRegion || !availableRegions) return undefined
   if (dbRegion === AUTO_REGION_VALUE)

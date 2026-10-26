@@ -211,7 +211,7 @@ export const ProjectCreationForm = ({
     kubernetesClusterForce: watchedKubernetesClusterForce,
   } = useWatch({ control: form.control })
   const { dirtyFields } = useFormState(form)
-  const isDbRegionDirty = dirtyFields.dbRegion
+  const isDbRegionDirty = dirtyFields.dbRegion === true
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
