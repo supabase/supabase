@@ -2,10 +2,10 @@ import { type Table as TTable } from '@tanstack/react-table'
 import { createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
-import { LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { LOG_TYPES, LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema, querySearchParamsSchema } from './UnifiedLogs.schema'
-import type { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import type { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
@@ -30,12 +30,33 @@ export function getComputeLogsAvailability({
   }
 }
 
+export function getLogTypeVisibility(
+  visibility: Partial<Record<UnifiedLogType, boolean>>,
+  scope?: UnifiedLogsScope
+): Partial<Record<UnifiedLogType, boolean>> {
+  const scopeLogTypes = scope?.filters
+    .filter((filter) => filter.column === 'log_type' && filter.operator === '=')
+    .map((filter) => filter.value)
+  if (!scopeLogTypes?.length) return { ...visibility, 'edge function runtime': false }
+
+  return Object.fromEntries(
+    LOG_TYPES.map((logType) => [
+      logType,
+      scopeLogTypes.includes(logType) && visibility[logType] !== false,
+    ])
+  )
+}
+
 export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
 
-export function toQuerySearchParams(search: Partial<SearchParamsType>): QuerySearchParamsType {
-  const query = Object.fromEntries(
+export function toQuerySearchParams(
+  search: Partial<SearchParamsType>,
+  scope?: UnifiedLogsScope
+): QuerySearchParamsType {
+  const query: Partial<QuerySearchParamsType> = Object.fromEntries(
     Object.entries(search).filter(([, value]) => value !== null && value !== undefined)
   )
+  if (scope !== undefined) query.scope = scope
   const result = querySearchParamsSchema.safeParse(query)
   if (!result.success) {
     throw new Error('Invalid unified logs search parameters', { cause: result.error })
@@ -43,8 +64,10 @@ export function toQuerySearchParams(search: Partial<SearchParamsType>): QuerySea
   return result.data
 }
 
-export const createUnifiedLogsSearch = (params: Partial<SearchParamsType> = {}) =>
-  toQuerySearchParams(params)
+export const createUnifiedLogsSearch = (
+  params: Partial<SearchParamsType> = {},
+  scope?: UnifiedLogsScope
+) => toQuerySearchParams(params, scope)
 
 export function getUniqueLogRows<T extends { id: string }>(
   pages: { data?: T[] }[] | undefined

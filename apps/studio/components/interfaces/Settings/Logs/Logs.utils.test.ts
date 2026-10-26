@@ -169,6 +169,7 @@ describe('Logs.utils', () => {
         omittedCount,
       })
       expect(result).toContain('from the **Edge Functions** service')
+      expect(result).toContain('latest error')
       expect(result.indexOf('latest error')).toBeLessThan(result.indexOf(note))
       expect(result).toContain(note)
       expect(result).toContain(
