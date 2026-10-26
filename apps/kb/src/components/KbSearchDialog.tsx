@@ -1,7 +1,7 @@
 import { useDocsSearchV2 } from 'common/hooks/useDocsSearchV2'
 import { SearchDialog, SearchPanel, type SearchLabels } from 'docs-search/components'
 
-import { KB_SEARCH_URL, reshapeKbResult } from '../lib/search'
+import { KB_SEARCH_MIN_CHARACTERS, KB_SEARCH_URL, reshapeKbResult } from '../lib/search'
 
 export interface KbSearchDialogProps {
   isOpen: boolean
@@ -35,6 +35,7 @@ const KbSearchPanel = ({ onOpenChange }: Pick<KbSearchDialogProps, 'onOpenChange
     <SearchPanel
       searchState={searchState}
       labels={LABELS}
+      minCharacters={KB_SEARCH_MIN_CHARACTERS}
       onQueryChange={(query) => (query ? handleDocsSearchDebounced(query) : resetSearch())}
       onResultNavigate={(path) => window.location.assign(path)}
       onResultLinkNavigate={() => onOpenChange(false)}
