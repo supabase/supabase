@@ -3,10 +3,14 @@ import { describe, expect, it } from 'vitest'
 import type { Span } from './types'
 import {
   buildTraceIndex,
+  collapsedChildMidpoints,
   createTimeScale,
+  effectiveEndMs,
   flattenTree,
   formatDuration,
   formatMs,
+  getTimingPlacement,
+  MAX_COLLAPSED_MARKS,
   niceTickStep,
 } from './utils'
 
@@ -154,5 +158,74 @@ describe('formatDuration', () => {
     expect(formatDuration(480)).toBe('480ms')
     expect(formatDuration(1234)).toBe('1.23s')
     expect(formatDuration(90_000)).toBe('1m 30s')
+  })
+})
+
+describe('effectiveEndMs', () => {
+  it('uses the end for finished spans and now for running spans', () => {
+    expect(effectiveEndMs(span('a', 10, 50), 999)).toBe(50)
+    expect(effectiveEndMs(span('a', 10, null), 200)).toBe(200)
+    expect(effectiveEndMs(span('a', 10, null), 5)).toBe(10)
+  })
+})
+
+describe('collapsedChildMidpoints', () => {
+  it('returns the midpoint of each direct child only, in start order', () => {
+    const index = buildTraceIndex([
+      span('root', 0, 100),
+      span('b', 60, 80, 'root'),
+      span('a', 10, 30, 'root'),
+      span('a1', 12, 14, 'a'),
+    ])
+    expect(collapsedChildMidpoints(index, 'root')).toEqual([20, 70])
+    expect(collapsedChildMidpoints(index, 'a1')).toEqual([])
+  })
+
+  it('extends a running child to now', () => {
+    const index = buildTraceIndex([span('root', 0, 100), span('a', 40, null, 'root')], 80)
+    expect(collapsedChildMidpoints(index, 'root')).toEqual([60])
+  })
+
+  it('renders nothing above the cap', () => {
+    const children = (count: number) =>
+      Array.from({ length: count }, (_, i) => span(`c${i}`, i, i + 1, 'root'))
+    const at = buildTraceIndex([span('root', 0, 1000), ...children(MAX_COLLAPSED_MARKS)])
+    const over = buildTraceIndex([span('root', 0, 1000), ...children(MAX_COLLAPSED_MARKS + 1)])
+    expect(collapsedChildMidpoints(at, 'root')).toHaveLength(MAX_COLLAPSED_MARKS)
+    expect(collapsedChildMidpoints(over, 'root')).toEqual([])
+  })
+})
+
+describe('getTimingPlacement', () => {
+  const base = { laneWidth: 400, labelPx: 44, gapPx: 6 }
+
+  it('places the label after the bar when there is room', () => {
+    expect(getTimingPlacement({ ...base, startPx: 50, endPx: 200 })).toBe('after')
+  })
+
+  it('fits exactly at the lane edge', () => {
+    expect(getTimingPlacement({ ...base, startPx: 50, endPx: 350 })).toBe('after')
+    expect(getTimingPlacement({ ...base, startPx: 50, endPx: 351 })).toBe('before')
+  })
+
+  it('flips to the left of the bar when the right side is full', () => {
+    expect(getTimingPlacement({ ...base, startPx: 300, endPx: 395 })).toBe('before')
+  })
+
+  it('flips for a very short bar at the right edge', () => {
+    expect(getTimingPlacement({ ...base, startPx: 392, endPx: 396 })).toBe('before')
+  })
+
+  it('goes inside a bar that spans the full lane', () => {
+    expect(getTimingPlacement({ ...base, startPx: 0, endPx: 400 })).toBe('inside')
+  })
+
+  it('goes inside when neither side has room', () => {
+    expect(getTimingPlacement({ ...base, startPx: 20, endPx: 390 })).toBe('inside')
+  })
+
+  it('fits before at exactly the label width', () => {
+    expect(getTimingPlacement({ ...base, startPx: 50, endPx: 400 })).toBe('before')
+    expect(getTimingPlacement({ ...base, startPx: 49, endPx: 400 })).toBe('inside')
   })
 })
