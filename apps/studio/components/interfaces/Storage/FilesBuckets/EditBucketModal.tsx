@@ -306,7 +306,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
           if (!open) closeModal()
         }}
       >
-        <DialogContent>
+        <DialogContent size="large">
           <DialogHeader>
             <DialogTitle>{`Edit bucket “${bucket?.name}”`}</DialogTitle>
           </DialogHeader>

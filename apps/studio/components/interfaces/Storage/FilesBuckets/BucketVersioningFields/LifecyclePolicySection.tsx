@@ -12,6 +12,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { BucketFormValues } from '../FilesBucket.schema'
@@ -30,6 +31,15 @@ const getRulesHref = (projectRef?: string, bucketName?: string) =>
   projectRef && bucketName
     ? `/project/${projectRef}/storage/files/policies?search=${encodeURIComponent(bucketName)}`
     : undefined
+
+const LabelWithTooltip = ({ label, tooltip }: { label: string; tooltip: string }) => (
+  <div className="flex items-center gap-x-1">
+    <span>{label}</span>
+    <InfoTooltip side="bottom" className="max-w-60">
+      {tooltip}
+    </InfoTooltip>
+  </div>
+)
 
 const SectionHeading = ({ rulesHref }: { rulesHref?: string }) => (
   <div className="flex items-start justify-between gap-x-2">
@@ -138,7 +148,15 @@ export const LifecyclePolicySection = ({
         name="version_expiry_days"
         control={control}
         render={({ field }) => (
-          <FormItemLayout label="Noncurrent version expiration" layout="flex-row-reverse">
+          <FormItemLayout
+            label={
+              <LabelWithTooltip
+                label="Delete noncurrent versions after"
+                tooltip="The current version is never deleted."
+              />
+            }
+            layout="flex-row-reverse"
+          >
             <FormControl>
               <InputGroup>
                 <FormInputGroupInput
@@ -165,7 +183,13 @@ export const LifecyclePolicySection = ({
         control={control}
         render={({ field }) => (
           <FormItemLayout
-            label="Retained noncurrent versions"
+            label={
+              <LabelWithTooltip
+                label="Newest noncurrent versions to keep"
+                tooltip="Leave blank to keep every version until the age limit. Max 100."
+              />
+            }
+            labelOptional="Optional"
             description={hasDays ? undefined : 'Requires an expiration age to be set.'}
             layout="flex-row-reverse"
             className={hasDays ? undefined : 'opacity-60'}
