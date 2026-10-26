@@ -1,13 +1,13 @@
 import { ident, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { LoaderIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, ExpandingTextArea } from 'ui'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { timeout } from '@/lib/helpers'
 
@@ -42,9 +42,8 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
   const hasChanged = value != contentText
   const animateCss = `transition duration-150`
 
-  const { can: canUpdateDescription } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_QUERY,
-    '*'
+  const { can: canUpdateDescription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const updateDescription = async () => {
@@ -64,6 +63,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           sql: query,
+          grant: unguarded.migrating,
         })
         // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
         await timeout(500)

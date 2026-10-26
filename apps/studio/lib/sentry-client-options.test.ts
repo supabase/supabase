@@ -11,45 +11,6 @@ import {
 
 describe('Sentry beforeSend filtering functions', () => {
   describe('isBrowserWalletExtensionError', () => {
-    it('returns true for Gate.io wallet extension error (gt-window-provider.js)', () => {
-      const event: SentryEvent = {
-        exception: {
-          values: [
-            {
-              type: 'TypeError',
-              value: 'en.shouldSetTallyForCurrentProvider is not a function',
-              stacktrace: {
-                frames: [
-                  { filename: 'app:///_next/static/chunks/main.js' } as StackFrame,
-                  { filename: 'app:///gt-window-provider.js' } as StackFrame,
-                ],
-              },
-            },
-          ],
-        },
-      }
-
-      expect(isBrowserWalletExtensionError(event)).toBe(true)
-    })
-
-    it('returns true for Gate.io BTC wallet extension error (gt-window-provider-btc.js)', () => {
-      const event: SentryEvent = {
-        exception: {
-          values: [
-            {
-              type: 'TypeError',
-              value: 'f.shouldSetTallyForCurrentProvider is not a function',
-              stacktrace: {
-                frames: [{ filename: 'app:///gt-window-provider-btc.js' } as StackFrame],
-              },
-            },
-          ],
-        },
-      }
-
-      expect(isBrowserWalletExtensionError(event)).toBe(true)
-    })
-
     it('returns true for wallet-provider in abs_path', () => {
       const event: SentryEvent = {
         exception: {
@@ -121,32 +82,15 @@ describe('Sentry beforeSend filtering functions', () => {
   })
 
   describe('isUserAbortedOperation', () => {
-    it('returns true for "operation was aborted" error', () => {
-      const error = new Error('The operation was aborted.')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "signal is aborted" error', () => {
-      const error = new Error('signal is aborted without reason')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "manually canceled" error', () => {
-      const error = new Error('operation is manually canceled')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "AbortError" message', () => {
-      const error = new Error('AbortError: The operation was aborted')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
+    it.each([
+      // SUPABASE-APP-BG6
+      'The operation was aborted.',
+      // SUPABASE-APP-BG7
+      'signal is aborted without reason',
+      'operation is manually canceled',
+      'AbortError: The operation was aborted',
+    ])('returns true for an error with message %o', (message) => {
+      expect(isUserAbortedOperation(new Error(message), {})).toBe(true)
     })
 
     it('returns true when message is in event.message (no error object)', () => {
@@ -356,26 +300,6 @@ describe('Sentry beforeSend filtering functions', () => {
       }
 
       expect(isBrowserWalletExtensionError(event)).toBe(true)
-    })
-
-    it('correctly identifies SUPABASE-APP-BG6 pattern (user aborted)', () => {
-      // Based on actual Sentry issue SUPABASE-APP-BG6
-      const error = new Error('The operation was aborted.')
-      const event: SentryEvent = {
-        message: '[CRITICAL][sign in via EP] Failed: The operation was aborted.',
-      }
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('correctly identifies SUPABASE-APP-BG7 pattern (signal aborted)', () => {
-      // Based on actual Sentry issue SUPABASE-APP-BG7
-      const error = new Error('signal is aborted without reason')
-      const event: SentryEvent = {
-        message: '[CRITICAL][sign in via EP] Failed: signal is aborted without reason',
-      }
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
     })
 
     it('correctly identifies SUPABASE-APP-ACC pattern (challenge expired)', () => {

@@ -16,11 +16,11 @@ export const CreateFunctionHeader = ({
           {selectedFunction !== undefined ? (
             isDuplicating ? (
               <>
-                Duplicate <code className="text-code-inline text-sm">{selectedFunction}</code>
+                Duplicate <code className="text-sm">{selectedFunction}</code>
               </>
             ) : (
               <>
-                Edit <code className="text-code-inline text-sm">{selectedFunction}</code>
+                Edit <code className="text-sm">{selectedFunction}</code>
               </>
             )
           ) : (

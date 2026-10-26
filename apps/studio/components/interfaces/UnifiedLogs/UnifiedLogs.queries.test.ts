@@ -8,17 +8,30 @@ import {
   isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
+import type { UnifiedLogsScope } from './UnifiedLogs.types'
+import { createUnifiedLogsSearch } from './UnifiedLogs.utils'
 
-const baseSearch = {
+const baseSearch = createUnifiedLogsSearch({
   date: [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')],
-} as any
+})
 
-// Helper: build a search with extra `filter` URL entries on top of the base.
-const withFilters = (...entries: string[]) => ({ ...baseSearch, filter: entries }) as any
+const withFilters = (...entries: string[]) =>
+  createUnifiedLogsSearch({ ...baseSearch, filter: entries })
 
-// Helper: build a search with the cross-cutting `user` filter set, plus optional `filter` entries.
+const FUNCTION_SCOPE: UnifiedLogsScope = {
+  filters: [
+    { column: 'log_type', operator: '=', value: 'edge function' },
+    { column: 'log_type', operator: '=', value: 'edge function runtime' },
+    { column: 'function_id', operator: '=', value: 'fn-123' },
+  ],
+}
+
+const withScope = (scope: UnifiedLogsScope, ...entries: string[]) =>
+  createUnifiedLogsSearch({ ...baseSearch, filter: entries }, scope)
+const withFunctionScope = (...entries: string[]) => withScope(FUNCTION_SCOPE, ...entries)
+
 const withUser = (user: string, ...entries: string[]) =>
-  ({ ...baseSearch, user, filter: entries }) as any
+  createUnifiedLogsSearch({ ...baseSearch, user, filter: entries })
 
 describe('UnifiedLogs.queries (OTEL flat)', () => {
   describe('getUnifiedLogsQuery', () => {
@@ -30,27 +43,25 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(where).not.toContain(`source = 'postgrest_logs'`)
     })
 
-    it('routes the `postgrest` log type solely to postgrest_logs (mutually exclusive from edge_logs)', () => {
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:postgrest'))
-      const where = sql.split(/\bWHERE\b/)[1] ?? ''
-      expect(where).toContain(`source = 'postgrest_logs'`)
-      expect(where).not.toContain(`source = 'edge_logs'`)
-      expect(where).not.toContain(`log_attributes['request.path'] LIKE '%/rest/%'`)
-    })
-
-    it('routes the `storage` log type solely to storage_logs (mutually exclusive from edge_logs)', () => {
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:storage'))
-      const where = sql.split(/\bWHERE\b/)[1] ?? ''
-      expect(where).toContain(`source = 'storage_logs'`)
-      expect(where).not.toContain(`source = 'edge_logs'`)
-      expect(where).not.toContain(`log_attributes['request.path'] LIKE '%/storage/%'`)
-    })
+    it.each([
+      ['postgrest', 'postgrest_logs', '%/rest/%'],
+      ['storage', 'storage_logs', '%/storage/%'],
+    ])(
+      'routes the `%s` log type solely to %s (mutually exclusive from edge_logs)',
+      (logType, source, edgePath) => {
+        const sql = getUnifiedLogsQuery(withFilters(`log_type:eq:${logType}`))
+        const where = sql.split(/\bWHERE\b/)[1] ?? ''
+        expect(where).toContain(`source = '${source}'`)
+        expect(where).not.toContain(`source = 'edge_logs'`)
+        expect(where).not.toContain(`log_attributes['request.path'] LIKE '${edgePath}'`)
+      }
+    )
 
     it('routes the `compute` log type to every worker OTEL stream', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
       expect(where).toContain(
-        `log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')`
+        `log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')`
       )
       expect(where).not.toContain(`source = 'compute'`)
     })
@@ -58,7 +69,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     it('classifies every worker OTEL stream as compute in the projected log type', () => {
       const sql = getUnifiedLogsQuery(baseSearch)
       expect(sql).toContain(
-        `WHEN log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs') THEN 'compute'`
+        `WHEN log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs') THEN 'compute'`
       )
     })
 
@@ -66,14 +77,21 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:neq:compute'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
       expect(where).toContain(
-        `NOT (log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs'))`
+        `NOT (log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs'))`
       )
+    })
+
+    it('keeps edge function runtime output out of the list when a log type is excluded', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:neq:postgres'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`NOT (source = 'postgres_logs')`)
+      expect(where).toContain(`NOT (source = 'function_logs')`)
     })
 
     it('projects only Compute fields that exist on worker logs', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
       const workerCondition =
-        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+        "log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
 
       expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
       expect(sql).toContain(
@@ -82,7 +100,9 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(
         `if(${workerCondition}, null, if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
       )
-      expect(sql).toContain(`if(${workerCondition}, log_attributes, map()) AS metadata`)
+      expect(sql).toContain(
+        `if(${workerCondition} OR source = 'function_logs', log_attributes, map()) AS metadata`
+      )
     })
 
     it('escapes single quotes in filter values to prevent SQL injection', () => {
@@ -122,31 +142,15 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toMatch(/END\) NOT IN \('401'\)/)
     })
 
-    it('reads the HTTP status from log_attributes[status] for auth rows', () => {
-      // Auth-service logs expose their status under `status`, not the gateway's
-      // `response.status_code`, so without this their 4xx/5xx classify as
-      // success and the severity filter returns nothing.
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:auth'))
-      expect(sql).toContain(`WHEN source = 'auth_logs' THEN log_attributes['status']`)
-    })
-
-    it('reads the HTTP status from log_attributes[res.statusCode] for storage rows', () => {
-      // Storage-service logs expose their status under `res.statusCode`, not the
-      // gateway's `response.status_code`.
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:storage'))
-      expect(sql).toContain(`WHEN source = 'storage_logs' THEN log_attributes['res.statusCode']`)
-    })
-
-    it('reads the method/pathname from log_attributes[req.method/req.url] for storage rows', () => {
-      // Storage-service logs expose method/path under `req.method` / `req.url`,
-      // not the gateway's `request.method` / `request.path`.
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:storage'))
-      expect(sql).toContain(
-        `if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method'])`
-      )
-      expect(sql).toContain(
-        `if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])`
-      )
+    // Auth- and storage-service logs expose their status under their own keys,
+    // not the gateway's `response.status_code`; without this their 4xx/5xx
+    // classify as success and the severity filter returns nothing.
+    it.each([
+      ['auth', `WHEN source = 'auth_logs' THEN log_attributes['status']`],
+      ['storage', `WHEN source = 'storage_logs' THEN log_attributes['res.statusCode']`],
+    ])('reads the HTTP status from the service-specific key for %s rows', (logType, expected) => {
+      const sql = getUnifiedLogsQuery(withFilters(`log_type:eq:${logType}`))
+      expect(sql).toContain(expected)
     })
 
     it('flips LIKE to NOT LIKE when the pathname/host operator is `<>`', () => {
@@ -157,75 +161,34 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(`log_attributes['request.url'] NOT LIKE '%cdn.foo%'`)
     })
 
-    it('emits ILIKE for pathname `~~*`, case-insensitive unlike the `=` LIKE behavior', () => {
-      const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:Customers'))
-      expect(sql).toContain(
-        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) ILIKE '%Customers%'`
-      )
-    })
+    const pathExpr = `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
 
-    it('emits NOT ILIKE for pathname `!~~*` so rows matching the term are excluded', () => {
-      const sql = getUnifiedLogsQuery(withFilters('pathname:notilike:health'))
-      expect(sql).toContain(
-        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) NOT ILIKE '%health%'`
-      )
-    })
+    it.each([
+      ['pathname:ilike:Customers', `${pathExpr} ILIKE '%Customers%'`, null],
+      ['pathname:notilike:health', `${pathExpr} NOT ILIKE '%health%'`, null],
+      ['pathname:ilike:foo%', `${pathExpr} ILIKE 'foo%'`, `'%foo%%'`],
+      ['pathname:ilike:fo_bar', `${pathExpr} ILIKE 'fo_bar'`, `'%fo_bar%'`],
+      ['event_message:ilike:Permission Denied', `event_message ILIKE '%Permission Denied%'`, null],
+      ['event_message:notilike:cron', `event_message NOT ILIKE '%cron%'`, null],
+      ['event_message:ilike:error%', `event_message ILIKE 'error%'`, `'%error%%'`],
+      ['event_message:ilike:foo_bar', `event_message ILIKE 'foo_bar'`, `'%foo_bar%'`],
+    ])(
+      'emits the pattern predicate for %s, auto-wrapping only values without wildcards',
+      (filter, expected, notExpected) => {
+        const sql = getUnifiedLogsQuery(withFilters(filter))
+        expect(sql).toContain(expected)
+        if (notExpected) expect(sql).not.toContain(notExpected)
+      }
+    )
 
-    it('joins multiple pathname NOT ILIKE values with AND (row must match none)', () => {
+    it.each([
+      ['pathname', pathExpr],
+      ['event_message', 'event_message'],
+    ])('joins multiple %s NOT ILIKE values with AND (row must match none)', (column, expr) => {
       const sql = getUnifiedLogsQuery(
-        withFilters('pathname:notilike:health', 'pathname:notilike:metrics')
+        withFilters(`${column}:notilike:health`, `${column}:notilike:metrics`)
       )
-      const pathExpr = `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
-      expect(sql).toContain(
-        `${pathExpr} NOT ILIKE '%health%' AND ${pathExpr} NOT ILIKE '%metrics%'`
-      )
-    })
-
-    it('passes through user-supplied `%` wildcards on pathname ILIKE without double-wrapping', () => {
-      const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:foo%'))
-      expect(sql).toContain(
-        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) ILIKE 'foo%'`
-      )
-      expect(sql).not.toContain(`'%foo%%'`)
-    })
-
-    it('passes through user-supplied `_` wildcards on pathname ILIKE without wrapping', () => {
-      const sql = getUnifiedLogsQuery(withFilters('pathname:ilike:fo_bar'))
-      expect(sql).toContain(
-        `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) ILIKE 'fo_bar'`
-      )
-      expect(sql).not.toContain(`'%fo_bar%'`)
-    })
-
-    it('emits ILIKE with auto-wrapped `%…%` for event_message `~~*`', () => {
-      const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:Permission Denied'))
-      expect(sql).toContain(`event_message ILIKE '%Permission Denied%'`)
-    })
-
-    it('emits NOT ILIKE for event_message `!~~*` so rows containing the term are excluded', () => {
-      const sql = getUnifiedLogsQuery(withFilters('event_message:notilike:cron'))
-      expect(sql).toContain(`event_message NOT ILIKE '%cron%'`)
-    })
-
-    it('joins multiple NOT ILIKE values with AND (row must contain none)', () => {
-      const sql = getUnifiedLogsQuery(
-        withFilters('event_message:notilike:cron', 'event_message:notilike:heartbeat')
-      )
-      expect(sql).toMatch(
-        /event_message NOT ILIKE '%cron%' AND event_message NOT ILIKE '%heartbeat%'/
-      )
-    })
-
-    it('passes through user-supplied `%` wildcards on event_message ILIKE without double-wrapping', () => {
-      const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:error%'))
-      expect(sql).toContain(`event_message ILIKE 'error%'`)
-      expect(sql).not.toContain(`'%error%%'`)
-    })
-
-    it('passes through user-supplied `_` wildcards on event_message ILIKE without wrapping', () => {
-      const sql = getUnifiedLogsQuery(withFilters('event_message:ilike:foo_bar'))
-      expect(sql).toContain(`event_message ILIKE 'foo_bar'`)
-      expect(sql).not.toContain(`'%foo_bar%'`)
+      expect(sql).toContain(`${expr} NOT ILIKE '%health%' AND ${expr} NOT ILIKE '%metrics%'`)
     })
 
     it('excludes connection log messages when show_connection_logs=false', () => {
@@ -343,25 +306,16 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
   })
 
   describe('getLogsChartQuery', () => {
-    it('uses minute bucketing for short ranges', () => {
-      const sql = getLogsChartQuery(baseSearch)
-      expect(sql).toContain('toStartOfMinute(timestamp)')
-    })
-
-    it('uses hour bucketing for ranges spanning more than 12 hours', () => {
+    it.each([
+      ['toStartOfMinute', '2026-05-08T09:00:00Z', '2026-05-08T10:00:00Z'],
+      ['toStartOfHour', '2026-05-08T00:00:00Z', '2026-05-08T18:00:00Z'],
+      ['toStartOfDay', '2026-05-01T00:00:00Z', '2026-05-08T00:00:00Z'],
+    ])('buckets with %s for a %s - %s range', (bucketFn, start, end) => {
       const sql = getLogsChartQuery({
         ...baseSearch,
-        date: [new Date('2026-05-08T00:00:00Z'), new Date('2026-05-08T18:00:00Z')],
+        date: [new Date(start), new Date(end)],
       } as any)
-      expect(sql).toContain('toStartOfHour(timestamp)')
-    })
-
-    it('uses day bucketing for ranges spanning more than 2 days', () => {
-      const sql = getLogsChartQuery({
-        ...baseSearch,
-        date: [new Date('2026-05-01T00:00:00Z'), new Date('2026-05-08T00:00:00Z')],
-      } as any)
-      expect(sql).toContain('toStartOfDay(timestamp)')
+      expect(sql).toContain(`${bucketFn}(timestamp)`)
     })
 
     it('buckets auth rows by their log_attributes[status] so 4xx/5xx are not counted as success', () => {
@@ -372,7 +326,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     it('does not classify Compute rows into a severity bucket', () => {
       const sql = getLogsChartQuery(withFilters('log_type:eq:compute'))
       const workerCondition =
-        "log_attributes['source'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
+        "log_attributes['subservice'] IN ('worker_ingress_logs','worker_guest_logs','worker_api_logs')"
 
       expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
       expect(sql).not.toContain(`WHEN ${workerCondition} THEN 'success'`)
@@ -432,42 +386,18 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(isUserFilterUnreachable(withFilters('log_type:eq:edge'))).toBe(false)
     })
 
-    it('is false when the user filter is active with no explicit log_type filter', () => {
-      expect(isUserFilterUnreachable(withUser('user-123'))).toBe(false)
-    })
-
-    it('is false when the explicit log_type filter includes an attributable source (auth)', () => {
-      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:auth'))).toBe(false)
-    })
-
-    it('is false when the explicit log_type filter includes an attributable source (edge)', () => {
-      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge'))).toBe(false)
-    })
-
-    it('is false when at least one of several selected log types is attributable', () => {
-      expect(
-        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge', 'log_type:eq:auth'))
-      ).toBe(false)
-    })
-
-    it('is true when the explicit log_type filter restricts to a single non-attributable source', () => {
-      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:storage'))).toBe(true)
-    })
-
-    it('is true when every selected log type is non-attributable', () => {
-      expect(
-        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:realtime', 'log_type:eq:storage'))
-      ).toBe(true)
-    })
-
-    it('(neq) is false when excluding a non-attributable source — the attributable sources remain eligible', () => {
-      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:neq:edge'))).toBe(false)
-    })
-
-    it('(neq) is true only when both attributable sources are excluded', () => {
-      expect(
-        isUserFilterUnreachable(withUser('user-123', 'log_type:neq:auth', 'log_type:neq:edge'))
-      ).toBe(true)
+    it.each([
+      [[], false],
+      [['log_type:eq:auth'], false],
+      [['log_type:eq:edge'], false],
+      [['log_type:eq:edge', 'log_type:eq:auth'], false],
+      [['log_type:eq:storage'], true],
+      [['log_type:eq:realtime', 'log_type:eq:storage'], true],
+      // Excluding one attributable source leaves the other eligible.
+      [['log_type:neq:edge'], false],
+      [['log_type:neq:auth', 'log_type:neq:edge'], true],
+    ])('with a user filter and log_type filters %j returns %s', (filters, expected) => {
+      expect(isUserFilterUnreachable(withUser('user-123', ...filters))).toBe(expected)
     })
   })
 
@@ -482,13 +412,6 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
       expect(sql).not.toContain(`E'a`)
     })
-
-    it("escapes single quotes by doubling them ('' rather than \\')", () => {
-      const sql = getUnifiedLogsQuery(withFilters("method:eq:GET' OR '1'='1"))
-      expect(sql).toContain(
-        `(if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method'])) IN ('GET'' OR ''1''=''1')`
-      )
-    })
   })
 })
 
@@ -498,18 +421,13 @@ describe('UnifiedLogs.queries.bq', () => {
     expect(sql).toContain("`method` IN ('GET')")
   })
 
-  it('rejects keys with non-identifier characters', () => {
-    // A column like "foo; DROP TABLE x" fails the quotedIdent regex (the `;` is not
-    // in `[A-Za-z_][A-Za-z0-9_]*`), so the predicate is dropped entirely.
-    const sql = getUnifiedLogsQueryBQ(withFilters('foo; DROP TABLE x:eq:y'))
-    expect(sql).not.toContain('DROP TABLE')
-    expect(sql).not.toContain('foo;')
-  })
-
-  it('rejects keys containing spaces', () => {
-    const sql = getUnifiedLogsQueryBQ(withFilters('level OR id IS NOT NULL:eq:anything'))
-    expect(sql).not.toContain('IS NOT NULL')
-    expect(sql).not.toContain('level OR')
+  // Keys failing the quotedIdent regex (`[A-Za-z_][A-Za-z0-9_]*`) drop the predicate entirely.
+  it.each([
+    ['foo; DROP TABLE x:eq:y', ['DROP TABLE', 'foo;']],
+    ['level OR id IS NOT NULL:eq:anything', ['IS NOT NULL', 'level OR']],
+  ])('rejects the non-identifier key in %s', (filter, forbidden) => {
+    const sql = getUnifiedLogsQueryBQ(withFilters(filter))
+    for (const fragment of forbidden) expect(sql).not.toContain(fragment)
   })
 
   it('escapes injection attempts in filter values via analyticsLiteral', () => {
@@ -520,61 +438,168 @@ describe('UnifiedLogs.queries.bq', () => {
     expect(sql).not.toMatch(/`method` IN \('GET' OR '1'='1'\)/)
   })
 
-  it('emulates ILIKE with LOWER()/LOWER() since BigQuery has no ILIKE keyword', () => {
-    const sql = getUnifiedLogsQueryBQ(withFilters('event_message:ilike:Permission Denied'))
-    expect(sql).toContain("LOWER(`event_message`) LIKE LOWER('%Permission Denied%')")
-    // Sanity check: never emit a raw ILIKE keyword for BQ.
+  // BigQuery has no ILIKE keyword. Wildcard handling must match the ClickHouse
+  // builder, otherwise switching the `otelUnifiedLogs` flag would silently
+  // change what a saved/shared filter matches.
+  it.each([
+    [
+      'event_message:ilike:Permission Denied',
+      "LOWER(`event_message`) LIKE LOWER('%Permission Denied%')",
+    ],
+    ['event_message:notilike:cron', "LOWER(`event_message`) NOT LIKE LOWER('%cron%')"],
+    ['pathname:ilike:Customers', "LOWER(`pathname`) LIKE LOWER('%Customers%')"],
+    ['pathname:notilike:health', "LOWER(`pathname`) NOT LIKE LOWER('%health%')"],
+    ['pathname:ilike:foo%', "LOWER(`pathname`) LIKE LOWER('foo%')"],
+    ['pathname:ilike:fo_bar', "LOWER(`pathname`) LIKE LOWER('fo_bar')"],
+  ])('emulates ILIKE with LOWER() for %s', (filter, expected) => {
+    const sql = getUnifiedLogsQueryBQ(withFilters(filter))
+    expect(sql).toContain(expected)
     expect(sql).not.toMatch(/\bILIKE\b/)
-  })
-
-  it('emulates NOT ILIKE with LOWER()/NOT LIKE/LOWER() for event_message `!~~*`', () => {
-    const sql = getUnifiedLogsQueryBQ(withFilters('event_message:notilike:cron'))
-    expect(sql).toContain("LOWER(`event_message`) NOT LIKE LOWER('%cron%')")
-    expect(sql).not.toMatch(/\bILIKE\b/)
-  })
-
-  it('emulates ILIKE with LOWER()/LOWER() for pathname `~~*`', () => {
-    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:Customers'))
-    expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('%Customers%')")
-    expect(sql).not.toMatch(/\bILIKE\b/)
-  })
-
-  it('emulates NOT ILIKE with LOWER()/NOT LIKE/LOWER() for pathname `!~~*`', () => {
-    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:notilike:health'))
-    expect(sql).toContain("LOWER(`pathname`) NOT LIKE LOWER('%health%')")
-    expect(sql).not.toMatch(/\bILIKE\b/)
-  })
-
-  it('passes through user-supplied `%` wildcards on pathname ILIKE without double-wrapping', () => {
-    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:foo%'))
-    expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('foo%')")
-    expect(sql).not.toContain("LOWER('%foo%%')")
-  })
-
-  it('passes through user-supplied `_` wildcards on pathname ILIKE without wrapping', () => {
-    const sql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:fo_bar'))
-    expect(sql).toContain("LOWER(`pathname`) LIKE LOWER('fo_bar')")
-    expect(sql).not.toContain("LOWER('%fo_bar%')")
   })
 })
 
-describe('pathname ILIKE prefix matching (cross-builder)', () => {
-  // Both query builders must treat an explicit `%` the same way — a value
-  // like `foo%` is a prefix match, not a "contains" search with a stray
-  // trailing wildcard — otherwise switching the `otelUnifiedLogs` flag would
-  // silently change what a saved/shared filter matches.
-  it('produces equivalent prefix-matching patterns for `pathname:ilike:foo%` on both backends', () => {
-    const clickhouseSql = getUnifiedLogsQuery(withFilters('pathname:ilike:foo%'))
-    const bqSql = getUnifiedLogsQueryBQ(withFilters('pathname:ilike:foo%'))
+describe('resource-scoped logs', () => {
+  const FUNCTION_SCOPE_CONDITION = `((source = 'function_edge_logs') OR (source = 'function_logs')) AND log_attributes['function_id'] IN ('fn-123')`
 
-    expect(clickhouseSql).toContain(
-      `(if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path'])) ILIKE 'foo%'`
-    )
-    expect(bqSql).toContain("LOWER(`pathname`) LIKE LOWER('foo%')")
+  describe('ClickHouse', () => {
+    it("restricts rows to the function's invocations and runtime logs instead of the default log types", () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope())
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(FUNCTION_SCOPE_CONDITION)
+      expect(where).not.toContain(`source = 'postgres_logs'`)
+      expect(where).not.toContain(`source = 'edge_logs'`)
+    })
 
-    // Neither backend should have double-wrapped the wildcard into a
-    // "contains" pattern.
-    expect(clickhouseSql).not.toContain(`'%foo%%'`)
-    expect(bqSql).not.toContain("LOWER('%foo%%')")
+    it('keeps the scope when the user narrows to one of its log types', () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope('log_type:eq:edge function runtime'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`((source = 'function_logs'))`)
+      expect(where).toContain(FUNCTION_SCOPE_CONDITION)
+    })
+
+    it('still lists runtime output when the user excludes invocations from a function scope', () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope('log_type:neq:edge function'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`NOT (source = 'function_edge_logs')`)
+      expect(where).not.toContain(`NOT (source = 'function_logs')`)
+    })
+
+    it('keeps rows outside the scope out even when an out-of-scope log type is requested', () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope('log_type:eq:postgres'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`((source = 'postgres_logs'))`)
+      expect(where).toContain(FUNCTION_SCOPE_CONDITION)
+    })
+
+    it('keeps every log count within the selected function', () => {
+      const scans = getLogsCountQuery(withFunctionScope()).split(/\bUNION ALL\b/)
+      expect(scans.length).toBeGreaterThan(1)
+      for (const scan of scans) expect(scan).toContain(FUNCTION_SCOPE_CONDITION)
+    })
+
+    it('keeps chart and filter counts within the selected function', () => {
+      expect(getLogsChartQuery(withFunctionScope())).toContain(FUNCTION_SCOPE_CONDITION)
+      expect(getFacetCountQuery({ search: withFunctionScope(), facet: 'status' })).toContain(
+        FUNCTION_SCOPE_CONDITION
+      )
+    })
+
+    it('labels runtime logs and preserves error and warning severity', () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope())
+      expect(sql).toContain(`WHEN source = 'function_logs' THEN 'edge function runtime'`)
+      expect(sql).toContain(
+        `WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('error','fatal') THEN 'error'`
+      )
+      expect(sql).toContain(
+        `WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('warn','warning') THEN 'warning'`
+      )
+    })
+
+    it('does not restrict project-wide searches to a resource', () => {
+      expect(getUnifiedLogsQuery(baseSearch)).not.toContain(`log_attributes['function_id']`)
+    })
+
+    it('requires logs to match both bucket inclusion and exclusion filters', () => {
+      const sql = getUnifiedLogsQuery(
+        withScope({
+          filters: [
+            { column: 'log_type', operator: '=', value: 'storage' },
+            { column: 'bucket_id', operator: '=', value: 'avatars' },
+            { column: 'bucket_id', operator: '<>', value: 'private' },
+          ],
+        })
+      )
+      expect(sql).toContain(
+        `(((source = 'storage_logs')) AND log_attributes['bucket_id'] IN ('avatars') AND log_attributes['bucket_id'] NOT IN ('private'))`
+      )
+    })
+
+    it('matches no rows when the fixed scope has no filters', () => {
+      const where = getUnifiedLogsQuery(withScope({ filters: [] })).split(/\bWHERE\b/)[1] ?? ''
+      expect(where.trim()).toBe('0')
+    })
+
+    it('matches no rows when an unvalidated scope filter omits its value', () => {
+      const scope = JSON.parse('{"filters":[{"column":"function_id","operator":"="}]}')
+      const where = getUnifiedLogsQuery({ ...baseSearch, scope }).split(/\bWHERE\b/)[1] ?? ''
+      expect(where.trim()).toBe('0')
+    })
+
+    it.each([
+      { operator: '~~*', label: 'substring inclusion' },
+      { operator: '!~~*', label: 'substring exclusion' },
+    ] as const)('matches no rows for unsupported function filters using $label', ({ operator }) => {
+      const where =
+        getUnifiedLogsQuery(
+          withScope({
+            filters: [{ column: 'function_id', operator, value: 'fn-%' }],
+          })
+        ).split(/\bWHERE\b/)[1] ?? ''
+
+      expect(where.trim()).toBe('0')
+    })
+
+    it.each([
+      {
+        scenario: 'includes logs whose messages contain text',
+        filter: { column: 'event_message', operator: '~~*', value: 'permission denied' },
+        expectedCondition: "event_message ILIKE '%permission denied%'",
+      },
+      {
+        scenario: 'excludes logs whose messages contain text',
+        filter: { column: 'event_message', operator: '!~~*', value: 'permission denied' },
+        expectedCondition: "event_message NOT ILIKE '%permission denied%'",
+      },
+      {
+        scenario: 'includes requests whose paths contain text',
+        filter: { column: 'pathname', operator: '~~*', value: '/functions/v1/example' },
+        expectedCondition: ") ILIKE '%/functions/v1/example%'",
+      },
+      {
+        scenario: 'excludes requests whose paths contain text',
+        filter: { column: 'pathname', operator: '!~~*', value: '/functions/v1/example' },
+        expectedCondition: ") NOT ILIKE '%/functions/v1/example%'",
+      },
+    ] as const)('$scenario', ({ filter, expectedCondition }) => {
+      const where =
+        getUnifiedLogsQuery(withScope({ filters: [filter] })).split(/\bWHERE\b/)[1] ?? ''
+
+      expect(where).toContain(expectedCondition)
+    })
+  })
+
+  describe('BigQuery', () => {
+    it('refuses scoped searches rather than return rows from outside the scope', () => {
+      expect(() => getUnifiedLogsQueryBQ(withFunctionScope())).toThrow(
+        'Scoped unified logs queries are only supported on ClickHouse'
+      )
+    })
+
+    it('leaves unscoped queries on the default log types', () => {
+      const sql = getUnifiedLogsQueryBQ(baseSearch)
+      expect(sql).toContain('from postgres_logs')
+      expect(sql).toContain('from edge_logs')
+      expect(sql).not.toContain('function_id')
+    })
   })
 })

@@ -7,7 +7,7 @@ afterAll(async () => {
   await cleanupRoot()
 })
 
-test('getTableDefinitionSql (scoped): escapes double quotes in schema, table, column and constraint names', async () => {
+test('getTableDefinitionSql: escapes double quotes in schema, table, column and constraint names', async () => {
   const db = await createTestDatabase()
   try {
     await db.executeQuery(`
@@ -23,7 +23,7 @@ test('getTableDefinitionSql (scoped): escapes double quotes in schema, table, co
       `select '"pub""lic2"."te""st"'::regclass::oid::int8 as id;`
     )
 
-    const sql = getTableDefinitionSql({ id, scoped: true })
+    const sql = getTableDefinitionSql({ id })
     const [{ definition }] = await db.executeQuery<{ definition: string }[]>(sql)
 
     expect(definition).toContain('"pub""lic2"')
@@ -39,7 +39,7 @@ test('getTableDefinitionSql (scoped): escapes double quotes in schema, table, co
   }
 })
 
-test('getTableDefinitionSql (scoped): quotes the parent schema for an inherited table', async () => {
+test('getTableDefinitionSql: quotes the parent schema for an inherited table', async () => {
   const db = await createTestDatabase()
   try {
     await db.executeQuery(`
@@ -53,7 +53,7 @@ test('getTableDefinitionSql (scoped): quotes the parent schema for an inherited 
       `select '"chi""ld1"."chi""ld_tbl"'::regclass::oid::int8 as id;`
     )
 
-    const sql = getTableDefinitionSql({ id, scoped: true })
+    const sql = getTableDefinitionSql({ id })
     const [{ definition }] = await db.executeQuery<{ definition: string }[]>(sql)
 
     expect(definition).toContain('INHERITS ("par""ent1"."par""ent_tbl")')

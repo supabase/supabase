@@ -104,17 +104,19 @@ describe('FileExplorerHeaderSelection', () => {
     expect(actions.setItemsToPurge).not.toHaveBeenCalled()
   })
 
-  it('drops the permanent delete on a suspended bucket, where deleting is already permanent', () => {
-    selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
-
-    render(<FileExplorerHeaderSelection />)
-
-    expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Delete permanently' })).not.toBeInTheDocument()
-  })
-
-  it('drops it on an unversioned bucket too, so the bar never says the same thing twice', () => {
-    selectedBucket.current = { id: 'my-bucket', name: 'my-bucket', public: false }
+  it.each([
+    {
+      // Deleting is already permanent once versioning is suspended
+      scenario: 'a suspended bucket',
+      bucket: { id: 'my-bucket', name: 'my-bucket', public: false, versioning_status: 'SUSPENDED' },
+    },
+    {
+      // So the bar never says the same thing twice
+      scenario: 'an unversioned bucket',
+      bucket: { id: 'my-bucket', name: 'my-bucket', public: false },
+    },
+  ])('drops the permanent delete on $scenario', ({ bucket }) => {
+    selectedBucket.current = bucket
 
     render(<FileExplorerHeaderSelection />)
 

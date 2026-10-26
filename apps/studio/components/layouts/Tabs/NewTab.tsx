@@ -65,7 +65,7 @@ export function NewTab() {
               {impersonatingAnon && <p className="text-foreground-lighter">Not logged-in</p>}
               {!!impersonatedUser && (
                 <p>
-                  ID: <code className="text-code-inline">{impersonatedUser.id}</code>
+                  ID: <code>{impersonatedUser.id}</code>
                 </p>
               )}
             </CardContent>

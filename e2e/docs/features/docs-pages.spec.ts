@@ -18,9 +18,11 @@ import {
   articleSelectorForPagePath,
   checkLinkFromBrowser,
   collectDocsOwnedLinks,
+  type LinkCheckResult,
 } from '../utils/docs-links.js'
 
 const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
+const LINK_CHECK_CONCURRENCY = 4
 
 function annotate(testInfo: TestInfo, description: string) {
   testInfo.annotations.push({ type: 'warning', description })
@@ -56,9 +58,21 @@ test.describe('Docs owned pages', () => {
       await expect(article, 'Page article should be present').toBeVisible()
 
       const links = await collectDocsOwnedLinks(page, baseURL!, articleSelector)
+      const anchoredUrls = new Set(links.filter((link) => link.anchor).map((link) => link.url))
+      const urls = [...new Set(links.map((link) => link.url))]
 
-      for (const url of links) {
-        const result = await checkLinkFromBrowser(page, url)
+      const results = new Map<string, LinkCheckResult>()
+      const queue = [...urls]
+      await Promise.all(
+        Array.from({ length: LINK_CHECK_CONCURRENCY }, async () => {
+          for (let url = queue.shift(); url; url = queue.shift()) {
+            results.set(url, await checkLinkFromBrowser(page, url, anchoredUrls.has(url)))
+          }
+        })
+      )
+
+      for (const url of urls) {
+        const result = results.get(url)!
         expect
           .soft(
             result.ok,
@@ -67,6 +81,18 @@ test.describe('Docs owned pages', () => {
               : `${url} should resolve (status ${result.status})`
           )
           .toBeTruthy()
+      }
+
+      for (const { url, anchor } of links) {
+        const result = results.get(url)!
+        if (anchor && result.ok) {
+          expect
+            .soft(
+              result.anchors.includes(anchor),
+              `${pagePath} links to ${url}#${anchor}, but ${url} has no element with id "${anchor}"`
+            )
+            .toBeTruthy()
+        }
       }
     })
   }

@@ -1,15 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const CreateBranchButton = () => {
   const snap = useAppStateSnapshot()
-  const { can: canCreateBranches } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'preview_branches',
-    { resource: { is_default: false } }
+  const { can: canCreateBranches } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_CREATE
   )
 
   return (

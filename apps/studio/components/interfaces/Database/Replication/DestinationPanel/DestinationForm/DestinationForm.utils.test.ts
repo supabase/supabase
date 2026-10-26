@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
-import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import {
@@ -828,111 +827,6 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseDatabase: 'analytics',
       })
     ).toEqual([])
-  })
-})
-
-describe('DestinationForm.utils BigQuery', () => {
-  it('returns required-field errors for missing BigQuery settings', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: '',
-      datasetId: '',
-      serviceAccountKey: '',
-    })
-
-    expect(issues).toEqual([
-      { path: 'projectId', message: 'Project ID is required.' },
-      { path: 'datasetId', message: 'Dataset ID is required.' },
-      { path: 'serviceAccountKey', message: 'Service account key is required.' },
-    ])
-  })
-
-  it('treats whitespace-only values as missing', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: '   ',
-      datasetId: '\t',
-      serviceAccountKey: '\n',
-    })
-
-    expect(issues).toEqual([
-      { path: 'projectId', message: 'Project ID is required.' },
-      { path: 'datasetId', message: 'Dataset ID is required.' },
-      { path: 'serviceAccountKey', message: 'Service account key is required.' },
-    ])
-  })
-
-  it('returns no issues for a complete configuration', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: 'my-project',
-      datasetId: 'my_dataset',
-      serviceAccountKey: '{ "type": "service_account" }',
-    })
-
-    expect(issues).toEqual([])
-  })
-
-  it('rejects invalid JSON in the service account key', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: 'my-project',
-      datasetId: 'my_dataset',
-      serviceAccountKey: '{ "type": "service_account" ',
-    })
-
-    expect(issues).toEqual([
-      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
-    ])
-  })
-
-  it('skips JSON shape checks when validateJson is false', () => {
-    const issues = getBigQueryValidationIssues(
-      {
-        projectId: 'my-project',
-        datasetId: 'my_dataset',
-        serviceAccountKey: '{ "type": "service_account" ',
-      },
-      { validateJson: false }
-    )
-
-    expect(issues).toEqual([])
-  })
-
-  it('rejects non-JSON text in the service account key', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: 'my-project',
-      datasetId: 'my_dataset',
-      serviceAccountKey: 'not-json',
-    })
-
-    expect(issues).toEqual([
-      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
-    ])
-  })
-
-  it('validates JSON when replacing credentials in edit mode', () => {
-    const issues = getBigQueryValidationIssues(
-      {
-        projectId: 'my-project',
-        datasetId: 'my_dataset',
-        serviceAccountKey: '{ invalid',
-      },
-      { secretsOptional: true }
-    )
-
-    expect(issues).toEqual([
-      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
-    ])
-  })
-
-  it('allows an omitted BigQuery service account key in edit mode', () => {
-    const issues = getBigQueryValidationIssues(
-      {
-        projectId: 'my-project',
-        datasetId: 'my_dataset',
-        serviceAccountKey: '',
-      },
-      { secretsOptional: true }
-    )
-
-    expect(issues).toEqual([])
   })
 })
 

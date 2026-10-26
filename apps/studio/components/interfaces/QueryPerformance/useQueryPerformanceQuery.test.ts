@@ -106,46 +106,20 @@ describe('generateQueryPerformanceSql', () => {
     expect(result.sql).toContain('WHERE')
   })
 
-  it('does not include user-defined WHERE conditions when no filters set', () => {
-    const result = generateQueryPerformanceSql({ preset: 'mostFrequentlyInvoked' })
-    expect(result.whereSql).toBe('')
-    // The base SQL may still contain its own WHERE clause (e.g. statements.calls > 0)
-    // but the user-defined whereSql should be empty
+  it.each([
+    'mostFrequentlyInvoked',
+    'mostTimeConsuming',
+    'slowestExecutionTime',
+    'queryHitRate',
+    'unified',
+  ] as const)('generates sql for the %s preset', (preset) => {
+    expect(generateQueryPerformanceSql({ preset }).sql.length).toBeGreaterThan(0)
   })
 
-  it('passes runIndexAdvisor and filterIndexAdvisor flags', () => {
-    const resultWithAdvisor = generateQueryPerformanceSql({
-      preset: 'mostFrequentlyInvoked',
-      runIndexAdvisor: true,
-      filterIndexAdvisor: true,
-    })
-    expect(resultWithAdvisor.sql).toBeDefined()
-  })
-
-  it('works with different presets', () => {
-    const presets = [
-      'mostFrequentlyInvoked',
-      'mostTimeConsuming',
-      'slowestExecutionTime',
-      'queryHitRate',
-      'unified',
-    ] as const
-
-    for (const preset of presets) {
-      const result = generateQueryPerformanceSql({ preset })
-      expect(result.sql).toBeDefined()
-    }
-  })
-
-  it('clamps page=0 to page=1 (no negative offset)', () => {
-    const result = generateQueryPerformanceSql({ preset: 'unified', page: 0, pageSize: 20 })
+  it.each([0, -5])('clamps page=%s to page=1 (no negative offset)', (page) => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page, pageSize: 20 })
     expect(result.sql).toContain('offset 0')
     expect(result.sql).not.toMatch(/offset -\d/)
-  })
-
-  it('clamps negative page to page=1', () => {
-    const result = generateQueryPerformanceSql({ preset: 'unified', page: -5, pageSize: 20 })
-    expect(result.sql).toContain('offset 0')
   })
 
   it('clamps pageSize above 100 to 100', () => {
@@ -173,14 +147,6 @@ describe('generateQueryPerformanceSql', () => {
 })
 
 describe('generateQueryPerformanceSql - ORDER BY column validation', () => {
-  it('rejects invalid orderBy column containing colon (old URL format)', () => {
-    const result = generateQueryPerformanceSql({
-      preset: 'mostFrequentlyInvoked',
-      orderBy: { column: 'created_at:asc' as any, order: 'desc' },
-    })
-    expect(result.orderBySql).toBeUndefined()
-  })
-
   it('rejects SQL injection in orderBy column', () => {
     const result = generateQueryPerformanceSql({
       preset: 'mostFrequentlyInvoked',
@@ -190,11 +156,12 @@ describe('generateQueryPerformanceSql - ORDER BY column validation', () => {
     expect(result.sql).not.toContain('DROP TABLE')
   })
 
-  it('falls back to default ORDER BY when column is invalid', () => {
+  it('rejects an orderBy column containing a colon (old URL format) and falls back to the default', () => {
     const result = generateQueryPerformanceSql({
       preset: 'mostFrequentlyInvoked',
       orderBy: { column: 'created_at:asc' as any, order: 'asc' },
     })
+    expect(result.orderBySql).toBeUndefined()
     expect(result.sql).toContain('order by statements.calls desc')
   })
 

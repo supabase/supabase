@@ -86,7 +86,7 @@ const NOTEBOOK_CONTENT = {
   ],
 }
 
-function mockGetNotebook() {
+function mockGetNotebook(content: unknown = NOTEBOOK_CONTENT) {
   addAPIMock({
     method: 'get',
     path: '/platform/projects/:ref/content/item/:id',
@@ -103,7 +103,7 @@ function mockGetNotebook() {
         owner_id: 1,
         project_id: 1,
         type: 'notebook',
-        content: NOTEBOOK_CONTENT,
+        content,
         // The generated response type expects a stricter cell union than this hand-written
         // fixture provides; the cells themselves are exercised by the schema tests above.
       } as unknown as GetUserContentByIdResponse),
@@ -113,7 +113,7 @@ function mockGetNotebook() {
 describe('ai/tools/notebook-tools', () => {
   describe('getNotebookTools', () => {
     it('should return all notebook tools', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
 
       expect(Object.keys(tools)).toEqual([
         'list_databases',
@@ -127,14 +127,15 @@ describe('ai/tools/notebook-tools', () => {
     })
 
     it('should not require approval to read notebooks', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
 
-      expect(tools.list_notebooks.needsApproval).toBeUndefined()
-      expect(tools.get_notebook.needsApproval).toBeUndefined()
+      expect(tools.list_databases.needsApproval).toBe(false)
+      expect(tools.list_notebooks.needsApproval).toBe(false)
+      expect(tools.get_notebook.needsApproval).toBe(false)
     })
 
     it('should require approval to run, create, update, or delete a notebook', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
 
       expect(tools.run_notebook.needsApproval).toBe(true)
       expect(tools.create_notebook.needsApproval).toBe(true)
@@ -183,7 +184,7 @@ describe('ai/tools/notebook-tools', () => {
           ]),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.list_databases.execute) throw new Error('execute is undefined')
 
       const result = await tools.list_databases.execute(
@@ -211,28 +212,6 @@ describe('ai/tools/notebook-tools', () => {
   })
 
   describe('run_notebook', () => {
-    function mockGetNotebook(content: unknown = NOTEBOOK_CONTENT) {
-      addAPIMock({
-        method: 'get',
-        path: '/platform/projects/:ref/content/item/:id',
-        response: () =>
-          HttpResponse.json<GetUserContentByIdResponse>({
-            id: 'notebook-1',
-            name: 'Signup funnel',
-            description: undefined,
-            visibility: 'project',
-            favorite: false,
-            folder_id: null,
-            inserted_at: '2026-01-01T00:00:00.000Z',
-            updated_at: '2026-01-01T00:00:00.000Z',
-            owner_id: 1,
-            project_id: 1,
-            type: 'notebook',
-            content,
-          } as unknown as GetUserContentByIdResponse),
-      })
-    }
-
     it('runs database and log cells in notebook order and skips markdown', async () => {
       mockGetNotebook()
       const executionOrder: string[] = []
@@ -391,7 +370,7 @@ describe('ai/tools/notebook-tools', () => {
 
     it('rejects the run when the notebook changed after it was read', async () => {
       mockGetNotebook()
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.run_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -522,6 +501,7 @@ describe('ai/tools/notebook-tools', () => {
       const tools = getNotebookTools({
         projectRef: 'test-project',
         authorization: 'Bearer token',
+        aiOptInLevel: 'schema',
       })
       if (!tools.list_notebooks.execute) throw new Error('execute is undefined')
 
@@ -567,7 +547,7 @@ describe('ai/tools/notebook-tools', () => {
         },
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.list_notebooks.execute) throw new Error('execute is undefined')
 
       await tools.list_notebooks.execute(
@@ -582,27 +562,9 @@ describe('ai/tools/notebook-tools', () => {
 
   describe('get_notebook', () => {
     it('should resolve markdown text and SQL for every cell', async () => {
-      addAPIMock({
-        method: 'get',
-        path: '/platform/projects/:ref/content/item/:id',
-        response: () =>
-          HttpResponse.json<GetUserContentByIdResponse>({
-            id: 'notebook-1',
-            name: 'Signup funnel',
-            description: undefined,
-            visibility: 'project',
-            favorite: false,
-            folder_id: null,
-            inserted_at: '2026-01-01T00:00:00.000Z',
-            updated_at: '2026-01-01T00:00:00.000Z',
-            owner_id: 1,
-            project_id: 1,
-            type: 'notebook',
-            content: NOTEBOOK_CONTENT,
-          } as unknown as GetUserContentByIdResponse),
-      })
+      mockGetNotebook()
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_notebook.execute) throw new Error('execute is undefined')
 
       const result = await tools.get_notebook.execute(
@@ -657,7 +619,7 @@ describe('ai/tools/notebook-tools', () => {
           }),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -675,7 +637,7 @@ describe('ai/tools/notebook-tools', () => {
         response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -689,7 +651,7 @@ describe('ai/tools/notebook-tools', () => {
 
   describe('create_notebook', () => {
     it('should reject content whose cells carry an agent-supplied id', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
       const schema = tools.create_notebook.inputSchema
 
       if (!('safeParse' in schema)) throw new Error('inputSchema has no safeParse')
@@ -706,7 +668,7 @@ describe('ai/tools/notebook-tools', () => {
     })
 
     it('should accept a valid id-less notebook with all three cell types', () => {
-      const tools = getNotebookTools()
+      const tools = getNotebookTools({ aiOptInLevel: 'schema' })
       const schema = tools.create_notebook.inputSchema
 
       if (!('safeParse' in schema)) throw new Error('inputSchema has no safeParse')
@@ -720,7 +682,7 @@ describe('ai/tools/notebook-tools', () => {
       expect(result.success).toBe(true)
     })
 
-    it('should PUT a notebook with promoted SQL and no cell ids', async () => {
+    it('should PUT a notebook with promoted SQL and no cell ids, returning the id it generated', async () => {
       let sentBody: Record<string, unknown> | undefined
       addAPIMock({
         method: 'put',
@@ -731,10 +693,10 @@ describe('ai/tools/notebook-tools', () => {
         },
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
-      await tools.create_notebook.execute(
+      const result = await tools.create_notebook.execute(
         { name: 'Signup funnel', content: VALID_AGENT_CONTENT },
         { toolCallId: 'test', messages: [], context: {} }
       )
@@ -752,93 +714,52 @@ describe('ai/tools/notebook-tools', () => {
       expect(logCell.sql).toBe(
         "select timestamp, event_message from edge_logs where source = 'edge_logs' limit 10"
       )
-    })
 
-    it('should return the id it generated and sent, since a successful create response has no body', async () => {
-      let sentBody: Record<string, unknown> | undefined
-      addAPIMock({
-        method: 'put',
-        path: '/platform/projects/:ref/content',
-        response: async ({ request }) => {
-          sentBody = (await request.json()) as Record<string, unknown>
-          return new HttpResponse(null)
-        },
-      })
-
-      const tools = getNotebookTools({ projectRef: 'test-project' })
-      if (!tools.create_notebook.execute) throw new Error('execute is undefined')
-
-      const result = await tools.create_notebook.execute(
-        { name: 'Signup funnel', content: VALID_AGENT_CONTENT },
-        { toolCallId: 'test', messages: [], context: {} }
-      )
-
+      // A successful create response has no body, so the tool returns the id it sent
       expect(typeof sentBody?.id).toBe('string')
       expect(result).toEqual({ id: sentBody?.id, name: 'Signup funnel' })
     })
 
-    it('should throw an assistant-exposable error instead of PUTting when a database_cell carries an unknown database_identifier', async () => {
-      mockDatabases(['test-project', 'test-project-replica-1'])
+    it.each([
+      ['an unknown', 'made-up-replica', /made-up-replica/],
+      ['an empty', '', NotebookToolError],
+    ])(
+      'should throw an assistant-exposable error instead of PUTting when a database_cell carries %s database_identifier',
+      async (_, databaseIdentifier, expectedError) => {
+        mockDatabases(['test-project', 'test-project-replica-1'])
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
-      if (!tools.create_notebook.execute) throw new Error('execute is undefined')
+        const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
+        if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
-      const execute = tools.create_notebook.execute(
-        {
-          name: 'Signup funnel',
-          content: {
-            schema_version: 1,
-            cells: [
-              {
-                _tag: 'database_cell',
-                sql: 'select 1',
-                row_limit: 100,
-                database_identifier: 'made-up-replica',
-              },
-            ],
+        const execute = tools.create_notebook.execute(
+          {
+            name: 'Signup funnel',
+            content: {
+              schema_version: 1,
+              cells: [
+                {
+                  _tag: 'database_cell',
+                  sql: 'select 1',
+                  row_limit: 100,
+                  database_identifier: databaseIdentifier,
+                },
+              ],
+            },
           },
-        },
-        { toolCallId: 'test', messages: [], context: {} }
-      )
+          { toolCallId: 'test', messages: [], context: {} }
+        )
 
-      await expect(execute).rejects.toThrow(/made-up-replica/)
-      await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
-      await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
-    })
-
-    it('should throw an assistant-exposable error instead of PUTting when a database_cell carries an empty database_identifier', async () => {
-      mockDatabases(['test-project', 'test-project-replica-1'])
-
-      const tools = getNotebookTools({ projectRef: 'test-project' })
-      if (!tools.create_notebook.execute) throw new Error('execute is undefined')
-
-      const execute = tools.create_notebook.execute(
-        {
-          name: 'Signup funnel',
-          content: {
-            schema_version: 1,
-            cells: [
-              {
-                _tag: 'database_cell',
-                sql: 'select 1',
-                row_limit: 100,
-                database_identifier: '',
-              },
-            ],
-          },
-        },
-        { toolCallId: 'test', messages: [], context: {} }
-      )
-
-      await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
-      await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
-    })
+        await expect(execute).rejects.toThrow(expectedError)
+        await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
+        await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
+      }
+    )
 
     it('should succeed when a database_cell carries a database_identifier that matches a real database', async () => {
       mockDatabases(['test-project', 'test-project-replica-1'])
       mockCreateNotebookPut()
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
@@ -865,7 +786,7 @@ describe('ai/tools/notebook-tools', () => {
     it('should succeed without ever calling the databases endpoint when no cell sets database_identifier', async () => {
       mockCreateNotebookPut()
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.create_notebook.execute) throw new Error('execute is undefined')
 
       // No mock registered for GET /platform/projects/:ref/databases: MSW fails the test
@@ -892,7 +813,7 @@ describe('ai/tools/notebook-tools', () => {
         },
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       const result = await tools.update_notebook.execute(
@@ -957,7 +878,7 @@ describe('ai/tools/notebook-tools', () => {
     it('should throw a descriptive, assistant-exposable error instead of PUTting when an operation targets an unknown cell id', async () => {
       mockGetNotebook()
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       const execute = tools.update_notebook.execute(
@@ -977,7 +898,7 @@ describe('ai/tools/notebook-tools', () => {
     it('should throw an assistant-exposable error instead of PUTting when the notebook changed since expected_updated_at', async () => {
       mockGetNotebook()
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       const execute = tools.update_notebook.execute(
@@ -994,169 +915,68 @@ describe('ai/tools/notebook-tools', () => {
       await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
     })
 
-    it('should throw an assistant-exposable error instead of PUTting when a resulting database_cell carries an unknown database_identifier', async () => {
-      mockGetNotebook()
-      mockDatabases(['test-project'])
+    describe.each(['replace_cell', 'insert_cell'] as const)(
+      'when a %s operation introduces a database_cell',
+      (operationTag) => {
+        const executeWithIdentifier = (databaseIdentifier: string) => {
+          const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
+          if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
-      if (!tools.update_notebook.execute) throw new Error('execute is undefined')
-
-      const execute = tools.update_notebook.execute(
-        {
-          id: 'notebook-1',
-          expected_updated_at: '2026-01-01T00:00:00.000Z',
-          operations: [
+          const cell = {
+            _tag: 'database_cell' as const,
+            sql: 'select * from auth.users limit 100',
+            row_limit: 100,
+            database_identifier: databaseIdentifier,
+          }
+          return tools.update_notebook.execute(
             {
-              _tag: 'replace_cell',
-              cell_id: 'cell-2',
-              cell: {
-                _tag: 'database_cell',
-                sql: 'select * from auth.users limit 100',
-                row_limit: 100,
-                database_identifier: 'made-up-replica',
-              },
+              id: 'notebook-1',
+              expected_updated_at: '2026-01-01T00:00:00.000Z',
+              operations: [
+                operationTag === 'replace_cell'
+                  ? { _tag: 'replace_cell', cell_id: 'cell-2', cell }
+                  : { _tag: 'insert_cell', after_cell_id: 'cell-1', cell },
+              ],
             },
-          ],
-        },
-        { toolCallId: 'test', messages: [], context: {} }
-      )
+            { toolCallId: 'test', messages: [], context: {} }
+          )
+        }
 
-      await expect(execute).rejects.toThrow(/made-up-replica/)
-      await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
-      await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
-    })
+        it('should throw an assistant-exposable error instead of PUTting for an unknown database_identifier', async () => {
+          mockGetNotebook()
+          mockDatabases(['test-project'])
 
-    it('should succeed when a resulting database_cell carries a database_identifier that matches a real database', async () => {
-      mockGetNotebook()
-      mockDatabases(['test-project', 'test-project-replica-1'])
-      addAPIMock({
-        method: 'put',
-        path: '/platform/projects/:ref/content',
-        response: () => new HttpResponse(null),
-      })
+          const execute = executeWithIdentifier('made-up-replica')
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
-      if (!tools.update_notebook.execute) throw new Error('execute is undefined')
+          await expect(execute).rejects.toThrow(/made-up-replica/)
+          await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
+          await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
+        })
 
-      await expect(
-        tools.update_notebook.execute(
-          {
+        it('should succeed for a database_identifier that matches a real database', async () => {
+          mockGetNotebook()
+          mockDatabases(['test-project', 'test-project-replica-1'])
+          mockCreateNotebookPut()
+
+          await expect(executeWithIdentifier('test-project-replica-1')).resolves.toMatchObject({
             id: 'notebook-1',
-            expected_updated_at: '2026-01-01T00:00:00.000Z',
-            operations: [
-              {
-                _tag: 'replace_cell',
-                cell_id: 'cell-2',
-                cell: {
-                  _tag: 'database_cell',
-                  sql: 'select * from auth.users limit 100',
-                  row_limit: 100,
-                  database_identifier: 'test-project-replica-1',
-                },
-              },
-            ],
-          },
-          { toolCallId: 'test', messages: [], context: {} }
-        )
-      ).resolves.toMatchObject({ id: 'notebook-1', name: 'Signup funnel' })
-    })
-
-    it('should throw an assistant-exposable error instead of PUTting when an inserted database_cell carries an unknown database_identifier', async () => {
-      mockGetNotebook()
-      mockDatabases(['test-project'])
-
-      const tools = getNotebookTools({ projectRef: 'test-project' })
-      if (!tools.update_notebook.execute) throw new Error('execute is undefined')
-
-      const execute = tools.update_notebook.execute(
-        {
-          id: 'notebook-1',
-          expected_updated_at: '2026-01-01T00:00:00.000Z',
-          operations: [
-            {
-              _tag: 'insert_cell',
-              after_cell_id: 'cell-1',
-              cell: {
-                _tag: 'database_cell',
-                sql: 'select * from auth.users limit 100',
-                row_limit: 100,
-                database_identifier: 'made-up-replica',
-              },
-            },
-          ],
-        },
-        { toolCallId: 'test', messages: [], context: {} }
-      )
-
-      await expect(execute).rejects.toThrow(/made-up-replica/)
-      await expect(execute).rejects.toBeInstanceOf(NotebookToolError)
-      await expect(execute).rejects.toMatchObject({ metadata: { exposeToAssistant: true } })
-    })
-
-    it('should succeed when an inserted database_cell carries a database_identifier that matches a real database', async () => {
-      mockGetNotebook()
-      mockDatabases(['test-project', 'test-project-replica-1'])
-      addAPIMock({
-        method: 'put',
-        path: '/platform/projects/:ref/content',
-        response: () => new HttpResponse(null),
-      })
-
-      const tools = getNotebookTools({ projectRef: 'test-project' })
-      if (!tools.update_notebook.execute) throw new Error('execute is undefined')
-
-      await expect(
-        tools.update_notebook.execute(
-          {
-            id: 'notebook-1',
-            expected_updated_at: '2026-01-01T00:00:00.000Z',
-            operations: [
-              {
-                _tag: 'insert_cell',
-                after_cell_id: 'cell-1',
-                cell: {
-                  _tag: 'database_cell',
-                  sql: 'select * from auth.users limit 100',
-                  row_limit: 100,
-                  database_identifier: 'test-project-replica-1',
-                },
-              },
-            ],
-          },
-          { toolCallId: 'test', messages: [], context: {} }
-        )
-      ).resolves.toMatchObject({ id: 'notebook-1', name: 'Signup funnel' })
-    })
+            name: 'Signup funnel',
+          })
+        })
+      }
+    )
 
     it('should succeed without validating or fetching databases when no operation introduces a database_cell', async () => {
       // cell-2 already carries an identifier that wouldn't validate today (e.g. its
       // replica was since removed) — but this update never touches it, so it must not
       // be re-checked, and the databases endpoint must not be called at all.
-      addAPIMock({
-        method: 'get',
-        path: '/platform/projects/:ref/content/item/:id',
-        response: () =>
-          HttpResponse.json<GetUserContentByIdResponse>({
-            id: 'notebook-1',
-            name: 'Signup funnel',
-            description: undefined,
-            visibility: 'project',
-            favorite: false,
-            folder_id: null,
-            inserted_at: '2026-01-01T00:00:00.000Z',
-            updated_at: '2026-01-01T00:00:00.000Z',
-            owner_id: 1,
-            project_id: 1,
-            type: 'notebook',
-            content: {
-              ...NOTEBOOK_CONTENT,
-              cells: NOTEBOOK_CONTENT.cells.map((cell) =>
-                cell._tag === 'database_cell'
-                  ? { ...cell, database_identifier: 'stale-replica-removed-long-ago' }
-                  : cell
-              ),
-            },
-          }),
+      mockGetNotebook({
+        ...NOTEBOOK_CONTENT,
+        cells: NOTEBOOK_CONTENT.cells.map((cell) =>
+          cell._tag === 'database_cell'
+            ? { ...cell, database_identifier: 'stale-replica-removed-long-ago' }
+            : cell
+        ),
       })
       addAPIMock({
         method: 'put',
@@ -1164,7 +984,7 @@ describe('ai/tools/notebook-tools', () => {
         response: () => new HttpResponse(null),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.update_notebook.execute) throw new Error('execute is undefined')
 
       // No mock registered for GET /platform/projects/:ref/databases: MSW fails the test
@@ -1195,7 +1015,7 @@ describe('ai/tools/notebook-tools', () => {
         },
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.delete_notebook.execute) throw new Error('execute is undefined')
 
       const result = await tools.delete_notebook.execute(
@@ -1216,7 +1036,7 @@ describe('ai/tools/notebook-tools', () => {
         response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
       })
 
-      const tools = getNotebookTools({ projectRef: 'test-project' })
+      const tools = getNotebookTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.delete_notebook.execute) throw new Error('execute is undefined')
 
       // No mock registered for DELETE /platform/projects/:ref/content: MSW fails the test

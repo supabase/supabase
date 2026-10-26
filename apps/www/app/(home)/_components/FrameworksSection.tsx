@@ -250,7 +250,7 @@ const frameworkExamples: Record<
     },
     {
       title: 'Auth & User Management',
-      description: 'Email, social login, and user profiles.',
+      description: 'Email, social sign-in, and user profiles.',
       url: '/docs/guides/auth/quickstarts/react',
       icon: 'Users',
     },

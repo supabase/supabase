@@ -145,6 +145,7 @@ describe('Logs.utils', () => {
       expect(result).toContain('1 Supabase log entry')
       expect(result).toContain('error occurred')
       expect(result).toContain('What do these logs indicate')
+      expect(result).not.toContain('more matching log')
     })
 
     test('builds prompt with multiple logs', () => {
@@ -156,10 +157,24 @@ describe('Logs.utils', () => {
       expect(result).toContain('2 Supabase log entries')
     })
 
-    test('handles singular correctly', () => {
-      const rows: LogData[] = [createLog({ id: '1', event_message: 'single error' })]
-      const result = buildLogsPrompt(rows)
-      expect(result).toContain('1 Supabase log entry')
+    test.each([
+      [1, '+1 more matching log entry not included.'],
+      [45, '+45 more matching log entries not included.'],
+      [1234, '+1,234 more matching log entries not included.'],
+    ])('tells the assistant that %i matching preview logs were omitted', (omittedCount, note) => {
+      const rows: LogData[] = [createLog({ id: '1', event_message: 'latest error' })]
+      const result = buildLogsPrompt(rows, {
+        queryType: 'functions',
+        sqlQuery: 'select event_message from function_logs limit 1',
+        omittedCount,
+      })
+      expect(result).toContain('from the **Edge Functions** service')
+      expect(result).toContain('latest error')
+      expect(result.indexOf('latest error')).toBeLessThan(result.indexOf(note))
+      expect(result).toContain(note)
+      expect(result).toContain(
+        '**Query used:**\n```sql\nselect event_message from function_logs limit 1\n```'
+      )
     })
   })
 
@@ -168,18 +183,12 @@ describe('Logs.utils', () => {
       expect(extractEdgeFunctionName('/functions/v1/hello-world-1')).toBe('hello-world-1')
     })
 
-    test('returns empty string for null', () => {
-      expect(extractEdgeFunctionName(null)).toBe('')
-    })
-
-    test('returns empty string for undefined', () => {
-      expect(extractEdgeFunctionName(undefined)).toBe('')
-    })
-
-    test('returns empty string for non-string values', () => {
-      expect(extractEdgeFunctionName(42)).toBe('')
-      expect(extractEdgeFunctionName({})).toBe('')
-    })
+    test.each([null, undefined, 42, {}])(
+      'returns empty string for non-string value %o',
+      (value) => {
+        expect(extractEdgeFunctionName(value)).toBe('')
+      }
+    )
 
     test('handles pathname with no slashes', () => {
       expect(extractEdgeFunctionName('my-function')).toBe('my-function')

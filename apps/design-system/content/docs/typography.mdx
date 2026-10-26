@@ -3,18 +3,48 @@ title: Typography
 description: An overview of all available typography CSS variables.
 ---
 
-Some reusable patterns work better as CSS variables, or “shorthands”, than as components. Typography is one of these cases, since its usage and context vary widely.
+Use shared typography styles to keep text consistent across apps. You can find the
+heading, text, and link utilities in [`typography.css`](https://github.com/supabase/supabase/blob/master/packages/config/typography.css).
 
-The shorthands below are composed of core [Tailwind utility classes](../docs/tailwind-classes). You can view the full list of shorthands in [`typography.scss`](https://github.com/supabase/supabase/blob/master/apps/studio/styles/typography.scss).
+## Primary text
 
-## Shorthands
-
-| Value              | Usage                                                                      |
-| ------------------ | -------------------------------------------------------------------------- |
-| `text-code-inline` | Apply to a `code` element for inline code or similar custom inline content |
-| `text-primary`     | Accessible Supabase green for readable branded text                        |
+Use `text-primary` for readable text in Supabase green.
 
 `text-primary` meets WCAG AA for normal text on app surfaces: darkened in light mode,
 bright in dark mode. Focus rings and selected controls derive their brighter fill from
 the same primary hue. See [Primary and brand colors](../docs/color-usage#primary-and-brand-colors) for when
 to use each green.
+
+## Inline code
+
+Apps that import `config/inline-code.css` get shared styles for inline `<code>`, including
+a border, background, and default foreground color. Code inherits the surrounding font weight
+and line height. Sizing keeps code readable beside small text, then stays 2px below the
+surrounding text from 16px upward, with a minimum of `0.75rem` (normally 12px).
+
+| Surrounding text | Inline code |
+| ---------------- | ----------- |
+| 13px             | 12px        |
+| 14px             | 12.5px      |
+| 15px             | 13.25px     |
+| 16px             | 14px        |
+| 20px             | 18px        |
+
+These sizes assume the standard 16px root font size.
+
+Long identifiers stay intact when they fit on the next line, but can break to avoid overflow.
+Tailwind utilities can override the defaults. A size class on `<code>` sets its size directly;
+put the class on a parent to keep the automatic sizing:
+
+```tsx
+<span className="text-sm">
+  <code>project_id</code>
+</span>
+```
+
+Code blocks and syntax-highlighting containers keep their own styles. For other custom
+displays, such as a command strip, add `data-code-style="plain"` to the `<code>` element
+or a parent. This removes all shared inline-code styles from that element and its descendants,
+so the display can control its own appearance.
+
+<ComponentPreview name="typography-inline-code" />

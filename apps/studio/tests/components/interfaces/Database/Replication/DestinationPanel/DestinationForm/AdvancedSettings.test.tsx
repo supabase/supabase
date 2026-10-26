@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { platformComponents as components } from 'api-types'
+import { HttpResponse } from 'msw'
 import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { AdvancedSettings } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/AdvancedSettings'
 import {
@@ -11,6 +13,9 @@ import {
   type DestinationPanelSchemaType,
 } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/DestinationForm.schema'
 import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+
+type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const numericFields = [
   { label: 'Batch wait time', initialValue: 10_000 },
@@ -45,38 +50,46 @@ const TestForm = () => {
 }
 
 describe('AdvancedSettings', () => {
-  it.each(numericFields)(
-    'allows $label to be cleared and replaced',
-    async ({ label, initialValue }) => {
-      const user = userEvent.setup()
-      customRender(<TestForm />)
+  beforeEach(() => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources',
+      response: () => HttpResponse.json<SourcesResponse>({ sources: [] }),
+    })
+  })
 
-      await user.click(screen.getByRole('button', { name: /Advanced settings/ }))
-
-      const input = screen.getByRole('spinbutton', { name: label })
-      expect(input).toHaveValue(initialValue)
-
-      await user.clear(input)
-      expect(input).toHaveValue(null)
-
-      await user.type(input, '5')
-      expect(input).toHaveValue(5)
-    }
-  )
-
-  it('uses the existing error while an empty required number is being edited', async () => {
-    const user = userEvent.setup()
+  // One render for all fields: each field is independent, and re-rendering per field only adds setup cost
+  it('allows every numeric field to be cleared and replaced', async () => {
+    const user = userEvent.setup({ delay: null })
     customRender(<TestForm />)
 
     await user.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    const input = screen.getByRole('spinbutton', { name: 'Table sync workers' })
 
-    await user.clear(input)
+    for (const { label, initialValue } of numericFields) {
+      const input = screen.getByLabelText(label)
+      expect(input, label).toHaveValue(initialValue)
+
+      fireEvent.change(input, { target: { value: '' } })
+      expect(input, label).toHaveValue(null)
+
+      fireEvent.change(input, { target: { value: '5' } })
+      expect(input, label).toHaveValue(5)
+    }
+  })
+
+  it('uses the existing error while an empty required number is being edited', async () => {
+    const user = userEvent.setup({ delay: null })
+    customRender(<TestForm />)
+
+    await user.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    const input = screen.getByLabelText('Table sync workers')
+
+    fireEvent.change(input, { target: { value: '' } })
     expect(
       await screen.findByText('Max table sync workers must be greater than 0.')
     ).toBeInTheDocument()
 
-    await user.type(input, '5')
+    fireEvent.change(input, { target: { value: '5' } })
     await waitFor(() => {
       expect(
         screen.queryByText('Max table sync workers must be greater than 0.')

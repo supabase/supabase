@@ -1,8 +1,13 @@
 import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
 
-import { isOptInLevelAtLeast, optInLevelSchema } from './opt-in-level'
-import { getToolContract, type ContractToolName } from './tools/registry'
+import { isOptInLevelAtLeast } from './opt-in-level'
+import {
+  getRemoteToolContract,
+  getToolContract,
+  type ContractToolName,
+  type RemoteContractToolName,
+} from './tools/registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
@@ -61,20 +66,6 @@ export const toolSetValidationSchema = z.record(
 )
 export type ToolName = keyof z.infer<typeof toolSetValidationSchema>
 
-export const updateOptInLevelInputSchema = z.object({
-  requiredLevel: z
-    .enum(['schema', 'schema_and_log', 'schema_and_log_and_data'])
-    .optional()
-    .describe(
-      'The lowest opt-in level that unlocks what you need: `schema` for table and column metadata, `schema_and_log` for logs, `schema_and_log_and_data` for query results. Omit it when the user just wants to review or change the setting, for example to lower it.'
-    ),
-})
-
-/** Input as stored on the message. `levelWhenAsked` is the org's level when the call was made. */
-export const storedUpdateOptInLevelInputSchema = updateOptInLevelInputSchema.extend({
-  levelWhenAsked: optInLevelSchema.optional(),
-})
-
 /**
  * Tool categories based on the data they access
  */
@@ -93,35 +84,18 @@ type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
 
 /**
  * Mapping of tool names to their categories. Tools that have migrated to a contract
- * (`TOOL_CONTRACTS`) declare their own `minOptInLevel` instead and aren't listed here.
+ * (`TOOL_CONTRACTS` or `REMOTE_TOOL_CONTRACTS`) declare their own `minOptInLevel` instead and
+ * aren't listed here.
  */
-export const TOOL_CATEGORY_MAP: Record<Exclude<ToolName, ContractToolName>, ToolCategory> = {
-  // UI tools - always available
-  update_opt_in_level: TOOL_CATEGORIES.UI,
-  escalate_to_human: TOOL_CATEGORIES.UI,
-  resolve_support_conversation: TOOL_CATEGORIES.UI,
-  search_docs: TOOL_CATEGORIES.UI,
-  get_active_incidents: TOOL_CATEGORIES.UI,
-
-  // Schema tools - MCP
-  list_tables: TOOL_CATEGORIES.SCHEMA,
-  list_extensions: TOOL_CATEGORIES.SCHEMA,
-  list_edge_functions: TOOL_CATEGORIES.SCHEMA,
-  list_branches: TOOL_CATEGORIES.SCHEMA,
-  list_policies: TOOL_CATEGORIES.SCHEMA,
-  list_reports: TOOL_CATEGORIES.SCHEMA,
-  get_report: TOOL_CATEGORIES.SCHEMA,
-  list_databases: TOOL_CATEGORIES.SCHEMA,
-  list_notebooks: TOOL_CATEGORIES.SCHEMA,
-  get_notebook: TOOL_CATEGORIES.SCHEMA,
+export const TOOL_CATEGORY_MAP: Record<
+  Exclude<ToolName, ContractToolName | RemoteContractToolName>,
+  ToolCategory
+> = {
+  // Schema tools
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,
   getEdgeFunctionKnowledge: TOOL_CATEGORIES.SCHEMA,
-
-  // Log tools - MCP and local
-  get_advisors: TOOL_CATEGORIES.LOG,
-  query_logs: TOOL_CATEGORIES.LOG,
 }
 
 /**
@@ -151,7 +125,7 @@ function isCategorizedTool(name: string): name is keyof typeof TOOL_CATEGORY_MAP
  * tool isn't on the allowlist. A contract's `minOptInLevel` wins over the category map.
  */
 function getToolMinimumLevel(toolName: string): AiOptInLevel | null | undefined {
-  const contract = getToolContract(toolName)
+  const contract = getToolContract(toolName) ?? getRemoteToolContract(toolName)
   if (contract) return contract.minOptInLevel
   if (isCategorizedTool(toolName)) return getMinimumOptInLevel(TOOL_CATEGORY_MAP[toolName])
   return undefined
@@ -218,5 +192,15 @@ export function filterToolsByOptInLevel(tools: ToolSet, aiOptInLevel: AiOptInLev
         // If the tool is not allowed, provide a stub that returns a privacy message
         return [toolName, createPrivacyMessageTool(toolInstance)]
       })
+  )
+}
+
+/**
+ * Drops tools that need approval. A one-shot request can't answer an approval request, so a
+ * call to one ends generation without output.
+ */
+export function withoutApprovalTools(tools: ToolSet): ToolSet {
+  return Object.fromEntries(
+    Object.entries(tools).filter(([, toolInstance]) => !toolInstance.needsApproval)
   )
 }

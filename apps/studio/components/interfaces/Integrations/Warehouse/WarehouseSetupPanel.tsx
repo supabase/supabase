@@ -3,11 +3,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  buildRetryTargets,
-  isWarehouseSettingUp,
-  type WarehouseSetupTarget,
-} from './Warehouse.utils'
+import { isWarehouseSettingUp, type WarehouseSetupTarget } from './Warehouse.utils'
 import { WarehouseConnectSection } from './WarehouseConnectSection'
 import { WarehouseDisableCard } from './WarehouseDisableCard'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
@@ -18,6 +14,7 @@ import {
 import { AlertError } from '@/components/ui/AlertError'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { useWarehouseDisableMutation } from '@/data/warehouse/warehouse-disable-mutation'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -34,7 +31,10 @@ export const WarehouseSetupPanel = () => {
     { projectRef },
     {
       refetchInterval: (query) =>
-        isWarehouseSettingUp(query.state.data?.setup_status) ? 3000 : false,
+        isWarehouseSettingUp(query.state.data?.setup_status) ||
+        query.state.data?.setup_status === 'disabling'
+          ? 3000
+          : false,
     }
   )
 
@@ -44,9 +44,13 @@ export const WarehouseSetupPanel = () => {
     error: destinationsError,
   } = useReplicationDestinationsQuery(
     { projectRef },
-    { enabled: data?.setup_status === 'not_started' && !!isOrioleDb }
+    {
+      enabled:
+        (data?.setup_status === 'not_started' || data?.setup_status === 'disabled') && !!isOrioleDb,
+    }
   )
 
+  const disableMutation = useWarehouseDisableMutation({ onError: () => {} })
   // Rendered inline by the picker rather than as a toast: a setup failure is something the user
   // has to act on, so it must not disappear.
   const setupMutation = useWarehouseSetupMutation({ onError: () => {} })
@@ -101,7 +105,7 @@ export const WarehouseSetupPanel = () => {
 
   const status = data.setup_status
 
-  if (status === 'not_started') {
+  if (status === 'not_started' || status === 'disabled') {
     if (isProjectPending) return <GenericSkeletonLoader />
     if (projectError) return <AlertError subject="Failed to load project" error={projectError} />
     if (isOrioleDb) {
@@ -138,31 +142,56 @@ export const WarehouseSetupPanel = () => {
     return <WarehouseEnablingProgress status={data} />
   }
 
+  if (status === 'disabling') {
+    return (
+      <Admonition
+        type="default"
+        title="Warehouse is being disabled"
+        description="Warehouse resources are being removed. This can take a few minutes."
+      />
+    )
+  }
+
+  if (status === 'deletion_failed') {
+    return (
+      <AlertError
+        subject="Failed to disable Warehouse"
+        showErrorPrefix={false}
+        error={{
+          message: disableMutation.error?.message ?? data.error ?? 'Warehouse cleanup failed.',
+        }}
+        additionalActions={
+          <Button
+            variant="default"
+            loading={disableMutation.isPending}
+            disabled={!projectRef}
+            onClick={() => {
+              if (projectRef) {
+                disableMutation.mutate({ projectRef, shouldDeleteData: data.delete_data ?? false })
+              }
+            }}
+          >
+            Retry
+          </Button>
+        }
+      />
+    )
+  }
+
   if (status === 'error') {
-    const retryTargets = buildRetryTargets(data.tables)
     const failingStep = data.steps.find((step) => step.status === 'error')
 
     return (
-      <AlertError
-        subject="Warehouse setup failed"
-        showErrorPrefix={false}
+      <WarehouseSchemaTablePicker
+        initialTables={data.tables}
+        onSubmit={handleSetup}
+        isSubmitting={setupMutation.isPending}
         error={{
           message:
             setupMutation.error?.message ??
             failingStep?.message ??
             'An unknown error occurred while setting up Warehouse.',
         }}
-        additionalActions={
-          retryTargets.length > 0 ? (
-            <Button
-              variant="default"
-              loading={setupMutation.isPending}
-              onClick={() => handleSetup(retryTargets)}
-            >
-              Retry
-            </Button>
-          ) : undefined
-        }
       />
     )
   }

@@ -52,9 +52,9 @@ The state module owns the AI SDK chat instances, request transport, chat persist
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Chat endpoint and request validation                | [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts)                                                                                                                                 |
 | Model streaming and response orchestration          | [generate-assistant-response.ts](./generate-assistant-response.ts)                                                                                                                      |
-| System instructions and topic knowledge             | [prompts.ts](./prompts.ts); `load_knowledge` in [studio-tools.ts](./tools/studio-tools.ts)                                                                                              |
+| System instructions and topic knowledge             | [prompts.ts](./prompts.ts); `load_knowledge` topics in [knowledge-topics.ts](./tools/knowledge-topics.ts)                                                                               |
 | Project, chat, clock, and logs context              | [assistant-context.ts](./assistant-context.ts), [assistant-message-metadata.ts](./assistant-message-metadata.ts)                                                                        |
-| History preparation and output sanitization         | [generate-assistant-response.utils.ts](./generate-assistant-response.utils.ts), [tool-sanitizer.ts](./tools/tool-sanitizer.ts)                                                          |
+| History preparation and output sanitization         | [generate-assistant-response.utils.ts](./generate-assistant-response.utils.ts), [tool-sanitizer.ts](./tools/tool-sanitizer.ts), [registry.ts](./tools/registry.ts)                      |
 | Model catalog, defaults, and provider configuration | [model.utils.ts](./model.utils.ts), [model.ts](./model.ts), [bedrock.ts](./bedrock.ts); entitlement and throttling decisions in [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts) |
 | Tracing and feedback                                | [braintrust-logger.ts](./braintrust-logger.ts), [feedback API](../../pages/api/ai/feedback/), [rate-message-mutation.ts](../../data/ai/rate-message-mutation.ts)                        |
 
@@ -62,26 +62,53 @@ Keep per-request context in `assistant-context.ts`. The shared system prompt is 
 
 ### Tools
 
-| Change                                                                                 | Start here                                                                                                                                                                               |
-| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tool assembly and platform/self-hosted selection                                       | [tools/index.ts](./tools/index.ts)                                                                                                                                                       |
-| Allowlist, minimum opt-in levels, and blocked-tool responses                           | [tool-filter.ts](./tool-filter.ts)                                                                                                                                                       |
-| SQL execution, Edge Function deployment, chat renaming, knowledge, and opt-in requests | [studio-tools.ts](./tools/studio-tools.ts)                                                                                                                                               |
-| Remote MCP connection and tool selection                                               | [supabase-mcp.ts](./supabase-mcp.ts), [mcp-tools.ts](./tools/mcp-tools.ts)                                                                                                               |
-| Schema and policy tools                                                                | [schema-tools.ts](./tools/schema-tools.ts)                                                                                                                                               |
-| Reports, notebooks, incidents, and support                                             | [report-tools.ts](./tools/report-tools.ts), [notebook-tools.ts](./tools/notebook-tools.ts), [incident-tools.ts](./tools/incident-tools.ts), [support-tools.ts](./tools/support-tools.ts) |
-| Self-hosted tools                                                                      | [fallback-tools.ts](./tools/fallback-tools.ts)                                                                                                                                           |
-| Shared tool contracts                                                                  | [types.ts](./tools/types.ts), [registry.ts](./tools/registry.ts), [tool-from-contract.ts](./tools/tool-from-contract.ts)                                                                 |
+| Change                                                       | Start here                                                                                                                                                                                                |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tool assembly and platform/self-hosted selection             | [tools/index.ts](./tools/index.ts)                                                                                                                                                                        |
+| Allowlist, minimum opt-in levels, and blocked-tool responses | [tool-filter.ts](./tool-filter.ts)                                                                                                                                                                        |
+| Studio tool assembly and opt-in requests                     | [studio-tools.ts](./tools/studio-tools.ts)                                                                                                                                                                |
+| Remote MCP connection and tool selection                     | [supabase-mcp.ts](./supabase-mcp.ts), [mcp-tools.ts](./tools/mcp-tools.ts)                                                                                                                                |
+| Schema and policy tools                                      | [schema-tools.ts](./tools/schema-tools.ts)                                                                                                                                                                |
+| Reports, notebooks, incidents, and support                   | [report-tools.ts](./tools/report-tools.ts), [notebook-tools.ts](./tools/notebook-tools.ts), [incident-tools.ts](./tools/incident-tools.ts), [support-tools.ts](./tools/support-tools.ts)                  |
+| Self-hosted tools                                            | [fallback-tools.ts](./tools/fallback-tools.ts)                                                                                                                                                            |
+| Contract-based tools (see [Tool contracts](#tool-contracts)) | [registry.ts](./tools/registry.ts) lists them in `TOOL_CONTRACTS` (and remote MCP tools in `REMOTE_TOOL_CONTRACTS`); [types.ts](./tools/types.ts), [tool-from-contract.ts](./tools/tool-from-contract.ts) |
 
-Some tools use shared contracts; others declare their schemas and output handling directly. [update-notebook.ts](./tools/update-notebook.ts) and [update-notebook.server.ts](./tools/update-notebook.server.ts) show the contract/server split. Contracts define input/output schemas, minimum opt-in level, approval requirements, and what the model may see. The registry also applies contract output handling when replaying history.
+Tools are moving to [contracts](#tool-contracts); the rest declare their schemas and output handling directly. [registry.ts](./tools/registry.ts) is the source of truth for which are which: a tool in `TOOL_CONTRACTS` or `REMOTE_TOOL_CONTRACTS` is a contract tool.
 
 For a new or changed tool:
 
-1. Implement it in the appropriate tool module and include it in `getTools`.
-2. Update the allowlist/validation in `tool-filter.ts`. Declare minimum access in its contract or the existing category map, as applicable.
+1. Prefer a [contract](#tool-contracts) for a new tool. Otherwise implement it in the appropriate tool module.
+2. Include it in `getTools` through the module's tool getter, and add its name to the allowlist in `tool-filter.ts`. A contract, local or remote, declares minimum access as `minOptInLevel`; other tools use `TOOL_CATEGORY_MAP`.
 3. Decide whether execution needs user approval and what output may reach the model, including on history replay. Read the [SQL safety skill](../../../../.agents/skills/safe-sql-execution/SKILL.md) before changing SQL execution.
 4. Update `Message.Parts.tsx` and its helpers if the tool needs a UI renderer.
 5. Update relevant tests, mock tools, and evaluation cases. See [local development and validation](#local-development-and-validation).
+
+### Tool contracts
+
+A contract declares a tool once: name, description, input and output schemas, `minOptInLevel`, `needsApproval`, and `toModelOutput`, which decides what the model may see of the output. The registry also applies `toModelOutput` to persisted outputs when it replays history, so it must be safe to run on its own result.
+
+Each contract tool is a pair of files named after the tool, plus an optional output helper:
+
+- `<tool-name>.ts` exports `contract`. The browser imports it, so it contains only zod schemas and pure functions, with no data-layer or other server imports.
+- `<tool-name>.server.ts` exports `createTool`, which builds the executable tool from the contract with `toolFromContract`, or `approvalGatedToolFromContract` when `needsApproval` is true.
+- `<tool-name>-output.ts` holds output schemas and transformations that outgrow the contract file.
+
+[update-notebook.ts](./tools/update-notebook.ts) and [update-notebook.server.ts](./tools/update-notebook.server.ts) show the split with approval. [update-opt-in-level.ts](./tools/update-opt-in-level.ts) shows `createInputSchema`, for a tool whose stored input depends on the request: the SDK stores the parsed input, so the contract's `inputSchema` describes the stored shape and the per-request schema is built from the context. [execute-sql.ts](./tools/execute-sql.ts) shows an output schema that also accepts an older persisted shape.
+
+To migrate a tool to a contract:
+
+1. Create `<tool-name>.ts` and `<tool-name>.server.ts`, moving the schemas, description, and `execute` out of the old definition.
+2. Make `outputSchema` accept every shape already saved in chat history, normalizing older ones with a union and transform. Set `outputOnInvalid` if the model should see something other than nothing when a saved output doesn't parse.
+3. Register the contract in `TOOL_CONTRACTS`, and compose `createTool` into the module's tool getter.
+4. Remove the tool from `TOOL_CATEGORY_MAP`. Keep it in the allowlist in `tool-filter.ts`.
+5. Delete any per-tool sanitizer. [tool-sanitizer.ts](./tools/tool-sanitizer.ts) only delegates to `sanitizeContractPart`.
+6. Replace imports of the old inline schemas in the UI, evals, and `generate-assistant-response.ts` with `contract.inputSchema`, `contract.outputSchema`, or `ToolContractInput`/`ToolContractOutput`.
+7. Test the contract's `toModelOutput` at every opt-in level and on history replay, in [registry.test.ts](./tools/registry.test.ts) and [tool-sanitizer.test.ts](./tools/tool-sanitizer.test.ts) as applicable.
+8. Call out any change to what the model sees or to the stored shape in the PR description.
+
+#### Remote contracts
+
+A tool the remote MCP server implements has a `RemoteToolContract`: only `name`, `minOptInLevel`, and `needsApproval`. The server owns the description, input schema, execution, and output, so there is no `.server.ts` file and its parts stay `dynamic-tool`, outside `StudioUIMessage`. Register it in `REMOTE_TOOL_CONTRACTS` and remove it from `TOOL_CATEGORY_MAP`; [mcp-tools.ts](./tools/mcp-tools.ts) applies `needsApproval`, since MCP tool definitions can't declare it. [list-extensions.ts](./tools/list-extensions.ts) is an example.
 
 ## Access and data sharing
 
@@ -94,12 +121,12 @@ These checks have different responsibilities:
 | Check permission to change organization settings            | [useCheckPermissions.ts](../../hooks/misc/useCheckPermissions.ts), used by [OptInRequest.tsx](../../components/ui/AIAssistantPanel/OptInRequest.tsx) and [AIOptInModal.tsx](../../components/ui/AIAssistantPanel/AIOptInModal.tsx) |
 | Save organization opt-in settings                           | [useAIOptInForm.ts](../../hooks/forms/useAIOptInForm.ts), [DataPrivacyForm.tsx](../../components/interfaces/Organization/GeneralSettings/DataPrivacyForm.tsx)                                                                      |
 | Gate tool availability by opt-in level                      | [tool-filter.ts](./tool-filter.ts)                                                                                                                                                                                                 |
-| Approve SQL execution and call the database                 | `execute_sql` in [studio-tools.ts](./tools/studio-tools.ts), using [execute-sql-mutation.ts](../../data/sql/execute-sql-mutation.ts)                                                                                               |
-| Control which SQL results reach the model                   | `toModelOutput` in [studio-tools.ts](./tools/studio-tools.ts) and history sanitization in [tool-sanitizer.ts](./tools/tool-sanitizer.ts)                                                                                           |
+| Approve SQL execution and call the database                 | [execute-sql.ts](./tools/execute-sql.ts) (approval) and [execute-sql.server.ts](./tools/execute-sql.server.ts) (execution), using [execute-sql-mutation.ts](../../data/sql/execute-sql-mutation.ts)                                |
+| Control which SQL results reach the model                   | `toModelOutput` in [execute-sql-output.ts](./tools/execute-sql-output.ts), applied to live results by the SDK and to history by [registry.ts](./tools/registry.ts)                                                                 |
 
 The opt-in levels are `disabled`, `schema`, `schema_and_log`, and `schema_and_log_and_data`. `execute_sql` is available at every level and requires user approval; sharing its result rows with the model requires `schema_and_log_and_data`. History sanitization also considers the level stamped on the original SQL output. Permission to change opt-in settings, user approval to run SQL, and the database's authorization checks are separate from result sharing.
 
-The model can call `update_opt_in_level` with `requiredLevel` to request higher access, or without `requiredLevel` when the user asks to review or change the setting. Every call requires approval through the opt-in request card, even when the organization already has the requested level. If the requested level is already satisfied, the input transform removes `requiredLevel` and treats the call as a review request; `levelWhenAsked` records the organization's level when the call was made.
+The model can call `update_opt_in_level` with `requiredLevel` to request higher access, or without `requiredLevel` when the user asks to review or change the setting. Every call requires approval through the opt-in request card, even when the organization already has the requested level. If the requested level is already satisfied, the contract's `createInputSchema` transform removes `requiredLevel` and treats the call as a review request; `levelWhenAsked` records the organization's level when the call was made.
 
 On platform, the endpoint resolves organization access and `getTools` includes platform tools when an access token is available. It also registers the opt-in request tool. Self-hosted requests use the `schema` level and fallback tools instead of the platform tool set. Check [getTools](./tools/index.ts) and [generate-v4](../../pages/api/ai/sql/generate-v4.ts) when changing either environment.
 

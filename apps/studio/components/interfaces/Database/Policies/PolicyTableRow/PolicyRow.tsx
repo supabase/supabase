@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import {
@@ -20,7 +19,7 @@ import type { Policy } from './PolicyTableRow.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -40,9 +39,8 @@ export const PolicyRow = ({
 }: PolicyRowProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
-  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'policies'
+  const { can: canUpdatePolicies } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data: project } = useSelectedProjectQuery()
@@ -79,14 +77,14 @@ export const PolicyRow = ({
         </div>
       </TableCell>
       <TableCell className="w-[20%] truncate">
-        <code className="text-code-inline">{policy.command}</code>
+        <code>{policy.command}</code>
       </TableCell>
       <TableCell className="w-[30%] truncate">
         <div className="flex items-center gap-x-1">
           <div className="text-foreground-lighter text-sm truncate">
             {displayedRoles.slice(0, 2).map((role, i) => (
               <span key={`policy-${role}-${i}`}>
-                <code className="text-code-inline">{role}</code>
+                <code>{role}</code>
                 {i < Math.min(displayedRoles.length, 2) - 1 ? ', ' : ' '}
               </span>
             ))}
@@ -107,7 +105,7 @@ export const PolicyRow = ({
               >
                 {displayedRoles.slice(2).map((role, i, arr) => (
                   <>
-                    <code key={role} className="text-code-inline break-keep!">
+                    <code key={role} className="break-keep!">
                       {role}
                     </code>
                     {i < arr.length - 1 && ', '}

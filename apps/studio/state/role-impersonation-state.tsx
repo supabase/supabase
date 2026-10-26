@@ -15,6 +15,7 @@ import {
   CustomAccessTokenHookDetails,
   useCustomAccessTokenHookDetails,
 } from '../hooks/misc/useCustomAccessTokenHookDetails'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -42,6 +43,7 @@ function useCustomizeAccessToken(
         connectionString,
         sql: safeSql`select ${ident(schema)}.${ident(functionName)}(${literal(JSON.stringify(event))}::jsonb) as event;`,
         queryKey: ['customize-access-token', projectRef],
+        grant: unguarded.migrating,
       })
 
       return result?.result?.[0]?.event?.claims

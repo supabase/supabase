@@ -97,22 +97,28 @@ const DuckLakeForm = () => {
 }
 
 describe('OrioleDB catalog restrictions', () => {
-  test('blocks new Warehouse setup using the current OrioleDB project', async () => {
-    mockProject(true)
-    mockWarehouse()
-    customRender(<WarehouseSetupPanel />)
-    expect(
-      await screen.findByText('This project cannot host a Warehouse catalog')
-    ).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
-  })
+  test.each(['not_started', 'disabled'] as const)(
+    'blocks Warehouse setup using the current OrioleDB project when %s',
+    async (status) => {
+      mockProject(true)
+      mockWarehouse(status)
+      customRender(<WarehouseSetupPanel />)
+      expect(
+        await screen.findByText('This project cannot host a Warehouse catalog')
+      ).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+    }
+  )
 
-  test('allows initial Warehouse setup on standard Postgres', async () => {
-    mockProject(false)
-    mockWarehouse()
-    customRender(<WarehouseSetupPanel />)
-    expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
-  })
+  test.each(['not_started', 'disabled'] as const)(
+    'allows Warehouse setup on standard Postgres when %s',
+    async (status) => {
+      mockProject(false)
+      mockWarehouse(status)
+      customRender(<WarehouseSetupPanel />)
+      expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
+    }
+  )
 
   test('preserves existing Warehouse management on an OrioleDB source', async () => {
     mockProject(true)
@@ -124,25 +130,28 @@ describe('OrioleDB catalog restrictions', () => {
     ).not.toBeInTheDocument()
   })
 
-  test('lets the API validate a retained Warehouse destination instead of blocking its source', async () => {
-    mockProject(true)
-    mockWarehouse('not_started', [
-      {
-        id: 1,
-        tenant_id: 'default',
-        name: 'supabase_warehouse',
-        config: {
-          ducklake: {
-            data_path: 's3://warehouse-default/',
-            s3_region: 'us-east-1',
-            s3_endpoint: 'otherproject.storage.supabase.co/storage/v1/s3',
+  test.each(['not_started', 'disabled'] as const)(
+    'lets the API validate a retained Warehouse destination when %s',
+    async (status) => {
+      mockProject(true)
+      mockWarehouse(status, [
+        {
+          id: 1,
+          tenant_id: 'default',
+          name: 'supabase_warehouse',
+          config: {
+            ducklake: {
+              data_path: 's3://warehouse-default/',
+              s3_region: 'us-east-1',
+              s3_endpoint: 'otherproject.storage.supabase.co/storage/v1/s3',
+            },
           },
         },
-      },
-    ])
-    customRender(<WarehouseSetupPanel />)
-    expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
-  })
+      ])
+      customRender(<WarehouseSetupPanel />)
+      expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
+    }
+  )
 
   test('disables the managed DuckLake option while allowing custom connection details', async () => {
     mockProject(true)
