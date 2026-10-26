@@ -71,8 +71,8 @@ export const StripeAtlasApplicationScreen = () => {
             type="caution"
             title="Only Pre-Filled Applications supported"
             description={
-              <p>
-                To claim your Stripe Atlas perk, please make sure:
+              <div>
+                <p>To claim your Stripe Atlas perk, please make sure:</p>
                 <ul>
                   <li>You're a founder of the Stripe Atlas company.</li>
                   <li>Your company is already incorporated on Stripe.</li>
@@ -80,7 +80,7 @@ export const StripeAtlasApplicationScreen = () => {
                     You're using the "Pre-fill my application" button on the Stripe Atlas dashboard.
                   </li>
                 </ul>
-              </p>
+              </div>
             }
           />
         </CardContent>
