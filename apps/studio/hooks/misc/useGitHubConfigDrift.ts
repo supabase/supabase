@@ -123,7 +123,7 @@ export function useSelectedGitHubConfigDrift() {
   const activeQueries = [
     projectQuery,
     ...(shouldLoad ? [branchesState, connectionQuery] : []),
-    ...(shouldLoad && hasConnection ? [projectConfigQuery, githubConfigQuery] : []),
+    ...(queriesEnabled ? [projectConfigQuery, githubConfigQuery] : []),
   ]
 
   const isReady =

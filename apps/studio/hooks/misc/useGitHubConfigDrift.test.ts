@@ -7,7 +7,7 @@ import type { Branch } from '@/data/branches/branches-query'
 import { BRANCH_TEST_SCOPE, mockBranchProject } from '@/tests/lib/branch-test-utils'
 import { customRenderHook } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { mockPermissions } from '@/tests/lib/msw-permissions'
+import { mockPermissions, mockPermissionsError } from '@/tests/lib/msw-permissions'
 import { NO_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
@@ -69,31 +69,35 @@ describe('getGitBranchName', () => {
   })
 })
 
+function mockGitHubConnection() {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/integrations/github/connections',
+    response: {
+      connections: [
+        {
+          id: 1,
+          inserted_at: '2026-01-01T00:00:00.000Z',
+          updated_at: '2026-01-01T00:00:00.000Z',
+          branch_limit: 50,
+          installation_id: 1,
+          new_branch_per_pr: true,
+          supabase_changes_only: true,
+          workdir: 'supabase',
+          project: { id: 1, name: 'Production', ref: BRANCH_TEST_SCOPE.parentRef },
+          repository: { id: 1, name: 'acme/app' },
+          user: null,
+        },
+      ],
+    },
+  })
+}
+
 describe('useSelectedGitHubConfigDrift', () => {
   it('settles as permission denied instead of staying pending without branch access', async () => {
     mockBranchProject()
     mockPermissions(NO_PERMISSIONS)
-    addAPIMock({
-      method: 'get',
-      path: '/platform/integrations/github/connections',
-      response: {
-        connections: [
-          {
-            id: 1,
-            inserted_at: '2026-01-01T00:00:00.000Z',
-            updated_at: '2026-01-01T00:00:00.000Z',
-            branch_limit: 50,
-            installation_id: 1,
-            new_branch_per_pr: true,
-            supabase_changes_only: true,
-            workdir: 'supabase',
-            project: { id: 1, name: 'Production', ref: BRANCH_TEST_SCOPE.parentRef },
-            repository: { id: 1, name: 'acme/app' },
-            user: null,
-          },
-        ],
-      },
-    })
+    mockGitHubConnection()
 
     const { result } = customRenderHook(() => useSelectedGitHubConfigDrift(), {
       profileContext: createMockProfileContext(),
@@ -102,5 +106,19 @@ describe('useSelectedGitHubConfigDrift', () => {
     await waitFor(() => expect(result.current.isPermissionDenied).toBe(true))
     expect(result.current.isPending).toBe(false)
     expect(result.current.isReady).toBe(false)
+  })
+
+  it('surfaces a permissions error instead of staying pending', async () => {
+    mockBranchProject()
+    mockPermissionsError({ message: 'Permissions service unavailable' })
+    mockGitHubConnection()
+
+    const { result } = customRenderHook(() => useSelectedGitHubConfigDrift(), {
+      profileContext: createMockProfileContext(),
+    })
+
+    await waitFor(() => expect(result.current.isError).toBe(true))
+    expect(result.current.isPending).toBe(false)
+    expect(result.current.error?.message).toBe('Permissions service unavailable')
   })
 })
