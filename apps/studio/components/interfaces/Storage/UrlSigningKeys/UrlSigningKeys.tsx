@@ -94,7 +94,7 @@ export const UrlSigningKeys = () => {
     // so it runs after Radix's own cleanup and the refetched keys have rendered.
     setTimeout(() => {
       const trigger = returnFocusRef.current
-      const target = trigger?.isConnected
+      const target = isFocusTarget(trigger)
         ? trigger
         : (rotateButtonRef.current ?? createButtonRef.current)
       target?.focus()
@@ -254,6 +254,16 @@ export const UrlSigningKeys = () => {
     </>
   )
 }
+
+/**
+ * Disabled buttons that explain themselves with a tooltip stay focusable and use `aria-disabled`
+ * instead of `disabled`, so check both before treating an element as a usable focus target.
+ */
+const isFocusTarget = (element: HTMLElement | null): element is HTMLElement =>
+  !!element &&
+  element.isConnected &&
+  !element.matches(':disabled') &&
+  element.getAttribute('aria-disabled') !== 'true'
 
 const MoreOptionsTrigger = ({
   triggerRef,

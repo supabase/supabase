@@ -252,6 +252,32 @@ describe('UrlSigningKeys', () => {
     await waitFor(() => expect(rotate).toHaveFocus())
   })
 
+  test('moves focus to the new standby key rotate button after creating one', async () => {
+    let keys = [ACTIVE]
+    addAPIMock({
+      method: 'get',
+      path: '/platform/storage/:ref/jwks',
+      response: () => HttpResponse.json<ListJwksResponse>({ data: keys }),
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/jwks/url-signing/standby',
+      response: () => {
+        keys = [ACTIVE, STANDBY]
+        return HttpResponse.json<CreateStandbyJwkResponse>({ kid: 'standby-key' }, { status: 201 })
+      },
+    })
+    customRender(<UrlSigningKeys />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Create standby key' }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Create standby key' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    const standby = await getRow('standby-key')
+    await waitFor(() => expect(standby.getByRole('button', { name: 'Rotate key' })).toHaveFocus())
+  })
+
   test('moves focus to the new standby key rotate button after a rotation', async () => {
     let keys = [ACTIVE, STANDBY]
     addAPIMock({
