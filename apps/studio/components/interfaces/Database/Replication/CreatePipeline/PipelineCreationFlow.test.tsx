@@ -188,7 +188,12 @@ describe('PipelineCreationFlow', () => {
     push.mockRestore()
   })
 
-  it('matches the connection subtitle and Docs to each destination', async () => {
+  it.each([
+    ['BigQuery', 'bigquery#configure-bigquery-as-a-destination'],
+    ['DuckLake', 'ducklake#choose-a-configuration-mode'],
+    ['Snowflake', 'snowflake#prepare-snowflake-resources'],
+    ['ClickHouse', 'clickhouse#configure-clickhouse-as-a-destination'],
+  ] as const)('matches the connection subtitle and Docs for %s', async (type, path) => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -213,6 +218,14 @@ describe('PipelineCreationFlow', () => {
           integration_source: null,
         }),
     })
+    if (type === 'DuckLake') {
+      addAPIMock({
+        method: 'get',
+        path: '/platform/storage/:ref/buckets',
+        response: () =>
+          HttpResponse.json<components['schemas']['StorageBucketResponse_Output'][]>([]),
+      })
+    }
     renderWizard(
       <PipelineCreationFlow
         availableDestinations={['BigQuery', 'DuckLake', 'Snowflake', 'ClickHouse']}
@@ -222,25 +235,17 @@ describe('PipelineCreationFlow', () => {
     expect(screen.getByText('Where should this database be replicated?')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
 
-    const docsPaths = [
-      ['BigQuery', 'bigquery#configure-bigquery-as-a-destination'],
-      ['DuckLake', 'ducklake#choose-a-configuration-mode'],
-      ['Snowflake', 'snowflake#prepare-snowflake-resources'],
-      ['ClickHouse', 'clickhouse#configure-clickhouse-as-a-destination'],
-    ] as const
-    for (const [type, path] of docsPaths) {
-      fireEvent.click(destinationType().getByRole('radio', { name: new RegExp(type) }))
-      await next('?step=connection')
-      expect(
-        screen.getByText(`Name this pipeline and enter credentials for ${type}.`)
-      ).toBeInTheDocument()
-      expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
-        'href',
-        `${DOCS_URL}/guides/database/replication/pipelines/${path}`
-      )
-      await back('')
-      expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
-    }
+    fireEvent.click(destinationType().getByRole('radio', { name: new RegExp(type) }))
+    await next('?step=connection')
+    expect(
+      screen.getByText(`Name this pipeline and enter credentials for ${type}.`)
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+      'href',
+      `${DOCS_URL}/guides/database/replication/pipelines/${path}`
+    )
+    await back('')
+    expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
   })
 
   const reachReview = async (
