@@ -3,6 +3,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { getAuthenticatorDbSchemasOverride } from './authenticator-role-config-query.utils'
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError } from '@/types'
 
@@ -27,6 +28,7 @@ export async function getAuthenticatorRoleConfig(
       connectionString,
       sql: getAuthenticatorRoleConfigSql,
       queryKey: ['authenticator-role-config'],
+      grant: unguarded.migrating,
     },
     signal
   )

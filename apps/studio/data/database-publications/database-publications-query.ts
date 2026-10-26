@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from '../sql/execute-sql-mutation'
 import { databasePublicationsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -24,6 +25,7 @@ export async function getDatabasePublications(
       connectionString,
       sql,
       queryKey: ['publications'].filter(Boolean),
+      grant: unguarded.migrating,
     },
     signal
   )

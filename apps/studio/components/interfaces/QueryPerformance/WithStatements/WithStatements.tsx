@@ -18,6 +18,7 @@ import { transformStatementDataToRows } from './WithStatements.utils'
 import { PresetHookResult } from '@/components/interfaces/Reports/Reports.utils'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { unguarded } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -318,6 +319,7 @@ export const WithStatements = ({
               projectRef: project?.ref,
               connectionString,
               sql: safeSql`SELECT pg_stat_statements_reset();`,
+              grant: unguarded.migrating,
             })
             handleRefresh()
             setShowResetgPgStatStatements(false)
