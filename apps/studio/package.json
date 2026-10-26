@@ -157,7 +157,7 @@
     "remark-gfm": "^4.0.0",
     "remark-parse": "^11.0.0",
     "shared-data": "workspace:*",
-    "sonner": "^1.5.0",
+    "sonner": "^2.0.8",
     "sql-formatter": "^15.0.0",
     "streamdown": "^1.3.0",
     "swiper": "^12.1.2",
