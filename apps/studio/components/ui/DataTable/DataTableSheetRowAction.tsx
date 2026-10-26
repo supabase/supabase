@@ -1,14 +1,14 @@
 import { Table } from '@tanstack/react-table'
 import { endOfDay, endOfHour, startOfDay, startOfHour } from 'date-fns'
 import {
-  CalendarClock,
-  CalendarDays,
-  CalendarSearch,
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  Equal,
-  Filter,
+  CalendarClockIcon,
+  CalendarDaysIcon,
+  CalendarSearchIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CopyIcon,
+  EqualIcon,
+  FilterIcon,
 } from 'lucide-react'
 import { ComponentPropsWithRef, useEffect, useState } from 'react'
 import {
@@ -37,7 +37,6 @@ interface DataTableSheetRowActionProps<
   value: string | number
   table?: Table<TData>
   label?: string
-  alignOffset?: number
 }
 
 export function DataTableSheetRowAction<TData, TFields extends DataTableFilterField<TData>>({
@@ -48,7 +47,6 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   className,
   table,
   label,
-  alignOffset = 8,
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
@@ -95,7 +93,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             }}
             className="flex items-center gap-2"
           >
-            <Filter size={12} />
+            <FilterIcon size={12} />
             Add filter
           </DropdownMenuItem>
         )
@@ -110,7 +108,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             }
             className="flex items-center gap-2"
           >
-            <Filter size={12} />
+            <FilterIcon size={12} />
             Add filter
           </DropdownMenuItem>
         )
@@ -122,7 +120,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               className="flex items-center gap-2"
             >
               {/* FIXME: change icon as it is not clear */}
-              <ChevronLeft size={12} />
+              <ChevronLeftIcon size={12} />
               Less or equal than
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -130,14 +128,14 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               className="flex items-center gap-2"
             >
               {/* FIXME: change icon as it is not clear */}
-              <ChevronRight size={12} />
+              <ChevronRightIcon size={12} />
               Greater or equal than
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => column?.setFilterValue([value])}
               className="flex items-center gap-2"
             >
-              <Equal size={12} />
+              <EqualIcon size={12} />
               Equal to
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -150,7 +148,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               onClick={() => column?.setFilterValue([date])}
               className="flex items-center gap-2"
             >
-              <CalendarSearch size={12} />
+              <CalendarSearchIcon size={12} />
               Exact timestamp
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -161,7 +159,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               }}
               className="flex items-center gap-2"
             >
-              <CalendarClock size={12} />
+              <CalendarClockIcon size={12} />
               Same hour
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -172,7 +170,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               }}
               className="flex items-center gap-2"
             >
-              <CalendarDays size={12} />
+              <CalendarDaysIcon size={12} />
               Same day
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -201,7 +199,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         {children}
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" alignOffset={alignOffset} side="bottom" className="w-56">
+      <DropdownMenuContent align="end" alignOffset={12} side="bottom" className="w-56">
         {!!field && !!column && (
           <>
             {renderOptions()}
@@ -213,7 +211,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
           onSelect={() => copyToClipboard(String(value))}
           className="flex items-center gap-2"
         >
-          <Copy size={12} />
+          <CopyIcon size={12} />
           Copy {label}
         </DropdownMenuItem>
       </DropdownMenuContent>

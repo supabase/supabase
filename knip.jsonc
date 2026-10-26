@@ -60,18 +60,13 @@
         // the full set, so some of it is unreferenced by design. execute.ts in
         // the same directory is hand-written and is NOT listed here.
         "data/graphql/{fragment-masking,gql,graphql}.ts": ["files"],
+        // Grant core; first consumers land with the fetch-wrapper and pilot PRs. Remove once imported.
+        "lib/grants.ts": ["files"],
         // CONSTRAINT_TYPE mirrors the complete closed set of Postgres
         // `pg_constraint.contype` values (c/f/p/u/t/x). The members we don't
         // read are documentation of the valid values, not dead code. Scoped to
         // this file so `enumMembers` keeps working everywhere else.
         "data/database/constraints-query.ts": ["enumMembers"],
-        // Data contracts and mock hooks for the OAuth authorization
-        // interstitial, landed ahead of the UI that consumes them. `exports`
-        // and `types` cover the contract types that only gain consumers in the
-        // consent-screen PR.
-        // TODO(PROD-625): drop every oauth-apps knip exception in the
-        // consent-screen PR, once the interstitial route imports them.
-        "data/oauth-apps/**": ["files", "exports", "types"],
         "hooks/misc/useTrackExperimentExposure.ts": ["files"],
         // Staging-only pinned Postgres image + FDW request payload for creating
         // Warehouse test projects by hand. Nothing imports it yet — it's kept
