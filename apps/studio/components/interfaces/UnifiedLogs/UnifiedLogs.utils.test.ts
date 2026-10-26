@@ -11,6 +11,7 @@ import {
   getRawLogData,
   getUniqueLogRows,
   parseMultigresEventMessage,
+  toQuerySearchParams,
   wrapIlikePattern,
 } from './UnifiedLogs.utils'
 
@@ -206,7 +207,7 @@ describe('gateLogTypeFilters', () => {
 })
 
 describe('createUnifiedLogsSearch', () => {
-  it('drops view-only and empty params and keeps defaults', () => {
+  it('keeps preview filters while excluding view state from query keys', () => {
     const search = createUnifiedLogsSearch({
       filter: ['level:eq:error'],
       id: 'log-1',
@@ -219,10 +220,61 @@ describe('createUnifiedLogsSearch', () => {
     expect(search).not.toHaveProperty('live')
     expect(search).not.toHaveProperty('date')
   })
+
+  it.each([undefined, {}, { size: undefined }])(
+    'keeps the default preview size when optional search settings are absent: %j',
+    (params) => {
+      expect(createUnifiedLogsSearch(params).size).toBe(40)
+    }
+  )
+})
+
+describe('toQuerySearchParams', () => {
+  it('preserves supplied filters, date ranges and explicit query settings', () => {
+    const date = [new Date('2026-10-01T00:00:00Z'), new Date('2026-10-01T01:00:00Z')]
+    const search = toQuerySearchParams({
+      filter: ['log_type:eq:edge function', 'level:eq:error'],
+      uuid: 'request-id',
+      user: 'user@example.com',
+      date,
+      latency: [0, 100],
+      'timing.dns': [0, 50],
+      sort: { id: 'custom-field', desc: false },
+      size: 0,
+      start: 0,
+      direction: 'prev',
+      cursor: date[0],
+      edge_auth: false,
+      id: 'opened-log',
+      live: true,
+    })
+
+    expect(search).toMatchObject({
+      filter: ['log_type:eq:edge function', 'level:eq:error'],
+      uuid: 'request-id',
+      user: 'user@example.com',
+      date,
+      latency: [0, 100],
+      'timing.dns': [0, 50],
+      sort: { id: 'custom-field', desc: false },
+      size: 0,
+      start: 0,
+      direction: 'prev',
+      cursor: date[0],
+      edge_auth: false,
+    })
+    expect(search).not.toHaveProperty('id')
+    expect(search).not.toHaveProperty('live')
+  })
+
+  it('rejects invalid runtime filters instead of silently querying an unfiltered list', () => {
+    const search = JSON.parse('{"filter":"level:eq:error"}')
+    expect(() => toQuerySearchParams(search)).toThrow('Invalid unified logs search parameters')
+  })
 })
 
 describe('getUniqueLogRows', () => {
-  it('flattens pages and keeps the first row for each id', () => {
+  it('shows each log once when timestamp-based query pages overlap', () => {
     const rows = getUniqueLogRows([
       {
         data: [
@@ -246,13 +298,13 @@ describe('getUniqueLogRows', () => {
     ])
   })
 
-  it('returns no rows before the first page loads', () => {
+  it('keeps the preview empty until query pages arrive', () => {
     expect(getUniqueLogRows(undefined)).toEqual([])
   })
 })
 
 describe('getLogRowClassName', () => {
-  it('tints by level and dims rows older than the live mode anchor', () => {
+  it('distinguishes errors and dims logs received before live mode started', () => {
     const errorRow = { level: 'error' as const, timestamp: 1000 }
 
     expect(getLogRowClassName(errorRow)).toContain('bg-destructive/5')

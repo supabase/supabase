@@ -154,7 +154,7 @@ export const UnifiedLogs = () => {
         gateLogTypeFilters(parameters.filter, {
           multigres: showMultigresLogs,
           compute: computeAvailability.canQueryCompute,
-        }) ?? null
+        }) ?? undefined
     }
     return parameters
   }, [search, showMultigresLogs, computeAvailability.canQueryCompute])

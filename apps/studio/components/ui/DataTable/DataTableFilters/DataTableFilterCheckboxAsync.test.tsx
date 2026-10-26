@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { DataTableFilterControls } from './DataTableFilterControls'
 import { buildDefaultColumnFilters } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { createUnifiedLogsSearch } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { DataTableCheckboxFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { useUnifiedLogsFacetCountQuery } from '@/data/logs/unified-logs-facet-count-query'
@@ -40,27 +41,10 @@ const columns = [
   { accessorKey: 'method', header: 'Method' },
 ]
 const initialDate = [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')]
-const defaultPathnameSearch: QuerySearchParamsType = {
-  filter: null,
-  latency: null,
-  'timing.dns': null,
-  'timing.connection': null,
-  'timing.tls': null,
-  'timing.ttfb': null,
-  'timing.transfer': null,
+const defaultPathnameSearch = createUnifiedLogsSearch({
   date: initialDate,
-  sort: null,
-  size: 40,
-  start: 0,
-  direction: 'next',
   cursor: new Date('2026-05-08T10:00:00Z'),
-  id: null,
-  show_connection_logs: true,
-  edge_auth: true,
-  edge_storage: true,
-  edge_postgrest: true,
-  user: null,
-}
+})
 const pathnameSearch = (overrides: Partial<QuerySearchParamsType> = {}): QuerySearchParamsType => ({
   ...defaultPathnameSearch,
   ...overrides,

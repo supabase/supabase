@@ -1,10 +1,10 @@
 import { type Table as TTable } from '@tanstack/react-table'
-import { createLoader, createSerializer } from 'nuqs'
+import { createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
 import { LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
-import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
+import { ColumnSchema, FacetMetadataSchema, querySearchParamsSchema } from './UnifiedLogs.schema'
 import type { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -30,45 +30,28 @@ export function getComputeLogsAvailability({
   }
 }
 
-const loadUnifiedLogsSearchParams = createLoader(SEARCH_PARAMS_PARSER)
-
-/** Writes unified logs search state to URL params, the same way the Logs page reads them. */
 export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
 
-/**
- * Turns URL search state into the search every unified logs query takes. Drops view-only params
- * (`id`, `live`) and empty values so they don't churn query keys.
- */
-export function toQuerySearchParams(search: SearchParamsType): QuerySearchParamsType {
-  return Object.entries(search).reduce(
-    (acc, [key, value]) => {
-      if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
-        acc[key] = value
-      }
-      return acc
-    },
-    {} as Record<string, unknown>
-  ) as QuerySearchParamsType
+export function toQuerySearchParams(search: Partial<SearchParamsType>): QuerySearchParamsType {
+  const query = Object.fromEntries(
+    Object.entries(search).filter(([, value]) => value !== null && value !== undefined)
+  )
+  const result = querySearchParamsSchema.safeParse(query)
+  if (!result.success) {
+    throw new Error('Invalid unified logs search parameters', { cause: result.error })
+  }
+  return result.data
 }
 
-/**
- * The search a unified logs query takes, for views that query logs without reading the URL.
- * Fills every param the view doesn't set with the Logs page's default.
- */
-export const createUnifiedLogsSearch = (params: Partial<SearchParamsType>) =>
-  toQuerySearchParams({ ...loadUnifiedLogsSearchParams(new URLSearchParams()), ...params })
+export const createUnifiedLogsSearch = (params: Partial<SearchParamsType> = {}) =>
+  toQuerySearchParams(params)
 
-/**
- * Flattens infinite query pages into rows, keeping the first of any duplicate ids. Pages can
- * overlap because the cursor is a timestamp (see unified-logs-infinite-query).
- */
 export function getUniqueLogRows<T extends { id: string }>(
   pages: { data?: T[] }[] | undefined
 ): T[] {
   return deduplicateUnifiedLogs((pages ?? []).flatMap((page) => page.data ?? []))
 }
 
-/** Row styling for the logs list; rows older than the live mode anchor are dimmed. */
 export function getLogRowClassName(
   row: Pick<ColumnSchema, 'level' | 'timestamp'>,
   liveTimestamp?: number
