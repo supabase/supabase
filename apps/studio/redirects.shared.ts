@@ -65,11 +65,6 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   { source: '/project/:ref/settings/billing', destination: '/org/_/billing', permanent: true },
-  {
-    source: '/project/:ref/settings/usage',
-    destination: '/project/:ref/settings/billing/usage',
-    permanent: true,
-  },
   { source: '/project/:ref/auth', destination: '/project/:ref/auth/users', permanent: true },
   {
     source: '/project/:ref/auth/advanced',
