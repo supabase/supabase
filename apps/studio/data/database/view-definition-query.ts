@@ -2,6 +2,7 @@ import { getViewDefinitionSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -28,6 +29,7 @@ export async function getViewDefinition(
       connectionString,
       sql,
       queryKey: ['view-definition', id, includeCreateStatement ?? false],
+      grant: unguarded.migrating,
     },
     signal
   )

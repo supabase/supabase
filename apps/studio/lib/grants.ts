@@ -29,6 +29,8 @@ export type Grant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never> 
   readonly organizationSlug: string | undefined
   /** The ref the grant authorizes (the branch ref for branch projects). */
   readonly projectRef: string | null | undefined
+  /** The ref permissions were evaluated against (the parent project for branch projects). */
+  readonly permissionsProjectRef: string | null | undefined
   // Function type: invariant in E and V. A plain property would be covariant, so `Grant<E, never>` would satisfy `Grant<E, 'write'>`.
   readonly [grantBrand]: (_: { e: E; v: V }) => { e: E; v: V }
 }
@@ -44,9 +46,11 @@ export type GrantScope = {
   projectRef?: string | null
 }
 
-type ResolvedGrantScope = GrantScope & { permissionsProjectRef?: string | null }
+/** `permissionsProjectRef` is the ref permissions are evaluated against: the parent project for branches. */
+type ResolvedGrantScope = GrantScope & { permissionsProjectRef: string | null | undefined }
 
-type EndpointKey<M extends string, P extends string> = `${Uppercase<M>} ${P}`
+/** The `fgaRequirements` key for a method and path, e.g. `GET /v1/projects/{ref}`. */
+export type EndpointKey<M extends string, P extends string> = `${Uppercase<M>} ${P}`
 
 type VariantOfKey<K extends string> = K extends FgaGuardedEndpoint ? VariantOf<K> : never
 
@@ -60,7 +64,7 @@ export type GrantFor<
 function mintGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E>>(
   endpoint: E,
   variant: V | undefined,
-  scope: GrantScope
+  scope: ResolvedGrantScope
 ): Grant<E, V> {
   // The brand is type-only: this is the one place a grant is created
   return {
@@ -68,13 +72,13 @@ function mintGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E>>(
     variant,
     organizationSlug: scope.organizationSlug,
     projectRef: scope.projectRef,
+    permissionsProjectRef: scope.permissionsProjectRef,
   } as unknown as Grant<E, V>
 }
 
 /**
- * Pure check of `permissions` against the endpoint's requirements (and the variant's, if given).
- * Permissions are evaluated against `permissionsProjectRef` (the parent project for branches),
- * falling back to `projectRef`; the minted grant records `projectRef`.
+ * Pure check of `permissions` against the endpoint's requirements (and the variant's, if given),
+ * evaluated against `permissionsProjectRef`. The minted grant records both refs.
  */
 export function getGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
   permissions: PermissionsV2Data | undefined,
@@ -85,12 +89,11 @@ export function getGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = 
   const variant = opts?.variant
   if (!IS_PLATFORM) return { status: 'granted', grant: mintGrant(endpoint, variant, scope) }
 
-  const evaluatedProjectRef = scope.permissionsProjectRef ?? scope.projectRef
   const passesBase = doPermissionsCheckV2(
     permissions,
     fgaRequirements[endpoint],
     scope.organizationSlug,
-    evaluatedProjectRef
+    scope.permissionsProjectRef
   )
   if (!passesBase) return { status: 'denied' }
 
@@ -99,7 +102,12 @@ export function getGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = 
     const requires = refinements[endpoint]?.variants[variant]?.requires
     if (
       !requires ||
-      !doPermissionsCheckV2(permissions, requires, scope.organizationSlug, evaluatedProjectRef)
+      !doPermissionsCheckV2(
+        permissions,
+        requires,
+        scope.organizationSlug,
+        scope.permissionsProjectRef
+      )
     ) {
       return { status: 'denied' }
     }
@@ -135,7 +143,12 @@ export function useGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = 
 
   return useMemo((): GrantResult<E, V> => {
     if (!IS_PLATFORM)
-      return getGrant(permissions, endpoint, { organizationSlug, projectRef }, { variant })
+      return getGrant(
+        permissions,
+        endpoint,
+        { organizationSlug, projectRef, permissionsProjectRef: projectRef },
+        { variant }
+      )
     if (!isLoggedIn) return { status: 'loading' }
     if (permissionsError) return { status: 'error', error: permissionsError }
     if (scopeError) return { status: 'error', error: scopeError }
@@ -162,32 +175,41 @@ export function useGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = 
   ])
 }
 
+async function resolveGrantScope(
+  queryClient: QueryClient,
+  scope: GrantScope & { permissionsProjectRef?: string | null }
+): Promise<ResolvedGrantScope> {
+  const { permissionsProjectRef, projectRef } = scope
+  if (permissionsProjectRef !== undefined) return { ...scope, permissionsProjectRef }
+  if (!IS_PLATFORM || typeof projectRef !== 'string') {
+    return { ...scope, permissionsProjectRef: projectRef }
+  }
+
+  const project = await prefetchProjectDetail(queryClient, { ref: projectRef })
+  return { ...scope, permissionsProjectRef: project.parent_project_ref ?? projectRef }
+}
+
 /**
  * Imperative counterpart of `useGrant` for prefetching and callbacks. Reuses fresh cached
- * permissions and project details, fetching them otherwise.
+ * permissions and project details, fetching them otherwise. Pass `permissionsProjectRef` to skip
+ * resolving a branch's parent project.
  */
 export async function ensureGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
   queryClient: QueryClient,
   endpoint: E,
-  scope: ResolvedGrantScope,
+  scope: GrantScope & { permissionsProjectRef?: string | null },
   opts?: { variant?: V }
 ): Promise<
   | { status: 'granted'; grant: Grant<E, V> }
   | { status: 'denied' }
   | { status: 'error'; error: ResponseError }
 > {
-  if (!IS_PLATFORM) return getGrant(undefined, endpoint, scope, opts)
-
   try {
-    const permissions = await queryClient.fetchQuery(permissionsQueryOptionsV2())
-
-    let permissionsProjectRef = scope.permissionsProjectRef
-    if (permissionsProjectRef === undefined && typeof scope.projectRef === 'string') {
-      const project = await prefetchProjectDetail(queryClient, { ref: scope.projectRef })
-      permissionsProjectRef = project.parent_project_ref ?? scope.projectRef
-    }
-
-    return getGrant(permissions, endpoint, { ...scope, permissionsProjectRef }, opts)
+    const [permissions, resolvedScope] = await Promise.all([
+      IS_PLATFORM ? queryClient.fetchQuery(permissionsQueryOptionsV2()) : undefined,
+      resolveGrantScope(queryClient, scope),
+    ])
+    return getGrant(permissions, endpoint, resolvedScope, opts)
   } catch (error) {
     const responseError =
       error instanceof ResponseError
