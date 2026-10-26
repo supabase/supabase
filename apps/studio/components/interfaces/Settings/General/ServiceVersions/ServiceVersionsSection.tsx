@@ -91,7 +91,12 @@ export const ServiceVersionsSection = () => {
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
 
-  const canShowLatestVersionHint = isOnLatestVersion && showDatabaseUpgrades && !isAwsK8s
+  const hasUpgradeAlertOrWarning =
+    !!data?.eligible ||
+    (data?.validation_errors ?? []).length > 0 ||
+    (data?.warnings ?? []).length > 0
+  const canShowLatestVersionHint =
+    isOnLatestVersion && showDatabaseUpgrades && !isAwsK8s && !hasUpgradeAlertOrWarning
 
   return (
     <PageSection id="service-versions">

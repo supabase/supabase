@@ -338,6 +338,21 @@ describe('ServiceVersionsSection', () => {
     expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
   })
 
+  it.each([
+    ['an eligible upgrade', { eligible: true }],
+    ['a validation error', { validation_errors: ['Remove read replicas'] }],
+    ['a warning', { warnings: ['Review extension compatibility'] }],
+  ])('hides the latest-version description when eligibility reports %s', (_, overrides) => {
+    mockUseUpgradeEligibility.mockReturnValue({
+      ...latestVersionEligibility,
+      data: { ...latestVersionEligibility.data, ...overrides },
+    })
+
+    render(<ServiceVersionsSection />)
+
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
+  })
+
   it('does not offer upgrade for v3 projects', () => {
     mockIsAwsK8sCloudProvider.mockReturnValue(true)
     mockUseUpgradeEligibility.mockReturnValue(latestVersionEligibility)
