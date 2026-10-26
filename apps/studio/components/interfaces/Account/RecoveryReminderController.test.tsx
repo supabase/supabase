@@ -83,8 +83,8 @@ function renderController(href = '/organizations') {
   const view = render(createTree(href))
   return { client, rerender: (destination = href) => view.rerender(createTree(destination)) }
 }
-const takeover = () => screen.queryByRole('dialog', { name: 'Account recovery' })
-const waitForTakeover = () => screen.findByRole('dialog', { name: 'Account recovery' })
+const takeover = () => screen.queryByRole('dialog', { name: 'Secure your account' })
+const waitForTakeover = () => screen.findByRole('dialog', { name: 'Secure your account' })
 
 async function settle(client: QueryClient) {
   await waitFor(() => expect(client.isFetching()).toBe(0))
