@@ -34,8 +34,7 @@ export const LogPage: NextPageWithLayout = () => {
         logId: log,
       })
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldRedirectToLogs])
+  }, [shouldRedirectToLogs, router, ref, functionSlug, its, ite, log])
 
   if (selectedFunction === undefined || isLoading || isLoadingPreview || shouldRedirectToLogs) {
     return null
