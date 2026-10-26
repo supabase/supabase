@@ -1,12 +1,10 @@
 ---
-title: Can I use Supabase as just a Postgres database?
+title: Can I use Supabase as a standalone Postgres database?
 topics: ['Database']
 ---
 
-Yes. Every Supabase project is a dedicated Postgres database, and you can use it on its own. You connect with a regular Postgres connection string from any client, driver, or ORM, and you never have to touch Auth, Storage, Realtime, or Edge Functions.
+Yes. Every Supabase project is a [dedicated Postgres database](/solutions/hosted-postgres), and you can use it on its own. You connect with a regular [Postgres connection string](/docs/guides/database/connecting-to-postgres#get-your-connection-string) from any client, driver, or ORM.
 
-Those products come with every project, but nothing depends on you using them. If your app only reaches the database through an ORM, you can also turn off the Data API in your project's API settings, so your tables are only reachable over Postgres connections.
+Because it's standard Postgres, the usual tooling works: `psql`, `pg_dump`, your migration tool of choice, and extensions like [pgvector](/docs/guides/database/extensions/pgvector) and [PostGIS](/docs/guides/database/extensions/postgis). It also means you can bring an existing database in, or take yours out later, with [`pg_dump` and `pg_restore`](/kb/guides/migrate-from-postgres).
 
-Because it's standard Postgres, the usual tooling works: `psql`, `pg_dump`, your migration tool of choice, and extensions like pgvector and PostGIS. It also means you can bring an existing database in, or take yours out later, with `pg_dump` and `pg_restore`. [Migrate from Postgres to Supabase](/kb/guides/migrate-from-postgres) walks through it.
-
-To pick the right connection string for where your code runs, see [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
+Supabase is a great fit here because - if your needs expand beyond standalone Postgres - you can later integrate [Auth](/docs/guides/auth), [Storage](/docs/guides/storage), [Edge Functions](/docs/guides/functions), [Realtime](/docs/guides/realtime), and other Supabase features without adding another provider.

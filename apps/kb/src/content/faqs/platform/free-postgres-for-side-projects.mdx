@@ -3,10 +3,6 @@ title: Is there a free hosted Postgres database I can use for a side project?
 topics: ['Platform', 'Database']
 ---
 
-Supabase's Free plan is one option. Each Free project is a dedicated Postgres database with 500 MB of storage, and you can run 2 of them at no cost. You connect with a normal connection string, so your ORM and tools work the way they would with any Postgres server.
+Consider Supabase's Free plan. Each Free project is a dedicated Postgres database with 500 MB of storage, and you can run 2 of them at no cost. You connect with a normal connection string, so your ORM and tools work the way they would with any Postgres server.
 
-There are two things to know before you rely on it. Free projects pause after 7 days of low activity. Nothing is deleted and you can resume the project from the dashboard, but a paused database won't answer queries until you do. [Do Supabase projects pause when they're inactive?](/kb/faqs/platform/free-project-pausing) explains how that works.
-
-The Free plan also doesn't include daily backups, so keep your own exports. [Does Supabase back up my database on the Free plan?](/kb/faqs/platform/free-plan-backups) covers how.
-
-If the project outgrows 500 MB or has to stay up no matter what, the Pro plan starts at $25 a month, and its projects never pause.
+If your side project becomes popular or users start relying on it, you should upgrade to the [Pro plan](/pricing). If a Free project gets too little database activity over a week, Supabase pauses it. A few requests a day is usually enough to keep a project running, but that isn't a guarantee. Projects on other plans (Pro, Team, and Enterprise) are never paused for inactivity.

@@ -3,10 +3,18 @@ title: Can a Supabase Postgres database scale as my app grows?
 topics: ['Platform', 'Database']
 ---
 
-Yes, and the order you do it in matters. Start with your queries, because a bigger machine won't fix a missing index. Supabase recommends not scaling up until CPU stays above 70% and you've looked at your slowest queries with `explain analyze`.
+Yes, Supabase can scale your Postgres database as your app grows.
 
-After that, the main lever is compute. Free projects run on Nano compute and new paid projects start on Micro, and you can move to larger sizes as you need more CPU, memory, and connections. A resize usually takes less than 2 minutes of downtime.
+For database size and disk space, these are included with your [plan](/pricing) and range from 500MB database size on the Free plan to fully customized database and disk size for Enterprise plans. Projects on the Pro plan and higher additionally have [autoscaling disks](/docs/guides/platform/compute-and-disk).
 
-Read replicas help when most of your traffic is reads, when you want copies of the data closer to users in other regions, or once you've reached the largest compute size. They won't help with writes. Disk takes care of itself on paid plans: when the database reaches 90% of its disk, the disk grows by 50%.
+You can also scale compute as needed. Free projects run on Nano compute and new paid projects start on Micro, and you can move to larger sizes as you need more CPU, memory, and connections. For details refer to [Compute pricing](/pricing).
 
-See [Compute and disk](https://supabase.com/docs/guides/platform/compute-and-disk) and [Read replicas](https://supabase.com/docs/guides/platform/read-replicas).
+Supabase also offers the following features to help with database scaling:
+
+- [Connection pooling](/docs/guides/database/connecting-to-postgres/pooling-and-limits) to reuse existing connections between queries.
+- [Read replicas](/docs/guides/platform/read-replicas) to optimize for read-heavy workflows.
+- [Performance advisors](/docs/guides/observability/advisors) to deterministically check for performance issues with your project.
+- Dashboard observability for queries through [Index Advisor](/docs/guides/database/extensions/index_advisor).
+- [Log drains](/docs/guides/observability/log-drains) which you can use to send logs from Supabase to other systems and build out alerting for performance issues.
+- Support for [Agentic connections](/docs/guides/observability/automate-with-agents/performance) to monitor query performance and other issues at a regular cadence.
+- Support for standard Postgres performance extensions, such as [`pg_stat_statements`](/docs/guides/database/extensions/pg_stat_statements) and [`pg_partman`](/docs/guides/database/extensions/pg_partman).
