@@ -10,7 +10,7 @@ async function main() {
     supabase: createSupabaseClient(),
     table: TABLE_NAME,
     contentRoot: path.resolve(process.cwd(), 'public/markdown'),
-    ignore: ['reference/**', '_partials/**'],
+    ignore: ['reference/**', 'guides/troubleshooting/**', '_partials/**'],
   })
 }
 
