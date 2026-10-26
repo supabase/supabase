@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Span } from './types'
-import { buildTraceIndex, createTimeScale, formatMs, niceTickStep } from './utils'
+import {
+  buildTraceIndex,
+  createTimeScale,
+  flattenTree,
+  formatDuration,
+  formatMs,
+  niceTickStep,
+} from './utils'
 
 const span = (id: string, startMs: number, endMs: number | null, parentId: string | null = null) =>
   ({
@@ -99,5 +106,53 @@ describe('ticks', () => {
   it('has no ticks for an empty window or zero width', () => {
     expect(createTimeScale([5, 5], 800).ticks).toEqual([])
     expect(createTimeScale([0, 100], 0).ticks).toEqual([])
+  })
+})
+
+describe('flattenTree', () => {
+  const spans = [
+    span('root', 0, 100),
+    span('a', 10, 50, 'root'),
+    span('a1', 20, 30, 'a'),
+    span('b', 60, 90, 'root'),
+  ]
+  const ids = (collapsed: string[] = [], input: Span[] = spans) =>
+    flattenTree(buildTraceIndex(input), new Set(collapsed)).map((row) => row.span.id)
+
+  it('orders rows depth-first by start time with depth and expansion state', () => {
+    const rows = flattenTree(buildTraceIndex(spans), new Set())
+    expect(rows.map((row) => [row.span.id, row.depth])).toEqual([
+      ['root', 0],
+      ['a', 1],
+      ['a1', 2],
+      ['b', 1],
+    ])
+    expect(rows[1]).toMatchObject({ hasChildren: true, isExpanded: true })
+    expect(rows[2]).toMatchObject({ hasChildren: false, isExpanded: false })
+  })
+
+  it('hides descendants of a collapsed span', () => {
+    expect(ids(['a'])).toEqual(['root', 'a', 'b'])
+    expect(ids(['root'])).toEqual(['root'])
+    const rows = flattenTree(buildTraceIndex(spans), new Set(['a']))
+    expect(rows[1]).toMatchObject({ hasChildren: true, isExpanded: false })
+  })
+
+  it('treats a span with a missing parent as a root', () => {
+    expect(ids([], [span('x', 5, 10, 'gone'), span('root', 0, 100)])).toEqual(['root', 'x'])
+  })
+
+  it('returns no rows for an empty trace', () => {
+    expect(ids([], [])).toEqual([])
+  })
+})
+
+describe('formatDuration', () => {
+  it('keeps three significant digits', () => {
+    expect(formatDuration(0)).toBe('0ms')
+    expect(formatDuration(45.678)).toBe('45.7ms')
+    expect(formatDuration(480)).toBe('480ms')
+    expect(formatDuration(1234)).toBe('1.23s')
+    expect(formatDuration(90_000)).toBe('1m 30s')
   })
 })

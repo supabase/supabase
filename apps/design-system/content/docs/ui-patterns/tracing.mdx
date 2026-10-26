@@ -13,4 +13,10 @@ import { Trace } from 'ui-patterns/Trace'
 
 The ruler adapts its ticks to the visible range. While a trace is live (any span has no end), `Trace.Cursor` also draws a line at `nowMs` from the top of the ruler to the bottom of the waterfall, with a dot on the ruler's bottom edge. Pass `nowMs` on the trace to pin it, and `minRangeMs` to keep a minimum visible duration while live.
 
+## Rows
+
+`Trace.Rows` is a virtualized, scrollable list with one row per visible span. Its children are the row template and render once per row. `Trace.Cell` is the tree column: indent by depth, an expand and collapse toggle, the span name, and `Trace.Duration`, which pulses while the span is running. `Trace.Lane` is the timeline column. It is an empty positioned container for now, so the timeline stays blank until bars are added.
+
+Rows follow the tree pattern. Use the arrow keys to move between rows, Right and Left to expand and collapse (Left on a collapsed row moves to its parent), and Enter or Space to select. Read the selection and collapse state with `useView()`.
+
 <ComponentPreview name="trace-waterfall-demo" peekCode wide squared />
