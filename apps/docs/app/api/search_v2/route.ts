@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: 'Missing q parameter' }, { status: 400, headers: corsHeaders })
     }
 
-    const { data, error } = await supabaseSearchV2().rpc('search_docs', {
+    const { data, error } = await supabaseSearchV2().rpc('docs_search_v2', {
       query_text: query,
       match_limit: limit,
     })

@@ -1,14 +1,15 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-// Search V2 lives in its own Supabase project (see ./sql/setup.sql), separate from the main
-// docs content DB `lib/supabase.ts` connects to — so it needs its own client and its own
-// hand-written Database type (there's no generated schema for this project).
+// Search V2 lives in the same Supabase project as the docs content DB (schema in
+// supabase/migrations/*_create_docs_search_v2.sql), but it's not part of the generated `Database`
+// type `lib/supabase.ts` uses — so it needs its own client (secret key, not anon) and its own
+// hand-written Database type.
 export type Database = {
   public: {
     Tables: Record<string, never>
     Views: Record<string, never>
     Functions: {
-      search_docs: {
+      docs_search_v2: {
         Args: { query_text: string; match_limit?: number }
         Returns: Array<{
           slug: string
@@ -31,8 +32,8 @@ let _supabaseSearchV2: SupabaseClient<Database>
 export function supabaseSearchV2() {
   if (!_supabaseSearchV2) {
     _supabaseSearchV2 = createClient<Database>(
-      `https://${process.env.SEARCH_V2_SUPABASE_PROJECT_ID}.supabase.co`,
-      process.env.SEARCH_V2_SUPABASE_SECRET_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SECRET_KEY!
     )
   }
 
