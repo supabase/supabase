@@ -265,6 +265,12 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
     <>
       <Head>
         <link rel="alternate" type="text/markdown" href="/changelog.md" />
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="RSS feed for the Supabase changelog"
+          href="/changelog-rss.xml"
+        />
       </Head>
       <NextSeo
         title={TITLE}
