@@ -1,4 +1,4 @@
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 
 export interface APIKeyVariables {
   projectRef?: string
@@ -19,6 +19,7 @@ export async function getAPIKeysById(
       query: { reveal: reveal ? 'true' : 'false' },
     },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) {
