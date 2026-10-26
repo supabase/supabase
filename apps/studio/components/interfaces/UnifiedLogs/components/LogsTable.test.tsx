@@ -1,6 +1,7 @@
 import { getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table'
 import { fireEvent, screen, within } from '@testing-library/react'
 import type { ReactNode } from 'react'
+import { Button } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
 import { LogsTable } from './LogsTable'
@@ -89,11 +90,11 @@ describe('LogsTable', () => {
 
   it('keeps the full logs link available for an empty preview after loading finishes', () => {
     const { rerender } = customRender(
-      <ActivityLogs data={[]} isLoading footer={<button>View all logs</button>} />
+      <ActivityLogs data={[]} isLoading footer={<Button>View all logs</Button>} />
     )
     expect(screen.queryByRole('button', { name: 'View all logs' })).not.toBeInTheDocument()
 
-    rerender(<ActivityLogs data={[]} footer={<button>View all logs</button>} />)
+    rerender(<ActivityLogs data={[]} footer={<Button>View all logs</Button>} />)
 
     expect(screen.getByText('No results found')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'View all logs' })).toBeVisible()
