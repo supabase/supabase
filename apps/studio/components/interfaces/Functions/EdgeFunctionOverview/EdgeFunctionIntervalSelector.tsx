@@ -1,3 +1,4 @@
+import { CheckIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import {
@@ -10,7 +11,6 @@ interface EdgeFunctionIntervalSelectorProps {
   onIntervalChange: (interval: string) => void
 }
 
-/** Segmented control for the period every Overview chart covers */
 export const EdgeFunctionIntervalSelector = ({
   interval,
   onIntervalChange,
@@ -24,6 +24,9 @@ export const EdgeFunctionIntervalSelector = ({
         onClick={() => onIntervalChange(item.key)}
         className={getSegmentedButtonClassName(index, EDGE_FUNCTION_CHART_INTERVALS.length)}
       >
+        {interval === item.key && (
+          <CheckIcon size={12} aria-hidden="true" data-testid="selected-period-indicator" />
+        )}
         {item.label}
       </Button>
     ))}
