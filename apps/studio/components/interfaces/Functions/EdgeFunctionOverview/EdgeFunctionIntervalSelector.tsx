@@ -20,6 +20,7 @@ export const EdgeFunctionIntervalSelector = ({
       <Button
         key={`function-filter-${item.key}`}
         variant={interval === item.key ? 'secondary' : 'default'}
+        aria-pressed={interval === item.key}
         onClick={() => onIntervalChange(item.key)}
         className={getSegmentedButtonClassName(index, EDGE_FUNCTION_CHART_INTERVALS.length)}
       >
