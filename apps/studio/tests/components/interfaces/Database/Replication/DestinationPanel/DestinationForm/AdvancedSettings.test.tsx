@@ -45,24 +45,24 @@ const TestForm = () => {
 }
 
 describe('AdvancedSettings', () => {
-  it.each(numericFields)(
-    'allows $label to be cleared and replaced',
-    async ({ label, initialValue }) => {
-      const user = userEvent.setup()
-      customRender(<TestForm />)
+  // One render for all fields: each field is independent, and re-rendering per field only adds setup cost
+  it('allows every numeric field to be cleared and replaced', async () => {
+    const user = userEvent.setup()
+    customRender(<TestForm />)
 
-      await user.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    await user.click(screen.getByRole('button', { name: /Advanced settings/ }))
 
+    for (const { label, initialValue } of numericFields) {
       const input = screen.getByRole('spinbutton', { name: label })
-      expect(input).toHaveValue(initialValue)
+      expect(input, label).toHaveValue(initialValue)
 
       await user.clear(input)
-      expect(input).toHaveValue(null)
+      expect(input, label).toHaveValue(null)
 
       await user.type(input, '5')
-      expect(input).toHaveValue(5)
+      expect(input, label).toHaveValue(5)
     }
-  )
+  })
 
   it('uses the existing error while an empty required number is being edited', async () => {
     const user = userEvent.setup()

@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Copy } from 'lucide-react'
+import { CopyIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, copyToClipboard } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -11,12 +10,14 @@ import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
   const { data: apiKeysData } = useAPIKeys({ projectRef: ref }, { enabled: canReadAPIKeys })
   useProjectSettingsV2Query({ projectRef: ref })
   const { anonKey, serviceKey } = apiKeysData ?? {}
@@ -61,7 +62,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    icon={<Copy />}
+                    icon={<CopyIcon />}
                     onClick={() => {
                       setCopied('anon')
                       copyToClipboard(anonApiKey ?? 'SUPABASE_CLIENT_ANON_KEY')
@@ -101,7 +102,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    icon={<Copy />}
+                    icon={<CopyIcon />}
                     onClick={() => {
                       setCopied('service')
                       copyToClipboard(serviceApiKey)

@@ -6,13 +6,13 @@ import { computeKeys } from './keys'
 describe('computeInstanceLogsSql', () => {
   it('reads one instance stream, newest first', () => {
     expect(computeInstanceLogsSql('embed', 'output')).toBe(
-      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_guest_logs' order by timestamp desc limit 100"
+      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['subservice'] = 'worker_guest_logs' order by timestamp desc limit 100"
     )
   })
 
   it('filters by event message before applying the limit', () => {
     expect(computeInstanceLogsSql('embed', 'requests', { message: 'timeout' })).toBe(
-      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['source'] = 'worker_ingress_logs' and event_message ilike '%timeout%' order by timestamp desc limit 100"
+      "select id, timestamp, severity_text as severity, event_message as message from logs where log_attributes['worker'] = 'embed' and log_attributes['subservice'] = 'worker_ingress_logs' and event_message ilike '%timeout%' order by timestamp desc limit 100"
     )
   })
 

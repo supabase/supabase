@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import type { UIMessageChunk } from 'ai'
 import { convertArrayToReadableStream } from 'ai/test'
 import { afterEach, describe, expect, it, vi } from 'vitest'

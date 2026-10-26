@@ -238,6 +238,30 @@ describe('selectBanner', () => {
       items: [makeIncident({ id: 'inc-1' }), makeIncident({ id: 'inc-2' })],
     })
   })
+
+  describe('signed-out user (user: null)', () => {
+    const dashboardComponent = {
+      id: 'dashboard',
+      name: 'Dashboard',
+      group_name: 'Dashboard',
+      current_status: 'full_outage' as const,
+    }
+
+    it('shows an incident that affects the Dashboard component', () => {
+      const items: Array<StatusItem> = [makeIncident({ components: [dashboardComponent] })]
+      const result = selectBanner({ items, user: null, dismissedKeys: new Set(), nowMs: NOW_MS })
+      expect(result).toEqual({
+        kind: 'incident',
+        items: [makeIncident({ components: [dashboardComponent] })],
+      })
+    })
+
+    it('hides an incident that does not affect the Dashboard component, even with global scope', () => {
+      const items: Array<StatusItem> = [makeIncident({ scope: GLOBAL_SCOPE, components: [] })]
+      const result = selectBanner({ items, user: null, dismissedKeys: new Set(), nowMs: NOW_MS })
+      expect(result).toBeNull()
+    })
+  })
 })
 
 describe('getKeysToDismiss', () => {

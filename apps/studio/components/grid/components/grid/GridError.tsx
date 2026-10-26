@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useCallback } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -163,7 +163,7 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
         again.
       </p>
       <p className="text-sm text-foreground-lighter prose max-w-full mb-4!">
-        Error: <code className="text-code-inline">{error.message}</code>
+        Error: <code>{error.message}</code>
       </p>
 
       <Button onClick={() => onApplySorts([])}>Remove sorts</Button>
@@ -224,11 +224,11 @@ const ExpandError = ({ error }: { error: ResponseError }) => {
       <CollapsibleTrigger className="mt-2 group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
         <div className="flex items-center gap-x-2 w-full cursor-pointer">
           <span className="font-mono uppercase tracking-tight">View error</span>
-          <ChevronDown className="transition-transform" size={14} />
+          <ChevronDownIcon className="transition-transform" size={14} />
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-1">
-        <code className="text-code-inline">{error.message}</code>
+        <code>{error.message}</code>
       </CollapsibleContent>
     </Collapsible>
   )

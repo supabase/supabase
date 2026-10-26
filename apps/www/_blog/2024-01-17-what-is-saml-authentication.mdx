@@ -112,7 +112,7 @@ At Supabase, you can easily enable SAML for your project and use the signInWithS
 
 ### SAML with Row Level Security
 
-Combining SAML with Row-Level Security (RLS) allows for fine-grained control over data access, ensuring that users only interact with the specific data rows aligned with their roles or attributes. This improves security and helps meet regulatory requirements while allowing flexible adjustments to access permissions over time.
+Combining SAML with [Row-Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS) allows for fine-grained control over data access, ensuring that users only interact with the specific data rows aligned with their roles or attributes. This improves security and helps meet regulatory requirements while allowing flexible adjustments to access permissions over time.
 
 Since Supabase is “just Postgres”™, it enables us to easily leverage the power of RLS policies to restrict access to the data. You can access the user’s JWT claims by invoking the `auth.jwt()` function in your RLS policy. In the scenario provided above, this allows Supabase to restrict developers from ACME Inc. from inviting someone else outside of the company to join their Supabase organization.
 
@@ -143,7 +143,7 @@ with check (
 
 In this post, we took a deep dive into SAML, from understanding how organizations centralize employee data using identity providers to illustrating SAML integration through a real-world use case and a practical implementation of SAML in conjunction with Row-Level Security (RLS).
 
-Supabase Auth currently supports [authenticating with SAML](https://supabase.com/docs/guides/auth/sso/auth-sso-saml) easily, setting it up takes less than an hour, so you can focus on shipping the core features of your product.
+Supabase Auth currently supports [authenticating with SAML](https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml) easily, setting it up takes less than an hour, so you can focus on shipping the core features of your product.
 
 ## More from the Auth team
 

@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
-import { MoreVertical } from 'lucide-react'
+import { MoreVerticalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback, useEffect, useState } from 'react'
@@ -299,7 +299,7 @@ const MapView = () => {
                       {database.identifier !== ref && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="text" icon={<MoreVertical />} className="px-1" />
+                            <Button variant="text" icon={<MoreVerticalIcon />} className="px-1" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="w-40" side="bottom" align="end">
                             <DropdownMenuItem

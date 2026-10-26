@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { FeatureFlagContext } from 'common'
@@ -9,17 +8,18 @@ import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
-import type { Permission } from '@/types'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CreateProjectResponse = components['schemas']['CreateProjectResponse_Output']
-type RegionsInfo = components['schemas']['RegionsInfo_Output']
+type RegionsInfo = components['schemas']['RegionsInfoPlatform_Output']
 type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
 type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
@@ -36,7 +36,10 @@ type GitHubRepositoriesResponse = {
 
 mockAnimationsApi()
 
-configure({ asyncUtilTimeout: 5000 })
+// defaultHidden skips RTL's per-element accessibility (getComputedStyle) check, which makes
+// each *ByRole query on this large form ~3x cheaper. Radix Selects also render hidden native
+// <option>s, so option queries are scoped to the open listbox via findOption.
+configure({ asyncUtilTimeout: 5000, defaultHidden: true })
 vi.setConfig({ testTimeout: 30000 })
 
 vi.mock('sonner', () => ({
@@ -76,16 +79,19 @@ vi.mock(import('@/lib/constants'), async (importOriginal) => {
 
 const ORG_SLUG = 'default-org'
 
-const ADMIN_PERMISSIONS = [
-  {
-    actions: [PermissionAction.CREATE],
-    resources: ['projects', 'integrations.github_connections'],
-    condition: null,
-    organization_slug: ORG_SLUG,
-    project_refs: [],
-    restrictive: false,
-  },
-] as unknown as Permission[]
+const ADMIN_PERMISSIONS: PermissionsV2Response = {
+  organizations: [
+    {
+      slug: ORG_SLUG,
+      role: 'administrator',
+      permissions: [
+        FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE,
+        FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE,
+      ],
+      projects: [],
+    },
+  ],
+}
 
 const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
   all: {
@@ -104,6 +110,18 @@ const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
 
 const FRANKFURT = 'Central EU (Frankfurt)'
 const SAO_PAULO = 'South America (São Paulo)'
+
+const AVAILABLE_REGIONS_WITH_AUTO: RegionsInfo = {
+  ...DEFAULT_AVAILABLE_REGIONS,
+  all: {
+    ...DEFAULT_AVAILABLE_REGIONS.all,
+    auto: { code: 'auto', name: 'Auto', type: 'auto' },
+  },
+  recommendations: {
+    ...DEFAULT_AVAILABLE_REGIONS.recommendations,
+    auto: { code: 'auto', name: 'Auto', type: 'auto' },
+  },
+}
 
 const availableRegionsWithSaoPaulo = (status?: 'capacity' | 'other'): RegionsInfo => ({
   ...DEFAULT_AVAILABLE_REGIONS,
@@ -130,6 +148,7 @@ const AVAILABLE_REGIONS_WITH_FRANKFURT: RegionsInfo = {
 const DEFAULT_AVAILABLE_VERSIONS: { available_versions: AvailableVersion[] } = {
   available_versions: [
     { postgres_engine: '15', release_channel: 'ga', version: 'supabase-postgres-15.6.1.139' },
+    { postgres_engine: '17', release_channel: 'beta', version: 'supabase-postgres-17.9.9.999' },
     {
       postgres_engine: '17-oriole',
       release_channel: 'beta',
@@ -170,7 +189,7 @@ const mockOrg = (overrides: Partial<OrganizationResponse> = {}) =>
 function mockWizardEndpoints(
   overrides: {
     organizations?: OrganizationResponse[]
-    permissions?: Permission[]
+    permissions?: PermissionsV2Response
     freeProjectLimitMembers?: MemberWithFreeProjectLimit[]
     overdueInvoices?: OverdueInvoiceCount[]
     orgProjects?: OrganizationProjectsResponse
@@ -189,9 +208,18 @@ function mockWizardEndpoints(
   })
   addAPIMock({
     method: 'get',
-    path: '/platform/profile/permissions',
-    // @ts-expect-error - Permission is bridged from the raw API shape, not the generated type
-    response: () => HttpResponse.json<Permission[]>(overrides.permissions ?? ADMIN_PERMISSIONS),
+    path: '/platform/organizations/:slug',
+    response: {
+      ...(overrides.organizations?.[0] ?? mockOrg()),
+      created_at: '2026-01-01T00:00:00Z',
+      has_oriole_project: false,
+    },
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/profile/permissions/v2',
+    response: () =>
+      HttpResponse.json<PermissionsV2Response>(overrides.permissions ?? ADMIN_PERMISSIONS),
   })
   addAPIMock({
     method: 'get',
@@ -255,12 +283,6 @@ function mockWizardEndpoints(
   })
   addAPIMock({
     method: 'get',
-    // @ts-expect-error - raw-fetch Next.js API route, not in the generated paths type
-    path: '/incident-status',
-    response: () => HttpResponse.json([]),
-  })
-  addAPIMock({
-    method: 'get',
     path: '/platform/integrations/github/repositories',
     response: () =>
       HttpResponse.json<GitHubRepositoriesResponse>(
@@ -275,13 +297,22 @@ const DEFAULT_FLAGS = {
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
   projectCreationRestrictedRegions: false,
+  freeTierGeneralRegionEnrollment: false,
+  freeTierGeneralRegionSelection: false,
 }
 
-async function renderWizard(options: { flags?: Record<string, boolean | string> } = {}) {
+async function renderWizard(
+  options: { flags?: Record<string, boolean | string>; isConfigCatStale?: boolean } = {}
+) {
   const { default: Wizard } = await import('@/pages/new/[slug]')
   return customRender(
     <FeatureFlagContext.Provider
-      value={{ configcat: { ...DEFAULT_FLAGS, ...options.flags }, posthog: {}, hasLoaded: true }}
+      value={{
+        configcat: { ...DEFAULT_FLAGS, ...options.flags },
+        posthog: {},
+        hasLoaded: true,
+        isConfigCatStale: options.isConfigCatStale,
+      }}
     >
       <Wizard dehydratedState={undefined} />
     </FeatureFlagContext.Provider>,
@@ -333,16 +364,26 @@ const getSelectTriggerByLabel = (labelText: string) => {
   return trigger as HTMLElement
 }
 
-// Region is selected explicitly because the smart-region auto-fill is unreliable (FE-3884).
+const submitAndReadRegionSelection = async (onRequest: ReturnType<typeof vi.fn>) => {
+  fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+  await waitFor(() => expect(onRequest).toHaveBeenCalled())
+  return onRequest.mock.calls[0][0].region_selection
+}
+
+const findOption = async (name: string | RegExp) =>
+  within(await screen.findByRole('listbox')).findByRole('option', { name })
+
 const selectRegion = async (optionName: string | RegExp) => {
   await user.click(getSelectTriggerByLabel('Region'))
-  await user.click(await screen.findByRole('option', { name: optionName }))
+  await user.click(await findOption(optionName))
 }
 
 const fillProjectName = async (name: string) => {
-  const input = await screen.findByPlaceholderText('Project name')
-  await user.clear(input)
-  await user.type(input, name)
+  // Typing character-by-character re-renders the whole wizard per keystroke; the input
+  // behaviour isn't under test, so set the value in one change event.
+  fireEvent.change(await screen.findByPlaceholderText('Project name'), {
+    target: { value: name },
+  })
 }
 
 const generateAndWaitForStrongPassword = async () => {
@@ -367,6 +408,8 @@ describe('project creation wizard', () => {
 
     await fillProjectName('My New Project')
     await generateAndWaitForStrongPassword()
+    // The recommended region is preselected, so no manual region choice is needed
+    expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas')
 
     fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
@@ -377,6 +420,7 @@ describe('project creation wizard', () => {
     expect(body.name).toBe('My New Project')
     expect(body.organization_slug).toBe(ORG_SLUG)
     expect(body.desired_instance_size).toBe('micro')
+    expect(body.region_selection).toMatchObject({ name: 'Americas' })
 
     await waitFor(() => expect(routerMock.asPath).toBe('/project/new-project-ref'))
   })
@@ -456,41 +500,272 @@ describe('project creation wizard', () => {
   })
 
   describe('region selection', () => {
-    test('surfaces the recommended smart region with a "Recommended" badge', async () => {
-      mockWizardEndpoints()
+    test('blocks submission until a region is selected', async () => {
+      mockWizardEndpoints({
+        availableRegions: {
+          ...DEFAULT_AVAILABLE_REGIONS,
+          recommendations: {
+            ...DEFAULT_AVAILABLE_REGIONS.recommendations,
+            smartGroup: { code: 'americas', name: '', type: 'smartGroup' },
+          },
+        },
+      })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
 
       await renderWizard()
 
-      await screen.findByPlaceholderText('Project name')
-      await user.click(getSelectTriggerByLabel('Region'))
+      await fillProjectName('Region Required Project')
+      await generateAndWaitForStrongPassword()
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Select a region')
 
-      const recommendedOption = await screen.findByRole('option', { name: /Americas/ })
-      expect(within(recommendedOption).getByText('Recommended')).toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      expect(await screen.findByText('Please select a region.')).toBeInTheDocument()
+      expect(onRequest).not.toHaveBeenCalled()
+
+      await selectRegion(/Americas/)
+
+      const regionSelection = await submitAndReadRegionSelection(onRequest)
+      expect(regionSelection).toMatchObject({ name: 'Americas' })
     })
 
-    test('submits the user-selected region', async () => {
+    test('defaults to the first general region when there is no recommendation', async () => {
+      mockWizardEndpoints({
+        availableRegions: { ...DEFAULT_AVAILABLE_REGIONS, recommendations: {} },
+      })
+
+      await renderWizard()
+
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas'))
+    })
+
+    test('defaults to the recommended Auto option and submits it as an auto region selection', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_AUTO })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Auto Region Project')
+      await generateAndWaitForStrongPassword()
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Auto'))
+
+      // Only Auto carries the "Recommended" badge while it is recommended
+      await user.click(getSelectTriggerByLabel('Region'))
+      const autoOption = await findOption(/Auto/)
+      expect(within(autoOption).getByText('Recommended')).toBeInTheDocument()
+      const americasOption = within(screen.getByRole('listbox')).getByRole('option', {
+        name: /Americas/,
+      })
+      expect(within(americasOption).queryByText('Recommended')).not.toBeInTheDocument()
+      await user.click(autoOption)
+
+      const regionSelection = await submitAndReadRegionSelection(onRequest)
+      expect(regionSelection).toMatchObject({ code: 'auto', type: 'auto' })
+    })
+
+    describe('specific regions behind a link', () => {
+      const FREE_PLAN_ORG = [mockOrg({ plan: { id: 'free', name: 'Free' } })]
+
+      test('opens on the general regions alone for a free-plan org', async () => {
+        mockWizardEndpoints({ organizations: FREE_PLAN_ORG })
+
+        await renderWizard()
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+      })
+
+      test('the link reopens the dropdown on the full list with the general region still selected', async () => {
+        mockWizardEndpoints({ organizations: FREE_PLAN_ORG })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard()
+
+        await fillProjectName('Specific Region Link Project')
+        await generateAndWaitForStrongPassword()
+        await selectRegion(/Americas/)
+
+        await user.click(screen.getByRole('button', { name: 'Need a specific region?' }))
+
+        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+        expect(screen.getByText('General regions')).toBeInTheDocument()
+        expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas')
+
+        await user.click(await findOption(/East US/))
+
+        expect(
+          screen.queryByRole('button', { name: 'Need a specific region?' })
+        ).not.toBeInTheDocument()
+        expect(await submitAndReadRegionSelection(onRequest)).toMatchObject({ code: 'us-east-1' })
+      })
+
+      test('does not apply to a paid-plan org: the full region list shows directly with no link', async () => {
+        mockWizardEndpoints()
+
+        await renderWizard()
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        const recommendedOption = await findOption(/Americas/)
+        expect(within(recommendedOption).getByText('Recommended')).toBeInTheDocument()
+        expect(screen.getByText('General regions')).toBeInTheDocument()
+        expect(screen.getByText('Specific regions')).toBeInTheDocument()
+        expect(
+          screen.queryByRole('button', { name: 'Need a specific region?' })
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    test('blocks submission when available regions fail to load', async () => {
+      mockWizardEndpoints({ availableRegions: 'error' })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await screen.findByText('Error loading available regions')
+      await fillProjectName('Unavailable Regions Project')
+      await generateAndWaitForStrongPassword()
+
+      const submitButton = screen.getByRole('button', { name: 'Create new project' })
+      expect(submitButton).toBeDisabled()
+      const form = submitButton.closest('form')
+      if (!form) throw new Error('Project creation form not found')
+      await act(async () => {
+        fireEvent.submit(form)
+      })
+      expect(onRequest).not.toHaveBeenCalled()
+    })
+
+    test('blocks a previously selected region when regions fail to load for the new compute size', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
       await renderWizard()
 
-      await fillProjectName('Region Project')
+      await fillProjectName('Changed Compute Project')
       await generateAndWaitForStrongPassword()
       await selectRegion(/Americas/)
 
-      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/available-regions',
+        response: () => HttpResponse.error(),
+      })
+      await user.click(getSelectTriggerByLabel('Compute size'))
+      await user.click(await findOption(/2 GB RAM/))
+      await screen.findByText('Error loading available regions')
 
-      await waitFor(() => expect(onRequest).toHaveBeenCalled())
-      expect(onRequest.mock.calls[0][0].region_selection).toMatchObject({ name: 'Americas' })
+      const submitButton = screen.getByRole('button', { name: 'Create new project' })
+      expect(submitButton).toBeDisabled()
+      const form = submitButton.closest('form')
+      if (!form) throw new Error('Project creation form not found')
+      await act(async () => {
+        fireEvent.submit(form)
+      })
+      expect(onRequest).not.toHaveBeenCalled()
     })
 
-    test('shows an error state when available regions fail to load', async () => {
-      mockWizardEndpoints({ availableRegions: 'error' })
+    describe('free tier general region experiment', () => {
+      test('keeps the region selector loading while flags are being re-evaluated', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
 
-      await renderWizard()
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+          isConfigCatStale: true,
+        })
 
-      await screen.findByText('Error loading available regions')
+        await screen.findByPlaceholderText('Project name')
+        expect(await screen.findByText('Loading available regions...')).toBeInTheDocument()
+        expect(getSelectTriggerByLabel('Region')).toBeDisabled()
+      })
+
+      test('restricts the picker to general regions with an upgrade footer for a free-plan org in the test arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+        expect(
+          within(screen.getByRole('listbox')).queryByRole('option', { name: /North Virginia/ })
+        ).not.toBeInTheDocument()
+
+        const upgradeLink = screen.getByRole('link', { name: 'Upgrade to Pro' })
+        expect(upgradeLink).toHaveAttribute(
+          'href',
+          `/org/${ORG_SLUG}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`
+        )
+
+        expect(screen.getByRole('link', { name: 'specific region' })).toHaveAttribute(
+          'href',
+          expect.stringMatching(/\/guides\/platform\/regions$/)
+        )
+        // The upgrade footer replaces the "Need a specific region?" link
+        expect(screen.queryByText('Need a specific region?')).not.toBeInTheDocument()
+      })
+
+      test('collapses specific regions behind the link for a free-plan org in the control arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: false,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+        // The reveal button sits outside the open dropdown, so it is hidden from the a11y tree
+        expect(screen.getByText('Need a specific region?')).toBeInTheDocument()
+      })
+
+      test('shows the full region picker with no upgrade footer for a paid-plan org even when enrolled', async () => {
+        mockWizardEndpoints()
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+      })
     })
 
     describe('restricted regions', () => {
@@ -512,11 +787,13 @@ describe('project creation wizard', () => {
         await generateAndWaitForStrongPassword()
         await user.click(getSelectTriggerByLabel('Region'))
 
-        const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
+        const saoPaulo = await findOption(/São Paulo/)
         expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')
         expect(within(saoPaulo).getByText('Unavailable')).toBeInTheDocument()
         expect(
-          within(screen.getByRole('option', { name: /North Virginia/ })).queryByText('Unavailable')
+          within(
+            within(screen.getByRole('listbox')).getByRole('option', { name: /North Virginia/ })
+          ).queryByText('Unavailable')
         ).not.toBeInTheDocument()
         await user.click(saoPaulo)
 
@@ -534,37 +811,42 @@ describe('project creation wizard', () => {
         expect(screen.queryByText(copy.title)).not.toBeInTheDocument()
       }
 
-      test('keeps a capacity-restricted region selectable, explains it, and blocks submission', async () => {
-        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo('capacity') })
-        const onRequest = vi.fn()
-        mockCreateProject(onRequest)
-
-        await renderWizard()
-
-        await expectSelectableRestrictedRegion(onRequest, CAPACITY_COPY)
-      })
-
-      test('labels an "other" platform status with generic copy instead of greying it out silently', async () => {
-        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo('other') })
-        const onRequest = vi.fn()
-        mockCreateProject(onRequest)
-
-        await renderWizard()
-
-        await expectSelectableRestrictedRegion(onRequest, GENERIC_COPY)
-      })
-
-      test('applies a flag-only restriction the same way when the platform reports no status', async () => {
-        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo() })
-        const onRequest = vi.fn()
-        mockCreateProject(onRequest)
-
-        await renderWizard({
+      test.each<{
+        scenario: string
+        status: 'capacity' | 'other' | undefined
+        flags: Record<string, boolean | string>
+        copy: typeof GENERIC_COPY
+      }>([
+        {
+          scenario: 'a capacity platform status',
+          status: 'capacity' as const,
+          flags: {},
+          copy: CAPACITY_COPY,
+        },
+        {
+          scenario: 'an "other" platform status (generic copy, not silently greyed out)',
+          status: 'other' as const,
+          flags: {},
+          copy: GENERIC_COPY,
+        },
+        {
+          scenario: 'a flag-only restriction with no platform status',
+          status: undefined,
           flags: { projectCreationRestrictedRegions: '{"sa-east-1":"unavailable"}' },
-        })
+          copy: GENERIC_COPY,
+        },
+      ])(
+        'keeps the region selectable, explains it, and blocks submission for $scenario',
+        async ({ status, flags, copy }) => {
+          mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo(status) })
+          const onRequest = vi.fn()
+          mockCreateProject(onRequest)
 
-        await expectSelectableRestrictedRegion(onRequest, GENERIC_COPY)
-      })
+          await renderWizard({ flags })
+
+          await expectSelectableRestrictedRegion(onRequest, copy)
+        }
+      )
     })
   })
 
@@ -700,7 +982,7 @@ describe('project creation wizard', () => {
       )
 
       await user.click(screen.getByLabelText('Postgres version'))
-      await user.click(await screen.findByRole('option', { name: /17\.9\.9\.999/ }))
+      await user.click(await findOption(/17\.9\.9\.999/))
       expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
 
       const requestsBeforeRegionChange = onAvailableVersionsRequest.mock.calls.length
@@ -730,7 +1012,7 @@ describe('project creation wizard', () => {
         expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
       )
       await user.click(screen.getByLabelText('Postgres version'))
-      await user.click(await screen.findByRole('option', { name: /17\.9\.9\.999/ }))
+      await user.click(await findOption(/17\.9\.9\.999/))
       expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
 
       fireEvent.click(panelToggle)
@@ -783,7 +1065,7 @@ describe('project creation wizard', () => {
   })
 
   describe('high availability', () => {
-    test('shows the high availability toggle when the entitlement is enabled', async () => {
+    test('shows the high availability toggle when the entitlement is enabled, and hides gated sections by default', async () => {
       mockWizardEndpoints()
 
       await renderWizard()
@@ -799,6 +1081,9 @@ describe('project creation wizard', () => {
       expect(
         screen.queryByRole('button', { name: 'Internal-only Configuration' })
       ).not.toBeInTheDocument()
+      // No github_connections entitlement by default
+      expect(screen.queryByText('GitHub (optional)')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Connect GitHub' })).not.toBeInTheDocument()
     })
 
     test('hides the high availability toggle when the org lacks the entitlement', async () => {
@@ -984,6 +1269,7 @@ describe('project creation wizard', () => {
       await waitFor(() => expect(onRequest).toHaveBeenCalled())
       const body = onRequest.mock.calls[0][0]
       expect(body.high_availability).toBe(false)
+      expect(body.cloud_provider).toBe('AWS')
       expect(body.postgres_engine).toBeUndefined()
       expect(body.release_channel).toBeUndefined()
       expect(body.custom_supabase_internal_requests).toBeUndefined()
@@ -1014,7 +1300,7 @@ describe('project creation wizard', () => {
         expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
       )
       await user.click(screen.getByLabelText('Postgres version'))
-      await user.click(await screen.findByRole('option', { name: /17\.9\.9\.999/ }))
+      await user.click(await findOption(/17\.9\.9\.999/))
       expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
 
       const highAvailabilitySwitch = await screen.findByRole('switch', {
@@ -1026,29 +1312,6 @@ describe('project creation wizard', () => {
       await waitFor(() =>
         expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
       )
-    })
-
-    test('restores the standard Postgres configuration when high availability is disabled', async () => {
-      mockWizardEndpoints()
-      const onRequest = vi.fn()
-      mockCreateProject(onRequest)
-
-      await renderWizard()
-
-      await fillProjectName('Standard Project')
-      await generateAndWaitForStrongPassword()
-      const highAvailabilitySwitch = await screen.findByRole('switch')
-      await user.click(highAvailabilitySwitch)
-      await user.click(highAvailabilitySwitch)
-
-      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
-
-      await waitFor(() => expect(onRequest).toHaveBeenCalled())
-      const body = onRequest.mock.calls[0][0]
-      expect(body.high_availability).toBe(false)
-      expect(body.cloud_provider).toBe('AWS')
-      expect(body.postgres_engine).toBeUndefined()
-      expect(body.custom_supabase_internal_requests).toBeUndefined()
     })
   })
 
@@ -1121,8 +1384,9 @@ describe('project creation wizard', () => {
     await renderWizard()
 
     await fillProjectName('Weak Password Project')
-    const passwordInput = screen.getByPlaceholderText('Type in a strong password')
-    await user.type(passwordInput, 'password')
+    fireEvent.change(screen.getByPlaceholderText('Type in a strong password'), {
+      target: { value: 'password' },
+    })
 
     await waitFor(() =>
       expect(screen.getByRole('progressbar')).not.toHaveAttribute('aria-valuenow', '100')
@@ -1151,16 +1415,6 @@ describe('project creation wizard', () => {
   })
 
   describe('github integration', () => {
-    test('hides the github field without entitlement access', async () => {
-      mockWizardEndpoints()
-
-      await renderWizard()
-
-      await screen.findByPlaceholderText('Project name')
-      expect(screen.queryByText('GitHub (optional)')).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Connect GitHub' })).not.toBeInTheDocument()
-    })
-
     test('selecting a connected repository fills in the project name and submission payload', async () => {
       mockWizardEndpoints({
         entitlements: [
@@ -1199,19 +1453,6 @@ describe('project creation wizard', () => {
       const body = onRequest.mock.calls[0][0]
       expect(body.github_repository_id).toBe(555)
       expect(body.github_installation_id).toBe(777)
-    })
-  })
-
-  describe('feature flags', () => {
-    test('hides internal-only configuration by default', async () => {
-      mockWizardEndpoints()
-
-      await renderWizard()
-
-      await screen.findByPlaceholderText('Project name')
-      expect(
-        screen.queryByRole('button', { name: 'Internal-only Configuration' })
-      ).not.toBeInTheDocument()
     })
   })
 

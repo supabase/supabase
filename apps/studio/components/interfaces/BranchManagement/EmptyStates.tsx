@@ -1,6 +1,5 @@
-import { Github } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button, GithubIcon } from 'ui'
 
 import { BranchSelector } from './BranchSelector'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -32,7 +31,7 @@ export const PullRequestsEmptyState = ({
       </p>
       <div className="flex items-center space-x-2 mt-4">
         {hasGithubConnection ? (
-          <Button variant="outline" asChild icon={<Github />}>
+          <Button variant="outline" asChild icon={<GithubIcon />}>
             <a href={url} target="_blank" rel="noopener noreferrer">
               Create pull request
             </a>

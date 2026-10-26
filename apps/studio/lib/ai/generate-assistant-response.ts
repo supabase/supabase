@@ -16,7 +16,10 @@ import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
-import { prepareMessagesForModel } from '@/lib/ai/generate-assistant-response.utils'
+import {
+  hideToolErrorsFromModel,
+  prepareMessagesForModel,
+} from '@/lib/ai/generate-assistant-response.utils'
 import {
   CHAT_PROMPT,
   GENERAL_PROMPT,
@@ -24,6 +27,8 @@ import {
   NOTEBOOKS_PROMPT,
   SECURITY_PROMPT,
 } from '@/lib/ai/prompts'
+import type { contract as renameChatContract } from '@/lib/ai/tools/rename-chat'
+import type { ToolContractInput } from '@/lib/ai/tools/types'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
 
@@ -48,6 +53,7 @@ export async function generateAssistantResponse({
   systemProviderOptions,
   providerOptions,
   requestedModel,
+  effectiveModel,
   abortSignal,
   timeout,
   onSpanCreated,
@@ -71,6 +77,8 @@ export async function generateAssistantResponse({
   includesLogsSnippets?: boolean
   isExplorerEnabled?: boolean
   requestedModel?: string
+  /** The model actually used after entitlement/throttle fallback. */
+  effectiveModel?: string
   systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
@@ -123,6 +131,7 @@ export async function generateAssistantResponse({
         schemasString,
         supportMode,
         includesLogsSnippets,
+        aiOptInLevel,
       }),
       ...(await convertToModelMessages(messages)),
     ]
@@ -143,6 +152,9 @@ export async function generateAssistantResponse({
       instructions: systemMessage,
       stopWhen: isStepCount(20),
       messages: coreMessages,
+      prepareStep: ({ messages }) => ({
+        messages: hideToolErrorsFromModel(messages, aiOptInLevel),
+      }),
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
@@ -155,7 +167,7 @@ export async function generateAssistantResponse({
           for (const step of steps) {
             for (const toolCall of step.toolCalls) {
               if (toolCall.toolName === 'rename_chat') {
-                const { newName } = toolCall.input as { newName: string }
+                const { newName } = toolCall.input as ToolContractInput<typeof renameChatContract>
                 metadata.chatName = newName
               }
             }
@@ -196,6 +208,7 @@ export async function generateAssistantResponse({
         planId,
         isHighComplianceProject,
         requestedModel,
+        effectiveModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
         environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
       },

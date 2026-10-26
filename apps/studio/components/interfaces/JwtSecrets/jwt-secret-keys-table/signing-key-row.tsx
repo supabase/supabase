@@ -1,24 +1,21 @@
 import { components } from 'api-types'
 import dayjs from 'dayjs'
-import { motion } from 'framer-motion'
 import {
-  CircleArrowDown,
-  CircleArrowUp,
-  Eye,
-  Key,
-  Minus,
-  MoreVertical,
-  ShieldOff,
-  Timer,
-  Trash2,
+  CircleArrowDownIcon,
+  CircleArrowUpIcon,
+  EyeIcon,
+  MinusIcon,
+  MoreVerticalIcon,
+  ShieldOffIcon,
+  Trash2Icon,
 } from 'lucide-react'
+import { motion } from 'motion/react'
 import {
-  Badge,
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   TableCell,
   TableRow,
@@ -27,7 +24,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
-import { statusColors, statusLabels } from '../jwt.constants'
+import { statusLabels } from '../jwt.constants'
+import { CopyableKey } from './copyable-key'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
@@ -63,12 +62,12 @@ const LastUsedCell = ({
   isLastUsedSupported: boolean
 }) => {
   const className =
-    'text-right py-2 text-sm text-foreground-light whitespace-nowrap data-[invisible=true]:invisible'
+    'text-right text-sm text-foreground-light whitespace-nowrap data-[invisible=true]:invisible'
 
   if (!isLastUsedSupported)
     return (
       <TableCell>
-        <Minus size={14} className="text-foreground-lighter ml-auto" />
+        <MinusIcon size={14} className="text-foreground-lighter ml-auto" />
       </TableCell>
     )
 
@@ -81,6 +80,7 @@ const LastUsedCell = ({
   }
 
   if (isError) return <TableCell className={className}>Unable to load</TableCell>
+
   if (lastUsedAt === undefined) {
     return (
       <TableCell className={cn(className, 'text-foreground-lighter')}>No requests in 24h</TableCell>
@@ -126,47 +126,25 @@ export const SigningKeyRow = ({
       signingKey.status !== 'in_use' ? 'border-b border-dashed border-border' : 'border-b'
     )}
   >
-    <TableCell className="w-[150px] pr-0 py-2">
-      <div className="flex -space-x-px items-center">
-        <Badge
-          className={cn(
-            statusColors[signingKey.status],
-            'rounded-r-none',
-            'gap-2 w-full h-6',
-            'uppercase font-mono',
-            'border-r-0'
-          )}
-        >
-          {signingKey.status === 'standby' ? (
-            <Timer className="shrink-0" size={14} />
-          ) : (
-            <Key className="shrink-0" size={14} />
-          )}
-          <span className="truncate text-xs">{statusLabels[signingKey.status]}</span>
-        </Badge>
-      </div>
+    <TableCell className="whitespace-nowrap">
+      <p className={cn(signingKey.status !== 'in_use' && 'text-foreground-lighter')}>
+        {statusLabels[signingKey.status]}
+      </p>
+      <CopyableKey keyId={signingKey.id} />
     </TableCell>
-    <TableCell className="font-mono truncate w-[315px] pl-0 py-2">
-      <div className="min-w-0 flex">
-        <Badge
-          className={cn(
-            'bg-default-200/100 border-foreground-muted',
-            'rounded-l-none',
-            'gap-2 py-2 h-6 min-w-0 overflow-hidden flex items-center flex-1'
-          )}
-        >
-          <span className="truncate flex-1 text-xs" title={signingKey.id}>
-            {signingKey.id}
-          </span>
-        </Badge>
-      </div>
+
+    <TableCell>
+      <AlgorithmHoverCard algorithm={signingKey.algorithm} />
     </TableCell>
-    <TableCell className="truncate py-2">
-      <AlgorithmHoverCard
-        algorithm={signingKey.algorithm}
-        legacy={signingKey.id === legacyKey?.id}
+
+    <TableCell className="text-right text-sm text-foreground-light whitespace-nowrap hidden xl:table-cell">
+      <TimestampInfo
+        className="text-sm"
+        utcTimestamp={signingKey.created_at}
+        label={dayjs(signingKey.created_at).fromNow()}
       />
     </TableCell>
+
     {isLastUsedVisible && (
       <LastUsedCell
         lastUsedAt={lastUsedAt}
@@ -175,9 +153,11 @@ export const SigningKeyRow = ({
         isLastUsedSupported={signingKey.id !== legacyKey?.id}
       />
     )}
+
     {!isLastUsedVisible && !hasRotationTimestamp(signingKey.status) && <TableCell />}
+
     {hasRotationTimestamp(signingKey.status) && (
-      <TableCell className="max-w-[100px] text-right py-2 text-sm text-foreground-light whitespace-nowrap hidden lg:table-cell">
+      <TableCell className="max-w-[100px] text-right text-sm text-foreground-light whitespace-nowrap hidden xl:table-cell">
         <TimestampInfo
           className="text-sm"
           utcTimestamp={signingKey.updated_at}
@@ -185,45 +165,53 @@ export const SigningKeyRow = ({
         />
       </TableCell>
     )}
-    <TableCell className="text-right py-2">
+
+    <TableCell className="text-right">
       {(signingKey.status !== 'in_use' || signingKey.algorithm !== 'HS256') && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
+            <ButtonTooltip
+              variant="default"
               aria-label="More options"
-              variant="text"
               className="px-1.5"
               loading={isLoading}
-              icon={<MoreVertical className="size-4" />}
+              icon={<MoreVerticalIcon className="size-4" />}
+              tooltip={{ content: { side: 'bottom', text: 'More options' } }}
             />
           </DropdownMenuTrigger>
+
           <DropdownMenuContent align="end" className="w-52">
             {signingKey.algorithm !== 'HS256' && (
               <DropdownMenuItem
+                className="gap-x-2"
                 onSelect={() => {
                   setSelectedKey(signingKey)
                   setShownDialog('key-details')
                 }}
               >
-                <Eye className="mr-2 size-4" />
+                <EyeIcon size={14} />
                 View key details
               </DropdownMenuItem>
             )}
+
+            {signingKey.status !== 'in_use' && signingKey.algorithm !== 'HS256' && (
+              <DropdownMenuSeparator />
+            )}
+
             {signingKey.status === 'standby' && (
-              <>
-                <DropdownMenuItem
-                  onSelect={() => handlePreviouslyUsedKey(signingKey.id)}
-                  className="text-destructive"
-                >
-                  <CircleArrowDown className="mr-2 size-4" />
-                  Move to previously used
-                </DropdownMenuItem>
-              </>
+              <DropdownMenuItem
+                className="gap-x-2"
+                onSelect={() => handlePreviouslyUsedKey(signingKey.id)}
+              >
+                <CircleArrowDownIcon size={14} />
+                Move to previously used
+              </DropdownMenuItem>
             )}
             {signingKey.status === 'previously_used' && (
               <>
                 <DropdownMenuItemTooltip
                   disabled={!!standbyKey}
+                  className="gap-x-2"
                   onSelect={() => handleStandbyKey(signingKey.id)}
                   tooltip={{
                     content: {
@@ -234,17 +222,18 @@ export const SigningKeyRow = ({
                     },
                   }}
                 >
-                  <CircleArrowUp className="mr-2 size-4" />
+                  <CircleArrowUpIcon size={14} />
                   Move to standby key
                 </DropdownMenuItemTooltip>
+
                 <DropdownMenuItem
+                  className="gap-x-2"
                   onSelect={() => {
                     setSelectedKey(signingKey)
                     setShownDialog('revoke')
                   }}
-                  className="text-destructive"
                 >
-                  <ShieldOff className="mr-2 size-4" />
+                  <ShieldOffIcon size={14} />
                   Revoke key
                 </DropdownMenuItem>
               </>
@@ -252,6 +241,7 @@ export const SigningKeyRow = ({
             {signingKey.status === 'revoked' && (
               <>
                 <DropdownMenuItemTooltip
+                  className="gap-x-2"
                   disabled={!!standbyKey}
                   onSelect={() => handleStandbyKey(signingKey.id)}
                   tooltip={{
@@ -263,18 +253,19 @@ export const SigningKeyRow = ({
                     },
                   }}
                 >
-                  <CircleArrowUp className="mr-2 size-4" />
+                  <CircleArrowUpIcon size={14} />
                   Move to standby key
                 </DropdownMenuItemTooltip>
+
                 <DropdownMenuItem
                   onSelect={() => {
                     setSelectedKey(signingKey)
                     setShownDialog('delete')
                   }}
-                  className="text-destructive"
+                  className="gap-x-2"
                   disabled={legacyKey?.id === signingKey.id}
                 >
-                  <Trash2 className="mr-2 size-4" />
+                  <Trash2Icon size={14} />
                   Delete permanently
                 </DropdownMenuItem>
               </>

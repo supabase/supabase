@@ -1,6 +1,6 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import { isEqual } from 'lodash'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
@@ -68,7 +68,7 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-code-inline">{reference}</code> will{' '}
+          <code>{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">raise an error</span> if there are records
           existing in this table that reference it
         </>
@@ -77,7 +77,7 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-code-inline">{reference}</code> will{' '}
+          <code>{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">also {action}</span> any records that
           reference it in this table
         </>
@@ -88,14 +88,14 @@ export const generateCascadeActionDescription = (
           <span className="text-foreground-light">{actionName}</span>
           <Tooltip>
             <TooltipTrigger className="translate-y-[3px] mx-1">
-              <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
+              <HelpCircleIcon className="text-foreground-light" size={16} strokeWidth={1.5} />
             </TooltipTrigger>
             <TooltipContent side="bottom" className="w-80">
               This is similar to no action, but the restrict check cannot be deferred till later in
               the transaction
             </TooltipContent>
           </Tooltip>
-          : {actionVerb} a record from <code className="text-code-inline">{reference}</code> will{' '}
+          : {actionVerb} a record from <code>{reference}</code> will{' '}
           <span className="text-amber-900 opacity-75">prevent {actionVerb.toLowerCase()}</span>{' '}
           existing referencing rows from this table.
         </>
@@ -104,18 +104,16 @@ export const generateCascadeActionDescription = (
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-code-inline">{reference}</code> will set the value of any existing
-          records in this table referencing it to their{' '}
-          <span className="text-amber-900 opacity-75">default value</span>
+          <code>{reference}</code> will set the value of any existing records in this table
+          referencing it to their <span className="text-amber-900 opacity-75">default value</span>
         </>
       )
     case FOREIGN_KEY_CASCADE_ACTION.SET_NULL:
       return (
         <>
           <span className="text-foreground-light">{actionName}</span>: {actionVerb} a record from{' '}
-          <code className="text-code-inline">{reference}</code> will set the value of any existing
-          records in this table referencing it{' '}
-          <span className="text-amber-900 opacity-75">to NULL</span>
+          <code>{reference}</code> will set the value of any existing records in this table
+          referencing it <span className="text-amber-900 opacity-75">to NULL</span>
         </>
       )
   }

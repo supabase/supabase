@@ -5,7 +5,9 @@ description: 'Enforce SSL usage for all Postgres connections'
 
 Your Supabase project supports connecting to the Postgres DB without SSL enabled to maximize client compatibility. For increased security, you can prevent clients from connecting if they're not using SSL.
 
-Disabling SSL enforcement only applies to connections to Postgres, Supavisor (shared Connection Pooler) and PgBouncer (dedicated Connection Pooler); all HTTP APIs offered by Supabase (e.g., PostgREST, Storage, Auth) automatically enforce SSL on all incoming connections.
+Disabling SSL enforcement only applies to connections to Postgres, Supavisor (shared Connection Pooler) and PgBouncer (dedicated Connection Pooler); all HTTP APIs offered by Supabase (e.g., PostgREST, Storage, Auth) automatically enforce SSL on all incoming connections (see [TLS for project APIs](/docs/guides/security/tls)).
+
+For Supavisor (shared Connection Pooler) this setting governs both legs of the connection: client to pooler, and pooler to Postgres.
 
 <Admonition type="caution">
 
@@ -63,7 +65,7 @@ To get started:
 
 1. [Install](/docs/guides/local-development) the Supabase CLI 1.37.0+.
 1. [Sign in](/docs/guides/local-development/database-migrations#sign-in-to-the-supabase-cli) to your Supabase account using the CLI.
-1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project that you are enabling SSL enforcement.
+1. Ensure that you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-organization-members) for the project that you are enabling SSL enforcement.
 
 ### Check enforcement status
 

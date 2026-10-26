@@ -427,7 +427,16 @@ function ApiOperationRequestBodyDetailsInternal({
     schema.type === 'number' ||
     schema.type === 'integer'
   ) {
-    return <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
+        {schema.description && (
+          <div className="prose wrap-break-word text-sm">
+            <MDXRemoteBase source={schema.description} customPreprocess={normalizeMarkdown} />
+          </div>
+        )}
+      </>
+    )
   } else if (schema.type === 'array') {
     const itemTypeDisplay = getTypeDisplayFromSchema(schema.items)
     const displayName = itemTypeDisplay?.displayName ?? 'unknown'
