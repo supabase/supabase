@@ -103,10 +103,52 @@ describe('SearchV2 telemetry', () => {
     })
   })
 
-  it('ignores k without Cmd', () => {
+  it('sends docs_search_v2_opened with keyboard_shortcut on Ctrl+K', () => {
+    render(<SearchV2Trigger />)
+
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
+
+    expect(screen.getByRole('combobox')).toBeTruthy()
+    expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_opened',
+      properties: { triggerType: 'keyboard_shortcut' },
+    })
+  })
+
+  it.each([
+    ['Cmd+K', { metaKey: true }],
+    ['Ctrl+K', { ctrlKey: true }],
+  ])('keeps the legacy command menu shortcut from firing on %s', (_name, modifier) => {
+    const legacyShortcut = vi.fn()
+    document.addEventListener('keydown', legacyShortcut)
+    render(<SearchV2Trigger />)
+
+    fireEvent.keyDown(document.body, { key: 'k', ...modifier })
+
+    expect(screen.getByRole('combobox')).toBeTruthy()
+    expect(legacyShortcut).not.toHaveBeenCalled()
+    document.removeEventListener('keydown', legacyShortcut)
+  })
+
+  it('ignores k without Cmd or Ctrl', () => {
     render(<SearchV2Trigger />)
 
     fireEvent.keyDown(window, { key: 'k' })
+
+    expect(screen.queryByRole('combobox')).toBeNull()
+    expect(sendTelemetryEvent).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['Ctrl+Shift+K', { ctrlKey: true, shiftKey: true }],
+    ['Ctrl+Alt+K', { ctrlKey: true, altKey: true }],
+    ['Cmd+Shift+K', { metaKey: true, shiftKey: true }],
+    ['Cmd+Alt+K', { metaKey: true, altKey: true }],
+  ])('ignores %s so browser shortcuts keep working', (_name, modifier) => {
+    render(<SearchV2Trigger />)
+
+    fireEvent.keyDown(window, { key: 'k', ...modifier })
 
     expect(screen.queryByRole('combobox')).toBeNull()
     expect(sendTelemetryEvent).not.toHaveBeenCalled()
