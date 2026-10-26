@@ -32,9 +32,7 @@ export const CardBrandIcon = ({ brand }: { brand: string | null | undefined }) =
     )
   }
 
-  return (
-    <img alt="Credit card brand" src={`${BASE_PATH}/img/payment-methods/${brand}.png`} width="32" />
-  )
+  return <img alt={brand} src={`${BASE_PATH}/img/payment-methods/${brand}.png`} width="32" />
 }
 
 interface CreditCardProps {
