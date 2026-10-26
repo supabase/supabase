@@ -29,30 +29,22 @@ const runQueryFn = (path: string, search?: string, pageParam?: string) => {
 }
 
 describe('bucketObjectsInfiniteQueryOptions', () => {
-  it('browses the bucket root with an empty prefix', async () => {
+  // list-v2 with with_delimiter:true treats a bare "photos" as a partial name match against
+  // siblings like "photos-old", so browsing into a folder needs a trailing slash.
+  it.each([
+    ['browses the bucket root with an empty prefix', '', undefined, ''],
+    ['appends a trailing slash to browse into a subfolder', 'photos', undefined, 'photos/'],
+    [
+      'folds a search string into the prefix without a trailing slash',
+      'photos',
+      'inv',
+      'photos/inv',
+    ],
+    ['searches at the bucket root without a leading slash', '', 'inv', 'inv'],
+  ])('%s', async (_, path, search, expectedPrefix) => {
     const getBody = captureRequestBody()
-    await runQueryFn('')
-    expect(getBody()?.prefix).toBe('')
-  })
-
-  it('appends a trailing slash to browse into a subfolder', async () => {
-    // list-v2 with with_delimiter:true treats a bare "photos" as a partial name match
-    // against siblings like "photos-old" rather than descending into the folder.
-    const getBody = captureRequestBody()
-    await runQueryFn('photos')
-    expect(getBody()?.prefix).toBe('photos/')
-  })
-
-  it('folds a search string into the prefix without a trailing slash after it', async () => {
-    const getBody = captureRequestBody()
-    await runQueryFn('photos', 'inv')
-    expect(getBody()?.prefix).toBe('photos/inv')
-  })
-
-  it('searches at the bucket root without a leading slash', async () => {
-    const getBody = captureRequestBody()
-    await runQueryFn('', 'inv')
-    expect(getBody()?.prefix).toBe('inv')
+    await runQueryFn(path, search)
+    expect(getBody()?.prefix).toBe(expectedPrefix)
   })
 
   it('forwards the page param as the cursor', async () => {

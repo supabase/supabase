@@ -18,7 +18,6 @@ interface LogFieldRowProps<TData> {
   disabled?: boolean
   /** Truncate the label to one line instead of wrapping it. */
   truncateLabel?: boolean
-  alignOffset?: number
   className?: string
 }
 
@@ -32,7 +31,6 @@ export function LogFieldRow<TData>({
   table,
   disabled,
   truncateLabel = false,
-  alignOffset = 16,
   className,
 }: LogFieldRowProps<TData>) {
   return (
@@ -44,7 +42,6 @@ export function LogFieldRow<TData>({
       label={label}
       disabled={disabled}
       className="rounded-none"
-      alignOffset={alignOffset}
     >
       <div
         role="button"

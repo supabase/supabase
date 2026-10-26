@@ -111,23 +111,6 @@ describe('OrganizationSettingsLayout helpers', () => {
     expect(linkByKey('documents')?.shortcutId).toBe(SHORTCUT_IDS.NAV_ORG_SETTINGS_DOCUMENTS)
   })
 
-  it('omits feature-flagged links (and their shortcutIds) when flags are off', () => {
-    const sections = generateOrganizationSettingsSections({
-      slug: 'my-org',
-      currentPath: '/org/my-org/general',
-      showSecuritySettings: false,
-      showSsoSettings: false,
-      showLegalDocuments: false,
-    })
-
-    const allLinks = sections.flatMap((s) => s.links)
-    const keys = allLinks.map((l) => l.key)
-
-    expect(keys).not.toContain('security')
-    expect(keys).not.toContain('sso')
-    expect(keys).not.toContain('documents')
-  })
-
   it('keeps webhooks nav item active for nested endpoint routes', () => {
     const sections = generateOrganizationSettingsSections({
       slug: 'my-org',

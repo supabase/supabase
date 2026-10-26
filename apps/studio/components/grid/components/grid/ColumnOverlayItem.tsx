@@ -1,4 +1,4 @@
-import { Key, Lightbulb, Link, Lock } from 'lucide-react'
+import { KeyIcon, LightbulbIcon, LinkIcon, LockIcon } from 'lucide-react'
 
 import { useColumnHasIndexSuggestion } from '../../context/TableIndexAdvisorContext'
 import { ColumnType, SupaColumn } from '../../types'
@@ -23,7 +23,7 @@ export function ColumnOverlayItem({ column }: ColumnOverlayItemProps) {
         <ColumnIcon type={columnType} />
         {column.isPrimaryKey && (
           <div className="sb-grid-column-header__inner__primary-key">
-            <Key size={14} strokeWidth={2} />
+            <KeyIcon size={14} strokeWidth={2} />
           </div>
         )}
 
@@ -33,8 +33,10 @@ export function ColumnOverlayItem({ column }: ColumnOverlayItemProps) {
           {columnFormat}
           {columnFormat === 'bytea' ? ` (hex)` : ''}
         </span>
-        {column.isEncrypted && <Lock size={14} strokeWidth={2} />}
-        {hasIndexSuggestion && <Lightbulb size={14} strokeWidth={2} className="text-warning!" />}
+        {column.isEncrypted && <LockIcon size={14} strokeWidth={2} />}
+        {hasIndexSuggestion && (
+          <LightbulbIcon size={14} strokeWidth={2} className="text-warning!" />
+        )}
       </div>
     </div>
   )
@@ -44,7 +46,7 @@ function ColumnIcon({ type }: { type: ColumnType }) {
   switch (type) {
     case 'foreign_key':
       // [Joshen] Look into this separately but this should be a hover card instead
-      return <Link size={14} strokeWidth={2} />
+      return <LinkIcon size={14} strokeWidth={2} />
     default:
       return null
   }

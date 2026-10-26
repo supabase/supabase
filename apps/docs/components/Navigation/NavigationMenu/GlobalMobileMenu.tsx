@@ -1,7 +1,7 @@
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { X } from 'lucide-react'
+import { AnimatePresence, domAnimation, LazyMotion, m } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'

@@ -146,6 +146,17 @@ Use an ordered list for steps taken in sequence, and an unordered list when orde
 doesn't matter. Use Arabic numerals (`1`, `2`, `3`) for ordered lists and dashes (`-`)
 for unordered lists.
 
+#### Point forward to a list with _the following_
+
+When a sentence refers to a list but another sentence sits between it and the list, use
+_the following_. _These_ reads as pointing back at something already on the page, so the
+reader can't tell which items it means. When the referring sentence is directly before
+the list, either word works.
+
+- **Recommended**: `To open Supabase Studio, start from either of the following tabs. Each one opens a different page in Supabase:`
+- **Recommended**: `Start from either of these tabs:`
+- **Not recommended**: `To open Supabase Studio, start from either of these tabs. Each one opens a different page in Supabase:`
+
 #### Prefer a paragraph to a single-item list
 
 A list of one signals content that was meant to grow and didn't. Exceptions: layout
@@ -185,8 +196,12 @@ to need one.
 The format makes that expectation explicit.
 
 Write sequential actions as an ordered list. **Begin each step with an imperative verb,
-and include one action or a closely related set of actions per step.** Give the reader
-enough context to know where to act.
+or with a short location phrase followed by one, and include one action or a closely
+related set of actions per step.** When a step says where to act, put the location
+first. Give the reader enough context to know where to act.
+
+- **Recommended**: `Next to Supabase, click **Manage**, then click **Open in Supabase**.`
+- **Not recommended**: `Click **Manage** next to Supabase, then click **Open in Supabase**.`
 
 For how many steps to present at once and when to split a procedure into phases, see
 chunking in [`03-page-structure.md`](./03-page-structure.md).
@@ -200,6 +215,20 @@ action:
 The first step establishes the operating context for both readers and agents. Don't add
 a redundant orientation step to a genuinely atomic instruction. Write `Click **Save**.`
 rather than adding `Locate the **Save** button` as a separate step.
+
+#### Pair Dashboard steps with a terminal option
+
+Agents can't use the Dashboard. For any change a reader makes there, also give a terminal
+path, such as `psql`, the Supabase CLI, or the Management API. Put paths with separate
+steps in [tabs](#tabs).
+
+#### For every "run the following SQL" step
+
+Paste this standard snippet before the SQL block:
+
+```mdx
+Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+```
 
 ### Code blocks
 

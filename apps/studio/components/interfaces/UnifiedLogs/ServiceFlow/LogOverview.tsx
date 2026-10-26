@@ -1,4 +1,4 @@
-import { Clock } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
 
 import { LogFields } from '../components/LogFields'
@@ -12,6 +12,7 @@ import {
   MemoizedPostgresBlock,
   MemoizedPostgRESTBlock,
   MemoizedStorageBlock,
+  MemoizedSupavisorBlock,
 } from './components/ServiceBlocks'
 import type { ServiceFlowBlockProps } from './types'
 import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
@@ -28,11 +29,26 @@ function RequestOverview({ children, ...props }: LogOverviewProps & { children: 
       <DetailSectionHeader
         title="Request started"
         className="border-b"
-        icon={Clock}
+        icon={ClockIcon}
         summary={timestamp === null ? undefined : new Date(timestamp).toLocaleString()}
       />
       <MemoizedNetworkBlock {...props} />
       {children}
+    </>
+  )
+}
+
+function SupavisorOverview(props: LogOverviewProps) {
+  const timestamp = getRowTimestampMs(props.data)
+  return (
+    <>
+      <DetailSectionHeader
+        title="Event time"
+        className="border-b"
+        icon={ClockIcon}
+        summary={timestamp === null ? undefined : new Date(timestamp).toLocaleString()}
+      />
+      <MemoizedSupavisorBlock {...props} />
     </>
   )
 }
@@ -79,6 +95,7 @@ const LOG_OVERVIEW_RENDERERS: Partial<
   auth: AuthOverview,
   storage: StorageOverview,
   'edge function': EdgeFunctionOverview,
+  supavisor: SupavisorOverview,
 }
 
 export function LogOverview(props: LogOverviewProps) {

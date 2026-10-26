@@ -56,7 +56,9 @@ import { useRootQueryClient } from '@/data/query-client'
 import { inter, manrope, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
@@ -89,8 +91,13 @@ const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const MetricsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() => import('@/components/ui/DevToolbar/MetricsTab').then((m) => m.MetricsTab))
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [
+      { id: 'metrics', label: 'Metrics', content: <MetricsTab /> },
       { id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> },
       { id: 'project-status', label: 'Project Status', content: <ProjectStatusTab /> },
     ]
@@ -101,6 +108,7 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const { data: organizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
   const cloudProvider = useDefaultProvider()
 
   const getConfigCatFlags = useCallback(
@@ -108,9 +116,17 @@ const FeatureFlagProviderWithOrgContext = ({
       const customAttributes: Record<string, string> = {}
       if (cloudProvider) customAttributes.cloud_provider = cloudProvider
       if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      if (selectedOrganization?.slug) customAttributes.organization_slug = selectedOrganization.slug
+      const createdAtUnixSeconds = toUnixSecondsString(organizationCreatedAt)
+      if (createdAtUnixSeconds) customAttributes.organization_created_at = createdAtUnixSeconds
       return getFlags(userEmail, customAttributes)
     },
-    [cloudProvider, selectedOrganization?.plan?.id]
+    [
+      cloudProvider,
+      selectedOrganization?.plan?.id,
+      selectedOrganization?.slug,
+      organizationCreatedAt,
+    ]
   )
 
   return (
@@ -166,6 +182,13 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   // [Joshen] Should target hosted staging, local dev, and local CLI only
   const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
+  const isLocalEnv =
+    process.env.NODE_ENV === 'development' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    isCLI
+  let faviconRoute = '/favicon'
+  if (isNonProdEnv) faviconRoute = '/favicon/staging'
+  if (isLocalEnv) faviconRoute = '/favicon/local'
 
   const checkCliEnvironment = async () => {
     const data = await getCLIReleaseVersion()
@@ -209,7 +232,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <MetaFaviconsPagesRouter
                         includeManifest
                         applicationName="Supabase Studio"
-                        route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                        route={faviconRoute}
                       />
                       <TooltipProvider>
                         <RouteValidationWrapper>

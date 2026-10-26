@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Activity, Gauge, Inbox, Shield } from 'lucide-react'
+import { ActivityIcon, GaugeIcon, InboxIcon, ShieldIcon } from 'lucide-react'
 import type { ElementType } from 'react'
 
 import type { AdvisorItem, AdvisorLintItem, AdvisorNotificationItem } from './AdvisorPanel.types'
@@ -173,10 +173,10 @@ export const getAdvisorItemSecondaryText = (
 }
 
 export const advisorCategoryIcons: Record<AdvisorCategory, ElementType> = {
-  security: Shield,
-  performance: Gauge,
-  health: Activity,
-  messages: Inbox,
+  security: ShieldIcon,
+  performance: GaugeIcon,
+  health: ActivityIcon,
+  messages: InboxIcon,
 }
 
 export const advisorCategoryLabels: Record<AdvisorCategory, string> = {

@@ -41,6 +41,66 @@ execute function "supabase_functions"."http_request"(
 
 We currently support HTTP webhooks. These can be sent as `POST` or `GET` requests with a JSON payload.
 
+## Call an Edge Function
+
+A webhook can call an [Edge Function](/docs/guides/functions) on each table event, and the function receives the [payload](#payload) as its request body. Call the function with your project's secret key, and accept it in the function with `auth: 'secret'` and `verify_jwt = false`. For more information, see [Service-to-service calls](/docs/guides/functions/auth#service-to-service-calls).
+
+### From the Supabase Dashboard
+
+1. Create a [Database Webhook](/dashboard/project/_/integrations/webhooks/overview) in the Supabase Dashboard.
+1. In **Type of webhook**, select **Supabase Edge Functions**, then select your function.
+1. Under **HTTP Headers**, select **Add secret key**.
+
+The webhook saves the key in its trigger definition, so the key appears anywhere the trigger's SQL does, such as a database dump.
+
+### From a migration
+
+To keep the secret key out of your migration files, store it in [Supabase Vault](/docs/guides/database/vault) and read it from a trigger function.
+
+1. In the [SQL Editor](/dashboard/project/_/sql/new), store your project URL and secret key in Vault. Run these statements once for each project, outside your migrations:
+
+   ```sql
+   select vault.create_secret('https://project-ref.supabase.co', 'project_url');
+   select vault.create_secret('YOUR_SUPABASE_SECRET_KEY', 'secret_key');
+   ```
+
+1. In a migration, create a trigger function that reads both values from Vault and calls the Edge Function with [`pg_net`](/docs/guides/database/extensions/pg_net). Then attach it to the table:
+
+   ```sql
+   create function public.call_function_name()
+   returns trigger
+   language plpgsql
+   security definer
+   set search_path = ''
+   as $$
+   begin
+     perform net.http_post(
+       url := (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/function-name',
+       headers := jsonb_build_object(
+         'Content-Type', 'application/json',
+         'apikey', (select decrypted_secret from vault.decrypted_secrets where name = 'secret_key')
+       ),
+       body := jsonb_build_object(
+         'type', tg_op,
+         'table', tg_table_name,
+         'schema', tg_table_schema,
+         'record', to_jsonb(new),
+         'old_record', null
+       )
+     );
+     return new;
+   end;
+   $$;
+
+   create trigger call_function_name
+   after insert on public.my_table
+   for each row execute function public.call_function_name();
+   ```
+
+   The trigger function is `security definer` because the roles that insert rows, such as `authenticated`, can't read Vault. Without it, their inserts fail with a permission error.
+
+<$Partial path="pg_net_queued_key.mdx" />
+
 ## Payload
 
 The payload is automatically generated from the underlying table record:

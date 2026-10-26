@@ -20,7 +20,6 @@ import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import { StepHikeCompact } from '~/components/StepHikeCompact'
-import Table from '~/components/Table'
 import { TerraformProviderSchema } from '~/components/TerraformProviderSchema'
 import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegration'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
@@ -34,7 +33,7 @@ import { YouTube } from '~/features/ui/YouTube'
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
-import { Badge, Button, Heading } from 'ui'
+import { Badge, Button, Heading, Table } from 'ui'
 import { Admonition, type AdmonitionProps } from 'ui-patterns/Admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
@@ -137,7 +136,7 @@ const components = {
     </Heading>
   ),
   pre: Pre,
-  table: Table,
+  table: (props: ComponentPropsWithoutRef<'table'>) => <Table prose {...props} />,
   /**
    * Force inline code tags to go sync, this prevents Heading anchor resolution fail due to
    * our CodeBlock component being async. We need to find a better solution for more future

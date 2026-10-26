@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -22,12 +23,13 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
 
 type EnablePipelinesModalProps =
-  | { open: boolean; onOpenChange: (open: boolean) => void }
-  | { open?: never; onOpenChange?: never }
+  | { open: boolean; onOpenChange: (open: boolean) => void; onSuccess?: () => void }
+  | { open?: never; onOpenChange?: never; onSuccess?: () => void }
 
 export const EnablePipelinesModal = ({
   open: extOpen,
   onOpenChange,
+  onSuccess,
 }: EnablePipelinesModalProps) => {
   const { ref: projectRef } = useParams()
   const [_open, _setOpen] = useState(false)
@@ -36,12 +38,13 @@ export const EnablePipelinesModal = ({
   const setOpen = onOpenChange ?? _setOpen
   const hideTrigger = extOpen !== undefined && onOpenChange !== undefined
 
-  const { hasAccess } = useCheckEntitlements('replication.etl')
+  const { hasAccess, isLoading } = useCheckEntitlements('replication.etl')
 
   const { mutate: createTenantSource, isPending: creatingTenantSource } =
     useCreateTenantSourceMutation({
       onSuccess: () => {
         toast.success('Pipelines enabled')
+        onSuccess?.()
         setOpen(false)
       },
       onError: (error) => {
@@ -50,6 +53,7 @@ export const EnablePipelinesModal = ({
     })
 
   const onEnablePipelines = async () => {
+    if (isLoading || !hasAccess) return
     if (!projectRef) return console.error('Project ref is required')
     createTenantSource({ projectRef })
   }
@@ -67,7 +71,15 @@ export const EnablePipelinesModal = ({
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-3">
-          {hasAccess ? (
+          <p role="status" aria-live="polite" className="sr-only">
+            {isLoading ? 'Checking Pipelines access…' : ''}
+          </p>
+          {isLoading && (
+            <div aria-hidden="true">
+              <GenericSkeletonLoader />
+            </div>
+          )}
+          {!isLoading && hasAccess && (
             <>
               <p className="text-sm text-foreground-light">
                 Pipelines bills for configured pipeline hours and Postgres row data processed during
@@ -81,7 +93,8 @@ export const EnablePipelinesModal = ({
                 Pipelines is in public alpha and may change.
               </p>
             </>
-          ) : (
+          )}
+          {!isLoading && !hasAccess && (
             <p className="text-sm text-foreground-light">Pipelines requires the Pro plan.</p>
           )}
         </DialogSection>
@@ -89,9 +102,14 @@ export const EnablePipelinesModal = ({
           <Button disabled={creatingTenantSource} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          {hasAccess ? (
-            <Button variant="primary" loading={creatingTenantSource} onClick={onEnablePipelines}>
-              Enable Pipelines
+          {isLoading || hasAccess ? (
+            <Button
+              variant="primary"
+              loading={isLoading || creatingTenantSource}
+              disabled={isLoading}
+              onClick={onEnablePipelines}
+            >
+              Enable
             </Button>
           ) : (
             <UpgradePlanButton source="replication" featureProposition="use replication" />

@@ -1,4 +1,4 @@
-import { ListTree, MessageCircle, Plus } from 'lucide-react'
+import { ListTreeIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -14,7 +14,6 @@ import {
 } from 'ui'
 
 import { BranchLink } from './BranchLink'
-import { BRANCHING_GITHUB_DISCUSSION_LINK } from '@/components/interfaces/BranchManagement/BranchManagement.constants'
 import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import type { Branch } from '@/data/branches/branches-query'
 import { useTrack } from '@/lib/telemetry/track'
@@ -53,7 +52,7 @@ export function BranchDropdownCommandContent({
             size="small"
             asChild
             block
-            icon={<ListTree size={14} strokeWidth={1.5} />}
+            icon={<ListTreeIcon size={14} strokeWidth={1.5} />}
           >
             <Link
               href={`/project/${projectRef}/branches`}
@@ -64,23 +63,6 @@ export function BranchDropdownCommandContent({
             </Link>
           </Button>
           <Button
-            variant="text"
-            size="small"
-            asChild
-            block
-            icon={<MessageCircle size={14} strokeWidth={1.5} />}
-          >
-            <a
-              target="_blank"
-              rel="noreferrer noopener"
-              href={BRANCHING_GITHUB_DISCUSSION_LINK}
-              onClick={onClose}
-              className="text-xs text-foreground-light hover:text-foreground"
-            >
-              Branching feedback
-            </a>
-          </Button>
-          <Button
             size="small"
             block
             className="col-span-full text-xs text-foreground-light hover:text-foreground"
@@ -89,7 +71,7 @@ export function BranchDropdownCommandContent({
               onClose()
               onCreateBranch()
             }}
-            icon={<Plus size={14} strokeWidth={1.5} />}
+            icon={<PlusIcon size={14} strokeWidth={1.5} />}
           >
             Create branch
           </Button>
@@ -144,7 +126,7 @@ export function BranchDropdownCommandContent({
             }}
           >
             <div className="w-full flex items-center gap-2">
-              <Plus size={14} strokeWidth={1.5} />
+              <PlusIcon size={14} strokeWidth={1.5} />
               <p>Create branch</p>
             </div>
           </CommandItem>
@@ -156,25 +138,8 @@ export function BranchDropdownCommandContent({
               onClose()
             }}
           >
-            <ListTree size={14} strokeWidth={1.5} />
+            <ListTreeIcon size={14} strokeWidth={1.5} />
             <p>Manage branches</p>
-          </CommandItemLink>
-        </CommandGroup>
-
-        <CommandSeparator />
-
-        <CommandGroup>
-          <CommandItemLink
-            href={BRANCHING_GITHUB_DISCUSSION_LINK}
-            linkProps={{ target: '_blank', rel: 'noreferrer noopener' }}
-            className="cursor-pointer w-full gap-2"
-            onSelect={onClose}
-          >
-            <MessageCircle size={14} strokeWidth={1} className="mt-0.5" />
-            <div>
-              <p>Branching feedback</p>
-              <p className="text-lighter">Join GitHub Discussion</p>
-            </div>
           </CommandItemLink>
         </CommandGroup>
       </CommandList>

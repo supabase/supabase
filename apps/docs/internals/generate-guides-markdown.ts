@@ -13,6 +13,7 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 import { parse as parseToml } from 'smol-toml'
 import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuilder/McpConfigPanel.md'
 
+import { stripHeadingCustomIds } from './helpers'
 import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
 import { AccordionItem } from './markdown-schema/Accordion'
 import { Admonition } from './markdown-schema/Admonition'
@@ -229,6 +230,7 @@ async function transformBody(content: string, data: Record<string, unknown>): Pr
   const tree = parseMdx(content)
   await inlinePartials(tree)
   addBaseUrlPrefix(tree)
+  stripHeadingCustomIds(tree)
   applySchema(tree, SCHEMA)
   const body = serializeMdx(tree)
 

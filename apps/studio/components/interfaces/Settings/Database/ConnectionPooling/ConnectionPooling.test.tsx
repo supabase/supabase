@@ -31,8 +31,9 @@ vi.mock('common', async (importOriginal) => ({
   useParams: () => ({ ref: 'ha-project' }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { DATABASE_POOLING_CONFIG_WRITE: 'database_pooling_config_write' } },
 }))
 
 vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
