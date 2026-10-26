@@ -571,7 +571,11 @@ const ColorPalette = ({ colors }: { colors: BrandColor[] }) => {
                         isActive={isCopied}
                         activeIcon={<CircleCheckFilled className="size-3.5" />}
                         inactiveIcon={<Copy className="size-3" />}
-                        className={cn('size-3.5 transition-opacity', !isCopied && 'opacity-0')}
+                        className={cn(
+                          'size-3.5 transition-opacity',
+                          !isCopied &&
+                            'opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100'
+                        )}
                       />
                       <span className="sr-only">
                         {isCopied ? 'Copied' : 'Copy'} {color.name} {format.label}

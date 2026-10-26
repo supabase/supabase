@@ -53,7 +53,6 @@ interface Drag {
 // px per symbol unit. the viewBox draws 1:1, so a 1 unit stroke stays 1px at any scale
 const SCALE = 1.1
 const PADDING = 24
-const TOP_SPACE = 64
 // a guide runs this far from the symbol. it must pass every edge of the hero
 const REACH = 2400
 const HATCH_SPACING = 6
@@ -209,22 +208,18 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
   }
 
   return (
-    <div
-      style={{ paddingTop: TOP_SPACE }}
-      className={cn('relative flex w-full flex-col items-center gap-6', className)}
-    >
+    <div className={cn('relative flex w-full flex-col items-center gap-6 pt-16', className)}>
       <GlyphLines
         linesRef={guidesRef}
         text={guideText}
         className={cn(
           'construction-mask absolute top-0 left-1/2 h-full w-screen -translate-x-1/2',
-          'font-mono text-border [--glyph-lines-pulse:var(--color-border-stronger)]'
+          'font-mono text-border-strong dark:text-border [--glyph-lines-pulse:var(--color-border-stronger)]'
         )}
       />
       <div
         aria-hidden
-        style={{ paddingTop: TOP_SPACE }}
-        className="construction-mask pointer-events-none absolute inset-y-0 left-1/2 flex w-screen -translate-x-1/2 justify-center"
+        className="construction-mask pointer-events-none absolute inset-y-0 left-1/2 flex w-screen -translate-x-1/2 justify-center pt-16"
       >
         <svg {...svgProps} ref={guidesRef} className="group/guides overflow-visible">
           <defs>
@@ -449,6 +444,19 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
           </g>
         </svg>
       </div>
+      {/* the drawing is aria-hidden, so a visually hidden button is the keyboard path to the same toggle */}
+      <button
+        type="button"
+        tabIndex={0}
+        aria-pressed={isWordmark}
+        onClick={handleLogoClick}
+        className={cn(
+          'sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:bottom-0',
+          'rounded-md border border-default bg-surface-100 px-2 py-1 text-xs text-foreground focus-ring'
+        )}
+      >
+        Show wordmark
+      </button>
     </div>
   )
 }
