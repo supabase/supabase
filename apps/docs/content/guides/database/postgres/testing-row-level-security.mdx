@@ -11,7 +11,19 @@ Prove each Row Level Security (RLS) policy allows and blocks what you meant by r
 
 The example tests a `todos` table whose policy lets each user access only their own rows.
 
-1. Create the table, enable RLS, and add the policy:
+1. Open a terminal in your project and start the local stack:
+
+   ```bash
+   supabase start
+   ```
+
+2. Create a migration for the table and its policy:
+
+   ```bash
+   supabase migration new create_todos
+   ```
+
+   In the new `supabase/migrations/<timestamp>_create_todos.sql` file, add the following SQL:
 
    ```sql
    create table todos (
@@ -29,13 +41,19 @@ The example tests a `todos` table whose policy lets each user access only their 
    using ((select auth.uid()) = user_id);
    ```
 
-2. Create the test file:
+   Apply the migration to your local database:
+
+   ```bash
+   supabase db reset
+   ```
+
+3. Create the test file:
 
    ```bash
    supabase test new todos_rls
    ```
 
-3. In `supabase/tests/todos_rls_test.sql`, write the tests:
+4. In `supabase/tests/todos_rls_test.sql`, write the tests:
 
    ```sql supabase/tests/todos_rls_test.sql
    begin;
@@ -92,7 +110,9 @@ The example tests a `todos` table whose policy lets each user access only their 
    rollback;
    ```
 
-4. Run the tests:
+   The file runs in one transaction that rolls back at the end, so the test data never persists. `set local role` and `request.jwt.claim.sub` set the role and user each assertion runs as, the way a signed-in user's request does.
+
+5. Run the tests:
 
    ```bash
    supabase test db
@@ -105,6 +125,8 @@ The example tests a `todos` table whose policy lets each user access only their 
    Files=1, Tests=4,  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
    Result: PASS
    ```
+
+The policy now has a test that fails if a change lets one user read or edit another user's todos.
 
 ## Related content
 
