@@ -5,7 +5,7 @@ import { cn } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import { FrameworkQuickstarts } from '@/components/FrameworkQuickstarts'
-import { MIGRATION_PAGES } from '@/data/migration-pages'
+import { resourcesMigrate } from '@/data/content-listings/resources.data'
 import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker'
 import { IconLinkImage, IconLinkList, IconLinkMenuIcon } from '@/features/ui/IconLink'
 import HomeLayout from '@/layouts/HomeLayout'
@@ -215,15 +215,15 @@ const additionalResources = [
   },
 ]
 
-const migrationGuides = [...MIGRATION_PAGES]
-  .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+const migrationGuides = [...resourcesMigrate.items]
+  .sort((a, b) => a.title.localeCompare(b.title))
   .flatMap((guide) => {
-    if (!guide.name || !guide.url || typeof guide.icon !== 'string') return []
+    if (!guide.href || typeof guide.icon !== 'string') return []
 
     return [
       {
-        title: guide.name,
-        href: guide.url,
+        title: guide.title,
+        href: guide.href,
         icon: <IconLinkImage path={guide.icon} hasLightIcon={guide.hasLightIcon} />,
       },
     ]

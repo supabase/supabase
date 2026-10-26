@@ -93,6 +93,20 @@ export const resourcesMigrate: ContentListingGroup = {
       hasLightIcon: false,
       description: 'Migrate your Microsoft SQL Server database to Supabase.',
     },
+    {
+      title: 'Neon',
+      href: 'https://supabase.com/kb/guides/migrate-from-neon',
+      icon: '/docs/img/icons/neon-icon',
+      hasLightIcon: true,
+      description: 'Migrate your Neon database to Supabase.',
+    },
+    {
+      title: 'Vercel Postgres',
+      href: 'https://supabase.com/kb/guides/migrate-from-vercel-postgres',
+      icon: '/docs/img/icons/vercel-icon',
+      hasLightIcon: true,
+      description: 'Migrate your Vercel Postgres database to Supabase.',
+    },
   ],
 }
 
