@@ -1,5 +1,6 @@
 import { clientSdkIds } from '~/content/navigation.references'
 import { BASE_PATH, PROD_URL } from '~/lib/constants'
+import { MARKDOWN_CONTENT_TYPE } from '~/lib/md-alternates'
 import { NextResponse } from 'next/server'
 
 const REFERENCE_MARKDOWN_LIBS = new Set([...clientSdkIds, 'cli', 'api'])
@@ -28,7 +29,7 @@ There is no markdown version of \`${BASE_PATH}/${relativePath}\`.
   return new NextResponse(markdown, {
     status: 404,
     headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
+      'Content-Type': MARKDOWN_CONTENT_TYPE,
       'Cache-Control': 'no-store',
       'X-Content-Type-Options': 'nosniff',
     },
