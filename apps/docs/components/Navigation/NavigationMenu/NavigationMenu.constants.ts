@@ -924,6 +924,7 @@ export const auth: NavMenuConstant = {
           ],
         },
         { name: 'Custom SMTP', url: '/guides/auth/auth-smtp' },
+        { name: 'Test Auth Flows', url: '/guides/auth/testing-auth-flows' },
         { name: 'User Management', url: '/guides/auth/managing-user-data' },
       ],
     },
