@@ -1,15 +1,19 @@
 import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
-import dayjs, { Dayjs } from 'dayjs'
 import maxBy from 'lodash/maxBy'
 import meanBy from 'lodash/meanBy'
 import sumBy from 'lodash/sumBy'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { Alert, AlertDescription, AlertTitle, Button, LogoLoader, WarningIcon } from 'ui'
+import { Alert, AlertDescription, AlertTitle, LogoLoader, WarningIcon } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
+import { EdgeFunctionIntervalSelector } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionIntervalSelector'
 import { EdgeFunctionOverview } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview'
+import {
+  EDGE_FUNCTION_CHART_INTERVALS,
+  getRollingTimeRange,
+} from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview.utils'
 import { EdgeFunctionOverviewHeader } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverviewHeader'
 import { EdgeFunctionRecentInvocations } from '@/components/interfaces/Functions/EdgeFunctionRecentInvocations'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
@@ -25,45 +29,16 @@ import {
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
-import type { ChartIntervals, NextPageWithLayout } from '@/types'
-
-const CHART_INTERVALS: ChartIntervals[] = [
-  {
-    key: '15min',
-    label: '15 min',
-    startValue: 15,
-    startUnit: 'minute',
-    format: 'MMM D, h:mm:ssa',
-  },
-  {
-    key: '1hr',
-    label: '1 hour',
-    startValue: 1,
-    startUnit: 'hour',
-    format: 'MMM D, h:mma',
-  },
-  {
-    key: '3hr',
-    label: '3 hours',
-    startValue: 3,
-    startUnit: 'hour',
-    format: 'MMM D, h:mma',
-  },
-  {
-    key: '1day',
-    label: '1 day',
-    startValue: 1,
-    startUnit: 'hour',
-    format: 'MMM D, h:mma',
-  },
-]
+import type { NextPageWithLayout } from '@/types'
 
 const LegacyEdgeFunctionOverview = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
 
   const [interval, setInterval] = useState<string>('1hr')
-  const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
+  const selectedInterval =
+    EDGE_FUNCTION_CHART_INTERVALS.find((i) => i.key === interval) ||
+    EDGE_FUNCTION_CHART_INTERVALS[1]
   const { data: selectedFunction } = useEdgeFunctionQuery({
     projectRef,
     slug: functionSlug,
@@ -82,14 +57,14 @@ const LegacyEdgeFunctionOverview = () => {
     return result || []
   }, [combinedStatsResults.data])
 
-  const [startDate, endDate]: [Dayjs, Dayjs] = useMemo(() => {
-    const start = dayjs()
-      .subtract(selectedInterval.startValue, selectedInterval.startUnit as dayjs.ManipulateType)
-      .startOf(selectedInterval.startUnit as dayjs.ManipulateType)
-
-    const end = dayjs().startOf(selectedInterval.startUnit as dayjs.ManipulateType)
-    return [start, end]
-  }, [selectedInterval])
+  const [startDate] = useMemo(
+    () =>
+      getRollingTimeRange(
+        selectedInterval,
+        new Date(combinedStatsResults.dataUpdatedAt || Date.now())
+      ),
+    [selectedInterval, combinedStatsResults.dataUpdatedAt]
+  )
 
   const {
     data: combinedStatsChartData,
@@ -117,8 +92,6 @@ const LegacyEdgeFunctionOverview = () => {
       'max_cpu_time_used',
     ],
     defaultValue: 0,
-    startDate: startDate.toISOString(),
-    endDate: endDate.toISOString(),
   })
 
   const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissionsV2(
@@ -130,7 +103,11 @@ const LegacyEdgeFunctionOverview = () => {
 
   return (
     <>
-      <EdgeFunctionOverviewHeader />
+      <EdgeFunctionOverviewHeader
+        actions={
+          <EdgeFunctionIntervalSelector interval={interval} onIntervalChange={setInterval} />
+        }
+      />
       <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
@@ -142,36 +119,6 @@ const LegacyEdgeFunctionOverview = () => {
                 />
               </div>
             )}
-            <div className="flex flex-row items-center gap-2 mb-4">
-              <div className="flex items-center">
-                {CHART_INTERVALS.map((item, i) => {
-                  const classes = []
-
-                  if (i === 0) {
-                    classes.push('rounded-tr-none rounded-br-none')
-                  } else if (i === CHART_INTERVALS.length - 1) {
-                    classes.push('rounded-tl-none rounded-bl-none')
-                  } else {
-                    classes.push('rounded-none')
-                  }
-
-                  return (
-                    <Button
-                      key={`function-filter-${i}`}
-                      variant={interval === item.key ? 'secondary' : 'default'}
-                      onClick={() => setInterval(item.key)}
-                      className={classes.join(' ')}
-                    >
-                      {item.label}
-                    </Button>
-                  )
-                })}
-              </div>
-
-              <span className="text-xs text-foreground-light">
-                Statistics for past {selectedInterval.label}
-              </span>
-            </div>
             <div>
               <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 lg:grid-cols-2 lg:gap-8">
                 <ReportWidget
