@@ -128,6 +128,7 @@ describe('assertGrant', () => {
   it('accepts unguarded, and requires a byDesign reason', () => {
     expect(check(BRANCHES, unguarded.migrating)).not.toThrow()
     expect(check(BRANCHES, unguarded.byDesign('optimistic call'))).not.toThrow()
+    // eslint-disable-next-line fga/unguarded-by-design-reason -- asserts the runtime check
     expect(check(BRANCHES, unguarded.byDesign(''))).toThrow('needs a reason')
   })
 
