@@ -1,0 +1,12 @@
+---
+title: Can a Supabase Postgres database scale as my app grows?
+topics: ['Platform', 'Database']
+---
+
+Yes, and the order you do it in matters. Start with your queries, because a bigger machine won't fix a missing index. Supabase recommends not scaling up until CPU stays above 70% and you've looked at your slowest queries with `explain analyze`.
+
+After that, the main lever is compute. Free projects run on Nano compute and new paid projects start on Micro, and you can move to larger sizes as you need more CPU, memory, and connections. A resize usually takes less than 2 minutes of downtime.
+
+Read replicas help when most of your traffic is reads, when you want copies of the data closer to users in other regions, or once you've reached the largest compute size. They won't help with writes. Disk takes care of itself on paid plans: when the database reaches 90% of its disk, the disk grows by 50%.
+
+See [Compute and disk](https://supabase.com/docs/guides/platform/compute-and-disk) and [Read replicas](https://supabase.com/docs/guides/platform/read-replicas).

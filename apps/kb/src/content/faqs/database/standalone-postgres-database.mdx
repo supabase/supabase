@@ -1,0 +1,12 @@
+---
+title: Can I use Supabase as just a Postgres database?
+topics: ['Database']
+---
+
+Yes. Every Supabase project is a dedicated Postgres database, and you can use it on its own. You connect with a regular Postgres connection string from any client, driver, or ORM, and you never have to touch Auth, Storage, Realtime, or Edge Functions.
+
+Those products come with every project, but nothing depends on you using them. If your app only reaches the database through an ORM, you can also turn off the Data API in your project's API settings, so your tables are only reachable over Postgres connections.
+
+Because it's standard Postgres, the usual tooling works: `psql`, `pg_dump`, your migration tool of choice, and extensions like pgvector and PostGIS. It also means you can bring an existing database in, or take yours out later, with `pg_dump` and `pg_restore`. [Migrate from Postgres to Supabase](/kb/guides/migrate-from-postgres) walks through it.
+
+To pick the right connection string for where your code runs, see [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
