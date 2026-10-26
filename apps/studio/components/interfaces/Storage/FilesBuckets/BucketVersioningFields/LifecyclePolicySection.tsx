@@ -128,7 +128,7 @@ export const LifecyclePolicySection = ({
         <SectionHeading />
         <Admonition
           type="default"
-          title="Lifecycle policy set outside the dashboard"
+          title="Custom lifecycle policies are set"
           description={
             rulesHref ? (
               <>

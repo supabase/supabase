@@ -236,7 +236,7 @@ describe('BucketVersioningFields', () => {
       isUnsupportedPolicy: true,
     })
 
-    expect(screen.getByText('Lifecycle policy set outside the dashboard')).toBeInTheDocument()
+    expect(screen.getByText('Custom lifecycle policies are set')).toBeInTheDocument()
     expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
     expect(screen.queryByText('No lifecycle policy')).not.toBeInTheDocument()
     expect(screen.queryByText('Tightening retention expires some versions')).not.toBeInTheDocument()
