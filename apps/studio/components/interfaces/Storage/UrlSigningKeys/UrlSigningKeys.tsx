@@ -50,6 +50,7 @@ export const UrlSigningKeys = () => {
   const track = useTrack()
   const [dialog, setDialog] = useState<DialogState>()
   const returnFocusRef = useRef<HTMLElement | null>(null)
+  const rotateButtonRef = useRef<HTMLButtonElement>(null)
   const createButtonRef = useRef<HTMLButtonElement>(null)
 
   const { can: canReadKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -87,11 +88,15 @@ export const UrlSigningKeys = () => {
   const closeDialog = () => {
     setDialog(undefined)
     // The dialogs are controlled, so Radix has no trigger to return focus to. Restore it
-    // ourselves, falling back to the create button when the trigger is gone (e.g. after a
-    // rotation moves the key to another table). Deferred so it runs after Radix's own cleanup.
+    // ourselves. A key moves between tables when it is rotated or revoked, which removes the
+    // button that opened the dialog, so fall back to the standby key's rotate button (where
+    // the previously active key lands after a rotation), then to the create button. Deferred
+    // so it runs after Radix's own cleanup and the refetched keys have rendered.
     setTimeout(() => {
       const trigger = returnFocusRef.current
-      const target = trigger?.isConnected ? trigger : createButtonRef.current
+      const target = trigger?.isConnected
+        ? trigger
+        : (rotateButtonRef.current ?? createButtonRef.current)
       target?.focus()
     })
   }
@@ -184,6 +189,9 @@ export const UrlSigningKeys = () => {
                   }}
                   renderActions={(key) => (
                     <StandbyKeyActions
+                      rotateButtonRef={
+                        key.kid === standbyKeys[0]?.kid ? rotateButtonRef : undefined
+                      }
                       canUpdateKeys={canUpdateKeys}
                       onRotate={(trigger) => openDialog({ type: 'rotate', key }, trigger)}
                       onRevoke={(trigger) => openDialog({ type: 'revoke', key }, trigger)}
@@ -271,10 +279,12 @@ const MoreOptionsTrigger = ({
 )
 
 const StandbyKeyActions = ({
+  rotateButtonRef,
   canUpdateKeys,
   onRotate,
   onRevoke,
 }: {
+  rotateButtonRef?: Ref<HTMLButtonElement>
   canUpdateKeys: boolean
   onRotate: (trigger: HTMLElement) => void
   onRevoke: (trigger: HTMLElement | null) => void
@@ -284,6 +294,7 @@ const StandbyKeyActions = ({
   return (
     <>
       <ButtonTooltip
+        ref={rotateButtonRef}
         variant="default"
         icon={<RotateCwIcon />}
         disabled={!canUpdateKeys}

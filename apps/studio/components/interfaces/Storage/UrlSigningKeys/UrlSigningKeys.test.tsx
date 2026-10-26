@@ -252,6 +252,40 @@ describe('UrlSigningKeys', () => {
     await waitFor(() => expect(rotate).toHaveFocus())
   })
 
+  test('moves focus to the new standby key rotate button after a rotation', async () => {
+    let keys = [ACTIVE, STANDBY]
+    addAPIMock({
+      method: 'get',
+      path: '/platform/storage/:ref/jwks',
+      response: () => HttpResponse.json<ListJwksResponse>({ data: keys }),
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/jwks/url-signing/standby/:kid/swap',
+      response: () => {
+        // The standby key becomes active and the previously active key becomes standby
+        keys = [
+          { ...STANDBY, kind: 'storage-url-signing-key' },
+          { ...ACTIVE, kind: 'storage-url-standby-key' },
+        ]
+        return HttpResponse.json<Record<string, never>>({}, { status: 201 })
+      },
+    })
+    customRender(<UrlSigningKeys />)
+
+    const standby = await getRow('standby-key')
+    await userEvent.click(standby.getByRole('button', { name: 'Rotate key' }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Rotate key' }))
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    const newStandby = await getRow('active-key')
+    expect(newStandby.getByText('Standby')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(newStandby.getByRole('button', { name: 'Rotate key' })).toHaveFocus()
+    )
+  })
+
   test('returns focus to the more options button when the revoke dialog is cancelled', async () => {
     mockKeys([ACTIVE, STANDBY])
     customRender(<UrlSigningKeys />)
