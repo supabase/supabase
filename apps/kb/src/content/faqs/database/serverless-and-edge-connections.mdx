@@ -1,0 +1,10 @@
+---
+title: Can I connect to Supabase Postgres from serverless and edge functions?
+topics: ['Database']
+---
+
+Yes, but connect through the pooler rather than directly. Serverless platforms run many short-lived copies of your function, and if each one opens its own database connections, you run out quickly. Supabase's shared pooler in transaction mode is built for this. Copy the **Transaction pooler** string from **Connect** in the dashboard. It uses port 6543.
+
+Transaction mode comes with a few rules. It doesn't support prepared statements, so turn them off in your driver, and keep each function instance's pool to a single connection. Postgres.js needs extra care: it pipelines queries by default, which can hang or mix up results through the transaction pooler, so read the [Postgres.js guide](https://supabase.com/docs/guides/database/postgres-js) before using it there.
+
+Some edge runtimes can't open a raw Postgres connection at all. For those, query over HTTPS instead, for example with `supabase-js` and the Data API. [Serverless drivers](https://supabase.com/docs/guides/database/connecting-to-postgres/serverless-drivers) covers the options for each runtime, and [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres) has the driver settings.
