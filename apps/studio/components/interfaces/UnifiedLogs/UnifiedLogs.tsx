@@ -149,7 +149,8 @@ export const UnifiedLogs = () => {
   const { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder } =
     useLogsTableColumns()
 
-  // Log types the queries, filters and facets may use
+  // Create a stable query key object by removing nulls/undefined, id, and live
+  // Mainly to prevent the react queries from unnecessarily re-fetching
   const queryLogTypeVisibility = useMemo(
     () =>
       getLogTypeVisibility({
@@ -159,12 +160,10 @@ export const UnifiedLogs = () => {
     [showMultigresLogs, computeAvailability.canQueryCompute]
   )
 
-  // Create a stable query key object by removing nulls/undefined, id, and live
-  // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = useMemo(() => {
     const parameters = toQuerySearchParams(search)
     if (parameters.filter) {
-      parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? null
+      parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? undefined
     }
     return parameters
   }, [search, queryLogTypeVisibility])
