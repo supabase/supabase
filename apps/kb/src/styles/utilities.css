@@ -1,12 +1,3 @@
-.cover-notch {
-  mask:
-    linear-gradient(#000 0 0),
-    var(--notch-mask) right -2px bottom -2px / calc(var(--notch-width) + 10px) 42px no-repeat;
-  mask-composite: exclude;
-  mask-clip: no-clip;
-  box-shadow: none;
-}
-
 @utility section-container {
   @apply w-full mx-auto max-w-6xl px-6;
 }
