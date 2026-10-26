@@ -1,8 +1,10 @@
 import { useParams } from 'common'
 import { AnimatePresence } from 'motion/react'
+import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
+  Button,
   FormControl,
   FormField,
   FormInputGroupInput,
@@ -48,9 +50,11 @@ const SectionHeading = ({ rulesHref }: { rulesHref?: string }) => (
       <p className="text-sm text-foreground-lighter">Automatically expire noncurrent versions</p>
     </div>
     {rulesHref && (
-      <InlineLink href={rulesHref} className="text-sm shrink-0">
-        View rules
-      </InlineLink>
+      <Button asChild type="button" size="tiny">
+        <Link href={rulesHref} className="text-sm shrink-0">
+          View rules
+        </Link>
+      </Button>
     )}
   </div>
 )
