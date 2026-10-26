@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
@@ -152,13 +152,12 @@ export function OrganizationSelector({
             {organizations.length > maxOrgsToShow && !showAll && !search && (
               <div className="flex justify-center py-2">
                 <Button
-                  icon={<ChevronDown className="w-4 h-4" />}
+                  icon={<ChevronDownIcon className="w-4 h-4" />}
                   size="tiny"
                   onClick={() => {
                     setSearch('')
                     setShowAll(true)
                   }}
-                  variant="default"
                 >
                   Show all organizations
                 </Button>
@@ -172,7 +171,7 @@ export function OrganizationSelector({
           <CardHeader className="border-none">
             <CardTitle>Need a new organization?</CardTitle>
           </CardHeader>
-          <Button size="small" className="" asChild variant="default">
+          <Button size="small" className="" asChild>
             <Link href={`/new?${searchParams.toString()}`}>New Organization</Link>
           </Button>
         </Card>

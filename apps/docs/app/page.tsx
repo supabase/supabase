@@ -5,7 +5,7 @@ import { cn } from 'ui'
 import { TextLink } from 'ui-patterns/TextLink'
 
 import { FrameworkQuickstarts } from '@/components/FrameworkQuickstarts'
-import { MIGRATION_PAGES } from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
+import { resourcesMigrate } from '@/data/content-listings/resources.data'
 import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker'
 import { IconLinkImage, IconLinkList, IconLinkMenuIcon } from '@/features/ui/IconLink'
 import HomeLayout from '@/layouts/HomeLayout'
@@ -28,10 +28,7 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
       ...(parentAlternates && {
         languages: parentAlternates.languages || undefined,
         media: parentAlternates.media || undefined,
-        types: {
-          ...(parentAlternates.types ?? {}),
-          'text/markdown': 'https://supabase.com/llms-full.txt',
-        },
+        types: parentAlternates.types || undefined,
       }),
     },
   }
@@ -177,7 +174,7 @@ const additionalResources = [
     title: 'AI tools',
     description: 'Develop with Supabase AI-first using plugins, MCP, and skills.',
     icon: 'ai-tools',
-    href: '/guides/ai',
+    href: '/guides/ai-tools',
   },
   {
     title: 'Platform guides',
@@ -204,10 +201,10 @@ const additionalResources = [
     href: '/guides/integrations',
   },
   {
-    title: 'Supabase UI',
+    title: 'Supabase Library',
     description: 'A collection of pre-built Supabase components to speed up your project.',
     icon: 'ui',
-    href: 'https://supabase.com/ui',
+    href: 'https://supabase.com/library',
     external: true,
   },
   {
@@ -218,15 +215,15 @@ const additionalResources = [
   },
 ]
 
-const migrationGuides = [...MIGRATION_PAGES]
-  .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+const migrationGuides = [...resourcesMigrate.items]
+  .sort((a, b) => a.title.localeCompare(b.title))
   .flatMap((guide) => {
-    if (!guide.name || !guide.url || typeof guide.icon !== 'string') return []
+    if (!guide.href || typeof guide.icon !== 'string') return []
 
     return [
       {
-        title: guide.name,
-        href: guide.url,
+        title: guide.title,
+        href: guide.href,
         icon: <IconLinkImage path={guide.icon} hasLightIcon={guide.hasLightIcon} />,
       },
     ]
@@ -333,7 +330,7 @@ const HomePage = () => (
             <TextLink
               label="Explore more resources"
               url="/guides/resources"
-              className="no-underline text-brand-link text-sm"
+              className="no-underline text-primary text-sm"
             />
           </div>
 
@@ -391,7 +388,7 @@ const HomePage = () => (
               <TextLink
                 label="More on self-hosting"
                 url="/guides/self-hosting"
-                className="no-underline text-brand-link text-sm"
+                className="no-underline text-primary text-sm"
               />
             </div>
           </div>

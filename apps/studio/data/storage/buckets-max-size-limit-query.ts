@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 
 import type { ConnectionVars } from '@/data/common.types'
 import { getLiveTupleEstimateKey } from '@/data/database/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { sqlKeys } from '@/data/sql/keys'
 
@@ -27,6 +28,7 @@ export const getBucketNumberEstimate = async ({
       connectionString,
       queryKey,
       sql,
+      grant: unguarded.migrating,
     })
     return result[0]?.live_tuple_estimate
   } catch {
@@ -55,6 +57,7 @@ const getBucketsWithLargestSizeLimit = async ({
     connectionString,
     queryKey: key,
     sql,
+    grant: unguarded.migrating,
   })
   return result
 }

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { LOG_TYPES, METHODS, REGIONS } from './UnifiedLogs.constants'
+import { METHODS, REGIONS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import {
   ARRAY_DELIMITER,
   LEVELS,
@@ -9,17 +9,18 @@ import {
 
 export const columnSchema = z.object({
   id: z.string(),
-  log_type: z.enum(LOG_TYPES),
-  method: z.enum(METHODS),
-  pathname: z.string(),
-  level: z.enum(LEVELS),
-  status: z.number(),
+  log_type: z.string(),
+  method: z.string().nullable(),
+  pathname: z.string().nullable(),
+  level: z.enum(LEVELS).nullable(),
+  status: z.union([z.string(), z.number()]).nullable(),
   date: z.date(),
-  timestamp: z.number(),
+  timestamp: z.union([z.string(), z.number()]),
   event_message: z.string().optional(),
-  log_count: z.number().optional(), // used to count function logs for a given execution_id
+  log_count: z.number().nullish(),
   logs: z.array(z.any()).optional(), // array of function logs
-  auth_user: z.string().optional(),
+  auth_user: z.string().nullable().optional(),
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
 })
 
 export type ColumnSchema = z.infer<typeof columnSchema>
@@ -80,3 +81,25 @@ export const timelineChartSchema = z.object({
 }) satisfies z.ZodType<BaseChartSchema>
 
 export type TimelineChartSchema = z.infer<typeof timelineChartSchema>
+
+export const querySearchParamsSchema = z.object({
+  filter: z.array(z.string()).optional(),
+  latency: z.array(z.number()).optional(),
+  'timing.dns': z.array(z.number()).optional(),
+  'timing.connection': z.array(z.number()).optional(),
+  'timing.tls': z.array(z.number()).optional(),
+  'timing.ttfb': z.array(z.number()).optional(),
+  'timing.transfer': z.array(z.number()).optional(),
+  date: z.array(z.date()).optional(),
+  sort: z.object({ id: z.string(), desc: z.boolean() }).optional(),
+  size: z.number().default(SEARCH_PARAMS_PARSER.size.defaultValue),
+  start: z.number().default(SEARCH_PARAMS_PARSER.start.defaultValue),
+  direction: z.enum(['prev', 'next']).default(SEARCH_PARAMS_PARSER.direction.defaultValue),
+  cursor: z.date().default(SEARCH_PARAMS_PARSER.cursor.defaultValue),
+  uuid: z.string().optional(),
+  show_connection_logs: z.boolean().default(SEARCH_PARAMS_PARSER.show_connection_logs.defaultValue),
+  edge_auth: z.boolean().default(SEARCH_PARAMS_PARSER.edge_auth.defaultValue),
+  edge_storage: z.boolean().default(SEARCH_PARAMS_PARSER.edge_storage.defaultValue),
+  edge_postgrest: z.boolean().default(SEARCH_PARAMS_PARSER.edge_postgrest.defaultValue),
+  user: z.string().optional(),
+})

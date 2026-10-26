@@ -17,3 +17,43 @@ export function resolveSharedDataPath(dataset: unknown, path: string): string | 
   }
   return selected
 }
+
+type LogSourceSchema = {
+  name: string
+  reference: string
+  fields: { path: string; type: string }[]
+}
+
+const LOG_COLUMNS = new Map([
+  ['id', 'String'],
+  ['timestamp', 'DateTime64'],
+  ['event_message', 'String'],
+  ['severity_text', 'String'],
+  ['source', 'String'],
+])
+
+/** One field mapping for the HTML reference and its Markdown export. */
+export function getLogFieldReference(schemas: LogSourceSchema[]) {
+  return schemas.map((schema) => {
+    const fields = [...schema.fields]
+    for (const [path, type] of LOG_COLUMNS) {
+      if (!fields.some((field) => field.path === path)) fields.push({ path, type })
+    }
+    return {
+      ...schema,
+      fields: fields
+        .sort((a, b) => a.path.localeCompare(b.path))
+        .map((field) => {
+          const key = field.path
+            .replace(/^metadata\./, '')
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "''")
+          return {
+            ...field,
+            queryField: LOG_COLUMNS.has(field.path) ? field.path : `log_attributes['${key}']`,
+            queryType: LOG_COLUMNS.get(field.path) ?? 'String',
+          }
+        }),
+    }
+  })
+}

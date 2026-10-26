@@ -5,6 +5,7 @@ import { AWS_REGIONS } from 'shared-data'
 
 import { miscKeys } from './keys'
 import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { getAvailableRegions } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { AWS_REGIONS_COORDINATES } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { fetchHandler } from '@/data/fetchers'
 import { getDistanceLatLonKM, tryParseJson } from '@/lib/helpers'
@@ -14,6 +15,21 @@ export type DefaultRegionVariables = {
   cloudProvider?: CloudProvider
   restrictedPool?: string[]
   useRestrictedPool?: boolean
+}
+
+// The geolocation-based default may only ever pick a region the selected cloud provider
+// actually offers (e.g. AWS_NIMBUS is restricted to a single region). The flag-based
+// restricted pool narrows within that set, and is ignored if it would leave no candidates.
+export function getDefaultRegionCandidateKeys(
+  cloudProvider: CloudProvider,
+  restrictedPool?: string[],
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) {
+  const providerRegionKeys = Object.keys(getAvailableRegions(cloudProvider, environment))
+  const pooledRegionKeys = restrictedPool
+    ? providerRegionKeys.filter((key) => restrictedPool.includes(key))
+    : providerRegionKeys
+  return pooledRegionKeys.length > 0 ? pooledRegionKeys : providerRegionKeys
 }
 
 export async function getDefaultRegionOption({
@@ -34,17 +50,18 @@ export async function getDefaultRegionOption({
 
     if (locLatLon === undefined) return undefined
 
-    const locations =
-      useRestrictedPool && restrictedPool
-        ? Object.entries(AWS_REGIONS_COORDINATES)
-            .filter((x) => restrictedPool.includes(x[0]))
-            .reduce((o, val) => ({ ...o, [val[0]]: val[1] }), {})
-        : AWS_REGIONS_COORDINATES
+    const candidateKeys = getDefaultRegionCandidateKeys(
+      cloudProvider,
+      useRestrictedPool ? restrictedPool : undefined
+    )
+    const locations = Object.fromEntries(
+      Object.entries(AWS_REGIONS_COORDINATES).filter(([key]) => candidateKeys.includes(key))
+    )
 
     const distances = Object.keys(locations).map((reg) => {
       const region: { lat: number; lon: number } = {
-        lat: locations[reg as keyof typeof locations][1],
-        lon: locations[reg as keyof typeof locations][0],
+        lat: locations[reg][1],
+        lon: locations[reg][0],
       }
       return getDistanceLatLonKM(locLatLon.lat, locLatLon.lon, region.lat, region.lon)
     })

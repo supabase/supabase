@@ -1,5 +1,6 @@
+// @vitest-environment jsdom
 import type { AnyRouter } from '@tanstack/react-router'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const sentryMocks = vi.hoisted(() => ({
   init: vi.fn(),
@@ -26,10 +27,6 @@ async function loadInitializer() {
 }
 
 describe('initSentryTanStackClient', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   afterEach(() => {
     vi.unstubAllGlobals()
     vi.unstubAllEnvs()

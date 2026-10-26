@@ -1,0 +1,33 @@
+# build output
+dist/
+
+# generated markdown export (scripts/generate-markdown.ts)
+public/markdown/
+
+# federated troubleshooting content (scripts/federated-content), regenerated on every prebuild
+src/content/troubleshooting/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+
+# jetbrains setting folder
+src/content/troubleshooting

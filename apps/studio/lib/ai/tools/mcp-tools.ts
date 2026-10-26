@@ -2,8 +2,9 @@
 import type * as SupabaseMcp from '@supabase/mcp-server-supabase'
 import type { ToolSet } from 'ai'
 
-import { createInProcessSupabaseMCPClient, createSupabaseMCPClient } from '../supabase-mcp'
+import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
+import { REMOTE_TOOL_CONTRACTS } from './registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 /**
@@ -34,7 +35,7 @@ const EXPECTED_MCP_TOOLS = [
   'list_edge_functions',
   'list_branches',
   'get_advisors',
-  'get_logs',
+  'query_logs',
 ] as const satisfies readonly SupabaseMcpToolName[]
 
 export const getMcpTools = async ({
@@ -50,22 +51,10 @@ export const getMcpTools = async ({
   // when the request ends. The caller owns that lifecycle via this signal.
   signal: AbortSignal
 }) => {
-  // Connect to the MCP server and fetch its tools, which replace the old local
-  // tools. `USE_REMOTE_MCP` gates the transport: the remote HTTP server (target
-  // state) or the legacy in-process server (fallback during the migration),
-  // defaulting to in-process until an environment opts in. Flip it per
-  // environment (staging → prod → Nimbus) once each one's prerequisites are met
-  // (dashboard-token support on the MCP API, remote MCP enabled for Nimbus);
-  // unset to roll back on the next deploy. Both transports expose the same tool
-  // surface, so the filtering, drift detection, and lifecycle handling below are
-  // transport-agnostic.
-  //
-  // TODO(AI-897): remove in process mcp — once every environment has been
-  // flipped and is stable, delete `createInProcessSupabaseMCPClient` and this
-  // fallback branch.
-  const useRemoteMcp = process.env.USE_REMOTE_MCP === 'true'
-  const createClient = useRemoteMcp ? createSupabaseMCPClient : createInProcessSupabaseMCPClient
-  const mcpClient = await createClient({
+  // Connect to the remote MCP server over HTTP and fetch its tools, replacing
+  // the local tools. A remote failure (outage, timeout, auth) degrades to the
+  // remaining tools in `getTools` rather than breaking the assistant.
+  const mcpClient = await createSupabaseMCPClient({
     accessToken,
     projectRef,
   })
@@ -90,7 +79,20 @@ export const getMcpTools = async ({
   signal.addEventListener('abort', closeClient, { once: true })
 
   try {
-    const availableMcpTools = (await mcpClient.tools()) as ToolSet
+    const remoteTools = (await mcpClient.tools()) as ToolSet
+
+    const availableMcpTools: ToolSet = { ...remoteTools }
+    for (const contract of Object.values(REMOTE_TOOL_CONTRACTS)) {
+      if (!(contract.name in remoteTools)) continue
+      // Reject a malformed entry here: if the opt-in filter below stubbed it, the spread would
+      // turn it into an object and it would pass validation.
+      const remoteTool = remoteTools[contract.name]
+      if (typeof remoteTool !== 'object' || remoteTool === null) {
+        console.error(`MCP tool ${contract.name} is not an object`)
+        throw new Error('Internal error: MCP tools validation failed')
+      }
+      availableMcpTools[contract.name] = { ...remoteTool, needsApproval: contract.needsApproval }
+    }
 
     // Runtime drift detection: `EXPECTED_MCP_TOOLS` is compile-time-checked
     // against the pinned package (see its declaration), but the *deployed* remote

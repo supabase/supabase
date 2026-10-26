@@ -2,6 +2,7 @@
 title: 'Postgres Changes'
 subtitle: 'Listen to Postgres changes using Supabase Realtime.'
 description: 'Listen to Postgres changes using Supabase Realtime.'
+tocVideo: _-y_Lnujq64
 ---
 
 Use Realtime's Postgres Changes to listen to database events.
@@ -310,8 +311,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "*",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -681,8 +681,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "INSERT",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -693,8 +692,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "UPDATE",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -705,8 +703,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "DELETE",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -717,8 +714,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "*",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -903,8 +899,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   schema="public",
   table="todos",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -1026,7 +1021,7 @@ myChannel.subscribe()
 changes = supabase.channel('db-changes').on_postgres_changes(
   "*",
   schema="public",
-  table="messages"
+  table="messages",
   callback=lambda payload: print(payload)
 ).on_postgres_changes(
   "INSERT",
@@ -1162,8 +1157,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="todos",
   filter="id=eq.1",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -1360,8 +1354,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="messages",
   filter="body=eq.hey",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -1524,8 +1517,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="messages",
   filter="body=neq.bye",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -1687,8 +1679,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="profiles",
   filter="age=lt.65",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -1850,8 +1841,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="profiles",
   filter="age=lte.65",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -2013,8 +2003,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="products",
   filter="quantity=gt.10",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -2176,8 +2165,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="products",
   filter="quantity=gte.10",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -2339,8 +2327,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="products",
   filter="name=in.(red,blue,yellow)",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -2503,8 +2490,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="articles",
   filter="title=ilike.%breaking%",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -2667,8 +2653,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="posts",
   filter="slug=match.^post-\\d+$",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -2831,8 +2816,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="todos",
   filter="completed_at=is.null",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -2995,8 +2979,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="orders",
   filter="status=isdistinct.shipped",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -3020,7 +3003,7 @@ await channel.Subscribe();
 </$Show>
 </Tabs>
 
-### Negating a filter (`not`)
+### Negating a filter (`not`) [#negating-a-filter-not]
 
 Prefix any operator with `not.` to invert it — for example `not.in`, `not.is`, or `not.like`.
 
@@ -3158,8 +3141,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="posts",
   filter="status=not.in.(draft,archived)",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -3332,8 +3314,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="orders",
   filter="amount=gt.100,status=eq.open",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -3430,6 +3411,21 @@ await myChannel.subscribe()
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('changes').on_postgres_changes(
+  "*",
+  schema="public",
+  table="profiles",
+  select=["id", "username"],
+  callback=lambda payload: print(payload)
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Receiving `old` records
@@ -3443,7 +3439,7 @@ alter table
 
 <Admonition type="caution">
 
-RLS policies are not applied to `DELETE` statements, because there is no way for Postgres to verify that a user has access to a deleted record. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
+RLS policies are not applied to `DELETE` statements, because there is no way for Postgres to verify that a user has access to a deleted record.
 
 </Admonition>
 
@@ -3595,8 +3591,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="products",
   filter="name=in.(red,blue,yellow)",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -3625,9 +3620,9 @@ await channel.Subscribe();
 
 ## Limitations
 
-### Delete events are not filterable
+### Delete events
 
-You can't filter Delete events when tracking Postgres Changes. This limitation is due to the way changes are pulled from Postgres.
+You can only filter Delete events when tracking Postgres Changes if the table has the `replica identity` set to `full`. See [Receiving old records](#receiving-old-records).
 
 ## Scaling Postgres Changes
 

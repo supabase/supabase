@@ -2,6 +2,7 @@ import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useMemo } from 'react'
 
 import { type BannerId } from '@/components/ui/BannerStack/BannerStackProvider'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export type FeaturePreview = {
   key: string
@@ -14,8 +15,14 @@ export type FeaturePreview = {
   isDefaultOptIn: boolean
   /** Visibility in the feature preview modal (For feature flagging a feature preview) */
   enabled: boolean
+  /**
+   * Forces the preview on for this user, whatever they previously chose — for a
+   * preview that has become the default behavior. Overrides both `isDefaultOptIn`
+   * and a stored opt-out, and takes away the ability to turn the preview back off.
+   */
+  isForced?: boolean
   /** Optional category that the feature preview falls under, defaults to "Others" in the UI otherwise */
-  category?: 'observability' | 'database'
+  category?: 'observability' | 'database' | 'editors'
   /**
    * Where to send the user after enabling, to try the feature out. Omit if the
    * feature has no single destination (e.g. a global layout change).
@@ -25,25 +32,46 @@ export type FeaturePreview = {
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
+  const isPipelineCreationWizardAvailable = useFlag('pipelineCreationWizard')
   const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
-  const isSqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
-  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
+  const isExplorerEnabled = useFlag('explorer')
+  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
 
-  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
+  const isSqlEditorManualSaveForced = useFlag('sqlEditorManualSaveForced')
 
   return useMemo(() => {
     const previews: FeaturePreview[] = [
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION,
+        name: 'Pipeline creation wizard',
+        category: 'database',
+        enabled: isPipelineCreationWizardAvailable,
+        isNew: true,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER,
+        name: 'Explorer & Notebooks',
+        category: 'editors',
+        discussionsUrl: 'https://github.com/orgs/supabase/discussions/49916',
+        enabled: isExplorerEnabled,
+        isNew: true,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+        getRoute: (ref?: string) => `/project/${ref}/explorer`,
+      },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
         name: 'Updated Logs interface',
         category: 'observability',
         discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
         enabled: true,
-        isNew: true,
+        isNew: false,
         isPlatformOnly: true,
-        isDefaultOptIn: unifiedLogsDefaultOptIn,
+        isDefaultOptIn: true,
         getRoute: (ref?: string) => `/project/${ref}/logs`,
       },
       {
@@ -58,7 +86,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF,
-        name: 'PG Delta Diff',
+        name: 'PG Delta diff',
         discussionsUrl: undefined,
         isNew: false,
         isPlatformOnly: true,
@@ -99,44 +127,75 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
-        name: 'One-Click Integrations',
+        name: 'One-click Integrations',
         discussionsUrl: undefined,
         enabled: isMarketplaceEnabled,
-        isNew: true,
+        isNew: false,
         isPlatformOnly: false,
         isDefaultOptIn: true,
         getRoute: (ref?: string) => `/project/${ref}/integrations`,
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
+        category: 'editors',
         name: 'Disable snippet auto-saving',
+        discussionsUrl: undefined,
+        isNew: false,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+        enabled: true,
+        // Manual saving is becoming the default for the SQL Editor. The preview
+        // stays listed so users who lose their local storage can opt back in
+        // before the rollout reaches them.
+        isForced: isSqlEditorManualSaveForced,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
+        name: 'Storage versioning',
         discussionsUrl: undefined,
         isNew: true,
         isPlatformOnly: true,
-        isDefaultOptIn: false,
-        enabled: isSqlEditorManualSaveEnabled,
-      },
-      {
-        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
-        name: 'Diagnose blocked queries',
-        category: 'observability',
-        discussionsUrl: 'https://github.com/orgs/supabase/discussions/48639',
-        isNew: true,
-        isPlatformOnly: false,
-        isDefaultOptIn: false,
-        enabled: isDatabaseConnectionsEnabled,
-        getRoute: (ref?: string) => `/project/${ref}/observability/connections`,
-        bannerId: 'database-connections-banner',
+        isDefaultOptIn: true,
+        enabled: isStorageVersioningEnabled,
+        getRoute: (ref?: string) => `/project/${ref}/storage/files`,
       },
     ]
 
     return previews.sort((a, b) => Number(b.isNew) - Number(a.isNew))
   }, [
-    unifiedLogsDefaultOptIn,
+    isPipelineCreationWizardAvailable,
+    isSqlEditorManualSaveForced,
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
     isMarketplaceEnabled,
-    isSqlEditorManualSaveEnabled,
-    isDatabaseConnectionsEnabled,
+    isExplorerEnabled,
+    isStorageVersioningEnabled,
   ])
+}
+
+export type FeaturePreviewCategoryGroup = {
+  category: FeaturePreview['category']
+  previews: FeaturePreview[]
+}
+
+/**
+ * The visible feature previews (respecting platform-only/enabled gating),
+ * grouped by category in first-seen order, uncategorized previews last as a
+ * final `category: undefined` group. Shared by the feature preview modal and
+ * the Cmd+K "Feature previews" page so both list the exact same previews.
+ */
+export const useVisibleFeaturePreviewsByCategory = (): FeaturePreviewCategoryGroup[] => {
+  const featurePreviews = useFeaturePreviews()
+
+  return useMemo(() => {
+    const previews = (
+      IS_PLATFORM ? featurePreviews : featurePreviews.filter((preview) => !preview.isPlatformOnly)
+    ).filter((preview) => preview.enabled)
+    const categories = [...new Set(previews.map((preview) => preview.category).filter(Boolean))]
+
+    return categories.concat(undefined).map((category) => ({
+      category,
+      previews: previews.filter((preview) => preview.category === category),
+    }))
+  }, [featurePreviews])
 }

@@ -1,3 +1,4 @@
 ^./i18n
 ^./packages/api-types
 ^./apps/www/lib/redirects.js
+^./apps/studio/public/*

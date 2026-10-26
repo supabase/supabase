@@ -1,3 +1,4 @@
+import { getCatalogPartner } from '~/lib/marketplaceDb'
 import supabase from '~/lib/supabaseMisc'
 import { notFound, redirect } from 'next/navigation'
 
@@ -17,5 +18,7 @@ export default async function PartnerLegacyPage({ params }: { params: Promise<Pa
 
   if (!partner || partner.type === 'expert') notFound()
 
-  redirect(`/partners/catalog/${partner.slug}`)
+  const catalogPartner = await getCatalogPartner(partner.slug)
+
+  redirect(catalogPartner ? `/partners/catalog/${partner.slug}` : '/partners/catalog')
 }

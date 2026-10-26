@@ -24,6 +24,20 @@ Add skills for all detected agents at the same time by passing `--all`. See the 
 
 You can also install the agent skills together with the Supabase MCP server using the [Supabase Plugin for AI Coding Agents](/docs/guides/ai-tools/plugins) for a combined one-step setup.
 
+## Updating skills
+
+<Admonition type="note">
+
+We update our agent skills frequently, so be sure to check for and install updates regularly to get the latest improvements.
+
+</Admonition>
+
+```bash
+npx skills update
+```
+
+This updates all skills you have installed. To update specific skills instead, pass their names to the command, e.g. `npx skills update SKILL_NAME`. See the [`skills update` docs](https://github.com/vercel-labs/skills#skills-update) for more options.
+
 ## Available skills
 
 <AiSkillsIndex />

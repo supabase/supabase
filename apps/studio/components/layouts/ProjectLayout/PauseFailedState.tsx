@@ -1,6 +1,6 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Download, MoreVertical, Trash } from 'lucide-react'
+import { DownloadIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -24,7 +24,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from '@/data/database/backup-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const PauseFailedState = () => {
@@ -33,9 +33,7 @@ export const PauseFailedState = () => {
   const [visible, setVisible] = useState(false)
   const [showCliBackup, setShowCliBackup] = useState(false)
 
-  const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: { project_id: project?.id },
-  })
+  const { can: canDeleteProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   const { data, isPending: isLoadingBackups } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
@@ -91,7 +89,7 @@ export const PauseFailedState = () => {
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end gap-x-2 py-4 px-8">
-              <Button asChild variant="default">
+              <Button asChild>
                 <SupportLink
                   queryParams={{
                     category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -103,8 +101,7 @@ export const PauseFailedState = () => {
                 </SupportLink>
               </Button>
               <ButtonTooltip
-                variant="default"
-                icon={<Download />}
+                icon={<DownloadIcon />}
                 disabled={isLoadingBackups}
                 loading={isDownloading || isLoadingBackups}
                 tooltip={{
@@ -118,8 +115,8 @@ export const PauseFailedState = () => {
                 Download backup
               </ButtonTooltip>
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button variant="default" className="px-1.5" icon={<MoreVertical />} />
+                <DropdownMenuTrigger asChild>
+                  <Button className="px-1.5" icon={<MoreVerticalIcon />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
                   <DropdownMenuItemTooltip
@@ -136,7 +133,7 @@ export const PauseFailedState = () => {
                     }}
                   >
                     <div className="translate-y-0.5">
-                      <Trash size={14} />
+                      <TrashIcon size={14} />
                     </div>
                     <div className="">
                       <p>Delete project</p>

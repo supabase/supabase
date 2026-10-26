@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangleIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -9,7 +8,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectDetailQuery, useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
@@ -20,9 +19,8 @@ export const UnhealthyState = () => {
   const { setProjectStatus } = useSetProjectStatus()
   const [showConfirm, setShowConfirm] = useState(false)
 
-  const { can: canRestartProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'reboot'
+  const { can: canRestartProject } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE
   )
 
   useProjectDetailQuery(
@@ -54,7 +52,7 @@ export const UnhealthyState = () => {
           <div className="space-y-6 py-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+                <AlertTriangleIcon className="text-warning" size={18} strokeWidth={1.5} />
               </div>
               <div className="flex flex-col gap-3">
                 <div className="space-y-1">
@@ -66,7 +64,6 @@ export const UnhealthyState = () => {
                 </div>
                 <div>
                   <Button
-                    variant="default"
                     size="tiny"
                     disabled={!canRestartProject}
                     loading={isRestarting}

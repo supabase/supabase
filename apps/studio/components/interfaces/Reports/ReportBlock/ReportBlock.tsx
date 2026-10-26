@@ -1,14 +1,14 @@
 import { acceptUntrustedSql, safeSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { applyAutoLimit } from '../../SQLEditor/SQLEditor.utils'
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
+import { LogsSnippetReportBlock } from './LogsSnippetReportBlock'
 import { UnavailableChartBlock } from './UnavailableChartBlock'
 import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -16,9 +16,11 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useContentIdQuery } from '@/data/content/content-id-query'
+import { unguarded } from '@/data/fetchers'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { sqlKeys } from '@/data/sql/keys'
+import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards, SqlSnippets } from '@/types'
@@ -79,8 +81,11 @@ export const ReportBlock = ({
     }
   )
 
+  const isLogsSnippet = data?.type === 'log_sql'
+
   const autoLimit = 100
-  const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
+  const sql =
+    isSnippet && !isLogsSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
   // acceptUntrustedSql is usually not allowed outside a user-action event
   // handler, but it's explicitly fine here: adding this block to a report is
   // itself the user action that approves running its SQL.
@@ -123,9 +128,10 @@ export const ReportBlock = ({
         projectRef,
         connectionString,
         sql: formattedSql,
+        grant: unguarded.migrating,
       })
     },
-    enabled: !isLoadingContent && contentError == null,
+    enabled: !isLoadingContent && contentError == null && !isLogsSnippet,
     refetchOnWindowFocus: false,
   })
 
@@ -151,6 +157,25 @@ export const ReportBlock = ({
     }
   }, [isRefreshing, refetch])
 
+  if (isLogsSnippet) {
+    return (
+      <LogsSnippetReportBlock
+        label={item.label}
+        actions={
+          !disableUpdate ? (
+            <ButtonTooltip
+              variant="text"
+              icon={<XIcon />}
+              className="w-7 h-7"
+              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+            />
+          ) : null
+        }
+      />
+    )
+  }
+
   return (
     <>
       {isSnippet ? (
@@ -175,7 +200,7 @@ export const ReportBlock = ({
           actions={
             <ButtonTooltip
               variant="text"
-              icon={<X />}
+              icon={<XIcon />}
               className="w-7 h-7"
               onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
               tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
@@ -196,7 +221,7 @@ export const ReportBlock = ({
             !disableUpdate ? (
               <ButtonTooltip
                 variant="text"
-                icon={<X />}
+                icon={<XIcon />}
                 className="h-7 w-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
                 tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
@@ -212,7 +237,7 @@ export const ReportBlock = ({
             !disableUpdate ? (
               <ButtonTooltip
                 variant="text"
-                icon={<X />}
+                icon={<XIcon />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
                 tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
@@ -235,7 +260,7 @@ export const ReportBlock = ({
             !disableUpdate ? (
               <ButtonTooltip
                 variant="text"
-                icon={<X />}
+                icon={<XIcon />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
                 tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}

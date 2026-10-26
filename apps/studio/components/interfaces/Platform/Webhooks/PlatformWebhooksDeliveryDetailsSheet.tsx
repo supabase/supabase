@@ -1,4 +1,4 @@
-import { Copy, RotateCcw } from 'lucide-react'
+import { CopyIcon, RotateCcwIcon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -89,7 +89,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                 <CardContent className="grid grid-cols-1 gap-4 p-4 @md:grid-cols-2">
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Delivery ID</p>
-                    <code className="text-code-inline">{selectedDelivery.id}</code>
+                    <code>{selectedDelivery.id}</code>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Attempt</p>
@@ -132,11 +132,11 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                 <TabsContent value="event" className="space-y-4 pt-4">
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Event type</p>
-                    <code className="text-code-inline">{selectedDelivery.eventType}</code>
+                    <code>{selectedDelivery.eventType}</code>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Event ID</p>
-                    <code className="text-code-inline">{selectedDelivery.id}</code>
+                    <code>{selectedDelivery.id}</code>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Event timestamp</p>
@@ -151,7 +151,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                       >
                         <Button
                           variant="text"
-                          icon={<Copy size={14} />}
+                          icon={<CopyIcon size={14} />}
                           onClick={() => onCopy(deliveryEventPayload, 'event payload')}
                         >
                           Copy
@@ -194,7 +194,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                       >
                         <Button
                           variant="text"
-                          icon={<Copy size={14} />}
+                          icon={<CopyIcon size={14} />}
                           onClick={() => onCopy(deliveryResponsePayload, 'response payload')}
                         >
                           Copy
@@ -220,8 +220,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
               onTrigger={() => onRetryDelivery(retryableDelivery.id)}
             >
               <Button
-                variant="default"
-                icon={<RotateCcw />}
+                icon={<RotateCcwIcon />}
                 onClick={() => onRetryDelivery(retryableDelivery.id)}
               >
                 Retry delivery

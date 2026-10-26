@@ -1,16 +1,24 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Box, Cable, Database, Server, Sparkles } from 'lucide-react'
+import {
+  BoxIcon,
+  CableIcon,
+  DatabaseIcon,
+  ServerIcon,
+  SparklesIcon,
+  WarehouseIcon,
+} from 'lucide-react'
 import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 import { cn } from 'ui'
 
 import type { ConnectMode } from './Connect.types'
 
 const MODE_ICONS: Record<string, ReactNode> = {
-  framework: <Box size={16} strokeWidth={1.5} />,
-  direct: <Database size={16} strokeWidth={1.5} />,
-  orm: <Cable size={16} strokeWidth={1.5} />,
-  mcp: <Sparkles size={16} strokeWidth={1.5} />,
-  server: <Server size={16} strokeWidth={1.5} />,
+  framework: <BoxIcon size={16} strokeWidth={1.5} />,
+  direct: <DatabaseIcon size={16} strokeWidth={1.5} />,
+  orm: <CableIcon size={16} strokeWidth={1.5} />,
+  mcp: <SparklesIcon size={16} strokeWidth={1.5} />,
+  server: <ServerIcon size={16} strokeWidth={1.5} />,
+  warehouse: <WarehouseIcon size={16} strokeWidth={1.5} />,
 }
 
 /** Maps mode count → container-query breakpoint used when collapsing to a single row. */
@@ -30,9 +38,8 @@ const connectModeButtonVariants = cva(
   {
     variants: {
       selected: {
-        true: 'z-1 border-foreground-muted bg-surface-300 ring-1 ring-border',
-        false:
-          'hover:z-1 hover:border-foreground-muted hover:bg-background dark:hover:bg-surface-200',
+        true: 'z-1 border-control-hover bg-surface-300',
+        false: 'hover:z-1 hover:border-control-hover hover:bg-background dark:hover:bg-surface-200',
       },
       // Narrow 2-col outer corners
       topLeft: {

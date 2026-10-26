@@ -1,6 +1,5 @@
 import { safeSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Database, Plus, Search } from 'lucide-react'
+import { DatabaseIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -36,7 +35,7 @@ import { useDatabaseFunctionDeleteMutation } from '@/data/database-functions/dat
 import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -124,9 +123,8 @@ export const FunctionsList = () => {
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canCreateFunctions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'functions'
+  const { can: canCreateFunctions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -275,7 +273,7 @@ export const FunctionsList = () => {
               ref={searchInputRef}
               placeholder="Search for a function"
               size="tiny"
-              icon={<Search />}
+              icon={<SearchIcon />}
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}
@@ -304,7 +302,6 @@ export const FunctionsList = () => {
               <>
                 <CreateFunctionButton createFunction={createFunction} />
                 <ButtonTooltip
-                  variant="default"
                   disabled={!canCreateFunctions}
                   className="px-1 pointer-events-auto"
                   icon={<AiIconAnimation size={16} />}
@@ -334,7 +331,7 @@ export const FunctionsList = () => {
         {functions.length === 0 ? (
           <>
             <EmptyStatePresentational
-              icon={Database}
+              icon={DatabaseIcon}
               title="Add your first function"
               description="PostgreSQL functions are a set of SQL and procedural commands such as declarations, assignments, loops, or flow-of-control."
             >
@@ -421,9 +418,8 @@ const CreateFunctionButton = ({
   createFunction: () => void
 }) => {
   const { selectedSchema } = useQuerySchemaState()
-  const { can: canCreateFunctions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'functions'
+  const { can: canCreateFunctions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
   const canAddFunctions = canCreateFunctions && !isSchemaLocked
@@ -440,7 +436,7 @@ const CreateFunctionButton = ({
           variant={variant}
           className="grow"
           onClick={() => createFunction()}
-          icon={hideIcon ? null : <Plus />}
+          icon={hideIcon ? null : <PlusIcon />}
         >
           New function
         </Button>
@@ -452,7 +448,7 @@ const CreateFunctionButton = ({
         disabled
         variant={variant}
         className="grow"
-        icon={hideIcon ? null : <Plus />}
+        icon={hideIcon ? null : <PlusIcon />}
         tooltip={{
           content: {
             side: 'bottom',

@@ -36,7 +36,7 @@ async function collectAppRouterPages(
       const nested = await collectAppRouterPages(path.join(dir, dirent.name), nextSegments)
       nested.forEach((filePath, slug) => pages.set(slug, filePath))
     } else if (dirent.name === 'page.tsx') {
-      pages.set(segments.join('/') || 'homepage', path.join(dir, dirent.name))
+      pages.set(segments.join('/') || 'index', path.join(dir, dirent.name))
     }
   }
   return pages
@@ -65,9 +65,10 @@ describe('markdown alternate drift', () => {
       const appPagePath = appPages.get(slug)
       if (appPagePath) {
         const source = await fs.readFile(appPagePath, 'utf-8')
+        const wiringShapes = [`alternates: mdAlternates('${slug}')`, `...mdAlternates('${slug}')`]
         expect(
-          source.includes(`alternates: mdAlternates('${slug}')`),
-          `${path.relative(process.cwd(), appPagePath)} must contain "alternates: mdAlternates('${slug}')" in its metadata export`
+          wiringShapes.some((shape) => source.includes(shape)),
+          `${path.relative(process.cwd(), appPagePath)} must wire mdAlternates('${slug}') into its metadata export, either as "alternates: mdAlternates('${slug}')" or spread into a wider alternates object as "...mdAlternates('${slug}')"`
         ).toBe(true)
       } else {
         expect(
@@ -90,6 +91,25 @@ describe('markdown alternate drift', () => {
     ).toBe(true)
   })
 
+  it('changelog entry page gates its .md alternate on CHANGELOG_PAGES membership', async () => {
+    const source = await fs.readFile(
+      path.join(process.cwd(), 'pages', 'changelog', '[slug].tsx'),
+      'utf-8'
+    )
+    expect(
+      source.includes('CHANGELOG_PAGES.has(`changelog/${entry.slug}`)'),
+      'pages/changelog/[slug].tsx must compute the markdown alternate flag from CHANGELOG_PAGES membership using the changelog/-prefixed key the generator emits'
+    ).toBe(true)
+    expect(
+      source.includes('hasMarkdownVariant &&'),
+      'pages/changelog/[slug].tsx must render the markdown alternate link only when hasMarkdownVariant is true'
+    ).toBe(true)
+    expect(
+      source.includes('rel="alternate" type="text/markdown"'),
+      'pages/changelog/[slug].tsx must advertise the text/markdown alternate for published slugs'
+    ).toBe(true)
+  })
+
   it.for(MDX_SECTIONS)('%s pages advertise their .md sibling', async (urlPrefix) => {
     const appPagePath = path.join(process.cwd(), 'app', urlPrefix, '[slug]', 'page.tsx')
     if (!existsSync(appPagePath)) {
@@ -100,9 +120,13 @@ describe('markdown alternate drift', () => {
       return
     }
     const source = await fs.readFile(appPagePath, 'utf-8')
+    // Accept the spread form too: pages that also set a canonical merge both
+    // helpers into one `alternates` object (`...mdAlternates(...)`), since a
+    // second `alternates` key would be a duplicate-property error.
     const wiring = 'alternates: mdAlternates(`' + urlPrefix + '/${slug}`)'
+    const spreadWiring = '...mdAlternates(`' + urlPrefix + '/${slug}`)'
     expect(
-      source.includes(wiring),
+      source.includes(wiring) || source.includes(spreadWiring),
       `app/${urlPrefix}/[slug]/page.tsx must contain "${wiring}" in its generateMetadata`
     ).toBe(true)
   })

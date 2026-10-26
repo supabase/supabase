@@ -77,7 +77,6 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
     onSuccess: (_, variables) => {
       setLinkedOrgSlug(variables.slug)
     },
-    onError: () => undefined,
   })
   const linkError = linkOrganizationError
     ? `Failed to link organization: ${linkOrganizationError.message}`
@@ -165,11 +164,11 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
             description={
               <p>
                 Open the onboarding link from AWS Marketplace again. The link must include a{' '}
-                <code className="text-code-inline">buyer_id</code> parameter.
+                <code>buyer_id</code> parameter.
               </p>
             }
           />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -205,7 +204,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
               </>
             }
           />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -220,7 +219,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
       <AwsMarketplaceInterstitial description={getContractIneligibilityDescription(reason)}>
         <div className="flex flex-col gap-3">
           <ContractIneligibilityNotice reason={reason} />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>

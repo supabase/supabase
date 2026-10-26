@@ -3,9 +3,9 @@
 import { type BlogView } from 'app/blog/blog-view'
 import { useBreakpoint } from 'common'
 import BlogViewToggle from 'components/Blog/BlogViewToggle'
-import { motion } from 'framer-motion'
 import { startCase } from 'lib/helpers'
 import { ChevronDown, X as CloseIcon, Search } from 'lucide-react'
+import { motion } from 'motion/react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -193,7 +193,6 @@ function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
           <Button
             className="px-2 h-full"
             size="medium"
-            variant="default"
             aria-label="Search posts"
             onClick={() => setShowSearchInput(true)}
           >

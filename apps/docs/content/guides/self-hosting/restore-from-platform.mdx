@@ -52,7 +52,7 @@ Before restoring, check the following on your self-hosted instance:
 
 ## Step 4: Restore to your self-hosted database
 
-Connect to your self-hosted Postgres and restore the dump files. The [default](/docs/guides/self-hosting/docker#accessing-postgres) connection string for self-hosted Supabase is:
+Connect to your self-hosted Postgres and restore the dump files. The [default](/docs/guides/self-hosting/accessing-postgres#connect-through-supavisor) connection string for self-hosted Supabase is:
 
 ```
 postgres://postgres.your-tenant-id:[POSTGRES_PASSWORD]@[your-domain]:5432/postgres
@@ -114,7 +114,7 @@ The database dump includes your schema, data, roles, RLS policies, database func
 Your `auth.users` table and related data are included in the database dump, so user accounts are preserved. However:
 
 - **JWT secrets differ** between your platform and self-hosted instances. Existing tokens issued by the platform project will not be valid. Users will need to re-authenticate.
-- **Social auth providers** (Apple, Google, GitHub, etc.) need to be configured in your self-hosted `.env` file. Set the relevant `GOTRUE_EXTERNAL_*` variables. See the Auth repository [README](https://github.com/supabase/auth) for all available options.
+- **Social sign-in providers**, such as Apple, Google, and GitHub, need to be configured in your self-hosted `.env` file. Set the relevant `GOTRUE_EXTERNAL_*` variables. See the Auth repository [README](https://github.com/supabase/auth) for all available options.
 - **Redirect URLs** in your OAuth provider consoles (Apple Developer, Google Cloud Console, etc.) must be updated to point to your self-hosted hostname instead of `*.supabase.co`.
 
 ## Postgres version compatibility
@@ -166,7 +166,7 @@ select * from pg_available_extensions;
 
 ### Connection refused
 
-Make sure your self-hosted Postgres port is accessible. In the default [self-hosted Supabase](/docs/guides/self-hosting/docker#accessing-postgres) setup, the user is `postgres.your-tenant-id` with Supavisor on port `5432`.
+Make sure your self-hosted Postgres port is accessible. In the default [self-hosted Supabase](/docs/guides/self-hosting/accessing-postgres#connect-through-supavisor) setup, the user is `postgres.your-tenant-id` with Supavisor on port `5432`.
 
 ### Legacy Studio configuration
 

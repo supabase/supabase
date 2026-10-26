@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import { ChevronDown, Plus } from 'lucide-react'
+import { ChevronDownIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -29,8 +29,11 @@ export const CreateTableInstructionsDialog = () => {
       <div className="flex items-center">
         <Button
           variant="primary"
-          icon={<Plus />}
-          className={cn(enableCreationOfTablesFromDashboard && 'rounded-r-none hover:z-10')}
+          icon={<PlusIcon />}
+          className={cn(
+            enableCreationOfTablesFromDashboard &&
+              'rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm'
+          )}
           onClick={() => {
             if (enableCreationOfTablesFromDashboard) setShowSheet(true)
             else setShowModal(true)
@@ -43,8 +46,9 @@ export const CreateTableInstructionsDialog = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="primary"
-                className="w-7 rounded-l-none -ml-px"
-                icon={<ChevronDown />}
+                aria-label="More table creation options"
+                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                icon={<ChevronDownIcon />}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48" align="end">

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { ConnectionTimeoutError, UnknownAPIResponseError } from '@/types/api-errors'
 import { ResponseError } from '@/types/base'
@@ -21,52 +21,26 @@ function throwAndCatch(error: unknown): ResponseError {
 }
 
 describe('handleError — error classification', () => {
-  beforeEach(() => vi.clearAllMocks())
-
-  describe('known patterns', () => {
-    it('classifies connection timeout via message field', () => {
-      const err = throwAndCatch({ message: 'CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT' })
-      expect(err).toBeInstanceOf(ConnectionTimeoutError)
-      expect((err as ConnectionTimeoutError).errorType).toBe('connection-timeout')
-    })
-
-    it('classifies connection timeout via msg field', () => {
-      const err = throwAndCatch({ msg: 'ERROR: CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT' })
-      expect(err).toBeInstanceOf(ConnectionTimeoutError)
-    })
-
-    it('classification is case-insensitive', () => {
-      const err = throwAndCatch({ message: 'connection terminated due to connection timeout' })
-      expect(err).toBeInstanceOf(ConnectionTimeoutError)
-    })
-
-    it('classified error is still instanceof ResponseError', () => {
-      const err = throwAndCatch({ message: 'CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT' })
-      expect(err).toBeInstanceOf(ResponseError)
-    })
+  // Pattern matching itself (case, whitespace, near-misses) is covered in error-patterns.test.ts.
+  it.each([
+    ['message', { message: 'CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT' }],
+    ['msg', { msg: 'ERROR: CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT' }],
+  ])('classifies a known pattern from the %s field', (_, raw) => {
+    const err = throwAndCatch(raw)
+    expect(err).toBeInstanceOf(ConnectionTimeoutError)
+    expect(err).toBeInstanceOf(ResponseError)
+    expect((err as ConnectionTimeoutError).errorType).toBe('connection-timeout')
   })
 
-  describe('unclassified errors', () => {
-    it('throws UnknownAPIResponseError for unmatched messages', () => {
-      const err = throwAndCatch({ message: 'something went wrong' })
-      expect(err).toBeInstanceOf(UnknownAPIResponseError)
-      expect(err).toBeInstanceOf(ResponseError)
-    })
-
-    it('throws UnknownAPIResponseError for empty message', () => {
-      const err = throwAndCatch({ message: '' })
-      expect(err).toBeInstanceOf(UnknownAPIResponseError)
-    })
-
-    it('throws UnknownAPIResponseError for null', () => {
-      const err = throwAndCatch(null)
-      expect(err).toBeInstanceOf(UnknownAPIResponseError)
-    })
-
-    it('throws UnknownAPIResponseError for non-object', () => {
-      const err = throwAndCatch('raw string error')
-      expect(err).toBeInstanceOf(UnknownAPIResponseError)
-    })
+  it.each([
+    ['an unmatched message', { message: 'something went wrong' }],
+    ['an empty message', { message: '' }],
+    ['null', null],
+    ['a non-object', 'raw string error'],
+  ])('throws UnknownAPIResponseError for %s', (_, raw) => {
+    const err = throwAndCatch(raw)
+    expect(err).toBeInstanceOf(UnknownAPIResponseError)
+    expect(err).toBeInstanceOf(ResponseError)
   })
 
   describe('field preservation', () => {
