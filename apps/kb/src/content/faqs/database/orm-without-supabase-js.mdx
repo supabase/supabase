@@ -3,8 +3,6 @@ title: Can I use Drizzle or Prisma with Supabase without supabase-js?
 topics: ['Database']
 ---
 
-Yes. Drizzle, Prisma, and other ORMs connect with a standard Postgres connection string, so you don't need `supabase-js` at all. The client library is only for the Data API, Auth, Storage, and Realtime.
+Yes. Drizzle, Prisma, and other ORMs can connect with a standard Postgres connection string, so you can use these without `supabase-js`. The client library is only for the [Data API](/docs/guides/api), [Auth](/docs/guides/auth), [Storage](/docs/guides/storage), and [Realtime](/docs/guides/realtime).
 
-The part to get right is the connection mode. A long-running server can use the direct connection or the session pooler as-is. Serverless functions should use the transaction pooler with prepared statements turned off: for Prisma, add `pgbouncer=true` to the connection string, and for Drizzle, set `prepare: false` on its driver. If you run Drizzle on Postgres.js in transaction mode, also read the note on pipelining in the [Postgres.js guide](https://supabase.com/docs/guides/database/postgres-js).
-
-Supabase also recommends giving Prisma its own database role instead of using `postgres`. The [Drizzle](https://supabase.com/docs/guides/database/drizzle) and [Prisma](https://supabase.com/docs/guides/database/prisma) guides walk through setup. If your app only reaches the database through the ORM, you can turn off the Data API in your project's API settings.
+For more details, refer to the dedicated guides on [Drizzle](/docs/guides/database/drizzle) and [Prisma](/docs/guides/database/prisma).

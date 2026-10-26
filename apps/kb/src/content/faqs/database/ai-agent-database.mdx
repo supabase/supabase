@@ -3,8 +3,12 @@ title: Can an AI coding agent create and manage a Supabase database?
 topics: ['Database', 'Platform']
 ---
 
-Yes, through the Supabase MCP server. Once you add it to your AI tool and sign in, the agent can create projects, change your schema, and run SQL for you.
+Yes, through the [Supabase MCP server](/docs/guides/ai-tools/mcp). Once you add it to your AI tool and sign in, the agent can create projects, change your schema, and run SQL for you.
 
-It's worth limiting what the agent can reach. You can scope the server to one project with the `project_ref` option, and turn on read-only mode with `read_only=true`, so every query runs as a read-only Postgres user. Do both before you connect a project that holds real user data. A development project or a preview branch is a safer place for an agent to make schema changes.
+The MCP server gives you more control over agentic actions, including:
 
-It also helps to ask the agent to write schema changes as migration files in your repo instead of applying them to production directly, so you can review them like any other change. Setup steps are in the [MCP server docs](https://supabase.com/docs/guides/ai-tools/mcp). An agent can also use the Supabase CLI, or connect with a plain connection string like any other client.
+- Limiting what the agent can reach, by scoping the server to one project with the `project_ref` option and turning on read-only mode with `read_only=true`, so every query runs as a read-only Postgres user.
+- Supporting manual approval for potential costs and destructive SQL commands.
+- Providing back Supabase Dashboard URLs for Edge Function secret entry (to avoid leaking secrets to your AI agent).
+
+An agent can also use the Supabase CLI or connect with a plain connection string like any other client.
