@@ -1,6 +1,8 @@
 'use client'
 
-import { CheckIcon, ClipboardIcon } from '@heroicons/react/outline'
+import { CircleCheckFilled, CrossfadeIcon } from '~/components/CrossfadeIcon'
+import { Copy, Download } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
 import { Fragment, MouseEvent, ReactNode, useEffect, useRef, useState } from 'react'
@@ -24,7 +26,9 @@ const RightClickBrandLogo = () => {
   const ref = useRef(null)
   const router = useRouter()
   const [open, setOpen] = useState<boolean>(false)
-  const [copied, setCopied] = useState<boolean>(false)
+  const [copiedLabel, setCopiedLabel] = useState<string | null>(null)
+  const [logoHighlight, setLogoHighlight] = useState<MenuItemProps['logoHighlight']>()
+  const { resolvedTheme } = useTheme()
 
   /**
    * Close dropdown by clicking outside
@@ -53,6 +57,7 @@ const RightClickBrandLogo = () => {
     e.preventDefault()
 
     if (e.type === 'contextmenu' || e.nativeEvent.button === 2) {
+      setLogoHighlight(undefined)
       setOpen(true)
     }
   }
@@ -77,13 +82,29 @@ const RightClickBrandLogo = () => {
    * Copy to clipboard logo SVG
    */
   const handleCopyToClipboard = (menuItem: MenuItemProps) => {
-    copyToClipboard(menuItem.clipboard ?? '', () => {
-      setCopied(true)
-      setTimeout(() => {
-        setCopied(false)
-      }, 2000)
-    })
+    // the ClipboardItem promise keeps the fetched copy inside the user gesture in safari
+    // the copied file matches the nav logo, which follows the site theme
+    const clipboardUrl =
+      menuItem.clipboardUrls?.[resolvedTheme?.includes('dark') ? 'dark' : 'light']
+    if (!clipboardUrl) return
+    copyToClipboard(
+      fetch(clipboardUrl).then((response) => response.text()),
+      () => {
+        setCopiedLabel(menuItem.label)
+        setTimeout(() => {
+          setCopiedLabel(null)
+        }, 2000)
+      }
+    )
   }
+
+  const handleItemPointerEnter = (menuItem: MenuItemProps) =>
+    setLogoHighlight(menuItem.logoHighlight)
+
+  const handleMenuPointerLeave = () => setLogoHighlight(undefined)
+
+  const isFrameVisible = open && logoHighlight !== undefined
+  const isFrameOnSymbol = logoHighlight !== 'wordmark'
 
   return (
     <DropdownMenu open={open}>
@@ -93,17 +114,33 @@ const RightClickBrandLogo = () => {
           onContextMenu={handleRightClick}
           onFocus={handleKeyboardOpen}
           onKeyDown={(e) => e.key === 'Enter' && router?.push('/')}
-          className="block w-auto h-6 focus-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative rounded-xs"
+          className={cn(
+            'relative isolate block w-auto h-6 box-content -mx-2 -my-3 px-2 py-3 focus-ring focus-visible:ring-offset-background-alternative rounded-md',
+            'transition-colors duration-200 ease-out motion-reduce:transition-none',
+            isFrameVisible && isFrameOnSymbol && 'text-foreground-muted'
+          )}
         >
           <SupabaseWordmark />
+          <span
+            aria-hidden
+            className={cn(
+              'pointer-events-none absolute inset-y-1.5 left-0.5 -z-10',
+              'rounded-md border border-overlay bg-overlay shadow-md',
+              'transition-all duration-200 ease-out motion-reduce:transition-none',
+              isFrameOnSymbol ? 'w-9' : 'w-[calc(100%-0.25rem)]',
+              isFrameVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+            )}
+          />
         </Link>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         autoFocus
         ref={ref}
         align="start"
+        alignOffset={2}
         side="bottom"
         className="mt-2 p-0 w-52"
+        onPointerLeave={handleMenuPointerLeave}
       >
         {menuItems.map((section, sectionIdx) => (
           <Fragment key={`cxtMenu-section-${sectionIdx}`}>
@@ -111,16 +148,16 @@ const RightClickBrandLogo = () => {
             <div className="p-1">
               {section.map((menuItem, i) => (
                 <DropdownMenuItem
-                  autoFocus
                   asChild
                   key={menuItem.label}
+                  onPointerEnter={() => handleItemPointerEnter(menuItem)}
                   className="w-full flex justify-between gap-2 items-center p-2!"
                 >
                   {menuItem.type === 'download' || menuItem.type === 'link' ? (
                     <Link
                       href={menuItem.href ?? ''}
                       download={menuItem.type === 'download'}
-                      className="group/menu-item w-full text-left flex justify-between gap-2 items-center"
+                      className="w-full text-left flex justify-between gap-2 items-center"
                     >
                       <MenuItemContent {...menuItem} />
                     </Link>
@@ -129,10 +166,10 @@ const RightClickBrandLogo = () => {
                       // DropdownMenuItem asChild manages roving tabIndex; don't override it.
                       // eslint-disable-next-line supabase/require-explicit-tabindex -- in-menu item
                       <button
-                        className="group/menu-item w-full text-left flex justify-between gap-2 items-center"
+                        className="w-full text-left flex justify-between gap-2 items-center"
                         onClick={() => handleCopyToClipboard(menuItem)}
                       >
-                        <MenuItemContent copied={copied} {...menuItem} />
+                        <MenuItemContent copied={copiedLabel === menuItem.label} {...menuItem} />
                       </button>
                     )
                   )}
@@ -153,7 +190,8 @@ interface MenuItemProps {
   type: 'clipboard' | 'download' | 'link'
   icon?: ReactNode
   href?: string
-  clipboard?: string
+  clipboardUrls?: Record<'light' | 'dark', string>
+  logoHighlight?: 'icon' | 'wordmark'
 }
 
 /**
@@ -164,7 +202,8 @@ interface MenuItemProps {
 const menuItems: MenuItemProps[][] = [
   [
     {
-      label: 'Copy logo as SVG',
+      label: 'Copy logo',
+      logoHighlight: 'icon',
       type: 'clipboard',
       icon: (
         <svg
@@ -180,99 +219,37 @@ const menuItems: MenuItemProps[][] = [
           />
         </svg>
       ),
-      clipboard: `<svg width="109" height="113" viewBox="0 0 109 113" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M63.7076 110.284C60.8481 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0627L99.1935 40.0627C107.384 40.0627 111.952 49.5228 106.859 55.9374L63.7076 110.284Z" fill="url(#paint0_linear)"/>
-<path d="M63.7076 110.284C60.8481 113.885 55.0502 111.912 54.9813 107.314L53.9738 40.0627L99.1935 40.0627C107.384 40.0627 111.952 49.5228 106.859 55.9374L63.7076 110.284Z" fill="url(#paint1_linear)" fill-opacity="0.2"/>
-<path d="M45.317 2.07103C48.1765 -1.53037 53.9745 0.442937 54.0434 5.041L54.4849 72.2922H9.83113C1.64038 72.2922 -2.92775 62.8321 2.1655 56.4175L45.317 2.07103Z" fill="#3ECF8E"/>
-<defs>
-<linearGradient id="paint0_linear" x1="53.9738" y1="54.974" x2="94.1635" y2="71.8295" gradientUnits="userSpaceOnUse">
-<stop stop-color="#249361"/>
-<stop offset="1" stop-color="#3ECF8E"/>
-</linearGradient>
-<linearGradient id="paint1_linear" x1="36.1558" y1="30.578" x2="54.4844" y2="65.0806" gradientUnits="userSpaceOnUse">
-<stop/>
-<stop offset="1" stop-opacity="0"/>
-</linearGradient>
-</defs>
-</svg>
-`,
+      clipboardUrls: {
+        light: '/brand-assets/supabase-icon-green-transparent.svg',
+        dark: '/brand-assets/supabase-icon-green-transparent.svg',
+      },
+    },
+    {
+      label: 'Copy wordmark',
+      logoHighlight: 'wordmark',
+      type: 'clipboard',
+      icon: <Copy strokeWidth={1.5} className="size-4" />,
+      clipboardUrls: {
+        light: '/brand-assets/supabase-logo-green-black-transparent.svg',
+        dark: '/brand-assets/supabase-logo-green-white-transparent.svg',
+      },
     },
     {
       label: 'Download wordmark',
       type: 'download',
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M4.66669 6.66675L8.00002 10.0001L11.3334 6.66675"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M8 10V2"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ),
+      icon: <Download strokeWidth={1.5} className="size-4" />,
       href: '/supabase-wordmark.zip',
     },
     {
       label: 'Download brand assets',
       type: 'download',
       href: '/brand-assets.zip',
-      icon: (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M4.66669 6.66675L8.00002 10.0001L11.3334 6.66675"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M8 10V2"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ),
+      icon: <Download strokeWidth={1.5} className="size-4" />,
     },
   ],
   [
     {
-      label: 'Brand Assets',
+      label: 'Go to Brand Assets',
       type: 'link',
       href: '/brand-assets',
     },
@@ -281,7 +258,6 @@ const menuItems: MenuItemProps[][] = [
 
 interface MenuItemContentProps {
   icon?: ReactNode
-  type: string
   label: string
   copied?: boolean
 }
@@ -289,28 +265,23 @@ interface MenuItemContentProps {
 /**
  * MenuItem content
  */
-const MenuItemContent = ({ icon, type, label, copied }: MenuItemContentProps) => (
+const MenuItemContent = ({ icon, label, copied }: MenuItemContentProps) => (
   <>
-    {icon && <span className="text-foreground-lighter">{icon}</span>}
-    <span className="grow">{label}</span>
-    {type === 'clipboard' && (
-      <span className="w-4 opacity-0 flex items-center justify-center group-hover/menu-item:opacity-100 group-focus/menu-item:opacity-100 group-focus-visible/menu-item:opacity-100">
-        {!copied ? (
-          <ClipboardIcon
-            strokeWidth={1}
-            className={cn(
-              'h-3 transition-opacity opacity-0 duration-300',
-              !copied && 'opacity-100'
-            )}
-          />
+    {icon && (
+      <span className="text-foreground-lighter">
+        {copied === undefined ? (
+          icon
         ) : (
-          <CheckIcon
-            strokeWidth={1}
-            className={cn('h-3 transition-opacity opacity-0 duration-300', copied && 'opacity-100')}
+          <CrossfadeIcon
+            isActive={copied}
+            activeIcon={<CircleCheckFilled className="size-4" />}
+            inactiveIcon={icon}
+            className="size-4"
           />
         )}
       </span>
     )}
+    <span className="grow">{label}</span>
   </>
 )
 
