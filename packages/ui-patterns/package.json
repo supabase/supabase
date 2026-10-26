@@ -758,6 +758,22 @@
       "import": "./src/Toc/types.ts",
       "types": "./src/Toc/types.ts"
     },
+    "./Trace/Trace": {
+      "import": "./src/Trace/Trace.tsx",
+      "types": "./src/Trace/Trace.tsx"
+    },
+    "./Trace": {
+      "import": "./src/Trace/index.ts",
+      "types": "./src/Trace/index.ts"
+    },
+    "./Trace/types": {
+      "import": "./src/Trace/types.ts",
+      "types": "./src/Trace/types.ts"
+    },
+    "./Trace/utils": {
+      "import": "./src/Trace/utils.ts",
+      "types": "./src/Trace/utils.ts"
+    },
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
