@@ -87,11 +87,17 @@ interface StickyHeaderProps {
   title?: React.ReactNode | string
   monoFont?: boolean
   className?: string
+  headingTag?: 'h1' | 'h2'
 }
 
-export function StickyHeader({ title, monoFont = false, className }: StickyHeaderProps) {
+export function StickyHeader({
+  title,
+  monoFont = false,
+  className,
+  headingTag: HeadingTag = 'h2',
+}: StickyHeaderProps) {
   return (
-    <h2
+    <HeadingTag
       tabIndex={-1} // For programmatic focus on auto-scroll to section
       className={cn(
         'sticky top-0 z-1',
@@ -111,7 +117,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
       )}
     >
       {title}
-    </h2>
+    </HeadingTag>
   )
 }
 

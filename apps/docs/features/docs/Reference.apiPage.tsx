@@ -64,7 +64,12 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
                   id="sb-docs-guide-main-article"
                   className="@container/article col-span-12 md:col-span-8 min-w-0"
                 >
-                  <SectionSwitch libraryId="api" version="latest" section={section} />
+                  <SectionSwitch
+                    libraryId="api"
+                    version="latest"
+                    section={section}
+                    headingTag="h1"
+                  />
                   {/* The sidebar is hidden below `md`, so keep the links reachable */}
                   {additionalLinks.length !== 0 && (
                     <ReferenceLinks links={additionalLinks} className="mt-8 md:hidden" />
@@ -83,7 +88,7 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
             </TocAnchorsProvider>
           ) : (
             <article className="@container/article">
-              <SectionSwitch libraryId="api" version="latest" section={section} />
+              <SectionSwitch libraryId="api" version="latest" section={section} headingTag="h1" />
             </article>
           )}
         </LayoutMainContent>

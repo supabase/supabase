@@ -80,9 +80,10 @@ type SectionSwitchProps = {
   libraryId: string
   version: string
   section: AbbrevApiReferenceSection
+  headingTag?: 'h1' | 'h2'
 }
 
-export function SectionSwitch({ libraryId, version, section }: SectionSwitchProps) {
+export function SectionSwitch({ libraryId, version, section, headingTag }: SectionSwitchProps) {
   const libPath = REFERENCES[libraryId.replaceAll('-', '_')].libPath
   const allAvailableVersions = REFERENCES[libraryId.replaceAll('-', '_')].versions
   const isLatestVersion = allAvailableVersions.length === 0 || version === allAvailableVersions[0]
@@ -98,6 +99,7 @@ export function SectionSwitch({ libraryId, version, section }: SectionSwitchProp
           isLatestVersion={isLatestVersion}
           link={sectionLink}
           section={section}
+          headingTag={headingTag}
         />
       )
     case 'function':
@@ -113,9 +115,16 @@ export function SectionSwitch({ libraryId, version, section }: SectionSwitchProp
     case 'cli-command':
       return <CliCommandSection link={sectionLink} section={section} />
     case 'operation':
-      return <ApiEndpointSection link={sectionLink} section={section} />
+      return <ApiEndpointSection link={sectionLink} section={section} headingTag={headingTag} />
     case 'self-hosted-operation':
-      return <ApiEndpointSection servicePath={libraryId} link={sectionLink} section={section} />
+      return (
+        <ApiEndpointSection
+          servicePath={libraryId}
+          link={sectionLink}
+          section={section}
+          headingTag={headingTag}
+        />
+      )
     default:
       console.error(`Unhandled type in reference sections: ${section.type}`)
       return null
@@ -128,6 +137,7 @@ interface MarkdownSectionProps {
   isLatestVersion: boolean
   link: string
   section: AbbrevApiReferenceSection
+  headingTag?: 'h1' | 'h2'
 }
 
 async function MarkdownSection({
@@ -136,6 +146,7 @@ async function MarkdownSection({
   isLatestVersion,
   link,
   section,
+  headingTag,
 }: MarkdownSectionProps) {
   const content = await getRefMarkdown(
     section.meta?.shared
@@ -145,7 +156,7 @@ async function MarkdownSection({
 
   return (
     <RefSubLayout.EducationSection link={link} {...section}>
-      <StickyHeader {...section} />
+      <StickyHeader {...section} headingTag={headingTag} />
       <MDXRemoteRefs source={content} />
     </RefSubLayout.EducationSection>
   )
@@ -267,9 +278,15 @@ interface ApiEndpointSectionProps {
   link: string
   section: AbbrevApiReferenceSection
   servicePath?: string
+  headingTag?: 'h1' | 'h2'
 }
 
-async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSectionProps) {
+async function ApiEndpointSection({
+  link,
+  section,
+  servicePath,
+  headingTag,
+}: ApiEndpointSectionProps) {
   const endpointDetails = servicePath
     ? await getSelfHostedApiEndpointById(servicePath, section.id)
     : await getApiEndpointById(section.id)
@@ -306,6 +323,7 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
       <StickyHeader
+        headingTag={headingTag}
         title={
           <>
             {endpointDetails.summary}
