@@ -154,6 +154,14 @@ describe('absolutizeLinks', () => {
     )
   })
 
+  it.each([
+    ['### Step [#1]: Accessing items[0]', '### Step \\[#1]: Accessing items\\[0]\n'],
+    ['## Issue [#123] [Beta]', '## Issue \\[#123] \\[Beta]\n'],
+    ['## Issue [#123] [#issue]', '## Issue \\[#123]\n'],
+  ])('preserves earlier bracketed text in %s', (body, expected) => {
+    expect(absolutizeLinks(body)).toBe(expected)
+  })
+
   it('leaves bracketed text that is not a trailing heading anchor untouched', () => {
     const body = '## Arrays [#1] explained\n\nSee [#create-client] below.'
     expect(absolutizeLinks(body)).toBe(
