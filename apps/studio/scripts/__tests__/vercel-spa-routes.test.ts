@@ -21,7 +21,7 @@ const staticEntries: StaticEntry[] = [
   { name: 'monaco-editor', isDirectory: true },
   { name: 'supabase-logo.svg', isDirectory: false },
 ]
-const STATIC_FILE_SRC = '^/dashboard/((?:_vercel|img|monaco-editor)/.*|(?:supabase-logo\\.svg))$'
+const STATIC_FILE_SRC = '^/dashboard/((?:_vercel|img|monaco-editor)/.+|(?:supabase-logo\\.svg))$'
 
 describe('buildSpaRoutes', () => {
   it('keeps the rules ahead of the filesystem handler and replaces the function catch-all', () => {
@@ -125,6 +125,7 @@ describe('buildSpaRoutes', () => {
     ['/dashboard/project/example/storage/files/buckets/my.bucket', '/_shell.html'],
     ['/dashboard/project/example/functions/hello.world', '/_shell.html'],
     ['/dashboard/img', '/_shell.html'],
+    ['/dashboard/img/', '/_shell.html'],
     ['/dashboard/img.png', '/_shell.html'],
     // Unprefixed paths are unchanged
     ['/api/export.json', '/__server'],

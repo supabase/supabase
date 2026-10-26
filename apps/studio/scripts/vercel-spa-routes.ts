@@ -43,7 +43,7 @@ export function buildStaticFileSrc(basePath: string, entries: StaticEntry[]): st
   const dirs = entries.filter((e) => e.isDirectory).map((e) => escapeRegExp(e.name))
   const files = entries.filter((e) => !e.isDirectory).map((e) => escapeRegExp(e.name))
   const alternatives = [
-    ...(dirs.length ? [`(?:${dirs.join('|')})/.*`] : []),
+    ...(dirs.length ? [`(?:${dirs.join('|')})/.+`] : []),
     ...(files.length ? [`(?:${files.join('|')})`] : []),
   ]
   if (!alternatives.length) return undefined
