@@ -172,7 +172,7 @@ This would be an example of catch all trigger function that would broadcast to t
 
 ```sql
 CREATE OR REPLACE FUNCTION notify_table_changes()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS $$
@@ -195,7 +195,7 @@ But you can also create more specific trigger functions for specific tables and 
 
 ```sql
 CREATE OR REPLACE FUNCTION room_messages_broadcast_trigger()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS $$
@@ -220,7 +220,7 @@ By default, `realtime.broadcast_changes` requires you to use private channels as
 
 ```sql
 CREATE OR REPLACE FUNCTION notify_custom_event()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
 SECURITY DEFINER
 LANGUAGE plpgsql
 AS $$
