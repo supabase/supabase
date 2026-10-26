@@ -189,7 +189,12 @@ const CONNECT_BUTTONS: { canvas: Canvas; svg: string; alt: string }[] = [
   },
 ]
 
-const fetchText = (url: string) => fetch(url).then((response) => response.text())
+// a failed fetch rejects, so copyToClipboard shows its error toast instead of copying the error page
+const fetchText = (url: string) =>
+  fetch(url).then((response) => {
+    if (!response.ok) throw new Error(`${response.status} ${url}`)
+    return response.text()
+  })
 
 export const LogoGallery = ({ className }: LogoGalleryProps) => (
   <div className={cn('section-container flex flex-col gap-20 py-16 md:py-24', className)}>

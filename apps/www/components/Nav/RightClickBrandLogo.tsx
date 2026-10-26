@@ -88,7 +88,10 @@ const RightClickBrandLogo = () => {
       menuItem.clipboardUrls?.[resolvedTheme?.includes('dark') ? 'dark' : 'light']
     if (!clipboardUrl) return
     copyToClipboard(
-      fetch(clipboardUrl).then((response) => response.text()),
+      fetch(clipboardUrl).then((response) => {
+        if (!response.ok) throw new Error(`${response.status} ${clipboardUrl}`)
+        return response.text()
+      }),
       () => {
         setCopiedLabel(menuItem.label)
         setTimeout(() => {
@@ -125,7 +128,7 @@ const RightClickBrandLogo = () => {
             aria-hidden
             className={cn(
               'pointer-events-none absolute inset-y-1.5 left-0.5 -z-10',
-              'rounded-md border border-overlay bg-overlay shadow-md',
+              'rounded-md bg-overlay',
               'transition-all duration-200 ease-out motion-reduce:transition-none',
               isFrameOnSymbol ? 'w-9' : 'w-[calc(100%-0.25rem)]',
               isFrameVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
