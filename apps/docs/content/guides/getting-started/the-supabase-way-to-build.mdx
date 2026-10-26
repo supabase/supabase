@@ -40,13 +40,13 @@ When your app needs to know who is making a request, add [Supabase Auth](/docs/g
 
 **Trigger:** any multi-user app, personalization, or anything that must be private to an account.
 
-Once email and password sign-in works, add [social login](/docs/guides/auth/social-login) for providers such as Google and GitHub.
+Once email and password sign-in works, add [social login](/docs/guides/auth/social-sign-in) for providers such as Google and GitHub.
 
 <ContentListings id="supabase-way-auth-build" />
 
-## Scope data to each user: Row-Level Security
+## Scope data to each user: Row Level Security
 
-Once you have users, each user needs to see only their own data. With [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS), you write that rule once, as a policy on the table, and Postgres enforces it on every request made with your publishable (anon) or user keys. The secret (`service_role`) key bypasses RLS, so keep it server-side and enforce authorization there yourself.
+After you have users, each user needs to see only their own data. With [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS), you write that rule once, as a policy on the table, and Postgres enforces it on every request made with your publishable (`anon`) or user keys. The secret (`service_role`) key bypasses RLS, so keep it server-side and enforce authorization there yourself.
 
 **Mental model:** authorization is data, enforced by Postgres, not logic scattered across your app. The policy lives next to the rows it protects.
 
