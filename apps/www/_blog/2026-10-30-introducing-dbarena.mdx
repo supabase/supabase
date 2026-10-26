@@ -1,0 +1,135 @@
+---
+title: 'Introducing DBArena: open, reproducible benchmarks for hosted Postgres'
+description: 'DBArena benchmarks hosted Postgres providers on price-performance, with a public methodology.'
+author: aditya_maruvada,daniel_mitterdorfer
+date: '2026-10-30'
+categories:
+  - product
+tags:
+  - postgres
+  - benchmarks
+imgSocial: 2026-10-30-introducing-dbarena/og.png
+imgThumb: 2026-10-30-introducing-dbarena/thumb.png
+toc_depth: 2
+---
+
+We're announcing [DBArena](https://dbarena.com/), a site that publishes benchmarks of hosted Postgres providers. The first results compare Supabase Postgres (with default storage), Supabase Postgres (with OrioleDB), Amazon RDS, and Google Cloud SQL at up to seven compute sizes, measured on throughput, price-performance, and latency.
+
+Supabase sponsors DBArena. The methodology is public, and the tools that run the benchmarks are open source. Each result includes a raw data file with the exact commands, configuration, and captured meta data, so you can rerun any test and compare your numbers with ours.
+
+## Why we built DBArena
+
+Most published database benchmarks come from vendors and are difficult to compare with each other. They use different instance sizes, tuned configurations on one side and defaults on the other, and are hard to reproduce. Many report performance metrics without considering price, which hides the tradeoff teams care about.
+
+On DBArena, every provider runs the same workload at matched vCPU counts with default settings, and results are normalized for cost.
+
+## What DBArena measures
+
+The first release covers four products:
+
+- Supabase Postgres with default heap storage
+- Supabase Postgres with OrioleDB (beta)
+- Amazon RDS for PostgreSQL
+- Google Cloud SQL for PostgreSQL (Enterprise edition)
+
+Each product is tested at up to seven compute tiers, from Small (2 vCPU, 2 GiB) to 8XLarge (32 vCPU, 128 GiB). Products are matched by vCPU count, and every test uses Postgres 17 with the provider's default configuration. Clients connect directly over TLS, without a connection pooler.
+
+Each tier is tested in two scenarios:
+
+- **Cache fit:** The data set fits in memory, with a buffer cache hit ratio of at least 99%.
+- **Cache exceeding:** The data set is four times larger than available RAM, which forces reads from disk. Disk IOPS and throughput are matched across providers.
+
+For every test point, DBArena reports three metrics:
+
+- **tpm:** average transactions per minute over a 60-minute measurement run.
+- **tpm/$:** transactions per minute per dollar of monthly cost, using public on-demand list prices with no discounts.
+- **p95 latency:** the latency that 19 out of 20 New Order transactions complete within.
+
+<Img
+  alt="Line chart ranking the four products by transactions per minute per dollar at each compute size from S to 8XL, with data at about four times memory. Supabase OrioleDB (Beta) ranks first at every size, from 155 tpm/$ at S to 38 at 8XL."
+  src="/images/blog/2026-10-30-introducing-dbarena/ranking2x.png"
+/>
+
+## How a result is produced
+
+The workload is derived from TPC-C, a standard benchmark that models an order-processing system. Think time is disabled, so the benchmark measures the maximum throughput each database can sustain.
+
+This workload is derived from the TPC-C Benchmark and is not comparable to published TPC-C Benchmark results, as this implementation does not comply with all requirements of the TPC-C Benchmark.
+
+For each test, DBArena provisions a fresh database and a load generator in the same region. It runs a 30-minute warmup that is discarded, followed by a 60-minute measurement. It sweeps the number of clients from one to six times the vCPU count to find each database's peak throughput. Each test repeats in a fresh environment until there are three successful runs, and the published result is the median run at peak concurrency.
+
+The first round of results was measured between September 25 and October 1, 2026. It covers 62 published results drawn from more than 750 individual benchmark runs. These results went live on October 2, when we launched DBArena at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits).
+
+## The first results
+
+Supabase with OrioleDB delivers the most throughput per dollar when your data set is larger than memory (cache exceeding). It led at every compute size we tested, and on the largest instance, 8XLarge, it processed about twice as many transactions per minute as Amazon RDS, and about 1.8 times as many as Google Cloud SQL. At 8XLarge, it also led when the data fits in memory.
+
+**Data larger than memory (cache exceeding), 8XLarge**
+
+| Product                             | Monthly cost | tpm     | tpm/$ | p95    |
+| ----------------------------------- | ------------ | ------- | ----- | ------ |
+| Supabase Postgres with OrioleDB     | $3,010.99    | 113,850 | 38    | 56 ms  |
+| Google Cloud SQL                    | $2,631.65    | 64,437  | 24    | 279 ms |
+| Amazon RDS                          | $2,872.66    | 57,942  | 20    | 229 ms |
+| Supabase Postgres with heap storage | $3,010.99    | 60,304  | 20    | 160 ms |
+
+**Data fits in memory (cache fit), 8XLarge (cost-optimized disk)**
+
+| Product                             | Monthly cost | tpm     | tpm/$ | p95    |
+| ----------------------------------- | ------------ | ------- | ----- | ------ |
+| Supabase Postgres with OrioleDB     | $2,177.63    | 303,225 | 139   | 46 ms  |
+| Supabase Postgres with heap storage | $2,177.63    | 235,163 | 108   | 64 ms  |
+| Google Cloud SQL                    | $1,928.29    | 159,417 | 83    | 164 ms |
+| Amazon RDS                          | $2,184.90    | 154,121 | 71    | 221 ms |
+
+_Both of the tests above use 32 vCPU, 128 GiB. tpm is New Order transactions per minute, and p95 is New Order latency, from the median run at peak concurrency._
+
+Results vary by compute size and by whether the data fits in memory. [Compare the results](https://dbarena.com/compare) for the size and scenario closest to your workload.
+
+<Img
+  alt="Grid showing the leader by tpm per dollar at each of seven compute sizes. In memory, the leader changes with size: Supabase Postgres at S, Google Cloud SQL at M, Amazon RDS from L to 4XL, and at 8XL Supabase OrioleDB (Beta) on the cost setup and Amazon RDS on the performance setup. Past memory, at about four times memory, Supabase OrioleDB (Beta) leads at every size."
+  src="/images/blog/2026-10-30-introducing-dbarena/leaders2x.png"
+/>
+
+## Reproduce any result
+
+Every published result has a `result.json` file in the [dbarena.com repository](https://github.com/dbarena/dbarena.com) under `results/`. It records the instance configuration that was provisioned, the price, the software versions, and the exact command used to run the test.
+
+The benchmarks are run with three open source tools:
+
+- [dbarenactl](https://github.com/dbarena/dbarenactl) schedules benchmark runs and tracks their progress.
+- [benchctl](https://github.com/dbarena/benchctl) provisions environments and runs the workload.
+- [go-tpc](https://github.com/supabase/go-tpc) is the load generator, a Supabase fork that fixes several issues in the upstream project.
+
+To rerun a single test point against Amazon RDS, for example, set up `dbarenactl` and `benchctl` with an AWS account and run:
+
+```bash
+dbarenactl run --candidate candidates/aws/rds/tpcc/manifest.yaml \
+               --test-point xlarge/cache-exceeding \
+               --iterations 3
+```
+
+The command prints a sweep ID. When the runs finish, export the results:
+
+```bash
+dbarenactl results $SWEEP_ID
+```
+
+Add `--dry-run` to the first command to preview what it will provision without creating anything.
+
+## Current limitations
+
+- **One workload:** All results come from a single workload derived from TPC-C.
+- **Throughput only:** Because think time is disabled, the results show maximum throughput, not the behavior of a typical application with idle periods.
+- **One region per cloud:** Tests run in AWS us-east-1 and GCP us-east1. They don't cover other regions, cross-region latency, or replicas.
+- **List prices:** Costs use public on-demand list prices with no discounts.
+- **Matched by vCPU.** Products are matched by vCPU count rather than memory, so providers with more RAM per vCPU have an advantage at some sizes.
+- **Load generator placement.** For Amazon RDS and Google Cloud SQL, the load generator runs in the same availability zone as the database. Supabase doesn't support availability zone selection, so on Supabase it only runs in the same region.
+
+The [methodology page](https://dbarena.com/methodology) explains each of these choices in detail.
+
+## What's next
+
+We plan to add more workloads, starting with one derived from TPC-E, and to test more complex setups that include connection poolers and high availability components. We will also publish new results over time so you can see how each provider's performance changes.
+
+To get an email when new benchmarks are published, [subscribe to the DBArena newsletter](https://dbarena.com/?subscribe). If you rerun a test and get different numbers, or want to see another provider added, open an issue on [GitHub](https://github.com/dbarena/dbarenactl).
