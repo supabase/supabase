@@ -8,8 +8,7 @@ import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { groupLogsFiltersByColumn, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
-import { UNIFIED_LOGS_SCOPES } from './UnifiedLogs.scopes'
-import { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
+import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
   joinSqlFragments,
@@ -31,26 +30,19 @@ const ALL_LOG_TYPES = ['edge', 'postgrest', 'storage', 'postgres', 'edge functio
 /**
  * Computes the log_type set that the CTE should union. With no filter, defaults
  * to the cheap two-source set. With `=` filters, narrows to those values. With
- * `<>` filters, excludes them from the full set. A scope replaces both the
- * default and the full set with its own log types.
+ * `<>` filters, excludes them from the full set.
  */
 export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
+  // Every BigQuery query starts here. Scoped views always query ClickHouse (see
+  // useUnifiedLogsBackend), so refuse a scope rather than return rows from outside it.
+  if (search.scope) throw new Error('Scoped unified logs queries are only supported on ClickHouse')
   const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
-  const scopeLogTypes: string[] | undefined = search.scope
-    ? [...UNIFIED_LOGS_SCOPES[search.scope.type].logTypes]
-    : undefined
-  if (filters.length === 0) return scopeLogTypes ?? [...DEFAULT_LOG_TYPES]
+  if (filters.length === 0) return [...DEFAULT_LOG_TYPES]
   const included = filters.filter((f) => f.operator === '=').map((f) => f.value)
   const excluded = new Set(filters.filter((f) => f.operator === '<>').map((f) => f.value))
-  const base = included.length > 0 ? included : (scopeLogTypes ?? ALL_LOG_TYPES)
+  const base = included.length > 0 ? included : ALL_LOG_TYPES
   return base.filter((t) => !excluded.has(t))
 }
-
-/** Restricts an edge function CTE to the scoped function, or matches every row when unscoped. */
-const functionIdCondition = (
-  column: SafeLogSqlFragment,
-  scope?: UnifiedLogsScope
-): SafeLogSqlFragment => (scope ? safeSql`${column} = ${lit(scope.functionId)}` : safeSql`true`)
 
 /**
  * Builds WHERE-clause fragments from the parsed `filter` URL array. Identifier-
@@ -269,7 +261,7 @@ const getPostgresLogsQuery = (): SafeLogSqlFragment => safeSql`
 /**
  * Edge function logs query fragment
  */
-const getEdgeFunctionLogsQuery = (scope?: UnifiedLogsScope): SafeLogSqlFragment => safeSql`
+const getEdgeFunctionLogsQuery = (): SafeLogSqlFragment => safeSql`
     select
       id,
       null as source_id,
@@ -299,35 +291,8 @@ const getEdgeFunctionLogsQuery = (scope?: UnifiedLogsScope): SafeLogSqlFragment 
     FROM function_logs as fl
     CROSS JOIN UNNEST(fl.metadata) as fl_metadata
     WHERE fl_metadata.request_id IS NOT NULL
-    AND ${functionIdCondition(safeSql`fl_metadata.function_id`, scope)}
     GROUP BY fl_metadata.request_id
     ) as function_logs_agg on fel_metadata.request_id = function_logs_agg.request_id
-    WHERE ${functionIdCondition(safeSql`fel_metadata.function_id`, scope)}
-  `
-
-/**
- * Edge function runtime logs (console output, boot and shutdown events) query fragment
- */
-const getEdgeFunctionRuntimeLogsQuery = (scope?: UnifiedLogsScope): SafeLogSqlFragment => safeSql`
-    select
-      id,
-      null as source_id,
-      fl.timestamp as timestamp,
-      'edge function runtime' as log_type,
-      null as status,
-      CASE
-          WHEN LOWER(fl_metadata.level) IN ('error', 'fatal') THEN 'error'
-          WHEN LOWER(fl_metadata.level) IN ('warn', 'warning') THEN 'warning'
-          ELSE 'success'
-      END as level,
-      null as pathname,
-      event_message as event_message,
-      null as method,
-      null as log_count,
-      null as logs
-    from function_logs as fl
-    cross join unnest(metadata) as fl_metadata
-    WHERE ${functionIdCondition(safeSql`fl_metadata.function_id`, scope)}
   `
 
 /**
@@ -393,37 +358,28 @@ const getSupabaseStorageLogsQuery = (): SafeLogSqlFragment => safeSql`
     WHERE edge_logs_request.path LIKE '%/storage/%'
   `
 
-const LOG_TYPE_QUERIES: Record<string, (scope?: UnifiedLogsScope) => SafeLogSqlFragment> = {
+const LOG_TYPE_QUERIES: Record<string, () => SafeLogSqlFragment> = {
   edge: getEdgeLogsQuery,
   postgrest: getPostgrestLogsQuery,
   postgres: getPostgresLogsQuery,
   'edge function': getEdgeFunctionLogsQuery,
-  'edge function runtime': getEdgeFunctionRuntimeLogsQuery,
   auth: getAuthLogsQuery,
   storage: getSupabaseStorageLogsQuery,
 }
 
 /**
  * Combine the requested log sources to create the unified logs CTE.
- * Defaults to postgres + postgrest on first load to reduce query cost. A scope
- * limits the union to its own log types, each filtered to the scoped resource.
+ * Defaults to postgres + postgrest on first load to reduce query cost.
  */
 export const getUnifiedLogsCTE = (
-  logTypes?: string[],
-  scope?: UnifiedLogsScope
+  logTypes: string[] = [...DEFAULT_LOG_TYPES]
 ): SafeLogSqlFragment => {
-  const allowedLogTypes: readonly string[] = scope
-    ? UNIFIED_LOGS_SCOPES[scope.type].logTypes
-    : DEFAULT_LOG_TYPES
-  const requested = (logTypes ?? allowedLogTypes).filter(
-    (type) => !scope || allowedLogTypes.includes(type)
-  )
-  const queries = requested
+  const queries = logTypes
     .filter((type) => type in LOG_TYPE_QUERIES)
-    .map((type) => LOG_TYPE_QUERIES[type](scope))
+    .map((type) => LOG_TYPE_QUERIES[type]())
 
   const effective =
-    queries.length > 0 ? queries : allowedLogTypes.map((t) => LOG_TYPE_QUERIES[t](scope))
+    queries.length > 0 ? queries : DEFAULT_LOG_TYPES.map((t) => LOG_TYPE_QUERIES[t]())
 
   return safeSql`
 WITH unified_logs AS (
@@ -444,7 +400,7 @@ export const getUnifiedLogsQuery = (
   const effectiveLogTypes = getEffectiveLogTypes(search)
 
   return safeSql`
-${getUnifiedLogsCTE(effectiveLogTypes, search.scope)}
+${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
     id,
     source_id,
@@ -516,7 +472,7 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
       : safeSql`WHERE level IS NOT NULL`
 
   return safeSql`
-${getUnifiedLogsCTE(effectiveLogTypes, search.scope)},
+${getUnifiedLogsCTE(effectiveLogTypes)},
 
 -- Single COUNTIF pass for all log_type buckets + total (no GROUP BY / sort needed)
 log_type_counts AS (
@@ -527,7 +483,6 @@ log_type_counts AS (
     COUNTIF(log_type = 'storage') AS storage_count,
     COUNTIF(log_type = 'postgres') AS postgres_count,
     COUNTIF(log_type = 'edge function') AS edge_function_count,
-    COUNTIF(log_type = 'edge function runtime') AS edge_function_runtime_count,
     COUNTIF(log_type = 'auth') AS auth_count
   FROM unified_logs
   ${logTypeWhere}
@@ -553,7 +508,6 @@ UNION ALL SELECT 'log_type', 'postgrest', postgrest_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'storage', storage_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'postgres', postgres_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'edge function', edge_function_count FROM log_type_counts
-UNION ALL SELECT 'log_type', 'edge function runtime', edge_function_runtime_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'auth', auth_count FROM log_type_counts
 UNION ALL SELECT 'level', 'success', success_count FROM level_counts
 UNION ALL SELECT 'level', 'warning', warning_count FROM level_counts
@@ -573,7 +527,7 @@ export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   const effectiveLogTypes = getEffectiveLogTypes(search)
 
   return safeSql`
-${getUnifiedLogsCTE(effectiveLogTypes, search.scope)}
+${getUnifiedLogsCTE(effectiveLogTypes)}
 SELECT
   TIMESTAMP_TRUNC(timestamp, ${TRUNCATION_LEVEL_SQL[truncationLevel]}) as time_bucket,
   COUNTIF(level = 'success') as success,

@@ -6,7 +6,6 @@ import {
   parseLogsFilterUrlParams,
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
-import { UNIFIED_LOGS_SCOPES } from './UnifiedLogs.scopes'
 import { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
@@ -251,14 +250,41 @@ const translateFilter = (
   }
 }
 
+// Matches no rows. A scope's conditions are what keep rows from outside it out, so one that
+// can't be built fails closed rather than being dropped like a user filter.
+const NO_ROWS: SafeLogSqlFragment = safeSql`0`
+
 /**
- * Restricts rows to the scope's log types and resource. Applied to every query, facet scans
- * included, so a scoped view never counts rows from outside the scope.
+ * Restricts rows to the scope's fixed filters. Applied to every query, facet scans included, so
+ * a scoped view never counts rows from outside the scope. Filters on the same column and
+ * operator combine like the URL's (`=` values match any), and each group must match.
  */
 const scopeCondition = (scope?: UnifiedLogsScope): SafeLogSqlFragment | null => {
   if (!scope) return null
-  const { logTypes, sqlCondition } = UNIFIED_LOGS_SCOPES[scope.type]
-  return safeSql`(${logTypeWhereCondition([...logTypes])} AND ${sqlCondition(scope)})`
+  if (scope.filters.length === 0) return NO_ROWS
+
+  const groups = new Map<
+    string,
+    { column: string; operator: LogsFilterOperator; values: string[] }
+  >()
+  for (const { column, operator, value } of scope.filters) {
+    const key = `${column}:${operator}`
+    const group = groups.get(key) ?? { column, operator, values: [] }
+    group.values.push(value)
+    groups.set(key, group)
+  }
+
+  const conditions: SafeLogSqlFragment[] = []
+  for (const { column, operator, values } of groups.values()) {
+    try {
+      const condition = translateFilter(column, values, operator)
+      if (!condition) return NO_ROWS
+      conditions.push(condition)
+    } catch {
+      return NO_ROWS
+    }
+  }
+  return safeSql`(${joinSqlFragments(conditions, ' AND ')})`
 }
 
 const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>

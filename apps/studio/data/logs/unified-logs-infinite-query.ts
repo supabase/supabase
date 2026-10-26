@@ -36,9 +36,14 @@ export type UnifiedLogsData = Awaited<ReturnType<typeof getUnifiedLogs>>
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
 
-export const useUnifiedLogsBackend = () => {
+/**
+ * Whether unified logs queries for a search run on ClickHouse (OTEL) rather than BigQuery. Scoped
+ * searches always do, since only the ClickHouse queries can apply a scope's filters.
+ */
+export const useUnifiedLogsBackend = (search?: QuerySearchParamsType) => {
   const { otelUnifiedLogs = true } = useFeatureFlags().configcat
-  return typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true
+  const isOtelEnabled = typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true
+  return isOtelEnabled || !!search?.scope
 }
 
 export const getUnifiedLogsISOStartEnd = (
@@ -166,7 +171,7 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     UnifiedLogsPageParam
   > = {}
 ) => {
-  const useOtel = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend(search)
   return useInfiniteQuery({
     queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal, pageParam }) =>

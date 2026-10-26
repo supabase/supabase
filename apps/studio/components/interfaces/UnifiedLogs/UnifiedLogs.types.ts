@@ -2,6 +2,7 @@ import type { inferParserType } from 'nuqs'
 import type { ReactNode } from 'react'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import type { LogsFilter } from './UnifiedLogs.filters'
 
 type Percentile = 50 | 75 | 90 | 95 | 99
 
@@ -14,11 +15,13 @@ export type PageParam = { cursor: number; direction: 'next' | 'prev' } | undefin
 export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
 
 /**
- * Narrows every unified logs query to a single resource. Set by embedded views
- * (e.g. an edge function's Logs tab) rather than read from the URL. What each
- * type narrows to lives in `UNIFIED_LOGS_SCOPES`.
+ * Fixed filters every query in a view applies on top of the user's, which the user can't
+ * remove, e.g. an edge function's Logs tab narrowed to that function. Same columns and
+ * operators as the `filter` URL param; any column that isn't a known one matches a
+ * `log_attributes` key. Set by embedded views rather than read from the URL, and only the
+ * ClickHouse queries support them.
  */
-export type UnifiedLogsScope = { type: 'edge-function'; functionId: string }
+export type UnifiedLogsScope = { filters: LogsFilter[] }
 
 export type QuerySearchParamsType = Omit<SearchParamsType, 'uuid' | 'live'> & {
   scope?: UnifiedLogsScope

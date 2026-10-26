@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { UnifiedLogsScope } from './UnifiedLogs.types'
 import {
   buildUnifiedLogsUrl,
   createUnifiedLogsSearch,
@@ -206,6 +207,14 @@ describe('gateLogTypeFilters', () => {
   })
 })
 
+const FUNCTION_SCOPE: UnifiedLogsScope = {
+  filters: [
+    { column: 'log_type', operator: '=', value: 'edge function' },
+    { column: 'log_type', operator: '=', value: 'edge function runtime' },
+    { column: 'function_id', operator: '=', value: 'fn-123' },
+  ],
+}
+
 describe('getLogTypeVisibility', () => {
   it('hides edge function runtime logs from the project-wide view and keeps other gates', () => {
     expect(getLogTypeVisibility({ compute: false })).toEqual({
@@ -215,10 +224,7 @@ describe('getLogTypeVisibility', () => {
   })
 
   it('only shows the edge function log types in a function-scoped view', () => {
-    const visibility = getLogTypeVisibility(
-      { compute: true },
-      { type: 'edge-function', functionId: 'fn-123' }
-    )
+    const visibility = getLogTypeVisibility({ compute: true }, FUNCTION_SCOPE)
     const visibleLogTypes = Object.entries(visibility)
       .filter(([, isVisible]) => isVisible)
       .map(([logType]) => logType)
@@ -228,11 +234,21 @@ describe('getLogTypeVisibility', () => {
     expect(visibility.postgres).toBe(false)
   })
 
+  it('treats a scope that fixes no log types like the project-wide view', () => {
+    const attributeScope: UnifiedLogsScope = {
+      filters: [{ column: 'function_id', operator: '=', value: 'fn-123' }],
+    }
+    expect(getLogTypeVisibility({ compute: false }, attributeScope)).toEqual({
+      compute: false,
+      'edge function runtime': false,
+    })
+  })
+
   it('drops out-of-scope log type filters from a function-scoped view', () => {
     expect(
       gateLogTypeFilters(
         ['log_type:eq:postgres', 'log_type:eq:edge function runtime', 'level:eq:error'],
-        getLogTypeVisibility({}, { type: 'edge-function', functionId: 'fn-123' })
+        getLogTypeVisibility({}, FUNCTION_SCOPE)
       )
     ).toEqual(['log_type:eq:edge function runtime', 'level:eq:error'])
   })
@@ -240,8 +256,8 @@ describe('getLogTypeVisibility', () => {
 
 describe('createUnifiedLogsSearch', () => {
   it('attaches the scope', () => {
-    const search = createUnifiedLogsSearch({}, { type: 'edge-function', functionId: 'fn-123' })
-    expect(search.scope).toEqual({ type: 'edge-function', functionId: 'fn-123' })
+    const search = createUnifiedLogsSearch({}, FUNCTION_SCOPE)
+    expect(search.scope).toEqual(FUNCTION_SCOPE)
   })
 
   it('leaves the scope off unscoped searches', () => {

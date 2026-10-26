@@ -5,7 +5,6 @@ import { cn } from 'ui'
 import { LOG_TYPES, LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
-import { UNIFIED_LOGS_SCOPES } from './UnifiedLogs.scopes'
 import type { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -32,18 +31,25 @@ export function getComputeLogsAvailability({
 }
 
 /**
- * Resolves which log types a view may filter on and query. A scoped view only offers its own
- * log types; the project-wide view hides edge function runtime rows, which it surfaces inside
- * each invocation's detail panel instead.
+ * Resolves which log types a view may filter on and query. A scope that fixes log types only
+ * offers those. Otherwise edge function runtime rows stay hidden, since the project-wide view
+ * surfaces them inside each invocation's detail panel instead.
  */
 export function getLogTypeVisibility(
   visibility: Partial<Record<UnifiedLogType, boolean>>,
   scope?: UnifiedLogsScope
 ): Partial<Record<UnifiedLogType, boolean>> {
-  if (!scope) return { ...visibility, 'edge function runtime': false }
+  const scopeLogTypes = scope?.filters
+    .filter((filter) => filter.column === 'log_type' && filter.operator === '=')
+    .map((filter) => filter.value)
+  if (!scopeLogTypes?.length) return { ...visibility, 'edge function runtime': false }
 
-  const scopeLogTypes: readonly UnifiedLogType[] = UNIFIED_LOGS_SCOPES[scope.type].logTypes
-  return Object.fromEntries(LOG_TYPES.map((logType) => [logType, scopeLogTypes.includes(logType)]))
+  return Object.fromEntries(
+    LOG_TYPES.map((logType) => [
+      logType,
+      scopeLogTypes.includes(logType) && visibility[logType] !== false,
+    ])
+  )
 }
 
 const loadUnifiedLogsSearchParams = createLoader(SEARCH_PARAMS_PARSER)

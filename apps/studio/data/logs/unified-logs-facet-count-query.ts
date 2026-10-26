@@ -52,7 +52,7 @@ export async function getUnifiedLogsFacetCount(
   const sql = useOtel
     ? getFacetCountQuery({ search, facet, facetSearch })
     : safeSql`
-${getUnifiedLogsCTE(getEffectiveLogTypes(search), search.scope)},
+${getUnifiedLogsCTE(getEffectiveLogTypes(search))},
 ${getFacetCountCTE({ search, facet, facetSearch, cteName })}
 SELECT dimension, value, count from ${cteName};
 `
@@ -89,7 +89,7 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) => {
-  const useOtel = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend(search)
   const scopedSearch =
     facet === 'pathname'
       ? {

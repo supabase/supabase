@@ -8,7 +8,7 @@ import {
   isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
-import type { QuerySearchParamsType } from './UnifiedLogs.types'
+import type { QuerySearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 
 const baseSearch = {
   date: [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')],
@@ -17,12 +17,22 @@ const baseSearch = {
 // Helper: build a search with extra `filter` URL entries on top of the base.
 const withFilters = (...entries: string[]) => ({ ...baseSearch, filter: entries }) as any
 
-// Helper: build a search scoped to one edge function, plus optional `filter` entries.
-const withFunctionScope = (...entries: string[]): QuerySearchParamsType => ({
+// A scope's fixed filters for one edge function's invocations and runtime logs
+const FUNCTION_SCOPE: UnifiedLogsScope = {
+  filters: [
+    { column: 'log_type', operator: '=', value: 'edge function' },
+    { column: 'log_type', operator: '=', value: 'edge function runtime' },
+    { column: 'function_id', operator: '=', value: 'fn-123' },
+  ],
+}
+
+// Helper: build a search with a scope (one edge function by default), plus optional `filter` entries.
+const withScope = (scope: UnifiedLogsScope, ...entries: string[]): QuerySearchParamsType => ({
   ...baseSearch,
-  scope: { type: 'edge-function', functionId: 'fn-123' },
+  scope,
   filter: entries,
 })
+const withFunctionScope = (...entries: string[]) => withScope(FUNCTION_SCOPE, ...entries)
 
 // Helper: build a search with the cross-cutting `user` filter set, plus optional `filter` entries.
 const withUser = (user: string, ...entries: string[]) =>
@@ -446,8 +456,8 @@ describe('UnifiedLogs.queries.bq', () => {
   })
 })
 
-describe('function scope', () => {
-  const FUNCTION_SCOPE_CONDITION = `((source = 'function_edge_logs') OR (source = 'function_logs')) AND log_attributes['function_id'] = 'fn-123'`
+describe('scope', () => {
+  const FUNCTION_SCOPE_CONDITION = `((source = 'function_edge_logs') OR (source = 'function_logs')) AND log_attributes['function_id'] IN ('fn-123')`
 
   describe('OTEL', () => {
     it("restricts rows to the function's invocations and runtime logs instead of the default log types", () => {
@@ -499,29 +509,33 @@ describe('function scope', () => {
     it('does not scope unscoped searches', () => {
       expect(getUnifiedLogsQuery(baseSearch)).not.toContain(`log_attributes['function_id']`)
     })
+
+    it('keeps different operators on the same column apart instead of merging them', () => {
+      const sql = getUnifiedLogsQuery(
+        withScope({
+          filters: [
+            { column: 'log_type', operator: '=', value: 'storage' },
+            { column: 'bucket_id', operator: '=', value: 'avatars' },
+            { column: 'bucket_id', operator: '<>', value: 'private' },
+          ],
+        })
+      )
+      expect(sql).toContain(
+        `(((source = 'storage_logs')) AND log_attributes['bucket_id'] IN ('avatars') AND log_attributes['bucket_id'] NOT IN ('private'))`
+      )
+    })
+
+    it('fails closed on a scope without filters', () => {
+      const where = getUnifiedLogsQuery(withScope({ filters: [] })).split(/\bWHERE\b/)[1] ?? ''
+      expect(where.trim()).toBe('0')
+    })
   })
 
   describe('BigQuery', () => {
-    it("unions only the function's invocation and runtime CTEs, each filtered to the function", () => {
-      const sql = getUnifiedLogsQueryBQ(withFunctionScope())
-      expect(sql).toContain('from function_edge_logs as fel')
-      expect(sql).toContain("'edge function runtime' as log_type")
-      expect(sql).toContain("WHERE fel_metadata.function_id = 'fn-123'")
-      expect(sql).toContain("WHERE fl_metadata.function_id = 'fn-123'")
-      expect(sql).not.toContain('from postgres_logs')
-      expect(sql).not.toContain('from edge_logs')
-    })
-
-    it('narrows to a single log type within the scope', () => {
-      const sql = getUnifiedLogsQueryBQ(withFunctionScope('log_type:eq:edge function runtime'))
-      expect(sql).toContain("'edge function runtime' as log_type")
-      expect(sql).not.toContain('from function_edge_logs as fel')
-    })
-
-    it('never unions an out-of-scope log type', () => {
-      const sql = getUnifiedLogsQueryBQ(withFunctionScope('log_type:eq:postgres'))
-      expect(sql).not.toContain('from postgres_logs')
-      expect(sql).toContain("WHERE fel_metadata.function_id = 'fn-123'")
+    it('refuses scoped searches rather than return rows from outside the scope', () => {
+      expect(() => getUnifiedLogsQueryBQ(withFunctionScope())).toThrow(
+        'Scoped unified logs queries are only supported on ClickHouse'
+      )
     })
 
     it('leaves unscoped queries on the default log types', () => {
