@@ -86,6 +86,15 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
     })
 
+    // The Logs page shows a function's console output inside each invocation's detail panel, so
+    // excluding some other log type mustn't add those lines to the list as rows of their own
+    it('keeps edge function runtime output out of the list when a log type is excluded', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:neq:postgres'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`NOT (source = 'postgres_logs')`)
+      expect(where).toContain(`NOT (source = 'function_logs')`)
+    })
+
     it('projects only Compute fields that exist on worker logs', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
       const workerCondition =
@@ -475,6 +484,14 @@ describe('scope', () => {
       expect(where).toContain(FUNCTION_SCOPE_CONDITION)
     })
 
+    // A function's Logs tab lists its console output as rows, unlike the project-wide Logs page
+    it('still lists runtime output when the user excludes invocations from a function scope', () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope('log_type:neq:edge function'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`NOT (source = 'function_edge_logs')`)
+      expect(where).not.toContain(`NOT (source = 'function_logs')`)
+    })
+
     it('keeps rows outside the scope out even when an out-of-scope log type is requested', () => {
       const sql = getUnifiedLogsQuery(withFunctionScope('log_type:eq:postgres'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
@@ -525,8 +542,20 @@ describe('scope', () => {
       )
     })
 
-    it('fails closed on a scope without filters', () => {
-      const where = getUnifiedLogsQuery(withScope({ filters: [] })).split(/\bWHERE\b/)[1] ?? ''
+    // Dropping the scope instead, like an unusable user filter, would show logs from outside it,
+    // e.g. every function's logs on one function's page
+    it.each<[string, UnifiedLogsScope]>([
+      ['has no filters', { filters: [] }],
+      [
+        "has a filter that can't be turned into SQL",
+        {
+          filters: [
+            { column: 'function_id', operator: '=', value: undefined as unknown as string },
+          ],
+        },
+      ],
+    ])('matches no rows when the scope %s', (_, scope) => {
+      const where = getUnifiedLogsQuery(withScope(scope)).split(/\bWHERE\b/)[1] ?? ''
       expect(where.trim()).toBe('0')
     })
   })

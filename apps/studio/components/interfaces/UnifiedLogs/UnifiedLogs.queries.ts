@@ -372,6 +372,11 @@ const buildBaseWhere = (
     if (logTypeFilter) {
       const condition = translateFilter('log_type', logTypeFilter.values, logTypeFilter.operator)
       if (condition) parts.push(condition)
+      // The project-wide view shows edge function runtime output inside each invocation's
+      // detail panel, so a `<>` filter mustn't list those rows either.
+      if (!search.scope && logTypeFilter.operator === '<>') {
+        parts.push(safeSql`NOT (${LOG_TYPE_CONDITION['edge function runtime']})`)
+      }
     } else if (!search.scope && !userFilterValue(search)) {
       // Skip the default (postgres|edge) source restriction while the user filter is
       // active — the user clause governs which sources are eligible (auth + postgres),
