@@ -14,7 +14,7 @@ const ORG_SAMEAS = [
   'https://www.instagram.com/supabasecom',
 ]
 
-const ORG_LOGO_URL = `${CANONICAL_ORIGIN}/images/og/supabase-og.png`
+const ORG_LOGO_URL = `${CANONICAL_ORIGIN}/brand-assets/supabase-logo-green-black-transparent.png`
 
 type JsonLdSchema = Record<string, unknown> | Record<string, unknown>[]
 
