@@ -9,12 +9,13 @@ import {
   type GitHubConfigDriftSummary,
 } from '@/components/interfaces/ConfigDrift/github-config-drift'
 import type { Branch } from '@/data/branches/branches-query'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useGitHubConfigQuery } from '@/data/config/github-config-query'
 import { projectConfigV2QueryOptions } from '@/data/config/project-config-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 const EMPTY_SUMMARY: GitHubConfigDriftSummary = {
   driftedFields: [],
@@ -37,7 +38,13 @@ export function useSelectedGitHubConfigDrift() {
   const parentProjectRef = project?.parentRef ?? projectRef
   const shouldLoad = IS_PLATFORM && Boolean(projectRef) && Boolean(project)
 
-  const branchesQuery = useBranchesQuery({ projectRef: parentProjectRef }, { enabled: shouldLoad })
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  const branchesQuery = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    enabled: shouldLoad,
+  })
   const connectionQuery = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
   const connection = connectionQuery.data
   const hasConnection = connection !== undefined
@@ -104,9 +111,18 @@ export function useSelectedGitHubConfigDrift() {
   const summary = driftResult.status === 'success' ? driftResult.summary : EMPTY_SUMMARY
   const conversionError = driftResult.status === 'error' ? driftResult.error : undefined
 
+  const branchesState = {
+    isPending:
+      branchesGrant.status === 'loading' ||
+      (branchesGrant.status === 'granted' && branchesQuery.isPending),
+    isFetching: branchesQuery.isFetching,
+    isError: branchesQuery.isError || branchesGrant.status === 'error',
+    error: branchesGrant.status === 'error' ? branchesGrant.error : branchesQuery.error,
+  }
+
   const activeQueries = [
     projectQuery,
-    ...(shouldLoad ? [branchesQuery, connectionQuery] : []),
+    ...(shouldLoad ? [branchesState, connectionQuery] : []),
     ...(shouldLoad && hasConnection ? [projectConfigQuery, githubConfigQuery] : []),
   ]
 

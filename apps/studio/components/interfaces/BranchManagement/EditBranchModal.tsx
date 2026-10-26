@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { CheckIcon, Loader2Icon } from 'lucide-react'
@@ -28,14 +29,19 @@ import * as z from 'zod'
 import { ConnectToGitHub } from './ConnectToGitHub'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import {
+  useBranchUpdateMutation,
+  type BranchUpdateGrant,
+} from '@/data/branches/branch-update-mutation'
+import { branchesQueryOptions, type Branch } from '@/data/branches/branches-query'
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 interface EditBranchModalProps {
   branch?: Branch
@@ -77,7 +83,14 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const isError = isErrorAuthorization || isErrorConnections
   const error = authorizationError || connectionsError
 
-  const { data: branches } = useBranchesQuery({ projectRef })
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch?.is_default,
+  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
+  )
   const { mutate: checkGithubBranchValidity, isPending: isChecking } = useCheckGithubBranchValidity(
     { onError: () => {} }
   )
@@ -123,18 +136,22 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
   const isFormValid = form.formState.isValid && (!gitBranchName || isGitBranchValid)
-  const canSubmit = isFormValid && !isUpdating && !isChecking
+  const canSubmit =
+    isFormValid && !isUpdating && !isChecking && updateBranchGrant.status === 'granted'
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!branch?.project_ref) return console.error('Branch ref is required')
+    if (updateBranchGrant.status !== 'granted') return
 
     const payload: {
+      grant: BranchUpdateGrant
       branchRef: string
       projectRef: string
       branchName: string
       gitBranch?: string
     } = {
+      grant: updateBranchGrant.grant,
       branchRef: branch.project_ref,
       projectRef,
       branchName: data.branchName,
@@ -317,6 +334,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
               <Button
                 form={formId}
                 disabled={
+                  updateBranchGrant.status !== 'granted' ||
                   (!!gitBranchName && !isSuccessConnections) ||
                   isUpdating ||
                   !canSubmit ||

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { Loader2Icon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
@@ -31,17 +32,19 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from '@/data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
 import { useGitHubConnectionCreateMutation } from '@/data/integrations/github-connection-create-mutation'
 import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionUpdateMutation } from '@/data/integrations/github-connection-update-mutation'
 import type { GitHubConnection } from '@/data/integrations/integrations.types'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 interface GitHubIntegrationConnectionFormProps {
   connection?: GitHubConnection
@@ -92,10 +95,18 @@ export const GitHubIntegrationConnectionForm = ({
     },
   })
 
-  const { data: existingBranches } = useBranchesQuery(
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: selectedProject?.ref,
+  })
+  const createBranchGrant = useGrant(
+    'POST /v1/projects/{ref}/branches',
     { projectRef: selectedProject?.ref },
-    { enabled: !!selectedProject?.ref }
+    { variant: 'production' }
   )
+  const { data: existingBranches } = useQuery({
+    ...branchesQueryOptions({ projectRef: selectedProject?.ref, grant: branchesGrant.grant }),
+    enabled: !!selectedProject?.ref,
+  })
 
   const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
     useCheckGithubBranchValidity({ onError: () => {} })
@@ -122,6 +133,46 @@ export const GitHubIntegrationConnectionForm = ({
     useGitHubConnectionUpdateMutation()
 
   const prodBranch = existingBranches?.find((branch) => branch.is_default)
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef: selectedProject?.ref,
+    isDefault: true,
+  })
+  const productionBranchGrant = prodBranch ? updateBranchGrant : createBranchGrant
+  const canManageProductionBranch = productionBranchGrant.status === 'granted'
+  const productionBranchPermissionMessage =
+    'You need additional permissions to update the production branch'
+
+  const requestProductionBranch = ({
+    projectRef,
+    gitBranch,
+    branchName,
+  }: {
+    projectRef: string
+    gitBranch: string
+    branchName?: string
+  }) => {
+    if (prodBranch) {
+      if (updateBranchGrant.status === 'granted') {
+        return updateBranch({
+          grant: updateBranchGrant.grant,
+          branchRef: prodBranch.project_ref,
+          projectRef,
+          gitBranch,
+          branchName,
+        })
+      }
+    } else if (createBranchGrant.status === 'granted') {
+      return createBranch({
+        grant: createBranchGrant.grant,
+        projectRef,
+        gitBranch,
+        branchName: branchName ?? 'main',
+        is_default: true,
+      })
+    }
+
+    return Promise.reject(new Error(productionBranchPermissionMessage))
+  }
 
   // Combined GitHub Settings Form
   const GitHubSettingsSchema = z
@@ -202,6 +253,10 @@ export const GitHubIntegrationConnectionForm = ({
 
   const handleCreateOrUpdateConnection = async (data: z.infer<typeof GitHubSettingsSchema>) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
+    if (!canManageProductionBranch) {
+      toast.error(productionBranchPermissionMessage)
+      return
+    }
 
     try {
       if (connection) {
@@ -247,18 +302,11 @@ export const GitHubIntegrationConnectionForm = ({
       },
     })
 
-    const branchRequest = prodBranch
-      ? updateBranch({
-          branchRef: prodBranch.project_ref,
-          projectRef: selectedProject.ref,
-          gitBranch: data.branchName,
-        })
-      : createBranch({
-          projectRef: selectedProject.ref,
-          branchName: 'main',
-          gitBranch: data.branchName,
-          is_default: true,
-        })
+    const branchRequest = requestProductionBranch({
+      projectRef: selectedProject.ref,
+      gitBranch: data.branchName,
+      branchName: prodBranch ? undefined : 'main',
+    })
 
     // Only re-baseline the form once both requests succeed, so a failure keeps the edits unsaved
     const results = await Promise.allSettled([connectionRequest, branchRequest])
@@ -304,19 +352,11 @@ export const GitHubIntegrationConnectionForm = ({
     })
 
     // if for some reason, the project doesn't have a default branch yet, create it.
-    const branchRequest = prodBranch
-      ? updateBranch({
-          branchRef: prodBranch.project_ref,
-          projectRef: selectedProject.ref,
-          gitBranch: data.enableProductionSync ? data.branchName : '',
-          branchName: data.branchName || 'main',
-        })
-      : createBranch({
-          projectRef: selectedProject.ref,
-          gitBranch: data.enableProductionSync ? data.branchName : '',
-          branchName: data.branchName || 'main',
-          is_default: true,
-        })
+    const branchRequest = requestProductionBranch({
+      projectRef: selectedProject.ref,
+      gitBranch: data.enableProductionSync ? data.branchName : '',
+      branchName: data.branchName || 'main',
+    })
 
     setIsConfirmingBranchChange(false)
 
@@ -365,6 +405,10 @@ export const GitHubIntegrationConnectionForm = ({
     const selectedRepo = githubRepos.find((repo) => repo.id === data.repositoryId)
 
     if (!selectedRepo || !connection || !selectedOrganization?.id) return
+    if (!canManageProductionBranch) {
+      toast.error(productionBranchPermissionMessage)
+      return
+    }
 
     try {
       await deleteConnection({
@@ -394,6 +438,18 @@ export const GitHubIntegrationConnectionForm = ({
     isUpdatingConnection ||
     isDeletingConnection ||
     (!!gitHubAuthorization && isLoadingRepositoryOptions)
+
+  const getSubmitDisabledReason = () => {
+    if (!canManageGitHubConnection) {
+      return "You need additional permissions to update this project's GitHub integration settings"
+    }
+    if (productionBranchGrant.status === 'denied') return productionBranchPermissionMessage
+    if (productionBranchGrant.status === 'error') {
+      return `Failed to check permissions`
+    }
+    return undefined
+  }
+  const submitDisabledReason = getSubmitDisabledReason()
 
   const isFieldDisabled = !canUpdateGitHubConnection || !gitHubAuthorization
 
@@ -686,6 +742,7 @@ export const GitHubIntegrationConnectionForm = ({
                           isCheckingBranch ||
                           isLoading ||
                           !canManageGitHubConnection ||
+                          !canManageProductionBranch ||
                           (!connection && !githubSettingsForm.getValues().repositoryId) ||
                           (connection && !githubSettingsForm.formState.isDirty)
                         }
@@ -693,9 +750,7 @@ export const GitHubIntegrationConnectionForm = ({
                         tooltip={{
                           content: {
                             side: 'bottom',
-                            text: !canManageGitHubConnection
-                              ? "You need additional permissions to update this project's GitHub integration settings"
-                              : undefined,
+                            text: submitDisabledReason,
                           },
                         }}
                       >

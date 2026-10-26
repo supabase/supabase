@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ChartAreaIcon, CheckIcon, ChevronDownIcon } from 'lucide-react'
@@ -31,12 +32,13 @@ import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailabi
 import { NoPermission } from '@/components/ui/NoPermission'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
+import { useGrant } from '@/lib/grants'
 
 export const Usage = () => {
   const { slug } = useParams()
@@ -77,19 +79,30 @@ export const Usage = () => {
     !selectedProjectRef ||
     (!isLoadingSelectedProject && !isErrorSelectedProject && !isHighAvailability)
 
+  const isBranchesQueryEnabled = !!selectedProject && !isHighAvailability
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: selectedProjectRef ?? undefined,
+  })
   const {
     data: branches,
-    isLoading: isLoadingBranches,
-    isPending: isPendingBranches,
-    isError: isErrorBranches,
+    isPending: isPendingBranchesQuery,
+    isError: isErrorBranchesQuery,
     isSuccess: isSuccessBranches,
-    error: branchesError,
-  } = useBranchesQuery(
-    {
+    error: branchesQueryError,
+  } = useQuery({
+    ...branchesQueryOptions({
       projectRef: selectedProjectRef ?? undefined,
-    },
-    { enabled: !!selectedProject && !isHighAvailability }
-  )
+      grant: branchesGrant.grant,
+    }),
+    enabled: isBranchesQueryEnabled,
+  })
+  const isPendingBranches =
+    isBranchesQueryEnabled &&
+    (branchesGrant.status === 'loading' ||
+      (branchesGrant.status === 'granted' && isPendingBranchesQuery))
+  const isLoadingBranches = isPendingBranches
+  const isErrorBranches = isErrorBranchesQuery || branchesGrant.status === 'error'
+  const branchesError = branchesGrant.status === 'error' ? branchesGrant.error : branchesQueryError
   const branchOptions = useMemo(() => getUsageBranchOptions(branches), [branches])
   const usageProjectRef = resolveUsageProjectRef(
     selectedProjectRef,

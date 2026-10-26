@@ -7,12 +7,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Usage } from './Usage'
 import type { Branch } from '@/data/branches/branches-query'
-import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
 import { createTestBranch } from '@/tests/lib/branch-test-utils'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissions } from '@/tests/lib/msw-permissions'
+import { allPermissionsFor } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
 
@@ -142,16 +142,7 @@ describe('Usage branch URLs', () => {
           createMockOrganizationResponse({ slug: 'test-org' }),
         ]),
     })
-    mockPermissions({
-      organizations: [
-        {
-          slug: 'test-org',
-          role: 'owner',
-          permissions: [FGA_PERMISSIONS.ORGANIZATION.BILLING_READ],
-          projects: [],
-        },
-      ],
-    })
+    mockPermissions(allPermissionsFor(['test-org']))
     addAPIMock({
       method: 'get',
       path: '/platform/organizations/:slug/billing/subscription',
