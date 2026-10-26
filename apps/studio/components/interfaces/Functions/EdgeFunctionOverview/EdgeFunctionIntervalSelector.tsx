@@ -21,12 +21,14 @@ export const EdgeFunctionIntervalSelector = ({
         key={`function-filter-${item.key}`}
         variant={interval === item.key ? 'secondary' : 'default'}
         aria-pressed={interval === item.key}
+        icon={
+          interval === item.key ? (
+            <CheckIcon size={12} aria-hidden="true" data-testid="selected-period-indicator" />
+          ) : undefined
+        }
         onClick={() => onIntervalChange(item.key)}
         className={getSegmentedButtonClassName(index, EDGE_FUNCTION_CHART_INTERVALS.length)}
       >
-        {interval === item.key && (
-          <CheckIcon size={12} aria-hidden="true" data-testid="selected-period-indicator" />
-        )}
         {item.label}
       </Button>
     ))}
