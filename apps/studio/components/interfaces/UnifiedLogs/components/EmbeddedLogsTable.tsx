@@ -30,13 +30,15 @@ interface EmbeddedLogsTableProps {
   /** Placeholder rows while `isLoading` */
   skeletonRowCount?: number
   emptyStateMessage?: ReactNode
+  /** Saves column visibility and order under this view's key instead of the Logs page's */
+  columnPreferencesKey?: string
   className?: string
 }
 
 /**
- * A read-only logs list for pages outside the Logs page: the same columns, styling and saved
- * column preferences as the Logs page, without multi-select, filters or pagination. Callers fetch
- * the rows, usually with the unified logs queries, and decide what a row click does.
+ * A read-only logs list for pages outside the Logs page: the same columns and styling as the Logs
+ * page, without multi-select, filters or pagination. Callers fetch the rows, usually with the
+ * unified logs queries, and decide what a row click does.
  */
 export const EmbeddedLogsTable = ({
   rows,
@@ -48,10 +50,11 @@ export const EmbeddedLogsTable = ({
   footer = null,
   skeletonRowCount,
   emptyStateMessage,
+  columnPreferencesKey,
   className,
 }: EmbeddedLogsTableProps) => {
   const { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder } =
-    useLogsTableColumns()
+    useLogsTableColumns(columnPreferencesKey)
   const { columns, columnVisibility: dynamicColumnVisibility } = useMemo(
     () => generateDynamicColumns({ data: rows, selectable: false }),
     [rows]

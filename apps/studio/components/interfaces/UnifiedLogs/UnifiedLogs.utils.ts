@@ -1,5 +1,5 @@
 import { type Table as TTable } from '@tanstack/react-table'
-import { createLoader } from 'nuqs'
+import { createLoader, createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
 import { LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
@@ -30,8 +30,10 @@ export function getComputeLogsAvailability({
   }
 }
 
-/** Reads unified logs URL params, applying the same defaults as the Logs page. */
-export const loadUnifiedLogsSearchParams = createLoader(SEARCH_PARAMS_PARSER)
+const loadUnifiedLogsSearchParams = createLoader(SEARCH_PARAMS_PARSER)
+
+/** Writes unified logs search state to URL params, the same way the Logs page reads them. */
+export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
 
 /**
  * Turns URL search state into the search every unified logs query takes. Drops view-only params
@@ -48,6 +50,13 @@ export function toQuerySearchParams(search: SearchParamsType): QuerySearchParams
     {} as Record<string, unknown>
   ) as QuerySearchParamsType
 }
+
+/**
+ * The search a unified logs query takes, for views that query logs without reading the URL.
+ * Fills every param the view doesn't set with the Logs page's default.
+ */
+export const createUnifiedLogsSearch = (params: Partial<SearchParamsType>) =>
+  toQuerySearchParams({ ...loadUnifiedLogsSearchParams(new URLSearchParams()), ...params })
 
 /**
  * Flattens infinite query pages into rows, keeping the first of any duplicate ids. Pages can
@@ -68,10 +77,6 @@ export function getLogRowClassName(
   return cn(getLevelRowClassName(row.level), isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
 }
 
-/** Serializes a time range into the unified logs `date` URL param. */
-export const formatUnifiedLogsDateParam = (start: string | Date, end: string | Date) =>
-  `${new Date(start).valueOf()}-${new Date(end).valueOf()}`
-
 export const buildUnifiedLogsUrl = ({
   projectRef,
   logType,
@@ -85,13 +90,12 @@ export const buildUnifiedLogsUrl = ({
   user?: string
   start?: string | Date
   end?: string | Date
-}) => {
-  const params = new URLSearchParams()
-  if (logType) params.append('filter', `log_type:eq:${logType}`)
-  if (user) params.set('user', user)
-  if (start && end) params.set('date', formatUnifiedLogsDateParam(start, end))
-  return `/project/${projectRef}/logs?${params.toString()}`
-}
+}) =>
+  serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
+    filter: logType ? [`log_type:eq:${logType}`] : null,
+    user: user ?? null,
+    date: start && end ? [new Date(start), new Date(end)] : null,
+  })
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {

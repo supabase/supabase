@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildUnifiedLogsUrl,
+  createUnifiedLogsSearch,
   gateLogTypeFilters,
   gateLogTypeOptions,
   getComputeLogsAvailability,
@@ -9,9 +10,7 @@ import {
   getLogRowClassName,
   getRawLogData,
   getUniqueLogRows,
-  loadUnifiedLogsSearchParams,
   parseMultigresEventMessage,
-  toQuerySearchParams,
   wrapIlikePattern,
 } from './UnifiedLogs.utils'
 
@@ -41,6 +40,13 @@ describe('buildUnifiedLogsUrl', () => {
       buildUnifiedLogsUrl({ projectRef: 'abc', logType: 'auth', start, end })
     )
     expect(params.get('date')).toBe(`${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
+  })
+
+  it('adds the user filter and leaves out params that are not set', () => {
+    expect(buildUnifiedLogsUrl({ projectRef: 'abc' })).toBe('/project/abc/logs')
+    const { params } = parse(buildUnifiedLogsUrl({ projectRef: 'abc', user: 'user@example.com' }))
+    expect(params.get('user')).toBe('user@example.com')
+    expect(params.has('filter')).toBe(false)
   })
 
   it('omits the date range when only one bound is provided', () => {
@@ -199,11 +205,13 @@ describe('gateLogTypeFilters', () => {
   })
 })
 
-describe('toQuerySearchParams', () => {
+describe('createUnifiedLogsSearch', () => {
   it('drops view-only and empty params and keeps defaults', () => {
-    const search = toQuerySearchParams(
-      loadUnifiedLogsSearchParams(new URLSearchParams('filter=level:eq:error&id=log-1&live=true'))
-    )
+    const search = createUnifiedLogsSearch({
+      filter: ['level:eq:error'],
+      id: 'log-1',
+      live: true,
+    })
 
     expect(search.filter).toEqual(['level:eq:error'])
     expect(search.size).toBe(40)

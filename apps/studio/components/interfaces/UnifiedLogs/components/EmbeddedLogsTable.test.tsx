@@ -1,6 +1,6 @@
-import { fireEvent, screen, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { Button } from 'ui'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { ColumnSchema } from '../UnifiedLogs.schema'
 import { EmbeddedLogsTable } from './EmbeddedLogsTable'
@@ -21,6 +21,8 @@ const logs: ColumnSchema[] = ['first', 'second'].map((id, index) => ({
 const row = (message: string) => within(screen.getByRole('table')).getByText(message).closest('tr')!
 
 describe('EmbeddedLogsTable', () => {
+  afterEach(() => localStorage.clear())
+
   it('renders logs without selection checkboxes', () => {
     customRender(<EmbeddedLogsTable rows={logs} isLoading={false} />)
 
@@ -47,6 +49,18 @@ describe('EmbeddedLogsTable', () => {
     expect(screen.getByRole('button', { name: 'View all logs' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Load more' })).not.toBeInTheDocument()
     expect(screen.queryByText(/No more data to load/)).not.toBeInTheDocument()
+  })
+
+  it('reads saved columns from its own key when given one, not the Logs page key', async () => {
+    localStorage.setItem('data-table-visibility', JSON.stringify({ method: false }))
+    localStorage.setItem('edge-function-data-table-visibility', JSON.stringify({ pathname: false }))
+
+    customRender(
+      <EmbeddedLogsTable rows={logs} isLoading={false} columnPreferencesKey="edge-function" />
+    )
+
+    await waitFor(() => expect(screen.queryByText('/functions/v1/hello')).not.toBeInTheDocument())
+    expect(screen.getAllByText('POST')).toHaveLength(2)
   })
 
   it('shows the empty state message when there are no logs', () => {
