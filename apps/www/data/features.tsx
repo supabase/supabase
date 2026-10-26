@@ -2401,6 +2401,7 @@ Get started with the [Personal Access Tokens documentation](https://supabase.com
     heroImage: '/images/features/personal-access-tokens.png',
     heroImageLight: '/images/features/personal-access-tokens-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/personal-access-tokens',
+    blogUrl: 'https://supabase.com/blog/scope-your-personal-access-tokens',
     slug: 'personal-access-tokens',
     status: {
       stage: PRODUCT_STAGES.GA,
