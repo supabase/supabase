@@ -11,10 +11,10 @@ import InfrastructurePage from '@/pages/project/[ref]/settings/infrastructure'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse_Output']
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 const PROJECT_REF = 'project-ref'
 const ORGANIZATION_SLUG = 'acme'
@@ -178,30 +178,26 @@ function mockInfrastructureEndpoints() {
       ],
     },
   })
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: {
-      organizations: [
-        {
-          slug: ORGANIZATION_SLUG,
-          role: 'administrator',
-          permissions: [],
-          projects: [
-            {
-              ref: PROJECT_REF,
-              role: 'administrator',
-              permissions: [
-                FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-                FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE,
-                FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE,
-                FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE,
-              ],
-            },
-          ],
-        },
-      ],
-    } satisfies PermissionsV2Response,
+  mockPermissions({
+    organizations: [
+      {
+        slug: ORGANIZATION_SLUG,
+        role: 'administrator',
+        permissions: [],
+        projects: [
+          {
+            ref: PROJECT_REF,
+            role: 'administrator',
+            permissions: [
+              FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+              FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE,
+              FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE,
+              FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE,
+            ],
+          },
+        ],
+      },
+    ],
   })
   addAPIMock({
     method: 'get',

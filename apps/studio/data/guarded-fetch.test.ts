@@ -1,22 +1,8 @@
-import type { FgaGuardedEndpoint } from 'api-types'
 import { assertType, describe, expect, it, vi } from 'vitest'
 
 import { client, get, post } from './fetchers'
 import { assertGrant, GrantAssertionError, guardMethod, unguarded } from './guarded-fetch'
-import type { Grant } from '@/lib/grants'
-
-function testGrant<E extends FgaGuardedEndpoint>(
-  endpoint: E,
-  opts: { projectRef?: string; permissionsProjectRef?: string; slug?: string } = {}
-) {
-  return {
-    endpoint,
-    variant: undefined,
-    organizationSlug: opts.slug,
-    projectRef: opts.projectRef,
-    permissionsProjectRef: opts.permissionsProjectRef ?? opts.projectRef,
-  } as unknown as Grant<E>
-}
+import { testGrant } from '@/tests/lib/test-grant'
 
 const BRANCHES = 'GET /v1/projects/{ref}/branches'
 const params = { path: { ref: 'proj' } }
@@ -177,8 +163,8 @@ describe('assertGrant', () => {
   it('rejects a grant for another organization', () => {
     const endpoint = 'DELETE /platform/organizations/{slug}/members/invitations/{id}'
     const init = { params: { path: { slug: 'org', id: 1 } } }
-    expect(check(endpoint, testGrant(endpoint, { slug: 'org' }), init)).not.toThrow()
-    expect(check(endpoint, testGrant(endpoint, { slug: 'other' }), init)).toThrow(
+    expect(check(endpoint, testGrant(endpoint, { organizationSlug: 'org' }), init)).not.toThrow()
+    expect(check(endpoint, testGrant(endpoint, { organizationSlug: 'other' }), init)).toThrow(
       "grant is for organization 'other'"
     )
   })
