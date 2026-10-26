@@ -544,6 +544,48 @@ describe('resource-scoped logs', () => {
       const where = getUnifiedLogsQuery({ ...baseSearch, scope }).split(/\bWHERE\b/)[1] ?? ''
       expect(where.trim()).toBe('0')
     })
+
+    it.each([
+      { operator: '~~*', label: 'substring inclusion' },
+      { operator: '!~~*', label: 'substring exclusion' },
+    ] as const)('matches no rows for unsupported function filters using $label', ({ operator }) => {
+      const where =
+        getUnifiedLogsQuery(
+          withScope({
+            filters: [{ column: 'function_id', operator, value: 'fn-%' }],
+          })
+        ).split(/\bWHERE\b/)[1] ?? ''
+
+      expect(where.trim()).toBe('0')
+    })
+
+    it.each([
+      {
+        scenario: 'includes logs whose messages contain text',
+        filter: { column: 'event_message', operator: '~~*', value: 'permission denied' },
+        expectedCondition: "event_message ILIKE '%permission denied%'",
+      },
+      {
+        scenario: 'excludes logs whose messages contain text',
+        filter: { column: 'event_message', operator: '!~~*', value: 'permission denied' },
+        expectedCondition: "event_message NOT ILIKE '%permission denied%'",
+      },
+      {
+        scenario: 'includes requests whose paths contain text',
+        filter: { column: 'pathname', operator: '~~*', value: '/functions/v1/example' },
+        expectedCondition: ") ILIKE '%/functions/v1/example%'",
+      },
+      {
+        scenario: 'excludes requests whose paths contain text',
+        filter: { column: 'pathname', operator: '!~~*', value: '/functions/v1/example' },
+        expectedCondition: ") NOT ILIKE '%/functions/v1/example%'",
+      },
+    ] as const)('$scenario', ({ filter, expectedCondition }) => {
+      const where =
+        getUnifiedLogsQuery(withScope({ filters: [filter] })).split(/\bWHERE\b/)[1] ?? ''
+
+      expect(where).toContain(expectedCondition)
+    })
   })
 
   describe('BigQuery', () => {

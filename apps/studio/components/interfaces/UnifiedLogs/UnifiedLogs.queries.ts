@@ -254,6 +254,10 @@ export const getUnifiedLogsScopeCondition = (
     { column: string; operator: LogsFilterOperator; values: string[] }
   >()
   for (const { column, operator, value } of result.data.filters) {
+    const isPatternOperator = operator === '~~*' || operator === '!~~*'
+    const supportsPatternOperator = column === 'event_message' || column === 'pathname'
+    if (isPatternOperator && !supportsPatternOperator) return NO_ROWS
+
     const key = `${column}:${operator}`
     const group = groups.get(key) ?? { column, operator, values: [] }
     group.values.push(value)
