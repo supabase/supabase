@@ -73,5 +73,40 @@
     "source": "/docs/client/eq",
     "destination": "/docs/reference/javascript/using-filters-eq",
     "permanent": false
+  },
+  {
+    "source": "/docs/client/filter",
+    "destination": "/docs/reference/javascript/using-filters-filter",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/fts",
+    "destination": "/docs/reference/javascript/using-filters-textsearch",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/generating-types",
+    "destination": "/docs/reference/javascript/typescript-support",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/getsubscriptions",
+    "destination": "/docs/reference/javascript/v1/getsubscriptions",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/gt",
+    "destination": "/docs/reference/javascript/using-filters-gt",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/gte",
+    "destination": "/docs/reference/javascript/using-filters-gte",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/ilike",
+    "destination": "/docs/reference/javascript/using-filters-ilike",
+    "permanent": false
   }
 ]
