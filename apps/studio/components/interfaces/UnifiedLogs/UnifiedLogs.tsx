@@ -54,6 +54,7 @@ import {
   getComputeLogsAvailability,
   getFacetedUniqueValues,
   getLogRowClassName,
+  getLogTypeVisibility,
   getUniqueLogRows,
   toQuerySearchParams,
 } from './UnifiedLogs.utils'
@@ -108,10 +109,13 @@ export const UnifiedLogs = () => {
     flagsLoaded,
     computeEnabled,
   })
-  const visibleSearchFilters = gateLogTypeFilters(search.filter, {
-    multigres: showMultigresLogs,
-    compute: computeAvailability.preserveComputeFilter,
-  })
+  const visibleSearchFilters = gateLogTypeFilters(
+    search.filter,
+    getLogTypeVisibility({
+      multigres: showMultigresLogs,
+      compute: computeAvailability.preserveComputeFilter,
+    })
+  )
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
   const defaultColumnFilters = buildDefaultColumnFilters({
@@ -147,17 +151,22 @@ export const UnifiedLogs = () => {
 
   // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
+  const queryLogTypeVisibility = useMemo(
+    () =>
+      getLogTypeVisibility({
+        multigres: showMultigresLogs,
+        compute: computeAvailability.canQueryCompute,
+      }),
+    [showMultigresLogs, computeAvailability.canQueryCompute]
+  )
+
   const searchParameters = useMemo(() => {
     const parameters = toQuerySearchParams(search)
     if (parameters.filter) {
-      parameters.filter =
-        gateLogTypeFilters(parameters.filter, {
-          multigres: showMultigresLogs,
-          compute: computeAvailability.canQueryCompute,
-        }) ?? undefined
+      parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? undefined
     }
     return parameters
-  }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [search, queryLogTypeVisibility])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
 
   useEffect(() => setLocalFilterOrigin(null), [urlFilterScope])
@@ -293,10 +302,7 @@ export const UnifiedLogs = () => {
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
-    const gatedFields = gateLogTypeOptions(defaultFilterFields, {
-      multigres: showMultigresLogs,
-      compute: computeAvailability.canQueryCompute,
-    })
+    const gatedFields = gateLogTypeOptions(defaultFilterFields, queryLogTypeVisibility)
 
     return gatedFields.map((field) => {
       const facetsField = facets?.[field.value]
@@ -324,15 +330,12 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [facets, queryLogTypeVisibility])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)
     if (Array.isArray(update.filter)) {
-      update.filter = gateLogTypeFilters(update.filter.map(String), {
-        multigres: showMultigresLogs,
-        compute: computeAvailability.canQueryCompute,
-      })
+      update.filter = gateLogTypeFilters(update.filter.map(String), queryLogTypeVisibility)
     }
     setSearch(update)
   }
