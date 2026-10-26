@@ -1,0 +1,10 @@
+---
+title: Can I query Supabase Postgres from a frontend app without a backend?
+topics: ['Database', 'Auth']
+---
+
+Yes. Supabase exposes your tables through the Data API, a REST API generated from your schema, so a React, Vue, or Svelte app can read and write data directly with `supabase-js`. You don't put a database password in the browser. You use the project's publishable key, which is safe to ship.
+
+Row Level Security is what makes this safe. The publishable key only reaches what your policies allow, so enable RLS on every table in an exposed schema and write policies for who can read and change each row, usually based on the signed-in user. A table in an exposed schema without RLS is open to any role that has a grant on it. And never ship the secret key, because it bypasses RLS.
+
+Anything that has to stay secret, like calling a paid API with your own key, still needs to run on a server. Edge Functions can handle that without you running one. See [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) and [API keys](https://supabase.com/docs/guides/getting-started/api-keys).

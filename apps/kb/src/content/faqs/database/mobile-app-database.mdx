@@ -1,0 +1,10 @@
+---
+title: Can I use Supabase as the database for a mobile app?
+topics: ['Database', 'Auth']
+---
+
+Yes. The app talks to Postgres through the Data API using a Supabase client library, and Row Level Security decides what each signed-in user can see and change. There are client libraries for Flutter, Swift, Kotlin, and JavaScript for React Native and Expo.
+
+Don't connect a mobile app directly to Postgres. Anything inside an app bundle can be extracted, so it can't hold a database password. The app ships with the publishable key instead, which only reaches what your policies allow. That makes the policies your real security boundary: turn on RLS for every exposed table and write policies that limit each user to their own rows. RLS with no policies denies everything, and a loose policy can expose other users' data.
+
+Put anything secret, such as payment calls, in Edge Functions. For live features like chat, Realtime streams database changes to the app. The [Flutter](https://supabase.com/docs/guides/getting-started/quickstarts/flutter) and [Expo](https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native) quickstarts show a full setup.

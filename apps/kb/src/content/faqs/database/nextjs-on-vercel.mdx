@@ -1,0 +1,10 @@
+---
+title: Can I use Supabase Postgres with a Next.js app on Vercel?
+topics: ['Database']
+---
+
+Yes. Next.js on Vercel runs your server code as functions, so connect through Supabase's transaction pooler and keep the connection string in a Vercel environment variable. You can also create and manage Supabase projects from the [Vercel Marketplace](https://supabase.com/docs/guides/integrations/vercel-marketplace), which syncs connection variables like `POSTGRES_URL` into your Vercel project.
+
+How you query depends on where the code runs. Route handlers and server actions on the Node.js runtime can use a Postgres driver or ORM through the pooler, with prepared statements turned off. The Edge runtime can't open a regular Postgres connection, so use `supabase-js` over HTTPS there. Code that runs in the browser should never hold your database password, so use the Data API with Row Level Security for that.
+
+For driver settings and what the transaction pooler doesn't support, see [Can I connect to Supabase Postgres from serverless and edge functions?](/kb/faqs/database/serverless-and-edge-connections)
