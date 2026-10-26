@@ -1,6 +1,14 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { useParams } from 'common'
-import { Edit, MoreVertical, Plus, RotateCw, Search, Trash, X } from 'lucide-react'
+import {
+  EditIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  RotateCwIcon,
+  SearchIcon,
+  TrashIcon,
+  XIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -259,7 +267,7 @@ export const OAuthAppsList = () => {
                 onKeyDown={onSearchInputEscape(filterString, setFilterString)}
               />
               <InputGroupAddon>
-                <Search />
+                <SearchIcon />
               </InputGroupAddon>
             </InputGroup>
             <FilterPopover
@@ -287,7 +295,7 @@ export const OAuthAppsList = () => {
               onSaveFilters={setFilteredClientTypes}
             />
             {hasActiveFilters && (
-              <Button size="tiny" className="px-1" icon={<X />} onClick={handleResetFilters} />
+              <Button size="tiny" className="px-1" icon={<XIcon />} onClick={handleResetFilters} />
             )}
           </div>
           <div className="flex items-center gap-x-2">
@@ -300,7 +308,7 @@ export const OAuthAppsList = () => {
               >
                 <Button
                   variant="primary"
-                  icon={<Plus />}
+                  icon={<PlusIcon />}
                   onClick={() => setShowCreateSheet(true)}
                   className="grow"
                 >
@@ -311,7 +319,7 @@ export const OAuthAppsList = () => {
               <ButtonTooltip
                 variant="primary"
                 disabled
-                icon={<Plus />}
+                icon={<PlusIcon />}
                 onClick={() => setShowCreateSheet(true)}
                 className="grow"
                 tooltip={{
@@ -392,7 +400,7 @@ export const OAuthAppsList = () => {
                         </Button>
                       </TableCell>
                       <TableCell title={app.client_id}>
-                        <code className="text-code-inline">{app.client_id}</code>
+                        <code>{app.client_id}</code>
                       </TableCell>
                       <TableCell className="max-w-28 capitalize">{app.client_type}</TableCell>
                       <TableCell className="max-w-28 capitalize">{app.registration_type}</TableCell>
@@ -403,11 +411,11 @@ export const OAuthAppsList = () => {
                           labelFormat="D MMM, YYYY"
                         />
                       </TableCell>
-                      <TableCell className="max-w-20 bg-surface-100 @[944px]:hover:bg-surface-200 px-6">
+                      <TableCell className="max-w-20 relative px-6">
                         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button className="px-1" icon={<MoreVertical />} />
+                              <Button className="px-1" icon={<MoreVerticalIcon />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-48">
                               <DropdownMenuItem
@@ -416,7 +424,7 @@ export const OAuthAppsList = () => {
                                   setSelectedAppToEdit(app.client_id)
                                 }}
                               >
-                                <Edit size={12} />
+                                <EditIcon size={12} />
                                 <p>Edit OAuth app</p>
                               </DropdownMenuItem>
                               {app.client_type === 'confidential' && (
@@ -427,7 +435,7 @@ export const OAuthAppsList = () => {
                                     setShowRegenerateDialog(true)
                                   }}
                                 >
-                                  <RotateCw size={12} />
+                                  <RotateCwIcon size={12} />
                                   <p>Regenerate client secret</p>
                                 </DropdownMenuItem>
                               )}
@@ -436,7 +444,7 @@ export const OAuthAppsList = () => {
                                 className="space-x-2"
                                 onClick={() => setSelectedAppToDelete(app.client_id)}
                               >
-                                <Trash size={12} />
+                                <TrashIcon size={12} />
                                 <p>Delete OAuth app</p>
                               </DropdownMenuItem>
                             </DropdownMenuContent>

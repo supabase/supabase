@@ -1,4 +1,4 @@
-import { FlaskConical, Settings } from 'lucide-react'
+import { FlaskConicalIcon, SettingsIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -61,7 +61,7 @@ export const LocalDropdown = ({
               }
             }}
           >
-            <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+            <SettingsIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
             Preferences
           </Link>
         </DropdownMenuItem>
@@ -70,7 +70,7 @@ export const LocalDropdown = ({
           onClick={() => toggleFeaturePreviewModal(true)}
           onSelect={() => toggleFeaturePreviewModal(true)}
         >
-          <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+          <FlaskConicalIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
           Feature previews
         </DropdownMenuItem>
         <DropdownMenuSeparator />

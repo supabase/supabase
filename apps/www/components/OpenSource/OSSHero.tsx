@@ -1,5 +1,5 @@
 import { useBreakpoint } from 'common'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { useTheme } from 'next-themes'
 import React from 'react'
 import { useWindowSize } from 'react-use'

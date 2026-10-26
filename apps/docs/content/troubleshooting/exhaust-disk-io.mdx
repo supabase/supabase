@@ -23,7 +23,7 @@ Running out of Disk IO Budget means that your instance is using more disk than i
 
 ## Monitor your disk IO budget
 
-To check your Disk IO Budget on the Supabase Platform, head over to [Database Health in the Observability section](/dashboard/project/_/observability/database).
+To monitor **Disk IO balance**, open the [Observability overview](/dashboard/project/_/observability). The metric shows the average remaining burst balance for the selected time window, using the lower of throughput and IOPS balances. A value of 100% means the balance is full, and 0% means it is exhausted. An average above 0% does not rule out exhaustion during part of the window. For the lowest sampled balance over the last seven days and its chart, open [Infrastructure settings](/dashboard/project/_/settings/infrastructure).
 
 It is also possible to monitor your resources and set up alerts using Prometheus/Grafana. With Grafana you will be able to pinpoint potential causes and see more fine-grained metrics like how much of your RAM is used for caching and your Swap usage. Read the [Metrics Guide](/docs/guides/observability/metrics) to learn more.
 

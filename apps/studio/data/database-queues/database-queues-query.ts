@@ -26,6 +26,7 @@ export async function getDatabaseQueues({ projectRef, connectionString }: Databa
     projectRef,
     connectionString,
     sql: queueSqlQuery,
+    queryKey: ['list-queues'],
   })
   return result
 }

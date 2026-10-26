@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { ExternalLink, RefreshCw } from 'lucide-react'
+import { ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
@@ -134,7 +134,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           <Button
             loading={isLoadingAuthLogs}
             disabled={isLoadingAuthLogs}
-            icon={<RefreshCw />}
+            icon={<RefreshCwIcon />}
             onClick={() => refresh()}
           >
             Refresh
@@ -193,7 +193,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                         className="px-1.5 absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition bg-background focus-visible:opacity-100"
                       >
                         <Link href={`/project/${ref}/logs/auth-logs?log=${log.id}`}>
-                          <ExternalLink size="12" className="text-foreground-light" />
+                          <ExternalLinkIcon size="12" className="text-foreground-light" />
                         </Link>
                       </ButtonTooltip>
                     </p>

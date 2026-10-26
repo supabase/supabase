@@ -30,6 +30,7 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
   const cloudProvider = useWatch({ control: form.control, name: 'cloudProvider' })
   const kubernetesClusterId = useWatch({ control: form.control, name: 'kubernetesClusterId' })
+  const useOrioleDbForCreate = useWatch({ control: form.control, name: 'useOrioleDb' })
   const isK8sProvider = cloudProvider === 'AWS_K8S' || cloudProvider === 'AWS_NIMBUS'
   // Held here (outside the collapsible content) so the selector's last valid
   // selection survives the section being collapsed and reopened.
@@ -56,6 +57,12 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                   disabled={highAvailability}
                   highAvailability={highAvailability}
                   lastValidSelectionRef={lastValidPostgresVersionSelection}
+                  useOrioleDbForCreate={useOrioleDbForCreate}
+                  description={
+                    useOrioleDbForCreate
+                      ? undefined
+                      : 'Choose OrioleDB in the advanced configuration if you want to use it'
+                  }
                 />
               )}
             />

@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 
 import { tableKeys } from './keys'
 import { getQueryClient } from '@/data/query-client'
-import { isScopedIntrospection, scopedIntrospectionReady } from '@/data/scoped-introspection'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -19,9 +18,7 @@ export async function getTable(
   { projectRef, connectionString, name, schema }: TablesVariables,
   signal?: AbortSignal
 ): Promise<SafePostgresTable> {
-  // Cold-load race guard -- see the module comment on scoped-introspection.ts.
-  await scopedIntrospectionReady()
-  const { sql, zod } = pgMeta.tables.retrieve({ name, schema, scoped: isScopedIntrospection() })
+  const { sql, zod } = pgMeta.tables.retrieve({ name, schema })
 
   const { result } = await executeSql(
     {

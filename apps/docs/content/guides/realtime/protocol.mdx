@@ -196,7 +196,7 @@ Messages for all events are encoded as text frames using JSON except with the `b
 | `broadcast`    | Broadcast message sent to all clients in a channel       | ✅           | ✅                |
 | `presence`     | Presence state update sent after joining a channel       | ✅           | ✅                |
 
-#### phx_join
+#### phx_join [#phx_join]
 
 This is the initial message required to join a channel. The client sends this message to the server to join a specific topic and configure the features it wants to use, such as Postgres changes, Presence, and Broadcast. The payload of the `phx_join` event contains the configuration options for the channel.
 
@@ -302,7 +302,7 @@ Example on protocol version `2.0.0`:
 [null, "26", "phoenix", "heartbeat", {}]
 ```
 
-#### access_token
+#### access_token [#access-token]
 
 Used to setup a new token to be used by Realtime for authentication and to refresh the token to prevent a private channel from closing when the token expires.
 

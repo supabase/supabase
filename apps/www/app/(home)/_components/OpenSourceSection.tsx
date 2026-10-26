@@ -2,7 +2,7 @@
 
 import staticContent from '.generated/staticContent/_index.json'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { useInView } from 'framer-motion'
+import { useInView } from 'motion/react'
 import Link from 'next/link'
 import { useRef } from 'react'
 import { Button } from 'ui'

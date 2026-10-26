@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { RotateCcw } from 'lucide-react'
+import { RotateCcwIcon } from 'lucide-react'
 import { useState } from 'react'
 import { get, useController, useFormState, type Control, type FieldErrors } from 'react-hook-form'
 import { Button } from 'ui'
@@ -179,7 +179,7 @@ const TableOptionEditor = ({
           type="button"
           variant="default"
           className="self-start"
-          icon={<RotateCcw size={14} />}
+          icon={<RotateCcwIcon size={14} />}
           onClick={onClear}
         >
           Clear

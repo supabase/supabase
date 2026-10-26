@@ -48,7 +48,7 @@ VITE_SUPABASE_KEY=YOUR_SUPABASE_KEY
 </$CodeTabs>
 
 With the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed
-in the browser, which is safe because they use a restricted publishable key and the SQL quickstart enables [Row Level Security](/docs/guides/auth#row-level-security) on the `profiles` table.
+in the browser, which is safe because they use a restricted publishable key and the SQL quickstart enables [Row Level Security](/docs/guides/database/postgres/row-level-security) on the `profiles` table.
 
 <$CodeSample
 path="/user-management/ionic-react-user-management/src/supabaseClient.ts"
