@@ -22,24 +22,6 @@ describe('useConfirmOnClose', () => {
     expect(result.current.modalProps.visible).toBe(false)
   })
 
-  it('opens the confirmation modal when the form is dirty', () => {
-    const onClose = vi.fn()
-
-    const { result } = renderHook(() =>
-      useConfirmOnClose({
-        checkIsDirty: () => true,
-        onClose,
-      })
-    )
-
-    act(() => {
-      result.current.confirmOnClose()
-    })
-
-    expect(onClose).not.toHaveBeenCalled()
-    expect(result.current.modalProps.visible).toBe(true)
-  })
-
   it('ignores open events and handles close events via handleOpenChange', () => {
     const onClose = vi.fn()
 

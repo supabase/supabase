@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { ChevronLeft, FlaskConical } from 'lucide-react'
+import { ChevronLeftIcon, FlaskConicalIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { POLICY_MODAL_VIEWS } from './PolicyEditorModal.constants'
@@ -42,7 +42,7 @@ export const PolicyEditorModalTitle = ({
             onClick={onSelectBackFromTemplates}
             className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
           >
-            <ChevronLeft strokeWidth={2} size={14} />
+            <ChevronLeftIcon strokeWidth={2} size={14} />
           </span>
           <h4>Select a template to use for your new policy</h4>
         </div>
@@ -56,7 +56,7 @@ export const PolicyEditorModalTitle = ({
       </h4>
       <div className="flex items-center gap-x-2 pr-6">
         {showAssistantPreview && view === POLICY_MODAL_VIEWS.EDITOR && (
-          <Button icon={<FlaskConical />} onClick={onToggleFeaturePreviewModal}>
+          <Button icon={<FlaskConicalIcon />} onClick={onToggleFeaturePreviewModal}>
             Try Supabase Assistant
           </Button>
         )}

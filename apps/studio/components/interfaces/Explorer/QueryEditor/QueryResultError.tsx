@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -122,7 +122,7 @@ export const QueryResultError = ({
                   className={cn(InlineLinkClassName, 'flex items-center gap-x-1')}
                 >
                   connecting to your database directly
-                  <ExternalLink size={12} />
+                  <ExternalLinkIcon size={12} />
                 </button>
                 .
               </p>

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronRight, Minus } from 'lucide-react'
+import { ChevronRightIcon, MinusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -81,9 +81,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
   const applyLag = replicationStatusData?.apply_lag
-  // Show the byte-based slot lag (WAL the destination hasn't confirmed flushing yet). The
-  // time-based flush_lag from pg_stat_replication is routinely NULL for logical slots that are
-  // idle or don't report timed feedback, whereas confirmed_flush_lsn_bytes is always populated.
+  // Slot acknowledgment can trail local worker progress; missing lag is not a caught-up signal.
   const lagBytes = applyLag?.confirmed_flush_lsn_bytes
   const lag = getFormattedLagValue('bytes', lagBytes)
   // The lag figure only covers ongoing changes, so it reads as "Caught up" while an initial copy
@@ -141,7 +139,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     if (isReplicationStatusError || !applyLag)
       return (
         <>
-          <Minus size={18} className="text-foreground-lighter" aria-hidden />
+          <MinusIcon size={18} className="text-foreground-lighter" aria-hidden />
           <span className="sr-only">Lag unavailable</span>
         </>
       )
@@ -251,7 +249,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                       onUpdateClick={() => setShowUpdateVersionModal(true)}
                     />
                   </div>
-                  <ChevronRight
+                  <ChevronRightIcon
                     size={16}
                     strokeWidth={1.5}
                     className="text-foreground-lighter"

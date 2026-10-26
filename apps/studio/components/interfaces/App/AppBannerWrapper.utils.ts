@@ -6,3 +6,12 @@ export function isLogsOrObservabilityPath(pathname: string | null | undefined): 
   if (!pathname) return false
   return LOGS_SECTION_PATH.test(pathname)
 }
+
+const ORGANIZATION_HOME_PATH = /^\/org\/[^/]+\/?$/
+
+export function isOrganizationLandingPath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false
+  return (
+    pathname === '/org' || pathname === '/organizations' || ORGANIZATION_HOME_PATH.test(pathname)
+  )
+}

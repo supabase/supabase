@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { getSequenceManager } from '@tanstack/react-hotkeys'
 import { describe, expect, it, vi } from 'vitest'
 

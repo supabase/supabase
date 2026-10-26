@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import { cn } from 'ui'
 
 import { CommandItemLink } from '@/components/ui/CommandItemLink'
@@ -39,7 +39,7 @@ export function OrgCommandItem({
         <span>{org.name}</span>
         <PartnerIcon organization={org} />
       </div>
-      {org.slug === selectedSlug && <Check size={16} />}
+      {org.slug === selectedSlug && <CheckIcon size={16} />}
     </CommandItemLink>
   )
 }

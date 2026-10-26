@@ -4,7 +4,7 @@ import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '
 import { loadStripe } from '@stripe/stripe-js'
 import { useDebounce } from '@uidotdev/usehooks'
 import { groupBy } from 'lodash'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
@@ -504,7 +504,7 @@ export const NewOrgForm = ({
                         label={
                           <div className="flex space-x-2 text-sm items-center">
                             <span>Spend Cap</span>
-                            <HelpCircle
+                            <HelpCircleIcon
                               size={16}
                               strokeWidth={1.5}
                               className="transition opacity-50 cursor-pointer hover:opacity-100"

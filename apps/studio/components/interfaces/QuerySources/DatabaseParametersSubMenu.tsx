@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useParams } from 'common'
-import { Check, Plus } from 'lucide-react'
+import { CheckIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   DropdownMenuItem,
@@ -66,7 +66,7 @@ export const DatabaseParametersSubMenu = ({
               onClick={() => onIdentifierChange(database.identifier)}
             >
               <span>{databaseLabel(database.identifier, database.region, projectRef)}</span>
-              {database.identifier === selectedDatabaseId && <Check size={14} />}
+              {database.identifier === selectedDatabaseId && <CheckIcon size={14} />}
             </DropdownMenuItem>
           )
         })}
@@ -75,7 +75,7 @@ export const DatabaseParametersSubMenu = ({
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="gap-x-2">
               <Link href={newReplicaURL}>
-                <Plus size={14} strokeWidth={1.5} />
+                <PlusIcon size={14} strokeWidth={1.5} />
                 Create a new read replica
               </Link>
             </DropdownMenuItem>

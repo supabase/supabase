@@ -1,8 +1,8 @@
 'use client'
 
 import { setBlogViewCookie, type BlogView } from 'app/blog/blog-view'
-import { motion } from 'framer-motion'
 import { AlignJustify, Grid } from 'lucide-react'
+import { motion } from 'motion/react'
 import { cn } from 'ui'
 
 export default function BlogViewToggle({
