@@ -549,7 +549,13 @@ async function call(action, arguments_ = {}) {
     }
     const delay = retryDelay(response.headers.get('Retry-After'))
     if (response.ok && action === 'download') return raw
-    const payload = JSON.parse(raw.toString('utf8'))
+    let payload
+    try {
+      payload = JSON.parse(raw.toString('utf8'))
+    } catch {
+      if (response.ok) throw new Error('invalid_response; requestId=' + requestId)
+      payload = { error: { code: 'invalid_response', retryable: response.status >= 500 } }
+    }
     if (response.ok) return { job: payload, delay }
     if (
       attempt < 2 &&
@@ -619,7 +625,7 @@ export FLOWSPEECH_REQUEST_ID='PASTE_PREVIOUS_REQUEST_ID_HERE'
 node generate.mjs
 ```
 
-The caller tries recovery first. Only a 404 leads to resubmission with the same ID and input. It retries temporary transport failures and retryable HTTP errors at most twice, without changing the serialized request. A failed or cancelled job remains terminal when its request ID is reused.
+The caller tries recovery first. Only a 404 leads to resubmission with the same ID and input. It retries temporary transport failures and retryable HTTP errors at most twice, without changing the serialized request. HTML or plain-text error responses still follow the HTTP status and `Retry-After`: 429 and 5xx responses use the same retry budget. Invalid JSON in a successful job response fails immediately. Errors retain the request ID for recovery. A failed or cancelled job remains terminal when its request ID is reused.
 
 Pending states are `queued`, `running`, `merging`, and `settling`. Poll at least five seconds apart, or longer when `Retry-After` requires it. HTTP 200 only means a status query succeeded. Generation succeeds only when the job's `status` is `success`.
 
