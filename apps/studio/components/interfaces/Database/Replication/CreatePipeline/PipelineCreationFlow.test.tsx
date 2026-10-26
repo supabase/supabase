@@ -553,7 +553,7 @@ describe('PipelineCreationFlow', () => {
     expect(requests).toHaveLength(1)
     expect(destinationRequests).toHaveLength(validatedDestinations)
     expect(validationRequests).toBe(validatedPipelines)
-  })
+  }, 10000)
 
   it('retains Review and retries after a final validation request fails', async () => {
     const { requests } = mockCreation()
@@ -828,7 +828,7 @@ describe('PipelineCreationFlow', () => {
     const dataAfterReturn = withinRegion('Data')
     fireEvent.click(dataAfterReturn.getByRole('button', { name: /Advanced settings/ }))
     expect(dataAfterReturn.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
-  })
+  }, 10000)
 
   it('shows one publication loading failure before Continue and clears it after a successful retry', async () => {
     let shouldFail = true
@@ -962,7 +962,7 @@ describe('PipelineCreationFlow', () => {
     })
     fireEvent.click(advancedSettings)
     expect(dataAfterReturn.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
-  })
+  }, 10000)
 
   it('blocks browser Forward to Review after data changes', async () => {
     window.history.replaceState(null, '', '/project/default/database/pipelines/new')

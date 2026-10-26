@@ -166,7 +166,7 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) => {
-  const useOtel = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend(search)
   return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
     queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),

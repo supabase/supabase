@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { CreateColumnBody } from './database-column-create-mutation'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -55,6 +56,7 @@ export async function updateDatabaseColumn({
     connectionString,
     sql,
     queryKey: ['column', 'update', originalColumn.id],
+    grant: unguarded.migrating,
   })
 
   return result
