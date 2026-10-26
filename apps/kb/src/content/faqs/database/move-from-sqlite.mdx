@@ -1,0 +1,12 @@
+---
+title: How do I move an app from SQLite to Supabase Postgres?
+topics: ['Database', 'Migration']
+---
+
+Create the schema in Postgres, copy the data over, and only then switch the app to the new connection string. A SQLite file lives on one machine's disk, so once your app runs on more than one server or on serverless functions, it needs a database server it can reach over the network.
+
+Most ORMs support both databases, so the app side is usually small: switch the provider or dialect to Postgres and read the connection string from an environment variable. Generate fresh migrations for Postgres rather than reusing the SQLite ones, because a few types behave differently. Booleans stored as integers should become `boolean`, and dates stored as text should become `timestamptz`. SQLite also accepts values that don't match a column's type, and Postgres won't, so clean those up first.
+
+Small tables can go through CSV import in the dashboard, up to 100 MB per file. Larger ones are better loaded with `COPY` or a bulk loader. If you load rows with explicit IDs, reset each table's ID sequence afterwards so new inserts don't collide. [Import data into Supabase](https://supabase.com/docs/guides/database/import-data) covers the options.
+
+If the app runs as a single process on one machine and nobody else needs the data, SQLite may still be the simpler choice.

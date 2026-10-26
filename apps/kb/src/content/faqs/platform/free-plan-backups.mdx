@@ -1,0 +1,12 @@
+---
+title: Does Supabase back up my database on the Free plan?
+topics: ['Platform', 'Database']
+---
+
+No. Daily backups start on the Pro plan, which keeps the last 7 days of them. Team keeps 14 days and Enterprise up to 30. On the Free plan, you're responsible for your own exports.
+
+The Supabase CLI can export everything, but it takes three separate dumps: one for your custom roles, one for the schema, and one for the data. Running `supabase db dump` with no flags exports only the schema, so a backup made that way restores empty tables. The [backup and restore guide](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore) has the exact commands and shows how to restore them into a new project.
+
+Those dumps don't include files you've uploaded to Storage, since the database only holds their metadata, so back those up separately. If you've changed the Supabase-managed `auth` or `storage` schemas, for example with your own triggers or policies, the guide covers restoring those changes too.
+
+If you'd rather restore to an exact moment than to the last daily backup, Point-in-Time Recovery is available as an add-on on paid plans. See [Database backups](https://supabase.com/docs/guides/platform/backups).
