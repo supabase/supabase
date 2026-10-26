@@ -1,6 +1,16 @@
 module.exports = [
   {
     permanent: true,
+    source: '/brand-assets',
+    destination: '/brand',
+  },
+  {
+    permanent: true,
+    source: '/brand-assets.md',
+    destination: '/brand.md',
+  },
+  {
+    permanent: true,
     source: '/images/customers/logos/light/:path*',
     destination: '/images/customers/logos/on-dark/:path*',
   },

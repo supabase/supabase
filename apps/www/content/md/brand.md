@@ -1,4 +1,4 @@
-# Supabase Brand Assets
+# Supabase Brand Guidelines
 
 > Official Supabase logos and colors, as SVG and PNG files for light and dark backgrounds.
 

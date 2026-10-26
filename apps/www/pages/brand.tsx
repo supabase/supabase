@@ -15,13 +15,13 @@ import { Button, copyToClipboard } from 'ui'
 
 const Index = ({ guideText }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const [isPromptCopied, setIsPromptCopied] = useState(false)
-  const meta_title = 'Brand Assets: Logos and Icons | Supabase'
+  const meta_title = 'Brand Guidelines: Logos and Icons | Supabase'
   const meta_description =
     'Official Supabase logos and colors, as SVG and PNG files for light and dark backgrounds'
 
   const handlePromptCopy = () => {
     copyToClipboard(
-      'Read https://supabase.com/brand-assets.md and use the official Supabase logo file that fits the background where the logo will appear. Do not change the logo.',
+      'Read https://supabase.com/brand.md and use the official Supabase logo file that fits the background where the logo will appear. Do not change the logo.',
       () => {
         setIsPromptCopied(true)
         setTimeout(() => setIsPromptCopied(false), 2000)
@@ -37,7 +37,7 @@ const Index = ({ guideText }: InferGetStaticPropsType<typeof getStaticProps>) =>
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: 'https://supabase.com/brand-assets',
+          url: 'https://supabase.com/brand',
           images: [
             {
               url: `https://supabase.com/images/og/supabase-og.png`,
@@ -51,7 +51,7 @@ const Index = ({ guideText }: InferGetStaticPropsType<typeof getStaticProps>) =>
             <SectionContainer className="flex flex-col items-center gap-4 pt-0 text-center sm:pt-0 md:pt-0">
               <VectorLogo guideText={guideText} className="pb-12" />
               <h1 className="m-0 text-5xl tracking-tight text-foreground sm:text-6xl">
-                Brand assets
+                Brand Guidelines
               </h1>
               <p className="m-0 max-w-xl text-balance text-sm text-foreground-lighter">
                 Official Supabase logos and colors, as SVG and PNG files for light and dark

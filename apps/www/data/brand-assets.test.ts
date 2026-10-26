@@ -15,7 +15,7 @@ describe('brand assets catalog', () => {
   })
 
   it('the markdown digest links every catalog file', () => {
-    const markdown = readFileSync(path.join(process.cwd(), 'content/md/brand-assets.md'), 'utf-8')
+    const markdown = readFileSync(path.join(process.cwd(), 'content/md/brand.md'), 'utf-8')
     for (const asset of BRAND_ASSETS) {
       expect(markdown).toContain(`(https://supabase.com${asset.svg})`)
       expect(markdown).toContain(`(https://supabase.com${asset.png})`)

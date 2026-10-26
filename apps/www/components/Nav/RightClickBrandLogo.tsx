@@ -252,9 +252,9 @@ const menuItems: MenuItemProps[][] = [
   ],
   [
     {
-      label: 'Go to Brand Assets',
+      label: 'Go to Brand Guidelines',
       type: 'link',
-      href: '/brand-assets',
+      href: '/brand',
     },
   ],
 ]
