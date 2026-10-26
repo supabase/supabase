@@ -322,6 +322,73 @@ describe('PlatformWebhooksPage (project scope)', () => {
     await waitFor(() => expect(retryCalled).toBe(true))
   })
 
+  describe('deliveries pagination', () => {
+    const mockPagedDeliveries = (ids: string[]) => {
+      const requests: Array<{ size: string | null; after: string | null }> = []
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: ({ request }) => {
+          const url = new URL(request.url)
+          const size = url.searchParams.get('page[size]')
+          const after = url.searchParams.get('page[after]')
+          requests.push({ size, after })
+
+          // Same rules as the real API: newest first, and the cursor row itself is skipped.
+          const rows = ids
+            .filter((id) => after === null || id < after)
+            .slice(0, Number(size))
+            .map((id) => ({
+              id,
+              type: 'delivery' as const,
+              attributes: { ...DELIVERY_ATTRIBUTES, id },
+            }))
+          return HttpResponse.json<DeliveryListResponse>({
+            data: rows,
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+      return requests
+    }
+
+    test('pages forward and back, asking for one extra row to detect a next page', async () => {
+      const requests = mockPagedDeliveries([7, 6, 5, 4, 3, 2, 1].map((n) => `delivery-${n}`))
+      renderPage(ENDPOINT_ID)
+
+      expect(await screen.findByLabelText('Retry delivery-7')).toBeInTheDocument()
+      expect(screen.getByLabelText('Retry delivery-3')).toBeInTheDocument()
+      expect(screen.queryByLabelText('Retry delivery-2')).not.toBeInTheDocument()
+      expect(requests[0]).toEqual({ size: '6', after: null })
+      expect(screen.getByLabelText('Previous page')).toBeDisabled()
+      expect(screen.getByLabelText('Next page')).toBeEnabled()
+
+      fireEvent.click(screen.getByLabelText('Next page'))
+
+      expect(await screen.findByLabelText('Retry delivery-2')).toBeInTheDocument()
+      expect(screen.queryByLabelText('Retry delivery-7')).not.toBeInTheDocument()
+      expect(requests).toContainEqual({ size: '6', after: 'delivery-3' })
+      expect(screen.getByLabelText('Next page')).toBeDisabled()
+      expect(screen.getByLabelText('Previous page')).toBeEnabled()
+
+      fireEvent.click(screen.getByLabelText('Previous page'))
+
+      expect(await screen.findByLabelText('Retry delivery-7')).toBeInTheDocument()
+      expect(screen.getByLabelText('Retry delivery-3')).toBeInTheDocument()
+      expect(screen.getByLabelText('Previous page')).toBeDisabled()
+    })
+
+    test('disables both buttons when the deliveries exactly fill one page', async () => {
+      mockPagedDeliveries([5, 4, 3, 2, 1].map((n) => `delivery-${n}`))
+      renderPage(ENDPOINT_ID)
+
+      expect(await screen.findByLabelText('Retry delivery-1')).toBeInTheDocument()
+      expect(screen.getByLabelText('Previous page')).toBeDisabled()
+      expect(screen.getByLabelText('Next page')).toBeDisabled()
+    })
+  })
+
   test('shows a friendly message when retry hits the rate limit', async () => {
     mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
     mockDeliveriesList([{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }])

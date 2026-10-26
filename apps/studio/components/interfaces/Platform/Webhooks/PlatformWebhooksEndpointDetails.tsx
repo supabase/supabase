@@ -1,11 +1,9 @@
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
-  type PaginationState,
   type SortingState,
 } from '@tanstack/react-table'
 import {
@@ -15,7 +13,7 @@ import {
   RotateCcwIcon,
   SearchIcon,
 } from 'lucide-react'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import {
   Badge,
   Button,
@@ -59,14 +57,17 @@ const DetailItem = ({ label, children, ddClassName = 'text-sm' }: DetailItemProp
 interface PlatformWebhooksEndpointDetailsProps {
   deliverySearch: string
   filteredDeliveries: WebhookDelivery[]
+  hasNextPage: boolean
+  hasPreviousPage: boolean
   selectedEndpoint: WebhookEndpoint
   onCopyUrl: () => void
   onDeliverySearchChange: (value: string) => void
+  onNextPage: () => void
+  onPreviousPage: () => void
   onOpenDelivery: (deliveryId: string) => void
   onRetryDelivery: (deliveryId: string) => void
 }
 
-const DELIVERIES_PAGE_SIZE = 5
 const DELIVERY_ACTIONS_COLUMN_ID = 'actions'
 const DEFAULT_DELIVERY_SORTING: SortingState = [{ id: 'attemptAt', desc: true }]
 
@@ -156,9 +157,13 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
 export const PlatformWebhooksEndpointDetails = ({
   deliverySearch,
   filteredDeliveries,
+  hasNextPage,
+  hasPreviousPage,
   selectedEndpoint,
   onCopyUrl,
   onDeliverySearchChange,
+  onNextPage,
+  onPreviousPage,
   onOpenDelivery,
   onRetryDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
@@ -170,36 +175,19 @@ export const PlatformWebhooksEndpointDetails = ({
   useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, () => deliverySearchRef.current?.focus(), {
     label: 'Search deliveries',
   })
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: DELIVERIES_PAGE_SIZE,
-  })
 
   const table = useReactTable({
     data: filteredDeliveries,
     columns: DELIVERY_COLUMNS,
-    state: { pagination, sorting },
+    state: { sorting },
     meta: { onRetryDelivery },
     getRowId: (row) => row.id,
-    onPaginationChange: setPagination,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
   })
 
-  const paginatedDeliveries = table.getRowModel().rows
-  const deliveryStartIndex =
-    table.getState().pagination.pageIndex * table.getState().pagination.pageSize
-  const deliveryRangeStart = filteredDeliveries.length === 0 ? 0 : deliveryStartIndex + 1
-  const deliveryRangeEnd = Math.min(
-    deliveryStartIndex + table.getState().pagination.pageSize,
-    filteredDeliveries.length
-  )
-
-  useEffect(() => {
-    setPagination((currentPagination) => ({ ...currentPagination, pageIndex: 0 }))
-  }, [deliverySearch, selectedEndpoint.id])
+  const deliveryRows = table.getRowModel().rows
 
   return (
     <div className="space-y-16">
@@ -314,8 +302,8 @@ export const PlatformWebhooksEndpointDetails = ({
               ))}
             </TableHeader>
             <TableBody>
-              {paginatedDeliveries.length > 0 ? (
-                paginatedDeliveries.map((row) => (
+              {deliveryRows.length > 0 ? (
+                deliveryRows.map((row) => (
                   <TableRow
                     key={row.id}
                     className="cursor-pointer focus-inset"
@@ -352,11 +340,11 @@ export const PlatformWebhooksEndpointDetails = ({
               )}
             </TableBody>
           </Table>
-          {filteredDeliveries.length > 0 && (
+          {(deliveryRows.length > 0 || hasNextPage || hasPreviousPage) && (
             <CardFooter className="border-t p-4 flex items-center justify-between">
               <p className="text-foreground-muted text-sm">
-                Showing {deliveryRangeStart} to {deliveryRangeEnd} of {filteredDeliveries.length}{' '}
-                deliveries
+                Showing {deliveryRows.length}{' '}
+                {deliveryRows.length === 1 ? 'delivery' : 'deliveries'}
               </p>
               <div className="flex items-center gap-x-2" aria-label="Pagination">
                 <Button
@@ -364,16 +352,16 @@ export const PlatformWebhooksEndpointDetails = ({
                   className="w-7 hit-area-2"
                   aria-label="Previous page"
                   size="tiny"
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={() => table.previousPage()}
+                  disabled={!hasPreviousPage}
+                  onClick={onPreviousPage}
                 />
                 <Button
                   icon={<ChevronRightIcon />}
                   className="w-7 hit-area-2"
                   aria-label="Next page"
                   size="tiny"
-                  disabled={!table.getCanNextPage()}
-                  onClick={() => table.nextPage()}
+                  disabled={!hasNextPage}
+                  onClick={onNextPage}
                 />
               </div>
             </CardFooter>

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
@@ -163,60 +163,52 @@ describe('PlatformWebhooksEndpointDetails', () => {
     render(
       <PlatformWebhooksEndpointDetails
         deliverySearch=""
-        filteredDeliveries={allDeliveries}
+        filteredDeliveries={allDeliveries.slice(0, 5)}
+        hasNextPage={false}
+        hasPreviousPage={false}
         selectedEndpoint={selectedEndpoint}
         onCopyUrl={vi.fn()}
         onDeliverySearchChange={vi.fn()}
+        onNextPage={vi.fn()}
+        onPreviousPage={vi.fn()}
         onOpenDelivery={vi.fn()}
         onRetryDelivery={vi.fn()}
         {...props}
       />
     )
 
-  it('renders paginated deliveries with previous and next controls', async () => {
-    const user = userEvent.setup()
-
+  it('shows every delivery it is given, without slicing them into pages', () => {
     renderComponent()
 
-    expect(screen.getByText('Showing 1 to 5 of 12 deliveries')).toBeInTheDocument()
-    expect(screen.queryByText('2026-02-27T06:59:00.000Z')).not.toBeInTheDocument()
-
-    await user.click(screen.getByLabelText('Next page'))
-
-    expect(screen.getByText('Showing 6 to 10 of 12 deliveries')).toBeInTheDocument()
-    expect(screen.getByText('2026-02-27T06:59:00.000Z')).toBeInTheDocument()
-
-    await user.click(screen.getByLabelText('Previous page'))
-
-    expect(screen.getByText('Showing 1 to 5 of 12 deliveries')).toBeInTheDocument()
-    expect(screen.queryByText('2026-02-27T06:59:00.000Z')).not.toBeInTheDocument()
+    expect(screen.getByText('Showing 5 deliveries')).toBeInTheDocument()
+    expect(screen.getByText('2026-02-27T08:04:00.000Z')).toBeInTheDocument()
   })
 
-  it('resets to the first page when the delivery search changes', async () => {
+  it('disables both pagination buttons when there is no next or previous page', () => {
+    renderComponent({ hasNextPage: false, hasPreviousPage: false })
+
+    expect(screen.getByLabelText('Previous page')).toBeDisabled()
+    expect(screen.getByLabelText('Next page')).toBeDisabled()
+  })
+
+  it('calls onNextPage and onPreviousPage from the pagination buttons', async () => {
     const user = userEvent.setup()
-    const projectDeliveries = allDeliveries.filter((delivery) =>
-      delivery.eventType?.includes('project')
-    )
-    const { rerender } = renderComponent()
+    const onNextPage = vi.fn()
+    const onPreviousPage = vi.fn()
+
+    renderComponent({ hasNextPage: true, hasPreviousPage: true, onNextPage, onPreviousPage })
 
     await user.click(screen.getByLabelText('Next page'))
-    expect(screen.getByText('Showing 6 to 10 of 12 deliveries')).toBeInTheDocument()
+    expect(onNextPage).toHaveBeenCalledTimes(1)
 
-    rerender(
-      <PlatformWebhooksEndpointDetails
-        deliverySearch="project"
-        filteredDeliveries={projectDeliveries}
-        selectedEndpoint={selectedEndpoint}
-        onCopyUrl={vi.fn()}
-        onDeliverySearchChange={vi.fn()}
-        onOpenDelivery={vi.fn()}
-        onRetryDelivery={vi.fn()}
-      />
-    )
+    await user.click(screen.getByLabelText('Previous page'))
+    expect(onPreviousPage).toHaveBeenCalledTimes(1)
+  })
 
-    await waitFor(() => {
-      expect(screen.getByText('Showing 1 to 5 of 8 deliveries')).toBeInTheDocument()
-    })
+  it('keeps the pagination controls when search filters the current page to nothing', () => {
+    renderComponent({ filteredDeliveries: [], hasNextPage: true })
+
+    expect(screen.getByLabelText('Next page')).toBeEnabled()
   })
 
   it('retries a failed delivery without opening the delivery row', async () => {

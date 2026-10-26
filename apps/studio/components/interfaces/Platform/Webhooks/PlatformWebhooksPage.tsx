@@ -31,7 +31,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-import { PLATFORM_WEBHOOK_EVENT_TYPES } from './PlatformWebhooks.constants'
+import { DELIVERIES_PAGE_SIZE, PLATFORM_WEBHOOK_EVENT_TYPES } from './PlatformWebhooks.constants'
 import type { WebhookEndpoint, WebhookScope } from './PlatformWebhooks.types'
 import {
   filterWebhookDeliveries,
@@ -153,10 +153,51 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     () => endpoints.find((endpoint) => endpoint.id === endpointId) ?? null,
     [endpoints, endpointId]
   )
-  const { data: deliveries = [] } = useWebhookDeliveriesQuery(
-    { scope: apiScope, endpointId: selectedEndpoint?.id ?? '' },
+  // `cursors` lists the `after` cursor of every page we moved forward to, so page 1 is `[]` and the
+  // last entry is the page on screen. It is stored with its endpoint, so after switching endpoints
+  // we fall back to page 1 instead of sending another endpoint's cursors.
+  const [deliveryPages, setDeliveryPages] = useState<{ endpointId: string; cursors: string[] }>({
+    endpointId: '',
+    cursors: [],
+  })
+  const pageCursors = deliveryPages.endpointId === selectedEndpoint?.id ? deliveryPages.cursors : []
+
+  // One extra row is requested only to learn whether a next page exists. It is never shown.
+  const { data: fetchedDeliveries } = useWebhookDeliveriesQuery(
+    {
+      scope: apiScope,
+      endpointId: selectedEndpoint?.id ?? '',
+      size: DELIVERIES_PAGE_SIZE + 1,
+      after: pageCursors.at(-1),
+    },
     { enabled: queryEnabled && !!selectedEndpoint }
   )
+  const deliveries = useMemo(
+    () => (fetchedDeliveries ?? []).slice(0, DELIVERIES_PAGE_SIZE),
+    [fetchedDeliveries]
+  )
+  const hasNextPage = (fetchedDeliveries?.length ?? 0) > DELIVERIES_PAGE_SIZE
+  const hasPreviousPage = pageCursors.length > 0
+
+  const handleNextPage = () => {
+    const lastDeliveryId = deliveries.at(-1)?.id
+    if (!selectedEndpoint || !lastDeliveryId) return
+
+    setDeliveryPages({
+      endpointId: selectedEndpoint.id,
+      cursors: [...pageCursors, lastDeliveryId],
+    })
+  }
+
+  const handlePreviousPage = () => {
+    if (!selectedEndpoint) return
+
+    setDeliveryPages({
+      endpointId: selectedEndpoint.id,
+      cursors: pageCursors.slice(0, -1),
+    })
+  }
+
   const {
     data: selectedDelivery = null,
     isSuccess: isSelectedDeliveryLoaded,
@@ -527,9 +568,13 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
               <PlatformWebhooksEndpointDetails
                 deliverySearch={deliverySearch}
                 filteredDeliveries={filteredDeliveries}
+                hasNextPage={hasNextPage}
+                hasPreviousPage={hasPreviousPage}
                 selectedEndpoint={selectedEndpoint}
                 onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}
                 onDeliverySearchChange={setDeliverySearch}
+                onNextPage={handleNextPage}
+                onPreviousPage={handlePreviousPage}
                 onOpenDelivery={(id) => {
                   setDeliveryDetailsTab('event')
                   setDeliveryId(id)
