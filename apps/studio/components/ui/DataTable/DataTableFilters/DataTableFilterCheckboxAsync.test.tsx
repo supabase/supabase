@@ -203,7 +203,7 @@ describe('pathname facet filter', () => {
     expect(requests).toBe(2)
   })
 
-  it('clears search on Escape before blurring the input', () => {
+  it('clears search on Escape before blurring the input', async () => {
     addAPIMock({
       method: 'post',
       path: '/platform/projects/:ref/analytics/endpoints/logs.all',
@@ -222,6 +222,7 @@ describe('pathname facet filter', () => {
 
     fireEvent.keyDown(searchInput, { key: 'Escape' })
     expect(searchInput).not.toHaveFocus()
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
   })
 
   it('replaces options on URL time-range and filter changes without syncing local filters', async () => {
@@ -295,6 +296,7 @@ describe('pathname facet filter', () => {
     expect(selectedCheckbox).toHaveAttribute('data-state', 'checked')
     fireEvent.click(selectedCheckbox)
     await waitFor(() => expect(screen.queryByRole('checkbox', { name: /\/selected/ })).toBeNull())
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
   })
 
   it('validates and orders option rows from the response', async () => {
