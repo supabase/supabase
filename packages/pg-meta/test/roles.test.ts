@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
 import pgMeta from '../src/index'
+import { safeSql } from '../src/pg-format'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
@@ -88,6 +89,41 @@ withTestDatabase('list roles w/ default roles', async ({ executeQuery }) => {
   `
   )
 })
+
+withTestDatabase(
+  'list and retrieve roles with equals signs in config',
+  async ({ executeQuery }) => {
+    const name = 'config_equals_role'
+    const config = {
+      application_name: 'tenant=blue=west',
+      'test.leading': '=blue',
+      'test.trailing': 'blue=',
+      'test.repeated': '==',
+      'test.quoted': "tenant='blue=west'",
+      'test.multiline': 'line1=blue\nline2=west',
+      'test.empty': '',
+      'test.plain': 'blue',
+    }
+    await executeQuery(pgMeta.roles.create({ name, config }).sql)
+
+    try {
+      await executeQuery(
+        safeSql`alter role config_equals_role set search_path to "tenant=blue", public;`
+      )
+      const expectedConfig = { ...config, search_path: '"tenant=blue", public' }
+
+      const { sql: listSql, zod: listZod } = pgMeta.roles.list()
+      const roles = listZod.parse(await executeQuery(listSql))
+      expect(roles.find((role) => role.name === name)?.config).toEqual(expectedConfig)
+
+      const { sql: retrieveSql, zod: retrieveZod } = pgMeta.roles.retrieve({ name })
+      const role = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+      expect(role?.config).toEqual(expectedConfig)
+    } finally {
+      await executeQuery(pgMeta.roles.remove({ name }).sql)
+    }
+  }
+)
 
 withTestDatabase('retrieve, create, update, delete roles', async ({ executeQuery }) => {
   // Create role
