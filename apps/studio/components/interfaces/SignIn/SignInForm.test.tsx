@@ -28,11 +28,7 @@ vi.mock('@hcaptcha/react-hcaptcha', async () => {
   >(({ size, onVerify }, _ref) => (
     <div data-testid="hcaptcha" data-size={size}>
       {size === 'normal' && (
-        <button
-          type="button"
-          tabIndex={0}
-          onClick={() => onVerify?.('manual-captcha-token')}
-        >
+        <button type="button" tabIndex={0} onClick={() => onVerify?.('manual-captcha-token')}>
           Complete security check
         </button>
       )}
