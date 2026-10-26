@@ -21,6 +21,11 @@ const mockInspection = () => {
   const queries: string[] = []
   addAPIMock({
     method: 'post',
+    path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+    response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+  })
+  addAPIMock({
+    method: 'post',
     path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
     response: async ({ request }) => {
       queries.push(requestSchema.parse(await request.json()).sql)
