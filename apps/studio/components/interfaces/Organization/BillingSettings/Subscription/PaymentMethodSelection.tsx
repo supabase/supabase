@@ -2,7 +2,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { LoaderIcon, PlusIcon } from 'lucide-react'
+import { CreditCardIcon, LoaderIcon, PlusIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
   forwardRef,
@@ -23,6 +23,7 @@ import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
 } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
+import { getCardBrandIconUrl } from '@/components/interfaces/Billing/Payment/PaymentMethods/PaymentMethods.utils'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
@@ -31,7 +32,7 @@ import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { BASE_PATH, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -341,16 +342,19 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               <SelectContent>
                 {paymentMethods?.data.map((method) => {
                   const label = `•••• •••• •••• ${method.card?.last4}`
+                  const brandIconUrl = getCardBrandIconUrl(method.card?.brand)
                   return (
                     <SelectItem key={method.id} value={method.id}>
                       <div className="flex gap-2">
-                        <img
-                          alt="Credit Card Brand"
-                          src={`${BASE_PATH}/img/payment-methods/${method.card?.brand
-                            .replace(' ', '-')
-                            .toLowerCase()}.png`}
-                          width="32"
-                        />
+                        {brandIconUrl ? (
+                          <img alt="Credit Card Brand" src={brandIconUrl} width="32" />
+                        ) : (
+                          <CreditCardIcon
+                            aria-label="Credit card"
+                            strokeWidth={1.5}
+                            className="h-6 w-8 text-foreground-lighter"
+                          />
+                        )}
                         {label}
                       </div>
                     </SelectItem>
