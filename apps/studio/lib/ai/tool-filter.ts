@@ -91,9 +91,6 @@ export const TOOL_CATEGORY_MAP: Record<
   Exclude<ToolName, ContractToolName | RemoteContractToolName>,
   ToolCategory
 > = {
-  // UI tools - always available
-  search_docs: TOOL_CATEGORIES.UI,
-
   // Schema tools
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,

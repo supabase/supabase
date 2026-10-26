@@ -57,6 +57,7 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
     const result = await getMcpTools(BASE_PARAMS)
 
     for (const name of [
+      'search_docs',
       'list_tables',
       'list_extensions',
       'list_edge_functions',
