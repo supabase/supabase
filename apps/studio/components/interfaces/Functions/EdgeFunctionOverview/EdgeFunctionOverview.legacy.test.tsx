@@ -1,4 +1,4 @@
-import { QueryClient } from '@tanstack/react-query'
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext } from 'common'
@@ -57,7 +57,7 @@ it('shows sparse execution averages in the legacy overview and updates the selec
   })
   customRender(
     <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: true }}>
-      <LegacyOverviewPage />
+      <LegacyOverviewPage dehydratedState={dehydrate(queryClient)} />
     </FeatureFlagContext.Provider>,
     { queryClient }
   )
