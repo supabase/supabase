@@ -8,7 +8,8 @@ import { AddNewURLModal } from './AddNewURLModal'
 import { render } from '@/tests/helpers'
 
 // One entry per URL shape urlRegex() accepts. None may be split by the paste separator,
-// otherwise pasting a valid URL would produce invalid rows.
+// otherwise pasting a valid URL would produce invalid rows. Pasting them all at once must
+// round-trip to exactly this list, which also proves no single entry gets split.
 const SUPPORTED_URL_FORMS = [
   'https://example.com',
   'https://example.com/auth/callback',
@@ -73,13 +74,15 @@ describe('AddNewURLModal', () => {
 
     expect(screen.getAllByPlaceholderText('https://mydomain.com')).toHaveLength(1)
 
-    await user.type(screen.getByPlaceholderText('https://mydomain.com'), 'https://app.example.com')
+    fireEvent.change(screen.getByPlaceholderText('https://mydomain.com'), {
+      target: { value: 'https://app.example.com' },
+    })
     await user.click(screen.getByRole('button', { name: 'Add URL' }))
 
     const urlInputs = screen.getAllByPlaceholderText('https://mydomain.com')
     expect(urlInputs).toHaveLength(2)
 
-    await user.type(urlInputs[1], 'https://dashboard.example.com')
+    fireEvent.change(urlInputs[1], { target: { value: 'https://dashboard.example.com' } })
     await user.click(screen.getAllByRole('button', { name: 'Remove URL' })[1])
 
     expect(screen.getAllByPlaceholderText('https://mydomain.com')).toHaveLength(1)
@@ -102,14 +105,15 @@ describe('AddNewURLModal', () => {
   })
 
   it('normalizes a trailing-comma URL before submitting', async () => {
-    const user = userEvent.setup()
     mutateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.())
 
     render(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
 
     await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('https://mydomain.com'), 'https://app.example.com,')
+    fireEvent.change(screen.getByPlaceholderText('https://mydomain.com'), {
+      target: { value: 'https://app.example.com,' },
+    })
 
     fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
 
@@ -181,23 +185,6 @@ describe('AddNewURLModal', () => {
     expect(mutateMock).not.toHaveBeenCalled()
   })
 
-  it.each(SUPPORTED_URL_FORMS)('leaves the supported URL form %s on one row', async (url) => {
-    const user = userEvent.setup()
-
-    expect(urlRegex().test(url)).toBe(true)
-
-    render(<AddNewURLModal visible allowList={[]} onClose={vi.fn()} />)
-
-    await screen.findByRole('dialog')
-
-    await user.click(screen.getByPlaceholderText('https://mydomain.com'))
-    await user.paste(url)
-
-    const inputs = screen.getAllByPlaceholderText('https://mydomain.com') as HTMLInputElement[]
-    expect(inputs).toHaveLength(1)
-    expect(inputs[0].value).toBe(url)
-  })
-
   it('splits a list of every supported URL form back into that list', async () => {
     const user = userEvent.setup()
 
@@ -237,18 +224,15 @@ describe('AddNewURLModal', () => {
   })
 
   it('rejects a trailing-comma URL when it already exists in the allow list', async () => {
-    const user = userEvent.setup()
-
     render(
       <AddNewURLModal visible allowList={['https://existing.example.com']} onClose={vi.fn()} />
     )
 
     await screen.findByRole('dialog')
 
-    await user.type(
-      screen.getByPlaceholderText('https://mydomain.com'),
-      'https://existing.example.com,'
-    )
+    fireEvent.change(screen.getByPlaceholderText('https://mydomain.com'), {
+      target: { value: 'https://existing.example.com,' },
+    })
 
     fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
 
@@ -257,18 +241,15 @@ describe('AddNewURLModal', () => {
   })
 
   it('rejects a whitespace-padded URL when it already exists in the allow list', async () => {
-    const user = userEvent.setup()
-
     render(
       <AddNewURLModal visible allowList={['https://existing.example.com']} onClose={vi.fn()} />
     )
 
     await screen.findByRole('dialog')
 
-    await user.type(
-      screen.getByPlaceholderText('https://mydomain.com'),
-      ' https://existing.example.com '
-    )
+    fireEvent.change(screen.getByPlaceholderText('https://mydomain.com'), {
+      target: { value: ' https://existing.example.com ' },
+    })
 
     fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
 

@@ -1148,7 +1148,7 @@ export interface DocsSearchV2OpenedEvent {
     /**
      * The trigger that opened the Search V2 dialog.
      */
-    triggerType: 'keyboard_shortcut' | 'search_input'
+    triggerType: 'keyboard_shortcut' | 'search_input' | 'not_found_button'
   }
 }
 
@@ -1563,7 +1563,7 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
- * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ * User clicked on the "Cancel subscription" Button on the billing settings page.
  *
  * @group Events
  * @source studio

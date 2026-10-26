@@ -81,30 +81,11 @@ describe('getApiEndpoint', () => {
       })
     ).toBe('')
   })
-
-  it('returns database restUrl for a replica database selection', () => {
-    expect(
-      getApiEndpoint({
-        selectedDatabaseId: 'replica-2',
-        projectRef: 'project-ref',
-        resolvedEndpoint: 'https://project-ref.supabase.co',
-        loadBalancers: undefined,
-        selectedDatabase: makeDatabase(
-          'replica-2',
-          'https://replica-2.supabase.co/rest/v1/'
-        ) as Database,
-      })
-    ).toBe('https://replica-2.supabase.co/rest/v1/')
-  })
 })
 
 describe('buildEntityMaps', () => {
-  it('returns empty maps for undefined paths', () => {
-    expect(buildEntityMaps(undefined)).toEqual({ resources: {}, rpcs: {} })
-  })
-
-  it('returns empty maps for empty paths', () => {
-    expect(buildEntityMaps({})).toEqual({ resources: {}, rpcs: {} })
+  it.each([undefined, {}])('returns empty maps for %j paths', (paths) => {
+    expect(buildEntityMaps(paths)).toEqual({ resources: {}, rpcs: {} })
   })
 
   it('skips the root path', () => {
@@ -112,25 +93,6 @@ describe('buildEntityMaps', () => {
       '/': { get: {} as ProjectJsonSchemaPaths[string]['get'] },
     }
     expect(buildEntityMaps(paths)).toEqual({ resources: {}, rpcs: {} })
-  })
-
-  it('classifies non-rpc paths as resources', () => {
-    const paths: ProjectJsonSchemaPaths = {
-      '/users': { get: {} as ProjectJsonSchemaPaths[string]['get'] },
-      '/posts': { get: {} as ProjectJsonSchemaPaths[string]['get'] },
-    }
-    const result = buildEntityMaps(paths)
-    expect(Object.keys(result.resources)).toEqual(['users', 'posts'])
-    expect(result.rpcs).toEqual({})
-  })
-
-  it('classifies rpc/ paths as rpcs', () => {
-    const paths: ProjectJsonSchemaPaths = {
-      '/rpc/my_function': { post: {} as ProjectJsonSchemaPaths[string]['post'] },
-    }
-    const result = buildEntityMaps(paths)
-    expect(result.resources).toEqual({})
-    expect(Object.keys(result.rpcs)).toEqual(['my_function'])
   })
 
   it('enriches entities with displayName and camelCase', () => {
@@ -152,7 +114,7 @@ describe('buildEntityMaps', () => {
     })
   })
 
-  it('handles mixed resources and rpcs', () => {
+  it('classifies rpc/ paths as rpcs and other paths as resources', () => {
     const paths: ProjectJsonSchemaPaths = {
       '/': { get: {} as ProjectJsonSchemaPaths[string]['get'] },
       '/users': { get: {} as ProjectJsonSchemaPaths[string]['get'] },

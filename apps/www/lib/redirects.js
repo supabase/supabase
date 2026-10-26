@@ -1846,6 +1846,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/quickstarts/with-expo-react-native',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/social-login',
     destination: '/docs/guides/auth/social-sign-in',
   },
@@ -2092,27 +2097,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/migrations/auth0',
-    destination: '/docs/guides/platform/migrating-to-supabase/auth0',
+    destination: '/kb/guides/migrate-from-auth0',
   },
   {
     permanent: true,
-    source: '/docs/guides/migrations/firestore-data',
-    destination: '/docs/guides/platform/migrating-to-supabase/firestore-data',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/migrations/firebase-auth',
-    destination: '/docs/guides/platform/migrating-to-supabase/firebase-auth',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/migrations/firebase-storage',
-    destination: '/docs/guides/platform/migrating-to-supabase/firebase-storage',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/migrations/heroku',
-    destination: '/docs/guides/platform/migrating-to-supabase/heroku',
+    source: '/docs/guides/migrations/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
   },
   {
     permanent: true,
@@ -3145,8 +3135,33 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/resources/migrating-to-supabase/:path*',
-    destination: '/docs/guides/platform/migrating-to-supabase/:path*',
+    source: '/docs/guides/platform/migrating-to-supabase',
+    destination: '/kb/topics/migration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase',
+    destination: '/kb/topics/migration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/migrating-to-supabase/vercel-postgres',
+    destination: '/kb/guides/migrate-from-vercel-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase/vercel-postgres',
+    destination: '/kb/guides/migrate-from-vercel-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/migrating-to-supabase/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
   },
   {
     permanent: true,

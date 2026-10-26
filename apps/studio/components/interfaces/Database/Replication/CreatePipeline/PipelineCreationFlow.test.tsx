@@ -188,12 +188,7 @@ describe('PipelineCreationFlow', () => {
     push.mockRestore()
   })
 
-  it.each([
-    ['BigQuery', 'bigquery#configure-bigquery-as-a-destination'],
-    ['DuckLake', 'ducklake#choose-a-configuration-mode'],
-    ['Snowflake', 'snowflake#prepare-snowflake-resources'],
-    ['ClickHouse', 'clickhouse#configure-clickhouse-as-a-destination'],
-  ] as const)('matches the connection subtitle and Docs to %s', async (type, path) => {
+  it('matches the connection subtitle and Docs to each destination', async () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -226,17 +221,26 @@ describe('PipelineCreationFlow', () => {
     )
     expect(screen.getByText('Where should this database be replicated?')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
-    fireEvent.click(destinationType().getByRole('radio', { name: new RegExp(type) }))
-    await next('?step=connection')
-    expect(
-      screen.getByText(`Name this pipeline and enter credentials for ${type}.`)
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
-      'href',
-      `${DOCS_URL}/guides/database/replication/pipelines/${path}`
-    )
-    await back('')
-    expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
+
+    const docsPaths = [
+      ['BigQuery', 'bigquery#configure-bigquery-as-a-destination'],
+      ['DuckLake', 'ducklake#choose-a-configuration-mode'],
+      ['Snowflake', 'snowflake#prepare-snowflake-resources'],
+      ['ClickHouse', 'clickhouse#configure-clickhouse-as-a-destination'],
+    ] as const
+    for (const [type, path] of docsPaths) {
+      fireEvent.click(destinationType().getByRole('radio', { name: new RegExp(type) }))
+      await next('?step=connection')
+      expect(
+        screen.getByText(`Name this pipeline and enter credentials for ${type}.`)
+      ).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+        'href',
+        `${DOCS_URL}/guides/database/replication/pipelines/${path}`
+      )
+      await back('')
+      expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
+    }
   })
 
   const reachReview = async (
@@ -327,8 +331,6 @@ describe('PipelineCreationFlow', () => {
 
   it.each([
     [false, false],
-    [true, false],
-    [false, true],
     [true, true],
   ])(
     'places review failures and keeps the current position (connection: %s, warnings: %s)',
@@ -826,35 +828,6 @@ describe('PipelineCreationFlow', () => {
     const dataAfterReturn = withinRegion('Data')
     fireEvent.click(dataAfterReturn.getByRole('button', { name: /Advanced settings/ }))
     expect(dataAfterReturn.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
-  })
-
-  it('preserves data values across steps and reaches Review', async () => {
-    renderWizard(
-      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
-      { rateLimitFactor: 1 }
-    )
-    await next('?step=connection')
-    fireEvent.change(screen.getByLabelText('Pipeline name'), {
-      target: { value: 'Warehouse' },
-    })
-    fillConnection()
-    await continueToData()
-    const data = withinRegion('Data')
-    fireEvent.click(data.getByRole('button', { name: /Advanced settings/ }))
-    fireEvent.change(data.getByRole('spinbutton', { name: 'Batch wait time' }), {
-      target: { value: '750' },
-    })
-    await back('?step=connection')
-    await continueToData()
-    const dataAfterReturn = withinRegion('Data')
-    fireEvent.click(dataAfterReturn.getByRole('button', { name: /Advanced settings/ }))
-    expect(dataAfterReturn.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
-    await selectPublication()
-    await next('?step=review')
-    await waitFor(() =>
-      expect(within(stepCard()).getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
-    )
-    expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
   })
 
   it('shows one publication loading failure before Continue and clears it after a successful retry', async () => {

@@ -3,6 +3,7 @@ import type { PGForeignTable } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { foreignTableKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -22,6 +23,7 @@ export async function getForeignTables(
       connectionString,
       sql: pgMeta.foreignTables.list({ includedSchemas: schemas }).sql,
       queryKey: ['foreign-tables', schemas].filter(Boolean),
+      grant: unguarded.migrating,
     },
     signal
   )

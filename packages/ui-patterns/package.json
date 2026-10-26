@@ -159,6 +159,10 @@
       "import": "./src/CommandMenu/api/TextHighlighter.tsx",
       "types": "./src/CommandMenu/api/TextHighlighter.tsx"
     },
+    "./CommandMenu/api/commandScore": {
+      "import": "./src/CommandMenu/api/commandScore.ts",
+      "types": "./src/CommandMenu/api/commandScore.ts"
+    },
     "./CommandMenu/api/hooks/commandsHooks": {
       "import": "./src/CommandMenu/api/hooks/commandsHooks.ts",
       "types": "./src/CommandMenu/api/hooks/commandsHooks.ts"
@@ -194,6 +198,10 @@
     "./CommandMenu/api/hooks/viewHooks": {
       "import": "./src/CommandMenu/api/hooks/viewHooks.ts",
       "types": "./src/CommandMenu/api/hooks/viewHooks.ts"
+    },
+    "./CommandMenu/api/sortSectionsByRelevance": {
+      "import": "./src/CommandMenu/api/sortSectionsByRelevance.ts",
+      "types": "./src/CommandMenu/api/sortSectionsByRelevance.ts"
     },
     "./CommandMenu/api/types": {
       "import": "./src/CommandMenu/api/types.ts",
@@ -705,6 +713,10 @@
       "import": "./src/TimestampInfo/index.tsx",
       "types": "./src/TimestampInfo/index.tsx"
     },
+    "./Toc/heading-reel": {
+      "import": "./src/Toc/heading-reel.tsx",
+      "types": "./src/Toc/heading-reel.tsx"
+    },
     "./Toc": {
       "import": "./src/Toc/index.ts",
       "types": "./src/Toc/index.ts"
@@ -720,6 +732,15 @@
     "./Toc/server/get-toc": {
       "import": "./src/Toc/server/get-toc.tsx",
       "types": "./src/Toc/server/get-toc.tsx"
+    },
+    "./Toc/toc-menu.css": {
+      "style": "./src/Toc/toc-menu.css",
+      "import": "./src/Toc/toc-menu.css",
+      "types": "./src/Toc/toc-menu.css"
+    },
+    "./Toc/toc-menu": {
+      "import": "./src/Toc/toc-menu.tsx",
+      "types": "./src/Toc/toc-menu.tsx"
     },
     "./Toc/toc-primitive": {
       "import": "./src/Toc/toc-primitive.tsx",
@@ -832,7 +853,7 @@
     "scroll-into-view-if-needed": "^3.1.0",
     "shiki": "catalog:",
     "smol-toml": "^1.6.1",
-    "sonner": "^1.5.0",
+    "sonner": "^2.0.8",
     "sql-formatter": "^15.0.0",
     "sse.js": "^2.2.0",
     "tsconfig": "workspace:*",
