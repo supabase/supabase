@@ -36,11 +36,11 @@ export function useSelectedGitHubConfigDrift() {
   const projectQuery = useSelectedProjectQuery()
   const project = projectQuery.data
   const parentProjectRef = project?.parentRef ?? projectRef
-  const shouldLoad = IS_PLATFORM && Boolean(projectRef) && Boolean(project)
-
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: parentProjectRef,
   })
+  const isPermissionDenied = branchesGrant.status === 'denied'
+  const shouldLoad = IS_PLATFORM && Boolean(projectRef) && Boolean(project) && !isPermissionDenied
   const branchesQuery = useQuery({
     ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
     enabled: shouldLoad,
@@ -140,6 +140,7 @@ export function useSelectedGitHubConfigDrift() {
   return {
     requestedGitBranch: gitBranch,
     isReady,
+    isPermissionDenied,
     isPending: activeQueries.some((query) => query.isPending),
     isFetching: activeQueries.some((query) => query.isFetching),
     isError: activeQueries.some((query) => query.isError) || conversionError !== undefined,

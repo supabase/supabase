@@ -1,6 +1,12 @@
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useGrant } from '@/lib/grants'
+import { useGrant, type GrantResult } from '@/lib/grants'
 import { useAppStateSnapshot } from '@/state/app-state'
+
+function getDisabledReason({ status }: GrantResult<'POST /v1/projects/{ref}/branches'>) {
+  if (status === 'denied') return 'You need additional permissions to create branches'
+  if (status === 'error') return 'Failed to check permissions'
+  return undefined
+}
 
 export const CreateBranchButton = () => {
   const snap = useAppStateSnapshot()
@@ -15,12 +21,7 @@ export const CreateBranchButton = () => {
       tooltip={{
         content: {
           side: 'bottom',
-          text:
-            createBranchGrant.status === 'denied'
-              ? 'You need additional permissions to create branches'
-              : createBranchGrant.status === 'error'
-                ? `Failed to check permissions`
-                : undefined,
+          text: getDisabledReason(createBranchGrant),
         },
       }}
     >

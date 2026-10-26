@@ -179,8 +179,16 @@ describe('assertGrant', () => {
     expect(check(BRANCHES, testGrant(BRANCHES))).not.toThrow()
   })
 
-  it('requires a variant where the refinement says so', () => {
-    const endpoint = 'PATCH /v1/branches/{branch_id_or_ref}'
+  it.each([
+    'GET /v1/branches/{branch_id_or_ref}',
+    'PATCH /v1/branches/{branch_id_or_ref}',
+    'DELETE /v1/branches/{branch_id_or_ref}',
+    'GET /v1/branches/{branch_id_or_ref}/diff',
+    'POST /v1/branches/{branch_id_or_ref}/merge',
+    'POST /v1/branches/{branch_id_or_ref}/push',
+    'POST /v1/branches/{branch_id_or_ref}/reset',
+    'POST /v1/branches/{branch_id_or_ref}/restore',
+  ] as const)('requires a variant for %s', (endpoint) => {
     const init = { params: { path: { branch_id_or_ref: 'branch' } } }
     expect(check(endpoint, testGrant(endpoint), init)).toThrow('grant needs a variant')
     expect(check(endpoint, testGrant(endpoint, { variant: 'development' }), init)).not.toThrow()

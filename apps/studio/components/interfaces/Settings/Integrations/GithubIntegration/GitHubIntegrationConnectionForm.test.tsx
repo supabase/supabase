@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
 import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
@@ -8,7 +9,7 @@ import { FGA_PERMISSIONS, type FgaPermissions } from '@/hooks/misc/useCheckPermi
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { createTestBranch } from '@/tests/lib/branch-test-utils'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissions } from '@/tests/lib/msw-permissions'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
@@ -171,5 +172,27 @@ describe('GitHubIntegrationConnectionForm', () => {
 
     const saveButton = await screen.findByRole('button', { name: 'Save changes' })
     await waitFor(() => expect(saveButton).toBeEnabled())
+  })
+
+  test('blocks saving until the branch list loads, so it never creates a second production branch', async () => {
+    mockEndpoints([
+      FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_READ,
+      FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_CREATE,
+      FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE,
+    ])
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/branches',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Failed to list branches' }, { status: 500 }),
+    })
+
+    renderForm()
+
+    await userEvent.type(await screen.findByLabelText('Working directory'), '/app')
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    await userEvent.hover(saveButton)
+    expect(await screen.findAllByText('Failed to load branches')).not.toHaveLength(0)
+    expect(saveButton).toHaveAttribute('aria-disabled', 'true')
   })
 })

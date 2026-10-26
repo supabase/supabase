@@ -222,11 +222,14 @@ export const CreateBranchModal = () => {
     isCreatingBranch ||
     isCheckingGHBranchValidity
 
-  const tooltipText = promptPlanUpgrade
-    ? 'Upgrade to unlock branching'
-    : createBranchGrant.status === 'denied'
-      ? 'You need additional permissions to create branches'
-      : undefined
+  const getTooltipText = () => {
+    if (promptPlanUpgrade) return 'Upgrade to unlock branching'
+    if (createBranchGrant.status === 'denied') {
+      return 'You need additional permissions to create branches'
+    }
+    return undefined
+  }
+  const tooltipText = getTooltipText()
 
   const validateGitBranchName = useCallback(
     (branchName: string) => {

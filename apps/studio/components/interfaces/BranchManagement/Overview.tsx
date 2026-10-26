@@ -354,6 +354,25 @@ const PreviewBranchActions = ({
     })
   }
 
+  const getResetDisabledReason = () => {
+    if (!canResetBranches) return 'You need additional permissions to reset branches'
+    if (!isBranchActiveHealthy) {
+      return 'Branch is still initializing. Please wait for it to become healthy before resetting.'
+    }
+    return undefined
+  }
+
+  const getModeSwitchDisabledReason = () => {
+    if (!canUpdateBranches) return 'You need additional permissions to edit branches'
+    if (!isBranchActiveHealthy) {
+      return 'Branch is still initializing. Please wait for it to become healthy before switching.'
+    }
+    if (!branch.persistent && !hasAccessToPersistentBranching) {
+      return 'Upgrade your plan to access persistent branches'
+    }
+    return undefined
+  }
+
   const onDeleteBranch = (e: Event | React.MouseEvent<HTMLDivElement>) => {
     if (isPersistentBranch) {
       setShowPersistentBranchDeleteConfirmationModal(true)
@@ -439,11 +458,7 @@ const PreviewBranchActions = ({
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: !canResetBranches
-                      ? 'You need additional permissions to reset branches'
-                      : !isBranchActiveHealthy
-                        ? 'Branch is still initializing. Please wait for it to become healthy before resetting.'
-                        : undefined,
+                    text: getResetDisabledReason(),
                   },
                 }}
               >
@@ -467,13 +482,7 @@ const PreviewBranchActions = ({
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: !canUpdateBranches
-                      ? 'You need additional permissions to edit branches'
-                      : !isBranchActiveHealthy
-                        ? 'Branch is still initializing. Please wait for it to become healthy before switching.'
-                        : !branch.persistent && !hasAccessToPersistentBranching
-                          ? 'Upgrade your plan to access persistent branches'
-                          : undefined,
+                    text: getModeSwitchDisabledReason(),
                   },
                 }}
               >

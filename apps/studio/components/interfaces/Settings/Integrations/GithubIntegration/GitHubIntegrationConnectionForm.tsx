@@ -103,7 +103,11 @@ export const GitHubIntegrationConnectionForm = ({
     { projectRef: selectedProject?.ref },
     { variant: 'production' }
   )
-  const { data: existingBranches } = useQuery({
+  const {
+    data: existingBranches,
+    error: branchesError,
+    isSuccess: isSuccessBranches,
+  } = useQuery({
     ...branchesQueryOptions({ projectRef: selectedProject?.ref, grant: branchesGrant.grant }),
     enabled: !!selectedProject?.ref,
   })
@@ -138,7 +142,7 @@ export const GitHubIntegrationConnectionForm = ({
     isDefault: true,
   })
   const productionBranchGrant = prodBranch ? updateBranchGrant : createBranchGrant
-  const canManageProductionBranch = productionBranchGrant.status === 'granted'
+  const canManageProductionBranch = isSuccessBranches && productionBranchGrant.status === 'granted'
   const productionBranchPermissionMessage =
     'You need additional permissions to update the production branch'
 
@@ -151,6 +155,7 @@ export const GitHubIntegrationConnectionForm = ({
     gitBranch: string
     branchName?: string
   }) => {
+    if (!isSuccessBranches) return Promise.reject(new Error('Branches have not loaded yet'))
     if (prodBranch) {
       if (updateBranchGrant.status === 'granted') {
         return updateBranch({
@@ -443,10 +448,13 @@ export const GitHubIntegrationConnectionForm = ({
     if (!canManageGitHubConnection) {
       return "You need additional permissions to update this project's GitHub integration settings"
     }
-    if (productionBranchGrant.status === 'denied') return productionBranchPermissionMessage
-    if (productionBranchGrant.status === 'error') {
-      return `Failed to check permissions`
+    if (branchesGrant.status === 'denied' || productionBranchGrant.status === 'denied') {
+      return productionBranchPermissionMessage
     }
+    if (branchesGrant.status === 'error' || productionBranchGrant.status === 'error') {
+      return 'Failed to check permissions'
+    }
+    if (branchesError) return 'Failed to load branches'
     return undefined
   }
   const submitDisabledReason = getSubmitDisabledReason()
