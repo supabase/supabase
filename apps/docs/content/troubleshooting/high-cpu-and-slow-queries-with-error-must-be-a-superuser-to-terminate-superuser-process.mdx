@@ -83,3 +83,7 @@ To avoid future emergency wraparound vacuums, especially on high-read/write tabl
 - **Schedule Manual Vacuums:** For tables with heavy write activity, consider scheduling manual `VACUUM` or `VACUUM FULL` operations during off-peak hours to reclaim space and prevent XID age from becoming critical. `VACUUM FULL` is more aggressive but locks the table and rewrites the entire table, so it should be used with caution and planned downtime.
 
 - **Adjust Autovacuum Settings:** For persistently problematic tables, your database team may need to adjust autovacuum parameters (like `autovacuum_vacuum_scale_factor`, `autovacuum_vacuum_threshold`, or `autovacuum_freeze_max_age`) to make autovacuum more aggressive or trigger earlier, preventing XID age from reaching critical levels.
+
+## Related
+
+- [Autovacuum management](/docs/guides/database/extensions/autovacuum-management)
