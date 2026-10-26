@@ -4,7 +4,7 @@ import { expect, it } from 'vitest'
 
 import { routerMock } from './route-mock'
 
-it('reports the current page path and follows navigation without query parameters', () => {
+it('reports the current page path without query parameters or hashes', () => {
   const initialUrl = routerMock.asPath
   try {
     routerMock.setCurrentUrl('/project/default/functions/send-email/details?tab=settings')
@@ -13,6 +13,16 @@ it('reports the current page path and follows navigation without query parameter
     expect(result.current).toBe('/project/default/functions/send-email/details')
 
     act(() => routerMock.setCurrentUrl('/project/default/functions/send-email/code?version=2'))
+
+    expect(result.current).toBe('/project/default/functions/send-email/code')
+
+    act(() => routerMock.setCurrentUrl('/project/default/functions/send-email/details#section'))
+
+    expect(result.current).toBe('/project/default/functions/send-email/details')
+
+    act(() =>
+      routerMock.setCurrentUrl('/project/default/functions/send-email/code?version=2#section')
+    )
 
     expect(result.current).toBe('/project/default/functions/send-email/code')
   } finally {
