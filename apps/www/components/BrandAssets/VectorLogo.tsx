@@ -148,6 +148,7 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
 
   // every point carries its place in data attributes, so one handler serves all of them
   const handlePointPointerDown = (event: PointerEvent<SVGElement>) => {
+    if (event.button !== 0) return
     event.stopPropagation()
     const { dataset } = event.currentTarget
     const ref = {
@@ -200,7 +201,8 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
     })
   }
 
-  const handlePointPointerUp = () => {
+  // capture also ends on pointerup, and on a cancelled touch that sends no pointerup
+  const handlePointDragEnd = () => {
     dragRef.current = null
   }
 
@@ -447,7 +449,7 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
                         height={getAnchorSize(shapeIndex)}
                         onPointerDown={handlePointPointerDown}
                         onPointerMove={handlePointPointerMove}
-                        onPointerUp={handlePointPointerUp}
+                        onLostPointerCapture={handlePointDragEnd}
                         onDoubleClick={handlePointDoubleClick}
                         className={cn(
                           'touch-none',
@@ -475,7 +477,7 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
                     r={2.5}
                     onPointerDown={handlePointPointerDown}
                     onPointerMove={handlePointPointerMove}
-                    onPointerUp={handlePointPointerUp}
+                    onLostPointerCapture={handlePointDragEnd}
                     onDoubleClick={handlePointDoubleClick}
                     className="touch-none"
                   />
