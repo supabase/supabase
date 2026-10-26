@@ -82,6 +82,10 @@ module.exports = defineConfig([
   { files: ['**/*.ts', '**/*.tsx'] },
   supabaseConfig,
   {
+    files: ['**/*.tsx'],
+    rules: { 'supabase/wrap-jsx-text': 'warn' },
+  },
+  {
     files: ['components/ui/PartnerIcon.tsx'],
     rules: { 'shadcn/no-raw-colors': 'off' },
   },
