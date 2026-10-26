@@ -24,7 +24,7 @@
 
 ## Colors
 
-The values come from the Supabase design system tokens.
+The values come from the [Supabase design system](https://supabase.com/design-system/docs/color-usage) tokens.
 
 | Name           | Token            | HEX       | RGB                | HSL                      | OKLCH                      |
 | -------------- | ---------------- | --------- | ------------------ | ------------------------ | -------------------------- |

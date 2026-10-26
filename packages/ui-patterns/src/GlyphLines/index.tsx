@@ -22,7 +22,6 @@ interface GlyphLine {
   to: number
   step: number
   textOffset: number
-  highlight?: string
 }
 
 type Point = [number, number]
@@ -32,6 +31,28 @@ const GLYPH_SIZE = 2.2
 const PULSE_LENGTH = 140
 // px past the canvas edge where glyphs still draw, so a glyph does not pop in at the edge
 const EDGE = 24
+
+const opaqueColors = new Map<string, string>()
+
+// border tokens have alpha, and alpha adds up where glyphs overlap. so glyphs draw in the opaque color the token gives over the surface
+export const toOpaque = (color: string, surface: string): string => {
+  if (color === surface) return color
+  const key = `${color}|${surface}`
+  const cached = opaqueColors.get(key)
+  if (cached) return cached
+  const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true })
+  if (!probe) return color
+  probe.canvas.width = 1
+  probe.canvas.height = 1
+  probe.fillStyle = surface
+  probe.fillRect(0, 0, 1, 1)
+  probe.fillStyle = color
+  probe.fillRect(0, 0, 1, 1)
+  const [red, green, blue] = probe.getImageData(0, 0, 1, 1).data
+  const opaque = `rgb(${red} ${green} ${blue})`
+  opaqueColors.set(key, opaque)
+  return opaque
+}
 
 const startGlyphLines = ({
   canvas,
@@ -94,6 +115,7 @@ const startGlyphLines = ({
     // a theme change swaps the color, so it is part of the key too
     const key = [
       style.color,
+      style.caretColor,
       font,
       // the glyphs draw in a fallback font until the web font loads
       document.fonts.status,
@@ -102,7 +124,6 @@ const startGlyphLines = ({
         height,
         ...glyphLines.flatMap((glyphLine) => [...glyphLine.start, glyphLine.from, glyphLine.to]),
       ].map((value) => value.toFixed(2)),
-      ...glyphLines.map((glyphLine) => glyphLine.highlight),
     ].join()
 
     if (key !== layerKey) {
@@ -110,18 +131,37 @@ const startGlyphLines = ({
       layer.width = width
       layer.height = height
       layerContext.setTransform(ratio, 0, 0, ratio, 0, 0)
-      layerContext.fillStyle = style.color
+      const color = toOpaque(style.color, style.caretColor)
       layerContext.font = font
       layerContext.textAlign = 'center'
       layerContext.textBaseline = 'middle'
       glyphLines.forEach((glyphLine) => {
-        // a highlighted line draws on every frame instead, in the pulse color
-        if (glyphLine.highlight) return
+        const indexes: number[] = []
         for (
           let index = Math.ceil(glyphLine.from / glyphLine.step);
           index * glyphLine.step <= glyphLine.to;
           index++
         ) {
+          indexes.push(index)
+        }
+        // each glyph cell fills with the caret color first, so a line hides the glyphs of a line it crosses.
+        // without a caret color, the caret color is the text color, and the cells would hide the glyphs
+        if (color !== style.caretColor) {
+          layerContext.beginPath()
+          for (const index of indexes) {
+            const [x, y] = toScreen(glyphLine, index * glyphLine.step)
+            layerContext.rect(
+              x - GLYPH_SIZE * 0.325,
+              y - GLYPH_SIZE * 0.5,
+              GLYPH_SIZE * 0.65,
+              GLYPH_SIZE
+            )
+          }
+          layerContext.fillStyle = style.caretColor
+          layerContext.fill()
+        }
+        layerContext.fillStyle = color
+        for (const index of indexes) {
           const char = text[(index + glyphLine.textOffset) % text.length]
           if (char === ' ') continue
           layerContext.fillText(char, ...toScreen(glyphLine, index * glyphLine.step))
@@ -137,28 +177,19 @@ const startGlyphLines = ({
       .map((pulse) => ({ ...pulse, head: pulse.head + pulse.speed * elapsed }))
       .filter((pulse) => (pulse.end - pulse.head) * Math.sign(pulse.speed) > 0)
     context.setTransform(ratio, 0, 0, ratio, 0, 0)
-    const pulseColor = style.getPropertyValue('--glyph-lines-pulse') || style.color
+    const pulseColor = toOpaque(
+      style.getPropertyValue('--glyph-lines-pulse') || style.color,
+      style.caretColor
+    )
     context.fillStyle = pulseColor
     context.shadowColor = pulseColor
     context.shadowBlur = 4
     context.font = font
     context.textAlign = 'center'
     context.textBaseline = 'middle'
-    glyphLines.forEach(({ highlight, ...glyphLine }) => {
-      if (!highlight) return
-      for (
-        let index = Math.ceil(glyphLine.from / glyphLine.step);
-        index * glyphLine.step <= glyphLine.to;
-        index++
-      ) {
-        const char = highlight[index % highlight.length]
-        if (char === ' ') continue
-        context.fillText(char, ...toScreen(glyphLine, index * glyphLine.step))
-      }
-    })
     pulses.forEach((pulse) => {
       const glyphLine = glyphLines.find(({ line }) => line === pulse.line)
-      if (!glyphLine || glyphLine.highlight) return
+      if (!glyphLine) return
       const tail = pulse.head - Math.sign(pulse.speed) * PULSE_LENGTH
       const from = Math.max(Math.min(pulse.head, tail), glyphLine.from)
       const to = Math.min(Math.max(pulse.head, tail), glyphLine.to)
@@ -229,8 +260,6 @@ const toGlyphLine = ({
       step: GLYPH_SIZE * (Math.abs(direction[0]) * 0.65 + Math.abs(direction[1])),
       // each line starts at a different place in the text, so neighbor lines do not repeat
       textOffset: lineIndex * 1009,
-      // a line with this attribute spells its value in the pulse color, in place of the text
-      highlight: line.dataset.glyphHighlight,
     },
   ]
 }
