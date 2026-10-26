@@ -32,12 +32,12 @@ The example tests a `todos` table whose policy lets each user access only their 
 2. Create the test file:
 
    ```bash
-   supabase test new todos_rls.test
+   supabase test new todos_rls
    ```
 
-3. In `supabase/tests/todos_rls.test.sql`, write the tests:
+3. In `supabase/tests/todos_rls_test.sql`, write the tests:
 
-   ```sql supabase/tests/todos_rls.test.sql
+   ```sql supabase/tests/todos_rls_test.sql
    begin;
    create extension if not exists pgtap with schema extensions;
    select plan(4);
@@ -63,9 +63,12 @@ The example tests a `todos` table whose policy lets each user access only their 
      'User 1 sees only their 2 todos'
    );
 
-   select lives_ok(
+   -- returning proves the row was written, not only that nothing failed
+   select results_eq(
      $$insert into todos (task, user_id)
-       values ('New Task', '123e4567-e89b-12d3-a456-426614174000'::uuid)$$,
+       values ('New Task', '123e4567-e89b-12d3-a456-426614174000'::uuid)
+       returning task$$,
+     array['New Task'],
      'User 1 can create their own todo'
    );
 
@@ -78,11 +81,10 @@ The example tests a `todos` table whose policy lets each user access only their 
      'User 2 sees only their 1 todo'
    );
 
-   select results_ne(
+   select is_empty(
      $$update todos set task = 'Hacked!'
        where user_id = '123e4567-e89b-12d3-a456-426614174000'::uuid
        returning 1$$,
-     $$values (1)$$,
      'User 2 cannot modify User 1 todos'
    );
 
@@ -97,10 +99,10 @@ The example tests a `todos` table whose policy lets each user access only their 
    ```
 
    ```text
-   psql:todos_rls.test.sql:4: NOTICE:  extension "pgtap" already exists, skipping
-   ./todos_rls.test.sql .. ok
+   psql:todos_rls_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+   ./todos_rls_test.sql .. ok
    All tests successful.
-   Files=1, Tests=6,  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
+   Files=1, Tests=4,  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
    Result: PASS
    ```
 
