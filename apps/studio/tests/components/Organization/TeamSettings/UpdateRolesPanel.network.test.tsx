@@ -12,12 +12,13 @@ import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
 type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse_Output']
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 const ORG_SLUG = 'test-org'
 
@@ -103,11 +104,7 @@ function setupMocks() {
       ]),
   })
 
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: () => HttpResponse.json<PermissionsV2Response>(PERMISSIONS_RESPONSE),
-  })
+  mockPermissions(PERMISSIONS_RESPONSE)
 
   addAPIMock({
     method: 'get',

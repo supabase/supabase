@@ -2,6 +2,7 @@ import { getExposedFunctionsSql } from '@supabase/pg-meta'
 import { infiniteQueryOptions } from '@tanstack/react-query'
 
 import { privilegeKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import type { ResponseError } from '@/types'
@@ -48,6 +49,7 @@ export async function getExposedFunctions(
       connectionString,
       sql,
       queryKey: ['exposed-functions', page],
+      grant: unguarded.migrating,
     },
     signal
   )

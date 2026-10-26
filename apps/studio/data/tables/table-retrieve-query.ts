@@ -2,6 +2,7 @@ import pgMeta from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { tableKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { SafePostgresTable } from '@/lib/postgres-types'
@@ -26,6 +27,7 @@ export async function getTable(
       connectionString,
       sql,
       queryKey: tableKeys.retrieve(projectRef, name, schema),
+      grant: unguarded.migrating,
     },
     signal
   )

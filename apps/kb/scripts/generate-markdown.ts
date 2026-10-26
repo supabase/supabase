@@ -10,11 +10,11 @@ import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import remarkStringify from 'remark-stringify'
 import { unified } from 'unified'
-import { visit } from 'unist-util-visit'
 import YAML from 'yaml'
 
 import { BASE_PATH } from '../src/lib/constants.ts'
 import { isInTopic, TOPICS, topicToSlug, type Topic } from '../src/lib/topics.ts'
+import { addBaseUrlPrefix, stripHeadingCustomIds } from './helpers.ts'
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
 const CONTENT_DIR = path.join(SCRIPT_DIR, '..', 'src', 'content')
@@ -49,6 +49,8 @@ const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
   .use(remarkStringify, { bullet: '-', listItemIndent: 'one', emphasis: '_', rule: '-' })
+
+export type MarkdownTree = ReturnType<typeof processor.parse>
 
 /**
  * Absolute base URL to prepend to root-relative links, mirroring apps/docs'
@@ -93,20 +95,13 @@ export function parseFrontmatter(raw: string): { data: Frontmatter; body: string
  * the body to an mdast tree, visiting its `link` nodes, and serializing it
  * back — the AST equivalent of apps/docs' `addBaseUrlPrefix()`, so this file
  * still makes sense read outside of the site (no regex over the raw text).
- *
+ * Heading custom anchors are stripped in the same pass.
  */
 export function absolutizeLinks(body: string): string {
   const tree = processor.parse(body)
-  const baseUrl = getInternalLinkBaseUrl()
 
-  visit(tree, 'link', (node) => {
-    if (!node.url.startsWith('/') || node.url.startsWith('//')) return
-    const withBase =
-      node.url === BASE_PATH || node.url.startsWith(`${BASE_PATH}/`)
-        ? node.url
-        : `${BASE_PATH}${node.url}`
-    node.url = `${baseUrl}${withBase}`
-  })
+  stripHeadingCustomIds(tree)
+  addBaseUrlPrefix(tree, getInternalLinkBaseUrl())
 
   return String(processor.stringify(tree))
 }

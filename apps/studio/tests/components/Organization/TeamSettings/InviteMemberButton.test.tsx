@@ -12,6 +12,8 @@ import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type Member = components['schemas']['Member_Output']
@@ -22,7 +24,6 @@ type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsR
 type OrgProject = OrganizationProjectsResponse['projects'][number]
 type CreateInvitationResponse =
   operations['InvitationsController_createInvitation']['responses']['201']['content']['application/json']
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 // The project multi-select's infinite-scroll sentinel uses IntersectionObserver, which jsdom lacks
 mockIntersectionObserver()
@@ -151,11 +152,7 @@ function setupMocks({
       ]),
   })
 
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: () => HttpResponse.json<PermissionsV2Response>(PERMISSIONS_RESPONSE),
-  })
+  mockPermissions(PERMISSIONS_RESPONSE)
 
   addAPIMock({
     method: 'get',
