@@ -1,4 +1,4 @@
-import { MoreHorizontalIcon } from 'lucide-react'
+import { CreditCardIcon, MoreHorizontalIcon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -12,12 +12,30 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { CardBrandIcon } from './CardBrandIcon'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import type { OrganizationPaymentMethod } from '@/data/organizations/organization-payment-methods-query'
 import type { PlanId } from '@/data/subscriptions/types'
+import { BASE_PATH } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
+
+const BRANDS_WITH_ICON = new Set(['amex', 'discover', 'jcb', 'mastercard', 'visa'])
+
+export const CardBrandIcon = ({ brand }: { brand: string | null | undefined }) => {
+  if (!brand || !BRANDS_WITH_ICON.has(brand)) {
+    return (
+      <CreditCardIcon
+        aria-label="Credit card"
+        strokeWidth={1.5}
+        className="h-6 w-8 text-foreground-lighter"
+      />
+    )
+  }
+
+  return (
+    <img alt="Credit card brand" src={`${BASE_PATH}/img/payment-methods/${brand}.png`} width="32" />
+  )
+}
 
 interface CreditCardProps {
   paymentMethod: OrganizationPaymentMethod

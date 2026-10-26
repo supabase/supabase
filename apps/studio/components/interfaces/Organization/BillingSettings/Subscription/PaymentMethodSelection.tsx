@@ -19,7 +19,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
-import { CardBrandIcon } from '@/components/interfaces/Billing/Payment/PaymentMethods/CardBrandIcon'
+import { CardBrandIcon } from '@/components/interfaces/Billing/Payment/PaymentMethods/CreditCard'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
