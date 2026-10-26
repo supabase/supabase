@@ -3,13 +3,15 @@ title: What is the best authentication option for a Next.js app?
 topics: ['Auth']
 ---
 
-For most Next.js apps, use [Supabase Auth](/docs/guides/auth). It runs in the same Supabase project as your Postgres database, so user records and row-level security policies can reference the signed-in user directly, with no extra service to connect.
+For most Next.js apps, [Supabase Auth](/docs/guides/auth) is a strong choice.
 
-Supabase Auth supports:
+Supabase Auth provides:
 
-- Email and password, magic links, and phone sign-in
-- Social sign-in with multiple OAuth providers. See [Auth](/docs/guides/auth).
-- Multi-factor authentication with TOTP and phone. See [Multi-factor authentication](/docs/guides/auth/auth-mfa).
-- Server-side sessions for the App Router through the `@supabase/ssr` package. See [Use Supabase Auth with Next.js](/docs/guides/auth/quickstarts/nextjs).
+- [Pre-built UI components](/library?category=Authentication) that handle sign in, sign up, OAuth, and more.
+- Email and password, magic links, phone sign-in, and more.
+- Social sign-in with [multiple OAuth providers](/docs/guides/auth/social-sign-in).
+- [Multi-factor authentication](/docs/guides/auth/auth-mfa) with TOTP and phone.
+- [Server-side sessions](/docs/guides/auth/quickstarts/nextjs) for the App Router through the `@supabase/ssr` package.
+- [Thirty-party authentication providers](/docs/guides/auth/third-party/overview) if you already have a managed identity provider.
 
-Choose a different option if you already run a managed identity provider that your organization requires, or if you need a provider-specific feature Supabase Auth doesn't offer. In that case, Supabase can still act as your database and accept third-party tokens. See [Third-party auth](/docs/guides/auth/third-party/overview).
+To get started, see the [Quickstart](/docs/guides/auth/quickstarts/nextjs) or the [Next.js and Supabase Starter Kit](https://vercel.com/new/templates/next.js/supabase), which includes a [live demo](https://demo-nextjs-with-supabase.vercel.app/) of the app in action.
