@@ -573,8 +573,7 @@ const ColorPalette = ({ colors }: { colors: BrandColor[] }) => {
                         inactiveIcon={<Copy className="size-3" />}
                         className={cn(
                           'size-3.5 transition-opacity',
-                          !isCopied &&
-                            'opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100'
+                          !isCopied && 'opacity-0 group-has-[:focus-visible]/row:opacity-100'
                         )}
                       />
                       <span className="sr-only">
