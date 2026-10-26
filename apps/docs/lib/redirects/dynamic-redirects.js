@@ -27,7 +27,7 @@ export const dynamicRedirects = [
     basePath: false,
     permanent: false,
     source: '/docs/careers/:match*',
-    destination: 'https://about.supabase.com/careers//:match*',
+    destination: 'https://about.supabase.com/careers/:match*',
   },
   {
     basePath: false,
