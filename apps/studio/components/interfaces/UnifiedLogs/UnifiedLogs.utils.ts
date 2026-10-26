@@ -53,7 +53,7 @@ export function toQuerySearchParams(
   search: Partial<SearchParamsType>,
   scope?: UnifiedLogsScope
 ): QuerySearchParamsType {
-  const query = Object.fromEntries(
+  const query: Partial<QuerySearchParamsType> = Object.fromEntries(
     Object.entries(search).filter(([, value]) => value !== null && value !== undefined)
   )
   if (scope !== undefined) query.scope = scope
