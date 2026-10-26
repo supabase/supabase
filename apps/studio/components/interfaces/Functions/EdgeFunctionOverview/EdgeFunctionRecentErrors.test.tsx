@@ -55,6 +55,7 @@ const mockLogs = ({
   invocationCount: number
 }) => {
   const rowListSql: string[] = []
+  const countSql: string[] = []
 
   addAPIMock({
     method: 'post',
@@ -63,24 +64,24 @@ const mockLogs = ({
       const { sql } = (await request.json()) as { sql: string }
       if (sql.includes('-- unified logs: row list')) {
         rowListSql.push(sql)
-        return HttpResponse.json<AnalyticsResponse>({ result: rows })
+        const limit = Number(sql.match(/LIMIT (\d+)$/)?.[1] ?? rows.length)
+        return HttpResponse.json<AnalyticsResponse>({ result: rows.slice(0, limit) })
       }
       if (sql.includes('-- unified logs: sidebar facet counts')) {
+        countSql.push(sql)
         return HttpResponse.json<AnalyticsResponse>({
-          result: [{ facet: 'total', value: 'all', count: totalErrors }],
+          result: [
+            { facet: 'total', value: 'all', count: totalErrors + invocationCount },
+            { facet: 'level', value: 'error', count: totalErrors },
+            { facet: 'log_type', value: 'edge function', count: invocationCount },
+          ],
         })
       }
       return HttpResponse.json<APIErrorBody>({ message: 'Unexpected SQL' }, { status: 400 })
     },
   })
-  addAPIMock({
-    method: 'get',
-    path: OTEL_ENDPOINT,
-    response: () =>
-      HttpResponse.json<AnalyticsResponse>({ result: [{ count: String(invocationCount) }] }),
-  })
 
-  return { rowListSql }
+  return { rowListSql, countSql }
 }
 
 const renderErrors = () => {
@@ -132,7 +133,7 @@ describe('EdgeFunctionRecentErrors', () => {
     // Installs the clipboard stub the spy attaches to
     const user = userEvent.setup()
     const copy = vi.spyOn(navigator.clipboard, 'writeText')
-    const { rowListSql } = mockLogs({
+    const { rowListSql, countSql } = mockLogs({
       rows: [0, 1, 2, 3, 4, 5].map((index) => errorRow(index)),
       totalErrors: 8,
       invocationCount: 20,
@@ -156,9 +157,14 @@ describe('EdgeFunctionRecentErrors', () => {
     expect(summary).not.toContain('TypeError: failure 5')
     expect(summary).toContain('+3 more matching log entries not included.')
 
-    // Scoped to this function's error rows, like the Logs tab it links to
-    expect(rowListSql[0]).toContain(`log_attributes['function_id'] = 'fn-1'`)
+    // Scoped to this function's error rows, like the Logs tab it links to, and only the 5 shown
+    expect(rowListSql[0]).toContain(`log_attributes['function_id'] IN ('fn-1')`)
     expect(rowListSql[0]).toContain(`IN ('error')`)
+    expect(rowListSql[0]).toMatch(/LIMIT 5$/)
+    // One unfiltered count covers both the error and invocation counts
+    expect(countSql).toHaveLength(1)
+    expect(countSql[0]).toContain(`log_attributes['function_id'] IN ('fn-1')`)
+    expect(countSql[0]).not.toContain(`IN ('error')`)
   })
 
   it('opens the clicked error in the Logs tab with the same filters', async () => {

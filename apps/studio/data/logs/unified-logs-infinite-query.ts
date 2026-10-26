@@ -35,6 +35,10 @@ export const UNIFIED_LOGS_QUERY_OPTIONS = {
 export type UnifiedLogsData = Awaited<ReturnType<typeof getUnifiedLogs>>
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
+type UnifiedLogsPageVariables = UnifiedLogsVariables & {
+  /** Rows per page, for views that show fewer logs than the Logs page */
+  pageSize?: number
+}
 
 /**
  * Whether unified logs queries for a search run on ClickHouse (OTEL) rather than BigQuery. Scoped
@@ -73,8 +77,9 @@ export async function getUnifiedLogs(
     projectRef,
     search,
     pageParam,
+    pageSize = LOGS_PAGE_LIMIT,
     useOtel = false,
-  }: UnifiedLogsVariables & {
+  }: UnifiedLogsPageVariables & {
     pageParam: UnifiedLogsPageParam
     useOtel?: boolean
   },
@@ -124,7 +129,7 @@ export async function getUnifiedLogs(
       const timestamp = cursorTimestamp(cursor)
       paginationFilter = safeSql`(timestamp < ${timestamp} OR (timestamp = ${timestamp} AND ${idColumn} < ${analyticsLiteral(cursor.id)}))`
     }
-    const sql = safeSql`${buildQuery(search, paginationFilter)} ORDER BY timestamp DESC, ${idColumn} DESC LIMIT ${analyticsLiteral(LOGS_PAGE_LIMIT)}`
+    const sql = safeSql`${buildQuery(search, paginationFilter)} ORDER BY timestamp DESC, ${idColumn} DESC LIMIT ${analyticsLiteral(pageSize)}`
     const data = await executeAnalyticsSql({
       projectRef,
       endpoint,
@@ -145,7 +150,7 @@ export async function getUnifiedLogs(
   const firstRow = result.length > 0 ? result[0] : null
   const lastRow = result.length > 0 ? result[result.length - 1] : null
   const lastQueryRow = rows.length > 0 ? rows[rows.length - 1] : pageParam?.row
-  const hasMore = result.length >= LOGS_PAGE_LIMIT - 1
+  const hasMore = result.length >= pageSize - 1
 
   const nextCursor = lastRow ? lastRow.date.getTime() : (pageParam?.cursor ?? null)
   const prevCursor = firstRow ? firstRow.date.getTime() : new Date().getTime()
@@ -159,7 +164,7 @@ export async function getUnifiedLogs(
 }
 
 export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, pageSize }: UnifiedLogsPageVariables,
   {
     enabled = true,
     ...options
@@ -173,9 +178,9 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
 ) => {
   const useOtel = useUnifiedLogsBackend(search)
   return useInfiniteQuery({
-    queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
+    queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel, pageSize }],
     queryFn: ({ signal, pageParam }) =>
-      getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal),
+      getUnifiedLogs({ projectRef, search, pageParam, pageSize, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     getPreviousPageParam: (firstPage) => {

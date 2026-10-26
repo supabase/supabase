@@ -93,7 +93,7 @@ export const mockLogs = (
             return timestamp < cursor || (timestamp === cursor && row.id < cursorId)
           })
           .sort(compareRows)
-          .slice(0, 50),
+          .slice(0, Number(body.sql.match(/LIMIT (\d+)$/)?.[1] ?? 50)),
       })
     },
   })

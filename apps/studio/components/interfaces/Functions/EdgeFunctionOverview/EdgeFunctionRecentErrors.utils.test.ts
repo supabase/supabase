@@ -1,8 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  getSinceLastDeployInvocationCount,
-  getSinceLastDeployInvocationCountSql,
   getSinceLastDeployInvocationPhrase,
   getSinceLastDeployLogRange,
   toAlertError,
@@ -54,23 +52,7 @@ describe('EdgeFunctionRecentErrors.utils', () => {
     vi.useRealTimers()
   })
 
-  it('builds the since-deploy invocation count query and phrase', () => {
-    expect(getSinceLastDeployInvocationCountSql()).toContain(
-      "select count() as count from logs where source = 'function_edge_logs'"
-    )
-    expect(getSinceLastDeployInvocationCountSql()).toContain(
-      "log_attributes['function_id'] = '__pending__'"
-    )
-
-    expect(
-      getSinceLastDeployInvocationCount([
-        {
-          count: '12',
-        },
-      ] as unknown as Parameters<typeof getSinceLastDeployInvocationCount>[0])
-    ).toBe(12)
-    expect(getSinceLastDeployInvocationCount([])).toBe(0)
-
+  it('phrases the since-deploy invocation count', () => {
     expect(getSinceLastDeployInvocationPhrase(1)).toBe('1 invocation')
     expect(getSinceLastDeployInvocationPhrase(1200)).toBe('1,200 invocations')
   })

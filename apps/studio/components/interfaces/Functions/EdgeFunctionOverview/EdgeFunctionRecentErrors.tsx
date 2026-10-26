@@ -11,10 +11,13 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { getEdgeFunctionLogsUrl, getLegacyEdgeFunctionLogsUrl } from './EdgeFunctionOverview.utils'
 import {
-  getSinceLastDeployInvocationCount,
-  getSinceLastDeployInvocationCountSql,
+  EDGE_FUNCTION_LOGS_VIEW,
+  getEdgeFunctionLogsScope,
+  getEdgeFunctionLogsUrl,
+  getLegacyEdgeFunctionLogsUrl,
+} from './EdgeFunctionOverview.utils'
+import {
   getSinceLastDeployInvocationPhrase,
   getSinceLastDeployLogRange,
 } from './EdgeFunctionRecentErrors.utils'
@@ -23,13 +26,12 @@ import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePrevie
 import { EmbeddedLogsTable } from '@/components/interfaces/UnifiedLogs/components/EmbeddedLogsTable'
 import type { ColumnSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
 import {
+  createUnifiedLogsSearch,
+  getFacetValueCount,
   getUniqueLogRows,
-  loadUnifiedLogsSearchParams,
-  toQuerySearchParams,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
-import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 
 // Error invocations (5xx) and runtime errors, as the Logs tab's level filter defines them
 const ERROR_LOG_FILTERS = ['level:eq:error']
@@ -56,55 +58,37 @@ export const EdgeFunctionRecentErrors = ({
     [updatedAt]
   )
 
-  // Built from the same URL params the Logs tab reads, so both run the same queries
-  const search = useMemo(
-    () =>
-      toQuerySearchParams(
-        {
-          ...loadUnifiedLogsSearchParams(new URLSearchParams()),
-          filter: ERROR_LOG_FILTERS,
-          date:
-            isoTimestampStart && isoTimestampEnd
-              ? [new Date(isoTimestampStart), new Date(isoTimestampEnd)]
-              : null,
-        },
-        functionId ? { functionId } : undefined
-      ),
-    [functionId, isoTimestampStart, isoTimestampEnd]
-  )
+  // Scoped like the function's Logs tab, so both run the same queries
+  const { errorsSearch, countsSearch } = useMemo(() => {
+    const scope = functionId ? getEdgeFunctionLogsScope(functionId) : undefined
+    const date =
+      isoTimestampStart && isoTimestampEnd
+        ? [new Date(isoTimestampStart), new Date(isoTimestampEnd)]
+        : null
+    return {
+      errorsSearch: createUnifiedLogsSearch({ filter: ERROR_LOG_FILTERS, date }, scope),
+      // Unfiltered, so its facets count both the errors and the invocations since the deploy
+      countsSearch: createUnifiedLogsSearch({ date }, scope),
+    }
+  }, [functionId, isoTimestampStart, isoTimestampEnd])
   const isQueryEnabled = Boolean(projectRef && functionId && isoTimestampStart)
 
   const { data, error, isError, isPending, isFetching } = useUnifiedLogsInfiniteQuery(
-    { projectRef, search },
+    { projectRef, search: errorsSearch, pageSize: MAX_VISIBLE_ERRORS },
     { enabled: isQueryEnabled }
   )
   const { data: counts } = useUnifiedLogsCountQuery(
-    { projectRef, search },
+    { projectRef, search: countsSearch },
     { enabled: isQueryEnabled }
   )
 
-  const {
-    logData: sinceLastDeployInvocationCountRows,
-    error: sinceLastDeployInvocationCountError,
-  } = useLogsQuery({
-    projectRef: projectRef!,
-    initialParams: {
-      sql: getSinceLastDeployInvocationCountSql(functionId),
-      iso_timestamp_start: isoTimestampStart,
-      iso_timestamp_end: isoTimestampEnd,
-    },
-    enabled: isQueryEnabled,
-    options: { useOtel: true },
-  })
-  const sinceLastDeployInvocationCount = getSinceLastDeployInvocationCount(
-    sinceLastDeployInvocationCountRows
-  )
-
-  const fetchedRows = useMemo(() => getUniqueLogRows<ColumnSchema>(data?.pages), [data?.pages])
-  const rows = useMemo(() => fetchedRows.slice(0, MAX_VISIBLE_ERRORS), [fetchedRows])
-  // Falls back to the fetched page until the count query resolves
-  const totalErrorCount = counts?.totalRowCount ?? fetchedRows.length
-  const hiddenErrorCount = Math.max(totalErrorCount - rows.length, 0)
+  const rows = useMemo(() => getUniqueLogRows<ColumnSchema>(data?.pages), [data?.pages])
+  // Until the counts resolve, the errors shown are all that's known
+  const errorCount = counts ? getFacetValueCount(counts.facets, 'level', 'error') : rows.length
+  const hiddenErrorCount = Math.max(errorCount - rows.length, 0)
+  const invocationCount = counts
+    ? getFacetValueCount(counts.facets, 'log_type', 'edge function')
+    : undefined
 
   // Without unified logs, invocations and runtime output live on separate tabs
   const getLogsUrl = (row?: ColumnSchema) => {
@@ -128,7 +112,6 @@ export const EdgeFunctionRecentErrors = ({
 
   const isLoading = !functionId || (isQueryEnabled && isPending)
   const hasNoErrors = !isLoading && !isError && rows.length === 0
-  const hasInvocationCount = !!isoTimestampStart && !sinceLastDeployInvocationCountError
 
   return (
     <PageSection>
@@ -147,7 +130,7 @@ export const EdgeFunctionRecentErrors = ({
         {hasNoErrors && (
           <div className="rounded-md border border-dashed px-5 py-6 text-sm text-foreground-light">
             <div className="flex items-start gap-3">
-              {hasInvocationCount && sinceLastDeployInvocationCount > 0 && (
+              {invocationCount !== undefined && invocationCount > 0 && (
                 <CheckIcon
                   size={16}
                   strokeWidth={1.5}
@@ -155,7 +138,7 @@ export const EdgeFunctionRecentErrors = ({
                   aria-hidden="true"
                 />
               )}
-              {hasInvocationCount && sinceLastDeployInvocationCount === 0 && (
+              {invocationCount === 0 && (
                 <EyeIcon
                   size={16}
                   strokeWidth={1.5}
@@ -164,11 +147,11 @@ export const EdgeFunctionRecentErrors = ({
                 />
               )}
               <div>
-                {hasInvocationCount ? (
+                {invocationCount !== undefined ? (
                   <>
-                    There {sinceLastDeployInvocationCount === 1 ? 'has' : 'have'} been{' '}
+                    There {invocationCount === 1 ? 'has' : 'have'} been{' '}
                     <span className="text-foreground">
-                      {getSinceLastDeployInvocationPhrase(sinceLastDeployInvocationCount)}
+                      {getSinceLastDeployInvocationPhrase(invocationCount)}
                     </span>{' '}
                     since last deploy and no errors.
                   </>
@@ -190,6 +173,7 @@ export const EdgeFunctionRecentErrors = ({
               isError={isError}
               onRowClick={handleOpenLog}
               skeletonRowCount={MAX_VISIBLE_ERRORS}
+              columnPreferencesKey={EDGE_FUNCTION_LOGS_VIEW.columnPreferencesKey}
               footer={
                 hiddenErrorCount > 0 && (
                   // Sized to its label so the Button's press-scale stays centered on the text

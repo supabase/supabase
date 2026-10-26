@@ -1,9 +1,6 @@
-import type { LogData } from '@/components/interfaces/Settings/Logs/Logs.types'
 import type { AlertErrorProps } from '@/components/ui/AlertError'
 
 const NUMERIC_TIMESTAMP_PATTERN = /^\d+(?:\.\d+)?$/
-
-const escapeSqlString = (value: string) => value.replace(/'/g, "''")
 
 export const toAlertError = (error: unknown): AlertErrorProps['error'] | undefined => {
   if (typeof error === 'string') return { message: error }
@@ -54,17 +51,6 @@ export const getSinceLastDeployLogRange = (updatedAt?: string | number, now: Dat
     isoTimestampStart: new Date(Math.max(startDate.valueOf(), earliestAllowedStart)).toISOString(),
     isoTimestampEnd: endDate.toISOString(),
   }
-}
-
-export const getSinceLastDeployInvocationCountSql = (functionId?: string): string => {
-  const id = escapeSqlString(functionId ?? '__pending__')
-  return `-- invocation count since last deploy
-select count() as count from logs where source = 'function_edge_logs' and log_attributes['function_id'] = '${id}'`
-}
-
-export const getSinceLastDeployInvocationCount = (invocationCountRows: LogData[]) => {
-  const count = Number(invocationCountRows[0]?.count ?? 0)
-  return Number.isFinite(count) ? count : 0
 }
 
 export const getSinceLastDeployInvocationPhrase = (invocationCount: number) => {

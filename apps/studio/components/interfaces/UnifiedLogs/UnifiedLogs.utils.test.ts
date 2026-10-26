@@ -8,6 +8,7 @@ import {
   gateLogTypeOptions,
   getComputeLogsAvailability,
   getEventMessageDisplay,
+  getFacetValueCount,
   getLogRowClassName,
   getLogTypeVisibility,
   getRawLogData,
@@ -215,6 +216,28 @@ const FUNCTION_SCOPE: UnifiedLogsScope = {
     { column: 'function_id', operator: '=', value: 'fn-123' },
   ],
 }
+
+describe('getFacetValueCount', () => {
+  const facets = {
+    level: {
+      total: 7,
+      rows: [
+        { value: 'error', total: 3 },
+        { value: 'success', total: 4 },
+      ],
+    },
+  }
+
+  it("reads one value's count from a facet", () => {
+    expect(getFacetValueCount(facets, 'level', 'error')).toBe(3)
+  })
+
+  it('counts zero for values and facets the query found nothing for', () => {
+    expect(getFacetValueCount(facets, 'level', 'warning')).toBe(0)
+    expect(getFacetValueCount(facets, 'log_type', 'edge function')).toBe(0)
+    expect(getFacetValueCount(undefined, 'level', 'error')).toBe(0)
+  })
+})
 
 describe('isOfferedFilter', () => {
   it('offers every filter when the view lists none', () => {
