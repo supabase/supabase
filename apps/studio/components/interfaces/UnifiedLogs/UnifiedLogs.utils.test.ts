@@ -256,22 +256,28 @@ describe('getLogTypeVisibility', () => {
 })
 
 describe('createUnifiedLogsSearch', () => {
-  it('retains fixed filters when a preview creates its query search', () => {
+  it('preserves fixed function filters for log previews', () => {
     const search = createUnifiedLogsSearch({}, FUNCTION_SCOPE)
     expect(search.scope).toEqual(FUNCTION_SCOPE)
   })
 
   it.each([
-    '{"filters":[{"column":"function_id","operator":"="}]}',
-    '{"filters":[{"column":"","operator":"=","value":""}]}',
-  ])('rejects invalid fixed filters instead of opening an unscoped view: %s', (payload) => {
+    {
+      scenario: 'a missing filter value',
+      payload: '{"filters":[{"column":"function_id","operator":"="}]}',
+    },
+    {
+      scenario: 'an empty filter column',
+      payload: '{"filters":[{"column":"","operator":"=","value":""}]}',
+    },
+  ])('rejects a fixed scope with $scenario instead of opening an unscoped view', ({ payload }) => {
     const scope = JSON.parse(payload)
     expect(() => createUnifiedLogsSearch({}, scope)).toThrow(
       'Invalid unified logs search parameters'
     )
   })
 
-  it('leaves the scope off unscoped searches', () => {
+  it('does not restrict project-wide searches to a resource', () => {
     expect(createUnifiedLogsSearch({})).not.toHaveProperty('scope')
   })
 

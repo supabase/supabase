@@ -458,10 +458,10 @@ describe('UnifiedLogs.queries.bq', () => {
   })
 })
 
-describe('scope', () => {
+describe('resource-scoped logs', () => {
   const FUNCTION_SCOPE_CONDITION = `((source = 'function_edge_logs') OR (source = 'function_logs')) AND log_attributes['function_id'] IN ('fn-123')`
 
-  describe('OTEL', () => {
+  describe('ClickHouse', () => {
     it("restricts rows to the function's invocations and runtime logs instead of the default log types", () => {
       const sql = getUnifiedLogsQuery(withFunctionScope())
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
@@ -491,20 +491,20 @@ describe('scope', () => {
       expect(where).toContain(FUNCTION_SCOPE_CONDITION)
     })
 
-    it('applies the scope to every count scan, including the log_type facet', () => {
+    it('keeps every log count within the selected function', () => {
       const scans = getLogsCountQuery(withFunctionScope()).split(/\bUNION ALL\b/)
       expect(scans.length).toBeGreaterThan(1)
       for (const scan of scans) expect(scan).toContain(FUNCTION_SCOPE_CONDITION)
     })
 
-    it('applies the scope to the chart and single-facet queries', () => {
+    it('keeps chart and filter counts within the selected function', () => {
       expect(getLogsChartQuery(withFunctionScope())).toContain(FUNCTION_SCOPE_CONDITION)
       expect(getFacetCountQuery({ search: withFunctionScope(), facet: 'status' })).toContain(
         FUNCTION_SCOPE_CONDITION
       )
     })
 
-    it('classifies function_logs rows as edge function runtime and levels them by their console level', () => {
+    it('labels runtime logs and preserves error and warning severity', () => {
       const sql = getUnifiedLogsQuery(withFunctionScope())
       expect(sql).toContain(`WHEN source = 'function_logs' THEN 'edge function runtime'`)
       expect(sql).toContain(
@@ -515,11 +515,11 @@ describe('scope', () => {
       )
     })
 
-    it('does not scope unscoped searches', () => {
+    it('does not restrict project-wide searches to a resource', () => {
       expect(getUnifiedLogsQuery(baseSearch)).not.toContain(`log_attributes['function_id']`)
     })
 
-    it('keeps different operators on the same column apart instead of merging them', () => {
+    it('requires logs to match both bucket inclusion and exclusion filters', () => {
       const sql = getUnifiedLogsQuery(
         withScope({
           filters: [

@@ -90,7 +90,10 @@ describe('unified log exports', () => {
     expect(queries[0]).toContain("log_attributes['function_id'] IN ('fn-123')")
   })
 
-  it.each([false, true])('preserves unscoped exports choosing otel=%s', async (useOtel) => {
+  it.each([
+    { backend: 'BigQuery', useOtel: false },
+    { backend: 'ClickHouse', useOtel: true },
+  ])('exports project-wide logs through the selected $backend backend', async ({ useOtel }) => {
     const queries = mockExport(useOtel)
     await expect(
       retrieveUnifiedLogs({
