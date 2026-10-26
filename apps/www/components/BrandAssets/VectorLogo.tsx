@@ -56,6 +56,8 @@ const PADDING = 24
 // a guide runs this far from the symbol. it must pass every edge of the hero
 const REACH = 2400
 const HATCH_SPACING = 6
+// a hovered guide spells this in place of the team names, and links to careers
+const CAREERS_GUIDE_TEXT = 'YOU + '
 const MORPH_TRANSITION = 'transition-all duration-500 ease-out motion-reduce:transition-none'
 
 const DRAG_TARGETS = ['point', 'in', 'out'] as const
@@ -77,6 +79,7 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
   const [mode, setMode] = useState<'icon' | 'wordmark'>('icon')
   const [shapes, setShapes] = useState(INITIAL_SHAPES)
   const [selected, setSelected] = useState<NodeRef | null>(null)
+  const [hoveredGuide, setHoveredGuide] = useState<string | null>(null)
   const dragRef = useRef<Drag | null>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
   // the guide lines have no stroke. GlyphLines draws them, and marks the svg ready so the draw-in waits for hydration
@@ -136,6 +139,12 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
   const handleLogoClick = () => setMode(isWordmark ? 'icon' : 'wordmark')
 
   useClickAway(canvasRef, () => setSelected(null))
+
+  const handleGuidePointerOver = (event: PointerEvent<Element>) => {
+    if (event.target instanceof SVGLineElement) setHoveredGuide(event.target.dataset.guide ?? null)
+  }
+
+  const handleGuidePointerOut = () => setHoveredGuide(null)
 
   // every point carries its place in data attributes, so one handler serves all of them
   const handlePointPointerDown = (event: PointerEvent<SVGElement>) => {
@@ -219,7 +228,11 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
       />
       <div
         aria-hidden
-        className="construction-mask pointer-events-none absolute inset-y-0 left-1/2 flex w-screen -translate-x-1/2 justify-center pt-16"
+        className={cn(
+          'construction-mask pointer-events-none absolute inset-y-0 left-1/2 flex w-screen -translate-x-1/2 justify-center pt-16',
+          // the mask already hides the guides past this box. the clip also stops them taking clicks there
+          'overflow-clip'
+        )}
       >
         <svg {...svgProps} ref={guidesRef} className="group/guides overflow-visible">
           <defs>
@@ -265,38 +278,62 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
                 height={REACH * 2}
               />
             </g>
-            {guides.map(([x1, y1, x2, y2], index) => (
-              <line
-                key={`${x1}:${y1}`}
-                x1={x1}
-                y1={y1}
-                x2={x2}
-                y2={y2}
-                pathLength={1}
-                data-glyph-line
-                style={{ animationDelay: `${index * 40}ms` }}
-                className="[stroke-dasharray:1] motion-safe:group-data-glyph-lines-ready/guides:animate-draw-line"
-              />
-            ))}
-            {wordmarkGuides.map(([x1, y1, x2, y2], index) => (
-              <line
-                key={`${x1}:${y1}`}
-                x1={x1}
-                y1={y1}
-                x2={x2}
-                y2={y2}
-                pathLength={1}
-                data-glyph-line
-                style={{
-                  transitionDelay: `${getDrawDelay({ index, count: wordmarkGuides.length, isDrawn: isWordmark })}ms`,
-                }}
-                className={cn(
-                  '[stroke-dasharray:1] transition-all duration-700 ease-out',
-                  'motion-reduce:transition-none',
-                  isWordmark ? '[stroke-dashoffset:0]' : '[stroke-dashoffset:1]'
-                )}
-              />
-            ))}
+            {/* the guides are the team. only the stroke takes the pointer, and the editor above it wins */}
+            <a
+              href="/careers"
+              tabIndex={-1}
+              onPointerOver={handleGuidePointerOver}
+              onPointerOut={handleGuidePointerOut}
+              className="cursor-pointer"
+            >
+              {guides.map(([x1, y1, x2, y2], index) => (
+                <line
+                  key={`${x1}:${y1}`}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  pathLength={1}
+                  strokeWidth={12}
+                  data-glyph-line
+                  data-guide={`icon:${x1}:${y1}`}
+                  data-glyph-highlight={
+                    hoveredGuide === `icon:${x1}:${y1}` ? CAREERS_GUIDE_TEXT : undefined
+                  }
+                  style={{ animationDelay: `${index * 40}ms` }}
+                  className={cn(
+                    '[stroke-dasharray:1] pointer-fine:[pointer-events:stroke]',
+                    'motion-safe:group-data-glyph-lines-ready/guides:animate-draw-line'
+                  )}
+                />
+              ))}
+              {wordmarkGuides.map(([x1, y1, x2, y2], index) => (
+                <line
+                  key={`${x1}:${y1}`}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  pathLength={1}
+                  strokeWidth={12}
+                  data-glyph-line
+                  data-guide={`wordmark:${x1}:${y1}`}
+                  data-glyph-highlight={
+                    hoveredGuide === `wordmark:${x1}:${y1}` ? CAREERS_GUIDE_TEXT : undefined
+                  }
+                  style={{
+                    transitionDelay: `${getDrawDelay({ index, count: wordmarkGuides.length, isDrawn: isWordmark })}ms`,
+                  }}
+                  className={cn(
+                    '[stroke-dasharray:1] transition-all duration-700 ease-out',
+                    'motion-reduce:transition-none',
+                    isWordmark
+                      ? '[stroke-dashoffset:0] pointer-fine:[pointer-events:stroke]'
+                      : '[stroke-dashoffset:1]'
+                  )}
+                />
+              ))}
+            </a>
           </g>
         </svg>
       </div>
@@ -305,7 +342,7 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
         aria-hidden
         onPointerDown={handleCanvasPointerDown}
         style={{ width, height }}
-        className="relative shrink-0"
+        className="pointer-events-none relative shrink-0"
       >
         <svg
           {...svgProps}
@@ -328,7 +365,11 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
                 <feDropShadow dx={0} dy={1 / SCALE} stdDeviation={1.5 / SCALE} />
               </filter>
             </defs>
-            <g transform={contentTransform} onClick={handleLogoClick} className="cursor-pointer">
+            <g
+              transform={contentTransform}
+              onClick={handleLogoClick}
+              className="pointer-events-auto cursor-pointer"
+            >
               <RaisedPaths
                 paths={[{ key: SYMBOL_OUTLINE, d: symbolPath }]}
                 gradientId={gradientId}
@@ -340,7 +381,7 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
               className={cn(
                 'cursor-pointer',
                 MORPH_TRANSITION,
-                isWordmark ? 'opacity-100 delay-700' : 'pointer-events-none opacity-0'
+                isWordmark ? 'pointer-events-auto opacity-100 delay-700' : 'opacity-0'
               )}
             >
               <RaisedPaths

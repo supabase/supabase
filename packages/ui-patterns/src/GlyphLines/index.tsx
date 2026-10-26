@@ -22,6 +22,7 @@ interface GlyphLine {
   to: number
   step: number
   textOffset: number
+  highlight?: string
 }
 
 type Point = [number, number]
@@ -101,6 +102,7 @@ const startGlyphLines = ({
         height,
         ...glyphLines.flatMap((glyphLine) => [...glyphLine.start, glyphLine.from, glyphLine.to]),
       ].map((value) => value.toFixed(2)),
+      ...glyphLines.map((glyphLine) => glyphLine.highlight),
     ].join()
 
     if (key !== layerKey) {
@@ -113,6 +115,8 @@ const startGlyphLines = ({
       layerContext.textAlign = 'center'
       layerContext.textBaseline = 'middle'
       glyphLines.forEach((glyphLine) => {
+        // a highlighted line draws on every frame instead, in the pulse color
+        if (glyphLine.highlight) return
         for (
           let index = Math.ceil(glyphLine.from / glyphLine.step);
           index * glyphLine.step <= glyphLine.to;
@@ -140,9 +144,21 @@ const startGlyphLines = ({
     context.font = font
     context.textAlign = 'center'
     context.textBaseline = 'middle'
+    glyphLines.forEach(({ highlight, ...glyphLine }) => {
+      if (!highlight) return
+      for (
+        let index = Math.ceil(glyphLine.from / glyphLine.step);
+        index * glyphLine.step <= glyphLine.to;
+        index++
+      ) {
+        const char = highlight[index % highlight.length]
+        if (char === ' ') continue
+        context.fillText(char, ...toScreen(glyphLine, index * glyphLine.step))
+      }
+    })
     pulses.forEach((pulse) => {
       const glyphLine = glyphLines.find(({ line }) => line === pulse.line)
-      if (!glyphLine) return
+      if (!glyphLine || glyphLine.highlight) return
       const tail = pulse.head - Math.sign(pulse.speed) * PULSE_LENGTH
       const from = Math.max(Math.min(pulse.head, tail), glyphLine.from)
       const to = Math.min(Math.max(pulse.head, tail), glyphLine.to)
@@ -213,6 +229,8 @@ const toGlyphLine = ({
       step: GLYPH_SIZE * (Math.abs(direction[0]) * 0.65 + Math.abs(direction[1])),
       // each line starts at a different place in the text, so neighbor lines do not repeat
       textOffset: lineIndex * 1009,
+      // a line with this attribute spells its value in the pulse color, in place of the text
+      highlight: line.dataset.glyphHighlight,
     },
   ]
 }
