@@ -27,6 +27,10 @@ const footerData = [
         url: '/edge-functions',
       },
       {
+        text: 'Compute',
+        url: '/compute',
+      },
+      {
         text: 'Realtime',
         url: '/realtime',
       },
@@ -97,12 +101,20 @@ const footerData = [
         url: '/partners/catalog',
       },
       {
+        text: 'Knowledge Base',
+        url: '/kb',
+      },
+      {
         text: 'Brand Assets',
         url: '/brand-assets',
       },
       {
         text: 'Security & Compliance',
         url: '/security',
+      },
+      {
+        text: 'Regions',
+        url: '/regions',
       },
       {
         text: 'SOC2',

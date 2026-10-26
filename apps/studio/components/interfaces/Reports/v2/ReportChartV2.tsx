@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { Card, CardContent, cn } from 'ui'
 
@@ -150,7 +150,7 @@ export const ReportChartV2 = ({
         )}
       >
         {isLoadingChart ? (
-          <Loader2 className="size-5 animate-spin text-foreground-light" />
+          <Loader2Icon className="size-5 animate-spin text-foreground-light" />
         ) : isErrorState ? (
           <p className="text-sm text-foreground-light text-center h-full flex items-center justify-center">
             Error loading chart data

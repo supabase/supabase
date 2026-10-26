@@ -60,7 +60,7 @@ export const useStripeSyncUninstallMutation = ({
 
   return useMutation<StripeSyncUninstallData, ResponseError, StripeSyncUninstallVariables>({
     mutationFn: (vars) => uninstallStripeSync(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
 
       track('integration_uninstall_submitted', {
@@ -77,13 +77,13 @@ export const useStripeSyncUninstallMutation = ({
         queryKey: stripeSyncKeys.all,
       })
 
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to uninstall Stripe Sync: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

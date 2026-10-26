@@ -8,6 +8,7 @@ import { CommandMenuGroup } from '../internal/CommandMenuGroup'
 import { CommandMenuItem } from '../internal/CommandMenuItem'
 import { useCommands } from './hooks/commandsHooks'
 import { useQuery } from './hooks/queryHooks'
+import { sortSectionsByRelevance } from './sortSectionsByRelevance'
 import { TextHighlighter } from './TextHighlighter'
 
 const CommandMenuList = forwardRef<
@@ -32,7 +33,7 @@ const CommandMenuList = forwardRef<
       {...props}
     >
       <CommandMenuEmpty listRef={innerRef}>No results found.</CommandMenuEmpty>
-      {commandSections.map((section) => {
+      {sortSectionsByRelevance(commandSections, query).map((section) => {
         if (section.commands.every((command) => command.defaultHidden) && !query) return null
 
         return (

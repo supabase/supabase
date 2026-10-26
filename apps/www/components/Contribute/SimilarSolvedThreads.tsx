@@ -301,7 +301,12 @@ export const SimilarSolvedThreads = ({ threads, parentThreadId }: SimilarSolvedT
             </div>
           </DialogSection>
           <DialogFooter>
-            <Button onClick={persistAndCloseDialog} disabled={isSubmitting} loading={isSubmitting}>
+            <Button
+              variant="primary"
+              onClick={persistAndCloseDialog}
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            >
               {isSubmitting ? 'Submitting...' : 'Submit feedback'}
             </Button>
           </DialogFooter>

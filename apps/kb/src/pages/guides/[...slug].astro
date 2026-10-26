@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content'
+import { createElement, type ComponentProps } from 'react'
+import { Table } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+import { relatedGuides, toSummary } from '../../lib/guides'
+import { breadcrumbListSchema, canonicalUrl, KB_BASE_URL, techArticleSchema } from '../../lib/json-ld'
+
+export async function getStaticPaths() {
+	const guides = await getCollection('guides')
+	const summaries = guides.map(toSummary)
+	return guides.map((guide) => ({
+		params: { slug: guide.id },
+		props: { guide, related: relatedGuides({ guide: toSummary(guide), guides: summaries }) },
+	}))
+}
+
+const { guide, related } = Astro.props
+const { title, description, topics, github_url, date } = guide.data
+const { Content, headings } = await render(guide)
+const toc = headings
+	.filter((heading) => heading.depth === 2 || heading.depth === 3)
+	.map((heading) => ({ title: heading.text, url: `#${heading.slug}`, depth: heading.depth }))
+
+const ProseTable = (props: ComponentProps<'table'>) => createElement(Table, { prose: true, ...props })
+
+// guide.filePath is relative to the kb app root, e.g. "src/content/guides/foo.mdx"
+const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb/${guide.filePath}`
+
+const url = canonicalUrl(Astro.url.pathname)
+const jsonLd = [
+	techArticleSchema({ url, headline: title, description }),
+	breadcrumbListSchema([
+		{ name: 'Knowledge Base', url: KB_BASE_URL },
+		{ name: title, url },
+	]),
+]
+---
+
+<ArticleLayout
+	title={title}
+	description={description}
+	topics={topics}
+	github_url={github_url}
+	viewGitHubLink={viewGitHubLink}
+	date={date}
+	jsonLd={jsonLd}
+	toc={toc}
+	related={related}
+>
+	<Content components={{ Admonition, table: ProseTable }} />
+</ArticleLayout>

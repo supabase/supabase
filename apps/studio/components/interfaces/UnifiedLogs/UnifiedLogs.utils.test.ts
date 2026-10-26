@@ -2,9 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildUnifiedLogsUrl,
-  gateMultigresLogType,
+  gateLogTypeFilters,
+  gateLogTypeOptions,
+  getComputeLogsAvailability,
   getEventMessageDisplay,
+  getRawLogData,
   parseMultigresEventMessage,
+  wrapIlikePattern,
 } from './UnifiedLogs.utils'
 
 describe('buildUnifiedLogsUrl', () => {
@@ -25,18 +29,10 @@ describe('buildUnifiedLogsUrl', () => {
     expect(params.get('filter')).toBe('log_type:eq:edge function')
   })
 
-  it('adds the date range as an epoch-ms pair when start and end are provided', () => {
-    const start = new Date('2026-05-08T00:00:00.000Z')
-    const end = new Date('2026-05-08T01:00:00.000Z')
-    const { params } = parse(
-      buildUnifiedLogsUrl({ projectRef: 'abc', logType: 'auth', start, end })
-    )
-    expect(params.get('date')).toBe(`${start.valueOf()}-${end.valueOf()}`)
-  })
-
-  it('accepts ISO strings for the date range', () => {
-    const start = '2026-05-08T00:00:00.000Z'
-    const end = '2026-05-08T01:00:00.000Z'
+  it.each([
+    ['Date objects', new Date('2026-05-08T00:00:00.000Z'), new Date('2026-05-08T01:00:00.000Z')],
+    ['ISO strings', '2026-05-08T00:00:00.000Z', '2026-05-08T01:00:00.000Z'],
+  ])('adds the date range as an epoch-ms pair from %s', (_, start, end) => {
     const { params } = parse(
       buildUnifiedLogsUrl({ projectRef: 'abc', logType: 'auth', start, end })
     )
@@ -94,7 +90,55 @@ describe('getEventMessageDisplay', () => {
   })
 })
 
-describe('gateMultigresLogType', () => {
+describe('getRawLogData', () => {
+  it('returns only the real Compute payload fields', () => {
+    const row = {
+      event_message: 'Error: Dynamic require of "path" is not supported',
+      id: '51a29911-9293-4616-8984-743cc548b629',
+      metadata: {
+        cw_event_id: '39883203917805946105278943454814281535421893832620638214',
+        launch_id: '1788424715503435269',
+        log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
+        log_stream: 'launch-1788424715503435269',
+        subservice: 'worker_guest_logs',
+        worker: 'api',
+      },
+      project: 'cxkpapyhaaywrtudnqpl',
+      timestamp: 1788424716876000,
+      log_type: 'compute' as const,
+      status: null,
+      level: null,
+      method: null,
+      pathname: null,
+      auth_user: null,
+      date: new Date(1788424716876),
+    }
+
+    expect(getRawLogData(row)).toEqual({
+      id: '51a29911-9293-4616-8984-743cc548b629',
+      timestamp: 1788424716876000,
+      event_message: 'Error: Dynamic require of "path" is not supported',
+      metadata: row.metadata,
+    })
+  })
+
+  it('returns non-Compute rows unchanged', () => {
+    const row = {
+      id: 'edge-log',
+      timestamp: 1788424716876000,
+      log_type: 'edge' as const,
+      status: 200,
+      method: 'GET' as const,
+      pathname: '/rest/v1',
+      level: 'success' as const,
+      date: new Date(1788424716876),
+    }
+
+    expect(getRawLogData(row)).toBe(row)
+  })
+})
+
+describe('gateLogTypeOptions', () => {
   const fields = [
     { value: 'date' },
     {
@@ -102,23 +146,104 @@ describe('gateMultigresLogType', () => {
       options: [
         { label: 'Postgres', value: 'postgres' },
         { label: 'Multigres', value: 'multigres' },
+        { label: 'Compute', value: 'compute' },
       ],
     },
   ]
 
-  it('drops the multigres log_type option when the flag is disabled', () => {
-    const gated = gateMultigresLogType(fields, false)
+  it('drops log_type options whose flags are disabled', () => {
+    const gated = gateLogTypeOptions(fields, { multigres: false, compute: false })
     const logType = gated.find((field) => field.value === 'log_type')
     expect(logType?.options?.map((option) => option.value)).toEqual(['postgres'])
   })
 
-  it('keeps the multigres option when the flag is enabled', () => {
-    const gated = gateMultigresLogType(fields, true)
+  it('keeps independently enabled log types', () => {
+    const gated = gateLogTypeOptions(fields, { multigres: false, compute: true })
+    const logType = gated.find((field) => field.value === 'log_type')
+    expect(logType?.options?.map((option) => option.value)).toEqual(['postgres', 'compute'])
+  })
+
+  it('returns the original fields when every gated log type is enabled', () => {
+    const gated = gateLogTypeOptions(fields, { multigres: true, compute: true })
     expect(gated).toBe(fields)
   })
 
   it('leaves non log_type fields untouched', () => {
-    const gated = gateMultigresLogType(fields, false)
+    const gated = gateLogTypeOptions(fields, { compute: false })
     expect(gated.find((field) => field.value === 'date')).toEqual({ value: 'date' })
+  })
+})
+
+describe('gateLogTypeFilters', () => {
+  it('removes disabled log types from equality and inequality filters', () => {
+    expect(
+      gateLogTypeFilters(
+        ['log_type:eq:compute', 'log_type:neq:multigres', 'log_type:eq:postgres', 'method:eq:GET'],
+        { compute: false, multigres: false }
+      )
+    ).toEqual(['log_type:eq:postgres', 'method:eq:GET'])
+  })
+
+  it('keeps enabled log types and unrelated filters unchanged', () => {
+    const filters = ['log_type:eq:compute', 'method:eq:GET']
+    expect(gateLogTypeFilters(filters, { compute: true })).toBe(filters)
+  })
+
+  it('preserves absent filter values', () => {
+    expect(gateLogTypeFilters(undefined, { compute: false })).toBeUndefined()
+    expect(gateLogTypeFilters(null, { compute: false })).toBeNull()
+  })
+})
+
+describe('getComputeLogsAvailability', () => {
+  const computeFilter = ['log_type:eq:compute']
+
+  it('preserves an unresolved platform filter without allowing it into queries or sync', () => {
+    const availability = getComputeLogsAvailability({
+      isPlatform: true,
+      flagsLoaded: false,
+      computeEnabled: false,
+    })
+
+    expect(gateLogTypeFilters(computeFilter, { compute: availability.preserveComputeFilter })).toBe(
+      computeFilter
+    )
+    expect(gateLogTypeFilters(computeFilter, { compute: availability.canQueryCompute })).toEqual([])
+    expect(availability.readyToSyncFilters).toBe(false)
+  })
+
+  it.each([
+    [
+      'allows Compute when the platform flag is enabled',
+      { isPlatform: true, flagsLoaded: true, computeEnabled: true },
+      true,
+    ],
+    [
+      'removes Compute when the platform flag is disabled',
+      { isPlatform: true, flagsLoaded: true, computeEnabled: false },
+      false,
+    ],
+    [
+      'syncs generic filters immediately while keeping Compute unavailable on self-hosted',
+      { isPlatform: false, computeEnabled: false },
+      false,
+    ],
+  ])('%s', (_, input, computeAvailable) => {
+    expect(getComputeLogsAvailability(input)).toEqual({
+      canQueryCompute: computeAvailable,
+      preserveComputeFilter: computeAvailable,
+      readyToSyncFilters: true,
+    })
+  })
+})
+
+describe('wrapIlikePattern', () => {
+  it.each([
+    ['foo', '%foo%'],
+    ['foo%', 'foo%'],
+    ['%foo', '%foo'],
+    ['fo_bar', 'fo_bar'],
+  ])('wraps %s only when it has no %% or _ wildcard', (value, expected) => {
+    expect(wrapIlikePattern(value)).toBe(expected)
   })
 })

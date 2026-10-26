@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -30,7 +29,7 @@ import {
   type GitHubConnection,
 } from '@/data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
@@ -58,20 +57,18 @@ const toIntegrationProjectConnection = (
   } as IntegrationProjectConnection['metadata'],
 })
 
-export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
+export const GitHubSection = ({ isProjectScoped = false }: { isProjectScoped?: boolean }) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
 
   const { can: canReadGitHubConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
-  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'integrations.github_connections'
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
-  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'integrations.github_connections'
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
 
   const { data: gitHubAuthorization } = useGitHubAuthorizationQuery({
@@ -121,7 +118,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   )
 
   return (
-    <PageSection>
+    <PageSection id="github">
       <PageSectionMeta>
         <div className="flex flex-1 items-start gap-5">
           <IntegrationSectionIcon title="github" />
@@ -150,6 +147,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                         disabled={!canUpdateGitHubConnection}
                         connection={toIntegrationProjectConnection(connection)}
                         type="GitHub"
+                        isProjectScoped={isProjectScoped}
                         onDeleteConnection={onDeleteGitHubConnection}
                       />
                     ))}
@@ -158,7 +156,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                     onClick={onAddGitHubConnection}
                     showNode={false}
                     disabled={!canCreateGitHubConnection}
-                    icon={<Plus />}
+                    icon={<PlusIcon />}
                   >
                     Add connection
                   </EmptyIntegrationConnection>
@@ -202,8 +200,7 @@ function GitHubOrgEmptyState({ disabled, onClick }: { disabled: boolean; onClick
         >
           {disabled ? (
             <ButtonTooltip
-              icon={<Plus />}
-              variant="default"
+              icon={<PlusIcon />}
               size="tiny"
               disabled
               tooltip={{
@@ -216,7 +213,7 @@ function GitHubOrgEmptyState({ disabled, onClick }: { disabled: boolean; onClick
               Add connection
             </ButtonTooltip>
           ) : (
-            <Button icon={<Plus />} variant="default" size="tiny" type="button" onClick={onClick}>
+            <Button icon={<PlusIcon />} size="tiny" type="button" onClick={onClick}>
               Add connection
             </Button>
           )}

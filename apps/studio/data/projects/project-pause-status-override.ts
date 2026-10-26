@@ -1,6 +1,6 @@
 import type { components } from '@/data/api'
 
-type PauseStatusResponse = components['schemas']['PauseStatusResponse']
+type PauseStatusResponse = components['schemas']['PauseStatusResponse_Output']
 
 export type PauseStateOverride = 'restorable' | 'restore-disabled'
 

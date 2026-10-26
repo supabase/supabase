@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -43,7 +42,7 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
 
 function HoursOrNeverText({ value }: { value: number }) {
@@ -71,13 +70,12 @@ export const SessionsAuthSettingsForm = () => {
   const [isUpdatingRefreshTokens, setIsUpdatingRefreshTokens] = useState(false)
   const [isUpdatingUserSessions, setIsUpdatingUserSessions] = useState(false)
 
-  const { can: canReadConfig } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { hasAccess: hasUserSessionsEntitlement, isLoading: isLoadingEntitlements } =
@@ -276,13 +274,11 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="SESSIONS_SINGLE_PER_USER"
                         label="Enforce single session per user"
                         description="If enabled, all but a user's most recently active session will be terminated."
                       >
                         <FormControl>
                           <Switch
-                            id="SESSIONS_SINGLE_PER_USER"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
@@ -300,14 +296,12 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="SESSIONS_TIMEBOX"
                         label="Time-box user sessions"
                         description={`The amount of time before a user is forced to sign in again. Use 0 for never. Maximum ${MAX_SESSIONS_TIMEBOX_HOURS} hours (1 year).`}
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
-                              id="SESSIONS_TIMEBOX"
                               type="number"
                               min={0}
                               {...field}
@@ -332,14 +326,12 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="SESSIONS_INACTIVITY_TIMEOUT"
                         label="Inactivity timeout"
                         description={`The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never. Maximum ${MAX_SESSIONS_INACTIVITY_TIMEOUT_HOURS} hours (1 year).`}
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
-                              id="SESSIONS_INACTIVITY_TIMEOUT"
                               type="number"
                               min={0}
                               {...field}
@@ -370,9 +362,7 @@ export const SessionsAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {userSessionsForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => userSessionsForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => userSessionsForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant={promptProPlanUpgrade ? 'default' : 'primary'}
@@ -413,14 +403,12 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="JWT_EXP"
                         label="Access token expiry time"
                         description="How long access tokens are valid for before they must be refreshed. Recommendation: 3600 seconds."
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
-                              id="JWT_EXP"
                               type="number"
                               min={1}
                               {...field}
@@ -437,9 +425,7 @@ export const SessionsAuthSettingsForm = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {accessTokenForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => accessTokenForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => accessTokenForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"
@@ -480,13 +466,11 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="REFRESH_TOKEN_ROTATION_ENABLED"
                         label="Detect and revoke potentially compromised refresh tokens"
                         description="Prevent replay attacks from potentially compromised refresh tokens."
                       >
                         <FormControl>
                           <Switch
-                            id="REFRESH_TOKEN_ROTATION_ENABLED"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
@@ -503,14 +487,12 @@ export const SessionsAuthSettingsForm = () => {
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                         label="Refresh token reuse interval"
                         description={`Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds. Maximum ${MAX_REFRESH_TOKEN_REUSE_INTERVAL_SECONDS} seconds (5 minutes).`}
                       >
                         <FormControl className="w-full">
                           <InputGroup>
                             <FormInputGroupInput
-                              id="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                               type="number"
                               min={0}
                               {...field}
@@ -527,9 +509,7 @@ export const SessionsAuthSettingsForm = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {refreshTokenForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => refreshTokenForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => refreshTokenForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"

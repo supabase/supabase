@@ -2,16 +2,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getTools } from './index'
 import { getMcpTools } from './mcp-tools'
+import { getSchemaTools } from './schema-tools'
 
 vi.mock('common', () => ({ IS_PLATFORM: true }))
 
 vi.mock('./mcp-tools', () => ({ getMcpTools: vi.fn() }))
-vi.mock('./studio-tools', () => ({ getStudioTools: vi.fn(() => ({ studio_tool: {} })) }))
+vi.mock('./studio-tools', () => ({
+  getStudioTools: vi.fn(() => ({ studio_tool: {} })),
+  getOptInTools: vi.fn(() => ({ opt_in_tool: {} })),
+}))
 vi.mock('./schema-tools', () => ({ getSchemaTools: vi.fn(() => ({ schema_tool: {} })) }))
 vi.mock('./incident-tools', () => ({ getIncidentTools: vi.fn(() => ({ incident_tool: {} })) }))
 vi.mock('./fallback-tools', () => ({ getFallbackTools: vi.fn(() => ({ fallback_tool: {} })) }))
 // Identity filter so assertions can check the raw merged tool set
-vi.mock('../tool-filter', () => ({ filterToolsByOptInLevel: vi.fn((tools) => tools) }))
+vi.mock('../tool-filter', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../tool-filter')>()),
+  filterToolsByOptInLevel: vi.fn((tools) => tools),
+}))
 
 const BASE_PARAMS = {
   projectRef: 'abcdefghijklmnopqrst',
@@ -25,7 +32,6 @@ const BASE_PARAMS = {
 
 describe('ai/tools getTools', () => {
   beforeEach(async () => {
-    vi.clearAllMocks()
     vi.mocked(getMcpTools).mockResolvedValue({ list_tables: {} } as any)
     // Reset to platform each test; the self-hosted test overrides to false.
     // Done here (not afterEach) so the spy can't leak across tests via order.
@@ -43,9 +49,21 @@ describe('ai/tools getTools', () => {
       signal: BASE_PARAMS.signal,
     })
     expect(tools).toHaveProperty('studio_tool')
+    expect(tools).toHaveProperty('opt_in_tool')
     expect(tools).toHaveProperty('list_tables')
     expect(tools).toHaveProperty('schema_tool')
     expect(tools).toHaveProperty('incident_tool')
+  })
+
+  it('passes authorization through to schema tools', async () => {
+    await getTools(BASE_PARAMS)
+
+    expect(getSchemaTools).toHaveBeenCalledWith({
+      projectRef: BASE_PARAMS.projectRef,
+      connectionString: BASE_PARAMS.connectionString,
+      authorization: BASE_PARAMS.authorization,
+      aiOptInLevel: BASE_PARAMS.aiOptInLevel,
+    })
   })
 
   it('degrades gracefully to the remaining tools when remote MCP fetch fails', async () => {
@@ -80,6 +98,7 @@ describe('ai/tools getTools', () => {
 
     expect(getMcpTools).not.toHaveBeenCalled()
     expect(tools).toHaveProperty('studio_tool')
+    expect(tools).not.toHaveProperty('opt_in_tool')
     expect(tools).toHaveProperty('fallback_tool')
     expect(tools).not.toHaveProperty('list_tables')
   })

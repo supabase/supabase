@@ -1,4 +1,4 @@
-import { ChevronRight, FileText, SquareCode } from 'lucide-react'
+import { ChevronRightIcon, FileTextIcon, Loader2Icon, SquareCodeIcon } from 'lucide-react'
 import {
   cn,
   Collapsible,
@@ -15,12 +15,11 @@ import {
   getCellLabel,
   getCellMonacoLanguage,
   getCellSourceText,
-  getEntryMetadataLine,
+  getEntryMetadata,
+  type NotebookDatabaseContext,
 } from './AssistantNotebookPreview.utils'
-import {
-  ExplorerQueryFooter,
-  ExplorerQueryResults,
-} from '@/components/interfaces/Explorer/ExplorerQuery'
+import { ExplorerQueryResults } from '@/components/interfaces/Explorer/ExplorerQuery'
+import { QueryResultFooter } from '@/components/interfaces/Explorer/QueryEditor/QueryResultFooter'
 import { QueryResultRenderer } from '@/components/interfaces/Explorer/QueryEditor/QueryResultRenderer'
 import type { QueryResult } from '@/components/interfaces/Explorer/types'
 import { DiffEditor } from '@/components/ui/DiffEditor'
@@ -34,6 +33,7 @@ export interface AssistantNotebookPreviewCellProps {
   /** Create and run previews omit per-row change glyphs. */
   mode: 'create' | 'update' | 'run'
   result?: QueryResult
+  databaseContext: NotebookDatabaseContext
 }
 
 /**
@@ -62,12 +62,13 @@ export const AssistantNotebookPreviewCell = ({
   onExpandedChange,
   mode,
   result,
+  databaseContext,
 }: AssistantNotebookPreviewCellProps) => {
   const marker = CHANGE_MARKERS[entry._tag]
   const isRemoved = entry._tag === 'removed'
   const cell = getEntryCell(entry)
   const label = getCellLabel(cell)
-  const metadata = getEntryMetadataLine(entry)
+  const metadata = getEntryMetadata(entry, databaseContext)
 
   return (
     <Collapsible open={isExpanded} onOpenChange={onExpandedChange}>
@@ -76,7 +77,7 @@ export const AssistantNotebookPreviewCell = ({
         className="group flex w-full items-center gap-2 bg-muted px-3 py-2 text-left transition-colors hover:bg-accent"
       >
         {mode === 'update' && <ChangeGlyph marker={marker} />}
-        <ChevronRight
+        <ChevronRightIcon
           size={12}
           className="shrink-0 text-foreground-lighter transition-transform group-data-[state=open]:rotate-90"
         />
@@ -89,11 +90,20 @@ export const AssistantNotebookPreviewCell = ({
         >
           {label}
         </span>
-        {metadata && (
+        {metadata.status !== 'hidden' ? (
           <span className="min-w-0 max-w-[45%] shrink truncate text-sm text-muted-foreground">
-            {metadata}
+            {metadata.status === 'loading' ? (
+              <span className="flex items-center gap-1.5">
+                <span className="animate-spin">
+                  <Loader2Icon aria-hidden size={12} />
+                </span>
+                Loading database…
+              </span>
+            ) : (
+              metadata.text
+            )}
           </span>
-        )}
+        ) : null}
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className="border-t">
@@ -127,17 +137,12 @@ const QueryCellResult = ({
       >
         <QueryResultRenderer view={cell.view ?? 'table'} result={result} chart={cell.chart} />
       </ExplorerQueryResults>
-      <ExplorerQueryFooter className="flex items-center gap-x-2">
-        <p>
-          {rowCount.toLocaleString()} {rowCount === 1 ? 'row' : 'rows'}
-        </p>
-        {rowLimit !== undefined && (
-          <>
-            <p>·</p>
-            <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
-          </>
-        )}
-      </ExplorerQueryFooter>
+      <QueryResultFooter
+        results={result.rows}
+        count={rowCount}
+        rowLimit={rowLimit}
+        fileName={cell.title}
+      />
     </>
   )
 }
@@ -167,7 +172,7 @@ const ChangeGlyph = ({ marker }: { marker: ChangeMarker }) => {
 
 /** Same icons the notebook tab uses for query vs markdown cells. */
 const CellTypeIcon = ({ cell }: { cell: CellWire | AgentCell }) => {
-  const Icon = cell._tag === 'markdown_cell' ? FileText : SquareCode
+  const Icon = cell._tag === 'markdown_cell' ? FileTextIcon : SquareCodeIcon
   return <Icon aria-hidden size={14} className="shrink-0 text-foreground-muted" />
 }
 

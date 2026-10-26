@@ -63,8 +63,7 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
   const tabsSnap = useTabsStateSnapshot()
   const isSQLSnippet = snippet.type === 'sql'
 
-  // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
-  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
   const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { id, name, description } = snippet
@@ -169,31 +168,26 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItemLayout name="name" layout="vertical" label="Name">
+              <FormItemLayout layout="vertical" label="Name">
                 <FormControl>
-                  <Input {...field} id="name" />
+                  <Input {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
           />
           <div className="flex w-full justify-end mt-2">
             <ButtonTooltip
-              variant="default"
               onClick={() => generateTitle()}
               size="tiny"
-              disabled={
-                isTitleGenerationLoading || !isApiKeySet || isHipaaProjectDisallowed || isAiOptedOut
-              }
+              disabled={isTitleGenerationLoading || !isApiKeySet || isAiOptedOut}
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: isHipaaProjectDisallowed
-                    ? 'This feature is not available for HIPAA projects.'
-                    : isAiOptedOut
-                      ? 'Your organization has opted out of AI features.'
-                      : isApiKeySet
-                        ? undefined
-                        : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                  text: isAiOptedOut
+                    ? 'Your organization has opted out of AI features.'
+                    : isApiKeySet
+                      ? undefined
+                      : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
                 },
               }}
             >
@@ -209,11 +203,10 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItemLayout name="description" layout="vertical" label="Description">
+              <FormItemLayout layout="vertical" label="Description">
                 <FormControl>
                   <Textarea
                     {...field}
-                    id="description"
                     rows={4}
                     placeholder="Describe query"
                     className="resize-none"
@@ -224,10 +217,15 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
           />
         </DialogSection>
         <DialogFooter>
-          <Button type="reset" variant="default" onClick={onCancel} disabled={isSubmitting}>
+          <Button type="reset" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
+          <Button
+            variant="primary"
+            type="submit"
+            loading={isSubmitting}
+            disabled={isSubmitting || !isDirty}
+          >
             Rename query
           </Button>
         </DialogFooter>

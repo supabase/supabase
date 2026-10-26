@@ -117,7 +117,7 @@ drop table if exists old_analytics;
 
 <Admonition type="caution">
 
-`DROP TABLE` acquires an `ACCESS EXCLUSIVE` lock, which blocks **all** other operations on the table, including reads. On a busy table, this can queue up behind long-running queries. See [Monitoring locks](#monitoring-locks) below.
+`DROP TABLE` acquires an `ACCESS EXCLUSIVE` lock, which blocks **all** other operations on the table, including reads. On a busy table, this can queue up behind long-running queries. See [Check for blocked queries](#check-for-blocked-queries) below.
 
 </Admonition>
 
@@ -200,6 +200,6 @@ The most efficient way to reclaim disk space, without locks, is to use [pg_repac
 ## Related links
 
 - [Safe Cascading Deletes](/docs/guides/database/postgres/cascade-deletes)
-- [Inspecting your Database](/docs/guides/database/inspect)
+- [Inspect the database](/docs/guides/observability/inspect)
 - [Understanding Database and Disk Size](/docs/guides/platform/database-size)
 - [Bloat in Postgres](/blog/postgres-bloat)

@@ -40,12 +40,28 @@ const rewrites = [
     destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
   },
   {
+    source: '/kb',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}`,
+  },
+  {
+    source: '/kb/:path*',
+    destination: `${process.env.NEXT_PUBLIC_KB_URL}/:path*`,
+  },
+  {
     source: '/evals',
     destination: 'https://supabase-evals.vercel.app',
   },
   {
     source: '/evals/:path*',
     destination: 'https://supabase-evals.vercel.app/:path*',
+  },
+  {
+    source: '/migrate/instantdb',
+    destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb',
+  },
+  {
+    source: '/migrate/instantdb/:path*',
+    destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb/:path*',
   },
 
   {
@@ -74,6 +90,15 @@ const rewrites = [
   {
     source: '/.well-known/security.txt',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
+  },
+  {
+    // legacy AI Catalog path; /.well-known/ard.json is the canonical source
+    source: '/.well-known/ai-catalog.json',
+    destination: '/.well-known/ard.json',
+  },
+  {
+    source: '/openapi.json',
+    destination: 'https://api.supabase.com/api/v1-json',
   },
   { source: '/feed.xml', destination: `/rss.xml` },
 ]

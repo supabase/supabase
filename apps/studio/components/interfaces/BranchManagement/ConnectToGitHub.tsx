@@ -1,7 +1,6 @@
 import { useParams } from 'common'
-import { Github } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Button } from 'ui'
+import { Button, GithubIcon } from 'ui'
 
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
@@ -48,7 +47,7 @@ export const ConnectToGitHub = () => {
           Keep this preview branch in sync with a chosen GitHub branch
         </p>
       </div>
-      <Button variant="default" icon={<Github />} onClick={onClick}>
+      <Button icon={<GithubIcon />} onClick={onClick}>
         {showAuthorizeCta ? 'Authorize' : 'Configure'}
       </Button>
     </div>

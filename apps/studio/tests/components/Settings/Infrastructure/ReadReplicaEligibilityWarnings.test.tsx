@@ -29,6 +29,7 @@ const eligibility = (delta: Record<string, unknown>) => ({
   isWalgNotEnabled: false,
   isProWithSpendCapEnabled: false,
   isReachedMaxReplicas: false,
+  isHighAvailability: false,
   maxNumberOfReplicas: READ_REPLICAS_MAX_COUNT,
   ...delta,
 })

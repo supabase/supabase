@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
 import {
@@ -12,7 +11,7 @@ import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from '@/lib/void'
@@ -21,10 +20,8 @@ export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const { can: canReadOAuthApps } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'oauth_apps',
-    undefined,
+  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ,
     {
       organizationSlug: org?.slug,
       projectRef: null,
@@ -83,13 +80,19 @@ export const useInstalledIntegrations = () => {
     connectionString: project?.connectionString,
   })
 
-  const isHooksEnabled = schemas.some((schema) => schema.name === 'supabase_functions')
+  const isHooksEnabled =
+    !!extensions.find((ext) => ext.name === 'pg_net')?.installed_version &&
+    schemas.some((schema) => schema.name === 'supabase_functions')
 
   const installedIntegrations = useMemo(() => {
     return allIntegrations
       .filter((integration) => {
         if (integration.id === 'webhooks') return isHooksEnabled
         if (integration.id === 'data_api') return true
+        // Availability is already gated by the org allow-list in `useAvailableIntegrations`, and
+        // whether Warehouse is set up on this project is handled inside its tabs, following the same split
+        // Data API uses.
+        if (integration.id === 'warehouse') return true
         if (integration.id === 'stripe_sync_engine') {
           return isStripeSyncEngineInstalled(schemas)
         }

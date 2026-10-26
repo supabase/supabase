@@ -8,7 +8,13 @@ import {
   type PaginationState,
   type SortingState,
 } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight, Copy, RotateCcw, Search } from 'lucide-react'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CopyIcon,
+  RotateCcwIcon,
+  SearchIcon,
+} from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   Badge,
@@ -74,10 +80,8 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   },
   {
     accessorKey: 'eventType',
-    header: ({ column }) => (
-      <TanStackTableHeadSort column={column}>Event type</TanStackTableHeadSort>
-    ),
-    cell: ({ row }) => <code className="text-code-inline">{row.original.eventType}</code>,
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Event</TanStackTableHeadSort>,
+    cell: ({ row }) => <code className="text-xs">{row.original.eventType}</code>,
   },
   {
     accessorKey: 'responseCode',
@@ -123,10 +127,9 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
         <div className="flex h-full items-center justify-end">
           {row.original.status !== 'success' ? (
             <ButtonTooltip
-              variant="default"
               size="tiny"
               className="w-7 shrink-0 hit-area-2"
-              icon={<RotateCcw />}
+              icon={<RotateCcwIcon />}
               aria-label={`Retry ${row.original.id}`}
               tooltip={{ content: { side: 'top', text: 'Retry' } }}
               onClick={(event) => {
@@ -137,10 +140,9 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
             />
           ) : (
             <Button
-              variant="default"
               size="tiny"
               className="w-7 shrink-0 hit-area-2 invisible pointer-events-none"
-              icon={<RotateCcw />}
+              icon={<RotateCcwIcon />}
               aria-hidden
               tabIndex={-1}
             />
@@ -161,7 +163,6 @@ export const PlatformWebhooksEndpointDetails = ({
   onRetryDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
-  const hasName = selectedEndpoint.name.trim().length > 0
   const hasDescription = selectedEndpoint.description.trim().length > 0
   const deliverySearchRef = useRef<HTMLInputElement>(null)
   const [sorting, setSorting] = useState<SortingState>(DEFAULT_DELIVERY_SORTING)
@@ -207,8 +208,6 @@ export const PlatformWebhooksEndpointDetails = ({
         <Card className="overflow-hidden">
           <CardContent className="pb-5">
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
-              {hasName && <DetailItem label="Name">{selectedEndpoint.name}</DetailItem>}
-
               <DetailItem label="URL" ddClassName="flex items-start gap-2 text-sm">
                 <span className="break-all">{selectedEndpoint.url}</span>
                 <ShortcutTooltip
@@ -219,7 +218,7 @@ export const PlatformWebhooksEndpointDetails = ({
                     variant="text"
                     size="tiny"
                     className="mt-0.5 shrink-0 h-5 w-5 p-0"
-                    icon={<Copy size={12} />}
+                    icon={<CopyIcon size={12} />}
                     aria-label="Copy endpoint URL"
                     onClick={onCopyUrl}
                   />
@@ -235,10 +234,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   ? ['All events (*)']
                   : selectedEndpoint.eventTypes
                 ).map((eventType) => (
-                  <code
-                    key={eventType}
-                    className="text-code-inline rounded-md border px-3 py-1.5 text-2xs"
-                  >
+                  <code key={eventType} className="rounded-md border px-3 py-1.5 text-2xs">
                     {eventType}
                   </code>
                 ))}
@@ -250,6 +246,7 @@ export const PlatformWebhooksEndpointDetails = ({
                     {selectedEndpoint.customHeaders.map((header) => (
                       <div
                         key={header.id}
+                        data-code-style="plain"
                         className="px-2 py-2 font-mono font-medium text-xs flex items-center gap-2 flex-wrap"
                       >
                         <code className="text-code_block-4">{header.key}:</code>
@@ -277,7 +274,7 @@ export const PlatformWebhooksEndpointDetails = ({
             ref={deliverySearchRef}
             placeholder="Search deliveries"
             size="tiny"
-            icon={<Search />}
+            icon={<SearchIcon />}
             value={deliverySearch}
             className="w-full lg:w-52"
             onChange={(event) => onDeliverySearchChange(event.target.value)}
@@ -363,19 +360,17 @@ export const PlatformWebhooksEndpointDetails = ({
               </p>
               <div className="flex items-center gap-x-2" aria-label="Pagination">
                 <Button
-                  icon={<ChevronLeft />}
+                  icon={<ChevronLeftIcon />}
                   className="w-7 hit-area-2"
                   aria-label="Previous page"
-                  variant="default"
                   size="tiny"
                   disabled={!table.getCanPreviousPage()}
                   onClick={() => table.previousPage()}
                 />
                 <Button
-                  icon={<ChevronRight />}
+                  icon={<ChevronRightIcon />}
                   className="w-7 hit-area-2"
                   aria-label="Next page"
-                  variant="default"
                   size="tiny"
                   disabled={!table.getCanNextPage()}
                   onClick={() => table.nextPage()}

@@ -1,9 +1,12 @@
+import { QueryClient } from '@tanstack/react-query'
 import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerQueryTab } from '../ExplorerQueryTab'
+import { projectKeys } from '@/data/projects/keys'
 import type { ReadReplicasData } from '@/data/read-replicas/replicas-query'
 import { explorerQueryState } from '@/state/explorer-query'
 import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
@@ -12,9 +15,14 @@ import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 
 const testContext = vi.hoisted(() => ({
+  track: vi.fn(),
   flags: { otelLegacyLogs: true } as Record<string, boolean>,
   params: { ref: 'default', id: 'query-test' } as { ref?: string; id?: string },
+  /** Simulated editor selection — the mocked CodeEditor's fake editor reads this. */
+  selectedText: undefined as string | undefined,
 }))
+
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => testContext.track }))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -30,16 +38,51 @@ vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
   CodeEditor: ({
     value,
     onInputChange,
+    onMount,
   }: {
     value: string
     onInputChange?: (value: string | undefined) => void
-  }) => (
-    <textarea
-      aria-label="SQL editor"
-      value={value}
-      onChange={(e) => onInputChange?.(e.target.value)}
-    />
-  ),
+    onMount?: (editor: any, monaco: any) => void
+  }) => {
+    // Kept fresh via a ref (rather than closed over) so the fake editor's
+    // `getValue` reflects edits made after mount, same as the real editor would.
+    const valueRef = useRef(value)
+    valueRef.current = value
+
+    useEffect(() => {
+      const hasSelection = testContext.selectedText !== undefined
+      // Matches this instance's selection at the moment it mounts — a fresh editor
+      // instance (e.g. after "Show query" remounts it) has no memory of a prior
+      // instance's selection, so this must be read fresh rather than carried over.
+      const selection = hasSelection
+        ? { startLineNumber: 1, endLineNumber: 2, startColumn: 1, endColumn: 5 }
+        : null
+
+      onMount?.(
+        {
+          getValue: () => valueRef.current,
+          getSelection: () => selection,
+          getModel: () => ({ getValueInRange: () => testContext.selectedText }),
+          onDidBlurEditorWidget: () => () => {},
+          // Intentionally never invoked here — the real editor only fires this on a
+          // subsequent user-driven selection change, not eagerly on mount. Tests that
+          // need to simulate a live selection change should call this directly.
+          onDidChangeCursorSelection: () => ({ dispose: () => {} }),
+          addAction: () => {},
+        },
+        { KeyMod: { CtrlCmd: 1, Shift: 2 }, KeyCode: { KeyK: 3, Enter: 4 } }
+      )
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    return (
+      <textarea
+        aria-label="SQL editor"
+        value={value}
+        onChange={(e) => onInputChange?.(e.target.value)}
+      />
+    )
+  },
 }))
 
 vi.mock('../QueryEditor/QuerySourceMenu', () => ({
@@ -55,6 +98,20 @@ vi.mock('../QueryEditor/QuerySourceMenu', () => ({
     </div>
   ),
 }))
+
+// react-resizable-panels needs real layout to mount panel content, which jsdom can't provide.
+vi.mock('ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('ui')>()
+  const Passthrough = ({ children, ...props }: { children?: ReactNode }) => (
+    <div {...props}>{children}</div>
+  )
+  return {
+    ...actual,
+    ResizableHandle: (props: Record<string, unknown>) => <div {...props} />,
+    ResizablePanel: Passthrough,
+    ResizablePanelGroup: Passthrough,
+  }
+})
 
 vi.mock('../QueryEditor/DisplaySettingsButton', () => ({
   DisplaySettingsButton: ({
@@ -103,12 +160,45 @@ vi.mock('../QueryEditor/QueryResultChart', () => ({
   QueryResultChart: () => <div>Chart results</div>,
 }))
 
-const renderQueryTab = (tabsState = createTabsState('default')) =>
+const renderQueryTab = (tabsState = createTabsState('default'), queryClient?: QueryClient) =>
   customRender(
     <TabsStateContext.Provider value={tabsState}>
       <ExplorerQueryTab />
-    </TabsStateContext.Provider>
+    </TabsStateContext.Provider>,
+    { queryClient }
   )
+
+/**
+ * By the time a query tab can auto-run, its project is already cached - the Explorer home tab
+ * that created the draft required the same project data to do so. Priming the cache here
+ * mirrors that instead of racing this test against a cold fetch of `/platform/projects/:ref`.
+ */
+const createWarmProjectQueryClient = (ref: string = 'default') => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  })
+  queryClient.setQueryData(projectKeys.detail(ref), {
+    id: 1,
+    ref,
+    organization_id: 1,
+    name: 'Test Project',
+    status: 'ACTIVE_HEALTHY',
+    cloud_provider: 'AWS',
+    region: 'us-east-1',
+    db_host: `db.${ref}.supabase.co`,
+    restUrl: `https://${ref}.supabase.co/rest/v1/`,
+    inserted_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+    subscription_id: 'sub_123',
+    is_branch_enabled: false,
+    is_physical_backups_enabled: false,
+    high_availability: false,
+    integration_source: null,
+    connectionString: 'postgresql://postgres@localhost:5432/postgres',
+    is_hibernating: false,
+  })
+  return queryClient
+}
 
 const createDraft = (
   source:
@@ -117,7 +207,8 @@ const createDraft = (
         _tag: 'logs'
         time_range: { _tag: 'relative_time_range'; amount: number; unit: 'hour' }
       },
-  sql: string = 'select 1'
+  sql: string = 'select 1',
+  { autoRun = false }: { autoRun?: boolean } = {}
 ) => {
   explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
   explorerQueryState.createDraft({
@@ -125,13 +216,38 @@ const createDraft = (
     projectRef: 'default',
     sql,
     source,
+    autoRun,
   })
 }
 
+/**
+ * Mocks the generic pg-meta query endpoint and returns the SQL of every executed query.
+ * Background prefetches (intellisense keywords/functions/schemas/table-columns, event
+ * triggers) hit the same endpoint, distinguished from an actual run by their non-empty
+ * `key` search param — an executed query's `key` is `''`.
+ */
+const mockExecutedQueries = () => {
+  const executedQueries: string[] = []
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: async ({ request }) => {
+      const key = new URL(request.url).searchParams.get('key')
+      if (key !== '') return HttpResponse.json([])
+      const { query } = (await request.json()) as { query: string }
+      executedQueries.push(query)
+      return HttpResponse.json([])
+    },
+  })
+  return executedQueries
+}
+
 beforeEach(() => {
+  testContext.track.mockClear()
   setupSqlEditorMocks()
   testContext.flags.otelLegacyLogs = true
   testContext.params = { ref: 'default', id: 'query-test' }
+  testContext.selectedText = undefined
   explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
 })
 
@@ -145,6 +261,43 @@ describe('QueryTab execution', () => {
 
     expect(screen.getByRole('status', { name: 'Loading query' })).toBeInTheDocument()
     expect(screen.queryByText('Query draft not found')).not.toBeInTheDocument()
+  })
+
+  it('auto-runs a draft created with autoRun, then clears the flag', async () => {
+    // `/platform/pg-meta/:ref/query` is also hit by unrelated background metadata fetches
+    // (autocomplete definitions, event triggers, ...), so the run is asserted via the stored
+    // result it produces rather than by counting requests to that shared endpoint.
+    createDraft({ _tag: 'database' }, 'select 1', { autoRun: true })
+
+    renderQueryTab(createTabsState('default'), createWarmProjectQueryClient())
+
+    await waitFor(() => expect(explorerQueryState.results['query-test']).toBeDefined())
+    expect(explorerQueryState.results['query-test']).toMatchObject({ rows: [] })
+    expect(explorerQueryState.drafts['query-test']?.pendingAutoRun).toBe(false)
+    const queryEvents = testContext.track.mock.calls.filter(([action]) =>
+      action.startsWith('explorer_query_')
+    )
+    expect(queryEvents.map(([action]) => action)).toEqual([
+      'explorer_query_submitted',
+      'explorer_query_completed',
+    ])
+    expect(queryEvents[0][1]).toMatchObject({
+      surface: 'query_tab',
+      queryId: 'query-test',
+      source: 'database',
+    })
+    expect(queryEvents[1][1].runId).toBe(queryEvents[0][1].runId)
+    expect(queryEvents[0][1]).not.toHaveProperty('sql')
+  })
+
+  it('does not auto-run a draft created without autoRun', async () => {
+    createDraft({ _tag: 'database' })
+
+    renderQueryTab()
+    await screen.findByRole('button', { name: 'Run' })
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(explorerQueryState.results['query-test']).toBeUndefined()
   })
 
   it('records an unavailable error and skips the logs endpoint when the flag is off', async () => {
@@ -172,6 +325,53 @@ describe('QueryTab execution', () => {
       await screen.findByText("Error: Querying logs isn't available for this project yet.")
     ).toBeInTheDocument()
     expect(requests).toHaveLength(0)
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_query_'))
+    ).toEqual([
+      [
+        'explorer_query_submitted',
+        expect.objectContaining({ source: 'logs', surface: 'query_tab' }),
+        expect.objectContaining({ project: 'default' }),
+      ],
+      [
+        'explorer_query_failed',
+        expect.objectContaining({ failureReason: 'logs_unavailable' }),
+        expect.objectContaining({ project: 'default' }),
+      ],
+    ])
+  })
+
+  it('records a terminal failure when database execution rejects', async () => {
+    createDraft({ _tag: 'database' })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: ({ request }) =>
+        new URL(request.url).searchParams.get('key') === ''
+          ? HttpResponse.json({ message: 'Query failed' }, { status: 500 })
+          : HttpResponse.json([]),
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    await waitFor(() =>
+      expect(
+        testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_query_'))
+      ).toHaveLength(2)
+    )
+    const [submitted, failed] = testContext.track.mock.calls.filter(([action]) =>
+      action.startsWith('explorer_query_')
+    )
+    expect(submitted[0]).toBe('explorer_query_submitted')
+    expect(failed[0]).toBe('explorer_query_failed')
+    expect(failed[1]).toMatchObject({
+      runId: submitted[1].runId,
+      failureReason: 'execution_error',
+    })
+    expect(failed[1]).not.toHaveProperty('message')
   })
 
   it('exposes and persists the shared notebook result view options', async () => {
@@ -211,25 +411,11 @@ describe('QueryTab execution', () => {
         return HttpResponse.json<ReadReplicasData>([])
       },
     })
-    // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
-    // fetches against this same generic pg-meta query endpoint (differentiated by the `key`
-    // search param) as soon as the editor mounts — those are expected and unrelated to the
-    // actual run. Only a request with no recognized intellisense `key` counts as an execution.
-    const INTELLISENSE_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
-    const requests: Request[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: ({ request }) => {
-        const key = new URL(request.url).searchParams.get('key')
-        if (!key || !INTELLISENSE_KEYS.includes(key)) requests.push(request)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
-    expect(runButton).toBeDisabled()
+    expect(runButton).toBeAriaDisabled()
 
     act(() => releaseReplicas())
     await waitFor(() => expect(runButton).toBeEnabled())
@@ -238,7 +424,7 @@ describe('QueryTab execution', () => {
     expect(
       await screen.findByText('Error: Unable to run query: Connection string is missing')
     ).toBeInTheDocument()
-    expect(requests).toHaveLength(0)
+    expect(executedQueries).toHaveLength(0)
   })
 
   it('resolves a relative logs range before sending the request', async () => {
@@ -305,23 +491,14 @@ describe('QueryTab execution', () => {
     renderQueryTab(tabsState)
 
     const sqlEditor = await screen.findByRole('textbox', { name: 'SQL editor' })
-    await userEvent.type(sqlEditor, ' where true')
+    await userEvent.type(sqlEditor, 'x')
 
     await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
   })
 
   it('blocks a destructive query behind a confirmation modal, then runs it once confirmed', async () => {
     createDraft({ _tag: 'database' }, 'delete from foo')
-    const executedQueries: string[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: async ({ request }) => {
-        const { query } = (await request.json()) as { query: string }
-        if (query.trim().toLowerCase().startsWith('delete')) executedQueries.push(query)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
@@ -330,6 +507,9 @@ describe('QueryTab execution', () => {
 
     expect(await screen.findByText('Potential issue detected')).toBeInTheDocument()
     expect(executedQueries).toHaveLength(0)
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_query_'))
+    ).toEqual([])
 
     await userEvent.click(screen.getByRole('button', { name: 'Run query' }))
 
@@ -338,16 +518,7 @@ describe('QueryTab execution', () => {
 
   it('cancels a blocked query without running it', async () => {
     createDraft({ _tag: 'database' }, 'update foo set bar = 1')
-    const executedQueries: string[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: async ({ request }) => {
-        const { query } = (await request.json()) as { query: string }
-        if (query.trim().toLowerCase().startsWith('update')) executedQueries.push(query)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
@@ -364,16 +535,7 @@ describe('QueryTab execution', () => {
 
   it('runs a CREATE TABLE query with RLS enabled once "Run and enable RLS" is chosen', async () => {
     createDraft({ _tag: 'database' }, 'create table foo (id int)')
-    const executedQueries: string[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: async ({ request }) => {
-        const { query } = (await request.json()) as { query: string }
-        if (query.trim().toLowerCase().startsWith('create table')) executedQueries.push(query)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
@@ -388,5 +550,76 @@ describe('QueryTab execution', () => {
     await waitFor(() => expect(executedQueries).toHaveLength(1))
     expect(executedQueries[0]).toContain('create table foo (id int)')
     expect(executedQueries[0]).toContain('ALTER TABLE foo ENABLE ROW LEVEL SECURITY;')
+  })
+
+  it('runs the full query from the Run button even when text is selected', async () => {
+    createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
+    testContext.selectedText = 'select 2;'
+
+    const executedQueries = mockExecutedQueries()
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    await waitFor(() => expect(executedQueries).toHaveLength(1))
+    expect(executedQueries[0]).toContain('select 1')
+    expect(executedQueries[0]).toContain('select 2')
+  })
+
+  it('runs only the selected text from the Run selected SQL menu item', async () => {
+    createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
+    testContext.selectedText = 'select 2;'
+
+    const executedQueries = mockExecutedQueries()
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+
+    await userEvent.click(screen.getByRole('button', { name: 'More actions' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Run selected SQL' }))
+
+    await waitFor(() => expect(executedQueries).toHaveLength(1))
+    expect(executedQueries[0]).toContain('select 2')
+    expect(executedQueries[0]).not.toContain('select 1')
+  })
+
+  it('drops the stale "Run selected SQL" state once the query panel is hidden and shown again', async () => {
+    createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
+    testContext.selectedText = 'select 2;'
+
+    const executedQueries = mockExecutedQueries()
+
+    renderQueryTab()
+    await userEvent.click(await screen.findByRole('button', { name: 'More actions' }))
+    expect(await screen.findByRole('menuitem', { name: 'Run selected SQL' })).toBeEnabled()
+    await userEvent.keyboard('{Escape}')
+
+    // Hiding the query panel unmounts CodeEditor entirely. Simulate the selection being
+    // gone by the time it's shown again (a fresh editor instance has no selection yet).
+    const hideQueryButton = document.querySelector('.lucide-eye-off')?.closest('button')
+    expect(hideQueryButton).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(hideQueryButton as HTMLButtonElement)
+    testContext.selectedText = undefined
+
+    const showQueryButton = document.querySelector('.lucide-eye')?.closest('button')
+    expect(showQueryButton).toBeInstanceOf(HTMLButtonElement)
+    await userEvent.click(showQueryButton as HTMLButtonElement)
+
+    await userEvent.click(screen.getByRole('button', { name: 'More actions' }))
+    expect(await screen.findByRole('menuitem', { name: 'Run selected SQL' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
+    await userEvent.keyboard('{Escape}')
+
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await userEvent.click(runButton)
+
+    await waitFor(() => expect(executedQueries).toHaveLength(1))
+    expect(executedQueries[0]).toContain('select 1')
+    expect(executedQueries[0]).toContain('select 2')
   })
 })

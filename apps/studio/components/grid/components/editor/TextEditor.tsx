@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Maximize } from 'lucide-react'
+import { MaximizeIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -178,10 +178,9 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
-                          variant="default"
                           className="px-1"
                           onClick={() => onSelectExpand()}
-                          icon={<Maximize size={12} strokeWidth={2} />}
+                          icon={<MaximizeIcon size={12} strokeWidth={2} />}
                           aria-label="Expand editor"
                         />
                       </TooltipTrigger>
@@ -190,7 +189,6 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     {isNullable && (
                       <Button
                         size="tiny"
-                        variant="default"
                         type="button"
                         onClick={() => {
                           // Skip confirmation when queue mode is enabled - changes can be reviewed/cancelled

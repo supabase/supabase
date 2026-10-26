@@ -8,12 +8,13 @@ import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
+import { MobileHeaderSlotsContext } from '~/layouts/MobileHeaderSlots'
 // End of third-party imports
 
 import { isFeatureEnabled } from 'common'
 import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
-import { memo, useEffect, type PropsWithChildren, type ReactNode } from 'react'
+import { memo, useEffect, useState, type PropsWithChildren, type ReactNode } from 'react'
 import { cn } from 'ui'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
@@ -59,7 +60,7 @@ const levelsData = {
   },
   telemetry: {
     icon: 'telemetry',
-    name: 'Telemetry',
+    name: 'Observability',
   },
   realtime: {
     icon: 'realtime',
@@ -109,6 +110,10 @@ const levelsData = {
     icon: 'reference-javascript',
     name: 'Server Reference v1.0',
   },
+  reference_middleware_v1: {
+    icon: 'reference-javascript',
+    name: 'Middleware Reference v1.0',
+  },
   reference_javascript_v1: {
     icon: 'reference-javascript',
     name: 'JavaScript Reference v1.0',
@@ -132,6 +137,10 @@ const levelsData = {
   reference_csharp_v1: {
     icon: 'reference-csharp',
     name: 'C# Reference v1.0',
+  },
+  reference_csharp_v8: {
+    icon: 'reference-csharp',
+    name: 'C# Reference v8.0',
   },
   reference_python_v2: {
     icon: 'reference-python',
@@ -210,6 +219,8 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
           mobileMenuOpen && 'mt-0.5'
         )}
         onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
+        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+        aria-expanded={mobileMenuOpen}
       >
         <div
           className={cn(
@@ -324,11 +335,11 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
     >
       <div
         className={cn(
-          'top-0 lg:top-(--header-height)',
+          'top-0',
           'h-full',
-          'relative lg:sticky',
+          'relative',
           'w-full lg:w-auto',
-          'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
+          'h-fit lg:h-full overflow-y-scroll lg:overflow-auto',
           'overscroll-contain',
           'backdrop-blur-sm backdrop-filter bg-background',
           'flex flex-col grow'
@@ -393,6 +404,7 @@ function SidebarSkeleton({
   const menuId = _menuId ?? getMenuId(pathname)
 
   const mobileMenuOpen = useMenuMobileOpen()
+  const [tocSlot, setTocSlot] = useState<HTMLDivElement | null>(null)
 
   return (
     <div className={cn('flex flex-row h-full relative', className)}>
@@ -413,21 +425,16 @@ function SidebarSkeleton({
         >
           <TopNavBar />
         </div>
-        <div
-          className={cn(
-            'sticky',
-            'transition-all top-0 z-10',
-            'backdrop-blur-sm backdrop-filter bg-background'
-          )}
-        >
+        <div className={cn('sticky', 'transition-all top-0 z-10', 'bg-background')}>
           {hideSideNav ? null : menuName ? (
             <MobileHeader menuName={menuName} />
           ) : (
             <MobileHeader menuId={menuId} />
           )}
+          <div ref={setTocSlot} className="md:hidden" />
         </div>
         <div className="grow">
-          {children}
+          <MobileHeaderSlotsContext value={{ tocSlot }}>{children}</MobileHeaderSlotsContext>
           {!hideFooter && <Footer />}
         </div>
         <MobileMenuBackdrop />

@@ -1,16 +1,16 @@
 import { format } from 'date-fns'
 import dayjs from 'dayjs'
-import { ArrowRight, Calendar } from 'lucide-react'
+import { ArrowRightIcon, CalendarIcon } from 'lucide-react'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
+  ButtonProps,
   Calendar as CalendarPicker,
   Popover,
   PopoverContent,
   PopoverSeparator,
   PopoverTrigger,
 } from 'ui'
-import { ButtonProps } from 'ui/src/components/Button/Button'
 
 import { TimeSplitInput } from './TimeSplitInput'
 import type { DatePickerToFrom } from '@/components/interfaces/Settings/Logs/Logs.types'
@@ -218,7 +218,7 @@ export function DatePicker({
         <Button
           title={triggerButtonTitle}
           variant={triggerButtonVariant}
-          icon={<Calendar />}
+          icon={<CalendarIcon />}
           size={triggerButtonSize}
           className={triggerButtonClassName}
         >
@@ -265,7 +265,7 @@ export function DatePicker({
                       />
                     </div>
                     <div className="flex items-center justify-center w-12 text-foreground-lighter">
-                      <ArrowRight strokeWidth={1.5} size={14} />
+                      <ArrowRightIcon strokeWidth={1.5} size={14} />
                     </div>
                   </>
                 )}
@@ -316,12 +316,10 @@ export function DatePicker({
           })}
           <PopoverSeparator />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
-            {!hideClear && (
-              <Button variant="default" onClick={() => handleClear()}>
-                Clear
-              </Button>
-            )}
-            <Button onClick={() => handleSubmit()}>Apply</Button>
+            {!hideClear && <Button onClick={() => handleClear()}>Clear</Button>}
+            <Button variant="primary" onClick={() => handleSubmit()}>
+              Apply
+            </Button>
           </div>
         </>
       </PopoverContent>

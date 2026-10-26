@@ -161,17 +161,21 @@ updated_at       | 2022-12-14 02:51:13.938396+00
 
 </details>
 
+### Deleting secrets
+
+To delete a secret, replace the example ID with your secret's ID:
+
+```sql
+delete from vault.secrets
+where id = '7095d222-efe5-4cd5-b5c6-5755b451e223'
+returning id, name;
+```
+
+Deleting the secret also removes it from the `vault.decrypted_secrets` view.
+
 ## Deep dive
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/QHLPNDrdN2w"
-    title="YouTube video player"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen
-  ></iframe>
-</div>
+<YouTube id="QHLPNDrdN2w" title="Storing secrets with Supabase Vault" />
 
 As we mentioned, Vault stores secrets in an authenticated encrypted form. There are some details around that you may be curious about. What does authenticated mean? Where is the encryption key stored? This section explains those details.
 

@@ -5,7 +5,10 @@ this repo owns.
 
 Use this suite when you change guides, troubleshooting entries, or shared
 partials under `apps/docs/content`. It loads each in-scope page, checks that the
-article renders, and verifies that docs-owned links in the article resolve.
+article renders, and verifies that docs-owned links in the article resolve. For
+links with an anchor, it also checks that the target page's article has an element
+with that `id` or an `a[name]` with that value, including same-page `#anchor`
+links.
 
 This page covers:
 
@@ -211,8 +214,10 @@ owned docs content, partials, or `e2e/docs`.
 1. Diff the pull request against its base branch and resolve in-scope page paths.
 2. Skip Playwright when nothing in scope changed.
 3. When `apps/docs` changed, wait for the Vercel docs preview and set
-   `PLAYWRIGHT_BASE_URL` to that preview. When no preview resolves, skip rather than
-   test against production.
+   `PLAYWRIGHT_BASE_URL` to that preview. If Vercel skipped the head commit's
+   build as not affected, the newest ready preview from an earlier commit of the
+   pull request is used instead. When no preview resolves, skip rather than test
+   against production.
 4. Run the suite with `DOCS_E2E_PAGE_PATHS` set to the resolved list.
 
 Draft pull requests stay skipped until you mark them ready for review. Manual

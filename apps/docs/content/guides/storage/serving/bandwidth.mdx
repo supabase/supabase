@@ -10,9 +10,9 @@ sidebar_label: 'Bandwidth & Storage Egress'
 
 Free Plan Organizations in Supabase have a limit of 10 GB of bandwidth (5 GB cached + 5 GB uncached). This limit is calculated by the sum of all the data transferred from the Supabase servers to the client. This includes all the data transferred from the database, storage, and functions.
 
-### Checking Storage egress requests in the SQL Editor
+### Query storage egress requests [#checking-storage-egress-requests-in-the-sql-editor]
 
-You can use the following query to get the number of requests for each object. Run it in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs) with the query source set to **Logs**.
+You can use the following query to get the number of requests for each object. Run it in the [Explorer](/dashboard/project/_/explorer) after selecting **Run SQL**, query source **Logs**, and a time range.
 
 ```sql
 select

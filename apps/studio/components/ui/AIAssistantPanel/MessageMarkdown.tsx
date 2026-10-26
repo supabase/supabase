@@ -97,9 +97,7 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children?: R
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="default" className="opacity-100">
-              Cancel
-            </Button>
+            <Button className="opacity-100">Cancel</Button>
           </DialogClose>
           <DialogClose asChild>
             <Button asChild variant="primary" className="opacity-100">
@@ -130,7 +128,7 @@ const baseMarkdownComponents = {
   ),
 }
 
-export function MessageMarkdown({
+export const MessageMarkdown = memo(function MessageMarkdown({
   id,
   isLoading,
   readOnly,
@@ -173,7 +171,7 @@ export function MessageMarkdown({
       {markdownSource}
     </Streamdown>
   )
-}
+})
 
 export const MarkdownPre = ({
   children,

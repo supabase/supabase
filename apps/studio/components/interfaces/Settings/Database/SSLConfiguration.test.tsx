@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components, paths } from 'api-types'
 import { HttpResponse } from 'msw'
@@ -8,8 +8,8 @@ import { SSLConfiguration } from './SSLConfiguration'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse']
-type SslEnforcementResponse = components['schemas']['SslEnforcementResponse']
+type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Output']
+type SslEnforcementResponse = components['schemas']['SslEnforcementResponse_Output']
 type JitAccessConfigResponse =
   paths['/v1/projects/{ref}/jit-access']['get']['responses'][200]['content']['application/json']
 
@@ -20,8 +20,9 @@ const { mockUseAsyncCheckPermissions, mockUseHighAvailability, mockUseSelectedPr
     mockUseSelectedProjectQuery: vi.fn(),
   }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { DATABASE_SSL_CONFIG_WRITE: 'database_ssl_config_write' } },
 }))
 
 vi.mock('@/hooks/misc/useHighAvailability', () => ({
@@ -87,8 +88,6 @@ function mockSSLEnforcement(config: SslEnforcementResponse) {
 
 describe('SSLConfiguration', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseSelectedProjectQuery.mockReturnValue({ data: { id: 1, ref: 'default' } })
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
     mockProjectSettings()
@@ -110,11 +109,10 @@ describe('SSLConfiguration', () => {
     // Nothing is loading for HA projects, so there is no announcement to make
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
 
-    // The tooltip trigger is the wrapper around the (disabled) switch
-    await userEvent.hover(sslSwitch.parentElement!)
-    expect((await screen.findAllByText(HA_TOOLTIP, {}, { timeout: 2000 })).length).toBeGreaterThan(
-      0
-    )
+    // The tooltip trigger is the wrapper around the (disabled) switch. Focus opens a Radix
+    // tooltip without the hover delay.
+    fireEvent.focus(sslSwitch.parentElement!)
+    expect((await screen.findAllByText(HA_TOOLTIP)).length).toBeGreaterThan(0)
 
     expect(sslEnforcementRequests.count).toBe(0)
   })

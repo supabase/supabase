@@ -11,23 +11,6 @@ import { addAPIMock } from '@/tests/lib/msw'
 const multilineValue = '-----BEGIN CERTIFICATE-----\nline2\nline3\n-----END CERTIFICATE-----'
 
 describe('AddNewSecretForm', () => {
-  test('renders the value field as a textarea so multiline pastes are preserved', () => {
-    addAPIMock({
-      method: 'get',
-      path: '/v1/projects/:ref/secrets',
-      response: () => HttpResponse.json<ProjectSecret[]>([]),
-    })
-
-    customRender(<AddNewSecretForm />)
-
-    const nameInput = screen.getByPlaceholderText('e.g. CLIENT_KEY')
-    expect(nameInput.tagName).toBe('INPUT')
-
-    const textareas = screen.getAllByRole('textbox')
-    const valueTextarea = textareas.find((el) => el.tagName === 'TEXTAREA')
-    expect(valueTextarea).toBeDefined()
-  })
-
   test('submits a multiline value with newlines intact', async () => {
     const requests: Array<{ ref: string | undefined; body: unknown }> = []
     addAPIMock({
@@ -51,9 +34,12 @@ describe('AddNewSecretForm', () => {
 
     await userEvent.type(nameInput, 'SSL_CERT')
 
+    // The value field must be a textarea so multiline pastes are preserved
     const textareas = screen.getAllByRole('textbox')
-    const valueTextarea = textareas.find((el) => el.tagName === 'TEXTAREA')!
-    await userEvent.type(valueTextarea, multilineValue)
+    const valueTextarea = textareas.find((el) => el.tagName === 'TEXTAREA')
+    if (!valueTextarea) throw new Error('Expected the secret value field to be a textarea')
+    await userEvent.click(valueTextarea)
+    await userEvent.paste(multilineValue)
 
     fireEvent.click(saveButton)
 

@@ -1,9 +1,6 @@
-import { Github } from 'lucide-react'
-import Link from 'next/link'
-
-import { cn } from 'ui'
-
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
+import Link from 'next/link'
+import { cn, GithubIcon } from 'ui'
 
 interface ClientLibHeaderProps {
   menuData: {
@@ -40,10 +37,10 @@ function ClientLibHeader({ menuData, className }: ClientLibHeaderProps) {
             href={menuData.pkg.repo}
             target="_blank"
             rel="noreferrer noopener"
-            className="hover:text-brand-link focus-visible:text-brand-link transition-colors"
+            className="hover:text-primary focus-visible:text-primary transition-colors"
           >
             <span className="sr-only">View on GitHub</span>
-            <Github size={18} />
+            <GithubIcon size={18} />
           </Link>
         </span>
       </div>

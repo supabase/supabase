@@ -1,10 +1,9 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Button, cn } from 'ui'
 
 import { hasInstallError, hasUninstallError } from './stripe-sync-status'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const IntegrationInstalledActions = ({
   className,
@@ -24,9 +23,8 @@ export const IntegrationInstalledActions = ({
   setShowUninstallModal: (value: boolean) => void
   setShouldShowInstallSheet: (value: boolean) => void
 }) => {
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_SECRET_WRITE,
-    '*'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
   )
 
   const {
@@ -55,7 +53,6 @@ export const IntegrationInstalledActions = ({
           </ButtonTooltip>
         )}
         <ButtonTooltip
-          variant="default"
           onClick={() => setShowUninstallModal(true)}
           disabled={disabled}
           loading={uninstalling}
@@ -91,9 +88,8 @@ export const IntegrationNotInstalledActions = ({
   handleUninstall: () => void
   setShouldShowInstallSheet: (value: boolean) => void
 }) => {
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_SECRET_WRITE,
-    '*'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
   )
 
   const {
@@ -123,7 +119,7 @@ export const IntegrationNotInstalledActions = ({
         </ButtonTooltip>
       )}
       {installError && (
-        <Button variant="default" loading={isUninstallRequested} onClick={handleUninstall}>
+        <Button loading={isUninstallRequested} onClick={handleUninstall}>
           Uninstall
         </Button>
       )}

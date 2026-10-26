@@ -6,11 +6,11 @@ import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   ExternalLinkIcon,
   InfoIcon,
-  RefreshCw,
-  Trash,
-  Users,
+  RefreshCwIcon,
+  TrashIcon,
+  UsersIcon,
   WandSparklesIcon,
-  X,
+  XIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -70,6 +70,8 @@ import { useUserDeleteMutation } from '@/data/auth/user-delete-mutation'
 import { useUserIndexStatusesQuery } from '@/data/auth/user-search-indexes-query'
 import { useUsersCountQuery } from '@/data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
+import { pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
+import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -81,13 +83,37 @@ import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-st
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
 const IMPROVED_SEARCH_COUNT_THRESHOLD = 10_000
 
-const INDEX_WORKER_LOGS_SEARCH_STRING = `select id, auth_logs.timestamp, metadata.level, event_message, metadata.msg as msg, metadata.error
-from auth_logs
-cross join unnest(metadata) as metadata
-where metadata.worker_type = 'apiworker_index_worker'
-  and auth_logs.timestamp >= timestamp_sub(current_timestamp(), interval 3 hour)
-order by timestamp desc
-limit 100`
+const INDEX_WORKER_LOGS_QUERY = safeSql`
+  select
+    id,
+    auth_logs.timestamp,
+    metadata.level,
+    event_message,
+    metadata.msg as msg,
+    metadata.error
+  from auth_logs
+  cross join unnest(metadata) as metadata
+  where metadata.worker_type = 'apiworker_index_worker'
+    and auth_logs.timestamp >= timestamp_sub(current_timestamp(), interval 3 hour)
+  order by timestamp desc
+  limit 100
+`
+
+const INDEX_WORKER_LOGS_QUERY_OTEL = safeSql`
+  select
+    id,
+    timestamp,
+    log_attributes['level'] as level,
+    event_message,
+    log_attributes['msg'] as msg,
+    log_attributes['error'] as error
+  from logs
+  where source = 'auth_logs'
+    and log_attributes['worker_type'] = 'apiworker_index_worker'
+    and timestamp >= now() - interval 3 hour
+  order by timestamp desc
+  limit 100
+`
 
 export const UsersV2 = () => {
   const router = useRouter()
@@ -99,6 +125,12 @@ export const UsersV2 = () => {
     isError: isProjectError,
   } = useSelectedProjectQuery()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
+  const useOtel = useFlag('otelLegacyLogs')
+  const indexWorkerLogsQuery = pickLogsQueryBuilder(
+    useOtel,
+    INDEX_WORKER_LOGS_QUERY_OTEL,
+    INDEX_WORKER_LOGS_QUERY
+  )
 
   const gridRef = useRef<DataGridHandle>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -286,6 +318,10 @@ export const UsersV2 = () => {
     authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
     indexWorkerStatus?.is_in_progress === true
 
+  // Avoids refetching an identical query when only the filter column changes (column is part of the query key).
+  const shouldUseColumnSearch =
+    filterKeywords.length > 0 && (improvedSearchEnabled || specificFilterColumn !== 'freeform')
+
   const {
     data,
     error,
@@ -311,7 +347,7 @@ export const UsersV2 = () => {
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
       // improved search will always have a column specified
-      ...(specificFilterColumn !== 'freeform' || improvedSearchEnabled
+      ...(shouldUseColumnSearch
         ? { column: specificFilterColumn as OptimizedSearchColumns }
         : { column: undefined }),
 
@@ -537,7 +573,7 @@ export const UsersV2 = () => {
                 onClick={() => setImprovedSearchDismissed(true)}
                 className="absolute top-3 right-3 opacity-30 hover:opacity-100 transition-opacity"
               >
-                <X size={14} className="text-foreground-light" />
+                <XIcon size={14} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>
@@ -551,7 +587,6 @@ export const UsersV2 = () => {
                 icon={<WandSparklesIcon />}
                 onClick={() => setShowCreateIndexesModal(true)}
                 loading={isUpdatingAuthConfig}
-                variant="default"
               >
                 Upgrade search
               </Button>
@@ -571,7 +606,7 @@ export const UsersV2 = () => {
 
               <Button variant="link" iconRight={<ExternalLinkIcon />} asChild>
                 <Link
-                  href={`/project/${projectRef}/logs/explorer?q=${encodeURI(INDEX_WORKER_LOGS_SEARCH_STRING)}`}
+                  href={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(indexWorkerLogsQuery)}`}
                   target="_blank"
                 >
                   View logs
@@ -584,12 +619,11 @@ export const UsersV2 = () => {
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
-              <Button variant="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
+              <Button icon={<TrashIcon />} onClick={() => setShowDeleteModal(true)}>
                 Delete {selectedUsers.size} users
               </Button>
               <ButtonTooltip
-                variant="default"
-                icon={<X />}
+                icon={<XIcon />}
                 className="px-1.5"
                 onClick={() => setSelectedUsers(new Set([]))}
                 tooltip={{ content: { side: 'bottom', text: 'Cancel selection' } }}
@@ -756,8 +790,7 @@ export const UsersV2 = () => {
               <div className="flex items-center gap-x-2">
                 <ButtonTooltip
                   size="tiny"
-                  icon={<RefreshCw />}
-                  variant="default"
+                  icon={<RefreshCwIcon />}
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={handleRefresh}
@@ -854,7 +887,7 @@ export const UsersV2 = () => {
                     </div>
                   ) : isSuccess ? (
                     <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                      <Users className="text-foreground-lighter" strokeWidth={1} />
+                      <UsersIcon className="text-foreground-lighter" strokeWidth={1} />
                       <div className="text-center">
                         <p className="text-foreground">
                           {filterUserType !== 'all' || filterKeywords.length > 0
@@ -966,7 +999,7 @@ export const UsersV2 = () => {
           <li className="marker:text-foreground-light">
             You can monitor the progress in the{' '}
             <InlineLink
-              href={`/project/${projectRef}/logs/explorer?q=${encodeURI(INDEX_WORKER_LOGS_SEARCH_STRING)}`}
+              href={`/project/${projectRef}/logs/explorer?q=${encodeURIComponent(indexWorkerLogsQuery)}`}
               target="_blank"
             >
               project logs

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon, Loader2Icon, PlusIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import {
@@ -30,6 +30,7 @@ import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
@@ -55,6 +56,8 @@ export const DatabaseSelector = ({
   isForm = false,
 }: DatabaseSelectorProps) => {
   const { ref: projectRef } = useParams()
+  const isHighAvailability = useIsHighAvailability()
+
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
@@ -92,9 +95,8 @@ export const DatabaseSelector = ({
             </span>
           )}
           <Button
-            variant="default"
-            icon={isLoading && <Loader2 className="animate-spin" />}
-            iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
+            icon={isLoading && <Loader2Icon className="animate-spin" />}
+            iconRight={<ChevronDownIcon strokeWidth={1.5} size={12} />}
             {...buttonProps}
             className={cn(
               'justify-start',
@@ -147,7 +149,7 @@ export const DatabaseSelector = ({
                   >
                     <div className="w-full flex items-center justify-between">
                       <p>{option.name}</p>
-                      {option.id === selectedDatabaseId && <Check size={14} />}
+                      {option.id === selectedDatabaseId && <CheckIcon size={14} />}
                     </div>
                   </CommandItem>
                 ))}
@@ -208,7 +210,7 @@ export const DatabaseSelector = ({
                             ? 'Primary database'
                             : `Read replica (${region} - ${id})`}
                         </p>
-                        {database.identifier === selectedDatabaseId && <Check size={16} />}
+                        {database.identifier === selectedDatabaseId && <CheckIcon size={16} />}
                       </div>
                     </CommandItem>
                   )
@@ -216,7 +218,7 @@ export const DatabaseSelector = ({
               </ScrollArea>
             </CommandGroup>
 
-            {IS_PLATFORM && infrastructureReadReplicas && (
+            {IS_PLATFORM && infrastructureReadReplicas && !isHighAvailability && (
               <CommandGroup className="border-t">
                 <CommandItemLink
                   href={newReplicaURL}
@@ -226,7 +228,7 @@ export const DatabaseSelector = ({
                     setShowConnect(false)
                   }}
                 >
-                  <Plus size={14} strokeWidth={1.5} />
+                  <PlusIcon size={14} strokeWidth={1.5} />
                   <p>Create a new read replica</p>
                 </CommandItemLink>
               </CommandGroup>

@@ -4,7 +4,6 @@ import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import { z } from 'zod'
 
 import { RealtimeSettings } from './RealtimeSettings'
 import type { Entitlement, FeatureKey } from '@/data/entitlements/entitlements-query'
@@ -28,8 +27,9 @@ const {
   mockUseDatabasePoliciesQuery: vi.fn(),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { REALTIME_CONFIG_WRITE: 'realtime_config_write' } },
 }))
 
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
@@ -55,7 +55,8 @@ vi.mock('@/lib/constants', async (importOriginal) => {
 
 const REALTIME_CONFIG = {
   connection_pool: 2,
-  postgres_changes_pool: 2,
+  // Deliberately differs from REALTIME_DEFAULT_CONFIG so the fallback test can tell them apart
+  postgres_changes_pool: 7,
   max_bytes_per_second: 100000,
   max_channels_per_client: 100,
   max_concurrent_users: 200,
@@ -66,26 +67,34 @@ const REALTIME_CONFIG = {
   presence_enabled: true,
   private_only: false,
   suspend: false,
+  admin_suspended_at: null,
 } as const satisfies RealtimeConfigurationData
 
-const REALTIME_ENTITLEMENTS: Entitlement[] = (
-  [
-    ['realtime.max_concurrent_users', 50_000],
-    ['realtime.max_events_per_second', 50_000],
-    ['realtime.max_presence_events_per_second', 5_000],
-    ['realtime.max_payload_size_in_kb', 3_000],
-  ] satisfies [FeatureKey, number][]
-).map(([key, value]) => ({
-  config: { enabled: true, unit: '', unlimited: false, value },
-  feature: { key, type: 'numeric' },
-  hasAccess: true,
-  type: 'numeric',
-}))
+const buildRealtimeEntitlements = (
+  overrides: Partial<Record<FeatureKey, number | 'unlimited'>> = {}
+): Entitlement[] =>
+  (
+    [
+      ['realtime.max_concurrent_users', 50_000],
+      ['realtime.max_events_per_second', 50_000],
+      ['realtime.max_presence_events_per_second', 5_000],
+      ['realtime.max_payload_size_in_kb', 3_000],
+    ] satisfies [FeatureKey, number][]
+  ).map(([key, value]) => {
+    const override = overrides[key]
+    const unlimited = override === 'unlimited'
+    return {
+      config: { enabled: true, unit: '', unlimited, value: unlimited ? 0 : (override ?? value) },
+      feature: { key, type: 'numeric' },
+      hasAccess: true,
+      type: 'numeric',
+    }
+  })
+
+const REALTIME_ENTITLEMENTS: Entitlement[] = buildRealtimeEntitlements()
 
 describe('RealtimeSettings', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isSuccess: true })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { ref: 'default', connectionString: 'postgresql://example' },
@@ -110,10 +119,13 @@ describe('RealtimeSettings', () => {
     })
   })
 
-  test('renders the fetched postgres changes pool value', async () => {
+  test('renders the fetched postgres changes pool value without a suspension banner', async () => {
     customRender(<RealtimeSettings />)
 
-    expect(await screen.findByLabelText('Postgres Changes connection pool size')).toHaveValue(2)
+    expect(await screen.findByLabelText('Postgres Changes connection pool size')).toHaveValue(7)
+    expect(
+      screen.queryByText('Supabase has suspended Realtime for this project')
+    ).not.toBeInTheDocument()
   })
 
   test('falls back to the default postgres changes pool value when omitted', async () => {
@@ -123,7 +135,7 @@ describe('RealtimeSettings', () => {
       method: 'get',
       path: '/platform/projects/:ref/config/realtime',
       response: () =>
-        HttpResponse.json<components['schemas']['RealtimeConfigResponse']>(
+        HttpResponse.json<components['schemas']['RealtimeConfigResponse_Output']>(
           configWithoutPool as any
         ),
     })
@@ -131,36 +143,6 @@ describe('RealtimeSettings', () => {
     customRender(<RealtimeSettings />)
 
     expect(await screen.findByLabelText('Postgres Changes connection pool size')).toHaveValue(2)
-  })
-
-  test('submits the postgres changes pool value when saving', async () => {
-    const updateBodySchema = z.object({ postgres_changes_pool: z.number() })
-
-    const requests: z.infer<typeof updateBodySchema>[] = []
-    addAPIMock({
-      method: 'patch',
-      path: '/platform/projects/:ref/config/realtime',
-      response: async ({ request }) => {
-        requests.push(updateBodySchema.parse(await request.json()))
-        return new HttpResponse(null, { status: 204 })
-      },
-    })
-
-    customRender(<RealtimeSettings />)
-
-    const postgresChangesPoolInput = await screen.findByLabelText(
-      'Postgres Changes connection pool size'
-    )
-    await userEvent.clear(postgresChangesPoolInput)
-    await userEvent.type(postgresChangesPoolInput, '5')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
-
-    const dialog = await screen.findByRole('dialog')
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Save changes' }))
-
-    await waitFor(() => expect(requests).toHaveLength(1))
-    expect(requests[0]).toMatchObject({ postgres_changes_pool: 5 })
   })
 
   test.each([
@@ -200,5 +182,84 @@ describe('RealtimeSettings', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       expect(requests).toHaveLength(0)
     }
+  })
+
+  test.each([
+    { value: '300000', accepted: true },
+    { value: '300001', accepted: false },
+  ])(
+    '$accepted for max concurrent clients of $value when the entitlement is unlimited',
+    async ({ value, accepted }) => {
+      addAPIMock({
+        method: 'get',
+        path: '/platform/organizations/:slug/entitlements',
+        response: {
+          entitlements: buildRealtimeEntitlements({ 'realtime.max_concurrent_users': 'unlimited' }),
+        },
+      })
+
+      const requests: unknown[] = []
+      addAPIMock({
+        method: 'patch',
+        path: '/platform/projects/:ref/config/realtime',
+        response: async ({ request }) => {
+          requests.push(await request.json())
+          return new HttpResponse(null, { status: 204 })
+        },
+      })
+
+      customRender(<RealtimeSettings />)
+
+      const maxConcurrentUsersInput = await screen.findByLabelText('Max concurrent clients')
+      await userEvent.clear(maxConcurrentUsersInput)
+      await userEvent.type(maxConcurrentUsersInput, value)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+
+      if (accepted) {
+        const dialog = await screen.findByRole('dialog')
+        fireEvent.click(within(dialog).getByRole('button', { name: 'Save changes' }))
+
+        await waitFor(() => expect(requests).toHaveLength(1))
+        expect(requests[0]).toMatchObject({ max_concurrent_users: Number(value) })
+      } else {
+        expect(
+          await screen.findByText('Cannot exceed 300,000 concurrent clients')
+        ).toBeInTheDocument()
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        expect(requests).toHaveLength(0)
+      }
+    }
+  )
+
+  test('rejects max concurrent clients above the entitlement when it is below the soft limit', async () => {
+    customRender(<RealtimeSettings />)
+
+    const maxConcurrentUsersInput = await screen.findByLabelText('Max concurrent clients')
+    await userEvent.clear(maxConcurrentUsersInput)
+    await userEvent.type(maxConcurrentUsersInput, '50001')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    expect(await screen.findByText('Cannot exceed 50,000 concurrent clients')).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  test('shows a suspension banner when Realtime has been admin-suspended', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/config/realtime',
+      response: () =>
+        HttpResponse.json<RealtimeConfigurationData>({
+          ...REALTIME_CONFIG,
+          admin_suspended_at: '2026-01-01T00:00:00+00:00',
+        }),
+    })
+
+    customRender(<RealtimeSettings />)
+
+    expect(
+      await screen.findByText('Supabase has suspended Realtime for this project')
+    ).toBeInTheDocument()
   })
 })

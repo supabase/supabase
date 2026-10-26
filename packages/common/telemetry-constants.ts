@@ -10,6 +10,7 @@
  *
  * @module telemetry-frontend
  */
+import type { components } from 'api-types'
 
 export type TelemetryGroups = {
   project: string
@@ -45,14 +46,15 @@ export interface SignUpEvent {
 }
 
 /**
- * Triggered when a user signs in with GitHub, Email and Password or SSO.
+ * Triggered when a user signs in with an OAuth provider, Email and Password, or SSO.
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
+ *   - distinct_id often resolves to the anonymous cookie (races identify); not a person-level join key.
  *
  * @group Events
  * @source studio
- * @page /sign-in-mfa
+ * @page /sign-in, /sign-in-mfa
  */
 export interface SignInEvent {
   action: 'sign_in'
@@ -60,6 +62,26 @@ export interface SignInEvent {
     category: 'account'
     /**
      * The method used to sign in, e.g. email, github, sso
+     */
+    method: string
+  }
+}
+
+/**
+ * Triggered when a user initiates a sign-in (form submit including client-side validation
+ * failures, OAuth or custom-provider click, partner token exchange), before auth resolves.
+ * Pre-auth, so distinct_id is the anonymous cookie: not a person-level join key.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-in, /sign-in-sso, /sign-in-partner
+ */
+export interface SignInSubmittedEvent {
+  action: 'sign_in_submitted'
+  properties: {
+    category: 'account'
+    /**
+     * Matches the sign_in event's method vocabulary, e.g. email (password path), github, sso
      */
     method: string
   }
@@ -405,7 +427,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
     useApiSchema?: boolean
     /**
      * Postgres engine type selection.
-     * true = "Postgres with OrioleDB" (alpha)
+     * true = "Postgres with OrioleDB" (beta)
      * false = "Postgres" (default)
      */
     useOrioleDb?: boolean
@@ -427,6 +449,25 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * omitted = PostHog flags had not loaded at the time of project creation
      */
     dataApiRevokeOnCreateDefaultEnabled?: boolean | string
+    /**
+     * freeTierGeneralRegionExperiment variant at submission time. Omitted when the org isn't
+     * in the experiment (paid plan, smart regions disabled for the selected cloud provider,
+     * or not enrolled via the freeTierGeneralRegionEnrollment ConfigCat flag).
+     */
+    freeTierGeneralRegionExperiment?: 'control' | 'test'
+    /**
+     * How the submitted region was arrived at. 'auto' = the user never touched the region field
+     * and kept the auto-assigned default. 'general' = the user picked a smart region group (e.g.
+     * Americas). 'specific' = the user picked an exact region (e.g. us-east-1). Only set when
+     * smart regions are enabled for the selected cloud provider.
+     */
+    regionSelectionType?: 'general' | 'auto' | 'specific'
+    /**
+     * The exact region code the project was provisioned in (e.g. sa-east-1), as returned by
+     * the create-project API. This is the resolved region — for a smart group selection (e.g.
+     * Americas) it's the specific region the backend picked, not the group name.
+     */
+    regionCode?: string
   }
   groups: TelemetryGroups
 }
@@ -481,6 +522,61 @@ export interface ProjectCreationFormExposedEvent {
      */
     surface?: 'main' | 'vercel'
   }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Org was targeted for the freeTierGeneralRegionExperiment: a free-plan org with smart
+ * regions enabled for the selected cloud provider, enrolled (control or test arm) via the
+ * freeTierGeneralRegionEnrollment ConfigCat flag.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionExperimentExposedEvent {
+  action: 'free_tier_general_region_experiment_exposed'
+  properties: {
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Upgrade to Pro" link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionUpgradeClickedEvent {
+  action: 'free_tier_general_region_upgrade_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "specific region" docs link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionDocsLinkClickedEvent {
+  action: 'free_tier_general_region_docs_link_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Need a specific region?" link to reveal the specific regions
+ * list in the project creation region selector.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationSpecificRegionLinkClickedEvent {
+  action: 'project_creation_specific_region_link_clicked'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -927,6 +1023,7 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
+  | 'troubleshooting'
 
 /**
  * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
@@ -956,6 +1053,22 @@ export interface AgentSetupClickedEvent {
 }
 
 /**
+ * User clicked the sidebar link to add Supabase as a preferred source on Google.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface PreferredSourceClickedEvent {
+  action: 'preferred_source_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
+}
+
+/**
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
@@ -973,6 +1086,41 @@ export interface AskAiClickedEvent {
 }
 
 /**
+ * Surface that rendered the prompt panel a user copied from.
+ */
+export type DocsAiPromptSource = 'homepage' | 'guide' | 'agent_setup'
+
+/**
+ * User copied the contents of a docs prompt panel - the homepage setup card or an
+ * `AiPrompt` block - and the clipboard write succeeded. Fires on success only;
+ * failed clipboard writes are not counted.
+ *
+ * Distinct from `ai_prompt_copied`, which belongs to Studio's AI assistant.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs, /docs/guides
+ */
+export interface DocsAiPromptCopiedEvent {
+  action: 'docs_ai_prompt_copied'
+  properties: {
+    /**
+     * Surface the panel was rendered on.
+     */
+    source: DocsAiPromptSource
+    /**
+     * `value` of the pane that was active when the copy happened. Known panes
+     * are `prompt` and `cli`; other strings remain allowed for future panes.
+     */
+    tab: 'prompt' | 'cli' | (string & {})
+    /**
+     * Prompt identifier, set when the panel comes from an `AiPrompt` block.
+     */
+    promptId?: string
+  }
+}
+
+/**
  * User clicked a curated orientation link from a content listings MDX component.
  *
  * @group Events
@@ -986,6 +1134,72 @@ export interface DocsContentListingClickedEvent {
     groupTitle?: string
     listingId?: string
   }
+}
+
+/**
+ * User opened the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2OpenedEvent {
+  action: 'docs_search_v2_opened'
+  properties: {
+    /**
+     * The trigger that opened the Search V2 dialog.
+     */
+    triggerType: 'keyboard_shortcut' | 'search_input'
+  }
+}
+
+/**
+ * User's search term was sent to the Search V2 endpoint.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2SearchSubmittedEvent {
+  action: 'docs_search_v2_search_submitted'
+  properties: {
+    /**
+     * The search term sent to the Search V2 endpoint.
+     */
+    query: string
+    /**
+     * Whether the Search V2 endpoint returned at least one result for the query.
+     */
+    hasResults: boolean
+  }
+}
+
+/**
+ * User activated a Search V2 result, either by clicking it or selecting it via keyboard.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2ResultClickedEvent {
+  action: 'docs_search_v2_result_clicked'
+  properties: {
+    /**
+     * The path of the result that was activated.
+     */
+    resultPath: string
+    /**
+     * The search term whose results were showing when the result was activated.
+     */
+    query: string
+  }
+}
+
+/**
+ * User closed the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2ClosedEvent {
+  action: 'docs_search_v2_closed'
 }
 
 /**
@@ -1349,7 +1563,7 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
- * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ * User clicked on the "Cancel subscription" Button on the billing settings page.
  *
  * @group Events
  * @source studio
@@ -1504,29 +1718,63 @@ export interface DatabaseConnectionsLiveModeClickedEvent {
 }
 
 /**
- * User clicked the dismiss button on the Database Connections banner in studio project pages.
+ * The Explorer feature preview banner was rendered in studio project pages, fired at most once
+ * per page load. Acts as the denominator for the banner's dismiss and CTA rates; dedupe per
+ * session or per user at query time.
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/observability/connections
  */
-export interface DatabaseConnectionsBannerDismissButtonClickedEvent {
-  action: 'database_connections_banner_dismiss_button_clicked'
+export interface ExplorerBannerExposedEvent {
+  action: 'explorer_banner_exposed'
   groups: TelemetryGroups
 }
 
 /**
- * User clicked the CTA button on the Database Connections banner in studio project pages.
+ * User clicked the dismiss button on the Explorer feature preview banner in studio project pages.
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/observability/connections
  */
-export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
-  action: 'database_connections_banner_cta_button_clicked'
-  properties: {
-    isEnabled: boolean
-  }
+export interface ExplorerBannerDismissButtonClickedEvent {
+  action: 'explorer_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA button on the Explorer feature preview banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ExplorerBannerCtaButtonClickedEvent {
+  action: 'explorer_banner_cta_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the SQL Editor button in the Explorer sidebar footer to temporarily switch
+ * to the SQL Editor for snippet access.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerTempAccessSqlEditorClickedEvent {
+  action: 'explorer_temp_access_sql_editor_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Explorer sidebar nav item while on the SQL Editor page, navigating back
+ * to Explorer.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/sql
+ */
+export interface SqlEditorBackExplorerClickedEvent {
+  action: 'sql_editor_back_explorer_clicked'
   groups: TelemetryGroups
 }
 
@@ -1954,6 +2202,24 @@ export interface StorageBucketCreatedEvent {
      * The type of the bucket created. E.g. standard or analytics iceberg.
      */
     bucketType?: string
+    /** Whether object versioning was turned on at creation time. */
+    hasVersioningEnabled?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when object versioning is turned on for a bucket that has never had it.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageBucketVersioningEnabledEvent {
+  action: 'storage_bucket_versioning_enabled'
+  properties: {
+    /** Whether a lifecycle policy was configured at the same time. */
+    hasLifecyclePolicy?: boolean
   }
   groups: TelemetryGroups
 }
@@ -2292,7 +2558,7 @@ export interface HomeConnectActionClickedEvent {
     /**
      * The connect action/tile that was clicked
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'api_keys'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'warehouse' | 'api_keys'
   }
   groups: TelemetryGroups
 }
@@ -2899,7 +3165,8 @@ export interface AuditLogDrainRemovedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
-type AdvisorCategory = 'PERFORMANCE' | 'SECURITY'
+type AdvisorCategory =
+  components['schemas']['GetProjectLintsResponse_Output'][number]['categories'][number]
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
@@ -2922,7 +3189,7 @@ export interface AdvisorDetailOpenedEvent {
      */
     advisorSource: 'lint' | 'notification' | 'signal'
     /**
-     * Category of the advisor (SECURITY or PERFORMANCE)
+     * Category of the advisor
      */
     advisorCategory?: AdvisorCategory
     /**
@@ -2953,7 +3220,7 @@ export interface AdvisorAssistantButtonClickedEvent {
      */
     origin: 'homepage' | 'lint_detail'
     /**
-     * Category of the advisor (SECURITY or PERFORMANCE)
+     * Category of the advisor
      */
     advisorCategory?: AdvisorCategory
     /**
@@ -3137,7 +3404,7 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Funnel the error occurred in (set only for instrumented funnel errors)
      */
-    origin?: 'signup' | 'project_creation' | 'org_creation'
+    origin?: 'signup' | 'signin' | 'project_creation' | 'org_creation'
     /**
      * Coarse classification of the funnel error
      */
@@ -3337,6 +3604,85 @@ export interface LogExplorerQueryRunButtonClickedEvent {
   groups: TelemetryGroups
 }
 
+export type ExplorerQueryLocation =
+  | { surface: 'query_tab'; queryId: string; notebookId?: never; cellId?: never }
+  | { surface: 'notebook_cell'; notebookId: string; cellId: string; queryId?: never }
+
+export type ExplorerQueryRunProperties = ExplorerQueryLocation & {
+  runId: string
+  source: 'database' | 'logs'
+}
+
+type ExplorerGroups = Pick<TelemetryGroups, 'project'> &
+  Partial<Pick<TelemetryGroups, 'organization'>>
+
+/**
+ * User started an Explorer query run.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerQuerySubmittedEvent {
+  action: 'explorer_query_submitted'
+  properties: ExplorerQueryRunProperties
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer query run completed successfully.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerQueryCompletedEvent {
+  action: 'explorer_query_completed'
+  properties: ExplorerQueryRunProperties
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer query run failed.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerQueryFailedEvent {
+  action: 'explorer_query_failed'
+  properties: ExplorerQueryRunProperties & {
+    failureReason: 'logs_unavailable' | 'connection_unavailable' | 'execution_error'
+  }
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer notebook was saved for the first time.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerNotebookCreatedEvent {
+  action: 'explorer_notebook_created'
+  properties: { notebookId: string }
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer notebook was saved after creation.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerNotebookUpdatedEvent {
+  action: 'explorer_notebook_updated'
+  properties: { notebookId: string }
+  groups: ExplorerGroups
+}
+
 /**
  * User clicked an upgrade CTA inside the compute badge hover card.
  *
@@ -3450,6 +3796,27 @@ export interface AccessTokenCreatedEvent {
 }
 
 /**
+ * Triggered when the access token creation sheet is closed before a token was created, either by
+ * the user (Escape, outside click, or Cancel) or because the permissions map failed to load and
+ * forced the sheet shut. The token created step blocks non-safe closes, so this event never fires
+ * for a completed creation.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens
+ */
+export interface AccessTokenCreationSheetDismissedEvent {
+  action: 'access_token_creation_sheet_dismissed'
+  properties: {
+    resourceAccess: 'project' | 'organization' | 'account'
+    formStep: 'form' | 'review'
+    isFormTouched: boolean
+    trigger: 'user' | 'permissions_load_error'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * Triggered when an access token is successfully deleted.
  *
  * @group Events
@@ -3460,6 +3827,57 @@ export interface AccessTokenRemovedEvent {
   action: 'access_token_removed'
   properties: {
     tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when the copy button is used on the token value shown after creation. The value is
+ * only ever displayed once, so this measures how many users leave with a usable token.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens (token created step of the generate token sheet)
+ */
+export interface AccessTokenCopiedEvent {
+  action: 'access_token_copied'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when the "I have copied the key and stored it securely" checkbox is toggled on the
+ * token created step. `isChecked` is the resulting state, so unticking is tracked too.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens (token created step of the generate token sheet)
+ */
+export interface AccessTokenStoredCheckboxClickedEvent {
+  action: 'access_token_stored_checkbox_clicked'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    /** The state the checkbox was toggled into */
+    isChecked: boolean
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Triggered when the "Done" button dismisses the token created step, completing the creation flow.
+ *
+ * @group Events
+ * @source studio
+ * @page /account/tokens (token created step of the generate token sheet)
+ */
+export interface AccessTokenDoneButtonClickedEvent {
+  action: 'access_token_done_button_clicked'
+  properties: {
+    tokenType: 'classic' | 'scoped'
+    /** Whether the copy button was used before finishing, as opposed to copying the value manually */
+    hasCopiedToken: boolean
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3509,6 +3927,23 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 }
 
 /**
+ * User clicked a metrics or documentation link on a resource exhaustion warning banner (Troubleshoot menu item or single-action button).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerTroubleshootClickedEvent {
+  action: 'resource_exhaustion_banner_troubleshoot_clicked'
+  groups: TelemetryGroups
+  properties: {
+    troubleshootAction: 'metrics' | 'docs'
+    warningType: string
+    warningTypes: string[]
+    destination: string
+  }
+}
+
+/**
  * User clicked a row in the Unified Logs interface.
  *
  * @group Events
@@ -3533,6 +3968,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
+      | 'compute'
   }
   groups: TelemetryGroups
 }
@@ -3709,11 +4145,55 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 }
 
 /**
+ * User enabled Warehouse by submitting a schema and table selection.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseEnabledEvent {
+  action: 'warehouse_enabled'
+  properties: {
+    /** Where the user initiated Warehouse setup. */
+    source: 'integrations_overview'
+    /** Number of schemas replicated in full. */
+    schemaTargetCount: number
+    /** Number of tables replicated individually. */
+    tableTargetCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User disabled Warehouse for a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseDisabledEvent {
+  action: 'warehouse_disabled'
+  properties: {
+    /** Number of schemas that were replicated in full. Omitted when the replicated tables have not resolved. */
+    schemaTargetCount?: number
+    /** Number of tables that were replicated individually. Omitted when the replicated tables have not resolved. */
+    tableTargetCount?: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | ExplorerQuerySubmittedEvent
+  | ExplorerQueryCompletedEvent
+  | ExplorerQueryFailedEvent
+  | ExplorerNotebookCreatedEvent
+  | ExplorerNotebookUpdatedEvent
   | SignUpEvent
   | SignInEvent
+  | SignInSubmittedEvent
   | ConnectionStringCopiedEvent
   | McpInstallButtonClickedEvent
   | ApiDocsOpenedEvent
@@ -3735,6 +4215,10 @@ export type TelemetryEvent =
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationFormExposedEvent
+  | FreeTierGeneralRegionExperimentExposedEvent
+  | FreeTierGeneralRegionUpgradeClickedEvent
+  | FreeTierGeneralRegionDocsLinkClickedEvent
+  | ProjectCreationSpecificRegionLinkClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
@@ -3763,8 +4247,14 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
+  | PreferredSourceClickedEvent
   | AskAiClickedEvent
+  | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
+  | DocsSearchV2OpenedEvent
+  | DocsSearchV2SearchSubmittedEvent
+  | DocsSearchV2ResultClickedEvent
+  | DocsSearchV2ClosedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
@@ -3808,8 +4298,11 @@ export type TelemetryEvent =
   | DatabaseConnectionsOverviewMetricCardClickedEvent
   | DatabaseConnectionsFilterUpdatedEvent
   | DatabaseConnectionsBlockerViewClickedEvent
-  | DatabaseConnectionsBannerDismissButtonClickedEvent
-  | DatabaseConnectionsBannerCtaButtonClickedEvent
+  | ExplorerBannerExposedEvent
+  | ExplorerBannerDismissButtonClickedEvent
+  | ExplorerBannerCtaButtonClickedEvent
+  | ExplorerTempAccessSqlEditorClickedEvent
+  | SqlEditorBackExplorerClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminateSubmittedEvent
   | QueryCancelButtonClickedEvent
@@ -3830,6 +4323,7 @@ export type TelemetryEvent =
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
+  | StorageBucketVersioningEnabledEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent
@@ -3898,9 +4392,14 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
   | AccessTokenCreatedEvent
+  | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent
+  | AccessTokenCopiedEvent
+  | AccessTokenStoredCheckboxClickedEvent
+  | AccessTokenDoneButtonClickedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
+  | ResourceExhaustionBannerTroubleshootClickedEvent
   | UnifiedLogsRowClickedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
@@ -3917,3 +4416,5 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | WarehouseEnabledEvent
+  | WarehouseDisabledEvent

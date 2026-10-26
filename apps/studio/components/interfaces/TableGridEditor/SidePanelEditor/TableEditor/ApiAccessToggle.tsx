@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   useCallback,
@@ -329,7 +329,7 @@ export const ApiAccessToggle = ({
               disabled={isDisabled}
             />
           ) : (
-            <Button asChild variant="default" icon={<ExternalLink />}>
+            <Button asChild icon={<ExternalLinkIcon />}>
               <Link
                 target="_blank"
                 rel="noopener noreferrer"

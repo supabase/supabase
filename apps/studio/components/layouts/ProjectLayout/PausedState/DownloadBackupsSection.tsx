@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Database, Storage } from 'icons'
-import { ChevronDown, Download } from 'lucide-react'
+import { ChevronDownIcon, DownloadIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -124,7 +124,7 @@ export const DownloadBackupsSection = () => {
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="default" icon={<Download />} iconRight={<ChevronDown />}>
+          <Button icon={<DownloadIcon />} iconRight={<ChevronDownIcon />}>
             Download backups
           </Button>
         </DropdownMenuTrigger>

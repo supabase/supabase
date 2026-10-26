@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { EyeOff, Globe } from 'lucide-react'
+import { EyeOffIcon, GlobeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -35,9 +35,9 @@ export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
 
   const issueDescription = (
     <>
-      The IP address <code className="text-code-inline">{item.sourceData.ip}</code> is temporarily
-      blocked because of suspicious traffic or repeated failed password attempts. If this block is
-      expected, you can dismiss this signal or remove the ban.
+      The IP address <code>{item.sourceData.ip}</code> is temporarily blocked because of suspicious
+      traffic or repeated failed password attempts. If this block is expected, you can dismiss this
+      signal or remove the ban.
     </>
   )
 
@@ -61,7 +61,7 @@ export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
         <TooltipTrigger asChild>
           <div className="flex items-center gap-2 px-2 py-0.5 bg-surface-200 border rounded-lg text-sm mb-6 w-fit">
             <span className="flex items-center text-foreground-muted" aria-hidden="true">
-              <Globe size={15} className="text-foreground-muted" />
+              <GlobeIcon size={15} className="text-foreground-muted" />
             </span>
             <span>{item.sourceData.ip}</span>
           </div>
@@ -88,17 +88,13 @@ export const AdvisorSignalDetail = ({ item }: AdvisorSignalDetailProps) => {
           telemetrySource="advisor_signal_detail"
         />
         {item.actions.map((action) => (
-          <Button key={`${item.dismissalKey}-${action.href}`} variant="default" asChild>
+          <Button key={`${item.dismissalKey}-${action.href}`} asChild>
             <Link href={action.href}>
               <span className="flex items-center gap-2">{action.label}</span>
             </Link>
           </Button>
         ))}
-        <Button
-          variant="default"
-          icon={<EyeOff size={14} strokeWidth={1.5} />}
-          onClick={onDismissSignal}
-        >
+        <Button icon={<EyeOffIcon size={14} strokeWidth={1.5} />} onClick={onDismissSignal}>
           Dismiss
         </Button>
       </div>

@@ -1,4 +1,11 @@
-import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, ExternalLink, ScanSearch } from 'lucide-react'
+import {
+  ArrowDownIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
+  ChevronDownIcon,
+  ExternalLinkIcon,
+  ScanSearchIcon,
+} from 'lucide-react'
 import { useMemo, type RefObject } from 'react'
 import { type Column, type DataGridHandle } from 'react-data-grid'
 import {
@@ -89,7 +96,7 @@ export function useQueryInsightsTableColumns({
                       variant="text"
                       size="tiny"
                       className="p-1 h-5 w-5 shrink-0"
-                      icon={<ChevronDown size={14} className="text-foreground-muted" />}
+                      icon={<ChevronDownIcon size={14} className="text-foreground-muted" />}
                       onClick={(e) => e.stopPropagation()}
                     />
                   </DropdownMenuTrigger>
@@ -101,7 +108,7 @@ export function useQueryInsightsTableColumns({
                         sort?.column === col.id && sort?.order === 'asc' && 'text-foreground'
                       )}
                     >
-                      <ArrowUp size={14} />
+                      <ArrowUpIcon size={14} />
                       Sort Ascending
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -111,7 +118,7 @@ export function useQueryInsightsTableColumns({
                         sort?.column === col.id && sort?.order === 'desc' && 'text-foreground'
                       )}
                     >
-                      <ArrowDown size={14} />
+                      <ArrowDownIcon size={14} />
                       Sort Descending
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -161,9 +168,8 @@ export function useQueryInsightsTableColumns({
                 />
                 <ButtonTooltip
                   tooltip={{ content: { text: 'Query details' } }}
-                  icon={<ArrowRight size={14} />}
+                  icon={<ArrowRightIcon size={14} />}
                   size="tiny"
-                  variant="default"
                   onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
                     setSelectedRow(props.rowIdx)
@@ -369,9 +375,8 @@ export function useQueryInsightsTableColumns({
               </div>
               <ButtonTooltip
                 tooltip={{ content: { text: 'Query details' } }}
-                icon={<ArrowRight size={14} />}
+                icon={<ArrowRightIcon size={14} />}
                 size="tiny"
-                variant="default"
                 onClick={(e: React.MouseEvent) => {
                   e.stopPropagation()
                   setSelectedTriageRow(props.rowIdx)
@@ -496,7 +501,6 @@ export function useQueryInsightsTableColumns({
             <div className="flex items-center gap-2 justify-end w-full h-full">
               {!row.issueType && (
                 <Button
-                  variant="default"
                   size="tiny"
                   onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
@@ -526,12 +530,12 @@ export function useQueryInsightsTableColumns({
                         size="tiny"
                         aria-label="More index actions"
                         className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-                        icon={<ChevronDown size={12} />}
+                        icon={<ChevronDownIcon size={12} />}
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
                       <DropdownMenuItem onClick={() => handleGoToLogs()} className="gap-2">
-                        <ExternalLink size={14} />
+                        <ExternalLinkIcon size={14} />
                         Go to Logs
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -541,7 +545,7 @@ export function useQueryInsightsTableColumns({
                         }}
                         className="gap-2"
                       >
-                        <ScanSearch size={14} />
+                        <ScanSearchIcon size={14} />
                         Explain
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -558,14 +562,14 @@ export function useQueryInsightsTableColumns({
                     additionalDropdownItems={[
                       {
                         label: 'Go to Logs',
-                        icon: <ExternalLink size={14} />,
+                        icon: <ExternalLinkIcon size={14} />,
                         onClick: () => handleGoToLogs(),
                       },
                       ...(row.issueType === 'slow'
                         ? [
                             {
                               label: 'Explain',
-                              icon: <ScanSearch size={14} />,
+                              icon: <ScanSearchIcon size={14} />,
                               onClick: () => {
                                 setSelectedTriageRow(props.rowIdx)
                                 setSheetView('explain')

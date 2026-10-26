@@ -1,6 +1,6 @@
 'use client'
 
-import { CircleIcon, LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
+import { LaptopIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
@@ -13,14 +13,19 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
+  DialogDescription,
   DialogProps,
+  DialogTitle,
 } from 'ui'
 
-import { COMMAND_ITEMS } from '@/config/docs'
+import { gettingStarted } from '@/config/docs'
+import { getLibraryBlockHref, libraryBlocks, libraryCategories } from '@/config/library'
+import { useFramework } from '@/context/framework-context'
 import { cn } from '@/lib/utils'
 
 export function CommandMenu({ ...props }: DialogProps) {
   const router = useRouter()
+  const { framework } = useFramework()
   const [open, setOpen] = React.useState(false)
   const { setTheme } = useTheme()
 
@@ -55,37 +60,59 @@ export function CommandMenu({ ...props }: DialogProps) {
       <Button
         variant="outline"
         className={cn(
-          `relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12
+          `@container relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12 md:pr-2.5 lg:pr-12
             hover:border-foreground-muted hover:bg-surface-100 hover:text-foreground-lighter
           `
         )}
         onClick={() => setOpen(true)}
         {...props}
       >
-        <span className="hidden lg:inline-flex">Search Library...</span>
-        <span className="inline-flex lg:hidden">Search...</span>
-        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded-sm border bg-surface-200 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex text-foreground-light">
+        <span className="hidden @min-[7.5rem]:inline-flex">Search library...</span>
+        <span className="inline-flex @min-[7.5rem]:hidden">Search...</span>
+        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded-sm border bg-surface-200 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex md:hidden lg:flex text-foreground-light">
           <span className="text-sm">⌘</span>K
         </kbd>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
+        <DialogTitle className="sr-only">Search the library</DialogTitle>
+        <DialogDescription className="sr-only">
+          Find guides, blocks, starter apps, and theme settings.
+        </DialogDescription>
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
+        <CommandList className="min-h-0 max-h-[min(400px,calc(100dvh-8rem))] overscroll-contain [&_[cmdk-group]]:p-2! [&_[cmdk-item]]:rounded-md [&_[cmdk-item]]:p-2!">
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup key="pages" heading="Pages">
-            {COMMAND_ITEMS.map((navItem) => (
+            {gettingStarted.items.map((navItem) => (
               <CommandItem
                 key={navItem.href}
-                value={navItem.label}
+                value={navItem.title}
                 onSelect={() => runCommand(() => router.push(navItem.href as string))}
               >
-                <div className="mr-2 flex h-4 w-4 items-center justify-center">
-                  <CircleIcon className="h-3 w-3" strokeWidth={1} />
-                </div>
-                {navItem.label}
+                {navItem.title}
               </CommandItem>
             ))}
           </CommandGroup>
+          {libraryCategories.map((category) => (
+            <CommandGroup key={category.slug} heading={category.name}>
+              {libraryBlocks
+                .filter((block) => block.category === category.name)
+                .map((block) => (
+                  <CommandItem
+                    key={block.slug}
+                    value={`${block.title} ${block.category} ${block.tags.join(' ')}`}
+                    onSelect={() =>
+                      runCommand(() => {
+                        const href = getLibraryBlockHref(block, framework)
+                        if (block.external) window.location.assign(href)
+                        else router.push(href)
+                      })
+                    }
+                  >
+                    {block.title}
+                  </CommandItem>
+                ))}
+            </CommandGroup>
+          ))}
           <CommandSeparator />
           <CommandGroup heading="Theme">
             <CommandItem onSelect={() => runCommand(() => setTheme('light'))}>
@@ -95,10 +122,6 @@ export function CommandMenu({ ...props }: DialogProps) {
             <CommandItem onSelect={() => runCommand(() => setTheme('dark'))}>
               <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
               Dark
-            </CommandItem>
-            <CommandItem onSelect={() => runCommand(() => setTheme('classic-dark'))}>
-              <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
-              Classic dark
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => setTheme('system'))}>
               <LaptopIcon className="mr-2 h-4 w-4" strokeWidth={1} />

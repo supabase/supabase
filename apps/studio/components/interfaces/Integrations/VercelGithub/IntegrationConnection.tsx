@@ -1,6 +1,12 @@
-import { ChevronDown, Loader2, RefreshCw, Trash } from 'lucide-react'
+import {
+  ChevronDownIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+  RefreshCwIcon,
+  SettingsIcon,
+  TrashIcon,
+} from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -25,12 +31,12 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
+  isProjectScoped?: boolean
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
 
 export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
-  ({ disabled, onDeleteConnection, ...props }, _ref) => {
-    const router = useRouter()
+  ({ disabled, isProjectScoped = false, onDeleteConnection, ...props }, _ref) => {
     const { data: org } = useSelectedOrganizationQuery()
 
     const { type, connection } = props
@@ -71,6 +77,13 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
 
     const projectIntegrationUrl = `/project/[ref]/settings/integrations`
 
+    // Project-scoped Vercel rows have their own "Edit" toggle, so "Manage" collapses to an icon
+    const isManageCompact = isProjectScoped && type === 'Vercel'
+    const triggerLabel = isManageCompact ? null : 'Manage'
+    const triggerProps = isManageCompact
+      ? { icon: <MoreVerticalIcon />, className: 'px-1.5', 'aria-label': 'Manage connection' }
+      : { iconRight: <ChevronDownIcon size={14} /> }
+
     return (
       <>
         <IntegrationConnection
@@ -79,8 +92,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
             disabled ? (
               <ButtonTooltip
                 disabled
-                iconRight={<ChevronDown size={14} />}
-                variant="default"
+                {...triggerProps}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -88,7 +100,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                   },
                 }}
               >
-                Manage
+                {triggerLabel}
               </ButtonTooltip>
             ) : (
               <DropdownMenu
@@ -97,19 +109,18 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                 modal={false}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button iconRight={<ChevronDown size={14} />} variant="default">
-                    <span>Manage</span>
-                  </Button>
+                  <Button {...triggerProps}>{triggerLabel}</Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="end">
-                  {router.pathname !== projectIntegrationUrl && (
-                    <DropdownMenuItem asChild>
+                <DropdownMenuContent side="bottom" align="end" className="w-56">
+                  {!isProjectScoped && (
+                    <DropdownMenuItem asChild className="gap-x-2">
                       <Link
-                        href={projectIntegrationUrl.replace(
-                          '[ref]',
-                          connection.supabase_project_ref
-                        )}
+                        href={
+                          projectIntegrationUrl.replace('[ref]', connection.supabase_project_ref) +
+                          `#${type.toLowerCase()}`
+                        }
                       >
+                        <SettingsIcon size={14} />
                         Configure connection
                       </Link>
                     </DropdownMenuItem>
@@ -124,17 +135,17 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                       disabled={isSyncEnvLoading}
                     >
                       {isSyncEnvLoading ? (
-                        <Loader2 className="animate-spin" size={14} />
+                        <Loader2Icon className="animate-spin" size={14} />
                       ) : (
-                        <RefreshCw size={14} />
+                        <RefreshCwIcon size={14} />
                       )}
                       <p>Resync environment variables</p>
                     </DropdownMenuItem>
                   )}
                   {((type === 'Vercel' && org?.managed_by !== 'vercel-marketplace') ||
-                    router.pathname !== projectIntegrationUrl) && <DropdownMenuSeparator />}
+                    !isProjectScoped) && <DropdownMenuSeparator />}
                   <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
-                    <Trash size={14} />
+                    <TrashIcon size={14} />
                     <p>Delete connection</p>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

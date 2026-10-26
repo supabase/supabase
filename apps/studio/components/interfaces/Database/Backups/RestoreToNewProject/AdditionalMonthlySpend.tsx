@@ -27,7 +27,7 @@ export const AdditionalMonthlySpend = ({
         </div>
         <div className="flex justify-between border-t pt-2">
           <p>Total</p>
-          <p className="font-mono text-right text-brand">
+          <p className="font-mono text-right text-primary">
             ${additionalMonthlySpend.computePrice + additionalMonthlySpend.diskPrice}
           </p>
         </div>

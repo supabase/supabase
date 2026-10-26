@@ -18,7 +18,7 @@ export const ProductButtonListItem = (props: Article) => {
         <SparklesIcon strokeWidth={1} />
       </div>
       <div className="flex flex-col items-start gap-0">
-        <span className="group-hover:text-brand text-sm">{props.title}</span>
+        <span className="group-hover:text-primary text-sm">{props.title}</span>
         <p className="text-foreground-light text-left text-sm">{props.description}</p>
       </div>
     </Link>

@@ -37,13 +37,19 @@ import {
   itemMatchesChangelogSelectedStages,
   itemMatchesChangelogSelectedTags,
   itemMatchesChangelogSelectedTypes,
+  stripTitleMarkdown,
   toChangelogTimelineIndexItem,
   type ChangelogTimelineIndexItem,
 } from '@/lib/changelog.utils'
+import { breadcrumbListSchema, collectionPageSchema, serializeJsonLd } from '@/lib/json-ld'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
 
 const FEATURED_COUNT = 3
+
+const TITLE = 'Changelog'
+const DESCRIPTION = 'New updates and improvements to Supabase'
+const CHANGELOG_URL = 'https://supabase.com/changelog'
 
 type FeaturedEntry = {
   slug: string
@@ -96,10 +102,33 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
 }
 
 export default function ChangelogPage(props: PageProps) {
+  const collectionJsonLd = collectionPageSchema({
+    url: CHANGELOG_URL,
+    name: TITLE,
+    description: DESCRIPTION,
+    items: props.allIndex.map((item) => ({
+      url: `https://supabase.com/changelog/${item.slug}`,
+      name: stripTitleMarkdown(item.title),
+    })),
+  })
+  const breadcrumbJsonLd = breadcrumbListSchema([
+    { name: 'Home', url: 'https://supabase.com' },
+    { name: TITLE, url: CHANGELOG_URL },
+  ])
   return (
-    <NuqsAdapter>
-      <ChangelogIndex {...props} />
-    </NuqsAdapter>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(collectionJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+      />
+      <NuqsAdapter>
+        <ChangelogIndex {...props} />
+      </NuqsAdapter>
+    </>
   )
 }
 
@@ -232,9 +261,6 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
 
   const singleSelectedTag = selectedTags.size === 1 ? [...selectedTags][0] : null
 
-  const TITLE = 'Changelog'
-  const DESCRIPTION = 'New updates and improvements to Supabase'
-
   return (
     <>
       <Head>
@@ -261,7 +287,6 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
               <div className="w-full lg:w-auto flex flex-wrap items-center gap-1">
                 <div className="flex-1">
                   <Button
-                    variant="default"
                     size="tiny"
                     className={cn('shrink-0', !filterPanelOpen && 'px-1.5')}
                     aria-expanded={filterPanelOpen}
@@ -284,7 +309,6 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                 </div>
                 <Button
                   asChild
-                  variant="default"
                   className="shrink-0"
                   icon={<Rss className="h-4 w-4" strokeWidth={2} aria-hidden />}
                 >

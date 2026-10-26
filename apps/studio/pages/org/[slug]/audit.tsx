@@ -20,8 +20,8 @@ const OrgAuditLogs: NextPageWithLayout = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   return (
-    <>
-      <PageHeader size="default">
+    <div className="flex flex-col h-full">
+      <PageHeader size="full">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Audit Logs</PageHeaderTitle>
@@ -31,8 +31,14 @@ const OrgAuditLogs: NextPageWithLayout = () => {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      {selectedOrganization === undefined && isLoadingPermissions ? <LogoLoader /> : <AuditLogs />}
-    </>
+      <div className="flex-1 min-h-0">
+        {selectedOrganization === undefined && isLoadingPermissions ? (
+          <LogoLoader />
+        ) : (
+          <AuditLogs />
+        )}
+      </div>
+    </div>
   )
 }
 
