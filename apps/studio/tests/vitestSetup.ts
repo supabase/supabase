@@ -36,7 +36,7 @@ vi.mock('next/navigation', async () => {
         replace: vi.fn(),
       }
     },
-    usePathname: () => vi.fn(),
+    usePathname: () => require('next-router-mock').useRouter().asPath.split('?')[0],
     useSearchParams: () => ({
       get: vi.fn(),
     }),
