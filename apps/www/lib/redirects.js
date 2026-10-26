@@ -3502,6 +3502,7 @@ module.exports = [
   },
   { permanent: true, source: '/docs/guides/api/api-settings', destination: '/docs/guides/api' },
   { permanent: true, source: '/docs/reference/llms.md', destination: '/llms.txt' },
+  { permanent: true, source: '/docs/llms.txt', destination: '/llms.txt' },
   { permanent: true, source: '/docs/guides/api/rest', destination: '/docs/guides/api' },
   {
     permanent: true,
