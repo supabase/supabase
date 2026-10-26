@@ -9,6 +9,12 @@ const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
 const GUIDES_MARKDOWN_SLUGS = new Set(MARKDOWN_SLUGS)
 
+function rewriteToMarkdownNotFound(url: URL) {
+  const rewriteUrl = new URL(url)
+  rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/md-404${url.pathname.replace(BASE_PATH ?? '', '')}`
+  return NextResponse.rewrite(rewriteUrl)
+}
+
 export function proxy(request: NextRequest) {
   const url = new URL(request.url)
   const { pathname } = url
@@ -37,6 +43,10 @@ export function proxy(request: NextRequest) {
 
   if (!pathname.startsWith(REFERENCE_PATH)) {
     return NextResponse.next()
+  }
+
+  if (pathname.endsWith('.md')) {
+    return rewriteToMarkdownNotFound(url)
   }
 
   if (isbot(request.headers.get('user-agent'))) {

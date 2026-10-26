@@ -175,6 +175,19 @@ describe('docs proxy — reference paths', () => {
     )
   })
 
+  it('rewrites .md guesses to the markdown 404 for every user agent, before the crawler rewrite', () => {
+    for (const userAgent of [
+      'curl/8.7.1',
+      'Googlebot',
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+    ]) {
+      const req = makeRequest('/docs/reference/javascript/select.md', { userAgent })
+      expect(proxy(req).headers.get(REWRITE_HEADER)).toBe(
+        'https://supabase.com/docs/api/md-404/reference/javascript/select.md'
+      )
+    }
+  })
+
   it('sends the Kotlin root to the crawler renderer for bots', () => {
     expect(
       proxy(makeRequest('/docs/reference/kotlin', { userAgent: 'Googlebot' })).headers.get(
