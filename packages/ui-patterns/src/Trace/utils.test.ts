@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Span } from './types'
 import {
+  areAllCollapsed,
   buildTraceIndex,
   clampWindow,
   collapsedChildMidpoints,
@@ -16,6 +17,7 @@ import {
   MAX_COLLAPSED_MARKS,
   niceTickStep,
   resizeWindow,
+  toggleAllCollapsed,
 } from './utils'
 
 const span = (id: string, startMs: number, endMs: number | null, parentId: string | null = null) =>
@@ -336,5 +338,30 @@ describe('formatAttributeValue', () => {
     expect(formatAttributeValue(null)).toBe('null')
     expect(formatAttributeValue(undefined)).toBe('undefined')
     expect(formatAttributeValue({ rows: 3, tags: ['a'] })).toBe('{"rows":3,"tags":["a"]}')
+  })
+})
+
+describe('collapse all', () => {
+  const index = buildTraceIndex([
+    span('root', 0, 100),
+    span('a', 10, 50, 'root'),
+    span('a1', 20, 30, 'a'),
+    span('b', 60, 90, 'root'),
+  ])
+
+  it('collapses every span that has children', () => {
+    expect([...toggleAllCollapsed(index, new Set())].sort()).toEqual(['a', 'root'])
+    expect([...toggleAllCollapsed(index, new Set(['a']))].sort()).toEqual(['a', 'root'])
+  })
+
+  it('expands everything when all parents are already collapsed', () => {
+    expect(areAllCollapsed(index, new Set(['root', 'a']))).toBe(true)
+    expect(toggleAllCollapsed(index, new Set(['root', 'a', 'gone'])).size).toBe(0)
+  })
+
+  it('never reports a trace without parents as collapsed', () => {
+    const flat = buildTraceIndex([span('x', 0, 10), span('y', 5, 15)])
+    expect(areAllCollapsed(flat, new Set())).toBe(false)
+    expect(toggleAllCollapsed(flat, new Set()).size).toBe(0)
   })
 })
