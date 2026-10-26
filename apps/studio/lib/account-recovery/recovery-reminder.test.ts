@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { safeLocalStorage } from 'common'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
