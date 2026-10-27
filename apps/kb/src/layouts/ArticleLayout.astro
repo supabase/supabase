@@ -88,7 +88,7 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 				</BreadcrumbList>
 			</Breadcrumb>
 			<header class="mb-8">
-				<h1 class="mt-0 mb-0 text-balance">{title}</h1>
+				<h1 data-page-title={title} class="mt-0 mb-0 text-balance">{title}</h1>
 				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
 			</header>
 			<slot />
