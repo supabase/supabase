@@ -242,7 +242,9 @@ describe(`EditBucketModal`, () => {
 
       await userEvent.click(await screen.findByRole('switch', { name: 'Object versioning' }))
 
-      expect(await screen.findByText('Custom lifecycle policies are set')).toBeInTheDocument()
+      expect(
+        await screen.findByText('This bucket has a custom lifecycle policy')
+      ).toBeInTheDocument()
 
       // Saved off the form itself: jsdom doesn't associate a button with a form by attribute,
       // so clicking the footer's Save submits nothing.

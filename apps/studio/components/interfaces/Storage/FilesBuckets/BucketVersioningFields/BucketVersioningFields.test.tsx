@@ -236,7 +236,7 @@ describe('BucketVersioningFields', () => {
       isUnsupportedPolicy: true,
     })
 
-    expect(screen.getByText('Custom lifecycle policies are set')).toBeInTheDocument()
+    expect(screen.getByText('This bucket has a custom lifecycle policy')).toBeInTheDocument()
     expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
     expect(screen.queryByText('No lifecycle policy')).not.toBeInTheDocument()
     expect(screen.queryByText('Tightening retention expires some versions')).not.toBeInTheDocument()
