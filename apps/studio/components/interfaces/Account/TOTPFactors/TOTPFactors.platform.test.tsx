@@ -12,6 +12,7 @@ import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TOTPFactors } from './index'
+import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 import { mswServer, type APIErrorBody } from '@/tests/lib/msw'
@@ -50,6 +51,11 @@ const session: Session = {
   user,
 }
 
+const SecurityFactors = () => {
+  const { findings } = useAccountRecovery()
+  return <TOTPFactors findings={findings} primaryAction={undefined} />
+}
+
 const renderSection = (searchParams = '') =>
   customRender(
     <AuthContext.Provider
@@ -66,7 +72,7 @@ const renderSection = (searchParams = '') =>
           hasLoaded: true,
         }}
       >
-        <TOTPFactors />
+        <SecurityFactors />
       </FeatureFlagContext.Provider>
     </AuthContext.Provider>,
     { nuqs: { searchParams } }

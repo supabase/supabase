@@ -44,6 +44,7 @@ import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useUnlinkIdentityMutation } from '@/data/profile/profile-unlink-identity-mutation'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import {
   evaluateAccountRecovery,
   type AccountRecoveryFinding,
@@ -63,6 +64,8 @@ export const AccountIdentities = ({
   primaryAction?: AccountRecoveryFinding['action'] | 'enable-mfa'
 } = {}) => {
   const router = useRouter()
+  const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
+  const settingsPath = hasSecuritySettings ? '/account/security' : '/account/me'
 
   const { data, isPending: isLoading, isSuccess, isError, error } = useProfileIdentitiesQuery()
 
@@ -128,7 +131,7 @@ export const AccountIdentities = ({
     setLinkingProviderId(provider.id)
 
     try {
-      const redirectTo = buildPathWithParams(buildProviderAuthRedirect(provider.id, '/account/me'))
+      const redirectTo = buildPathWithParams(buildProviderAuthRedirect(provider.id, settingsPath))
 
       const { error } = await auth.linkIdentity({
         provider: provider.authProvider as Provider,

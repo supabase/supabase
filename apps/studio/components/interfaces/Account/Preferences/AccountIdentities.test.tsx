@@ -87,14 +87,14 @@ const mockGetUser = (identities: IdentityFixture[]) => {
   })
 }
 
-const renderAccountIdentities = () => {
+const renderAccountIdentities = (searchParams = '') => {
   mswServer.use(
     http.get(`${BASE_PATH}/api/enabled-features-overrides`, () =>
       HttpResponse.json({ disabled_features: [] })
     )
   )
 
-  return customRender(<AccountIdentities />)
+  return customRender(<AccountIdentities />, { nuqs: { searchParams } })
 }
 
 const openAddPasswordDialog = async () => {
@@ -247,5 +247,12 @@ describe('AccountIdentities', () => {
       )
     ).toBeInTheDocument()
     expect(updateUserMock).not.toHaveBeenCalled()
+  })
+  it('opens password setup from a deep link and closes on cancel', async () => {
+    mockGetUser([githubIdentity])
+    renderAccountIdentities('?securityAction=set-password&keep=yes')
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 })
