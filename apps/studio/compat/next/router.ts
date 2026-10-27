@@ -202,6 +202,16 @@ function toRelativeSameOrigin(url: string): string {
     try {
       const parsed = new URL(url)
       if (parsed.origin !== window.location.origin) return url
+      // Absolute same-origin links outside the configured dashboard basePath
+      // target the public site. Preserve their origin so splitInternalUrl can
+      // route them through native navigation instead of prefixing /dashboard.
+      if (
+        NEXT_PUBLIC_BASE_PATH &&
+        parsed.pathname !== NEXT_PUBLIC_BASE_PATH &&
+        !parsed.pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`)
+      ) {
+        return url
+      }
       pathname = parsed.pathname
       search = parsed.search
       hash = parsed.hash
@@ -286,14 +296,22 @@ export function useRouter() {
       // decodes it and strips control characters (dropping `%0A` newlines
       // from values like the Logs Explorer's `s` SQL param). Split into
       // { to, search, hash } instead; the target is already relative and
-      // basepath-stripped, so splitInternalUrl's own origin/basePath
-      // normalisation is a no-op here. `search: {}` clears the query,
+      // basepath-stripped. The helper also identifies docs/changelog links as
+      // public-site destinations so they can bypass dashboard routing.
+      // `search: {}` clears the query,
       // matching Next's push-without-query semantics; same for `hash: ''`.
       //
       // The `<AnyRouter, string>` type arguments opt out of the registered
       // route tree's strict typing: Next-style hrefs are free-form strings
       // that can't satisfy the route-path union at compile time.
-      const { to, search, hash } = splitInternalUrl(target)
+      const { to, search, hash, external } = splitInternalUrl(target)
+      if (external) {
+        if (typeof window !== 'undefined') {
+          if (options?._replace) window.location.replace(to)
+          else window.location.assign(to)
+        }
+        return true
+      }
       await router.navigate<AnyRouter, string>({
         to,
         search: search ?? {},
@@ -378,7 +396,8 @@ export function useRouter() {
           // preloads the real target instead of a path-mangled one.
           // `<string, string>` (TFrom, TTo) loosens `to` to a plain string
           // for the same free-form-href reason as `navigate` above.
-          const { to, search, hash } = splitInternalUrl(toRelativeSameOrigin(url))
+          const { to, search, hash, external } = splitInternalUrl(toRelativeSameOrigin(url))
+          if (external) return
           await router.preloadRoute<string, string>({
             to,
             search: search ?? {},
