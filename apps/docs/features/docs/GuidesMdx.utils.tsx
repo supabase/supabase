@@ -23,6 +23,8 @@ import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 
+type OpenGraphArticleMetadata = Extract<NonNullable<Metadata['openGraph']>, { type: 'article' }>
+
 const PUBLISHED_SECTIONS = [
   'ai',
   'api',
@@ -170,11 +172,15 @@ const genGuidesStaticParams = (directory?: string) => async () => {
 
 const genGuideMeta =
   <Params,>(
-    generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
+    generate: (params: Params) => OrPromise<{
+      meta: GuideFrontmatter
+      pathname: `/${string}`
+      lastUpdated?: string
+    }>
   ) =>
   async (props: { params: Promise<Params> }, parent: ResolvingMetadata): Promise<Metadata> => {
     const params = await props.params
-    const [parentAlternates, parentOg, { meta, pathname }] = await Promise.all([
+    const [parentAlternates, parentOg, { meta, pathname, lastUpdated }] = await Promise.all([
       pluckPromise(parent, 'alternates'),
       pluckPromise(parent, 'openGraph'),
       generate(params),
@@ -197,13 +203,16 @@ const genGuideMeta =
       },
       openGraph: {
         ...parentOg,
+        type: 'article',
+        publishedTime: undefined,
+        modifiedTime: lastUpdated,
         url: `${BASE_PATH}${pathname}`,
         images: generateOpenGraphImageMeta({
           type: ogType,
           title: meta.title,
           description: meta.description,
         }),
-      },
+      } satisfies OpenGraphArticleMetadata,
     }
   }
 
