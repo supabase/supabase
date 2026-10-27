@@ -1,17 +1,23 @@
 import { QueryClient } from '@tanstack/react-query'
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
+import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
+import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { useQueryStates } from 'nuqs'
 import { ResizablePanelGroup } from 'ui'
-import { describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
 
 import { ServiceFlowPanel } from '../ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from '../UnifiedLogs.constants'
 import { ColumnSchema } from '../UnifiedLogs.schema'
+import type { UnifiedLogsScope } from '../UnifiedLogs.types'
+import { toQuerySearchParams } from '../UnifiedLogs.utils'
 import { generateDynamicColumns } from './Columns'
+import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { miscKeys } from '@/data/misc/keys'
 import { customRender } from '@/tests/lib/custom-render'
@@ -19,19 +25,12 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type LogsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 
-vi.mock('@/lib/constants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/lib/constants')>()),
-  IS_PLATFORM: true,
-}))
-
-vi.mock('common', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('common')>()
-  return {
-    ...actual,
-    useParams: () => ({ ref: 'default' }),
-    useFlag: (name: string) => name === 'otelUnifiedLogs',
-  }
-})
+vi.unmock('common')
+const { default: routerMock } =
+  await vi.importMock<typeof import('next-router-mock')>('next/router')
+const removeRouteParser = routerMock.useParser(createDynamicRouteParser(['/project/[ref]/logs']))
+afterAll(removeRouteParser)
+const requestSchema = z.object({ sql: z.string() })
 
 const RAY_ID = '8f00aa11bb22cc33-IAD'
 
@@ -80,7 +79,7 @@ const timelineRows = [
   },
 ]
 
-function PanelHarness() {
+function PanelHarness({ scope }: { scope?: UnifiedLogsScope }) {
   const [searchParameters] = useQueryStates(SEARCH_PARAMS_PARSER)
   const { columns } = generateDynamicColumns({ data: [gatewayLog] })
   const table = useReactTable({
@@ -105,14 +104,17 @@ function PanelHarness() {
           dock="right"
           setDock={vi.fn()}
           selectedRows={[gatewayLog]}
-          searchParameters={searchParameters}
+          searchParameters={{ ...toQuerySearchParams(searchParameters), scope }}
         />
       </ResizablePanelGroup>
     </DataTableProvider>
   )
 }
 
-function renderPanel(rows: typeof timelineRows = timelineRows) {
+function renderPanel(
+  rows: typeof timelineRows = timelineRows,
+  { scope, flag = true }: { scope?: UnifiedLogsScope; flag?: boolean | null } = {}
+) {
   const queries: string[] = []
   addAPIMock({
     method: 'get',
@@ -141,9 +143,9 @@ function renderPanel(rows: typeof timelineRows = timelineRows) {
     method: 'post',
     path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
     response: async ({ request }) => {
-      const { sql } = (await request.json()) as { sql: string }
+      const { sql } = requestSchema.parse(await request.json())
       queries.push(sql)
-      if (sql.includes('log attributes')) {
+      if (sql.includes('SELECT source, log_attributes')) {
         return HttpResponse.json<LogsResponse>({
           result: [
             {
@@ -153,17 +155,32 @@ function renderPanel(rows: typeof timelineRows = timelineRows) {
           ],
         })
       }
-      if (sql.includes('request timeline')) return HttpResponse.json<LogsResponse>({ result: rows })
+      if (sql.includes('ORDER BY timestamp ASC, id ASC'))
+        return HttpResponse.json<LogsResponse>({ result: rows })
       return HttpResponse.json<LogsResponse>({ result: [] })
     },
   })
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), { disabled_features: [] })
-  customRender(<PanelHarness />, { queryClient })
-  return { queries }
+  customRender(
+    <FeatureFlagContext.Provider
+      value={{
+        configcat: flag === null ? {} : { otelUnifiedLogs: flag },
+        posthog: {},
+        hasLoaded: true,
+      }}
+    >
+      <FeaturePreviewContextProvider>
+        <PanelHarness scope={scope} />
+      </FeaturePreviewContextProvider>
+    </FeatureFlagContext.Provider>,
+    { queryClient }
+  )
+  return { queries, queryClient }
 }
 
 describe('request timeline tab', () => {
+  beforeEach(() => routerMock.setCurrentUrl('/project/default/logs'))
   const openTimeline = async (user: ReturnType<typeof userEvent.setup>) => {
     await user.click(screen.getByRole('tab', { name: 'Timeline' }))
     return screen.findByRole('list', { name: 'Related logs' })
@@ -173,9 +190,30 @@ describe('request timeline tab', () => {
       .getAllByRole('button')
       .filter((button) => !/^\+\d+ more$/.test(button.textContent?.trim() ?? ''))
 
+  it.each([
+    {
+      flag: false,
+      scope: { filters: [{ column: 'function_id', operator: '=' as const, value: 'fn-1' }] },
+      expected: true,
+      name: 'scoped logs with the legacy backend selected',
+    },
+    {
+      flag: false,
+      scope: undefined,
+      expected: false,
+      name: 'unscoped logs with the legacy backend selected',
+    },
+    { flag: null, scope: undefined, expected: true, name: 'logs before the backend flag loads' },
+  ])('offers the timeline for $name: $expected', async ({ flag, scope, expected }) => {
+    const { queryClient } = renderPanel(timelineRows, { flag, scope })
+    if (expected) expect(screen.getByRole('tab', { name: 'Timeline' })).toBeVisible()
+    else expect(screen.queryByRole('tab', { name: 'Timeline' })).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
   it('lists logs sharing the request ID and opens one in the overview', async () => {
     const user = userEvent.setup()
-    const { queries } = renderPanel()
+    const { queries, queryClient } = renderPanel()
 
     const items = stepsIn(await openTimeline(user))
     expect(items).toHaveLength(2)
@@ -204,6 +242,7 @@ describe('request timeline tab', () => {
     expect(screen.queryByText('method')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Request' }))
     expect(screen.getByText('method')).toBeVisible()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
   it('keeps an open log between the hidden steps before and after it', async () => {
@@ -213,7 +252,7 @@ describe('request timeline tab', () => {
       id: `auth-log-${i}`,
       timestamp: `2026-01-01T10:00:00.0${10 + i}000`,
     }))
-    renderPanel([timelineRows[0], ...authSteps])
+    const { queryClient } = renderPanel([timelineRows[0], ...authSteps])
 
     expect(stepsIn(await openTimeline(user))).toHaveLength(3)
     await user.click(screen.getByRole('button', { name: '+6 more' }))
@@ -233,5 +272,6 @@ describe('request timeline tab', () => {
     const expanded = stepsIn(list)
     expect(expanded).toHaveLength(9)
     expect(expanded[6]).toHaveAttribute('aria-current', 'true')
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 })
