@@ -58,7 +58,6 @@ interface BaseGuideTemplateProps {
   editLink: EditLink
   mdxOptions?: SerializeOptions
   pathname: `/${string}`
-  /** ISO 8601 date of the most recent content change, if known. */
   lastUpdated?: string
 }
 
