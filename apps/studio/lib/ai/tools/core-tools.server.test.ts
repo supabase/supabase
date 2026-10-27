@@ -1,23 +1,35 @@
 import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getOptInTools, getStudioTools } from './studio-tools'
+import { createTool as createDeployEdgeFunctionTool } from './deploy-edge-function.server'
+import { createTool as createExecuteSqlTool } from './execute-sql.server'
+import { createTool as createLoadKnowledgeTool } from './load-knowledge.server'
+import { buildLocalTools } from './registry.server'
+import { createTool as createRenameChatTool } from './rename-chat.server'
+import type { ToolContext } from './types'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/execute-sql-output'
+
+const createStudioTools = (ctx: ToolContext) => ({
+  execute_sql: createExecuteSqlTool(ctx),
+  deploy_edge_function: createDeployEdgeFunctionTool(ctx),
+  rename_chat: createRenameChatTool(ctx),
+  load_knowledge: createLoadKnowledgeTool(ctx),
+})
 
 vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: vi.fn(),
 }))
 
-describe('ai/tools/studio-tools', () => {
+describe('ai/tools core tools', () => {
   beforeEach(() => {
     vi.mocked(executeSql).mockReset()
   })
 
-  describe('getStudioTools', () => {
+  describe('studio tools', () => {
     it('should expose exactly the studio tools', () => {
-      const tools = getStudioTools({ aiOptInLevel: 'schema' })
+      const tools = createStudioTools({ aiOptInLevel: 'schema' })
 
       expect(Object.keys(tools).sort()).toEqual([
         'deploy_edge_function',
@@ -28,7 +40,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should include logs in the load_knowledge schema', () => {
-      const tools = getStudioTools({ aiOptInLevel: 'schema' })
+      const tools = createStudioTools({ aiOptInLevel: 'schema' })
       const schema = tools.load_knowledge.inputSchema
 
       if (!('safeParse' in schema)) throw new Error('inputSchema has no safeParse')
@@ -39,7 +51,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should return ClickHouse logs knowledge for load_knowledge logs', async () => {
-      const tools = getStudioTools({ aiOptInLevel: 'schema' })
+      const tools = createStudioTools({ aiOptInLevel: 'schema' })
       if (!tools.load_knowledge.execute) throw new Error('execute is undefined')
 
       const result = await tools.load_knowledge.execute(
@@ -54,7 +66,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should have rename_chat hand the rename off to the client', async () => {
-      const tools = getStudioTools({ aiOptInLevel: 'schema' })
+      const tools = createStudioTools({ aiOptInLevel: 'schema' })
       const renameTool = tools.rename_chat
 
       if (!renameTool.execute) throw new Error('execute is undefined')
@@ -66,7 +78,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should validate execute_sql input schema correctly', () => {
-      const tools = getStudioTools({ aiOptInLevel: 'schema' })
+      const tools = createStudioTools({ aiOptInLevel: 'schema' })
       const schema = tools.execute_sql.inputSchema
 
       if (!('safeParse' in schema)) throw new Error('inputSchema has no safeParse')
@@ -98,7 +110,7 @@ describe('ai/tools/studio-tools', () => {
     })
 
     it('should require approval for read and write SQL queries', () => {
-      const tools = getStudioTools({ aiOptInLevel: 'schema' })
+      const tools = createStudioTools({ aiOptInLevel: 'schema' })
 
       expect(tools.execute_sql.needsApproval).toBe(true)
     })
@@ -107,7 +119,7 @@ describe('ai/tools/studio-tools', () => {
       const rows = [{ email: 'test@example.com' }]
       vi.mocked(executeSql).mockResolvedValue({ result: rows })
 
-      const tools = getStudioTools({
+      const tools = createStudioTools({
         projectRef: 'test-project',
         connectionString: 'encrypted-connection-string',
         aiOptInLevel: 'schema',
@@ -145,7 +157,7 @@ describe('ai/tools/studio-tools', () => {
       const error = new Error('duplicate key (email)=(test@example.com)')
       vi.mocked(executeSql).mockRejectedValue(error)
 
-      const tools = getStudioTools({
+      const tools = createStudioTools({
         projectRef: 'test-project',
         connectionString: 'encrypted-connection-string',
         aiOptInLevel: 'schema',
@@ -169,7 +181,7 @@ describe('ai/tools/studio-tools', () => {
       const rows = [{ email: 'test@example.com' }]
       vi.mocked(executeSql).mockResolvedValue({ result: rows })
 
-      const tools = getStudioTools({
+      const tools = createStudioTools({
         projectRef: 'test-project',
         connectionString: 'encrypted-connection-string',
         aiOptInLevel: 'schema_and_log_and_data',
@@ -205,7 +217,7 @@ describe('ai/tools/studio-tools', () => {
 
     it('should push a row limit into read queries but leave write queries untouched', async () => {
       vi.mocked(executeSql).mockResolvedValue({ result: [] })
-      const tools = getStudioTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
+      const tools = createStudioTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.execute_sql.execute) throw new Error('execute is undefined')
       const options = { toolCallId: 'test', messages: [], context: {} }
       const base = { label: 'Query', chartConfig: { view: 'table' as const } }
@@ -226,7 +238,7 @@ describe('ai/tools/studio-tools', () => {
     it('should cap rows and say the total is unknown when the limit ran in the database', async () => {
       const rows = Array.from({ length: 101 }, (_, i) => ({ id: i }))
       vi.mocked(executeSql).mockResolvedValue({ result: rows })
-      const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
+      const tools = createStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
       const input = {
         sql: 'SELECT id FROM users',
         label: 'Get ids',
@@ -262,7 +274,7 @@ describe('ai/tools/studio-tools', () => {
     it('should report the real total when the query could not be limited in the database', async () => {
       const rows = Array.from({ length: 150 }, (_, i) => ({ id: i }))
       vi.mocked(executeSql).mockResolvedValue({ result: rows })
-      const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
+      const tools = createStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
       const input = {
         sql: 'SELECT id FROM users; SELECT id FROM users',
         label: 'Get ids',
@@ -293,8 +305,22 @@ describe('ai/tools/studio-tools', () => {
   })
 })
 
-describe('ai/tools/studio-tools getOptInTools', () => {
-  it('registers update_opt_in_level for the level', () => {
-    expect(Object.keys(getOptInTools({ aiOptInLevel: 'schema' }))).toEqual(['update_opt_in_level'])
+describe('ai/tools update_opt_in_level', () => {
+  it('is registered on platform for the level', () => {
+    const tools = buildLocalTools(
+      { aiOptInLevel: 'schema' },
+      { environment: 'platform', satisfied: new Set() }
+    )
+
+    expect(Object.keys(tools)).toContain('update_opt_in_level')
+  })
+
+  it('is not registered when self-hosted', () => {
+    const tools = buildLocalTools(
+      { aiOptInLevel: 'schema' },
+      { environment: 'self-hosted', satisfied: new Set() }
+    )
+
+    expect(Object.keys(tools)).not.toContain('update_opt_in_level')
   })
 })

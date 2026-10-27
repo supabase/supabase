@@ -12,6 +12,16 @@ export type ToolContext = {
   baseUrl?: string
 }
 
+export type ToolEnvironment = 'platform' | 'self-hosted'
+
+/** Request-level conditions a tool needs beyond its environment. */
+export type ToolRequirement = 'explorer' | 'supportMode' | 'baseUrl'
+
+export type ToolAvailability = {
+  environments: ReadonlySet<ToolEnvironment>
+  requires?: ReadonlySet<ToolRequirement>
+}
+
 /**
  * Isomorphic: zod and pure functions only, so nothing here may import the data layer.
  */
@@ -26,6 +36,8 @@ export type ToolContract<TInput = unknown, TOutput = unknown> = {
    */
   createInputSchema?(ctx: ToolContext): z.ZodType<TInput, z.ZodTypeDef, unknown>
   outputSchema: z.ZodType<TOutput, z.ZodTypeDef, unknown>
+  /** Where the tool exists, and what else the request must provide for it to be offered. */
+  availability: ToolAvailability
   /** Lowest opt-in level at which the tool runs. `null` means always available. */
   minOptInLevel: AiOptInLevel | null
   needsApproval: boolean
@@ -46,7 +58,10 @@ export type ToolContract<TInput = unknown, TOutput = unknown> = {
  * A tool the remote MCP server implements. The server owns the description, input schema,
  * execution and output; Studio decides only who may run it and whether it needs approval.
  */
-export type RemoteToolContract = Pick<ToolContract, 'name' | 'minOptInLevel' | 'needsApproval'>
+export type RemoteToolContract = Pick<
+  ToolContract,
+  'name' | 'availability' | 'minOptInLevel' | 'needsApproval'
+>
 
 export type ToolContractInput<C extends ToolContract> = z.infer<C['inputSchema']>
 export type ToolContractOutput<C extends ToolContract> = z.infer<C['outputSchema']>

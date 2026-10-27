@@ -2,21 +2,28 @@ import { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
-import { getReportTools } from './report-tools'
+import { createTool as createGetReportTool } from './get-report.server'
+import { createTool as createListReportsTool } from './list-reports.server'
+import type { ToolContext } from './types'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdResponse_Output']
 
-describe('ai/tools/report-tools', () => {
-  describe('getReportTools', () => {
+const createReportTools = (ctx: ToolContext) => ({
+  list_reports: createListReportsTool(ctx),
+  get_report: createGetReportTool(ctx),
+})
+
+describe('ai/tools/reports', () => {
+  describe('report tools', () => {
     it('should return list_reports and get_report tools', () => {
-      const tools = getReportTools({ aiOptInLevel: 'schema' })
+      const tools = createReportTools({ aiOptInLevel: 'schema' })
 
       expect(Object.keys(tools)).toEqual(['list_reports', 'get_report'])
     })
 
     it('should not require approval to read reports', () => {
-      const tools = getReportTools({ aiOptInLevel: 'schema' })
+      const tools = createReportTools({ aiOptInLevel: 'schema' })
 
       expect(tools.list_reports.needsApproval).toBe(false)
       expect(tools.get_report.needsApproval).toBe(false)
@@ -61,7 +68,7 @@ describe('ai/tools/report-tools', () => {
         },
       })
 
-      const tools = getReportTools({
+      const tools = createReportTools({
         projectRef: 'test-project',
         authorization: 'Bearer token',
         aiOptInLevel: 'schema',
@@ -168,7 +175,7 @@ describe('ai/tools/report-tools', () => {
         },
       })
 
-      const tools = getReportTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
+      const tools = createReportTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_report.execute) throw new Error('execute is undefined')
 
       const result = (await tools.get_report.execute(
@@ -208,7 +215,7 @@ describe('ai/tools/report-tools', () => {
           }),
       })
 
-      const tools = getReportTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
+      const tools = createReportTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_report.execute) throw new Error('execute is undefined')
 
       await expect(
