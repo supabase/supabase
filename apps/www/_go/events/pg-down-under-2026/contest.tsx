@@ -65,7 +65,7 @@ const page: GoPageInput = {
     {
       type: 'form',
       id: 'enter-contest',
-      title: 'Enter the contest',
+      title: 'Enter the raffle',
       description: 'Fill out the form below to complete your entry.',
       fields: [
         {
@@ -99,7 +99,7 @@ const page: GoPageInput = {
           required: true,
         },
       ],
-      submitLabel: 'Enter contest',
+      submitLabel: 'Enter raffle',
       successRedirect: '/go/pg-down-under-2026/contest/thank-you',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy) and the [Official Rules](/go/contest-rules).',
