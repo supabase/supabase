@@ -483,6 +483,8 @@ The files above live under `supabase/tests/` and run through [pgTAP](/docs/guide
 
 For more information about writing a policy test and running it against your local database, see [Test Row Level Security policies with pgTAP](/docs/guides/database/postgres/testing-row-level-security).
 
+If an agent writes your tests, have it follow [Write tests that catch policy mistakes](/docs/guides/database/postgres/testing-row-level-security#write-tests-that-catch-policy-mistakes) so the suite covers the rules that matter.
+
 [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main) adds `tests.create_supabase_user()`, `tests.authenticate_as()`, and `tests.rls_enabled()`. See [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended) and [Testing your database](/docs/guides/database/testing).
 
 ### Add indexes
