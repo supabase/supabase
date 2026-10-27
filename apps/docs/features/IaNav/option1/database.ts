@@ -105,6 +105,7 @@ export const database: NavMenuConstant = {
         {
           name: 'Functions and triggers',
           items: [
+            { name: 'Managing database functions', url: '/guides/database/functions' },
             { name: 'Debugging database functions', url: '/guides/database/debugging-functions' },
             { name: 'Managing database triggers', url: '/guides/database/postgres/triggers' },
             { name: 'Managing event triggers', url: '/guides/database/postgres/event-triggers' },

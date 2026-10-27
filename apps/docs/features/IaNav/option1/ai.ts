@@ -98,6 +98,7 @@ export const ai: NavMenuConstant = {
         { name: 'LlamaIndex', url: '/guides/ai/integrations/llamaindex' },
         { name: 'Roboflow', url: '/guides/ai/integrations/roboflow' },
         { name: 'Amazon Bedrock', url: '/guides/ai/integrations/amazon-bedrock' },
+        { name: 'Fireworks AI', url: '/guides/ai/integrations/fireworks-ai' },
         { name: 'Mixpeek', url: '/guides/ai/examples/mixpeek-video-search' },
       ],
     },

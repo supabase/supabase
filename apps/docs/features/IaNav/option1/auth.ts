@@ -141,6 +141,7 @@ export const auth: NavMenuConstant = {
           enabled: authConfigurationEnabled,
         },
         { name: 'Custom SMTP', url: '/guides/auth/auth-smtp', enabled: authConfigurationEnabled },
+        { name: 'Test Auth Flows', url: '/guides/auth/testing-auth-flows' },
         {
           name: 'Redirect URLs',
           url: '/guides/auth/redirect-urls',
@@ -241,6 +242,7 @@ export const auth: NavMenuConstant = {
             { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
             { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
             { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
+            { name: 'Custom OIDC', url: '/guides/auth/third-party/custom-oidc' },
           ],
         },
         {

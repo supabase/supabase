@@ -30,6 +30,7 @@ export const start: NavMenuConstant = {
   title: 'Start',
   url: '/guides/getting-started',
   items: [
+    { name: 'The Supabase way to build', url: '/guides/getting-started/the-supabase-way-to-build' },
     { name: 'API keys and key rotation', url: '/guides/getting-started/api-keys' },
     {
       name: 'Migrating from legacy API keys',
