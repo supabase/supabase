@@ -75,6 +75,7 @@ describe('useAccountRecovery', () => {
     resolveStatus({ data: { remaining: 0 }, error: null })
     await waitFor(() => expect(result.current.findings[0]?.id).toBe('recovery-codes-exhausted'))
     expect(result.current.isPending).toBe(false)
+    expect(result.current.isFactorsSuccess).toBe(true)
   })
 
   it('keeps the password finding independent of unavailable Security settings', async () => {
