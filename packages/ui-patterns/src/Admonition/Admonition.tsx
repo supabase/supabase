@@ -115,7 +115,10 @@ export const Admonition = forwardRef<
                 )}
               >
                 <FloatingPlate
-                  className={cn('flex gap-2', layout === 'responsive' && 'w-full @lg:w-auto')}
+                  className={cn(
+                    'flex gap-2',
+                    layout === 'responsive' && 'has-[>.w-full]:w-full @lg:has-[>.w-full]:w-auto'
+                  )}
                 >
                   {actions}
                 </FloatingPlate>
