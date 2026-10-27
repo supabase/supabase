@@ -755,6 +755,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/guides/auth/troubleshooting",
+    "destination": "/kb/topics/troubleshooting?troubleshooting=auth",
+    "permanent": false
+  },
+  {
     "source": "/docs/guides/cli",
     "destination": "/docs/guides/local-development",
     "permanent": true
@@ -1025,6 +1030,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/guides/database/troubleshooting",
+    "destination": "/kb/topics/troubleshooting?troubleshooting=database",
+    "permanent": false
+  },
+  {
     "source": "/docs/guides/database/typescript-support",
     "destination": "/docs/guides/api/rest/generating-types",
     "permanent": true
@@ -1133,6 +1143,11 @@
     "source": "/docs/guides/functions/log-drains",
     "destination": "/docs/guides/observability/log-drains",
     "permanent": true
+  },
+  {
+    "source": "/docs/guides/functions/troubleshooting",
+    "destination": "/kb/topics/troubleshooting?troubleshooting=edge-functions",
+    "permanent": false
   },
   {
     "source": "/docs/guides/functions/typescript-support",
@@ -1878,6 +1893,11 @@
     "source": "/docs/guides/realtime/testing",
     "destination": "/docs/guides/realtime",
     "permanent": true
+  },
+  {
+    "source": "/docs/guides/realtime/troubleshooting",
+    "destination": "/kb/topics/troubleshooting?troubleshooting=realtime",
+    "permanent": false
   },
   {
     "source": "/docs/guides/resources/examples",
