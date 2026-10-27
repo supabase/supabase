@@ -1,5 +1,5 @@
 import { useDebounce } from '@uidotdev/usehooks'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
@@ -132,6 +132,7 @@ export const PlanUpdateSidePanel = () => {
   const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const snap = useOrgSettingsPageStateSnapshot()
   const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'
@@ -157,9 +158,14 @@ export const PlanUpdateSidePanel = () => {
     snap.setPanelKey(undefined)
   }
 
-  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: slug,
-  })
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
+
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery(
+    { orgSlug: slug },
+    { enabled: visible && canReadSubscriptions }
+  )
   const { data: plans, isPending: isLoadingPlans } = useOrgPlansQuery(
     { orgSlug: slug },
     { enabled: visible }
@@ -233,7 +239,9 @@ export const PlanUpdateSidePanel = () => {
   // Fail closed until subscription succeeds: unresolved plan ids look eligible.
   const showAwsMarketplacePurchase =
     isSuccessSubscription &&
+    canReadSubscriptions &&
     canUpdateSubscription &&
+    !projectUpdateDisabled &&
     selectedOrganization?.managed_by === MANAGED_BY.SUPABASE &&
     !isPartnerBilledOrganization &&
     subscription.billing_via_partner === false &&
