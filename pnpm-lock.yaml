@@ -14289,8 +14289,8 @@ packages:
     resolution: {integrity: sha512-MbjN408fEndfiQXbFQ1vnd+1NoLDsnQW41410oQBXiyXDMYH5z505juWa4KUE1LqxRC7DgOgZDbKLxHIwm27hA==}
     engines: {node: '>=0.10'}
 
-  launch-editor@2.14.1:
-    resolution: {integrity: sha512-QWBrQsMpH7gPr965dsKD/3cKWiNoTjpATQf++Xq63N6sKRGMwlVXz41O1IZTMfZQgBctD/K5Zt06+/I6pP6+HA==}
+  launch-editor@2.14.2:
+    resolution: {integrity: sha512-NHJEb30MGBCkmZXLZwz25t37QR4aY03ZzPYUJXOJaOa92uWwExI9SBQUuIznBYc1xkD7cJNGX7oc3Nl3sq2kQQ==}
 
   layout-base@1.0.2:
     resolution: {integrity: sha512-8h2oVEZNktL4BH2JCOI90iD1yXwL6iNW7KcCKT2QZgQJR2vbqDsldCTPRU9NifTCqHZci57XvQQ15YTu+sTYPg==}
@@ -23128,7 +23128,7 @@ snapshots:
       hookable: 6.1.1
       image-meta: 0.2.2
       is-installed-globally: 1.0.0
-      launch-editor: 2.14.1
+      launch-editor: 2.14.2
       local-pkg: 1.2.1
       magicast: 0.5.4
       nypm: 0.6.9
@@ -26375,7 +26375,7 @@ snapshots:
       '@tanstack/devtools-client': 0.0.6
       '@tanstack/devtools-event-bus': 0.4.1
       chalk: 5.6.2
-      launch-editor: 2.14.1
+      launch-editor: 2.14.2
       picomatch: 4.0.4
       vite: 8.2.1(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
@@ -32510,7 +32510,7 @@ snapshots:
     dependencies:
       language-subtag-registry: 0.3.23
 
-  launch-editor@2.14.1:
+  launch-editor@2.14.2:
     dependencies:
       picocolors: 1.1.1
       shell-quote: 1.12.0
