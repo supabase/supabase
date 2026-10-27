@@ -7,6 +7,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
 import { getPrimarySecurityAction } from '@/components/interfaces/Account/Security/Security.utils'
 import { TOTPFactors } from '@/components/interfaces/Account/TOTPFactors'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
@@ -22,7 +23,7 @@ const Security: NextPageWithLayout = () => {
 
   const recovery = useAccountRecovery({ enabled: showSecuritySettings })
   const primaryAction = getPrimarySecurityAction({
-    findings: recovery.findings.filter((finding) => finding.action !== 'set-password'),
+    findings: recovery.findings,
     isPending: recovery.isPending,
     isError: recovery.isError,
     canEnableMfa: recovery.isFactorsSuccess && recovery.verifiedFactorCount === 0,
@@ -39,12 +40,13 @@ const Security: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Security</PageHeaderTitle>
             <PageHeaderDescription>
-              Manage your account security settings and authentication methods.
+              Manage how you sign in, protect your account, and recover access.
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
+        <AccountIdentities primaryAction={primaryAction} />
         <TOTPFactors findings={recovery.findings} primaryAction={primaryAction} />
       </PageContainer>
     </>

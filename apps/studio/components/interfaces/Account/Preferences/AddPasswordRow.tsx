@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -50,6 +51,12 @@ export const AddPasswordRow = ({
   isPrimary?: boolean
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [securityAction, setSecurityAction] = useQueryState('securityAction', parseAsString)
+  const isOpen = isDialogOpen || securityAction === 'set-password'
+  const handleOpenChange = (open: boolean) => {
+    setIsDialogOpen(open)
+    if (!open && securityAction === 'set-password') void setSecurityAction(null)
+  }
 
   return (
     <>
@@ -63,18 +70,21 @@ export const AddPasswordRow = ({
             : `Add a password to sign in with ${email}.`
         }
         actions={
-          <Button variant={isPrimary ? 'primary' : 'default'} onClick={() => setIsDialogOpen(true)}>
+          <Button
+            variant={isPrimary ? 'primary' : 'default'}
+            onClick={() => handleOpenChange(true)}
+          >
             Add password
           </Button>
         }
       />
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader className="border-b">
             <DialogTitle>Add password</DialogTitle>
           </DialogHeader>
-          <AddPasswordForm email={email} onClose={() => setIsDialogOpen(false)} />
+          <AddPasswordForm email={email} onClose={() => handleOpenChange(false)} />
         </DialogContent>
       </Dialog>
     </>
