@@ -105,7 +105,6 @@ export const buildUnifiedLogsUrl = ({
   user?: string
   start?: string | Date
   end?: string | Date
-  /** Opens this log in the side panel */
   logId?: string
 }) =>
   serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {

@@ -16,7 +16,6 @@ import { unifiedLogRequestTimelineQueryOptions } from '@/data/logs/unified-log-r
 import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-/** The Supabase user behind a log's request, when one can be found. */
 export function LogUser({
   row,
   searchParameters,
@@ -27,7 +26,6 @@ export function LogUser({
   const { ref: projectRef } = useParams()
   const isOtel = useUnifiedLogsBackend(searchParameters)
 
-  // Only logs without their own user need the rest of the request to find one
   const timelineQuery = unifiedLogRequestTimelineQueryOptions({
     projectRef,
     logId: row.id,
@@ -143,7 +141,6 @@ function SupabaseUser({ userId }: { userId: string }) {
   )
 }
 
-/** A user ID that can be copied, or used to filter the list like the sidebar's user filter. */
 function UserIdRow({ label, userId }: { label: string; userId: string }) {
   const [, setUserFilter] = useQueryState('user', parseAsString)
   return (

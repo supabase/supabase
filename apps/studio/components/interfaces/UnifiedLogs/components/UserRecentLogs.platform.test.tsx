@@ -95,7 +95,7 @@ describe('UserRecentLogs', () => {
     expect(queries.some((sql) => sql.includes(`'${USER_ID}'`))).toBe(true)
   })
 
-  it('links to the rest of their logs', async () => {
+  it('opens all logs filtered to the selected user', async () => {
     renderRecentLogs([listRow('log-1', '2026-01-02T09:00:00.000000', '/rest/v1/todos')])
 
     await userEvent.click(await screen.findByRole('button', { name: 'View more in Logs' }))
@@ -104,7 +104,7 @@ describe('UserRecentLogs', () => {
     expect(logsUrl.searchParams.has('id')).toBe(false)
   })
 
-  it('explains an empty list', async () => {
+  it('shows an empty state when the user has no recent logs', async () => {
     renderRecentLogs([])
     expect(await screen.findByText('No logs in the last 24 hours')).toBeVisible()
   })

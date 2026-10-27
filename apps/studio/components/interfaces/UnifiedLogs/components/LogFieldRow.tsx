@@ -18,7 +18,6 @@ interface LogFieldRowProps<TData> {
   disabled?: boolean
   /** Truncate the label to one line instead of wrapping it. */
   truncateLabel?: boolean
-  /** Offers "Add filter" for a filter that isn't a table column (e.g. a URL param). */
   onAddFilter?: () => void
   className?: string
 }
