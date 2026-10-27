@@ -141,4 +141,47 @@ describe('Admonition', () => {
     expect(paragraph.tagName).toBe('P')
     expect(paragraph.parentElement).toHaveAttribute('data-slot', 'alert-description')
   })
+  it('keeps separate action surfaces with a transparent gap between independent buttons', () => {
+    render(
+      <Admonition
+        actions={[<button key="save">Save</button>, <button key="cancel">Cancel</button>]}
+      />
+    )
+    const savePlate = screen.getByRole('button', { name: 'Save' }).parentElement
+    const cancelPlate = screen.getByRole('button', { name: 'Cancel' }).parentElement
+    expect(savePlate).toHaveClass('bg-popover')
+    expect(cancelPlate).toHaveClass('bg-popover')
+    expect(savePlate).not.toBe(cancelPlate)
+    expect(savePlate?.parentElement).toBe(cancelPlate?.parentElement)
+    expect(savePlate?.parentElement).not.toHaveClass('bg-popover')
+  })
+
+  it('keeps a joined action group on one surface and flattens nested fragments', () => {
+    render(
+      <Admonition
+        layout="responsive"
+        actions={
+          <>
+            <div className="flex w-full @lg:w-auto">
+              <button>Regenerate</button>
+              <button>Code options</button>
+            </div>
+            <>
+              {false && <button>Hidden</button>}
+              {null}
+              <button>Cancel</button>
+            </>
+          </>
+        }
+      />
+    )
+    const group = screen.getByRole('button', { name: 'Regenerate' }).parentElement
+    expect(group).toBe(screen.getByRole('button', { name: 'Code options' }).parentElement)
+    const groupPlate = group?.parentElement
+    const cancelPlate = screen.getByRole('button', { name: 'Cancel' }).parentElement
+    expect(groupPlate).toHaveClass('bg-popover')
+    expect(cancelPlate).toHaveClass('bg-popover')
+    expect(groupPlate).not.toBe(cancelPlate)
+    expect(groupPlate?.parentElement?.children).toHaveLength(2)
+  })
 })

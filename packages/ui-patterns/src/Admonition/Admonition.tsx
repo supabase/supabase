@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { Children, forwardRef, Fragment, isValidElement, type ReactNode } from 'react'
 import { Alert, AlertDescription, AlertTitle, cn, FloatingPlate } from 'ui'
 
 import { TYPE_LABEL, TYPE_TO_VARIANT } from './Admonition.constants'
@@ -14,6 +14,24 @@ const admonitionBodyClassName = [
   '[&_ul]:list-none [&_ol]:list-decimal [&_ul]:pl-4 [&_ol]:pl-4',
   '[&_ul>li]:relative [&_ul>li]:before:absolute [&_ul>li]:before:left-[-1rem] [&_ul>li]:before:top-2.5 [&_ul>li]:before:h-0.5 [&_ul>li]:before:w-2 [&_ul>li]:before:rounded [&_ul>li]:before:bg-border-strong [&_ul>li]:before:content-[""]',
 ].join(' ')
+
+const ActionPlates = ({ children, layout }: { children: ReactNode; layout: AdmonitionLayout }) =>
+  Children.map(children, (action) => {
+    if (action === null || action === undefined) return null
+    if (isValidElement<{ children?: ReactNode }>(action) && action.type === Fragment) {
+      return <ActionPlates layout={layout}>{action.props.children}</ActionPlates>
+    }
+    return (
+      <FloatingPlate
+        className={cn(
+          'flex',
+          layout === 'responsive' && 'has-[>.w-full]:w-full @lg:has-[>.w-full]:w-auto'
+        )}
+      >
+        {action}
+      </FloatingPlate>
+    )
+  })
 
 export const Admonition = forwardRef<
   React.ComponentRef<typeof Alert>,
@@ -114,14 +132,7 @@ export const Admonition = forwardRef<
                   layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'
                 )}
               >
-                <FloatingPlate
-                  className={cn(
-                    'flex gap-2',
-                    layout === 'responsive' && 'has-[>.w-full]:w-full @lg:has-[>.w-full]:w-auto'
-                  )}
-                >
-                  {actions}
-                </FloatingPlate>
+                <ActionPlates layout={layout}>{actions}</ActionPlates>
               </div>
             )}
           </div>
