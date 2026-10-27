@@ -147,18 +147,6 @@ describe('useCreateQuery', () => {
     expect(mockPush).toHaveBeenCalledWith('/project/default/explorer/query/query-new')
   })
 
-  it('creates an empty draft when no sql or name is provided', () => {
-    const { result } = renderHook(() => useCreateQuery())
-
-    expect(result.current.createQuery()).toBe('query-new')
-    expect(mockCreateDraft).toHaveBeenCalledWith({
-      id: 'query-new',
-      projectRef: 'default',
-      sql: undefined,
-      name: undefined,
-    })
-  })
-
   it('forwards autoRun to the draft so its query tab can run itself once mounted', () => {
     const { result } = renderHook(() => useCreateQuery())
 

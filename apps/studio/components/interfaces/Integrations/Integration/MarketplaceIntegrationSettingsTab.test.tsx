@@ -12,12 +12,13 @@ import { type ProjectSecret } from '@/data/secrets/secrets-query'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
 type OAuthAppResponse = components['schemas']['OAuthAppResponse_Output']
 type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse_Output']
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 // `useIntegrationDetail` resolves the integration definition from the route, the marketplace query
 // and feature flags — none of which is the subject of this test. Mock it so each test can drive a
@@ -103,11 +104,7 @@ const mockProjectResources = ({
   oauthApps = [] as OAuthAppResponse[],
   smtpHost = null as string | null,
 } = {}) => {
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: () => HttpResponse.json<PermissionsV2Response>(CAN_READ_OAUTH_APPS_PERMISSIONS),
-  })
+  mockPermissions(CAN_READ_OAUTH_APPS_PERMISSIONS)
   addAPIMock({
     method: 'get',
     path: '/v1/projects/:ref/api-keys',
@@ -140,7 +137,7 @@ const mockProjectResources = ({
 
 describe('MarketplaceIntegrationSettingsTab', () => {
   describe('section visibility follows the integration definition', () => {
-    test('renders the secret API key section when the integration declares a secret key prefix', async () => {
+    test('renders the secret API key section with a Remove action and generic warning when the integration declares a secret key prefix', async () => {
       setIntegration({ secretKeyPrefix: 'custom_' })
       mockProjectResources({ apiKeys: [secretApiKey('custom_metrics_key')] })
 
@@ -148,6 +145,13 @@ describe('MarketplaceIntegrationSettingsTab', () => {
 
       expect(await screen.findByRole('heading', { name: 'Secret API key' })).toBeInTheDocument()
       expect(screen.getByText('custom_metrics_key')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+      // No integration-specific override, so the generic removal warning is used.
+      expect(
+        screen.getByText(
+          'Removing this key takes effect immediately and can interrupt the integration.'
+        )
+      ).toBeInTheDocument()
     })
 
     test('does not render a secret API key section when the integration declares no prefix, even if secret keys exist', async () => {
@@ -212,29 +216,6 @@ describe('MarketplaceIntegrationSettingsTab', () => {
   })
 
   describe('resource section states', () => {
-    test('a present resource shows the Connected badge and a Remove action', async () => {
-      setIntegration({ secretKeyPrefix: 'custom_' })
-      mockProjectResources({ apiKeys: [secretApiKey('custom_key')] })
-
-      customRender(<MarketplaceIntegrationSettingsTab />)
-
-      expect(await screen.findByText('custom_key')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
-    })
-
-    test('uses the generic removal warning when the integration has no override copy', async () => {
-      setIntegration({ secretKeyPrefix: 'custom_' })
-      mockProjectResources({ apiKeys: [secretApiKey('custom_key')] })
-
-      customRender(<MarketplaceIntegrationSettingsTab />)
-
-      expect(
-        await screen.findByText(
-          'Removing this key takes effect immediately and can interrupt the integration.'
-        )
-      ).toBeInTheDocument()
-    })
-
     test('uses the integration-specific removal warning override when one is defined', async () => {
       setIntegration({ id: 'grafana', name: 'Grafana' })
       mockProjectResources({ apiKeys: [secretApiKey('grafana_cloud_integration_metrics')] })

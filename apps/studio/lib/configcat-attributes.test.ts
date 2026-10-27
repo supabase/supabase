@@ -11,19 +11,7 @@ describe('toUnixSecondsString', () => {
     expect(toUnixSecondsString('2024-01-01T00:00:00Z')).toBe('1704067200')
   })
 
-  it('returns undefined for undefined', () => {
-    expect(toUnixSecondsString(undefined)).toBeUndefined()
-  })
-
-  it('returns undefined for null', () => {
-    expect(toUnixSecondsString(null)).toBeUndefined()
-  })
-
-  it('returns undefined for an empty string', () => {
-    expect(toUnixSecondsString('')).toBeUndefined()
-  })
-
-  it('returns undefined for an unparseable string', () => {
-    expect(toUnixSecondsString('not-a-date')).toBeUndefined()
+  it.each([undefined, null, '', 'not-a-date'])('returns undefined for %o', (value) => {
+    expect(toUnixSecondsString(value)).toBeUndefined()
   })
 })

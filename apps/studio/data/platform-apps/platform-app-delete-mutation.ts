@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { platformAppKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
+import { del, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type PlatformAppDeleteVariables = {
@@ -13,6 +13,7 @@ export type PlatformAppDeleteVariables = {
 export async function deletePlatformApp({ slug, appId }: PlatformAppDeleteVariables) {
   const { data, error } = await del('/platform/organizations/{slug}/apps/{app_id}', {
     params: { path: { slug, app_id: appId } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

@@ -2,6 +2,7 @@ import { getPgStatActivitySql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -93,7 +94,7 @@ export async function getDatabaseActivity(
   const sql = getPgStatActivitySql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['activity'] },
+    { projectRef, connectionString, sql, queryKey: ['activity'], grant: unguarded.migrating },
     signal
   )
 

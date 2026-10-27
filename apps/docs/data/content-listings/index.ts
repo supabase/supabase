@@ -39,10 +39,28 @@ import {
   telemetryExport,
   telemetryHireAgent,
 } from './telemetry.data'
+import {
+  supabaseWayAuthBuild,
+  supabaseWayDatabaseBuild,
+  supabaseWayFunctionsBuild,
+  supabaseWayProductionBuild,
+  supabaseWayProgression,
+  supabaseWayRealtimeBuild,
+  supabaseWayRlsBuild,
+  supabaseWayStorageBuild,
+} from './the-supabase-way-to-build.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
   aiToolsSupportedAgents,
   aiToolsBuildingIntoApp,
+  supabaseWayProgression,
+  supabaseWayDatabaseBuild,
+  supabaseWayAuthBuild,
+  supabaseWayRlsBuild,
+  supabaseWayRealtimeBuild,
+  supabaseWayStorageBuild,
+  supabaseWayFunctionsBuild,
+  supabaseWayProductionBuild,
   authGetStarted,
   authPricing,
   authNextSteps,

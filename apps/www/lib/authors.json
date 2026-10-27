@@ -1119,5 +1119,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/raulb",
     "author_image_url": "https://github.com/raulb.png"
+  },
+  {
+    "author_id": "gildas_garcia",
+    "author": "Gildas Garcia",
+    "username": "djhi",
+    "position": "Engineering",
+    "author_url": "https://github.com/djhi",
+    "author_image_url": "https://github.com/djhi.png"
   }
 ]

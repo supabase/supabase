@@ -1148,7 +1148,7 @@ export interface DocsSearchV2OpenedEvent {
     /**
      * The trigger that opened the Search V2 dialog.
      */
-    triggerType: 'keyboard_shortcut' | 'search_input'
+    triggerType: 'keyboard_shortcut' | 'search_input' | 'not_found_button'
   }
 }
 
@@ -1563,7 +1563,7 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
- * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ * User clicked on the "Cancel subscription" Button on the billing settings page.
  *
  * @group Events
  * @source studio
@@ -2220,6 +2220,39 @@ export interface StorageBucketVersioningEnabledEvent {
   properties: {
     /** Whether a lifecycle policy was configured at the same time. */
     hasLifecyclePolicy?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a standby URL signing key is created for a project's Storage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/signing-keys
+ */
+export interface StorageUrlSigningKeyCreatedEvent {
+  action: 'storage_url_signing_key_created'
+  properties: {
+    /** The algorithm the standby key was created with. */
+    algorithm: 'ES256' | 'HS512'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a URL signing key's role changes: a standby key is rotated to active,
+ * a standby key is revoked, or a revoked key is moved back to standby.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/signing-keys
+ */
+export interface StorageUrlSigningKeyUpdatedEvent {
+  action: 'storage_url_signing_key_updated'
+  properties: {
+    /** What happened to the key. */
+    change: 'rotated' | 'revoked' | 'moved_to_standby'
   }
   groups: TelemetryGroups
 }
@@ -3266,6 +3299,7 @@ export type AiAssistantSource =
   | 'error_code'
   | 'advisor_signal_detail'
   | 'database_connections'
+  | 'edge_function_errors'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3964,6 +3998,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'auth'
       | 'storage'
       | 'edge function'
+      | 'edge function runtime'
       | 'realtime'
       | 'supavisor'
       | 'pgbouncer'
@@ -4183,9 +4218,58 @@ export interface WarehouseDisabledEvent {
 }
 
 /**
+ * Account recovery rollout exposure when the takeover opens.
+ * @group Events
+ * @source Automatic reminder controller
+ * @page /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface AccountRecoveryReminderExposed {
+  action: 'account_recovery_reminder_exposed'
+  properties: { gap: 'missing' | 'exhausted' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a recovery task
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryActionClicked {
+  action: 'account_recovery_action_clicked'
+  properties: { actionType: 'generate_codes' | 'regenerate_codes' | 'add_factor' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User saves recovery codes or verifies another authenticator
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryTaskCompleted {
+  action: 'account_recovery_task_completed'
+  properties: { taskType: 'recovery_codes' | 'authenticator' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User skips or continues from the recovery interstitial
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryReminderClosed {
+  action: 'account_recovery_reminder_closed'
+  properties: { hasCompletedTask: boolean }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | AccountRecoveryReminderExposed
+  | AccountRecoveryActionClicked
+  | AccountRecoveryTaskCompleted
+  | AccountRecoveryReminderClosed
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4324,6 +4408,8 @@ export type TelemetryEvent =
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
   | StorageBucketVersioningEnabledEvent
+  | StorageUrlSigningKeyCreatedEvent
+  | StorageUrlSigningKeyUpdatedEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent

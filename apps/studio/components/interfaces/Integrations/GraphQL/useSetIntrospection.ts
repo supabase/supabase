@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { buildSchemaCommentWith, parseSchemaComment } from './pgGraphqlSchemaComment'
+import { unguarded } from '@/data/fetchers'
 import { pgGraphqlKeys } from '@/data/pg-graphql/keys'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -60,6 +61,7 @@ export const useSetIntrospection = ({
       projectRef: project.ref,
       connectionString: project.connectionString,
       sql,
+      grant: unguarded.migrating,
     })
   }
 
