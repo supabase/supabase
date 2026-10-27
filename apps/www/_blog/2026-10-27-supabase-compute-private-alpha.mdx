@@ -14,7 +14,7 @@ imgThumb: '2026-10-27-supabase-compute-private-alpha/thumb.png'
 toc_depth: 2
 ---
 
-Today we're launching Supabase Compute in private alpha. It runs your agents inside your Supabase project, next to their data and memory. Background jobs and APIs run there too. It's for teams whose data is on Supabase but whose agents run somewhere else. Compute is free during the alpha and runs in us-west-2. [Join the waitlist](https://supabase.com/compute#waitlist) to try it.
+Today we're launching Supabase Compute in private alpha. Now you can run agents, background jobs, and APIs right next to your data, in the same project. During the private alpha, Compute is available in the us-west-2 region, with more regions coming soon. [Join the waitlist](https://supabase.com/compute#waitlist) to try it for free.
 
 Developers told us some work doesn't fit in an Edge Function. Some work needs more memory or CPU. Some runs longer than 400 seconds, like an AI agent. Some is written in another language.
 
@@ -24,12 +24,13 @@ That work usually means a second platform, with its own deploys, its own logs, a
 
 Each service gets a full Linux environment, so you can run:
 
-- An agent that works through a task for minutes
-- A background job that pulls work from a Postgres queue
+- An AI agent that can spin up and coordinate multiple tasks
+- An API or web service written in any language, configured with a Dockerfile
+- A durable job processor that pulls tasks from Postgres, such as OpenWorkflow
 - A data sync or embedding backfill that runs for hours
-- An API in another language, from a Dockerfile
-- A voice agent that holds a WebSocket open for a session, with your client reconnecting if the instance is replaced
-- A small open-source model in Python, running on CPU
+- A WebSocket service for low-latency, real-time apps like voice agents
+
+Dreambase [moved their data agent onto Compute](https://dreambase.com/blog/running-our-data-pipeline-on-supabase-compute) to test it. Its queries to Postgres took a median of 2.9 ms, versus 65 ms from another region.
 
 ## Deploy with the Supabase CLI
 
@@ -49,16 +50,11 @@ Your services get your project's secrets. Their logs show up on the Compute page
   src="/images/blog/2026-10-27-supabase-compute-private-alpha/dashboard.png"
 />
 
-## Keep your agent's memory in Postgres
-
-A service can run with no time limit. But instances can be replaced at any time, so save your agent's progress to Postgres. Your code can then pick up where the last instance stopped.
-
-Your agent's memory can live in Postgres too, with pgvector for search. Supabase Compute runs in us-west-2, the same region as your database, so queries stay fast. Dreambase [quickly moved their data agent onto Compute](https://dreambase.com/blog/running-our-data-pipeline-on-supabase-compute) to test it. Queries to Postgres took a median of 2.9 ms, versus 65 ms from another region.
-
 ## What to know about the private alpha
 
 - It's for evaluation, not production, and it may change or end.
 - Only projects in us-west-2 can use it.
+- A service can be restarted at any time, so save long-running work to Postgres.
 - Every service gets all of your project's secrets.
 - There's no autoscaling, GPU, or persistent disk.
 - Public services suspend when idle. Private services keep running.
