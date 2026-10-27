@@ -41,7 +41,7 @@ export const AuthenticatorTask = ({
               setIsOpen(true)
             }}
           >
-            Add another method
+            Add backup
           </Button>
         )}
       </RecoveryTaskRow>

@@ -1,14 +1,8 @@
 import dayjs from 'dayjs'
-import {
-  LockKeyholeIcon,
-  PlusIcon,
-  RectangleEllipsisIcon,
-  ShieldCheckIcon,
-  TrashIcon,
-} from 'lucide-react'
+import { LockKeyholeIcon, PlusIcon, ShieldCheckIcon, TrashIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { Button, Card, CardContent, cn } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
@@ -25,9 +19,10 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
 import { DeleteFactorModal } from './DeleteFactorModal'
-import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
-import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
-import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
+import { useGenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
+import { RecoveryCodesAvailable } from './RecoveryCodesAvailable'
+import { RecoveryCodesSetup } from './RecoveryCodesSetup'
+import { useRegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { useRecoveryCodesGate } from './useRecoveryCodesGate'
 import { getPrimarySecurityAction } from '@/components/interfaces/Account/Security/Security.utils'
 import { AlertError } from '@/components/ui/AlertError'
@@ -67,6 +62,17 @@ export const TOTPFactors = () => {
   const factorIdToDelete = totpFactors.find((factor) => factor.id === factorToBeDeleted)?.id ?? null
   const isDeleteFactorModalVisible = factorIdToDelete !== null
   const factorFinding = findings.find((finding) => finding.id === 'single-mfa-factor')
+  const codeFinding = findings.find(
+    (finding) => finding.action === 'generate-codes' || finding.action === 'regenerate-codes'
+  )
+  const isCodeActionPrimary =
+    primaryAction === 'generate-codes' || primaryAction === 'regenerate-codes'
+
+  const codeActionVariant = isCodeActionPrimary ? 'primary' : 'default'
+  const generateCodes = useGenerateRecoveryCodesModal({ variant: codeActionVariant })
+  const regenerateCodes = useRegenerateRecoveryCodesModal({ variant: codeActionVariant })
+
+  const canShowRecoveryCodes = recoveryCodes.isActive && !recoveryCodes.isError
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
   const deleteFactorTooltip = recoveryCodes.isError
@@ -94,7 +100,7 @@ export const TOTPFactors = () => {
                 icon={<PlusIcon />}
                 onClick={handleAddNewApp}
               >
-                Add another method
+                Add MFA method
               </Button>
             </PageSectionAside>
           )}
@@ -176,18 +182,17 @@ export const TOTPFactors = () => {
         </PageSectionContent>
       </PageSection>
 
-      {recoveryCodes.isActive && (
-        <PageSection>
+      {recoveryCodes.isActive && !isError && (
+        <PageSection id="recovery-codes" className="scroll-mt-6">
           <PageSectionMeta>
             <PageSectionSummary>
               <PageSectionTitle>Recovery codes</PageSectionTitle>
               <PageSectionDescription>
-                Recovery codes allow you to recover your account in case you lost access to your MFA
-                apps.
+                Recover your account in case you lose access to your MFA methods.
               </PageSectionDescription>
             </PageSectionSummary>
           </PageSectionMeta>
-          <PageSectionContent aria-live="polite">
+          <PageSectionContent aria-live="polite" className="flex flex-col gap-4">
             {recoveryCodes.isPending && (
               <Card>
                 <CardContent role="status" className="flex items-center gap-4">
@@ -221,33 +226,21 @@ export const TOTPFactors = () => {
                 }
               />
             )}
-            {status === 'unenrolled' && <GenerateRecoveryCodesModal />}
-            {status === 'available' && codes && (
-              <Card>
-                <CardContent className="flex items-center justify-between">
-                  <div className="flex items-center gap-x-4">
-                    <div className="w-9 h-9 rounded-full bg-selection flex items-center justify-center">
-                      <RectangleEllipsisIcon size={18} className="text-foreground-lighter" />
-                    </div>
-                    <div className="text-sm">
-                      <p className={cn(codes.remaining < 2 ? 'text-warning' : '')}>
-                        {codes.remaining}/{codes.total} recovery codes available
-                      </p>
-                      <p className="text-foreground-lighter">Each code can only be used once</p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 ml-auto">
-                    <RegenerateRecoveryCodesModal />
-                    <UnenrollRecoveryCodesModal />
-                  </div>
-                </CardContent>
-              </Card>
+            {canShowRecoveryCodes && status === 'unenrolled' && (
+              <RecoveryCodesSetup>{generateCodes.trigger}</RecoveryCodesSetup>
+            )}
+            {canShowRecoveryCodes && status === 'available' && codes && (
+              <RecoveryCodesAvailable codes={codes} finding={codeFinding}>
+                {regenerateCodes.trigger}
+              </RecoveryCodesAvailable>
             )}
           </PageSectionContent>
         </PageSection>
       )}
 
+      {/* Keep open dialogs mounted when a status refresh replaces their triggers. */}
+      {generateCodes.dialog}
+      {regenerateCodes.dialog}
       <AddNewFactorModal
         visible={isAddNewFactorOpen || (securityAction === 'add-factor' && canAddApp)}
         onClose={() => {
