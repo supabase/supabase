@@ -106,7 +106,6 @@ export const buildUnifiedLogsUrl = ({
     date: start && end ? [new Date(start), new Date(end)] : null,
   })
 
-/** How many logs a count query found with one value of a facet, e.g. `level` `error` */
 export const getFacetValueCount = (
   facets: Record<string, FacetMetadataSchema> | undefined,
   facet: string,
