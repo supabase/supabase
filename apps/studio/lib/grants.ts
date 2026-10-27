@@ -61,6 +61,14 @@ export type GrantFor<
   V extends VariantOfKey<EndpointKey<M, P>> = never,
 > = EndpointKey<M, P> extends FgaGuardedEndpoint ? Grant<EndpointKey<M, P>, V> : never
 
+type GrantForVariant<E extends FgaGuardedEndpoint, V> = V extends VariantOf<E> ? Grant<E, V> : never
+
+/** A grant for any one of an endpoint's variants, or `never` if the endpoint isn't annotated. */
+export type GrantForVariants<M extends string, P extends string> =
+  EndpointKey<M, P> extends FgaGuardedEndpoint
+    ? GrantForVariant<EndpointKey<M, P>, VariantOf<EndpointKey<M, P>>>
+    : never
+
 function mintGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E>>(
   endpoint: E,
   variant: V | undefined,

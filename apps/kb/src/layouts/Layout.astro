@@ -79,7 +79,7 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 	</head>
 	<body class="flex min-h-dvh flex-col">
 		<div class="sticky top-0 z-40">
-			<Header client:load topics={navTopics} />
+			<Header client:load topics={navTopics} currentPath={Astro.url.pathname.replace(/\/$/, '')} />
 			<slot name="header-end" />
 		</div>
 		<main class="grow">

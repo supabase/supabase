@@ -14,7 +14,7 @@ export function testGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> =
     projectRef?: string | null
     permissionsProjectRef?: string | null
   } = {}
-): Grant<E, V> {
+): Grant<E, NoInfer<V>> {
   // Grants are type-branded; production code can only mint them through `lib/grants`
   return {
     endpoint,
