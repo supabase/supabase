@@ -17391,10 +17391,6 @@ packages:
     peerDependencies:
       seroval: ^1.0
 
-  seroval@1.6.2:
-    resolution: {integrity: sha512-mPT+SD2TrlB6wvte1KkYOYUkubaTbd6pZ/6Kk3C9nxzrHmCZyhxOO7XGAeL7f+yLKZglzGtM9odUVvg/EhO+vQ==}
-    engines: {node: '>=10'}
-
   seroval@1.6.7:
     resolution: {integrity: sha512-AeDcLh0yO2SFm9W71essgnSzLV9DI8ZH0x0knXn2DMnUZj728mpLbxjlbB6IqKCmqh8JA3cEqRyGoNkt584JcQ==}
     engines: {node: '>=10'}
@@ -23389,7 +23385,7 @@ snapshots:
       pkg-types: 2.3.1
       postcss: 8.5.28
       rolldown-string: 0.3.1(rolldown@1.2.9)
-      seroval: 1.6.2
+      seroval: 1.6.9
       std-env: 4.2.0
       ufo: 1.6.4
       unenv: 2.0.0-rc.24
@@ -36909,8 +36905,6 @@ snapshots:
   seroval-plugins@1.6.9(seroval@1.6.9):
     dependencies:
       seroval: 1.6.9
-
-  seroval@1.6.2: {}
 
   seroval@1.6.7: {}
 
