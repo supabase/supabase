@@ -68,7 +68,7 @@ const GlobalNavigationMenu: FC = () => {
     <div
       className={cn(
         'flex relative gap-2 justify-start items-end w-full h-full',
-        !isNavReady && 'invisible'
+        !isNavReady && 'invisible noscript:visible'
       )}
     >
       <NavigationMenu

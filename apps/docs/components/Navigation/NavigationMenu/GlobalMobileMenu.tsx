@@ -108,7 +108,10 @@ const Menu = () => {
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
 
   return (
-    <Accordion type="multiple" className={cn('space-y-1 mt-2.5', !isNavReady && 'invisible')}>
+    <Accordion
+      type="multiple"
+      className={cn('space-y-1 mt-2.5', !isNavReady && 'invisible noscript:visible')}
+    >
       {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
         <AccordionMenuItem key={index} section={section} activeLabel={activeLabel} />
       ))}

@@ -79,7 +79,7 @@ const NavigationMenuGuideList = ({
     <NavigationMenuGuideListWrapper
       id={id}
       firstLevelRoute={firstLevelRoute}
-      className={cn(!isNavReady && 'invisible')}
+      className={cn(!isNavReady && 'invisible noscript:visible')}
     >
       <NavigationMenuGuideListItems menu={menu} id={id} />
     </NavigationMenuGuideListWrapper>

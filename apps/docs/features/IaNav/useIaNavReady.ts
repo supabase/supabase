@@ -10,6 +10,7 @@ const READY_TIMEOUT_MS = 1000
 /**
  * True once the visitor's nav variant is known, so the nav can stay hidden instead of
  * flashing today's nav. Falls back to true after a timeout in case flags never load.
+ * Hide with `invisible noscript:visible` so the nav still shows without JavaScript.
  */
 export function useIaNavReady(): boolean {
   const { hasLoaded } = useFeatureFlags()
