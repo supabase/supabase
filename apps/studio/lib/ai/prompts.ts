@@ -642,7 +642,9 @@ useEffect(() => {
       .subscribe()
   }
 
-  void setupChannel()
+  void setupChannel().catch((error) => {
+    console.error('Failed to set up Realtime channel:', error)
+  })
 
   return () => {
     cancelled = true
