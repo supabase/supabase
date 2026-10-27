@@ -3,17 +3,18 @@
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { isFeatureEnabled } from 'common/enabled-features'
 import { DevToolbarTrigger } from 'dev-tools'
-import { Command, Menu, Search, X } from 'lucide-react'
+import { Command, Search } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import type { FC, Ref } from 'react'
 import { memo } from 'react'
-import { Button, buttonVariants, cn } from 'ui'
+import { Button, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
+import { MobileNavToggle } from 'ui-patterns/MobileNav/MobileNavToggle'
 import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
@@ -85,36 +86,12 @@ const TopNavBar: FC<TopNavBarProps> = ({
                 }
               />
             )}
-            <button
+            <MobileNavToggle
               ref={menuButtonRef}
-              tabIndex={0}
-              title="Menu dropdown button"
-              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={isMenuOpen}
-              className={cn(
-                buttonVariants({ variant: 'default' }),
-                'relative flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] px-0 data-open:bg-overlay-hover/30',
-                "before:absolute before:-inset-y-2 before:left-0 before:-right-3 before:content-['']"
-              )}
+              isOpen={isMenuOpen}
               onClick={onMenuToggle}
-            >
-              <Menu
-                size={18}
-                strokeWidth={1}
-                className={cn(
-                  'absolute inset-0 m-auto transition duration-150 ease-out',
-                  isMenuOpen && 'opacity-0 scale-75 motion-reduce:scale-100'
-                )}
-              />
-              <X
-                size={18}
-                strokeWidth={1}
-                className={cn(
-                  'absolute inset-0 m-auto transition duration-150 ease-out',
-                  !isMenuOpen && 'opacity-0 scale-75 motion-reduce:scale-100'
-                )}
-              />
-            </button>
+              className="lg:hidden"
+            />
           </div>
         </div>
         <div className="hidden lg:flex items-center justify-end gap-3">
