@@ -59,6 +59,36 @@ if ! command -v aws &> /dev/null; then
     rm awscliv2.zip
 fi
 
+# TanStack Start builds (Studio): upload Nitro's Vercel immutable store, whose
+# files are content-hashed, to a folder shared by every deployment (see
+# apps/studio/asset-cdn.ts). Shared rather than per-commit so unchanged chunks
+# dedupe and older tabs keep resolving their lazy chunks. The files also stay in
+# the Vercel output: web workers must be served same-origin.
+if [[ "$1" == "tanstack" ]]; then
+    IMMUTABLE_DIR=".vercel/output/static/_vercel/immutable"
+    if [ ! -d "$IMMUTABLE_DIR" ]; then
+        echo -e "${YELLOW}Directory $IMMUTABLE_DIR not found!${NC}"
+        echo "Make sure the TanStack build ran for Vercel with immutable static files enabled."
+        exit 1
+    fi
+
+    # Names are content hashes, so an existing object never needs replacing:
+    # --size-only skips files a previous deployment already uploaded (the
+    # default mtime check would re-upload every freshly built file). Source
+    # maps are uploaded to Sentry, never published.
+    echo -e "${YELLOW}Uploading immutable static files to R2...${NC}"
+    aws s3 sync "$IMMUTABLE_DIR" "s3://$BUCKET_NAME/${SITE_NAME:-studio}/tanstack/_vercel/immutable" \
+        --size-only \
+        --exclude "*.map" \
+        --endpoint-url "$ASSET_CDN_S3_ENDPOINT" \
+        --cache-control "public,max-age=31536000,immutable" \
+        --region auto \
+        --only-show-errors
+
+    echo -e "${GREEN}Upload completed successfully!${NC}"
+    exit 0
+fi
+
 # Check if directory exists
 if [ ! -d "$STATIC_DIR" ]; then
     echo -e "${YELLOW}Directory $STATIC_DIR not found!${NC}"
