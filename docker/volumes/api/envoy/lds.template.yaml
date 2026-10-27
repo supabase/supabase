@@ -333,6 +333,11 @@ resources:
                               value: /functions/v1/
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
+                          # Functions handle their own CORS, including preflight requests.
+                          envoy.filters.http.cors:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
                           envoy.filters.http.basic_auth:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig

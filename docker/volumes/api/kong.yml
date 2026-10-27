@@ -386,8 +386,8 @@ services:
         strip_path: true
         paths:
           - /functions/v1/
+    # Functions handle their own CORS, including preflight requests.
     plugins:
-      - name: cors
       - name: request-transformer
         config:
           remove:
