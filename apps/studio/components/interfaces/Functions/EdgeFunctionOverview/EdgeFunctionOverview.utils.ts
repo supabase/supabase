@@ -124,18 +124,6 @@ export const MEMORY_CHART_CONFIG = {
 const toManipulateUnit = (unit: ChartIntervals['startUnit']) => unit as dayjs.ManipulateType
 const toNumber = (value: string | number | undefined) => Number(value ?? 0)
 
-export const getBucketedTimeRange = (
-  interval: ChartIntervals,
-  now: Date = new Date()
-): [Date, Date] => {
-  const currentTime = dayjs(now)
-  const unit = toManipulateUnit(interval.startUnit)
-  const start = currentTime.subtract(interval.startValue, unit).startOf(unit)
-  const end = currentTime.startOf(unit)
-
-  return [start.toDate(), end.toDate()]
-}
-
 export const getRollingTimeRange = (
   interval: ChartIntervals,
   now: Date = new Date()
