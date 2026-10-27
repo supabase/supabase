@@ -44,7 +44,6 @@ export const defaultPrivilegesQueryOptions = (
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   return queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: privilegeKeys.defaultPrivileges(projectRef, schema),
     queryFn: ({ signal }) =>
       getDefaultPrivilegesState(
