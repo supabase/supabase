@@ -195,4 +195,37 @@ describe('GitHubIntegrationConnectionForm', () => {
     expect(await screen.findAllByText('Failed to load branches')).not.toHaveLength(0)
     expect(saveButton).toHaveAttribute('aria-disabled', 'true')
   })
+
+  test('keeps saving blocked while the branch list is still loading', async () => {
+    mockEndpoints([
+      FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_READ,
+      FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_CREATE,
+      FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE,
+    ])
+    let resolveBranches: () => void = () => {}
+    const branchesLoaded = new Promise<void>((resolve) => {
+      resolveBranches = resolve
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/branches',
+      response: async () => {
+        await branchesLoaded
+        return HttpResponse.json<(typeof PRODUCTION_BRANCH)[]>([PRODUCTION_BRANCH])
+      },
+    })
+
+    renderForm()
+
+    const workingDirectory = await screen.findByLabelText('Working directory')
+    await waitFor(() => expect(workingDirectory).toBeEnabled())
+    await userEvent.type(workingDirectory, '/app')
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    expect(saveButton).toBeDisabled()
+
+    resolveBranches()
+    await editWorkingDirectory()
+
+    await waitFor(() => expect(saveButton).toBeEnabled())
+  })
 })

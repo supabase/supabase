@@ -342,6 +342,11 @@ export const GitHubIntegrationConnectionForm = ({
     currentConnection: GitHubConnection
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
+    if (!canManageProductionBranch) {
+      setIsConfirmingBranchChange(false)
+      toast.error(productionBranchPermissionMessage)
+      return
+    }
 
     const connectionRequest = updateConnectionSettings({
       connectionId: currentConnection.id,
