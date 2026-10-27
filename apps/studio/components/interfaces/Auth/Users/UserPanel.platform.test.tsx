@@ -73,10 +73,10 @@ const renderPanel = (
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), { disabled_features: [] })
 
-  const rendered = customRender(
+  const content = (backend = otel) => (
     <FeatureFlagContext.Provider
       value={{
-        configcat: otel === null ? {} : { otelUnifiedLogs: otel },
+        configcat: backend === null ? {} : { otelUnifiedLogs: backend },
         posthog: {},
         hasLoaded: true,
       }}
@@ -86,16 +86,20 @@ const renderPanel = (
           <UserPanel />
         </ResizablePanelGroup>
       </FeaturePreviewContextProvider>
-    </FeatureFlagContext.Provider>,
-    {
-      queryClient,
-      nuqs: { searchParams: `?show=${mockUser.id}` },
-      profileContext: createMockProfileContext({
-        profile: createMockProfile({ disabled_features: disabledFeatures }),
-      }),
-    }
+    </FeatureFlagContext.Provider>
   )
-  return { ...rendered, queryClient }
+  const rendered = customRender(content(), {
+    queryClient,
+    nuqs: { searchParams: `?show=${mockUser.id}` },
+    profileContext: createMockProfileContext({
+      profile: createMockProfile({ disabled_features: disabledFeatures }),
+    }),
+  })
+  return {
+    ...rendered,
+    queryClient,
+    updateBackend: (backend: boolean) => rendered.rerender(content(backend)),
+  }
 }
 
 describe('UserPanel', () => {
@@ -157,4 +161,25 @@ describe('UserPanel', () => {
       await waitFor(() => expect(queryClient.isFetching()).toBe(0))
     }
   )
+  it('keeps Logs selected when switching between legacy and unified logs', async () => {
+    const user = userEvent.setup()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: () =>
+        HttpResponse.json<platformComponents['schemas']['AnalyticsResponse_Output']>({
+          result: [],
+        }),
+    })
+    const { updateBackend, queryClient } = renderPanel([], { otel: false, unifiedLogs: true })
+    await user.click(await screen.findByRole('tab', { name: 'Logs' }))
+    expect(await screen.findByTestId('user-logs')).toBeVisible()
+    updateBackend(true)
+    expect(await screen.findByText('No logs in the last 24 hours')).toBeVisible()
+    expect(screen.getByRole('tab', { name: 'Logs' })).toHaveAttribute('aria-selected', 'true')
+    updateBackend(false)
+    expect(await screen.findByTestId('user-logs')).toBeVisible()
+    expect(screen.getByRole('tab', { name: 'Logs' })).toHaveAttribute('aria-selected', 'true')
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
 })

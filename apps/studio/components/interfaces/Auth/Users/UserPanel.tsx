@@ -25,12 +25,11 @@ import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-type UserPanelView = 'overview' | 'raw' | 'logs' | 'recent-logs'
+type UserPanelView = 'overview' | 'raw' | 'logs'
 
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
   const showLogs = useIsFeatureEnabled('logs:all')
-  // Recent logs read unified logs filtered by user, which only the ClickHouse path supports
   const isOtelUnifiedLogs = useUnifiedLogsBackend()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const showRecentLogs = showLogs && isOtelUnifiedLogs && isUnifiedLogsEnabled
@@ -65,13 +64,7 @@ export const UserPanel = () => {
           value={view}
           className="flex flex-col h-full"
           onValueChange={(value) => {
-            if (
-              value === 'overview' ||
-              value === 'raw' ||
-              value === 'logs' ||
-              value === 'recent-logs'
-            )
-              setView(value)
+            if (value === 'overview' || value === 'raw' || value === 'logs') setView(value)
           }}
         >
           {isPending ? (
@@ -100,7 +93,7 @@ export const UserPanel = () => {
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 {showLogs && !showRecentLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}
                 <TabsTrigger value="raw">Raw JSON</TabsTrigger>
-                {showRecentLogs && <TabsTrigger value="recent-logs">Logs</TabsTrigger>}
+                {showRecentLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}
                 <TabsIndicator />
               </TabsList>
 
@@ -109,17 +102,13 @@ export const UserPanel = () => {
                   <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
                 )}
               </TabsContent>
-              {showRecentLogs && selectedUser.id && (
-                <TabsContent
-                  value="recent-logs"
-                  className={cn('mt-0 grow min-h-0 overflow-y-auto')}
-                >
-                  <UserRecentLogs userId={selectedUser.id} />
-                </TabsContent>
-              )}
-              {showLogs && !showRecentLogs && (
+              {showLogs && (
                 <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
-                  {selectedUser && <UserLogs user={selectedUser} />}
+                  {showRecentLogs && selectedUser.id ? (
+                    <UserRecentLogs userId={selectedUser.id} />
+                  ) : (
+                    <UserLogs user={selectedUser} />
+                  )}
                 </TabsContent>
               )}
               <TabsContent value="raw" className="mt-0 grow min-h-0 overflow-y-auto">
