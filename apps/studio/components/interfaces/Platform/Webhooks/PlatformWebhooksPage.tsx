@@ -567,7 +567,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
             ) : (
               <PlatformWebhooksEndpointDetails
                 // A failed refresh keeps the loaded rows, so only report errors when there are none
-                deliveriesError={fetchedDeliveries ? null : deliveriesError}
+                deliveriesError={fetchedDeliveries?.length ? null : deliveriesError}
                 orgSlug={scope === 'organization' ? slug : undefined}
                 projectRef={scope === 'project' ? ref : undefined}
                 deliverySearch={deliverySearch}

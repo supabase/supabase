@@ -15,8 +15,9 @@ export const shouldHandleEndpointNotFound = ({
 }
 
 /**
- * The details sheet loads its delivery separately from the table, so it can be one that is not on
- * the current page. Prefer it when the id matches, and fall back to the rows on screen.
+ * The table's rows refresh every few seconds, but the sheet's delivery is loaded once, so its status
+ * can be out of date. Prefer the table's row, and only fall back to the sheet's delivery when it is
+ * not on the current page.
  */
 export const findDeliveryToRetry = ({
   deliveryId,
@@ -27,9 +28,8 @@ export const findDeliveryToRetry = ({
   selectedDelivery: WebhookDelivery | null
   pageDeliveries: WebhookDelivery[]
 }) =>
-  selectedDelivery?.id === deliveryId
-    ? selectedDelivery
-    : pageDeliveries.find((delivery) => delivery.id === deliveryId)
+  pageDeliveries.find((delivery) => delivery.id === deliveryId) ??
+  (selectedDelivery?.id === deliveryId ? selectedDelivery : undefined)
 
 /**
  * Only redirect away once the flags have loaded and the route params are populated; before

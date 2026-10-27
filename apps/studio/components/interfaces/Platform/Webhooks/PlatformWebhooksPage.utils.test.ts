@@ -154,6 +154,19 @@ describe('PlatformWebhooksPage.utils', () => {
       ).toBe(offPage)
     })
 
+    it('prefers the table row over a stale selected delivery with the same id', () => {
+      const staleSelected = { ...onPage, status: 'pending' as const }
+      const freshRow = { ...onPage, status: 'success' as const }
+
+      expect(
+        findDeliveryToRetry({
+          deliveryId: 'on-page',
+          selectedDelivery: staleSelected,
+          pageDeliveries: [freshRow],
+        })
+      ).toBe(freshRow)
+    })
+
     it('ignores the selected delivery when the id is a different one', () => {
       expect(
         findDeliveryToRetry({

@@ -338,6 +338,36 @@ describe('PlatformWebhooksPage (project scope)', () => {
       expect(screen.queryByText('No deliveries found')).not.toBeInTheDocument()
     })
 
+    test('shows the error when the first load was empty and a refresh fails', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          // The first load is empty, the automatic refresh after it fails
+          if (requests > 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Something went wrong' },
+              { status: 500 }
+            )
+          }
+          return HttpResponse.json<DeliveryListResponse>({
+            data: [],
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+
+      renderPage(ENDPOINT_ID)
+
+      expect(
+        await screen.findByText('Failed to retrieve deliveries', {}, { timeout: 9000 })
+      ).toBeInTheDocument()
+      expect(requests).toBeGreaterThan(1)
+    }, 20000)
+
     test('shows the search empty state, not an error, when a refresh fails after rows loaded', async () => {
       mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
       let requests = 0
