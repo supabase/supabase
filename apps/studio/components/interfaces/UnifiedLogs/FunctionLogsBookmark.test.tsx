@@ -38,8 +38,12 @@ const BookmarkControls = () => {
   return (
     <>
       <output aria-label="Current bookmark">{id ?? 'none'}</output>
-      <button onClick={() => setId('second-log')}>Open second bookmark</button>
-      <button onClick={() => setId(null)}>Close bookmark</button>
+      <button tabIndex={0} onClick={() => setId('second-log')}>
+        Open second bookmark
+      </button>
+      <button tabIndex={0} onClick={() => setId(null)}>
+        Close bookmark
+      </button>
     </>
   )
 }
