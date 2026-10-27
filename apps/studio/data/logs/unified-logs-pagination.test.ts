@@ -103,7 +103,7 @@ describe('getUnifiedLogs final page', () => {
         search,
         useOtel: true,
         pageSize,
-        pageParam: null,
+        pageParam: { cursor: now.getTime(), direction: 'next' },
       })
 
       expect(page.data).toHaveLength(rowCount)
