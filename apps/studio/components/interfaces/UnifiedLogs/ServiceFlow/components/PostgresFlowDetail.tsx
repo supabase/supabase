@@ -42,7 +42,6 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
 }: PostgresFlowDetailProps) {
   return (
     <div>
-      {/* Only the first section starts open; the rest are a click away */}
       {POSTGRES_SECTIONS.map((section, index) => (
         <CollapsibleDetailSection
           key={section.title}

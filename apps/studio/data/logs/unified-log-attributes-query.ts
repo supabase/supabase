@@ -9,7 +9,6 @@ import { handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
 
-// A log is looked up by its exact stored timestamp, so a tight window is enough.
 const LOG_WINDOW_MS = 60 * 1000
 
 const logAttributesRowSchema = z.object({
@@ -20,7 +19,6 @@ const logAttributesRowSchema = z.object({
 export type UnifiedLogAttributesVariables = {
   projectRef?: string
   logId?: string
-  /** Source of the log, e.g. `edge_logs`. */
   source?: string
   logTimestampMs?: number | null
 }
@@ -32,7 +30,6 @@ const getLogTimeWindow = (timestampMs: number, windowMs: number) => ({
   iso_timestamp_end: new Date(timestampMs + windowMs).toISOString(),
 })
 
-/** Runs SQL against the ClickHouse logs endpoint, which can answer 200 with an `error` body. */
 async function runOtelLogsSql(variables: Omit<ExecuteAnalyticsSqlVariables, 'endpoint'>) {
   const data = await executeAnalyticsSql({
     ...variables,
@@ -42,7 +39,6 @@ async function runOtelLogsSql(variables: Omit<ExecuteAnalyticsSqlVariables, 'end
   return data?.result ?? []
 }
 
-/** One log's source and attributes, or undefined when it can't be found. */
 async function getLogAttributesRow(
   { projectRef, logId, source, logTimestampMs }: UnifiedLogAttributesVariables,
   signal?: AbortSignal

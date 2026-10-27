@@ -5,11 +5,9 @@ import CopyButton from '@/components/ui/CopyButton'
 
 interface RawJsonViewProps {
   data: unknown
-  /** Accessible name for the copy button, e.g. "Copy log as JSON". */
   copyLabel: string
 }
 
-/** Full-bleed JSON for a side panel tab, with a copy button pinned while scrolling. */
 export function RawJsonView({ data, copyLabel }: RawJsonViewProps) {
   const json = JSON.stringify(data, null, 2)
 

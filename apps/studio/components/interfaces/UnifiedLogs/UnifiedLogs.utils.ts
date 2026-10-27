@@ -134,11 +134,9 @@ export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetad
   }
 }
 
-/** The logs table `source` a list log type reads from, when it maps to exactly one. */
 export function getLogTypeSource(logType: string) {
-  return logType in LOG_TYPE_TO_SOURCE
-    ? LOG_TYPE_TO_SOURCE[logType as keyof typeof LOG_TYPE_TO_SOURCE]
-    : undefined
+  const sources: Partial<Record<string, string>> = LOG_TYPE_TO_SOURCE
+  return sources[logType]
 }
 
 /**
