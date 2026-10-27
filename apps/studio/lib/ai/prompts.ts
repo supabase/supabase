@@ -625,7 +625,7 @@ useEffect(() => {
   let channel = null
 
   async function setupChannel() {
-      // Refresh auth before subscribing to a private channel.
+    // Refresh auth before subscribing to a private channel.
     await supabase.realtime.setAuth()
     if (cancelled) return
 
