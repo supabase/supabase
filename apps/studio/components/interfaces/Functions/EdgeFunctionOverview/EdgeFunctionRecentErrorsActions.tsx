@@ -2,6 +2,7 @@ import { AiIconAnimation } from 'ui'
 
 import { buildLogsPrompt } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import { parseSelectedLogs } from '@/components/interfaces/UnifiedLogs/LogSelectionActions.utils'
+import type { ColumnSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import CopyButton from '@/components/ui/CopyButton'
@@ -11,16 +12,9 @@ import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface EdgeFunctionRecentErrorsActionsProps {
-  /** The errors shown in the preview */
-  rows: unknown[]
-  /** Matching errors beyond the preview, noted in the prompt */
+  rows: ColumnSchema[]
   omittedCount: number
 }
-
-/**
- * Hands the previewed errors to an AI tool: the same prompt the Logs page builds for selected
- * logs, noting how many more errors the preview leaves out.
- */
 export const EdgeFunctionRecentErrorsActions = ({
   rows,
   omittedCount,

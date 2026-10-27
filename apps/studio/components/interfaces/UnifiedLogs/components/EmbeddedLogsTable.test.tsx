@@ -18,12 +18,13 @@ const logs: ColumnSchema[] = ['first', 'second'].map((id, index) => ({
   status: 500,
 }))
 
-const row = (message: string) => within(screen.getByRole('table')).getByText(message).closest('tr')!
+const row = (message: string) =>
+  within(screen.getByRole('table')).getByRole('row', { name: new RegExp(message) })
 
 describe('EmbeddedLogsTable', () => {
   afterEach(() => localStorage.clear())
 
-  it('renders logs without selection checkboxes', () => {
+  it('shows a preview without offering bulk log actions', () => {
     customRender(<EmbeddedLogsTable rows={logs} isLoading={false} />)
 
     expect(row('first message')).toBeInTheDocument()
@@ -31,7 +32,7 @@ describe('EmbeddedLogsTable', () => {
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
   })
 
-  it('hands the clicked log id to onRowClick without selecting the row', () => {
+  it('opens the clicked preview log details without starting multi-select', () => {
     const onRowClick = vi.fn()
     customRender(<EmbeddedLogsTable rows={logs} isLoading={false} onRowClick={onRowClick} />)
 
@@ -41,7 +42,7 @@ describe('EmbeddedLogsTable', () => {
     expect(screen.queryAllByRole('row', { selected: true })).toHaveLength(0)
   })
 
-  it('renders the footer below the rows instead of pagination', () => {
+  it('offers the full logs link instead of pagination in a fixed-size preview', () => {
     customRender(
       <EmbeddedLogsTable rows={logs} isLoading={false} footer={<Button>View all logs</Button>} />
     )
@@ -51,7 +52,7 @@ describe('EmbeddedLogsTable', () => {
     expect(screen.queryByText(/No more data to load/)).not.toBeInTheDocument()
   })
 
-  it('reads saved columns from its own key when given one, not the Logs page key', async () => {
+  it('keeps preview column preferences separate from the Logs page', async () => {
     localStorage.setItem('data-table-visibility', JSON.stringify({ method: false }))
     localStorage.setItem('edge-function-data-table-visibility', JSON.stringify({ pathname: false }))
 
@@ -63,7 +64,7 @@ describe('EmbeddedLogsTable', () => {
     expect(screen.getAllByText('POST')).toHaveLength(2)
   })
 
-  it('shows the empty state message when there are no logs', () => {
+  it('explains when the preview has no matching logs', () => {
     customRender(
       <EmbeddedLogsTable rows={[]} isLoading={false} emptyStateMessage="No errors found" />
     )

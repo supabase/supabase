@@ -8,7 +8,6 @@ import { EdgeFunctionIntervalSelector } from './EdgeFunctionIntervalSelector'
 import { EdgeFunctionInvocationsSection } from './EdgeFunctionInvocationsSection'
 import {
   EDGE_FUNCTION_CHART_INTERVALS,
-  getBucketedTimeRange,
   getExecutionMetrics,
   getInvocationChartData,
   getInvocationChartNavigationUrl,
@@ -70,12 +69,12 @@ export const EdgeFunctionOverview = () => {
   )
 
   const [startDate, endDate] = useMemo(
-    () => getBucketedTimeRange(selectedInterval),
-    [selectedInterval]
-  )
-  const [selectedWindowStart, selectedWindowEnd] = useMemo(
-    () => getRollingTimeRange(selectedInterval),
-    [selectedInterval]
+    () =>
+      getRollingTimeRange(
+        selectedInterval,
+        new Date(combinedStatsResults.dataUpdatedAt || Date.now())
+      ),
+    [selectedInterval, combinedStatsResults.dataUpdatedAt]
   )
   const dateTimeFormat = selectedInterval.format ?? 'MMM D, h:mma'
 
@@ -105,8 +104,6 @@ export const EdgeFunctionOverview = () => {
       'max_cpu_time_used',
     ],
     defaultValue: 0,
-    startDate: startDate.toISOString(),
-    endDate: endDate.toISOString(),
   })
 
   const chartData = useMemo(
@@ -135,10 +132,10 @@ export const EdgeFunctionOverview = () => {
       getInvocationUpdateAnnotation({
         updatedAt: selectedFunction?.updated_at,
         invocationChartData,
-        windowStart: selectedWindowStart,
-        windowEnd: selectedWindowEnd,
+        windowStart: startDate,
+        windowEnd: endDate,
       }),
-    [invocationChartData, selectedFunction?.updated_at, selectedWindowEnd, selectedWindowStart]
+    [invocationChartData, selectedFunction?.updated_at, endDate, startDate]
   )
 
   const invocationActions = useMemo(

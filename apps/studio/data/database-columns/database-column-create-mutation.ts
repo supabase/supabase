@@ -3,6 +3,7 @@ import type { ColumnTypeRef } from '@supabase/pg-meta/src/pg-meta-columns'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -54,6 +55,7 @@ export async function createDatabaseColumn({
     connectionString,
     sql,
     queryKey: ['column', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result

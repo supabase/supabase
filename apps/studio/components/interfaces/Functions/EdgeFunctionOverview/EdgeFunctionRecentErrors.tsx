@@ -33,9 +33,8 @@ import {
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 
-// Error invocations (5xx) and runtime errors, as the Logs tab's level filter defines them
 const ERROR_LOG_FILTERS = ['level:eq:error']
-// The overview previews the latest errors; the rest are a click away in the Logs tab
+
 const MAX_VISIBLE_ERRORS = 5
 
 interface EdgeFunctionRecentErrorsProps {
@@ -58,7 +57,6 @@ export const EdgeFunctionRecentErrors = ({
     [updatedAt]
   )
 
-  // Scoped like the function's Logs tab, so both run the same queries
   const { errorsSearch, countsSearch } = useMemo(() => {
     const scope = functionId ? getEdgeFunctionLogsScope(functionId) : undefined
     const date =
@@ -67,7 +65,7 @@ export const EdgeFunctionRecentErrors = ({
         : null
     return {
       errorsSearch: createUnifiedLogsSearch({ filter: ERROR_LOG_FILTERS, date }, scope),
-      // Unfiltered, so its facets count both the errors and the invocations since the deploy
+
       countsSearch: createUnifiedLogsSearch({ date }, scope),
     }
   }, [functionId, isoTimestampStart, isoTimestampEnd])
@@ -75,7 +73,7 @@ export const EdgeFunctionRecentErrors = ({
 
   const { data, error, isError, isPending, isFetching } = useUnifiedLogsInfiniteQuery(
     { projectRef, search: errorsSearch, pageSize: MAX_VISIBLE_ERRORS },
-    { enabled: isQueryEnabled }
+    { enabled: isQueryEnabled, placeholderData: undefined }
   )
   const { data: counts } = useUnifiedLogsCountQuery(
     { projectRef, search: countsSearch },
@@ -83,14 +81,13 @@ export const EdgeFunctionRecentErrors = ({
   )
 
   const rows = useMemo(() => getUniqueLogRows<ColumnSchema>(data?.pages), [data?.pages])
-  // Until the counts resolve, the errors shown are all that's known
+
   const errorCount = counts ? getFacetValueCount(counts.facets, 'level', 'error') : rows.length
   const hiddenErrorCount = Math.max(errorCount - rows.length, 0)
   const invocationCount = counts
     ? getFacetValueCount(counts.facets, 'log_type', 'edge function')
     : undefined
 
-  // Without unified logs, invocations and runtime output live on separate tabs
   const getLogsUrl = (row?: ColumnSchema) => {
     const target = {
       projectRef: projectRef ?? '',
@@ -176,7 +173,6 @@ export const EdgeFunctionRecentErrors = ({
               columnPreferencesKey={EDGE_FUNCTION_LOGS_VIEW.columnPreferencesKey}
               footer={
                 hiddenErrorCount > 0 && (
-                  // Sized to its label so the Button's press-scale stays centered on the text
                   <div className="px-0.5 py-0.5">
                     <Button
                       variant="text"
