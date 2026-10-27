@@ -140,6 +140,59 @@ describe('UnifiedLogs', () => {
     }
   })
 
+  it('keeps loaded logs readable without claiming zero matches when counts fail', async () => {
+    let releaseCount: () => void = () => {}
+    const pendingCount = new Promise<void>((resolve) => {
+      releaseCount = resolve
+    })
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        if (sql.includes('sidebar facet counts')) {
+          await pendingCount
+          return HttpResponse.json<AnalyticsResponse>({ error: 'Count query failed' })
+        }
+        return HttpResponse.json<AnalyticsResponse>({
+          result: sql.includes('row list')
+            ? [0, 1].map((index) => ({
+                id: `log-${index}`,
+                log_type: 'edge function runtime',
+                timestamp: Date.now() * 1000,
+                event_message: `Runtime error ${index}`,
+                level: 'error',
+                method: null,
+                pathname: null,
+                status: null,
+                log_count: null,
+                logs: null,
+              }))
+            : [],
+        })
+      },
+    })
+    customRender(
+      <UnifiedLogs scope={FUNCTION_SCOPE} hasFilterSideBar={false} {...EDGE_FUNCTION_LOGS_VIEW} />,
+      { queryClient }
+    )
+
+    try {
+      expect(await screen.findByText('Runtime error 0')).toBeInTheDocument()
+      expect(screen.getByText(/No more data to load/)).toHaveTextContent(
+        /^No more data to load \(2 rows\)$/
+      )
+    } finally {
+      releaseCount()
+    }
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    expect(screen.getByText('Runtime error 1')).toBeInTheDocument()
+    expect(screen.getByText(/No more data to load/)).toHaveTextContent(
+      /^No more data to load \(2 rows\)$/
+    )
+  })
+
   it('remembers the function dock independently from the project dock when reopening logs', async () => {
     const user = userEvent.setup({ delay: null })
     mswServer.use(
@@ -187,18 +240,16 @@ describe('UnifiedLogs', () => {
             }
           />
         </FeatureFlagContext.Provider>,
-        { nuqs: { hasMemory: true } }
+        { nuqs: { hasMemory: true, searchParams: '?id=function-log' } }
       )
-    const selectLog = async ({ container }: ReturnType<typeof renderLogs>) => {
+    const waitForDock = async ({ container }: ReturnType<typeof renderLogs>) => {
       const view = within(container)
-      const table = within(view.getByRole('table', { hidden: true }))
-      fireEvent.click(await table.findByText('Function started'))
       await view.findByLabelText('Dock side')
       return view
     }
 
     const first = renderLogs(true)
-    const firstView = await selectLog(first)
+    const firstView = await waitForDock(first)
     expect(firstView.getByRole('separator', { hidden: true })).toHaveAttribute(
       'aria-orientation',
       'horizontal'
@@ -214,14 +265,14 @@ describe('UnifiedLogs', () => {
     first.unmount()
 
     const project = renderLogs(false)
-    const projectView = await selectLog(project)
+    const projectView = await waitForDock(project)
     expect(projectView.getByRole('separator', { hidden: true })).toHaveAttribute(
       'aria-orientation',
       'horizontal'
     )
     project.unmount()
 
-    const reopenedView = await selectLog(renderLogs(true))
+    const reopenedView = await waitForDock(renderLogs(true))
     await waitFor(() =>
       expect(reopenedView.getByRole('separator', { hidden: true })).toHaveAttribute(
         'aria-orientation',
