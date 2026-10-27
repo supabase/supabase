@@ -207,9 +207,9 @@ export const BillingMetric = ({
               </p>
             )}
 
-            {metric.key === PricingMetric.LOG_QUERYING && isLogMetricOnNonPlatformPlan && (
+            {metric.key === PricingMetric.LOG_QUERYING && isLogMetricOnNonPlatformPlan ? (
               <p className="text-foreground-light">
-                We're working on resolving some mis-reported numbers for this metric.{' '}
+                We won't enforce this metric until known mis-reporting issues are resolved.{' '}
                 <a
                   href="https://github.com/orgs/supabase/discussions/50925"
                   target="_blank"
@@ -219,30 +219,25 @@ export const BillingMetric = ({
                   Share feedback on GitHub.
                 </a>
               </p>
+            ) : (
+              <>
+                {subscription.usage_billing_enabled && isLogMetricOnNonPlatformPlan && (
+                  <p className="text-foreground-light">
+                    Billing and enforcement will only start after the grace period ends in early
+                    2027.
+                  </p>
+                )}
+                {subscription.usage_billing_enabled === false &&
+                  relativeToSubscription &&
+                  (isApproachingLimit || isExceededLimit) && (
+                    <p className="text-foreground-light">
+                      {isLogMetricOnNonPlatformPlan
+                        ? 'Enforcement will only start after the grace period ends in early 2027. Reduce your usage, upgrade to a usage-based plan or disable the spend cap to avoid restrictions.'
+                        : 'Exceeding your plans included usage will lead to restrictions to your project. Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.'}
+                    </p>
+                  )}
+              </>
             )}
-
-            {subscription.usage_billing_enabled && isLogMetricOnNonPlatformPlan && (
-              <p className="text-foreground-light">
-                Billing and enforcement of restrictions for this metric will only start after the
-                grace period ends in early 2027.
-              </p>
-            )}
-
-            {subscription.usage_billing_enabled === false &&
-              relativeToSubscription &&
-              (isApproachingLimit || isExceededLimit) &&
-              (isLogMetricOnNonPlatformPlan ? (
-                <p className="text-foreground-light">
-                  Enforcement of restrictions will only start after the grace period ends in early
-                  2027. Reduce your usage, upgrade to a usage-based plan or disable the spend cap to
-                  avoid restrictions.
-                </p>
-              ) : (
-                <p className="text-foreground-light">
-                  Exceeding your plans included usage will lead to restrictions to your project.
-                  Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
-                </p>
-              ))}
 
             {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
               <table className="list-disc w-full">
