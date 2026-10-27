@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { menuState } from '../../../hooks/useMenuState'
+import type { GlobalMenuItems } from '../Navigation.types'
 import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
 
 export function getPathWithoutHash(relativePath: string) {
@@ -178,4 +179,22 @@ export const getMenuGroupLabel = (menuId: string): string | undefined =>
       section.enabled !== false &&
       (isMenuLevel(menuId, section.level) ||
         section.menuItems?.some((group) => group.some((item) => isMenuLevel(menuId, item.level))))
+  )?.[0].label
+
+// the top bar has no menu id, so it finds the group by its links
+export const getMenuGroupLabelByPath = ({
+  menu,
+  pathname,
+}: {
+  menu: GlobalMenuItems
+  pathname: string
+}): string | undefined =>
+  menu.find(
+    ([section]) =>
+      section.enabled !== false &&
+      [section.href, ...(section.menuItems?.flat().map((item) => item.href) ?? [])].some(
+        (href) =>
+          !!href &&
+          (pathname === href || pathname.startsWith(`${href}/`) || href.startsWith(`${pathname}/`))
+      )
   )?.[0].label

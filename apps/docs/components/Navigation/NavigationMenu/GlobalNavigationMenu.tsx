@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { FC, Fragment, useEffect, useState } from 'react'
+import React, { FC, Fragment } from 'react'
 import {
   Badge,
   cn,
@@ -16,50 +16,14 @@ import {
   navigationMenuTriggerStyle,
 } from 'ui'
 
-import type { GlobalMenuItems } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
+import { getMenuGroupLabelByPath } from './NavigationMenu.utils'
 import { useNavItems } from '@/features/IaNav'
-
-/**
- * Get TopNav active label based on current pathname
- */
-export const useActiveMenuLabel = (menu: GlobalMenuItems) => {
-  const pathname = usePathname()
-  const [activeLabel, setActiveLabel] = useState('')
-
-  useEffect(() => {
-    // check if homepage
-    if (pathname === '/') {
-      return setActiveLabel('Home')
-    }
-
-    for (let index = 0; index < menu.length; index++) {
-      const section = menu[index]
-      if (section[0].enabled === false) continue
-
-      // check if first level menu items match beginning of url
-      if (section[0].href?.startsWith(pathname)) {
-        return setActiveLabel(section[0].label)
-      }
-      // check if second level menu items match beginning of url
-      if (section[0].menuItems) {
-        section[0].menuItems.map((menuItemGroup) =>
-          menuItemGroup
-            .filter((menuItem) => menuItem.enabled !== false)
-            .map(
-              (menuItem) => menuItem.href?.startsWith(pathname) && setActiveLabel(section[0].label)
-            )
-        )
-      }
-    }
-  }, [pathname, menu])
-
-  return activeLabel
-}
 
 const GlobalNavigationMenu: FC = () => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
-  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
+  const pathname = usePathname()
+  const activeLabel = getMenuGroupLabelByPath({ menu: GLOBAL_MENU_ITEMS, pathname })
   const triggerClassName =
     'h-(--header-height) p-2 bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-light hover:bg-transparent hover:text-foreground data-open:bg-transparent! data-open:text-foreground! focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
 
