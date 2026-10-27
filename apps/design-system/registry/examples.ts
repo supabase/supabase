@@ -20,12 +20,6 @@ export const examples: Registry = [
     files: ['example/admonition-responsive.tsx'],
   },
   {
-    name: 'admonition-responsive-actions',
-    type: 'components:example',
-    registryDependencies: ['admonition', 'button'],
-    files: ['example/admonition-responsive-actions.tsx'],
-  },
-  {
     name: 'admonition-button',
     type: 'components:example',
     registryDependencies: ['admonition'],
