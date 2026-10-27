@@ -26,11 +26,18 @@ export const MobileNavLock = ({ toggleRef }: MobileNavLockProps) => {
         toggle.focus()
       }
       document.addEventListener('keydown', handleKeyDown)
+      // an open nav keeps the page inert, so the nav closes at the lg breakpoint
+      const desktop = window.matchMedia('(min-width: 64rem)')
+      const handleDesktopChange = (event: MediaQueryListEvent) => {
+        if (event.matches) toggle.click()
+      }
+      desktop.addEventListener('change', handleDesktopChange)
 
       return () => {
         for (const element of inerted) element.removeAttribute('inert')
         root.style.overflow = overflow
         document.removeEventListener('keydown', handleKeyDown)
+        desktop.removeEventListener('change', handleDesktopChange)
       }
     },
     [toggleRef]

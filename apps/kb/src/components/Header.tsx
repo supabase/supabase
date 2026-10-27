@@ -27,10 +27,6 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
   const shownTitle = isMenuOpen ? null : scrolledTitle
 
   const handleMenuToggle = () => setIsMenuOpen(!isMenuOpen)
-  const handleMenuClose = () => {
-    setIsMenuOpen(false)
-    menuButtonRef.current?.focus()
-  }
 
   // the article title is static html, so the island finds it once the header mounts
   const observePageTitle = useCallback((nav: HTMLElement | null) => {
@@ -120,7 +116,6 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
         menus={menus}
         currentPath={currentPath}
         toggleRef={menuButtonRef}
-        onClose={handleMenuClose}
         className="lg:hidden"
       />
     </>
