@@ -256,12 +256,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/contributing',
             enabled: contributionEnabled,
           },
-          {
-            label: 'Troubleshooting',
-            icon: 'troubleshooting',
-            href: '/guides/troubleshooting',
-            level: 'troubleshooting',
-          },
         ],
       ],
     },

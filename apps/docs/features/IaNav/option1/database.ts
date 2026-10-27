@@ -176,7 +176,6 @@ export const database: NavMenuConstant = {
           name: 'Debugging and troubleshooting',
           items: [
             { name: 'Inspect the database', url: '/guides/observability/inspect' },
-            { name: 'Troubleshooting', url: '/guides/database/troubleshooting' },
             {
               name: 'Print Postgres Version',
               url: '/guides/database/postgres/which-version-of-postgres',

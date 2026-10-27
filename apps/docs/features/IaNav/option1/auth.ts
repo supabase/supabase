@@ -9,7 +9,6 @@ const {
   docsAuthConfiguration: authConfigurationEnabled,
   docsAuthFlows: authFlowsEnabled,
   docsAuthFullSecurity: authFullSecurityEnabled,
-  docsAuthTroubleshooting: authTroubleshootingEnabled,
   docsFrameworkQuickstarts: frameworkQuickstartsEnabled,
 } = isFeatureEnabled([
   'authentication:show_providers',
@@ -17,7 +16,6 @@ const {
   'docs:auth_configuration',
   'docs:auth_flows',
   'docs:auth_full_security',
-  'docs:auth_troubleshooting',
   'docs:framework_quickstarts',
 ])
 
@@ -179,14 +177,7 @@ export const auth: NavMenuConstant = {
         },
         {
           name: 'Debugging',
-          items: [
-            { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
-            {
-              name: 'Troubleshooting',
-              url: '/guides/auth/troubleshooting',
-              enabled: authTroubleshootingEnabled,
-            },
-          ],
+          items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
         },
       ],
     },

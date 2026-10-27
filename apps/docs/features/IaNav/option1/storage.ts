@@ -114,7 +114,6 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'Storage logs', url: '/guides/storage/debugging/logs' },
         { name: 'Error codes', url: '/guides/storage/debugging/error-codes' },
-        { name: 'Troubleshooting', url: '/guides/storage/troubleshooting' },
       ],
     },
     { name: 'Scaling for production', url: '/guides/storage/production/scaling' },

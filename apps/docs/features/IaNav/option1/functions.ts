@@ -49,7 +49,6 @@ export const functions: NavMenuConstant = {
         { name: 'Logging', url: '/guides/functions/logging' },
         { name: 'Error codes', url: '/guides/functions/error-codes' },
         { name: 'Status codes', url: '/guides/functions/status-codes' },
-        { name: 'Troubleshooting', url: '/guides/functions/troubleshooting' },
       ],
     },
     {

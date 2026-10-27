@@ -122,7 +122,6 @@ export const apis: NavMenuConstant = {
           name: 'Debugging and reports',
           items: [
             { name: 'Operational Error Codes', url: '/guides/realtime/error_codes' },
-            { name: 'Troubleshooting', url: '/guides/realtime/troubleshooting' },
             { name: 'Realtime Reports', url: '/guides/realtime/reports' },
           ],
         },
