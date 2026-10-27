@@ -2,18 +2,23 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { createMockOrganization, render } from '@/tests/helpers'
 
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 const mockPush = vi.hoisted(() => vi.fn())
 const mockPartnerManagedResource = vi.hoisted(() => vi.fn())
+const mockOrgSubscriptionQuery = vi.hoisted(() => vi.fn())
+const mockPermissions = vi.hoisted(() => vi.fn())
+const mockUseFlag = vi.hoisted(() => vi.fn())
 
 vi.mock('common', async (importOriginal) => {
   const original = (await importOriginal()) as typeof import('common')
   return {
     ...original,
     useParams: () => ({ slug: 'stripe-org' }),
+    useFlag: (flag: string) => mockUseFlag(flag),
   }
 })
 
@@ -60,7 +65,7 @@ vi.mock('@/lib/telemetry/track', () => ({
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
-  useAsyncCheckPermissionsV2: () => ({ can: true }),
+  useAsyncCheckPermissionsV2: (permission: unknown) => mockPermissions(permission),
 }))
 
 vi.mock('@/state/organization-settings', () => ({
@@ -83,10 +88,13 @@ vi.mock('@/data/organizations/organization-query', () => ({
 }))
 
 vi.mock('@/data/subscriptions/org-subscription-query', () => ({
-  useOrgSubscriptionQuery: () => ({
-    data: { plan: { id: 'free', name: 'Free' }, billing_via_partner: false },
-    isSuccess: true,
-  }),
+  useOrgSubscriptionQuery: (params: unknown, options: unknown) => {
+    mockOrgSubscriptionQuery(params, options)
+    return {
+      data: { plan: { id: 'free', name: 'Free' }, billing_via_partner: false },
+      isSuccess: true,
+    }
+  },
 }))
 
 vi.mock('@/data/subscriptions/org-plans-query', () => ({
@@ -138,6 +146,9 @@ vi.mock('./SubscriptionPlanUpdateDialog', () => ({
 
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
+    mockPermissions.mockReturnValue({ can: true })
+    mockUseFlag.mockReturnValue(false)
+    mockOrgSubscriptionQuery.mockClear()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',
@@ -146,6 +157,30 @@ describe('PlanUpdateSidePanel', () => {
         managed_by: MANAGED_BY.STRIPE_PROJECTS,
       })
     )
+  })
+
+
+  it('does not fetch subscription data when billing-read permission is denied', () => {
+    mockPermissions.mockImplementation((permission) => ({
+      can: permission !== FGA_PERMISSIONS.ORGANIZATION.BILLING_READ,
+    }))
+
+    render(<PlanUpdateSidePanel />)
+
+    expect(mockOrgSubscriptionQuery).toHaveBeenCalledWith(
+      { orgSlug: 'stripe-org' },
+      { enabled: false }
+    )
+  })
+
+  it('does not offer AWS Marketplace when plan changes are disabled', () => {
+    mockUseFlag.mockReturnValue(true)
+
+    render(<PlanUpdateSidePanel />)
+
+    expect(
+      screen.queryByText('Prefer purchasing through AWS Marketplace?')
+    ).not.toBeInTheDocument()
   })
 
   it('shows Stripe-managed messaging without treating Stripe orgs as partner-billed', () => {
