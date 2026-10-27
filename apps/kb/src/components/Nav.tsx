@@ -1,4 +1,7 @@
+import { ChevronRight } from 'lucide-react'
+import { useState } from 'react'
 import {
+  buttonVariants,
   cn,
   NavigationMenu,
   NavigationMenuContent,
@@ -6,74 +9,128 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
+  NavigationMenuViewport,
 } from 'ui'
 
-import { TOPICS, topicToSlug } from '../lib/topics'
+import type { NavMenu } from '../lib/nav'
 
-const topics = TOPICS.map((topic) => ({
-  label: topic.name,
-  href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`,
-}))
+export interface NavProps {
+  menus: NavMenu[]
+  className?: string
+}
 
-/**
- * Hard-codding links in here for now until we have actual content. Might be worth putting these arrays in their on data file too.
- */
-const resources = [
-  { label: 'Status', href: 'https://status.supabase.com' },
-  { label: 'Changelog', href: 'https://supabase.com/changelog' },
-  { label: 'Docs', href: 'https://supabase.com/docs' },
-]
+interface MenuPanelProps {
+  menu: NavMenu
+}
 
-const menus = [
-  { label: 'Topics', items: topics },
-  { label: 'Resources', items: resources },
-]
+export const Nav = ({ menus, className }: NavProps) => {
+  const menuLabels = menus.map((menu) => menu.label)
+  const [activeMenu, setActiveMenu] = useState('')
+  const [visibleMenu, setVisibleMenu] = useState('')
+  const [isSwitching, setIsSwitching] = useState(false)
 
-const triggerClass =
-  'h-(--header-height) p-2 bg-transparent border-transparent font-normal rounded-none text-foreground-light hover:text-foreground data-open:text-foreground! border-0 focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
-// docs gates this at `md:absolute` (its own base component class) because its
-// nav is hidden entirely below `lg` in favor of a separate mobile menu. kb
-// doesn't have that split — the nav is always visible — so `absolute` is
-// unconditional here; without it, an open menu pushes its siblings around
-// below the `md` breakpoint instead of overlaying them.
-const contentClass =
-  'absolute top-[calc(100%+4px)]! min-w-56 max-h-[calc(100vh-4rem)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md duration-0!'
-const itemClass =
-  'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground'
+  const handleMenuChange = (value: string) => {
+    setIsSwitching(value !== '' && activeMenu !== '')
+    setActiveMenu(value)
+    if (value !== '') setVisibleMenu(value)
+  }
 
-function Nav() {
+  const sideOf = (label: string) => {
+    if (label === visibleMenu) return 'active'
+    return menuLabels.indexOf(label) < menuLabels.indexOf(visibleMenu) ? 'start' : 'end'
+  }
+
   return (
-    <div className="flex relative gap-2 justify-start items-end w-full h-full">
-      <NavigationMenu
-        delayDuration={0}
-        skipDelayDuration={0}
-        className="w-full flex justify-start h-full"
-        renderViewport={false}
-      >
-        <NavigationMenuList className="px-6 space-x-2 h-(--header-height)">
-          {menus.map((menu) => (
-            <NavigationMenuItem key={menu.label} className="text-sm relative h-full m-0">
-              <NavigationMenuTrigger className={cn(navigationMenuTriggerStyle(), triggerClass)}>
-                {menu.label}
-              </NavigationMenuTrigger>
-              <NavigationMenuContent className={contentClass}>
-                <div className="p-3 md:p-1">
-                  {menu.items.map((item) => (
-                    <NavigationMenuLink key={item.label} asChild>
-                      <a href={item.href} className={itemClass}>
-                        {item.label}
-                      </a>
-                    </NavigationMenuLink>
-                  ))}
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          ))}
-        </NavigationMenuList>
-      </NavigationMenu>
-    </div>
+    <NavigationMenu
+      delayDuration={0}
+      value={activeMenu}
+      onValueChange={handleMenuChange}
+      renderViewport={false}
+      className={cn('relative h-full items-stretch', className)}
+    >
+      <NavigationMenuList className="h-full items-stretch space-x-0">
+        {menus.map((menu) => (
+          <NavigationMenuItem key={menu.label} value={menu.label} className="text-sm font-medium">
+            <NavigationMenuTrigger
+              className={cn(
+                buttonVariants({ variant: 'text', size: 'small' }),
+                'h-full bg-transparent! px-2.5 hover:text-primary data-open:text-primary!',
+                'focus-ring focus-visible:text-foreground'
+              )}
+            >
+              {menu.label}
+            </NavigationMenuTrigger>
+            <NavigationMenuContent
+              forceMount
+              inert={visibleMenu !== menu.label}
+              data-active={visibleMenu === menu.label}
+              data-side={sideOf(menu.label)}
+              className={cn(
+                'data-[motion^=from-]:animate-none! data-[motion^=to-]:animate-none!',
+                'data-[active=false]:pointer-events-none data-[active=false]:opacity-0',
+                'data-[side=start]:-translate-x-4 data-[side=end]:translate-x-4',
+                'motion-safe:group-data-[switching=true]/viewport:transition',
+                'motion-safe:group-data-[switching=true]/viewport:duration-250',
+                'motion-safe:group-data-[switching=true]/viewport:ease-in-out'
+              )}
+            >
+              <MenuPanel menu={menu} />
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        ))}
+      </NavigationMenuList>
+      <NavigationMenuViewport
+        forceMount
+        data-open={activeMenu !== ''}
+        data-switching={isSwitching}
+        containerProps={{ className: '-left-3.5 justify-start pointer-events-none' }}
+        className={cn(
+          'group/viewport pointer-events-auto origin-top-left scale-100 rounded-xl bg-surface-75',
+          'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
+          'data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200',
+          'data-[open=false]:pointer-events-none data-[open=false]:invisible',
+          'data-[open=false]:scale-[0.97] data-[open=false]:opacity-0',
+          'motion-safe:transition-[opacity,scale,visibility]',
+          'motion-safe:data-[switching=true]:transition-[width,height,opacity,scale,visibility]',
+          'motion-reduce:transition-none'
+        )}
+      />
+    </NavigationMenu>
   )
 }
 
-export { Nav }
+const MenuPanel = ({ menu }: MenuPanelProps) => (
+  <div className="flex gap-12 px-6 py-5">
+    {menu.groups.map((group) => (
+      <div key={group.label} className="flex w-44 flex-col gap-6">
+        <span className="font-mono text-xs uppercase tracking-widest text-foreground-lighter">
+          {group.label}
+        </span>
+        <ul className="flex flex-col gap-4">
+          {group.links.map((link) => (
+            <li key={link.href}>
+              <NavigationMenuLink asChild>
+                <a
+                  href={link.href}
+                  className={cn(
+                    'group flex items-center gap-2 rounded-sm text-sm text-foreground-light',
+                    'hover:text-foreground focus-ring focus-visible:text-foreground'
+                  )}
+                >
+                  {link.label}
+                  <ChevronRight
+                    strokeWidth={2}
+                    className={cn(
+                      '-ml-1 w-3 -translate-x-1 opacity-0 transition-all',
+                      'group-hover:translate-x-0 group-hover:opacity-100'
+                    )}
+                  />
+                </a>
+              </NavigationMenuLink>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+)

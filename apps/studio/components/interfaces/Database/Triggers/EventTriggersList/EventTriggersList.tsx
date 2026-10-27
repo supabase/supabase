@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DatabaseZap, Plus, Search } from 'lucide-react'
+import { DatabaseZapIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -33,7 +32,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabaseEventTriggerDeleteMutation } from '@/data/database-event-triggers/database-event-trigger-delete-mutation'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -67,9 +66,8 @@ export const EventTriggersList = () => {
     setInitialPrompt: setEditorPanelInitialPrompt,
   } = useEditorPanelStateSnapshot()
 
-  const { can: canUpdateEventTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  const { can: canUpdateEventTriggers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const {
@@ -202,7 +200,7 @@ export const EventTriggersList = () => {
               onKeyDown={onSearchInputEscape(filterString, setFilterString)}
             />
             <InputGroupAddon>
-              <Search />
+              <SearchIcon />
             </InputGroupAddon>
           </InputGroup>
           <ReportsSelectFilter
@@ -225,14 +223,14 @@ export const EventTriggersList = () => {
               onTrigger={createEventTrigger}
               side="bottom"
             >
-              <Button variant="primary" icon={<Plus size={12} />} onClick={createEventTrigger}>
+              <Button variant="primary" icon={<PlusIcon size={12} />} onClick={createEventTrigger}>
                 New trigger
               </Button>
             </Shortcut>
           ) : (
             <ButtonTooltip
               variant="primary"
-              icon={<Plus size={12} />}
+              icon={<PlusIcon size={12} />}
               disabled
               tooltip={{
                 content: {
@@ -249,7 +247,7 @@ export const EventTriggersList = () => {
 
       {showEmptyState ? (
         <EmptyStatePresentational
-          icon={DatabaseZap}
+          icon={DatabaseZapIcon}
           title="No event triggers yet"
           description="Event triggers run on database-level events like DDL commands."
         >

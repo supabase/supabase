@@ -1,4 +1,4 @@
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 
 import InformationBox from '@/components/ui/InformationBox'
 import Panel from '@/components/ui/Panel'
@@ -11,7 +11,7 @@ export const DisabledWarningDueToIncident = ({ title }: DisabledWarningDueToInci
   return (
     <Panel.Content className="pb-8">
       <InformationBox
-        icon={<AlertCircle size={20} strokeWidth={1.5} />}
+        icon={<AlertCircleIcon size={20} strokeWidth={1.5} />}
         defaultVisibility={true}
         hideCollapse
         title={title}

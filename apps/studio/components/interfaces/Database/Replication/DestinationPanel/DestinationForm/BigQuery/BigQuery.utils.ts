@@ -1,3 +1,5 @@
+import type { UseFormReturn } from 'react-hook-form'
+
 import { type DestinationPanelSchemaType } from '../DestinationForm.schema'
 import { BigQueryPartitionBy } from '@/data/replication/types'
 
@@ -96,4 +98,46 @@ export const getBigQueryValidationIssues = (
   }
 
   return issues
+}
+
+export const MAX_SERVICE_ACCOUNT_KEY_LENGTH = 5000
+
+export const readServiceAccountFile = async (
+  file: File,
+  form: UseFormReturn<DestinationPanelSchemaType>,
+  isCurrentRequest: () => boolean
+) => {
+  if (file.size > MAX_SERVICE_ACCOUNT_KEY_LENGTH) {
+    if (isCurrentRequest()) {
+      form.setError('serviceAccountKey', {
+        message: 'Service account key must be 5,000 characters or fewer.',
+      })
+    }
+    return
+  }
+
+  try {
+    const contents = await file.text()
+    if (!isCurrentRequest()) return
+
+    if (contents.length > MAX_SERVICE_ACCOUNT_KEY_LENGTH) {
+      form.setError('serviceAccountKey', {
+        message: 'Service account key must be 5,000 characters or fewer.',
+      })
+      return
+    }
+
+    form.setValue('serviceAccountKey', contents, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    })
+    form.clearErrors('serviceAccountKey')
+  } catch {
+    if (isCurrentRequest()) {
+      form.setError('serviceAccountKey', {
+        message: 'Could not read the selected JSON file.',
+      })
+    }
+  }
 }

@@ -1,26 +1,28 @@
 ---
 title: Realtime Cursor
 description: Real-time cursor sharing for collaborative applications
+preview: |-
+  <BlockOverview name="realtime-cursor-nuxtjs" showFiles>
+    <div className="flex flex-row -space-x-px w-full">
+      <BlockPreview name="realtime-cursor-demo" isPair />
+      <BlockPreview name="realtime-cursor-demo" isPair />
+    </div>
+  </BlockOverview>
 ---
-
-<div className="flex flex-row -space-x-px w-full">
-  <BlockPreview name="realtime-cursor-demo" isPair />
-  <BlockPreview name="realtime-cursor-demo" isPair />
-</div>
 
 ## Installation
 
-<BlockItem
-  name="realtime-cursor-nuxtjs"
-  description="Renders realtime cursors from other users in a room."
-  framework="vue"
-/>
+### Set up the Supabase client
 
-## Folder structure
+This block requires a Supabase client for Nuxt.js. If your project already has one, reuse it and update the block's imports to match your client. Otherwise, install the client:
 
-This block assumes that you have already installed a Supabase client for Nuxt from the previous step.
+<BlockItem name="supabase-client-nuxtjs" framework="vue" showOpenInV0={false} />
 
-<RegistryBlock itemName="realtime-cursor-nuxtjs" />
+Configure the environment variables described in the [Nuxt.js client guide](/library/docs/nuxtjs/client#getting-started) before using the block.
+
+### Install the block
+
+<BlockItem name="realtime-cursor-nuxtjs" framework="vue" />
 
 ## Introduction
 

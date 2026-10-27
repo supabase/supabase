@@ -7,14 +7,12 @@ import {
   getFacetedMinMaxValues as getTTableFacetedMinMaxValues,
   getFacetedUniqueValues as getTTableFacetedUniqueValues,
   Row,
-  RowSelectionState,
   SortingState,
   Table,
   useReactTable,
-  VisibilityState,
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
-import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -32,38 +30,46 @@ import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Colum
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
+import { LogsTable } from './components/LogsTable'
 import { TooltipLabel } from './components/TooltipLabel'
-import { RowSelectionHeader } from './RowSelectionHeader'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
-import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { LOG_TYPES, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
   buildDefaultColumnFilters,
   buildFilterSearchUpdate,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
-import { useFilterSearchSync, useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
+import {
+  useFilterSearchSync,
+  useLiveMode,
+  useLogsTableColumns,
+  useResetFocus,
+} from './UnifiedLogs.hooks'
 import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
-import { QuerySearchParamsType } from './UnifiedLogs.types'
 import {
   gateLogTypeFilters,
   gateLogTypeOptions,
   getComputeLogsAvailability,
   getFacetedUniqueValues,
-  getLevelRowClassName,
+  getLogRowClassName,
+  getLogTypeVisibility,
+  getUniqueLogRows,
+  toQuerySearchParams,
 } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
 import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
-import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideBarLayout'
 import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions'
 import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
 import { LiveButton } from '@/components/ui/DataTable/LiveButton'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { RowSelectionModifiers } from '@/components/ui/DataTable/rowSelection.utils'
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
+import { useTableRowSelection } from '@/components/ui/DataTable/useTableRowSelection'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
@@ -97,19 +103,21 @@ export const UnifiedLogs = () => {
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const computeEnabled = !!useFlag('compute')
+  const computeEnabled = useFlag('compute')
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
     computeEnabled,
   })
-  const visibleSearchFilters = gateLogTypeFilters(search.filter, {
-    multigres: showMultigresLogs,
-    compute: computeAvailability.preserveComputeFilter,
-  })
+  const visibleSearchFilters = gateLogTypeFilters(
+    search.filter,
+    getLogTypeVisibility({
+      multigres: showMultigresLogs,
+      compute: computeAvailability.preserveComputeFilter,
+    })
+  )
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
-  const defaultColumnVisibility = { uuid: false }
   const defaultColumnFilters = buildDefaultColumnFilters({
     ...search,
     filter: visibleSearchFilters,
@@ -131,45 +139,43 @@ export const UnifiedLogs = () => {
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-  const [openRowId, setOpenRowId] = useState<string | undefined>(search.id ?? undefined)
+  const [localFilterOrigin, setLocalFilterOrigin] = useState<string | null>(null)
 
   const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
     LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK,
     'bottom'
   )
 
-  const [columnVisibility, setColumnVisibility] = useLocalStorageQuery<VisibilityState>(
-    'data-table-visibility',
-    defaultColumnVisibility
-  )
-  const [columnOrder, setColumnOrder] = useLocalStorageQuery<string[]>(
-    'data-table-column-order',
-    []
-  )
+  const { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder } =
+    useLogsTableColumns()
 
   // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
-  const searchParameters = useMemo(() => {
-    const parameters = Object.entries(search).reduce(
-      (acc, [key, value]) => {
-        if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
-          acc[key] = value
-        }
-        return acc
-      },
-      {} as Record<string, unknown>
-    ) as QuerySearchParamsType
+  const queryLogTypeVisibility = useMemo(
+    () =>
+      getLogTypeVisibility({
+        multigres: showMultigresLogs,
+        compute: computeAvailability.canQueryCompute,
+      }),
+    [showMultigresLogs, computeAvailability.canQueryCompute]
+  )
 
+  const searchParameters = useMemo(() => {
+    const parameters = toQuerySearchParams(search)
     if (parameters.filter) {
-      parameters.filter =
-        gateLogTypeFilters(parameters.filter, {
-          multigres: showMultigresLogs,
-          compute: computeAvailability.canQueryCompute,
-        }) ?? null
+      parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? undefined
     }
     return parameters
-  }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [search, queryLogTypeVisibility])
+  const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
+
+  useEffect(() => setLocalFilterOrigin(null), [urlFilterScope])
+
+  const { selection, selectRow, clearSelection } = useTableRowSelection({
+    scope: JSON.stringify([projectRef, searchParameters]),
+    initialId: search.id ?? undefined,
+  })
+  const rowSelection = selection.selected
 
   const {
     data: unifiedLogsData,
@@ -215,15 +221,10 @@ export const UnifiedLogs = () => {
   // Only fade when filtering (not when loading more data or live mode)
   const isFetchingButNotPaginating = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
 
-  const rawFlatData = useMemo(() => {
-    return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
-  }, [unifiedLogsData?.pages])
-  // [Joshen] Refer to unified-logs-infinite-query on why the need to deupe
-  const flatData = useMemo(() => {
-    return rawFlatData.filter((value, idx) => {
-      return idx === rawFlatData.findIndex((x) => x.id === value.id)
-    })
-  }, [rawFlatData])
+  const flatData: ColumnSchema[] = useMemo(
+    () => getUniqueLogRows(unifiedLogsData?.pages),
+    [unifiedLogsData?.pages]
+  )
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount
@@ -244,23 +245,15 @@ export const UnifiedLogs = () => {
     ) as ChartConfig
   }, [search.filter])
 
-  const getRowClassName = <
-    TData extends { date: Date; level: (typeof LEVELS)[number] | null; timestamp: number },
-  >(
-    row: Row<TData>
-  ) => {
-    const rowTimestamp = row.original.timestamp
-    const isPast = rowTimestamp <= (liveMode.timestamp || -1)
-    const levelClassName = getLevelRowClassName(row.original.level)
-    return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
-  }
+  const getRowClassName = (row: Row<ColumnSchema>) =>
+    getLogRowClassName(row.original, liveMode.timestamp)
 
   // Generate dynamic columns based on current data
   const { columns: dynamicColumns, columnVisibility: dynamicColumnVisibility } = useMemo(() => {
     return generateDynamicColumns({ data: flatData })
   }, [flatData])
 
-  const table: Table<ColumnSchema> = useReactTable({
+  const table: Table<ColumnSchema> = useReactTable<ColumnSchema>({
     data: flatData,
     columns: dynamicColumns,
     state: {
@@ -276,8 +269,10 @@ export const UnifiedLogs = () => {
     meta: { getRowClassName },
     getRowId: (row) => row.id,
     onColumnVisibilityChange: setColumnVisibility,
-    onColumnFiltersChange: setColumnFilters,
-    onRowSelectionChange: setRowSelection,
+    onColumnFiltersChange: (updater) => {
+      setLocalFilterOrigin(urlFilterScope)
+      setColumnFilters(updater)
+    },
     onSortingChange: setSorting,
     onColumnOrderChange: setColumnOrder,
     getSortedRowModel: getSortedRowModel(),
@@ -288,18 +283,26 @@ export const UnifiedLogs = () => {
     getFacetedMinMaxValues: getTTableFacetedMinMaxValues(),
   })
 
-  const selectedRow = useMemo(() => {
-    if ((isLoading || isFetching) && !flatData.length) return
-    return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
-  }, [isLoading, isFetching, flatData.length, table, openRowId])
+  const selectedRows = table.getSelectedRowModel().rows
+  const selectedRow =
+    selectedRows.find((row) => row.id === selection.activeId) ?? selectedRows.at(-1)
+  const openRowId = selectedRow?.id
+  const handleSelectRow = (id: string, modifiers?: RowSelectionModifiers) => {
+    selectRow(
+      table.getRowModel().rows.map((row) => row.id),
+      id,
+      modifiers
+    )
+  }
+  const setOpenRowId = (id: string | undefined) => {
+    if (id) handleSelectRow(id)
+    else clearSelection()
+  }
 
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
-    const gatedFields = gateLogTypeOptions(defaultFilterFields, {
-      multigres: showMultigresLogs,
-      compute: computeAvailability.canQueryCompute,
-    })
+    const gatedFields = gateLogTypeOptions(defaultFilterFields, queryLogTypeVisibility)
 
     return gatedFields.map((field) => {
       const facetsField = facets?.[field.value]
@@ -327,15 +330,12 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [facets, queryLogTypeVisibility])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)
     if (Array.isArray(update.filter)) {
-      update.filter = gateLogTypeFilters(update.filter.map(String), {
-        multigres: showMultigresLogs,
-        compute: computeAvailability.canQueryCompute,
-      })
+      update.filter = gateLogTypeFilters(update.filter.map(String), queryLogTypeVisibility)
     }
     setSearch(update)
   }
@@ -360,7 +360,8 @@ export const UnifiedLogs = () => {
       setOpenRowId(undefined)
     } else if (openRowId && selectedRow) {
       setSearch({ id: openRowId })
-      track('unified_logs_row_clicked', { logType: selectedRow.original.log_type })
+      const logType = LOG_TYPES.find((type) => type === selectedRow.original.log_type)
+      if (logType) track('unified_logs_row_clicked', { logType })
     } else if (!openRowId && search.id) {
       // Clear the URL parameter when no row is open
       setSearch({ id: null })
@@ -387,10 +388,6 @@ export const UnifiedLogs = () => {
     }
   }, [isMobile])
 
-  useEffect(() => {
-    table.resetRowSelection()
-  }, [searchParameters, table])
-
   return (
     <DataTableProvider
       table={table}
@@ -402,9 +399,11 @@ export const UnifiedLogs = () => {
       rowSelection={rowSelection}
       openRowId={openRowId}
       setOpenRowId={setOpenRowId}
+      onSelectRow={handleSelectRow}
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
       searchParameters={searchParameters}
+      hasPendingFilterChange={localFilterOrigin === urlFilterScope}
       enableColumnOrdering={true}
       isFetching={isFetching}
       isError={isError}
@@ -430,7 +429,7 @@ export const UnifiedLogs = () => {
                   <Button
                     size="tiny"
                     variant="text"
-                    icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                    icon={isFilterBarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
                     onClick={() => setIsFilterBarOpen((prev) => !prev)}
                     className="hidden w-[26px] sm:flex"
                     aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
@@ -466,7 +465,7 @@ export const UnifiedLogs = () => {
 
               {isLoading ? (
                 <div className="h-[60px] flex items-center justify-center">
-                  <Loader2 size={14} className="animate-spin text-foreground-lighter" />
+                  <Loader2Icon size={14} className="animate-spin text-foreground-lighter" />
                 </div>
               ) : (
                 <TimelineChart
@@ -482,8 +481,6 @@ export const UnifiedLogs = () => {
               )}
             </div>
 
-            <RowSelectionHeader />
-
             <ResizablePanelGroup
               key="main-logs"
               className="flex-1 border-t"
@@ -497,47 +494,35 @@ export const UnifiedLogs = () => {
                   isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                 )}
               >
-                <div
-                  className={cn(
-                    'h-full [&>div]:h-full',
-                    '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
-                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_var(--border-default)]!',
-                    '[&_thead_th]:text-foreground-lighter! [&_thead_tr:hover]:bg-surface-75',
-                    '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
-                  )}
-                >
-                  <DataTableInfinite
-                    columns={UNIFIED_LOGS_COLUMNS}
-                    totalRows={totalDBRowCount}
-                    filterRows={filterDBRowCount}
-                    totalRowsFetched={totalFetched}
-                    fetchNextPage={fetchNextPage}
-                    hasNextPage={hasNextPage}
-                    setColumnOrder={setColumnOrder}
-                    setColumnVisibility={setColumnVisibility}
-                    errorSubject="Failed to retrieve logs"
-                    emptyStateMessage={
-                      isUserFilterUnreachable(searchParameters) ? (
-                        <div className="text-sm flex flex-col gap-y-1">
-                          <p className="text-foreground-light">No results found</p>
-                          <p className="text-foreground-lighter">
-                            Filtering by user is only supported for Auth and API Gateway log types
-                          </p>
-                        </div>
-                      ) : undefined
-                    }
-                  />
-                </div>
+                <LogsTable
+                  columns={UNIFIED_LOGS_COLUMNS}
+                  totalRows={totalDBRowCount}
+                  filterRows={filterDBRowCount}
+                  totalRowsFetched={totalFetched}
+                  fetchNextPage={fetchNextPage}
+                  hasNextPage={hasNextPage}
+                  setColumnOrder={setColumnOrder}
+                  setColumnVisibility={setColumnVisibility}
+                  emptyStateMessage={
+                    isUserFilterUnreachable(searchParameters) ? (
+                      <div className="text-sm flex flex-col gap-y-1">
+                        <p className="text-foreground-light">No results found</p>
+                        <p className="text-foreground-lighter">
+                          Filtering by user is only supported for Auth and API Gateway log types
+                        </p>
+                      </div>
+                    ) : undefined
+                  }
+                />
               </ResizablePanel>
 
               {!!openRowId && !!selectedRow && (
                 <>
-                  <LogsListPanel selectedRow={selectedRow} />
+                  {selectedRows.length === 1 && <LogsListPanel selectedRow={selectedRow} />}
                   <ServiceFlowPanel
                     dock={dock}
                     setDock={setDock}
-                    selectedRow={selectedRow?.original}
-                    selectedRowKey={openRowId}
+                    selectedRows={selectedRows.map((row) => row.original)}
                     searchParameters={searchParameters}
                   />
                 </>

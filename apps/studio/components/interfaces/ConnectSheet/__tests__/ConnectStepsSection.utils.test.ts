@@ -126,9 +126,11 @@ describe('resolveContentPath', () => {
 })
 
 describe('shouldShowIpv4AddonNotice', () => {
-  const BASE = {
+  const BASE: Parameters<typeof shouldShowIpv4AddonNotice>[0] = {
     isPlatform: true,
-    mode: 'direct' as const,
+    isAws: true,
+    isIpv4Enabled: true,
+    mode: 'direct',
     connectionMethod: 'direct',
     useSharedPooler: false,
     hasIpv4Addon: false,
@@ -149,72 +151,40 @@ describe('shouldShowIpv4AddonNotice', () => {
     ).toBe(true)
   })
 
-  test('returns false for the transaction pooler when using the shared pooler (already IPv4)', () => {
-    expect(
-      shouldShowIpv4AddonNotice({ ...BASE, connectionMethod: 'transaction', useSharedPooler: true })
-    ).toBe(false)
-  })
-
-  test('returns false for the session pooler (has its own notice)', () => {
-    expect(shouldShowIpv4AddonNotice({ ...BASE, connectionMethod: 'session' })).toBe(false)
-  })
-
-  test('returns false when the IPv4 addon is already enabled', () => {
-    expect(shouldShowIpv4AddonNotice({ ...BASE, hasIpv4Addon: true })).toBe(false)
-  })
-
-  test('returns false when not in direct mode', () => {
-    expect(shouldShowIpv4AddonNotice({ ...BASE, mode: 'framework' })).toBe(false)
-  })
-
-  test('returns false when self-hosted (not platform)', () => {
-    expect(shouldShowIpv4AddonNotice({ ...BASE, isPlatform: false })).toBe(false)
-  })
-
-  test('returns false for high-availability projects even with a direct connection and no addon', () => {
-    expect(shouldShowIpv4AddonNotice({ ...BASE, isHighAvailability: true })).toBe(false)
+  test.each<[string, Partial<typeof BASE>]>([
+    [
+      'the transaction pooler via the shared pooler (already IPv4)',
+      { connectionMethod: 'transaction', useSharedPooler: true },
+    ],
+    ['the session pooler (has its own notice)', { connectionMethod: 'session' }],
+    ['the IPv4 addon is already enabled', { hasIpv4Addon: true }],
+    ['not in direct mode', { mode: 'framework' }],
+    ['self-hosted (not platform)', { isPlatform: false }],
+    ['not on AWS (e.g. Multigres/Fly)', { isAws: false }],
+    ['the IPv4 add-on is not enabled for the project', { isIpv4Enabled: false }],
+    ['high-availability projects', { isHighAvailability: true }],
+  ])('returns false for %s', (_label, overrides) => {
+    expect(shouldShowIpv4AddonNotice({ ...BASE, ...overrides })).toBe(false)
   })
 })
 
 describe('shouldShowSessionPoolerNotice', () => {
+  const BASE: Parameters<typeof shouldShowSessionPoolerNotice>[0] = {
+    isPlatform: true,
+    mode: 'direct',
+    connectionMethod: 'session',
+  }
+
   test('returns true for the session pooler on platform in direct mode', () => {
-    expect(
-      shouldShowSessionPoolerNotice({
-        isPlatform: true,
-        mode: 'direct',
-        connectionMethod: 'session',
-      })
-    ).toBe(true)
+    expect(shouldShowSessionPoolerNotice(BASE)).toBe(true)
   })
 
-  test('returns false when self-hosted (not platform)', () => {
-    expect(
-      shouldShowSessionPoolerNotice({
-        isPlatform: false,
-        mode: 'direct',
-        connectionMethod: 'session',
-      })
-    ).toBe(false)
-  })
-
-  test('returns false when not in direct mode', () => {
-    expect(
-      shouldShowSessionPoolerNotice({
-        isPlatform: true,
-        mode: 'framework',
-        connectionMethod: 'session',
-      })
-    ).toBe(false)
-  })
-
-  test('returns false for a non-session connection method', () => {
-    expect(
-      shouldShowSessionPoolerNotice({
-        isPlatform: true,
-        mode: 'direct',
-        connectionMethod: 'transaction',
-      })
-    ).toBe(false)
+  test.each<[string, Partial<typeof BASE>]>([
+    ['self-hosted (not platform)', { isPlatform: false }],
+    ['not in direct mode', { mode: 'framework' }],
+    ['a non-session connection method', { connectionMethod: 'transaction' }],
+  ])('returns false for %s', (_label, overrides) => {
+    expect(shouldShowSessionPoolerNotice({ ...BASE, ...overrides })).toBe(false)
   })
 })
 

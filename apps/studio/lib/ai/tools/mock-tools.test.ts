@@ -121,11 +121,14 @@ describe('ai/tools/mock-tools getMockTools', () => {
       })
     })
 
-    it('overrides create_notebook needsApproval to false, unlike the real tool', async () => {
+    it('overrides needsApproval to false for notebook mutations, unlike the real tools', async () => {
       const mockTools = await getMockTools(undefined)
+      const realTools = getNotebookTools({ aiOptInLevel: 'schema' })
 
-      expect(getNotebookTools().create_notebook.needsApproval).toBe(true)
-      expect(mockTools.create_notebook.needsApproval).toBe(false)
+      for (const name of ['create_notebook', 'update_notebook', 'delete_notebook'] as const) {
+        expect(realTools[name].needsApproval).toBe(true)
+        expect(mockTools[name].needsApproval).toBe(false)
+      }
     })
 
     it('create_notebook stores a new notebook visible via get_notebook and list_notebooks', async () => {
@@ -162,13 +165,6 @@ describe('ai/tools/mock-tools getMockTools', () => {
       expect(listed.notebooks).toHaveLength(3)
       const newEntry = listed.notebooks.find((notebook) => notebook.id === created.id)
       expect(newEntry?.cell_count).toBe(2)
-    })
-
-    it('overrides update_notebook needsApproval to false, unlike the real tool', async () => {
-      const mockTools = await getMockTools(undefined)
-
-      expect(getNotebookTools().update_notebook.needsApproval).toBe(true)
-      expect(mockTools.update_notebook.needsApproval).toBe(false)
     })
 
     it('update_notebook inserts and deletes cells, and list_notebooks reflects the new cell count', async () => {
@@ -244,13 +240,6 @@ describe('ai/tools/mock-tools getMockTools', () => {
         { toolCallId: 'test', messages: [], context: {} }
       )
       expect(after.cells.map((cell) => cell._tag)).toEqual(['markdown_cell', 'log_cell'])
-    })
-
-    it('overrides delete_notebook needsApproval to false, unlike the real tool', async () => {
-      const mockTools = await getMockTools(undefined)
-
-      expect(getNotebookTools().delete_notebook.needsApproval).toBe(true)
-      expect(mockTools.delete_notebook.needsApproval).toBe(false)
     })
 
     it('delete_notebook removes the notebook, and list_notebooks no longer returns it', async () => {

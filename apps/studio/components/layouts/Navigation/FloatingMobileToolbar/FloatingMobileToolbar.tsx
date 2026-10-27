@@ -1,6 +1,6 @@
 import { useParams, useViewport } from 'common'
-import { AnimatePresence } from 'framer-motion'
-import { Menu, Search, X } from 'lucide-react'
+import { MenuIcon, SearchIcon, XIcon } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useRef } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
 
@@ -80,7 +80,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
             }}
             onClick={handleSearchClick}
           >
-            <Search size={16} strokeWidth={1} />
+            <SearchIcon size={16} strokeWidth={1} />
           </ButtonTooltip>
           <span key="help" data-sidebar-id={SIDEBAR_KEYS.HELP_PANEL}>
             <HelpButton />
@@ -107,7 +107,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
                 'flex lg:hidden mr-1 rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30',
                 !sheet.isMenuOpen && 'bg-surface-300!'
               )}
-              icon={<Menu className={cn(sheet.isMenuOpen && 'text-background')} />}
+              icon={<MenuIcon className={cn(sheet.isMenuOpen && 'text-background')} />}
               onClick={sheet.handleMenuClick}
             />
           )}
@@ -125,7 +125,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
             'rounded-full',
             !sheet.isSheetOpen && 'hidden'
           )}
-          icon={<X />}
+          icon={<XIcon />}
           onClick={sheet.handleClose}
         />
       </AnimatePresence>

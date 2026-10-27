@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useRef, useState, type ComponentPropsWithoutRef } from 'react'
 import { useForm } from 'react-hook-form'
@@ -21,16 +21,14 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
-import {
-  extractPostgresVersionDetails,
-  PostgresVersionSelector,
-} from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { PostgresVersionSelector } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from '@/data/projects/project-restore-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -80,17 +78,23 @@ export const ResumeProjectButton = ({
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
+  const [billingBlockReason, setBillingBlockReason] = useState<string>()
 
-  const { can: canResumeProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_jobs.projects.initialize_or_resume'
-  )
+  const { can: canResumeProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   const { mutate: restoreProject, isPending: isRestoring } = useProjectRestoreMutation({
     onSuccess: async (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.RESTORING })
       toast.success('Restoring project, project will be ready in a few minutes')
       await router.push(`/project/${variables.ref}`)
+    },
+    onError: (error) => {
+      // 402s from restore (unpaid invoices, restrictions, Free Plan limits) are all resolved from billing
+      if (error.code === 402) {
+        setShowConfirmRestore(false)
+        return setBillingBlockReason(error.message)
+      }
+      toast.error(`Failed to restore project: ${error.message}`)
     },
   })
 
@@ -225,7 +229,7 @@ export const ResumeProjectButton = ({
         open={showFreeProjectLimitWarning}
         onOpenChange={() => setShowFreeProjectLimitWarning(false)}
       >
-        <DialogContent size="medium" className="gap-0 pb-0">
+        <DialogContent size="medium" className="gap-0 pb-0" aria-describedby={undefined}>
           <DialogHeader className="border-b">
             <DialogTitle className="leading-normal">
               Your organization has members who have exceeded their free project limits
@@ -252,6 +256,25 @@ export const ResumeProjectButton = ({
           <DialogFooter>
             <Button type="button" onClick={() => setShowFreeProjectLimitWarning(false)}>
               Understood
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!billingBlockReason} onOpenChange={() => setBillingBlockReason(undefined)}>
+        <DialogContent size="small" aria-describedby={undefined} className="gap-0 pb-0">
+          <DialogHeader className="border-b">
+            <DialogTitle>Unable to resume project</DialogTitle>
+          </DialogHeader>
+          <DialogSection className="text-sm text-foreground-light">
+            {billingBlockReason}
+          </DialogSection>
+          <DialogFooter>
+            <Button variant="default" onClick={() => setBillingBlockReason(undefined)}>
+              Cancel
+            </Button>
+            <Button asChild variant="primary">
+              <Link href={`/org/${orgSlug}/billing`}>Go to billing</Link>
             </Button>
           </DialogFooter>
         </DialogContent>

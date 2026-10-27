@@ -67,6 +67,9 @@ const nextConfig = {
       // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
+      // Next 16 creates `.next/lock` during `next build` and deletes it on exit. Routes that read
+      // `process.cwd()` get the whole app dir traced, so Vercel would try to deploy the missing file.
+      '.next/lock',
       // Static assets
       'public/**/*',
     ],
@@ -85,6 +88,11 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
+    // Next 16 rejects local images with a query string (e.g. `/images/blog/foo/thumb.png?v=3`,
+    // used for cache busting) unless `localPatterns` allows it. Omitting `search` allows any.
+    localPatterns: [{ pathname: '/**' }],
+    // Next 16 only allows `quality` values listed here (default is [75]); the app uses 75, 80 and 100.
+    qualities: [75, 80, 100],
     remotePatterns,
   },
   async headers() {
@@ -165,7 +173,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/(docs|blog)/:path*',
+        source: '/(docs|blog|kb)/:path*',
         headers: [
           {
             key: 'X-Robots-Tag',
@@ -229,10 +237,6 @@ const nextConfig = {
     // prod
     ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
   },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel.
-    ignoreDuringBuilds: true,
-  },
 }
 
 // next.config.js.
@@ -247,8 +251,12 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'www',
-  unstable_sentryWebpackPluginOptions: {
-    applicationKey: 'supabase-www',
+  applicationKey: 'supabase-www',
+  webpack: {
+    treeshake: {
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      removeDebugLogging: true,
+    },
   },
 
   // Only print logs for uploading source maps in CI
@@ -265,9 +273,6 @@ export default withSentryConfig(configExport, {
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
   // tunnelRoute: "/monitoring",
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
 })
 
 function getAssetPrefix() {

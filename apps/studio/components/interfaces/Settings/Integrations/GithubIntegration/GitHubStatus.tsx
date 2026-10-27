@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertCircle, ArrowUpRight, CheckCircle2 } from 'lucide-react'
+import { AlertCircleIcon, ArrowUpRightIcon, CheckCircle2Icon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
@@ -45,7 +45,7 @@ export const GitHubStatus = () => {
         >
           <div className="w-full flex items-center justify-between">
             <h3 className="text-sm">GitHub connection</h3>
-            <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
+            <ArrowUpRightIcon strokeWidth={1} className="h-4 w-4" />
           </div>
           <p className="mt-0.5 text-xs text-foreground-lighter flex items-center gap-2">
             {isConnected ? (
@@ -84,9 +84,9 @@ export const GitHubStatus = () => {
           <div className="flex flex-col gap-2 text-xs text-foreground-light">
             <div className="flex items-center gap-2">
               {hasGitBranchSync ? (
-                <CheckCircle2 size={12} className="text-brand-600" />
+                <CheckCircle2Icon size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning" />
+                <AlertCircleIcon size={12} className="text-warning" />
               )}
               <span>
                 {hasGitBranchSync
@@ -96,9 +96,9 @@ export const GitHubStatus = () => {
             </div>
             <div className="flex items-center gap-2">
               {hasAutomaticBranching ? (
-                <CheckCircle2 size={12} className="text-brand-600" />
+                <CheckCircle2Icon size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning" />
+                <AlertCircleIcon size={12} className="text-warning" />
               )}
               <span>
                 {hasAutomaticBranching

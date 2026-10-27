@@ -1,5 +1,12 @@
 import { Handle, Node, NodeProps, Position } from '@xyflow/react'
-import { Database, DatabaseBackup, HelpCircle, Layers, Loader2, Network } from 'lucide-react'
+import {
+  DatabaseBackupIcon,
+  DatabaseIcon,
+  HelpCircleIcon,
+  LayersIcon,
+  Loader2Icon,
+  NetworkIcon,
+} from 'lucide-react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ComputeMetricsFooter } from './ComputeMetricsFooter'
@@ -49,7 +56,7 @@ export const MultigatewayNode = ({ data }: NodeProps<Node<MultigatewayNodeData>>
         <div className="flex items-start p-3 gap-x-4" style={{ width: NODE_CARD_WIDTH }}>
           <div className="flex gap-x-3">
             <div className="min-w-8 h-8 bg-blue-600 border border-blue-800 rounded-md flex items-center justify-center">
-              <Network aria-hidden="true" size={16} />
+              <NetworkIcon aria-hidden="true" size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <p className="text-sm">Multigateway</p>
@@ -88,7 +95,7 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
         <div className="flex items-start justify-between p-3" style={{ width: NODE_CARD_WIDTH }}>
           <div className="flex gap-x-3">
             <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
-              <Database aria-hidden="true" size={16} />
+              <DatabaseIcon aria-hidden="true" size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <div className="flex items-center gap-x-2">
@@ -115,8 +122,8 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
           )}
         </div>
         {/* Whether connection metrics are meaningful through the multigateway
-            is unconfirmed, so they're left off for HA projects. */}
-        <ComputeMetricsFooter showConnections={false} />
+            is unconfirmed, so they're marked unavailable for HA projects. */}
+        <ComputeMetricsFooter isConnectionsAvailable={false} />
       </div>
       <Handle type="source" position={Position.Bottom} style={{ background: 'transparent' }} />
     </>
@@ -144,9 +151,9 @@ export const HaReplicaNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
             )}
           >
             {status === 'coming_up' ? (
-              <Loader2 aria-hidden="true" className="motion-safe:animate-spin" size={16} />
+              <Loader2Icon aria-hidden="true" className="motion-safe:animate-spin" size={16} />
             ) : (
-              <DatabaseBackup aria-hidden="true" size={16} />
+              <DatabaseBackupIcon aria-hidden="true" size={16} />
             )}
           </div>
           <div className="flex flex-col gap-y-0.5">
@@ -171,13 +178,13 @@ export const HaShardNode = ({ data }: NodeProps<Node<HaShardNodeData>>) => {
   return (
     <div className="relative h-full w-full rounded-md border border-default bg-surface-100/25">
       <div className="pointer-events-auto absolute top-3 left-3 flex items-center gap-x-2 rounded-full border border-default bg-surface-100 pl-3 pr-2 py-1">
-        <Layers aria-hidden="true" size={14} className="text-foreground-light" />
+        <LayersIcon aria-hidden="true" size={14} className="text-foreground-light" />
         <p className="text-sm">{name}</p>
         <Tooltip>
           {/* Renders a button so the explanation is keyboard reachable */}
           <TooltipTrigger className="flex items-center gap-x-1 text-sm text-foreground-light">
             Automatic failover
-            <HelpCircle aria-hidden="true" size={14} />
+            <HelpCircleIcon aria-hidden="true" size={14} />
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-72 text-center">
             If the primary database fails, a replica in this shard is automatically promoted to take

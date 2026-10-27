@@ -7,6 +7,7 @@ import { FDW } from './fdws-query'
 import { fdwKeys } from './keys'
 import type { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
@@ -33,7 +34,13 @@ export async function updateFDW({
   tables,
 }: FDWUpdateVariables) {
   const sql = wrapWithTransaction(getUpdateFDWSql({ wrapper, wrapperMeta, formState, tables }))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['update-fdw'],
+    grant: unguarded.migrating,
+  })
   return result
 }
 
@@ -68,7 +75,7 @@ export const useFDWUpdateMutation = ({
     async onError(data, variables, context) {
       if (onError === undefined) {
         toast.error(
-          `Failed to update ${variables.wrapper.name} foreign data wrapper: ${data.message}`
+          `Failed to update ${variables.wrapperMeta.label} foreign data wrapper: ${data.message}`
         )
       } else {
         onError(data, variables, context)
