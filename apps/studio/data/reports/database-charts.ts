@@ -53,6 +53,16 @@ export const getReportAttributesV2: (
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
+  const provisionedThroughputMBps =
+    diskConfig?.attributes?.type === 'gp3' &&
+    typeof diskConfig.attributes.throughput_mbps === 'number'
+      ? diskConfig.attributes.throughput_mbps
+      : undefined
+  const computeThroughputLimit = diskLimits?.maxThroughputMBps
+  const effectiveMaxThroughputMBps =
+    typeof provisionedThroughputMBps === 'number' && typeof computeThroughputLimit === 'number'
+      ? Math.min(provisionedThroughputMBps, computeThroughputLimit)
+      : provisionedThroughputMBps
   const showBurstBalanceChart = shouldShowDiskIOBurstBalanceChart(
     project,
     !!showDiskIOBurstBalanceChart,
@@ -442,11 +452,10 @@ export const getReportAttributesV2: (
           label: 'Max throughput',
           color: 'var(--chart-reference)',
           value:
-            diskConfig?.attributes?.type === 'gp3' &&
-            typeof diskConfig.attributes.throughput_mbps === 'number'
-              ? diskConfig.attributes.throughput_mbps * 1024 * 1024
+            typeof effectiveMaxThroughputMBps === 'number'
+              ? effectiveMaxThroughputMBps * 1024 * 1024
               : undefined,
-          tooltip: 'Maximum disk throughput for your current compute size',
+          tooltip: 'Maximum disk throughput for your disk and compute configuration',
           isMaxValue: true,
         },
       ],

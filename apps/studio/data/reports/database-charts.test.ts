@@ -106,6 +106,40 @@ describe('getReportAttributesV2 shared pooler chart', () => {
 })
 
 // Visibility permutations are covered by shouldShowDiskIOBurstBalanceChart below.
+describe('getReportAttributesV2 disk throughput reference line', () => {
+  const getMaxThroughputLine = (diskLimits?: (typeof INSTANCE_DISK_LIMITS)[string]) => {
+    const chart = getReportAttributesV2(
+      ENTITLED_FEATURES,
+      buildProject(),
+      {
+        attributes: { type: 'gp3', throughput_mbps: 1000, iops: 3000, size_gb: 100 },
+      } as Parameters<typeof getReportAttributesV2>[2],
+      undefined,
+      undefined,
+      false,
+      false,
+      false,
+      true,
+      diskLimits
+    ).find((chart) => chart.id === 'disk-throughput')
+    const line = (chart?.attributes ?? []).find(
+      (attribute) => typeof attribute === 'object' && attribute.attribute === 'disk_throughput_max'
+    )
+    return typeof line === 'object' ? line : undefined
+  }
+
+  it('caps the reference line at the compute limit when provisioned above it', () => {
+    // 1000 MB/s provisioned, but an m6g.large sustains at most 594 MB/s
+    const line = getMaxThroughputLine(INSTANCE_DISK_LIMITS['m6g.large'])
+    expect(line?.value).toBe(594 * 1024 * 1024)
+  })
+
+  it('keeps the provisioned value when the compute limit is higher', () => {
+    const line = getMaxThroughputLine(INSTANCE_DISK_LIMITS['m6i.large'])
+    expect(line?.value).toBe(1000 * 1024 * 1024)
+  })
+})
+
 describe('getReportAttributesV2 disk-io-burst-balance chart', () => {
   it('shows the chart for burstable non high availability projects', () => {
     expect(getBurstBalanceChart(buildProject())?.hide).toBe(false)
