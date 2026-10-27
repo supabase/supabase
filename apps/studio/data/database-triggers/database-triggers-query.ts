@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-mutation'
 import { databaseTriggerKeys } from './keys'
 import type { PostgresTrigger } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
+import { unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 function markSavedTriggerSafe(trigger: DatabaseTriggersData[number]): PostgresTrigger {
@@ -29,6 +30,7 @@ export async function getDatabaseTriggers(
       connectionString,
       sql,
       queryKey: ['triggers'],
+      grant: unguarded.migrating,
     },
     signal
   )

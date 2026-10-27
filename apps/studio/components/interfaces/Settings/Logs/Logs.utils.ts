@@ -960,7 +960,6 @@ export function buildLogsPrompt(
   }: {
     queryType?: string
     sqlQuery?: string
-    /** Matching logs left out of `rows`, noted after the entries (e.g. a preview of the latest few) */
     omittedCount?: number
   } = {}
 ): string {

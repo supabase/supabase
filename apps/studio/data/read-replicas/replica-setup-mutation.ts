@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { replicaKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type Region =
@@ -35,6 +35,7 @@ export async function setUpReadReplica({ projectRef, region }: ReadReplicaSetUpV
     body: {
       read_replica_region: region,
     },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data

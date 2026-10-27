@@ -6,6 +6,7 @@ import {
   parseLogsFilterUrlParams,
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
+import { unifiedLogsScopeSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
@@ -116,19 +117,8 @@ const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
 
 const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_METHOD_EXPR})`
 const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_PATH_EXPR})`
-// Edge function runtime rows carry their detail (event_type, level, execution_id)
-// only in log_attributes, so surface it alongside the compute streams.
 const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source = 'function_logs', log_attributes, map())`
 
-// SQL expression for derived `level`. Used inline (not as alias reference)
-// because the OTEL endpoint can't resolve aliases inside countIf when the
-// alias is not in GROUP BY.
-//
-// HTTP status is checked first so gateway and auth rows (which carry a
-// `severity_text` of `INFO` regardless of response code) bucket as
-// success/warning/error by status. Postgres-style severity is the
-// fallback for rows without a status code. Edge function runtime rows record
-// their console level in `log_attributes['level']`.
 const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN null
       WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('error','fatal') THEN 'error'
@@ -250,24 +240,24 @@ const translateFilter = (
   }
 }
 
-// Matches no rows. A scope's conditions are what keep rows from outside it out, so one that
-// can't be built fails closed rather than being dropped like a user filter.
 const NO_ROWS: SafeLogSqlFragment = safeSql`0`
 
-/**
- * Restricts rows to the scope's fixed filters. Applied to every query, facet scans included, so
- * a scoped view never counts rows from outside the scope. Filters on the same column and
- * operator combine like the URL's (`=` values match any), and each group must match.
- */
-const scopeCondition = (scope?: UnifiedLogsScope): SafeLogSqlFragment | null => {
+export const getUnifiedLogsScopeCondition = (
+  scope?: UnifiedLogsScope
+): SafeLogSqlFragment | null => {
   if (!scope) return null
-  if (scope.filters.length === 0) return NO_ROWS
+  const result = unifiedLogsScopeSchema.safeParse(scope)
+  if (!result.success || result.data.filters.length === 0) return NO_ROWS
 
   const groups = new Map<
     string,
     { column: string; operator: LogsFilterOperator; values: string[] }
   >()
-  for (const { column, operator, value } of scope.filters) {
+  for (const { column, operator, value } of result.data.filters) {
+    const isPatternOperator = operator === '~~*' || operator === '!~~*'
+    const supportsPatternOperator = column === 'event_message' || column === 'pathname'
+    if (isPatternOperator && !supportsPatternOperator) return NO_ROWS
+
     const key = `${column}:${operator}`
     const group = groups.get(key) ?? { column, operator, values: [] }
     group.values.push(value)
@@ -372,8 +362,6 @@ const buildBaseWhere = (
     if (logTypeFilter) {
       const condition = translateFilter('log_type', logTypeFilter.values, logTypeFilter.operator)
       if (condition) parts.push(condition)
-      // The project-wide view shows edge function runtime output inside each invocation's
-      // detail panel, so a `<>` filter mustn't list those rows either.
       if (!search.scope && logTypeFilter.operator === '<>') {
         parts.push(safeSql`NOT (${LOG_TYPE_CONDITION['edge function runtime']})`)
       }
@@ -381,12 +369,11 @@ const buildBaseWhere = (
       // Skip the default (postgres|edge) source restriction while the user filter is
       // active — the user clause governs which sources are eligible (auth + postgres),
       // and the default would otherwise exclude auth_logs, the primary attributable source.
-      // A scope brings its own source restriction.
       parts.push(logTypeWhereCondition([...DEFAULT_LOG_TYPES]))
     }
   }
 
-  const scope = scopeCondition(search.scope)
+  const scope = getUnifiedLogsScopeCondition(search.scope)
   if (scope) parts.push(scope)
 
   for (const [key, { operator, values }] of Object.entries(grouped)) {
