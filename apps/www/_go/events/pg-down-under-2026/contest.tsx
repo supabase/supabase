@@ -33,7 +33,7 @@ const page: GoPageInput = {
     {
       type: 'single-column',
       id: 'how-to-enter',
-      title: 'Enter the Raffle',
+      title: 'How to enter',
       children: (
         <div className="flex flex-col items-center gap-6">
           <ol className="flex flex-col gap-4 text-foreground-light text-lg list-decimal list-inside">
