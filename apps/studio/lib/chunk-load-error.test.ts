@@ -199,6 +199,22 @@ describe('getChunkLoadReloadDecision', () => {
     expect(getChunkLoadReloadDecision(chunkError())).toBe(false)
   })
 
+  test('re-evaluates a refused error object once the window has passed', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1_700_000_000_000)
+    vi.stubGlobal('window', { sessionStorage: createStorage() })
+
+    expect(getChunkLoadReloadDecision(chunkError())).toBe(true)
+
+    // A retry rethrows the same error object (React.lazy caches the rejection)
+    const retried = chunkError()
+    expect(getChunkLoadReloadDecision(retried)).toBe(false)
+    expect(getChunkLoadReloadDecision(retried)).toBe(false)
+
+    vi.advanceTimersByTime(CHUNK_LOAD_RELOAD_GUARD_MS)
+    expect(getChunkLoadReloadDecision(retried)).toBe(true)
+  })
+
   test('returns false when sessionStorage access throws', () => {
     vi.stubGlobal('window', {
       get sessionStorage() {

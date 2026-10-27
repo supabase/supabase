@@ -150,20 +150,20 @@ export function claimChunkLoadReload(
   return writeReloadState(storage, { at: now, count: count + 1 })
 }
 
-const decisions = new WeakMap<object, boolean>()
+const claimedErrors = new WeakSet<object>()
 
 /**
- * Memoized per error object, so an error boundary's fallback (render) and its
- * `onError` handler (commit) can both ask and get the same answer while the
- * guard is only claimed once.
+ * A claimed reload is remembered per error object, so an error boundary's
+ * fallback (render) and its `onError` handler (commit) both see it while the
+ * guard is only claimed once. A refusal isn't remembered: a retry can rethrow
+ * the same error object (`React.lazy` caches its rejected promise), and that
+ * retry should get a fresh decision once the guard window has passed.
  */
 export function getChunkLoadReloadDecision(error: unknown): boolean {
   if (typeof error !== 'object' || error === null) return false
-
-  const cached = decisions.get(error)
-  if (cached !== undefined) return cached
+  if (claimedErrors.has(error)) return true
 
   const decision = claimChunkLoadReload(error)
-  decisions.set(error, decision)
+  if (decision) claimedErrors.add(error)
   return decision
 }

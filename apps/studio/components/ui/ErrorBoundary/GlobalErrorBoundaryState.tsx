@@ -1,6 +1,7 @@
 import { isError } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 import { ClientSideExceptionHandler } from './ClientSideExceptionHandler'
 import { InsertBeforeRemoveChildErrorHandler } from './InsertBeforeRemoveChildErrorHandler'
@@ -18,9 +19,16 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
 
   const largeLogo = useIsFeatureEnabled('branding:large_logo')
 
-  // The boundary's `onError` reloads the page; render nothing rather than
-  // flash the error state while the reload is in flight
-  if (getChunkLoadReloadDecision(error)) return null
+  // Render nothing rather than flash the error state while the reload is in
+  // flight. The boundary's `onError` reloads on the first catch; reloading here
+  // too covers a later re-render whose fresh decision flips to a reload after
+  // `onError` already ran
+  const shouldReload = getChunkLoadReloadDecision(error)
+  useEffect(() => {
+    if (shouldReload) window.location.reload()
+  }, [shouldReload])
+
+  if (shouldReload) return null
 
   const errorMessage = checkIsError ? error.message : ''
   const urlMessage = checkIsError ? `Path name: ${router.pathname}\n\n${error?.stack}` : ''
