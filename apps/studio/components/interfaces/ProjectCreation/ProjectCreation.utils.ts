@@ -153,20 +153,16 @@ export type AvailableRegions = NonNullable<OrganizationAvailableRegionsData>['al
 type GetRegionSelectionTypeArgs = {
   dbRegion: string | undefined
   availableRegions: AvailableRegions | undefined
-  /** Whether the user ever touched the region field. */
-  isDbRegionDirty: boolean
 }
 
 /**
- * How the submitted region was arrived at: the auto-assigned default left untouched ('auto'),
- * a smart group region picked by the user (e.g. Americas, 'general'), or an exact region picked
- * by the user (e.g. us-east-1, 'specific'). Explicitly picking the Auto option is also 'auto'.
- * Returns undefined if dbRegion matches neither list, regardless of whether the field was touched.
+ * Classifies the submitted region: the Auto (best available) option ('auto'), a smart group
+ * region (e.g. Americas, 'general') or an exact region (e.g. us-east-1, 'specific'). An untouched
+ * field reports whichever default it holds. Returns undefined if dbRegion matches neither list.
  */
 export function getRegionSelectionType({
   dbRegion,
   availableRegions,
-  isDbRegionDirty,
 }: GetRegionSelectionTypeArgs): 'general' | 'auto' | 'specific' | undefined {
   if (!dbRegion || !availableRegions) return undefined
   if (dbRegion === AUTO_REGION_VALUE)
@@ -174,7 +170,6 @@ export function getRegionSelectionType({
   const isGeneral = availableRegions.smartGroup.some((region) => region.name === dbRegion)
   const isSpecific = availableRegions.specific.some((region) => region.name === dbRegion)
   if (!isGeneral && !isSpecific) return undefined
-  if (!isDbRegionDirty) return 'auto'
   return isGeneral ? 'general' : 'specific'
 }
 

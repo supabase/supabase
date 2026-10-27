@@ -456,10 +456,10 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     freeTierGeneralRegionExperiment?: 'control' | 'test'
     /**
-     * How the submitted region was arrived at. 'auto' = the user never touched the region field
-     * and kept the auto-assigned default. 'general' = the user picked a smart region group (e.g.
-     * Americas). 'specific' = the user picked an exact region (e.g. us-east-1). Only set when
-     * smart regions are enabled for the selected cloud provider.
+     * Which kind of region was submitted. 'auto' = the Auto (best available) region option.
+     * 'general' = a smart region group (e.g. Americas). 'specific' = an exact region (e.g.
+     * us-east-1). An untouched field reports whichever default it holds. Only set when smart
+     * regions are enabled for the selected cloud provider.
      */
     regionSelectionType?: 'general' | 'auto' | 'specific'
     /**
