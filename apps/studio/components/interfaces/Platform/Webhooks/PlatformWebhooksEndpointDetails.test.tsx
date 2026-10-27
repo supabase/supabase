@@ -5,9 +5,14 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { PlatformWebhooksEndpointDetails } from './PlatformWebhooksEndpointDetails'
+import type { ResponseError } from '@/types'
 
 vi.mock('@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () => ({
   DataTableColumnStatusCode: ({ value }: { value: number }) => <span>{value}</span>,
+}))
+
+vi.mock('@/components/ui/AlertError', () => ({
+  AlertError: ({ subject }: { subject: string }) => <p>{subject}</p>,
 }))
 
 vi.mock('@/components/ui/ShortcutTooltip', () => ({
@@ -162,10 +167,12 @@ describe('PlatformWebhooksEndpointDetails', () => {
   ) =>
     render(
       <PlatformWebhooksEndpointDetails
+        deliveriesError={null}
         deliverySearch=""
         filteredDeliveries={allDeliveries.slice(0, 5)}
         hasNextPage={false}
         hasPreviousPage={false}
+        isLoadingDeliveries={false}
         selectedEndpoint={selectedEndpoint}
         onCopyUrl={vi.fn()}
         onDeliverySearchChange={vi.fn()}
@@ -209,6 +216,32 @@ describe('PlatformWebhooksEndpointDetails', () => {
     renderComponent({ filteredDeliveries: [], hasNextPage: true })
 
     expect(screen.getByLabelText('Next page')).toBeEnabled()
+  })
+
+  it('shows five skeleton rows instead of the empty state while deliveries load', () => {
+    const { container } = renderComponent({ filteredDeliveries: [], isLoadingDeliveries: true })
+
+    // 5 skeleton rows in the table body plus 1 in the footer
+    expect(container.querySelectorAll('.shimmering-loader')).toHaveLength(6)
+    expect(screen.queryByText('No deliveries found')).not.toBeInTheDocument()
+    expect(screen.queryByText(/^Showing/)).not.toBeInTheDocument()
+  })
+
+  it('shows an error instead of the empty state when deliveries fail to load', () => {
+    renderComponent({
+      filteredDeliveries: [],
+      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+    })
+
+    expect(screen.getByText(/Failed to retrieve deliveries/)).toBeInTheDocument()
+    expect(screen.queryByText('No deliveries found')).not.toBeInTheDocument()
+  })
+
+  it('keeps showing deliveries when a refetch fails after they loaded', () => {
+    renderComponent({ deliveriesError: { message: 'Something went wrong' } as ResponseError })
+
+    expect(screen.getByText('Showing 5 deliveries')).toBeInTheDocument()
+    expect(screen.queryByText(/Failed to retrieve deliveries/)).not.toBeInTheDocument()
   })
 
   it('retries a failed delivery without opening the delivery row', async () => {

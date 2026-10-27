@@ -28,18 +28,22 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TanStackTableHeadSort } from 'ui-patterns/Table'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { DELIVERIES_PAGE_SIZE } from './PlatformWebhooks.constants'
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import type { ResponseError } from '@/types'
 
 interface DetailItemProps {
   label: string
@@ -56,9 +60,11 @@ const DetailItem = ({ label, children, ddClassName = 'text-sm' }: DetailItemProp
 
 interface PlatformWebhooksEndpointDetailsProps {
   deliverySearch: string
+  deliveriesError: ResponseError | null
   filteredDeliveries: WebhookDelivery[]
   hasNextPage: boolean
   hasPreviousPage: boolean
+  isLoadingDeliveries: boolean
   selectedEndpoint: WebhookEndpoint
   onCopyUrl: () => void
   onDeliverySearchChange: (value: string) => void
@@ -156,9 +162,11 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
 
 export const PlatformWebhooksEndpointDetails = ({
   deliverySearch,
+  deliveriesError,
   filteredDeliveries,
   hasNextPage,
   hasPreviousPage,
+  isLoadingDeliveries,
   selectedEndpoint,
   onCopyUrl,
   onDeliverySearchChange,
@@ -302,7 +310,15 @@ export const PlatformWebhooksEndpointDetails = ({
               ))}
             </TableHeader>
             <TableBody>
-              {deliveryRows.length > 0 ? (
+              {isLoadingDeliveries ? (
+                Array.from({ length: DELIVERIES_PAGE_SIZE }, (_, index) => (
+                  <TableRow key={`loading-${index}`} className="[&>td]:hover:bg-inherit">
+                    <TableCell colSpan={DELIVERY_COLUMNS.length}>
+                      <ShimmeringLoader />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : deliveryRows.length > 0 ? (
                 deliveryRows.map((row) => (
                   <TableRow
                     key={row.id}
@@ -328,6 +344,19 @@ export const PlatformWebhooksEndpointDetails = ({
                     ))}
                   </TableRow>
                 ))
+              ) : deliveriesError ? (
+                <TableRow className="[&>td]:hover:bg-inherit">
+                  <TableCell
+                    colSpan={DELIVERY_COLUMNS.length}
+                    className="p-0! rounded-b! overflow-hidden"
+                  >
+                    <AlertError
+                      className="border-0 rounded-none"
+                      error={deliveriesError}
+                      subject="Failed to retrieve deliveries"
+                    />
+                  </TableCell>
+                </TableRow>
               ) : (
                 <TableRow className="[&>td]:hover:bg-inherit">
                   <TableCell colSpan={DELIVERY_COLUMNS.length}>
@@ -340,12 +369,16 @@ export const PlatformWebhooksEndpointDetails = ({
               )}
             </TableBody>
           </Table>
-          {(deliveryRows.length > 0 || hasNextPage || hasPreviousPage) && (
+          {(isLoadingDeliveries || deliveryRows.length > 0 || hasNextPage || hasPreviousPage) && (
             <CardFooter className="border-t p-4 flex items-center justify-between">
-              <p className="text-foreground-muted text-sm">
-                Showing {deliveryRows.length}{' '}
-                {deliveryRows.length === 1 ? 'delivery' : 'deliveries'}
-              </p>
+              {isLoadingDeliveries ? (
+                <ShimmeringLoader className="w-28" />
+              ) : (
+                <p className="text-foreground-muted text-sm">
+                  Showing {deliveryRows.length}{' '}
+                  {deliveryRows.length === 1 ? 'delivery' : 'deliveries'}
+                </p>
+              )}
               <div className="flex items-center gap-x-2" aria-label="Pagination">
                 <Button
                   icon={<ChevronLeftIcon />}

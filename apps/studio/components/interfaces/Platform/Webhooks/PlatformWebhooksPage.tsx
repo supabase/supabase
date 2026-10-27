@@ -163,7 +163,11 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const pageCursors = deliveryPages.endpointId === selectedEndpoint?.id ? deliveryPages.cursors : []
 
   // One extra row is requested only to learn whether a next page exists. It is never shown.
-  const { data: fetchedDeliveries } = useWebhookDeliveriesQuery(
+  const {
+    data: fetchedDeliveries,
+    error: deliveriesError,
+    isLoading: isLoadingDeliveries,
+  } = useWebhookDeliveriesQuery(
     {
       scope: apiScope,
       endpointId: selectedEndpoint?.id ?? '',
@@ -566,10 +570,12 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
               />
             ) : (
               <PlatformWebhooksEndpointDetails
+                deliveriesError={deliveriesError}
                 deliverySearch={deliverySearch}
                 filteredDeliveries={filteredDeliveries}
                 hasNextPage={hasNextPage}
                 hasPreviousPage={hasPreviousPage}
+                isLoadingDeliveries={isLoadingDeliveries}
                 selectedEndpoint={selectedEndpoint}
                 onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}
                 onDeliverySearchChange={setDeliverySearch}
