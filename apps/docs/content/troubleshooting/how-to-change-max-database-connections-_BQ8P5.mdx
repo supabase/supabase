@@ -41,7 +41,7 @@ You can run the following commands:
 ```sh
 npx supabase login
 
-npx supabase --experimental --project-ref <PROJECT REF> postgres-config update --config max_connections=<INTEGER VALUE>
+npx supabase postgres-config update --experimental --project-ref <PROJECT REF> --config max_connections=<INTEGER VALUE>
 ```
 
 Then you could run the following SQL in the SQL Editor to see if the changes went through:
