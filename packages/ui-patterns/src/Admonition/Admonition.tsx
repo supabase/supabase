@@ -114,7 +114,11 @@ export const Admonition = forwardRef<
                   layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'
                 )}
               >
-                <FloatingPlate className="flex gap-2">{actions}</FloatingPlate>
+                <FloatingPlate
+                  className={cn('flex gap-2', layout === 'responsive' && 'w-full @lg:w-auto')}
+                >
+                  {actions}
+                </FloatingPlate>
               </div>
             )}
           </div>
