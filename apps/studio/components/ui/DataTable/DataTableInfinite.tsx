@@ -30,12 +30,7 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   emptyStateMessage?: string | ReactNode
   /** Overrides the subject shown in the error state, e.g. "Failed to retrieve X" */
   errorSubject?: string
-  /**
-   * Replaces the "Load more" row, e.g. for a fixed-size preview of the list. Pass `null` to
-   * render no footer.
-   */
   footer?: ReactNode
-  /** Number of placeholder rows while the first page loads */
   skeletonRowCount?: number
 }
 
@@ -45,7 +40,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   defaultColumnVisibility = {},
   fetchNextPage,
   hasNextPage,
-  totalRows = 0,
+  totalRows,
   filterRows = 0,
   totalRowsFetched = 0,
   setColumnOrder,
@@ -73,11 +68,12 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         Math.ceil(e.currentTarget.scrollTop + e.currentTarget.clientHeight) >=
         e.currentTarget.scrollHeight - BOTTOM_BUFFER_PX
 
-      if (onPageBottom && !isFetching && hasNextPage) {
+      const shouldFetchNextPage = onPageBottom && !isFetching && hasNextPage && !hasCustomFooter
+      if (shouldFetchNextPage) {
         fetchNextPage()
       }
     },
-    [fetchNextPage, isFetching, hasNextPage]
+    [fetchNextPage, isFetching, hasNextPage, hasCustomFooter]
   )
 
   useShortcut(
@@ -214,7 +210,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             </Fragment>
           )}
 
-          {hasCustomFooter && !!footer && rows.length > 0 && (
+          {hasCustomFooter && !!footer && !isLoading && (
             <TableRow
               className={cn(
                 TableRowClassName,
@@ -256,10 +252,14 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                         <span className="font-mono font-medium">
                           {formatCompactNumber(totalRowsFetched)}
                         </span>{' '}
-                        of{' '}
-                        <span className="font-mono font-medium">
-                          {formatCompactNumber(totalRows)}
-                        </span>{' '}
+                        {totalRows !== undefined && (
+                          <>
+                            of{' '}
+                            <span className="font-mono font-medium">
+                              {formatCompactNumber(totalRows)}
+                            </span>{' '}
+                          </>
+                        )}
                         rows
                       </p>
                     </>
@@ -270,10 +270,14 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                         <span className="font-mono font-medium">
                           {formatCompactNumber(filterRows)}
                         </span>{' '}
-                        of{' '}
-                        <span className="font-mono font-medium">
-                          {formatCompactNumber(totalRows)}
-                        </span>{' '}
+                        {totalRows !== undefined && (
+                          <>
+                            of{' '}
+                            <span className="font-mono font-medium">
+                              {formatCompactNumber(totalRows)}
+                            </span>{' '}
+                          </>
+                        )}
                         rows)
                       </p>
                     )

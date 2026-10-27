@@ -90,6 +90,7 @@ export const LogPanelNavigation = ({ dock = 'bottom', setDock }: LogPanelNavigat
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
+            aria-label="Dock side"
             variant="text"
             className="px-1"
             icon={dock === 'bottom' ? <PanelBottomIcon /> : <PanelRightIcon />}

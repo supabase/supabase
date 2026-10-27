@@ -185,7 +185,8 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
 
 export function clearLocalStorage() {
   for (const key of safeLocalStorage.keys()) {
-    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key)) {
+    const isRecoveryReminder = key.startsWith('account-recovery-reminder:')
+    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) && !isRecoveryReminder) {
       safeLocalStorage.removeItem(key)
     }
   }

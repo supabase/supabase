@@ -2,6 +2,7 @@ import { getIndexWorkerStatusSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -26,6 +27,7 @@ export async function getIndexWorkerStatus(
       connectionString,
       sql,
       queryKey: ['index-worker-status'],
+      grant: unguarded.migrating,
     },
     signal
   )

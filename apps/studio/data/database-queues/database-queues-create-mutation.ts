@@ -7,6 +7,7 @@ import {
   isQueueNameValid,
   pgmqQueueTable,
 } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -55,6 +56,7 @@ export async function createDatabaseQueue({
     connectionString,
     sql: safeSql`${createFragment}${rlsFragment}`,
     queryKey: databaseQueuesKeys.create(),
+    grant: unguarded.migrating,
   })
 
   return result

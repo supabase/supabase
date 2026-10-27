@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from '../sql/execute-sql-mutation'
 import { materializedViewKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type MaterializedViewsVariables = {
@@ -25,6 +26,7 @@ export async function getMaterializedViews(
       connectionString,
       sql,
       queryKey: ['materialized-views', schemas].filter(Boolean),
+      grant: unguarded.migrating,
     },
     signal
   )

@@ -8,15 +8,23 @@ import { LoadingBeam } from './LoadingBeam'
 import { SearchFooter } from './SearchFooter'
 import { SearchResultItem } from './SearchResultItem'
 import type { SearchLabels, SearchRenderLink, SearchResult, SearchState } from './types'
-import { getHighlightQuery, getIsSearching, getVisibleResults } from './utils'
+import { canSubmitQuery, getHighlightQuery, getIsSearching, getVisibleResults } from './utils'
 
 export interface SearchPanelProps {
   searchState: SearchState
   /**
-   * Fires on every change of the input. An empty string means the input was cleared
-   * (typed away or via the Clear button), so the consumer should reset its search.
+   * Fires when the trimmed query changes, so surrounding whitespace and repeats never re-fire it.
+   * An empty string means there's nothing to search: the input was cleared (typed away or via
+   * the Clear button) or is still `minCharacters` long or shorter. The consumer should reset its
+   * search, which also drops any pending one, so a query that was never submitted never reports
+   * as a search.
    */
   onQueryChange: (query: string) => void
+  /**
+   * The query has to be longer than this, once trimmed, to be submitted: with 2, nothing is
+   * searched until the third character. Defaults to 0, so any non-empty query is submitted.
+   */
+  minCharacters?: number
   /** Fires when a result is activated by click or Enter. `query` is the one its results belong to. */
   onResultActivate?: (result: SearchResult, context: { query: string }) => void
   /** Fires when a result is activated from the keyboard, so the consumer has to navigate. */
@@ -30,6 +38,7 @@ export interface SearchPanelProps {
 export function SearchPanel({
   searchState,
   onQueryChange,
+  minCharacters = 0,
   onResultActivate,
   onResultNavigate,
   onResultLinkNavigate,
@@ -40,6 +49,8 @@ export function SearchPanel({
   const [query, setQuery] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  // starts empty to match a search that hasn't run, so clearing an untouched input reports nothing
+  const reportedQueryRef = useRef('')
 
   // highlight with the query the visible results belong to, not the one being typed
   const highlightQuery = getHighlightQuery(searchState)
@@ -47,11 +58,19 @@ export function SearchPanel({
 
   const isListVisible =
     results.length > 0 || searchState.status === 'noResults' || searchState.status === 'error'
-  const isSearching = getIsSearching({ searchState, query })
+  const isSearching = getIsSearching({ searchState, query, minCharacters })
+
+  // only reports a query that differs from the last one reported, so "abc" followed by "abc "
+  // doesn't search (and report a search) twice for the same query
+  function reportQuery(nextQuery: string) {
+    if (nextQuery === reportedQueryRef.current) return
+    reportedQueryRef.current = nextQuery
+    onQueryChange(nextQuery)
+  }
 
   function handleClear() {
     setQuery('')
-    onQueryChange('')
+    reportQuery('')
     inputRef.current?.focus()
   }
 
@@ -64,7 +83,10 @@ export function SearchPanel({
   function handleValueChange(value: string) {
     setIsDeleting(value.length < query.length)
     setQuery(value)
-    onQueryChange(value)
+
+    // the input keeps what was typed, but only the trimmed query is ever submitted
+    const trimmedQuery = value.trim()
+    reportQuery(canSubmitQuery(trimmedQuery, minCharacters) ? trimmedQuery : '')
   }
 
   // Announced via the aria-live region below — a sighted user sees the spinner/list update,
