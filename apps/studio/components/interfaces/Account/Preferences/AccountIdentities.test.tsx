@@ -26,7 +26,7 @@ vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return {
     ...actual,
-    useParams: () => ({ ref: 'default' }),
+    useParams: () => ({}),
     useFlag: useFlagMock,
   }
 })
@@ -117,8 +117,40 @@ describe('AccountIdentities', () => {
     renderAccountIdentities()
 
     expect(await screen.findByRole('button', { name: 'Add password' })).toBeInTheDocument()
-    expect(screen.getByText('Email')).toBeInTheDocument()
+    expect(screen.queryByText('Email')).not.toBeInTheDocument()
+    expect(
+      screen.getByText(
+        `Use ${EMAIL} and a password as another way to sign in if you lose access to GitHub.`
+      )
+    ).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Change password' })).not.toBeInTheDocument()
+  })
+
+  it('keeps multiple OAuth methods without claiming an email sign-in method exists', async () => {
+    mockGetUser([
+      githubIdentity,
+      { ...githubIdentity, identity_id: 'other-id', provider: 'google' },
+    ])
+
+    renderAccountIdentities()
+
+    expect(await screen.findByText('google')).toBeInTheDocument()
+    expect(screen.getByText('GitHub')).toBeInTheDocument()
+    expect(screen.queryByText('Email')).not.toBeInTheDocument()
+    expect(screen.getByText(`Add a password to sign in with ${EMAIL}.`)).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Add password' })).toHaveLength(1)
+  })
+
+  it('shows a query error instead of offering password setup without account data', async () => {
+    getUserMock.mockResolvedValue({
+      data: { user: null },
+      error: { message: 'Account unavailable' },
+    })
+
+    renderAccountIdentities()
+
+    expect(await screen.findByText('Failed to retrieve sign-in methods')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })
 
   it('does not offer to add a password when an email identity exists', async () => {
@@ -147,6 +179,7 @@ describe('AccountIdentities', () => {
     renderAccountIdentities()
 
     expect(await screen.findByText('SSO')).toBeInTheDocument()
+    expect(screen.getByText('Your organization manages how you sign in.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })
 
