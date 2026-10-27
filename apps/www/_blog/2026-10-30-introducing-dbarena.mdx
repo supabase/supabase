@@ -127,9 +127,3 @@ Add `--dry-run` to the first command to preview what it will provision without c
 - **Load generator placement.** For Amazon RDS and Google Cloud SQL, the load generator runs in the same availability zone as the database. Supabase doesn't support availability zone selection, so on Supabase it only runs in the same region.
 
 The [methodology page](https://dbarena.com/methodology) explains each of these choices in detail.
-
-## What's next
-
-We plan to add more workloads, starting with one derived from TPC-E, and to test more complex setups that include connection poolers and high availability components. We will also publish new results over time so you can see how each provider's performance changes.
-
-To get an email when new benchmarks are published, [subscribe to the DBArena newsletter](https://dbarena.com/?subscribe). If you rerun a test and get different numbers, or want to see another provider added, open an issue on [GitHub](https://github.com/dbarena/dbarenactl).
