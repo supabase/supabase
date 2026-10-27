@@ -3,12 +3,12 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
-import { FeatureFlagContext } from 'common'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { useQueryStates } from 'nuqs'
 import { ResizablePanelGroup } from 'ui'
-import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { ServiceFlowPanel } from '../ServiceFlowPanel'
@@ -20,6 +20,7 @@ import { generateDynamicColumns } from './Columns'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { miscKeys } from '@/data/misc/keys'
+import { TimezoneProvider } from '@/lib/datetime'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -113,7 +114,11 @@ function PanelHarness({ scope }: { scope?: UnifiedLogsScope }) {
 
 function renderPanel(
   rows: typeof timelineRows = timelineRows,
-  { scope, flag = true }: { scope?: UnifiedLogsScope; flag?: boolean | null } = {}
+  {
+    scope,
+    flag = true,
+    timezone,
+  }: { scope?: UnifiedLogsScope; flag?: boolean | null; timezone?: string } = {}
 ) {
   const queries: string[] = []
   addAPIMock({
@@ -162,6 +167,7 @@ function renderPanel(
   })
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), { disabled_features: [] })
+  if (timezone) localStorage.setItem(LOCAL_STORAGE_KEYS.UI_TIMEZONE, JSON.stringify(timezone))
   customRender(
     <FeatureFlagContext.Provider
       value={{
@@ -171,7 +177,9 @@ function renderPanel(
       }}
     >
       <FeaturePreviewContextProvider>
-        <PanelHarness scope={scope} />
+        <TimezoneProvider>
+          <PanelHarness scope={scope} />
+        </TimezoneProvider>
       </FeaturePreviewContextProvider>
     </FeatureFlagContext.Provider>,
     { queryClient }
@@ -181,6 +189,7 @@ function renderPanel(
 
 describe('request timeline tab', () => {
   beforeEach(() => routerMock.setCurrentUrl('/project/default/logs'))
+  afterEach(() => localStorage.removeItem(LOCAL_STORAGE_KEYS.UI_TIMEZONE))
   const openTimeline = async (user: ReturnType<typeof userEvent.setup>) => {
     await user.click(screen.getByRole('tab', { name: 'Timeline' }))
     return screen.findByRole('list', { name: 'Related logs' })
@@ -195,19 +204,35 @@ describe('request timeline tab', () => {
       flag: false,
       scope: { filters: [{ column: 'function_id', operator: '=' as const, value: 'fn-1' }] },
       expected: true,
-      name: 'scoped logs with the legacy backend selected',
+      name: 'shows the timeline for scoped logs with the legacy backend selected',
     },
     {
       flag: false,
       scope: undefined,
       expected: false,
-      name: 'unscoped logs with the legacy backend selected',
+      name: 'hides the timeline for unscoped logs with the legacy backend selected',
     },
-    { flag: null, scope: undefined, expected: true, name: 'logs before the backend flag loads' },
-  ])('offers the timeline for $name: $expected', async ({ flag, scope, expected }) => {
+    {
+      flag: null,
+      scope: undefined,
+      expected: true,
+      name: 'shows the timeline before the backend flag loads',
+    },
+  ])('$name', async ({ flag, scope, expected }) => {
     const { queryClient } = renderPanel(timelineRows, { flag, scope })
     if (expected) expect(screen.getByRole('tab', { name: 'Timeline' })).toBeVisible()
     else expect(screen.queryByRole('tab', { name: 'Timeline' })).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('uses the selected timezone for log and request timestamps while preserving offsets', async () => {
+    const user = userEvent.setup()
+    const { queryClient } = renderPanel(timelineRows, { timezone: 'Asia/Tokyo' })
+    expect(await screen.findByText('01 Jan 2026 19:00:00')).toBeVisible()
+    const items = stepsIn(await openTimeline(user))
+    expect(screen.getByText('01 Jan 2026 19:00:00')).toBeVisible()
+    expect(items[0]).toHaveTextContent('+0 ms')
+    expect(items[1]).toHaveTextContent('+45 ms')
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
@@ -217,7 +242,7 @@ describe('request timeline tab', () => {
 
     const items = stepsIn(await openTimeline(user))
     expect(items).toHaveLength(2)
-    // One line per step, like the logs list: type icon, status, method, path
+
     expect(within(items[0]).getByRole('img', { name: 'edge' })).toBeInTheDocument()
     expect(items[0]).toHaveTextContent('POST/auth/v1/token')
     expect(items[0]).toHaveAttribute('aria-current', 'true')
@@ -236,9 +261,9 @@ describe('request timeline tab', () => {
     expect(auth).toHaveAttribute('aria-current', 'true')
     await user.click(gateway)
     expect(screen.getByRole('status')).toHaveTextContent('POST /auth/v1/token')
-    // API Gateway logs have no hand-written layout, so their attributes are grouped
+
     expect(await screen.findByText('Request headers')).toBeVisible()
-    // Only the first section starts open
+
     expect(screen.queryByText('method')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Request' }))
     expect(screen.getByText('method')).toBeVisible()
