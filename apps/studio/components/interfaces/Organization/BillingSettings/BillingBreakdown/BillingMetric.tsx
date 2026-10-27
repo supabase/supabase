@@ -207,10 +207,24 @@ export const BillingMetric = ({
               </p>
             )}
 
+            {metric.key === PricingMetric.LOG_QUERYING && isLogMetricOnNonPlatformPlan && (
+              <p className="text-foreground-light">
+                We're working on resolving some mis-reported numbers for this metric.{' '}
+                <a
+                  href="https://github.com/orgs/supabase/discussions/50925"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  Share feedback on GitHub.
+                </a>
+              </p>
+            )}
+
             {subscription.usage_billing_enabled && isLogMetricOnNonPlatformPlan && (
               <p className="text-foreground-light">
                 Billing and enforcement of restrictions for this metric will only start after the
-                grace period ends at the start of 2027.
+                grace period ends in early 2027.
               </p>
             )}
 
@@ -219,9 +233,9 @@ export const BillingMetric = ({
               (isApproachingLimit || isExceededLimit) &&
               (isLogMetricOnNonPlatformPlan ? (
                 <p className="text-foreground-light">
-                  Enforcement of restrictions will only start after the grace period ends at the
-                  start of 2027. Reduce your usage, upgrade to a usage-based plan or disable the
-                  spend cap to avoid restrictions.
+                  Enforcement of restrictions will only start after the grace period ends in early
+                  2027. Reduce your usage, upgrade to a usage-based plan or disable the spend cap to
+                  avoid restrictions.
                 </p>
               ) : (
                 <p className="text-foreground-light">
