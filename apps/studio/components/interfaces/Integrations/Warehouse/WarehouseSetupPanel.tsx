@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -22,6 +23,28 @@ import { useTrack } from '@/lib/telemetry/track'
 import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
 
 export const WarehouseSetupPanel = () => {
+  const [statusMessage, setStatusMessage] = useState('')
+  const statusRef = useRef<HTMLParagraphElement>(null)
+
+  useEffect(() => {
+    if (statusMessage) statusRef.current?.focus()
+  }, [statusMessage])
+
+  return (
+    <>
+      <p ref={statusRef} role="status" tabIndex={-1} className="sr-only">
+        {statusMessage}
+      </p>
+      <WarehouseSetupPanelContent onStatusChange={setStatusMessage} />
+    </>
+  )
+}
+
+const WarehouseSetupPanelContent = ({
+  onStatusChange,
+}: {
+  onStatusChange: (message: string) => void
+}) => {
   const { ref: projectRef } = useParams()
   const track = useTrack()
   const isOrioleDb = useIsOrioleDb()
@@ -159,7 +182,18 @@ export const WarehouseSetupPanel = () => {
               <Button
                 variant="default"
                 loading={isDestinationsFetching}
-                onClick={() => refetchDestinations()}
+                onClick={async () => {
+                  onStatusChange('')
+                  const result = await refetchDestinations()
+                  if (
+                    result.isSuccess &&
+                    result.data?.destinations.some(
+                      (destination) => destination.name === WAREHOUSE_PUBLICATION_NAME
+                    )
+                  ) {
+                    onStatusChange('Warehouse destination loaded. You can continue setup.')
+                  }
+                }}
               >
                 Retry
               </Button>

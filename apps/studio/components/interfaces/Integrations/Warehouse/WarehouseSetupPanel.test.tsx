@@ -52,6 +52,19 @@ const PROJECT: ProjectDetail = {
   updated_at: '2026-01-01T00:00:00.000Z',
 }
 
+const WAREHOUSE_DESTINATION: Destinations['destinations'][number] = {
+  id: 1,
+  tenant_id: 'default',
+  name: 'supabase_warehouse',
+  config: {
+    ducklake: {
+      data_path: 's3://warehouse-default/',
+      s3_region: 'us-east-1',
+      s3_endpoint: 'otherproject.storage.supabase.co/storage/v1/s3',
+    },
+  },
+}
+
 function mockProject(isOrioleDb: boolean) {
   addAPIMock({
     method: 'get',
@@ -142,31 +155,49 @@ describe('OrioleDB catalog restrictions', () => {
     }
   )
 
-  test('retries a failed destination lookup and applies the catalog restriction', async () => {
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false, retryDelay: 0 } },
-    })
-    mockProject(true)
-    mockWarehouse('error')
-    addAPIMock({
-      method: 'get',
-      path: '/platform/replication/:ref/destinations',
-      response: () =>
-        HttpResponse.json<APIErrorBody>({ message: 'Destination lookup failed' }, { status: 500 }),
-    })
-    customRender(<WarehouseSetupPanel />, { queryClient })
+  test.each([false, true])(
+    'retries a failed destination lookup and announces only a retained destination (%s)',
+    async (hasRetainedDestination) => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false, retryDelay: 0 } },
+      })
+      mockProject(true)
+      mockWarehouse('error')
+      addAPIMock({
+        method: 'get',
+        path: '/platform/replication/:ref/destinations',
+        response: () =>
+          HttpResponse.json<APIErrorBody>(
+            { message: 'Destination lookup failed' },
+            { status: 500 }
+          ),
+      })
+      customRender(<WarehouseSetupPanel />, { queryClient })
+      const retryStatus = screen.getByRole('status')
+      expect(retryStatus).toBeEmptyDOMElement()
 
-    expect(await screen.findByText('Failed to load Warehouse destination')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+      expect(await screen.findByText('Failed to load Warehouse destination')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
 
-    mockWarehouse('error')
-    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
-    expect(
-      await screen.findByText('This project cannot host a Warehouse catalog')
-    ).toBeInTheDocument()
-    expect(screen.queryByText('Failed to load Warehouse destination')).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
-  })
+      mockWarehouse('error', hasRetainedDestination ? [WAREHOUSE_DESTINATION] : [])
+      fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+      if (hasRetainedDestination) {
+        expect(
+          await screen.findByText('Warehouse destination loaded. You can continue setup.')
+        ).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
+        expect(retryStatus).toHaveFocus()
+      } else {
+        expect(
+          await screen.findByText('This project cannot host a Warehouse catalog')
+        ).toBeInTheDocument()
+        expect(retryStatus).toBeEmptyDOMElement()
+        expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+      }
+      expect(screen.getByRole('status')).toBe(retryStatus)
+      expect(screen.queryByText('Failed to load Warehouse destination')).not.toBeInTheDocument()
+    }
+  )
 
   test('preserves existing Warehouse management on an OrioleDB source', async () => {
     mockProject(true)
@@ -182,20 +213,7 @@ describe('OrioleDB catalog restrictions', () => {
     'lets the API validate a retained Warehouse destination when %s',
     async (status) => {
       mockProject(true)
-      mockWarehouse(status, [
-        {
-          id: 1,
-          tenant_id: 'default',
-          name: 'supabase_warehouse',
-          config: {
-            ducklake: {
-              data_path: 's3://warehouse-default/',
-              s3_region: 'us-east-1',
-              s3_endpoint: 'otherproject.storage.supabase.co/storage/v1/s3',
-            },
-          },
-        },
-      ])
+      mockWarehouse(status, [WAREHOUSE_DESTINATION])
       customRender(<WarehouseSetupPanel />)
       expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
     }
