@@ -2,6 +2,7 @@ import { useAuth } from 'common'
 import { useRouter } from 'next/router'
 import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { LogoLoader } from 'ui'
 
 import { SessionTimeoutModal } from '@/components/interfaces/SignIn/SessionTimeoutModal'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
@@ -56,7 +57,9 @@ export function withAuth<T>(
       }
     }, [isErrorAAL, errorAAL])
 
-    const { isError: isErrorPermissions, error: errorPermissions } = usePermissionsQuery()
+    const { isError: isErrorPermissions, error: errorPermissions } = usePermissionsQuery({
+      enabled: !isLoading && !!session && isAtHighestAAL,
+    })
 
     useEffect(() => {
       if (isErrorPermissions && isAtHighestAAL) {
@@ -152,7 +155,13 @@ export function withAuth<T>(
           redirectToSignIn={redirectToSignIn}
           supportContext={supportContext}
         />
-        <InnerComponent {...props} />
+        {isFinishedLoading && isLoggedIn && isCorrectLevel ? (
+          <InnerComponent {...props} />
+        ) : (
+          <div className="flex h-screen items-center justify-center">
+            <LogoLoader />
+          </div>
+        )}
       </>
     )
   }
