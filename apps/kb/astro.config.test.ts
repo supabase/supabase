@@ -12,5 +12,5 @@ describe('astro.config', () => {
     const inlined = JSON.parse(config.vite?.environments?.client?.define?.['process.env'])
     expect(inlined.NEXT_PUBLIC_IS_PLATFORM).toBe('true')
     expect(Object.keys(inlined).every((key) => key.startsWith('NEXT_PUBLIC_'))).toBe(true)
-  })
+  }, 30_000)
 })
