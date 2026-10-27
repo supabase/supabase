@@ -16,13 +16,11 @@ import type { ServiceFlowBlockProps } from './types'
 
 type LogOverviewProps = Omit<ServiceFlowBlockProps, 'data'> & {
   data: ColumnSchema
-  rawData: unknown
 }
 
 function RequestOverview({ children, ...props }: LogOverviewProps & { children: ReactNode }) {
   return (
     <>
-      {/* Only the first section starts open; the rest are a click away */}
       <MemoizedNetworkBlock {...props} defaultOpen />
       {children}
     </>
@@ -80,14 +78,10 @@ const LOG_OVERVIEW_RENDERERS: Partial<
 
 export const hasLogOverviewRenderer = (logType: string) => logType in LOG_OVERVIEW_RENDERERS
 
-/**
- * Everything known about a log, grouped into collapsible sections.
- * Sources without a hand-written layout group their `attributes` generically.
- */
 export function LogOverview({
   attributes,
   ...props
-}: LogOverviewProps & { attributes?: Record<string, unknown> | null }) {
+}: LogOverviewProps & { attributes?: ColumnSchema['metadata'] }) {
   const Renderer = LOG_OVERVIEW_RENDERERS[props.data.log_type]
 
   return (
