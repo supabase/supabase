@@ -696,11 +696,6 @@ export default defineConfig(({ command, mode }) => {
     //   again: its only non-barrel importer is the Appearance settings'
     //   `ThemeColorSettings`, so Rolldown pools it into the `/account/me`
     //   page chunk while `ui`'s barrel re-exports it too.
-    //
-    //   `packages/ui/src/components/shadcn/ui/avatar.tsx` — same shape
-    //   again: its only non-barrel importer is the Auth users panel's
-    //   `UserCard`, so Rolldown pools it into the `users` page chunk
-    //   while `ui`'s barrel re-exports it too.
     build: {
       rollupOptions: {
         output: {
@@ -740,6 +735,7 @@ export default defineConfig(({ command, mode }) => {
             if (id.includes('packages/ui/src/components/shadcn/ui/slider.tsx')) {
               return 'ui-slider'
             }
+            // Keep Avatar in its own chunk to prevent a users-page import cycle through ui.
             if (id.includes('packages/ui/src/components/shadcn/ui/avatar.tsx')) {
               return 'ui-avatar'
             }
