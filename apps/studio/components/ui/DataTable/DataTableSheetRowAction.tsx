@@ -37,7 +37,6 @@ interface DataTableSheetRowActionProps<
   value: string | number
   table?: Table<TData>
   label?: string
-  /** Offers "Add filter" for a filter that isn't a table column (e.g. a URL param). */
   onAddFilter?: () => void
 }
 

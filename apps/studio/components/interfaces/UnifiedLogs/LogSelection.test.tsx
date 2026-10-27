@@ -286,7 +286,6 @@ describe('selected log details', () => {
     await user.click(row('first'))
     expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('Message')).toBeVisible()
-    // The header reads like the log's timeline step; the time stays above the sections
     expect(screen.getByRole('status')).toHaveTextContent('Realtime')
     expect(screen.getByText('Logged')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Previous log' })).toBeVisible()

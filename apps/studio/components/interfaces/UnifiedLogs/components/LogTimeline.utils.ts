@@ -1,4 +1,3 @@
-/** Keep the open log in sequence, with separate counts for each hidden range. */
 export function foldTimelineSteps<T extends { id: string }>(
   logs: T[],
   {

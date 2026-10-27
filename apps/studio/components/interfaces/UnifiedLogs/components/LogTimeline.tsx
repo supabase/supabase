@@ -12,21 +12,14 @@ import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableCo
 interface LogTimelineProps {
   logs: ColumnSchema[]
   'aria-label': string
-  /** Shown on the right of each step, e.g. an offset or a time. */
   getTimeLabel: (log: ColumnSchema) => string
-  /** Highlighted as the open log. */
   activeLogId?: string
-  /** Opens a step in place. */
   onSelectLog?: (log: ColumnSchema) => void
-  /** Links each step elsewhere instead of opening it in place. */
   getLogHref?: (log: ColumnSchema) => string
-  /** Shows this many leading steps, plus the open log in its original position. */
   collapsedStepCount?: number
-  /** A final step to see more logs. */
   footer?: ReactNode
 }
 
-/** Logs as steps on a rail, oldest or newest first as given. */
 export function LogTimeline({
   logs,
   'aria-label': ariaLabel,
@@ -98,13 +91,10 @@ export function LogTimeline({
   )
 }
 
-// The rail is drawn per step as segments above and below the step's marker,
-// stretched over the step's vertical padding so consecutive steps join up.
 const RailSegment = ({ isVisible, className }: { isVisible: boolean; className?: string }) => (
   <span className={cn('w-px', isVisible && 'bg-border', className)} />
 )
 
-// Stands in for the steps it hides, so it reads as part of the rail
 const FoldedStepDots = () => (
   <span className="flex flex-col items-center gap-0.75">
     {[0, 1, 2].map((i) => (
@@ -143,7 +133,6 @@ const MoreStepContent = ({
 
 interface TimelineMoreStepProps {
   hasPrev: boolean
-  /** Draws the rail down to the next step. */
   hasNext?: boolean
   onClick: () => void
   children: ReactNode
@@ -165,9 +154,7 @@ interface TimelineStepProps {
   log: ColumnSchema
   timeLabel: string
   isActive: boolean
-  /** Draws the rail up to the previous step. */
   hasPrev: boolean
-  /** Draws the rail down to the next step. */
   hasNext: boolean
   href?: string
   onSelect?: (log: ColumnSchema) => void
@@ -189,7 +176,6 @@ function TimelineStep({
   )
   const content = (
     <>
-      {/* Stretched over the step's padding; the top segment centers the dot on the row */}
       <span aria-hidden className="-my-1.5 flex w-4 shrink-0 flex-col items-center self-stretch">
         <RailSegment isVisible={hasPrev} className="h-[13px] shrink-0" />
         <LogLevelDot level={log.level} />
@@ -220,7 +206,6 @@ function TimelineStep({
   )
 }
 
-/** A timeline step on one line, like a row of the logs list: type, status, request or message, then time. */
 function LogStepRow({ log, timeLabel }: { log: ColumnSchema; timeLabel: string }) {
   const hasRequest = !!log.method && !!log.pathname
   const message = hasRequest
@@ -230,7 +215,6 @@ function LogStepRow({ log, timeLabel }: { log: ColumnSchema; timeLabel: string }
   return (
     <span className="flex min-w-0 flex-1 items-center gap-2 font-mono text-xs leading-5 tracking-tight">
       <LogTypeIcon type={log.log_type} className="shrink-0 text-foreground-lighter" />
-      {/* Fixed width, as in the list, so the requests line up */}
       <span className="w-8 shrink-0">
         {log.status !== null && log.status !== undefined && (
           <DataTableColumnStatusCode value={log.status} level={log.level ?? undefined} />
@@ -243,17 +227,12 @@ function LogStepRow({ log, timeLabel }: { log: ColumnSchema; timeLabel: string }
   )
 }
 
-/**
- * A log's type, status, and time over its message, as a timeline step shows it.
- * Also leads the log side panel so the open log reads like its timeline step.
- */
 export function LogStepSummary({
   log,
   timeLabel,
   className,
 }: {
   log: ColumnSchema
-  /** e.g. an offset; omit where the time is shown elsewhere. */
   timeLabel?: string
   className?: string
 }) {
@@ -263,7 +242,6 @@ export function LogStepSummary({
         <LogTypeIcon type={log.log_type} className="shrink-0 text-foreground-lighter" />
         <span className="truncate text-foreground">{getLogTypeLabel(log.log_type)}</span>
         {log.status !== null && log.status !== undefined && (
-          // Coloured by level, as in the logs list
           <DataTableColumnStatusCode
             value={log.status}
             level={log.level ?? undefined}
@@ -281,15 +259,13 @@ export function LogStepSummary({
   )
 }
 
-const EXTRA_LOG_TYPE_LABELS: Record<string, string> = {
+const LOG_TYPE_LABELS: Partial<Record<string, string>> = {
+  ...LOG_TYPES_LABELS,
   function_logs: 'Edge Function console',
 }
 
 function getLogTypeLabel(logType: string) {
-  if (logType in LOG_TYPES_LABELS) {
-    return LOG_TYPES_LABELS[logType as keyof typeof LOG_TYPES_LABELS]
-  }
-  return EXTRA_LOG_TYPE_LABELS[logType] ?? logType
+  return LOG_TYPE_LABELS[logType] ?? logType
 }
 
 function getLogSummary(log: ColumnSchema) {
