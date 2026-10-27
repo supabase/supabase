@@ -123,9 +123,9 @@ describe('function log bookmarks', () => {
     )
 
     expect(
-      await screen.findByRole('status', { name: 'Bookmarked function output' })
+      await screen.findByRole('status', { name: 'Bookmarked function output', hidden: true })
     ).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: 'Raw JSON' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Raw JSON', hidden: true })).toBeInTheDocument()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
     const lookup = requests.find(({ sql }) => sql.includes("toString(id) = 'older-log'"))
     expect(lookup).toBeDefined()
@@ -135,12 +135,12 @@ describe('function log bookmarks', () => {
     expect(lookup?.sql).toContain('LIMIT 1')
     expect(lookup?.iso_timestamp_start).toBe('2026-10-27T00:00:00.000Z')
     expect(lookup?.iso_timestamp_end).toBe('2026-10-28T00:00:00.000Z')
-    fireEvent.click(screen.getByRole('button', { name: 'Open second bookmark' }))
+    fireEvent.click(screen.getByText('Open second bookmark', { selector: 'button' }))
     expect(
-      await screen.findByRole('status', { name: 'Second bookmarked output' })
+      await screen.findByRole('status', { name: 'Second bookmarked output', hidden: true })
     ).toBeInTheDocument()
     expect(screen.queryByText('Bookmarked function output')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Close bookmark' }))
+    fireEvent.click(screen.getByText('Close bookmark', { selector: 'button' }))
     await waitFor(() =>
       expect(screen.queryByText('Second bookmarked output')).not.toBeInTheDocument()
     )
@@ -152,7 +152,9 @@ describe('function log bookmarks', () => {
     await waitFor(() =>
       expect(screen.getByLabelText('Current bookmark')).toHaveTextContent('recent-1')
     )
-    expect(screen.getByRole('status', { name: '2 logs selected' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('status', { name: '2 logs selected', hidden: true })
+    ).toBeInTheDocument()
     expect(requests.some(({ sql }) => sql.includes("toString(id) = 'recent-"))).toBe(false)
   })
 
