@@ -25,7 +25,14 @@ export const WarehouseSetupPanel = () => {
   const { ref: projectRef } = useParams()
   const track = useTrack()
   const isOrioleDb = useIsOrioleDb()
-  const { isPending: isProjectPending, error: projectError } = useSelectedProjectQuery()
+  const {
+    isPending: isProjectPending,
+    isSuccess: isProjectSuccess,
+    isFetched: isProjectFetched,
+    isFetching: isProjectFetching,
+    error: projectError,
+    refetch: refetchProject,
+  } = useSelectedProjectQuery()
 
   const { data, isPending, isFetching, isError, error, refetch } = useWarehouseSetupStatusQuery(
     { projectRef },
@@ -38,17 +45,32 @@ export const WarehouseSetupPanel = () => {
     }
   )
 
+  const shouldCheckCatalogCompatibility =
+    data?.setup_status === 'not_started' ||
+    data?.setup_status === 'disabled' ||
+    data?.setup_status === 'error'
+
   const {
     data: destinations,
     isPending: isDestinationsPending,
+    isSuccess: isDestinationsSuccess,
     error: destinationsError,
   } = useReplicationDestinationsQuery(
     { projectRef },
     {
-      enabled:
-        (data?.setup_status === 'not_started' || data?.setup_status === 'disabled') && !!isOrioleDb,
+      enabled: shouldCheckCatalogCompatibility && isOrioleDb === true,
     }
   )
+
+  // Existing destinations may use another project's catalog; the API validates that project.
+  const hasWarehouseDestination =
+    destinations?.destinations.some(
+      (destination) => destination.name === WAREHOUSE_PUBLICATION_NAME
+    ) ?? false
+  const canSetUpWarehouse =
+    isProjectSuccess &&
+    (isOrioleDb === false ||
+      (isOrioleDb === true && isDestinationsSuccess && hasWarehouseDestination))
 
   const disableMutation = useWarehouseDisableMutation({ onError: () => {} })
   // Rendered inline by the picker rather than as a toast: a setup failure is something the user
@@ -57,6 +79,7 @@ export const WarehouseSetupPanel = () => {
 
   const handleSetup = (targets: WarehouseSetupTarget[]) => {
     if (!projectRef || targets.length === 0) return
+    if (shouldCheckCatalogCompatibility && !canSetUpWarehouse) return
     const isInitialSetup = data?.setup_status !== 'complete'
 
     setupMutation.mutate(
@@ -105,9 +128,22 @@ export const WarehouseSetupPanel = () => {
 
   const status = data.setup_status
 
-  if (status === 'not_started' || status === 'disabled') {
-    if (isProjectPending) return <GenericSkeletonLoader />
-    if (projectError) return <AlertError subject="Failed to load project" error={projectError} />
+  if (shouldCheckCatalogCompatibility) {
+    if (isProjectPending && !isProjectFetched) return <GenericSkeletonLoader />
+    if (!isProjectSuccess || isOrioleDb === undefined) {
+      return (
+        <AlertError
+          subject="Failed to check project compatibility"
+          error={projectError ?? { message: 'The project database version is unavailable.' }}
+          projectRef={projectRef}
+          additionalActions={
+            <Button variant="default" loading={isProjectFetching} onClick={() => refetchProject()}>
+              Retry
+            </Button>
+          }
+        />
+      )
+    }
     if (isOrioleDb) {
       if (isDestinationsPending) return <GenericSkeletonLoader />
       if (destinationsError) {
@@ -115,10 +151,6 @@ export const WarehouseSetupPanel = () => {
           <AlertError subject="Failed to load Warehouse destination" error={destinationsError} />
         )
       }
-      // Existing destinations may use another project's catalog; the API validates that project.
-      const hasWarehouseDestination = destinations?.destinations.some(
-        (destination) => destination.name === WAREHOUSE_PUBLICATION_NAME
-      )
       if (!hasWarehouseDestination) {
         return (
           <Admonition
@@ -129,6 +161,9 @@ export const WarehouseSetupPanel = () => {
         )
       }
     }
+  }
+
+  if (status === 'not_started' || status === 'disabled') {
     return (
       <WarehouseSchemaTablePicker
         onSubmit={handleSetup}

@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { platformComponents as components } from 'api-types'
+import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
@@ -15,7 +14,8 @@ import {
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type SourcesResponse = components['schemas']['SourcesResponse_Output']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 
 const numericFields = [
   { label: 'Batch wait time', initialValue: 10_000 },
@@ -49,21 +49,49 @@ const TestForm = () => {
   )
 }
 
+// Waits for the table layout queries so none are left in flight when the test ends
+const renderExpanded = async () => {
+  customRender(<TestForm />)
+  fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+  await screen.findByText('This publication has no tables.')
+}
+
 describe('AdvancedSettings', () => {
   beforeEach(() => {
     addAPIMock({
       method: 'get',
       path: '/platform/replication/:ref/sources',
-      response: () => HttpResponse.json<SourcesResponse>({ sources: [] }),
+      response: () =>
+        HttpResponse.json<ReplicationSourcesResponse>({
+          sources: [
+            {
+              id: 1,
+              name: 'default',
+              tenant_id: 'tenant',
+              config: { host: 'db.internal', name: 'main-db', port: 5432, username: 'etl_user' },
+            },
+          ],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: () =>
+        HttpResponse.json<PublicationDetailsResponse>({
+          name: 'publication',
+          config: {
+            type: 'all_tables',
+            operations: ['insert', 'update', 'delete', 'truncate'],
+            publish_via_partition_root: false,
+          },
+          tables: [],
+        }),
     })
   })
 
   // One render for all fields: each field is independent, and re-rendering per field only adds setup cost
   it('allows every numeric field to be cleared and replaced', async () => {
-    const user = userEvent.setup({ delay: null })
-    customRender(<TestForm />)
-
-    await user.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    await renderExpanded()
 
     for (const { label, initialValue } of numericFields) {
       const input = screen.getByLabelText(label)
@@ -78,10 +106,7 @@ describe('AdvancedSettings', () => {
   })
 
   it('uses the existing error while an empty required number is being edited', async () => {
-    const user = userEvent.setup({ delay: null })
-    customRender(<TestForm />)
-
-    await user.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    await renderExpanded()
     const input = screen.getByLabelText('Table sync workers')
 
     fireEvent.change(input, { target: { value: '' } })

@@ -3512,6 +3512,7 @@ module.exports = [
   },
   { permanent: true, source: '/docs/guides/api/api-settings', destination: '/docs/guides/api' },
   { permanent: true, source: '/docs/reference/llms.md', destination: '/llms.txt' },
+  { permanent: true, source: '/docs/llms.txt', destination: '/llms.txt' },
   { permanent: true, source: '/docs/guides/api/rest', destination: '/docs/guides/api' },
   {
     permanent: true,
@@ -4264,5 +4265,25 @@ module.exports = [
     permanent: true,
     source: '/docs/deployment/branching/dashboard',
     destination: '/docs/guides/deployment/branching/dashboard',
+  },
+  {
+    permanent: true,
+    source: '/docs/deployment/branching/github-integration',
+    destination: '/docs/guides/deployment/branching/github-integration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/mcp',
+    destination: '/docs/guides/ai-tools/mcp',
+  },
+  {
+    permanent: true,
+    source: '/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png',
+    destination: '/docs/img/supabase-architecture.svg',
+  },
+  {
+    permanent: true,
+    source: '/changelog/rss.xml',
+    destination: '/changelog-rss.xml',
   },
 ]

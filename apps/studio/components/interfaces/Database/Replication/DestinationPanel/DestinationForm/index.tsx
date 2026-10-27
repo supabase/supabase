@@ -104,7 +104,7 @@ export const DestinationForm = ({
     refetch: refetchProject,
   } = useSelectedProjectQuery({ enabled: selectedType === 'DuckLake' })
   const isDuckLakeProjectBlocked =
-    selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb === true)
+    selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb !== false)
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
@@ -499,25 +499,31 @@ export const DestinationForm = ({
       )}
       {selectedType === 'DuckLake' && etlEnableDucklake && (
         <>
-          {isManagedDuckLake && isProjectPending && !isProjectFetched && (
-            <p role="status" className="px-5 pt-5 text-sm text-foreground-light">
-              Checking project compatibility...
-            </p>
-          )}
+          <p role="status" className="px-5 pt-5 text-sm text-foreground-light empty:sr-only">
+            {isManagedDuckLake && isProjectPending && !isProjectFetched
+              ? 'Checking project compatibility...'
+              : ''}
+          </p>
           {/* Keep this mounted during retries: AlertError's telemetry also observes the project. */}
-          {isManagedDuckLake && isProjectFetched && !isProjectSuccess && (
-            <AlertError
-              className="mx-5 mt-5"
-              subject="Failed to load project"
-              error={projectError}
-              projectRef={projectRef}
-              additionalActions={
-                <Button type="button" loading={isProjectFetching} onClick={() => refetchProject()}>
-                  Retry
-                </Button>
-              }
-            />
-          )}
+          {isManagedDuckLake &&
+            isProjectFetched &&
+            (!isProjectSuccess || isOrioleDb === undefined) && (
+              <AlertError
+                className="mx-5 mt-5"
+                subject="Failed to load project"
+                error={projectError ?? { message: 'The project database version is unavailable.' }}
+                projectRef={projectRef}
+                additionalActions={
+                  <Button
+                    type="button"
+                    loading={isProjectFetching}
+                    onClick={() => refetchProject()}
+                  >
+                    Retry
+                  </Button>
+                }
+              />
+            )}
           <DuckLakeFields form={form} editMode={editMode} />
         </>
       )}

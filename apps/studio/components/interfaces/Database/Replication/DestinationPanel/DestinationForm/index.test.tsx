@@ -399,7 +399,7 @@ describe('DestinationForm', () => {
       return submitButton
     }
 
-    it.each(['pending', 'error'] as const)(
+    it.each(['pending', 'error', 'missing-version'] as const)(
       'blocks managed submission while the project query is %s and allows it after recovery',
       async (queryState) => {
         const response = Promise.withResolvers<void>()
@@ -411,6 +411,9 @@ describe('DestinationForm', () => {
               await response.promise
               return HttpResponse.json<ProjectDetail>(project)
             }
+            if (queryState === 'missing-version') {
+              return HttpResponse.json<ProjectDetail>({ ...project, dbVersion: undefined })
+            }
             return HttpResponse.json<APIErrorBody>(
               { message: 'Project details unavailable' },
               { status: 500 }
@@ -421,17 +424,26 @@ describe('DestinationForm', () => {
         try {
           customRender(<DestinationForm selectedType="DuckLake" visible onClose={vi.fn()} />)
           const submitButton = await fillDuckLakeForm()
+          const compatibilityStatus = screen.getByRole('status')
+          expect(compatibilityStatus).toBeEmptyDOMElement()
           fireEvent.change(screen.getByLabelText('Configuration method'), {
             target: { value: 'supabase' },
           })
 
           expect(submitButton).toBeDisabled()
-          if (queryState === 'error') {
+          if (queryState !== 'pending') {
             expect(await screen.findByText('Failed to load project')).toBeInTheDocument()
-            expect(await screen.findByText(/Project details unavailable/)).toBeInTheDocument()
+            expect(
+              screen.getByText(
+                queryState === 'error'
+                  ? /Project details unavailable/
+                  : /The project database version is unavailable/
+              )
+            ).toBeInTheDocument()
           } else {
-            expect(screen.getByText('Checking project compatibility...')).toBeInTheDocument()
+            expect(compatibilityStatus).toHaveTextContent('Checking project compatibility...')
           }
+          expect(screen.getByRole('status')).toBe(compatibilityStatus)
 
           // Submitting the form directly also exercises the handler behind the disabled button.
           await act(async () => {
@@ -440,7 +452,7 @@ describe('DestinationForm', () => {
           expect(mocks.validateConfiguration).not.toHaveBeenCalled()
           expect(mocks.submitPipeline).not.toHaveBeenCalled()
 
-          if (queryState === 'error') {
+          if (queryState !== 'pending') {
             addAPIMock({
               method: 'get',
               path: '/platform/projects/:ref',
@@ -452,6 +464,8 @@ describe('DestinationForm', () => {
           }
 
           await waitFor(() => expect(submitButton).toBeEnabled())
+          expect(screen.getByRole('status')).toBe(compatibilityStatus)
+          expect(compatibilityStatus).toBeEmptyDOMElement()
           fireEvent.click(submitButton)
           fireEvent.click(await screen.findByRole('button', { name: 'Confirm pipeline creation' }))
           await waitFor(() => expect(mocks.submitPipeline).toHaveBeenCalledOnce())
@@ -464,7 +478,7 @@ describe('DestinationForm', () => {
       }
     )
 
-    it.each(['pending', 'error'] as const)(
+    it.each(['pending', 'error', 'missing-version'] as const)(
       'allows custom submission while the project query is %s',
       async (queryState) => {
         const response = Promise.withResolvers<void>()
@@ -473,6 +487,9 @@ describe('DestinationForm', () => {
           path: '/platform/projects/:ref',
           response: async () => {
             if (queryState === 'pending') await response.promise
+            if (queryState === 'missing-version') {
+              return HttpResponse.json<ProjectDetail>({ ...project, dbVersion: undefined })
+            }
             return HttpResponse.json<APIErrorBody>(
               { message: 'Project details unavailable' },
               { status: 500 }
@@ -482,8 +499,14 @@ describe('DestinationForm', () => {
 
         try {
           customRender(<DestinationForm selectedType="DuckLake" visible onClose={vi.fn()} />)
-          if (queryState === 'error') {
-            expect(await screen.findByText(/Project details unavailable/)).toBeInTheDocument()
+          if (queryState !== 'pending') {
+            expect(
+              await screen.findByText(
+                queryState === 'error'
+                  ? /Project details unavailable/
+                  : /The project database version is unavailable/
+              )
+            ).toBeInTheDocument()
           }
           const submitButton = await fillDuckLakeForm()
           expect(screen.queryByText('Failed to load project')).not.toBeInTheDocument()

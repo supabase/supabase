@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -97,7 +97,7 @@ const DuckLakeForm = () => {
 }
 
 describe('OrioleDB catalog restrictions', () => {
-  test.each(['not_started', 'disabled'] as const)(
+  test.each(['not_started', 'disabled', 'error'] as const)(
     'blocks Warehouse setup using the current OrioleDB project when %s',
     async (status) => {
       mockProject(true)
@@ -110,12 +110,33 @@ describe('OrioleDB catalog restrictions', () => {
     }
   )
 
-  test.each(['not_started', 'disabled'] as const)(
+  test.each(['not_started', 'disabled', 'error'] as const)(
     'allows Warehouse setup on standard Postgres when %s',
     async (status) => {
       mockProject(false)
       mockWarehouse(status)
       customRender(<WarehouseSetupPanel />)
+      expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
+    }
+  )
+
+  test.each(['not_started', 'disabled', 'error'] as const)(
+    'blocks Warehouse setup with a missing database version until a retry resolves it when %s',
+    async (status) => {
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref',
+        response: () => HttpResponse.json<ProjectDetail>(PROJECT),
+      })
+      mockWarehouse(status)
+      customRender(<WarehouseSetupPanel />)
+
+      expect(await screen.findByText('Failed to check project compatibility')).toBeInTheDocument()
+      expect(screen.getByText(/The project database version is unavailable/)).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+
+      mockProject(false)
+      fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
       expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
     }
   )
@@ -130,7 +151,7 @@ describe('OrioleDB catalog restrictions', () => {
     ).not.toBeInTheDocument()
   })
 
-  test.each(['not_started', 'disabled'] as const)(
+  test.each(['not_started', 'disabled', 'error'] as const)(
     'lets the API validate a retained Warehouse destination when %s',
     async (status) => {
       mockProject(true)
