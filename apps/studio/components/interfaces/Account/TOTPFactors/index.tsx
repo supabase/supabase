@@ -24,14 +24,20 @@ import { RecoveryCodesAvailable } from './RecoveryCodesAvailable'
 import { RecoveryCodesSetup } from './RecoveryCodesSetup'
 import { useRegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { useRecoveryCodesGate } from './useRecoveryCodesGate'
-import { getPrimarySecurityAction } from '@/components/interfaces/Account/Security/Security.utils'
+import type { SecurityAction } from '@/components/interfaces/Account/Security/Security.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
-import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
+import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
 import { DATETIME_FORMAT } from '@/lib/constants'
 
-export const TOTPFactors = () => {
+export const TOTPFactors = ({
+  findings,
+  primaryAction,
+}: {
+  findings: AccountRecoveryFinding[]
+  primaryAction: SecurityAction | undefined
+}) => {
   const [isCheckingIdentity, setIsCheckingIdentity] = useState(false)
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [resumeFactorId, setResumeFactorId] = useQueryState('removeAuthenticator', parseAsString)
@@ -46,15 +52,6 @@ export const TOTPFactors = () => {
   )
   const hasVerifiedFactors = verifiedFactors.length > 0
   const canAddApp = isSuccess && totpFactors.length < 2
-
-  const recovery = useAccountRecovery()
-  const findings = recovery.findings
-  const primaryAction = getPrimarySecurityAction({
-    findings: findings.filter((finding) => finding.action !== 'set-password'),
-    isPending: recovery.isPending,
-    isError: recovery.isError,
-    canEnableMfa: recovery.isFactorsSuccess && recovery.verifiedFactorCount === 0,
-  })
 
   const recoveryCodes = useRecoveryCodesGate({ enabled: hasVerifiedFactors })
   const { codes, status } = recoveryCodes

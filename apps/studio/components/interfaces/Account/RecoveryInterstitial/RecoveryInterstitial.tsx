@@ -16,7 +16,6 @@ import { AlertError } from '@/components/ui/AlertError'
 import { profileKeys } from '@/data/profile/keys'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import {
   clearRecoveryReminderSnooze,
   getRemainingRecoveryGap,
@@ -35,12 +34,11 @@ const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
   const { hasLoaded, isConfigCatStale } = useFeatureFlags()
   const flagsReady = hasLoaded === true && !isConfigCatStale
   const isEnabled = useFlag('enableAuthRecoveryCodes')
-  const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
   const { findings, isPending, isFetching, isError, verifiedFactorCount } = useAccountRecovery({
-    enabled: flagsReady && isEnabled && hasSecuritySettings,
+    enabled: flagsReady && isEnabled,
   })
   const isLoading = !flagsReady || isPending || isFetching
-  const isUnavailable = flagsReady && (!isEnabled || !hasSecuritySettings)
+  const isUnavailable = flagsReady && !isEnabled
   const gap = isError || !flagsReady || isPending || isUnavailable ? null : getRecoveryGap(findings)
   let announcement = 'Account recovery check complete'
   if (gap) announcement = 'Account recovery action needed'

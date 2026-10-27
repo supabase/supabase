@@ -3,7 +3,6 @@ import { useFlag, useUser } from 'common'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import {
   evaluateAccountRecovery,
   type AccountRecoveryInput,
@@ -12,13 +11,11 @@ import { IS_PLATFORM } from '@/lib/constants'
 
 export const useAccountRecovery = ({ enabled = true }: { enabled?: boolean } = {}) => {
   const userId = useUser()?.id
-  const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
   const recoveryCodesEnabled = useFlag('enableAuthRecoveryCodes')
   const passwordEnabled = useFlag('enableAccountPassword')
   const shouldReadAccount = IS_PLATFORM && enabled && !!userId
   const identities = useProfileIdentitiesQuery({ enabled: shouldReadAccount })
-  const shouldReadFactors = shouldReadAccount && hasSecuritySettings
-  const factors = useMfaListFactorsQuery({ enabled: shouldReadFactors })
+  const factors = useMfaListFactorsQuery({ enabled: shouldReadAccount })
   const verifiedFactorCount = factors.isSuccess
     ? factors.data.all.filter(
         (factor) => factor.status === 'verified' && factor.factor_type !== 'recovery_code'
@@ -28,7 +25,7 @@ export const useAccountRecovery = ({ enabled = true }: { enabled?: boolean } = {
     identities.isSuccess &&
     identities.data.identities.some((identity) => identity.provider.startsWith('sso'))
   const shouldReadCodes =
-    shouldReadFactors &&
+    shouldReadAccount &&
     recoveryCodesEnabled &&
     factors.isSuccess &&
     verifiedFactorCount > 0 &&
@@ -38,14 +35,10 @@ export const useAccountRecovery = ({ enabled = true }: { enabled?: boolean } = {
 
   const isPending =
     shouldReadAccount &&
-    (identities.isPending ||
-      (shouldReadFactors && factors.isPending) ||
-      (shouldReadCodes && codes.isPending))
+    (identities.isPending || factors.isPending || (shouldReadCodes && codes.isPending))
   const isError =
     shouldReadAccount &&
-    (identities.isError ||
-      (shouldReadFactors && factors.isError) ||
-      (shouldReadCodes && codes.isError))
+    (identities.isError || factors.isError || (shouldReadCodes && codes.isError))
 
   let recoveryCodes: AccountRecoveryInput['recoveryCodes'] = { status: 'unknown' }
   if (shouldReadCodes && codes.isSuccess) {
@@ -63,7 +56,6 @@ export const useAccountRecovery = ({ enabled = true }: { enabled?: boolean } = {
           verifiedFactorCount,
           recoveryCodes,
           features: {
-            hasSecuritySettings: hasSecuritySettings && factors.isSuccess,
             recoveryCodesEnabled,
             passwordEnabled,
           },
@@ -72,9 +64,7 @@ export const useAccountRecovery = ({ enabled = true }: { enabled?: boolean } = {
 
   const isFetching =
     shouldReadAccount &&
-    (identities.isFetching ||
-      (shouldReadFactors && factors.isFetching) ||
-      (shouldReadCodes && codes.isFetching))
+    (identities.isFetching || factors.isFetching || (shouldReadCodes && codes.isFetching))
 
   return {
     findings,
@@ -82,6 +72,6 @@ export const useAccountRecovery = ({ enabled = true }: { enabled?: boolean } = {
     isFetching,
     isError,
     verifiedFactorCount,
-    isFactorsSuccess: shouldReadFactors && factors.isSuccess,
+    isFactorsSuccess: shouldReadAccount && factors.isSuccess,
   }
 }
