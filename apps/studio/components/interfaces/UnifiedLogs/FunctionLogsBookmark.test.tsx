@@ -99,7 +99,7 @@ describe('function log bookmarks', () => {
         requests.push(body)
         let result: AnalyticsResponse['result'] = []
         if (body.sql.includes('row list')) {
-          result = Array.from({ length: 50 }, (_, i) => log(`recent-${i}`, `Recent output ${i}`))
+          result = [log('recent-log', 'Recent output')]
           if (body.sql.includes("toString(id) = 'second-log'"))
             result = [log('second-log', 'Second bookmarked output')]
           if (body.sql.includes("toString(id) = 'older-log'"))
@@ -146,8 +146,11 @@ describe('function log bookmarks', () => {
     expect(screen.queryByText('Bookmarked function output')).not.toBeInTheDocument()
     fireEvent.click(screen.getByText('Close bookmark', { selector: 'button' }))
     await waitFor(() =>
-      expect(screen.queryByText('Second bookmarked output')).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('status', { name: 'Second bookmarked output', hidden: true })
+      ).not.toBeInTheDocument()
     )
+    expect(screen.queryByText('Second bookmarked output')).not.toBeInTheDocument()
   })
 
   it('updates the bookmark for selected rows without fetching logs already in the table', async () => {
