@@ -60,9 +60,7 @@ export const useGetUnifiedLogsMutation = ({
 > = {}) => {
   const useOtel = useUnifiedLogsBackend()
   return useMutation<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>({
-    // Scoped searches always query ClickHouse, like useUnifiedLogsBackend picks for queries
-    mutationFn: (vars) =>
-      retrieveUnifiedLogs({ ...vars, useOtel: vars.useOtel ?? (useOtel || !!vars.search.scope) }),
+    mutationFn: (vars) => retrieveUnifiedLogs({ ...vars, useOtel: vars.useOtel ?? useOtel }),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },
