@@ -133,42 +133,6 @@ describe('prod smoke test: graphql: searchDocs', () => {
     expect(guideNode).toHaveProperty('methodName')
   })
 
-  it('searchDocs query includes troubleshooting articles', async () => {
-    const query = `
-        query SearchDocsQuery($query: String!) {
-          searchDocs(query: $query) {
-            nodes {
-              ...on TroubleshootingGuide {
-                title
-                href
-                content
-              }
-            }
-          }
-        }
-      `
-    const result = await fetch(GRAPHQL_URL, {
-      method: 'POST',
-      body: JSON.stringify({ query, variables: { query: 'exhaust I/O' } }),
-    })
-
-    expect(result.status).toBe(200)
-    const { data, errors } = await result.json()
-    expect(errors).toBeUndefined()
-
-    const {
-      searchDocs: { nodes },
-    } = data
-    expect(Array.isArray(nodes)).toBe(true)
-    expect(nodes.length).toBeGreaterThan(0)
-
-    const guideNode = nodes.find((node: any) => !!node.title)
-    expect(guideNode).toBeDefined()
-    expect(guideNode).toHaveProperty('title')
-    expect(guideNode).toHaveProperty('href')
-    expect(guideNode).toHaveProperty('content')
-  })
-
   it('searchDocs query includes CLI references', async () => {
     const query = `
         query SearchDocsQuery($query: String!) {

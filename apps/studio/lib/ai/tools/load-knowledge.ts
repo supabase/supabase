@@ -16,6 +16,9 @@ export const contract = {
   inputSchema,
   outputSchema: z.string(),
   minOptInLevel: null,
+  availability: {
+    environments: new Set(['platform', 'self-hosted']),
+  },
   needsApproval: false,
   toModelOutput: (output: string) => output,
 } as const satisfies ToolContract
