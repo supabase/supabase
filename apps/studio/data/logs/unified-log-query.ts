@@ -40,10 +40,10 @@ async function getUnifiedLog(
 
 export type UnifiedLogData = Awaited<ReturnType<typeof getUnifiedLog>>
 
-export const unifiedLogQueryOptions = (variables: UnifiedLogVariables) =>
+export const unifiedLogQueryOptions = ({ projectRef, search, id }: UnifiedLogVariables) =>
   queryOptions<UnifiedLogData, UnifiedLogError>({
-    queryKey: logsKeys.unifiedLog(variables.projectRef, variables.search, variables.id),
-    queryFn: ({ signal }) => getUnifiedLog(variables, signal),
-    enabled: !!variables.projectRef && !!variables.id && !!variables.search.scope,
+    queryKey: logsKeys.unifiedLog(projectRef, search, id),
+    queryFn: ({ signal }) => getUnifiedLog({ projectRef, search, id }, signal),
+    enabled: !!projectRef && !!id && !!search.scope,
     refetchOnWindowFocus: false,
   })
