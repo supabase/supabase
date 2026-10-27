@@ -43,7 +43,7 @@ export const HeroGrid = ({ axis, text, isMirrored, className }: HeroGridProps) =
         text={text}
         className={cn(
           'absolute inset-0 size-full font-mono caret-background text-border-stronger',
-          '[--glyph-lines-pulse:var(--color-border-control-hover)]',
+          '[--glyph-lines-pulse:var(--color-brand)] dark:[--glyph-lines-pulse:var(--color-glyph-strong)]',
           isMirrored && '-scale-x-100'
         )}
       />

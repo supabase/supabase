@@ -31,7 +31,7 @@ interface CanvasPoint {
 }
 
 const PROBES = {
-  line: 'text-border-stronger',
+  line: 'text-glyph-strong',
   fill: 'text-background',
 } as const
 

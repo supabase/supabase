@@ -217,7 +217,7 @@ export const VectorLogo = ({ guideText, className }: VectorLogoProps) => {
         text={guideText}
         className={cn(
           'construction-mask absolute top-0 left-1/2 h-full w-screen -translate-x-1/2',
-          'font-mono caret-background text-border-stronger [--glyph-lines-pulse:var(--color-border-control-hover)]'
+          'font-mono caret-background text-border-stronger [--glyph-lines-pulse:var(--color-brand)] dark:[--glyph-lines-pulse:var(--color-glyph-strong)]'
         )}
       />
       <div
