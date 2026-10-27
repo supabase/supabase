@@ -2,12 +2,18 @@ import { QueryClient } from '@tanstack/react-query'
 import type { platformComponents } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 
 import { unifiedLogAttributesQueryOptions } from './unified-log-attributes-query'
 import { unifiedLogRequestTimelineQueryOptions } from './unified-log-request-timeline-query'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type LogsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
+const requestSchema = z.object({
+  sql: z.string(),
+  iso_timestamp_start: z.string(),
+  iso_timestamp_end: z.string(),
+})
 const variables = {
   projectRef: 'default',
   logId: 'gateway',
@@ -22,7 +28,7 @@ const step = (id: string, source: string, metadata: Record<string, string>) => (
   id,
   source,
   metadata,
-  timestamp: '2026-01-01T10:00:00.000000',
+  timestamp: '2026-01-01T10:00:00.000000Z',
   log_type: 'edge function',
   status: '200',
   level: 'success',
@@ -49,7 +55,7 @@ describe('request timeline query', () => {
           const { sql } = (await request.json()) as { sql: string }
           requests.push(sql)
           return HttpResponse.json<LogsResponse>({
-            result: sql.includes('log attributes') ? [root] : [related],
+            result: sql.includes('SELECT source, log_attributes') ? [root] : [related],
           })
         },
       })
@@ -75,7 +81,9 @@ describe('request timeline query', () => {
           ?.logs.map((log) => log.id)
       ).toEqual(['invocation'])
       // Request count is the contract here: consumers share both cached and in-flight data.
-      expect(requests.filter((sql) => sql.includes('log attributes'))).toHaveLength(1)
+      expect(requests.filter((sql) => sql.includes('SELECT source, log_attributes'))).toHaveLength(
+        1
+      )
       expect(requests).toHaveLength(2)
     }
   )
@@ -115,37 +123,57 @@ describe('request timeline query', () => {
     expect(requests).toHaveLength(1)
   })
 
-  it('follows an execution ID from a request and stops after two lookups', async () => {
-    const requests: { sql: string; iso_timestamp_start: string; iso_timestamp_end: string }[] = []
-    const invocation = step('invocation', 'function_edge_logs', { execution_id: 'exec-1' })
-    const consoleLog = step('console', 'function_logs', { execution_id: 'exec-2' })
-    addAPIMock({
-      method: 'post',
-      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
-      response: async ({ request }) => {
-        const body = (await request.json()) as (typeof requests)[number]
-        requests.push(body)
-        if (body.sql.includes('log attributes')) {
+  it.each([350, 400])(
+    'includes function output %s seconds after the gateway request',
+    async (durationSeconds) => {
+      const requests: z.infer<typeof requestSchema>[] = []
+      const gateway = {
+        ...step('gateway', 'edge_logs', { 'request.headers.cf_ray': 'ray-1' }),
+        log_type: 'edge',
+      }
+      const invocation = {
+        ...step('invocation', 'function_edge_logs', {
+          'request.headers.cf_ray': 'ray-1',
+          execution_id: 'exec-1',
+        }),
+        timestamp: new Date(variables.logTimestampMs + durationSeconds * 1000).toISOString(),
+      }
+      const consoleLog = {
+        ...step('console', 'function_logs', { execution_id: 'exec-1' }),
+        timestamp: invocation.timestamp,
+        log_type: 'edge function runtime',
+      }
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+        response: async ({ request }) => {
+          const body = requestSchema.parse(await request.json())
+          requests.push(body)
+          if (body.sql.includes('SELECT source, log_attributes')) {
+            return HttpResponse.json<LogsResponse>({
+              result: [{ source: 'edge_logs', log_attributes: gateway.metadata }],
+            })
+          }
+          const candidates = body.sql.includes("log_attributes['execution_id'] IN ('exec-1')")
+            ? [gateway, invocation, consoleLog]
+            : [gateway, invocation]
+          const start = Date.parse(body.iso_timestamp_start)
+          const end = Date.parse(body.iso_timestamp_end)
           return HttpResponse.json<LogsResponse>({
-            result: [
-              { source: 'edge_logs', log_attributes: { 'request.headers.cf_ray': 'ray-1' } },
-            ],
+            result: candidates.filter(({ timestamp }) => {
+              const time = Date.parse(timestamp)
+              return time >= start && time <= end
+            }),
           })
-        }
-        return HttpResponse.json<LogsResponse>({
-          result: requests.length === 2 ? [invocation] : [invocation, consoleLog],
-        })
-      },
-    })
-    const result = await fetchTimeline()
-    expect(result.logs.map((log) => log.id)).toEqual(['invocation', 'console'])
-    expect(requests).toHaveLength(3)
-    expect(requests[2].sql).toContain("log_attributes['execution_id'] IN ('exec-1')")
-    expect(requests[2]).toMatchObject({
-      iso_timestamp_start: '2026-01-01T09:55:00.000Z',
-      iso_timestamp_end: '2026-01-01T10:05:00.000Z',
-    })
-  })
+        },
+      })
+      const result = await fetchTimeline()
+      expect(result.logs.map((log) => log.id)).toEqual(['gateway', 'invocation', 'console'])
+      expect(result.executionIds).toEqual(['exec-1'])
+      expect(requests).toHaveLength(3)
+      expect(requests[2].sql).toContain("log_attributes['execution_id'] IN ('exec-1')")
+    }
+  )
 
   it.each([
     { result: [] },

@@ -21,7 +21,7 @@ import type { ResponseError } from '@/types'
 
 // Related logs can trail the request (e.g. a slow Edge Function), so they get
 // a wider window than the selected log's own lookup.
-const TIMELINE_WINDOW_MS = 5 * 60 * 1000
+const TIMELINE_WINDOW_MS = 7 * 60 * 1000
 
 // Following IDs found on related logs (e.g. an Edge Function's execution ID)
 // can surface more logs; stop after one extra hop.
