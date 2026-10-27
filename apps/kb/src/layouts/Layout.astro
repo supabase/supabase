@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content'
 import { genFaviconLinks } from 'common/MetaFavicons/icons'
+import { ConsentIsland } from '../components/ConsentIsland'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
 import { toSummary, toTroubleshootingSummary } from '../lib/guides'
@@ -86,6 +87,7 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 			<slot />
 		</main>
 		<Footer />
+		<ConsentIsland client:only="react" />
 	</body>
 </html>
 
