@@ -141,7 +141,7 @@ describe('UnifiedLogs', () => {
   })
 
   it('remembers the function dock independently from the project dock when reopening logs', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     mswServer.use(
       http.get('/api/enabled-features-overrides', () =>
         HttpResponse.json<{ disabled_features: string[] }>({ disabled_features: [] })
@@ -189,30 +189,44 @@ describe('UnifiedLogs', () => {
         </FeatureFlagContext.Provider>,
         { nuqs: { hasMemory: true } }
       )
-    const selectLog = async () => {
-      fireEvent.click(await within(screen.getByRole('table')).findByText('Function started'))
-      await screen.findByRole('button', { name: 'Dock side' })
+    const selectLog = async ({ container }: ReturnType<typeof renderLogs>) => {
+      const view = within(container)
+      const table = within(view.getByRole('table', { hidden: true }))
+      fireEvent.click(await table.findByText('Function started'))
+      await view.findByLabelText('Dock side')
+      return view
     }
 
     const first = renderLogs(true)
-    await selectLog()
-    expect(screen.getByRole('separator')).toHaveAttribute('aria-orientation', 'horizontal')
-    fireEvent.keyDown(screen.getByRole('button', { name: 'Dock side' }), { key: 'Enter' })
-    await user.click(await screen.findByRole('menuitem', { name: 'Dock to right' }))
+    const firstView = await selectLog(first)
+    expect(firstView.getByRole('separator', { hidden: true })).toHaveAttribute(
+      'aria-orientation',
+      'horizontal'
+    )
+    fireEvent.keyDown(firstView.getByLabelText('Dock side'), { key: 'Enter' })
+    await user.click(await screen.findByRole('menuitem', { name: 'Dock to right', hidden: true }))
     await waitFor(() =>
-      expect(screen.getByRole('separator')).toHaveAttribute('aria-orientation', 'vertical')
+      expect(firstView.getByRole('separator', { hidden: true })).toHaveAttribute(
+        'aria-orientation',
+        'vertical'
+      )
     )
     first.unmount()
 
     const project = renderLogs(false)
-    await selectLog()
-    expect(screen.getByRole('separator')).toHaveAttribute('aria-orientation', 'horizontal')
+    const projectView = await selectLog(project)
+    expect(projectView.getByRole('separator', { hidden: true })).toHaveAttribute(
+      'aria-orientation',
+      'horizontal'
+    )
     project.unmount()
 
-    renderLogs(true)
-    await selectLog()
+    const reopenedView = await selectLog(renderLogs(true))
     await waitFor(() =>
-      expect(screen.getByRole('separator')).toHaveAttribute('aria-orientation', 'vertical')
+      expect(reopenedView.getByRole('separator', { hidden: true })).toHaveAttribute(
+        'aria-orientation',
+        'vertical'
+      )
     )
   })
 })
