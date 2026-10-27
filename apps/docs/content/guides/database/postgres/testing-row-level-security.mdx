@@ -41,6 +41,9 @@ The example tests a `todos` table whose policy lets each user access only their 
    on todos for all
    to authenticated
    using ((select auth.uid()) = user_id);
+
+   -- index the column the policy filters on
+   create index todos_user_id_idx on todos using btree (user_id);
    ```
 
    Apply the migration to your local database:
@@ -127,6 +130,8 @@ The example tests a `todos` table whose policy lets each user access only their 
    Files=1, Tests=4,  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
    Result: PASS
    ```
+
+   If any assertion fails, fix the policy or the test, then rerun `supabase test db` until the output ends with `Result: PASS`.
 
 The policy now has a test that fails if a change lets one user read or edit another user's todos.
 
