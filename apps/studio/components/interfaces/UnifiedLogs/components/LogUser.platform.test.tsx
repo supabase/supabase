@@ -21,6 +21,14 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 type LogsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 type TimelineRow = UnifiedLogsQueryRow & { source: string }
 
+const deployment = vi.hoisted(() => ({ basePath: '' }))
+vi.mock('@/lib/constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/constants')>()),
+  get BASE_PATH() {
+    return deployment.basePath
+  },
+}))
+
 vi.unmock('common')
 const { default: routerMock } =
   await vi.importMock<typeof import('next-router-mock')>('next/router')
@@ -162,7 +170,10 @@ const user: User = {
 }
 
 describe('LogUser', () => {
-  beforeEach(() => routerMock.setCurrentUrl('/project/default/logs'))
+  beforeEach(() => {
+    deployment.basePath = ''
+    routerMock.setCurrentUrl('/project/default/logs')
+  })
   it("shows the log's own user without looking up the rest of the request", async () => {
     const { logQueries } = renderUser({ ...baseLog, auth_user: USER_ID }, { users: [user] })
 
@@ -172,9 +183,19 @@ describe('LogUser', () => {
     expect(screen.queryByRole('button', { name: 'View logs' })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Open in Authentication' })).toHaveAttribute(
       'href',
-      expect.stringContaining(`/project/default/auth/users?show=${USER_ID}`)
+      `/project/default/auth/users?show=${USER_ID}`
     )
     expect(logQueries).toEqual([])
+  })
+
+  it('preserves the configured deployment base path in the Authentication link', async () => {
+    deployment.basePath = '/custom-studio-prefix'
+    const { queryClient } = renderUser({ ...baseLog, auth_user: USER_ID }, { users: [user] })
+    expect(await screen.findByRole('link', { name: 'Open in Authentication' })).toHaveAttribute(
+      'href',
+      `${deployment.basePath}/project/default/auth/users?show=${USER_ID}`
+    )
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
   it('finds the user on another log from the same request', async () => {

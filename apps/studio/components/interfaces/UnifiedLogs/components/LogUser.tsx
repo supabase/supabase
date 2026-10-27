@@ -15,6 +15,7 @@ import { useUserQuery } from '@/data/auth/user-query'
 import { unifiedLogRequestTimelineQueryOptions } from '@/data/logs/unified-log-request-timeline-query'
 import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 
 export function LogUser({
   row,
@@ -132,7 +133,7 @@ function SupabaseUser({ userId }: { userId: string }) {
       <UserCard
         user={user}
         variant="outline"
-        href={`/project/${projectRef}/auth/users?show=${userId}`}
+        href={`${BASE_PATH}/project/${projectRef}/auth/users?show=${userId}`}
         linkLabel="Open in Authentication"
         className="mx-4 mb-1 mt-3"
       />
