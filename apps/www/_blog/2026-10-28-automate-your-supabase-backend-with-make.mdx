@@ -1,0 +1,57 @@
+---
+title: 'Automate your Supabase backend with Make'
+description: 'Connect Supabase to Make with OAuth and bring your database, Edge Functions, logs, and projects into automated scenarios and AI agents.'
+author: elsa_heffernan
+date: '2026-10-28'
+categories:
+  - product
+tags:
+  - ai
+  - integrations
+  - mcp
+imgSocial: '2026-10-28-automate-your-supabase-backend-with-make/og.png'
+imgThumb: '2026-10-28-automate-your-supabase-backend-with-make/thumb.png'
+toc_depth: 2
+---
+
+The [Supabase integration for Make](https://www.make.com/en/integrations/category/supabase?categoryType=subcategory&utm_source=supabase&utm_medium=partner&utm_campaign=supabase-announcement-blog) is now available. Connect your Supabase account to Make, and your automation and AI agents can work with your projects directly: query your database, read logs, deploy Edge Functions, and manage your projects as workflow steps.
+
+[Make](https://www.make.com/en?utm_source=supabase&utm_medium=partner&utm_campaign=supabase-announcement-blog), part of Celonis, is an AI automation platform where more than 400,000 organizations build workflows, called scenarios, across 3,000+ connected apps. Scenarios live on a visual canvas, so people across a business can build them and every step stays visible and governable. This integration adds your Supabase projects to that lineup.
+
+## Two ways to connect: Supabase API apps or AI agents via MCP
+
+How you bring Supabase into a scenario depends on the job:
+
+- **Supabase API apps:** drop pre-built modules into the scenario builder for steps that run the same way every time, like querying the week's signups every Monday morning to post a summary where your team already works, or writing a record into Postgres when a deal closes in your CRM.
+- **MCP client and AI agents:** connect a scenario or a Make AI Agent to the Supabase MCP server. The agent gets structured access to your project, so it can route errors from your logs into your issue tracker, or answer a question from what's actually in the database.
+
+Either way, you can build the scenario visually or describe it in plain language to Maia, Make's AI assistant.
+
+## Live data instead of exports
+
+Inside a scenario, Supabase looks like any other app, the same as the CRM or help desk beside it. That puts the database within reach of anyone who builds scenarios, and they're usually on a different team from whoever runs Postgres. The scenario builder works with live data without asking for an export, and the engineer gets to delete the nightly sync that used to sit between them.
+
+Make tracks every scenario run and agent tool call as it happens, so both of them can open the history and see exactly what touched the database.
+
+## How to connect
+
+You'll need a [Make account](https://www.make.com/en?utm_source=supabase&utm_medium=partner&utm_campaign=supabase-announcement-blog) and a Supabase project.
+
+1. Add the MCP Client app to your scenario and choose the Call a tool module, or add it as a tool for a Make AI Agent
+2. Create a connection and select Supabase
+3. Sign in to your Supabase account and approve access
+4. Pick a tool and map its inputs
+
+Every tool the Supabase MCP server exposes is annotated as read-only or destructive, so you know what a scenario can touch before it runs. The pre-built Supabase apps connect with project credentials instead; setup for those lives in [Make's app directory](https://www.make.com/en/integrations/category/supabase?categoryType=subcategory&utm_source=supabase&utm_medium=partner&utm_campaign=supabase-announcement-blog).
+
+## Built in partnership with Make
+
+> AI automation earns trust when engineering and leadership can both see what it's doing. Whether a scenario runs deterministic steps or hands a task to an agent, bringing Supabase to Make keeps every database action visible and governed.
+
+— **Ina Adamczyk**, Tech partnerships lead, Make
+
+## Get started
+
+The integration runs through Make's MCP Client, included on every Make plan.
+
+- [Connect Supabase in Make](https://www.make.com/integrations/category/supabase?utm_source=supabase&utm_medium=partner&utm_campaign=supabase-announcement-blog)
