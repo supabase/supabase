@@ -19,6 +19,7 @@ import {
   RefSubLayout,
   ReturnTypeDetails,
   StickyHeader,
+  type HeadingTag,
 } from '~/features/docs/Reference.ui'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
@@ -80,10 +81,10 @@ type SectionSwitchProps = {
   libraryId: string
   version: string
   section: AbbrevApiReferenceSection
-  headingTag?: 'h1' | 'h2'
+  tag?: HeadingTag
 }
 
-export function SectionSwitch({ libraryId, version, section, headingTag }: SectionSwitchProps) {
+export function SectionSwitch({ libraryId, version, section, tag }: SectionSwitchProps) {
   const libPath = REFERENCES[libraryId.replaceAll('-', '_')].libPath
   const allAvailableVersions = REFERENCES[libraryId.replaceAll('-', '_')].versions
   const isLatestVersion = allAvailableVersions.length === 0 || version === allAvailableVersions[0]
@@ -99,7 +100,7 @@ export function SectionSwitch({ libraryId, version, section, headingTag }: Secti
           isLatestVersion={isLatestVersion}
           link={sectionLink}
           section={section}
-          headingTag={headingTag}
+          tag={tag}
         />
       )
     case 'function':
@@ -115,14 +116,14 @@ export function SectionSwitch({ libraryId, version, section, headingTag }: Secti
     case 'cli-command':
       return <CliCommandSection link={sectionLink} section={section} />
     case 'operation':
-      return <ApiEndpointSection link={sectionLink} section={section} headingTag={headingTag} />
+      return <ApiEndpointSection link={sectionLink} section={section} tag={tag} />
     case 'self-hosted-operation':
       return (
         <ApiEndpointSection
           servicePath={libraryId}
           link={sectionLink}
           section={section}
-          headingTag={headingTag}
+          tag={tag}
         />
       )
     default:
@@ -137,7 +138,7 @@ interface MarkdownSectionProps {
   isLatestVersion: boolean
   link: string
   section: AbbrevApiReferenceSection
-  headingTag?: 'h1' | 'h2'
+  tag?: HeadingTag
 }
 
 async function MarkdownSection({
@@ -146,7 +147,7 @@ async function MarkdownSection({
   isLatestVersion,
   link,
   section,
-  headingTag,
+  tag,
 }: MarkdownSectionProps) {
   const refPath = section.meta?.shared
     ? `shared/${section.id}`
@@ -159,7 +160,7 @@ async function MarkdownSection({
   return (
     <RefSubLayout.EducationSection link={link} {...section}>
       {/* Pages with `hideTitle` already render their own title in the MDX */}
-      {!frontmatter.hideTitle && <StickyHeader {...section} headingTag={headingTag} />}
+      {!frontmatter.hideTitle && <StickyHeader {...section} tag={tag} />}
       <MDXRemoteRefs source={content} />
     </RefSubLayout.EducationSection>
   )
@@ -281,15 +282,10 @@ interface ApiEndpointSectionProps {
   link: string
   section: AbbrevApiReferenceSection
   servicePath?: string
-  headingTag?: 'h1' | 'h2'
+  tag?: HeadingTag
 }
 
-async function ApiEndpointSection({
-  link,
-  section,
-  servicePath,
-  headingTag,
-}: ApiEndpointSectionProps) {
+async function ApiEndpointSection({ link, section, servicePath, tag }: ApiEndpointSectionProps) {
   const endpointDetails = servicePath
     ? await getSelfHostedApiEndpointById(servicePath, section.id)
     : await getApiEndpointById(section.id)
@@ -326,7 +322,7 @@ async function ApiEndpointSection({
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
       <StickyHeader
-        headingTag={headingTag}
+        tag={tag}
         title={
           <>
             {endpointDetails.summary}

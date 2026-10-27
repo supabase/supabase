@@ -83,21 +83,23 @@ export const RefSubLayout = {
   Examples,
 }
 
+export type HeadingTag = 'h1' | 'h2'
+
 interface StickyHeaderProps {
   title?: React.ReactNode | string
   monoFont?: boolean
   className?: string
-  headingTag?: 'h1' | 'h2'
+  tag?: HeadingTag
 }
 
 export function StickyHeader({
   title,
   monoFont = false,
   className,
-  headingTag: HeadingTag = 'h2',
+  tag: Tag = 'h2',
 }: StickyHeaderProps) {
   return (
-    <HeadingTag
+    <Tag
       tabIndex={-1} // For programmatic focus on auto-scroll to section
       className={cn(
         'sticky top-0 z-1',
@@ -117,7 +119,7 @@ export function StickyHeader({
       )}
     >
       {title}
-    </HeadingTag>
+    </Tag>
   )
 }
 
