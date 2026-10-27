@@ -367,6 +367,8 @@ export const CoverCanvas = ({
       const resizeObserver = new ResizeObserver(measure)
       resizeObserver.observe(host)
       if (keepOutRef?.current) resizeObserver.observe(keepOutRef.current)
+      // a pinch zoom changes only the visual viewport scale, so the layers resize for it too
+      visualViewport?.addEventListener('resize', measure)
 
       const unobserveTheme = observeTheme(() => {
         palette = readPalette(probeRoot)
@@ -379,6 +381,7 @@ export const CoverCanvas = ({
       return () => {
         cancelAnimationFrame(frame)
         resizeObserver.disconnect()
+        visualViewport?.removeEventListener('resize', measure)
         unobserveTheme()
         host.removeEventListener('pointermove', handlePointerMove)
         host.removeEventListener('pointerleave', handlePointerLeave)
