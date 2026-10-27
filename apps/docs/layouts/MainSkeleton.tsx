@@ -31,12 +31,12 @@ import { MobileNavLock } from 'ui-patterns/MobileNav/MobileNavLock'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
 const GlobalMenuDrawerSection = dynamic(() =>
-  import('~/components/Navigation/NavigationMenu/GlobalMobileMenu').then(
+  import('~/components/Navigation/NavigationMenu/GlobalMenuDrawer').then(
     (mod) => mod.GlobalMenuDrawerSection
   )
 )
 const GlobalMenuDrawerFooter = dynamic(() =>
-  import('~/components/Navigation/NavigationMenu/GlobalMobileMenu').then(
+  import('~/components/Navigation/NavigationMenu/GlobalMenuDrawer').then(
     (mod) => mod.GlobalMenuDrawerFooter
   )
 )
