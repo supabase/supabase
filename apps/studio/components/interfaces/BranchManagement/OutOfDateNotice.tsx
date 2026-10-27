@@ -14,6 +14,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -27,6 +28,7 @@ interface OutOfDateNoticeProps {
   hasEdgeFunctionModifications: boolean
   modifiedFunctionsCount: number
   isPushing: boolean
+  canPush: boolean
   onPush: () => void
 }
 
@@ -38,6 +40,7 @@ export const OutOfDateNotice = ({
   hasEdgeFunctionModifications,
   modifiedFunctionsCount,
   isPushing,
+  canPush,
   onPush,
 }: OutOfDateNoticeProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -88,7 +91,22 @@ export const OutOfDateNotice = ({
           <p className="text-sm text-foreground-light">{getDescription()}</p>
         </div>
 
-        {hasEdgeFunctionModifications ? (
+        {!canPush && (
+          <ButtonTooltip
+            disabled
+            icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
+            className="shrink-0"
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: 'You need additional permissions to update branches',
+              },
+            }}
+          >
+            Update branch
+          </ButtonTooltip>
+        )}
+        {canPush && hasEdgeFunctionModifications && (
           <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
               <Button
@@ -117,7 +135,8 @@ export const OutOfDateNotice = ({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-        ) : (
+        )}
+        {canPush && !hasEdgeFunctionModifications && (
           <Button
             loading={isPushing}
             onClick={() => handleUpdate()}
