@@ -13,9 +13,33 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 function renderUsage(
   balances: Array<string | undefined>,
   computeSize = 'micro',
-  options: { hasError?: boolean; responseReady?: Promise<void> } = {}
+  options: { hasError?: boolean; responseReady?: Promise<void>; instanceType?: string } = {}
 ) {
   const windows: Array<{ startDate: string | null; endDate: string | null }> = []
+  if (options.instanceType) {
+    // Burstability resolves from the primary database's instance configuration;
+    // the global databases mock returns an always-bursting t4g.nano.
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/databases',
+      response: [
+        {
+          cloud_provider: 'AWS',
+          connectionString: '123',
+          connection_string_read_only: '123',
+          db_host: '123',
+          db_name: 'postgres',
+          db_port: 5432,
+          identifier: 'default',
+          inserted_at: '2025-02-16T22:24:42.115195',
+          region: 'us-east-1',
+          restUrl: 'https://default.supabase.co',
+          size: options.instanceType,
+          status: 'ACTIVE_HEALTHY',
+        },
+      ],
+    })
+  }
   addAPIMock({
     method: 'get',
     path: '/platform/projects/:ref/infra-monitoring',
@@ -122,12 +146,19 @@ describe('ComputeAndDiskUsageCharts', () => {
   })
 
   it('hides burst balance and excludes it from compute usage on dedicated IO compute', async () => {
-    renderUsage(['5'], '4xlarge')
+    renderUsage(['5'], '4xlarge', { instanceType: 'm6g.4xlarge' })
 
     expect(await screen.findByText('40%')).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Disk IO balance' })).not.toBeInTheDocument()
     expect(screen.getAllByText('60%')).toHaveLength(2)
     expect(screen.queryByText('95%')).not.toBeInTheDocument()
+  })
+
+  it('keeps burst balance for 4XL configurations whose disk IO bursts', async () => {
+    renderUsage(['99', '5', '90'], '4xlarge', { instanceType: 'm6i.4xlarge' })
+
+    expect(await screen.findByText('5%')).toBeInTheDocument()
+    expect(screen.getByText('95%')).toBeInTheDocument()
   })
 
   it('displays missing balance as unavailable without inflating compute usage', async () => {

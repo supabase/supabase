@@ -458,16 +458,14 @@ describe('instance disk limits data', () => {
     expect(Object.keys(COMPUTE_DISK)).toEqual(Object.keys(published))
     for (const [key, floor] of Object.entries(COMPUTE_DISK)) {
       const [baselineIops, maxIops, baselineThroughputMBps, maxThroughputMBps] = published[key]
-      expect
-        .soft({ key, ...floor }, key)
-        .toEqual(
-          expect.objectContaining({
-            baselineIops,
-            maxIops,
-            baselineThroughputMBps,
-            maxThroughputMBps,
-          })
-        )
+      expect.soft({ key, ...floor }, key).toEqual(
+        expect.objectContaining({
+          baselineIops,
+          maxIops,
+          baselineThroughputMBps,
+          maxThroughputMBps,
+        })
+      )
     }
   })
 })
