@@ -44,7 +44,7 @@ export const MobileMenu = ({
       toggleRef={toggleRef}
       className={className}
       footer={
-        <Button variant="primary" size="large" block asChild>
+        <Button variant="primary" block className="h-8 text-sm" asChild>
           <a href={SIGN_UP_URL}>Sign up</a>
         </Button>
       }
@@ -69,7 +69,7 @@ export const MobileMenu = ({
                   <a
                     href={link.href}
                     aria-current={link.href === currentPath ? 'page' : undefined}
-                    className="flex h-10 items-center text-sm text-foreground-light hover:text-foreground focus-ring aria-[current=page]:text-foreground"
+                    className="flex h-8 items-center text-sm text-foreground-light hover:text-foreground focus-ring aria-[current=page]:text-foreground"
                   >
                     {link.label}
                   </a>
@@ -85,7 +85,7 @@ export const MobileMenu = ({
                 href={href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="flex h-10 items-center gap-2 text-sm text-foreground-light hover:text-foreground focus-ring"
+                className="flex h-8 items-center gap-2 text-sm text-foreground-light hover:text-foreground focus-ring"
               >
                 <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
                 {label}

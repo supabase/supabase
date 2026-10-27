@@ -1,75 +1,21 @@
-import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { X } from 'lucide-react'
-import { AnimatePresence, domAnimation, LazyMotion, m } from 'motion/react'
-import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Dispatch, Fragment, SetStateAction, useEffect } from 'react'
-import { useKey } from 'react-use'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, cn } from 'ui'
+import { Fragment } from 'react'
+import { Button, cn } from 'ui'
 import { MobileNavTabs } from 'ui-patterns/MobileNav/MobileNavTabs'
-import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import type { DropdownMenuItem } from '../Navigation.types'
-import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
+import { MenuItem } from './GlobalNavigationMenu'
+import NavigationMenu, { MenuId } from './NavigationMenu'
 import { isMenuLevel } from './NavigationMenu.utils'
 import { IA_NAV_PENDING_CLASS, useIaNavReady, useNavItems } from '@/features/IaNav'
-
-const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
-
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-}
-
-const listItem = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: DEFAULT_EASE } },
-  exit: { opacity: 0, transition: { duration: 0.05 } },
-}
-
-const itemClassName =
-  'block py-2 pl-2 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-ring rounded-sm'
-
-const AccordionMenuItem = ({
-  section,
-  activeLabel,
-}: {
-  section: DropdownMenuItem[]
-  activeLabel: string
-}) => {
-  return section[0].menuItems ? (
-    <AccordionItem
-      value={section[0].label}
-      className={cn(
-        'relative',
-        activeLabel === section[0].label && 'text-foreground!',
-        itemClassName
-      )}
-    >
-      <AccordionTrigger className="py-1">{section[0].label}</AccordionTrigger>
-      <AccordionContent>
-        <SectionMenuItems section={section} />
-      </AccordionContent>
-    </AccordionItem>
-  ) : (
-    <Link
-      href={section[0].href || '#'}
-      className={cn(activeLabel === section[0].label && 'text-foreground!', itemClassName)}
-    >
-      {section[0].label}
-    </Link>
-  )
-}
 
 const SectionMenuItems = ({
   section,
   activeLevel,
 }: {
   section: DropdownMenuItem[]
-  activeLevel?: string
+  activeLevel: string
 }) =>
   section[0].menuItems?.map((menuItem, menuItemIndex) => (
     <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
@@ -86,11 +32,9 @@ const SectionMenuItems = ({
           ) : (
             <MenuItem
               key={item.label}
-              className="h-10 px-0 aria-[current=true]:text-primary aria-[current=true]:**:text-primary"
+              className="h-8 px-0 aria-[current=true]:text-primary aria-[current=true]:**:text-primary"
               // the item is the section of the open page, not the page itself
-              aria-current={
-                activeLevel && isMenuLevel(activeLevel, item.level) ? 'true' : undefined
-              }
+              aria-current={isMenuLevel(activeLevel, item.level) ? 'true' : undefined}
               href={item.href}
               title={item.label}
               community={item.community}
@@ -103,23 +47,6 @@ const SectionMenuItems = ({
     </Fragment>
   ))
 
-const Menu = () => {
-  const { GLOBAL_MENU_ITEMS } = useNavItems()
-  const isNavReady = useIaNavReady()
-  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
-
-  return (
-    <Accordion
-      type="multiple"
-      className={cn('space-y-1 mt-2.5', !isNavReady && IA_NAV_PENDING_CLASS)}
-    >
-      {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
-        <AccordionMenuItem key={index} section={section} activeLabel={activeLabel} />
-      ))}
-    </Accordion>
-  )
-}
-
 const GlobalMenuAccountActions = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
@@ -127,22 +54,22 @@ const GlobalMenuAccountActions = () => {
   if (isUserLoading) return null
 
   return isLoggedIn ? (
-    <Button block size="medium" asChild>
+    <Button block className="h-8 text-sm" asChild>
       <Link href="https://supabase.com/dashboard/projects">Dashboard</Link>
     </Button>
   ) : (
     <>
-      <Button block size="medium" asChild>
+      <Button block className="h-8 text-sm" asChild>
         <Link href="https://supabase.com/dashboard/sign-in">Sign in</Link>
       </Button>
-      <Button variant="primary" block size="medium" asChild>
+      <Button variant="primary" block className="h-8 text-sm" asChild>
         <Link href="https://supabase.com/dashboard/sign-up">Start your project</Link>
       </Button>
     </>
   )
 }
 
-// the sidebar drawer on mobile holds what this menu holds, since the header has one burger for both
+// the header has one burger, so the sidebar drawer also holds the top nav groups
 export const GlobalMenuDrawerSection = ({
   selectedLabel,
   currentLabel,
@@ -157,15 +84,21 @@ export const GlobalMenuDrawerSection = ({
   className?: string
 }) => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
+  const isNavReady = useIaNavReady()
   const sections = GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false)
   const selectedSection = sections.find((section) => section[0].label === selectedLabel)
+  // a group without menu items, such as start, opens its own sidebar nav in place
+  const selectedMenuId = Object.values(MenuId).find((id) => id === selectedSection?.[0].level)
 
   return (
-    <section aria-label="All docs" className={cn('flex flex-col gap-3', className)}>
+    <section
+      aria-label="All docs"
+      className={cn('flex flex-col gap-3', !isNavReady && IA_NAV_PENDING_CLASS, className)}
+    >
       <MobileNavTabs
         tabs={sections.map(([section]) => ({
           label: section.label,
-          href: section.menuItems ? undefined : section.href,
+          href: section.menuItems || section.level ? undefined : section.href,
         }))}
         selectedLabel={selectedLabel}
         currentLabel={currentLabel}
@@ -177,6 +110,11 @@ export const GlobalMenuDrawerSection = ({
         <div>
           <SectionMenuItems section={selectedSection} activeLevel={currentLevel} />
         </div>
+      ) : selectedMenuId ? (
+        <div>
+          <MenuItem href={selectedSection?.[0].href} title="Overview" className="h-8 px-0" />
+          {selectedLabel === currentLabel ? null : <NavigationMenu menuId={selectedMenuId} />}
+        </div>
       ) : null}
     </section>
   )
@@ -187,90 +125,3 @@ export const GlobalMenuDrawerFooter = ({ className }: { className?: string }) =>
     <GlobalMenuAccountActions />
   </div>
 )
-
-interface Props {
-  open: boolean
-  setOpen: Dispatch<SetStateAction<boolean>>
-}
-
-const GlobalMobileMenu = ({ open, setOpen }: Props) => {
-  const pathname = usePathname()
-
-  const { navigationLogo } = getCustomContent(['navigation:logo'])
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setOpen(false)
-  }, [pathname])
-
-  useKey('Escape', () => setOpen(false))
-
-  return (
-    <LazyMotion features={domAnimation}>
-      <AnimatePresence mode="wait">
-        {open && (
-          <m.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            exit="exit"
-            className="bg-overlay fixed overflow-hidden inset-0 z-50 h-screen max-h-screen w-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-svh transform"
-          >
-            <div className="absolute px-5 h-(--header-height) flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay before:content[''] before:absolute before:w-full before:h-3 before:inset-0 before:top-full before:bg-linear-to-b before:from-background-overlay before:to-transparent">
-              <Link href="/" className="flex items-center gap-2">
-                <Image
-                  className="cursor-pointer hidden dark:block"
-                  src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
-                  priority
-                  width={96}
-                  height={24}
-                  alt="Supabase Logo"
-                />
-                <Image
-                  className="cursor-pointer block dark:hidden"
-                  src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
-                  priority
-                  width={96}
-                  height={24}
-                  alt="Supabase Logo"
-                />
-                <span className="font-mono text-sm font-medium text-primary mb-px">DOCS</span>
-              </Link>
-              <div className="flex gap-4 items-center">
-                <ThemeToggle contentClassName="bg-surface-200" />
-                <button
-                  tabIndex={0}
-                  onClick={() => setOpen(false)}
-                  type="button"
-                  className="inline-flex items-center justify-center bg-surface-100 hover:bg-surface-200 border border-default bg-surface-100/75 text-foreground-light rounded-sm min-w-[30px] w-[30px] h-[30px] focus-ring"
-                >
-                  <span className="sr-only">Close menu</span>
-                  <X />
-                </button>
-              </div>
-            </div>
-            <div className="max-h-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-svh overflow-y-auto pt-12 pb-32 px-3">
-              <Menu />
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 top-auto w-full bg-alternative flex items-stretch p-4 gap-4">
-              <GlobalMenuAccountActions />
-            </div>
-          </m.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence mode="wait">
-        {open && (
-          <m.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            exit="exit"
-            className="bg-alternative fixed overflow-hidden inset-0 z-40 h-screen w-screen transform"
-          />
-        )}
-      </AnimatePresence>
-    </LazyMotion>
-  )
-}
-
-export default GlobalMobileMenu
