@@ -1,4 +1,5 @@
 import type { InferUITools, Tool, ToolUIPart, UIDataTypes, UIMessage } from 'ai'
+import { IS_PLATFORM } from 'common'
 
 import type { ToolName } from '../tool-filter'
 import { contract as createNotebook } from './create-notebook'
@@ -136,11 +137,34 @@ export function sanitizeContractPart<Part extends ToolUIPart>(
 /** Whether a tool is offered in `environment`, given the requirements the request satisfies. */
 export function isToolAvailable(
   availability: ToolAvailability,
-  {
-    environment,
-    satisfied,
-  }: { environment: ToolEnvironment; satisfied: ReadonlySet<ToolRequirement> }
+  { environment, satisfied }: ToolRequest
 ): boolean {
   if (!availability.environments.has(environment)) return false
   return [...(availability.requires ?? [])].every((requirement) => satisfied.has(requirement))
+}
+
+/** The request conditions that decide which tools exist: the environment and the requirements met. */
+export type ToolRequest = {
+  environment: ToolEnvironment
+  satisfied: ReadonlySet<ToolRequirement>
+}
+
+/**
+ * The one place a request becomes a `ToolRequest`, so the tools `getTools` builds and the tools
+ * the system prompt describes can't disagree.
+ */
+export function getToolRequest({
+  isExplorerEnabled,
+  supportMode,
+  baseUrl,
+}: {
+  isExplorerEnabled?: boolean
+  supportMode?: boolean
+  baseUrl?: string
+}): ToolRequest {
+  const satisfied = new Set<ToolRequirement>()
+  if (isExplorerEnabled) satisfied.add('explorer')
+  if (supportMode) satisfied.add('supportMode')
+  if (baseUrl) satisfied.add('baseUrl')
+  return { environment: IS_PLATFORM ? 'platform' : 'self-hosted', satisfied }
 }

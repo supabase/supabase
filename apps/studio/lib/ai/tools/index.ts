@@ -4,8 +4,8 @@ import { IS_PLATFORM } from 'common'
 import { filterToolsByOptInLevel } from '../tool-filter'
 import { getFallbackTools } from './fallback-tools'
 import { getMcpTools } from './mcp-tools'
+import { getToolRequest } from './registry'
 import { buildLocalTools } from './registry.server'
-import type { ToolRequirement } from './types'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 export const getTools = async ({
@@ -34,14 +34,9 @@ export const getTools = async ({
   // that is closed when this signal aborts (i.e. when the request ends).
   signal: AbortSignal
 }) => {
-  const satisfied = new Set<ToolRequirement>()
-  if (isExplorerEnabled) satisfied.add('explorer')
-  if (supportMode) satisfied.add('supportMode')
-  if (baseUrl) satisfied.add('baseUrl')
-
   const localTools = buildLocalTools(
     { projectRef, connectionString, authorization, aiOptInLevel, baseUrl },
-    { environment: IS_PLATFORM ? 'platform' : 'self-hosted', satisfied }
+    getToolRequest({ isExplorerEnabled, supportMode, baseUrl })
   )
 
   let tools: ToolSet = {}
