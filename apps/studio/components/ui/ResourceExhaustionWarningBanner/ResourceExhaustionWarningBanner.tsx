@@ -9,7 +9,6 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { COMPUTE_DISK } from 'shared-data'
 import {
   Alert,
   AlertDescription,
@@ -36,11 +35,10 @@ import {
   isComputeUpgradeWarning,
   type TroubleshootItem,
 } from './ResourceExhaustionWarningBanner.utils'
-import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useShowDiskIOBurstBalanceChart } from '@/hooks/misc/useShowDiskIOBurstBalanceChart'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -103,12 +101,11 @@ export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
-  const { data: project } = useSelectedProjectQuery()
-  const diskIoBaselineLabel = (() => {
-    const variant = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
-    const baseline = COMPUTE_DISK[variant]?.baselineThroughputMBps
-    return typeof baseline === 'number' ? `${baseline} MB/s` : 'its baseline'
-  })()
+  const { limits: diskLimits } = useProjectDiskLimits()
+  const diskIoBaselineLabel =
+    typeof diskLimits?.baselineThroughputMBps === 'number'
+      ? `${diskLimits.baselineThroughputMBps} MB/s`
+      : 'its baseline'
   const applyDiskIoBaseline = (text?: string) =>
     text ? text.replace(/\{baseline\}/g, diskIoBaselineLabel) : text
   const { openSidebar } = useSidebarManagerSnapshot()

@@ -1,10 +1,7 @@
-import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
+import { COMPUTE_DISK, hasBurstableDiskIO, type InstanceDiskLimits } from 'shared-data'
 
 import { getMemoryCommitmentRanges } from './database-charts.utils'
-import {
-  hasBurstableIO,
-  mapComputeSizeNameToAddonVariantId,
-} from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { compactNumberFormatter } from '@/components/ui/Charts/Charts.utils'
 import { ReportAttributes } from '@/components/ui/Charts/ComposedChart.utils'
 import { DiskAttributesData } from '@/data/config/disk-attributes-query'
@@ -18,9 +15,9 @@ import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 // Disk IO Burst Balance chart has no data to show for them.
 export const shouldShowDiskIOBurstBalanceChart = (
   project: Project | undefined,
-  isFlagEnabled: boolean
-): boolean =>
-  isFlagEnabled && hasBurstableIO(project?.infra_compute_size) && !resolveHighAvailability(project)
+  isFlagEnabled: boolean,
+  diskLimits: InstanceDiskLimits | undefined
+): boolean => isFlagEnabled && hasBurstableDiskIO(diskLimits) && !resolveHighAvailability(project)
 
 export const getReportAttributesV2: (
   entitledFeatures: string[],
@@ -31,7 +28,8 @@ export const getReportAttributesV2: (
   isSpendCapEnabled?: boolean,
   showDiskIOBurstBalanceChart?: boolean,
   showMemoryCommitmentChart?: boolean,
-  showMemoryCommitmentRiskZones?: boolean
+  showMemoryCommitmentRiskZones?: boolean,
+  projectDiskLimits?: InstanceDiskLimits
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
@@ -41,23 +39,26 @@ export const getReportAttributesV2: (
   isSpendCapEnabled,
   showDiskIOBurstBalanceChart,
   showMemoryCommitmentChart,
-  showMemoryCommitmentRiskZones = true
+  showMemoryCommitmentRiskZones = true,
+  projectDiskLimits
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   // High Availability projects run Multigres, whose dedicated pooler is multipooler rather
   // than PgBouncer. Multipooler docs aren't published yet, so the docs link is dropped for now.
   const isHighAvailability = resolveHighAvailability(project)
   const provisionedDiskIops = diskConfig?.attributes?.iops
-  const computeIopsLimit = COMPUTE_MAX_IOPS[computeVariantId]
+  const diskLimits = projectDiskLimits ?? COMPUTE_DISK[computeVariantId]
+  const computeIopsLimit = diskLimits?.maxIops
   const effectiveMaxIops =
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
   const showBurstBalanceChart = shouldShowDiskIOBurstBalanceChart(
     project,
-    !!showDiskIOBurstBalanceChart
+    !!showDiskIOBurstBalanceChart,
+    diskLimits
   )
-  const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
+  const baselineThroughputMBps = diskLimits?.baselineThroughputMBps
   const baselineThroughputLabel =
     typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
 

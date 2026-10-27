@@ -1,3 +1,4 @@
+import { INSTANCE_DISK_LIMITS } from 'shared-data'
 import { describe, expect, it } from 'vitest'
 
 import { getReportAttributesV2, shouldShowDiskIOBurstBalanceChart } from './database-charts'
@@ -117,30 +118,49 @@ describe('getReportAttributesV2 disk-io-burst-balance chart', () => {
 
 describe('shouldShowDiskIOBurstBalanceChart', () => {
   it('shows the chart for burstable non high availability projects when the flag is on', () => {
-    expect(shouldShowDiskIOBurstBalanceChart(buildProject(), true)).toBe(true)
+    expect(
+      shouldShowDiskIOBurstBalanceChart(buildProject(), true, INSTANCE_DISK_LIMITS['t4g.micro'])
+    ).toBe(true)
   })
 
   it('hides the chart when the flag is off', () => {
-    expect(shouldShowDiskIOBurstBalanceChart(buildProject(), false)).toBe(false)
+    expect(
+      shouldShowDiskIOBurstBalanceChart(buildProject(), false, INSTANCE_DISK_LIMITS['t4g.micro'])
+    ).toBe(false)
   })
 
-  it('hides the chart for non burstable compute sizes', () => {
+  it('hides the chart for configurations whose baseline equals the maximum', () => {
     expect(
-      shouldShowDiskIOBurstBalanceChart(buildProject({ infra_compute_size: '4xlarge' }), true)
+      shouldShowDiskIOBurstBalanceChart(
+        buildProject({ infra_compute_size: '4xlarge' }),
+        true,
+        INSTANCE_DISK_LIMITS['m6g.4xlarge']
+      )
     ).toBe(false)
+  })
+
+  it('shows the chart for 4XL configurations that do burst', () => {
+    expect(
+      shouldShowDiskIOBurstBalanceChart(
+        buildProject({ infra_compute_size: '4xlarge' }),
+        true,
+        INSTANCE_DISK_LIMITS['m6i.4xlarge']
+      )
+    ).toBe(true)
   })
 
   it('hides the chart for high availability projects', () => {
     expect(
       shouldShowDiskIOBurstBalanceChart(
         buildProject({ high_availability: true, infra_compute_size: 'large' }),
-        true
+        true,
+        INSTANCE_DISK_LIMITS['m6g.large']
       )
     ).toBe(false)
   })
 
   it('hides the chart when the project is unknown', () => {
-    expect(shouldShowDiskIOBurstBalanceChart(undefined, true)).toBe(false)
+    expect(shouldShowDiskIOBurstBalanceChart(undefined, true, undefined)).toBe(false)
   })
 })
 

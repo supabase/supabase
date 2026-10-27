@@ -3,6 +3,7 @@ import {
   COMPUTE_MAX_IOPS,
   COMPUTE_MAX_THROUGHPUT,
   computeInstanceAddonVariantIdSchema,
+  type InstanceDiskLimits,
 } from 'shared-data'
 import { z } from 'zod'
 
@@ -52,10 +53,21 @@ export const CreateDiskStorageSchema = ({
   defaultTotalSize,
   cloudProvider,
   isSpendCapEnabled,
+  currentComputeSize,
+  currentInstanceLimits,
 }: {
   defaultTotalSize: number
   cloudProvider: CloudProvider
   isSpendCapEnabled: boolean
+  /** Addon variant the project currently runs on (e.g. 'ci_large') */
+  currentComputeSize?: string
+  /**
+   * Exact limits of the project's current instance. Only applied while the
+   * form's selected compute size matches `currentComputeSize` — a different
+   * selection lands on an unknown configuration, so it validates against that
+   * size's floors instead.
+   */
+  currentInstanceLimits?: InstanceDiskLimits
 }) => {
   const isAwsNimbusProject = cloudProvider === 'AWS_NIMBUS'
   const isAwsK8sProject = cloudProvider === 'AWS_K8S'
@@ -64,7 +76,9 @@ export const CreateDiskStorageSchema = ({
 
   const schema = baseSchema.superRefine((data, ctx) => {
     const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb, computeSize } = data
+    const instanceLimits = computeSize === currentComputeSize ? currentInstanceLimits : undefined
     const computeMaxIops = (() => {
+      if (instanceLimits !== undefined) return instanceLimits.maxIops
       const parsedCompute = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
       if (!parsedCompute.success) return Number.POSITIVE_INFINITY
       return COMPUTE_MAX_IOPS[parsedCompute.data] ?? Number.POSITIVE_INFINITY
@@ -170,6 +184,7 @@ export const CreateDiskStorageSchema = ({
       const maxIopsAllowedForDiskSizeWithGp3 = calculateMaxIopsAllowedForDiskSizeWithGp3(totalSize)
       const maxIopsForGp3 = Math.min(DISK_LIMITS[DiskType.GP3].maxIops, computeMaxIops)
       const computeMaxThroughput = (() => {
+        if (instanceLimits !== undefined) return instanceLimits.maxThroughputMBps
         const parsedCompute = computeInstanceAddonVariantIdSchema.safeParse(computeSize)
         if (!parsedCompute.success) return DISK_LIMITS[DiskType.GP3].maxThroughput
         return COMPUTE_MAX_THROUGHPUT[parsedCompute.data] ?? DISK_LIMITS[DiskType.GP3].maxThroughput
