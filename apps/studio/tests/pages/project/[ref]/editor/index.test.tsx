@@ -4,7 +4,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import TableEditorPage from '@/pages/project/[ref]/editor/index'
 
 const mocks = vi.hoisted(() => ({
-  router: { push: vi.fn(), replace: vi.fn() },
+  router: {
+    push: vi.fn(),
+    replace: vi.fn(),
+    isReady: true,
+  },
   history: { editor: undefined as string | undefined },
   tabs: {
     openTabs: [] as string[],
@@ -41,6 +45,7 @@ describe('Table Editor index', () => {
   beforeEach(() => {
     mocks.router.push.mockReset()
     mocks.router.replace.mockReset()
+    mocks.router.isReady = true
     mocks.history.editor = undefined
     mocks.tabs.openTabs = []
     mocks.tabs.tabsMap = {}

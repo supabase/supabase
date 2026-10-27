@@ -1,3 +1,7 @@
+// patch history.pushState before createRouter copies it. this import is what
+// installs the listener, so it does not wait on routeTree loading __root.
+import '@/lib/history-traverse'
+
 import type { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'

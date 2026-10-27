@@ -32,6 +32,7 @@ import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
+import Router from 'next/router'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -62,6 +63,11 @@ import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import {
+  markHistoryTraverseShellReady,
+  scheduleHistoryTraverseSettlement,
+  settleHistoryTraverseNavigation,
+} from '@/lib/history-traverse'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { ToastErrorTracker } from '@/lib/toast-errors'
@@ -176,6 +182,20 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useEffect(() => {
     clearBootTimeoutFallback()
+  }, [])
+
+  useEffect(() => {
+    const handleRouteSettled = () => scheduleHistoryTraverseSettlement()
+    const handleRouteChangeError = () => settleHistoryTraverseNavigation()
+    Router.events.on('routeChangeComplete', handleRouteSettled)
+    Router.events.on('hashChangeComplete', handleRouteSettled)
+    Router.events.on('routeChangeError', handleRouteChangeError)
+    markHistoryTraverseShellReady()
+    return () => {
+      Router.events.off('routeChangeComplete', handleRouteSettled)
+      Router.events.off('hashChangeComplete', handleRouteSettled)
+      Router.events.off('routeChangeError', handleRouteChangeError)
+    }
   }, [])
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'

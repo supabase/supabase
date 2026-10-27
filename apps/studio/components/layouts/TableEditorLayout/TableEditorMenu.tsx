@@ -172,8 +172,9 @@ export const TableEditorMenu = () => {
               selectedSchemaName={selectedSchema}
               onSelectSchema={(name: string) => {
                 setSearchText('')
-                setSelectedSchema(name)
                 setIsSchemaDropdownOpen(false)
+                // replace so back leaves the editor instead of stepping through schemas
+                setSelectedSchema(name, { history: 'replace' })
               }}
               onSelectCreateSchema={() => {
                 snap.onAddSchema()
