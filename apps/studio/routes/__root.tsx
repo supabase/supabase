@@ -30,6 +30,7 @@ import {
   Outlet,
   redirect,
   Scripts,
+  useLocation,
   type AnyRouter,
   type ErrorComponentProps,
 } from '@tanstack/react-router'
@@ -62,6 +63,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { RecoveryReminderController } from '@/components/interfaces/Account/RecoveryReminderController'
 import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
@@ -345,6 +347,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
+  const recoveryLocation = useLocation()
   useThemeSandbox()
 
   return (
@@ -365,9 +368,11 @@ function RootComponent() {
                               <BannerStackProvider>
                                 <FeaturePreviewContextProvider>
                                   <MainScrollContainerProvider>
-                                    <ClientOnly fallback={<ShellFallback />}>
-                                      <Outlet />
-                                    </ClientOnly>
+                                    <RecoveryReminderController href={recoveryLocation.href}>
+                                      <ClientOnly fallback={<ShellFallback />}>
+                                        <Outlet />
+                                      </ClientOnly>
+                                    </RecoveryReminderController>
                                   </MainScrollContainerProvider>
                                   <GlobalShortcuts />
                                   <StudioCommandMenu />

@@ -5,9 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 // Compile with the routing utilities consumed by the installed Vercel config SDK.
 const require = createRequire(import.meta.url)
 const vercelRequire = createRequire(require.resolve('@vercel/config/v1'))
-const getTransformedRoutes: (config: { headers: VercelConfig['headers'] }) => {
+const getTransformedRoutes: (
+  config: Pick<VercelConfig, 'headers'> | Pick<VercelConfig, 'redirects'>
+) => {
   error: unknown
-  routes: { src?: string; headers?: Record<string, string> }[] | null
+  routes: { src?: string; headers?: Record<string, string>; status?: number }[] | null
 } = vercelRequire('@vercel/routing-utils').getTransformedRoutes
 
 afterEach(() => {
@@ -135,3 +137,48 @@ describe.each(['', '/dashboard'])('TanStack content types with base path "%s"', 
     expect(headersForPath('/.well-known/vercel/flags')['content-type']).toBe('application/json')
   })
 })
+
+describe.each(['', '/dashboard'])(
+  'TanStack maintenance redirects with base path "%s"',
+  (basePath) => {
+    let compiledRoutes: ReturnType<typeof getTransformedRoutes>['routes']
+
+    beforeEach(async () => {
+      vi.resetModules()
+      vi.stubEnv('STUDIO_FRAMEWORK', 'tanstack')
+      vi.stubEnv('NEXT_PUBLIC_BASE_PATH', basePath)
+      vi.stubEnv('NEXT_PUBLIC_IS_PLATFORM', 'true')
+      vi.stubEnv('MAINTENANCE_MODE', 'true')
+      const { config } = await import('./vercel')
+      const result = getTransformedRoutes({ redirects: config.redirects })
+      expect(result.error).toBeNull()
+      compiledRoutes = result.routes
+    })
+
+    function redirectFor(pathname: string) {
+      const route = compiledRoutes?.find(({ src }) => src && new RegExp(src).test(pathname))
+      return route?.headers?.Location
+    }
+
+    it.each([
+      '/maintenance',
+      '/img/supabase-dark.svg',
+      '/favicon/favicon.ico',
+      '/favicon/manifest.json',
+      '/assets/main-abc123.js',
+      '/_vercel/immutable/salt/nitro/main-abc123.js',
+      '/_vercel/immutable/salt/nitro/styles-abc123.css',
+    ])('does not redirect %s', (pathname) => {
+      expect(redirectFor(`${basePath}${pathname}`)).toBeUndefined()
+    })
+
+    it.each([
+      '/project/abc/editor',
+      '/org/acme/billing',
+      '/maintenance-other',
+      '/api/platform/profile',
+    ])('redirects %s to the maintenance page', (pathname) => {
+      expect(redirectFor(`${basePath}${pathname}`)).toBe(`${basePath}/maintenance`)
+    })
+  }
+)

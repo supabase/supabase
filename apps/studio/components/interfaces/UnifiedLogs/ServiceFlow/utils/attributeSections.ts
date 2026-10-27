@@ -16,8 +16,6 @@ export interface AttributeSection {
   fields: { key: string; label: string; value: unknown }[]
 }
 
-// First matching prefix wins, so the more specific prefixes come first. The
-// prefix is dropped from the label (`request.cf.city` → `city`).
 const PREFIX_RULES: { prefixes: string[]; section: AttributeSectionId }[] = [
   { prefixes: ['request.headers.', 'req.headers.'], section: 'request-headers' },
   { prefixes: ['response.headers.', 'res.headers.'], section: 'response-headers' },
@@ -29,19 +27,18 @@ const PREFIX_RULES: { prefixes: string[]; section: AttributeSectionId }[] = [
   { prefixes: ['auth_event.', 'auth_audit_event.'], section: 'event' },
 ]
 
-// Listed in display order
-const SECTION_TITLES: Record<AttributeSectionId, string> = {
-  details: 'Details',
-  request: 'Request',
-  response: 'Response',
-  auth: 'Authorization',
-  client: 'Client',
-  postgres: 'Postgres',
-  event: 'Event',
-  'request-headers': 'Request headers',
-  'response-headers': 'Response headers',
-  other: 'Other',
-}
+const SECTIONS: { id: AttributeSectionId; title: string }[] = [
+  { id: 'details', title: 'Details' },
+  { id: 'request', title: 'Request' },
+  { id: 'response', title: 'Response' },
+  { id: 'auth', title: 'Authorization' },
+  { id: 'client', title: 'Client' },
+  { id: 'postgres', title: 'Postgres' },
+  { id: 'event', title: 'Event' },
+  { id: 'request-headers', title: 'Request headers' },
+  { id: 'response-headers', title: 'Response headers' },
+  { id: 'other', title: 'Other' },
+]
 
 const isEmpty = (value: unknown) => value === null || value === undefined || value === ''
 
@@ -50,15 +47,11 @@ function classify(key: string): { section: AttributeSectionId; label: string } {
     const prefix = prefixes.find((p) => key.startsWith(p))
     if (prefix) return { section, label: key.slice(prefix.length) }
   }
-  // Top-level keys (e.g. `msg`, `execution_id`) describe the log itself
+
   if (!key.includes('.')) return { section: 'details', label: key }
   return { section: 'other', label: key }
 }
 
-/**
- * Groups a log's attributes into sections by key prefix, so any source reads
- * the same way without a hand-written layout. Empty values are dropped.
- */
 export function groupLogAttributes(attributes: Record<string, unknown>): AttributeSection[] {
   const fieldsBySection = new Map<AttributeSectionId, AttributeSection['fields']>()
 
@@ -71,7 +64,8 @@ export function groupLogAttributes(attributes: Record<string, unknown>): Attribu
     fieldsBySection.set(section, fields)
   }
 
-  return (Object.keys(SECTION_TITLES) as AttributeSectionId[])
-    .filter((id) => fieldsBySection.has(id))
-    .map((id) => ({ id, title: SECTION_TITLES[id], fields: fieldsBySection.get(id) ?? [] }))
+  return SECTIONS.filter(({ id }) => fieldsBySection.has(id)).map((section) => ({
+    ...section,
+    fields: fieldsBySection.get(section.id) ?? [],
+  }))
 }

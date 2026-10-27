@@ -12,34 +12,21 @@ import type { ResponseError } from '@/types'
 
 const getRowClassName = (row: Row<ColumnSchema>) => getLogRowClassName(row.original)
 const noopFetchNextPage = async () => {}
-// The header takes the background of whatever the list sits in, e.g. a Card, rather than the
-// Logs page background. An embedded list is short enough that its sticky header never scrolls.
 const HEADER_CLASS_NAME = '[&_thead_tr]:bg-transparent! [&_thead_tr:hover]:bg-transparent!'
 
 interface EmbeddedLogsTableProps {
-  /** Rows to show, e.g. `getUniqueLogRows(data.pages)` from `useUnifiedLogsInfiniteQuery` */
   rows: ColumnSchema[]
   isLoading: boolean
   isFetching?: boolean
   error?: ResponseError | null
   isError?: boolean
-  /** Called with a row's log id when it's clicked, e.g. to open that log on a Logs page */
   onRowClick?: (logId: string) => void
-  /** Rendered below the rows, e.g. a link to the rest of the logs. Nothing by default. */
   footer?: ReactNode
-  /** Placeholder rows while `isLoading` */
   skeletonRowCount?: number
   emptyStateMessage?: ReactNode
-  /** Saves column visibility and order under this view's key instead of the Logs page's */
   columnPreferencesKey?: string
   className?: string
 }
-
-/**
- * A read-only logs list for pages outside the Logs page: the same columns and styling as the Logs
- * page, without multi-select, filters or pagination. Callers fetch the rows, usually with the
- * unified logs queries, and decide what a row click does.
- */
 export const EmbeddedLogsTable = ({
   rows,
   isLoading,

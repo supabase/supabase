@@ -9,13 +9,34 @@ import { Button, cn } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { SearchV2Dialog, useSearchV2Dialog, useSearchV2Variant } from '@/features/SearchV2'
+
 function SearchButton() {
+  const searchVariant = useSearchV2Variant()
+
+  return searchVariant === 'search-v2-active' ? <SearchV2Button /> : <LegacySearchButton />
+}
+
+function LegacySearchButton() {
   const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
     <Button variant="primary" size="small" onClick={() => setCommandMenuOpen(true)}>
       Search for page
     </Button>
+  )
+}
+
+function SearchV2Button() {
+  const { open, openDialog, handleOpenChange } = useSearchV2Dialog()
+
+  return (
+    <>
+      <Button variant="primary" size="small" onClick={() => openDialog('not_found_button')}>
+        Search for page
+      </Button>
+      <SearchV2Dialog open={open} onOpenChange={handleOpenChange} />
+    </>
   )
 }
 

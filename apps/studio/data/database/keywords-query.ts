@@ -2,6 +2,7 @@ import { getKeywordsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -17,7 +18,7 @@ export async function getKeywords(
   const sql = getKeywordsSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['keywords'] },
+    { projectRef, connectionString, sql, queryKey: ['keywords'], grant: unguarded.migrating },
     signal
   )
 

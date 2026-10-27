@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { jitDbAccessKeys } from './keys'
-import { handleError, put } from '@/data/fetchers'
+import { handleError, put, unguarded } from '@/data/fetchers'
 import type { ResponseError } from '@/types'
 
 type JitDbAccessGrantVariables = {
@@ -30,6 +30,7 @@ async function grantJitDbAccess({ projectRef, userId, roles }: JitDbAccessGrantV
       user_id: userId,
       roles,
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

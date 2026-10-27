@@ -39,6 +39,20 @@ const confirmRegenerate = async () => {
 }
 
 describe('RegenerateRecoveryCodesModal', () => {
+  test('canceling confirmation does not replace recovery codes', async () => {
+    const regenerate = vi.spyOn(auth.mfa.recoveryCodes, 'regenerate')
+    customRender(<RegenerateRecoveryCodesModal />)
+    fireEvent.click(screen.getByRole('button', { name: 'Regenerate' }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(regenerate).not.toHaveBeenCalled()
+    expect(screen.queryByText('Save your recovery codes')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Regenerate' }))
+    await screen.findByRole('dialog')
+    expect(regenerate).not.toHaveBeenCalled()
+  })
+
   test('regenerate the recovery codes after confirmation and allow users to copy them', async () => {
     vi.spyOn(auth.mfa.recoveryCodes, 'regenerate').mockResolvedValue({
       data: {

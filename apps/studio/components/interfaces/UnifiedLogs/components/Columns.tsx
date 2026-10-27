@@ -36,10 +36,6 @@ export function generateDynamicColumns({
   selectable = true,
 }: {
   data: ColumnSchema[]
-  /**
-   * Reveals a checkbox over each row's level dot for multi-selecting logs. Turn off for read-only
-   * lists, which show only the level dot.
-   */
   selectable?: boolean
 }): {
   columns: ColumnDef<ColumnSchema>[]

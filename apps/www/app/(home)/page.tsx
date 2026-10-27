@@ -17,6 +17,10 @@ export const metadata: Metadata = {
     ...mdAlternates('index'),
     canonical: 'https://supabase.com',
   },
+  // This meta tag is required for Bing verification. Do not remove.
+  other: {
+    'msvalidate.01': '92FBA8A0D370D71480454DBEAB37D0AE',
+  },
 }
 
 export default function HomePage() {

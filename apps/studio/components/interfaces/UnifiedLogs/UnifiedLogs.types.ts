@@ -1,8 +1,9 @@
 import type { inferParserType } from 'nuqs'
 import type { ReactNode } from 'react'
+import type { z } from 'zod'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
-import type { LogsFilter } from './UnifiedLogs.filters'
+import { querySearchParamsSchema, unifiedLogsScopeSchema } from './UnifiedLogs.schema'
 
 type Percentile = 50 | 75 | 90 | 95 | 99
 
@@ -13,19 +14,8 @@ export type LogsMeta = {
 export type PageParam = { cursor: number; direction: 'next' | 'prev' } | undefined
 
 export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
-
-/**
- * Fixed filters every query in a view applies on top of the user's, which the user can't
- * remove, e.g. an edge function's Logs tab narrowed to that function. Same columns and
- * operators as the `filter` URL param; any column that isn't a known one matches a
- * `log_attributes` key. Set by embedded views rather than read from the URL, and only the
- * ClickHouse queries support them.
- */
-export type UnifiedLogsScope = { filters: LogsFilter[] }
-
-export type QuerySearchParamsType = Omit<SearchParamsType, 'uuid' | 'live'> & {
-  scope?: UnifiedLogsScope
-}
+export type UnifiedLogsScope = z.infer<typeof unifiedLogsScopeSchema>
+export type QuerySearchParamsType = z.infer<typeof querySearchParamsSchema>
 
 /** ----------------------------------------- */
 
