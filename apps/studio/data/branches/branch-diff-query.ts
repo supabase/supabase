@@ -1,22 +1,32 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, skipToken } from '@tanstack/react-query'
 
 import { branchKeys } from './keys'
-import { get, handleError, unguarded } from '@/data/fetchers'
+import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { GrantForVariants } from '@/lib/grants'
+import type { ResponseError } from '@/types'
+
+export type BranchDiffGrant = GrantForVariants<'get', '/v1/branches/{branch_id_or_ref}/diff'>
 
 export type BranchDiffVariables = {
-  branchRef: string
-  projectRef: string
+  branchRef?: string
+  projectRef?: string
   includedSchemas?: string
   pgdelta?: boolean
+  grant?: BranchDiffGrant
 }
 
 export async function getBranchDiff({
   branchRef,
   includedSchemas,
   pgdelta,
-}: Pick<BranchDiffVariables, 'branchRef' | 'includedSchemas' | 'pgdelta'>) {
+  grant,
+}: {
+  branchRef: string
+  includedSchemas?: string
+  pgdelta?: boolean
+  grant: BranchDiffGrant
+}) {
   const query: { included_schemas?: string; pgdelta?: string } = {}
   if (includedSchemas) query.included_schemas = includedSchemas
   if (pgdelta === true) query.pgdelta = 'true'
@@ -30,7 +40,7 @@ export async function getBranchDiff({
       Accept: 'text/plain',
     },
     parseAs: 'text',
-    grant: unguarded.migrating,
+    grant,
   })
 
   if (error) {
@@ -45,18 +55,20 @@ export async function getBranchDiff({
   return diffData || ''
 }
 
-type BranchDiffData = Awaited<ReturnType<typeof getBranchDiff>>
+export type BranchDiffData = Awaited<ReturnType<typeof getBranchDiff>>
+export type BranchDiffError = ResponseError
 
-export const useBranchDiffQuery = (
-  { branchRef, projectRef, includedSchemas, pgdelta }: BranchDiffVariables,
-  {
-    enabled = true,
-    ...options
-  }: Omit<UseCustomQueryOptions<BranchDiffData, ResponseError>, 'queryKey' | 'queryFn'> = {}
-) =>
-  useQuery<BranchDiffData, ResponseError>({
+export const branchDiffQueryOptions = ({
+  branchRef,
+  projectRef,
+  includedSchemas,
+  pgdelta,
+  grant,
+}: BranchDiffVariables) =>
+  queryOptions<BranchDiffData, BranchDiffError>({
     queryKey: branchKeys.diff(projectRef, branchRef, pgdelta),
-    queryFn: () => getBranchDiff({ branchRef, includedSchemas, pgdelta }),
-    enabled: IS_PLATFORM && enabled && Boolean(branchRef),
-    ...options,
+    queryFn:
+      IS_PLATFORM && branchRef && grant
+        ? () => getBranchDiff({ branchRef, includedSchemas, pgdelta, grant })
+        : skipToken,
   })
