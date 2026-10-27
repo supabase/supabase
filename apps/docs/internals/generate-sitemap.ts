@@ -28,18 +28,7 @@ async function generate() {
     })
   )
 
-  const troubleshootingFiles = await globby(['content/troubleshooting/**/!(_)*.mdx'])
-  const troubleshootingPages = await Promise.all(
-    troubleshootingFiles.map(async (filePath) => {
-      return {
-        link: filePath.replace(/^content/, 'guides').replace(/\.mdx$/, ''),
-        priority: 1,
-      }
-    })
-  )
-
   const allPages = (contentPages as Array<{ link: string; priority: number }>).concat(
-    troubleshootingPages,
     referencePages
   )
   // Keep the output order stable across builds

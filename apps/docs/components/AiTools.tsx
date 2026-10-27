@@ -54,11 +54,6 @@ function AiTools({
       onPreferredSourceClick={handlePreferredSourceClick}
       onMarkdownCopy={handleMarkdownCopy}
       onAskAiClick={handleAskAiClick}
-      titleClassName={
-        pageType === 'troubleshooting'
-          ? 'font-sans text-sm normal-case text-foreground-lighter'
-          : undefined
-      }
       className={className}
     />
   )
