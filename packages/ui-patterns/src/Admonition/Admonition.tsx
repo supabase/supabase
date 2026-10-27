@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import { Alert, AlertDescription, AlertTitle, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, cn, FloatingPlate } from 'ui'
 
 import { TYPE_LABEL, TYPE_TO_VARIANT } from './Admonition.constants'
 import type { AdmonitionLayout, AdmonitionProps, AdmonitionType } from './Admonition.types'
@@ -114,7 +114,7 @@ export const Admonition = forwardRef<
                   layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'
                 )}
               >
-                {actions}
+                <FloatingPlate className="flex gap-2">{actions}</FloatingPlate>
               </div>
             )}
           </div>
