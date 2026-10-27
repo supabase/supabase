@@ -258,9 +258,9 @@ export const auth: NavMenuConstant = {
           items: [
             {
               name: 'From Firebase Auth',
-              url: '/guides/platform/migrating-to-supabase/firebase-auth',
+              url: 'https://supabase.com/kb/guides/migrate-from-firebase-auth',
             },
-            { name: 'From Auth0', url: '/guides/platform/migrating-to-supabase/auth0' },
+            { name: 'From Auth0', url: 'https://supabase.com/kb/guides/migrate-from-auth0' },
           ],
         },
       ],

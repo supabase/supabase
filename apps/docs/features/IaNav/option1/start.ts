@@ -1,7 +1,6 @@
 import { isFeatureEnabled } from 'common/enabled-features'
 
 import type { NavMenuConstant } from '@/components/Navigation/Navigation.types'
-import { MIGRATION_PAGES } from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
 
 const {
   docsFrameworkQuickstarts: frameworkQuickstartsEnabled,
@@ -25,9 +24,6 @@ const {
 
 const jsOnly =
   !sdkCsharpEnabled && !sdkDartEnabled && !sdkKotlinEnabled && !sdkPythonEnabled && !sdkSwiftEnabled
-
-const migrationPages = (names: string[]) =>
-  MIGRATION_PAGES.filter((page) => names.includes(page.name ?? ''))
 
 export const start: NavMenuConstant = {
   icon: 'getting-started',
@@ -132,19 +128,23 @@ export const start: NavMenuConstant = {
     {
       name: 'Migrate to Supabase',
       items: [
-        { name: 'Overview', url: '/guides/platform/migrating-to-supabase' },
+        { name: 'Overview', url: 'https://supabase.com/kb/topics/migration' },
         {
           name: 'From another Postgres host',
-          items: migrationPages([
-            'Heroku',
-            'Render',
-            'Amazon RDS',
-            'Postgres',
-            'Vercel Postgres',
-            'Neon',
-          ]),
+          items: [
+            { name: 'Heroku', url: 'https://supabase.com/kb/guides/migrate-from-heroku' },
+            { name: 'Render', url: 'https://supabase.com/kb/guides/migrate-from-render' },
+            { name: 'Amazon RDS', url: 'https://supabase.com/kb/guides/migrate-from-amazon-rds' },
+            { name: 'Postgres', url: 'https://supabase.com/kb/guides/migrate-from-postgres' },
+            {
+              name: 'Vercel Postgres',
+              url: 'https://supabase.com/kb/guides/migrate-from-vercel-postgres',
+            },
+            { name: 'Neon', url: 'https://supabase.com/kb/guides/migrate-from-neon' },
+          ],
         },
-        ...migrationPages(['MySQL', 'MSSQL']),
+        { name: 'MySQL', url: 'https://supabase.com/kb/guides/migrate-from-mysql' },
+        { name: 'MSSQL', url: 'https://supabase.com/kb/guides/migrate-from-mssql' },
       ],
     },
   ],

@@ -86,7 +86,7 @@ export const database: NavMenuConstant = {
             { name: 'Importing data', url: '/guides/database/import-data' },
             {
               name: 'Migrate data from Firestore',
-              url: '/guides/platform/migrating-to-supabase/firestore-data',
+              url: 'https://supabase.com/kb/guides/migrate-from-firestore-data',
             },
             {
               name: 'Implementing cascade deletes',

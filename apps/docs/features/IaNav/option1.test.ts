@@ -81,7 +81,11 @@ describe('Option 1 navigation', () => {
   it("links only to pages already in today's navigation", () => {
     const page = (url: string) => url.split('#')[0]
     const todayPages = new Set(navUrls(today).map((url) => page(url)))
+    // the migration guides moved to the knowledge base
+    const isKbPage = (url: string) => url.startsWith('https://supabase.com/kb/')
 
-    expect(navUrls(option1).filter((url) => !todayPages.has(page(url)))).toEqual([])
+    expect(navUrls(option1).filter((url) => !isKbPage(url) && !todayPages.has(page(url)))).toEqual(
+      []
+    )
   })
 })

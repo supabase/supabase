@@ -121,7 +121,7 @@ export const storage: NavMenuConstant = {
     { name: 'Storage pricing', url: '/guides/storage/pricing', enabled: billingEnabled },
     {
       name: 'Migrate files from Firebase Storage',
-      url: '/guides/platform/migrating-to-supabase/firebase-storage',
+      url: 'https://supabase.com/kb/guides/migrate-from-firebase-storage',
     },
   ],
 }
