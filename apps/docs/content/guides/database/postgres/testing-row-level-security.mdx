@@ -9,6 +9,12 @@ Prove each Row Level Security (RLS) policy allows and blocks what you meant by r
 
 For more information about how policies work, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
+<Admonition type="note" title="Using an agent to write your tests?">
+
+Without direction, an agent can write a long suite that still misses the one test that matters. Before it writes any tests, have it list the access rules to prove and confirm them with you. Then have it write one test at a time and see each test fail before the policy makes it pass. For what each test should check, see [Write tests that catch policy mistakes](#write-tests-that-catch-policy-mistakes).
+
+</Admonition>
+
 ## Write and run a policy test
 
 The example tests a `todos` table whose policy lets each user access only their own rows.
@@ -261,6 +267,14 @@ Use the following approaches so tests don't collide over shared data:
 - **Unique identifiers:** generate unique IDs for each test suite.
 - **Cleanup:** delete the data a suite creates in an `afterAll` or `afterEach` hook.
 - **Isolated data sets:** use prefixes or namespaces in data to separate test cases.
+
+## Write tests that catch policy mistakes
+
+- **Agree on the rules first.** List each role and operation the policy must allow or block, such as "a signed-in user can't read another user's todo." Write one test per rule. A rule with no test is a gap, however many assertions the file has.
+- **Test the cross-user case.** RLS exists to stop one user from reaching another user's rows. For each table that holds user data, assert that a second user can't read, update, or delete the first user's rows.
+- **See each test fail.** Write the test before the policy, or drop the policy for a moment, and check that the test fails. A test that has never failed might not be able to.
+- **Test through roles.** Run each assertion as `anon` or `authenticated` with `request.jwt.claim.sub` set, and check the rows returned or the error raised. A check on `pg_policies` passes while the policy is still wrong.
+- **Filter reads on tables everyone can read.** Select only the rows your test inserted, by ID. An exact match on the whole table fails once other data exists.
 
 ## Related content
 
