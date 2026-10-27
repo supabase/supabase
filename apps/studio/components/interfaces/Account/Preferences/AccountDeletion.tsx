@@ -24,7 +24,7 @@ export const AccountDeletion = () => {
       <PageSectionContent>
         <Alert variant="destructive">
           <CriticalIcon />
-          <AlertTitle>Request for account deletion</AlertTitle>
+          <AlertTitle>Request account deletion</AlertTitle>
           <AlertDescription>
             Deleting your account is permanent and cannot be undone. Your data will be deleted
             within 30 days, but we may retain some metadata and logs for longer where required or
