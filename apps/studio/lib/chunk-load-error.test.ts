@@ -7,6 +7,7 @@ import {
   claimChunkLoadReload,
   getChunkLoadReloadDecision,
   isChunkLoadError,
+  peekChunkLoadReload,
   shouldReloadForChunkError,
 } from './chunk-load-error'
 
@@ -169,6 +170,49 @@ describe('claimChunkLoadReload', () => {
 
   test('does not reload without storage (SSR)', () => {
     expect(claimChunkLoadReload(chunkError(), { storage: undefined, now })).toBe(false)
+  })
+})
+
+describe('peekChunkLoadReload', () => {
+  const now = 1_700_000_000_000
+
+  test('agrees with claimChunkLoadReload without writing to storage', () => {
+    const storage = createStorage()
+    const setItem = vi.spyOn(storage, 'setItem')
+
+    expect(peekChunkLoadReload(chunkError(), { storage, now })).toBe(true)
+    expect(peekChunkLoadReload(chunkError(), { storage, now })).toBe(true)
+    expect(setItem).not.toHaveBeenCalled()
+
+    expect(claimChunkLoadReload(chunkError(), { storage, now })).toBe(true)
+    expect(peekChunkLoadReload(chunkError(), { storage, now: now + 1_000 })).toBe(false)
+    expect(
+      peekChunkLoadReload(chunkError(), { storage, now: now + CHUNK_LOAD_RELOAD_GUARD_MS })
+    ).toBe(true)
+  })
+
+  test.each([
+    ['non-chunk error', new Error('boom'), createStorage()],
+    ['missing storage', chunkError(), undefined],
+    [
+      'unreadable storage',
+      chunkError(),
+      {
+        getItem: () => {
+          throw new Error('SecurityError')
+        },
+        setItem: vi.fn(),
+      },
+    ],
+    [
+      'per-tab cap reached',
+      chunkError(),
+      createStorage({
+        [CHUNK_LOAD_RELOAD_STORAGE_KEY]: reloadState(0, CHUNK_LOAD_RELOAD_MAX_PER_TAB),
+      }),
+    ],
+  ])('is false for %s', (_label, error, storage) => {
+    expect(peekChunkLoadReload(error, { storage, now })).toBe(false)
   })
 })
 

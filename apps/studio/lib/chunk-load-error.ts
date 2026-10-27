@@ -126,6 +126,26 @@ function getSessionStorage(): ChunkReloadStorage | undefined {
   }
 }
 
+type ChunkReloadOptions = { storage?: ChunkReloadStorage; now?: number }
+
+/** The guard state to record if `error` may reload now, without writing it. */
+function getNextReloadState(
+  error: unknown,
+  storage: ChunkReloadStorage,
+  now: number
+): ReloadState | undefined {
+  if (!isChunkLoadError(error)) return undefined
+
+  const state = readReloadState(storage)
+  if (state === null) return undefined
+
+  const count = state?.count ?? 0
+  if (count >= CHUNK_LOAD_RELOAD_MAX_PER_TAB) return undefined
+  if (!shouldReloadForChunkError({ now, lastReloadAt: state?.at ?? null })) return undefined
+
+  return { at: now, count: count + 1 }
+}
+
 /**
  * Decides whether `error` should trigger a page reload, recording the reload
  * in the guard when it should. Without a working storage there's no loop
@@ -133,29 +153,35 @@ function getSessionStorage(): ChunkReloadStorage | undefined {
  */
 export function claimChunkLoadReload(
   error: unknown,
-  {
-    storage = getSessionStorage(),
-    now = Date.now(),
-  }: { storage?: ChunkReloadStorage; now?: number } = {}
+  { storage = getSessionStorage(), now = Date.now() }: ChunkReloadOptions = {}
 ): boolean {
-  if (!storage || !isChunkLoadError(error)) return false
-
-  const state = readReloadState(storage)
-  if (state === null) return false
-
-  const count = state?.count ?? 0
-  if (count >= CHUNK_LOAD_RELOAD_MAX_PER_TAB) return false
-  if (!shouldReloadForChunkError({ now, lastReloadAt: state?.at ?? null })) return false
-
-  return writeReloadState(storage, { at: now, count: count + 1 })
+  if (!storage) return false
+  const next = getNextReloadState(error, storage, now)
+  return next !== undefined && writeReloadState(storage, next)
 }
 
 const claimedErrors = new WeakSet<object>()
 
 /**
- * A claimed reload is remembered per error object, so an error boundary's
- * fallback (render) and its `onError` handler (commit) both see it while the
- * guard is only claimed once. A refusal isn't remembered: a retry can rethrow
+ * Whether `error` has claimed, or could claim, a reload, without touching the
+ * guard. Safe to call during render, where a claim could be discarded along
+ * with the render and use up the guard without a reload ever happening.
+ */
+export function peekChunkLoadReload(
+  error: unknown,
+  { storage = getSessionStorage(), now = Date.now() }: ChunkReloadOptions = {}
+): boolean {
+  if (typeof error === 'object' && error !== null && claimedErrors.has(error)) return true
+  return storage !== undefined && getNextReloadState(error, storage, now) !== undefined
+}
+
+/**
+ * Claims a reload for `error`. Call it after commit (an effect or an error
+ * boundary's `onError`), never during render; use `peekChunkLoadReload` there.
+ *
+ * A claimed reload is remembered per error object, so a boundary's `onError`
+ * and its fallback's effect both see it while the guard is only claimed
+ * once. A refusal isn't remembered: a retry can rethrow
  * the same error object (`React.lazy` caches its rejected promise), and that
  * retry should get a fresh decision once the guard window has passed.
  */

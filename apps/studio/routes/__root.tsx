@@ -76,6 +76,7 @@ import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { useChunkLoadReload } from '@/components/ui/ErrorBoundary/useChunkLoadReload'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -297,13 +298,10 @@ function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
   // `react-error-boundary`) — TanStack's `errorComponent` covers
   // errors thrown during route load/render before the in-tree
   // boundary mounts, so we report from both layers.
-  const shouldReload = getChunkLoadReloadDecision(error)
+  const { isReloading } = useChunkLoadReload(error)
 
   useEffect(() => {
-    if (shouldReload) {
-      window.location.reload()
-      return
-    }
+    if (isReloading) return
 
     Sentry.withScope((scope) => {
       scope.setTag('routerErrorComponent', true)
@@ -314,9 +312,9 @@ function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
       }
     })
     console.error(error instanceof Error ? error.stack : error)
-  }, [error, shouldReload])
+  }, [error, isReloading])
 
-  if (shouldReload) return null
+  if (isReloading) return null
   return <Error500 />
 }
 
