@@ -1,7 +1,7 @@
-import { Menu, X } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
-import { Button, buttonVariants, cn } from 'ui'
+import { Button } from 'ui'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
+import { MobileNavToggle } from 'ui-patterns/MobileNav/MobileNavToggle'
 import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 
 import { getNavMenus, SIGN_UP_URL } from '../lib/nav'
@@ -76,37 +76,13 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
                 className="lg:hidden"
               />
             ) : null}
-            <button
+            <MobileNavToggle
               ref={menuButtonRef}
-              type="button"
-              aria-expanded={isMenuOpen}
+              isOpen={isMenuOpen}
               aria-controls={MOBILE_MENU_ID}
               onClick={handleMenuToggle}
-              className={cn(
-                buttonVariants({ variant: 'default' }),
-                'relative size-7.5 min-w-7.5 border-default bg-surface-100/75 px-0',
-                'text-foreground-light lg:hidden',
-                "before:absolute before:-inset-y-2 before:left-0 before:-right-3 before:content-['']"
-              )}
-            >
-              <span className="sr-only">{isMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
-              <Menu
-                aria-hidden
-                strokeWidth={1}
-                className={cn(
-                  'absolute inset-0 m-auto size-4.5 transition duration-150 ease-out',
-                  isMenuOpen && 'opacity-0 scale-75 motion-reduce:scale-100'
-                )}
-              />
-              <X
-                aria-hidden
-                strokeWidth={1}
-                className={cn(
-                  'absolute inset-0 m-auto size-4.5 transition duration-150 ease-out',
-                  !isMenuOpen && 'opacity-0 scale-75 motion-reduce:scale-100'
-                )}
-              />
-            </button>
+              className="lg:hidden"
+            />
           </div>
         </div>
       </nav>
