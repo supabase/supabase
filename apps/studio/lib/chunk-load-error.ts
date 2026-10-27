@@ -8,6 +8,8 @@
  * URL fails instantly until the document is replaced.
  */
 
+import { z } from 'zod'
+
 export const CHUNK_LOAD_RELOAD_STORAGE_KEY = 'supabase-studio:chunk-load-reload'
 
 /**
@@ -19,6 +21,19 @@ export const CHUNK_LOAD_RELOAD_STORAGE_KEY = 'supabase-studio:chunk-load-reload'
  * fresh flake after the window gets its own reload.
  */
 export const CHUNK_LOAD_RELOAD_GUARD_MS = 30_000
+
+/**
+ * Hard cap on automatic reloads per tab, so a chunk that keeps failing on a
+ * page that takes longer than the guard window to boot can't reload forever.
+ */
+export const CHUNK_LOAD_RELOAD_MAX_PER_TAB = 3
+
+const reloadStateSchema = z.object({
+  at: z.number().finite(),
+  count: z.number().int().nonnegative(),
+})
+
+type ReloadState = z.infer<typeof reloadStateSchema>
 
 const CHUNK_LOAD_ERROR_PATTERNS = [
   // Chrome / Chromium
@@ -66,25 +81,37 @@ export function shouldReloadForChunkError({
 
 type ChunkReloadStorage = Pick<Storage, 'getItem' | 'setItem'>
 
+function parseReloadState(raw: string): ReloadState | undefined {
+  try {
+    const result = reloadStateSchema.safeParse(JSON.parse(raw))
+    return result.success ? result.data : undefined
+  } catch {
+    return undefined
+  }
+}
+
 /**
  * Returns `undefined` when there's no usable value, and `null` when storage
  * itself can't be read (private mode, blocked site data, SSR).
  */
-function readLastReloadAt(storage: ChunkReloadStorage): number | undefined | null {
+function readReloadState(storage: ChunkReloadStorage): ReloadState | undefined | null {
   try {
     const raw = storage.getItem(CHUNK_LOAD_RELOAD_STORAGE_KEY)
-    if (raw === null) return undefined
-    const value = Number(raw)
-    return Number.isFinite(value) ? value : undefined
+    return raw === null ? undefined : parseReloadState(raw)
   } catch {
     return null
   }
 }
 
-function writeLastReloadAt(storage: ChunkReloadStorage, now: number): boolean {
+/**
+ * Reads the value back after writing it: a storage that silently drops
+ * writes would otherwise look empty on every boot and reload forever.
+ */
+function writeReloadState(storage: ChunkReloadStorage, state: ReloadState): boolean {
+  const value = JSON.stringify(state)
   try {
-    storage.setItem(CHUNK_LOAD_RELOAD_STORAGE_KEY, String(now))
-    return true
+    storage.setItem(CHUNK_LOAD_RELOAD_STORAGE_KEY, value)
+    return storage.getItem(CHUNK_LOAD_RELOAD_STORAGE_KEY) === value
   } catch {
     return false
   }
@@ -113,11 +140,14 @@ export function claimChunkLoadReload(
 ): boolean {
   if (!storage || !isChunkLoadError(error)) return false
 
-  const lastReloadAt = readLastReloadAt(storage)
-  if (lastReloadAt === null) return false
-  if (!shouldReloadForChunkError({ now, lastReloadAt: lastReloadAt ?? null })) return false
+  const state = readReloadState(storage)
+  if (state === null) return false
 
-  return writeLastReloadAt(storage, now)
+  const count = state?.count ?? 0
+  if (count >= CHUNK_LOAD_RELOAD_MAX_PER_TAB) return false
+  if (!shouldReloadForChunkError({ now, lastReloadAt: state?.at ?? null })) return false
+
+  return writeReloadState(storage, { at: now, count: count + 1 })
 }
 
 const decisions = new WeakMap<object, boolean>()

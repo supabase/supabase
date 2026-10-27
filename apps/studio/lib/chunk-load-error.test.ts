@@ -2,6 +2,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import {
   CHUNK_LOAD_RELOAD_GUARD_MS,
+  CHUNK_LOAD_RELOAD_MAX_PER_TAB,
   CHUNK_LOAD_RELOAD_STORAGE_KEY,
   claimChunkLoadReload,
   getChunkLoadReloadDecision,
@@ -18,6 +19,10 @@ function createStorage(initial: Record<string, string> = {}) {
       values.set(key, value)
     },
   }
+}
+
+function reloadState(at: number, count = 1) {
+  return JSON.stringify({ at, count })
 }
 
 function chunkError() {
@@ -88,7 +93,7 @@ describe('claimChunkLoadReload', () => {
   test('reloads and records the time when there is no previous reload', () => {
     const storage = createStorage()
     expect(claimChunkLoadReload(chunkError(), { storage, now })).toBe(true)
-    expect(storage.values.get(CHUNK_LOAD_RELOAD_STORAGE_KEY)).toBe(String(now))
+    expect(storage.values.get(CHUNK_LOAD_RELOAD_STORAGE_KEY)).toBe(reloadState(now, 1))
   })
 
   test('does not reload for non-chunk errors and leaves storage alone', () => {
@@ -98,9 +103,9 @@ describe('claimChunkLoadReload', () => {
   })
 
   test('falls through to the error UI when a reload happened within the window', () => {
-    const storage = createStorage({ [CHUNK_LOAD_RELOAD_STORAGE_KEY]: String(now - 1_000) })
+    const storage = createStorage({ [CHUNK_LOAD_RELOAD_STORAGE_KEY]: reloadState(now - 1_000) })
     expect(claimChunkLoadReload(chunkError(), { storage, now })).toBe(false)
-    expect(storage.values.get(CHUNK_LOAD_RELOAD_STORAGE_KEY)).toBe(String(now - 1_000))
+    expect(storage.values.get(CHUNK_LOAD_RELOAD_STORAGE_KEY)).toBe(reloadState(now - 1_000))
   })
 
   test('reloads again for the same message once the window has passed', () => {
@@ -114,9 +119,31 @@ describe('claimChunkLoadReload', () => {
     ).toBe(true)
   })
 
-  test('treats a malformed stored value as no previous reload', () => {
-    const storage = createStorage({ [CHUNK_LOAD_RELOAD_STORAGE_KEY]: 'not-a-number' })
+  test.each([
+    ['not JSON', 'not-a-number'],
+    ['wrong shape', JSON.stringify({ at: 'yesterday', count: 1 })],
+    ['negative count', JSON.stringify({ at: 0, count: -1 })],
+  ])('treats a malformed stored value (%s) as no previous reload', (_label, raw) => {
+    const storage = createStorage({ [CHUNK_LOAD_RELOAD_STORAGE_KEY]: raw })
     expect(claimChunkLoadReload(chunkError(), { storage, now })).toBe(true)
+    expect(storage.values.get(CHUNK_LOAD_RELOAD_STORAGE_KEY)).toBe(reloadState(now, 1))
+  })
+
+  test('counts reloads and stops at the per-tab cap, even outside the window', () => {
+    const storage = createStorage()
+    let time = now
+    for (let i = 1; i <= CHUNK_LOAD_RELOAD_MAX_PER_TAB; i++) {
+      expect(claimChunkLoadReload(chunkError(), { storage, now: time })).toBe(true)
+      expect(storage.values.get(CHUNK_LOAD_RELOAD_STORAGE_KEY)).toBe(reloadState(time, i))
+      time += CHUNK_LOAD_RELOAD_GUARD_MS
+    }
+    expect(claimChunkLoadReload(chunkError(), { storage, now: time + 60 * 60 * 1000 })).toBe(false)
+  })
+
+  test('does not reload when storage silently drops the write', () => {
+    const storage = { getItem: () => null, setItem: vi.fn() }
+    expect(claimChunkLoadReload(chunkError(), { storage, now })).toBe(false)
+    expect(storage.setItem).toHaveBeenCalledTimes(1)
   })
 
   test('does not reload when storage cannot be read', () => {
