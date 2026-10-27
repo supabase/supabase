@@ -128,15 +128,15 @@ export const LifecyclePolicySection = ({
         <SectionHeading />
         <Admonition
           type="default"
-          title="Custom lifecycle policies are set"
+          title="This bucket has a custom lifecycle policy"
           description={
             rulesHref ? (
               <>
-                It uses rules these fields cannot show, so saving leaves the policy as it is.{' '}
-                <InlineLink href={rulesHref}>Manage its rules individually</InlineLink> instead.
+                The policy uses rules these fields can't show, so saving won't change it.{' '}
+                <InlineLink href={rulesHref}>Edit rules</InlineLink> individually instead.
               </>
             ) : (
-              'It uses rules these fields cannot show, so saving leaves the policy as it is. Manage it with the S3 or Storage API.'
+              "The policy uses rules these fields can't show, so saving won't change it. Edit it with the S3 or Storage API."
             )
           }
         />
@@ -236,7 +236,7 @@ export const LifecyclePolicySection = ({
               type="warning"
               className="mt-2"
               title="No lifecycle policy"
-              description="Lifecycle policies are recommended to manage and reduce storage costs for noncurrent versions."
+              description="Noncurrent versions accumulate and increase storage costs. Set an expiration to delete them automatically."
             />
           </FormSectionCollapse>
         )}
