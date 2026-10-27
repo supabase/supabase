@@ -57,9 +57,18 @@ export const EdgeFunctionInvocationsSection = ({
     [chartErrorMessage, isErrorChart]
   )
 
+  let chartStatus = ''
+  if (isLoadingChart) chartStatus = 'Loading invocations'
+  else if (isErrorChart)
+    chartStatus = [emptyStateCopy.title, emptyStateCopy.description].filter(Boolean).join('. ')
+  else if (chartData.length === 0) chartStatus = 'No invocation data to show'
+
   return (
     <PageSection>
       <PageSectionContent className="flex flex-col gap-5">
+        <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+          {chartStatus}
+        </div>
         {isLoadingFunction && <GenericSkeletonLoader />}
         {isErrorFunction && (
           <AlertError
