@@ -107,6 +107,10 @@ To migrate a tool to a contract:
 
 A tool the remote MCP server implements has a `RemoteToolContract`: only `name`, `availability`, `minOptInLevel`, and `needsApproval`. The server owns the description, input schema, execution, and output, so there is no `.server.ts` file and its parts stay `dynamic-tool`, outside `StudioUIMessage`. Register it in `REMOTE_TOOL_CONTRACTS` and remove it from `TOOL_CATEGORY_MAP`; [mcp-tools.ts](./tools/mcp-tools.ts) applies `needsApproval`, since MCP tool definitions can't declare it. [list-extensions.ts](./tools/list-extensions.ts) is an example.
 
+#### Legacy contracts
+
+A tool that no longer exists can still have outputs in saved chats, such as the self-hosted fallback tools that contracts replace. A `LegacyToolContract` keeps those outputs safe: only `name`, `outputSchema`, `toModelOutput`, and `outputOnInvalid`, so replayed output is validated and gated by opt-in level like any contract tool's. [legacy-tools.ts](./tools/legacy-tools.ts) lists them in `LEGACY_TOOL_CONTRACTS`. Only history replay reads them, through `sanitizeContractPart`, and nothing registers them as tools. When you remove or rename a tool whose outputs exist in saved chats, add a legacy contract for the old name.
+
 ## Access and data sharing
 
 These checks have different responsibilities:
