@@ -12,13 +12,18 @@ const INVALID_LEGACY_OUTPUT_MESSAGE =
   'The tool ran, but its saved output could not be read, so it is not shared with the Assistant.'
 
 /** Output that describes the project, so it needs at least the `schema` level. */
-function gatedBySchemaLevel(output: string | unknown[], optInLevel: AiOptInLevel): JSONValue {
-  return isOptInLevelAtLeast(optInLevel, 'schema')
-    ? (output as JSONValue)
-    : HIDDEN_LEGACY_OUTPUT_MESSAGE
+function gatedBySchemaLevel(output: JSONValue, optInLevel: AiOptInLevel): JSONValue {
+  return isOptInLevelAtLeast(optInLevel, 'schema') ? output : HIDDEN_LEGACY_OUTPUT_MESSAGE
 }
 
 const stringOutputSchema = z.string()
+
+/** The row `getEntityDefinitionsSql` returns. */
+const entityDefinitionsRowSchema = z.object({
+  data: z.object({
+    definitions: z.array(z.object({ id: z.number(), sql: z.string().nullable() })),
+  }),
+})
 
 /**
  * Self-hosted fallback tools that are being replaced. Saved chats still hold their outputs,
@@ -27,7 +32,7 @@ const stringOutputSchema = z.string()
 export const LEGACY_TOOL_CONTRACTS = {
   getSchemaTables: {
     name: 'getSchemaTables',
-    outputSchema: z.union([z.array(z.unknown()), stringOutputSchema]),
+    outputSchema: z.union([z.array(entityDefinitionsRowSchema), stringOutputSchema]),
     toModelOutput: gatedBySchemaLevel,
     outputOnInvalid: INVALID_LEGACY_OUTPUT_MESSAGE,
   },

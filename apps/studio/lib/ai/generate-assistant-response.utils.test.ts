@@ -144,7 +144,9 @@ describe('prepareMessagesForModel', () => {
   })
 
   it('replays a self-hosted chat with legacy tool parts into model messages', async () => {
-    const rows = [{ schema: 'public', name: 'todos' }]
+    const rows = [
+      { data: { definitions: [{ id: 16384, sql: 'CREATE TABLE public.todos (id bigint)' }] } },
+    ]
     const messages = [
       assistantMessage([
         toolPart({ type: 'tool-getSchemaTables', toolCallId: 'c1', output: rows }),

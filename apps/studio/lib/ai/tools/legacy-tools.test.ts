@@ -22,6 +22,10 @@ const outputOf = (tool: string, output: unknown, level: AiOptInLevel) =>
 
 const hiddenAt = (tool: string, level: AiOptInLevel) => outputOf(tool, 'x', level)
 
+const SCHEMA_ROW = {
+  data: { definitions: [{ id: 16384, sql: 'CREATE TABLE public.todos (id bigint)' }] },
+}
+
 describe('legacy tool contracts', () => {
   it('looks up only own keys', () => {
     expect(getLegacyToolContract('getFunctions')).toBe(LEGACY_TOOL_CONTRACTS.getFunctions)
@@ -30,10 +34,7 @@ describe('legacy tool contracts', () => {
   })
 
   const gated: [string, unknown[]][] = [
-    [
-      'getSchemaTables',
-      [[{ schema: 'public', name: 'todos' }], [], 'Failed to fetch schema: boom'],
-    ],
+    ['getSchemaTables', [[SCHEMA_ROW], [], 'Failed to fetch schema: boom']],
     ['getRlsKnowledge', ['Row Level Security guidance']],
     ['getFunctions', ['Function: add\nReturn Type: int', '', 'Failed to fetch functions: boom']],
   ]
@@ -55,6 +56,15 @@ describe('legacy tool contracts', () => {
       expect(typeof invalid).toBe('string')
     })
   })
+
+  it.each([[[null]], [[{ schema: 'public', name: 'todos' }]]])(
+    'replaces a malformed getSchemaTables array %j',
+    (output) => {
+      expect(outputOf('getSchemaTables', output, 'schema')).toBe(
+        LEGACY_TOOL_CONTRACTS.getSchemaTables.outputOnInvalid
+      )
+    }
+  )
 
   it.each(OPT_IN_LEVELS)('shows getEdgeFunctionKnowledge at %s', (level) => {
     expect(outputOf('getEdgeFunctionKnowledge', 'Edge guidance', level)).toBe('Edge guidance')
