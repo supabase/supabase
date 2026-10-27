@@ -12,7 +12,9 @@ vi.mock('@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', (
 }))
 
 vi.mock('@/components/ui/AlertError', () => ({
-  AlertError: ({ subject }: { subject: string }) => <p>{subject}</p>,
+  AlertError: ({ subject, projectRef }: { subject: string; projectRef?: string }) => (
+    <p data-project-ref={projectRef}>{subject}</p>
+  ),
 }))
 
 vi.mock('@/components/ui/ShortcutTooltip', () => ({
@@ -235,6 +237,19 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
     expect(screen.getByText(/Failed to retrieve deliveries/)).toBeInTheDocument()
     expect(screen.queryByText('No deliveries found')).not.toBeInTheDocument()
+  })
+
+  it('passes the project to the error so the support link is pre-filled', () => {
+    renderComponent({
+      filteredDeliveries: [],
+      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      projectRef: 'abcdefghijklmnopqrst',
+    })
+
+    expect(screen.getByText('Failed to retrieve deliveries')).toHaveAttribute(
+      'data-project-ref',
+      'abcdefghijklmnopqrst'
+    )
   })
 
   it('keeps showing deliveries when a refetch fails after they loaded', () => {

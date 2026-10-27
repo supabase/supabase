@@ -322,6 +322,55 @@ describe('PlatformWebhooksPage (project scope)', () => {
     await waitFor(() => expect(retryCalled).toBe(true))
   })
 
+  describe('deliveries errors', () => {
+    test('shows an error when the first deliveries load fails', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () =>
+          HttpResponse.json<APIErrorBody>({ message: 'Something went wrong' }, { status: 500 }),
+      })
+
+      renderPage(ENDPOINT_ID)
+
+      expect(await screen.findByText('Failed to retrieve deliveries')).toBeInTheDocument()
+      expect(screen.queryByText('No deliveries found')).not.toBeInTheDocument()
+    })
+
+    test('shows the search empty state, not an error, when a refresh fails after rows loaded', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          // The first load works, the automatic refresh after it fails
+          if (requests > 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Something went wrong' },
+              { status: 500 }
+            )
+          }
+          return HttpResponse.json<DeliveryListResponse>({
+            data: [{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }],
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByLabelText(`Retry ${DELIVERY_ID}`)
+      await waitFor(() => expect(requests).toBeGreaterThan(1), { timeout: 9000 })
+
+      await userEvent.setup().type(screen.getByPlaceholderText('Search deliveries'), 'no match')
+
+      expect(await screen.findByText('No deliveries found')).toBeInTheDocument()
+      expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
+    }, 20000)
+  })
+
   describe('deliveries pagination', () => {
     const mockPagedDeliveries = (ids: string[]) => {
       const requests: Array<{ size: string | null; after: string | null }> = []

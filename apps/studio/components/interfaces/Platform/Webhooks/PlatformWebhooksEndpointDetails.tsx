@@ -65,6 +65,8 @@ interface PlatformWebhooksEndpointDetailsProps {
   hasNextPage: boolean
   hasPreviousPage: boolean
   isLoadingDeliveries: boolean
+  orgSlug?: string
+  projectRef?: string
   selectedEndpoint: WebhookEndpoint
   onCopyUrl: () => void
   onDeliverySearchChange: (value: string) => void
@@ -167,6 +169,8 @@ export const PlatformWebhooksEndpointDetails = ({
   hasNextPage,
   hasPreviousPage,
   isLoadingDeliveries,
+  orgSlug,
+  projectRef,
   selectedEndpoint,
   onCopyUrl,
   onDeliverySearchChange,
@@ -353,6 +357,8 @@ export const PlatformWebhooksEndpointDetails = ({
                     <AlertError
                       className="border-0 rounded-none"
                       error={deliveriesError}
+                      orgSlug={orgSlug}
+                      projectRef={projectRef}
                       subject="Failed to retrieve deliveries"
                     />
                   </TableCell>
