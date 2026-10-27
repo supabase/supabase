@@ -309,7 +309,7 @@ describe('authenticator removal failures', () => {
     const unenroll = vi.spyOn(auth.mfa, 'unenroll')
     vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({
       data: null,
-      error: new AuthApiError('Codes could not be removed', 500),
+      error: new AuthApiError('Codes could not be removed', 500, 'unexpected_failure'),
     })
     const onClose = vi.fn()
     customRender(
@@ -332,7 +332,7 @@ describe('authenticator removal failures', () => {
       .spyOn(auth.mfa, 'unenroll')
       .mockResolvedValueOnce({
         data: null,
-        error: new AuthApiError('Authenticator could not be removed', 500),
+        error: new AuthApiError('Authenticator could not be removed', 500, 'unexpected_failure'),
       })
       .mockResolvedValueOnce({ data: { id: 'factor-a' }, error: null })
     const unenrollCodes = vi
