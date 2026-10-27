@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import {
@@ -34,12 +34,13 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
-import { useBranchQuery } from '@/data/branches/branch-query'
+import { branchQueryOptions } from '@/data/branches/branch-query'
 import { useBranchResetMutation } from '@/data/branches/branch-reset-mutation'
 import { useBranchRestoreMutation } from '@/data/branches/branch-restore-mutation'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import type { Branch } from '@/data/branches/branches-query'
 import { branchKeys } from '@/data/branches/keys'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -251,16 +252,30 @@ const PreviewBranchActions = ({
   const queryClient = useQueryClient()
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
-  const { can: canDeleteBranches } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_DELETE
-  )
+  const branchGrant = useBranchGrant('GET /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const resetBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/reset', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const restoreBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/restore', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const deleteBranchGrant = useBranchGrant('DELETE /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
   const { can: canUpdateBranches } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_WRITE
   )
-  // If user can update branches, they can restore branches
-  const canRestoreBranches = canUpdateBranches
+  const canResetBranches = resetBranchGrant.status === 'granted'
+  const canRestoreBranches = restoreBranchGrant.status === 'granted'
+  const canDeleteBranches = deleteBranchGrant.status === 'granted'
 
-  const { data } = useBranchQuery({ projectRef, branchRef })
+  const { data } = useQuery(branchQueryOptions({ projectRef, branchRef, grant: branchGrant.grant }))
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
   const isPersistentBranch = branch.persistent
 
@@ -313,15 +328,25 @@ const PreviewBranchActions = ({
   }
 
   const onRestoreBranch = () => {
-    restoreBranch({ branchRef, projectRef })
+    if (restoreBranchGrant.status !== 'granted') return
+    restoreBranch({ grant: restoreBranchGrant.grant, branchRef, projectRef })
   }
 
   const onConfirmReset = () => {
-    resetBranch({ branchRef, projectRef })
+    if (resetBranchGrant.status !== 'granted') return
+    resetBranch({ grant: resetBranchGrant.grant, branchRef, projectRef })
   }
 
   const onTogglePersistent = () => {
     updateBranch({ branchRef, projectRef, persistent: !branch.persistent })
+  }
+
+  const getResetDisabledReason = () => {
+    if (!canResetBranches) return 'You need additional permissions to reset branches'
+    if (!isBranchActiveHealthy) {
+      return 'Branch is still initializing. Please wait for it to become healthy before resetting.'
+    }
+    return undefined
   }
 
   const onDeleteBranch = (e: Event | React.MouseEvent<HTMLDivElement>) => {
@@ -397,7 +422,7 @@ const PreviewBranchActions = ({
               </DropdownMenuItemTooltip>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
-                disabled={isResetting || !isBranchActiveHealthy}
+                disabled={!canResetBranches || isResetting || !isBranchActiveHealthy}
                 onSelect={(e) => {
                   e.stopPropagation()
                   setShowConfirmResetModal(true)
@@ -409,9 +434,7 @@ const PreviewBranchActions = ({
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: !isBranchActiveHealthy
-                      ? 'Branch is still initializing. Please wait for it to become healthy before resetting.'
-                      : undefined,
+                    text: getResetDisabledReason(),
                   },
                 }}
               >
