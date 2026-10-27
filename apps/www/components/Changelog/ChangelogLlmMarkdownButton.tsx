@@ -2,7 +2,7 @@
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { askAiUrls, useCopyMarkdownFromUrl } from 'common'
-import { Chatgpt, Claude } from 'icons'
+import { Chatgpt, Claude, Grok } from 'icons'
 import { Check, ChevronDown, Copy } from 'lucide-react'
 import {
   Button,
@@ -94,6 +94,22 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
             >
               <Claude className="h-4 w-4 shrink-0" aria-hidden />
               Ask Claude
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild className="gap-2">
+            <a
+              href={urls.grok}
+              target="_blank"
+              rel="noreferrer noopener"
+              onClick={() =>
+                sendTelemetryEvent({
+                  action: 'ask_ai_clicked',
+                  properties: { agent: 'grok', pageType: 'changelog' },
+                })
+              }
+            >
+              <Grok className="h-4 w-4 shrink-0" aria-hidden />
+              Ask Grok
             </a>
           </DropdownMenuItem>
         </DropdownMenuContent>

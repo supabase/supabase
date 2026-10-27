@@ -3,7 +3,7 @@
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { askAiUrls, useCopyMarkdownFromUrl } from 'common'
 import type { MarkdownAffordancePageType } from 'common/telemetry-constants'
-import { Chatgpt, Claude } from 'icons'
+import { Chatgpt, Claude, Grok } from 'icons'
 import { Check, Copy } from 'lucide-react'
 import { cn } from 'ui'
 
@@ -90,6 +90,21 @@ export function MarkdownActions({
       >
         <Claude size={14} aria-hidden />
         Ask Claude
+      </a>
+      <a
+        href={urls.grok}
+        target="_blank"
+        rel="noreferrer noopener"
+        onClick={() =>
+          sendTelemetryEvent({
+            action: 'ask_ai_clicked',
+            properties: { agent: 'grok', pageType },
+          })
+        }
+        className={itemClass}
+      >
+        <Grok size={14} aria-hidden />
+        Ask Grok
       </a>
     </div>
   )

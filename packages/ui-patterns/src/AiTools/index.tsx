@@ -2,12 +2,12 @@
 
 import { useCopyMarkdownFromUrl } from 'common/hooks/useCopyMarkdownFromUrl'
 import { askAiUrls } from 'common/markdown-affordance'
-import { Chatgpt, Claude, Google } from 'icons'
+import { Chatgpt, Claude, Google, Grok } from 'icons'
 import { Check, Copy, Sparkles } from 'lucide-react'
 import { useId } from 'react'
 import { cn } from 'ui'
 
-export type AiAgent = 'chatgpt' | 'claude'
+export type AiAgent = 'chatgpt' | 'claude' | 'grok'
 
 export interface AiToolsProps {
   pageUrl: string
@@ -49,6 +49,7 @@ export const AiTools = ({
   }
   const handleChatgptClick = () => onAskAiClick?.('chatgpt')
   const handleClaudeClick = () => onAskAiClick?.('claude')
+  const handleGrokClick = () => onAskAiClick?.('grok')
 
   return (
     <section className={className} aria-labelledby={titleId}>
@@ -102,6 +103,16 @@ export const AiTools = ({
         >
           <Claude aria-hidden className="size-3.5" />
           Ask Claude
+        </a>
+        <a
+          href={urls.grok}
+          target="_blank"
+          rel="noreferrer noopener"
+          onClick={handleGrokClick}
+          className={ITEM_CLASS}
+        >
+          <Grok aria-hidden className="size-3.5" />
+          Ask Grok
         </a>
         {preferredSourceHref ? (
           <a
