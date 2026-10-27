@@ -130,7 +130,9 @@ export function ServiceFlowPanel({
                       onSelectLog={handleSelectTimelineLog}
                     />
                   )}
-                  {tab === 'user' && selectedRow && <LogUser row={selectedRow} />}
+                  {tab === 'user' && activeLog && (
+                    <LogUser row={activeLog} searchParameters={searchParameters} />
+                  )}
                   {(tab === 'overview' || tab === 'raw-json') && activeLog && (
                     <LogDetail
                       row={activeLog}

@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -22,6 +21,7 @@ import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePrevie
 import { UserRecentLogs } from '@/components/interfaces/UnifiedLogs/components/UserRecentLogs'
 import { RawJsonView } from '@/components/ui/RawJsonView'
 import { useUserQuery } from '@/data/auth/user-query'
+import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -31,7 +31,7 @@ export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
   const showLogs = useIsFeatureEnabled('logs:all')
   // Recent logs read unified logs filtered by user, which only the ClickHouse path supports
-  const isOtelUnifiedLogs = !!useFlag('otelUnifiedLogs')
+  const isOtelUnifiedLogs = useUnifiedLogsBackend()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const showRecentLogs = showLogs && isOtelUnifiedLogs && isUnifiedLogsEnabled
 

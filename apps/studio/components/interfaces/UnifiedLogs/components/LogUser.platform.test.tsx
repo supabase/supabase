@@ -1,30 +1,30 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
+import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
-import { describe, expect, it, vi } from 'vitest'
+import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
 
 import { ColumnSchema } from '../UnifiedLogs.schema'
+import type { QuerySearchParamsType } from '../UnifiedLogs.types'
+import { createUnifiedLogsSearch, getLogTypeSource } from '../UnifiedLogs.utils'
 import { LogUser } from './LogUser'
+import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import type { User } from '@/data/auth/users-infinite-query'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type LogsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
 
-vi.mock('@/lib/constants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/lib/constants')>()),
-  IS_PLATFORM: true,
-}))
-
-vi.mock('common', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('common')>()
-  return {
-    ...actual,
-    useParams: () => ({ ref: 'default' }),
-    useFlag: (name: string) => name === 'otelUnifiedLogs',
-  }
-})
+vi.unmock('common')
+const { default: routerMock } =
+  await vi.importMock<typeof import('next-router-mock')>('next/router')
+const removeRouteParser = routerMock.useParser(createDynamicRouteParser(['/project/[ref]/logs']))
+afterAll(removeRouteParser)
+const requestSchema = z.object({ sql: z.string() })
 
 const USER_ID = '6f1c1a8e-4a0b-4c1e-9b1e-2f3a4b5c6d7e'
 
@@ -60,7 +60,19 @@ const gatewayStep = (overrides: Record<string, unknown>) => ({
 
 function renderUser(
   log: ColumnSchema,
-  { timeline = [], users = [] }: { timeline?: unknown[]; users?: unknown[] } = {}
+  {
+    timeline = [],
+    users = [],
+    flag = true,
+    search = createUnifiedLogsSearch(),
+    failTimeline = false,
+  }: {
+    timeline?: unknown[]
+    users?: User[]
+    flag?: boolean | null
+    search?: QuerySearchParamsType
+    failTimeline?: boolean
+  } = {}
 ) {
   const logQueries: string[] = []
   const urlUpdates: string[] = []
@@ -91,12 +103,23 @@ function renderUser(
     method: 'post',
     path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
     response: async ({ request }) => {
-      const { sql } = (await request.json()) as { sql: string }
+      const { sql } = requestSchema.parse(await request.json())
       logQueries.push(sql)
-      if (sql.includes('log attributes')) {
+      if (failTimeline)
+        return HttpResponse.json<APIErrorBody>(
+          { message: 'Correlation unavailable' },
+          { status: 500 }
+        )
+      if (sql.includes('SELECT source, log_attributes')) {
         return HttpResponse.json<LogsResponse>({
           result: [
-            { source: 'edge_logs', log_attributes: { 'request.headers.cf_ray': '8f00aa-IAD' } },
+            {
+              source: getLogTypeSource(log.log_type),
+              log_attributes: {
+                [log.log_type === 'storage' ? 'req.headers.cf_ray' : 'request.headers.cf_ray']:
+                  '8f00aa-IAD',
+              },
+            },
           ],
         })
       }
@@ -106,17 +129,30 @@ function renderUser(
   addAPIMock({
     method: 'post',
     path: '/platform/pg-meta/:ref/query',
-    response: () => HttpResponse.json<unknown[]>(users),
+    response: () => HttpResponse.json<User[]>(users),
   })
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  customRender(<LogUser row={log} />, {
-    queryClient,
-    nuqs: { onUrlUpdate: ({ queryString }) => urlUpdates.push(queryString) },
-  })
-  return { logQueries, urlUpdates }
+  customRender(
+    <FeatureFlagContext.Provider
+      value={{
+        configcat: flag === null ? {} : { otelUnifiedLogs: flag },
+        posthog: {},
+        hasLoaded: true,
+      }}
+    >
+      <FeaturePreviewContextProvider>
+        <LogUser row={log} searchParameters={search} />
+      </FeaturePreviewContextProvider>
+    </FeatureFlagContext.Provider>,
+    {
+      queryClient,
+      nuqs: { onUrlUpdate: ({ queryString }) => urlUpdates.push(queryString) },
+    }
+  )
+  return { logQueries, urlUpdates, queryClient }
 }
 
-const user = {
+const user: User = {
   id: USER_ID,
   email: 'ada@example.com',
   providers: ['email', 'github'],
@@ -124,6 +160,7 @@ const user = {
 }
 
 describe('LogUser', () => {
+  beforeEach(() => routerMock.setCurrentUrl('/project/default/logs'))
   it("shows the log's own user without looking up the rest of the request", async () => {
     const { logQueries } = renderUser({ ...baseLog, auth_user: USER_ID }, { users: [user] })
 
@@ -180,5 +217,44 @@ describe('LogUser', () => {
     await userActions.click(await screen.findByText('Providers'))
     expect(await screen.findByRole('menuitem', { name: /Copy/ })).toBeVisible()
     expect(screen.queryByRole('menuitem', { name: 'Add filter' })).not.toBeInTheDocument()
+  })
+  it('reports a failed request lookup instead of claiming the request was anonymous', async () => {
+    const { queryClient } = renderUser(baseLog, { failTimeline: true })
+    expect(await screen.findByText('Failed to retrieve related logs')).toBeVisible()
+    expect(screen.getByRole('alert')).toHaveTextContent('Correlation unavailable')
+    expect(screen.queryByText('No signed-in user')).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it.each([
+    {
+      flag: false,
+      scope: { filters: [{ column: 'function_id', operator: '=' as const, value: 'fn-1' }] },
+      canCorrelate: true,
+      name: 'correlates scoped logs with the legacy backend selected',
+    },
+    {
+      flag: false,
+      scope: undefined,
+      canCorrelate: false,
+      name: 'leaves unscoped legacy logs without correlation',
+    },
+    {
+      flag: null,
+      scope: undefined,
+      canCorrelate: true,
+      name: 'correlates logs before the backend flag loads',
+    },
+  ])('$name', async ({ flag, scope, canCorrelate }) => {
+    const { queryClient, logQueries } = renderUser(baseLog, {
+      flag,
+      search: createUnifiedLogsSearch({}, scope),
+      timeline: [gatewayStep({ auth_user: USER_ID })],
+      users: [user],
+    })
+    if (canCorrelate) expect(await screen.findAllByText('ada@example.com')).toHaveLength(2)
+    else expect(await screen.findByText('No signed-in user')).toBeVisible()
+    expect(logQueries.length > 0).toBe(canCorrelate)
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 })

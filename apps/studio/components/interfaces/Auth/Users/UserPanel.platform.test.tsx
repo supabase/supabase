@@ -39,7 +39,7 @@ vi.mock('./UserLogs', () => ({
 
 const renderPanel = (
   disabledFeatures: string[] = [],
-  { otel = false, unifiedLogs = false } = {}
+  { otel = false, unifiedLogs = false }: { otel?: boolean | null; unifiedLogs?: boolean } = {}
 ) => {
   localStorage.setItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, JSON.stringify(unifiedLogs))
   addAPIMock({
@@ -75,7 +75,11 @@ const renderPanel = (
 
   const rendered = customRender(
     <FeatureFlagContext.Provider
-      value={{ configcat: { otelUnifiedLogs: otel }, posthog: {}, hasLoaded: true }}
+      value={{
+        configcat: otel === null ? {} : { otelUnifiedLogs: otel },
+        posthog: {},
+        hasLoaded: true,
+      }}
     >
       <FeaturePreviewContextProvider>
         <ResizablePanelGroup orientation="horizontal">
@@ -128,26 +132,29 @@ describe('UserPanel', () => {
     expect(screen.queryByPlaceholderText('Filter...')).not.toBeInTheDocument()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
-  it('shows recent user logs after Raw JSON when unified logs are enabled', async () => {
-    const user = userEvent.setup()
-    addAPIMock({
-      method: 'post',
-      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
-      response: () =>
-        HttpResponse.json<platformComponents['schemas']['AnalyticsResponse_Output']>({
-          result: [],
-        }),
-    })
-    const { queryClient } = renderPanel([], { otel: true, unifiedLogs: true })
-    await screen.findByRole('tab', { name: 'Logs' })
-    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
-      'Overview',
-      'Raw JSON',
-      'Logs',
-    ])
-    await user.click(screen.getByRole('tab', { name: 'Logs' }))
-    expect(await screen.findByText('No logs in the last 24 hours')).toBeVisible()
-    expect(screen.queryByRole('link', { name: 'View logs' })).not.toBeInTheDocument()
-    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
-  })
+  it.each([true, null])(
+    'shows recent user logs after Raw JSON with backend flag %s',
+    async (otel) => {
+      const user = userEvent.setup()
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+        response: () =>
+          HttpResponse.json<platformComponents['schemas']['AnalyticsResponse_Output']>({
+            result: [],
+          }),
+      })
+      const { queryClient } = renderPanel([], { otel, unifiedLogs: true })
+      await screen.findByRole('tab', { name: 'Logs' })
+      expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+        'Overview',
+        'Raw JSON',
+        'Logs',
+      ])
+      await user.click(screen.getByRole('tab', { name: 'Logs' }))
+      expect(await screen.findByText('No logs in the last 24 hours')).toBeVisible()
+      expect(screen.queryByRole('link', { name: 'View logs' })).not.toBeInTheDocument()
+      await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    }
+  )
 })

@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Skeleton } from 'ui'
 
 import { ColumnSchema } from '../UnifiedLogs.schema'
+import type { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { getLogTypeSource, getRowTimestampMs } from '../UnifiedLogs.utils'
 import { LogFieldRow } from './LogFieldRow'
 import { resolveRequestUser } from './LogUser.utils'
@@ -12,12 +13,19 @@ import { UserFields } from '@/components/interfaces/Auth/Users/UserFields'
 import { AlertError } from '@/components/ui/AlertError'
 import { useUserQuery } from '@/data/auth/user-query'
 import { unifiedLogRequestTimelineQueryOptions } from '@/data/logs/unified-log-request-timeline-query'
+import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 /** The Supabase user behind a log's request, when one can be found. */
-export function LogUser({ row }: { row: ColumnSchema }) {
+export function LogUser({
+  row,
+  searchParameters,
+}: {
+  row: ColumnSchema
+  searchParameters: QuerySearchParamsType
+}) {
   const { ref: projectRef } = useParams()
-  const isOtel = !!useFlag('otelUnifiedLogs')
+  const isOtel = useUnifiedLogsBackend(searchParameters)
 
   // Only logs without their own user need the rest of the request to find one
   const timelineQuery = unifiedLogRequestTimelineQueryOptions({
@@ -26,12 +34,28 @@ export function LogUser({ row }: { row: ColumnSchema }) {
     source: getLogTypeSource(row.log_type),
     logTimestampMs: getRowTimestampMs(row),
   })
-  const { data: timeline, isLoading: isLoadingTimeline } = useQuery({
+  const canFetchTimeline = isOtel && !row.auth_user && timelineQuery.enabled
+  const {
+    data: timeline,
+    isLoading: isLoadingTimeline,
+    error: timelineError,
+  } = useQuery({
     ...timelineQuery,
-    enabled: isOtel && !row.auth_user && timelineQuery.enabled,
+    enabled: canFetchTimeline,
   })
 
   if (isLoadingTimeline) return <LogUserSkeleton />
+
+  if (canFetchTimeline && timelineError) {
+    return (
+      <AlertError
+        error={timelineError}
+        subject="Failed to retrieve related logs"
+        projectRef={projectRef}
+        className="m-4"
+      />
+    )
+  }
 
   const requestUser = resolveRequestUser(row, timeline?.logs)
 
