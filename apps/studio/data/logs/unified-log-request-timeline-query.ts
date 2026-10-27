@@ -15,16 +15,11 @@ import {
   getRequestTimelineQuery,
   type RequestCorrelationIds,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
-import type { ColumnSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
 
-// Related logs can trail the request (e.g. a slow Edge Function), so they get
-// a wider window than the selected log's own lookup.
 const TIMELINE_WINDOW_MS = 7 * 60 * 1000
 
-// Following IDs found on related logs (e.g. an Edge Function's execution ID)
-// can surface more logs; stop after one extra hop.
 const MAX_LOOKUPS = 2
 
 const timelineRowSchema = unifiedLogsQueryRowSchema.extend({ source: z.string() })
@@ -52,7 +47,7 @@ async function getUnifiedLogRequestTimeline(
   const root = await queryClient.fetchQuery(
     unifiedLogAttributesQueryOptions({ projectRef, logId, source, logTimestampMs })
   )
-  // A shared attribute lookup may outlive this timeline request.
+
   signal?.throwIfAborted()
 
   let ids = getRequestCorrelationIds(
@@ -81,11 +76,7 @@ async function getUnifiedLogRequestTimeline(
     }
   }
 
-  // Related logs can come from sources the row list doesn't show (e.g.
-  // `function_logs`), so `log_type` may fall outside the list's log types.
-  const logs = rows.map(
-    (row) => ({ ...mapUnifiedLogRow(row), metadata: row.metadata ?? null }) as ColumnSchema
-  )
+  const logs = rows.map((row) => ({ ...mapUnifiedLogRow(row), metadata: row.metadata ?? null }))
 
   return { requestIds: ids.requestIds, executionIds: ids.executionIds, logs }
 }

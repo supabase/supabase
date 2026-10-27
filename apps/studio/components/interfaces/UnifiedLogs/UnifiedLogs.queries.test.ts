@@ -616,7 +616,7 @@ describe('request timeline', () => {
           source: 'function_edge_logs',
           attributes: { execution_id: 'exec-1', 'request.headers.cf_ray': '8f00bb-IAD' },
         },
-        // Keys are only read for the sources that set them
+
         { source: 'postgres_logs', attributes: { request_id: 'ignored' } },
       ])
     ).toEqual({ requestIds: ['8f00aa-IAD', '8f00bb-IAD'], executionIds: ['exec-1'] })

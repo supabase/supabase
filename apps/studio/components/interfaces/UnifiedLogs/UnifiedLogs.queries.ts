@@ -652,10 +652,8 @@ export type RequestCorrelationIds = { requestIds: string[]; executionIds: string
 
 export const REQUEST_TIMELINE_LIMIT = 200
 
-// Ray and execution IDs are hex/uuid-shaped with an optional `-COLO` suffix.
 const CORRELATION_ID_PATTERN = /^[0-9A-Za-z-]{1,64}$/
 
-/** Reads the request and execution IDs a log carries, per its source. */
 export const getRequestCorrelationIds = (
   logs: { source: string; attributes: Record<string, unknown> | null | undefined }[]
 ): RequestCorrelationIds => {
@@ -703,11 +701,6 @@ WHERE id = ${lit(logId)} AND source = ${lit(source)}
 LIMIT 1
 `
 
-/**
- * Every log that shares a request or execution ID, oldest first. Selects the
- * same columns as the row list, with `log_attributes` as `metadata` so each
- * log can be shown in full without another lookup.
- */
 export const getRequestTimelineQuery = ({
   requestIds,
   executionIds,
@@ -718,7 +711,7 @@ export const getRequestTimelineQuery = ({
   ]
   if (conditions.length === 0) throw new Error('A request or execution ID is required')
 
-  return safeSql`-- unified logs: request timeline
+  return safeSql`
 SELECT
     id,
     timestamp,
