@@ -1,13 +1,12 @@
 import { platformComponents } from 'api-types'
 import { HttpResponse } from 'msw'
-import { createLoader } from 'nuqs/server'
 import { z } from 'zod'
 
-import { SEARCH_PARAMS_PARSER } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
+import { createUnifiedLogsSearch } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { addAPIMock } from '@/tests/lib/msw'
 
 export const now = new Date('2026-09-30T12:00:00.000Z')
-export const search = createLoader(SEARCH_PARAMS_PARSER)(new URLSearchParams())
+export const search = createUnifiedLogsSearch()
 
 export const createRow = (id: string, timestamp: number | string = now.getTime() * 1000) => ({
   id,

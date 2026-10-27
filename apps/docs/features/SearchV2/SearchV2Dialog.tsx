@@ -11,7 +11,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-import { SEARCH_V2_ENDPOINT } from './constants'
+import { SEARCH_V2_ENDPOINT, SEARCH_V2_MIN_CHARACTERS } from './constants'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 type SearchV2DialogProps = Pick<SearchDialogProps, 'open' | 'onOpenChange'>
@@ -53,6 +53,7 @@ function SearchV2Panel({ onResultNavigate, onResultLinkNavigate }: SearchV2Panel
     <SearchPanel
       searchState={searchState}
       renderLink={(props) => <Link prefetch={false} {...props} />}
+      minCharacters={SEARCH_V2_MIN_CHARACTERS}
       onQueryChange={(query) => {
         if (query) {
           handleDocsSearchDebounced(query)

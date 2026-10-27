@@ -1,6 +1,7 @@
 import { getPaginatedUsersSQL } from '@supabase/pg-meta'
 
 import { authKeys } from '@/data/auth/keys'
+import { unguarded } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 
@@ -32,7 +33,9 @@ export async function searchAuthUsers(
       })
       return executeSql<
         { id: string; email: string | null; created_at: string; last_sign_in_at: string | null }[]
-      >({ projectRef, connectionString, sql }, signal).then((res) => res.result)
+      >({ projectRef, connectionString, sql, grant: unguarded.migrating }, signal).then(
+        (res) => res.result
+      )
     },
   })
   return result.map((row) => ({

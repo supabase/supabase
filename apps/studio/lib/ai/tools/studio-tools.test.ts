@@ -2,6 +2,7 @@ import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getOptInTools, getStudioTools } from './studio-tools'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/execute-sql-output'
 
@@ -128,6 +129,7 @@ describe('ai/tools/studio-tools', () => {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
           sql: 'SELECT email FROM users limit 101;',
+          grant: unguarded.migrating,
         },
         undefined,
         undefined
@@ -189,6 +191,7 @@ describe('ai/tools/studio-tools', () => {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
           sql: 'SELECT email FROM users limit 101;',
+          grant: unguarded.migrating,
         },
         undefined,
         undefined

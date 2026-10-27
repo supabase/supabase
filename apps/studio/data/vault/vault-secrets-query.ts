@@ -3,6 +3,7 @@ import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
 
 import { vaultSecretsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions, VaultSecret } from '@/types'
 
@@ -27,7 +28,7 @@ export async function getVaultSecrets(
   const sql = getVaultSecretsSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['vault-secrets'] },
+    { projectRef, connectionString, sql, queryKey: ['vault-secrets'], grant: unguarded.migrating },
     signal
   )
 

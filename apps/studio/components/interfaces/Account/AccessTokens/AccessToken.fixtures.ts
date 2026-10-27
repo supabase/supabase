@@ -3,6 +3,8 @@ import { HttpResponse } from 'msw'
 
 import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 
 /**
  * Test-only fixtures for the scoped-access-token surfaces.
@@ -15,7 +17,6 @@ type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
 type OrganizationProject = OrganizationProjectsResponse['projects'][number]
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 export type PermissionOrgFixture = PermissionsV2Response['organizations'][number]
 type Role = PermissionOrgFixture['role']
 
@@ -117,8 +118,4 @@ export const mockScopedTokenEnvironment = () => {
 }
 
 export const mockPermissionsApi = (organizations: PermissionOrgFixture[]) =>
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: () => HttpResponse.json<PermissionsV2Response>({ organizations }),
-  })
+  mockPermissions({ organizations })

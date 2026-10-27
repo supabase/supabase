@@ -40,10 +40,6 @@ type UnifiedLogsPageVariables = UnifiedLogsVariables & {
   pageSize?: number
 }
 
-/**
- * Whether unified logs queries for a search run on ClickHouse (OTEL) rather than BigQuery. Scoped
- * searches always do, since only the ClickHouse queries can apply a scope's filters.
- */
 export const useUnifiedLogsBackend = (search?: QuerySearchParamsType) => {
   const { otelUnifiedLogs = true } = useFeatureFlags().configcat
   const isOtelEnabled = typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true

@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { computeRefetchInterval, parseComputeInstance } from './compute.utils'
 import { computeKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import { ResponseError } from '@/types'
 
@@ -15,6 +15,7 @@ async function getComputeInstances({ projectRef }: ComputeVariables, signal?: Ab
   const { data, error, response } = await get('/v2/projects/{ref}/compute', {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (response.status === 404) {

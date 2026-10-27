@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import { configKeys } from '@/data/config/keys'
 import { databaseKeys } from '@/data/database/keys'
-import { handleError, patch } from '@/data/fetchers'
+import { handleError, patch, unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -30,7 +30,7 @@ export async function createAndExposeApiSchema({
   const sql = safeSql`create schema if not exists api;
 grant usage on schema api to anon, authenticated;`
 
-  await executeSql({ projectRef, connectionString, sql })
+  await executeSql({ projectRef, connectionString, sql, grant: unguarded.migrating })
 
   const { db_extra_search_path, db_pool, db_schema, max_rows } = existingPostgrestConfig
 

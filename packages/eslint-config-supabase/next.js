@@ -84,7 +84,12 @@ module.exports = defineConfig([
   tanstackQuery.configs['flat/recommended'],
   {
     rules: {
-      '@tanstack/query/exhaustive-deps': 'warn',
+      // Grants (FGA permission tokens) and connection strings don't change the returned data,
+      // so keeping them out of query keys avoids splitting the cache.
+      '@tanstack/query/exhaustive-deps': [
+        'warn',
+        { allowlist: { variables: ['grant', 'connectionString'] } },
+      ],
     },
   },
   typescriptConfig,
