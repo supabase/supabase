@@ -8,6 +8,7 @@ import type {
   GeminiMcpConfig,
   GooseMcpConfig,
   GrokMcpConfig,
+  KimchiMcpConfig,
   KimiMcpConfig,
   McpClientBaseConfig,
   McpClientConfig,
@@ -201,6 +202,24 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
         mcpServers: {
           supabase: {
             httpUrl: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
+    key: 'kimchi',
+    label: 'Kimchi',
+    icon: 'kimchi',
+    hasDistinctDarkIcon: true,
+    configFile: '.kimchi/mcp.json',
+    externalDocsUrl: 'https://docs.kimchi.dev/docs/kimchi-cli',
+    transformConfig: (config): KimchiMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            type: 'http',
+            url: config.mcpServers.supabase.url,
           },
         },
       }
@@ -464,6 +483,7 @@ export const MCP_CLIENT_GROUPS = [
       'factory',
       'fx',
       'omp',
+      'kimchi',
     ],
   },
   {
