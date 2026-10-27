@@ -140,7 +140,7 @@ Don't rely on a clean database state. Resetting the database before each test is
 
 </Admonition>
 
-The following Vitest suite mirrors the pgTAP tests above:
+The following Vitest suite mirrors the pgTAP tests above. It needs `@supabase/supabase-js` and `vitest` installed. Set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` to the `API_URL`, `PUBLISHABLE_KEY`, and `SECRET_KEY` values that `supabase status -o env` prints.
 
 ```typescript
 import crypto from 'crypto'
