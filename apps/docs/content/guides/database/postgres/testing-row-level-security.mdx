@@ -248,16 +248,15 @@ describe('Todos RLS', () => {
       password: 'password123',
     })
 
-    // Fetch User 1's todos
-    const { data: todos, error } = await supabase.from('todos').select('task')
+    // Fetch the todos seeded in beforeAll, so other tests' rows don't matter
+    const { data: todos, error } = await supabase
+      .from('todos')
+      .select('task')
+      .in('task', ['User 1 Task 1', 'User 1 Task 2'])
 
-    // Verify that User 1 still sees all their todos, unchanged
+    // Verify that User 1 still sees both seeded todos, unchanged
     expect(error).toBeNull()
-    expect(todos?.map((todo) => todo.task).sort()).toEqual([
-      'New Task',
-      'User 1 Task 1',
-      'User 1 Task 2',
-    ])
+    expect(todos?.map((todo) => todo.task).sort()).toEqual(['User 1 Task 1', 'User 1 Task 2'])
   })
 })
 ```
