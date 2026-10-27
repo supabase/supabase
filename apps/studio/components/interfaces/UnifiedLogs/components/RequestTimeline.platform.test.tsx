@@ -127,7 +127,12 @@ function renderPanel(
     flag = true,
     timezone,
     selectedLog,
-  }: { scope?: UnifiedLogsScope; flag?: boolean | null; timezone?: string } = {}
+  }: {
+    scope?: UnifiedLogsScope
+    flag?: boolean | null
+    timezone?: string
+    selectedLog?: ColumnSchema
+  } = {}
 ) {
   const queries: string[] = []
   addAPIMock({
