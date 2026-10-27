@@ -490,10 +490,10 @@ export const REALTIME_PROMPT = `
 ### Using realtime.broadcast_changes (Recommended for database changes)
 \`\`\`sql
 CREATE OR REPLACE FUNCTION room_messages_broadcast_trigger()
-RETURNS TRIGGER AS $$
-SECURITY DEFINER
+RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $$
+SECURITY DEFINER
+AS $
 BEGIN
   PERFORM realtime.broadcast_changes(
     'room:' || COALESCE(NEW.room_id, OLD.room_id)::text,
@@ -506,7 +506,7 @@ BEGIN
   );
   RETURN COALESCE(NEW, OLD);
 END;
-$$;
+$;
 
 CREATE TRIGGER messages_broadcast_trigger
   AFTER INSERT OR UPDATE OR DELETE ON messages
@@ -621,25 +621,34 @@ myChannel.subscribe((status) => {
 const channelRef = useRef(null)
 
 useEffect(() => {
-  // Check if already subscribed to prevent multiple subscriptions
-  if (channelRef.current?.state === 'subscribed') return
-  
-  const channel = supabase.channel('room:123:messages', {
-    config: { private: true }
-  })
-  channelRef.current = channel
+  let cancelled = false
+  let channel = null
 
-  // Set auth before subscribing
-  await supabase.realtime.setAuth()
+  async function setupChannel() {
+    // Refresh auth before subscribing to a private channel.
+    await supabase.realtime.setAuth()
+    if (cancelled) return
 
-  channel
-    .on('broadcast', { event: 'message_created' }, handleMessage)
-    .subscribe()
+    // Avoid creating duplicate subscriptions for this room.
+    if (channelRef.current?.state === 'subscribed') return
+
+    channel = supabase.channel('room:123:messages', {
+      config: { private: true },
+    })
+    channelRef.current = channel
+
+    channel
+      .on('broadcast', { event: 'message_created' }, handleMessage)
+      .subscribe()
+  }
+
+  void setupChannel()
 
   return () => {
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current)
-      channelRef.current = null
+    cancelled = true
+    if (channel) {
+      void supabase.removeChannel(channel)
+      if (channelRef.current === channel) channelRef.current = null
     }
   }
 }, [roomId])
