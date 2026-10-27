@@ -30,6 +30,7 @@ function renderUsage(
           db_host: '123',
           db_name: 'postgres',
           db_port: 5432,
+          db_user: 'postgres',
           identifier: 'default',
           inserted_at: '2025-02-16T22:24:42.115195',
           region: 'us-east-1',
