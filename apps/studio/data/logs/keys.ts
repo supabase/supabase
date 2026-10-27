@@ -14,6 +14,11 @@ export const logsKeys = {
       'logs-data',
       ...(searchParams ? [searchParams].filter(Boolean) : []),
     ] as const,
+  unifiedLog: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType,
+    id: string | undefined
+  ) => ['projects', projectRef, 'unified-logs', 'single-log', searchParams, id] as const,
   unifiedLogsCount: (
     projectRef: string | undefined,
     searchParams: QuerySearchParamsType | undefined

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -60,6 +61,7 @@ import {
   isOfferedFilter,
   toQuerySearchParams,
 } from './UnifiedLogs.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -73,6 +75,7 @@ import { RowSelectionModifiers } from '@/components/ui/DataTable/rowSelection.ut
 import { TimelineChart } from '@/components/ui/DataTable/TimelineChart'
 import { useTableRowSelection } from '@/components/ui/DataTable/useTableRowSelection'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { unifiedLogQueryOptions } from '@/data/logs/unified-log-query'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
@@ -197,6 +200,15 @@ export const UnifiedLogs = ({
     scope: JSON.stringify([projectRef, searchParameters]),
     initialId: search.id ?? undefined,
   })
+  const previousUrlId = useRef(search.id)
+  const hasUrlSelectionChanged = !!scope && previousUrlId.current !== search.id
+  useEffect(() => {
+    if (!scope || previousUrlId.current === search.id) return
+    previousUrlId.current = search.id
+    if (search.id === selection.activeId) return
+    if (search.id) selectRow([search.id], search.id)
+    else clearSelection()
+  }, [scope, search.id, selection.activeId, selectRow, clearSelection])
   const rowSelection = selection.selected
 
   const {
@@ -205,6 +217,8 @@ export const UnifiedLogs = ({
     isError,
     isLoading,
     isFetching,
+    isSuccess: hasLoadedLogs,
+    isPlaceholderData,
     isFetchingNextPage,
     isFetchingPreviousPage,
     hasNextPage,
@@ -236,6 +250,7 @@ export const UnifiedLogs = ({
     refetchLogs()
     refetchCounts()
     refetchCharts()
+    if (missingSelectedId) selectedLogQuery.refetch()
   }
 
   const isRefetchingData = isFetching || isFetchingCounts || isFetchingCharts
@@ -246,6 +261,23 @@ export const UnifiedLogs = ({
   const flatData: ColumnSchema[] = useMemo(
     () => getUniqueLogRows(unifiedLogsData?.pages),
     [unifiedLogsData?.pages]
+  )
+  const missingSelectedId =
+    scope && selection.activeId && !flatData.some((row) => row.id === selection.activeId)
+      ? selection.activeId
+      : undefined
+  const canFetchSelectedLog =
+    !!missingSelectedId && hasLoadedLogs && !isFetching && !isPlaceholderData
+  const selectedLogQuery = useQuery({
+    ...unifiedLogQueryOptions({ projectRef, search: searchParameters, id: missingSelectedId }),
+    enabled: canFetchSelectedLog,
+  })
+  const tableData = useMemo(
+    () =>
+      selectedLogQuery.data && missingSelectedId === selectedLogQuery.data.id
+        ? [...flatData, selectedLogQuery.data]
+        : flatData,
+    [flatData, missingSelectedId, selectedLogQuery.data]
   )
   const liveMode = useLiveMode(flatData)
 
@@ -272,11 +304,11 @@ export const UnifiedLogs = ({
 
   // Generate dynamic columns based on current data
   const { columns: dynamicColumns, columnVisibility: dynamicColumnVisibility } = useMemo(() => {
-    return generateDynamicColumns({ data: flatData })
-  }, [flatData])
+    return generateDynamicColumns({ data: tableData })
+  }, [tableData])
 
   const table: Table<ColumnSchema> = useReactTable<ColumnSchema>({
-    data: flatData,
+    data: tableData,
     columns: dynamicColumns,
     state: {
       columnFilters,
@@ -377,7 +409,8 @@ export const UnifiedLogs = ({
   }, [sorting])
 
   useEffect(() => {
-    if (isLoading || isFetching) return
+    if (isLoading || isFetching || hasUrlSelectionChanged) return
+    if (missingSelectedId && (!selectedLogQuery.isSuccess || isPlaceholderData)) return
 
     if (openRowId && !selectedRow) {
       // Clear both uuid and logId when the open row no longer exists in data
@@ -390,9 +423,19 @@ export const UnifiedLogs = ({
     } else if (!openRowId && search.id) {
       // Clear the URL parameter when no row is open
       setSearch({ id: null })
+      if (missingSelectedId) clearSelection()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openRowId, selectedRow, isLoading, isFetching])
+  }, [
+    openRowId,
+    selectedRow,
+    isLoading,
+    isFetching,
+    missingSelectedId,
+    selectedLogQuery.isSuccess,
+    isPlaceholderData,
+    hasUrlSelectionChanged,
+  ])
 
   const isMobile = useIsMobile()
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
@@ -523,6 +566,13 @@ export const UnifiedLogs = ({
               )}
             </div>
 
+            {selectedLogQuery.isError && (
+              <AlertError
+                error={selectedLogQuery.error}
+                subject="Failed to retrieve logs"
+                projectRef={projectRef}
+              />
+            )}
             <ResizablePanelGroup
               key="main-logs"
               className="flex-1 border-t"
