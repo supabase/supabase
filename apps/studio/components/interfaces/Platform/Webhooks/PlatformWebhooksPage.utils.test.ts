@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import type { WebhookDelivery } from './PlatformWebhooks.types'
 import {
   clearPendingSigningSecretReveal,
+  findDeliveryToRetry,
   getPendingSigningSecretReveal,
   resetPendingSigningSecretRevealForTests,
   setPendingSigningSecretReveal,
@@ -114,5 +116,62 @@ describe('PlatformWebhooksPage.utils', () => {
     clearPendingSigningSecretReveal('project')
 
     expect(getPendingSigningSecretReveal('project', endpointId)).toBeNull()
+  })
+
+  describe('findDeliveryToRetry', () => {
+    const makeDelivery = (id: string): WebhookDelivery => ({
+      id,
+      endpointId,
+      eventId: 'evt_1',
+      eventType: 'v1.project.paused',
+      eventPayload: {},
+      status: 'failure',
+      responseCode: 500,
+      responseBody: null,
+      responseHeaders: null,
+      attemptAt: '2026-02-27T08:04:00.000Z',
+    })
+    const onPage = makeDelivery('on-page')
+    const offPage = makeDelivery('off-page')
+
+    it('finds a delivery that is on the current page', () => {
+      expect(
+        findDeliveryToRetry({
+          deliveryId: 'on-page',
+          selectedDelivery: null,
+          pageDeliveries: [onPage],
+        })
+      ).toBe(onPage)
+    })
+
+    it('uses the selected delivery when it is not on the current page', () => {
+      expect(
+        findDeliveryToRetry({
+          deliveryId: 'off-page',
+          selectedDelivery: offPage,
+          pageDeliveries: [onPage],
+        })
+      ).toBe(offPage)
+    })
+
+    it('ignores the selected delivery when the id is a different one', () => {
+      expect(
+        findDeliveryToRetry({
+          deliveryId: 'on-page',
+          selectedDelivery: offPage,
+          pageDeliveries: [onPage],
+        })
+      ).toBe(onPage)
+    })
+
+    it('returns undefined when the delivery is neither selected nor on the page', () => {
+      expect(
+        findDeliveryToRetry({
+          deliveryId: 'missing',
+          selectedDelivery: offPage,
+          pageDeliveries: [onPage],
+        })
+      ).toBeUndefined()
+    })
   })
 })

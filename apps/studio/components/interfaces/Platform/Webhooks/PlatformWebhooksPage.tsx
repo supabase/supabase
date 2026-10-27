@@ -51,6 +51,7 @@ import {
 import { PlatformWebhooksHeader } from './PlatformWebhooksHeader'
 import {
   clearPendingSigningSecretReveal,
+  findDeliveryToRetry,
   getPendingSigningSecretReveal,
   setPendingSigningSecretReveal,
   shouldHandleEndpointNotFound,
@@ -436,7 +437,11 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
   const handleRetryDelivery = async (deliveryId: string) => {
     if (!selectedEndpoint) return
-    const delivery = deliveries.find((item) => item.id === deliveryId)
+    const delivery = findDeliveryToRetry({
+      deliveryId,
+      selectedDelivery,
+      pageDeliveries: deliveries,
+    })
     if (!delivery || delivery.status === 'success') return
 
     try {
