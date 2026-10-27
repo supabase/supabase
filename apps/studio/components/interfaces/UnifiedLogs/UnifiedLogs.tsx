@@ -159,7 +159,9 @@ export const UnifiedLogs = ({
   const [localFilterOrigin, setLocalFilterOrigin] = useState<string | null>(null)
 
   const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
-    LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK,
+    columnPreferencesKey
+      ? `${LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK}-${columnPreferencesKey}`
+      : LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK,
     'bottom'
   )
 
@@ -438,7 +440,7 @@ export const UnifiedLogs = ({
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
         <ResizablePanelGroup
           orientation="horizontal"
-          autoSaveId={hasFilterSideBar ? 'logs-layout' : 'scoped-logs-layout'}
+          autoSaveId={columnPreferencesKey ? `logs-layout-${columnPreferencesKey}` : 'logs-layout'}
         >
           {hasFilterSideBar && (
             <>
