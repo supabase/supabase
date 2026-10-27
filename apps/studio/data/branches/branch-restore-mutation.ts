@@ -2,7 +2,7 @@ import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/
 import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError } from '@/types'
 
 export type BranchRestoreVariables = {
@@ -15,6 +15,7 @@ export async function restoreBranch({ branchRef }: BranchRestoreVariables) {
     params: {
       path: { branch_id_or_ref: branchRef },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

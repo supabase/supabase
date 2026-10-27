@@ -5,9 +5,13 @@ import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 import { Button, cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageSection } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ConstrainedIntegrationTabScaffold } from '../ConstrainedIntegrationTabScaffold'
+import { useIntegrationDetail } from '../Landing/useIntegrationDetail'
 import { CreateQueueSheet } from './CreateQueueSheet'
 import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
 import { AlertError } from '@/components/ui/AlertError'
@@ -21,6 +25,8 @@ export const QueuesTab = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+
+  const { isInstalled } = useIntegrationDetail()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [search, setSearch] = useState(searchQuery)
@@ -57,10 +63,13 @@ export const QueuesTab = () => {
     isError,
     isRefetching,
     refetch,
-  } = useQueuesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useQueuesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: isInstalled }
+  )
 
   // Filter queues based on search query
   const filteredQueues = useMemo(() => {
@@ -76,6 +85,18 @@ export const QueuesTab = () => {
 
   // Get columns configuration
   const columns = useMemo(() => formatQueueColumns(), [])
+
+  if (!isInstalled) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-6 xl:px-10">
+        <ConstrainedIntegrationTabScaffold>
+          <PageSection className="py-0">
+            <Admonition type="default" description="Queues is not installed." />
+          </PageSection>
+        </ConstrainedIntegrationTabScaffold>
+      </div>
+    )
+  }
 
   return (
     <>

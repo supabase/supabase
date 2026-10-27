@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { act, waitFor } from '@testing-library/react'
 import { delay, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -18,7 +19,7 @@ const paramsFor = (ref: string, name: string): SecretsParams => ({
   dev: { state: undefined },
 })
 
-const WRITE_DELAY_MS = 120
+const WRITE_DELAY_MS = 50
 
 const PROJECT: components['schemas']['ProjectDetailResponse_Output'] = {
   cloud_provider: 'AWS',

@@ -5,7 +5,7 @@ topics: ['Migration', 'Database']
 lastEdited: 2026-09-24
 ---
 
-Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore) to convert data from a Firebase Firestore database to a Supabase Postgres database. The process copies the entire contents of a single Firestore `collection` to a single Postgres `table`.
+Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/firestore) to convert data from a Firebase Firestore database to a [Supabase Postgres database](/solutions/hosted-postgres). The process copies the entire contents of a single Firestore `collection` to a single Postgres `table`.
 
 The Firestore `collection` is "flattened" and converted to a table with basic columns of one of the following types: `text`, `numeric`, `boolean`, or `jsonb`. If your structure is more complex, you can write a program to split the newly-created `json` file into multiple, related tables before you import your `json` file(s) to Supabase.
 
@@ -206,8 +206,8 @@ The result is two separate JSON files:
 ## Resources
 
 - [Supabase vs Firebase](/alternatives/supabase-vs-firebase)
-- [Firestore Storage Migration](/kb/guides/platform/migrating-to-supabase/firebase-storage)
-- [Firebase Auth Migration](/kb/guides/platform/migrating-to-supabase/firebase-auth)
+- [Firestore Storage Migration](/kb/guides/migrate-from-firebase-storage)
+- [Firebase Auth Migration](/kb/guides/migrate-from-firebase-auth)
 
 ## Migrate to Supabase
 

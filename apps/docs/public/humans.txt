@@ -38,6 +38,7 @@ Ariuna K
 Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
+Avinash Sajjanshetty
 Aziz Quadri
 Barco Fourie
 Barry Roodt
@@ -136,6 +137,7 @@ Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
+Glauber Costa
 Gonzalo Servat
 Graeme Gillies
 Greg Kress
@@ -175,6 +177,7 @@ Jesse White
 Jim Brodeur
 Jim Chanco Jr
 Joakim Ahrlin
+Joanna Lisiewicz
 Joanna Michniewicz
 Joaquim Moreno
 Joel Low
@@ -248,6 +251,7 @@ Matt Rossman
 Matt Smiley
 Matthias Luft
 Mats Kindahl
+Meg Corren
 Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
@@ -297,6 +301,7 @@ Ricardo Tavares
 Riccardo Busetti
 Richard Kasprzak
 Rob Shields
+Robert Vojta
 Rodrigo Esteves
 Rodrigo Mansueli
 Román Cuellar
@@ -315,6 +320,7 @@ Sam Rome
 Sam Rose
 Samir Ketema
 Sana Cordeaux
+Santos Flores de Leon
 Sasi Kanumuri
 Sara Read
 Satya Rohith Gannamanedi

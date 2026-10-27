@@ -17,6 +17,7 @@ import {
   GitBranch,
   Globe,
   Image,
+  KeyRound,
   Lock,
   Mail,
   MessageCircle,
@@ -1070,8 +1071,8 @@ Supabase's Social Sign-in feature allows you to improve user experience and pote
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '/images/features/social-login.png',
     heroImageLight: '/images/features/social-login-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/auth/social-login',
-    slug: 'social-login',
+    docsUrl: 'https://supabase.com/docs/guides/auth/social-sign-in',
+    slug: 'social-sign-in',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
@@ -2033,8 +2034,7 @@ Turn on the OAuth 2.1 server and dynamic client registration under Authenticatio
 `,
     icon: Server,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION, PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: '',
-    hideHero: true,
+    heroImage: 'https://www.youtube-nocookie.com/embed/vEv87D-eJK4',
     docsUrl: 'https://supabase.com/docs/reference/server/introduction',
     slug: 'server-sdk',
     status: {
@@ -2353,6 +2353,56 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     heroImageLight: '/images/features/management-api-light.png',
     docsUrl: 'https://supabase.com/docs/reference/api/introduction',
     slug: 'management-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
+    title: 'Personal Access Tokens',
+    subtitle: 'Limit a token to the organizations, projects, and permissions its job needs.',
+    description: `
+Personal Access Tokens authenticate your CLI, scripts, CI pipelines, and AI coding agents to your Supabase account. You can limit each token to the organizations, projects, and permissions its job needs, instead of handing a tool access to everything you can reach.
+
+Tokens you create in the Dashboard are scoped by default. Access is checked on every request and never exceeds your own role.
+
+## Key benefits
+1. Least privilege: Give a CI pipeline or coding agent a token limited to one project and the permissions its job needs.
+2. Contained leaks: A leaked token exposes only what it was scoped to, not your whole account.
+3. Review before you create: A review screen shows what a token can reach before you create it.
+4. Expiry: Set an expiry date so a temporary tool doesn't hold a token forever.
+5. Bounded by your role: A token never has more access than you do. If you lose access to a project, the token does too.
+6. Works where you work: Use a token with the CLI, the Management API, and the Supabase MCP server.
+
+## Personal Access Tokens are particularly valuable for:
+- CI pipelines that deploy a single project
+- AI coding agents connected through the Supabase MCP server
+- Scripts and tools that do one narrow task
+- Developers who belong to several organizations and want a token that reaches only one
+
+## Frequently asked questions
+
+### Can I change a token's scope after I create it?
+
+No. A token's scope is fixed when you create it. To change it, create a replacement token.
+
+### Can I scope the token that Supabase login creates?
+
+Not yet. \`supabase login\` in the browser creates a token with full account access today. Create the token in the Dashboard and pass it with \`supabase login --token\`.
+
+### What happens if I lose access to a project?
+
+The token loses that access too. If your access is restored, the token works again.
+
+Get started with the [Personal Access Tokens documentation](https://supabase.com/docs/guides/platform/personal-access-tokens).
+`,
+    icon: KeyRound,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/features/personal-access-tokens.png',
+    heroImageLight: '/images/features/personal-access-tokens-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/platform/personal-access-tokens',
+    blogUrl: 'https://supabase.com/blog/scope-your-personal-access-tokens',
+    slug: 'personal-access-tokens',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,

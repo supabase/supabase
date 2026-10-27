@@ -1841,88 +1841,108 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/quickstarts/with-expo-react-native',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/social-login',
+    destination: '/docs/guides/auth/social-sign-in',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/social-login/:path*',
+    destination: '/docs/guides/auth/social-sign-in/:path*',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/auth-google',
-    destination: '/docs/guides/auth/social-login/auth-google',
+    destination: '/docs/guides/auth/social-sign-in/auth-google',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-facebook',
-    destination: '/docs/guides/auth/social-login/auth-facebook',
+    destination: '/docs/guides/auth/social-sign-in/auth-facebook',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-apple',
-    destination: '/docs/guides/auth/social-login/auth-apple',
+    destination: '/docs/guides/auth/social-sign-in/auth-apple',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-azure',
-    destination: '/docs/guides/auth/social-login/auth-azure',
+    destination: '/docs/guides/auth/social-sign-in/auth-azure',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-twitter',
-    destination: '/docs/guides/auth/social-login/auth-twitter',
+    destination: '/docs/guides/auth/social-sign-in/auth-twitter',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-github',
-    destination: '/docs/guides/auth/social-login/auth-github',
+    destination: '/docs/guides/auth/social-sign-in/auth-github',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-gitlab',
-    destination: '/docs/guides/auth/social-login/auth-gitlab',
+    destination: '/docs/guides/auth/social-sign-in/auth-gitlab',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-bitbucket',
-    destination: '/docs/guides/auth/social-login/auth-bitbucket',
+    destination: '/docs/guides/auth/social-sign-in/auth-bitbucket',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-discord',
-    destination: '/docs/guides/auth/social-login/auth-discord',
+    destination: '/docs/guides/auth/social-sign-in/auth-discord',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-keycloak',
-    destination: '/docs/guides/auth/social-login/auth-keycloak',
+    destination: '/docs/guides/auth/social-sign-in/auth-keycloak',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-linkedin',
-    destination: '/docs/guides/auth/social-login/auth-linkedin',
+    destination: '/docs/guides/auth/social-sign-in/auth-linkedin',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-notion',
-    destination: '/docs/guides/auth/social-login/auth-notion',
+    destination: '/docs/guides/auth/social-sign-in/auth-notion',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-slack',
-    destination: '/docs/guides/auth/social-login/auth-slack',
+    destination: '/docs/guides/auth/social-sign-in/auth-slack',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-spotify',
-    destination: '/docs/guides/auth/social-login/auth-spotify',
+    destination: '/docs/guides/auth/social-sign-in/auth-spotify',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-twitch',
-    destination: '/docs/guides/auth/social-login/auth-twitch',
+    destination: '/docs/guides/auth/social-sign-in/auth-twitch',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-workos',
-    destination: '/docs/guides/auth/social-login/auth-workos',
+    destination: '/docs/guides/auth/social-sign-in/auth-workos',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-zoom',
-    destination: '/docs/guides/auth/social-login/auth-zoom',
+    destination: '/docs/guides/auth/social-sign-in/auth-zoom',
   },
   {
     permanent: true,
@@ -2002,7 +2022,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/with-expo-social-auth',
-    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
   },
   {
     permanent: true,
@@ -2012,7 +2032,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/getting-started/tutorials/with-expo-social-auth',
-    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
   },
   {
     permanent: true,
@@ -2077,27 +2097,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/migrations/auth0',
-    destination: '/docs/guides/platform/migrating-to-supabase/auth0',
+    destination: '/kb/guides/migrate-from-auth0',
   },
   {
     permanent: true,
-    source: '/docs/guides/migrations/firestore-data',
-    destination: '/docs/guides/platform/migrating-to-supabase/firestore-data',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/migrations/firebase-auth',
-    destination: '/docs/guides/platform/migrating-to-supabase/firebase-auth',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/migrations/firebase-storage',
-    destination: '/docs/guides/platform/migrating-to-supabase/firebase-storage',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/migrations/heroku',
-    destination: '/docs/guides/platform/migrating-to-supabase/heroku',
+    source: '/docs/guides/migrations/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
   },
   {
     permanent: true,
@@ -2782,7 +2787,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-google-oauth',
-    destination: '/docs/guides/auth/social-login/auth-google',
+    destination: '/docs/guides/auth/social-sign-in/auth-google',
   },
   {
     permanent: true,
@@ -2842,7 +2847,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/native-mobile-login',
-    destination: '/docs/guides/auth/social-login',
+    destination: '/docs/guides/auth/social-sign-in',
   },
   {
     permanent: true,
@@ -2872,7 +2877,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/auth-deep-dive/auth-google-oauth',
-    destination: '/docs/guides/auth/social-login/auth-google',
+    destination: '/docs/guides/auth/social-sign-in/auth-google',
   },
   {
     permanent: true,
@@ -2967,7 +2972,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
-    destination: '/docs/guides/auth/social-login',
+    destination: '/docs/guides/auth/social-sign-in',
   },
   {
     permanent: true,
@@ -3130,8 +3135,33 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/resources/migrating-to-supabase/:path*',
-    destination: '/docs/guides/platform/migrating-to-supabase/:path*',
+    source: '/docs/guides/platform/migrating-to-supabase',
+    destination: '/kb/topics/migration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase',
+    destination: '/kb/topics/migration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/migrating-to-supabase/vercel-postgres',
+    destination: '/kb/guides/migrate-from-vercel-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase/vercel-postgres',
+    destination: '/kb/guides/migrate-from-vercel-postgres',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/migrating-to-supabase/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/resources/migrating-to-supabase/:slug',
+    destination: '/kb/guides/migrate-from-:slug',
   },
   {
     permanent: true,
@@ -3313,6 +3343,11 @@ module.exports = [
   // features
   {
     permanent: true,
+    source: '/features/social-login',
+    destination: '/features/social-sign-in',
+  },
+  {
+    permanent: true,
     source: '/features/ai-query-assistance',
     destination: '/features/ai-assistant',
   },
@@ -3477,6 +3512,7 @@ module.exports = [
   },
   { permanent: true, source: '/docs/guides/api/api-settings', destination: '/docs/guides/api' },
   { permanent: true, source: '/docs/reference/llms.md', destination: '/llms.txt' },
+  { permanent: true, source: '/docs/llms.txt', destination: '/llms.txt' },
   { permanent: true, source: '/docs/guides/api/rest', destination: '/docs/guides/api' },
   {
     permanent: true,
@@ -4229,5 +4265,25 @@ module.exports = [
     permanent: true,
     source: '/docs/deployment/branching/dashboard',
     destination: '/docs/guides/deployment/branching/dashboard',
+  },
+  {
+    permanent: true,
+    source: '/docs/deployment/branching/github-integration',
+    destination: '/docs/guides/deployment/branching/github-integration',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/mcp',
+    destination: '/docs/guides/ai-tools/mcp',
+  },
+  {
+    permanent: true,
+    source: '/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png',
+    destination: '/docs/img/supabase-architecture.svg',
+  },
+  {
+    permanent: true,
+    source: '/changelog/rss.xml',
+    destination: '/changelog-rss.xml',
   },
 ]

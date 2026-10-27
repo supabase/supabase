@@ -47,6 +47,7 @@ import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { authenticatorRoleConfigQueryOptions } from '@/data/database/authenticator-role-config-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { unguarded } from '@/data/fetchers'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
@@ -702,6 +703,7 @@ export const PostgrestConfig = () => {
             projectRef,
             connectionString: project?.connectionString,
             sql: resetAuthenticatorDbSchemasSql,
+            grant: unguarded.migrating,
           })
         }}
       >

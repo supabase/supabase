@@ -43,22 +43,14 @@ describe('getSqlErrorLines', () => {
     ])
   })
 
-  it('returns empty array for a single-line message so callers render the fallback', () => {
-    const lines = getSqlErrorLines({ message: 'permission denied for table users' })
-    expect(lines).toEqual([])
-  })
-
-  it('returns empty array when both fields are missing', () => {
-    expect(getSqlErrorLines({})).toEqual([])
-  })
-
-  it('returns empty array when message is an empty string', () => {
-    expect(getSqlErrorLines({ message: '' })).toEqual([])
-  })
-
-  it('returns empty array when message only contains whitespace newlines', () => {
-    // Only empty segments after filtering — treated as single-line
-    expect(getSqlErrorLines({ message: '\n\n' })).toEqual([])
+  // A single-line (or empty) message returns no lines so callers render their fallback.
+  it.each([
+    ['a single-line message', { message: 'permission denied for table users' }],
+    ['both fields missing', {}],
+    ['an empty message', { message: '' }],
+    ['a message of only newlines', { message: '\n\n' }],
+  ])('returns an empty array for %s', (_, error) => {
+    expect(getSqlErrorLines(error)).toEqual([])
   })
 
   it('prefers formattedError even when message is also multi-line', () => {
@@ -100,37 +92,22 @@ describe('trimTrailingSemicolons', () => {
 })
 
 describe('applyAutoLimit', () => {
-  test('Should return false if limit passed is <= 0', () => {
-    const sql = safeSql`select * from countries;`
-    const limit = -1
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
+  test('does not append when the limit passed is <= 0', () => {
+    expect(applyAutoLimit(safeSql`select * from countries;`, -1).appendAutoLimit).toBe(false)
   })
-  test('Should return true if limit passed is > 0', () => {
-    const sql = safeSql`select * from countries;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(true)
-  })
-  test('Should return false if query already has a limit', () => {
-    const sql = safeSql`select * from countries limit 10;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
+
   test.each([
-    'select * from countries limit all;',
-    'select * from countries limit all',
-    'SELECT * FROM countries LIMIT ALL ;',
-    'select * from countries limit null;',
-    'select * from countries limit all offset 5;',
-    'select * from countries offset 5 limit null',
-  ])('Should return false if query already has LIMIT ALL / LIMIT NULL: %s', (query) => {
-    const { sql, appendAutoLimit } = applyAutoLimit(query as SafeSqlFragment, 100)
-    expect(appendAutoLimit).toBe(false)
-    expect(sql).toBe(query)
+    ['without a semicolon', 'select * from countries'],
+    ['with a semicolon', 'select * from countries;'],
+    ['with multiple semicolons', 'select * from countries;;;;;;;'],
+  ])('appends the limit to a query %s', (_, query) => {
+    expect(applyAutoLimit(query as SafeSqlFragment, 100)).toEqual({
+      sql: 'select * from countries limit 100;',
+      appendAutoLimit: true,
+    })
   })
-  test('Should append the limit to a CTE query', () => {
+
+  test('appends the limit to a CTE query', () => {
     const sql = safeSql`WITH numbers AS (SELECT generate_series(1, 2000) AS n) SELECT n FROM numbers;`
     const result = applyAutoLimit(sql, 100)
     expect(result.appendAutoLimit).toBe(true)
@@ -138,150 +115,56 @@ describe('applyAutoLimit', () => {
       'WITH numbers AS (SELECT generate_series(1, 2000) AS n) SELECT n FROM numbers limit 100;'
     )
   })
-  test('Should append the limit to a recursive CTE query when the inner query has its own limit', () => {
-    const sql = safeSql`with recursive t as (select 1 as n limit 5) select * from t`
-    expect(applyAutoLimit(sql, 100).appendAutoLimit).toBe(true)
-  })
-  test('Should return false if a CTE query already has a limit', () => {
-    const sql = safeSql`with t as (select 1) select * from t limit 10`
-    expect(applyAutoLimit(sql, 100).appendAutoLimit).toBe(false)
-  })
-  test('Should append the limit to a read-only CTE whose literals or identifiers contain write keywords', () => {
-    const sql = safeSql`with t as (select 'update' as "delete") select * from t`
-    expect(applyAutoLimit(sql, 100).appendAutoLimit).toBe(true)
-  })
+
   test.each([
+    [
+      'a recursive CTE whose inner query has its own limit',
+      'with recursive t as (select 1 as n limit 5) select * from t',
+    ],
+    [
+      'a read-only CTE whose literals or identifiers contain write keywords',
+      `with t as (select 'update' as "delete") select * from t`,
+    ],
+  ])('appends the limit to %s', (_, query) => {
+    expect(applyAutoLimit(query as SafeSqlFragment, 100).appendAutoLimit).toBe(true)
+  })
+
+  test.each([
+    // Existing limits, in any casing/whitespace/order, including LIMIT ALL / NULL
+    'select * from countries limit 10;',
+    'SELECT * FROM countries LIMIT 10;',
+    'select * from countries limit 10 ;',
+    'select * from countries limit 10 offset 0;',
+    'select * from countries limit 10 offset 0 ;',
+    'select * from countries offset 0 limit 1;',
+    'select * from countries limit',
+    'select * from countries limit all;',
+    'select * from countries limit all',
+    'SELECT * FROM countries LIMIT ALL ;',
+    'select * from countries limit null;',
+    'select * from countries limit all offset 5;',
+    'select * from countries offset 5 limit null',
+    'with t as (select 1) select * from t limit 10',
+    // FETCH FIRST / NEXT instead of limit
+    'select * from countries FETCH FIRST 5 rows only',
+    'select * from countries fetch   first 5 rows only',
+    'select * from countries offset 5 rows FETCH NEXT 5 rows only',
+    // CTEs that write
     'with d as (delete from t returning *) select * from d',
     'with s as (select 1) insert into t select * from s',
     'with s as (select 1) update t set a = 1',
     'with t as (select 1) select * into new_t from t',
-  ])('Should return false for a CTE query that writes: %s', (query) => {
-    expect(applyAutoLimit(query as SafeSqlFragment, 100).appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit (check for case-insensitiveness)', () => {
-    const sql = safeSql`SELECT * FROM countries LIMIT 10;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit with whitespace before the semi colon', () => {
-    const sql = safeSql`select * from countries limit 10 ;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit and offset', () => {
-    const sql = safeSql`select * from countries limit 10 offset 0;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit and offset with whitespace before the semi colon', () => {
-    const sql = safeSql`select * from countries limit 10 offset 0 ;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit and offset (flip order of limit and offset)', () => {
-    const sql = safeSql`select * from countries offset 0 limit 1;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query already has a limit, even if no value provided for limit', () => {
-    const sql = safeSql`select * from countries limit`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `FETCH FIRST` instead of limit ', () => {
-    const sql = safeSql`select * from countries FETCH FIRST 5 rows only`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `fetch first` instead of limit ', () => {
-    const sql = safeSql`select * from countries fetch first 5 rows only`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `fetch   first` (with random spaces) instead of limit ', () => {
-    const sql = safeSql`select * from countries FETCH FIRST 5 rows only`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query uses `FETCH NEXT` instead of limit ', () => {
-    const sql = safeSql`select * from countries offset 5 rows FETCH NEXT 5 rows only`
-    const { sql: result, appendAutoLimit } = applyAutoLimit(sql, 100)
-    expect(appendAutoLimit).toBe(false)
-    expect(result).toBe(sql)
-  })
-  test('Should return false if query is not a select statement', () => {
-    const sql = safeSql`create table test (id int8 primary key, name varchar);`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if there are multiple queries I', () => {
-    const sql1 = safeSql`select * from countries;
-select * from cities;`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql1, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if there are multiple queries II', () => {
-    const sql1 = safeSql`select * from countries;
-select * from cities`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql1, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  // [Joshen] Opting to just avoid appending in this case to prevent making the logic overly complex atm
-  test('Should return false if query has with a comment I', () => {
-    const sql = safeSql`-- This is a comment
-select * from cities`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-  test('Should return false if query has with a comment II', () => {
-    const sql = safeSql`select * from cities
--- This is a comment`
-    const limit = 100
-    const { appendAutoLimit } = applyAutoLimit(sql, limit)
-    expect(appendAutoLimit).toBe(false)
-  })
-
-  // [Joshen] These will just need to test the cases when appendAutoLimit returns true then
-  test('Should add the limit param properly if query ends without a semi colon', () => {
-    const sql = safeSql`select * from countries`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 100;')
-  })
-  test('Should add the limit param properly if query ends with a semi colon', () => {
-    const sql = safeSql`select * from countries;`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 100;')
-  })
-  test('Should add the limit param properly if query ends with multiple semi colon', () => {
-    const sql = safeSql`select * from countries;;;;;;;`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 100;')
-  })
-  test('Should not append a limit if query already has one with whitespace before the semi colon', () => {
-    const sql = safeSql`select * from countries limit 10 ;`
-    const limit = 100
-    const { sql: formattedSql } = applyAutoLimit(sql, limit)
-    expect(formattedSql).toBe('select * from countries limit 10 ;')
-  })
-  test('returns the SafeSqlFragment result unchanged when no limit is appended', () => {
-    const sql = safeSql`select * from countries limit 10;`
-    const { sql: formattedSql } = applyAutoLimit(sql, 100)
-    expect(formattedSql).toBe(sql)
+    // Non-select statements and multiple statements
+    'create table test (id int8 primary key, name varchar);',
+    'select * from countries;\nselect * from cities;',
+    'select * from countries;\nselect * from cities',
+    // [Joshen] Opting to just avoid appending with comments to keep the logic simple atm
+    '-- This is a comment\nselect * from cities',
+    'select * from cities\n-- This is a comment',
+  ])('leaves the query unchanged: %s', (query) => {
+    expect(applyAutoLimit(query as SafeSqlFragment, 100)).toEqual({
+      sql: query,
+      appendAutoLimit: false,
+    })
   })
 })

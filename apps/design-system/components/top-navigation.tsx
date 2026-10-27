@@ -26,9 +26,9 @@ export const TopNavigation = () => {
               aria-label="Toggle navigation menu"
             />
             <Link href="/" className="flex items-center lg:gap-6 gap-4">
-              <h1 className="hidden md:flex line-clamp-1 lg:text-2xl text-xl">
+              <span className="hidden md:flex line-clamp-1 lg:text-2xl text-xl">
                 Supabase Design System
-              </h1>
+              </span>
               <HomepageSvgHandler name="logo" className="h-4 w-auto" />
             </Link>
           </div>

@@ -7,6 +7,7 @@ import { CodeBlockControlsIsland } from '../components/CodeBlockControlsIsland'
 import { FeaturedSection } from '../components/FeaturedSection'
 import { GuideSidebar } from '../components/GuideSidebar'
 import { formatDisplayDate } from '../lib/format-date'
+import { TocHeaderMenu } from '../components/TocHeaderMenu'
 import type { RelatedGuides } from '../lib/guides'
 import Layout from './Layout.astro'
 import { getTopicDescription, isKnownTopic, topicToSlug } from '../lib/topics'
@@ -43,6 +44,16 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 ---
 
 <Layout title={title} description={description} jsonLd={jsonLd}>
+	{
+		toc.length > 0 && (
+			<TocHeaderMenu
+				slot="header-end"
+				client:media="(width < 64rem)"
+				items={toc}
+				className="section-container pr-8 lg:hidden"
+			/>
+		)
+	}
 	<div class="section-container lg:grid lg:grid-cols-3 lg:gap-6">
 		<article class="prose prose-img:rounded-lg max-w-none min-w-0 py-16 lg:col-span-2">
 			<Breadcrumb className="not-prose mb-6">
@@ -78,7 +89,7 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 				</BreadcrumbList>
 			</Breadcrumb>
 			<header class="mb-8">
-				<h1 class="mt-0 mb-0 text-balance">{title}</h1>
+				<h1 data-page-title={title} class="mt-0 mb-0 text-balance">{title}</h1>
 				{lastEdited && <p class="not-prose mt-3 text-sm text-foreground-lighter">Last edited: {formatDisplayDate(lastEdited)}</p>}
 				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
 			</header>
