@@ -290,15 +290,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     return filterWebhookDeliveries(deliveries, deliverySearch)
   }, [deliveries, deliverySearch, selectedEndpoint])
 
-  const deliveryAttempt = useMemo(() => {
-    if (!selectedDelivery) return null
-    const sortedDeliveries = [...deliveries].sort(
-      (a, b) => new Date(b.attemptAt).getTime() - new Date(a.attemptAt).getTime()
-    )
-    const index = sortedDeliveries.findIndex((delivery) => delivery.id === selectedDelivery.id)
-    return index >= 0 ? index + 1 : null
-  }, [deliveries, selectedDelivery])
-
   const deliveryEventPayload = useMemo(() => {
     if (!selectedDelivery) return ''
     return JSON.stringify(
@@ -601,7 +592,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       </PageContainer>
 
       <PlatformWebhooksDeliveryDetailsSheet
-        deliveryAttempt={deliveryAttempt}
         deliveryDetailsTab={deliveryDetailsTab}
         deliveryEventPayload={deliveryEventPayload}
         deliveryResponsePayload={deliveryResponsePayload}
