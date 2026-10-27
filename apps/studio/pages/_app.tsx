@@ -164,10 +164,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page)
 
   const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
-    const shouldReload = getChunkLoadReloadDecision(error)
+    // A chunk failure a reload recovers from isn't worth reporting; one that
+    // recurs inside the reload guard window is reported below
+    if (getChunkLoadReloadDecision(error)) {
+      window.location.reload()
+      return
+    }
+
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
-      if (isChunkLoadError(error)) scope.setTag('chunkLoadReload', shouldReload)
+      if (isChunkLoadError(error)) scope.setTag('chunkLoadError', true)
       const eventId = Sentry.captureException(error)
       // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
       if (eventId && error && typeof error === 'object') {
@@ -176,7 +182,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     })
 
     console.error(error.stack)
-    if (shouldReload) window.location.reload()
   }
 
   useThemeSandbox()
