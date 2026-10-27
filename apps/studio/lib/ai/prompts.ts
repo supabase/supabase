@@ -521,7 +521,7 @@ CREATE OR REPLACE FUNCTION notify_custom_event()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-AS $
+AS $$
 BEGIN
   PERFORM realtime.send(
     'room:' || NEW.room_id::text,
