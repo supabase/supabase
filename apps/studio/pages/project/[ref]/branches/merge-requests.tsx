@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ArrowRightIcon, GitMergeIcon, MoreVerticalIcon, ShieldIcon, XIcon } from 'lucide-react'
@@ -30,12 +31,13 @@ import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions, type Branch } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 import type { NextPageWithLayout } from '@/types'
 
@@ -53,6 +55,8 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ
   )
 
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+
   const {
     data: connections,
     error: connectionsError,
@@ -66,7 +70,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     error: branchesError,
     isPending: isLoadingBranches,
     isError: isErrorBranches,
-  } = useBranchesQuery({ projectRef })
+  } = useQuery(branchesQueryOptions({ projectRef, grant: branchesGrant.grant }))
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
@@ -317,7 +321,11 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const { data: branches } = useBranchesQuery({ projectRef })
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+
+  const { data: branches } = useQuery(
+    branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
+  )
   const previewBranches = (branches || []).filter((b) => !b.is_default)
 
   const track = useTrack()
