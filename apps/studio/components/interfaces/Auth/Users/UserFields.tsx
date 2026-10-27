@@ -27,7 +27,6 @@ function getUserFields(user: User): { label: string; value: string }[] {
   ]
 }
 
-/** A user's details as key/value rows; click a row to copy its value. */
 export function UserFields({ user, className }: { user: User; className?: string }) {
   return (
     <div className={cn('flex flex-col py-1', className)}>
