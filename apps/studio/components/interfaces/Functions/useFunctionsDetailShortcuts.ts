@@ -8,7 +8,6 @@ interface UseFunctionsDetailShortcutsParams {
   functionSlug: string | undefined
   canReadFunctions: boolean
   isPlatform: boolean
-  /** False once unified logs merge invocations into the Logs tab */
   hasInvocationsTab: boolean
   onOpenTest: () => void
   onOpenDownload: () => void
