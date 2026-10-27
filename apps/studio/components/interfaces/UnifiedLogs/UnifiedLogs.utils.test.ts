@@ -12,7 +12,6 @@ import {
   getLogTypeVisibility,
   getRawLogData,
   getUniqueLogRows,
-  isOfferedFilter,
   parseMultigresEventMessage,
   toQuerySearchParams,
   wrapIlikePattern,
@@ -216,20 +215,6 @@ const FUNCTION_SCOPE: UnifiedLogsScope = {
     { column: 'function_id', operator: '=', value: 'fn-123' },
   ],
 }
-
-describe('isOfferedFilter', () => {
-  it('offers every filter when the view lists none', () => {
-    expect(isOfferedFilter('user')).toBe(true)
-    expect(isOfferedFilter('pathname')).toBe(true)
-  })
-
-  it('offers only the listed filters', () => {
-    const offeredFilters = ['date', 'level']
-    expect(isOfferedFilter('level', offeredFilters)).toBe(true)
-    expect(isOfferedFilter('user', offeredFilters)).toBe(false)
-    expect(isOfferedFilter('pathname', offeredFilters)).toBe(false)
-  })
-})
 
 describe('getLogTypeVisibility', () => {
   it('hides edge function runtime logs from the project-wide view and keeps other gates', () => {

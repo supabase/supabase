@@ -42,7 +42,6 @@ const TimeRangeOption = ({ onChange }: CustomOptionProps) => (
 )
 
 interface LogsFilterBarProps {
-  /** Filters to offer, by name (field values, plus `user`). Every filter by default. */
   offeredFilters?: readonly string[]
 }
 
