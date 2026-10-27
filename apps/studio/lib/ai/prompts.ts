@@ -504,7 +504,7 @@ BEGIN
     NEW,
     OLD
   );
-  RETURN COALESCE(NEW, OLD);
+  RETURN NULL;
 END;
 $$;
 
@@ -524,10 +524,10 @@ SECURITY DEFINER
 AS $$
 BEGIN
   PERFORM realtime.send(
-    'room:' || NEW.room_id::text,
-    'status_changed',
-    jsonb_build_object('id', NEW.id, 'status', NEW.status),
-    false  -- set to true for private channels
+    payload => jsonb_build_object('id', NEW.id, 'status', NEW.status),
+    event => 'status_changed',
+    topic => 'room:' || NEW.room_id::text,
+    private => true -- Must match config: { private: true } on the client
   );
   RETURN NEW;
 END;
@@ -639,7 +639,11 @@ useEffect(() => {
 
     channel
       .on('broadcast', { event: 'message_created' }, handleMessage)
-      .subscribe()
+      .subscribe((status, error) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.error('Realtime subscription failed:', status, error)
+        }
+      })
   }
 
   void setupChannel().catch((error) => {
