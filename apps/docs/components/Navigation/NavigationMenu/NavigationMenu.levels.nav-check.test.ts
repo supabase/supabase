@@ -7,9 +7,14 @@ import * as option1NavItems from '@/features/IaNav/option1.constants'
 const MAX_ITEMS = 9
 
 type Level = { path: string; size: number }
-type NavNode = { name?: string; items?: NavNode[] }
+type NavNode = { name?: string; enabled?: boolean; items?: NavNode[] }
 
-function sidebarLevels(path: string, items: NavNode[]): Level[] {
+// count only what renders: disabled items and their subtrees are hidden
+const isRendered = (item: { enabled?: boolean }) => item.enabled !== false
+
+function sidebarLevels(path: string, allItems: NavNode[]): Level[] {
+  const items = allItems.filter((item) => isRendered(item))
+
   return [
     { path, size: items.length },
     ...items.flatMap((item) =>
@@ -18,13 +23,15 @@ function sidebarLevels(path: string, items: NavNode[]): Level[] {
   ]
 }
 
-function topNavLevels(menu: GlobalMenuItems): Level[] {
+function topNavLevels(allSections: GlobalMenuItems): Level[] {
+  const menu = allSections.filter(([item]) => isRendered(item))
+
   return [
     { path: 'Top nav', size: menu.length },
     ...menu.flatMap(([item]) =>
       (item.menuItems ?? []).map((column, index) => ({
         path: `Top nav > ${item.label} > column ${index + 1}`,
-        size: column.length,
+        size: column.filter((columnItem) => isRendered(columnItem)).length,
       }))
     ),
   ]
