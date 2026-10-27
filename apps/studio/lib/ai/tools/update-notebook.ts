@@ -32,6 +32,10 @@ export const contract = {
   inputSchema,
   outputSchema,
   minOptInLevel: 'schema',
+  availability: {
+    environments: new Set(['platform']),
+    requires: new Set(['explorer']),
+  },
   needsApproval: true,
   toModelOutput: ({ id, name }) => ({ id, name }),
 } as const satisfies ToolContract

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getIncidentTools } from './incident-tools'
+import { createTool as createGetActiveIncidentsTool } from './get-active-incidents.server'
+import type { ToolContext } from './types'
 
 // Mock IS_PLATFORM
 vi.mock('common', () => ({
@@ -20,7 +21,11 @@ function statusPagePayload(overrides: Record<string, unknown> = {}) {
   }
 }
 
-describe('ai/tools/incident-tools', () => {
+const createIncidentTools = (ctx: ToolContext) => ({
+  get_active_incidents: createGetActiveIncidentsTool(ctx),
+})
+
+describe('ai/tools/get-active-incidents', () => {
   let mockFetch: ReturnType<typeof vi.fn>
   let mockAbortSignal: AbortSignal
 
@@ -35,13 +40,13 @@ describe('ai/tools/incident-tools', () => {
     }
   })
 
-  describe('getIncidentTools', () => {
+  describe('incident tools', () => {
     describe('execute function', () => {
       it('should return empty incidents when not on platform', async () => {
         const common = await import('common')
         vi.spyOn(common, 'IS_PLATFORM', 'get').mockReturnValue(false)
 
-        const tools = getIncidentTools({
+        const tools = createIncidentTools({
           baseUrl: 'https://supabase.com/dashboard',
           aiOptInLevel: 'schema',
         })
@@ -60,7 +65,7 @@ describe('ai/tools/incident-tools', () => {
 
         mockFetch.mockRejectedValue(new Error('Network error'))
 
-        const tools = getIncidentTools({
+        const tools = createIncidentTools({
           baseUrl: 'https://supabase.com/dashboard',
           aiOptInLevel: 'schema',
         })
@@ -78,7 +83,7 @@ describe('ai/tools/incident-tools', () => {
           json: async () => statusPagePayload(),
         })
 
-        const tools = getIncidentTools({
+        const tools = createIncidentTools({
           baseUrl: 'https://supabase.com/dashboard',
           aiOptInLevel: 'schema',
         })
@@ -99,7 +104,7 @@ describe('ai/tools/incident-tools', () => {
         })
         const abortController = new AbortController()
 
-        const tools = getIncidentTools({
+        const tools = createIncidentTools({
           baseUrl: 'https://supabase.com/dashboard',
           aiOptInLevel: 'schema',
         })
@@ -151,7 +156,7 @@ describe('ai/tools/incident-tools', () => {
         json: async () => statusPagePayload(),
       })
 
-      const tools = getIncidentTools({
+      const tools = createIncidentTools({
         baseUrl: 'https://example.com/dashboard',
         aiOptInLevel: 'schema',
       })
@@ -176,7 +181,7 @@ describe('ai/tools/incident-tools', () => {
           }),
       })
 
-      const tools = getIncidentTools({
+      const tools = createIncidentTools({
         baseUrl: 'https://supabase.com/dashboard',
         aiOptInLevel: 'schema',
       })
@@ -198,7 +203,7 @@ describe('ai/tools/incident-tools', () => {
           }),
       })
 
-      const tools = getIncidentTools({
+      const tools = createIncidentTools({
         baseUrl: 'https://supabase.com/dashboard',
         aiOptInLevel: 'schema',
       })
@@ -233,7 +238,7 @@ describe('ai/tools/incident-tools', () => {
           }),
       })
 
-      const tools = getIncidentTools({
+      const tools = createIncidentTools({
         baseUrl: 'https://supabase.com/dashboard',
         aiOptInLevel: 'schema',
       })
@@ -256,7 +261,7 @@ describe('ai/tools/incident-tools', () => {
           }),
       })
 
-      const tools = getIncidentTools({
+      const tools = createIncidentTools({
         baseUrl: 'https://supabase.com/dashboard',
         aiOptInLevel: 'schema',
       })
@@ -273,7 +278,7 @@ describe('ai/tools/incident-tools', () => {
         json: async () => statusPagePayload(),
       })
 
-      const tools = getIncidentTools({
+      const tools = createIncidentTools({
         baseUrl: 'https://supabase.com/dashboard',
         aiOptInLevel: 'schema',
       })
@@ -291,7 +296,7 @@ describe('ai/tools/incident-tools', () => {
         json: async () => ({ this_is: 'not a valid status page response' }),
       })
 
-      const tools = getIncidentTools({
+      const tools = createIncidentTools({
         baseUrl: 'https://supabase.com/dashboard',
         aiOptInLevel: 'schema',
       })
@@ -306,7 +311,7 @@ describe('ai/tools/incident-tools', () => {
         status: 500,
       })
 
-      const tools = getIncidentTools({
+      const tools = createIncidentTools({
         baseUrl: 'https://supabase.com/dashboard',
         aiOptInLevel: 'schema',
       })

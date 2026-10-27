@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getSchemaTools } from './schema-tools'
+import { createTool as createListPoliciesTool } from './list-policies.server'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 
 vi.mock('@/data/sql/execute-sql-mutation', () => ({
@@ -9,7 +9,7 @@ vi.mock('@/data/sql/execute-sql-mutation', () => ({
 
 const TOOL_CONTEXT = { toolCallId: 'test', messages: [], context: {} }
 
-describe('ai/tools/schema-tools list_policies', () => {
+describe('ai/tools/list-policies', () => {
   beforeEach(() => {
     vi.mocked(executeSql).mockReset()
     vi.mocked(executeSql).mockResolvedValue({
@@ -27,15 +27,15 @@ describe('ai/tools/schema-tools list_policies', () => {
   })
 
   it('forwards the Authorization header to executeSql', async () => {
-    const tools = getSchemaTools({
+    const tool = createListPoliciesTool({
       projectRef: 'abcdefghijklmnopqrst',
       connectionString: 'encrypted',
       authorization: 'Bearer token',
       aiOptInLevel: 'schema',
     })
-    if (!tools.list_policies.execute) throw new Error('execute is undefined')
+    if (!tool.execute) throw new Error('execute is undefined')
 
-    const result = await tools.list_policies.execute({ schemas: ['public'] }, TOOL_CONTEXT)
+    const result = await tool.execute({ schemas: ['public'] }, TOOL_CONTEXT)
 
     expect(executeSql).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -49,14 +49,14 @@ describe('ai/tools/schema-tools list_policies', () => {
   })
 
   it('omits headers when no authorization is provided', async () => {
-    const tools = getSchemaTools({
+    const tool = createListPoliciesTool({
       projectRef: 'abcdefghijklmnopqrst',
       connectionString: 'encrypted',
       aiOptInLevel: 'schema',
     })
-    if (!tools.list_policies.execute) throw new Error('execute is undefined')
+    if (!tool.execute) throw new Error('execute is undefined')
 
-    await tools.list_policies.execute({ schemas: ['public'] }, TOOL_CONTEXT)
+    await tool.execute({ schemas: ['public'] }, TOOL_CONTEXT)
 
     expect(executeSql).toHaveBeenCalledWith(expect.any(Object), undefined, undefined)
   })
