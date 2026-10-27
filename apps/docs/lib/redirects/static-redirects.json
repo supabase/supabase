@@ -757,7 +757,7 @@
   {
     "source": "/docs/guides/auth/troubleshooting",
     "destination": "/kb/topics/troubleshooting?troubleshooting=auth",
-    "permanent": false
+    "permanent": true
   },
   {
     "source": "/docs/guides/cli",
@@ -1032,7 +1032,7 @@
   {
     "source": "/docs/guides/database/troubleshooting",
     "destination": "/kb/topics/troubleshooting?troubleshooting=database",
-    "permanent": false
+    "permanent": true
   },
   {
     "source": "/docs/guides/database/typescript-support",
@@ -1147,7 +1147,7 @@
   {
     "source": "/docs/guides/functions/troubleshooting",
     "destination": "/kb/topics/troubleshooting?troubleshooting=edge-functions",
-    "permanent": false
+    "permanent": true
   },
   {
     "source": "/docs/guides/functions/typescript-support",
@@ -1897,7 +1897,7 @@
   {
     "source": "/docs/guides/realtime/troubleshooting",
     "destination": "/kb/topics/troubleshooting?troubleshooting=realtime",
-    "permanent": false
+    "permanent": true
   },
   {
     "source": "/docs/guides/resources/examples",
