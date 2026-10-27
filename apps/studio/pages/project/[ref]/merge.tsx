@@ -24,7 +24,9 @@ import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ProjectLayoutWithAuth } from '@/components/layouts/ProjectLayout'
 import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useBranchDeleteMutation } from '@/data/branches/branch-delete-mutation'
 import { useBranchMergeMutation } from '@/data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
@@ -303,6 +305,26 @@ const MergePage: NextPageWithLayout = () => {
   useEffect(() => {
     setWorkflowFinalStatus(null)
   }, [currentWorkflowRunId])
+
+  if (isBranch && branchesGrant.status === 'denied') {
+    return (
+      <PageLayout>
+        <ScaffoldContainer size="full">
+          <NoPermission resourceText="review this branch's changes" />
+        </ScaffoldContainer>
+      </PageLayout>
+    )
+  }
+
+  if (isBranch && branchesGrant.status === 'error') {
+    return (
+      <PageLayout>
+        <ScaffoldContainer size="full">
+          <AlertError error={branchesGrant.error} subject="Failed to check permissions" />
+        </ScaffoldContainer>
+      </PageLayout>
+    )
+  }
 
   // If not on a preview branch or branch info unavailable, show notice
   if (!isBranch || !currentBranch) {

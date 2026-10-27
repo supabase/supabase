@@ -1,14 +1,19 @@
 // @vitest-environment jsdom
-import { waitFor } from '@testing-library/react'
+import { act, waitFor } from '@testing-library/react'
+import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
 import { getGitBranchName, useSelectedGitHubConfigDrift } from './useGitHubConfigDrift'
 import type { Branch } from '@/data/branches/branches-query'
 import { BRANCH_TEST_SCOPE, mockBranchProject } from '@/tests/lib/branch-test-utils'
 import { customRenderHook } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissions, mockPermissionsError } from '@/tests/lib/msw-permissions'
-import { NO_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
+import {
+  allPermissionsFor,
+  NO_PERMISSIONS,
+  type PermissionsV2Response,
+} from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
 vi.mock('common', async (importOriginal) => {
@@ -120,5 +125,68 @@ describe('useSelectedGitHubConfigDrift', () => {
     await waitFor(() => expect(result.current.isError).toBe(true))
     expect(result.current.isPending).toBe(false)
     expect(result.current.error?.message).toBe('Permissions service unavailable')
+  })
+
+  it('reloads branches and both configs once a refreshed permissions request succeeds', async () => {
+    mockBranchProject()
+    let permissionsAvailable = false
+    addAPIMock({
+      method: 'get',
+      path: '/platform/profile/permissions/v2',
+      response: () => {
+        if (permissionsAvailable) {
+          return HttpResponse.json<PermissionsV2Response>(
+            allPermissionsFor([BRANCH_TEST_SCOPE.organizationSlug])
+          )
+        }
+        return HttpResponse.json<APIErrorBody>(
+          { message: 'Permissions service unavailable' },
+          { status: 500 }
+        )
+      },
+    })
+    mockGitHubConnection()
+    const requested = { branches: vi.fn(), projectConfig: vi.fn(), githubConfig: vi.fn() }
+    addAPIMock({
+      method: 'get',
+      path: '/v1/projects/:ref/branches',
+      response: () => {
+        requested.branches()
+        return HttpResponse.json<Branch[]>([
+          branch({ project_ref: BRANCH_TEST_SCOPE.branchRef, git_branch: 'feature' }),
+        ])
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/v2/projects/:ref/config',
+      response: () => {
+        requested.projectConfig()
+        return HttpResponse.json<APIErrorBody>({ message: 'Not needed' }, { status: 500 })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/integrations/github/connections/:connection_id/config',
+      response: () => {
+        requested.githubConfig()
+        return HttpResponse.json<APIErrorBody>({ message: 'Not needed' }, { status: 500 })
+      },
+    })
+
+    const { result } = customRenderHook(() => useSelectedGitHubConfigDrift(), {
+      profileContext: createMockProfileContext(),
+    })
+    await waitFor(() => expect(result.current.isError).toBe(true))
+    expect(requested.branches).not.toHaveBeenCalled()
+
+    permissionsAvailable = true
+    await act(async () => {
+      await result.current.refetch()
+    })
+
+    await waitFor(() => expect(requested.branches).toHaveBeenCalled())
+    await waitFor(() => expect(requested.projectConfig).toHaveBeenCalled())
+    await waitFor(() => expect(requested.githubConfig).toHaveBeenCalled())
   })
 })

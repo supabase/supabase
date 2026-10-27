@@ -72,7 +72,8 @@ const BranchesPage: NextPageWithLayout = () => {
   const isGithubConnected = githubConnection !== undefined
   const repo = githubConnection?.repository.name ?? ''
 
-  const isLoading = isLoadingConnections || isLoadingBranches
+  const isErrorBranchesGrant = branchesGrant.status === 'error'
+  const isLoading = isLoadingConnections || (isLoadingBranches && !isErrorBranchesGrant)
   const isSuccess = isSuccessConnections && isSuccessBranches
 
   const generateCreatePullRequestURL = (branch?: string) => {
@@ -105,6 +106,10 @@ const BranchesPage: NextPageWithLayout = () => {
                       error={branchesError}
                       subject="Failed to retrieve preview branches"
                     />
+                  )}
+
+                  {branchesGrant.status === 'error' && (
+                    <AlertError error={branchesGrant.error} subject="Failed to check permissions" />
                   )}
 
                   <Overview

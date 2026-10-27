@@ -12,7 +12,7 @@ import { createTestBranch } from '@/tests/lib/branch-test-utils'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissions } from '@/tests/lib/msw-permissions'
-import { allPermissionsFor } from '@/tests/lib/permissions-fixtures'
+import { ALL_FGA_PERMISSIONS, allPermissionsFor } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
 
@@ -394,6 +394,29 @@ describe('Usage branch URLs', () => {
     expect(await screen.findByText('Free Plan')).toBeInTheDocument()
     expect(screen.queryByRole('status', { name: 'Loading branch usage' })).not.toBeInTheDocument()
     expect(screen.queryByText('Branch unavailable')).not.toBeInTheDocument()
+    expect(screen.queryByText('Usage Summary')).not.toBeInTheDocument()
+    expect(requests).toEqual({ usage: [], daily: [] })
+  })
+
+  it('blocks branch usage without falling back to the parent when branch access is denied', async () => {
+    const requests = captureUsageRequests()
+    mockPermissions({
+      organizations: [
+        {
+          slug: 'test-org',
+          role: 'owner',
+          permissions: ALL_FGA_PERMISSIONS.filter(
+            (permission) => !permission.startsWith('branching_')
+          ),
+          projects: [],
+        },
+      ],
+    })
+    renderUsage()
+
+    expect(
+      await screen.findByText(/additional permissions to view this branch's usage/)
+    ).toBeVisible()
     expect(screen.queryByText('Usage Summary')).not.toBeInTheDocument()
     expect(requests).toEqual({ usage: [], daily: [] })
   })

@@ -88,7 +88,8 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
 
-  const isError = isErrorConnections || isErrorBranches
+  const isErrorBranchesGrant = branchesGrant.status === 'error'
+  const isError = isErrorConnections || isErrorBranches || isErrorBranchesGrant
 
   const isGithubConnected = githubConnection !== undefined
 
@@ -178,6 +179,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
                 {isErrorBranches && (
                   <AlertError error={branchesError} subject="Failed to retrieve preview branches" />
+                )}
+
+                {branchesGrant.status === 'error' && (
+                  <AlertError error={branchesGrant.error} subject="Failed to check permissions" />
                 )}
 
                 {!isError && (
@@ -327,6 +332,7 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
     branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
   )
   const previewBranches = (branches || []).filter((b) => !b.is_default)
+  const canListBranches = branchesGrant.status !== 'error' && branchesGrant.status !== 'denied'
 
   const track = useTrack()
 
@@ -371,12 +377,14 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
       title="Merge requests"
       subtitle="Review and merge changes from one branch into another"
       primaryActions={
-        <BranchSelector
-          branches={previewBranches}
-          onBranchSelected={handleMarkBranchForReview}
-          disabled={!projectRef}
-          isUpdating={isUpdating}
-        />
+        canListBranches && (
+          <BranchSelector
+            branches={previewBranches}
+            onBranchSelected={handleMarkBranchForReview}
+            disabled={!projectRef}
+            isUpdating={isUpdating}
+          />
+        )
       }
       secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
     >
