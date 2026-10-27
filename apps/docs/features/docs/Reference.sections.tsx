@@ -8,7 +8,7 @@ import {
   getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
-import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import { getRefFrontmatter, getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
@@ -148,15 +148,18 @@ async function MarkdownSection({
   section,
   headingTag,
 }: MarkdownSectionProps) {
-  const content = await getRefMarkdown(
-    section.meta?.shared
-      ? `shared/${section.id}`
-      : `${libPath}/${isLatestVersion ? '' : `${version}/`}${section.id}`
-  )
+  const refPath = section.meta?.shared
+    ? `shared/${section.id}`
+    : `${libPath}/${isLatestVersion ? '' : `${version}/`}${section.id}`
+  const [content, frontmatter] = await Promise.all([
+    getRefMarkdown(refPath),
+    getRefFrontmatter(refPath),
+  ])
 
   return (
     <RefSubLayout.EducationSection link={link} {...section}>
-      <StickyHeader {...section} headingTag={headingTag} />
+      {/* Pages with `hideTitle` already render their own title in the MDX */}
+      {!frontmatter.hideTitle && <StickyHeader {...section} headingTag={headingTag} />}
       <MDXRemoteRefs source={content} />
     </RefSubLayout.EducationSection>
   )
