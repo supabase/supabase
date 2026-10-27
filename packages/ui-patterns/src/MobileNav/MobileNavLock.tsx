@@ -15,13 +15,22 @@ export const MobileNavLock = ({ toggleRef }: MobileNavLockProps) => {
       const drawer = marker?.parentElement
       if (!toggle || !drawer) return
 
-      const inerted = markInertOutside([toggle.closest('nav') ?? toggle, drawer])
+      const regions = [toggle.closest('nav') ?? toggle, drawer]
+      const inerted = markInertOutside(regions)
       const root = document.documentElement
       const overflow = root.style.overflow
       root.style.overflow = 'hidden'
-      // the toggle owns the open state, so escape presses it
+      // the toggle owns the open state, so escape presses it.
+      // a popup with focus is outside the regions, so it closes first. a closed layer elsewhere can set defaultPrevented.
+      // a click on an empty part of the drawer moves focus to the body
       const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key !== 'Escape' || event.defaultPrevented) return
+        const target = event.target
+        if (event.key !== 'Escape') return
+        const isFocusElsewhere =
+          target instanceof Element &&
+          target !== document.body &&
+          !regions.some((region) => region.contains(target))
+        if (isFocusElsewhere) return
         toggle.click()
         toggle.focus()
       }
