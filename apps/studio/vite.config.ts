@@ -12,6 +12,7 @@ import viteReact from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
+import { getCdnUrlForBuiltFile, getTanstackAssetCdnUrl } from './asset-cdn'
 import { vercelSpaRoutes } from './scripts/vercel-spa-routes'
 import { getSecurityHeaders } from './security-headers'
 
@@ -552,6 +553,11 @@ export default defineConfig(({ command, mode }) => {
   // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
   // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
+  // Client JS/CSS (and CSS-referenced fonts/images) load from the R2 asset CDN
+  // on production builds, uploaded by scripts/upload-static-assets.sh. Vite's
+  // base stays `/dashboard` so documents, server functions and API routes stay
+  // on Vercel. The shell's asset tags are rewritten by server.ts.
+  const assetCdnUrl = command === 'build' ? getTanstackAssetCdnUrl(env) : undefined
   const shouldUploadSourceMaps =
     process.env.SKIP_ASSET_UPLOAD !== '1' && !!process.env.SENTRY_AUTH_TOKEN
 
@@ -646,7 +652,19 @@ export default defineConfig(({ command, mode }) => {
     define: {
       ...publicEnvDefines,
       ...sharedDefines,
+      __STUDIO_ASSET_CDN_URL__: JSON.stringify(assetCdnUrl) ?? 'undefined',
     },
+    ...(assetCdnUrl && {
+      experimental: {
+        // Absolute CDN URLs for client assets referenced from JS and CSS. With
+        // this set, Vite's preload helper resolves a lazy chunk's deps against
+        // the importing chunk's URL, so they follow it to the CDN.
+        renderBuiltUrl(filename: string, { ssr }: { ssr: boolean }) {
+          if (ssr) return
+          return getCdnUrlForBuiltFile(filename, assetCdnUrl)
+        },
+      },
+    }),
     // Circular-dep workaround: pin shared library code into dedicated
     // chunks so per-component chunks don't import from a chunk that
     // (transitively) imports them back.
