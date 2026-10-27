@@ -1,6 +1,7 @@
 'use client'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { PREFERRED_SOURCE_URL } from 'common/markdown-affordance'
 import type { MarkdownAffordancePageType } from 'common/telemetry-constants'
 import { AiTools as SharedAiTools, type AiAgent, type AiToolsProps } from 'ui-patterns/AiTools'
 
@@ -38,9 +39,7 @@ export function AiTools({
     <SharedAiTools
       pageUrl={`${SITE_ORIGIN}${pagePath === '/' ? '' : pagePath}`}
       markdownUrl={pagePath === '/' ? '/index.md' : `${pagePath}.md`}
-      preferredSourceHref={
-        showPreferredSource ? 'https://www.google.com/preferences/source?q=supabase.com' : undefined
-      }
+      preferredSourceHref={showPreferredSource ? PREFERRED_SOURCE_URL : undefined}
       onPreferredSourceClick={handlePreferredSourceClick}
       onMarkdownCopy={handleMarkdownCopy}
       onAskAiClick={handleAskAiClick}
