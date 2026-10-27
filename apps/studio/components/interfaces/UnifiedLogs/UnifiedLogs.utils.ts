@@ -47,6 +47,9 @@ export function getLogTypeVisibility(
   )
 }
 
+export const isOfferedFilter = (name: string, offeredFilters?: readonly string[]) =>
+  !offeredFilters || offeredFilters.includes(name)
+
 export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
 
 export function toQuerySearchParams(

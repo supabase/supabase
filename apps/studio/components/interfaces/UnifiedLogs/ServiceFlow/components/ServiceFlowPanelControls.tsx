@@ -93,6 +93,7 @@ export const ServiceFlowPanelControls = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
+            aria-label="Dock side"
             variant="text"
             className="px-1"
             icon={dock === 'bottom' ? <PanelBottomIcon /> : <PanelRightIcon />}

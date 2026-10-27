@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { LogsTableName } from './Logs.constants'
 import type { Filters, LogData } from './Logs.types'
@@ -139,6 +139,27 @@ describe('Logs.utils', () => {
   })
 
   describe('buildLogsPrompt', () => {
+    test.each([
+      '2026-10-27T10:15:00.000000',
+      '2026-10-27 10:15:00.000000',
+      '2026-10-27T10:15:00Z',
+      '2026-10-27T11:15:00+01:00',
+    ])(
+      'preserves the UTC log time in Assistant prompts regardless of the local timezone: %s',
+      (timestamp) => {
+        vi.stubEnv('TZ', 'Europe/Madrid')
+        try {
+          expect(new Date('2026-10-27T10:15:00').getTimezoneOffset()).toBe(-60)
+          const prompt = buildLogsPrompt([
+            { id: 'log', timestamp, event_message: 'Function failed' },
+          ])
+          expect(prompt).toContain('**Timestamp:** 2026-10-27T10:15:00.000Z')
+        } finally {
+          vi.unstubAllEnvs()
+        }
+      }
+    )
+
     test('builds prompt with single log', () => {
       const rows: LogData[] = [createLog({ id: '1', event_message: 'error occurred' })]
       const result = buildLogsPrompt(rows)

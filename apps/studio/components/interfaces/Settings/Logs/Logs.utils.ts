@@ -16,6 +16,7 @@ import {
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
+import { parseOtelTimestamp } from '@/data/logs/otel-inspection.utils'
 import {
   analyticsLiteral,
   joinSqlFragments,
@@ -881,7 +882,7 @@ export function formatLogsAsMarkdown(rows: LogExportData[]): string {
         if (isFinite(numTs)) {
           tsString = new Date(numTs / 1000).toISOString()
         } else if (typeof row.timestamp === 'string') {
-          const d = new Date(row.timestamp)
+          const d = parseOtelTimestamp(row.timestamp)
           tsString = isNaN(d.getTime()) ? row.timestamp : d.toISOString()
         } else {
           tsString = String(row.timestamp)
