@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseKeys } from './keys'
-import { handleError, put } from '@/data/fetchers'
+import { handleError, put, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type MigrationUpsertVariables = {
@@ -32,6 +32,7 @@ export async function upsertMigration({
     params: { path: { ref: projectRef } },
     body,
     headers,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

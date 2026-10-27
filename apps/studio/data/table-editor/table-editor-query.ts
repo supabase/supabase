@@ -3,6 +3,7 @@ import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
 
 import { tableEditorKeys } from './keys'
 import { Entity } from './table-editor-types'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -30,6 +31,7 @@ export async function getTableEditor(
       connectionString,
       sql,
       queryKey: ['table-editor', id],
+      grant: unguarded.migrating,
     },
     signal
   )

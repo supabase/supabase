@@ -3,6 +3,7 @@ import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
 
 import { vaultSecretsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -45,6 +46,7 @@ export const getDecryptedValue = async (
       connectionString,
       sql,
       queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id),
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -87,7 +89,7 @@ export const getDecryptedValues = async (
 ) => {
   const sql = vaultSecretDecryptedValuesQuery(ids)
   const { result } = await executeSql<{ id: string; decrypted_secret: string }[]>(
-    { projectRef, connectionString, sql, queryKey: ['decrypt-secret'] },
+    { projectRef, connectionString, sql, queryKey: ['decrypt-secret'], grant: unguarded.migrating },
     signal
   )
   return result.reduce(

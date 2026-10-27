@@ -14,6 +14,7 @@ export type {
 } from './types'
 export { useSearchShortcut } from './useSearchShortcut'
 export {
+  canSubmitQuery,
   formatHeadingPath,
   getHighlightQuery,
   getIsSearching,

@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, ExpandingTextArea } from 'ui'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -62,6 +63,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           sql: query,
+          grant: unguarded.migrating,
         })
         // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
         await timeout(500)

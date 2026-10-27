@@ -42,7 +42,6 @@
         // one-off build/codegen scripts, run by hand or from package.json
         "scripts/**",
         // dynamically imported
-        "components/interfaces/ConnectSheet/content/**",
         "components/interfaces/ConnectSheet/DirectConnectionExamples.tsx",
         // data layer templates, copied when adding a new query/mutation
         "data/__templates/**",
@@ -60,8 +59,6 @@
         // the full set, so some of it is unreferenced by design. execute.ts in
         // the same directory is hand-written and is NOT listed here.
         "data/graphql/{fragment-masking,gql,graphql}.ts": ["files"],
-        // Grant core; first consumers land with the fetch-wrapper and pilot PRs. Remove once imported.
-        "lib/grants.ts": ["files"],
         // CONSTRAINT_TYPE mirrors the complete closed set of Postgres
         // `pg_constraint.contype` values (c/f/p/u/t/x). The members we don't
         // read are documentation of the valid values, not dead code. Scoped to
