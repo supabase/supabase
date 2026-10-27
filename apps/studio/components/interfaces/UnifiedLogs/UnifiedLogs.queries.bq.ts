@@ -33,8 +33,6 @@ const ALL_LOG_TYPES = ['edge', 'postgrest', 'storage', 'postgres', 'edge functio
  * `<>` filters, excludes them from the full set.
  */
 export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
-  // Every BigQuery query starts here. Scoped views always query ClickHouse (see
-  // useUnifiedLogsBackend), so refuse a scope rather than return rows from outside it.
   if (search.scope) throw new Error('Scoped unified logs queries are only supported on ClickHouse')
   const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
   if (filters.length === 0) return [...DEFAULT_LOG_TYPES]

@@ -58,7 +58,6 @@ export const EdgeFunctionInvocationsSection = ({
   )
 
   return (
-    // No section title: invocations are the Overview's headline metric, right below the page header
     <PageSection>
       <PageSectionContent className="flex flex-col gap-5">
         {isLoadingFunction && <GenericSkeletonLoader />}

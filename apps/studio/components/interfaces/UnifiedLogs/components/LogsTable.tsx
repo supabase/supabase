@@ -8,12 +8,6 @@ import {
 type LogsTableProps<TData> = DataTableInfiniteProps<TData, unknown, unknown> & {
   className?: string
 }
-
-/**
- * A logs list: DataTableInfinite with the Logs page's header and row styling. Reads rows,
- * selection and loading state from the surrounding DataTableProvider, so any logs view renders
- * the same way whatever its columns or row type.
- */
 export const LogsTable = <TData,>({ className, ...props }: LogsTableProps<TData>) => (
   <div
     className={cn(

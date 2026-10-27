@@ -98,16 +98,9 @@ export const CHART_CONFIG = {
 } satisfies ChartConfig
 
 interface UnifiedLogsProps {
-  /**
-   * Narrows every query, count and filter to one resource, e.g. on an edge function's Logs tab.
-   * Pass a stable object (e.g. from `useMemo`), since the queries rebuild when it changes.
-   */
   scope?: UnifiedLogsScope
-  /** Shows the facet sidebar beside the logs. Without it, filters live in the filter bar only. */
   hasFilterSideBar?: boolean
-  /** Filters the view offers, by name (field values, plus `user`). Every filter by default. */
   offeredFilters?: readonly string[]
-  /** Saves column visibility and order under this view's key instead of the Logs page's */
   columnPreferencesKey?: string
 }
 
@@ -173,7 +166,8 @@ export const UnifiedLogs = ({
   const { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder } =
     useLogsTableColumns(columnPreferencesKey)
 
-  // Log types the queries, filters and facets may use
+  // Create a stable query key object by removing nulls/undefined, id, and live
+  // Mainly to prevent the react queries from unnecessarily re-fetching
   const queryLogTypeVisibility = useMemo(
     () =>
       getLogTypeVisibility(
@@ -186,12 +180,10 @@ export const UnifiedLogs = ({
     [showMultigresLogs, computeAvailability.canQueryCompute, scope]
   )
 
-  // Create a stable query key object by removing nulls/undefined, id, and live
-  // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = useMemo(() => {
     const parameters = toQuerySearchParams(search, scope)
     if (parameters.filter) {
-      parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? null
+      parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? undefined
     }
     return parameters
   }, [search, scope, queryLogTypeVisibility])

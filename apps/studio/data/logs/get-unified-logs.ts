@@ -30,10 +30,11 @@ export async function retrieveUnifiedLogs({
     throw new Error('projectRef is required for retrieveUnifiedLogs')
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search, hoursAgo)
-  const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
+  const shouldUseOtel = useOtel || !!search.scope
+  const buildQuery = pickLogsQueryBuilder(shouldUseOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
   const sql = `${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${limit}`
 
-  const endpoint = logsAllEndpointUrl(useOtel)
+  const endpoint = logsAllEndpointUrl(shouldUseOtel)
   const { data, error } = await post(endpoint, {
     params: { path: { ref: projectRef } },
     body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
