@@ -105,10 +105,14 @@ response: () => HttpResponse.json<MyResponse>({}, { status: 201 })
 The convention `<Button form={FORM_ID} type="submit" />` (button
 outside the form, associated by id) doesn't reliably trigger submission
 under `userEvent.click` in jsdom. Use `fireEvent.click` for the submit
-button. Continue to use `userEvent.type` for inputs.
+button. If that still doesn't submit, call
+`fireEvent.submit(document.getElementById(FORM_ID)!)` directly. Fill inputs
+with `user.paste` rather than `user.type` (see "Keep Tests Fast" in
+`studio-testing`).
 
 ```ts
-await userEvent.type(screen.getByPlaceholderText('value'), 'hello')
+await user.click(screen.getByPlaceholderText('value'))
+await user.paste('hello')
 fireEvent.click(await screen.findByRole('button', { name: 'Save' }))
 ```
 
@@ -206,6 +210,26 @@ query layer attaches). Same pattern applies to any type that's a frontend
 extension of an OpenAPI schema: build a `createMockXResponse` helper that
 returns the raw API shape.
 
+### 9. Mock FGA permissions with `mockPermissions`
+
+Components that check permissions (`useGrant`, `useAsyncCheckPermissionsV2`)
+request `/platform/profile/permissions/v2`. There's no global default — mock it
+in each test that needs it:
+
+```ts
+import { mockPermissions, mockPermissionsError } from '@/tests/lib/msw-permissions'
+import { allPermissionsFor, NO_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
+
+mockPermissions(allPermissionsFor(['my-org'])) // everything in my-org
+mockPermissions(NO_PERMISSIONS) // denied everywhere
+mockPermissions({ organizations: [{ slug: 'my-org', role: 'developer', permissions: [...], projects: [] }] })
+mockPermissionsError({ status: 500 }) // grant resolves to an error
+```
+
+Unit tests of fetchers or query options that take a grant can use
+`testGrant(endpoint, { projectRef })` from `@/tests/lib/test-grant` instead of
+going through permissions at all.
+
 ## Prefer asserting on UI state
 
 MSW's own best-practices doc explicitly recommends asserting on what
@@ -294,4 +318,5 @@ hook with global state.
 | `addAPIMock` source                                            | `apps/studio/tests/lib/msw.ts`                                                                          |
 | `customRender` source                                          | `apps/studio/tests/lib/custom-render.tsx`                                                               |
 | Global handlers + lifecycle                                    | `apps/studio/tests/lib/msw-global-api-mocks.ts`, `apps/studio/tests/vitestSetup.ts`                     |
+| Permissions mocks + `testGrant`                                | `apps/studio/tests/lib/msw-permissions.ts`, `apps/studio/tests/lib/test-grant.ts`                       |
 | Related skills                                                 | `studio-testing` (when to write a component test at all), `studio-queries` (hook conventions), `vitest` |

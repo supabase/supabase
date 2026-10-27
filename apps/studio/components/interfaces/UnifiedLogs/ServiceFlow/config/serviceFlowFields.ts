@@ -765,3 +765,52 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
     requiresEnrichedData: true,
   },
 ]
+
+// =============================================================================
+// SUPAVISOR FIELDS
+// =============================================================================
+
+// Supavisor rows carry everything under `metadata` (the OTEL `log_attributes` map).
+const supavisorField = (
+  key: string,
+  label: string,
+  options?: Pick<BlockFieldConfig, 'wrap'>
+): BlockFieldConfig => ({
+  id: key,
+  label,
+  getValue: (_data, enrichedData) => enrichedData?.metadata?.[key],
+  requiresEnrichedData: true,
+  ...options,
+})
+
+export const supavisorPrimaryFields: BlockFieldConfig[] = [
+  {
+    id: 'event_message',
+    label: 'Message',
+    getValue: (data, enrichedData) => enrichedData?.event_message || data?.event_message,
+    wrap: true,
+  },
+  supavisorField('user', 'User'),
+  supavisorField('db_name', 'Database'),
+  supavisorField('mode', 'Pool mode'),
+  supavisorField('type', 'Pool type'),
+  supavisorField('state', 'State'),
+  supavisorField('app_name', 'Application'),
+  supavisorField('peer_ip', 'Peer IP'),
+  supavisorField('local', 'Local'),
+]
+
+export const supavisorNodeFields: BlockFieldConfig[] = [
+  supavisorField('region', 'Region'),
+  supavisorField('location', 'Location'),
+  supavisorField('nodehost', 'Node host', { wrap: true }),
+  supavisorField('instance_id', 'Instance ID'),
+]
+
+export const supavisorSourceFields: BlockFieldConfig[] = [
+  supavisorField('context.module', 'Module', { wrap: true }),
+  supavisorField('context.function', 'Function'),
+  supavisorField('context.file', 'File', { wrap: true }),
+  supavisorField('context.line', 'Line'),
+  supavisorField('context.pid', 'Process ID'),
+]

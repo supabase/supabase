@@ -1,0 +1,8 @@
+---
+title: Can I use Supabase Postgres with a Next.js app on Vercel?
+topics: ['Database']
+---
+
+Yes. Vercel even has a dedicated starter template for this [specific use case](https://vercel.com/new/templates/next.js/supabase).
+
+If you wanted to set up Supabase with an existing Next.js app, you'd connect through Supabase's transaction pooler and keep the connection string in a Vercel environment variable. You can do this through the [Vercel Marketplace integration](/docs/guides/integrations/vercel-marketplace) or [manually](/docs/guides/database/connecting-to-postgres/serverless-drivers#manual-configuration).

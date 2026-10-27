@@ -1,6 +1,7 @@
 @import 'config/tailwind.config.css';
 @import 'config/inline-code.css';
 @import 'ui-patterns/CodeBlock/code-block.css';
+@import 'ui-patterns/Toc/toc-menu.css';
 @import './code-block.css';
 @import './reference.css';
 @import 'docs-search/styles.css';

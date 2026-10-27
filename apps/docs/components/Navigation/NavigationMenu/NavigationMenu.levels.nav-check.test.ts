@@ -64,7 +64,6 @@ const ALLOWLIST = [
   'Edge Functions > Third-Party Tools',
   'Platform > Billing > Manage your usage',
   'Platform > Platform Configuration',
-  'Platform > Upgrades & Migrations > Migrating to Supabase',
   'Self-Hosting',
   'Self-Hosting > How-to Guides',
   'Start with Supabase > Framework Quickstarts',

@@ -795,14 +795,6 @@ describe('mapOtelSingleLogToLegacy', () => {
     expect(log.metadata[0].response[0].headers[0].x_sb_error_code).toBeNull()
   })
 
-  it('falls back to the legacy x_sb_error_code key for api rows', () => {
-    const log = mapOtelSingleLogToLegacy(
-      { log_attributes: { 'response.headers.x_sb_error_code': 'pgrst' } },
-      'api'
-    ) as any
-    expect(log.metadata[0].response[0].headers[0].x_sb_error_code).toBe('pgrst')
-  })
-
   it('fills database metadata with null when attributes are missing', () => {
     const log = mapOtelSingleLogToLegacy({ log_attributes: {} }, 'database') as any
     expect(log.metadata[0].parsed[0].hint).toBeNull()

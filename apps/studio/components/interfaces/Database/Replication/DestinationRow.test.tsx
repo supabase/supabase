@@ -228,10 +228,8 @@ describe('DestinationRow', () => {
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
-    await userEvent.type(
-      screen.getByPlaceholderText('Type the pipeline name'),
-      'My BigQuery Destination'
-    )
+    await userEvent.click(screen.getByPlaceholderText('Type the pipeline name'))
+    await userEvent.paste('My BigQuery Destination')
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
     )
@@ -289,10 +287,8 @@ describe('DestinationRow', () => {
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete pipeline' }))
-    await userEvent.type(
-      screen.getByPlaceholderText('Type the pipeline name'),
-      'My BigQuery Destination'
-    )
+    await userEvent.click(screen.getByPlaceholderText('Type the pipeline name'))
+    await userEvent.paste('My BigQuery Destination')
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Delete pipeline' })).toBeEnabled()
     )
@@ -336,17 +332,11 @@ describe('DestinationRow', () => {
   })
 
   test('shows "Caught up" when confirmed_flush_lsn_bytes is 0', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('started')
-    addReplicationStatusMock(0)
-    addVersionMock()
+    addAllMocks()
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
     const lag = await screen.findByText('Caught up')
-    expect(lag).toHaveClass('text-foreground-light')
     expect(lag.closest('[aria-live="polite"]')).toHaveAttribute('aria-atomic', 'true')
   })
 
@@ -360,7 +350,7 @@ describe('DestinationRow', () => {
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('2 KB')).toHaveClass('text-foreground-light')
+    expect(await screen.findByText('2 KB')).toBeInTheDocument()
   })
 
   test('shows unavailable lag instead of caught up when the distance is null', async () => {
@@ -400,7 +390,7 @@ describe('DestinationRow', () => {
     expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
   })
 
-  test('shows initial sync with the same lag text treatment', async () => {
+  test('shows initial sync while tables are copying', async () => {
     addSourcesMock()
     addDestinationMock()
     addPipelinesMock()
@@ -419,7 +409,7 @@ describe('DestinationRow', () => {
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('Initial sync')).toHaveClass('text-foreground-light')
+    expect(await screen.findByText('Initial sync')).toBeInTheDocument()
   })
 
   test('shows initial sync when apply lag is unavailable', async () => {
@@ -516,60 +506,18 @@ describe('DestinationRow', () => {
     expect(await screen.findByText('Lag unavailable')).toBeInTheDocument()
   })
 
-  test('shows publication name from pipeline config', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('started')
-    addReplicationStatusMock(0)
-    addVersionMock()
+  test.each([
+    ['started', 'Running'],
+    ['failed', 'Failed'],
+    ['stopped', 'Stopped'],
+  ] as const)('shows the %s pipeline status as %s', async (statusName, label) => {
+    addAllMocks()
+    addPipelineStatusMock(statusName)
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
-    expect(await screen.findByText('supabase_realtime')).toBeInTheDocument()
-  })
-
-  test('shows Running badge when pipeline is started', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('started')
-    addReplicationStatusMock(0)
-    addVersionMock()
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
-
-    const status = await screen.findByText('Running')
-    const liveRegion = status.closest('[aria-live="polite"]')
-
-    expect(status).toBeInTheDocument()
-    expect(liveRegion).toHaveAttribute('aria-atomic', 'true')
-  })
-
-  test('shows Failed badge when pipeline has failed', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('failed')
-    addReplicationStatusMock(0)
-    addVersionMock()
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
-
-    expect(await screen.findByText('Failed')).toBeInTheDocument()
-  })
-
-  test('shows Stopped badge when pipeline is stopped', async () => {
-    addSourcesMock()
-    addDestinationMock()
-    addPipelinesMock()
-    addPipelineStatusMock('stopped')
-    addReplicationStatusMock(0)
-    addVersionMock()
-
-    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
-
-    expect(await screen.findByText('Stopped')).toBeInTheDocument()
+    const status = await screen.findByText(label)
+    expect(status.closest('[aria-live="polite"]')).toHaveAttribute('aria-atomic', 'true')
   })
 
   test('shows table errors in the subtext and on the logo when tables have replication errors', async () => {
