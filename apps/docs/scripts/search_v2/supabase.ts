@@ -11,11 +11,7 @@ function requireEnv(name: string): string {
   return value
 }
 
-/**
- * Ingest client for the main Supabase project (supabase/migrations/*_docs_search_v2*.sql), built from
- * NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SECRET_KEY in .env.local. The search_v2 API route still reads
- * from the separate Search V2 project through `./client.ts` until it is moved.
- */
+/** Server-side client built from NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SECRET_KEY in .env.local. */
 export function createSupabaseClient(): SupabaseClient {
   const url = requireEnv('NEXT_PUBLIC_SUPABASE_URL')
   const secretKey = requireEnv('SUPABASE_SECRET_KEY')
