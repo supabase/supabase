@@ -54,7 +54,10 @@ export const WarehouseSetupPanel = () => {
     data: destinations,
     isPending: isDestinationsPending,
     isSuccess: isDestinationsSuccess,
+    isFetched: isDestinationsFetched,
+    isFetching: isDestinationsFetching,
     error: destinationsError,
+    refetch: refetchDestinations,
   } = useReplicationDestinationsQuery(
     { projectRef },
     {
@@ -145,10 +148,23 @@ export const WarehouseSetupPanel = () => {
       )
     }
     if (isOrioleDb) {
-      if (isDestinationsPending) return <GenericSkeletonLoader />
-      if (destinationsError) {
+      if (isDestinationsPending && !isDestinationsFetched) return <GenericSkeletonLoader />
+      if (!isDestinationsSuccess) {
         return (
-          <AlertError subject="Failed to load Warehouse destination" error={destinationsError} />
+          <AlertError
+            subject="Failed to load Warehouse destination"
+            error={destinationsError}
+            projectRef={projectRef}
+            additionalActions={
+              <Button
+                variant="default"
+                loading={isDestinationsFetching}
+                onClick={() => refetchDestinations()}
+              >
+                Retry
+              </Button>
+            }
+          />
         )
       }
       if (!hasWarehouseDestination) {

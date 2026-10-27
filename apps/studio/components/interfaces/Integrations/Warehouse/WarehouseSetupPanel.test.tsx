@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
@@ -12,7 +13,7 @@ import type { DestinationPanelSchemaType } from '@/components/interfaces/Databas
 import { DuckLakeFields } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/DuckLake/Fields'
 import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type SetupStatus = components['schemas']['WarehouseSetupStatusResponse_Output']
 type Destinations = components['schemas']['DestinationsResponse_Output']
@@ -140,6 +141,32 @@ describe('OrioleDB catalog restrictions', () => {
       expect(await screen.findByRole('button', { name: 'Enable Warehouse' })).toBeInTheDocument()
     }
   )
+
+  test('retries a failed destination lookup and applies the catalog restriction', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, retryDelay: 0 } },
+    })
+    mockProject(true)
+    mockWarehouse('error')
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/destinations',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Destination lookup failed' }, { status: 500 }),
+    })
+    customRender(<WarehouseSetupPanel />, { queryClient })
+
+    expect(await screen.findByText('Failed to load Warehouse destination')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+
+    mockWarehouse('error')
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(
+      await screen.findByText('This project cannot host a Warehouse catalog')
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Failed to load Warehouse destination')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+  })
 
   test('preserves existing Warehouse management on an OrioleDB source', async () => {
     mockProject(true)
