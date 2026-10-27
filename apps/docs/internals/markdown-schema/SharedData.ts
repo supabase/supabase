@@ -17,11 +17,11 @@ const renderLogConstants = (data: typeof logConstants): string =>
         '',
         `Source: \`${schema.reference}\``,
         '',
-        '| Schema path | ClickHouse query field | Source type | Query value type |',
-        '| --- | --- | --- | --- |',
+        '| Schema path | Query field | Source type | Query value type | PII | Description |',
+        '| --- | --- | --- | --- | --- | --- |',
         ...schema.fields.map(
           (field) =>
-            `| \`${field.path}\` | \`${field.queryField}\` | \`${field.type}\` | \`${field.queryType}\` |`
+            `| \`${field.path}\` | \`${field.queryField}\` | \`${field.type}\` | \`${field.queryType}\` | ${field.containsPii ? 'Yes' : ''} | ${field.description ?? ''} |`
         ),
       ].join('\n')
     )

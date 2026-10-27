@@ -21,7 +21,7 @@ export function resolveSharedDataPath(dataset: unknown, path: string): string | 
 type LogSourceSchema = {
   name: string
   reference: string
-  fields: { path: string; type: string }[]
+  fields: { path: string; type: string; description?: string; containsPii?: boolean }[]
 }
 
 const LOG_COLUMNS = new Map([
