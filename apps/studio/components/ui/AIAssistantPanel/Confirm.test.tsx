@@ -5,29 +5,28 @@ import { Confirm } from './Confirm'
 import { customRender as render } from '@/tests/lib/custom-render'
 
 describe('Confirm', () => {
-  it('keeps its content visible and replaces actions with a success status', () => {
-    render(
-      <Confirm state="success" message="Run query" successMessage="Query executed">
-        <div>Query preview</div>
-      </Confirm>
-    )
+  it.each([
+    { state: 'success' as const, outcome: 'Query executed' },
+    { state: 'error' as const, outcome: 'Failed to execute SQL' },
+  ])(
+    'keeps its content visible and replaces actions with the $state status',
+    ({ state, outcome }) => {
+      render(
+        <Confirm
+          state={state}
+          message="Run query"
+          successMessage="Query executed"
+          errorMessage="Failed to execute SQL"
+        >
+          <div>Query preview</div>
+        </Confirm>
+      )
 
-    expect(screen.getByText('Query preview')).toBeInTheDocument()
-    expect(screen.getByText('Query executed')).toBeInTheDocument()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
-  })
-
-  it('keeps its content visible and replaces actions with an error status', () => {
-    render(
-      <Confirm state="error" message="Run query" errorMessage="Failed to execute SQL">
-        <div>Query preview</div>
-      </Confirm>
-    )
-
-    expect(screen.getByText('Query preview')).toBeInTheDocument()
-    expect(screen.getByText('Failed to execute SQL')).toBeInTheDocument()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
-  })
+      expect(screen.getByText('Query preview')).toBeInTheDocument()
+      expect(screen.getByText(outcome)).toBeInTheDocument()
+      expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    }
+  )
 
   it('keeps the confirm and cancel buttons visible but disabled while loading after approval', () => {
     render(

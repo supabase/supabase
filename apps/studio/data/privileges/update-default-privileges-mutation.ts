@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { ConnectionVars } from '@/data/common.types'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { UseCustomMutationOptions } from '@/types'
 
@@ -24,6 +25,7 @@ export async function updateDefaultPrivileges({
     connectionString,
     sql,
     queryKey: ['update-default-privileges'],
+    grant: unguarded.migrating,
   })
 }
 

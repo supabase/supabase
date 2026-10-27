@@ -38,6 +38,9 @@ vi.mock('ai', async () => {
   const actual = await vi.importActual('ai')
   return {
     ...actual,
+    // Braintrust reads this property to check whether `ai` is a language model.
+    // Vitest throws if the mock omits it.
+    specificationVersion: undefined,
     streamText: vi.fn().mockImplementation(() => ({
       stream: new ReadableStream({
         start(controller) {

@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import { ResponseError } from '@/types'
 import type { UseCustomMutationOptions } from '@/types'
 
@@ -72,6 +72,7 @@ export async function sendSupportTicket({
       dashboardStudioVersion,
       threadRef,
     },
+    grant: unguarded.migrating,
   })
 
   if (error) {

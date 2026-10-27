@@ -1,0 +1,112 @@
+[
+  {
+    "source": "/docs/api",
+    "destination": "/docs/guides/api",
+    "permanent": true
+  },
+  {
+    "source": "/docs/architecture",
+    "destination": "/docs/guides/getting-started/architecture",
+    "permanent": true
+  },
+  {
+    "source": "/docs/client/adj",
+    "destination": "/docs/reference/javascript/using-filters-rangeadjacent",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/auth-onauthstatechange",
+    "destination": "/docs/reference/javascript/auth-onauthstatechange",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/auth-session",
+    "destination": "/docs/reference/javascript/v1/auth-session",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/auth-signin",
+    "destination": "/docs/reference/javascript/v1/auth-signin",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/auth-signout",
+    "destination": "/docs/reference/javascript/auth-signout",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/auth-signup",
+    "destination": "/docs/reference/javascript/auth-signup",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/auth-update",
+    "destination": "/docs/reference/javascript/v1/auth-update",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/auth-user",
+    "destination": "/docs/reference/javascript/v1/auth-user",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/auth-verifyotp",
+    "destination": "/docs/reference/javascript/auth-verifyotp",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/cd",
+    "destination": "/docs/reference/javascript/using-filters-containedby",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/cs",
+    "destination": "/docs/reference/javascript/using-filters-contains",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/delete",
+    "destination": "/docs/reference/javascript/delete",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/eq",
+    "destination": "/docs/reference/javascript/using-filters-eq",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/filter",
+    "destination": "/docs/reference/javascript/using-filters-filter",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/fts",
+    "destination": "/docs/reference/javascript/using-filters-textsearch",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/generating-types",
+    "destination": "/docs/reference/javascript/typescript-support",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/getsubscriptions",
+    "destination": "/docs/reference/javascript/v1/getsubscriptions",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/gt",
+    "destination": "/docs/reference/javascript/using-filters-gt",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/gte",
+    "destination": "/docs/reference/javascript/using-filters-gte",
+    "permanent": false
+  },
+  {
+    "source": "/docs/client/ilike",
+    "destination": "/docs/reference/javascript/using-filters-ilike",
+    "permanent": false
+  }
+]
