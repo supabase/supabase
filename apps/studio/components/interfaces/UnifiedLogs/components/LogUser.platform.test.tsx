@@ -14,10 +14,12 @@ import { createUnifiedLogsSearch, getLogTypeSource } from '../UnifiedLogs.utils'
 import { LogUser } from './LogUser'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { User } from '@/data/auth/users-infinite-query'
+import type { UnifiedLogsQueryRow } from '@/data/logs/unified-logs.utils'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type LogsResponse = platformComponents['schemas']['AnalyticsResponse_Output']
+type TimelineRow = UnifiedLogsQueryRow & { source: string }
 
 vi.unmock('common')
 const { default: routerMock } =
@@ -41,7 +43,7 @@ const baseLog: ColumnSchema = {
   auth_user: null,
 }
 
-const gatewayStep = (overrides: Record<string, unknown>) => ({
+const gatewayStep = (overrides: Partial<TimelineRow>): TimelineRow => ({
   id: 'gateway-log',
   source: 'edge_logs',
   timestamp: '2026-01-01T10:00:00.000000',
@@ -67,7 +69,7 @@ function renderUser(
     search = createUnifiedLogsSearch(),
     failTimeline = false,
   }: {
-    timeline?: unknown[]
+    timeline?: TimelineRow[]
     users?: User[]
     flag?: boolean | null
     search?: QuerySearchParamsType
@@ -164,7 +166,6 @@ describe('LogUser', () => {
   it("shows the log's own user without looking up the rest of the request", async () => {
     const { logQueries } = renderUser({ ...baseLog, auth_user: USER_ID }, { users: [user] })
 
-    // The card leads with the email when there's no display name, and the fields repeat it
     expect(await screen.findAllByText('ada@example.com')).toHaveLength(2)
     expect(screen.getByText('A')).toBeVisible()
     expect(screen.getByText('email, github')).toBeVisible()
