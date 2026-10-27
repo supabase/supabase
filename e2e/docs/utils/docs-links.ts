@@ -4,7 +4,9 @@ export const GUIDE_ARTICLE_SELECTOR = '[data-testid="sb-docs-guide-main-article"
 export const TROUBLESHOOTING_ARTICLE_SELECTOR =
   '[data-testid="sb-docs-troubleshooting-main-article"]'
 const DOCS_PATH_PREFIX = '/docs'
+const GUIDES_PATH_PREFIX = '/docs/guides/'
 const TROUBLESHOOTING_PATH_PREFIX = '/docs/guides/troubleshooting/'
+const MAIN_CONTENT_SELECTOR = 'main'
 
 export function articleSelectorForPagePath(pagePath: string): string {
   const pathname = pagePath.startsWith('http') ? new URL(pagePath).pathname : pagePath
@@ -16,7 +18,14 @@ export function articleSelectorForPagePath(pagePath: string): string {
     return TROUBLESHOOTING_ARTICLE_SELECTOR
   }
 
-  return GUIDE_ARTICLE_SELECTOR
+  if (pathname.startsWith(GUIDES_PATH_PREFIX)) {
+    return GUIDE_ARTICLE_SELECTOR
+  }
+
+  // Reference and landing pages don't render the guide article test id.
+  // Scope anchor checks to the main content instead of the full document,
+  // which can accidentally match IDs in the header, sidebar, or footer.
+  return MAIN_CONTENT_SELECTOR
 }
 
 export type LinkTarget = {
