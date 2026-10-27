@@ -187,18 +187,16 @@ describe('UnifiedLogs', () => {
             }
           />
         </FeatureFlagContext.Provider>,
-        { nuqs: { hasMemory: true } }
+        { nuqs: { hasMemory: true, searchParams: '?id=function-log' } }
       )
-    const selectLog = async ({ container }: ReturnType<typeof renderLogs>) => {
+    const waitForDock = async ({ container }: ReturnType<typeof renderLogs>) => {
       const view = within(container)
-      const table = within(view.getByRole('table', { hidden: true }))
-      fireEvent.click(await table.findByText('Function started'))
       await view.findByLabelText('Dock side')
       return view
     }
 
     const first = renderLogs(true)
-    const firstView = await selectLog(first)
+    const firstView = await waitForDock(first)
     expect(firstView.getByRole('separator', { hidden: true })).toHaveAttribute(
       'aria-orientation',
       'horizontal'
@@ -214,14 +212,14 @@ describe('UnifiedLogs', () => {
     first.unmount()
 
     const project = renderLogs(false)
-    const projectView = await selectLog(project)
+    const projectView = await waitForDock(project)
     expect(projectView.getByRole('separator', { hidden: true })).toHaveAttribute(
       'aria-orientation',
       'horizontal'
     )
     project.unmount()
 
-    const reopenedView = await selectLog(renderLogs(true))
+    const reopenedView = await waitForDock(renderLogs(true))
     await waitFor(() =>
       expect(reopenedView.getByRole('separator', { hidden: true })).toHaveAttribute(
         'aria-orientation',

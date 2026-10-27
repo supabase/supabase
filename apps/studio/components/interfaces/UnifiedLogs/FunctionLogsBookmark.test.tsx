@@ -148,7 +148,36 @@ describe('function log bookmarks', () => {
     await waitFor(() =>
       expect(screen.queryByText('Second bookmarked output')).not.toBeInTheDocument()
     )
-    fireEvent.click(screen.getByText('Recent output 0'))
+  })
+
+  it('updates the bookmark for selected rows without fetching logs already in the table', async () => {
+    const queries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        queries.push(sql)
+        return HttpResponse.json<AnalyticsResponse>({
+          result: sql.includes('row list')
+            ? [log('recent-0', 'Recent output 0'), log('recent-1', 'Recent output 1')]
+            : [],
+        })
+      },
+    })
+    customRender(
+      <>
+        <BookmarkControls />
+        <UnifiedLogs
+          scope={getEdgeFunctionLogsScope('fn-123')}
+          hasFilterSideBar={false}
+          {...EDGE_FUNCTION_LOGS_VIEW}
+        />
+      </>,
+      { nuqs: { hasMemory: true } }
+    )
+
+    fireEvent.click(await screen.findByText('Recent output 0'))
     await waitFor(() =>
       expect(screen.getByLabelText('Current bookmark')).toHaveTextContent('recent-0')
     )
@@ -159,7 +188,7 @@ describe('function log bookmarks', () => {
     expect(
       screen.getByRole('status', { name: '2 logs selected', hidden: true })
     ).toBeInTheDocument()
-    expect(requests.some(({ sql }) => sql.includes("toString(id) = 'recent-"))).toBe(false)
+    expect(queries.some((sql) => sql.includes("toString(id) = 'recent-"))).toBe(false)
   })
 
   it.each([
