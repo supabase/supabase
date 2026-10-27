@@ -138,8 +138,6 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.AiTools
     case pathname.startsWith('observability'):
       return MenuId.Telemetry
-    case pathname.startsWith('troubleshooting'):
-      return MenuId.Telemetry
     case pathname.startsWith('platform'):
       return MenuId.Platform
     case pathname.startsWith('queues'):
