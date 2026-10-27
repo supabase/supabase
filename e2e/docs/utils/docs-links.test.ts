@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { docsOwnedLinkTargets } from './docs-links.ts'
+import {
+  articleSelectorForPagePath,
+  docsOwnedLinkTargets,
+  GUIDE_ARTICLE_SELECTOR,
+  TROUBLESHOOTING_ARTICLE_SELECTOR,
+} from './docs-links.ts'
 
 const baseURL = 'https://supabase.com'
 const pageUrl = 'https://supabase.com/docs/guides/auth/redirect-urls'
@@ -77,4 +82,31 @@ test('skips links outside the docs on this origin', () => {
     ),
     []
   )
+})
+
+test('uses the guide article for guide routes', () => {
+  assert.equal(
+    articleSelectorForPagePath('/docs/guides/auth/redirect-urls'),
+    GUIDE_ARTICLE_SELECTOR
+  )
+})
+
+test('uses the troubleshooting article for troubleshooting routes', () => {
+  assert.equal(
+    articleSelectorForPagePath('/docs/guides/troubleshooting/authentication'),
+    TROUBLESHOOTING_ARTICLE_SELECTOR
+  )
+  assert.equal(
+    articleSelectorForPagePath('https://supabase.com/docs/guides/troubleshooting/authentication'),
+    TROUBLESHOOTING_ARTICLE_SELECTOR
+  )
+})
+
+test('uses main content for reference and landing routes', () => {
+  assert.equal(articleSelectorForPagePath('/docs/reference/javascript/select'), 'main')
+  assert.equal(
+    articleSelectorForPagePath('https://supabase.com/docs/reference/javascript/select'),
+    'main'
+  )
+  assert.equal(articleSelectorForPagePath('/docs'), 'main')
 })
