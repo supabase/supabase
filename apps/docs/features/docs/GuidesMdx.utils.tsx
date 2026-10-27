@@ -9,6 +9,7 @@ import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
+import { getGuideLastUpdated } from '~/lib/last-changed'
 import { mdAlternate } from '~/lib/md-alternates'
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
 import { fromMarkdown } from 'mdast-util-from-markdown'
@@ -83,11 +84,14 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       editLinkOverride ?? `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
     )
 
+    const lastUpdated = await getGuideLastUpdated(slug)
+
     return {
       pathname: `/guides/${slug.join('/')}` satisfies `/${string}`,
       meta: restMeta,
       content,
       editLink,
+      lastUpdated,
     }
   } catch (error: unknown) {
     // `fromFs` rethrows FileNotFoundError directly, so check the error itself

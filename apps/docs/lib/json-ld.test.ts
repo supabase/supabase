@@ -84,11 +84,22 @@ describe('techArticleSchema', () => {
     expect(schema.description).toBeUndefined()
   })
 
-  it('omits date fields', () => {
+  it('omits date fields when no date is given', () => {
     const schema = techArticleSchema({ url, headline: 'JWTs' })
 
     expect(schema).not.toHaveProperty('datePublished')
-    expect(schema).not.toHaveProperty('dateModified')
+    expect(schema.dateModified).toBeUndefined()
+    expect(JSON.parse(JSON.stringify(schema))).not.toHaveProperty('dateModified')
+  })
+
+  it('emits dateModified when given', () => {
+    const schema = techArticleSchema({
+      url,
+      headline: 'JWTs',
+      dateModified: '2026-10-01T12:00:00+00:00',
+    })
+
+    expect(schema.dateModified).toBe('2026-10-01T12:00:00+00:00')
   })
 
   it('publishes under an inline Supabase organization', () => {

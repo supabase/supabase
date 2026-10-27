@@ -2,8 +2,8 @@ import Breadcrumbs from '~/components/Breadcrumbs'
 import GuidesSidebar from '~/components/GuidesSidebar'
 import { GuideTocMenu, TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
-import { PageTitleObserver } from '~/layouts/MobileHeaderSlots'
 import type { WithRequired } from '~/features/helpers.types'
+import { PageTitleObserver } from '~/layouts/MobileHeaderSlots'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { PROD_URL } from '~/lib/constants'
 import { type GuideFrontmatter } from '~/lib/docs'
@@ -58,11 +58,21 @@ interface BaseGuideTemplateProps {
   editLink: EditLink
   mdxOptions?: SerializeOptions
   pathname: `/${string}`
+  /** ISO 8601 date of the most recent content change, if known. */
+  lastUpdated?: string
 }
 
 type GuideTemplateProps =
   | WithRequired<BaseGuideTemplateProps, 'children'>
   | WithRequired<BaseGuideTemplateProps, 'content'>
+
+const formatLastUpdated = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  })
 
 const GuideTemplate = ({
   meta,
@@ -71,6 +81,7 @@ const GuideTemplate = ({
   editLink,
   mdxOptions,
   pathname,
+  lastUpdated,
 }: GuideTemplateProps) => {
   const hideToc = meta?.hideToc || meta?.hide_table_of_contents
   const breadcrumbChain = resolveBreadcrumbs(pathname)
@@ -82,6 +93,7 @@ const GuideTemplate = ({
           url: `${PROD_URL}${pathname}`,
           headline: mdToPlainText(meta.title),
           description: mdToPlainText(meta.description ?? meta.subtitle ?? '') || undefined,
+          dateModified: lastUpdated,
         })
       )
     : null
@@ -125,6 +137,11 @@ const GuideTemplate = ({
                 <div className="mt-3 not-prose [&_p]:text-xl [&_p]:leading-7 text-foreground-light [&>p]:m-0">
                   <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
                 </div>
+              )}
+              {lastUpdated && (
+                <p className="mt-4 mb-0 text-sm text-foreground-lighter">
+                  Last updated {formatLastUpdated(lastUpdated)}
+                </p>
               )}
             </header>
             {hideToc ? null : <GuideTocMenu />}
