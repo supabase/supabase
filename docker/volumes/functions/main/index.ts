@@ -285,18 +285,7 @@ Deno.serve(async (req: Request) => {
   if (req.method !== 'OPTIONS' && VERIFY_JWT) {
     try {
       const token = getAuthToken(req)
-      if (typeof token !== 'string') {
-        return getAuthErrorResponse(token)
-      }
-      const authFailure = await isValidHybridJWT(token)
-      if (authFailure) {
-        return getAuthErrorResponse(authFailure)
-      }
-    } catch (e) {
-      console.error(e)
-      return getAuthErrorResponse({
-        code: RequestErrors.InvalidTokenFormat,
-        message: 'Invalid JWT format',
+master
       })
     }
   }
@@ -307,10 +296,7 @@ Deno.serve(async (req: Request) => {
   const service_name = path_parts[1]
 
   if (!service_name || service_name === '') {
-    return getFunctionErrorResponse({
-      code: RequestErrors.NotFound,
-      message: 'Requested function was not found',
-      status: 404,
+master
     })
   }
 
@@ -356,40 +342,7 @@ Deno.serve(async (req: Request) => {
   const envVarsObj = { ...Deno.env.toObject(), SUPABASE_FUNCTION_SLUG: service_name }
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
-  const callWorker = async (req: Request, retriesLeft = MAX_WORKER_RETRIES): Promise<Response> => {
-    // Preserve the body before fetch() can consume it, even on a failed attempt.
-    // Must run before `new Request(req)` below, which takes over the body.
-    // The unread retry branch can buffer the entire body in main-worker memory,
-    // even when the first attempt succeeds.
-    const retryReq = retriesLeft > 0 ? req.clone() : null
-
-    try {
-      const worker = await EdgeRuntime.userWorkers.create({
-        servicePath,
-        memoryLimitMb,
-        workerTimeoutMs,
-        context: { supervisor: { requestAbsentTimeoutMs } },
-        noModuleCache,
-        importMapPath,
-        envVars,
-      })
-      // Gateway-minted internal JWT is for this router only; never expose it to user functions.
-      const userReq = new Request(req)
-      userReq.headers.delete('sb-api-key')
-      EdgeRuntime.applySupabaseTag(req, userReq)
-      return handleWorkerResponse(await worker.fetch(userReq))
-    } catch (e) {
-      // Retirement rejects before dispatch, so user code has not run yet.
-      if (e instanceof Deno.errors.WorkerAlreadyRetired && retryReq) {
-        console.warn(`${service_name}: worker retired before dispatch; retrying (${retriesLeft} left)`)
-        // Request.clone() does not copy the tag that connects streaming to the client.
-        EdgeRuntime.applySupabaseTag(req, retryReq)
-        return await callWorker(retryReq, retriesLeft - 1)
-      }
-
-      console.error(e)
-      return getFunctionErrorResponse(resolveRuntimeError(e))
-    }
+master
   }
 
   return await callWorker(req)
