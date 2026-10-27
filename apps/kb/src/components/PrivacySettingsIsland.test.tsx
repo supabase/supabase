@@ -3,6 +3,8 @@ import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 
+import { PrivacySettingsIsland } from './PrivacySettingsIsland'
+
 describe('PrivacySettingsIsland', () => {
   let root: Root | undefined
 
@@ -17,8 +19,6 @@ describe('PrivacySettingsIsland', () => {
   })
 
   it('opens the privacy settings dialog from the footer link', async () => {
-    const { PrivacySettingsIsland } = await import('./PrivacySettingsIsland')
-
     const container = document.createElement('div')
     document.body.append(container)
     root = createRoot(container)
