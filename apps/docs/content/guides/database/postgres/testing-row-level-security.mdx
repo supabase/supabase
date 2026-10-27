@@ -5,7 +5,9 @@ description: 'Prove each Row Level Security policy allows and blocks what you me
 subtitle: 'Prove each Row Level Security policy allows and blocks what you meant, with pgTAP tests against your local database.'
 ---
 
-Prove each Row Level Security (RLS) policy allows and blocks what you meant by running [pgTAP](https://pgtap.org) tests against your local database. To learn how policies work, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
+Prove each Row Level Security (RLS) policy allows and blocks what you meant by running [pgTAP](https://pgtap.org) tests against your local database.
+
+For more information about how policies work, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
 ## Write and run a policy test
 
@@ -130,16 +132,15 @@ The policy now has a test that fails if a change lets one user read or edit anot
 
 ## Test the policy from your application
 
-Testing through application code provides end-to-end verification. Unlike database-level testing with pgTAP, application-level tests cannot use transactions for isolation.
+Test the same policy through the Supabase client your app uses. Unlike pgTAP tests, application-level tests can't use a transaction to keep their data from persisting.
 
 <Admonition type="caution">
 
-Application-level tests should not rely on a clean database state, as resetting the database before each test can be slow and makes tests difficult to parallelize.
-Instead, design your tests to be independent by using unique user IDs for each test case.
+Don't rely on a clean database state. Resetting the database before each test is slow and keeps tests from running in parallel. Give each test suite its own user IDs instead.
 
 </Admonition>
 
-Here's an example using TypeScript that mirrors the pgTAP tests above:
+The following Vitest suite mirrors the pgTAP tests above:
 
 ```typescript
 import crypto from 'crypto'
@@ -248,13 +249,13 @@ describe('Todos RLS', () => {
 })
 ```
 
-### Test isolation strategies
+### Keep application tests independent
 
-For application-level testing, consider these approaches for test isolation:
+Use the following approaches so tests don't collide over shared data:
 
-1. **Unique Identifiers**: Generate unique IDs for each test suite to prevent data conflicts
-2. **Cleanup After Tests**: If necessary, clean up created data in an `afterAll` or `afterEach` hook
-3. **Isolated Data Sets**: Use prefixes or namespaces in data to separate test cases
+- **Unique identifiers:** generate unique IDs for each test suite.
+- **Cleanup:** delete the data a suite creates in an `afterAll` or `afterEach` hook.
+- **Isolated data sets:** use prefixes or namespaces in data to separate test cases.
 
 ## Related content
 
