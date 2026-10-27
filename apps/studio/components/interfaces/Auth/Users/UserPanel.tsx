@@ -64,7 +64,15 @@ export const UserPanel = () => {
         <Tabs
           value={view}
           className="flex flex-col h-full"
-          onValueChange={(value) => setView(value as UserPanelView)}
+          onValueChange={(value) => {
+            if (
+              value === 'overview' ||
+              value === 'raw' ||
+              value === 'logs' ||
+              value === 'recent-logs'
+            )
+              setView(value)
+          }}
         >
           {isPending ? (
             <div>

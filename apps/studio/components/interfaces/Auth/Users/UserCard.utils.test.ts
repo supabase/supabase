@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { getUserInitials, getUserPrimaryLabel } from './UserCard.utils'
 import type { User } from '@/data/auth/users-infinite-query'
 
-const user = (overrides: Partial<User>) => ({ id: 'u1', providers: [], ...overrides }) as User
+const user = (overrides: Partial<User>): User => ({ id: 'u1', providers: [], ...overrides })
 
 describe('getUserInitials', () => {
   it('uses the first and last words of the display name', () => {

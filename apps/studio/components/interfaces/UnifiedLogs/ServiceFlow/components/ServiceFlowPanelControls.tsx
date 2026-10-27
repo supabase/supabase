@@ -25,7 +25,6 @@ interface LogPanelNavigationProps {
   setDock: (value: 'bottom' | 'right') => void
 }
 
-/** Previous/next log and dock position, for the side panel footer. */
 export const LogPanelNavigation = ({ dock = 'bottom', setDock }: LogPanelNavigationProps) => {
   const { table, openRowId, setOpenRowId, onSelectRow } = useDataTable()
   const rows = table.getRowModel().rows
@@ -90,6 +89,7 @@ export const LogPanelNavigation = ({ dock = 'bottom', setDock }: LogPanelNavigat
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
+            aria-label="Dock side"
             variant="text"
             className="px-1"
             icon={dock === 'bottom' ? <PanelBottomIcon /> : <PanelRightIcon />}
@@ -117,7 +117,6 @@ export const LogPanelNavigation = ({ dock = 'bottom', setDock }: LogPanelNavigat
   )
 }
 
-/** Clears the selection, closing the side panel. */
 export const LogPanelCloseButton = () => {
   const { setOpenRowId } = useDataTable()
   const onClose = () => setOpenRowId(undefined)

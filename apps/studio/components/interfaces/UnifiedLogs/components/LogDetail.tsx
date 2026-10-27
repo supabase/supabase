@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import type { ReactNode } from 'react'
 import { Skeleton } from 'ui'
 
@@ -16,6 +16,7 @@ import {
   SERVICE_FLOW_TYPES,
   useUnifiedLogInspectionQuery,
 } from '@/data/logs/unified-log-inspection-query'
+import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function LogDetail({
@@ -27,7 +28,6 @@ export function LogDetail({
   row: ColumnSchema
   tab: 'overview' | 'raw-json'
   searchParameters: QuerySearchParamsType
-  /** Leads the overview, e.g. the request the log belongs to. */
   overviewHeader?: ReactNode
 }) {
   const { ref: projectRef } = useParams()
@@ -45,9 +45,7 @@ export function LogDetail({
     },
     { enabled: !!serviceFlowType }
   )
-  // Logs without a hand-written overview are grouped from their attributes. Timeline
-  // and compute logs already carry them; the rest are looked up.
-  const isOtel = !!useFlag('otelUnifiedLogs')
+  const isOtel = useUnifiedLogsBackend(searchParameters)
   const canFetchAttributes =
     isOtel && logsMetadata && !row.metadata && !hasLogOverviewRenderer(row.log_type)
   const attributesQuery = unifiedLogAttributesQueryOptions({
@@ -56,52 +54,51 @@ export function LogDetail({
     source: getLogTypeSource(row.log_type),
     logTimestampMs: getRowTimestampMs(row),
   })
-  const { data: fetchedAttributes } = useQuery({
+  const {
+    data: fetchedAttributes,
+    isLoading: isLoadingAttributes,
+    error: attributesError,
+  } = useQuery({
     ...attributesQuery,
     select: (row) => row?.log_attributes ?? null,
     enabled: canFetchAttributes && attributesQuery.enabled,
   })
   const attributes = logsMetadata ? (row.metadata ?? fetchedAttributes) : undefined
 
-  const isLoading = !!serviceFlowType && isPending
+  const isLoading = (!!serviceFlowType && isPending) || isLoadingAttributes
+  const retrievalError = error ?? attributesError
   const enrichedData = data?.result?.[0]
   const baseData = enrichedData ?? (attributes ? { ...row, metadata: attributes } : row)
   const rawData = getLogDataForMetadataVisibility(getRawLogData(baseData), logsMetadata)
 
-  if (tab === 'raw-json') {
-    return (
-      <>
-        {isLoading && (
-          <div className="flex items-center gap-3 p-3 text-foreground-light">
-            <Skeleton className="h-4 w-4 rounded-full" />
-            <span className="text-sm">Enriching log...</span>
-          </div>
-        )}
-        <RawJsonView data={rawData} copyLabel="Copy log as JSON" />
-      </>
-    )
-  }
-
   return (
     <div className="py-2">
-      {error && (
+      {retrievalError && (
         <AlertError
-          error={error}
+          error={retrievalError}
           subject="Failed to retrieve log details"
           projectRef={projectRef}
           className="mx-4 mb-2"
         />
       )}
-      <LogOverview
-        header={overviewHeader}
-        attributes={attributes}
-        data={row}
-        enrichedData={enrichedData}
-        rawData={rawData}
-        isLoading={isLoading}
-        filterFields={filterFields}
-        table={table}
-      />
+      {isLoading && (
+        <div role="status" className="flex items-center gap-3 p-3 text-foreground-light">
+          <Skeleton className="h-4 w-4 rounded-full" />
+          <span className="text-sm">Enriching log...</span>
+        </div>
+      )}
+      {tab === 'raw-json' && <RawJsonView data={rawData} copyLabel="Copy log as JSON" />}
+      {tab === 'overview' && (
+        <LogOverview
+          header={overviewHeader}
+          attributes={attributes}
+          data={row}
+          enrichedData={enrichedData}
+          isLoading={isLoading}
+          filterFields={filterFields}
+          table={table}
+        />
+      )}
     </div>
   )
 }

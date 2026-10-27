@@ -27,14 +27,12 @@ function getUserFields(user: User): { label: string; value: string }[] {
   ]
 }
 
-/** A user's details as key/value rows; click a row to copy its value. */
 export function UserFields({
   user,
   onFilterByUser,
   className,
 }: {
   user: User
-  /** Adds "Add filter" to the User ID row, e.g. to filter logs to this user. */
   onFilterByUser?: () => void
   className?: string
 }) {

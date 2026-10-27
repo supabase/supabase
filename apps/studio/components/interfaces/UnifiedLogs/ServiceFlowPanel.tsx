@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { useState } from 'react'
 import {
   ResizableHandle,
@@ -25,6 +24,7 @@ import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getEventMessageDisplay, getRawLogData } from './UnifiedLogs.utils'
 import { JsonCodeBlock } from '@/components/ui/JsonCodeBlock'
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
+import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -42,9 +42,9 @@ export function ServiceFlowPanel({
   searchParameters,
 }: ServiceFlowPanelProps) {
   const [activeTab, setActiveTab] = useState('overview')
-  // A log opened from the timeline, remembered against the row it was opened from
+
   const [openedLog, setOpenedLog] = useState<{ fromId: string; log: ColumnSchema } | null>(null)
-  const isRequestTimelineEnabled = !!useFlag('otelUnifiedLogs')
+  const isRequestTimelineEnabled = useUnifiedLogsBackend(searchParameters)
   const hasMultiple = selectedRows.length > 1
   const selectedRow = selectedRows[0]
   const activeLog =
@@ -119,8 +119,6 @@ export function ServiceFlowPanel({
               </TabsList>
               {tabs.map((tab) => (
                 <TabsContent
-                  // Keyed to the selected row, not the open log, so opening a log from
-                  // the timeline keeps its expanded steps
                   key={`${tab}-${selectedRow?.id}`}
                   value={tab}
                   className="mt-0 min-h-0 flex-1 overflow-auto"

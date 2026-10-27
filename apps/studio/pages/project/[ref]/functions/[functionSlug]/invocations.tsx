@@ -1,9 +1,8 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { getEdgeFunctionLogsUrl } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview.utils'
+import { useFunctionLogsMigration } from '@/components/interfaces/Functions/useFunctionLogsMigration'
 import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
@@ -12,7 +11,7 @@ import type { NextPageWithLayout } from '@/types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref, functionSlug, its, ite, log } = useParams()
+  const { ref, functionSlug } = useParams()
   const { isEnabled: isUnifiedLogsEnabled, isLoading: isLoadingPreview } = useUnifiedLogsPreview()
 
   const { data: selectedFunction, isPending: isLoading } = useEdgeFunctionQuery({
@@ -20,25 +19,23 @@ export const LogPage: NextPageWithLayout = () => {
     slug: functionSlug,
   })
 
-  // Unified logs merge invocations into the Logs tab, so keep old links working by forwarding
-  // their time range and selected log
-  const shouldRedirectToLogs = isUnifiedLogsEnabled && !!ref && !!functionSlug
-  useEffect(() => {
-    if (!shouldRedirectToLogs) return
-    router.replace(
-      getEdgeFunctionLogsUrl({
-        projectRef: ref,
-        functionSlug,
-        start: its,
-        end: ite,
-        logId: log,
-      })
-    )
-  }, [shouldRedirectToLogs, router, ref, functionSlug, its, ite, log])
+  const { isMigrating, shouldUseLegacyLogs } = useFunctionLogsMigration({
+    asPath: router.asPath,
+    onReplace: router.replace,
+    projectRef: ref,
+    functionSlug,
+    isEnabled: isUnifiedLogsEnabled,
+    isLoading: isLoadingPreview,
+    isInvocationsPage: true,
+  })
 
-  if (selectedFunction === undefined || isLoading || isLoadingPreview || shouldRedirectToLogs) {
-    return null
-  }
+  const shouldWaitForLogs =
+    selectedFunction === undefined ||
+    isLoading ||
+    isLoadingPreview ||
+    isMigrating ||
+    (isUnifiedLogsEnabled && !shouldUseLegacyLogs)
+  if (shouldWaitForLogs) return null
 
   return (
     <div className="flex-1">

@@ -23,6 +23,7 @@ import { contract as queryLogs } from './query-logs'
 import { contract as renameChat } from './rename-chat'
 import { contract as resolveSupportConversation } from './resolve-support-conversation'
 import { contract as runNotebook } from './run-notebook'
+import { contract as searchDocs } from './search-docs'
 import type {
   RemoteToolContract,
   ToolContract,
@@ -94,6 +95,7 @@ export const REMOTE_TOOL_CONTRACTS = {
   list_extensions: listExtensions,
   list_tables: listTables,
   query_logs: queryLogs,
+  search_docs: searchDocs,
 } as const satisfies Partial<Record<ToolName, RemoteToolContract>>
 
 export type RemoteContractToolName = keyof typeof REMOTE_TOOL_CONTRACTS

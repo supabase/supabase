@@ -8,18 +8,13 @@ import type { User } from '@/data/auth/users-infinite-query'
 
 interface UserCardProps {
   user: User
-  /** `outline` draws a bordered, rounded card like the outline button. */
   variant?: 'default' | 'outline'
-  /** Makes the whole card a link, e.g. to the user in Authentication. */
   href?: string
-  /** Accessible name for `href`; defaults to the user's name. */
   linkLabel?: string
-  /** Shown on the right, e.g. links to the user's logs. */
   actions?: ReactNode
   className?: string
 }
 
-/** Who a user is at a glance: avatar, display name, and email. */
 export function UserCard({
   user,
   variant = 'default',
@@ -30,7 +25,6 @@ export function UserCard({
 }: UserCardProps) {
   const primaryLabel = getUserPrimaryLabel(user)
   const hasDisplayName = !!getDisplayName(user, '')
-  // Only repeat the email beneath a display name; otherwise it's already the label
   const secondaryLabel = hasDisplayName ? (user.email ?? user.phone) : undefined
   const initials = getUserInitials(user)
 
@@ -44,7 +38,6 @@ export function UserCard({
       )}
     >
       {href && (
-        // Stretched over the card so the actions stay separate controls
         <a
           href={href}
           aria-label={linkLabel ?? primaryLabel}

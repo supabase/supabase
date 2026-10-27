@@ -9,34 +9,32 @@ import { LogTimeline } from './LogTimeline'
 import { AlertError } from '@/components/ui/AlertError'
 import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
 import { unifiedLogRequestTimelineQueryOptions } from '@/data/logs/unified-log-request-timeline-query'
+import { useFormatDateTime } from '@/lib/datetime'
 
-// Longer requests show this many steps until expanded
 const COLLAPSED_STEP_COUNT = 3
 
 interface RequestTimelineProps {
-  /** The log the timeline is built from. */
   row: ColumnSchema
-  /** The log currently open in the panel. */
   activeLog: ColumnSchema
   onSelectLog: (log: ColumnSchema) => void
 }
 
-/** When a log was written. Leads the overview. */
 export function LogTimestampHeader({ log }: { log: ColumnSchema }) {
+  const formatDateTime = useFormatDateTime()
   const timestampMs = getRowTimestampMs(log)
   return (
     <DetailSectionHeader
       title="Logged"
       icon={ClockIcon}
       className="border-b"
-      summary={timestampMs === null ? undefined : new Date(timestampMs).toLocaleString()}
+      summary={timestampMs === null ? undefined : formatDateTime(timestampMs)}
     />
   )
 }
 
-/** Every log from the same request, in order, with the open log highlighted. */
 export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimelineProps) {
   const { ref: projectRef } = useParams()
+  const formatDateTime = useFormatDateTime()
   const { data, error, isPending, isError, isSuccess } = useQuery(
     unifiedLogRequestTimelineQueryOptions({
       projectRef,
@@ -86,7 +84,7 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
       <DetailSectionHeader
         title="Request started"
         icon={RouteIcon}
-        summary={new Date(startMs).toLocaleString()}
+        summary={formatDateTime(startMs)}
       />
       <LogTimeline
         aria-label="Related logs"
