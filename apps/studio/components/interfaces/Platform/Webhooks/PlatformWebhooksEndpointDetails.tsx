@@ -323,31 +323,36 @@ export const PlatformWebhooksEndpointDetails = ({
                   </TableRow>
                 ))
               ) : deliveryRows.length > 0 ? (
-                deliveryRows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className="cursor-pointer focus-inset"
-                    onClick={() => onOpenDelivery(row.original.id)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault()
-                        onOpenDelivery(row.original.id)
-                      }
-                    }}
-                    tabIndex={0}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={
-                          cell.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1 text-right' : ''
+                deliveryRows.map((row) => {
+                  // A pending delivery has no result yet, so there is nothing to show in the sheet
+                  const canOpen = row.original.status !== 'pending'
+                  return (
+                    <TableRow
+                      key={row.id}
+                      className={canOpen ? 'cursor-pointer focus-inset' : 'focus-inset'}
+                      aria-disabled={!canOpen || undefined}
+                      onClick={() => canOpen && onOpenDelivery(row.original.id)}
+                      onKeyDown={(event) => {
+                        if (canOpen && (event.key === 'Enter' || event.key === ' ')) {
+                          event.preventDefault()
+                          onOpenDelivery(row.original.id)
                         }
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                      }}
+                      tabIndex={0}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className={
+                            cell.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1 text-right' : ''
+                          }
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  )
+                })
               ) : deliveriesError ? (
                 <TableRow className="[&>td]:hover:bg-inherit">
                   <TableCell

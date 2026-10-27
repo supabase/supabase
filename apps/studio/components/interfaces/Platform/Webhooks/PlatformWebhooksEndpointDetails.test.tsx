@@ -272,6 +272,62 @@ describe('PlatformWebhooksEndpointDetails', () => {
     expect(onOpenDelivery).not.toHaveBeenCalled()
   })
 
+  it('does not open a pending delivery, but opens one that has finished', async () => {
+    const user = userEvent.setup()
+    const onOpenDelivery = vi.fn()
+    const pending = createDelivery({
+      id: 'pending-delivery',
+      eventType: 'event.pending',
+      status: 'pending',
+    })
+    const finished = createDelivery({
+      id: 'failed-delivery',
+      eventType: 'event.finished',
+      status: 'failure',
+    })
+
+    renderComponent({ filteredDeliveries: [pending, finished], onOpenDelivery })
+
+    await user.click(screen.getByText('event.pending'))
+    expect(onOpenDelivery).not.toHaveBeenCalled()
+
+    await user.click(screen.getByText('event.finished'))
+    expect(onOpenDelivery).toHaveBeenCalledWith('failed-delivery')
+  })
+
+  it('does not open a pending delivery from the keyboard', async () => {
+    const user = userEvent.setup()
+    const onOpenDelivery = vi.fn()
+    const pending = createDelivery({
+      id: 'pending-delivery',
+      eventType: 'event.pending',
+      status: 'pending',
+    })
+
+    renderComponent({ filteredDeliveries: [pending], onOpenDelivery })
+
+    screen.getByText('event.pending').closest('tr')?.focus()
+    await user.keyboard('{Enter}')
+
+    expect(onOpenDelivery).not.toHaveBeenCalled()
+  })
+
+  it('still lets a pending delivery be retried from its row', async () => {
+    const user = userEvent.setup()
+    const onRetryDelivery = vi.fn()
+    const pending = createDelivery({
+      id: 'pending-delivery',
+      eventType: 'event.pending',
+      status: 'pending',
+    })
+
+    renderComponent({ filteredDeliveries: [pending], onRetryDelivery })
+
+    await user.click(screen.getByLabelText('Retry pending-delivery'))
+
+    expect(onRetryDelivery).toHaveBeenCalledWith('pending-delivery')
+  })
+
   it('renders a zero response code instead of the placeholder', () => {
     renderComponent({
       filteredDeliveries: [{ ...allDeliveries[0], id: 'org-delivery-zero', responseCode: 0 }],
