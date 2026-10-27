@@ -12,7 +12,6 @@ export interface MobileMenuProps {
   menus: NavMenu[]
   currentPath: string
   toggleRef: RefObject<HTMLElement | null>
-  onClose: () => void
   className?: string
 }
 
@@ -22,7 +21,6 @@ export const MobileMenu = ({
   menus,
   currentPath,
   toggleRef,
-  onClose,
   className,
 }: MobileMenuProps) => {
   const [pickedLabel, setPickedLabel] = useState<string>()
@@ -39,20 +37,8 @@ export const MobileMenu = ({
   const selectedLabel = pickedLabel ?? currentLabel ?? menus[0]?.label
   const selectedMenu = menus.find((menu) => menu.label === selectedLabel)
 
-  // the menu only exists below lg, so close it once the viewport grows past that
-  const bindDesktopClose = (drawer: HTMLDivElement | null) => {
-    if (!drawer) return
-    const desktop = window.matchMedia('(width >= 64rem)')
-    const handleDesktopChange = (event: MediaQueryListEvent) => {
-      if (event.matches) onClose()
-    }
-    desktop.addEventListener('change', handleDesktopChange)
-    return () => desktop.removeEventListener('change', handleDesktopChange)
-  }
-
   return (
     <MobileNavDrawer
-      ref={bindDesktopClose}
       id={id}
       open={open}
       toggleRef={toggleRef}
