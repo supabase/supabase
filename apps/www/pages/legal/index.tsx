@@ -51,6 +51,11 @@ const sections = [
         href: '/legal/privacy-resources/data-residency-and-transfers-faq',
         type: 'document' as const,
       },
+      {
+        label: 'Candidate Privacy Notice',
+        href: '/legal/privacy-resources/candidate-privacy-notice',
+        type: 'document' as const,
+      },
     ],
   },
   {
