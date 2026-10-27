@@ -42,11 +42,19 @@ export function useRouter() {
       // route tree's strict typing: Next-style hrefs are free-form strings
       // that can't satisfy the route-path union at compile time.
       push: (href: string, _options?: NavigateOptions) => {
-        const { to, search, hash } = splitInternalUrl(href)
+        const { to, search, hash, external } = splitInternalUrl(href)
+        if (external) {
+          if (typeof window !== 'undefined') window.location.assign(to)
+          return
+        }
         router.navigate<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '' })
       },
       replace: (href: string, _options?: NavigateOptions) => {
-        const { to, search, hash } = splitInternalUrl(href)
+        const { to, search, hash, external } = splitInternalUrl(href)
+        if (external) {
+          if (typeof window !== 'undefined') window.location.replace(to)
+          return
+        }
         router.navigate<AnyRouter, string>({
           to,
           search: search ?? {},
@@ -67,7 +75,8 @@ export function useRouter() {
         if (typeof window !== 'undefined') window.history.forward()
       },
       prefetch: (href: string, _options?: PrefetchOptions) => {
-        const { to, search, hash } = splitInternalUrl(href)
+        const { to, search, hash, external } = splitInternalUrl(href)
+        if (external) return
         // `<string, string>` (TFrom, TTo) loosens `to` to a plain string for
         // the same free-form-href reason as `navigate` above.
         router

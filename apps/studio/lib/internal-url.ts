@@ -19,9 +19,10 @@
 //      (this is what `buildTableEditorUrl` does)
 //   3. a genuinely external URL like `https://supabase.com/docs`.
 //
-// Split into three parts: pathname, search, hash. Same-origin absolute
-// URLs are normalised to a relative path. Cross-origin URLs are left
-// alone so TanStack's external-link path handles them.
+// Split into three parts: pathname, search, hash. Same-origin dashboard URLs
+// are normalised to basepath-relative paths. Cross-origin URLs and known
+// public-site routes (docs and changelog) are left as complete URLs so
+// TanStack's external-link path handles them without adding /dashboard.
 //
 // basePath quirk: TanStack's `to` is **basepath-relative** — given
 // `basepath: '/dashboard'` and `to: '/foo'`, TanStack builds the href
@@ -47,6 +48,8 @@ export interface SplitInternalUrlResult {
   to: string
   search?: SearchRecord
   hash?: string
+  /** True when the destination belongs to the public site, not the dashboard router. */
+  external?: boolean
 }
 
 export function splitInternalUrl(url: string): SplitInternalUrlResult {
@@ -76,6 +79,26 @@ export function splitInternalUrl(url: string): SplitInternalUrlResult {
   const baseOrigin = new URL(base).origin
   if (parsed.origin !== baseOrigin) {
     return { to: url }
+  }
+
+  // The dashboard is mounted below /dashboard on the same origin as the
+  // public Supabase site. Absolute same-origin URLs outside the basePath are
+  // public-site destinations, not Studio routes. Keep the complete URL so
+  // the router doesn't add /dashboard to paths such as /pricing or /docs.
+  const hasBasePath = !!(
+    NEXT_PUBLIC_BASE_PATH &&
+    (parsed.pathname === NEXT_PUBLIC_BASE_PATH ||
+      parsed.pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`))
+  )
+  const isAbsoluteUrl = url.startsWith('http://') || url.startsWith('https://')
+  const isKnownPublicPath =
+    parsed.pathname === '/docs' ||
+    parsed.pathname.startsWith('/docs/') ||
+    parsed.pathname === '/changelog' ||
+    parsed.pathname.startsWith('/changelog/')
+
+  if (NEXT_PUBLIC_BASE_PATH && !hasBasePath && (isAbsoluteUrl || isKnownPublicPath)) {
+    return { to: parsed.toString(), external: true }
   }
 
   let pathname = parsed.pathname

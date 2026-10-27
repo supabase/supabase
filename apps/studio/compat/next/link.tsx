@@ -102,8 +102,8 @@ const Link = forwardRef(function Link(
   ref: ForwardedRef<HTMLAnchorElement>
 ) {
   const resolved = resolveHref(href)
-  const { to, search, hash } = splitInternalUrl(resolved)
-  const preload = mapPrefetch(prefetch)
+  const { to, search, hash, external } = splitInternalUrl(resolved)
+  const preload = external ? false : mapPrefetch(prefetch)
 
   // Next's `legacyBehavior` (and `passHref` with a custom anchor child)
   // expects the consumer's child element to *be* the anchor — the parent
