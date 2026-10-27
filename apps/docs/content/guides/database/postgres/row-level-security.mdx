@@ -481,6 +481,8 @@ This prevents the policy `( (select auth.uid()) = user_id )` from running for an
 
 The files above live under `supabase/tests/` and run through [pgTAP](/docs/guides/database/extensions/pgtap). Create them with `supabase test new <table>_rls`, and run them with `supabase test db`.
 
+For more information about writing a policy test and running it against your local database, see [Test Row Level Security policies with pgTAP](/docs/guides/database/postgres/testing-row-level-security).
+
 [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main) adds `tests.create_supabase_user()`, `tests.authenticate_as()`, and `tests.rls_enabled()`. See [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended) and [Testing your database](/docs/guides/database/testing).
 
 ### Add indexes
