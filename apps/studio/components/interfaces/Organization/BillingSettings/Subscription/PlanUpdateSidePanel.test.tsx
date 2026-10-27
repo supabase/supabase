@@ -159,7 +159,6 @@ describe('PlanUpdateSidePanel', () => {
     )
   })
 
-
   it('does not fetch subscription data when billing-read permission is denied', () => {
     mockPermissions.mockImplementation((permission) => ({
       can: permission !== FGA_PERMISSIONS.ORGANIZATION.BILLING_READ,
