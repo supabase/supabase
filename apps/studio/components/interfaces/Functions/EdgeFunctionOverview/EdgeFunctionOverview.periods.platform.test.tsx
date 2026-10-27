@@ -58,7 +58,7 @@ it('shows sparse execution averages without adding old zeroes and updates the se
     },
   })
   addAPIMock({
-    method: 'get',
+    method: 'post',
     path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
     response: () => HttpResponse.json<{ result: never[] }>({ result: [] }),
   })

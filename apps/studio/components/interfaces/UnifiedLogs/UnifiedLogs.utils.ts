@@ -106,6 +106,12 @@ export const buildUnifiedLogsUrl = ({
     date: start && end ? [new Date(start), new Date(end)] : null,
   })
 
+export const getFacetValueCount = (
+  facets: Record<string, FacetMetadataSchema> | undefined,
+  facet: string,
+  value: string
+) => facets?.[facet]?.rows.find((row) => row.value === value)?.total ?? 0
+
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {
     return new Map(facets?.[columnId]?.rows?.map(({ value, total }) => [value, total]) || [])
