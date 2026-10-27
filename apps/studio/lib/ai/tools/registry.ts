@@ -26,9 +26,12 @@ import { contract as runNotebook } from './run-notebook'
 import { contract as searchDocs } from './search-docs'
 import type {
   RemoteToolContract,
+  ToolAvailability,
   ToolContract,
   ToolContractInput,
   ToolContractOutput,
+  ToolEnvironment,
+  ToolRequirement,
 } from './types'
 import { contract as updateNotebook } from './update-notebook'
 import { contract as updateOptInLevel } from './update-opt-in-level'
@@ -125,4 +128,16 @@ export function sanitizeContractPart<Part extends ToolUIPart>(
       ? contract.toModelOutput(parsed.data, optInLevel)
       : contract.outputOnInvalid,
   }
+}
+
+/** Whether a tool is offered in `environment`, given the requirements the request satisfies. */
+export function isToolAvailable(
+  availability: ToolAvailability,
+  {
+    environment,
+    satisfied,
+  }: { environment: ToolEnvironment; satisfied: ReadonlySet<ToolRequirement> }
+): boolean {
+  if (!availability.environments.has(environment)) return false
+  return [...(availability.requires ?? [])].every((requirement) => satisfied.has(requirement))
 }
