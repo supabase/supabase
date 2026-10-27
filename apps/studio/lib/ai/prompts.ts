@@ -518,10 +518,10 @@ CREATE TRIGGER messages_broadcast_trigger
 ### Using realtime.send (For custom messages)
 \`\`\`sql
 CREATE OR REPLACE FUNCTION notify_custom_event()
-RETURNS TRIGGER AS $$
-SECURITY DEFINER
+RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $$
+SECURITY DEFINER
+AS $
 BEGIN
   PERFORM realtime.send(
     'room:' || NEW.room_id::text,
