@@ -25,6 +25,7 @@ const ActionPlates = ({ children, layout }: { children: ReactNode; layout: Admon
       <FloatingPlate
         className={cn(
           'flex',
+          layout === 'vertical' && 'has-[>.w-full]:w-full',
           layout === 'responsive' && 'has-[>.w-full]:w-full @lg:has-[>.w-full]:w-auto'
         )}
       >
