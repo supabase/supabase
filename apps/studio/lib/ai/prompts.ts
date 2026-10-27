@@ -493,7 +493,7 @@ CREATE OR REPLACE FUNCTION room_messages_broadcast_trigger()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-AS $
+AS $$
 BEGIN
   PERFORM realtime.broadcast_changes(
     'room:' || COALESCE(NEW.room_id, OLD.room_id)::text,
@@ -506,7 +506,7 @@ BEGIN
   );
   RETURN COALESCE(NEW, OLD);
 END;
-$;
+$$;
 
 CREATE TRIGGER messages_broadcast_trigger
   AFTER INSERT OR UPDATE OR DELETE ON messages
