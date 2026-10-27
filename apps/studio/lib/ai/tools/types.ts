@@ -12,11 +12,22 @@ export type ToolContext = {
   baseUrl?: string
 }
 
+/**
+ * Where Studio is running, from `IS_PLATFORM`:
+ * - `platform`: the hosted dashboard, where the remote MCP server and Management API are available.
+ * - `self-hosted`: self-hosted or local Studio, which talks only to the project's database.
+ */
 export type ToolEnvironment = 'platform' | 'self-hosted'
 
-/** Request-level conditions a tool needs beyond its environment. */
+/**
+ * Request-level conditions a tool needs beyond its environment. `getTools` marks each one as met:
+ * - `explorer`: the Explorer feature flag is on for the user, which gates notebooks.
+ * - `supportMode`: the chat is a support conversation.
+ * - `baseUrl`: the request has the public dashboard URL, for tools that call Studio's own API routes.
+ */
 export type ToolRequirement = 'explorer' | 'supportMode' | 'baseUrl'
 
+/** Where a tool is offered. A request gets the tool only in a listed environment, with every requirement met. */
 export type ToolAvailability = {
   environments: ReadonlySet<ToolEnvironment>
   requires?: ReadonlySet<ToolRequirement>
