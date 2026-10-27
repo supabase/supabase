@@ -129,10 +129,81 @@ describe('account security MFA and recovery sections', () => {
     mockUser([{ ...factor, status: 'unverified' }])
     renderSection()
     expect(await screen.findByText('Set up multi-factor authentication')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Set up MFA' }))
+    expect(screen.getByText('Set up recovery codes')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Set up MFA first' }))
     expect(await screen.findByRole('dialog')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: /authenticator.*name/i })).toBeInTheDocument()
-    expect(screen.queryByText('Recovery codes')).not.toBeInTheDocument()
+  })
+
+  it('shows missing codes with a generation action rather than backup-authenticator advice', async () => {
+    mswServer.use(
+      http.get('*/auth/v1/factors/recovery-codes', () =>
+        HttpResponse.json(
+          { code: 'mfa_factor_not_found', msg: 'Recovery codes have not been generated' },
+          { status: 404, headers: { 'X-Supabase-Api-Version': '2024-01-01' } }
+        )
+      )
+    )
+    renderSection()
+    expect(await screen.findByText('No recovery codes')).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Generate recovery codes' })).toHaveLength(1)
+    expect(screen.getByText('Set up recovery codes')).toBeInTheDocument()
+    expect(screen.queryByText('Add a backup MFA method')).not.toBeInTheDocument()
+  })
+
+  it.each([1, 3])('shows a low code count of %s with a regeneration action', async (remaining) => {
+    mswServer.use(
+      http.get('*/auth/v1/factors/recovery-codes', () =>
+        HttpResponse.json<AuthMFARecoveryCodesStatusResponseData>({
+          id: 'codes-a',
+          type: 'recovery_code',
+          remaining,
+          total: 10,
+        })
+      )
+    )
+    renderSection()
+    expect(
+      await screen.findByText(`${remaining} of 10 recovery codes available`)
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByText('Generate a new set before you need them to recover your account.')
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Regenerate' })).toHaveLength(1)
+    expect(
+      screen.getByText('Each code can only be used once. Keep them somewhere safe.')
+    ).toBeInTheDocument()
+  })
+
+  it('shows exhausted codes and keeps removal in the options menu', async () => {
+    mswServer.use(
+      http.get('*/auth/v1/factors/recovery-codes', () =>
+        HttpResponse.json<AuthMFARecoveryCodesStatusResponseData>({
+          id: 'codes-a',
+          type: 'recovery_code',
+          remaining: 0,
+          total: 10,
+        })
+      )
+    )
+    renderSection()
+    expect(await screen.findByText('Recovery codes used up')).toBeInTheDocument()
+    expect(screen.getByText('0 of 10 recovery codes available')).toBeInTheDocument()
+    expect(
+      screen.getByText('Generate a new set so you have a backup way to sign in.')
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Regenerate' })).toHaveLength(1)
+    expect(screen.queryByRole('button', { name: /remove codes/i })).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Recovery code options' }))
+    expect(await screen.findByRole('menuitem', { name: 'Remove codes' })).toBeInTheDocument()
+  })
+
+  it('shows healthy recovery codes without backup advice when two authenticators are verified', async () => {
+    mockUser([factor, { ...factor, id: 'backup-a', friendly_name: 'Tablet' }])
+    renderSection()
+    expect(await screen.findByText('10 of 10 recovery codes available')).toBeInTheDocument()
+    expect(screen.getByText('Phone')).toBeInTheDocument()
+    expect(screen.queryByText('Add a backup MFA method')).not.toBeInTheDocument()
   })
 
   it('shows a backup warning with one authenticator action', async () => {
@@ -147,7 +218,7 @@ describe('account security MFA and recovery sections', () => {
   it('keeps recovery codes available when a verified phone factor is the only MFA method', async () => {
     mockUser([{ ...factor, factor_type: 'phone', friendly_name: 'Backup phone' }])
     renderSection()
-    expect(await screen.findByText('10/10 recovery codes available')).toBeInTheDocument()
+    expect(await screen.findByText('10 of 10 recovery codes available')).toBeInTheDocument()
     expect(screen.queryByText('Set up multi-factor authentication')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add another method' })).toBeInTheDocument()
   })
@@ -167,7 +238,7 @@ describe('account security MFA and recovery sections', () => {
     expect(screen.queryByText('Your recovery codes will be deleted too')).not.toBeInTheDocument()
   })
 
-  it('keeps removal unavailable when recovery-code status cannot be checked', async () => {
+  it('does not infer missing codes or allow removal when the status check fails', async () => {
     mswServer.use(
       http.get('*/auth/v1/factors/recovery-codes', () =>
         HttpResponse.json(
@@ -178,9 +249,32 @@ describe('account security MFA and recovery sections', () => {
     )
     renderSection()
     expect(await screen.findByText('Failed to load recovery codes')).toBeInTheDocument()
+    expect(screen.queryByText('No recovery codes')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Generate recovery codes' })
+    ).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove MFA method: Phone' })).toHaveAttribute(
       'aria-disabled',
       'true'
     )
+  })
+
+  it('hides recovery-code settings when MFA methods fail to load', async () => {
+    mswServer.use(
+      http.get('*/auth/v1/user', () =>
+        HttpResponse.json(
+          { code: 'unexpected_failure', msg: 'Methods unavailable' },
+          { status: 500 }
+        )
+      )
+    )
+    renderSection()
+    expect(
+      await screen.findByText('Failed to retrieve account security information')
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Recovery codes' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Generate recovery codes' })
+    ).not.toBeInTheDocument()
   })
 })
