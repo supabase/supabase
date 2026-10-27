@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { parseAsInteger } from 'nuqs'
 import { PropsWithChildren, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
@@ -56,6 +56,7 @@ import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 import {
   PipelineStatusRequestStatus,
@@ -80,7 +81,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [, setEdit] = useQueryState(
+  const [, setEdit] = usePanelQueryState(
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )

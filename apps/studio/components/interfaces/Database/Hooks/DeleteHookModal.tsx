@@ -1,4 +1,4 @@
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
@@ -6,6 +6,8 @@ import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseTriggerDeleteMutation } from '@/data/database-triggers/database-trigger-delete-mutation'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 
 export const DeleteHookModal = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -15,9 +17,9 @@ export const DeleteHookModal = () => {
     connectionString: project?.connectionString,
   })
 
-  const [selectedHookIdToDelete, setSelectedHookIdToDelete] = useQueryState(
+  const [selectedHookIdToDelete, setSelectedHookIdToDelete] = usePanelQueryState(
     'delete',
-    parseAsString.withDefault('')
+    parseAsString.withDefault('').withOptions({ history: 'push' })
   )
   const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToDelete)
   const { name, schema } = selectedHook ?? {}
@@ -26,6 +28,7 @@ export const DeleteHookModal = () => {
     mutate: deleteDatabaseTrigger,
     isPending: isDeleting,
     isSuccess: isSuccessDelete,
+    variables: deletedHook,
   } = useDatabaseTriggerDeleteMutation({
     onSuccess: () => {
       toast.success(`Successfully deleted ${name}`)
@@ -45,11 +48,29 @@ export const DeleteHookModal = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && !!selectedHookIdToDelete && !selectedHook && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: selectedHookIdToDelete,
+      resourceFound: !!selectedHook,
+      isSuccessDelete,
+      isPendingDelete: isDeleting,
+      deletedId: deletedHook?.trigger.id,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('Webhook not found')
-      setSelectedHookIdToDelete(null)
     }
-  }, [isSuccess, isSuccessDelete, selectedHook, selectedHookIdToDelete, setSelectedHookIdToDelete])
+    setSelectedHookIdToDelete(null, { history: 'replace' })
+  }, [
+    deletedHook,
+    isDeleting,
+    isSuccess,
+    isSuccessDelete,
+    selectedHook,
+    selectedHookIdToDelete,
+    setSelectedHookIdToDelete,
+  ])
 
   return (
     <TextConfirmModal

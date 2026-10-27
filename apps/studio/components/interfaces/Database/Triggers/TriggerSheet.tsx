@@ -144,6 +144,7 @@ export const TriggerSheet = ({
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
+    active: open,
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { literal, safeSql } from '@supabase/pg-meta'
 import { PlusIcon, Trash2Icon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -35,6 +35,7 @@ import { useVectorBucketIndexCreateMutation } from '@/data/storage/vector-bucket
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 
 const isStagingLocal = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
@@ -106,7 +107,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
   const { data: project } = useSelectedProjectQuery()
   const { isCli } = useDeploymentMode()
 
-  const [visible, setVisible] = useQueryState(
+  const [visible, setVisible] = usePanelQueryState(
     'newTable',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

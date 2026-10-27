@@ -7,7 +7,7 @@ import {
   Link2Icon,
   TerminalIcon,
 } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
@@ -28,6 +28,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -46,7 +47,10 @@ interface ProjectConnectionPopoverProps {
 export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopoverProps) => {
   const [open, setOpen] = useState(false)
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = usePanelQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+  )
 
   const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
-import { useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
@@ -35,6 +35,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { BASE_PATH } from '@/lib/constants'
 
 interface ProviderFormProps {
@@ -49,7 +50,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const [urlProvider, setUrlProvider] = useQueryState('provider', { defaultValue: '' })
+  const [urlProvider, setUrlProvider] = usePanelQueryState(
+    'provider',
+    parseAsString.withDefault('').withOptions({ history: 'push' })
+  )
 
   const [open, setOpen] = useState(false)
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()

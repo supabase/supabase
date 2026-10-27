@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { CodeIcon, ServerIcon, TerminalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useMemo } from 'react'
 import { AiIconAnimation, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
@@ -14,6 +14,7 @@ import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -27,7 +28,10 @@ export const FunctionsEmptyState = () => {
   const { openSidebar } = useSidebarManagerSnapshot()
 
   const track = useTrack()
-  const [, setCreateMethod] = useQueryState('create', parseAsString)
+  const [, setCreateMethod] = usePanelQueryState(
+    'create',
+    parseAsString.withOptions({ history: 'push' })
+  )
 
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const templates = useMemo(() => {

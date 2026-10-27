@@ -1,6 +1,6 @@
 import { useFlag, useParams } from 'common'
 import { SearchIcon } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
@@ -23,7 +23,9 @@ import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 
 export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
@@ -54,7 +56,7 @@ export const EdgeFunctionSecrets = () => {
     [data]
   )
 
-  const [selectedIdToEdit, setSelectedIdToEdit] = useQueryState(
+  const [selectedIdToEdit, setSelectedIdToEdit] = usePanelQueryState(
     'edit',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -63,7 +65,7 @@ export const EdgeFunctionSecrets = () => {
     [customSecrets, selectedIdToEdit]
   )
 
-  const [selectedIdToDelete, setSelectedIdToDelete] = useQueryState(
+  const [selectedIdToDelete, setSelectedIdToDelete] = usePanelQueryState(
     'delete',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -76,6 +78,7 @@ export const EdgeFunctionSecrets = () => {
     mutate: deleteSecret,
     isPending: isDeleting,
     isSuccess: isSuccessDelete,
+    variables: deletedSecret,
   } = useSecretsDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully deleted secret “${variables.secrets[0]}”`)
@@ -103,16 +106,28 @@ export const EdgeFunctionSecrets = () => {
   useEffect(() => {
     if (!!selectedIdToEdit && isSuccess && !selectedSecretToEdit) {
       toast(`Secret ${selectedIdToEdit} cannot be found`)
-      setSelectedIdToEdit(null)
+      setSelectedIdToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, selectedIdToEdit, selectedSecretToEdit, setSelectedIdToEdit])
 
   useEffect(() => {
-    if (!!selectedIdToDelete && isSuccess && !selectedSecretToDelete && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: selectedIdToDelete,
+      resourceFound: !!selectedSecretToDelete,
+      isSuccessDelete,
+      isPendingDelete: isDeleting,
+      deletedId: deletedSecret?.secrets[0],
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast(`Secret ${selectedIdToDelete} cannot be found`)
-      setSelectedIdToDelete(null)
     }
+    setSelectedIdToDelete(null, { history: 'replace' })
   }, [
+    deletedSecret,
+    isDeleting,
     isSuccess,
     isSuccessDelete,
     selectedIdToDelete,

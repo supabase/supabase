@@ -1,7 +1,7 @@
 import { useFeatureFlags, useParams } from 'common'
 import { ArrowUpRightIcon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
+import { parseAsInteger, parseAsStringEnum } from 'nuqs'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import {
@@ -31,6 +31,7 @@ import { useReplicationDestinationsQuery } from '@/data/replication/destinations
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export const DestinationPanel = () => {
@@ -42,7 +43,7 @@ export const DestinationPanel = () => {
   const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
 
-  const [urlDestinationType, setDestinationType] = useQueryState(
+  const [urlDestinationType, setDestinationType] = usePanelQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
@@ -56,7 +57,7 @@ export const DestinationPanel = () => {
     })
   )
 
-  const [edit, setEdit] = useQueryState(
+  const [edit, setEdit] = usePanelQueryState(
     'edit',
     parseAsInteger.withOptions({
       history: 'push',
@@ -100,9 +101,16 @@ export const DestinationPanel = () => {
     setEdit(null)
   }
 
+  const onCommit = () => {
+    checkIsDirtyRef.current = () => false
+    setDestinationType(null)
+    setEdit(null)
+  }
+
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => checkIsDirtyRef.current(),
     onClose,
+    active: visible,
   })
 
   const destinationDocsPath =
@@ -116,7 +124,7 @@ export const DestinationPanel = () => {
   useEffect(() => {
     if (edit !== null && invalidExistingDestination) {
       toast(`Unable to find destination ID ${edit}`)
-      setEdit(null)
+      setEdit(null, { history: 'replace' })
     }
   }, [edit, invalidExistingDestination, setEdit])
 
@@ -210,7 +218,7 @@ export const DestinationPanel = () => {
                 existingDestination={existingDestination}
                 typeSelection={pipelinesTypeSelection}
                 checkIsDirtyRef={checkIsDirtyRef}
-                onClose={onClose}
+                onClose={onCommit}
                 onCancel={confirmOnClose}
               />
             )}

@@ -1,4 +1,4 @@
-import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
+import { parseAsInteger, parseAsStringEnum } from 'nuqs'
 import {
   Select,
   SelectContent,
@@ -22,6 +22,7 @@ import {
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -44,7 +45,7 @@ export const DestinationTypeSelection = () => {
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
 
-  const [urlDestinationType, setDestinationType] = useQueryState(
+  const [urlDestinationType, setDestinationType] = usePanelQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
@@ -58,7 +59,7 @@ export const DestinationTypeSelection = () => {
     })
   )
 
-  const [edit] = useQueryState(
+  const [edit] = usePanelQueryState(
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )

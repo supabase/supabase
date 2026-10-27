@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { SqlEditor } from 'icons'
 import { ChevronDownIcon, ListPlusIcon } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
@@ -30,6 +30,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 
@@ -43,9 +44,9 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
   const [language, setLanguage] = useState<'javascript' | 'sql'>('sql')
   const [showLanguage, setShowLanguage] = useState(false)
 
-  const [_, setOpenImportForeignSchemaDialog] = useQueryState(
+  const [_, setOpenImportForeignSchemaDialog] = usePanelQueryState(
     'initForeignSchema',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
   const updateLanguage = (value: 'javascript' | 'sql') => {

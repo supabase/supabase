@@ -3,7 +3,7 @@ import { keyword } from '@supabase/pg-meta'
 import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsString } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -24,6 +24,7 @@ import { useSchemasQuery } from '@/data/database/schemas-query'
 import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
 
@@ -102,14 +103,14 @@ export const EditHookPanel = () => {
     connectionString: project?.connectionString,
   })
 
-  const [showCreateHookForm, setShowCreateHookForm] = useQueryState(
+  const [showCreateHookForm, setShowCreateHookForm] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
 
-  const [selectedHookIdToEdit, setSelectedHookIdToEdit] = useQueryState(
+  const [selectedHookIdToEdit, setSelectedHookIdToEdit] = usePanelQueryState(
     'edit',
-    parseAsString.withDefault('')
+    parseAsString.withDefault('').withOptions({ history: 'push' })
   )
   const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToEdit)
 
@@ -128,11 +129,17 @@ export const EditHookPanel = () => {
     setSelectedHookIdToEdit(null)
   }
 
+  const handleCommit = () => {
+    isClosingRef.current = true
+    setShowCreateHookForm(false)
+    setSelectedHookIdToEdit(null)
+  }
+
   const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
     {
       onSuccess: (_, variables) => {
         toast.success(`Successfully created new webhook "${variables.payload.name}"`)
-        onClose()
+        handleCommit()
       },
       onError: (error) => {
         toast.error(`Failed to create webhook: ${error.message}`)
@@ -144,7 +151,7 @@ export const EditHookPanel = () => {
     {
       onSuccess: (res) => {
         toast.success(`Successfully updated webhook "${res.name}"`)
-        onClose()
+        handleCommit()
       },
       onError: (error) => {
         toast.error(`Failed to update webhook: ${error.message}`)
@@ -176,7 +183,7 @@ export const EditHookPanel = () => {
   useEffect(() => {
     if (isSuccess && !!selectedHookIdToEdit && !selectedHook && !isClosingRef.current) {
       toast('Webhook not found')
-      setSelectedHookIdToEdit(null)
+      setSelectedHookIdToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, selectedHook, selectedHookIdToEdit, setSelectedHookIdToEdit])
 
@@ -323,11 +330,13 @@ export const EditHookPanel = () => {
     }
   }
 
-  // This is intentionally kept outside of the useConfirmOnClose hook to force RHF to update the isDirty state.
+  // Read during render so RHF subscribes. Also read the proxy when Back fires:
+  // the render boolean is still false until that subscription flushes.
   const isDirty = form.formState.isDirty
   const { confirmOnClose, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
+    checkIsDirty: () => form.formState.isDirty || isDirty,
     onClose: () => onClose(),
+    active: visible,
   })
 
   return (

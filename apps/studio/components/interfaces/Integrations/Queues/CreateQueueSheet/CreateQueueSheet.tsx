@@ -16,6 +16,7 @@ import {
 
 import { usePgPartmanStatus } from '../usePgPartmanStatus'
 import { CreateQueueForm, FormSchema } from './CreateQueueSheet.schema'
+import { createdQueuePath } from './CreateQueueSheet.utils'
 import { PartitionConfigFields } from './PartitionConfigFields'
 import { PgPartmanCallout } from './PgPartmanCallout'
 import { QueueNameField } from './QueueNameField'
@@ -74,6 +75,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty,
     onClose,
+    active: visible,
   })
 
   const onSubmit: SubmitHandler<CreateQueueForm> = async ({ name, enableRls, values }) => {
@@ -82,9 +84,11 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
       return
     }
 
+    const projectRef = project.ref
+
     createQueue(
       {
-        projectRef: project.ref,
+        projectRef,
         connectionString: project?.connectionString,
         name,
         enableRls,
@@ -100,8 +104,9 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
       {
         onSuccess: () => {
           toast.success(`Successfully created queue ${name}`)
-          router.push(`/project/${project?.ref}/integrations/queues/queues/${name}`)
-          onClose()
+          // Replace the open panel entry. Going back and then pushing can lose
+          // the race to the back's popstate and leave the user on the list.
+          router.replace(createdQueuePath(projectRef, name))
         },
       }
     )

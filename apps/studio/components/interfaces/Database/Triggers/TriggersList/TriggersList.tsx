@@ -39,9 +39,11 @@ import { useTablesQuery } from '@/data/tables/tables-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useIsProtectedSchema, useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -95,24 +97,34 @@ export const TriggersList = () => {
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
-  const [showCreateTriggerForm, setShowCreateTriggerForm] = useQueryState(
+  const [showCreateTriggerForm, setShowCreateTriggerForm] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [triggerIdToEdit, setTriggerToEdit] = useQueryState('edit', parseAsString)
+  const [triggerIdToEdit, setTriggerToEdit] = usePanelQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const triggerToEdit = triggers?.find((fn) => fn.id.toString() === triggerIdToEdit)
 
-  const [triggerIdToDuplicate, setTriggerToDuplicate] = useQueryState('duplicate', parseAsString)
+  const [triggerIdToDuplicate, setTriggerToDuplicate] = usePanelQueryState(
+    'duplicate',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const triggerToDuplicate = triggers?.find((fn) => fn.id.toString() === triggerIdToDuplicate)
 
-  const [triggerIdToDelete, setTriggerToDelete] = useQueryState('delete', parseAsString)
+  const [triggerIdToDelete, setTriggerToDelete] = usePanelQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const triggerToDelete = triggers?.find((fn) => fn.id.toString() === triggerIdToDelete)
 
   const {
     mutate: deleteDatabaseTrigger,
     isPending: isDeletingTrigger,
     isSuccess: isSuccessDelete,
+    variables: deletedTrigger,
   } = useDatabaseTriggerDeleteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Successfully removed ${variables.trigger.name}`)
@@ -205,23 +217,41 @@ execute function function_name();`
   useEffect(() => {
     if (isSuccess && !!triggerIdToEdit && !triggerToEdit) {
       toast('Trigger not found')
-      setTriggerToEdit(null)
+      setTriggerToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, setTriggerToEdit, triggerIdToEdit, triggerToEdit])
 
   useEffect(() => {
     if (isSuccess && !!triggerIdToDuplicate && !triggerToDuplicate) {
       toast('Trigger not found')
-      setTriggerToDuplicate(null)
+      setTriggerToDuplicate(null, { history: 'replace' })
     }
   }, [isSuccess, triggerIdToDuplicate, triggerToDuplicate, setTriggerToDuplicate])
 
   useEffect(() => {
-    if (isSuccess && !!triggerIdToDelete && !triggerToDelete && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: isSuccess,
+      currentId: triggerIdToDelete,
+      resourceFound: !!triggerToDelete,
+      isSuccessDelete,
+      isPendingDelete: isDeletingTrigger,
+      deletedId: deletedTrigger?.trigger?.id,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('Trigger not found')
-      setTriggerToDelete(null)
     }
-  }, [isSuccess, triggerIdToDelete, triggerToDelete, isSuccessDelete, setTriggerToDelete])
+    setTriggerToDelete(null, { history: 'replace' })
+  }, [
+    deletedTrigger,
+    isDeletingTrigger,
+    isSuccess,
+    isSuccessDelete,
+    setTriggerToDelete,
+    triggerIdToDelete,
+    triggerToDelete,
+  ])
 
   if (isPending) {
     return <GenericSkeletonLoader />

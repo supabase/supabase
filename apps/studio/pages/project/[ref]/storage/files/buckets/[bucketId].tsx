@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { ChevronDownIcon, FolderOpenIcon, SettingsIcon, ShieldIcon, Trash2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import {
@@ -37,6 +37,7 @@ import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import type { NextPageWithLayout } from '@/types'
 
@@ -45,15 +46,15 @@ const BucketPage: NextPageWithLayout = () => {
   const { bucketId, ref } = useParams()
   const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
 
-  const [showEditModal, setShowEditModal] = useQueryState(
+  const [showEditModal, setShowEditModal] = usePanelQueryState(
     'edit',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [showEmptyModal, setShowEmptyModal] = useQueryState(
+  const [showEmptyModal, setShowEmptyModal] = usePanelQueryState(
     'empty',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [showDeleteModal, setShowDeleteModal] = useQueryState(
+  const [showDeleteModal, setShowDeleteModal] = usePanelQueryState(
     'delete',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

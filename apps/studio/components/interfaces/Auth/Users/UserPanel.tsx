@@ -1,5 +1,5 @@
 import { XIcon } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
@@ -22,12 +22,13 @@ import { useUserQuery } from '@/data/auth/user-query'
 import { User } from '@/data/auth/users-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
   const showLogs = useIsFeatureEnabled('logs:all')
 
-  const [selectedId, setSelectedId] = useQueryState(
+  const [selectedId, setSelectedId] = usePanelQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )

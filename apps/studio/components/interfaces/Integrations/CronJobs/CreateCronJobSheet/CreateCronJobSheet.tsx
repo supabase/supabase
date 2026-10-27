@@ -167,6 +167,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose: () => onClose(),
+    active: open,
   })
 
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { parseAsBoolean } from 'nuqs'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -27,6 +27,7 @@ import * as z from 'zod'
 
 import { useVaultSecretCreateMutation } from '@/data/vault/vault-secret-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 const formSchema = z.object({
   name: z.string().min(1, 'Please provide a name for your secret'),
@@ -44,15 +45,28 @@ export const AddNewSecretModal = () => {
 
   const [isSecretVisible, setIsSecretVisible] = useState(false)
 
-  const [showAddSecretModal, setShowAddSecretModal] = useQueryState(
+  const [showAddSecretModal, setShowAddSecretModal] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false)
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
   )
+
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: '', description: '', secret: '' },
+  })
+
+  // this modal stays mounted, so back can drop ?new without calling handleClose
+  useEffect(() => {
+    if (showAddSecretModal) {
+      return
+    }
+
+    setIsSecretVisible(false)
+    form.reset()
+  }, [form, showAddSecretModal])
 
   const handleClose = () => {
     setShowAddSecretModal(null)
-    setIsSecretVisible(false)
-    form.reset()
   }
 
   const onAddNewSecret: SubmitHandler<FormSchema> = async (values) => {
@@ -67,17 +81,12 @@ export const AddNewSecretModal = () => {
         secret: values.secret,
       })
       toast.success(`Successfully added new secret ${values.name}`)
-      handleClose()
+      setShowAddSecretModal(null)
     } catch (error: any) {
       // [Joshen] No error handler required as they are all handled within the mutations already
     } finally {
     }
   }
-
-  const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { name: '', description: '', secret: '' },
-  })
 
   const { isDirty, isSubmitting } = form.formState
 

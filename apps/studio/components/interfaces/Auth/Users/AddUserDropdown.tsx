@@ -1,5 +1,5 @@
 import { ChevronDownIcon, MailIcon, UserPlusIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
 import CreateUserModal from './CreateUserModal'
@@ -8,6 +8,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const AddUserDropdown = () => {
@@ -21,11 +22,11 @@ export const AddUserDropdown = () => {
     FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
 
-  const [inviteVisible, setInviteVisible] = useQueryState(
+  const [inviteVisible, setInviteVisible] = usePanelQueryState(
     'invite',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [createVisible, setCreateVisible] = useQueryState(
+  const [createVisible, setCreateVisible] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

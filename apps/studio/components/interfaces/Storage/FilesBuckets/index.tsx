@@ -1,7 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { ArrowDownNarrowWideIcon, RefreshCwIcon, SearchIcon } from 'lucide-react'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -30,6 +30,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { IS_PLATFORM } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -48,7 +49,7 @@ export const FilesBuckets = () => {
   const sortColumn = sortBucket === STORAGE_BUCKET_SORT.ALPHABETICAL ? 'name' : 'created_at'
   const sortOrder = sortBucket === STORAGE_BUCKET_SORT.ALPHABETICAL ? 'asc' : 'desc'
 
-  const [visible, setVisible] = useQueryState(
+  const [visible, setVisible] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

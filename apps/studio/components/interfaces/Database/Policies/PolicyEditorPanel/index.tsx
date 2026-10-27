@@ -187,6 +187,7 @@ export const PolicyEditorPanel = memo(function ({
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: hasUnsavedChanges,
     onClose: onSelectCancel,
+    active: visible,
   })
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {

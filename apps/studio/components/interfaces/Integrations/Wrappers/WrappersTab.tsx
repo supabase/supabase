@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean } from 'nuqs'
 import { useCallback, useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
 
@@ -16,6 +16,7 @@ import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -24,9 +25,9 @@ export const WrappersTab = () => {
   const { data: project } = useSelectedProjectQuery()
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
-  const [isCreating, setIsCreating] = useQueryState(
+  const [isCreating, setIsCreating] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const { can: canCreateWrapper } = useAsyncCheckPermissionsV2(
@@ -56,6 +57,7 @@ export const WrappersTab = () => {
       setIsCreating(null)
       setIsDirty(false)
     }, [setIsCreating]),
+    active: !!isCreating,
   })
 
   const CreateWrapperSheetComponent = !wrapperMeta

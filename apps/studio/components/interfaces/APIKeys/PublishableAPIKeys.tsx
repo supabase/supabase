@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useParams } from 'common'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import {
@@ -23,6 +23,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
 import { APIKeysData, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -56,7 +57,10 @@ export const PublishableAPIKeys = () => {
   const showSelfHostedEmptyState =
     !IS_PLATFORM && publishableApiKeys.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
 
-  const [deleteId, setDeleteId] = useQueryState('deletePublishableKey', parseAsString)
+  const [deleteId, setDeleteId] = usePanelQueryState(
+    'deletePublishableKey',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const apiKeyToDelete = publishableApiKeys?.find((key) => key.id === deleteId)
 
   const {
@@ -79,7 +83,7 @@ export const PublishableAPIKeys = () => {
   useEffect(() => {
     if (isSuccessApiKeys && !!deleteId && !apiKeyToDelete && !isDeleteSuccess) {
       toast('Unable to find publishable key')
-      setDeleteId(null)
+      setDeleteId(null, { history: 'replace' })
     }
   }, [apiKeyToDelete, deleteId, isDeleteSuccess, isSuccessApiKeys, setDeleteId])
 

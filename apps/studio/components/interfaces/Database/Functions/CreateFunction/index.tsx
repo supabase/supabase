@@ -99,6 +99,7 @@ export const CreateFunction = ({
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
     onClose,
+    active: visible,
   })
 
   const { mutate: createDatabaseFunction, isPending: isCreating } =

@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { ChevronDownIcon, CodeIcon, TerminalIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import {
   AiIconAnimation,
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -23,7 +24,10 @@ export const DeployEdgeFunctionButton = () => {
   const snap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const track = useTrack()
-  const [, setCreateMethod] = useQueryState('create', parseAsString)
+  const [, setCreateMethod] = usePanelQueryState(
+    'create',
+    parseAsString.withOptions({ history: 'push' })
+  )
 
   const isProjectActive = useIsProjectActive()
 

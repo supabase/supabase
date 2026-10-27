@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -27,6 +27,7 @@ import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-dec
 import { useVaultSecretUpdateMutation } from '@/data/vault/vault-secret-update-mutation'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { VaultSecret } from '@/types'
 
 const SecretSchema = z.object({
@@ -44,7 +45,10 @@ export const EditSecretModal = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [secretIdToEdit, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
+  const [secretIdToEdit, setSelectedSecretToEdit] = usePanelQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const secret = secrets.find((secret) => secret.id === secretIdToEdit)
 
   const [showSecretValue, setShowSecretValue] = useState(false)
@@ -106,7 +110,7 @@ export const EditSecretModal = () => {
   useEffect(() => {
     if (isSuccess && !!secretIdToEdit && !secret) {
       toast('Secret not found')
-      setSelectedSecretToEdit(null)
+      setSelectedSecretToEdit(null, { history: 'replace' })
     }
   }, [isSuccess, secretIdToEdit, secret, setSelectedSecretToEdit])
 

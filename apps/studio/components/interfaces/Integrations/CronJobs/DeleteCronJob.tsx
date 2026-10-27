@@ -8,14 +8,19 @@ import { useCronJobsData } from './CronJobsTab.useCronJobsData'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabaseCronJobDeleteMutation } from '@/data/database-cron-jobs/database-cron-jobs-delete-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
+import { missingPanelIdAction } from '@/lib/panel-history.utils'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const DeleteCronJob = () => {
   const { data: project } = useSelectedProjectQuery()
 
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
-  const [cronJobIdForDeletion, setCronJobForDeletion] = useQueryState('delete', parseAsString)
+  const [cronJobIdForDeletion, setCronJobForDeletion] = usePanelQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push' })
+  )
 
   const { grid } = useCronJobsData({
     projectRef: project?.ref,
@@ -29,6 +34,7 @@ export const DeleteCronJob = () => {
     mutate: deleteDatabaseCronJob,
     isPending,
     isSuccess: isSuccessDelete,
+    variables: deletedCronJob,
   } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
       if (cronJob && project) {
@@ -53,11 +59,29 @@ export const DeleteCronJob = () => {
   }
 
   useEffect(() => {
-    if (grid.isSuccess && !!cronJobIdForDeletion && !cronJob && !isSuccessDelete) {
+    const action = missingPanelIdAction({
+      listLoaded: grid.isSuccess,
+      currentId: cronJobIdForDeletion,
+      resourceFound: !!cronJob,
+      isSuccessDelete,
+      isPendingDelete: isPending,
+      deletedId: deletedCronJob?.jobId,
+    })
+
+    if (action === 'keep') return
+    if (action === 'clear-and-notify') {
       toast('Cron job not found')
-      setCronJobForDeletion(null)
     }
-  }, [cronJob, cronJobIdForDeletion, grid.isSuccess, isSuccessDelete, setCronJobForDeletion])
+    setCronJobForDeletion(null, { history: 'replace' })
+  }, [
+    cronJob,
+    cronJobIdForDeletion,
+    deletedCronJob,
+    grid.isSuccess,
+    isPending,
+    isSuccessDelete,
+    setCronJobForDeletion,
+  ])
 
   if (!cronJob) {
     return null

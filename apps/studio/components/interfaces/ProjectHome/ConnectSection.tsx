@@ -7,6 +7,7 @@ import { Card, CardContent, cn } from 'ui'
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
 import { CONNECT_ACTIONS } from './ConnectSection.config'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -16,7 +17,10 @@ export const ConnectSection = () => {
   const { data: selectedProject } = useSelectedProjectQuery()
   const { setConnectSheetSource } = useAppStateSnapshot()
   const track = useTrack()
-  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setShowConnect] = usePanelQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push' })
+  )
   const [, setConnectTab] = useQueryState('connectTab', parseAsString)
 
   const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY

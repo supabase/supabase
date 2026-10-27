@@ -20,6 +20,7 @@ import { CreateCronJobSheet } from '@/components/interfaces/Integrations/CronJob
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
 import { createNavigationHandler } from '@/lib/navigation'
 import { useTrack } from '@/lib/telemetry/track'
@@ -56,15 +57,21 @@ export const CronjobsTab = () => {
     enabled: isInstalled,
   })
 
-  const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
+  const [createCronJobSheetShown, setCreateCronJobSheetShown] = usePanelQueryState(
     'new',
-    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [cronJobIdForEditing, setCronJobForEditing] = useQueryState('edit', parseAsString)
+  const [cronJobIdForEditing, setCronJobForEditing] = usePanelQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
   const cronJobForEditing = grid.rows.find((j) => j.jobid.toString() === cronJobIdForEditing)
 
-  const [, setCronJobForDeletion] = useQueryState('delete', parseAsString)
+  const [, setCronJobForDeletion] = usePanelQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push' })
+  )
 
   const columns = useMemo(
     () =>
@@ -127,7 +134,7 @@ export const CronjobsTab = () => {
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
       toast('Cron job not found')
-      setCronJobForEditing(null)
+      setCronJobForEditing(null, { history: 'replace' })
     }
   }, [cronJobForEditing, cronJobIdForEditing, grid.isSuccess, setCronJobForEditing])
 

@@ -73,7 +73,6 @@ export const EditWrapperSheet = ({
       const { tables } = getValues()
       const hasNewSchema = (tables as Record<string, any>[]).some((table) => table.is_new_schema)
       if (hasNewSchema) invalidateSchemasQuery(queryClient, project?.ref)
-
       onClose()
     },
   })
@@ -121,8 +120,9 @@ export const EditWrapperSheet = ({
   }
 
   const { confirmOnClose, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
+    checkIsDirty: () => form.formState.isDirty,
     onClose,
+    active: true,
   })
 
   useEffect(() => {

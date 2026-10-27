@@ -12,6 +12,7 @@ import { MAX_BULK_DELETE } from './Users.constants'
 import type { User } from '@/data/auth/users-infinite-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -49,7 +50,7 @@ export function useAuthUsersShortcuts({
   const [hasCellSelected, setHasCellSelected] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const [selectedId, setSelectedId] = useQueryState(
+  const [selectedId, setSelectedId] = usePanelQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
@@ -65,11 +66,11 @@ export function useAuthUsersShortcuts({
   const [sortByValue, setSortByValue] = useQueryState('sortBy', {
     defaultValue: 'created_at:desc',
   })
-  const [, setInviteVisible] = useQueryState(
+  const [, setInviteVisible] = usePanelQueryState(
     'invite',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [, setCreateVisible] = useQueryState(
+  const [, setCreateVisible] = usePanelQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )

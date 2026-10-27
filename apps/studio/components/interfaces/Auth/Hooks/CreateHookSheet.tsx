@@ -177,8 +177,9 @@ export const CreateHookSheet = ({
     handleOpenChange,
     modalProps: discardChangesModalProps,
   } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
+    checkIsDirty: () => form.formState.isDirty || isDirty,
     onClose,
+    active: visible,
   })
 
   const statements = useMemo(() => {

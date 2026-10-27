@@ -9,7 +9,7 @@ import {
   MoreVerticalIcon,
   TrashIcon,
 } from 'lucide-react'
-import { parseAsString, useQueryState } from 'nuqs'
+import { parseAsString } from 'nuqs'
 import { useState } from 'react'
 import {
   Button,
@@ -28,6 +28,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { VaultSecret } from '@/types'
 
 interface SecretRowProps {
@@ -41,8 +42,14 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   const [revealSecret, setRevealSecret] = useState(false)
   const name = row?.name ?? 'No name provided'
 
-  const [, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
-  const [, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
+  const [, setSelectedSecretToEdit] = usePanelQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push' })
+  )
+  const [, setSelectedSecretToDelete] = usePanelQueryState(
+    'delete',
+    parseAsString.withOptions({ history: 'push' })
+  )
 
   const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
