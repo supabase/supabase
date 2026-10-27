@@ -28,11 +28,14 @@ export function UserRecentLogs({ userId }: { userId: string }) {
     const now = Date.now()
     return [new Date(now - USER_LOGS_WINDOW_MS), new Date(now)]
   })
-  const { data, error, isError, isPending, isFetching } = useUnifiedLogsInfiniteQuery({
-    projectRef,
-    search: createUnifiedLogsSearch({ user: userId, date: [start, end] }),
-    pageSize: MAX_ROWS,
-  })
+  const { data, error, isError, isPending, isFetching } = useUnifiedLogsInfiniteQuery(
+    {
+      projectRef,
+      search: createUnifiedLogsSearch({ user: userId, date: [start, end] }),
+      pageSize: MAX_ROWS,
+    },
+    { placeholderData: undefined }
+  )
   const rows = useMemo(() => getUniqueLogRows<ColumnSchema>(data?.pages), [data?.pages])
 
   const getLogsUrl = (log?: ColumnSchema) => {
