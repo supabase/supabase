@@ -12,10 +12,22 @@ The Send Email Hook replaces Supabase's built-in email sending. You can use this
 
 **Inputs**
 
-| Field   | Type                                              | Description                                    |
-| ------- | ------------------------------------------------- | ---------------------------------------------- |
-| `user`  | [`User`](/docs/guides/auth/users#the-user-object) | The user account taking the action             |
-| `email` | `object`                                          | Metadata specific to the email sending process |
+| Field        | Type                                              | Description                                    |
+| ------------ | ------------------------------------------------- | ---------------------------------------------- |
+| `user`       | [`User`](/docs/guides/auth/users#the-user-object) | The user account taking the action             |
+| `email_data` | `object`                                          | Metadata specific to the email sending process |
+
+The `email_data` object contains these fields:
+
+| Field                                               | Description                                                                                                                                                                                                                                                                                                         |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `email_action_type`                                 | The kind of email to send, such as `signup`, `magiclink`, or `recovery`                                                                                                                                                                                                                                             |
+| `token`                                             | The one-time code to show in the email                                                                                                                                                                                                                                                                              |
+| `token_hash`                                        | The hashed token to put in a verification link                                                                                                                                                                                                                                                                      |
+| `site_url`                                          | Your project's Auth API URL, such as `https://<project-ref>.supabase.co/auth/v1`. Despite the name, this isn't the [Site URL](/docs/guides/auth/redirect-urls) from your Auth settings. Build verification links from it: `<site_url>/verify?token=<token_hash>&type=<email_action_type>&redirect_to=<redirect_to>` |
+| `redirect_to`                                       | Where to send the user after they verify. It's the redirect URL the client asked for if it's in your allow list, and your Site URL otherwise                                                                                                                                                                        |
+| `token_new`, `token_hash_new`                       | The second code and hash for email changes. See [Email change behavior](#email-change-behavior-and-token-hash-mapping)                                                                                                                                                                                              |
+| `old_email`, `old_phone`, `provider`, `factor_type` | Details for security notification emails, such as the previous email address. Empty for other email types                                                                                                                                                                                                           |
 
 <Tabs
   scrollable
@@ -69,7 +81,7 @@ The Send Email Hook replaces Supabase's built-in email sending. You can use this
     "token_hash": "7d5b7b1964cf5d388340a7f04f1dbb5eeb6c7b52ef8270e1737a58d0",
     "redirect_to": "http://localhost:3000/",
     "email_action_type": "signup",
-    "site_url": "http://localhost:9999",
+    "site_url": "http://127.0.0.1:54321/auth/v1",
     "token_new": "",
     "token_hash_new": "",
     "old_email": "",
@@ -648,7 +660,6 @@ import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 const postmarkEndpoint = 'https://api.postmarkapp.com/email'
 // Replace this with your email
 const FROM_EMAIL = 'myemail@gmail.com'
-const PROJECT_REF = '<your-project-ref>'
 
 // Email Subjects
 const subjects = {
@@ -713,7 +724,7 @@ const templates = {
 }
 
 function generateConfirmationURL(email_data) {
-  const baseUrl = `https://${PROJECT_REF}.supabase.co/auth/v1/verify`
+  const baseUrl = `${email_data.site_url}/verify`
   const params = new URLSearchParams({
     token: email_data.token_hash,
     type: email_data.email_action_type,
@@ -739,7 +750,7 @@ Deno.serve(async (req) => {
   let htmlBody = template
     .replace('{{confirmation_url}}', confirmation_url)
     .replace('{{token}}', email_data.token || '')
-    .replace('{{new_token}}', email_data.new_token || '')
+    .replace('{{new_token}}', email_data.token_new || '')
     .replace('{{site_url}}', email_data.site_url || '')
     .replace('{{old_email}}', email_data.old_email || '')
     .replace('{{new_email}}', user.new_email || '')
@@ -831,8 +842,12 @@ const templates = {
 };
 
 function generateConfirmationURL(email_data) {
-   // TODO: replace the ref with your project ref
-   return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token_hash}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
+   const params = new URLSearchParams({
+       token: email_data.token_hash,
+       type: email_data.email_action_type,
+       redirect_to: email_data.redirect_to,
+   })
+   return `${email_data.site_url}/verify?${params.toString()}`
 }
 
 async function sendEmailWithPostmark(user: any, email_data: any, serverToken: string): Promise<Response> {
@@ -841,7 +856,7 @@ async function sendEmailWithPostmark(user: any, email_data: any, serverToken: st
     let template = templates[email_data.email_action_type];
     let htmlBody = template.replace('{{confirmation_url}}', confirmation_url)
         .replace('{{token}}', email_data.token || '')
-        .replace('{{new_token}}', email_data.new_token || '')
+        .replace('{{new_token}}', email_data.token_new || '')
         .replace('{{site_url}}', email_data.site_url || '')
         .replace('{{old_email}}', email_data.old_email || '')
         .replace('{{new_email}}', user.new_email || '');
@@ -870,7 +885,7 @@ async function sendEmailWithSendGrid(user: any, email_data: any, apiKey: string)
     cont confirmation_url = generateConfirmationURL(email_data)
     let htmlBody = template.replace('{{confirmation_url}}', confirmation_url)
         .replace('{{token}}', email_data.token || '')
-        .replace('{{new_token}}', email_data.new_token || '')
+        .replace('{{new_token}}', email_data.token_new || '')
         .replace('{{site_url}}', email_data.site_url || '')
         .replace('{{old_email}}', email_data.old_email || '')
         .replace('{{new_email}}', user.new_email || '');
