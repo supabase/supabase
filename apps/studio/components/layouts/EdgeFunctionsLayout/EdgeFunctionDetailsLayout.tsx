@@ -1,6 +1,6 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, useParams } from 'common'
-import { DownloadIcon, FileArchiveIcon, SendIcon } from 'lucide-react'
+import { CopyIcon, DownloadIcon, FileArchiveIcon, SendIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState, type PropsWithChildren } from 'react'
@@ -57,7 +57,6 @@ const EdgeFunctionDetailsLayout = ({
     FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ
   )
 
-  // Unified logs merge invocations and runtime logs into a single Logs tab
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -251,6 +250,13 @@ const EdgeFunctionDetailsLayout = ({
             actions={
               <PageBreadcrumbsActions>
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
+                {!IS_PLATFORM && !!functionUrl && (
+                  <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL} side="bottom">
+                    <Button icon={<CopyIcon />} onClick={copyFunctionUrl}>
+                      Copy URL
+                    </Button>
+                  </ShortcutTooltip>
+                )}
                 <Popover open={isDownloadOpen} onOpenChange={setIsDownloadOpen}>
                   <ShortcutTooltip
                     shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_DOWNLOAD}

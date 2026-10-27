@@ -14,6 +14,7 @@ import {
 
 import { LogFieldRow } from '../../components/LogFieldRow'
 import { LogFields } from '../../components/LogFields'
+import type { ColumnSchema } from '../../UnifiedLogs.schema'
 import { getEventMessageDisplay } from '../../UnifiedLogs.utils'
 import type { BlockFieldConfig, ServiceFlowBlockProps } from '../types'
 import { groupLogAttributes, type AttributeSectionId } from '../utils/attributeSections'
@@ -33,7 +34,6 @@ const SECTION_ICONS: Record<AttributeSectionId, LucideIcon> = {
   other: BracesIcon,
 }
 
-// Fields every log has, whatever its source. Ids match the list's filter fields.
 const LOG_FIELDS: BlockFieldConfig[] = [
   {
     id: 'event_message',
@@ -48,12 +48,11 @@ const LOG_FIELDS: BlockFieldConfig[] = [
   { id: 'auth_user', label: 'User', getValue: (data) => data.auth_user },
 ]
 
-type GenericLogOverviewProps = Pick<ServiceFlowBlockProps, 'data' | 'filterFields' | 'table'> & {
-  /** The log's structured attributes, when known and allowed to be shown. */
-  attributes?: Record<string, unknown> | null
+type GenericLogOverviewProps = Pick<ServiceFlowBlockProps, 'filterFields' | 'table'> & {
+  data: ColumnSchema
+  attributes?: ColumnSchema['metadata']
 }
 
-/** Overview for any log without a hand-written layout: common fields, then attributes by group. */
 export function GenericLogOverview({
   data,
   attributes,

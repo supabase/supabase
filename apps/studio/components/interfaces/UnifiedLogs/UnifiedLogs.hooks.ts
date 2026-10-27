@@ -29,10 +29,6 @@ export const useFilterSearchSync = ({
 
 const DEFAULT_COLUMN_VISIBILITY: VisibilityState = { uuid: false }
 
-/**
- * Column visibility and order for the logs table, saved per view. Views without a `viewKey` share
- * the Logs page's saved columns.
- */
 export const useLogsTableColumns = (viewKey?: string) => {
   const keyPrefix = viewKey ? `${viewKey}-` : ''
   const [columnVisibility, setColumnVisibility] = useLocalStorageQuery<VisibilityState>(

@@ -21,14 +21,9 @@ import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface EdgeFunctionOverviewHeaderProps {
-  /** Controls shown beside the name and URL, e.g. the chart period selector */
   actions?: ReactNode
 }
 
-/**
- * Top section of an edge function's Overview tab: the function name, its invoke URL and when it
- * was last deployed.
- */
 export const EdgeFunctionOverviewHeader = ({ actions }: EdgeFunctionOverviewHeaderProps) => {
   const { ref: projectRef, functionSlug } = useParams()
   const { data: selectedFunction, isPending: isLoadingFunction } = useEdgeFunctionQuery({
@@ -46,8 +41,17 @@ export const EdgeFunctionOverviewHeader = ({ actions }: EdgeFunctionOverviewHead
     ? dayjs(selectedFunction.updated_at).fromNow()
     : undefined
 
+  let detailsStatus = ''
+  if (isLoadingFunction) detailsStatus = 'Loading function details'
+  if (selectedFunction) {
+    detailsStatus = `${selectedFunction.name} details loaded. Last deployed ${updatedRelative ?? 'status unavailable'}.`
+  }
+
   return (
     <PageHeader>
+      <span role="status" aria-live="polite" className="sr-only">
+        {detailsStatus}
+      </span>
       <PageHeaderMeta>
         <PageHeaderSummary>
           <PageHeaderTitle>{selectedFunction?.name || functionSlug}</PageHeaderTitle>
@@ -57,7 +61,12 @@ export const EdgeFunctionOverviewHeader = ({ actions }: EdgeFunctionOverviewHead
               <span className="flex items-center gap-x-2">
                 <span className="break-all">{functionUrl}</span>
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL} side="bottom">
-                  <CopyButton iconOnly variant="text" text={functionUrl} />
+                  <CopyButton
+                    iconOnly
+                    variant="text"
+                    text={functionUrl}
+                    aria-label="Copy function URL"
+                  />
                 </ShortcutTooltip>
               </span>
             )}

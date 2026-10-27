@@ -15,6 +15,7 @@ import {
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
+import { toQuerySearchParams } from './UnifiedLogs.utils'
 import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { RowSelectionModifiers } from '@/components/ui/DataTable/rowSelection.utils'
@@ -44,7 +45,8 @@ function SelectionHarness({
   scope?: string
   showPanel?: boolean
 }) {
-  const [searchParameters] = useQueryStates(SEARCH_PARAMS_PARSER)
+  const [search] = useQueryStates(SEARCH_PARAMS_PARSER)
+  const searchParameters = toQuerySearchParams(search)
   const { selection, selectRow, clearSelection } = useTableRowSelection({ scope })
   const table = useReactTable({
     data: logs,
@@ -284,7 +286,6 @@ describe('selected log details', () => {
     await user.click(row('first'))
     expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByText('Message')).toBeVisible()
-    // The header reads like the log's timeline step; the time stays above the sections
     expect(screen.getByRole('status')).toHaveTextContent('Realtime')
     expect(screen.getByText('Logged')).toBeVisible()
     expect(screen.getByRole('button', { name: 'Previous log' })).toBeVisible()

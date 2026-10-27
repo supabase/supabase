@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jitDbAccessKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
+import { del, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessRevokeVariables = {
@@ -16,6 +16,7 @@ async function revokeJitDbAccess({ projectRef, userId }: JitDbAccessRevokeVariab
 
   const { data, error } = await del('/v1/projects/{ref}/database/jit/{user_id}', {
     params: { path: { ref: projectRef, user_id: userId } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

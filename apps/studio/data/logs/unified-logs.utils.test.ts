@@ -230,7 +230,7 @@ describe('extractLogMetadata', () => {
       expect(mapped).not.toHaveProperty('project')
     })
 
-    it('maps edge function runtime rows without request fields but with their metadata and level', () => {
+    it('preserves runtime error details without adding HTTP request fields', () => {
       const metadata = { event_type: 'Log', level: 'error', execution_id: 'exec-1' }
       const mapped = mapUnifiedLogRow({
         id: 'runtime-log',

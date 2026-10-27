@@ -126,18 +126,6 @@ export const MEMORY_CHART_CONFIG = {
 const toManipulateUnit = (unit: ChartIntervals['startUnit']) => unit as dayjs.ManipulateType
 const toNumber = (value: string | number | undefined) => Number(value ?? 0)
 
-export const getBucketedTimeRange = (
-  interval: ChartIntervals,
-  now: Date = new Date()
-): [Date, Date] => {
-  const currentTime = dayjs(now)
-  const unit = toManipulateUnit(interval.startUnit)
-  const start = currentTime.subtract(interval.startValue, unit).startOf(unit)
-  const end = currentTime.startOf(unit)
-
-  return [start.toDate(), end.toDate()]
-}
-
 export const getRollingTimeRange = (
   interval: ChartIntervals,
   now: Date = new Date()
@@ -172,7 +160,6 @@ export const getInvocationChartNavigationUrl = ({
   return getLegacyEdgeFunctionLogsUrl({ projectRef, functionSlug, tab: 'invocations', start, end })
 }
 
-/** Narrows unified logs to one edge function: its invocations and the runtime output they produce */
 export const getEdgeFunctionLogsScope = (functionId: string): UnifiedLogsScope => ({
   filters: [
     { column: 'log_type', operator: '=', value: 'edge function' },
@@ -181,20 +168,19 @@ export const getEdgeFunctionLogsScope = (functionId: string): UnifiedLogsScope =
   ],
 })
 
-/** How an edge function's unified logs views show its logs, on top of its scope */
 export const EDGE_FUNCTION_LOGS_VIEW = {
-  // The time range, message search and severity the old Invocations and Logs tabs had, plus log
-  // type to tell invocations and runtime output apart. No user filter, since no function row has
-  // a user.
   offeredFilters: ['date', 'log_type', 'level', 'event_message'],
-  // Shared by the Logs tab and the Overview errors, apart from the project Logs page
   columnPreferencesKey: 'edge-function',
 } as const
 
-/**
- * Links to an edge function's unified Logs tab, optionally focused on a time range, filters
- * (e.g. `level:eq:error`) and a selected log. Uses the same URL params as the project-wide Logs page.
- */
+export const getFunctionLogsDateRange = (start?: string, end?: string): Date[] | null => {
+  if (!start || !end) return null
+  const from = new Date(start)
+  const to = new Date(end)
+  if (!Number.isFinite(from.getTime()) || !Number.isFinite(to.getTime()) || from > to) return null
+  return [from, to]
+}
+
 export const getEdgeFunctionLogsUrl = ({
   projectRef,
   functionSlug,
@@ -212,14 +198,10 @@ export const getEdgeFunctionLogsUrl = ({
 }) =>
   serializeUnifiedLogsSearchParams(`/project/${projectRef}/functions/${functionSlug}/logs`, {
     filter: filters?.length ? [...filters] : null,
-    date: start && end ? [new Date(start), new Date(end)] : null,
+    date: getFunctionLogsDateRange(start, end),
     id: logId ?? null,
   })
 
-/**
- * Links to an edge function's Invocations or Logs tab from before unified logs, optionally focused
- * on a time range and a selected log. Uses those tabs' own URL params.
- */
 export const getLegacyEdgeFunctionLogsUrl = ({
   projectRef,
   functionSlug,
@@ -244,6 +226,34 @@ export const getLegacyEdgeFunctionLogsUrl = ({
 
   const query = params.toString()
   return `/project/${projectRef}/functions/${functionSlug}/${tab}${query ? `?${query}` : ''}`
+}
+
+export function getFunctionOverviewLogsUrl({
+  projectRef,
+  functionSlug,
+  start,
+  end,
+  logType,
+  isUnifiedLogsEnabled,
+}: {
+  projectRef: string
+  functionSlug: string
+  start: string
+  end: string
+  logType: 'edge function' | 'edge function runtime'
+  isUnifiedLogsEnabled: boolean
+}) {
+  if (isUnifiedLogsEnabled) {
+    return getEdgeFunctionLogsUrl({
+      projectRef,
+      functionSlug,
+      start,
+      end,
+      filters: [`log_type:eq:${logType}`],
+    })
+  }
+  const destination = logType === 'edge function' ? 'invocations' : 'logs'
+  return `/project/${projectRef}/functions/${functionSlug}/${destination}?its=${start}`
 }
 
 export const formatChartTimestamp = (value: Date | string | number | undefined, format: string) => {

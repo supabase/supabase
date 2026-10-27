@@ -657,7 +657,6 @@ export const storageDetailsFields: BlockFieldConfig[] = [
 // POSTGRES FIELDS
 // =============================================================================
 
-// What ran and how it ended
 export const postgresStatementFields: BlockFieldConfig[] = [
   {
     id: 'event_message',
@@ -699,13 +698,13 @@ export const postgresStatementFields: BlockFieldConfig[] = [
   {
     id: 'hint',
     label: 'Hint',
-    getValue: (data, enrichedData) => enrichedData?.['parsed.hint'] || data?.hint,
+    getValue: (data, enrichedData) =>
+      enrichedData?.hint || enrichedData?.['parsed.hint'] || data?.hint,
     requiresEnrichedData: true,
     wrap: true,
   },
 ]
 
-// Who ran it and from where
 export const postgresSessionFields: BlockFieldConfig[] = [
   {
     id: 'database_user',
@@ -754,7 +753,6 @@ export const postgresSessionFields: BlockFieldConfig[] = [
   },
 ]
 
-// Internal identifiers, mostly useful for correlating with other Postgres logs
 export const postgresTransactionFields: BlockFieldConfig[] = [
   {
     id: 'transaction_id',
