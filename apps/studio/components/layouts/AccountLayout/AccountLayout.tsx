@@ -75,17 +75,17 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
                   isActive: currentPath === '/account/me',
                 },
                 {
+                  key: 'security',
+                  label: 'Security',
+                  href: '/account/security',
+                  isActive: currentPath === '/account/security',
+                },
+                {
                   key: 'access-tokens',
                   label: 'Access Tokens',
                   href: '/account/tokens',
                   isActive:
                     currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
-                },
-                {
-                  key: 'security',
-                  label: 'Security',
-                  href: '/account/security',
-                  isActive: currentPath === '/account/security',
                 },
                 ...(showOAuthApps
                   ? [
