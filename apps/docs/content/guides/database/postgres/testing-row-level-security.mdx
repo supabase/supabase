@@ -56,6 +56,8 @@ The example tests a `todos` table whose policy lets each user access only their 
    supabase db reset
    ```
 
+   `supabase db reset` recreates the local database from your migrations and seed file, so it deletes any data they don't create. To apply only the new migration, run `supabase migration up` instead.
+
 3. Create the test file:
 
    ```bash
@@ -247,13 +249,15 @@ describe('Todos RLS', () => {
     })
 
     // Fetch User 1's todos
-    const { data: todos } = await supabase.from('todos').select('*')
+    const { data: todos, error } = await supabase.from('todos').select('task')
 
-    // Verify that none of the todos were changed to "Hacked!"
-    expect(todos).toBeDefined()
-    todos?.forEach((todo) => {
-      expect(todo.task).not.toBe('Hacked!')
-    })
+    // Verify that User 1 still sees all their todos, unchanged
+    expect(error).toBeNull()
+    expect(todos?.map((todo) => todo.task).sort()).toEqual([
+      'New Task',
+      'User 1 Task 1',
+      'User 1 Task 2',
+    ])
   })
 })
 ```
