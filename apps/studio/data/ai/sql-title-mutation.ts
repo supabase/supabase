@@ -50,6 +50,9 @@ export const useSqlTitleGenerateMutation = ({
 > = {}) => {
   return useMutation<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>({
     mutationFn: (vars) => generateSqlTitle(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
     async onError(data, variables, context) {
       if (onError === undefined) {
         toast.error(`Failed to generate title: ${data.message}`)
