@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { ClientSideExceptionHandler } from './ClientSideExceptionHandler'
 import { InsertBeforeRemoveChildErrorHandler } from './InsertBeforeRemoveChildErrorHandler'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { getChunkLoadReloadDecision } from '@/lib/chunk-load-error'
 
 export type FallbackProps = {
   error: unknown
@@ -16,6 +17,10 @@ export const GlobalErrorBoundaryState = ({ error, resetErrorBoundary }: Fallback
   const checkIsError = isError(error)
 
   const largeLogo = useIsFeatureEnabled('branding:large_logo')
+
+  // The boundary's `onError` reloads the page; render nothing rather than
+  // flash the error state while the reload is in flight
+  if (getChunkLoadReloadDecision(error)) return null
 
   const errorMessage = checkIsError ? error.message : ''
   const urlMessage = checkIsError ? `Path name: ${router.pathname}\n\n${error?.stack}` : ''

@@ -81,6 +81,7 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { getChunkLoadReloadDecision, isChunkLoadError } from '@/lib/chunk-load-error'
 import { getCLIFaviconRoute } from '@/lib/cli-favicon'
 import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
@@ -267,8 +268,10 @@ function DynamicTitle() {
 }
 
 const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
+  const shouldReload = getChunkLoadReloadDecision(error)
   Sentry.withScope(function (scope) {
     scope.setTag('globalErrorBoundary', true)
+    if (isChunkLoadError(error)) scope.setTag('chunkLoadReload', shouldReload)
     const eventId = Sentry.captureException(error)
     // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
     if (eventId && error && typeof error === 'object') {
@@ -277,6 +280,7 @@ const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
   })
 
   console.error(error.stack)
+  if (shouldReload) window.location.reload()
 }
 
 function NotFound() {
@@ -288,17 +292,22 @@ function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
   // `react-error-boundary`) — TanStack's `errorComponent` covers
   // errors thrown during route load/render before the in-tree
   // boundary mounts, so we report from both layers.
+  const shouldReload = getChunkLoadReloadDecision(error)
+
   useEffect(() => {
     Sentry.withScope((scope) => {
       scope.setTag('routerErrorComponent', true)
+      if (isChunkLoadError(error)) scope.setTag('chunkLoadReload', shouldReload)
       const eventId = Sentry.captureException(error)
       if (eventId && error && typeof error === 'object') {
         Object.assign(error, { sentryId: eventId })
       }
     })
     console.error(error instanceof Error ? error.stack : error)
-  }, [error])
+    if (shouldReload) window.location.reload()
+  }, [error, shouldReload])
 
+  if (shouldReload) return null
   return <Error500 />
 }
 

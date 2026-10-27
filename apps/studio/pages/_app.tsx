@@ -60,6 +60,7 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { getChunkLoadReloadDecision, isChunkLoadError } from '@/lib/chunk-load-error'
 import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
@@ -163,8 +164,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page)
 
   const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
+    const shouldReload = getChunkLoadReloadDecision(error)
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
+      if (isChunkLoadError(error)) scope.setTag('chunkLoadReload', shouldReload)
       const eventId = Sentry.captureException(error)
       // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
       if (eventId && error && typeof error === 'object') {
@@ -173,6 +176,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     })
 
     console.error(error.stack)
+    if (shouldReload) window.location.reload()
   }
 
   useThemeSandbox()
