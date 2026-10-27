@@ -83,3 +83,31 @@ describe('getUnifiedLogs page size', () => {
     expect(page.nextCursor).not.toBeNull()
   })
 })
+
+describe('getUnifiedLogs final page', () => {
+  it.each([
+    { pageSize: 5, rowCount: 4 },
+    { pageSize: 1, rowCount: 0 },
+  ])(
+    'stops loading more logs when the final $pageSize-row page contains $rowCount rows',
+    async ({ pageSize, rowCount }) => {
+      vi.useFakeTimers()
+      vi.setSystemTime(now)
+      const rows = Array.from({ length: rowCount }, (_, index) =>
+        createRow(`log-${index}`, (now.getTime() - 1000 - index) * 1000)
+      )
+      mockLogs(rows, true)
+
+      const page = await getUnifiedLogs({
+        projectRef: 'default',
+        search,
+        useOtel: true,
+        pageSize,
+        pageParam: null,
+      })
+
+      expect(page.data).toHaveLength(rowCount)
+      expect(page.nextCursor).toBeNull()
+    }
+  )
+})

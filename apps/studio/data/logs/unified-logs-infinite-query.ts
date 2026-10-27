@@ -36,7 +36,6 @@ export type UnifiedLogsData = Awaited<ReturnType<typeof getUnifiedLogs>>
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
 type UnifiedLogsPageVariables = UnifiedLogsVariables & {
-  /** Rows per page, for views that show fewer logs than the Logs page */
   pageSize?: number
 }
 
@@ -146,7 +145,7 @@ export async function getUnifiedLogs(
   const firstRow = result.length > 0 ? result[0] : null
   const lastRow = result.length > 0 ? result[result.length - 1] : null
   const lastQueryRow = rows.length > 0 ? rows[rows.length - 1] : pageParam?.row
-  const hasMore = result.length >= pageSize - 1
+  const hasMore = result.length === pageSize
 
   const nextCursor = lastRow ? lastRow.date.getTime() : (pageParam?.cursor ?? null)
   const prevCursor = firstRow ? firstRow.date.getTime() : new Date().getTime()
