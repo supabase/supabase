@@ -17,6 +17,10 @@ export const contract = {
   inputSchema,
   outputSchema: z.object({ status: z.string() }),
   minOptInLevel: null,
+  availability: {
+    environments: new Set(['platform']),
+    requires: new Set(['supportMode']),
+  },
   needsApproval: false,
   toModelOutput: ({ status }) => ({ status }),
 } as const satisfies ToolContract

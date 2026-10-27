@@ -157,12 +157,6 @@ function createModelFromMatch({
       } else {
         return null
       }
-    case 'troubleshooting':
-      return new TroubleshootingModel({
-        title: page_title,
-        href,
-        content,
-      })
     default:
       return null
   }
