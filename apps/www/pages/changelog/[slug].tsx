@@ -4,6 +4,7 @@ import { MDXClient, type SerializeResult as MDXRemoteSerializeResult } from 'nex
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
+import { Heading } from 'ui'
 
 import { CHANGELOG_PAGES } from '@/app/api-v2/md/content.generated'
 import { ChangelogDetailSidebar } from '@/components/Changelog/ChangelogDetailSidebar'
@@ -98,7 +99,14 @@ const ChangelogDetailPage = ({
                 {'error' in source ? (
                   <p>Error rendering changelog entry: {source.error.message}</p>
                 ) : (
-                  <MDXClient {...source} components={mdxComponents('blog')} />
+                  <MDXClient
+                    {...source}
+                    components={{
+                      ...mdxComponents('blog'),
+                      // The page title already renders as the h1
+                      h1: (props: any) => <Heading {...props} tag="h2" />,
+                    }}
+                  />
                 )}
               </article>
             </div>

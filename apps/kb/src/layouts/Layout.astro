@@ -4,6 +4,7 @@ import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import { ConsentIsland } from '../components/ConsentIsland'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
+import { KbSearch } from '../components/KbSearch'
 import { toSummary, toTroubleshootingSummary } from '../lib/guides'
 import { getListedTopics } from '../lib/topics'
 import '../styles/globals.css'
@@ -80,13 +81,14 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 	</head>
 	<body class="flex min-h-dvh flex-col">
 		<div class="sticky top-0 z-40">
-			<Header client:load topics={navTopics} />
+			<Header client:load topics={navTopics} currentPath={Astro.url.pathname.replace(/\/$/, '')} />
 			<slot name="header-end" />
 		</div>
 		<main class="grow">
 			<slot />
 		</main>
 		<Footer />
+		<KbSearch client:load />
 		<ConsentIsland client:only="react" />
 	</body>
 </html>

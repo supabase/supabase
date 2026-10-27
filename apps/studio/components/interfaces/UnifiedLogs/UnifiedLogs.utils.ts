@@ -47,6 +47,9 @@ export function getLogTypeVisibility(
   )
 }
 
+export const isOfferedFilter = (name: string, offeredFilters?: readonly string[]) =>
+  !offeredFilters || offeredFilters.includes(name)
+
 export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
 
 export function toQuerySearchParams(
@@ -102,6 +105,12 @@ export const buildUnifiedLogsUrl = ({
     user: user ?? null,
     date: start && end ? [new Date(start), new Date(end)] : null,
   })
+
+export const getFacetValueCount = (
+  facets: Record<string, FacetMetadataSchema> | undefined,
+  facet: string,
+  value: string
+) => facets?.[facet]?.rows.find((row) => row.value === value)?.total ?? 0
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {

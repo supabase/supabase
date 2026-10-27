@@ -3299,6 +3299,7 @@ export type AiAssistantSource =
   | 'error_code'
   | 'advisor_signal_detail'
   | 'database_connections'
+  | 'edge_function_errors'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -4217,9 +4218,58 @@ export interface WarehouseDisabledEvent {
 }
 
 /**
+ * Account recovery rollout exposure when the takeover opens.
+ * @group Events
+ * @source Automatic reminder controller
+ * @page /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface AccountRecoveryReminderExposed {
+  action: 'account_recovery_reminder_exposed'
+  properties: { gap: 'missing' | 'exhausted' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a recovery task
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryActionClicked {
+  action: 'account_recovery_action_clicked'
+  properties: { actionType: 'generate_codes' | 'regenerate_codes' | 'add_factor' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User saves recovery codes or verifies another authenticator
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryTaskCompleted {
+  action: 'account_recovery_task_completed'
+  properties: { taskType: 'recovery_codes' | 'authenticator' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User skips or continues from the recovery interstitial
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryReminderClosed {
+  action: 'account_recovery_reminder_closed'
+  properties: { hasCompletedTask: boolean }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | AccountRecoveryReminderExposed
+  | AccountRecoveryActionClicked
+  | AccountRecoveryTaskCompleted
+  | AccountRecoveryReminderClosed
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
