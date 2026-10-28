@@ -55,9 +55,9 @@ const renderFields = (props: Parameters<typeof Harness>[0] = {}) =>
 
 const getVersioningSwitch = () => screen.getByRole('switch')
 const getDaysInput = () =>
-  screen.getByRole('spinbutton', { name: /noncurrent version expiration/i })
+  screen.getByRole('spinbutton', { name: /delete noncurrent versions after/i })
 const getVersionsInput = () =>
-  screen.getByRole('spinbutton', { name: /retained noncurrent versions/i })
+  screen.getByRole('spinbutton', { name: /newest noncurrent versions to keep/i })
 
 describe('BucketVersioningFields', () => {
   test('hides the lifecycle policy until versioning is turned on', async () => {
@@ -69,8 +69,8 @@ describe('BucketVersioningFields', () => {
     await userEvent.click(getVersioningSwitch())
 
     expect(await screen.findByText('Lifecycle policy')).toBeInTheDocument()
-    expect(screen.getByText('Noncurrent version expiration')).toBeInTheDocument()
-    expect(screen.getByText('Retained noncurrent versions')).toBeInTheDocument()
+    expect(screen.getByText('Delete noncurrent versions after')).toBeInTheDocument()
+    expect(screen.getByText('Newest noncurrent versions to keep')).toBeInTheDocument()
   })
 
   test('rejects a version cap above the S3 ceiling', async () => {
@@ -236,7 +236,7 @@ describe('BucketVersioningFields', () => {
       isUnsupportedPolicy: true,
     })
 
-    expect(screen.getByText('Lifecycle policy set outside the dashboard')).toBeInTheDocument()
+    expect(screen.getByText('This bucket has a custom lifecycle policy')).toBeInTheDocument()
     expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
     expect(screen.queryByText('No lifecycle policy')).not.toBeInTheDocument()
     expect(screen.queryByText('Tightening retention expires some versions')).not.toBeInTheDocument()

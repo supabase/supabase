@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { FilesBucket as FilesBucketIcon } from 'icons'
 import { noop } from 'lodash'
 import { forwardRef, type CSSProperties } from 'react'
@@ -18,8 +19,10 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { BucketLifecycleRules } from './BucketLifecycleRules/BucketLifecycleRules'
 import { PolicyRow } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyRow'
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { BucketVersioningPill } from '@/components/interfaces/Storage/BucketVersioningPill'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import { Bucket } from '@/data/storage/buckets-query'
 
@@ -48,6 +51,8 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
     },
     ref
   ) => {
+    const { ref: projectRef } = useParams()
+
     return (
       <Card ref={ref} style={style}>
         <CardHeader className="flex flex-row w-full items-center justify-between gap-2 space-y-0">
@@ -65,6 +70,7 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
                   <TooltipContent side="top">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
                 </Tooltip>
               )}
+              <BucketVersioningPill bucket={bucket} />
             </div>
           </div>
           <Button variant="outline" onClick={() => onSelectPolicyAdd(bucket?.name, table)}>
@@ -100,6 +106,9 @@ export const StoragePoliciesBucketRow = forwardRef<HTMLDivElement, StoragePolici
               </TableBody>
             </Table>
           </CardContent>
+        )}
+        {bucket !== undefined && projectRef !== undefined && (
+          <BucketLifecycleRules projectRef={projectRef} bucket={bucket} />
         )}
       </Card>
     )
