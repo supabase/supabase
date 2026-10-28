@@ -189,8 +189,12 @@ export async function generateReferenceMetadata(
       },
     }
   } else if (isCliReference) {
+    const { path } = parsedPath
+    const commandName =
+      path[0] && path[0] !== 'introduction' ? path[0].replace(/-/g, ' ') : undefined
+
     return {
-      title: 'CLI Reference | Supabase Docs',
+      title: `${commandName ? `${commandName} | ` : ''}CLI Reference | Supabase Docs`,
       description: 'CLI reference for the Supabase CLI',
     }
   } else if (isApiReference) {
@@ -225,8 +229,15 @@ export async function generateReferenceMetadata(
       },
     }
   } else if (isSelfHostingReference) {
+    const { servicePath, path } = parsedPath
+    const serviceName =
+      Object.values(REFERENCES).find((reference) => reference.libPath === servicePath)?.name ??
+      'Self-Hosting'
+    const pageName = path[0] && path[0] !== 'introduction' ? path[0].replace(/-/g, ' ') : undefined
+    const pageTitle = pageName ? pageName.charAt(0).toUpperCase() + pageName.slice(1) : undefined
+
     return {
-      title: 'Self-Hosting | Supabase Docs',
+      title: `${pageTitle ? `${pageTitle} | ` : ''}${serviceName} | Supabase Docs`,
     }
   } else {
     return {}
