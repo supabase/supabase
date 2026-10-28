@@ -55,6 +55,10 @@ export const databaseKeys = {
     ['projects', projectRef, 'foreign-key-constraints', schema, options] as const,
   databaseSize: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database-size'] as const,
+  orioleDbUndoSize: (projectRef: string | undefined, connectionString?: string | null) =>
+    connectionString
+      ? (['projects', projectRef, 'orioledb-undo-size', connectionString] as const)
+      : (['projects', projectRef, 'orioledb-undo-size'] as const),
   maxConnections: (projectRef: string | undefined) =>
     ['projects', projectRef, 'max-connections'] as const,
   pgbouncerStatus: (projectRef: string | undefined) =>
