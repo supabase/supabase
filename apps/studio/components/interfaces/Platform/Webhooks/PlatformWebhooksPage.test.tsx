@@ -347,7 +347,7 @@ describe('PlatformWebhooksPage (project scope)', () => {
         path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
         response: () => {
           requests += 1
-          // The first load is empty, the automatic refresh after it fails
+          // The first load is empty, the refresh after it fails
           if (requests > 1) {
             return HttpResponse.json<APIErrorBody>(
               { message: 'Something went wrong' },
@@ -362,14 +362,14 @@ describe('PlatformWebhooksPage (project scope)', () => {
       })
 
       renderPage(ENDPOINT_ID)
+      await screen.findByText('No deliveries found')
 
-      expect(
-        await screen.findByText('Failed to retrieve deliveries', {}, { timeout: 9000 })
-      ).toBeInTheDocument()
-      expect(requests).toBeGreaterThan(1)
-    }, 20000)
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Refresh deliveries' }))
 
-    test('stops polling after a failed first load, and "Try again" loads the rows', async () => {
+      expect(await screen.findByText('Failed to retrieve deliveries')).toBeInTheDocument()
+    })
+
+    test('"Try again" loads the rows after a failed first load', async () => {
       mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
       let requests = 0
       addAPIMock({
@@ -394,15 +394,11 @@ describe('PlatformWebhooksPage (project scope)', () => {
       renderPage(ENDPOINT_ID)
       await screen.findByText('Failed to retrieve deliveries')
 
-      // Longer than the 5s polling interval: a polling page would have made a second request
-      await new Promise((resolve) => setTimeout(resolve, 5500))
-      expect(requests).toBe(1)
-
       await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }))
 
       expect(await screen.findByLabelText(`Retry ${DELIVERY_ID}`)).toBeInTheDocument()
       expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
-    }, 20000)
+    })
 
     test('keeps the rows and warns they may be out of date when a refresh fails', async () => {
       mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
@@ -412,7 +408,7 @@ describe('PlatformWebhooksPage (project scope)', () => {
         path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
         response: () => {
           requests += 1
-          // The first load works, the automatic refresh after it fails
+          // The first load works, the refresh after it fails
           if (requests > 1) {
             return HttpResponse.json<APIErrorBody>(
               { message: 'Something went wrong' },
@@ -429,12 +425,12 @@ describe('PlatformWebhooksPage (project scope)', () => {
       renderPage(ENDPOINT_ID)
       await screen.findByLabelText(`Retry ${DELIVERY_ID}`)
 
-      expect(
-        await screen.findByText('Unable to refresh deliveries', {}, { timeout: 9000 })
-      ).toBeInTheDocument()
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Refresh deliveries' }))
+
+      expect(await screen.findByText('Unable to refresh deliveries')).toBeInTheDocument()
       expect(screen.getByLabelText(`Retry ${DELIVERY_ID}`)).toBeInTheDocument()
       expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
-    }, 20000)
+    })
 
     test('shows the search empty state, not an error, when a refresh fails after rows loaded', async () => {
       mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
@@ -444,7 +440,7 @@ describe('PlatformWebhooksPage (project scope)', () => {
         path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
         response: () => {
           requests += 1
-          // The first load works, the automatic refresh after it fails
+          // The first load works, the refresh after it fails
           if (requests > 1) {
             return HttpResponse.json<APIErrorBody>(
               { message: 'Something went wrong' },
@@ -460,13 +456,108 @@ describe('PlatformWebhooksPage (project scope)', () => {
 
       renderPage(ENDPOINT_ID)
       await screen.findByLabelText(`Retry ${DELIVERY_ID}`)
-      await waitFor(() => expect(requests).toBeGreaterThan(1), { timeout: 9000 })
+      const user = userEvent.setup()
+      await user.click(screen.getByRole('button', { name: 'Refresh deliveries' }))
+      await waitFor(() => expect(requests).toBeGreaterThan(1))
 
-      await userEvent.setup().type(screen.getByPlaceholderText('Search deliveries'), 'no match')
+      await user.type(screen.getByPlaceholderText('Search deliveries'), 'no match')
 
       expect(await screen.findByText('No deliveries found')).toBeInTheDocument()
       expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('deliveries refreshing', () => {
+    const mockDeliveries = (getRows: (requests: number) => DeliveryResource[]) => {
+      let requests = 0
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          return HttpResponse.json<DeliveryListResponse>({
+            data: getRows(requests),
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+      return { getRequests: () => requests }
+    }
+    const delivery = (status: DeliveryResource['attributes']['status']): DeliveryResource => ({
+      id: DELIVERY_ID,
+      type: 'delivery',
+      attributes: { ...DELIVERY_ATTRIBUTES, status },
+    })
+
+    test('does not poll by default', async () => {
+      const { getRequests } = mockDeliveries(() => [delivery('success')])
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('success')
+
+      // Longer than the 5s polling interval
+      await new Promise((resolve) => setTimeout(resolve, 5500))
+      expect(getRequests()).toBe(1)
     }, 20000)
+
+    test('refreshes once when Refresh is clicked', async () => {
+      const { getRequests } = mockDeliveries(() => [delivery('success')])
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('success')
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Refresh deliveries' }))
+
+      await waitFor(() => expect(getRequests()).toBe(2))
+    })
+
+    test('polls while Live is on and stops when it is turned off', async () => {
+      const { getRequests } = mockDeliveries(() => [delivery('success')])
+      const user = userEvent.setup()
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('success')
+
+      const liveButton = screen.getByRole('button', { name: 'Live' })
+      await user.click(liveButton)
+      expect(liveButton).toHaveAttribute('aria-pressed', 'true')
+      await waitFor(() => expect(getRequests()).toBeGreaterThan(1), { timeout: 9000 })
+
+      await user.click(liveButton)
+      expect(liveButton).toHaveAttribute('aria-pressed', 'false')
+    }, 20000)
+
+    test('polls while a delivery is pending, until it finishes', async () => {
+      mockDeliveries((requests) => [delivery(requests === 1 ? 'pending' : 'success')])
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('pending')
+
+      expect(await screen.findByText('success', {}, { timeout: 9000 })).toBeInTheDocument()
+    }, 20000)
+
+    test('polls after a test event is sent, until its delivery appears', async () => {
+      // The first requests show no rows, as if the test event had not been delivered yet
+      mockDeliveries((requests) => (requests < 3 ? [] : [delivery('success')]))
+      addAPIMock({
+        method: 'post',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/test',
+        response: () =>
+          HttpResponse.json<EndpointTestResponse>(
+            { data: { id: 'evt_1', type: 'ingress' } },
+            { status: 201 }
+          ),
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('No deliveries found')
+
+      await userEvent.click(await waitFor(() => findMoreActionsButton()))
+      fireEvent.click(await screen.findByText('Send test event'))
+
+      expect(await screen.findByText('success', {}, { timeout: 12000 })).toBeInTheDocument()
+    }, 25000)
   })
 
   describe('deliveries pagination', () => {

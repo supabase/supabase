@@ -1,3 +1,4 @@
+import { DELIVERIES_POLL_INTERVAL_MS } from './PlatformWebhooks.constants'
 import type { WebhookDelivery, WebhookScope } from './PlatformWebhooks.types'
 
 export const shouldHandleEndpointNotFound = ({
@@ -75,4 +76,35 @@ export const resetPendingSigningSecretRevealForTests = () => {
   for (const key of Object.keys(pendingSigningSecretRevealByScope) as WebhookScope[]) {
     delete pendingSigningSecretRevealByScope[key]
   }
+}
+
+/** Set after a test event or retry is sent, until its delivery shows up in the table. */
+export interface AwaitingDelivery {
+  newestDeliveryId?: string
+}
+
+/**
+ * Deliveries are not polled by default. Polling is on while the user chose "Live", while a delivery
+ * is still pending, and right after a test event or retry was sent but its row has not appeared yet.
+ * It stays off after a failed load with no rows, because the error has a "Try again" button.
+ */
+export const getDeliveriesRefetchInterval = ({
+  isLive,
+  awaitingDelivery,
+  deliveries,
+  hasLoadFailed,
+}: {
+  isLive: boolean
+  awaitingDelivery: AwaitingDelivery | null
+  deliveries: WebhookDelivery[]
+  hasLoadFailed: boolean
+}) => {
+  if (hasLoadFailed) return false
+
+  const hasPendingDelivery = deliveries.some((delivery) => delivery.status === 'pending')
+  // Deliveries come newest first, so the same top row means nothing new has arrived yet
+  const isAwaitingNewDelivery =
+    awaitingDelivery !== null && deliveries[0]?.id === awaitingDelivery.newestDeliveryId
+
+  return isLive || hasPendingDelivery || isAwaitingNewDelivery ? DELIVERIES_POLL_INTERVAL_MS : false
 }
