@@ -16,6 +16,16 @@ toc_depth: 2
 
 OrioleDB, an [open-source](https://github.com/orioledb/orioledb) storage engine for Postgres, is now in public beta on every Supabase plan. We announced the public beta at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits), alongside Multigres and DBArena. Pick OrioleDB when you create a project. It's billed the same as standard Postgres. Compute and disk resizing, read replicas, Postgres upgrades, and scheduled backups work. It's not ready for production yet.
 
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/s2jdUxV2xFo"
+    title="OrioleDB is now in public beta"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
 ## The problem with Postgres’s default storage engine
 
 Postgres stores table rows in a format called the heap. An update doesn't change a row in place. Postgres writes a new version and leaves the old one behind as a dead tuple. Because every index points to a row’s physical location, the new version usually needs a new entry in every index on the table, even indexes on columns that didn’t change. Deletes leave dead tuples too.
