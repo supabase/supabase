@@ -13575,8 +13575,8 @@ packages:
   highlightjs-vue@1.0.0:
     resolution: {integrity: sha512-PDEfEF102G23vHmPhLyPboFCD+BkMGu+GuJe2d9/eH4FsCwvgBpnc9n0pGE+ffKdph38s6foEZiEjdgHdzp+IA==}
 
-  hono@4.13.7:
-    resolution: {integrity: sha512-c8/gF9ac8Y78/agExVocyLevgR+JlpNB444Py0FSX8pJoPdYUfUzRcXtYEYGwt6l19qIlVZPN5Mfsw9jFShmQQ==}
+  hono@4.13.14:
+    resolution: {integrity: sha512-yhRLQ21U6qa9Hsu2N7Qcbh8tE+WKEcoErjIo56LeSGiGXGp9sA7UpE86Ui9uexb61KakiGwuHMn2QdV7w6i6kQ==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -21959,9 +21959,9 @@ snapshots:
     dependencies:
       react: 19.2.6
 
-  '@hono/node-server@1.19.17(hono@4.13.7)':
+  '@hono/node-server@1.19.17(hono@4.13.14)':
     dependencies:
-      hono: 4.13.7
+      hono: 4.13.14
 
   '@hookform/resolvers@3.3.1(react-hook-form@7.72.1(react@19.2.6))':
     dependencies:
@@ -22912,7 +22912,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.32.0(supports-color@8.1.1)(zod@3.25.76)':
     dependencies:
-      '@hono/node-server': 1.19.17(hono@4.13.7)
+      '@hono/node-server': 1.19.17(hono@4.13.14)
       ajv: 8.18.0
       ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
@@ -22922,7 +22922,7 @@ snapshots:
       eventsource-parser: 3.0.8
       express: 5.2.1(supports-color@8.1.1)
       express-rate-limit: 8.3.1(express@5.2.1(supports-color@8.1.1))
-      hono: 4.13.7
+      hono: 4.13.14
       jose: 6.2.9
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -31888,7 +31888,7 @@ snapshots:
 
   highlightjs-vue@1.0.0: {}
 
-  hono@4.13.7: {}
+  hono@4.13.14: {}
 
   hookable@5.5.3: {}
 
