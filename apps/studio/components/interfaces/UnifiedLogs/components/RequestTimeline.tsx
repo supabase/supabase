@@ -35,7 +35,7 @@ export function LogTimestampHeader({ log }: { log: ColumnSchema }) {
 export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimelineProps) {
   const { ref: projectRef } = useParams()
   const formatDateTime = useFormatDateTime()
-  const { data, error, isPending, isError, isSuccess } = useQuery(
+  const { data, error, isLoading, isError } = useQuery(
     unifiedLogRequestTimelineQueryOptions({
       projectRef,
       logId: row.id,
@@ -44,7 +44,7 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
     })
   )
 
-  if (isPending) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-3 p-4" aria-label="Loading related logs">
         {[0, 1, 2].map((i) => (
@@ -65,7 +65,7 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
     )
   }
 
-  if (isSuccess && data.logs.length === 0) {
+  if (!data || data.logs.length === 0) {
     return (
       <div className="flex flex-col gap-1 p-4 text-sm">
         <p className="text-foreground-light">No related logs</p>
