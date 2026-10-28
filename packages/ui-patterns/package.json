@@ -563,6 +563,10 @@
       "import": "./src/MobileNav/MobileNavThemeButton.tsx",
       "types": "./src/MobileNav/MobileNavThemeButton.tsx"
     },
+    "./MobileNav/MobileNavToggle": {
+      "import": "./src/MobileNav/MobileNavToggle.tsx",
+      "types": "./src/MobileNav/MobileNavToggle.tsx"
+    },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
       "types": "./src/MobileSheetNav/MobileSheetNav.tsx"

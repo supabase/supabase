@@ -6,8 +6,7 @@ import { getMenu } from 'data/nav'
 import { DevToolbarTrigger } from 'dev-tools'
 import { useSendTelemetryEvent } from 'lib/telemetry'
 import { usePathname } from 'next/navigation'
-import React, { useState } from 'react'
-import { useWindowSize } from 'react-use'
+import React, { useRef, useState } from 'react'
 import {
   Button,
   buttonVariants,
@@ -22,9 +21,9 @@ import {
   NavigationMenuViewport,
 } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { MobileNavToggle } from 'ui-patterns/MobileNav/MobileNavToggle'
 
 import GitHubButton from './GitHubButton'
-import HamburgerButton from './HamburgerMenu'
 import MenuItem from './MenuItem'
 import { MobileMenu } from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
@@ -37,8 +36,8 @@ interface Props {
 
 const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const pathname = usePathname()
-  const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const [activeDropdown, setActiveDropdown] = useState('')
   const [visibleDropdown, setVisibleDropdown] = useState('')
   const [isSwitchingDropdown, setIsSwitchingDropdown] = useState(false)
@@ -80,19 +79,8 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   const isTransparent = isStateOfStartupsPage && !scrolled && !open
 
-  React.useEffect(() => {
-    if (open) {
-      // Prevent scrolling on mount
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'auto'
-    }
-  }, [open])
-
-  // Close mobile menu when desktop
-  React.useEffect(() => {
-    if (width >= 1024) setOpen(false)
-  }, [width])
+  const handleMenuToggle = () => setOpen(!open)
+  const handleMenuClose = () => setOpen(false)
 
   if (hideNavbar) {
     return null
@@ -280,16 +268,24 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 </div>
               </div>
             </div>
-            <HamburgerButton
-              toggleFlyOut={() => setOpen(true)}
-              showLaunchWeekNavMode={showLaunchWeekNavMode}
+            <MobileNavToggle
+              ref={menuButtonRef}
+              isOpen={open}
+              onClick={handleMenuToggle}
+              className="self-center lg:hidden"
             />
           </div>
-          <MobileMenu open={open} setOpen={setOpen} menu={menu} />
         </nav>
 
         <ScrollProgress />
       </div>
+      <MobileMenu
+        open={open}
+        menu={menu}
+        toggleRef={menuButtonRef}
+        onLinkClick={handleMenuClose}
+        className="lg:hidden [--header-height:--spacing(16)]"
+      />
     </>
   )
 }
