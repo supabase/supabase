@@ -5,48 +5,68 @@ description: 'Let a team member connect to your project database as a Postgres r
 subtitle: 'Let a team member connect to your project database as a Postgres role with their own access token, and limit that access by expiry and network.'
 ---
 
-Once temporary access has been enabled, project users must be authorized and mapped to [Postgres roles](/docs/guides/database/postgres/roles) they are allowed to access. Each user can be authorized to "assume" one or more Postgres roles using temporary access.
+Let a team member connect to your project database as a [Postgres role](/docs/guides/database/postgres/roles) with their own access token, and limit that access by expiry and network. To learn how to enable temporary access and connect with it, see [Temporary access](/docs/guides/platform/temporary-access).
 
-When a user is authorized to assume a Postgres role, the user's Personal Access Token (PAT) will be used as the password for the Postgres role.
+A mapping authorizes a team member to assume one or more existing Postgres roles. It creates no new role or user in the database, and the assumed role's permissions still apply. The role's own password keeps working, so long-lived service connections don't change.
 
-<Admonition type="note">
+## Before you begin
 
-Postgres roles can still be accessed using the password configured on the role. This allows long-lived service connections to continue using the existing credentials.
+- [Enable temporary access](/docs/guides/platform/temporary-access#manage-temporary-access-via-the-dashboard) on the project.
+- Create a [personal access token](/dashboard/account/tokens) to call the Management API.
 
-Temporary access authentication only applies for Supabase project users authenticating to the database, and assuming the given Postgres role. No new roles or users are created in the Postgres database and the assumed role's permissions will still apply.
+## Authorize a team member
 
-</Admonition>
+1. Set your access token and project ref:
 
-## Apply temporary access restrictions
+   ```bash
+   export SUPABASE_MANAGEMENT_API_TOKEN="your-access-token"
+   export PROJECT_REF="your-project-ref"
+   export MEMBER_USER_ID="the-member-user-id"
+   ```
 
-A user's temporary access can also be restricted to a validity period, after which their temporary access will expire and even though the access token is still valid, the database will reject the connection.
+   `MEMBER_USER_ID` is the user ID of the team member you want to authorize.
 
-IP address restrictions can also be applied, ensuring that temporary access will only be authorized from allowed network ranges (IPv4 and/or IPv6).
+2. Map the team member to the roles they can assume. This example authorizes the `postgres` role:
 
-### Applying restrictions with the management API
+   ```bash
+   curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit" \
+     -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d @- <<EOF
+   {
+     "user_id": "$MEMBER_USER_ID",
+     "user_roles": [{ "role": "postgres" }]
+   }
+   EOF
+   ```
 
-Restrictions can also be applied through the Management API.
+The team member can now connect as the `postgres` role, with their access token as the password. For connection strings, see [Using temporary access](/docs/guides/platform/temporary-access#using-temporary-access).
+
+## Restrict a team member's access
+
+Each role in the mapping takes two optional restrictions:
+
+- `expires_at`: a Unix timestamp. After it passes, the database rejects the connection, even if the access token is still valid.
+- `allowed_networks`: the CIDR ranges the team member can connect from. Put IPv4 ranges in `allowed_cidrs` and IPv6 ranges in `allowed_cidrs_v6`.
+
+This example limits the `postgres` role to one IPv4 address until a fixed time:
 
 ```bash
-# Get your access token from https://supabase.com/dashboard/account/tokens
-export SUPABASE_MANAGEMENT_API_TOKEN="your-access-token"
-export PROJECT_REF="your-project-ref"
-
-# Restrict temporary access to IPv4 ranges and expiry date
-# user_id is the gotrue_id of the user with access to the project
 curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit" \
   -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{
-    "user_id": "00000000-1111-2222-3333-444444444444",
-    "user_roles": [
-      {
-        "role": "postgres",
-        "allowed_networks": {
-          "allowed_cidrs": [{ "cidr": "176.1.12.1/32" }]
-        },
-        "expires_at": 1758721065775
+  -d @- <<EOF
+{
+  "user_id": "$MEMBER_USER_ID",
+  "user_roles": [
+    {
+      "role": "postgres",
+      "expires_at": 1758721065775,
+      "allowed_networks": {
+        "allowed_cidrs": [{ "cidr": "176.1.12.1/32" }]
       }
-    ]
-  }'
+    }
+  ]
+}
+EOF
 ```
