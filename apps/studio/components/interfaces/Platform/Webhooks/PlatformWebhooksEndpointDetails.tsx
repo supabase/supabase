@@ -299,7 +299,7 @@ export const PlatformWebhooksEndpointDetails = ({
             type="warning"
             layout="responsive"
             title="Unable to refresh deliveries"
-            description="These deliveries may be out of date. We'll keep trying."
+            description="These deliveries may be out of date."
             actions={tryAgainButton}
           />
         )}
