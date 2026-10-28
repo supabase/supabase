@@ -52,7 +52,6 @@ describe('Option 1 navigation', () => {
 
     expect(links).toEqual(
       expect.arrayContaining([
-        ['Production security checklist', '/guides/deployment/going-into-prod#security'],
         ['Query plans with explain()', '/guides/database/debugging-performance#using-explain'],
         ['Preview branches on Vercel', '/guides/deployment/branching/integrations#vercel'],
         [

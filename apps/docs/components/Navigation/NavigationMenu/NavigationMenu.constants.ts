@@ -2634,6 +2634,11 @@ export const security: NavMenuConstant = {
           enabled: productionChecklistEnabled,
         },
         {
+          name: 'Production security checklist',
+          url: '/guides/security/production-checklist' as `/${string}`,
+          enabled: productionChecklistEnabled,
+        },
+        {
           name: 'Shared Responsibility Model',
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
