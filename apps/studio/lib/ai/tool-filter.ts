@@ -43,6 +43,7 @@ export const toolSetValidationSchema = z.record(
     'update_opt_in_level',
     'escalate_to_human',
     'resolve_support_conversation',
+    'get_active_incidents',
     'list_policies',
     'list_reports',
     'get_report',
