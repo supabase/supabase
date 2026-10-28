@@ -119,7 +119,6 @@ catalogs:
       version: 3.25.76
 
 overrides:
-  '@ardatan/relay-compiler>immutable': ^3.8.3
   monaco-editor: 0.52.2
   '@mapbox/node-pre-gyp>tar': ^7.5.21
   '@sentry/webpack-plugin>uuid': ^11.1.1
@@ -3299,8 +3298,8 @@ packages:
   '@apm-js-collab/tracing-hooks@0.10.0':
     resolution: {integrity: sha512-2/Z3NTewJTruUkmsSnBC5bJlLNUd9keuD1OLlTEpim4FyLhm6m2Rnfv+wrFdUvFfhmH8CRdiDZBqBrn+wyaGuA==}
 
-  '@ardatan/relay-compiler@12.0.3':
-    resolution: {integrity: sha512-mBDFOGvAoVlWaWqs3hm1AciGHSQE1rqFc/liZTyYz/Oek9yZdT5H26pH2zAFuEiTiBVPPyMuqf5VjOFPI2DGsQ==}
+  '@ardatan/relay-compiler@12.3.0':
+    resolution: {integrity: sha512-lc6PyM1IQCSa87DMChfv61HuhrSquHGhsF+WFSm2csFnKMSHaj0S1M8fnGr04i7O9YnwyR+OcgQ3CfzlEPC9Fg==}
     hasBin: true
     peerDependencies:
       graphql: '*'
@@ -13566,12 +13565,11 @@ packages:
   immer@10.1.1:
     resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
 
-  immutable@3.8.3:
-    resolution: {integrity: sha512-AUY/VyX0E5XlibOmWt10uabJzam1zlYjwiEgQSDc5+UIkFNaF9WM0JxXKaNMGf+F/ffUF+7kRKXM9A7C0xXqMg==}
-    engines: {node: '>=0.10.0'}
-
   immutable@4.3.9:
     resolution: {integrity: sha512-ObHy4YN7ycwZOUCLI1/6svfyAFu7vL8RhAvVu/bh/RZW9EPlOyDaQ9jDQWCtdqzaXUjgXZCW1migtHE7YI7UGQ==}
+
+  immutable@5.1.9:
+    resolution: {integrity: sha512-m8nVez3rwrgmWxtLMt1ZYXB2Lv7OKYn/disyxAlSDYAlKSlFoPPfIAmAM/M5xqL4m4C/wAPw7S2/CNaUii1Hxg==}
 
   import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -19561,7 +19559,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@ardatan/relay-compiler@12.0.3(encoding@0.1.13)(graphql@16.11.0)':
+  '@ardatan/relay-compiler@12.3.0(encoding@0.1.13)(graphql@16.11.0)':
     dependencies:
       '@babel/generator': 7.29.8
       '@babel/parser': 7.29.8
@@ -19569,7 +19567,7 @@ snapshots:
       chalk: 4.1.2
       fb-watchman: 2.0.2
       graphql: 16.11.0
-      immutable: 3.8.3
+      immutable: 5.1.9
       invariant: 2.2.4
       nullthrows: 1.1.1
       relay-runtime: 12.0.0(encoding@0.1.13)
@@ -21701,7 +21699,7 @@ snapshots:
 
   '@graphql-tools/relay-operation-optimizer@7.0.19(encoding@0.1.13)(graphql@16.11.0)':
     dependencies:
-      '@ardatan/relay-compiler': 12.0.3(encoding@0.1.13)(graphql@16.11.0)
+      '@ardatan/relay-compiler': 12.3.0(encoding@0.1.13)(graphql@16.11.0)
       '@graphql-tools/utils': 10.8.6(graphql@16.11.0)
       graphql: 16.11.0
       tslib: 2.8.1
@@ -31776,10 +31774,10 @@ snapshots:
   immer@10.1.1:
     optional: true
 
-  immutable@3.8.3: {}
-
   immutable@4.3.9:
     optional: true
+
+  immutable@5.1.9: {}
 
   import-fresh@3.3.0:
     dependencies:
