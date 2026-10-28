@@ -15,9 +15,9 @@ import {
   violationIds,
 } from '../utils/axe-helpers.js'
 import {
-  articleSelectorForPagePath,
   checkLinkFromBrowser,
   collectDocsOwnedLinks,
+  GUIDE_ARTICLE_SELECTOR,
   type LinkCheckResult,
 } from '../utils/docs-links.js'
 
@@ -46,7 +46,7 @@ test.describe('Docs owned pages', () => {
       const baseURL = testInfo.project.use.baseURL
       expect(baseURL, 'A Playwright base URL should be configured').toBeTruthy()
 
-      const articleSelector = articleSelectorForPagePath(pagePath)
+      const articleSelector = GUIDE_ARTICLE_SELECTOR
       const response = await page.goto(pagePath)
       expect(response, `Expected a response for ${pagePath}`).not.toBeNull()
       expect(
@@ -103,7 +103,7 @@ test.describe('Docs owned pages', () => {
     }, testInfo) => {
       test.setTimeout(120_000)
 
-      const include = articleSelectorForPagePath(pagePath)
+      const include = GUIDE_ARTICLE_SELECTOR
 
       let response
       try {
@@ -128,8 +128,8 @@ test.describe('Docs owned pages', () => {
 
       await expect(
         page.locator(include),
-        `No article matching "${include}" on ${pagePath}. This suite covers guides and ` +
-          'troubleshooting entries; other routes have no article element to scan.'
+        `No article matching "${include}" on ${pagePath}. This suite covers guides; ` +
+          'other routes have no article element to scan.'
       ).toBeVisible()
 
       const result = await scanArticle(page, pagePath, include)
