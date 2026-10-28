@@ -37,6 +37,7 @@ interface DataTableSheetRowActionProps<
   value: string | number
   table?: Table<TData>
   label?: string
+  onAddFilter?: () => void
 }
 
 export function DataTableSheetRowAction<TData, TFields extends DataTableFilterField<TData>>({
@@ -47,6 +48,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   className,
   table,
   label,
+  onAddFilter,
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
@@ -203,6 +205,15 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         {!!field && !!column && (
           <>
             {renderOptions()}
+            <DropdownMenuSeparator />
+          </>
+        )}
+        {!column && !!onAddFilter && (
+          <>
+            <DropdownMenuItem onClick={onAddFilter} className="flex items-center gap-2">
+              <FilterIcon size={12} />
+              Add filter
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
