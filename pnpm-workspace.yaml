@@ -104,6 +104,7 @@ minimumReleaseAgeExclude:
 
 overrides:
   'monaco-editor': 'catalog:'
+  '@nuxt/devtools>simple-git': ^4.0.0
   '@mapbox/node-pre-gyp>tar': ^7.5.21
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
