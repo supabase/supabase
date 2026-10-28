@@ -556,8 +556,11 @@ export default defineConfig(({ command, mode }) => {
   // Client JS/CSS (and CSS-referenced fonts/images) load from the R2 asset CDN
   // on production builds, uploaded by scripts/upload-static-assets.sh. Vite's
   // base stays `/dashboard` so documents, server functions and API routes stay
-  // on Vercel. The shell's asset tags are rewritten by server.ts.
-  const assetCdnUrl = command === 'build' ? getTanstackAssetCdnUrl(env) : undefined
+  // on Vercel. The shell's asset tags are rewritten by server.ts. Reads the
+  // process env, not `env`: the upload script only sees the process env, so a
+  // CDN switch set in a `.env*` file must not point the build at assets that
+  // were never uploaded.
+  const assetCdnUrl = command === 'build' ? getTanstackAssetCdnUrl(process.env) : undefined
   const shouldUploadSourceMaps =
     process.env.SKIP_ASSET_UPLOAD !== '1' && !!process.env.SENTRY_AUTH_TOKEN
 
