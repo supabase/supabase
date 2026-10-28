@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
 import { CheckIcon, DatabaseZapIcon, DollarSignIcon, GitMergeIcon, Loader2Icon } from 'lucide-react'
@@ -47,7 +47,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from '@/data/branches/branch-create-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { DiskAttributesData, useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
@@ -60,6 +60,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -86,6 +87,8 @@ export const CreateBranchModal = () => {
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
+
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
 
   const formId = 'create-branch-form'
   const FormSchema = z.object({
@@ -141,7 +144,9 @@ export const CreateBranchModal = () => {
   const isError = isErrorAuthorization || isErrorConnections
   const error = authorizationError || connectionsError
 
-  const { data: branches } = useBranchesQuery({ projectRef })
+  const { data: branches } = useQuery(
+    branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
+  )
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery(
     { projectRef },
     { enabled: showCreateBranchModal }
