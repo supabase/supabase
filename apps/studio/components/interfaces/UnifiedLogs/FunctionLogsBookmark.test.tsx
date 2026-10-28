@@ -59,6 +59,7 @@ const CloseBookmarkAfterRefresh = () => {
   }, [shouldClose, fetchingQueries, setId])
   return (
     <button
+      tabIndex={0}
       onClick={() => {
         setShouldClose(true)
         queryClient.invalidateQueries({
