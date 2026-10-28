@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import {
@@ -34,14 +34,14 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
-import { useBranchQuery } from '@/data/branches/branch-query'
+import { branchQueryOptions } from '@/data/branches/branch-query'
 import { useBranchResetMutation } from '@/data/branches/branch-reset-mutation'
 import { useBranchRestoreMutation } from '@/data/branches/branch-restore-mutation'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import type { Branch } from '@/data/branches/branches-query'
 import { branchKeys } from '@/data/branches/keys'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -251,16 +251,37 @@ const PreviewBranchActions = ({
   const queryClient = useQueryClient()
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
-  const { can: canDeleteBranches } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_DELETE
-  )
-  const { can: canUpdateBranches } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_WRITE
-  )
-  // If user can update branches, they can restore branches
-  const canRestoreBranches = canUpdateBranches
+  const branchGrant = useBranchGrant('GET /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const pushBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/push', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const resetBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/reset', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const restoreBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/restore', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const deleteBranchGrant = useBranchGrant('DELETE /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const canUpdateBranches = updateBranchGrant.status === 'granted'
+  const canPushBranches = pushBranchGrant.status === 'granted'
+  const canResetBranches = resetBranchGrant.status === 'granted'
+  const canRestoreBranches = restoreBranchGrant.status === 'granted'
+  const canDeleteBranches = deleteBranchGrant.status === 'granted'
 
-  const { data } = useBranchQuery({ projectRef, branchRef })
+  const { data } = useQuery(branchQueryOptions({ projectRef, branchRef, grant: branchGrant.grant }))
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
   const isPersistentBranch = branch.persistent
 
@@ -309,19 +330,47 @@ const PreviewBranchActions = ({
   })
 
   const onRetriggerBranch = () => {
-    branchPushMutate({ branchRef, projectRef })
+    if (pushBranchGrant.status !== 'granted') return
+    branchPushMutate({ grant: pushBranchGrant.grant, branchRef, projectRef })
   }
 
   const onRestoreBranch = () => {
-    restoreBranch({ branchRef, projectRef })
+    if (restoreBranchGrant.status !== 'granted') return
+    restoreBranch({ grant: restoreBranchGrant.grant, branchRef, projectRef })
   }
 
   const onConfirmReset = () => {
-    resetBranch({ branchRef, projectRef })
+    if (resetBranchGrant.status !== 'granted') return
+    resetBranch({ grant: resetBranchGrant.grant, branchRef, projectRef })
   }
 
   const onTogglePersistent = () => {
-    updateBranch({ branchRef, projectRef, persistent: !branch.persistent })
+    if (updateBranchGrant.status !== 'granted') return
+    updateBranch({
+      grant: updateBranchGrant.grant,
+      branchRef,
+      projectRef,
+      persistent: !branch.persistent,
+    })
+  }
+
+  const getResetDisabledReason = () => {
+    if (!canResetBranches) return 'You need additional permissions to reset branches'
+    if (!isBranchActiveHealthy) {
+      return 'Branch is still initializing. Please wait for it to become healthy before resetting.'
+    }
+    return undefined
+  }
+
+  const getModeSwitchDisabledReason = () => {
+    if (!canUpdateBranches) return 'You need additional permissions to edit branches'
+    if (!isBranchActiveHealthy) {
+      return 'Branch is still initializing. Please wait for it to become healthy before switching.'
+    }
+    if (!branch.persistent && !hasAccessToPersistentBranching) {
+      return 'Upgrade your plan to access persistent branches'
+    }
+    return undefined
   }
 
   const onDeleteBranch = (e: Event | React.MouseEvent<HTMLDivElement>) => {
@@ -375,7 +424,7 @@ const PreviewBranchActions = ({
             <>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
-                disabled={!canUpdateBranches || isRetriggering}
+                disabled={!canPushBranches || isRetriggering}
                 onSelect={(e) => {
                   e.stopPropagation()
                   setShowConfirmRetriggersModal(true)
@@ -387,7 +436,7 @@ const PreviewBranchActions = ({
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: !canUpdateBranches
+                    text: !canPushBranches
                       ? `You need additional permissions to ${branch.git_branch ? 'resync' : 'rebase'} branches`
                       : undefined,
                   },
@@ -397,7 +446,7 @@ const PreviewBranchActions = ({
               </DropdownMenuItemTooltip>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
-                disabled={isResetting || !isBranchActiveHealthy}
+                disabled={!canResetBranches || isResetting || !isBranchActiveHealthy}
                 onSelect={(e) => {
                   e.stopPropagation()
                   setShowConfirmResetModal(true)
@@ -409,9 +458,7 @@ const PreviewBranchActions = ({
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: !isBranchActiveHealthy
-                      ? 'Branch is still initializing. Please wait for it to become healthy before resetting.'
-                      : undefined,
+                    text: getResetDisabledReason(),
                   },
                 }}
               >
@@ -420,7 +467,9 @@ const PreviewBranchActions = ({
               <DropdownMenuItemTooltip
                 className="gap-x-2"
                 disabled={
-                  !isBranchActiveHealthy || (!branch.persistent && !hasAccessToPersistentBranching)
+                  !canUpdateBranches ||
+                  !isBranchActiveHealthy ||
+                  (!branch.persistent && !hasAccessToPersistentBranching)
                 }
                 onSelect={(e) => {
                   e.stopPropagation()
@@ -433,11 +482,7 @@ const PreviewBranchActions = ({
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: !isBranchActiveHealthy
-                      ? 'Branch is still initializing. Please wait for it to become healthy before switching.'
-                      : !branch.persistent && !hasAccessToPersistentBranching
-                        ? 'Upgrade your plan to access persistent branches'
-                        : undefined,
+                    text: getModeSwitchDisabledReason(),
                   },
                 }}
               >
@@ -580,9 +625,16 @@ const PreviewBranchActions = ({
 const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) => {
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
-  const { can: canUpdateBranches } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE
-  )
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const pushBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/push', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const canUpdateBranches = updateBranchGrant.status === 'granted'
+  const canPushBranches = pushBranchGrant.status === 'granted'
   const { mutate: branchPushMutate, isPending: isRetriggering } = useBranchPushMutation({
     onSuccess() {
       toast.success('Success! Please allow a few minutes for the branch to update.')
@@ -596,7 +648,8 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
   const [showConfirmRetriggersModal, setShowConfirmRetriggersModal] = useState(false)
 
   const onRetriggerBranch = () => {
-    branchPushMutate({ branchRef, projectRef })
+    if (pushBranchGrant.status !== 'granted') return
+    branchPushMutate({ grant: pushBranchGrant.grant, branchRef, projectRef })
   }
 
   return (
@@ -631,7 +684,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
           {branch.git_branch ? (
             <DropdownMenuItemTooltip
               className="gap-x-2"
-              disabled={!canUpdateBranches || isRetriggering}
+              disabled={!canPushBranches || isRetriggering}
               onSelect={(e) => {
                 e.stopPropagation()
                 setShowConfirmRetriggersModal(true)
@@ -643,7 +696,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
               tooltip={{
                 content: {
                   side: 'left',
-                  text: !canUpdateBranches
+                  text: !canPushBranches
                     ? `You need additional permissions to resync branches`
                     : undefined,
                 },
