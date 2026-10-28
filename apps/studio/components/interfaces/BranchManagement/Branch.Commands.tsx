@@ -1,12 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { ForwardIcon, GitBranchIcon, PlusIcon } from 'lucide-react'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 
 import { COMMAND_MENU_SECTIONS } from '../App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from '../App/CommandMenu/ordering'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 const SWITCH_BRANCH_PAGE_NAME = 'Switch branch'
@@ -26,10 +28,14 @@ export function useBranchCommands() {
     { resource: { is_default: false } }
   )
 
-  let { data: branches } = useBranchesQuery(
-    { projectRef: selectedProject?.parent_project_ref || selectedProject?.ref },
-    { enabled: isBranchingEnabled }
-  )
+  const parentProjectRef = selectedProject?.parent_project_ref || selectedProject?.ref
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  let { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    enabled: isBranchingEnabled,
+  })
 
   branches ??= EMPTY_ARRAY
 
