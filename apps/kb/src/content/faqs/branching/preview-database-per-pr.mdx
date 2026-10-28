@@ -1,0 +1,8 @@
+---
+title: How do I set up a separate Postgres database for each pull request?
+topics: ['Database', 'Platform']
+---
+
+Use [Supabase Branching](/docs/guides/deployment/branching) to get a new Postgres database for each pull request. Then, you can safely experiment with changes like new configurations, database schemas, or features without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
+
+By default, new branches do not start with any data or storage objects from your base project. This is meant to better protect your sensitive production data. To start your branches with data, you can use a [seed file](/docs/guides/deployment/branching/github-integration#seeding) if using the GitHub integration, or the [Include data](/docs/guides/deployment/branching/dashboard#include-production-data) option if you create the branch from the Supabase Dashboard.

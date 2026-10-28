@@ -113,22 +113,7 @@ You can access them only by:
 
 ### Signing URLs
 
-<Admonition type="note">
-
-Storage signed URLs are signed with a dedicated internal key that is separate from your project's Auth JWT signing key. Each project has its own signing key.
-
-Because signed URLs use this separate key, they are not affected by:
-
-- Rotating or revoking Auth JWT legacy secret or signing key
-- Disabling legacy keys in the dashboard
-- Switching from HS256 to asymmetric (ES256) signing key
-
-Signed URLs remain valid until their expiry time regardless of any Auth key changes.
-
-If you need to revoke signed URLs, [contact Supabase support](/dashboard/support/new?projectRef=).
-
-</Admonition>
-You can sign a time-limited URL that you can share to your users by invoking the `createSignedUrl` method on the SDK.
+You can sign a time-limited URL that you can share with your users by invoking the `createSignedUrl` method on the SDK.
 
 ```js
 import { createClient } from '@supabase/supabase-js'
@@ -144,3 +129,30 @@ if (data) {
   console.log(data.signedUrl)
 }
 ```
+
+### Revoke signed URLs
+
+<Admonition type="note">
+
+You can't revoke individual signed URLs. To invalidate a specific one, delete, move, or rename the underlying object.
+
+</Admonition>
+
+Storage signs URLs with a dedicated internal key, separate from your project's Auth JWT signing key. Each project has its own key.
+
+Because of this, signed URLs are not affected by:
+
+- Rotating or revoking the Auth JWT legacy secret or signing key
+- Disabling legacy keys in the Supabase Dashboard
+- Switching from a shared secret (HS256) to an asymmetric (ES256) signing key
+
+Signed URLs remain valid until their expiry time regardless of any Auth key changes.
+
+To revoke all signed URLs, [contact Supabase support](/dashboard/support/new?projectRef=) to coordinate the internal key rotation.
+
+Supabase then:
+
+- Rotates the internal key, which invalidates all signed URLs (upload and download).
+- Clears the CDN cache so the server validates every signed URL request directly before serving the object.
+
+As a result, all existing signed URLs return a 404 error, and new signed URLs created after the rotation use the updated key.

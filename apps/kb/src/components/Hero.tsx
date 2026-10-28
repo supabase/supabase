@@ -1,12 +1,12 @@
 import { Search } from 'lucide-react'
-import { useCallback, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useRef, useSyncExternalStore, type ReactNode } from 'react'
 import { cn, KeyboardShortcut } from 'ui'
 
 import type { Topic } from '../lib/topics'
 import { AsciiHoverText } from './AsciiHoverText'
 import { HeroGrid } from './HeroGrid'
 import { InfallText } from './InfallText'
-import { KbSearchDialog } from './KbSearchDialog'
+import { openKbSearch } from './KbSearch'
 import { TopicShape } from './TopicShape'
 import { WarpCanvas } from './WarpCanvas'
 
@@ -204,42 +204,23 @@ const CopyFrame = ({ lines }: CopyFrameProps) =>
   ))
 
 const HeroSearch = () => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const isMac = useSyncExternalStore(subscribeToNothing, getIsMac, getIsMacOnServer)
 
-  const bindSearchShortcut = useCallback((trigger: HTMLButtonElement | null) => {
-    if (!trigger) return
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat || event.key?.toLowerCase() !== 'k') return
-      if (!(event.metaKey || event.ctrlKey)) return
-      event.preventDefault()
-      setIsSearchOpen((isOpen) => !isOpen)
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
-
-  const handleSearchOpen = () => setIsSearchOpen(true)
-
   return (
-    <>
-      <button
-        ref={bindSearchShortcut}
-        type="button"
-        data-warp-throat
-        aria-keyshortcuts="Meta+K Control+K"
-        onClick={handleSearchOpen}
-        className={cn(
-          'relative mt-2 flex h-12 w-full max-w-85 items-center gap-2.5 rounded-lg pl-3 pr-4 sm:max-w-107',
-          'border border-default bg-surface-75 text-left text-base text-foreground-lighter shadow-raised',
-          'transition-colors hover:border-strong hover:text-foreground-light focus-ring'
-        )}
-      >
-        <Search aria-hidden className="size-4.5 shrink-0" strokeWidth={2.25} />
-        <span className="flex-1 truncate">Search guides</span>
-        <KeyboardShortcut keys={[isMac ? '⌘' : 'Ctrl', 'K']} />
-      </button>
-      <KbSearchDialog isOpen={isSearchOpen} onOpenChange={setIsSearchOpen} />
-    </>
+    <button
+      type="button"
+      data-warp-throat
+      aria-keyshortcuts="Meta+K Control+K"
+      onClick={openKbSearch}
+      className={cn(
+        'relative mt-2 flex h-12 w-full max-w-85 items-center gap-2.5 rounded-lg pl-3 pr-4 sm:max-w-107',
+        'border border-default bg-surface-75 text-left text-base text-foreground-lighter shadow-raised',
+        'transition-colors hover:border-strong hover:text-foreground-light focus-ring'
+      )}
+    >
+      <Search aria-hidden className="size-4.5 shrink-0" strokeWidth={2.25} />
+      <span className="flex-1 truncate">Search guides</span>
+      <KeyboardShortcut keys={[isMac ? '⌘' : 'Ctrl', 'K']} />
+    </button>
   )
 }

@@ -6,8 +6,8 @@ import { PropsWithChildren } from 'react'
 
 import { type NavMenuSection } from '../Navigation.types'
 import { MenuId } from './NavigationMenu'
-import * as NavItems from './NavigationMenu.constants'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
+import { useNavItems } from '@/features/IaNav'
 
 const NavigationMenuGuideList = ({
   id,
@@ -18,8 +18,8 @@ const NavigationMenuGuideList = ({
 }) => {
   const pathname = usePathname()
   const firstLevelRoute = pathname?.split('/')?.slice(0, 4)?.join('/')
+  const NavItems = useNavItems()
 
-  // eslint-disable-next-line import/namespace -- dynamic access, can't lint properly
   let menu = NavItems[id]
 
   if (id === MenuId.Integrations && additionalNavItems?.integrations) {

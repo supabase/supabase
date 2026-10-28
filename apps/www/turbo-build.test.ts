@@ -181,6 +181,8 @@ function build(env: Partial<NodeJS.ProcessEnv> = {}, rootCommand = false) {
         VERCEL_GIT_COMMIT_SHA: '1111111111111111111111111111111111111111',
         SITE_NAME: 'www',
         ASSET_CDN_S3_ENDPOINT: 'https://example.invalid',
+        AWS_ACCESS_KEY_ID: 'test-access-key-id',
+        AWS_SECRET_ACCESS_KEY: 'test-secret-access-key',
         PATH: `${path.join(fixture, 'node_modules/.bin')}${path.delimiter}${process.env.PATH}`,
         ...env,
       },
