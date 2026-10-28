@@ -123,7 +123,7 @@
     "@types/three": "^0.169.0",
     "api-types": "workspace:*",
     "postcss": "catalog:",
-    "react-hook-form": "^7.71.2",
+    "react-hook-form": "^7.91.0",
     "remark-mdx": "^3.0.1",
     "tailwindcss": "catalog:",
     "tar-stream": "^3.1.7",
