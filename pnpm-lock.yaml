@@ -70,7 +70,7 @@ catalogs:
       specifier: ^11.18.2
       version: 11.18.2
     next:
-      specifier: ^16.3.6
+      specifier: ^16.4.3
       version: 16.4.3
     next-themes:
       specifier: ^0.4.6
