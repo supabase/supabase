@@ -30,6 +30,7 @@ export const heroSectionSchema = z.object({
   video: videoSchema.optional(),
   youtubeUrl: z.string().url().optional(),
   ctas: z.array(ctaSchema).optional(),
+  supportingLink: ctaSchema.pick({ label: true, href: true }).optional(),
 })
 
 export const contentBlockSchema = z.object({
