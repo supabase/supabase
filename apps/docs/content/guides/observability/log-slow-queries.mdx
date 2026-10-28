@@ -4,67 +4,114 @@ title: 'Log slow and failing queries'
 description: 'Log slow queries, their query plans, and the queries behind errors in your Postgres logs.'
 ---
 
-Find slow and failing queries by recording them in your Postgres logs. To read the logs, see [Logs in Studio](/docs/guides/observability/logs). For every log setting, see [Postgres log configurations](/docs/guides/database/postgres/postgres-log-config).
+Find slow and failing queries by recording them in your Postgres logs.
 
-<Admonition type="caution">
+Use this guide when a statement runs slowly and you want to know which one. It covers anything that connects as the `postgres` role, such as a backend service, an ORM, or a migration. Postgres records each slow statement with how long it took and, if you want it, how it ran the query. When an error shows up in your logs, you can also find the query that caused it.
+
+The slow query settings don't cover requests through the [Data API](/docs/guides/api), such as supabase-js calls, which connect as other roles. If your slow queries come from your app that way, start with the [Query Performance](/dashboard/project/_/observability/query-performance?preset=slowest_execution) page and filter by role. To see the plan of a slow Data API query, use [`explain()`](/docs/guides/database/debugging-performance). Query Performance doesn't show queries that time out or fail. For those, see [Find the query behind an error](#find-the-query-behind-an-error), which covers every role.
+
+To read the logs, see [Logs in Studio](/docs/guides/observability/logs). To search them with SQL, see [Query logs with SQL](/docs/guides/observability/advanced-log-filtering). For every log setting, see [Postgres log configurations](/docs/guides/database/postgres/postgres-log-config).
 
 Logging a large amount of query activity can slow your queries and increase logging costs. Lower a threshold while you investigate, and raise it again when you're done.
 
-</Admonition>
+<Admonition type="danger">
 
-Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+Logged statements include their literal values, which can contain personal data or secrets. Check who can read your logs before you lower a threshold.
+
+</Admonition>
 
 ## Log slow queries
 
-`log_min_duration_statement` logs each statement that runs longer than a threshold. It records the statement and its duration, and nothing else, so it's lighter than logging query plans.
+To log the statements that run longer than a threshold:
 
-```sql
-alter role "postgres" set "log_min_duration_statement" to '2s';
-```
+1. Set the threshold. Postgres logs each statement whose run time meets or exceeds the threshold. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
-A slow statement produces a log like this:
+   ```sql
+   alter role "postgres" set "log_min_duration_statement" to '2s';
+   ```
+
+2. Open a new connection, or restart your app's connection pool, and run the queries you want to investigate. The setting applies only to connections opened after you change it, and a pool can keep reusing older ones.
+3. In the [Postgres logs](/dashboard/project/_/logs/postgres-logs), find the entries that start with `duration:`. To search them with SQL instead, see [Query logs with SQL](/docs/guides/observability/advanced-log-filtering).
+
+Each slow statement produces a log like this:
 
 ```sh
-duration: 1.097 ms statement: select * from example_table limit 100;
+duration: 2107.797 ms  statement: select count(*), pg_sleep(2.1) from example
 ```
+
+If a slow query is missing from the logs, see [How query logging works](#how-query-logging-works).
 
 ## Log the query plans of slow queries
 
-[auto_explain](https://www.postgresql.org/docs/current/auto-explain.html) is a Postgres module installed on every Supabase project. It logs the statement and the [query plan](https://www.postgresql.org/docs/current/sql-explain.html) of each query that runs longer than a threshold.
+To log the query plan of each query that runs longer than a threshold:
 
-```sql
-alter role "postgres" set "auto_explain.log_min_duration" to '2s';
-```
+1. Set the threshold. The auto_explain module logs the statement and the query plan of each query whose run time meets or exceeds the threshold. For how it works, see [auto_explain](https://www.postgresql.org/docs/current/auto-explain.html) in the Postgres documentation.
 
-A slow query produces a log like this:
+   ```sql
+   alter role "postgres" set "auto_explain.log_min_duration" to '2s';
+   ```
+
+2. Open a new connection, or restart your app's connection pool, and run the queries you want to investigate.
+3. In the [Postgres logs](/dashboard/project/_/logs/postgres-logs), find the entries that contain `plan:`. To search them with SQL instead, see [Query logs with SQL](/docs/guides/observability/advanced-log-filtering).
+
+Each slow query produces a log like this:
 
 ```sh
-duration: 1661.934 ms plan: Query Text: SELECT * FROM example;
-Seq Scan on example (cost=0.00..1443.00 rows=100000 width=36)
+duration: 2107.319 ms  plan:
+  Query Text: select count(*), pg_sleep(2.1) from example
+  Aggregate  (cost=1855.06..1855.08 rows=1 width=12)
+    ->  Seq Scan on example  (cost=0.00..1572.65 rows=112965 width=0)
 ```
 
-`auto_explain.log_min_duration` is the main setting in a family. Others, such as `auto_explain.log_analyze` and `auto_explain.log_buffers`, control how much detail the plan records. For the full list, see the [auto_explain docs](https://www.postgresql.org/docs/current/auto-explain.html).
+Other auto_explain settings, such as `auto_explain.log_analyze` and `auto_explain.log_buffers`, control how much detail each plan records. For every setting, see [auto_explain](https://www.postgresql.org/docs/current/auto-explain.html) in the Postgres documentation.
 
-## Log the query behind an error
+## Find the query behind an error
 
-When Postgres logs an event, it also records subfields, such as the [error code](https://www.postgresql.org/docs/current/errcodes-appendix.html). `log_min_error_statement` decides whether the query that caused the event is recorded too, in the `query` subfield. Postgres records the query when the event is as severe as the setting or more. For the severity levels, see [`log_min_messages`](/docs/guides/database/postgres/postgres-log-config#logminmessages).
+Postgres records the query behind every error by default, so you don't need to change a setting.
 
-```sql
-alter role "postgres" set "log_min_error_statement" to 'error';
-```
+To find the query that caused an error:
+
+1. In the [Postgres logs](/dashboard/project/_/logs/postgres-logs), open the error's entry.
+2. Read its `query` subfield.
 
 A failed insert produces a log like this:
 
 ```sh
 duplicate key value violates unique constraint "example_pkey"
 ...
-query: "insert into example (id) values (1), (1);
+query: "insert into example (id) values (1), (1);"
 ```
 
-## Turn logging off
+## Restore the defaults
 
-To remove a setting from a role, reset it to its default:
+If the `postgres` role had its own value for either setting before you started, set it back to that value instead. To see the role's current settings, run `select rolconfig from pg_roles where rolname = 'postgres';`.
+
+To return the `postgres` role to its default logging:
+
+1. Reset both settings on the `postgres` role:
+
+   ```sql
+   alter role "postgres" set "log_min_duration_statement" to default;
+   alter role "postgres" set "auto_explain.log_min_duration" to default;
+   ```
+
+2. Open new connections, or restart your app's connection pool, so the change applies.
+
+The default plan threshold logs the query plan of each query that runs longer than 10 seconds. To stop logging query plans entirely, set the threshold to `-1`:
 
 ```sql
-alter role "postgres" set "log_min_duration_statement" to default;
+alter role "postgres" set "auto_explain.log_min_duration" to '-1';
 ```
+
+The change applies to new connections.
+
+## How query logging works
+
+`log_min_duration_statement` records each statement that runs longer than its threshold, with its duration and nothing else, so it's lighter than logging query plans. It logs only statements that finish. A statement canceled by a [timeout](/docs/guides/database/postgres/timeouts) produces an error log instead, which records the query as described in [Find the query behind an error](#find-the-query-behind-an-error).
+
+Two cases log less than you might expect:
+
+- If `log_statement` already logged a statement, its duration entry leaves the statement out. `log_statement` defaults to `ddl`, so a slow schema change, such as one in a migration, appears as two entries: the statement, and then its duration. To match the two, compare their `session_id`.
+- With the extended query protocol, which most drivers and ORMs use, Postgres times the parse, bind, and execute steps separately. A query whose steps each stay under the threshold isn't logged, even when their total is over it.
+
+When Postgres logs an event, it also records subfields, such as the [error code](https://www.postgresql.org/docs/current/errcodes-appendix.html). `log_min_error_statement` decides whether the query that caused the event is recorded too, in the `query` subfield. Postgres records the query when the event is as severe as the setting or more. The setting defaults to `error`. For the severity levels, see [`log_min_messages`](/docs/guides/database/postgres/postgres-log-config#logminmessages).
