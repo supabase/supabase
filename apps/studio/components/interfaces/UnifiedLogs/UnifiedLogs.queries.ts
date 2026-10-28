@@ -634,3 +634,101 @@ GROUP BY time_bucket
 ORDER BY time_bucket ASC
 `
 }
+
+export const REQUEST_CORRELATION_KEYS = {
+  requestId: {
+    edge_logs: ['request.headers.cf_ray', 'response.headers.cf_ray'],
+    auth_logs: ['request_id'],
+    storage_logs: ['req.headers.cf_ray'],
+    function_edge_logs: ['request.headers.cf_ray'],
+  },
+  executionId: {
+    function_edge_logs: ['execution_id'],
+    function_logs: ['execution_id'],
+  },
+} as const satisfies Record<'requestId' | 'executionId', Record<string, readonly string[]>>
+
+export type RequestCorrelationIds = { requestIds: string[]; executionIds: string[] }
+
+export const REQUEST_TIMELINE_LIMIT = 200
+
+const CORRELATION_ID_PATTERN = /^[0-9A-Za-z-]{1,64}$/
+
+export const getRequestCorrelationIds = (
+  logs: { source: string; attributes: Record<string, unknown> | null | undefined }[]
+): RequestCorrelationIds => {
+  const collect = (keysBySource: Record<string, readonly string[]>) => {
+    const ids = new Set<string>()
+    for (const { source, attributes } of logs) {
+      for (const key of keysBySource[source] ?? []) {
+        const value = attributes?.[key]
+        if (typeof value === 'string' && CORRELATION_ID_PATTERN.test(value)) ids.add(value)
+      }
+    }
+    return [...ids].sort()
+  }
+  return {
+    requestIds: collect(REQUEST_CORRELATION_KEYS.requestId),
+    executionIds: collect(REQUEST_CORRELATION_KEYS.executionId),
+  }
+}
+
+const correlationConditions = (
+  keysBySource: Record<string, readonly string[]>,
+  ids: string[]
+): SafeLogSqlFragment[] => {
+  if (ids.length === 0) return []
+  const idList = joinSqlFragments(
+    ids.map((id) => lit(id)),
+    ','
+  )
+  return Object.entries(keysBySource).map(([source, keys]) => {
+    const matches = keys.map((key) => safeSql`log_attributes[${lit(key)}] IN (${idList})`)
+    return safeSql`(source = ${lit(source)} AND (${joinSqlFragments(matches, ' OR ')}))`
+  })
+}
+
+export const getLogAttributesQuery = ({
+  logId,
+  source,
+}: {
+  logId: string
+  source: string
+}): SafeLogSqlFragment => safeSql`
+SELECT source, log_attributes
+FROM logs
+WHERE id = ${lit(logId)} AND source = ${lit(source)}
+LIMIT 1
+`
+
+export const getRequestTimelineQuery = ({
+  requestIds,
+  executionIds,
+}: RequestCorrelationIds): SafeLogSqlFragment => {
+  const conditions = [
+    ...correlationConditions(REQUEST_CORRELATION_KEYS.requestId, requestIds),
+    ...correlationConditions(REQUEST_CORRELATION_KEYS.executionId, executionIds),
+  ]
+  if (conditions.length === 0) throw new Error('A request or execution ID is required')
+
+  return safeSql`
+SELECT
+    id,
+    timestamp,
+    source,
+    ${LOG_TYPE_EXPR} AS log_type,
+    ${STATUS_EXPR} AS status,
+    ${LEVEL_EXPR} AS level,
+    ${PATHNAME_EXPR} AS pathname,
+    event_message,
+    ${METHOD_EXPR} AS method,
+    ${AUTH_USER_EXPR} AS auth_user,
+    log_attributes AS metadata,
+    null AS log_count,
+    null AS logs
+FROM logs
+WHERE ${joinSqlFragments(conditions, ' OR ')}
+ORDER BY timestamp ASC, id ASC
+LIMIT ${lit(REQUEST_TIMELINE_LIMIT)}
+`
+}

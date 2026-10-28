@@ -38,7 +38,10 @@ export const useWebhookDeliveriesQuery = <TData = WebhookDeliveriesData>(
     queryFn: ({ signal }) =>
       getWebhookDeliveries({ scope, endpointId, size, after, before }, signal),
     enabled: enabled && Boolean(endpointId),
-    refetchInterval: 5000,
+    // With no rows to show, a failed load leaves an error card with a "Try again" button, so
+    // polling stops. With rows on screen it keeps going and recovers by itself.
+    refetchInterval: (query) =>
+      query.state.status === 'error' && !query.state.data?.length ? false : 5000,
     ...options,
   })
 }

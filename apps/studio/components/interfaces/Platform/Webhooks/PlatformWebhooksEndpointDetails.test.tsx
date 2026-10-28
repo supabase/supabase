@@ -1,13 +1,31 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { PlatformWebhooksEndpointDetails } from './PlatformWebhooksEndpointDetails'
+import type { ResponseError } from '@/types'
 
 vi.mock('@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () => ({
   DataTableColumnStatusCode: ({ value }: { value: number }) => <span>{value}</span>,
+}))
+
+vi.mock('@/components/ui/AlertError', () => ({
+  AlertError: ({
+    subject,
+    projectRef,
+    additionalActions,
+  }: {
+    subject: string
+    projectRef?: string
+    additionalActions?: ReactNode
+  }) => (
+    <div>
+      <p data-project-ref={projectRef}>{subject}</p>
+      {additionalActions}
+    </div>
+  ),
 }))
 
 vi.mock('@/components/ui/ShortcutTooltip', () => ({
@@ -162,61 +180,137 @@ describe('PlatformWebhooksEndpointDetails', () => {
   ) =>
     render(
       <PlatformWebhooksEndpointDetails
+        deliveriesError={null}
         deliverySearch=""
-        filteredDeliveries={allDeliveries}
+        filteredDeliveries={allDeliveries.slice(0, 5)}
+        hasNextPage={false}
+        hasPreviousPage={false}
+        hasRefreshError={false}
+        isLoadingDeliveries={false}
+        isRefetchingDeliveries={false}
         selectedEndpoint={selectedEndpoint}
         onCopyUrl={vi.fn()}
         onDeliverySearchChange={vi.fn()}
+        onNextPage={vi.fn()}
+        onPreviousPage={vi.fn()}
         onOpenDelivery={vi.fn()}
+        onRefetchDeliveries={vi.fn()}
         onRetryDelivery={vi.fn()}
         {...props}
       />
     )
 
-  it('renders paginated deliveries with previous and next controls', async () => {
-    const user = userEvent.setup()
-
+  it('shows every delivery it is given, without slicing them into pages', () => {
     renderComponent()
 
-    expect(screen.getByText('Showing 1 to 5 of 12 deliveries')).toBeInTheDocument()
-    expect(screen.queryByText('2026-02-27T06:59:00.000Z')).not.toBeInTheDocument()
-
-    await user.click(screen.getByLabelText('Next page'))
-
-    expect(screen.getByText('Showing 6 to 10 of 12 deliveries')).toBeInTheDocument()
-    expect(screen.getByText('2026-02-27T06:59:00.000Z')).toBeInTheDocument()
-
-    await user.click(screen.getByLabelText('Previous page'))
-
-    expect(screen.getByText('Showing 1 to 5 of 12 deliveries')).toBeInTheDocument()
-    expect(screen.queryByText('2026-02-27T06:59:00.000Z')).not.toBeInTheDocument()
+    expect(screen.getByText('Showing 5 deliveries')).toBeInTheDocument()
+    expect(screen.getByText('2026-02-27T08:04:00.000Z')).toBeInTheDocument()
   })
 
-  it('resets to the first page when the delivery search changes', async () => {
+  it('disables both pagination buttons when there is no next or previous page', () => {
+    renderComponent({ hasNextPage: false, hasPreviousPage: false })
+
+    expect(screen.getByLabelText('Previous page')).toBeDisabled()
+    expect(screen.getByLabelText('Next page')).toBeDisabled()
+  })
+
+  it('calls onNextPage and onPreviousPage from the pagination buttons', async () => {
     const user = userEvent.setup()
-    const projectDeliveries = allDeliveries.filter((delivery) =>
-      delivery.eventType?.includes('project')
-    )
-    const { rerender } = renderComponent()
+    const onNextPage = vi.fn()
+    const onPreviousPage = vi.fn()
+
+    renderComponent({ hasNextPage: true, hasPreviousPage: true, onNextPage, onPreviousPage })
 
     await user.click(screen.getByLabelText('Next page'))
-    expect(screen.getByText('Showing 6 to 10 of 12 deliveries')).toBeInTheDocument()
+    expect(onNextPage).toHaveBeenCalledTimes(1)
 
-    rerender(
-      <PlatformWebhooksEndpointDetails
-        deliverySearch="project"
-        filteredDeliveries={projectDeliveries}
-        selectedEndpoint={selectedEndpoint}
-        onCopyUrl={vi.fn()}
-        onDeliverySearchChange={vi.fn()}
-        onOpenDelivery={vi.fn()}
-        onRetryDelivery={vi.fn()}
-      />
-    )
+    await user.click(screen.getByLabelText('Previous page'))
+    expect(onPreviousPage).toHaveBeenCalledTimes(1)
+  })
 
-    await waitFor(() => {
-      expect(screen.getByText('Showing 1 to 5 of 8 deliveries')).toBeInTheDocument()
+  it('keeps the pagination controls when search filters the current page to nothing', () => {
+    renderComponent({ filteredDeliveries: [], hasNextPage: true })
+
+    expect(screen.getByLabelText('Next page')).toBeEnabled()
+  })
+
+  it('shows five skeleton rows instead of the empty state while deliveries load', () => {
+    const { container } = renderComponent({ filteredDeliveries: [], isLoadingDeliveries: true })
+
+    // 5 skeleton rows in the table body plus 1 in the footer
+    expect(container.querySelectorAll('.shimmering-loader')).toHaveLength(6)
+    expect(screen.queryByText('No deliveries found')).not.toBeInTheDocument()
+    expect(screen.queryByText(/^Showing/)).not.toBeInTheDocument()
+  })
+
+  it('shows an error instead of the empty state when deliveries fail to load', () => {
+    renderComponent({
+      filteredDeliveries: [],
+      deliveriesError: { message: 'Something went wrong' } as ResponseError,
     })
+
+    expect(screen.getByText(/Failed to retrieve deliveries/)).toBeInTheDocument()
+    expect(screen.queryByText('No deliveries found')).not.toBeInTheDocument()
+  })
+
+  it('passes the project to the error so the support link is pre-filled', () => {
+    renderComponent({
+      filteredDeliveries: [],
+      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      projectRef: 'abcdefghijklmnopqrst',
+    })
+
+    expect(screen.getByText('Failed to retrieve deliveries')).toHaveAttribute(
+      'data-project-ref',
+      'abcdefghijklmnopqrst'
+    )
+  })
+
+  it('reloads the deliveries when "Try again" is clicked on the error', async () => {
+    const user = userEvent.setup()
+    const onRefetchDeliveries = vi.fn()
+
+    renderComponent({
+      filteredDeliveries: [],
+      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      onRefetchDeliveries,
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Try again' }))
+
+    expect(onRefetchDeliveries).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not offer "Try again" while there is no error', () => {
+    renderComponent()
+
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument()
+  })
+
+  it('warns that the rows may be out of date when a refresh fails, and offers Try again', async () => {
+    const user = userEvent.setup()
+    const onRefetchDeliveries = vi.fn()
+
+    renderComponent({ hasRefreshError: true, onRefetchDeliveries })
+
+    expect(screen.getByText('Unable to refresh deliveries')).toBeInTheDocument()
+    expect(screen.getByText('Showing 5 deliveries')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(onRefetchDeliveries).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not warn about out of date rows when nothing failed', () => {
+    renderComponent()
+
+    expect(screen.queryByText('Unable to refresh deliveries')).not.toBeInTheDocument()
+  })
+
+  it('keeps showing deliveries when a refetch fails after they loaded', () => {
+    renderComponent({ deliveriesError: { message: 'Something went wrong' } as ResponseError })
+
+    expect(screen.getByText('Showing 5 deliveries')).toBeInTheDocument()
+    expect(screen.queryByText(/Failed to retrieve deliveries/)).not.toBeInTheDocument()
   })
 
   it('retries a failed delivery without opening the delivery row', async () => {
@@ -230,6 +324,62 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
     expect(onRetryDelivery).toHaveBeenCalledWith('org-delivery-2')
     expect(onOpenDelivery).not.toHaveBeenCalled()
+  })
+
+  it('does not open a pending delivery, but opens one that has finished', async () => {
+    const user = userEvent.setup()
+    const onOpenDelivery = vi.fn()
+    const pending = createDelivery({
+      id: 'pending-delivery',
+      eventType: 'event.pending',
+      status: 'pending',
+    })
+    const finished = createDelivery({
+      id: 'failed-delivery',
+      eventType: 'event.finished',
+      status: 'failure',
+    })
+
+    renderComponent({ filteredDeliveries: [pending, finished], onOpenDelivery })
+
+    await user.click(screen.getByText('event.pending'))
+    expect(onOpenDelivery).not.toHaveBeenCalled()
+
+    await user.click(screen.getByText('event.finished'))
+    expect(onOpenDelivery).toHaveBeenCalledWith('failed-delivery')
+  })
+
+  it('does not open a pending delivery from the keyboard', async () => {
+    const user = userEvent.setup()
+    const onOpenDelivery = vi.fn()
+    const pending = createDelivery({
+      id: 'pending-delivery',
+      eventType: 'event.pending',
+      status: 'pending',
+    })
+
+    renderComponent({ filteredDeliveries: [pending], onOpenDelivery })
+
+    screen.getByText('event.pending').closest('tr')?.focus()
+    await user.keyboard('{Enter}')
+
+    expect(onOpenDelivery).not.toHaveBeenCalled()
+  })
+
+  it('still lets a pending delivery be retried from its row', async () => {
+    const user = userEvent.setup()
+    const onRetryDelivery = vi.fn()
+    const pending = createDelivery({
+      id: 'pending-delivery',
+      eventType: 'event.pending',
+      status: 'pending',
+    })
+
+    renderComponent({ filteredDeliveries: [pending], onRetryDelivery })
+
+    await user.click(screen.getByLabelText('Retry pending-delivery'))
+
+    expect(onRetryDelivery).toHaveBeenCalledWith('pending-delivery')
   })
 
   it('renders a zero response code instead of the placeholder', () => {
