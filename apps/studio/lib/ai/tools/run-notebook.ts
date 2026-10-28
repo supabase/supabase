@@ -24,6 +24,10 @@ export const contract = {
   inputSchema,
   outputSchema: notebookRunOutputSchema,
   minOptInLevel: 'schema',
+  availability: {
+    environments: new Set(['platform']),
+    requires: new Set(['explorer']),
+  },
   needsApproval: true,
   toModelOutput: (output: NotebookRunOutput, optInLevel) =>
     sanitizeNotebookRunOutput(output, optInLevel),

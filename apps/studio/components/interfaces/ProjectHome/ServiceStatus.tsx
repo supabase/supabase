@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
@@ -14,7 +15,7 @@ import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewConte
 import type { ProjectServiceStatus } from './ServiceStatus.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { SingleStat } from '@/components/ui/SingleStat'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from '@/data/service-status/edge-functions-status-query'
 import {
   useProjectServiceStatusQuery,
@@ -23,6 +24,7 @@ import {
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
@@ -126,12 +128,18 @@ export const ServiceStatus = () => {
   const isBranch = project?.parentRef !== project?.ref
 
   // Get branches data when on a branch
-  const { data: branches, isPending: isBranchesLoading } = useBranchesQuery(
-    { projectRef: isBranch ? project?.parentRef : undefined },
-    {
-      enabled: isBranch,
-    }
-  )
+  const branchesProjectRef = isBranch ? project?.parentRef : undefined
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: branchesProjectRef,
+  })
+  const { data: branches, isPending: isBranchesPending } = useQuery({
+    ...branchesQueryOptions({ projectRef: branchesProjectRef, grant: branchesGrant.grant }),
+    enabled: isBranch,
+  })
+  const isBranchesLoading =
+    isBranch &&
+    (branchesGrant.status === 'loading' ||
+      (branchesGrant.status === 'granted' && isBranchesPending))
 
   const currentBranch = isBranch
     ? branches?.find((branch) => branch.project_ref === ref)

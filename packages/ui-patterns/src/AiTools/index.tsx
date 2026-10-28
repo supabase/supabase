@@ -19,6 +19,7 @@ export interface AiToolsProps {
   onPreferredSourceClick?: () => void
   onMarkdownCopy?: () => void
   onAskAiClick?: (agent: AiAgent) => void
+  orientation?: 'vertical' | 'horizontal'
   titleClassName?: string
   className?: string
 }
@@ -36,6 +37,7 @@ export const AiTools = ({
   onPreferredSourceClick,
   onMarkdownCopy,
   onAskAiClick,
+  orientation = 'vertical',
   titleClassName,
   className,
 }: AiToolsProps) => {
@@ -61,7 +63,12 @@ export const AiTools = ({
       >
         AI tools
       </h2>
-      <div className="flex flex-col gap-2">
+      <div
+        className={cn(
+          'flex',
+          orientation === 'vertical' ? 'flex-col gap-2' : 'flex-row flex-wrap items-center gap-4'
+        )}
+      >
         {agentSetupHref ? (
           <a href={agentSetupHref} onClick={onAgentSetupClick} className={ITEM_CLASS}>
             <Sparkles aria-hidden className="size-3.5" strokeWidth={1.5} />

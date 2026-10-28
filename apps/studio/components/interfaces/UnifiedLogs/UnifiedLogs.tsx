@@ -417,7 +417,7 @@ export const UnifiedLogs = ({
       setSearch({ id: null })
       setOpenRowId(undefined)
     } else if (openRowId && selectedRow) {
-      setSearch({ id: openRowId })
+      if (search.id !== openRowId) setSearch({ id: openRowId })
       const logType = LOG_TYPES.find((type) => type === selectedRow.original.log_type)
       if (logType) track('unified_logs_row_clicked', { logType })
     } else if (!openRowId && search.id) {
