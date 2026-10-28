@@ -71,3 +71,53 @@
     animation-play-state: running;
   }
 }
+
+@keyframes ask-ai-roll-out {
+  to {
+    opacity: 0;
+    filter: blur(2px);
+    transform: perspective(400px) rotateX(-70deg);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* the tilt makes blocks wider than the list. clip stops a horizontal scrollbar */
+    [data-scrolled] > .ask-ai-roll {
+      overflow-x: clip;
+    }
+
+    /* a list rolls item by item, and an item with blocks rolls block by block. a whole list or a
+       tall item stays flat until its last part leaves */
+    [data-scrolled]
+      > .ask-ai-roll
+      :is(
+        [data-roll],
+        .prose > :not(ol, ul),
+        .prose > :is(ol, ul) > li:not(:has(> :is(p, div, pre, ol, ul))),
+        .prose > :is(ol, ul) > li > :is(p, div, pre, ol, ul)
+      ) {
+      transform-origin: bottom center;
+      animation: ask-ai-roll-out ease-in both;
+      animation-timeline: view();
+      animation-range: exit calc(100% - 144px) exit 100%;
+    }
+  }
+}
+
+.ask-ai-edge {
+  position: absolute;
+  inset: 0 1px auto;
+  height: 96px;
+  max-height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+  background: linear-gradient(to bottom, var(--background-dash-sidebar), transparent);
+  backdrop-filter: blur(2px);
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+[data-scrolled] + .ask-ai-edge {
+  opacity: 1;
+}

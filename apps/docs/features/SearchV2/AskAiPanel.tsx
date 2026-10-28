@@ -71,6 +71,8 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
   const handleListScroll = (event: UIEvent<HTMLDivElement>) => {
     const list = event.currentTarget
     isPinnedRef.current = list.scrollHeight - list.scrollTop - list.clientHeight < 32
+    // the roll and the top edge band apply only after a scroll
+    list.toggleAttribute('data-scrolled', list.scrollTop > 0)
   }
 
   // follows the question and the streamed answer while the reader stays at the bottom.
@@ -119,18 +121,21 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
         {getStatusMessage()}
       </div>
       {hasConversation ? (
-        <div
-          onScroll={handleListScroll}
-          className="max-h-[min(477px,70dvh)] overflow-y-auto mx-px scroll-fade-bottom"
-        >
-          <div ref={followConversation}>
-            <AiMessages messages={messages} hasError={hasError} onLinkNavigate={onLinkNavigate} />
-            {hasAnswer ? (
-              <p className="px-4 pt-4 pb-3 text-center text-xs text-foreground-lighter">
-                Supabase AI can make mistakes. Verify answers before you run them.
-              </p>
-            ) : null}
+        <div className="relative">
+          <div
+            onScroll={handleListScroll}
+            className="max-h-[min(477px,70dvh)] overflow-y-auto mx-px scroll-fade-bottom"
+          >
+            <div ref={followConversation} className="ask-ai-roll">
+              <AiMessages messages={messages} hasError={hasError} onLinkNavigate={onLinkNavigate} />
+              {hasAnswer ? (
+                <p data-roll className="px-4 pt-4 pb-3 text-center text-xs text-foreground-lighter">
+                  Supabase AI can make mistakes. Verify answers before you run them.
+                </p>
+              ) : null}
+            </div>
           </div>
+          <div aria-hidden className="ask-ai-edge" />
         </div>
       ) : null}
       <form onSubmit={handleSubmit}>
@@ -181,6 +186,7 @@ function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
           // messages have no id and are only ever appended, so the index is stable
           <li
             key={index}
+            data-roll
             className="max-w-[80%] self-end rounded-2xl bg-surface-400 px-3 py-1.5 text-search-dialog text-foreground wrap-break-word"
           >
             {message.content}
@@ -202,12 +208,12 @@ function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
               </Markdown>
             )}
             {isFailedAnswer(message, index) ? (
-              <p className="text-search-dialog text-foreground-lighter">
+              <p data-roll className="text-search-dialog text-foreground-lighter">
                 No answer from Supabase AI. Try again in a moment.
               </p>
             ) : null}
             {message.sources?.length ? (
-              <nav aria-label="Sources" className="mt-3">
+              <nav data-roll aria-label="Sources" className="mt-3">
                 <ul className="flex flex-wrap gap-1.5">
                   {message.sources.map((source) => (
                     <li key={source.path}>
