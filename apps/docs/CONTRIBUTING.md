@@ -101,6 +101,10 @@ Add an entry with the `name`, `url`, and optional `icon` for your page.
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
 
+JavaScript v2 reference docs use the TypeDoc pipeline described in the [reference pipeline README](./spec/reference/README.md).
+To update JavaScript v2 reference content, edit source comments in the relevant SDK repository when changing function parameters or return values, or edit the tracked `config.json` and partials under `apps/docs/spec/reference/javascript/v2/` when changing docs-specific content.
+The TypeDoc JSON files and generated `content/reference/` output are build artifacts, so do not edit them directly.
+
 ### Common spec file
 
 Each type of library, such as a language SDK or CLI, has a common spec file. For example, see the [spec file for the language SDKs](https://github.com/supabase/supabase/blob/master/apps/docs/spec/common-client-libs-sections.json). This file contains definitions for the common SDK functions:
@@ -115,11 +119,12 @@ To add a new function, manually add an entry to this common file.
 
 ### Specific spec file
 
-Each library also has its own spec file containing library-specific details. For example, see the [JavaScript SDK spec file](https://github.com/supabase/supabase/blob/master/apps/docs/spec/supabase_js_v2.yml).
+Libraries that still use the legacy pipeline have a specific YAML spec file containing library-specific details.
+For example, see the [Python SDK spec file](https://github.com/supabase/supabase/blob/master/apps/docs/spec/supabase_py_v2.yml).
 
 The functions listed in this file match the ones defined in the common spec file.
 
-Each function contains a description, code examples, and optional notes. The parameters are pulled from the source code via the `$ref` property, which references a function definition in the source code repo. These references are pulled down and transformed using commands in the spec [Makefile](https://github.com/supabase/supabase/blob/master/apps/docs/spec/Makefile). Unless you're a library maintainer, you don't need to worry about this.
+Each function contains a description, code examples, and optional notes. The parameters are pulled from the source code via the `$ref` property, which references a function definition in the source code repo. The legacy pipeline pulls these references down and transforms them using commands in the spec [Makefile](https://github.com/supabase/supabase/blob/master/apps/docs/spec/Makefile). Unless you're a library maintainer, you don't need to worry about this.
 
 If you're a library maintainer, follow these steps when updating function parameters or return values:
 
