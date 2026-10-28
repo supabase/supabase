@@ -35,6 +35,15 @@ if [[ "$FORCE_ASSET_CDN" != "1" ]] && [[ "$VERCEL_ENV" != "production" ]]; then
     exit 0
 fi
 
+# The build already points at the CDN at this point, so a missing credential
+# must fail the build rather than skip the upload.
+for var in ASSET_CDN_S3_ENDPOINT AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+    if [[ -z "${!var}" ]]; then
+        echo "Asset CDN upload is enabled but $var is not set. Set the R2 credentials for this environment, or FORCE_ASSET_CDN=-1 to disable the asset CDN."
+        exit 1
+    fi
+done
+
 # Set the cdnBucket variable based on NEXT_PUBLIC_ENVIRONMENT
 if [[ "$NEXT_PUBLIC_ENVIRONMENT" == "staging" ]]; then
   BUCKET_NAME="frontend-assets-staging"
