@@ -43,7 +43,7 @@ To check whether an asset is cached, read the [`cf-cache-status`](/docs/guides/s
 
 <Admonition type="caution">
 
-`HEAD` requests are not eligible for Smart CDN caching and return `cache-control: no-cache`, so a `HEAD` response doesn't show whether an asset is cached. Use `GET` requests to check caching.
+A `HEAD` response doesn't show whether an asset is cached. `HEAD` requests aren't eligible for Smart CDN caching and return `cache-control: private, no-cache`.
 
 </Admonition>
 
@@ -57,7 +57,7 @@ curl -sD - -o /dev/null \
 To avoid downloading the whole file, request only the first byte. The server responds with `206 Partial Content` and a 1-byte body:
 
 ```bash
-curl -v -r 0-0 \
+curl -sD - -r 0-0 -o /dev/null \
   https://<project-ref>.supabase.co/storage/v1/object/public/<bucket>/<file>
 ```
 
