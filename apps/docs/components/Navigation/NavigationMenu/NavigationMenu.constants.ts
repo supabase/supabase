@@ -353,10 +353,6 @@ export const gettingstarted: NavMenuConstant = {
     { name: 'Build with AI tools', url: '/guides/ai-tools' },
     { name: 'The Supabase way to build', url: '/guides/getting-started/the-supabase-way-to-build' },
     { name: 'API Keys', url: '/guides/getting-started/api-keys' },
-    {
-      name: 'Rotate a leaked or compromised API key',
-      url: '/guides/security/rotate-leaked-api-keys' as `/${string}`,
-    },
     { name: 'Local Development', url: '/guides/local-development/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
@@ -2633,6 +2629,10 @@ export const security: NavMenuConstant = {
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
+        {
+          name: 'Rotate a leaked API key',
+          url: '/guides/security/rotate-leaked-api-keys',
+        },
       ],
     },
   ],
