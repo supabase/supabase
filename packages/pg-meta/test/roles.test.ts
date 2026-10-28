@@ -1,6 +1,7 @@
+import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
-import pgMeta, { safeSql } from '../src/index'
+import pgMeta, { ident, literal, safeSql } from '../src/index'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
@@ -265,21 +266,17 @@ withTestDatabase('update and remove a role whose name needs quoting', async ({ e
   expect(await findRole(`it's a "role"`)).toBeUndefined()
 })
 
-// Roles are cluster-wide, so dropping the test database doesn't remove them.
 withTestDatabase('create a role with a password containing quotes', async ({ executeQuery }) => {
-  try {
-    const { sql: createSql } = pgMeta.roles.create({
-      name: 'password_r1',
-      canLogin: true,
-      password: `p'ss"word`,
-    })
-    await executeQuery(createSql)
+  // Roles are cluster-wide, so use a unique name and only drop it once it has been created.
+  const name = `password_${randomUUID().replace(/-/g, '_')}`
+  await executeQuery(pgMeta.roles.create({ name, canLogin: true, password: `p'ss"word` }).sql)
 
+  try {
     const rows = await executeQuery(
-      safeSql`select rolcanlogin, rolpassword is not null as has_password from pg_authid where rolname = 'password_r1'`
+      safeSql`select rolcanlogin, rolpassword is not null as has_password from pg_authid where rolname = ${literal(name)}`
     )
     expect(rows).toEqual([{ rolcanlogin: true, has_password: true }])
   } finally {
-    await executeQuery(safeSql`drop role if exists password_r1`)
+    await executeQuery(safeSql`drop role if exists ${ident(name)}`)
   }
 })

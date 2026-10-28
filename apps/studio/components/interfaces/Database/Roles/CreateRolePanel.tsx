@@ -207,6 +207,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                       authentication.{' '}
                       <button
                         type="button"
+                        tabIndex={0}
                         className={InlineLinkClassName}
                         onClick={() =>
                           form.setValue('password', generateStrongPassword(), { shouldDirty: true })

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
+import z from 'zod'
 
 import { CreateRolePanel } from './CreateRolePanel'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
@@ -13,6 +14,8 @@ import { routerMock } from '@/tests/lib/route-mock'
 mockAnimationsApi()
 
 const FORM_ID = 'create-new-role'
+
+const QueryBodySchema = z.object({ query: z.string() })
 
 describe('CreateRolePanel', () => {
   let queries: string[]
@@ -41,9 +44,9 @@ describe('CreateRolePanel', () => {
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
       response: async ({ request }) => {
-        const body = (await request.json()) as { query: string }
+        const body = QueryBodySchema.parse(await request.json())
         queries.push(body.query)
-        return HttpResponse.json([])
+        return HttpResponse.json<Record<string, unknown>[]>([])
       },
     })
   })
