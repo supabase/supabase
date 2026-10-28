@@ -576,6 +576,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 filteredDeliveries={filteredDeliveries}
                 hasNextPage={hasNextPage}
                 hasPreviousPage={hasPreviousPage}
+                // The rows are kept when a refresh fails, so tell the user they may be out of date
+                hasRefreshError={!!deliveriesError && !!fetchedDeliveries?.length}
                 isLoadingDeliveries={isLoadingDeliveries}
                 isRefetchingDeliveries={isFetchingDeliveries}
                 onRefetchDeliveries={refetchDeliveries}

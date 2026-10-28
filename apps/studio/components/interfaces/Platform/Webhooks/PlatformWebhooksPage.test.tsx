@@ -403,6 +403,38 @@ describe('PlatformWebhooksPage (project scope)', () => {
       expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
     }, 20000)
 
+    test('keeps the rows and warns they may be out of date when a refresh fails', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          // The first load works, the automatic refresh after it fails
+          if (requests > 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Something went wrong' },
+              { status: 500 }
+            )
+          }
+          return HttpResponse.json<DeliveryListResponse>({
+            data: [{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }],
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByLabelText(`Retry ${DELIVERY_ID}`)
+
+      expect(
+        await screen.findByText('Unable to refresh deliveries', {}, { timeout: 9000 })
+      ).toBeInTheDocument()
+      expect(screen.getByLabelText(`Retry ${DELIVERY_ID}`)).toBeInTheDocument()
+      expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
+    }, 20000)
+
     test('shows the search empty state, not an error, when a refresh fails after rows loaded', async () => {
       mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
       let requests = 0

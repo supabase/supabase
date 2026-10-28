@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TanStackTableHeadSort } from 'ui-patterns/Table'
@@ -64,6 +65,7 @@ interface PlatformWebhooksEndpointDetailsProps {
   filteredDeliveries: WebhookDelivery[]
   hasNextPage: boolean
   hasPreviousPage: boolean
+  hasRefreshError: boolean
   isLoadingDeliveries: boolean
   isRefetchingDeliveries: boolean
   orgSlug?: string
@@ -170,6 +172,7 @@ export const PlatformWebhooksEndpointDetails = ({
   filteredDeliveries,
   hasNextPage,
   hasPreviousPage,
+  hasRefreshError,
   isLoadingDeliveries,
   isRefetchingDeliveries,
   orgSlug,
@@ -204,6 +207,12 @@ export const PlatformWebhooksEndpointDetails = ({
   })
 
   const deliveryRows = table.getRowModel().rows
+
+  const tryAgainButton = (
+    <Button loading={isRefetchingDeliveries} onClick={onRefetchDeliveries}>
+      Try again
+    </Button>
+  )
 
   return (
     <div className="space-y-16">
@@ -285,6 +294,15 @@ export const PlatformWebhooksEndpointDetails = ({
             onKeyDown={onSearchInputEscape(deliverySearch, onDeliverySearchChange)}
           />
         </div>
+        {hasRefreshError && (
+          <Admonition
+            type="warning"
+            layout="responsive"
+            title="Unable to refresh deliveries"
+            description="These deliveries may be out of date. We'll keep trying."
+            actions={tryAgainButton}
+          />
+        )}
         <Card className="overflow-hidden">
           <Table>
             <TableHeader>
@@ -369,11 +387,7 @@ export const PlatformWebhooksEndpointDetails = ({
                       orgSlug={orgSlug}
                       projectRef={projectRef}
                       subject="Failed to retrieve deliveries"
-                      additionalActions={
-                        <Button loading={isRefetchingDeliveries} onClick={onRefetchDeliveries}>
-                          Try again
-                        </Button>
-                      }
+                      additionalActions={tryAgainButton}
                     />
                   </TableCell>
                 </TableRow>

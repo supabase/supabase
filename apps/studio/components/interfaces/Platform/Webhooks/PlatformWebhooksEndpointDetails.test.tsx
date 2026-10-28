@@ -185,6 +185,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
         filteredDeliveries={allDeliveries.slice(0, 5)}
         hasNextPage={false}
         hasPreviousPage={false}
+        hasRefreshError={false}
         isLoadingDeliveries={false}
         isRefetchingDeliveries={false}
         selectedEndpoint={selectedEndpoint}
@@ -284,6 +285,25 @@ describe('PlatformWebhooksEndpointDetails', () => {
     renderComponent()
 
     expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument()
+  })
+
+  it('warns that the rows may be out of date when a refresh fails, and offers Try again', async () => {
+    const user = userEvent.setup()
+    const onRefetchDeliveries = vi.fn()
+
+    renderComponent({ hasRefreshError: true, onRefetchDeliveries })
+
+    expect(screen.getByText('Unable to refresh deliveries')).toBeInTheDocument()
+    expect(screen.getByText('Showing 5 deliveries')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(onRefetchDeliveries).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not warn about out of date rows when nothing failed', () => {
+    renderComponent()
+
+    expect(screen.queryByText('Unable to refresh deliveries')).not.toBeInTheDocument()
   })
 
   it('keeps showing deliveries when a refetch fails after they loaded', () => {
