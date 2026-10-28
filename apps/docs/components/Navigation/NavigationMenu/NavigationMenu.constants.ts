@@ -1193,6 +1193,10 @@ export const database: NavMenuConstant = {
           name: 'Postgres log configuration',
           url: '/guides/database/postgres/postgres-log-config' as `/${string}`,
         },
+        {
+          name: 'Log slow and failing queries',
+          url: '/guides/observability/log-slow-queries' as `/${string}`,
+        },
       ],
     },
     {

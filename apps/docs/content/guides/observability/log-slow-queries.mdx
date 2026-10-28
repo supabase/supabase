@@ -1,0 +1,117 @@
+---
+id: 'log-slow-queries'
+title: 'Log slow and failing queries'
+description: 'Log slow queries, their query plans, and the queries behind errors in your Postgres logs.'
+---
+
+## `log_min_duration_statement`
+
+It is similar to `auto_explain.log_min_duration`, but it lighter weight. It only logs query statements that run longer than the setting's limit.
+
+**Useful for:**
+
+- Monitoring and optimizing slow queries
+
+**Example log:**
+
+```sh
+duration: 1.097 ms statement: select * from example_table limit 100;
+```
+
+<Accordion
+  type="default"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+    <AccordionItem
+      header="Configuration examples"
+      id="item-1"
+    >
+
+```sql name=SQL
+alter role "postgres" set "log_min_duration_statement" to '2s';
+```
+
+</AccordionItem>
+</Accordion>
+
+## `auto_explain.*`
+
+[auto_explain](https://www.postgresql.org/docs/current/auto-explain.html) is a Postgres module that is installed on all Supabase projects. It logs the statements and [explain plans](https://www.postgresql.org/docs/current/sql-explain.html) of queries that took more than the setting's limit.
+
+**Useful for:**
+
+- Monitoring and optimizing slow queries
+
+**Example log:**
+
+```sh
+duration: 1661.934 ms plan: Query Text: SELECT * FROM example;
+Seq Scan on example (cost=0.00..1443.00 rows=100000 width=36)
+```
+
+<Accordion
+  type="default"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+    <AccordionItem
+      header="Configuration examples"
+      id="item-1"
+    >
+
+<Admonition type="note">
+
+`auto_explain` is a family of configurations. The primary one is `auto_explain.log_min_duration`. However, there are other configs of note, such as `auto_explain.log_analyze` and `auto_explain.log_buffers` that control the details of the query plan recorded. Reference the module's [official docs](https://www.postgresql.org/docs/current/auto-explain.html) for more information.
+
+</Admonition>
+
+```sql name=SQL
+alter role "postgres" set "auto_explain.log_min_duration" to '2s';
+```
+
+</AccordionItem>
+</Accordion>
+
+## `log_min_error_statement`
+
+When an event is logged, beyond the primary message, multiple subfields are also captured, such as the [status code](https://www.postgresql.org/docs/current/errcodes-appendix.html). The `log_min_error_statement` field determines if the query responsible for the log should be recorded, too, under the `query` subfield.
+
+If the event is equally or more severe than `log_min_error_statement`, the query will be captured. To view the varying severity levels, reference [log_min_messages](#logminmessages).
+
+**Useful for:**
+
+- Detecting what queries induced specific logs
+- Detecting what queries induced a specific error
+
+**Example log:**
+
+```sh
+duplicate key value violates unique constraint "example_pkey"
+...
+# affiliated subfield
+query: "insert into example (id) values (1), (1);
+```
+
+<Accordion
+  type="default"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+    <AccordionItem
+      header="Configuration examples"
+      id="item-1"
+    >
+
+```sql name=SQL
+alter role "postgres" set "log_min_error_statement" to 'error';
+```
+
+</AccordionItem>
+</Accordion>
