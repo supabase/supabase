@@ -20,9 +20,9 @@ Pick OrioleDB when you create a project. It's billed the same as standard Postgr
 
 ## The problem with Postgres’s default storage engine
 
-Postgres stores table rows in a format called the heap. An update doesn't change a row in place. Postgres writes a new version and leaves the old one behind as a dead tuple. Deletes leave dead tuples too.
+Postgres stores table rows in a format called the heap. An update doesn't change a row in place. Postgres writes a new version and leaves the old one behind as a dead tuple. Because every index points to a row’s physical location, the new version usually needs a new entry in every index on the table, even indexes on columns that didn’t change. Deletes leave dead tuples too.
 
-Postgres cleans them up with a process called VACUUM, and a background process called autovacuum runs it automatically once enough dead tuples build up in a table. On tables with a lot of updates or deletes, autovacuum can fall behind. This creates bloat: tables and indexes grow larger than the data they hold, and queries get slower because they read more pages. Teams end up tuning autovacuum settings per table, scheduling manual VACUUM runs, or using tools like `pg_repack` to rebuild tables.
+Postgres cleans up the old row versions with a process called VACUUM, and a background process called autovacuum runs it automatically once enough dead tuples build up in a table. On tables with a lot of updates or deletes, autovacuum can fall behind. This creates bloat: tables and indexes grow larger than the data they hold, and queries get slower because they read more pages. Teams end up tuning autovacuum settings per table, scheduling manual VACUUM runs, or using tools like `pg_repack` to rebuild tables.
 
 Heap storage also has limits at high concurrency. A lookup by primary key has to read both the index and the table, every read goes through a shared buffer pool that many connections compete for, and write-heavy workloads generate a lot of disk I/O at each checkpoint. On larger machines, these costs can keep Postgres from using all the CPU and I/O you’re paying for.
 
