@@ -126,6 +126,7 @@ overrides:
   qs: ^6.15.2
   refractor>prismjs: ^1.30.0
   tmp: ^0.2.7
+  velite>sharp: ^0.35.0
   vite>esbuild: ^0.28.1
   webpack: ^5.104.1
   'codemirror-graphql>@codemirror/language': 6.11.0
