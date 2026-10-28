@@ -14,7 +14,7 @@ imgThumb: '2026-10-28-orioledb-public-beta/thumb.png'
 toc_depth: 2
 ---
 
-OrioleDB, an [open-source](https://github.com/orioledb/orioledb) storage engine for Postgres, is now in public beta on every Supabase plan. We announced the public beta at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits), alongside Multigres and DBArena. Pick OrioleDB when you create a project. It's billed the same as standard Postgres. Compute and disk resizing, read replicas, Postgres upgrades, and scheduled backups work. It's not for production yet.
+OrioleDB, an [open-source](https://github.com/orioledb/orioledb) storage engine for Postgres, is now in public beta on every Supabase plan. We announced the public beta at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits), alongside Multigres and DBArena. Pick OrioleDB when you create a project. It's billed the same as standard Postgres. Compute and disk resizing, read replicas, Postgres upgrades, and scheduled backups work. It's not ready for production yet.
 
 ## The problem with Postgres’s default storage engine
 
@@ -34,7 +34,7 @@ OrioleDB replaces the heap through the Table Access Method, Postgres's plug-in i
 - **No buffer mapping.** In-memory pages link directly to their storage pages, so OrioleDB avoids the contention on Postgres’s shared buffer mapping. Page reads are lock-free, which helps when many connections are reading at once.
 - **Copy-on-write checkpoints and row-level WAL.** Checkpoints write only the data that changed, which reduces disk I/O on write-heavy workloads.
 
-OrioleDB has been in development since 2021, and its creators are part of the Supabase team. This beta ships with OrioleDB beta18 on Postgres 17.11.
+OrioleDB has been in development since 2021, and its creators are part of the Supabase team. This beta ships with OrioleDB beta19 on Postgres 17.11.
 
 ## Performance
 
