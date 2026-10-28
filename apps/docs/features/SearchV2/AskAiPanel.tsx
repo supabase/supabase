@@ -4,12 +4,14 @@ import { SearchInputRow, type SearchDialogProps } from 'docs-search/components'
 import { FileText } from 'lucide-react'
 import Link from 'next/link'
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
   type ChangeEvent,
   type FormEvent,
   type KeyboardEvent,
+  type UIEvent,
 } from 'react'
 import {
   MessageRole,
@@ -42,7 +44,7 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
   const [isLoading, setIsLoading] = useState(false)
   const { submit, reset, messages, isResponding, hasError } = useAiChat({ setIsLoading })
   const inputRef = useRef<HTMLInputElement>(null)
-  const listRef = useRef<HTMLDivElement>(null)
+  const isPinnedRef = useRef(true)
   const isBusy = isLoading || isResponding
   const hasConversation = messages.length > 0
   const hasAnswer = messages.some(
@@ -63,9 +65,25 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
     if (!trimmedQuestion || isBusy) return
     submit(trimmedQuestion)
     setQuestion('')
-    // the new question renders on the next frame, so the scroll waits for it
-    requestAnimationFrame(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight }))
+    isPinnedRef.current = true
   }
+
+  const handleListScroll = (event: UIEvent<HTMLDivElement>) => {
+    const list = event.currentTarget
+    isPinnedRef.current = list.scrollHeight - list.scrollTop - list.clientHeight < 32
+  }
+
+  // follows the question and the streamed answer while the reader stays at the bottom.
+  // a stable callback ref, so react does not create the observer again on each render
+  const followConversation = useCallback((content: HTMLDivElement | null) => {
+    const list = content?.parentElement
+    if (!content || !list) return
+    const observer = new ResizeObserver(() => {
+      if (isPinnedRef.current) list.scrollTop = list.scrollHeight
+    })
+    observer.observe(content)
+    return () => observer.disconnect()
+  }, [])
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     // enter confirms an IME composition, so it must not submit
@@ -102,15 +120,17 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
       </div>
       {hasConversation ? (
         <div
-          ref={listRef}
+          onScroll={handleListScroll}
           className="max-h-[min(477px,70dvh)] overflow-y-auto mx-px scroll-fade-bottom"
         >
-          <AiMessages messages={messages} hasError={hasError} onLinkNavigate={onLinkNavigate} />
-          {hasAnswer ? (
-            <p className="px-4 pt-4 pb-3 text-center text-xs text-foreground-lighter">
-              Supabase AI can make mistakes. Verify answers before you run them.
-            </p>
-          ) : null}
+          <div ref={followConversation}>
+            <AiMessages messages={messages} hasError={hasError} onLinkNavigate={onLinkNavigate} />
+            {hasAnswer ? (
+              <p className="px-4 pt-4 pb-3 text-center text-xs text-foreground-lighter">
+                Supabase AI can make mistakes. Verify answers before you run them.
+              </p>
+            ) : null}
+          </div>
         </div>
       ) : null}
       <form onSubmit={handleSubmit}>
