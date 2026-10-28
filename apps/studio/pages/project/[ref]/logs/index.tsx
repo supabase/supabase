@@ -52,8 +52,4 @@ export const LogPage: NextPageWithLayout = () => {
 // chain under TanStack since the shell already supplies one.
 LogPage.getLayout = (page) => <DefaultLayout>{page}</DefaultLayout>
 
-// Unlike the other logs pages, this one is not wrapped in an auth-guarded
-// layout (LogsLayout / ProjectLayoutWithAuth), so guard the page itself. This
-// keeps the guard mounted while the unified logs preview is still resolving,
-// so logged-out visitors are always sent to sign-in.
 export default withAuth(LogPage)
