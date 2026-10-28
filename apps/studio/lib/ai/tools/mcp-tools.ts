@@ -16,7 +16,7 @@ import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
  */
 type SupabaseMcpToolName = keyof typeof SupabaseMcp.supabaseMcpToolSchemas
 
-// UI-executed tools handled locally by Studio (see getStudioTools); the remote
+// UI-executed tools handled locally by Studio (see TOOL_FACTORIES); the remote
 // MCP server's versions are removed so the UI-controlled Studio versions win.
 const UI_EXECUTED_TOOLS = [
   'execute_sql',

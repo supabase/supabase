@@ -54,16 +54,6 @@ function findMenuItemByUrl(
 }
 
 export function resolveBreadcrumbs(pathname: string): BreadcrumbItem[] {
-  if (pathname.startsWith('/guides/troubleshooting')) {
-    return [
-      {
-        name: 'Observability',
-        url: '/guides/observability',
-      },
-      { name: 'Detect and diagnose' },
-      { name: 'Diagnosing', url: '/guides/troubleshooting' },
-    ]
-  }
   if (pathname.startsWith('/guides/getting-started/ai-prompts')) {
     return [
       { name: 'Getting started', url: '/guides/getting-started' },

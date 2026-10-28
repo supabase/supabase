@@ -18,13 +18,11 @@ This quickstart uses Prisma migrations against your Postgres database. Use a **d
 
 ## 2. Gather database connection strings
 
-Open the project [**Connect** panel](/dashboard/project/_?showConnect=true&connectTab=direct). This quickstart connects using the [**Transaction pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=transaction) and [**Session pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=session) mode. Transaction mode is used for application queries and Session mode is used for running migrations with Prisma.
+Open the project [**Connect** panel](/dashboard/project/_?showConnect=true&connectTab=direct). This quickstart uses two connection strings. The [**Transaction pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=transaction) string is for application queries, and the [**Direct connection**](/dashboard/project/_?showConnect=true&connectTab=direct) string is for running migrations with Prisma. If your network doesn't support IPv6 and you don't have the [IPv4 add-on](/docs/guides/platform/ipv4-address), use the [**Session pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=session) string for migrations instead.
 
-To do this, set the connection mode to `Transaction` in the [Database Settings page](/dashboard/project/_/database/settings) and copy the connection string and append `?pgbouncer=true&connection_limit=1`. `pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment. This is the Transaction mode connection string.
+Copy the Transaction pooler connection string and append `?pgbouncer=true&connection_limit=1`. `pgbouncer=true` stops Prisma from generating prepared statements, which the shared pooler doesn't support in transaction mode. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment.
 
-To get the Session mode connection pooler string, change the port of the connection string from the dashboard to 5432.
-
-You will need the Transaction mode connection string and the Session mode connection string to set up environment variables in Step 5.
+You will need both connection strings to set up environment variables in Step 5.
 
 <Admonition type="note">
 
@@ -60,14 +58,14 @@ In your `.env` file, add the following environment variables for your database c
 
 - The `DATABASE_URL` should use the Transaction mode connection string you copied in Step 2.
 
-- The `DIRECT_URL` should use the Session mode connection string you copied in Step 2.
+- The `DIRECT_URL` should use the direct connection string you copied in Step 2.
 
 ```bash name=.env
 # Transaction mode connection string for Prisma Client app queries
 DATABASE_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:6543/postgres?pgbouncer=true&connection_limit=1"
 
-# Session mode connection string for Prisma Migrate
-DIRECT_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres"
+# Direct connection string for Prisma Migrate
+DIRECT_URL="postgres://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres"
 ```
 
 ## 6. Update your Prisma schema

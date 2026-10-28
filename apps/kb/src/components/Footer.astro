@@ -2,6 +2,8 @@
 import { CheckCircle, FlaskConical, LifeBuoy } from 'lucide-react'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 
+import { PrivacySettingsIsland } from './PrivacySettingsIsland'
+
 const primaryLinks = [
 	{
 		Icon: LifeBuoy,
@@ -56,6 +58,7 @@ const secondaryLinks = [
 					</a>
 				))
 			}
+			<PrivacySettingsIsland client:only="react" />
 		</div>
 		<div class="flex items-center gap-4">
 			<a href="https://twitter.com/supabase" class="text-foreground-muted hover:text-foreground transition">

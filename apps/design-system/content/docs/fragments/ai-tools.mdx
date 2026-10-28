@@ -36,6 +36,12 @@ Without `agentSetupHref` and `preferredSourceHref`, AI Tools renders Copy as Mar
 
 <ComponentPreview name="ai-tools-minimal" peekCode wide />
 
+### Horizontal layout
+
+Set `orientation="horizontal"` to show the actions in a row, such as under a page heading. To hide the "AI tools" heading visually, pass `titleClassName="sr-only"`. Screen readers still announce it as the section's label.
+
+<ComponentPreview name="ai-tools-horizontal" peekCode wide />
+
 ## Analytics
 
 AI Tools doesn't send telemetry. Each surface passes callbacks and sends its own events from them. For example, the docs wrapper in `apps/docs/components/AiTools.tsx` sends `copy_as_markdown_clicked` from `onMarkdownCopy` and `ask_ai_clicked` from `onAskAiClick`.
@@ -44,16 +50,17 @@ AI Tools doesn't send telemetry. Each surface passes callbacks and sends its own
 
 ## Props
 
-| Prop                     | Type                                     | Default     | Description                                                                       |
-| ------------------------ | ---------------------------------------- | ----------- | --------------------------------------------------------------------------------- |
-| `pageUrl`                | `string`                                 | —           | Canonical URL of the page. Used in the Ask ChatGPT and Ask Claude prompts.        |
-| `markdownUrl`            | `string`                                 | —           | URL of the page's Markdown version. Copy as Markdown fetches it.                  |
-| `markdownFallback`       | `() => string`                           | `undefined` | Returns the text to copy when `markdownUrl` doesn't return an OK response.        |
-| `agentSetupHref`         | `string`                                 | `undefined` | Shows the Connect your AI agent link when set.                                    |
-| `preferredSourceHref`    | `string`                                 | `undefined` | Shows the Prefer on Google link when set.                                         |
-| `onAgentSetupClick`      | `() => void`                             | —           | Fires when the Connect your AI agent link is clicked.                             |
-| `onPreferredSourceClick` | `() => void`                             | —           | Fires when the Prefer on Google link is clicked.                                  |
-| `onMarkdownCopy`         | `() => void`                             | —           | Fires after the page is copied to the clipboard.                                  |
-| `onAskAiClick`           | `(agent: 'chatgpt' \| 'claude') => void` | —           | Fires when an Ask link is clicked, with the assistant it opens.                   |
-| `titleClassName`         | `string`                                 | —           | Extra classes on the "AI tools" heading. Use it to match the surrounding sidebar. |
-| `className`              | `string`                                 | —           | Extra classes on the root `section`.                                              |
+| Prop                     | Type                                     | Default      | Description                                                                       |
+| ------------------------ | ---------------------------------------- | ------------ | --------------------------------------------------------------------------------- |
+| `pageUrl`                | `string`                                 | —            | Canonical URL of the page. Used in the Ask ChatGPT and Ask Claude prompts.        |
+| `markdownUrl`            | `string`                                 | —            | URL of the page's Markdown version. Copy as Markdown fetches it.                  |
+| `markdownFallback`       | `() => string`                           | `undefined`  | Returns the text to copy when `markdownUrl` doesn't return an OK response.        |
+| `agentSetupHref`         | `string`                                 | `undefined`  | Shows the Connect your AI agent link when set.                                    |
+| `preferredSourceHref`    | `string`                                 | `undefined`  | Shows the Prefer on Google link when set.                                         |
+| `onAgentSetupClick`      | `() => void`                             | —            | Fires when the Connect your AI agent link is clicked.                             |
+| `onPreferredSourceClick` | `() => void`                             | —            | Fires when the Prefer on Google link is clicked.                                  |
+| `onMarkdownCopy`         | `() => void`                             | —            | Fires after the page is copied to the clipboard.                                  |
+| `onAskAiClick`           | `(agent: 'chatgpt' \| 'claude') => void` | —            | Fires when an Ask link is clicked, with the assistant it opens.                   |
+| `orientation`            | `'vertical' \| 'horizontal'`             | `'vertical'` | Stacks the actions in a column or shows them in a row.                            |
+| `titleClassName`         | `string`                                 | —            | Extra classes on the "AI tools" heading. Use it to match the surrounding sidebar. |
+| `className`              | `string`                                 | —            | Extra classes on the root `section`.                                              |
