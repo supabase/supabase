@@ -6,7 +6,7 @@ import {
   Outlet,
   RouterProvider,
 } from '@tanstack/react-router'
-import { act, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import Link from './link'
@@ -51,9 +51,14 @@ const origin = window.location.origin
 describe('next/link + next/router shims with a configured basePath', () => {
   it('renders a same-origin URL outside the basePath as a plain anchor to the full URL', async () => {
     const href = `${origin}/docs/guides/platform/manage-your-usage/compute`
-    const { view } = await renderWithRouter(() => <Link href={href}>Compute Costs</Link>)
+    const { router, view } = await renderWithRouter(() => <Link href={href}>Compute Costs</Link>)
     try {
-      expect(screen.getByText('Compute Costs').closest('a')).toHaveAttribute('href', href)
+      const link = screen.getByRole('link', { name: 'Compute Costs' })
+      expect(link).toHaveAttribute('href', href)
+      const navigate = vi.spyOn(router, 'navigate')
+      fireEvent.click(link)
+      expect(navigate).not.toHaveBeenCalled()
+      expect(router.state.location.href).toBe('/project/default')
     } finally {
       view.unmount()
     }
