@@ -3259,6 +3259,10 @@ export const integrations: NavMenuConstant = {
       url: '/guides/integrations/vercel-marketplace',
     },
     {
+      name: 'Preview branches on Vercel',
+      url: '/guides/integrations/vercel-preview-branches',
+    },
+    {
       name: 'Stripe Projects',
       url: '/guides/integrations/stripe-projects',
     },

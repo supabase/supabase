@@ -1,25 +1,38 @@
 ---
 id: 'vercel-preview-branches'
 title: 'Preview branches on Vercel'
-description: 'Match each Vercel preview deployment to its Supabase preview branch.'
+description: 'Keep Vercel preview deployments off your production database.'
 ---
 
-Match each Vercel preview deployment to its Supabase preview branch, so every preview runs against the right database schema, Edge Functions, and other Supabase configuration. For how branching works with other hosting providers, see [Branching integrations](/docs/guides/deployment/branching/integrations).
+Match each Vercel preview deployment to its Supabase preview branch, so every preview runs against the right database schema, Edge Functions, and other Supabase configuration.
 
-## Before you begin
+Use this guide when you already get a Supabase preview branch for each pull request, and your frontend deploys a Vercel preview for each pull request too. Without this integration, those previews use the Supabase URL and keys set on your Vercel project, which usually point at your production project. A preview built to test a schema change then reads and writes production data.
 
-- Set up [branching with GitHub](/docs/guides/deployment/branching/github-integration) on your Supabase project.
-- Install the [Vercel GitHub integration](https://vercel.com/docs/deployments/git/vercel-for-github) on your Vercel project.
+If you don't have preview branches yet, start with [Branching](/docs/guides/deployment/branching). To manage Supabase projects from your Vercel account instead, see [Vercel Marketplace](/docs/guides/integrations/vercel-marketplace).
+
+## Prerequisites
+
+Before you connect Vercel, you need the following:
+
+- [Branching](/docs/guides/deployment/branching) set up on your Supabase project.
+- Your Vercel project connected to its GitHub repository through the [Vercel GitHub integration](https://vercel.com/docs/deployments/git/vercel-for-github).
 
 ## Connect Vercel
 
-1. Install the Supabase integration for Vercel in one of these ways:
-   - From the [Vercel marketplace](https://vercel.com/integrations/supabase).
-   - By clicking the blue **Deploy** button in a Supabase example app's `README` file.
-2. In the [**Integrations**](/dashboard/org/_/integrations) section of your organization settings, connect your Supabase project to your Vercel project.
+To connect Vercel to your Supabase project:
 
-## How preview deployments get their variables
+1. On your organization's [**Integrations**](/dashboard/org/_/integrations) page in the Supabase Dashboard, click **Install Vercel integration** and finish the installation in Vercel. You can also click **Deploy** in a Supabase example app's `README` file.
+2. Click **Add new project connection**, then select your Supabase project and your Vercel project.
 
-Supabase updates your Vercel project with the environment variables for each preview branch. It syncs them when a pull request opens, not when the branch is created.
+## After you connect
 
-The integration depends on Vercel preview deployments, so Vercel can start a deployment before Supabase sets the variables. To cover that, Supabase redeploys the most recent deployment of the pull request.
+Supabase updates your Vercel project with the environment variables for each preview branch. It syncs them when a pull request opens, not when the branch is created. The variables are:
+
+- **Postgres connection:** `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING`, `POSTGRES_USER`, `POSTGRES_HOST`, `POSTGRES_PASSWORD`, and `POSTGRES_DATABASE`.
+- **Supabase API:** `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, and `SUPABASE_JWT_SECRET`.
+- **Public copies:** `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. To change the `NEXT_PUBLIC_` prefix, edit the project connection on the **Integrations** page.
+- **Legacy API keys**, while they're enabled on your project: `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+The integration depends on Vercel preview deployments, so Vercel can start a deployment before Supabase sets the variables. Supabase always redeploys the most recent deployment of the pull request to cover this.
+
+To let users sign in on preview deployments, add a wildcard pattern for your Vercel preview URLs to the redirect allowlist. For the pattern, see [Vercel preview URLs](/docs/guides/auth/redirect-urls#vercel-preview-urls).
