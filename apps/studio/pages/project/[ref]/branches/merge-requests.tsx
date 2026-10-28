@@ -33,7 +33,6 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { branchesQueryOptions, type Branch } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -50,10 +49,6 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
-
-  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ
-  )
 
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
 
@@ -88,8 +83,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
 
-  const isErrorBranchesGrant = branchesGrant.status === 'error'
-  const isError = isErrorConnections || isErrorBranches || isErrorBranchesGrant
+  const isError = isErrorConnections || isErrorBranches
 
   const isGithubConnected = githubConnection !== undefined
 
@@ -166,9 +160,16 @@ const MergeRequestsPage: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-4">
-            {isPermissionsLoaded && !canReadBranches ? (
+            {branchesGrant.status === 'denied' && (
               <NoPermission resourceText="view this project's branches" />
-            ) : (
+            )}
+            {branchesGrant.status === 'error' && (
+              <AlertError
+                error={branchesGrant.error}
+                subject="Failed to check your permissions to view branches"
+              />
+            )}
+            {(branchesGrant.status === 'loading' || branchesGrant.status === 'granted') && (
               <>
                 {isErrorConnections && (
                   <AlertError
@@ -179,10 +180,6 @@ const MergeRequestsPage: NextPageWithLayout = () => {
 
                 {isErrorBranches && (
                   <AlertError error={branchesError} subject="Failed to retrieve preview branches" />
-                )}
-
-                {branchesGrant.status === 'error' && (
-                  <AlertError error={branchesGrant.error} subject="Failed to check permissions" />
                 )}
 
                 {!isError && (
