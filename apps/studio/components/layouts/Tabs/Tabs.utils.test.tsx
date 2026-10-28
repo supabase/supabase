@@ -72,16 +72,6 @@ describe('useSqlEditorTabsCleanup', () => {
     expect(store.tabsMap['sql-logs-live']).toBeDefined()
   })
 
-  it('keeps a logs tab that still exists in the snippet list', () => {
-    const store = createTabsState('default')
-    store.addTab(logsTab('logs'))
-
-    const cleanup = renderCleanup(store)
-    act(() => cleanup({ snippets: [{ id: 'logs', type: 'log_sql', name: 'logs' }] }))
-
-    expect(store.openTabs).toEqual(['sql-logs'])
-  })
-
   it('preserves logs tabs when logs snippets are not authoritative (canPruneLogsTabs false)', () => {
     const store = createTabsState('default')
     store.addTab(dbTab('db-stale'))

@@ -1,0 +1,12 @@
+---
+title: Can I connect to Supabase Postgres from serverless and edge functions?
+topics: ['Database']
+---
+
+Yes, though the connection methods vary:
+
+- For Vercel Edge functions, follow the guidelines in the [Supabase docs](/docs/guides/database/connecting-to-postgres/serverless-drivers#vercel-edge-functions)
+- For Cloudflare Workers, follow the [Cloudflare's guidelines](https://developers.cloudflare.com/workers/databases/third-party-integrations/supabase/) to set up Supabase.
+- For other serverless providers, connect through the [shared pooler](/docs/guides/database/connecting-to-postgres#pooler-transaction-mode) rather than directly. Serverless platforms open many short-lived connections to your Postgres instance, which can overload the available connections.
+
+For more detailed guidance, see [Serverless drivers](/docs/guides/database/connecting-to-postgres/serverless-drivers).

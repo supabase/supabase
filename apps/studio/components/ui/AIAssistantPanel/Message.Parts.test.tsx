@@ -1,28 +1,15 @@
-import { screen, waitFor } from '@testing-library/react'
+import { act, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ToolUIPart } from 'ai'
 import { type PropsWithChildren } from 'react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { MessageProvider } from './Message.Context'
 import { MessagePartSwitcher, MessagePartToolGroup } from './Message.Parts'
+import type { CompactPart } from './Message.Parts.utils'
 import { customRender } from '@/tests/lib/custom-render'
 
 type MessagePart = Parameters<typeof MessagePartSwitcher>[0]['part']
-
-const reasoningPart = {
-  type: 'reasoning',
-  state: 'done',
-  text: 'I will look up the project details.',
-} satisfies Extract<MessagePart, { type: 'reasoning' }>
-
-const toolPart = {
-  type: 'tool-load_knowledge',
-  toolCallId: 'load-knowledge-1',
-  state: 'output-available',
-  input: {},
-  output: {},
-} satisfies ToolUIPart
 
 function Provider({
   children,
@@ -46,6 +33,19 @@ function Provider({
 
 describe('MessagePartSwitcher', () => {
   it('keeps consecutive generic tool parts as direct siblings', () => {
+    const reasoningPart = {
+      type: 'reasoning',
+      state: 'done',
+      text: 'I will look up the project details.',
+    } satisfies Extract<MessagePart, { type: 'reasoning' }>
+    const toolPart = {
+      type: 'tool-load_knowledge',
+      toolCallId: 'load-knowledge-1',
+      state: 'output-available',
+      input: {},
+      output: {},
+    } satisfies ToolUIPart
+
     const { container } = customRender(
       <Provider>
         <MessagePartSwitcher part={reasoningPart} />
@@ -122,120 +122,84 @@ describe('MessagePartSwitcher', () => {
 })
 
 describe('MessagePartToolGroup', () => {
-  it('folds its tool rows behind a summary until expanded', async () => {
-    const user = userEvent.setup()
-    const { container } = customRender(
-      <Provider>
-        <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={false} />
-      </Provider>
-    )
+  const reasoning = (text = 'Looking at the schema'): CompactPart => ({
+    type: 'reasoning',
+    state: 'done',
+    text,
+  })
+  const streamingReasoning: CompactPart = { type: 'reasoning', state: 'streaming', text: '' }
+  const tool: CompactPart = {
+    type: 'tool-load_knowledge',
+    toolCallId: 'knowledge-1',
+    state: 'output-available',
+    input: {},
+    output: {},
+  }
+  const runningTool: CompactPart = {
+    type: 'tool-load_knowledge',
+    toolCallId: 'knowledge-1',
+    state: 'input-available',
+    input: {},
+  }
 
-    const trigger = screen.getByRole('button', { name: 'Worked across 2 tools' })
-    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  afterEach(() => vi.useRealTimers())
+
+  // A group only runs while its message streams
+  const toolGroup = (parts: CompactPart[], isRunning: boolean) => (
+    <Provider isLoading={isRunning}>
+      <MessagePartToolGroup parts={parts} isRunning={isRunning} />
+    </Provider>
+  )
+
+  it('folds its rows behind a summary until expanded', async () => {
+    const { container } = customRender(toolGroup([reasoning(), tool], false))
     expect(container.querySelectorAll('.tool-item')).toHaveLength(0)
 
-    await user.click(trigger)
+    await userEvent.click(screen.getByRole('button', { name: 'Read up' }))
 
-    expect(trigger).toHaveAttribute('aria-expanded', 'true')
-    const toolRows = container.querySelectorAll('.tool-item')
-    expect(toolRows).toHaveLength(2)
-    expect(toolRows[0].nextElementSibling).toBe(toolRows[1])
+    expect(container.querySelectorAll('.tool-item')).toHaveLength(2)
     expect(screen.getByText('Reasoned')).toBeInTheDocument()
   })
 
-  it('shows the latest tool call while running collapsed', async () => {
-    const { rerender } = customRender(
-      <Provider isLoading>
-        <MessagePartToolGroup parts={[reasoningPart]} isRunning={true} />
-      </Provider>
-    )
-    const trigger = screen.getByRole('button', { name: 'Reasoned' })
-
-    rerender(
-      <Provider isLoading>
-        <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={true} />
-      </Provider>
-    )
-
-    await waitFor(() => expect(trigger).toHaveAccessibleName('Ran load_knowledge'))
+  it('hides finished reasoning rows with nothing to expand', async () => {
+    const { container } = customRender(toolGroup([reasoning(''), tool], false))
+    await userEvent.click(screen.getByRole('button', { name: 'Read up' }))
+    expect(container.querySelectorAll('.tool-item')).toHaveLength(1)
   })
 
-  it('can be expanded to show every tool call while running', async () => {
-    const user = userEvent.setup()
-    const { container } = customRender(
-      <Provider isLoading>
-        <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={true} />
-      </Provider>
-    )
+  it('holds each running header long enough to read', () => {
+    vi.useFakeTimers()
+    const { rerender } = customRender(toolGroup([streamingReasoning], true))
+    const trigger = screen.getByRole('button', { name: 'Thinking...' })
 
-    const trigger = screen.getByRole('button', { name: 'Ran load_knowledge' })
-    await user.click(trigger)
+    rerender(toolGroup([reasoning(), runningTool], true))
+    expect(trigger).toHaveAccessibleName('Thinking...')
+    act(() => vi.advanceTimersByTime(1000))
+    expect(trigger).toHaveAccessibleName('Reading up...')
 
-    await waitFor(() => expect(trigger).toHaveAccessibleName('Working...'))
-    const toolRows = container.querySelectorAll('.tool-item')
-    expect(toolRows).toHaveLength(2)
-    // Only the latest call is in progress
-    expect(toolRows[0].querySelector('.shimmer')).toBeNull()
-    expect(toolRows[1].querySelector('.shimmer')).toBeInTheDocument()
+    // The call finished right away, but its label stays up before going back to thinking
+    rerender(toolGroup([reasoning(), tool], true))
+    expect(trigger).toHaveAccessibleName('Reading up...')
+    act(() => vi.advanceTimersByTime(1000))
+    expect(trigger).toHaveAccessibleName('Thinking...')
+
+    // The summary replaces the header as soon as the group stops
+    rerender(toolGroup([reasoning(), tool], false))
+    expect(trigger).toHaveAccessibleName('Read up')
+    expect(trigger.querySelector('.shimmer')).toBeNull()
   })
 
-  it('moves the shimmer to each new tool call as it arrives', async () => {
-    const user = userEvent.setup()
+  it('shimmers every row still in progress', async () => {
     const { container, rerender } = customRender(
-      <Provider isLoading>
-        <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={true} />
-      </Provider>
+      toolGroup([reasoning(), runningTool, tool, runningTool], true)
     )
-    await user.click(screen.getByRole('button', { name: 'Ran load_knowledge' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Reading up...' }))
 
-    const nextReasoningPart = { ...reasoningPart, state: 'streaming' as const }
-    rerender(
-      <Provider isLoading>
-        <MessagePartToolGroup
-          parts={[reasoningPart, toolPart, nextReasoningPart]}
-          isRunning={true}
-        />
-      </Provider>
-    )
+    const shimmeringRows = () =>
+      [...container.querySelectorAll('.tool-item')].map((row) => !!row.querySelector('.shimmer'))
+    expect(shimmeringRows()).toEqual([false, true, false, true])
 
-    const toolRows = container.querySelectorAll('.tool-item')
-    expect(toolRows).toHaveLength(3)
-    expect(toolRows[1].querySelector('.shimmer')).toBeNull()
-    expect(toolRows[2].querySelector('.shimmer')).toBeInTheDocument()
-  })
-
-  it('shimmers the summary only while running', async () => {
-    const { rerender } = customRender(
-      <Provider isLoading>
-        <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={true} />
-      </Provider>
-    )
-    const trigger = screen.getByRole('button', { name: 'Ran load_knowledge' })
-    expect(trigger.querySelector('.shimmer')).toBeInTheDocument()
-
-    rerender(
-      <Provider>
-        <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={false} />
-      </Provider>
-    )
-
-    await waitFor(() => expect(trigger.querySelector('.shimmer')).toBeNull())
-  })
-
-  it('summarizes the tool count once it stops running', async () => {
-    const { rerender } = customRender(
-      <Provider isLoading>
-        <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={true} />
-      </Provider>
-    )
-    const trigger = screen.getByRole('button', { name: 'Ran load_knowledge' })
-
-    rerender(
-      <Provider>
-        <MessagePartToolGroup parts={[reasoningPart, toolPart]} isRunning={false} />
-      </Provider>
-    )
-
-    await waitFor(() => expect(trigger).toHaveAccessibleName('Worked across 2 tools'))
+    rerender(toolGroup([reasoning(), tool, tool, tool, streamingReasoning], true))
+    expect(shimmeringRows()).toEqual([false, false, false, false, true])
   })
 })

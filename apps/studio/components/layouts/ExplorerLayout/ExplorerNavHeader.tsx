@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import {
@@ -57,7 +57,7 @@ const ExplorerResourceAction = ({ type }: { type: ExplorerResourceType }) => {
       variant="outline"
       aria-label={`New ${type}`}
       className="size-7 shrink-0 px-0"
-      icon={<Plus />}
+      icon={<PlusIcon />}
       tooltip={{ content: { side: 'bottom', text: `New ${type}` } }}
       onClick={() => {
         if (type === 'notebook') createNotebook()

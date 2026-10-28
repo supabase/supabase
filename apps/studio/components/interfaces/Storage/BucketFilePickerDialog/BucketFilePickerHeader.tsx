@@ -1,16 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import {
-  ArrowLeft,
-  Check,
-  ChevronRight,
-  Columns,
-  List,
-  RefreshCw,
-  Search,
-  Upload,
-  X,
+  ArrowLeftIcon,
+  CheckIcon,
+  ChevronRightIcon,
+  ColumnsIcon,
+  ListIcon,
+  RefreshCwIcon,
+  SearchIcon,
+  UploadIcon,
+  XIcon,
 } from 'lucide-react'
 import { useRef, useState, type ChangeEvent } from 'react'
 import {
@@ -33,18 +32,18 @@ import { useBucketFilePickerStateSnapshot } from './BucketFilePickerState'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { storageKeys } from '@/data/storage/keys'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
   { key: STORAGE_VIEWS.LIST, name: 'As list' },
 ]
 
+// list-v2 only supports sorting by name, created_at, or updated_at
 const SORT_BY_OPTIONS = [
   { key: STORAGE_SORT_BY.NAME, name: 'Name' },
   { key: STORAGE_SORT_BY.CREATED_AT, name: 'Time created' },
   { key: STORAGE_SORT_BY.UPDATED_AT, name: 'Time modified' },
-  { key: STORAGE_SORT_BY.LAST_ACCESSED_AT, name: 'Time last accessed' },
 ]
 
 const SORT_ORDER_OPTIONS = [
@@ -88,7 +87,7 @@ const HeaderBreadcrumbs = ({
         return (
           <div className="flex shrink-0 items-center" key={`${crumb.index}-${crumb.name}`}>
             {idx !== 0 && (
-              <ChevronRight size={14} strokeWidth={2} className="text-foreground-muted mx-1" />
+              <ChevronRightIcon size={14} strokeWidth={2} className="text-foreground-muted mx-1" />
             )}
             {isEllipsis ? (
               <span className="max-w-24 truncate text-sm text-foreground-light">{crumb.name}</span>
@@ -137,7 +136,9 @@ export const BucketFilePickerHeader = () => {
     setSelectedFilePreview,
   } = useBucketFilePickerStateSnapshot()
 
-  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_WRITE
+  )
 
   const breadcrumbs = columns
   const backDisabled = columns.length < 1
@@ -217,7 +218,7 @@ export const BucketFilePickerHeader = () => {
             {breadcrumbs.length > 0 && (
               <>
                 <Button
-                  icon={<ArrowLeft size={16} strokeWidth={2} />}
+                  icon={<ArrowLeftIcon size={16} strokeWidth={2} />}
                   size="tiny"
                   variant="text"
                   className="shrink-0 px-1"
@@ -239,7 +240,7 @@ export const BucketFilePickerHeader = () => {
             <div className="flex shrink-0 items-center space-x-1 px-2">
               <Button
                 size="tiny"
-                icon={<RefreshCw />}
+                icon={<RefreshCwIcon />}
                 variant="text"
                 loading={isRefreshing}
                 onClick={refreshData}
@@ -253,9 +254,9 @@ export const BucketFilePickerHeader = () => {
                     variant="text"
                     icon={
                       view === 'LIST' ? (
-                        <List size={16} strokeWidth={2} />
+                        <ListIcon size={16} strokeWidth={2} />
                       ) : (
-                        <Columns size={16} strokeWidth={2} />
+                        <ColumnsIcon size={16} strokeWidth={2} />
                       )
                     }
                   >
@@ -268,7 +269,7 @@ export const BucketFilePickerHeader = () => {
                       <div className="flex items-center justify-between w-full">
                         <p>{option.name}</p>
                         {view === option.key && (
-                          <Check size={16} className="text-primary" strokeWidth={2} />
+                          <CheckIcon size={16} className="text-primary" strokeWidth={2} />
                         )}
                       </div>
                     </DropdownMenuItem>
@@ -282,7 +283,7 @@ export const BucketFilePickerHeader = () => {
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortBy === option.key && (
-                              <Check size={16} className="text-primary" strokeWidth={2} />
+                              <CheckIcon size={16} className="text-primary" strokeWidth={2} />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -300,7 +301,7 @@ export const BucketFilePickerHeader = () => {
                           <div className="flex items-center justify-between w-full">
                             <p>{option.name}</p>
                             {sortByOrder === option.key && (
-                              <Check size={16} className="text-primary" strokeWidth={2} />
+                              <CheckIcon size={16} className="text-primary" strokeWidth={2} />
                             )}
                           </div>
                         </DropdownMenuItem>
@@ -317,7 +318,7 @@ export const BucketFilePickerHeader = () => {
                 <input ref={uploadButtonRef} type="file" multiple onChange={handleFilesUpload} />
               </div>
               <ButtonTooltip
-                icon={<Upload size={16} strokeWidth={2} />}
+                icon={<UploadIcon size={16} strokeWidth={2} />}
                 variant="text"
                 disabled={!canUpdateStorage}
                 loading={isUploading}
@@ -342,13 +343,13 @@ export const BucketFilePickerHeader = () => {
                   size="tiny"
                   autoFocus
                   className="w-52"
-                  icon={<Search />}
+                  icon={<SearchIcon />}
                   actions={[
                     <Button
                       key="cancel"
                       size="tiny"
                       variant="text"
-                      icon={<X />}
+                      icon={<XIcon />}
                       onClick={onCancelSearch}
                       className="p-0 h-5 w-5"
                     />,
@@ -360,7 +361,7 @@ export const BucketFilePickerHeader = () => {
                 />
               ) : (
                 <Button
-                  icon={<Search />}
+                  icon={<SearchIcon />}
                   size="tiny"
                   variant="text"
                   className="px-1"

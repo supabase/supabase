@@ -1,7 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
+import { motion } from 'motion/react'
 import React, { forwardRef } from 'react'
 import { cn } from 'ui'
 
@@ -22,11 +22,13 @@ export type FilterBarProps = {
   isLoading?: boolean
   className?: string
   supportsOperators?: boolean
+  /** Logical operator for groups created via "New Group". Defaults to 'AND'. */
+  defaultGroupOperator?: FilterGroupType['logicalOperator']
   variant?: FilterBarVariant
   icon?: React.ReactNode
   /**
    * Name of the property to use when the user commits free text from the root input. Must match
-   * a `name` in `filterProperties`. When set, the dropdown shows a "Search <propertyLabel>: \"...\""
+   * a `name` in `filterProperties`. When set, the dropdown shows a "SearchIcon <propertyLabel>: \"...\""
    * item as the first option while the user is typing. Selecting it (Enter) creates a filter
    * `{ propertyName, operator: '=', value: typedText }`. If the property has no `=` operator,
    * the first operator in its list is used instead.
@@ -59,24 +61,24 @@ function FilterBarContent({ className }: { className?: string }) {
     <div className="w-full space-y-2 relative">
       <div
         className={cn(
-          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 pr-2 overflow-auto',
+          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 overflow-auto',
           className
         )}
       >
         <div
           className={cn(
-            'relative flex items-center justify-center shrink-0 px-2 bg-surface-200 cursor-pointer',
+            'relative flex items-start justify-center shrink-0 px-2 bg-surface-200 cursor-pointer',
             variant === 'pill' ? 'bg-transparent border-r-0' : 'border-r'
           )}
           onClick={() => handleGroupFreeformFocus([])}
         >
           <div
             className={cn(
-              'transition-opacity duration-300 ease-in-out',
+              'transition-opacity duration-300 ease-in-out relative top-[4px]',
               loadingIcon ? 'opacity-0' : 'opacity-100'
             )}
           >
-            <Search className="text-foreground-muted w-4 h-4 sticky" />
+            <SearchIcon size={16} className="text-foreground-muted" />
           </div>
           {loadingIcon && (
             <div className="absolute inset-0 flex items-center justify-center">{loadingIcon}</div>
@@ -141,6 +143,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
     isLoading,
     className,
     supportsOperators = false,
+    defaultGroupOperator,
     variant = 'default',
     icon,
     freeformDefaultProperty,
@@ -159,6 +162,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
       actions={actions}
       isLoading={isLoading}
       supportsOperators={supportsOperators}
+      defaultGroupOperator={defaultGroupOperator}
       variant={variant}
       icon={icon}
       freeformDefaultProperty={freeformDefaultProperty}

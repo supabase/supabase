@@ -1,0 +1,93 @@
+---
+title: Code Block
+description: Shows highlighted code with line numbers, a copy button, and a wrap button.
+fragment: true
+---
+
+Code Block is the frame for code samples in the documentation and in knowledge base articles. The frame and the highlighted code render as static HTML. Users can see the code before JavaScript loads. The copy button and the wrap button are optional. They operate in the browser.
+
+<ComponentPreview name="code-block-demo" peekCode wide />
+
+## Without line numbers
+
+For short code samples, such as a single command, set `lineNumbers={false}`.
+
+Add `controls` only for code that users copy.
+
+<ComponentPreview name="code-block-plain" peekCode />
+
+## Annotations
+
+A token can have annotations that show when you hold the pointer over it. For example, Twoslash supplies type information. Put the annotations in the third item of the token: `[content, className, annotations]`.
+
+## Setup
+
+### Highlight the code
+
+```tsx
+import { highlightCode } from 'ui-patterns/CodeBlock/CodeBlock.highlight'
+import { getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
+import { CodeBlockControls } from 'ui-patterns/CodeBlock/CodeBlockControls'
+import { CodeBlockFrame, CodeBlockTokens } from 'ui-patterns/CodeBlock/CodeBlockFrame'
+```
+
+```tsx
+const { tokens } = await highlightCode(code, 'ts')
+
+<CodeBlockFrame
+  lang="ts"
+  lineCount={tokens.length}
+  controls={<CodeBlockControls content={code} />}
+>
+  <CodeBlockTokens
+    lineNumbers
+    lines={tokens.map((line) =>
+      line.map(({ content, color, fontStyle }) => [content, getTokenClassName(color, fontStyle)])
+    )}
+  />
+</CodeBlockFrame>
+```
+
+Use `highlightCode` in a server component or during the build. It loads Shiki one time and uses it again for all other blocks. Do not import `highlightCode` into a client component.
+
+`getTokenClassName` changes each Shiki color into a short class name, for example `s-k` for keywords. The token colors are CSS variables. When the theme changes between light and dark, the colors also change.
+
+### Add the styles
+
+Import the Code Block stylesheet one time. Put the import after the Tailwind config:
+
+```css
+@import 'config/tailwind.config.css';
+@import 'ui-patterns/CodeBlock/code-block.css';
+```
+
+This stylesheet contains these styles:
+
+- The line number gutter
+- The token colors for the light theme and the dark theme
+- The word wrap mode
+- The space around code blocks in `prose` content
+
+### Give the copy text
+
+`CodeBlockControls` copies the `content` string. Give the source code that users can run. Do not give the rendered text, because it contains the line numbers and the annotations.
+
+The button shows a check mark only after the clipboard write is successful. Then, screen readers announce "Code copied".
+
+## Guidelines
+
+### When to use
+
+Use Code Block for code that users copy or read line by line, for example a setup step or a function.
+
+Use inline `code` for a single name or value in a sentence.
+
+For Studio and other app screens, use the `CodeBlock` component from `ui-patterns/CodeBlock`.
+
+### Always set the language
+
+Always set `lang` to the language of the code. `highlightCode` uses the language to color the tokens. The frame uses it to name the block for screen readers, for example "JavaScript, 3 lines".
+
+### Keep the code runnable
+
+Give code that users can run without changes. Do not use pseudo-code, and do not put a `$` prompt before shell commands.

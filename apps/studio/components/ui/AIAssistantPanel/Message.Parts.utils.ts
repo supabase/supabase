@@ -1,7 +1,19 @@
-import { getToolName, isToolUIPart, type UIMessage } from 'ai'
+import {
+  getToolName,
+  isToolUIPart,
+  type DynamicToolUIPart,
+  type ReasoningUIPart,
+  type ToolUIPart,
+  type UIMessage,
+} from 'ai'
 import isEqual from 'lodash/isEqual'
 
+import { KNOWLEDGE_TOPIC_LABELS, type KnowledgeName } from '@/lib/ai/tools/knowledge-topics'
+
 type MessagePart = UIMessage['parts'][number]
+type ToolPart = ToolUIPart | DynamicToolUIPart
+/** A one-line row that folds into a tool group: reasoning, or a lookup tool call. */
+export type CompactPart = ReasoningUIPart | ToolPart
 
 export function areMessagePartsEqual(previous: MessagePart, next: MessagePart): boolean {
   if (previous === next) return true
@@ -26,106 +38,178 @@ export function areMessagePartsEqual(previous: MessagePart, next: MessagePart): 
   return isEqual(previous, next)
 }
 
-/**
- * - `compact`: a one-line tool row (reasoning, lookups) that gets folded into a tool group
- * - `block`: content that renders on its own (text, SQL results, notebooks, Edge Functions)
- * - `hidden`: renders nothing, so it neither breaks up nor joins a tool group
- */
-type MessagePartKind = 'compact' | 'block' | 'hidden'
-
-const COMPACT_TOOL_PART_TYPES = new Set<string>([
-  'tool-list_policies',
-  'tool-search_docs',
-  'tool-get_active_incidents',
-  'tool-load_knowledge',
-])
-
-const BLOCK_TOOL_PART_TYPES = new Set<string>([
-  'tool-execute_sql',
-  'tool-query_logs',
-  'tool-deploy_edge_function',
-  'tool-create_notebook',
-  'tool-update_notebook',
-  'tool-delete_notebook',
-  'tool-run_notebook',
-  'tool-render_page',
-])
-
-export function getMessagePartKind(part: MessagePart): MessagePartKind {
-  if (part.type === 'reasoning') return 'compact'
-  if (part.type === 'dynamic-tool') return part.toolName === 'query_logs' ? 'block' : 'compact'
-  if (part.type === 'text') return part.text.trim().length > 0 ? 'block' : 'hidden'
-  if (COMPACT_TOOL_PART_TYPES.has(part.type)) return 'compact'
-  if (BLOCK_TOOL_PART_TYPES.has(part.type)) return 'block'
-  return 'hidden'
+type ToolLabels = {
+  running: string
+  done: string
+  /** What the call looks at, from its input, e.g. "in public" */
+  detail?: (input: unknown) => string | undefined
 }
+
+const getField = (input: unknown, key: string): unknown =>
+  typeof input === 'object' && input !== null ? Reflect.get(input, key) : undefined
+
+function inSchemas(input: unknown) {
+  const schemas = getField(input, 'schemas')
+  return Array.isArray(schemas) && schemas.length > 0 ? `in ${schemas.join(', ')}` : undefined
+}
+
+function forDocsQuery(input: unknown) {
+  // e.g. { searchDocs(query: "row level security", limit: 5) { ... } }
+  const query = String(getField(input, 'graphql_query')).match(
+    /searchDocs\s*\(\s*query\s*:\s*"((?:[^"\\]|\\.)+)"/
+  )?.[1]
+  return query ? `for "${query}"` : undefined
+}
+
+function onKnowledgeTopic(input: unknown) {
+  const name = String(getField(input, 'name'))
+  return Object.hasOwn(KNOWLEDGE_TOPIC_LABELS, name)
+    ? `on ${KNOWLEDGE_TOPIC_LABELS[name as KnowledgeName]}`
+    : undefined
+}
+
+function forAdvisorType(input: unknown) {
+  const type = getField(input, 'type')
+  return type === 'security' || type === 'performance' ? `for ${type} issues` : undefined
+}
+
+const TOOL_LABELS: Record<string, ToolLabels> = {
+  search_docs: { running: 'Searching docs', done: 'Searched docs', detail: forDocsQuery },
+  load_knowledge: { running: 'Reading up', done: 'Read up', detail: onKnowledgeTopic },
+  get_active_incidents: { running: 'Checking Supabase status', done: 'Checked Supabase status' },
+  list_policies: { running: 'Checking policies', done: 'Checked policies', detail: inSchemas },
+  list_tables: { running: 'Listing tables', done: 'Listed tables', detail: inSchemas },
+  list_extensions: { running: 'Listing extensions', done: 'Listed extensions' },
+  list_edge_functions: { running: 'Listing Edge Functions', done: 'Listed Edge Functions' },
+  list_branches: { running: 'Listing branches', done: 'Listed branches' },
+  get_advisors: { running: 'Checking advisors', done: 'Checked advisors', detail: forAdvisorType },
+  list_reports: { running: 'Listing reports', done: 'Listed reports' },
+  get_report: { running: 'Reading report', done: 'Read report' },
+  list_databases: { running: 'Listing databases', done: 'Listed databases' },
+  list_notebooks: { running: 'Listing notebooks', done: 'Listed notebooks' },
+  get_notebook: { running: 'Reading notebook', done: 'Read notebook' },
+  // Self-hosted fallbacks
+  getSchemaTables: { running: 'Listing tables', done: 'Listed tables', detail: inSchemas },
+  getRlsKnowledge: { running: 'Checking policies', done: 'Checked policies', detail: inSchemas },
+  getFunctions: {
+    running: 'Listing database functions',
+    done: 'Listed database functions',
+    detail: inSchemas,
+  },
+  getEdgeFunctionKnowledge: {
+    running: 'Reading up',
+    done: 'Read up',
+    detail: () => 'on Edge Functions',
+  },
+}
+
+function getToolLabels(toolName: string): ToolLabels {
+  if (Object.hasOwn(TOOL_LABELS, toolName)) return TOOL_LABELS[toolName]
+  const name = toolName.replaceAll('_', ' ')
+  return { running: `Running ${name}`, done: `Ran ${name}` }
+}
+
+const BLOCK_TOOLS = new Set([
+  'execute_sql',
+  'query_logs',
+  'deploy_edge_function',
+  'create_notebook',
+  'update_notebook',
+  'delete_notebook',
+  'run_notebook',
+  'update_opt_in_level',
+  'render_page',
+])
+
+/** Lookups get a compact row. Studio's own tools need a label; any MCP tool gets a generic one. */
+export function isCompactToolCall(part: ToolPart): boolean {
+  const toolName = getToolName(part)
+  return part.type === 'dynamic-tool'
+    ? toolName !== 'query_logs'
+    : Object.hasOwn(TOOL_LABELS, toolName)
+}
+
+const isBlockPart = (part: MessagePart) =>
+  part.type === 'text'
+    ? part.text.trim().length > 0
+    : isToolUIPart(part) && BLOCK_TOOLS.has(getToolName(part))
 
 export type MessagePartItem =
   | { type: 'part'; part: MessagePart; partIndex: number }
-  | { type: 'tool-group'; parts: MessagePart[]; groupIndex: number }
+  | { type: 'tool-group'; parts: CompactPart[]; groupIndex: number }
 
 /**
- * Folds each run of consecutive compact tool parts into a single tool group. Hidden parts
- * (step markers, tools without UI) are dropped so they don't split a run in two.
+ * Folds each run of consecutive compact parts into a tool group. Parts that render nothing
+ * (step markers, empty text, tools without UI) are dropped so they don't split a run.
  */
 export function groupMessageParts(parts: MessagePart[]): MessagePartItem[] {
   const items: MessagePartItem[] = []
   let groupCount = 0
 
   parts.forEach((part, partIndex) => {
-    const kind = getMessagePartKind(part)
-    if (kind === 'hidden') return
-
-    if (kind === 'block') {
+    if (part.type === 'reasoning' || (isToolUIPart(part) && isCompactToolCall(part))) {
+      const lastItem = items.at(-1)
+      if (lastItem?.type === 'tool-group') lastItem.parts.push(part)
+      else items.push({ type: 'tool-group', parts: [part], groupIndex: groupCount++ })
+    } else if (isBlockPart(part)) {
       items.push({ type: 'part', part, partIndex })
-      return
-    }
-
-    const lastItem = items.at(-1)
-    if (lastItem?.type === 'tool-group') {
-      lastItem.parts.push(part)
-    } else {
-      items.push({ type: 'tool-group', parts: [part], groupIndex: groupCount++ })
     }
   })
 
   return items
 }
 
-/** The text of a compact tool row: an action, plus the tool's name for tool calls. */
-type CompactPartLabel = { action: string; toolName?: string }
+export const INTERRUPTED_LABEL = 'Response interrupted'
 
-export function getCompactPartLabel(part: MessagePart): CompactPartLabel {
-  if (part.type === 'reasoning') {
-    return { action: part.state === 'streaming' ? 'Thinking...' : 'Reasoned' }
-  }
-  if (isToolUIPart(part)) {
-    return {
-      action: part.state === 'input-streaming' ? 'Running' : 'Ran',
-      toolName: getToolName(part),
-    }
-  }
-  return { action: 'Working...' }
+/** `running` covers any unfinished part. Once its message stops, it renders as interrupted. */
+export type CompactPartStatus = 'running' | 'done' | 'failed'
+
+export function getCompactPartStatus(part: CompactPart): CompactPartStatus {
+  if (part.type === 'reasoning') return part.state === 'streaming' ? 'running' : 'done'
+  if (part.state === 'output-available') return 'done'
+  if (part.state === 'output-error' || part.state === 'output-denied') return 'failed'
+  return 'running'
 }
 
-/** The summary row of a tool group. While the group runs collapsed it mirrors the latest tool call. */
-export function getToolGroupHeader({
-  parts,
-  isRunning,
-  isOpen,
-}: {
-  parts: MessagePart[]
-  isRunning: boolean
-  isOpen: boolean
-}): CompactPartLabel {
-  if (!isRunning) {
-    const noun = parts.length === 1 ? 'tool' : 'tools'
-    return { action: `Worked across ${parts.length} ${noun}` }
+export const isRunningToolCall = (part: CompactPart) =>
+  part.type !== 'reasoning' && getCompactPartStatus(part) === 'running'
+
+export function getCompactPartLabel(
+  part: CompactPart,
+  status = getCompactPartStatus(part)
+): string {
+  if (part.type === 'reasoning') return status === 'running' ? 'Thinking...' : 'Reasoned'
+
+  const labels = getToolLabels(getToolName(part))
+  const detail = labels.detail?.(part.input)
+  const target = detail ? ` ${detail}` : ''
+  if (status === 'running') return `${labels.running}${target}...`
+  if (status === 'failed') return `${labels.running}${target} failed`
+  return `${labels.done}${target}`
+}
+
+const lowerFirst = (text: string) => text.charAt(0).toLowerCase() + text.slice(1)
+
+/** A finished group's header: what its tool calls did, e.g. "Searched docs and checked policies". */
+export function getToolGroupSummary(parts: CompactPart[]): string {
+  const actions = new Set(
+    parts.flatMap((part) =>
+      part.type !== 'reasoning' && getCompactPartStatus(part) === 'done'
+        ? [getToolLabels(getToolName(part)).done]
+        : []
+    )
+  )
+  const [first, second, ...rest] = actions
+
+  if (!first) {
+    // Nothing finished: the group only reasoned, failed or was cut off
+    const lastPart = parts.at(-1)
+    if (!lastPart) return 'Reasoned'
+    return getCompactPartStatus(lastPart) === 'running'
+      ? INTERRUPTED_LABEL
+      : getCompactPartLabel(lastPart)
   }
-
-  const latestPart = parts.at(-1)
-  // Expanded, the latest call is already visible as the last row
-  if (isOpen || !latestPart) return { action: 'Working...' }
-
-  return getCompactPartLabel(latestPart)
+  if (!second) return first
+  if (rest.length === 0) return `${first} and ${lowerFirst(second)}`
+  return `${first}, ${lowerFirst(second)}, and ${rest.length} more`
 }

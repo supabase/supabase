@@ -1,42 +1,58 @@
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { RecoveryCodesModal } from './RecoveryCodesModal'
 import { useRecoveryCodesGenerateMutation } from '@/data/recovery-codes/recovery-codes-generate-mutation'
 
-export const GenerateRecoveryCodesModal = () => {
-  const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation({
-    onSettled: () => setOpen(true),
-  })
-  const [open, setOpen] = useState(false)
+export interface GenerateRecoveryCodesModalProps {
+  children?: (trigger: { onClick: () => void; isPending: boolean }) => ReactNode
+  onComplete?: () => void
+  onStart?: () => void
+  showSecurityLink?: boolean
+}
+
+const DefaultTrigger = ({ onClick, isPending }: { onClick: () => void; isPending: boolean }) => (
+  <Admonition
+    type="warning"
+    layout="horizontal"
+    title="No recovery codes generated"
+    description="Recovery codes let you access your account if you lose access to your MFA device"
+    actions={
+      <Button onClick={onClick} loading={isPending}>
+        {isPending ? 'Generating codes' : 'Generate recovery codes'}
+      </Button>
+    }
+  />
+)
+
+export const GenerateRecoveryCodesModal = ({
+  children,
+  onComplete,
+  onStart,
+  showSecurityLink,
+}: GenerateRecoveryCodesModalProps = {}) => {
+  const mutation = useRecoveryCodesGenerateMutation()
+  const [isOpen, setIsOpen] = useState(false)
+  const handleGenerate = () => {
+    onStart?.()
+    setIsOpen(true)
+    mutation.mutate({})
+  }
+  const triggerProps = { onClick: handleGenerate, isPending: mutation.isPending }
 
   return (
-    <Admonition
-      type="danger"
-      layout="horizontal"
-      title="You haven't generated recovery codes yet"
-      description="Recovery codes are important to ensure you can recover your account if you loose access to your MFA."
-      actions={
-        <>
-          <span aria-live="polite" className="sr-only">
-            {recoveryCodesGenerateMutation.isPending ? 'Generating your recovery codes...' : ''}
-          </span>
-          <Button
-            onClick={() => {
-              recoveryCodesGenerateMutation.mutate({})
-            }}
-            loading={recoveryCodesGenerateMutation.isPending}
-          >
-            Generate recovery codes
-          </Button>
-          <RecoveryCodesModal
-            open={open}
-            onOpenChange={(open) => setOpen(open)}
-            mutation={recoveryCodesGenerateMutation}
-          />
-        </>
-      }
-    />
+    <>
+      {children ? children(triggerProps) : <DefaultTrigger {...triggerProps} />}
+      <RecoveryCodesModal
+        open={isOpen}
+        mutation={mutation}
+        showSecurityLink={showSecurityLink}
+        onOpenChange={(open) => {
+          setIsOpen(open)
+          if (!open && mutation.isSuccess) onComplete?.()
+        }}
+      />
+    </>
   )
 }

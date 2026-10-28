@@ -183,6 +183,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/database/publications/index.tsx` ← `pages/project/[ref]/database/publications/index.tsx`
 - [x] A `routes/project/$ref/database/publications/$id.tsx` ← `pages/project/[ref]/database/publications/[id].tsx`
 - [x] A `routes/project/$ref/database/pipelines/index.tsx` ← `pages/project/[ref]/database/pipelines/index.tsx`
+- [x] A `routes/project/$ref/database/pipelines/new.tsx` ← `pages/project/[ref]/database/pipelines/new.tsx`
 - [x] A `routes/project/$ref/database/pipelines/$pipelineId.tsx` ← `pages/project/[ref]/database/pipelines/[pipelineId].tsx`
 - [x] A `routes/project/$ref/database/replication/replica/$replicaId.tsx` ← `pages/project/[ref]/database/replication/replica/[replicaId].tsx` (redirects to Infrastructure)
 - [x] A `routes/project/$ref/database/triggers/index.tsx` ← `pages/project/[ref]/database/triggers/index.tsx`
@@ -216,6 +217,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### Project shell — `/storage/*`
 
 - [x] A `routes/project/$ref/storage/s3.tsx` ← `pages/project/[ref]/storage/s3.tsx`
+- [x] A `routes/project/$ref/storage/signing-keys.tsx` ← `pages/project/[ref]/storage/signing-keys.tsx`
 - [x] A `routes/project/$ref/storage/files/index.tsx` ← `pages/project/[ref]/storage/files/index.tsx`
 - [x] A `routes/project/$ref/storage/files/policies.tsx` ← `pages/project/[ref]/storage/files/policies.tsx`
 - [x] A `routes/project/$ref/storage/files/settings.tsx` ← `pages/project/[ref]/storage/files/settings.tsx`
@@ -368,6 +370,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/logout.tsx` ← `pages/logout.tsx`
 - [x] A `routes/maintenance.tsx` ← `pages/maintenance.tsx`
 - [x] A `routes/verify-email.tsx` ← `pages/verify-email.tsx`
+- [x] A `routes/support/csat.tsx` ← `pages/support/csat.tsx` (pre-auth support satisfaction survey; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
 - [x] A `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
 
 ### Error pages (handled at root)
@@ -434,7 +437,7 @@ per-file items only when a subtree has special cases.
 - [x] `routes/api/get-ip-address.ts` — canary port (validates the shim)
 - [x] `routes/api/**` — root-level simple endpoints (`check-cname`,
       `cli-release-version`, `enabled-features-overrides`, `generate-attachment-url`,
-      `get-deployment-commit`, `get-utc-time`, `status-override`)
+      `get-deployment-commit`, `get-utc-time`)
 - [x] `routes/api/ai/**` — AI endpoints (`docs.ts` direct-ported as Web-native)
 - [x] `routes/api/connect/**`
 - [x] `routes/api/content/**`
@@ -444,8 +447,8 @@ per-file items only when a subtree has special cases.
 - [x] `routes/api/v1/**` — except `body.ts` (streaming rewrite)
 - [x] `routes/api/v1/projects/$ref/functions/$slug/body.ts` — Web-streams rewrite. Returns a `Response` whose body is a `ReadableStream`; each artifact file is converted via `Readable.toWeb(createReadStream(...))` and pulled chunk-by-chunk into the multipart stream. Skips the `apiWrapper` since `getFunctionsArtifactStore` already asserts self-hosted mode (the pages-router `withAuth` was a no-op outside `IS_PLATFORM`).
 - [x] `routes/api/mcp/index.ts` — uses `WebStandardStreamableHTTPServerTransport` from `@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js`. Takes a Web `Request`, returns a `Response` directly — no shim needed. Query parsing pulled from `request.url`'s search params; headers passed through unchanged.
-- [x] `routes/api/incident-banner.ts`, `routes/api/incident-status.ts` — App
-      Router routes under `app/api/**` (already Web-native, direct re-export)
+- [x] `routes/api/status-page.ts` — App Router route under `app/api/**`
+      (already Web-native, direct re-export)
 
 ---
 
@@ -470,8 +473,9 @@ inline.
   `beforeHistoryChange` / `hashChangeStart` / `hashChangeComplete`.
   **Known gap:** Next's throw-from-`routeChangeStart`-to-cancel pattern
   isn't supportable — `subscribe` is fire-and-forget.
-  `usePreventNavigationOnUnsavedChanges` relies on it and needs
-  migrating to TanStack's `useBlocker` separately.
+  `usePreventNavigationOnUnsavedChanges` uses a Vite alias to
+  `compat/usePreventNavigationOnUnsavedChanges.ts`, which blocks through
+  TanStack's native `useBlocker`. Next keeps the original hook.
 - `api.ts` — `toWebHandler(nextHandler)`. See **API routes → Shim
   coverage** above.
 - `link.tsx`, `navigation.ts`, `dynamic.tsx`, `image.tsx`,
@@ -617,7 +621,7 @@ for the Vite pipeline:
 
 - Switch `routes/index.tsx` redirects from `href` to `to` — all targets
   now live in the TanStack tree.
-- Migrate `usePreventNavigationOnUnsavedChanges` from `router.events.on('routeChangeStart', …)` (throw-to-cancel pattern) to TanStack's `useBlocker`.
+- Remove the Vite alias for `usePreventNavigationOnUnsavedChanges` and replace the original Next hook with the native implementation in `compat/usePreventNavigationOnUnsavedChanges.ts`.
 - Drop the `_splat` / `routeSlug` normalisation block from
   `pages/org/_/[[...routeSlug]].tsx` + `pages/project/_/[[...routeSlug]].tsx` (only there to keep both runtimes mounting the same body).
 - Remove `RouteValidationWrapper` + `next/router` compat shim usage from `__root.tsx`.

@@ -2,8 +2,8 @@
  * Wire schema shared by the `render_page` tool (server) and the chat renderer that hosts
  * the generated page (client).
  *
- * It lives apart from `generated-page-tools.ts` because that module is only ever loaded on
- * the server — it pulls in the AI SDK's tool factory — while the renderer needs the exact
+ * It lives apart from `render-page.server.ts` because that module is only ever loaded on
+ * the server — it pulls in `node:vm` for the script check — while the renderer needs the exact
  * same parsing rules to decide what it is about to run. Both sides parse the model's raw
  * input through these schemas; neither trusts the other's copy.
  *

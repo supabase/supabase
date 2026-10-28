@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import type { NextRouter } from 'next/router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 

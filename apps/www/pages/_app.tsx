@@ -14,7 +14,6 @@ import {
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter, {
-  DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
@@ -31,6 +30,7 @@ import { useWwwCommandMenuTelemetry } from '../hooks/useWwwCommandMenuTelemetry'
 import { MD_PAGES } from '@/app/api-v2/md/content.generated'
 import { Toaster } from '@/app/toaster'
 import { WwwCommandMenu } from '@/components/CommandMenu'
+import { getPagesCanonicalHref, normalizePagesPath } from '@/lib/canonical'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -47,17 +47,22 @@ export default function App({ Component, pageProps }: AppProps) {
   const forceDarkMode = isDarkLaunchWeek
 
   const applicationName = 'Supabase'
-  const faviconRoute = DEFAULT_FAVICON_ROUTE
+  const faviconRoute = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
   const themeColor = DEFAULT_FAVICON_THEME_COLOR
 
   // Advertise the .md version for AI agents on pages that have one.
-  const cleanPath = (router.asPath ?? '/').split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
+  const cleanPath = normalizePagesPath(router.asPath ?? '/') || '/'
   const mdSlug = cleanPath === '/' ? 'index' : cleanPath.slice(1)
   const mdAlternateHref = MD_PAGES.has(mdSlug)
     ? cleanPath === '/'
       ? '/index.md'
       : `${cleanPath}.md`
     : null
+
+  // Canonical for every pages-router route. Pages that set their own canonical
+  // via NextSeo override this default. Unresolved dynamic routes (e.g. `/[ref]`
+  // on a page without getStaticProps) are skipped rather than emitted literally.
+  const canonicalHref = getPagesCanonicalHref(router.asPath ?? '/')
 
   return (
     <>
@@ -70,12 +75,12 @@ export default function App({ Component, pageProps }: AppProps) {
         route={faviconRoute}
         themeColor={themeColor}
         includeManifest
-        includeMsApplicationConfig
         includeRssXmlFeed
       />
       <DefaultSeo
         title={site_title}
         description={DEFAULT_META_DESCRIPTION}
+        canonical={canonicalHref}
         openGraph={{
           type: 'website',
           url: 'https://supabase.com/',

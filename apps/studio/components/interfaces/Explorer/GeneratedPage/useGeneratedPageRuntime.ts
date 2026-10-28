@@ -25,7 +25,7 @@ import {
 import { resolveLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { isValidConnString } from '@/data/fetchers'
+import { isValidConnString, unguarded } from '@/data/fetchers'
 import { executeLogsSql } from '@/data/logs/execute-logs-sql-mutation'
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
@@ -178,6 +178,7 @@ export function useGeneratedPageRuntime({
           connectionString,
           sql: limited.sql,
           preflightCheck: true,
+          grant: unguarded.migrating,
         })
         return { ...base, ok: true, rows: Array.isArray(result) ? result : [] }
       }

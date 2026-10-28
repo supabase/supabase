@@ -97,7 +97,10 @@ test('supports keyboard activation and disables rows without an identity', async
   const onEditRow = vi.fn()
   render(<Results rows={rows} onEditRow={onEditRow} canEditRow={(row) => row.id === 0} />)
   const actions = screen.getAllByRole('button', { name: 'Edit row' })
-  expect(actions[1]).toBeDisabled()
+  // Stays focusable so its tooltip can explain the missing primary key
+  expect(actions[1]).toHaveAttribute('aria-disabled', 'true')
+  await userEvent.click(actions[1])
+  expect(onEditRow).not.toHaveBeenCalled()
   actions[0].focus()
   await userEvent.keyboard('{Enter}')
   expect(onEditRow).toHaveBeenCalledWith(rows[0])

@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 import { executeSql } from './execute-sql-mutation'
 import { sqlKeys } from './keys'
-import { constructHeaders, fetchHandler, handleError } from '@/data/fetchers'
+import { constructHeaders, fetchHandler, handleError, unguarded } from '@/data/fetchers'
 import { getTable } from '@/data/tables/table-retrieve-query'
 import { BASE_PATH } from '@/lib/constants'
 import { editableQuerySchema, getResultColumnMapping } from '@/lib/query-result-editing'
@@ -57,6 +57,7 @@ async function getQueryResultTable(args: QueryResultTableVariables, signal?: Abo
         args.roleImpersonationState
       ),
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(args.roleImpersonationState?.role),
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -97,6 +98,7 @@ async function getQueryResultRow(args: QueryResultRowVariables, signal?: AbortSi
         args.roleImpersonationState
       ),
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(args.roleImpersonationState?.role),
+      grant: unguarded.migrating,
     },
     signal
   )

@@ -26,9 +26,16 @@ type TOTP = { qr_code: string; secret: string; uri: string }
 interface AddNewFactorModalProps {
   visible: boolean
   onClose: () => void
+  onComplete?: () => void
+  onRecoveryCodesSaved?: () => void
 }
 
-export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
+export const AddNewFactorModal = ({
+  visible,
+  onClose,
+  onComplete,
+  onRecoveryCodesSaved,
+}: AddNewFactorModalProps) => {
   const { data, mutate: enroll, isPending: isEnrolling, reset } = useMfaEnrollMutation()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
   const { isPending: isRecoveryCodesStatusPending, refetch: refetchRecoveryCodesStatus } =
@@ -67,7 +74,9 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
           (enableAuthRecoveryCodes &&
             (isRecoveryCodesStatusPending || recoveryCodesGenerateMutation.isPending))
         }
-        onClose={async () => {
+        onClose={onClose}
+        onComplete={async () => {
+          onComplete?.()
           if (enableAuthRecoveryCodes) {
             const { data: currentRecoveryCodesStatus } = await refetchRecoveryCodesStatus()
             const shouldGenerateRecoveryCodes = currentRecoveryCodesStatus?.status === 'unenrolled'
@@ -82,7 +91,11 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
       />
       <RecoveryCodesModal
         open={isRecoveryCodesModalOpen}
-        onOpenChange={(open) => setIsRecoveryCodesModalOpen(open)}
+        onOpenChange={(open) => {
+          setIsRecoveryCodesModalOpen(open)
+          // A successful close is allowed only after the save acknowledgement.
+          if (!open && recoveryCodesGenerateMutation.isSuccess) onRecoveryCodesSaved?.()
+        }}
         mutation={recoveryCodesGenerateMutation}
       />
     </>
@@ -170,6 +183,7 @@ interface SecondStepProps {
   }
   isLoading: boolean
   onClose: () => void
+  onComplete: () => void
 }
 
 const SecondStep = ({
@@ -178,6 +192,7 @@ const SecondStep = ({
   factor: outerFactor,
   isLoading,
   onClose,
+  onComplete,
 }: SecondStepProps) => {
   const queryClient = useQueryClient()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
@@ -192,20 +207,23 @@ const SecondStep = ({
   })
 
   const [factor, setFactor] = useState<{ id: string; type: 'totp'; totp: TOTP } | null>(null)
+  const [verifiedFactorId, setVerifiedFactorId] = useState<string | null>(null)
+  const hasCompletedChallenge = !!factor && verifiedFactorId === factor.id
 
   const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
   const { mutate: challengeAndVerify, isPending: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
       toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
     },
-    onSuccess: async () => {
+    onSuccess: async (_data, variables) => {
+      setVerifiedFactorId(variables.factorId)
       if (lastVisitedOrganization) {
         await queryClient.invalidateQueries({
           queryKey: organizationKeys.members(lastVisitedOrganization),
         })
       }
       toast.success(`Successfully added a second factor authentication`)
-      onClose()
+      onComplete()
     },
   })
 
@@ -232,12 +250,12 @@ const SecondStep = ({
       title={`Verify new factor ${factorName}`}
       confirmLabel="Confirm"
       confirmLabelLoading="Confirming"
-      loading={isVerifying || isLoading}
+      loading={isVerifying || isLoading || hasCompletedChallenge}
       onCancel={() => {
         // If a factor has been created (but not verified), unenroll it. This will be run as a
         // side effect so that it's not confusing to the user why the modal stays open while
         // unenrolling.
-        if (factor) unenroll({ factorId: factor.id })
+        if (factor && !hasCompletedChallenge) unenroll({ factorId: factor.id })
       }}
       onConfirm={form.handleSubmit(onSubmit)}
     >
@@ -246,7 +264,7 @@ const SecondStep = ({
         complete the enrolment.
       </p>
 
-      {isLoading && (
+      {!factor && (
         <div className="pb-4 px-4">
           <GenericSkeletonLoader />
         </div>

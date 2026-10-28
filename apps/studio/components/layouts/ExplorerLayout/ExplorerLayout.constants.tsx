@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { Database, MessageSquare, NotebookText } from 'lucide-react'
+import { DatabaseIcon, MessageSquareIcon, NotebookTextIcon } from 'lucide-react'
+import { motion } from 'motion/react'
 import { type ComponentType, type PropsWithChildren } from 'react'
 import { cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
@@ -26,8 +26,8 @@ export const EXPLORER_RESOURCES: Record<
   ExplorerResourceType,
   { icon: ExplorerNavIcon; searchPlaceholder: string }
 > = {
-  notebook: { icon: NotebookText, searchPlaceholder: 'Search notebooks' },
-  chat: { icon: MessageSquare, searchPlaceholder: 'Search chats' },
+  notebook: { icon: NotebookTextIcon, searchPlaceholder: 'Search notebooks' },
+  chat: { icon: MessageSquareIcon, searchPlaceholder: 'Search chats' },
 }
 
 /** Top-level sidebar destinations, in display order. */
@@ -36,7 +36,7 @@ export const EXPLORER_SECTIONS: Array<{
   label: string
   icon: ExplorerNavIcon
 }> = [
-  { level: 'database', label: 'Database', icon: Database },
+  { level: 'database', label: 'Database', icon: DatabaseIcon },
   { level: 'notebook', label: 'Notebooks', icon: EXPLORER_RESOURCES.notebook.icon },
   { level: 'chat', label: 'Chats', icon: EXPLORER_RESOURCES.chat.icon },
 ]

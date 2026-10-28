@@ -1,8 +1,12 @@
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { useCallback } from 'react'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { ArchivedFilePreviewPane } from './ArchivedFilePreviewPane'
+import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
+import { ConfirmPurgeModal } from './ConfirmPurgeModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
 import { FileExplorer } from './FileExplorer'
 import { FileExplorerHeader } from './FileExplorerHeader'
@@ -10,7 +14,10 @@ import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
+import { UploadConflictModal } from './UploadConflictModal'
 import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
+import { useUploadConflictPrompt } from './useUploadConflictPrompt'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface StorageExplorerContentProps {
@@ -39,6 +46,9 @@ export const StorageExplorerContent = ({
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
   const { truncateToColumn } = useStorageExplorerNavigation()
+  const { isOverlayEnabled, isListingTruncated, selectedArchivedObject } = useArchivedFilesContext()
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+  const { conflicts, promptForConflicts, resolveConflicts } = useUploadConflictPrompt()
 
   const handleClearSearch = useCallback(() => {
     setIsSearching(false)
@@ -52,7 +62,8 @@ export const StorageExplorerContent = ({
 
   const onSelectAllItemsInColumn = (columnIndex: number) => {
     const columnFiles = columns[columnIndex].items
-      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
+      // An archived row has no live object, so the bulk actions have nothing to act on.
+      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE && item.archived === undefined)
       .map((item) => {
         return { ...item, columnIndex }
       })
@@ -80,7 +91,14 @@ export const StorageExplorerContent = ({
     event.persist()
     const items = event.target.files || event.dataTransfer.items
     const isDrop = !isEmpty(get(event, ['dataTransfer', 'items'], []))
-    await uploadFiles({ files: items, columnIndex, isDrop })
+    await uploadFiles({
+      files: items,
+      columnIndex,
+      isDrop,
+      // Whether a clash is worth asking about depends on the bucket's versioning state,
+      // which `uploadFiles` reads for itself. The preview gate is the part only a hook knows.
+      onConflict: isStorageVersioningEnabled ? promptForConflicts : undefined,
+    })
     event.target.value = ''
   }
 
@@ -99,6 +117,14 @@ export const StorageExplorerContent = ({
       ) : (
         <FileExplorerHeaderSelection />
       )}
+      {isOverlayEnabled && isListingTruncated && (
+        <Admonition
+          type="warning"
+          className="mb-0 rounded-none border-x-0 border-t-0"
+          title="Showing only some of this bucket's archived files"
+          description="The bucket holds more rows than one listing can carry. Archived files past that point aren't shown here and can't be restored or deleted from this view."
+        />
+      )}
       <div className="flex flex-1 min-h-0">
         <FileExplorer
           columns={columns}
@@ -112,10 +138,18 @@ export const StorageExplorerContent = ({
             fetchMoreFolderContents({ index, column, searchString: itemSearchString })
           }
         />
-        <PreviewPane />
+        {selectedArchivedObject !== undefined ? <ArchivedFilePreviewPane /> : <PreviewPane />}
       </div>
 
+      <UploadConflictModal
+        conflicts={conflicts}
+        onCancel={() => resolveConflicts('cancel')}
+        onConfirm={(choice) => resolveConflicts(choice)}
+      />
+
       <ConfirmDeleteModal />
+
+      <ConfirmPurgeModal />
 
       <MoveItemsModal
         visible={selectedItemsToMove.length > 0}

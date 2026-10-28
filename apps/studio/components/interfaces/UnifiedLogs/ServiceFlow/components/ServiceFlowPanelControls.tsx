@@ -1,4 +1,11 @@
-import { Check, ChevronDown, ChevronUp, PanelBottom, PanelRight, X } from 'lucide-react'
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  PanelBottomIcon,
+  PanelRightIcon,
+  XIcon,
+} from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -62,7 +69,7 @@ export const ServiceFlowPanelControls = ({
           disabled={!prevId}
           onClick={onPrev}
           className="px-1"
-          icon={<ChevronUp />}
+          icon={<ChevronUpIcon />}
         />
       </Shortcut>
 
@@ -79,33 +86,34 @@ export const ServiceFlowPanelControls = ({
           disabled={!nextId}
           onClick={onNext}
           className="px-1"
-          icon={<ChevronDown />}
+          icon={<ChevronDownIcon />}
         />
       </Shortcut>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
+            aria-label="Dock side"
             variant="text"
             className="px-1"
-            icon={dock === 'bottom' ? <PanelBottom /> : <PanelRight />}
+            icon={dock === 'bottom' ? <PanelBottomIcon /> : <PanelRightIcon />}
             tooltip={{ content: { side: 'top', text: 'Dock side' } }}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40" align="end">
           <DropdownMenuItem className="justify-between" onClick={() => setDock('bottom')}>
             <div className="flex items-center gap-x-2">
-              <PanelBottom size={14} />
+              <PanelBottomIcon size={14} />
               <span>Dock to bottom</span>
             </div>
-            {dock === 'bottom' && <Check size={14} className="text-primary" />}
+            {dock === 'bottom' && <CheckIcon size={14} className="text-primary" />}
           </DropdownMenuItem>
           <DropdownMenuItem className="justify-between" onClick={() => setDock('right')}>
             <div className="flex items-center gap-x-2">
-              <PanelRight size={14} />
+              <PanelRightIcon size={14} />
               <span>Dock to right</span>
             </div>
-            {dock === 'right' && <Check size={14} className="text-primary" />}
+            {dock === 'right' && <CheckIcon size={14} className="text-primary" />}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -122,7 +130,7 @@ export const ServiceFlowPanelControls = ({
           variant="text"
           onClick={onClose}
           className="px-1"
-          icon={<X />}
+          icon={<XIcon />}
         />
       </Shortcut>
     </div>

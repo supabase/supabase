@@ -1,18 +1,20 @@
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { X } from 'lucide-react'
+import { AnimatePresence, domAnimation, LazyMotion, m } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Dispatch, Fragment, SetStateAction, useEffect } from 'react'
 import { useKey } from 'react-use'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, cn } from 'ui'
+import { MobileNavTabs } from 'ui-patterns/MobileNav/MobileNavTabs'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import type { DropdownMenuItem } from '../Navigation.types'
 import { MenuItem, useActiveMenuLabel } from './GlobalNavigationMenu'
-import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
+import { isMenuLevel } from './NavigationMenu.utils'
+import { useNavItems } from '@/features/IaNav'
 
 const DEFAULT_EASE = [0.24, 0.25, 0.05, 1]
 
@@ -31,9 +33,13 @@ const listItem = {
 const itemClassName =
   'block py-2 pl-2 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-ring rounded-sm'
 
-const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
-  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
-
+const AccordionMenuItem = ({
+  section,
+  activeLabel,
+}: {
+  section: DropdownMenuItem[]
+  activeLabel: string
+}) => {
   return section[0].menuItems ? (
     <AccordionItem
       value={section[0].label}
@@ -45,31 +51,7 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
     >
       <AccordionTrigger className="py-1">{section[0].label}</AccordionTrigger>
       <AccordionContent>
-        {section[0].menuItems?.map((menuItem, menuItemIndex) => (
-          <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
-            {menuItem
-              .filter((item) => item.enabled !== false)
-              .map((item) =>
-                !item.href ? (
-                  <div
-                    key={item.label}
-                    className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none"
-                  >
-                    {item.label}
-                  </div>
-                ) : (
-                  <MenuItem
-                    key={item.label}
-                    href={item.href}
-                    title={item.label}
-                    community={item.community}
-                    new={item.new}
-                    icon={item.icon}
-                  />
-                )
-              )}
-          </Fragment>
-        ))}
+        <SectionMenuItems section={section} />
       </AccordionContent>
     </AccordionItem>
   ) : (
@@ -82,21 +64,131 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
   )
 }
 
-const Menu = () => (
-  <Accordion type="multiple" className="space-y-1 mt-2.5">
-    {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
-      <AccordionMenuItem key={index} section={section} />
-    ))}
-  </Accordion>
+const SectionMenuItems = ({
+  section,
+  activeLevel,
+}: {
+  section: DropdownMenuItem[]
+  activeLevel?: string
+}) =>
+  section[0].menuItems?.map((menuItem, menuItemIndex) => (
+    <Fragment key={`desktop-docs-menu-section-${menuItemIndex}`}>
+      {menuItem
+        .filter((item) => item.enabled !== false)
+        .map((item) =>
+          !item.href ? (
+            <div
+              key={item.label}
+              className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md py-2 leading-none"
+            >
+              {item.label}
+            </div>
+          ) : (
+            <MenuItem
+              key={item.label}
+              className="h-10 px-0 aria-[current=true]:text-primary aria-[current=true]:**:text-primary"
+              // the item is the section of the open page, not the page itself
+              aria-current={
+                activeLevel && isMenuLevel(activeLevel, item.level) ? 'true' : undefined
+              }
+              href={item.href}
+              title={item.label}
+              community={item.community}
+              new={item.new}
+              icon={item.icon}
+            />
+          )
+        )}
+    </Fragment>
+  ))
+
+const Menu = () => {
+  const { GLOBAL_MENU_ITEMS } = useNavItems()
+  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
+
+  return (
+    <Accordion type="multiple" className="space-y-1 mt-2.5">
+      {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
+        <AccordionMenuItem key={index} section={section} activeLabel={activeLabel} />
+      ))}
+    </Accordion>
+  )
+}
+
+const GlobalMenuAccountActions = () => {
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
+
+  if (isUserLoading) return null
+
+  return isLoggedIn ? (
+    <Button block size="medium" asChild>
+      <Link href="https://supabase.com/dashboard/projects">Dashboard</Link>
+    </Button>
+  ) : (
+    <>
+      <Button block size="medium" asChild>
+        <Link href="https://supabase.com/dashboard/sign-in">Sign in</Link>
+      </Button>
+      <Button variant="primary" block size="medium" asChild>
+        <Link href="https://supabase.com/dashboard/sign-up">Start your project</Link>
+      </Button>
+    </>
+  )
+}
+
+// the sidebar drawer on mobile holds what this menu holds, since the header has one burger for both
+export const GlobalMenuDrawerSection = ({
+  selectedLabel,
+  currentLabel,
+  currentLevel,
+  onGroupPick,
+  className,
+}: {
+  selectedLabel: string | undefined
+  currentLabel: string | undefined
+  currentLevel: string
+  onGroupPick: (label: string) => void
+  className?: string
+}) => {
+  const { GLOBAL_MENU_ITEMS } = useNavItems()
+  const sections = GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false)
+  const selectedSection = sections.find((section) => section[0].label === selectedLabel)
+
+  return (
+    <section aria-label="All docs" className={cn('flex flex-col gap-3', className)}>
+      <MobileNavTabs
+        tabs={sections.map(([section]) => ({
+          label: section.label,
+          href: section.menuItems ? undefined : section.href,
+        }))}
+        selectedLabel={selectedLabel}
+        currentLabel={currentLabel}
+        onTabSelect={onGroupPick}
+        placeholder="Sections"
+        linkAs={Link}
+      />
+      {selectedSection?.[0].menuItems ? (
+        <div>
+          <SectionMenuItems section={selectedSection} activeLevel={currentLevel} />
+        </div>
+      ) : null}
+    </section>
+  )
+}
+
+export const GlobalMenuDrawerFooter = ({ className }: { className?: string }) => (
+  <div className={cn('flex items-stretch gap-4', className)}>
+    <GlobalMenuAccountActions />
+  </div>
 )
+
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
 }
 
 const GlobalMobileMenu = ({ open, setOpen }: Props) => {
-  const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
   const pathname = usePathname()
 
   const { navigationLogo } = getCustomContent(['navigation:logo'])
@@ -156,26 +248,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
               <Menu />
             </div>
             <div className="absolute bottom-0 left-0 right-0 top-auto w-full bg-alternative flex items-stretch p-4 gap-4">
-              {!isUserLoading && (
-                <>
-                  {isLoggedIn ? (
-                    <Button block size="medium" asChild>
-                      <Link href="https://supabase.com/dashboard/projects">Dashboard</Link>
-                    </Button>
-                  ) : (
-                    <>
-                      <Button block size="medium" asChild>
-                        <Link href="https://supabase.com/dashboard/sign-in">Sign in</Link>
-                      </Button>
-                      <Button variant="primary" block size="medium" asChild>
-                        <Link href="https://supabase.com/dashboard/sign-up">
-                          Start your project
-                        </Link>
-                      </Button>
-                    </>
-                  )}
-                </>
-              )}
+              <GlobalMenuAccountActions />
             </div>
           </m.div>
         )}

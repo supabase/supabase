@@ -41,7 +41,7 @@ Firestore’s schemaless design makes it easy to prototype. As data relationship
 | **Offline auth**    | The client SDK persists auth tokens locally and handles session renewal                                                                                                 | Session management integrates with Postgres; tokens are validated on the server                        |
 | **Customization**   | Custom auth requires writing Cloud Functions or backend services                                                                                                        | You can write custom policies and logic in SQL; column‑level security enables field‑level restrictions |
 
-Firebase Authentication is easy to set up for email/password and social logins. Enterprise features such as SAML/OIDC and blocking functions require upgrading to the Identity Platform and come with new usage limits[.](https://firebase.google.com/docs/auth#:~:text=iOS%20%20%20135%20Web,192%20Unity) Supabase Auth integrates with Postgres, so you can enforce complex policies using SQL and upgrade to SSO or enterprise auth features without changing products.
+Firebase Authentication is easy to set up for email/password and social sign-in. Enterprise features such as SAML/OIDC and blocking functions require upgrading to the Identity Platform and come with new usage limits[.](https://firebase.google.com/docs/auth#:~:text=iOS%20%20%20135%20Web,192%20Unity) Supabase Auth integrates with Postgres, so you can enforce complex policies using SQL and upgrade to SSO or enterprise auth features without changing products.
 
 ## Serverless functions and backend logic
 
@@ -112,7 +112,7 @@ Many teams start with Firebase for fast prototyping and switch to Supabase when 
 1. **Run both services side by side.** Export your Firestore collections and import them into Supabase—initially as JSON or JSONB columns—while your app continues to read from Firebase. Then incrementally swap Firebase SDK calls for Supabase queries.
 2. **Normalize your data.** Refactor JSON into proper Postgres tables, add foreign keys and indexes and write RLS policies. This is when you begin to enjoy SQL’s power and simplified code.
 
-Supabase provides [open‑source migration tools](/docs/guides/platform/migrating-to-supabase). There is a utility for [migrating Firebase Authentication to Supabase Auth](/docs/guides/platform/migrating-to-supabase/firebase-auth) by exporting users and re‑creating them in Postgres, another for [copying Firestore collections to Postgres tables](/docs/guides/platform/migrating-to-supabase/firestore-data), and a tool for [migrating files from Cloud Storage to Supabase Storage](/docs/guides/platform/migrating-to-supabase/firebase-storage). These tools are maintained on GitHub and have been used by startups to migrate tens of thousands of users with minimal downtime.
+Supabase provides [open‑source migration tools](https://supabase.com/kb/topics/migration). There is a utility for [migrating Firebase Authentication to Supabase Auth](/kb/guides/migrate-from-firebase-auth) by exporting users and re‑creating them in Postgres, another for [copying Firestore collections to Postgres tables](/kb/guides/migrate-from-firestore-data), and a tool for [migrating files from Cloud Storage to Supabase Storage](/kb/guides/migrate-from-firebase-storage). These tools are maintained on GitHub and have been used by startups to migrate tens of thousands of users with minimal downtime.
 
 ## Conclusion
 

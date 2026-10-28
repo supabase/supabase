@@ -118,10 +118,10 @@ describe('registry composition and resolution', () => {
     // `~/` keeps backend files out of the installing project's src directory.
     expect(
       getInstalledPath({
-        path: 'registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts',
-        target: '~/supabase/functions/mcp-server/index.ts',
+        path: 'registry/default/blocks/mcp/supabase/functions/mcp/index.ts',
+        target: '~/supabase/functions/mcp/index.ts',
       })
-    ).toBe('supabase/functions/mcp-server/index.ts')
+    ).toBe('supabase/functions/mcp/index.ts')
     expect(() => getInstalledPath({ path: 'source.ts', target: '../outside.ts' })).toThrow(
       /Invalid installed path/
     )

@@ -32,13 +32,24 @@ export type UnifiedLogsQueryRow = z.infer<typeof unifiedLogsQueryRowSchema>
 export const parseUnifiedLogsQueryRows = (value: unknown): UnifiedLogsQueryRow[] =>
   z.array(unifiedLogsQueryRowSchema).parse(value ?? [])
 
+export const deduplicateUnifiedLogs = <T extends { id: string }>(logs: T[]) => {
+  const ids = new Set<string>()
+  return logs.filter((log) => {
+    if (ids.has(log.id)) return false
+    ids.add(log.id)
+    return true
+  })
+}
+
 const extractLeadingStatus = (s?: string) => {
   const m = typeof s === 'string' ? s.match(/^(\d{3})\b/) : null
   return m ? Number(m[1]) : undefined
 }
 
+const NON_REQUEST_LOG_TYPES = new Set(['compute', 'edge function runtime'])
+
 export const extractLogMetadata = (row: UnifiedLogMetadataRow) => {
-  if (row.log_type === 'compute') {
+  if (row.log_type && NON_REQUEST_LOG_TYPES.has(row.log_type)) {
     return { status: null, method: null, pathname: null }
   }
 
@@ -76,6 +87,8 @@ export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
     auth_user: isComputeLog ? null : row.auth_user || null,
   }
 
-  if (isComputeLog) return { ...mappedRow, metadata: row.metadata ?? null }
+  if (isComputeLog || row.log_type === 'edge function runtime') {
+    return { ...mappedRow, metadata: row.metadata ?? null }
+  }
   return mappedRow
 }

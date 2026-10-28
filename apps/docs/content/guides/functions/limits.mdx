@@ -9,7 +9,7 @@ subtitle: "Limits applied Edge Functions in Supabase's hosted platform."
 
 - Maximum Memory: 256MB
 - Maximum Duration (Wall clock limit):
-  This is the duration an Edge Function worker will stay active. During this period, a worker can serve multiple requests or process background tasks.
+  This is the duration an Edge Function worker will stay active. During this period, a worker can serve multiple requests or process [background tasks](/docs/guides/functions/background-tasks).
   - Free plan: 150s
   - Paid plans: 400s
 - Maximum CPU Time: 2s (Amount of actual time spent on the CPU per request - does not include async I/O.)
@@ -33,7 +33,7 @@ subtitle: "Limits applied Edge Functions in Supabase's hosted platform."
 - Secret name length: up to **256** characters
 - Maximum secret size: **48 KiB** (**24,576** characters)
 - Names must NOT start with the prefix `SUPABASE_` (this prefix is reserved).
-- Need more than 100 secrets? [Bundle secrets into a JSON value](/docs/guides/troubleshooting/working-around-the-edge-function-secrets-limit).
+- Need more than 100 secrets? [Bundle secrets into a JSON value](/kb/troubleshooting/working-around-the-edge-function-secrets-limit).
 
 ## Other limits & restrictions
 

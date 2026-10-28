@@ -83,12 +83,10 @@ const callbacks = {
 function FeedMessage({
   message = initialMessage,
   isLoading = true,
-  isLastMessage,
   addToolApprovalResponse = callbacks.addToolApprovalResponse,
 }: {
   message?: UIMessage
   isLoading?: boolean
-  isLastMessage?: boolean
   addToolApprovalResponse?: typeof callbacks.addToolApprovalResponse
 }) {
   return (
@@ -97,7 +95,7 @@ function FeedMessage({
       id={message.id}
       message={message}
       isLoading={isLoading}
-      isLastMessage={isLastMessage}
+      isLastMessage
       isAfterEditedMessage={false}
       isBeingEdited={false}
       addToolApprovalResponse={addToolApprovalResponse}
@@ -183,21 +181,36 @@ describe('assistant feed rendering', () => {
   it('finishes reasoning when the SDK mutates the first streamed part before publishing a snapshot', () => {
     const reasoning = {
       type: 'reasoning' as const,
-      text: '',
+      text: 'Looking at the schema',
       state: 'streaming' as 'streaming' | 'done',
     }
     const message: UIMessage = { id: 'reasoning-1', role: 'assistant', parts: [reasoning] }
-    const { rerender } = render(<FeedMessage message={message} isLastMessage />)
+    const { rerender } = render(<FeedMessage message={message} />)
     // Expand the tool group so the reasoning row itself is rendered
     fireEvent.click(screen.getByRole('button', { name: 'Thinking...' }))
-    expect(screen.getByText('Thinking...')).toBeInTheDocument()
+    // The group header and the reasoning row
+    expect(screen.getAllByText('Thinking...')).toHaveLength(2)
 
     // Chat.pushMessage exposes the initial object; subsequent replaceMessage calls clone it.
     reasoning.state = 'done'
-    rerender(<FeedMessage message={structuredClone(message)} isLoading={false} isLastMessage />)
+    rerender(<FeedMessage message={structuredClone(message)} isLoading={false} />)
 
     expect(screen.queryByText('Thinking...')).not.toBeInTheDocument()
-    expect(screen.getByText('Reasoned')).toBeInTheDocument()
+    expect(screen.getAllByText('Reasoned')).toHaveLength(2)
+  })
+
+  it('keeps a tool group running while a call in it outlasts a later block', () => {
+    const message: UIMessage = {
+      id: 'parallel-1',
+      role: 'assistant',
+      parts: [
+        { type: 'tool-search_docs', toolCallId: 'docs-1', state: 'input-available', input: {} },
+        { type: 'text', text: 'Checking your schema' },
+      ],
+    }
+    render(<FeedMessage message={message} />)
+
+    expect(screen.getByRole('button', { name: 'Searching docs...' })).toBeInTheDocument()
   })
 
   it('updates text when the SDK mutates the first streamed part', () => {
@@ -218,7 +231,7 @@ describe('assistant feed rendering', () => {
       state: 'input-streaming' as const,
     }
     const message: UIMessage = { id: 'tool-1', role: 'assistant', parts: [tool] }
-    const { rerender } = render(<FeedMessage message={message} isLastMessage />)
+    const { rerender } = render(<FeedMessage message={message} />)
     expect(screen.getByText('Writing SQL...')).toBeInTheDocument()
 
     Object.assign(tool, {
@@ -226,7 +239,7 @@ describe('assistant feed rendering', () => {
       input: { sql: 'select 1' },
       output: [{ value: 1 }],
     })
-    rerender(<FeedMessage message={structuredClone(message)} isLoading={false} isLastMessage />)
+    rerender(<FeedMessage message={structuredClone(message)} isLoading={false} />)
 
     expect(screen.queryByText('Writing SQL...')).not.toBeInTheDocument()
     expect(screen.getByText('[{"value":1}]')).toBeInTheDocument()

@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
-import { MoreVertical } from 'lucide-react'
+import { MoreVerticalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   ComposableMap,
   Geographies,
@@ -33,7 +33,12 @@ import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getComputeSizeLabel } from '@/lib/compute-labels'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+
+const MAP_WIDTH = 800
+const MAP_HEIGHT = 600
 
 const MapView = () => {
   const { ref } = useParams()
@@ -41,8 +46,11 @@ const MapView = () => {
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
+  const { data: project } = useSelectedProjectQuery()
+  const computeSize = getComputeSizeLabel(project?.infra_compute_size)
 
   const [mount, setMount] = useState(false)
+  const [isPanning, setIsPanning] = useState(false)
   const [zoom, setZoom] = useState<number>(1.5)
   const [center, setCenter] = useState<[number, number]>([14, 7])
   const [tooltip, setTooltip] = useState<{
@@ -78,18 +86,34 @@ const MapView = () => {
     setTimeout(() => setMount(true), 100)
   }, [])
 
+  const filterZoomEvent = useCallback((event: SVGElement) => {
+    const { type, ctrlKey, button } = event as unknown as MouseEvent
+    return type !== 'wheel' && type !== 'dblclick' && !ctrlKey && !button
+  }, [])
+  const onMoveStart = useCallback(() => setIsPanning(true), [])
+  const onMoveEnd = useCallback(() => setIsPanning(false), [])
+
   return (
-    <div className="bg-studio h-[500px] relative">
-      <ComposableMap projectionConfig={{ scale: 155 }} className="w-full h-full">
+    <div className="bg-studio h-full relative cursor-grab active:cursor-grabbing">
+      <ComposableMap
+        width={MAP_WIDTH}
+        height={MAP_HEIGHT}
+        projectionConfig={{ scale: 155 }}
+        className="w-full h-full"
+      >
         <ZoomableGroup
-          className={mount ? 'transition-all duration-300' : ''}
+          className={mount && !isPanning ? 'transition-all duration-300' : ''}
           center={center}
           zoom={zoom}
           minZoom={1.5}
           maxZoom={2.0}
-          filterZoomEvent={({ constructor: { name } }) =>
-            !['MouseEvent', 'WheelEvent'].includes(name)
-          }
+          translateExtent={[
+            [0, 0],
+            [MAP_WIDTH, MAP_HEIGHT],
+          ]}
+          filterZoomEvent={filterZoomEvent}
+          onMoveStart={onMoveStart}
+          onMoveEnd={onMoveEnd}
         >
           <Geographies geography={GeographyData}>
             {({ geographies }) =>
@@ -266,7 +290,10 @@ const MapView = () => {
                         </p>
                         <div>
                           <p className="text-xs text-foreground-light">
-                            AWS{projectHomepageShowInstanceSize ? ` • ${database.size}` : ''}
+                            AWS
+                            {projectHomepageShowInstanceSize && !!computeSize
+                              ? ` • ${computeSize}`
+                              : ''}
                           </p>
                           {database.identifier !== ref && (
                             <p className="text-xs text-foreground-light">
@@ -279,7 +306,7 @@ const MapView = () => {
                       {database.identifier !== ref && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="text" icon={<MoreVertical />} className="px-1" />
+                            <Button variant="text" icon={<MoreVerticalIcon />} className="px-1" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="w-40" side="bottom" align="end">
                             <DropdownMenuItem

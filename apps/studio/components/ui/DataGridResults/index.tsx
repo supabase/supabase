@@ -1,4 +1,4 @@
-import { Copy, Expand, Loader2, Maximize2 } from 'lucide-react'
+import { CopyIcon, ExpandIcon, Loader2Icon, Maximize2Icon } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderCellProps } from 'react-data-grid'
 import {
@@ -115,7 +115,7 @@ export const DataGridResults = ({
             renderCell: ({ row, tabIndex }) => {
               if (isLoadingRowActions) {
                 return (
-                  <Loader2
+                  <Loader2Icon
                     size={14}
                     className="animate-spin text-tertiary-foreground"
                     role="img"
@@ -139,7 +139,7 @@ export const DataGridResults = ({
                     },
                   }}
                   tabIndex={tabIndex}
-                  icon={<Maximize2 />}
+                  icon={<Maximize2Icon />}
                   disabled={canEditRow ? !canEditRow(row) : false}
                   onClick={() => onEditRow(row)}
                 />
@@ -173,7 +173,7 @@ export const DataGridResults = ({
                   }}
                   onFocusCapture={(event) => event.stopPropagation()}
                 >
-                  <Maximize2 size={12} />
+                  <Maximize2Icon size={12} />
                   Edit row
                 </ContextMenuItem>
               )}
@@ -185,7 +185,7 @@ export const DataGridResults = ({
                 }}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <Copy size={12} />
+                <CopyIcon size={12} />
                 Copy cell content
               </ContextMenuItem>
               <ContextMenuItem
@@ -196,7 +196,7 @@ export const DataGridResults = ({
                 }}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <Expand size={12} />
+                <ExpandIcon size={12} />
                 View cell content
               </ContextMenuItem>
             </ContextMenuContent>

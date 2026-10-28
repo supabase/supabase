@@ -1,4 +1,4 @@
-import { Play } from 'lucide-react'
+import { PlayIcon } from 'lucide-react'
 
 import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { type QueryResult } from '../types'
@@ -35,7 +35,7 @@ export const QueryResultRenderer = ({
   if (!result) {
     return (
       <div className="flex items-center gap-x-2 p-3 w-full">
-        <Play size={12} className="text-foreground-lighter" />
+        <PlayIcon size={12} className="text-foreground-lighter" />
         <p className="text-xs text-foreground-lighter">Run the query to see results</p>
       </div>
     )
