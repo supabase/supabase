@@ -23,8 +23,8 @@ type TableOption = NonNullable<DestinationPanelSchemaType['tableOptions']>[numbe
 type PartitionBy = TableOption['partitionBy']
 
 const getFieldErrorMessage = (errors: FieldErrors<DestinationPanelSchemaType>, path: string) => {
-  const error = get(errors, path)
-  return typeof error?.message === 'string' ? error.message : undefined
+  const message = get(errors, `${path}.message`)
+  return typeof message === 'string' ? message : undefined
 }
 
 interface TableOptionErrors {
