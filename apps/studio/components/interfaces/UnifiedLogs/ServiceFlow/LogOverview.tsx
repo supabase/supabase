@@ -79,13 +79,15 @@ const LOG_OVERVIEW_RENDERERS: Partial<
 export const hasLogOverviewRenderer = (logType: string) => logType in LOG_OVERVIEW_RENDERERS
 
 export function LogOverview({
+  header,
   attributes,
   ...props
-}: LogOverviewProps & { attributes?: ColumnSchema['metadata'] }) {
+}: LogOverviewProps & { header?: ReactNode; attributes?: ColumnSchema['metadata'] }) {
   const Renderer = LOG_OVERVIEW_RENDERERS[props.data.log_type]
 
   return (
     <>
+      {header}
       {Renderer ? (
         <Renderer {...props} />
       ) : (
