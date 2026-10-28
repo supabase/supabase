@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -68,6 +69,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   })
 
   const canLogin = useWatch({ control: form.control, name: 'canLogin' })
+  const [isPasswordGenerated, setIsPasswordGenerated] = useState(false)
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async ({ password, ...values }) => {
     if (!project) return console.error('Project is required')
@@ -83,6 +85,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const handleClose = () => {
     onClose()
     form.reset(initialValues)
+    setIsPasswordGenerated(false)
   }
 
   return (
@@ -209,9 +212,10 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                         type="button"
                         tabIndex={0}
                         className={InlineLinkClassName}
-                        onClick={() =>
+                        onClick={() => {
                           form.setValue('password', generateStrongPassword(), { shouldDirty: true })
-                        }
+                          setIsPasswordGenerated(true)
+                        }}
                       >
                         Generate a password
                       </button>
@@ -222,12 +226,19 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                   <FormControl>
                     <PatternInput
                       {...field}
+                      onChange={(event) => {
+                        field.onChange(event)
+                        setIsPasswordGenerated(false)
+                      }}
                       copy={field.value.length > 0}
                       type="password"
                       autoComplete="new-password"
                       placeholder="Type in a password"
                     />
                   </FormControl>
+                  <span role="status" aria-live="polite" className="sr-only">
+                    {isPasswordGenerated ? 'Password generated' : ''}
+                  </span>
                 </FormItemLayout>
               )}
             />

@@ -83,6 +83,25 @@ describe('CreateRolePanel', () => {
     expect(await screen.findByLabelText('Password')).toBeInTheDocument()
   })
 
+  test('fills the password field and announces it when a password is generated', async () => {
+    renderPanel()
+    const user = userEvent.setup()
+    await screen.findByLabelText('Name')
+
+    await user.click(getLoginSwitch())
+    const passwordInput = await screen.findByLabelText('Password')
+    expect(passwordInput).toHaveValue('')
+
+    await user.click(screen.getByRole('button', { name: 'Generate a password' }))
+
+    expect(passwordInput).not.toHaveValue('')
+    expect(screen.getByText('Password generated')).toBeInTheDocument()
+
+    // Editing the generated password clears the announcement
+    await user.type(passwordInput, 'x')
+    expect(screen.queryByText('Password generated')).not.toBeInTheDocument()
+  })
+
   test('creates the role with the password when login is enabled', async () => {
     renderPanel()
     const user = await fillName('app_user')
