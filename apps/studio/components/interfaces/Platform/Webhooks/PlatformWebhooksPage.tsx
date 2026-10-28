@@ -411,6 +411,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to send webhook test event', error)
       return
     }
+    // A new delivery is newer than every cursor, so it can only show up on the first page
+    setDeliveryPages({ endpointId: selectedEndpoint.id, cursors: [] })
     startAwaitingDelivery()
     toast.success('Test event sent — check deliveries shortly')
   }

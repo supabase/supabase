@@ -82,21 +82,16 @@ export const resetPendingSigningSecretRevealForTests = () => {
  * Deliveries are not polled by default. Polling is on while the user chose "Live", while a delivery
  * is still pending, and for a short wait after a test event or retry was sent. That wait cannot end
  * when the new row shows up, because the API returns an ingress ID, not the ID of the delivery.
- * It stays off after a failed load with no rows, because the error has a "Try again" button.
  */
 export const getDeliveriesRefetchInterval = ({
   isLive,
   isAwaitingDelivery,
   deliveries,
-  hasLoadFailed,
 }: {
   isLive: boolean
   isAwaitingDelivery: boolean
   deliveries: WebhookDelivery[]
-  hasLoadFailed: boolean
 }) => {
-  if (hasLoadFailed) return false
-
   const hasPendingDelivery = deliveries.some((delivery) => delivery.status === 'pending')
 
   return isLive || isAwaitingDelivery || hasPendingDelivery ? DELIVERIES_POLL_INTERVAL_MS : false

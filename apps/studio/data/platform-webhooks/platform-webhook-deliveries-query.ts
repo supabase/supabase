@@ -49,7 +49,6 @@ export const useWebhookDeliveriesQuery = <TData = WebhookDeliveriesData>(
         isLive,
         isAwaitingDelivery,
         deliveries: query.state.data ?? [],
-        hasLoadFailed: query.state.status === 'error' && !query.state.data?.length,
       }),
     ...options,
   })

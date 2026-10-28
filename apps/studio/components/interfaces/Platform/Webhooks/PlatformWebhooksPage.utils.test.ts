@@ -207,7 +207,6 @@ describe('PlatformWebhooksPage.utils', () => {
       isLive: false,
       isAwaitingDelivery: false,
       deliveries: settled,
-      hasLoadFailed: false,
     }
 
     it('does not poll by default', () => {
@@ -236,10 +235,12 @@ describe('PlatformWebhooksPage.utils', () => {
       )
     })
 
-    it('does not poll after a failed load with no rows, even when Live is on', () => {
+    it('keeps polling while Live is on or waiting, even with no rows after a failed load', () => {
+      expect(getDeliveriesRefetchInterval({ ...base, isLive: true, deliveries: [] })).toBe(5000)
       expect(
-        getDeliveriesRefetchInterval({ ...base, isLive: true, deliveries: [], hasLoadFailed: true })
-      ).toBe(false)
+        getDeliveriesRefetchInterval({ ...base, isAwaitingDelivery: true, deliveries: [] })
+      ).toBe(5000)
+      expect(getDeliveriesRefetchInterval({ ...base, deliveries: [] })).toBe(false)
     })
   })
 })
