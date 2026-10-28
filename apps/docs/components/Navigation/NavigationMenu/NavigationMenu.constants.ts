@@ -2815,7 +2815,7 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/temporary-access' as `/${string}`,
         },
         {
-          name: 'Team Database Access',
+          name: 'Map team members to Postgres roles',
           url: '/guides/platform/team-database-access' as `/${string}`,
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' as `/${string}` },

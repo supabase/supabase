@@ -1,44 +1,67 @@
 ---
 id: 'team-database-access'
 title: 'Map team members to Postgres roles'
-description: 'Let a team member connect to your project database as a Postgres role with their own access token, and limit that access by expiry and network.'
-subtitle: 'Let a team member connect to your project database as a Postgres role with their own access token, and limit that access by expiry and network.'
+description: 'Give team members database access through their own access tokens instead of a shared password.'
 ---
 
-Let a team member connect to your project database as a [Postgres role](/docs/guides/database/postgres/roles) with their own access token, and limit that access by expiry and network. To learn how to enable temporary access and connect with it, see [Temporary access](/docs/guides/platform/temporary-access).
+Let a team member connect to your project database as a [Postgres role](/docs/guides/database/postgres/roles), using their own [access token](/docs/guides/platform/personal-access-tokens) instead of a shared password. This follows security best practices, allowing each person to only access what they need for as long as they need it.
 
-A mapping authorizes a team member to assume one or more existing Postgres roles. It creates no new role or user in the database, and the assumed role's permissions still apply. The role's own password keeps working, so long-lived service connections don't change.
+A role mapping authorizes a team member to assume one or more Postgres roles. It creates no new role or user in the database, and the assumed role's permissions apply. The role's own password keeps working, so long-lived service connections don't change. A team member who knows the role's password can connect with it after you remove their mapping. To end that access, change the role's password. For the `postgres` role, see [Changing your project password](/docs/guides/database/postgres/roles#changing-your-project-password).
 
-## Before you begin
+Use this guide when:
 
-- [Enable temporary access](/docs/guides/platform/temporary-access#manage-temporary-access-via-the-dashboard) on the project.
-- Create a [personal access token](/dashboard/account/tokens) to call the Management API.
+- Your team shares the `postgres` password, and you want each person to connect with their own credentials.
+- Someone needs database access that [ends on a date you set](#restrict-a-team-members-access).
+- You want to [remove one person's access](#remove-a-team-members-access) without changing a password everyone else uses.
+
+For how temporary access works and how to connect with it, see [Temporary access](/docs/guides/platform/temporary-access).
+
+## Prerequisites
+
+Before you authorize a team member, set up the following:
+
+- [Enable temporary access](/docs/guides/platform/temporary-access#manage-temporary-access-via-the-management-api) on the project.
+- Create a personal access token in the [Supabase Dashboard](/dashboard/account/tokens) to call the Management API. If you scope the token, give it **Organization Members** with **Read** access and **Database JIT** with **Read-write** access.
+- Confirm that the team member has access to the project.
 
 ## Authorize a team member
 
-1. Set your access token and project ref:
+To authorize a team member:
+
+1. Set your access token, project ref, and organization slug:
 
    ```bash
    export SUPABASE_MANAGEMENT_API_TOKEN="your-access-token"
    export PROJECT_REF="your-project-ref"
-   export MEMBER_USER_ID="the-member-user-id"
+   export ORG_SLUG="your-org-slug"
    ```
 
-   `MEMBER_USER_ID` is the user ID of the team member you want to authorize.
+   The organization slug is the part of your organization's URL in the Supabase Dashboard that follows `/org/`.
 
-2. Map the team member to the roles they can assume. This example authorizes the `postgres` role:
+2. List the organization's members, and copy the `user_id` of the team member you want to authorize:
 
    ```bash
+   curl "https://api.supabase.com/v1/organizations/$ORG_SLUG/members" \
+     -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN"
+   ```
+
+3. Map the team member to the roles they can assume. Each request replaces the team member's mappings, so list every role they need. To restrict access from the start, add the fields from [Restrict a team member's access](#restrict-a-team-members-access) to this request:
+
+   ```bash
+   export MEMBER_USER_ID="the-member-user-id"
+
    curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit" \
      -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
      -H "Content-Type: application/json" \
      -d @- <<EOF
    {
      "user_id": "$MEMBER_USER_ID",
-     "user_roles": [{ "role": "postgres" }]
+     "roles": [{ "role": "postgres" }]
    }
    EOF
    ```
+
+   This example maps the `postgres` role, which has broad privileges on your database. If the team member needs less, map a narrower role.
 
 The team member can now connect as the `postgres` role, with their access token as the password. For connection strings, see [Using temporary access](/docs/guides/platform/temporary-access#using-temporary-access).
 
@@ -46,27 +69,38 @@ The team member can now connect as the `postgres` role, with their access token 
 
 Each role in the mapping takes two optional restrictions:
 
-- `expires_at`: a Unix timestamp. After it passes, the database rejects the connection, even if the access token is still valid.
+- `expires_at`: a Unix timestamp in seconds. After it passes, the database rejects the connection, even if the access token is still valid.
 - `allowed_networks`: the CIDR ranges the team member can connect from. Put IPv4 ranges in `allowed_cidrs` and IPv6 ranges in `allowed_cidrs_v6`.
 
-This example limits the `postgres` role to one IPv4 address until a fixed time:
+This example uses the variables from [Authorize a team member](#authorize-a-team-member). It limits the `postgres` role to one IPv4 address for seven days. Replace `203.0.113.10/32` with the address or range the team member connects from:
 
 ```bash
+export EXPIRES_AT=$(( $(date +%s) + 7 * 24 * 60 * 60 ))
+
 curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit" \
   -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d @- <<EOF
 {
   "user_id": "$MEMBER_USER_ID",
-  "user_roles": [
+  "roles": [
     {
       "role": "postgres",
-      "expires_at": 1758721065775,
+      "expires_at": $EXPIRES_AT,
       "allowed_networks": {
-        "allowed_cidrs": [{ "cidr": "176.1.12.1/32" }]
+        "allowed_cidrs": [{ "cidr": "203.0.113.10/32" }]
       }
     }
   ]
 }
 EOF
+```
+
+## Remove a team member's access
+
+To remove all of a team member's role mappings, send a delete request:
+
+```bash
+curl -X DELETE "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit/$MEMBER_USER_ID" \
+  -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN"
 ```
