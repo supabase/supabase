@@ -239,8 +239,12 @@ describe('Todos RLS', () => {
     })
 
     // Attempt to update the todos we shouldn't have access to
-    // result will be a no-op
-    await supabase.from('todos').update({ task: 'Hacked!' }).eq('user_id', USER_1_ID)
+    // RLS filters out the rows, so the update succeeds but changes nothing
+    const { error: updateError } = await supabase
+      .from('todos')
+      .update({ task: 'Hacked!' })
+      .eq('user_id', USER_1_ID)
+    expect(updateError).toBeNull()
 
     // Log back in as User 1 to verify their todos weren't changed
     await supabase.auth.signInWithPassword({
