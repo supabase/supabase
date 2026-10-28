@@ -4,34 +4,66 @@ title: 'Production security checklist'
 description: 'Secure your database, your Supabase account, and Auth before you launch.'
 ---
 
-Secure your project before you launch it. Work through each group below, and check your database for issues with [Security Advisor](/dashboard/project/_/database/security-advisor). For performance and availability checks, see the [Production checklist](/docs/guides/deployment/going-into-prod).
+Secure your project before real users depend on it. This checklist covers the settings that, when missed, leave data exposed or accounts open to takeover.
+
+Run through it when you:
+
+- Get ready to launch, or move a project from testing to production.
+- Open sign-ups to the public.
+- Add tables, sign-in methods, or teammates to a live project.
+- Answer a security review or a customer's security questionnaire.
+
+This page covers the security part of the [Production checklist](/docs/guides/deployment/going-into-prod). That checklist also covers performance, availability, deployment, and rate limits. To find issues in your database at any time, run [Security Advisor](/dashboard/project/_/database/security-advisor).
+
+To have your AI agent check your project against this list, copy this prompt:
+
+<AiPrompt id="production-security-checklist" includeInMarkdown />
 
 ## Database
 
-- Enable Row Level Security (RLS) on every table in the [**Database > Tables**](/dashboard/project/_/database/tables) section of the Dashboard. A table without RLS and reasonable policies lets any client read and change its data. To learn more, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
-- Enable replication on tables containing sensitive data by enabling RLS and setting row security policies:
+The Data API exposes your tables to anyone who has your publishable key, and that key ships in your app. These checks make sure each table returns only what a request is allowed to see, and that direct connections come only from networks you expect.
+
+To secure your database:
+
+- Enable Row Level Security (RLS) on every table in the [**Database > Tables**](/dashboard/project/_/database/tables) section of the Supabase Dashboard. A table without RLS and reasonable policies lets any client read and change its data. To learn more, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
+- Enable RLS and create policies on every replicated table that holds sensitive data:
   - Go to the [**Database > Policies**](/dashboard/project/_/database/policies) section of the Dashboard to enable RLS and create policies.
-  - Go to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Dashboard to manage replicated tables.
+  - Go to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Dashboard to add or remove replicated tables. To add or remove them with SQL, see [Postgres Changes](/docs/guides/realtime/postgres-changes#quick-start).
+  - To send sensitive changes only to authorized users, use [Broadcast with Realtime Authorization](/docs/guides/realtime/authorization#broadcast). RLS doesn't filter Postgres Changes `DELETE` events.
 - Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement) in the [**Database > Settings > SSL Configuration**](/dashboard/project/_/database/settings#ssl-configuration) section of the Dashboard.
 - Enable [Network Restrictions](/docs/guides/platform/network-restrictions) in the [**Database > Settings > Network Restrictions**](/dashboard/project/_/database/settings#network-restrictions) section of the Dashboard.
 
 ## Account and organization
 
+Members of your Supabase organization can change your projects' settings and read their data, depending on their role. These checks protect the accounts that have that access, and make sure you can't get locked out.
+
+To secure your account and organization:
+
 - Protect your Supabase account with multi-factor authentication (MFA):
-  - If you sign in with GitHub, [enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication). Your GitHub account gives you administrative rights to your Supabase organization, so protect it with a strong password and 2FA, using a U2F key or a TOTP app.
+  - If you sign in with GitHub, [enable two-factor authentication (2FA) on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication). Your GitHub account gives you administrative rights to your Supabase organization, so also protect it with a strong password. For 2FA, use a security key or an authenticator app.
   - If you sign in with an email and password, set up [MFA for your Supabase account](/docs/guides/platform/multi-factor-authentication#enable-mfa).
-- Consider enabling [MFA enforcement on your organization](/docs/guides/platform/mfa/org-mfa-enforcement). Every member then needs a valid MFA-backed session to work with organization and project resources.
-- Consider adding more than one owner to your organization in the [**Organization > Team**](/dashboard/org/_/team) section of the Dashboard. If one owner is unreachable or loses access to their account, you still have Owner access to your organization.
+- If your organization is on the Pro, Team, or Enterprise plan, enable [MFA enforcement on your organization](/docs/guides/platform/mfa/org-mfa-enforcement). Every member then needs a valid MFA-backed session to work with organization and project resources.
+- Add more than one owner to your organization in the [**Organization > Team**](/dashboard/org/_/team) section of the Dashboard. If one owner is unreachable or loses access to their account, you still have Owner access to your organization.
 
 ## Auth
 
-- Enable email confirmations in the [**Authentication > Providers**](/dashboard/project/_/auth/providers) section of the Dashboard.
+These settings decide how your users sign up and sign in to your app. Tighten them before real users arrive, so sign-ups are confirmed, codes and links expire within an hour, and Auth emails come from your own domain.
+
+To change these settings from a terminal, use the Management API [update Auth config](/docs/reference/api/v1-update-auth-service-config) endpoint.
+
+To secure Auth:
+
+- Enable email confirmations in the [**Authentication > Sign In / Providers**](/dashboard/project/_/auth/providers) section of the Dashboard.
 - Remove any [test phone numbers](/docs/guides/auth/testing-auth-flows#test-phone-sign-in-with-test-numbers) you added for testing.
-- Set the expiry for one-time passwords (OTPs) in the [**Authentication > Providers**](/dashboard/project/_/auth/providers) section of the Dashboard. Use 3600 seconds (1 hour) or lower. If you need more entropy, increase the length of the OTP.
+- Set the expiry for one-time passwords (OTPs) in the [**Authentication > Sign In / Providers**](/dashboard/project/_/auth/providers) section of the Dashboard. Use 3600 seconds (1 hour) or lower. The same setting controls how long confirmation, password recovery, email change, and invitation links stay valid, so a shorter expiry also shortens those. If you need more entropy, increase the length of the OTP.
 - If your application needs a higher level of security, set up [multi-factor authentication](/docs/guides/auth/auth-mfa) for your users.
-- Use a custom SMTP server for Auth emails, so your users see mail from a trusted domain, ideally the domain your app runs on. Get SMTP credentials from any major email provider, such as SendGrid or AWS SES.
+- Use a [custom SMTP server](/docs/guides/auth/auth-smtp) for Auth emails, so your users see mail from a trusted domain, ideally the domain your app runs on. Get SMTP credentials from any major email provider, such as SendGrid or AWS SES.
 
 ## Threat review
 
-- Consider how _you_ might abuse your service as an attacker, and take steps to mitigate it.
-- Review these [common cybersecurity threats](https://auth0.com/docs/security/prevent-threats).
+The Database, Account and organization, and Auth checks cover settings that every project shares. Finish with the parts that only your app has.
+
+To review the risks that are specific to your app:
+
+- Work out how an attacker could abuse your app, and mitigate each risk you find.
+- Review the common web application risks in the [OWASP Top 10](https://owasp.org/projects/top-ten).
