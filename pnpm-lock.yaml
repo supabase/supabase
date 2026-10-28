@@ -460,8 +460,8 @@ importers:
         specifier: ^11.0.0
         version: 11.1.1
       katex:
-        specifier: ^0.16.21
-        version: 0.16.21
+        specifier: ^0.18.2
+        version: 0.18.2
       libpg-query:
         specifier: 15.2.0
         version: 15.2.0(encoding@0.1.13)(supports-color@8.1.1)
@@ -13727,16 +13727,12 @@ packages:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
 
-  katex@0.16.21:
-    resolution: {integrity: sha512-XvqR7FgOHtWupfMiigNzmh+MgUVmDGU2kXZm899ZkPfcuoPuFxyHmXsgATDpFZDAXCI8tvinaVcDo8PIIJSo4A==}
-    hasBin: true
-
-  katex@0.16.22:
-    resolution: {integrity: sha512-XCHRdUw4lf3SKBaJe4EvgqIuWwkPSo9XoeO8GjQW94Bp7TWv9hNhzZjZ+OH9yf1UmLygb7DIT5GSFQiyt16zYg==}
-    hasBin: true
-
   katex@0.16.47:
     resolution: {integrity: sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==}
+    hasBin: true
+
+  katex@0.18.2:
+    resolution: {integrity: sha512-3snve4y0SXTMequLim1FMiPvLGElySam0blN5xQZBqEY3lOJz1TnuaaiugnBZBqHzlSAGmFTYL7MCQkORuLKCA==}
     hasBin: true
 
   keyv@4.5.4:
@@ -31448,15 +31444,11 @@ snapshots:
       object.assign: 4.1.7
       object.values: 1.2.1
 
-  katex@0.16.21:
-    dependencies:
-      commander: 8.3.0
-
-  katex@0.16.22:
-    dependencies:
-      commander: 8.3.0
-
   katex@0.16.47:
+    dependencies:
+      commander: 8.3.0
+
+  katex@0.18.2:
     dependencies:
       commander: 8.3.0
 
@@ -35313,7 +35305,7 @@ snapshots:
       '@types/katex': 0.16.7
       hast-util-from-html-isomorphic: 2.0.0
       hast-util-to-text: 4.0.0
-      katex: 0.16.22
+      katex: 0.16.47
       unist-util-visit-parents: 6.0.1
       vfile: 6.0.3
 
@@ -36396,7 +36388,7 @@ snapshots:
     dependencies:
       clsx: 2.1.1
       harden-react-markdown: 1.1.2(react-markdown@10.1.0(@types/react@19.2.14)(react@19.2.6)(supports-color@8.1.1))(react@19.2.6)
-      katex: 0.16.22
+      katex: 0.16.47
       lucide-react: 0.542.0(react@19.2.6)
       marked: 16.3.0
       mermaid: 11.17.2(supports-color@8.1.1)
