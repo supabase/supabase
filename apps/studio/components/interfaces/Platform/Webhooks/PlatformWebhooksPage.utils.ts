@@ -1,4 +1,4 @@
-import type { WebhookScope } from './PlatformWebhooks.types'
+import type { WebhookDelivery, WebhookScope } from './PlatformWebhooks.types'
 
 export const shouldHandleEndpointNotFound = ({
   endpointId,
@@ -13,6 +13,23 @@ export const shouldHandleEndpointNotFound = ({
   if (hasSelectedEndpoint) return false
   return endpointId !== pendingCreatedEndpointId
 }
+
+/**
+ * The table's rows refresh every few seconds, but the sheet's delivery is loaded once, so its status
+ * can be out of date. Prefer the table's row, and only fall back to the sheet's delivery when it is
+ * not on the current page.
+ */
+export const findDeliveryToRetry = ({
+  deliveryId,
+  selectedDelivery,
+  pageDeliveries,
+}: {
+  deliveryId: string
+  selectedDelivery: WebhookDelivery | null
+  pageDeliveries: WebhookDelivery[]
+}) =>
+  pageDeliveries.find((delivery) => delivery.id === deliveryId) ??
+  (selectedDelivery?.id === deliveryId ? selectedDelivery : undefined)
 
 /**
  * Only redirect away once the flags have loaded and the route params are populated; before
