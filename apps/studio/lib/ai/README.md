@@ -28,7 +28,7 @@ The state module owns the AI SDK chat instances, request transport, chat persist
 - **Enforce access in code.** Resolve organization/project access on the server and keep the restrictive fallback for an unverified pairing. Prompts and UI visibility are not authorization checks.
 - **Keep execution approval separate from data sharing.** Full data opt-in does not approve AI-generated SQL execution. Promote untrusted SQL only after explicit user approval.
 - **Protect results on every model path.** Apply output filtering to both live tool results and replayed history. Raising opt-in must not expose SQL results collected under a lower level.
-- **Keep the tool allowlist.** Register tools explicitly and declare their minimum opt-in level. Remote MCP tools must pass the filter; the remote server's read-only setting does not replace it.
+- **Keep the tool allowlist.** The registry is the allowlist: register a tool with a contract that declares its minimum opt-in level. Remote MCP tools must have a remote contract to pass; the remote server's read-only setting does not replace it.
 - **Keep request context out of the shared system prompt.** Put project, chat, clock, and logs context in `assistant-context.ts` to preserve provider caching.
 - **Keep tool contracts safe to import in the browser.** Shared contracts contain schemas and pure output transformations; database calls and other server execution belong in the server implementation.
 - **Preserve both runtimes.** Keep the TanStack adapter and Next.js handler aligned. The chat route currently delegates to the shared handler; do not remove that handler while the adapter uses it.
@@ -65,17 +65,16 @@ Keep per-request context in `assistant-context.ts`. The shared system prompt is 
 | Change                                                       | Start here                                                                                                                                                                                                                                                                                                   |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Tool assembly and platform/self-hosted selection             | [tools/index.ts](./tools/index.ts)                                                                                                                                                                                                                                                                           |
-| Allowlist, minimum opt-in levels, and blocked-tool responses | [tool-filter.ts](./tool-filter.ts)                                                                                                                                                                                                                                                                           |
+| Opt-in filtering and blocked-tool responses                  | [tool-filter.ts](./tool-filter.ts)                                                                                                                                                                                                                                                                           |
 | Remote MCP connection and tool selection                     | [supabase-mcp.ts](./supabase-mcp.ts), [mcp-tools.ts](./tools/mcp-tools.ts)                                                                                                                                                                                                                                   |
-| Self-hosted tools                                            | [fallback-tools.ts](./tools/fallback-tools.ts)                                                                                                                                                                                                                                                               |
 | Contract-based tools (see [Tool contracts](#tool-contracts)) | [registry.ts](./tools/registry.ts) lists them in `TOOL_CONTRACTS` (and remote MCP tools in `REMOTE_TOOL_CONTRACTS`), and [registry.server.ts](./tools/registry.server.ts) maps each to its factory in `TOOL_FACTORIES`; [types.ts](./tools/types.ts), [tool-from-contract.ts](./tools/tool-from-contract.ts) |
 
-Tools are moving to [contracts](#tool-contracts); the rest declare their schemas and output handling directly. [registry.ts](./tools/registry.ts) is the source of truth for which are which: a tool in `TOOL_CONTRACTS` or `REMOTE_TOOL_CONTRACTS` is a contract tool.
+Every tool is a [contract](#tool-contracts) tool, and [registry.ts](./tools/registry.ts) is the source of truth for which tools exist: `TOOL_CONTRACTS` for tools Studio implements and `REMOTE_TOOL_CONTRACTS` for tools the remote MCP server implements. A tool not in either is not on the allowlist.
 
 For a new or changed tool:
 
-1. Prefer a [contract](#tool-contracts) for a new tool. Otherwise implement it in the appropriate tool module.
-2. Register it in the registry, which `getTools` builds tools from (add the factory to `TOOL_FACTORIES` for a local contract), and add its name to the allowlist in `tool-filter.ts`. A contract, local or remote, declares minimum access as `minOptInLevel`; other tools use `TOOL_CATEGORY_MAP`.
+1. Write a [contract](#tool-contracts) for the tool.
+2. Register it in the registry, which `getTools` builds tools from and which is the allowlist (add the factory to `TOOL_FACTORIES` for a local contract). A contract, local or remote, declares minimum access as `minOptInLevel` and where it exists as `availability`.
 3. Decide whether execution needs user approval and what output may reach the model, including on history replay. Read the [SQL safety skill](../../../../.agents/skills/safe-sql-execution/SKILL.md) before changing SQL execution.
 4. Update `Message.Parts.tsx` and its helpers if the tool needs a UI renderer.
 5. Update relevant tests, mock tools, and evaluation cases. See [local development and validation](#local-development-and-validation).
@@ -83,6 +82,8 @@ For a new or changed tool:
 ### Tool contracts
 
 A contract declares a tool once: name, description, input and output schemas, `availability`, `minOptInLevel`, `needsApproval`, optional `promptGuidance`, and `toModelOutput`, which decides what the model may see of the output. `availability` says which environments (`platform`, `self-hosted`) the tool exists in and which request conditions it also needs (`requires`, such as the Explorer flag or support mode). [registry.server.ts](./tools/registry.server.ts) builds only the available tools for a request, so `getTools` has no per-tool branches.
+
+A tool factory that queries the project's database runs the pg-meta query through `runPgMetaQuery` in [tool-sql.server.ts](./tools/tool-sql.server.ts), not `executeSql` directly. Off platform, `executeSql` without a fetcher posts to `API_URL`, which is the relative `/api` unless `NEXT_PUBLIC_SITE_URL` is set and so can't resolve on the server; the helper passes `executeQuery` from `lib/api/self-hosted/query.ts` as the fetcher there. It accepts only the `{ sql, zod }` a pg-meta builder returns, so the SQL is a `SafeSqlFragment` and the rows are validated.
 
 `promptGuidance` holds the rules for using the tool that its description doesn't cover; omit it when the description is enough. [buildToolsPrompt](./tools/tools-prompt.ts) generates the system prompt's `## Tools` section from the tools the model is given: it lists each one that has a contract, then adds a section with the guidance of each tool that has any. Because it reads the tool set itself, the prompt never mentions a tool the model doesn't have, including remote tools that failed to load. Keep rules that name a tool in its `promptGuidance`, not in `prompts.ts`, and name only tools that are available whenever that tool is; a test checks the tool set `getTools` builds for every combination of environment and requirements. The prompt is cached, so the section may depend only on the tool set, never on per-request data. The registry also applies `toModelOutput` to persisted outputs when it replays history, so it must be safe to run on its own result.
 
@@ -94,24 +95,13 @@ Each contract tool is a pair of files named after the tool, plus an optional out
 
 [update-notebook.ts](./tools/update-notebook.ts) and [update-notebook.server.ts](./tools/update-notebook.server.ts) show the split with approval. [update-opt-in-level.ts](./tools/update-opt-in-level.ts) shows `createInputSchema`, for a tool whose stored input depends on the request: the SDK stores the parsed input, so the contract's `inputSchema` describes the stored shape and the per-request schema is built from the context. [execute-sql.ts](./tools/execute-sql.ts) shows an output schema that also accepts an older persisted shape.
 
-To migrate a tool to a contract:
-
-1. Create `<tool-name>.ts` and `<tool-name>.server.ts`, moving the schemas, description, and `execute` out of the old definition.
-2. Make `outputSchema` accept every shape already saved in chat history, normalizing older ones with a union and transform. Set `outputOnInvalid` if the model should see something other than nothing when a saved output doesn't parse.
-3. Register the contract in `TOOL_CONTRACTS`, and declare its `availability`, and add `createTool` to `TOOL_FACTORIES` in [registry.server.ts](./tools/registry.server.ts).
-4. Remove the tool from `TOOL_CATEGORY_MAP`. Keep it in the allowlist in `tool-filter.ts`.
-5. Delete any per-tool sanitizer. [tool-sanitizer.ts](./tools/tool-sanitizer.ts) only delegates to `sanitizeContractPart`.
-6. Replace imports of the old inline schemas in the UI, evals, and `generate-assistant-response.ts` with `contract.inputSchema`, `contract.outputSchema`, or `ToolContractInput`/`ToolContractOutput`.
-7. Test the contract's `toModelOutput` at every opt-in level and on history replay, in [registry.test.ts](./tools/registry.test.ts) and [tool-sanitizer.test.ts](./tools/tool-sanitizer.test.ts) as applicable.
-8. Call out any change to what the model sees or to the stored shape in the PR description.
-
 #### Remote contracts
 
-A tool the remote MCP server implements has a `RemoteToolContract`: only `name`, `availability`, `minOptInLevel`, `needsApproval`, and `promptGuidance`. The server owns the description, input schema, execution, and output, so there is no `.server.ts` file and its parts stay `dynamic-tool`, outside `StudioUIMessage`. Register it in `REMOTE_TOOL_CONTRACTS` and remove it from `TOOL_CATEGORY_MAP`; [mcp-tools.ts](./tools/mcp-tools.ts) applies `needsApproval`, since MCP tool definitions can't declare it. [list-extensions.ts](./tools/list-extensions.ts) is an example.
+A tool the remote MCP server implements has a `RemoteToolContract`: only `name`, `availability`, `minOptInLevel`, `needsApproval`, and `promptGuidance`. The server owns the description, input schema, execution, and output, so there is no `.server.ts` file and its parts stay `dynamic-tool`, outside `StudioUIMessage`. When a local contract has the same name, give them disjoint environments and the same `minOptInLevel` and `needsApproval`; the remote file is named `<tool-name>.remote.ts`, as in [list-tables.remote.ts](./tools/list-tables.remote.ts) next to the self-hosted [list-tables.ts](./tools/list-tables.ts). Register it in `REMOTE_TOOL_CONTRACTS`, which is also what lets the tool through; [mcp-tools.ts](./tools/mcp-tools.ts) applies `needsApproval`, since MCP tool definitions can't declare it. [list-extensions.ts](./tools/list-extensions.ts) is an example.
 
 #### Legacy contracts
 
-A tool that no longer exists can still have outputs in saved chats, such as the self-hosted fallback tools that contracts replace. A `LegacyToolContract` keeps those outputs safe: only `name`, `outputSchema`, `toModelOutput`, and `outputOnInvalid`, so replayed output is validated and gated by opt-in level like any contract tool's. [legacy-tools.ts](./tools/legacy-tools.ts) lists them in `LEGACY_TOOL_CONTRACTS`. Only history replay reads them, through `sanitizeContractPart`, and nothing registers them as tools. When you remove or rename a tool whose outputs exist in saved chats, add a legacy contract for the old name.
+A tool that no longer exists can still have outputs in saved chats, such as the self-hosted fallback tools (`getSchemaTables`, `getRlsKnowledge`, `getFunctions`, `getEdgeFunctionKnowledge`) that contracts replaced. A `LegacyToolContract` keeps those outputs safe: only `name`, `outputSchema`, `toModelOutput`, and `outputOnInvalid`, so replayed output is validated and gated by opt-in level like any contract tool's. [legacy-tools.ts](./tools/legacy-tools.ts) lists them in `LEGACY_TOOL_CONTRACTS`. Only history replay reads them, through `sanitizeContractPart`, and nothing registers them as tools. A legacy contract may replay less than was saved: `getRlsKnowledge` replays only the saved policies, dropping the stale instructions stored with them, and `getEdgeFunctionKnowledge` replays a pointer to `load_knowledge`. A legacy name must never match a registry tool. When you remove or rename a tool whose outputs exist in saved chats, add a legacy contract for the old name.
 
 #### Legacy contracts
 
@@ -135,7 +125,7 @@ The opt-in levels are `disabled`, `schema`, `schema_and_log`, and `schema_and_lo
 
 The model can call `update_opt_in_level` with `requiredLevel` to request higher access, or without `requiredLevel` when the user asks to review or change the setting. Every call requires approval through the opt-in request card, even when the organization already has the requested level. If the requested level is already satisfied, the contract's `createInputSchema` transform removes `requiredLevel` and treats the call as a review request; `levelWhenAsked` records the organization's level when the call was made.
 
-On platform, the endpoint resolves organization access and `getTools` includes platform tools when an access token is available. It also registers the opt-in request tool. Self-hosted requests use the `schema` level and fallback tools instead of the platform tool set. Check [getTools](./tools/index.ts) and [generate-v4](../../pages/api/ai/sql/generate-v4.ts) when changing either environment.
+On platform, the endpoint resolves organization access and `getTools` includes platform tools when an access token is available. It also registers the opt-in request tool. Self-hosted requests use the `schema` level and the contract tools whose `availability` includes `self-hosted`, such as `list_tables` (a local contract that mirrors the remote MCP tool), `list_policies`, and `list_functions`, instead of the remote MCP tools. Check [getTools](./tools/index.ts) and [generate-v4](../../pages/api/ai/sql/generate-v4.ts) when changing either environment.
 
 ## Related AI features
 
@@ -149,7 +139,7 @@ The chat Assistant shares code with other Studio AI features, but those have sep
 
 ## Local development and validation
 
-Use the [Studio setup instructions](../../README.md#developer-quickstart) for the application and backend configuration. From the repository root, `pnpm dev:studio` starts Studio on port 8082 by default. The chat endpoint currently selects the OpenAI provider, which requires a server-side `OPENAI_API_KEY`; see [model.ts](./model.ts). A self-hosted session exercises the fallback tool set, so use a platform development environment when working on platform-only tools or organization settings.
+Use the [Studio setup instructions](../../README.md#developer-quickstart) for the application and backend configuration. From the repository root, `pnpm dev:studio` starts Studio on port 8082 by default. The chat endpoint currently selects the OpenAI provider, which requires a server-side `OPENAI_API_KEY`; see [model.ts](./model.ts). A self-hosted session exercises the self-hosted contract tools, so use a platform development environment when working on platform-only tools or organization settings.
 
 Tests are colocated with the implementation under `lib/ai/`, `components/ui/AIAssistantPanel/`, and `state/`. For example, from `apps/studio`:
 
