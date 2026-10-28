@@ -12,7 +12,7 @@ enableGlobalVirtualStore: false
 
 catalog:
   '@monaco-editor/react': 4.8.0-rc.3
-  '@sentry/nextjs': ^10.59.0
+  '@sentry/nextjs': ^10.75.2
   '@sentry/tanstackstart-react': ^10.59.0
   '@supabase/auth-js': 2.117.3
   '@supabase/postgrest-js': 2.117.3
