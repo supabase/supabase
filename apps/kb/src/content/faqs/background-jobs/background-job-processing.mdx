@@ -1,6 +1,7 @@
 ---
 title: How do I add background job processing to my app?
 topics: ['Queues']
+lastEdited: 2026-10-28
 ---
 
 Use [Supabase Queues](/docs/guides/queues). Your app adds a message when work needs doing, and a worker reads the message and processes it. Queues are built on the [`pgmq` Postgres extension](/docs/guides/queues/pgmq), so messages are stored in your database.
