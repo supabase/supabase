@@ -368,6 +368,41 @@ describe('PlatformWebhooksPage (project scope)', () => {
       expect(requests).toBeGreaterThan(1)
     }, 20000)
 
+    test('stops polling after a failed first load, and "Try again" loads the rows', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          // Only the first request fails, so the next one has to come from the button
+          if (requests === 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Something went wrong' },
+              { status: 500 }
+            )
+          }
+          return HttpResponse.json<DeliveryListResponse>({
+            data: [{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }],
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('Failed to retrieve deliveries')
+
+      // Longer than the 5s polling interval: a polling page would have made a second request
+      await new Promise((resolve) => setTimeout(resolve, 5500))
+      expect(requests).toBe(1)
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }))
+
+      expect(await screen.findByLabelText(`Retry ${DELIVERY_ID}`)).toBeInTheDocument()
+      expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
+    }, 20000)
+
     test('shows the search empty state, not an error, when a refresh fails after rows loaded', async () => {
       mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
       let requests = 0

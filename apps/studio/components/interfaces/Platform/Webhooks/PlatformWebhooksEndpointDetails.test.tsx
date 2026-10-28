@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
@@ -12,8 +12,19 @@ vi.mock('@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', (
 }))
 
 vi.mock('@/components/ui/AlertError', () => ({
-  AlertError: ({ subject, projectRef }: { subject: string; projectRef?: string }) => (
-    <p data-project-ref={projectRef}>{subject}</p>
+  AlertError: ({
+    subject,
+    projectRef,
+    additionalActions,
+  }: {
+    subject: string
+    projectRef?: string
+    additionalActions?: ReactNode
+  }) => (
+    <div>
+      <p data-project-ref={projectRef}>{subject}</p>
+      {additionalActions}
+    </div>
   ),
 }))
 
@@ -175,12 +186,14 @@ describe('PlatformWebhooksEndpointDetails', () => {
         hasNextPage={false}
         hasPreviousPage={false}
         isLoadingDeliveries={false}
+        isRefetchingDeliveries={false}
         selectedEndpoint={selectedEndpoint}
         onCopyUrl={vi.fn()}
         onDeliverySearchChange={vi.fn()}
         onNextPage={vi.fn()}
         onPreviousPage={vi.fn()}
         onOpenDelivery={vi.fn()}
+        onRefetchDeliveries={vi.fn()}
         onRetryDelivery={vi.fn()}
         {...props}
       />
@@ -250,6 +263,27 @@ describe('PlatformWebhooksEndpointDetails', () => {
       'data-project-ref',
       'abcdefghijklmnopqrst'
     )
+  })
+
+  it('reloads the deliveries when "Try again" is clicked on the error', async () => {
+    const user = userEvent.setup()
+    const onRefetchDeliveries = vi.fn()
+
+    renderComponent({
+      filteredDeliveries: [],
+      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      onRefetchDeliveries,
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Try again' }))
+
+    expect(onRefetchDeliveries).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not offer "Try again" while there is no error', () => {
+    renderComponent()
+
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument()
   })
 
   it('keeps showing deliveries when a refetch fails after they loaded', () => {

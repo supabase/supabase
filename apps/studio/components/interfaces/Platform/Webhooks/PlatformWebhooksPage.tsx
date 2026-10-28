@@ -168,6 +168,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     data: fetchedDeliveries,
     error: deliveriesError,
     isLoading: isLoadingDeliveries,
+    isFetching: isFetchingDeliveries,
+    refetch: refetchDeliveries,
   } = useWebhookDeliveriesQuery(
     {
       scope: apiScope,
@@ -575,6 +577,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 hasNextPage={hasNextPage}
                 hasPreviousPage={hasPreviousPage}
                 isLoadingDeliveries={isLoadingDeliveries}
+                isRefetchingDeliveries={isFetchingDeliveries}
+                onRefetchDeliveries={refetchDeliveries}
                 selectedEndpoint={selectedEndpoint}
                 onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}
                 onDeliverySearchChange={setDeliverySearch}

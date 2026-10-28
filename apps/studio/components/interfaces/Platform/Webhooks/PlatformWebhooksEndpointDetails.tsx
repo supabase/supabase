@@ -65,10 +65,12 @@ interface PlatformWebhooksEndpointDetailsProps {
   hasNextPage: boolean
   hasPreviousPage: boolean
   isLoadingDeliveries: boolean
+  isRefetchingDeliveries: boolean
   orgSlug?: string
   projectRef?: string
   selectedEndpoint: WebhookEndpoint
   onCopyUrl: () => void
+  onRefetchDeliveries: () => void
   onDeliverySearchChange: (value: string) => void
   onNextPage: () => void
   onPreviousPage: () => void
@@ -169,10 +171,12 @@ export const PlatformWebhooksEndpointDetails = ({
   hasNextPage,
   hasPreviousPage,
   isLoadingDeliveries,
+  isRefetchingDeliveries,
   orgSlug,
   projectRef,
   selectedEndpoint,
   onCopyUrl,
+  onRefetchDeliveries,
   onDeliverySearchChange,
   onNextPage,
   onPreviousPage,
@@ -365,6 +369,11 @@ export const PlatformWebhooksEndpointDetails = ({
                       orgSlug={orgSlug}
                       projectRef={projectRef}
                       subject="Failed to retrieve deliveries"
+                      additionalActions={
+                        <Button loading={isRefetchingDeliveries} onClick={onRefetchDeliveries}>
+                          Try again
+                        </Button>
+                      }
                     />
                   </TableCell>
                 </TableRow>
