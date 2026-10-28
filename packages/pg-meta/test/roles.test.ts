@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
-import pgMeta from '../src/index'
+import pgMeta, { safeSql } from '../src/index'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
@@ -263,4 +263,18 @@ withTestDatabase('update and remove a role whose name needs quoting', async ({ e
 
   await executeQuery(pgMeta.roles.remove({ id }).sql)
   expect(await findRole(`it's a "role"`)).toBeUndefined()
+})
+
+withTestDatabase('create a role with a password containing quotes', async ({ executeQuery }) => {
+  const { sql: createSql } = pgMeta.roles.create({
+    name: 'password_r1',
+    canLogin: true,
+    password: `p'ss"word`,
+  })
+  await executeQuery(createSql)
+
+  const rows = await executeQuery(
+    safeSql`select rolcanlogin, rolpassword is not null as has_password from pg_authid where rolname = 'password_r1'`
+  )
+  expect(rows).toEqual([{ rolcanlogin: true, has_password: true }])
 })
