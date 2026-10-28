@@ -105,6 +105,7 @@
   --text-8xl: 5.875rem;
   --text-9xl: 7.875rem;
   --font-weight-normal: 450;
+  --ease-crossfade: cubic-bezier(0.2, 0, 0, 1);
 }
 
 @keyframes draw-line {
