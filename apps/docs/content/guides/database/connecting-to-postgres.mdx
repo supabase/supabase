@@ -48,7 +48,7 @@ For every Postgres connection mode, the string comes from the same place:
 
 <Admonition type="caution">
 
-An unencoded special character in your password is the most common cause of `password authentication failed` errors and of `P1000` errors from ORMs such as Prisma. An unencoded `@` or `:` changes how clients parse the string's user, host, and port, so the credentials you send are not the ones you typed. If you have reset your password and still cannot connect, percent-encode every reserved character before putting it in the connection string.
+Unencoded special characters in your password are a common cause of `password authentication failed` errors, including `P1000` errors from ORMs such as Prisma. An unencoded `@` can move the host boundary, so clients parse the wrong host and send credentials you did not type. An unencoded `:` is allowed within the user information by RFC 3986, but some clients split credentials on it and fail anyway. If you have reset your password and still cannot connect, percent-encode every reserved character before putting it in the connection string.
 
 </Admonition>
 
