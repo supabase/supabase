@@ -12,14 +12,12 @@ import {
   type CliReferenceSource,
   type OpenApiReferenceSource,
 } from './reference-doc.js'
-import { fetchTroubleshootingSources, type TroubleshootingSource } from './troubleshooting.js'
 
 export type SearchSource =
   | MarkdownSource
   | OpenApiReferenceSource
   | ClientLibReferenceSource
   | CliReferenceSource
-  | TroubleshootingSource
   | IntegrationSource
   | LintWarningsGuideSource
 
@@ -177,11 +175,6 @@ export async function fetchAllSources(fullIndex: boolean) {
         .then((data) => data.flat())
     : []
 
-  // Load troubleshooting articles from local MDX files
-  const troubleshootingSources = fetchTroubleshootingSources()
-    .then((loaders) => Promise.all(loaders.map((loader) => loader.load())))
-    .then((data) => data.flat())
-
   // Type assertion required because ReferenceLoader.load() returns Promise<BaseSource[]>
   // which widens the inferred union type. All concrete sources in this array are valid
   // SearchSource types (MarkdownSource, OpenApiReferenceSource, etc.).
@@ -200,7 +193,6 @@ export async function fetchAllSources(fullIndex: boolean) {
       ktLibReferenceSource,
       cliReferenceSource,
       partnerIntegrationSources,
-      troubleshootingSources,
     ])
   ).flat() as SearchSource[]
 
