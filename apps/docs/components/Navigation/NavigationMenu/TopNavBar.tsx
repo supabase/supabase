@@ -18,7 +18,7 @@ import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
-import { SearchV2Trigger } from '@/features/SearchV2'
+import { AskAiTrigger, SearchV2Trigger } from '@/features/SearchV2'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
@@ -66,19 +66,15 @@ const TopNavBar: FC<TopNavBarProps> = ({
               <MobileHeaderLogo scrolledTitle={scrolledTitle} />
             </div>
 
-            <div className="flex gap-2 items-center">
+            <div className={cn('flex items-center', isSearchV2 ? 'gap-3' : 'gap-2')}>
               <DevToolbarTrigger />
               {onMenuToggle && isOpen ? (
                 <MobileNavThemeButton value={theme} onValueChange={setTheme} />
               ) : (
-                <SearchV2Trigger
-                  placeholder={
-                    <>
-                      Search
-                      <span className="hidden xl:inline ml-1"> docs...</span>
-                    </>
-                  }
-                />
+                <>
+                  <SearchV2Trigger placeholder="Search" />
+                  <AskAiTrigger />
+                </>
               )}
               <TopNavMenuToggle
                 ref={menuButtonRef}
@@ -89,7 +85,8 @@ const TopNavBar: FC<TopNavBarProps> = ({
             </div>
           </div>
           <div className="hidden lg:flex items-center justify-end gap-3">
-            {!isUserLoading && (
+            {/* search v2 shows Ask AI in this bar, so it drops Dashboard for logged-in users */}
+            {!isUserLoading && !(isSearchV2 && isLoggedIn) && (
               <Button variant="primary" asChild>
                 <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
                   {isLoggedIn ? 'Dashboard' : 'Sign up'}
