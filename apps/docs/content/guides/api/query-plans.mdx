@@ -1,17 +1,22 @@
 ---
 id: 'query-plans'
 title: 'Query plans with explain()'
-description: 'Debug slow Data API queries with the Postgres execution plan.'
-subtitle: 'Debug slow Data API queries with the Postgres execution plan.'
+description: 'See whether Postgres scans a whole table or uses an index for a slow Data API query.'
 ---
 
-Find out why a Data API query is slow by reading its Postgres `EXPLAIN` execution plan. Chain `explain()` to any query, including `rpc()` calls and writes, to get the plan instead of the data.
+When a Data API query, such as a supabase-js call, is slow, see how Postgres runs it. A query plan shows the steps Postgres takes to answer a query: whether it scans the whole table or uses an index, and how many rows it expects each step to handle. Chain `explain()` to any query, including `rpc()` calls and writes, to get its plan instead of its data.
+
+Use `explain()` when a query is slower than you expect, or after you add an index, to check that Postgres uses the index.
+
+To find which queries are slow in the first place, use the [Query Performance](/dashboard/project/_/observability/query-performance) page. For a query you run in SQL rather than through the Data API, use `explain` directly, as described in [Analyze the query plan](/docs/guides/database/query-optimization#analyze-the-query-plan).
 
 `explain()` is disabled by default, because a plan reveals details of your database structure and operations. Enable it in a non-production environment. To use it in production, [restrict it to your own IP address](#production-use-with-pre-request-protection).
 
 ## Enabling `explain()`
 
 Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+
+On a production project, set up [pre-request protection](#production-use-with-pre-request-protection) before you enable `explain()`.
 
 {/* prettier-ignore */}
 ```sql
@@ -23,7 +28,9 @@ notify pgrst, 'reload config';
 
 ## Using `explain()`
 
-1. If you don't have a table to query, create an `instruments` table with sample data:
+To get the plan of a query:
+
+1. To follow along with sample data, create an `instruments` table. To use your own table, skip this step.
 
    {/* prettier-ignore */}
    ```sql
@@ -59,44 +66,83 @@ notify pgrst, 'reload config';
            ->  Seq Scan on instruments  (cost=0.00..22.00 rows=1200 width=40)
    ```
 
-The plan is in text format by default. To get it as JSON, pass the `format` parameter.
+The plan is in text format by default. To get it as JSON, pass `format: 'json'`:
+
+```ts
+const { data, error } = await supabase.from('instruments').select().explain({ format: 'json' })
+```
+
+For every option `explain()` accepts, such as `analyze` and `verbose`, see the [`explain()` reference](/docs/reference/javascript/explain). With `analyze`, Postgres runs the query to measure it, so `analyze` on a write changes your data. If the plan shows a policy filter that removes most of the table, see [Row Level Security performance](/docs/guides/database/postgres/row-level-security-performance).
 
 ## Production use with pre-request protection
 
-To use `explain()` in production, restrict it with a pre-request function. The function below rejects plan requests from every IP address except yours. Replace `'123.123.123.123'` with your IP address.
+To use `explain()` in production, restrict it with a pre-request function that rejects plan requests from every IP address except yours. PostgREST runs one pre-request function per project, so check whether yours already has one.
 
-{/* prettier-ignore */}
-```sql
-create or replace function filter_plan_requests()
-returns void as $$
-declare
-  headers   json := current_setting('request.headers', true)::json;
-  client_ip text := coalesce(headers->>'cf-connecting-ip', '');
-  accept    text := coalesce(headers->>'accept', '');
-  your_ip   text := '123.123.123.123';
-begin
-  if accept like 'application/vnd.pgrst.plan%' and client_ip != your_ip then
-    raise insufficient_privilege using
-      message = 'Not allowed to use application/vnd.pgrst.plan';
-  end if;
-end; $$ language plpgsql;
-alter role authenticator set pgrst.db_pre_request to 'filter_plan_requests';
-notify pgrst, 'reload config';
-```
+To restrict `explain()` to your IP address:
+
+1. Check whether your project already uses a pre-request function:
+
+   ```sql
+   select coalesce(d.datname, 'all databases') as database, s.setconfig
+   from pg_db_role_setting s
+   left join pg_database d on d.oid = s.setdatabase
+   where s.setrole = 'authenticator'::regrole;
+   ```
+
+   If any row includes `pgrst.db_pre_request` set to a function name, your project already has one. If no row includes `pgrst.db_pre_request`, or it has no function name, your project has none. On a self-hosted project, also check the `PGRST_DB_PRE_REQUEST` setting of PostgREST.
+
+2. Create the filter function. Replace `'123.123.123.123'` with your IP address.
+
+   {/* prettier-ignore */}
+   ```sql
+   create or replace function filter_plan_requests()
+   returns void
+   set search_path = ''
+   as $$
+   declare
+     headers   json := current_setting('request.headers', true)::json;
+     client_ip text := coalesce(headers->>'cf-connecting-ip', '');
+     accept    text := lower(coalesce(headers->>'accept', ''));
+     your_ip   text := '123.123.123.123';
+   begin
+     if accept like '%application/vnd.pgrst.plan%' and client_ip != your_ip then
+       raise insufficient_privilege using
+         message = 'Not allowed to use application/vnd.pgrst.plan';
+     end if;
+   end; $$ language plpgsql;
+   ```
+
+3. Run the filter on every request:
+   - If your project has no pre-request function, set the filter as the pre-request function:
+
+     ```sql
+     alter role authenticator set pgrst.db_pre_request to 'filter_plan_requests';
+     notify pgrst, 'reload config';
+     ```
+
+   - If your project already has one, call `filter_plan_requests()` from that function instead, so the existing function keeps running.
 
 <$Partial path="db_pre_request_warning.mdx" />
 
-## Disabling explain
+## Disabling `explain()`
 
-When you're done, disable `explain()`. If you set up the pre-request function, the second statement removes it.
+When you're done, disable `explain()`:
 
 {/* prettier-ignore */}
 ```sql
 alter role authenticator
 set pgrst.db_plan_enabled to 'false';
 
+notify pgrst, 'reload config';
+```
+
+If you set `filter_plan_requests` as the pre-request function, remove it too:
+
+```sql
 alter role authenticator
-set pgrst.db_pre_request to '';
+reset pgrst.db_pre_request;
 
 notify pgrst, 'reload config';
 ```
+
+If you called `filter_plan_requests()` from your own pre-request function, remove the call from that function instead.
