@@ -10,9 +10,12 @@ export function getUserInitials(user: User): string {
   const displayName = getDisplayName(user, '').trim()
   if (displayName) {
     const words = displayName.trim().split(/\s+/).filter(Boolean)
-    const initials = words.length > 1 ? words[0][0] + words[words.length - 1][0] : words[0][0]
+    const initials =
+      words.length > 1
+        ? Array.from(words[0])[0] + Array.from(words[words.length - 1])[0]
+        : Array.from(words[0])[0]
     return initials.toUpperCase()
   }
-  const first = user.email?.trim()[0]
+  const first = Array.from(user.email?.trim() ?? '')[0]
   return first ? first.toUpperCase() : ''
 }
