@@ -4,7 +4,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import LegalDocVersions, { type LegalDocVersion } from '~/components/Legal/LegalDocVersions'
 import PageBreadcrumb from '~/components/Sections/PageBreadcrumb'
 import PageHeader from '~/components/Sections/PageHeader'
-import V1 from '~/data/legal/privacy-resources/candidate-privacy-notice/v1.mdx'
+import V2 from '~/data/legal/privacy-resources/candidate-privacy-notice/v2.mdx'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { NextSeo } from 'next-seo'
 
@@ -16,7 +16,7 @@ const meta = {
 }
 
 const versions: LegalDocVersion[] = [
-  { id: 'v1', label: 'Version 1', effectiveDate: 'October 27, 2026', Component: V1 },
+  { id: 'v2', label: 'Version 2.0', effectiveDate: 'October 28, 2026', Component: V2 },
 ]
 
 export default function CandidatePrivacyNoticePage() {
