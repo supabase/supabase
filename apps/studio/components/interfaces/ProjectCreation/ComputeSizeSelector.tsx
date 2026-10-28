@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import {
@@ -15,11 +14,12 @@ import {
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { HIGH_AVAILABILITY_INSTANCE_SIZE, sizes } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { getComputeSizeOptions } from './ProjectCreation.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { useIsNanoAllowedOnPaidPlan } from '@/hooks/misc/useIsNanoAllowedOnPaidPlan'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSizeSelectorProps {
@@ -29,16 +29,9 @@ interface ComputeSizeSelectorProps {
 export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
   const cloudProvider = useWatch({ control: form.control, name: 'cloudProvider' }) as CloudProvider
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  const isNanoAllowed = useIsNanoAllowedOnPaidPlan()
 
-  const sizeOptions = useMemo(
-    () =>
-      highAvailability
-        ? [HIGH_AVAILABILITY_INSTANCE_SIZE]
-        : sizes.filter((option) =>
-            instanceSizeSpecs[option].cloud_providers.includes(cloudProvider)
-          ),
-    [highAvailability, cloudProvider]
-  )
+  const sizeOptions = getComputeSizeOptions({ cloudProvider, highAvailability, isNanoAllowed })
 
   return (
     <Panel.Content>

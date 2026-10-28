@@ -2,10 +2,9 @@ import { components } from 'api-types'
 
 import { PROVIDERS } from '@/lib/constants'
 
-export type DesiredInstanceSize = Exclude<
-  components['schemas']['CreateProjectBody']['desired_instance_size'],
-  undefined | 'pico' | 'nano'
->
+export type DesiredInstanceSize =
+  | Exclude<components['schemas']['CreateProjectBody']['desired_instance_size'], undefined>
+  | 'nano'
 export type ReleaseChannel = Exclude<
   components['schemas']['CreateProjectBody']['release_channel'],
   undefined
@@ -26,6 +25,14 @@ export const instanceSizeSpecs: Record<
     cloud_providers: string[]
   }
 > = {
+  nano: {
+    label: 'Nano',
+    ram: '0.5 GB',
+    cpu: 'Shared compute',
+    priceHourly: 0.01344,
+    priceMonthly: 10,
+    cloud_providers: [PROVIDERS.AWS.id],
+  },
   micro: {
     label: 'Micro',
     ram: '1 GB',

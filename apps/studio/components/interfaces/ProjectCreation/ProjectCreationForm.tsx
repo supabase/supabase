@@ -25,6 +25,7 @@ import {
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
   sizes,
+  sizesWithNoCostConfirmationRequired,
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
@@ -86,8 +87,6 @@ import { trimSafeSqlFragment } from '@/lib/sql'
 import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
-
-const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
 interface ProjectCreationFormProps {
   isVercelIntegrationFlow?: boolean

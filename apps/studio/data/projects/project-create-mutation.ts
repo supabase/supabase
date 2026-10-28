@@ -67,7 +67,7 @@ export async function createProject({
     ...(customSupabaseRequest !== undefined && {
       custom_supabase_internal_requests: customSupabaseRequest as any,
     }),
-    desired_instance_size: dbInstanceSize,
+    desired_instance_size: dbInstanceSize as CreateProjectBody['desired_instance_size'],
     data_api_exposed_schemas: dataApiExposedSchemas,
     data_api_use_api_schema: dataApiUseApiSchema,
     data_api_revoke_default_privileges: dataApiRevokeDefaultPrivileges,

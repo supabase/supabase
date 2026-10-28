@@ -2,6 +2,7 @@ import type { CloudProvider, Region } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
 import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
+import { HIGH_AVAILABILITY_INSTANCE_SIZE, sizes } from './ProjectCreation.constants'
 import type { OrganizationAvailableRegionsData } from '@/data/organizations/organization-available-regions-query'
 import {
   DesiredInstanceSize,
@@ -94,6 +95,21 @@ export function resolveDefaultDbRegion({
  */
 export const monthlyInstancePrice = (instance: string | undefined): number => {
   return instanceSizeSpecs[instance as DesiredInstanceSize]?.priceMonthly || 10
+}
+
+export function getComputeSizeOptions({
+  cloudProvider,
+  highAvailability,
+  isNanoAllowed,
+}: {
+  cloudProvider: CloudProvider
+  highAvailability: boolean
+  isNanoAllowed: boolean
+}): DesiredInstanceSize[] {
+  if (highAvailability) return [HIGH_AVAILABILITY_INSTANCE_SIZE]
+
+  const options: DesiredInstanceSize[] = isNanoAllowed ? ['nano', ...sizes] : sizes
+  return options.filter((size) => instanceSizeSpecs[size].cloud_providers.includes(cloudProvider))
 }
 
 export const instanceLabel = (instance: string | undefined): string => {

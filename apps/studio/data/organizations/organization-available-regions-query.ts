@@ -5,8 +5,9 @@ import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type DesiredInstanceSizeForAvailableRegions =
+type SpecDesiredInstanceSize =
   operations['ProjectsController_getRegions']['parameters']['query']['desired_instance_size']
+export type DesiredInstanceSizeForAvailableRegions = SpecDesiredInstanceSize | 'nano'
 
 export type OrganizationAvailableRegionsVariables = {
   slug?: string
@@ -31,7 +32,7 @@ export async function getOrganizationAvailableRegions(
       query: {
         cloud_provider: cloudProvider,
         organization_slug: slug,
-        desired_instance_size: desiredInstanceSize,
+        desired_instance_size: desiredInstanceSize as SpecDesiredInstanceSize,
         high_availability: highAvailability?.toString(),
       },
     },

@@ -61,12 +61,17 @@ vi.mock('@/lib/password-strength', () => ({
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
+const { getStringArrayFlagMock } = vi.hoisted(() => ({
+  getStringArrayFlagMock: vi.fn<(flagKey: string, targetingKey: string) => Promise<string[]>>(),
+}))
+
 vi.mock(import('common'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
     useParams: () => ({ slug: 'default-org' }),
     useIsLoggedIn: () => true,
+    getStringArrayFlag: getStringArrayFlagMock,
   }
 })
 
@@ -392,6 +397,7 @@ const generateAndWaitForStrongPassword = async () => {
 describe('project creation wizard', () => {
   beforeEach(() => {
     user = userEvent.setup({ delay: null })
+    getStringArrayFlagMock.mockResolvedValue([])
     routerMock.setCurrentUrl(`/new/${ORG_SLUG}`)
   })
 
@@ -869,6 +875,46 @@ describe('project creation wizard', () => {
 
       await waitFor(() => expect(onRequest).toHaveBeenCalled())
       expect(onRequest.mock.calls[0][0].desired_instance_size).toBe('medium')
+    })
+
+    test('offers Nano and submits it without a cost confirmation when the org is in the allow-list', async () => {
+      getStringArrayFlagMock.mockResolvedValue(['another-org', ORG_SLUG])
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Nano Project')
+      await generateAndWaitForStrongPassword()
+
+      await user.click(getSelectTriggerByLabel('Compute size'))
+      await user.click(await findOption(/0\.5 GB RAM/))
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(screen.queryByText('Confirm compute costs')).not.toBeInTheDocument()
+      expect(onRequest.mock.calls[0][0].desired_instance_size).toBe('nano')
+      expect(getStringArrayFlagMock).toHaveBeenCalledWith(
+        'orgsAllowedToLaunchNanoInstancesOnPaidPlans',
+        ORG_SLUG
+      )
+    })
+
+    test('does not offer Nano when the org is not in the allow-list', async () => {
+      getStringArrayFlagMock.mockResolvedValue(['another-org'])
+      mockWizardEndpoints()
+
+      await renderWizard()
+      await screen.findByPlaceholderText('Project name')
+      await waitFor(() => expect(getStringArrayFlagMock).toHaveBeenCalled())
+
+      await user.click(getSelectTriggerByLabel('Compute size'))
+      expect(await findOption(/1 GB RAM/)).toBeInTheDocument()
+      expect(
+        within(screen.getByRole('listbox')).queryByRole('option', { name: /0\.5 GB RAM/ })
+      ).toBeNull()
     })
   })
 

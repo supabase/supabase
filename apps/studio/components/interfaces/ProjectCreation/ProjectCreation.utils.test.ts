@@ -7,6 +7,7 @@ import {
   extractPostgresVersionDetails,
   filterHighAvailabilityRegions,
   getAvailableRegions,
+  getComputeSizeOptions,
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
   getRegionSelectionType,
@@ -344,5 +345,32 @@ describe('resolvePostgresVersion', () => {
         availableOrioleVersion,
       })
     ).toEqual({})
+  })
+})
+
+describe('getComputeSizeOptions', () => {
+  it.each([
+    {
+      name: 'returns the default sizes',
+      args: { cloudProvider: 'AWS', highAvailability: false, isNanoAllowed: false },
+      expected: ['micro', 'small', 'medium'],
+    },
+    {
+      name: 'prepends Nano when the org is allowed it',
+      args: { cloudProvider: 'AWS', highAvailability: false, isNanoAllowed: true },
+      expected: ['nano', 'micro', 'small', 'medium'],
+    },
+    {
+      name: 'drops Nano on providers that do not support it',
+      args: { cloudProvider: 'AWS_K8S', highAvailability: false, isNanoAllowed: true },
+      expected: ['micro', 'small', 'medium'],
+    },
+    {
+      name: 'returns only the high availability size when high availability is on',
+      args: { cloudProvider: 'AWS', highAvailability: true, isNanoAllowed: true },
+      expected: ['large'],
+    },
+  ] as const)('$name', ({ args, expected }) => {
+    expect(getComputeSizeOptions(args)).toEqual(expected)
   })
 })

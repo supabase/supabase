@@ -264,3 +264,5 @@ export const COUNTRY_LAT_LON = {
 }
 
 export const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
+
+export const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['nano', 'micro', 'small']
