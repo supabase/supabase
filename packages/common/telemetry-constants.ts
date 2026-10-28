@@ -2707,7 +2707,7 @@ export interface TableCreatedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ * @page /dashboard/project/{ref}/editor, /dashboard/project/{ref}/sql, or /dashboard/project/{ref}/explorer/query/{id} (Add row in the details sidebar)
  */
 export interface TableDataAddedEvent {
   action: 'table_data_added'
@@ -2715,7 +2715,7 @@ export interface TableDataAddedEvent {
     /**
      * Method used to insert data
      */
-    method: 'sql_editor' | 'table_editor' | 'spreadsheet_import'
+    method: 'sql_editor' | 'table_editor' | 'spreadsheet_import' | 'explorer'
     /**
      * Schema of the table
      */

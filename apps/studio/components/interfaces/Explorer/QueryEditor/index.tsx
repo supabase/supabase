@@ -1,6 +1,8 @@
 import { useMonaco } from '@monaco-editor/react'
 import {
   acceptUntrustedSql,
+  literal,
+  safeSql,
   untrustedSql,
   type SafeSqlFragment,
   type UntrustedSqlFragment,
@@ -20,7 +22,9 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { toast } from 'sonner'
 import { Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import { z } from 'zod'
 
 import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import { buildEntitySelectSql, type QueryEntityBinding } from '../entityQuery.utils'
@@ -44,8 +48,10 @@ import { QueryDetailsPanel } from './QueryDetailsPanel'
 import { QueryResultEditsBar } from './QueryResultEditsBar'
 import { QueryResultFooter } from './QueryResultFooter'
 import { QueryResultRenderer } from './QueryResultRenderer'
+import { QueryResultRowEditor } from './QueryResultRowEditor'
 import { QueryRunButton } from './QueryRunButton'
 import { QuerySourceMenu } from './QuerySourceMenu'
+import { RowDetailsPanel } from './RowDetailsPanel'
 import { useQueryEditorAi } from './useQueryEditorAi'
 import { useQueryResultEditing } from './useQueryResultEditing'
 import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
@@ -68,6 +74,7 @@ import {
   type LogsSourceParameters,
 } from '@/data/content/notebooks/notebook-schema'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { isValidConnString, unguarded } from '@/data/fetchers'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import {
@@ -81,12 +88,13 @@ import {
   type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { executeSql, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { parsedQueryQueryOptions } from '@/data/sql/parsed-query-query'
 import { applyAutoLimit } from '@/data/sql/utils'
 import { useDebouncedValue } from '@/hooks/misc/useDebouncedValue'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { detectOS } from '@/lib/helpers'
 import { getQueryLabel } from '@/lib/query-relations'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -263,7 +271,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     { enabled: query._tag === 'database' && isValidConnString(connectionString) }
   )
 
-  const { mutateAsync: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
+  const { grant: queryGrant } = useGrant('POST /platform/pg-meta/{ref}/query', {
+    projectRef: project?.ref,
+  })
+
+  const { mutateAsync: runSql, isPending: isExecutingSql } = useExecuteSqlMutation({
     onError: () => {},
   })
 
@@ -318,7 +330,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       return
     }
 
-    await executeSql({
+    await runSql({
       projectRef: project.ref,
       connectionString,
       sql: wrapWithRoleImpersonation(limitedSql.sql, roleImpersonationState),
@@ -335,6 +347,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           ...querySnapshot,
           editingContext,
           pendingEdits,
+          // A full page under the auto limit means there may be more rows to load.
+          canLoadMore:
+            limitedSql.appendAutoLimit &&
+            rowLimit !== undefined &&
+            rowLimit > 0 &&
+            data.result.length >= rowLimit,
         })
       },
       (error) => {
@@ -433,7 +451,8 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     query._tag === 'database' && query.entity ? buildEntitySelectSql(query.entity) : undefined
   // Compared trimmed, which also drops the branding both sides carry — the point is whether
   // the text on screen is still the text Studio generated.
-  const canAutoRun = autoRun && generatedSql !== undefined && generatedSql.trim() === sql.trim()
+  const isGeneratedQuery = generatedSql !== undefined && generatedSql.trim() === sql.trim()
+  const canAutoRun = autoRun && isGeneratedQuery
 
   const runGeneratedQueryRef = useLatest(() => {
     if (generatedSql === undefined) return
@@ -512,6 +531,39 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   }
   const isReviewingChanges = canShowSidebar && isReviewRequested && hasPendingEdits
   const isDetailsOpen = canShowSidebar && showDetails && !isReviewingChanges
+
+  // The row the details describe, named by primary key so it survives edits and re-runs; once
+  // a result no longer has it, the details fall back to the table.
+  const [selectedRowKey, setSelectedRowKey] = useState<{
+    tableId: number
+    rowIdentifiers: Record<string, unknown>
+  }>()
+  const [isRowEditorOpen, setIsRowEditorOpen] = useState(false)
+  const target = editing.target
+  const selectedRow =
+    selectedRowKey && target?.table.id === selectedRowKey.tableId
+      ? editing.findRow(selectedRowKey.rowIdentifiers)
+      : undefined
+  const selectedRowDetails =
+    selectedRow && selectedRowKey && target
+      ? {
+          relation: {
+            id: target.table.id,
+            schema: target.table.schema,
+            name: target.table.name,
+            type: ENTITY_TYPE.TABLE,
+          },
+          row: selectedRow,
+          rowIdentifiers: selectedRowKey.rowIdentifiers,
+        }
+      : undefined
+
+  const handleSelectedRowChange = (row: Record<string, unknown> | undefined) => {
+    const rowIdentifiers = row ? editing.getRowIdentifiers(row) : null
+    setSelectedRowKey(
+      rowIdentifiers && target ? { tableId: target.table.id, rowIdentifiers } : undefined
+    )
+  }
   // Follows the results on screen; before a first run, a query opened from a table already
   // knows what it will read.
   const detailsSql = (result?.source === 'database' ? result.sql : undefined) ?? generatedSql
@@ -575,6 +627,19 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         editing={editing}
         // A query that runs itself is as good as running from the moment it opens.
         isRunning={isExecuting || (canAutoRun && result === undefined && !isRunDisabled)}
+        rowSelection={
+          canShowSidebar
+            ? {
+                selectedRow: isDetailsOpen ? selectedRow : undefined,
+                onSelectedRowChange: handleSelectedRowChange,
+                onViewRow: (row) => {
+                  handleSelectedRowChange(row)
+                  setIsReviewRequested(false)
+                  setShowDetails(true)
+                },
+              }
+            : undefined
+        }
       />
     </ExplorerQueryResults>
   )
@@ -707,6 +772,51 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     </>
   ) : null
 
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const handleLoadMore = async () => {
+    const current = resultRef.current
+    if (
+      !project ||
+      !queryGrant ||
+      generatedSql === undefined ||
+      !current?.rows ||
+      rowLimit === undefined ||
+      rowLimit <= 0 ||
+      !isValidConnString(connectionString)
+    )
+      return
+
+    const role = current.editingContext?.roleImpersonationState
+    setIsLoadingMore(true)
+    try {
+      const { result: page } = await executeSql({
+        projectRef: project.ref,
+        connectionString,
+        sql: wrapWithRoleImpersonation(
+          safeSql`${generatedSql} limit ${literal(rowLimit)} offset ${literal(current.rows.length)}`,
+          role
+        ),
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(role?.role),
+        grant: queryGrant,
+      })
+      const rows = z.array(z.record(z.unknown())).parse(page)
+      // A new run may have replaced the result while this page loaded.
+      const latest = resultRef.current
+      if (latest !== current || !latest.rows) return
+      onResultChange({
+        ...latest,
+        rows: [...latest.rows, ...rows],
+        canLoadMore: rows.length >= rowLimit,
+      })
+    } catch (error) {
+      toast.error(
+        `Failed to load more rows: ${error instanceof Error ? error.message : String(error)}`
+      )
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }
+
   const queryBody = (
     <>
       {isResizableSplit ? (
@@ -734,6 +844,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           count={resultsRowCount}
           rowLimit={rowLimit}
           fileName={title}
+          onLoadMore={
+            // Paging appends to the generated query, so it's offered only while the editor
+            // still holds it; a rewritten query is the user's to page with SQL.
+            isGeneratedQuery && result?.canLoadMore && !isBusy ? handleLoadMore : undefined
+          }
+          isLoadingMore={isLoadingMore}
         />
       )}
     </>
@@ -853,7 +969,23 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                   defaultSize={288}
                 >
                   {isReviewingChanges && <PendingChangesPanel editing={editing} />}
-                  {isDetailsOpen && <QueryDetailsPanel sql={detailsSql} />}
+                  {isDetailsOpen && selectedRowDetails && (
+                    <RowDetailsPanel
+                      {...selectedRowDetails}
+                      onBack={() => setSelectedRowKey(undefined)}
+                      onRowDeleted={() => {
+                        editing.removeRow(selectedRowDetails.rowIdentifiers)
+                        setSelectedRowKey(undefined)
+                      }}
+                      onEdit={editing.canEdit ? () => setIsRowEditorOpen(true) : undefined}
+                    />
+                  )}
+                  {isDetailsOpen && !selectedRowDetails && (
+                    <QueryDetailsPanel
+                      sql={detailsSql}
+                      onRowAdded={(relation, row) => editing.addRow(relation.id, row)}
+                    />
+                  )}
                 </ResizablePanel>
               </>
             )}
@@ -862,6 +994,22 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           queryBody
         )}
       </Shell>
+
+      {isRowEditorOpen && editing.canEdit && target && selectedRowKey && project && (
+        <QueryResultRowEditor
+          projectRef={project.ref}
+          connectionString={project.connectionString}
+          table={target.table}
+          identifiers={selectedRowKey.rowIdentifiers}
+          pendingEdits={editing.pendingEdits}
+          roleImpersonationState={result?.editingContext?.roleImpersonationState}
+          onClose={() => setIsRowEditorOpen(false)}
+          onStage={(row, changes) => {
+            editing.stageRowEdits(selectedRowKey.rowIdentifiers, row, changes)
+            setIsRowEditorOpen(false)
+          }}
+        />
+      )}
 
       {query._tag === 'database' && (
         <RunQueryWarningModal

@@ -21,6 +21,8 @@ export type QueryResult = {
    * and are carried over when the query runs again, so refining a query doesn't lose them.
    */
   pendingEdits?: readonly PendingCellEdit[]
+  /** The run filled its auto row limit, so more rows may follow. */
+  canLoadMore?: boolean
 }
 
 /**

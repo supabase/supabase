@@ -1,14 +1,10 @@
 import { Undo2Icon } from 'lucide-react'
 
+import { formatRowIdentifiers } from '../Details/Details.utils'
 import { DetailsList, DetailsListItem } from '../Details/DetailsSection'
 import type { QueryResultEditing } from './useQueryResultEditing'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { formatCellValue } from '@/components/ui/DataGridResults/DataGridResults.utils'
-
-const formatRowIdentifiers = (rowIdentifiers: Record<string, unknown>) =>
-  Object.entries(rowIdentifiers)
-    .map(([column, value]) => `${column} = ${formatCellValue(value)}`)
-    .join(', ')
 
 /**
  * Sidebar view of a result's unsaved edits, each with what it changes and a way to take it

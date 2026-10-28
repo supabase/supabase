@@ -24,17 +24,24 @@ export type ResultCellEditor = (props: RenderEditCellProps<ResultRow>) => ReactN
 
 export const DataGridResults = ({
   rows,
-  onEditRow,
-  canEditRow,
+  onViewRow,
+  canViewRow,
   reserveRowActions = false,
   isLoadingRowActions = false,
   cellEditors,
   onCellChange,
   isCellDirty,
+  onSelectedRowChange,
+  selectedRow,
 }: {
   rows: readonly ResultRow[]
-  onEditRow?: (row: ResultRow) => void
-  canEditRow?: (row: ResultRow) => boolean
+  /** Opens a row's details, from its gutter button or context menu. */
+  onViewRow?: (row: ResultRow) => void
+  canViewRow?: (row: ResultRow) => boolean
+  /** Reports the row holding the selected cell, as the user clicks or arrows around. */
+  onSelectedRowChange?: (row: ResultRow | undefined) => void
+  /** Highlighted so it's clear which row a side panel is describing. */
+  selectedRow?: ResultRow
   /** Keep the action gutter stable while row editability is being resolved. */
   reserveRowActions?: boolean
   isLoadingRowActions?: boolean
@@ -116,7 +123,7 @@ export const DataGridResults = ({
   )
 
   const gridColumns: Column<ResultRow>[] =
-    onEditRow || reserveRowActions || isLoadingRowActions
+    onViewRow || reserveRowActions || isLoadingRowActions
       ? [
           {
             key: '\u0000edit-row',
@@ -138,25 +145,25 @@ export const DataGridResults = ({
                   />
                 )
               }
-              if (!onEditRow) return null
+              if (!onViewRow) return null
               return (
                 <ButtonTooltip
                   variant="text"
                   size="tiny"
                   className="px-1 opacity-0 transition-opacity group-hover/result-row:opacity-100 focus-visible:opacity-100"
-                  aria-label="Edit row"
+                  aria-label="View row"
                   tooltip={{
                     content: {
                       text:
-                        canEditRow && !canEditRow(row)
+                        canViewRow && !canViewRow(row)
                           ? 'This row does not include a usable primary key.'
-                          : 'Edit row',
+                          : 'View row',
                     },
                   }}
                   tabIndex={tabIndex}
                   icon={<Maximize2Icon />}
-                  disabled={canEditRow ? !canEditRow(row) : false}
-                  onClick={() => onEditRow(row)}
+                  disabled={canViewRow ? !canViewRow(row) : false}
+                  onClick={() => onViewRow(row)}
                 />
               )
             },
@@ -178,18 +185,18 @@ export const DataGridResults = ({
               <div ref={triggerRef} className="fixed pointer-events-none w-0 h-0" />
             </ContextMenuTrigger>
             <ContextMenuContent onCloseAutoFocus={(e) => e.stopPropagation()}>
-              {onEditRow && (
+              {onViewRow && (
                 <ContextMenuItem
                   className="gap-x-2"
-                  disabled={!contextMenuRow || (canEditRow && !canEditRow(contextMenuRow))}
+                  disabled={!contextMenuRow || (canViewRow && !canViewRow(contextMenuRow))}
                   onSelect={() => {
                     const row = contextMenuCellRef.current?.row
-                    if (row && (!canEditRow || canEditRow(row))) onEditRow(row)
+                    if (row && (!canViewRow || canViewRow(row))) onViewRow(row)
                   }}
                   onFocusCapture={(event) => event.stopPropagation()}
                 >
                   <Maximize2Icon size={12} />
-                  Edit row
+                  View row
                 </ContextMenuItem>
               )}
               <ContextMenuItem
@@ -220,7 +227,14 @@ export const DataGridResults = ({
             columns={gridColumns}
             rows={rows}
             className="grow min-h-0 border-t-0! border-b-0!"
-            rowClass={() => 'group/result-row [&>.rdg-cell]:items-center'}
+            rowClass={(row) =>
+              row === selectedRow
+                ? 'group/result-row rdg-row--selected [&>.rdg-cell]:items-center'
+                : 'group/result-row [&>.rdg-cell]:items-center'
+            }
+            onSelectedCellChange={
+              onSelectedRowChange ? ({ row }) => onSelectedRowChange(row) : undefined
+            }
             onCellKeyDown={handleCellKeyDown}
             onRowsChange={
               onCellChange

@@ -46,7 +46,9 @@ export const DetailsProperties = ({ children }: { children: ReactNode }) => (
 /** A label and its value on one line, the label muted so the values read down the column. */
 export const DetailsProperty = ({ label, children }: { label: string; children: ReactNode }) => (
   <div className="grid min-h-8 grid-cols-[7rem_minmax(0,1fr)] items-center gap-x-3 text-sm">
-    <dt className="text-foreground-lighter">{label}</dt>
+    <dt className="truncate text-foreground-lighter" title={label}>
+      {label}
+    </dt>
     <dd className="flex min-w-0 items-center justify-between gap-x-2 text-foreground">
       {children}
     </dd>

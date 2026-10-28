@@ -42,6 +42,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddUserDropdown } from './AddUserDropdown'
 import { DeleteUserModal } from './DeleteUserModal'
+import { OpenInExplorerButton } from './OpenInExplorerButton'
 import { SortDropdown } from './SortDropdown'
 import { useAuthUsersShortcuts } from './useAuthUsersShortcuts'
 import { UserPanel } from './UserPanel'
@@ -797,6 +798,7 @@ export const UsersV2 = () => {
                   tooltip={{ content: { side: 'bottom', text: 'Refresh' } }}
                   aria-label="Refresh"
                 />
+                <OpenInExplorerButton />
                 <AddUserDropdown />
               </div>
             </>

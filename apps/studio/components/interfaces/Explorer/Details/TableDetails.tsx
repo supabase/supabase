@@ -4,6 +4,8 @@ import { toast } from 'sonner'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useOpenEntityQuery } from '../hooks'
+import { AddRowButton } from './AddRowButton'
+import type { DatabaseObjectDetailsProps } from './DatabaseObjectDetails'
 import {
   formatPolicySummary,
   formatTriggerSummary,
@@ -41,7 +43,7 @@ import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useTrack } from '@/lib/telemetry/track'
 
 /** What a table query sits on top of: its size, access rules, and the objects around it. */
-export const TableDetails = ({ relation }: { relation: QueryRelation }) => {
+export const TableDetails = ({ relation, onRowAdded }: DatabaseObjectDetailsProps) => {
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const connectionString = project?.connectionString
@@ -52,6 +54,9 @@ export const TableDetails = ({ relation }: { relation: QueryRelation }) => {
     id: relation.id,
   })
   const table = isTableLike(entity) ? entity : undefined
+  // A Supabase-managed schema such as `auth` isn't changed from here, and isn't exposed to API
+  // roles the way the API-role policy hint assumes.
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: relation.schema })
 
   if (isPending) {
     return (
@@ -67,11 +72,19 @@ export const TableDetails = ({ relation }: { relation: QueryRelation }) => {
 
   return (
     <div className="flex flex-col">
-      <RelationDetailsHeader relation={relation} description={entity?.comment} />
+      <RelationDetailsHeader
+        relation={relation}
+        description={entity?.comment}
+        action={table && <AddRowButton relation={relation} onRowAdded={onRowAdded} />}
+      />
       {table && <TableProperties relation={relation} table={table} />}
-      <TablePolicies relation={relation} isRlsEnabled={table?.rls_enabled ?? false} />
-      <TableTriggers relation={relation} />
-      <TableIndexes relation={relation} />
+      <TablePolicies
+        relation={relation}
+        isRlsEnabled={table?.rls_enabled ?? false}
+        isSchemaLocked={isSchemaLocked}
+      />
+      <TableTriggers relation={relation} isSchemaLocked={isSchemaLocked} />
+      <TableIndexes relation={relation} isSchemaLocked={isSchemaLocked} />
       {table && (
         <TableRelationships relationships={getTableRelationships(table.relationships, relation)} />
       )}
@@ -79,7 +92,13 @@ export const TableDetails = ({ relation }: { relation: QueryRelation }) => {
   )
 }
 
-const TableProperties = ({ relation, table }: { relation: QueryRelation; table: TableLike }) => {
+export const TableProperties = ({
+  relation,
+  table,
+}: {
+  relation: QueryRelation
+  table: TableLike
+}) => {
   const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const [isRlsDialogOpen, setIsRlsDialogOpen] = useState(false)
@@ -173,12 +192,14 @@ const TableProperties = ({ relation, table }: { relation: QueryRelation; table: 
   )
 }
 
-const TablePolicies = ({
+export const TablePolicies = ({
   relation,
   isRlsEnabled,
+  isSchemaLocked,
 }: {
   relation: QueryRelation
   isRlsEnabled: boolean
+  isSchemaLocked: boolean
 }) => {
   const { data: project } = useSelectedProjectQuery()
   const { data, isPending, isError } = useDatabasePoliciesQuery({
@@ -193,13 +214,13 @@ const TablePolicies = ({
     <DetailsSection
       title="Policies"
       count={isPending ? undefined : policies.length}
-      action={<DetailsAddLink href={policiesUrl} label="Add policy" />}
+      action={isSchemaLocked ? undefined : <DetailsAddLink href={policiesUrl} label="Add policy" />}
     >
       {isPending && <ShimmeringLoader className="py-2" />}
       {isError && <DetailsEmpty>Couldn't load policies</DetailsEmpty>}
       {!isPending && !isError && policies.length === 0 && (
         <DetailsEmpty>
-          {isRlsEnabled
+          {isRlsEnabled && !isSchemaLocked
             ? "No policies yet. API roles can't read or write rows until you add one."
             : 'No policies'}
         </DetailsEmpty>
@@ -219,7 +240,13 @@ const TablePolicies = ({
   )
 }
 
-const TableTriggers = ({ relation }: { relation: QueryRelation }) => {
+export const TableTriggers = ({
+  relation,
+  isSchemaLocked,
+}: {
+  relation: QueryRelation
+  isSchemaLocked: boolean
+}) => {
   const { data: project } = useSelectedProjectQuery()
   const { data, isPending, isError } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -232,7 +259,9 @@ const TableTriggers = ({ relation }: { relation: QueryRelation }) => {
     <DetailsSection
       title="Triggers"
       count={isPending ? undefined : triggers.length}
-      action={<DetailsAddLink href={createTriggerUrl} label="Add trigger" />}
+      action={
+        isSchemaLocked ? undefined : <DetailsAddLink href={createTriggerUrl} label="Add trigger" />
+      }
     >
       {isPending && <ShimmeringLoader className="py-2" />}
       {isError && <DetailsEmpty>Couldn't load triggers</DetailsEmpty>}
@@ -253,7 +282,13 @@ const TableTriggers = ({ relation }: { relation: QueryRelation }) => {
   )
 }
 
-const TableIndexes = ({ relation }: { relation: QueryRelation }) => {
+const TableIndexes = ({
+  relation,
+  isSchemaLocked,
+}: {
+  relation: QueryRelation
+  isSchemaLocked: boolean
+}) => {
   const { data: project } = useSelectedProjectQuery()
   const { data, isPending, isError } = useIndexesQuery({
     projectRef: project?.ref,
@@ -268,7 +303,9 @@ const TableIndexes = ({ relation }: { relation: QueryRelation }) => {
       title="Indexes"
       count={isPending ? undefined : indexes.length}
       defaultOpen={false}
-      action={<DetailsAddLink href={createIndexUrl} label="Add index" />}
+      action={
+        isSchemaLocked ? undefined : <DetailsAddLink href={createIndexUrl} label="Add index" />
+      }
     >
       {isPending && <ShimmeringLoader className="py-2" />}
       {isError && <DetailsEmpty>Couldn't load indexes</DetailsEmpty>}

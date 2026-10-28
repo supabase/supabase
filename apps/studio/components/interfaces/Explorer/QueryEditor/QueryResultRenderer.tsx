@@ -4,7 +4,7 @@ import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { type QueryResult } from '../types'
 import { QueryResultChart } from './QueryResultChart'
 import { QueryResultError } from './QueryResultError'
-import { QueryResultTable } from './QueryResultTable'
+import { QueryResultTable, type ResultRowSelection } from './QueryResultTable'
 import type { QueryResultEditing } from './useQueryResultEditing'
 import { DataGridResults } from '@/components/ui/DataGridResults'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
@@ -21,6 +21,7 @@ interface QueryResultRendererProps {
   editing?: QueryResultEditing
   /** A run is under way; shown only while there's no earlier result to keep on screen. */
   isRunning?: boolean
+  rowSelection?: ResultRowSelection
 }
 
 export const QueryResultRenderer = ({
@@ -32,6 +33,7 @@ export const QueryResultRenderer = ({
   onDebug,
   editing,
   isRunning = false,
+  rowSelection,
 }: QueryResultRendererProps) => {
   const { rows, error, autoLimit } = result ?? {}
 
@@ -72,7 +74,7 @@ export const QueryResultRenderer = ({
   if (rows && rows.length > 0) {
     if (view === 'table')
       return editing ? (
-        <QueryResultTable result={result} editing={editing} />
+        <QueryResultTable result={result} editing={editing} rowSelection={rowSelection} />
       ) : (
         <DataGridResults rows={rows} />
       )

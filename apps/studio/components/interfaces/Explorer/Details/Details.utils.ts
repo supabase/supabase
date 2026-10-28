@@ -1,5 +1,6 @@
 import type { PGPolicy, PGTableRelationship, PGTrigger } from '@supabase/pg-meta'
 
+import { formatCellValue } from '@/components/ui/DataGridResults/DataGridResults.utils'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 export const ENTITY_TYPE_LABELS: Record<ENTITY_TYPE, string> = {
@@ -95,3 +96,9 @@ export function getTableRelationships(
 
   return { references: [...references.values()], referencedBy: [...referencedBy.values()] }
 }
+
+/** e.g. "id = 5" or "tenant_id = a, id = 5", naming a row the way its primary key does. */
+export const formatRowIdentifiers = (rowIdentifiers: Record<string, unknown>) =>
+  Object.entries(rowIdentifiers)
+    .map(([column, value]) => `${column} = ${formatCellValue(value)}`)
+    .join(', ')

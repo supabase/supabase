@@ -1,33 +1,35 @@
 import { useState } from 'react'
 
 import type { QueryResult } from '../types'
-import { QueryResultRowEditor } from './QueryResultRowEditor'
 import type { QueryResultEditing } from './useQueryResultEditing'
 import { CellEditQueueProvider } from '@/components/grid/context/CellEditQueueContext'
 import { getColumnCellEditor } from '@/components/grid/utils/gridColumns'
 import { JsonEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/JsonEditor'
 import { TextEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/TextEditor'
 import { DataGridResults, type ResultCellEditor } from '@/components/ui/DataGridResults'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type ResultRow = Record<string, unknown>
 
 type ExpandedCell = { type: 'json' | 'text'; column: string; row: ResultRow }
 
+/** Which row the surface is describing, and how it follows the grid. */
+export type ResultRowSelection = {
+  selectedRow?: ResultRow
+  onSelectedRowChange: (row: ResultRow | undefined) => void
+  onViewRow: (row: ResultRow) => void
+}
+
 export const QueryResultTable = ({
   result,
   editing,
+  rowSelection,
 }: {
   result: QueryResult
   editing: QueryResultEditing
+  rowSelection?: ResultRowSelection
 }) => {
-  const { data: project } = useSelectedProjectQuery()
   const { target, canEdit } = editing
-  const [selection, setSelection] = useState<{ result: QueryResult; row: ResultRow }>()
   const [expandedCell, setExpandedCell] = useState<ExpandedCell>()
-
-  const selectedRow = selection?.result === result ? selection.row : undefined
-  const selectedIdentifiers = selectedRow ? editing.getRowIdentifiers(selectedRow) : null
   const roleImpersonationState = result.editingContext?.roleImpersonationState
 
   const cellEditors: Record<string, ResultCellEditor | undefined> = {}
@@ -53,28 +55,14 @@ export const QueryResultTable = ({
         rows={editing.rows}
         reserveRowActions={result.source === 'database'}
         isLoadingRowActions={editing.isLoadingTarget}
-        onEditRow={canEdit ? (row) => setSelection({ result, row }) : undefined}
-        canEditRow={target ? (row) => !!editing.getRowIdentifiers(row) : undefined}
+        onViewRow={target ? rowSelection?.onViewRow : undefined}
+        canViewRow={target ? (row) => !!editing.getRowIdentifiers(row) : undefined}
+        onSelectedRowChange={rowSelection?.onSelectedRowChange}
+        selectedRow={rowSelection?.selectedRow}
         cellEditors={cellEditors}
         onCellChange={canEdit ? editing.stageCellEdit : undefined}
         isCellDirty={editing.pendingEdits.length > 0 ? editing.isCellEdited : undefined}
       />
-
-      {canEdit && target && selectedIdentifiers && project && (
-        <QueryResultRowEditor
-          projectRef={project.ref}
-          connectionString={project.connectionString}
-          table={target.table}
-          identifiers={selectedIdentifiers}
-          pendingEdits={editing.pendingEdits}
-          roleImpersonationState={roleImpersonationState}
-          onClose={() => setSelection(undefined)}
-          onStage={(row, changes) => {
-            editing.stageRowEdits(selectedIdentifiers, row, changes)
-            setSelection(undefined)
-          }}
-        />
-      )}
 
       <TextEditor
         visible={expandedCell?.type === 'text'}

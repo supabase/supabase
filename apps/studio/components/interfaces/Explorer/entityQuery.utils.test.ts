@@ -29,3 +29,12 @@ describe('buildEntitySelectSql', () => {
     )
   })
 })
+
+describe('buildEntitySelectSql per table', () => {
+  it('reads auth.users without password hashes or one-time tokens, newest first', () => {
+    const sql = buildEntitySelectSql({ schema: 'auth', name: 'users' })
+    expect(sql).toMatch(/^select id, email, phone,/)
+    expect(sql).not.toMatch(/\*|encrypted_password|token/)
+    expect(sql).toMatch(/order by created_at desc nulls last$/)
+  })
+})

@@ -191,6 +191,11 @@
   @apply bg-200;
 }
 
+/* Row a side panel is describing, e.g. Explorer's row details */
+.rdg-row.rdg-row--selected {
+  @apply bg-200;
+}
+
 .tab-cursor {
   cursor: pointer !important;
 }

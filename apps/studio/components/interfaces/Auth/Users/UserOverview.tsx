@@ -38,8 +38,8 @@ import { timeout } from '@/lib/helpers'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
-  'bg-surface-100 border-default text-foreground flex items-center justify-between',
-  'gap-x-4 border px-5 py-4 text-sm first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl'
+  'bg-surface-100 border-default text-foreground flex flex-wrap items-center justify-between',
+  'gap-x-4 gap-y-2 border px-5 py-4 text-sm first:rounded-tr first:rounded-tl last:rounded-br last:rounded-bl'
 )
 
 interface UserOverviewProps {

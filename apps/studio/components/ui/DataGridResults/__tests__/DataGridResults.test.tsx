@@ -84,31 +84,31 @@ test('shows empty state when no rows provided', () => {
   expect(screen.getByText('Success. No rows returned')).toBeTruthy()
 })
 
-test('opens the selected row using its edit action', async () => {
+test('opens the selected row using its view action', async () => {
   const rows = generateRows(2)
-  const onEditRow = vi.fn()
-  render(<Results rows={rows} onEditRow={onEditRow} />)
-  await userEvent.click(screen.getAllByRole('button', { name: 'Edit row' })[1])
-  expect(onEditRow).toHaveBeenCalledWith(rows[1])
+  const onViewRow = vi.fn()
+  render(<Results rows={rows} onViewRow={onViewRow} />)
+  await userEvent.click(screen.getAllByRole('button', { name: 'View row' })[1])
+  expect(onViewRow).toHaveBeenCalledWith(rows[1])
 })
 
 test('supports keyboard activation and disables rows without an identity', async () => {
   const rows = generateRows(2)
-  const onEditRow = vi.fn()
-  render(<Results rows={rows} onEditRow={onEditRow} canEditRow={(row) => row.id === 0} />)
-  const actions = screen.getAllByRole('button', { name: 'Edit row' })
+  const onViewRow = vi.fn()
+  render(<Results rows={rows} onViewRow={onViewRow} canViewRow={(row) => row.id === 0} />)
+  const actions = screen.getAllByRole('button', { name: 'View row' })
   // Stays focusable so its tooltip can explain the missing primary key
   expect(actions[1]).toHaveAttribute('aria-disabled', 'true')
   await userEvent.click(actions[1])
-  expect(onEditRow).not.toHaveBeenCalled()
+  expect(onViewRow).not.toHaveBeenCalled()
   actions[0].focus()
   await userEvent.keyboard('{Enter}')
-  expect(onEditRow).toHaveBeenCalledWith(rows[0])
+  expect(onViewRow).toHaveBeenCalledWith(rows[0])
 })
 
 test('keeps ordinary result grids read-only', () => {
   render(<Results rows={generateRows(2)} />)
-  expect(screen.queryByRole('button', { name: 'Edit row' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'View row' })).not.toBeInTheDocument()
 })
 
 test('keeps result columns in place while editing becomes available or stays unavailable', () => {
@@ -121,15 +121,15 @@ test('keeps result columns in place while editing becomes available or stays una
     'animate-spin',
     'text-tertiary-foreground'
   )
-  expect(screen.queryByRole('button', { name: 'Edit row' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'View row' })).not.toBeInTheDocument()
 
-  rerender(<Results rows={rows} reserveRowActions onEditRow={vi.fn()} />)
+  rerender(<Results rows={rows} reserveRowActions onViewRow={vi.fn()} />)
   expect(headers()).toEqual(['', 'id', 'name'])
-  expect(screen.getByRole('button', { name: 'Edit row' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'View row' })).toBeInTheDocument()
   expect(screen.queryByRole('img', { name: 'Checking row editability' })).not.toBeInTheDocument()
 
   rerender(<Results rows={rows} reserveRowActions />)
   expect(headers()).toEqual(['', 'id', 'name'])
-  expect(screen.queryByRole('button', { name: 'Edit row' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'View row' })).not.toBeInTheDocument()
   expect(screen.queryByRole('img', { name: 'Checking row editability' })).not.toBeInTheDocument()
 })

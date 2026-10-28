@@ -61,9 +61,9 @@ export function useQueryResultEditing({
   const context = result?.editingContext
   const isPrimaryDatabase =
     context?.databaseIdentifier === undefined || context.databaseIdentifier === project?.ref
-  const canInspectResult =
-    isEnabled &&
-    hasWritePermission &&
+  // Working out which table rows came from is a read, so anyone can see row details; only
+  // editing needs write access.
+  const canIdentifyRows =
     result?.source === 'database' &&
     !!result.sql &&
     !!context &&
@@ -77,7 +77,7 @@ export function useQueryResultEditing({
       sql: result?.sql,
       roleImpersonationState: context?.roleImpersonationState,
     }),
-    enabled: canInspectResult,
+    enabled: canIdentifyRows,
   })
   const { isSchemaLocked } = useIsProtectedSchema({ schema: target?.table.schema ?? '' })
   // The Table Editor's view of the table, which is what its cell editors are built from.
@@ -89,7 +89,8 @@ export function useQueryResultEditing({
 
   const { mutate: saveEdits, isPending: isSaving } = useQueryResultEditsSaveMutation()
 
-  const canEdit = canInspectResult && !!target && !isSchemaLocked && !isSaving
+  const canEdit =
+    canIdentifyRows && isEnabled && hasWritePermission && !!target && !isSchemaLocked && !isSaving
   const pendingEdits = result?.pendingEdits ?? []
   const sourceRows = result?.rows ?? []
   const shown = target
@@ -122,6 +123,15 @@ export function useQueryResultEditing({
       isEqual(getResultRowIdentifiers(candidate, target.table, target.columns), identifiers)
     )
     return matchIndex >= 0 ? sourceRows[matchIndex] : undefined
+  }
+
+  /** The row as shown, for the primary key it had in the result. */
+  const findRow = (rowIdentifiers: Record<string, unknown>) => {
+    if (!target) return undefined
+    const index = sourceRows.findIndex((row) =>
+      isEqual(getResultRowIdentifiers(row, target.table, target.columns), rowIdentifiers)
+    )
+    return index >= 0 ? shown.rows[index] : undefined
   }
 
   const getRowIdentifiers = (row: ResultRow) => {
@@ -173,6 +183,35 @@ export function useQueryResultEditing({
       if (edit) edits = stagePendingCellEdit(edits, edit)
     }
     setPendingEdits(edits)
+  }
+
+  /**
+   * Shows a row just added to the result's table at the top, so it can be seen and edited
+   * straight away — even if the query's own conditions wouldn't select it on a re-run.
+   */
+  const addRow = (tableId: number, row: ResultRow) => {
+    const { result: latest, target: latestTarget } = latestRef.current
+    if (!latest?.rows || !latestTarget || latestTarget.table.id !== tableId) return
+    const shownRow = Object.fromEntries(
+      latestTarget.columns.map(({ name, column }) => [name, row[column]])
+    )
+    onResultChange({ ...latest, rows: [shownRow, ...latest.rows] })
+  }
+
+  /** Drops a row deleted outside the grid, such as a user deleted through Auth. */
+  const removeRow = (rowIdentifiers: Record<string, unknown>) => {
+    const { result: latest, target: latestTarget } = latestRef.current
+    if (!latest?.rows || !latestTarget) return
+    onResultChange({
+      ...latest,
+      rows: latest.rows.filter(
+        (row) =>
+          !isEqual(
+            getResultRowIdentifiers(row, latestTarget.table, latestTarget.columns),
+            rowIdentifiers
+          )
+      ),
+    })
   }
 
   const revertEdit = (edit: PendingCellEdit) =>
@@ -245,14 +284,16 @@ export function useQueryResultEditing({
   return {
     target,
     columns,
-    isLoadingTarget: canInspectResult && isLoadingTarget,
-    canInspectResult,
+    isLoadingTarget: canIdentifyRows && isLoadingTarget,
     canEdit,
     rows: shown.rows,
     isCellEdited: (row: ResultRow, resultColumn: string) =>
       shown.editedColumns.get(row)?.has(resultColumn) ?? false,
     pendingEdits,
     getRowIdentifiers,
+    findRow,
+    addRow,
+    removeRow,
     stageCellEdit,
     stageRowEdits,
     revertEdit,

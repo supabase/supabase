@@ -3,7 +3,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DatabaseObjectDetails } from '../Details/DatabaseObjectDetails'
 import { DetailsEmpty } from '../Details/DetailsSection'
-import { queryRelationsQueryOptions } from '@/data/sql/query-relations-query'
+import { queryRelationsQueryOptions, type QueryRelation } from '@/data/sql/query-relations-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
 
@@ -14,9 +14,11 @@ import { useGrant } from '@/lib/grants'
  */
 export const QueryDetailsPanel = ({
   sql,
+  onRowAdded,
 }: {
   /** The SQL whose objects to describe; usually the last one run. */
   sql?: string
+  onRowAdded?: (relation: QueryRelation, row: Record<string, unknown>) => void
 }) => {
   const { data: project } = useSelectedProjectQuery()
   const queryGrant = useGrant('POST /platform/pg-meta/{ref}/query', { projectRef: project?.ref })
@@ -38,7 +40,11 @@ export const QueryDetailsPanel = ({
     <aside aria-label="Query details" className="flex h-full flex-col overflow-y-auto">
       <div className="flex flex-col divide-y">
         {(relations ?? []).map((relation) => (
-          <DatabaseObjectDetails key={relation.id} relation={relation} />
+          <DatabaseObjectDetails
+            key={relation.id}
+            relation={relation}
+            onRowAdded={onRowAdded ? (row) => onRowAdded(relation, row) : undefined}
+          />
         ))}
         {!sql && (
           <div className="p-4">

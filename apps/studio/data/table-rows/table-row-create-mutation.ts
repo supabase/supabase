@@ -18,6 +18,8 @@ export type TableRowCreateVariables = {
   enumArrayColumns: string[]
   returning?: boolean
   roleImpersonationState?: RoleImpersonationState
+  /** Where the row was added from, for analytics. Defaults to the Table Editor. */
+  telemetryMethod?: 'table_editor' | 'explorer'
 }
 
 export function getTableRowCreateSql({
@@ -78,7 +80,7 @@ export const useTableRowCreateMutation = ({
       track(
         'table_data_added',
         {
-          method: 'table_editor',
+          method: variables.telemetryMethod ?? 'table_editor',
           schema_name: table.schema,
           table_name: table.name,
         },

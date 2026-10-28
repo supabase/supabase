@@ -32,8 +32,9 @@ export const EXPLORER_RESOURCES: Record<
 export type ExplorerSection = { level: ExplorerNavLevel; label: string; icon: ExplorerNavIcon }
 
 /**
- * The project's tables, first in the sidebar and set apart from the rest: it's the Table
- * Editor's job, and the destination people return to most. It shares the Table Editor's icon.
+ * The project's tables, first in the sidebar and grouped with Run SQL apart from saved work:
+ * it's the Table Editor's job, and the destination people return to most. It shares the Table
+ * Editor's icon.
  */
 export const EXPLORER_TABLES_SECTION: ExplorerSection = {
   level: 'tables',
@@ -41,7 +42,7 @@ export const EXPLORER_TABLES_SECTION: ExplorerSection = {
   icon: TableEditor,
 }
 
-/** Sections for the user's own work, below the tables, in display order. */
+/** Sections for the user's own work, below the tables and Run SQL, in display order. */
 export const EXPLORER_RESOURCE_SECTIONS: ExplorerSection[] = [
   { level: 'notebook', label: 'Notebooks', icon: EXPLORER_RESOURCES.notebook.icon },
   { level: 'chat', label: 'Chats', icon: EXPLORER_RESOURCES.chat.icon },

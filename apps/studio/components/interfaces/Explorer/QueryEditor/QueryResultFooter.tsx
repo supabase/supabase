@@ -1,3 +1,5 @@
+import { Button } from 'ui'
+
 import { ExplorerQueryFooter } from '../ExplorerQuery'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { pluralize } from '@/lib/helpers'
@@ -7,6 +9,9 @@ interface QueryResultFooterProps {
   rowLimit?: number
   results?: readonly Record<string, unknown>[]
   fileName?: string
+  /** Present when another page of rows can be appended to the result. */
+  onLoadMore?: () => void
+  isLoadingMore?: boolean
 }
 
 export const QueryResultFooter = ({
@@ -14,6 +19,8 @@ export const QueryResultFooter = ({
   rowLimit,
   results,
   fileName,
+  onLoadMore,
+  isLoadingMore = false,
 }: QueryResultFooterProps) => {
   return (
     <ExplorerQueryFooter className="flex items-center justify-between gap-x-2">
@@ -25,6 +32,20 @@ export const QueryResultFooter = ({
           <>
             <p>·</p>
             <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
+          </>
+        )}
+        {onLoadMore && (
+          <>
+            <p>·</p>
+            <Button
+              variant="text"
+              size="tiny"
+              className="h-auto px-1 py-0 text-xs"
+              loading={isLoadingMore}
+              onClick={onLoadMore}
+            >
+              Load more
+            </Button>
           </>
         )}
       </div>
