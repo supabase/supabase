@@ -24,7 +24,7 @@
 
 ## Colors
 
-The values come from the [Supabase design system](https://supabase.com/design-system/docs/color-usage) tokens.
+Supabase green is the main color of the logo symbol. The grays are background colors from the [Supabase design system](https://supabase.com/design-system/docs/color-usage). The logo files already have the correct colors, so do not repaint the logo with these values.
 
 | Name           | Token            | HEX       | RGB                | HSL                      | OKLCH                      |
 | -------------- | ---------------- | --------- | ------------------ | ------------------------ | -------------------------- |

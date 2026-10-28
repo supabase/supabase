@@ -142,7 +142,7 @@ const CANVAS_CAPTIONS: Record<Canvas, string> = {
   dark: 'Dark',
 }
 
-// values come from the design system tokens in packages/ui/build/css
+// the green is the color in the logo files. the grays come from the design system tokens in packages/ui/build/css
 const COLORS: BrandColor[] = [
   {
     name: 'Supabase green',
@@ -252,7 +252,7 @@ export const LogoGallery = ({ className }: LogoGalleryProps) => (
     })}
     <AssetSection
       title="Colors"
-      description="The values come from the Supabase design system tokens. Use Supabase green for brand elements. Use the grays for backgrounds and lettering. Each value is valid CSS."
+      description="Supabase green is the main color of the logo symbol. Use the grays for backgrounds behind the logo. The files already have the logo colors, so do not repaint the logo. Each value is valid CSS."
     >
       <ColorPalette colors={COLORS} />
     </AssetSection>
