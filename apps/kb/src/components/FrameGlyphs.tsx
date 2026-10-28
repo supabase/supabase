@@ -4,6 +4,7 @@ import { toOpaque } from 'ui-patterns/GlyphLines'
 
 import { fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
 import { sizeLayers } from '../lib/ascii/layer'
+import { observeTheme } from './ColorProbes'
 
 export interface FrameGlyphsProps {
   text: string
@@ -23,15 +24,20 @@ export const FrameGlyphs = ({ text, className }: FrameGlyphsProps) => {
       let drawnKey = ''
 
       const draw = () => {
-        frame = requestAnimationFrame(draw)
-        const box = canvas.getBoundingClientRect()
-        if (!box.width || box.bottom < 0 || box.top > innerHeight) return
         // the spans start their draw-out from this attribute. the next frame reads the first animated scale
         if (!host.hasAttribute('data-frame-glyphs-ready')) {
           host.setAttribute('data-frame-glyphs-ready', '')
+          frame = requestAnimationFrame(draw)
           return
         }
         const spans = [...host.querySelectorAll<HTMLElement>('[data-glyph-frame]')]
+        // a finished draw-out keeps its fill, so getAnimations still returns it. the play state shows that it finished
+        const isDrawingOut = spans.some((span) =>
+          span.getAnimations().some((animation) => animation.playState !== 'finished')
+        )
+        if (isDrawingOut) frame = requestAnimationFrame(draw)
+        const box = canvas.getBoundingClientRect()
+        if (!box.width) return
         const rects = spans.map((span) => span.getBoundingClientRect())
         const style = getComputedStyle(canvas)
         const key = [
@@ -79,8 +85,22 @@ export const FrameGlyphs = ({ text, className }: FrameGlyphsProps) => {
         ctx.globalAlpha = 1
       }
 
-      frame = requestAnimationFrame(draw)
-      return () => cancelAnimationFrame(frame)
+      const redraw = () => {
+        cancelAnimationFrame(frame)
+        frame = requestAnimationFrame(draw)
+      }
+
+      const resizeObserver = new ResizeObserver(redraw)
+      resizeObserver.observe(host)
+      // a pinch zoom changes only the visual viewport scale, so the canvas redraws for it too
+      visualViewport?.addEventListener('resize', redraw)
+      const unobserveTheme = observeTheme(redraw)
+      return () => {
+        cancelAnimationFrame(frame)
+        resizeObserver.disconnect()
+        visualViewport?.removeEventListener('resize', redraw)
+        unobserveTheme()
+      }
     },
     [text]
   )
