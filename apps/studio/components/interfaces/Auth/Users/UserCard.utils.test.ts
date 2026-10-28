@@ -29,6 +29,12 @@ describe('getUserInitials', () => {
 })
 
 describe('getUserPrimaryLabel', () => {
+  it('falls back to email when the display name contains only whitespace', () => {
+    expect(
+      getUserPrimaryLabel(user({ email: 'ada@example.com', raw_user_meta_data: { name: '  ' } }))
+    ).toBe('ada@example.com')
+  })
+
   it('prefers the display name, then email, then phone', () => {
     expect(
       getUserPrimaryLabel(user({ email: 'ada@example.com', raw_user_meta_data: { name: 'Ada' } }))

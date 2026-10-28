@@ -3,7 +3,7 @@ import type { User } from '@/data/auth/users-infinite-query'
 
 export function getUserPrimaryLabel(user: User): string {
   if (user.is_anonymous) return 'Anonymous user'
-  return getDisplayName(user, '') || user.email || user.phone || user.id || 'Unknown user'
+  return getDisplayName(user, '').trim() || user.email || user.phone || user.id || 'Unknown user'
 }
 
 export function getUserInitials(user: User): string {
