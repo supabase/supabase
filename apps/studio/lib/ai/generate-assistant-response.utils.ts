@@ -12,16 +12,15 @@ import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
 import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
 import { NO_DATA_ERROR } from '@/lib/ai/tools/execute-sql-output'
 import { decodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
-import type { ToolRequest } from '@/lib/ai/tools/registry'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 import { buildToolsPrompt } from '@/lib/ai/tools/tools-prompt'
 
-/** The chat system prompt for a request's tool set. See `generateAssistantResponse` on caching. */
-export function buildSystemPrompt(request: ToolRequest): string {
+/** The chat system prompt for the tools the model is given. See `generateAssistantResponse` on caching. */
+export function buildSystemPrompt(toolNames: Iterable<string>): string {
   return source`
     ${GENERAL_PROMPT}
     ${CHAT_PROMPT}
-    ${buildToolsPrompt(request)}
+    ${buildToolsPrompt(toolNames)}
     ${SECURITY_PROMPT}
     ${LIMITATIONS_PROMPT}
   `

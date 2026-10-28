@@ -20,7 +20,6 @@ import {
   hideToolErrorsFromModel,
   prepareMessagesForModel,
 } from '@/lib/ai/generate-assistant-response.utils'
-import { getToolRequest } from '@/lib/ai/tools/registry'
 import type { contract as renameChatContract } from '@/lib/ai/tools/rename-chat'
 import type { ToolContractInput } from '@/lib/ai/tools/types'
 
@@ -43,8 +42,6 @@ export async function generateAssistantResponse({
   planId,
   isHighComplianceProject,
   includesLogsSnippets,
-  isExplorerEnabled,
-  baseUrl,
   systemProviderOptions,
   providerOptions,
   requestedModel,
@@ -70,9 +67,6 @@ export async function generateAssistantResponse({
   isHighComplianceProject?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
-  isExplorerEnabled?: boolean
-  /** The public dashboard URL `getTools` got, which decides whether URL-dependent tools exist. */
-  baseUrl?: string
   requestedModel?: string
   /** The model actually used after entitlement/throttle fallback. */
   effectiveModel?: string
@@ -95,13 +89,10 @@ export async function generateAssistantResponse({
         : NO_SCHEMA_ACCESS_MESSAGE
 
     // Important: do not use per-request dynamic content in the system prompt or Bedrock will
-    // not cache it. The tools section varies with the environment and base URL, which are fixed
-    // per deployment, and with Explorer and support mode, which can change per user or chat.
-    // That costs no extra cache misses: providers cache tools before the system prompt, so a
-    // change to the tool set already invalidates the cached system prompt, and those flags
-    // change the tool set. The section changes only when the tool set does, since it uses the
-    // same request as `getTools`.
-    const system = buildSystemPrompt(getToolRequest({ isExplorerEnabled, supportMode, baseUrl }))
+    // not cache it. The tools section varies with the tool set. That costs no extra cache
+    // misses: providers cache tools before the system prompt, so a change to the tool set
+    // already invalidates the cached system prompt.
+    const system = buildSystemPrompt(Object.keys(tools))
 
     const systemMessage: SystemModelMessage = {
       role: 'system',

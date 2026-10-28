@@ -1,5 +1,4 @@
 import type { InferUITools, Tool, ToolUIPart, UIDataTypes, UIMessage } from 'ai'
-import { IS_PLATFORM } from 'common'
 
 import type { ToolName } from '../tool-filter'
 import { contract as createNotebook } from './create-notebook'
@@ -147,24 +146,4 @@ export function isToolAvailable(
 export type ToolRequest = {
   environment: ToolEnvironment
   satisfied: ReadonlySet<ToolRequirement>
-}
-
-/**
- * The one place a request becomes a `ToolRequest`, so the tools `getTools` builds and the tools
- * the system prompt describes can't disagree.
- */
-export function getToolRequest({
-  isExplorerEnabled,
-  supportMode,
-  baseUrl,
-}: {
-  isExplorerEnabled?: boolean
-  supportMode?: boolean
-  baseUrl?: string
-}): ToolRequest {
-  const satisfied = new Set<ToolRequirement>()
-  if (isExplorerEnabled) satisfied.add('explorer')
-  if (supportMode) satisfied.add('supportMode')
-  if (baseUrl) satisfied.add('baseUrl')
-  return { environment: IS_PLATFORM ? 'platform' : 'self-hosted', satisfied }
 }

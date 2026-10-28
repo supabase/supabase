@@ -184,14 +184,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     // in getTools. The TanStack adapter doesn't emit it, so settling the pipe below also aborts.
     res.on('close', () => abortController.abort())
 
-    const baseUrl = getBasePathURL()
     const tools = await getTools({
       projectRef,
       connectionString,
       authorization,
       aiOptInLevel,
       accessToken,
-      baseUrl,
+      baseUrl: getBasePathURL(),
       supportMode,
       isExplorerEnabled: explorerEnabled,
       signal: abortController.signal,
@@ -239,8 +238,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       planId,
       isHighComplianceProject,
       includesLogsSnippets,
-      isExplorerEnabled: explorerEnabled,
-      baseUrl,
       requestedModel,
       effectiveModel,
       systemProviderOptions,
