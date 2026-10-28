@@ -24,3 +24,6 @@ export const PLATFORM_WEBHOOK_EVENT_TYPES = [
   'v1.organization.billing.plan.upgraded',
   'v1.organization.billing.plan.downgraded',
 ] as const satisfies readonly WebhookEventType[]
+
+// Rows requested per page of the deliveries table (the API pages by cursor, not page number).
+export const DELIVERIES_PAGE_SIZE = 5

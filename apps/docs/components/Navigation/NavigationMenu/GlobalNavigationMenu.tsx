@@ -16,13 +16,14 @@ import {
   navigationMenuTriggerStyle,
 } from 'ui'
 
+import type { GlobalMenuItems } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
-import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
+import { useNavItems } from '@/features/IaNav'
 
 /**
  * Get TopNav active label based on current pathname
  */
-export const useActiveMenuLabel = (menu: typeof GLOBAL_MENU_ITEMS) => {
+export const useActiveMenuLabel = (menu: GlobalMenuItems) => {
   const pathname = usePathname()
   const [activeLabel, setActiveLabel] = useState('')
 
@@ -57,6 +58,7 @@ export const useActiveMenuLabel = (menu: typeof GLOBAL_MENU_ITEMS) => {
 }
 
 const GlobalNavigationMenu: FC = () => {
+  const { GLOBAL_MENU_ITEMS } = useNavItems()
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
   const triggerClassName =
     'h-(--header-height) p-2 bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-light hover:bg-transparent hover:text-foreground data-open:bg-transparent! data-open:text-foreground! focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
