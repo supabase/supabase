@@ -25,12 +25,12 @@ export type UnifiedLogAttributesVariables = {
 
 export type UnifiedLogAttributesError = ResponseError
 
-const getLogTimeWindow = (timestampMs: number, windowMs: number) => ({
+export const getLogTimeWindow = (timestampMs: number, windowMs: number) => ({
   iso_timestamp_start: new Date(timestampMs - windowMs).toISOString(),
   iso_timestamp_end: new Date(timestampMs + windowMs).toISOString(),
 })
 
-async function runOtelLogsSql(variables: Omit<ExecuteAnalyticsSqlVariables, 'endpoint'>) {
+export async function runOtelLogsSql(variables: Omit<ExecuteAnalyticsSqlVariables, 'endpoint'>) {
   const data = await executeAnalyticsSql({
     ...variables,
     endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
@@ -39,7 +39,7 @@ async function runOtelLogsSql(variables: Omit<ExecuteAnalyticsSqlVariables, 'end
   return data?.result ?? []
 }
 
-async function getLogAttributesRow(
+async function getUnifiedLogAttributes(
   { projectRef, logId, source, logTimestampMs }: UnifiedLogAttributesVariables,
   signal?: AbortSignal
 ) {
@@ -56,15 +56,7 @@ async function getLogAttributesRow(
     ...getLogTimeWindow(logTimestampMs, LOG_WINDOW_MS),
     signal,
   })
-  return z.array(logAttributesRowSchema).parse(result)[0]
-}
-
-async function getUnifiedLogAttributes(
-  variables: UnifiedLogAttributesVariables,
-  signal?: AbortSignal
-) {
-  const row = await getLogAttributesRow(variables, signal)
-  return row?.log_attributes ?? null
+  return z.array(logAttributesRowSchema).parse(result)[0] ?? null
 }
 
 export type UnifiedLogAttributesData = Awaited<ReturnType<typeof getUnifiedLogAttributes>>

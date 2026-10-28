@@ -38,7 +38,10 @@ describe('log attributes', () => {
         })
       },
     })
-    await expect(fetchAttributes()).resolves.toEqual({ 'request.method': 'GET' })
+    await expect(fetchAttributes()).resolves.toEqual({
+      source: 'edge_logs',
+      log_attributes: { 'request.method': 'GET' },
+    })
     expect(body).toMatchObject({
       iso_timestamp_start: '2026-01-01T09:59:00.000Z',
       iso_timestamp_end: '2026-01-01T10:01:00.000Z',
@@ -46,14 +49,14 @@ describe('log attributes', () => {
   })
 
   it.each([{ result: [] }, { result: [{ source: 'edge_logs', log_attributes: null }] }])(
-    'returns null for absent attributes: %j',
+    'preserves the source when attributes are absent: %j',
     async ({ result }) => {
       addAPIMock({
         method: 'post',
         path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
         response: () => HttpResponse.json<LogsResponse>({ result }),
       })
-      await expect(fetchAttributes()).resolves.toBeNull()
+      await expect(fetchAttributes()).resolves.toEqual(result[0] ?? null)
     }
   )
 
