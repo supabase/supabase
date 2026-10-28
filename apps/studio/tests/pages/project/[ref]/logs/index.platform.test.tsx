@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import LogPage from '@/pages/project/[ref]/logs/index'
+import { Route as TanStackLogsIndexRoute } from '@/routes/project/$ref/logs/index'
 import { customRender } from '@/tests/lib/custom-render'
 import { routerMock } from '@/tests/lib/route-mock'
 
@@ -64,6 +65,15 @@ describe('/project/[ref]/logs', () => {
     unifiedLogsPreviewState.current = { isEnabled: false, isLoading: true }
 
     customRender(<LogPage dehydratedState={undefined} />)
+
+    await waitFor(() => expect(routerMock.pathname).toBe('/sign-in'))
+    expect(routerMock.query.returnTo).toBe('/project/default/logs')
+  })
+
+  it('redirects to sign-in from the TanStack route when there is no session', async () => {
+    const RouteComponent = TanStackLogsIndexRoute.options.component!
+
+    customRender(<RouteComponent />)
 
     await waitFor(() => expect(routerMock.pathname).toBe('/sign-in'))
     expect(routerMock.query.returnTo).toBe('/project/default/logs')
