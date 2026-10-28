@@ -65,6 +65,12 @@ export type ToolContract<TInput = unknown, TOutput = unknown> = {
   outputOnInvalid?: JSONValue
 }
 
+/** A tool that no longer exists, kept so its outputs in saved chats replay safely. */
+export type LegacyToolContract<TOutput = unknown> = Pick<
+  ToolContract<unknown, TOutput>,
+  'name' | 'outputSchema' | 'toModelOutput' | 'outputOnInvalid'
+>
+
 /**
  * A tool the remote MCP server implements. The server owns the description, input schema,
  * execution and output; Studio decides only who may run it and whether it needs approval.
