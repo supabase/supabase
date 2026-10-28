@@ -2,10 +2,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
-import { handleError, patch, unguarded } from '@/data/fetchers'
+import { handleError, patch } from '@/data/fetchers'
+import type { GrantForVariants } from '@/lib/grants'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
+export type BranchUpdateGrant = GrantForVariants<'patch', '/v1/branches/{branch_id_or_ref}'>
+
 export type BranchUpdateVariables = {
+  grant: BranchUpdateGrant
   branchRef: string
   projectRef: string
   branchName?: string
@@ -20,6 +24,7 @@ export async function updateBranch({
   gitBranch,
   persistent,
   requestReview,
+  grant,
 }: BranchUpdateVariables) {
   const { data, error } = await patch('/v1/branches/{branch_id_or_ref}', {
     params: {
@@ -31,7 +36,7 @@ export async function updateBranch({
       persistent,
       request_review: requestReview,
     },
-    grant: unguarded.migrating,
+    grant,
   })
 
   if (error) handleError(error)
