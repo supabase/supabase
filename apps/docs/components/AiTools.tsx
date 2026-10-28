@@ -1,6 +1,7 @@
 'use client'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { PREFERRED_SOURCE_URL } from 'common/markdown-affordance'
 import { type MarkdownAffordancePageType } from 'common/telemetry-constants'
 import { usePathname } from 'next/navigation'
 import { AiTools as SharedAiTools, type AiAgent } from 'ui-patterns/AiTools'
@@ -47,18 +48,11 @@ function AiTools({
       markdownUrl={`/docs${path}.md`}
       markdownFallback={getArticleHtml}
       agentSetupHref={showAgentSetup ? '/docs/guides/ai-tools' : undefined}
-      preferredSourceHref={
-        showPreferredSource ? 'https://www.google.com/preferences/source?q=supabase.com' : undefined
-      }
+      preferredSourceHref={showPreferredSource ? PREFERRED_SOURCE_URL : undefined}
       onAgentSetupClick={handleAgentSetupClick}
       onPreferredSourceClick={handlePreferredSourceClick}
       onMarkdownCopy={handleMarkdownCopy}
       onAskAiClick={handleAskAiClick}
-      titleClassName={
-        pageType === 'troubleshooting'
-          ? 'font-sans text-sm normal-case text-foreground-lighter'
-          : undefined
-      }
       className={className}
     />
   )

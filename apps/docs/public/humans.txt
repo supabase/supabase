@@ -15,6 +15,7 @@ Alaister Young
 Aleksi Immonen
 Alex Hall
 Alex Hsu
+Alex Ives
 Alexander Alexandrov
 Alexander Korotkov
 Alexis Aguilar
@@ -185,6 +186,7 @@ Joey Freeland
 Joey Lei
 John Fitzgerald
 John Jarvis
+John Murret
 Joel Martin
 Johan Bergström
 John Pena
@@ -320,6 +322,7 @@ Sam Rome
 Sam Rose
 Samir Ketema
 Sana Cordeaux
+Santos Flores de Leon
 Sasi Kanumuri
 Sara Read
 Satya Rohith Gannamanedi

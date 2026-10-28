@@ -2,7 +2,12 @@ import { type Table as TTable } from '@tanstack/react-table'
 import { createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
-import { LOG_TYPES, LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import {
+  LOG_TYPE_TO_SOURCE,
+  LOG_TYPES,
+  LOG_TYPES_LABELS,
+  SEARCH_PARAMS_PARSER,
+} from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema, querySearchParamsSchema } from './UnifiedLogs.schema'
 import type { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
@@ -46,6 +51,9 @@ export function getLogTypeVisibility(
     ])
   )
 }
+
+export const isOfferedFilter = (name: string, offeredFilters?: readonly string[]) =>
+  !offeredFilters || offeredFilters.includes(name)
 
 export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
 
@@ -103,6 +111,12 @@ export const buildUnifiedLogsUrl = ({
     date: start && end ? [new Date(start), new Date(end)] : null,
   })
 
+export const getFacetValueCount = (
+  facets: Record<string, FacetMetadataSchema> | undefined,
+  facet: string,
+  value: string
+) => facets?.[facet]?.rows.find((row) => row.value === value)?.total ?? 0
+
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {
     return new Map(facets?.[columnId]?.rows?.map(({ value, total }) => [value, total]) || [])
@@ -118,6 +132,11 @@ export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetad
     if (typeof max === 'number') return [max, max]
     return undefined
   }
+}
+
+export function getLogTypeSource(logType: string) {
+  const sources: Partial<Record<string, string>> = LOG_TYPE_TO_SOURCE
+  return sources[logType]
 }
 
 /**

@@ -1,0 +1,104 @@
+---
+title: 'OrioleDB public beta: a Postgres storage engine for update-heavy tables'
+description: 'OrioleDB, an open-source storage engine for Postgres, is in public beta on every Supabase plan.'
+author: aditya_maruvada,daniel_mitterdorfer
+date: '2026-10-28'
+categories:
+  - product
+tags:
+  - postgres
+  - database
+  - orioledb
+imgSocial: '2026-10-28-orioledb-public-beta/og.png'
+imgThumb: '2026-10-28-orioledb-public-beta/thumb.png'
+toc_depth: 2
+---
+
+OrioleDB, an [open-source](https://github.com/orioledb/orioledb) storage engine for Postgres, is now in public beta on every Supabase plan. We announced the public beta at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits), alongside Multigres and DBArena. Pick OrioleDB when you create a project. It's billed the same as standard Postgres. Compute and disk resizing, read replicas, Postgres upgrades, and scheduled backups work. It's not ready for production yet.
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/s2jdUxV2xFo"
+    title="OrioleDB is now in public beta"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
+## The problem with Postgres’s default storage engine
+
+Postgres stores table rows in a format called the heap. An update doesn't change a row in place. Postgres writes a new version and leaves the old one behind as a dead tuple. Because every index points to a row’s physical location, the new version usually needs a new entry in every index on the table, even indexes on columns that didn’t change. Deletes leave dead tuples too.
+
+Postgres cleans up the old row versions with a process called VACUUM, and a background process called autovacuum runs it automatically once enough dead tuples build up in a table. On tables with a lot of updates or deletes, autovacuum can fall behind. This creates bloat: tables and indexes grow larger than the data they hold, and queries get slower because they read more pages. Teams end up tuning autovacuum settings per table, scheduling manual VACUUM runs, or using tools like `pg_repack` to rebuild tables.
+
+Heap storage also has limits at high concurrency. A lookup by primary key has to read both the index and the table, every read goes through a shared buffer pool that many connections compete for, and write-heavy workloads generate a lot of disk I/O at each checkpoint. On larger machines, these costs can keep Postgres from using all the CPU and I/O you’re paying for.
+
+## How OrioleDB works
+
+OrioleDB replaces the heap through the Table Access Method, Postgres's plug-in interface for storage engines. Your connection strings, Auth, Row Level Security policies, and client libraries stay the same.
+
+- **Undo log instead of dead tuples.** When a row is updated or deleted, OrioleDB writes the previous version to an undo log, which is reclaimed automatically. In most cases, tables don't accumulate dead tuples, so there's nothing for VACUUM to clean up.
+- **64-bit transaction IDs.** Postgres’s 32-bit transaction IDs wrap around, and if VACUUM falls behind, Postgres stops accepting writes. OrioleDB tables use 64-bit IDs, so they don’t wrap around. System catalogs and any heap tables still use 32-bit IDs.
+- **Index-organized tables.** Rows are stored inside the primary key index rather than in a separate heap, so a primary key lookup reads one structure instead of two. Secondary indexes point to the primary key, so an update writes only to the indexes whose columns changed. If a table has no primary key, OrioleDB creates a hidden one.
+- **No buffer mapping.** In-memory pages link directly to their storage pages, so OrioleDB avoids the contention on Postgres’s shared buffer mapping. Page reads are lock-free, which helps when many connections are reading at once.
+- **Copy-on-write checkpoints and row-level WAL.** Checkpoints write only the data that changed, which reduces disk I/O on write-heavy workloads.
+
+OrioleDB has been in development since 2021, and its creators are part of the Supabase team. This beta ships with OrioleDB beta19 on Postgres 17.11.
+
+## Performance
+
+We benchmark OrioleDB on [DBArena](https://dbarena.com/), our open benchmarking site for hosted Postgres. It runs a workload derived from TPC-C against Supabase Postgres, Supabase with OrioleDB, Amazon RDS, and Google Cloud SQL across seven compute sizes. It tests two scenarios: one where the data fits in memory and one where it is four times larger than memory. The benchmark code, methodology, and raw results for every run are public, so you can check our numbers or rerun them yourself. This workload is derived from the TPC-C Benchmark and is not comparable to published TPC-C Benchmark results, as this implementation does not comply with all requirements of the TPC-C Benchmark.
+
+When the data doesn’t fit in memory, OrioleDB had the highest throughput per dollar of any product at every compute size we tested. On an 8XL instance (32 vCPU, 128 GiB of RAM), it completed about 1.8x more transactions per minute than Supabase Postgres on heap storage, reaching 113,850 transactions per minute. At the Small size, at the same price, it delivered about 46% more throughput per dollar than heap. When the data fits in memory, the gap is smaller. OrioleDB was about 13% ahead of heap at Large and about 29% ahead at 8XL. At Small, heap came out ahead. You can [compare the results](https://dbarena.com/compare?bound=cache-exceeding&cols=supabase:8xlarge,orioledb:8xlarge) for any size and scenario.
+
+The performance benefits of OrioleDB depend on your workload. OrioleDB helps most with tables that are updated or deleted often, such as order status, inventory counts, job queues, and session data, since those are the tables where heap storage builds up the most bloat. It also helps when your data set is larger than memory, when many connections are reading and writing at once on a large instance, and when most queries look up rows by primary key. Read-mostly workloads that fit comfortably in memory will see a smaller difference. Workloads that depend on non-B-tree indexes, like pgvector HNSW, may not see gains yet, since those indexes run through an experimental bridge. We recommend benchmarking your own workload before drawing conclusions.
+
+<Img
+  alt="Benchmark derived from TPC-C: OrioleDB completed up to 1.8x more transactions per minute than the standard Postgres heap on an 8XL instance (32 vCPU, 128 GiB RAM) with data larger than memory and 128 clients. Results on dbarena.com."
+  src="/images/blog/2026-10-28-orioledb-public-beta/bench2x.png"
+/>
+
+## Getting started
+
+1. Open [Create a new project](https://supabase.com/dashboard/new/_) in the Dashboard.
+2. Expand **Advanced Configuration**.
+3. Under **Postgres Type**, select **Postgres with OrioleDB**.
+4. Finish creating the project.
+
+In an OrioleDB project, new tables use OrioleDB by default. You don't need any special syntax:
+
+```sql
+create table orders (
+    id bigint generated always as identity primary key,
+    customer_id bigint not null,
+    status text not null,
+    updated_at timestamptz not null default now()
+);
+```
+
+To develop locally, initialize your project with the Supabase CLI (v2.119.0 or later):
+
+```bash
+supabase init --use-orioledb
+```
+
+<Img
+  alt="The Advanced Configuration section of the new project form, with Postgres with OrioleDB (Beta) selected as the Postgres Type and a notice that OrioleDB is not production ready. The setting can't be changed after the project is created."
+  src="/images/blog/2026-10-28-orioledb-public-beta/engine2x.png"
+/>
+
+## Things to know during the public beta
+
+- **Not for production yet.** The public beta is for testing, and it has no SLA.
+- **Chosen at project creation.** You can't add OrioleDB to an existing project or remove it later.
+- **No Point-in-Time Recovery.** Restoring a backup to a new project isn't available either.
+- **Index types.** Native B-tree indexes perform best. Other index types, including pgvector HNSW, run through an experimental bridge.
+- **Unsupported commands.** `CLUSTER`, `VACUUM FULL`, and [a few other commands](https://supabase.com/docs/guides/database/orioledb) don't work on OrioleDB tables.
+- **Extensions.** The OrioleDB image doesn't include `plv8`, `plls`, `plcoffee`, or `timescaledb-apache`.
+- **SERIALIZABLE transactions.** By default, OrioleDB takes a lock on each table a `SERIALIZABLE` transaction touches. You can change this with the `orioledb.serializable` setting.
+- **OrioleDB or Multigres.** A project can use one or the other, not both.
+- **Self-hosting.** OrioleDB isn't part of the self-hosted Supabase stack yet.
+- **Alpha projects.** Existing alpha projects aren't migrated to public beta and keep running as they are.
+
+The [OrioleDB docs](https://supabase.com/docs/guides/database/orioledb) cover configuration and the full list of limitations.

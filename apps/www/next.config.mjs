@@ -218,18 +218,7 @@ const nextConfig = {
     }
   },
   async redirects() {
-    // For /docs/guides/ redirects, auto-generate .md variants so renamed/deleted pages
-    // redirect correctly when fetched as markdown
-    const docsMdRedirects = redirects
-      .filter(
-        (r) =>
-          r.source.startsWith('/docs/guides/') &&
-          typeof r.destination === 'string' &&
-          r.destination.startsWith('/')
-      )
-      .map((r) => ({ ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }))
-
-    return [...docsMdRedirects, ...redirects]
+    return redirects
   },
   typescript: {
     // On previews, typechecking is run via GitHub Action only for efficiency

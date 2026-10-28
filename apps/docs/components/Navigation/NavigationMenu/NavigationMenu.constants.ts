@@ -11,7 +11,6 @@ const {
   docsAuthConfiguration: authConfigurationEnabled,
   docsAuthFlows: authFlowsEnabled,
   docsAuthFullSecurity: authFullSecurityEnabled,
-  docsAuthTroubleshooting: authTroubleshootingEnabled,
   docsCompliance: complianceEnabled,
   docsContribution: contributionEnabled,
   docsFdw: fdwEnabled,
@@ -39,7 +38,6 @@ const {
   'docs:auth_configuration',
   'docs:auth_flows',
   'docs:auth_full_security',
-  'docs:auth_troubleshooting',
   'docs:compliance',
   'docs:contribution',
   'docs:fdw',
@@ -289,13 +287,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
-            level: 'reference_javascript',
+            level: 'reference_cli',
           },
           {
             label: 'Management API',
             icon: 'reference-api',
             href: '/reference/api/introduction' as `/${string}`,
-            level: 'reference_javascript',
+            level: 'reference_api',
           },
           {
             label: 'Library',
@@ -335,12 +333,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'contributing',
             href: '/contributing' as `/${string}`,
             enabled: contributionEnabled,
-          },
-          {
-            label: 'Troubleshooting',
-            icon: 'troubleshooting',
-            href: '/guides/troubleshooting' as `/${string}`,
-            level: 'troubleshooting',
           },
           {
             label: 'Knowledge base',
@@ -848,14 +840,7 @@ export const auth: NavMenuConstant = {
     },
     {
       name: 'Debugging',
-      items: [
-        { name: 'Error Codes', url: '/guides/auth/debugging/error-codes' },
-        {
-          name: 'Troubleshooting',
-          url: '/guides/auth/troubleshooting',
-          enabled: authTroubleshootingEnabled,
-        },
-      ],
+      items: [{ name: 'Error Codes', url: '/guides/auth/debugging/error-codes' }],
     },
     {
       name: 'OAuth 2.1 Server',
@@ -1229,10 +1214,6 @@ export const database: NavMenuConstant = {
         {
           name: 'Supavisor',
           url: '/guides/database/supavisor' as `/${string}`,
-        },
-        {
-          name: 'Troubleshooting',
-          url: '/guides/database/troubleshooting' as `/${string}`,
         },
       ],
     },
@@ -1819,10 +1800,6 @@ export const functions: NavMenuConstant = {
           name: 'Error codes',
           url: '/guides/functions/error-codes' as `/${string}`,
         },
-        {
-          name: 'Troubleshooting',
-          url: '/guides/functions/troubleshooting' as `/${string}`,
-        },
       ],
     },
     {
@@ -2083,10 +2060,7 @@ export const realtime: NavMenuConstant = {
     {
       name: 'Debugging',
       url: undefined,
-      items: [
-        { name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] },
-        { name: 'Troubleshooting', url: '/guides/realtime/troubleshooting' },
-      ],
+      items: [{ name: 'Operational Error Codes', url: '/guides/realtime/error_codes', items: [] }],
     },
   ],
 }
@@ -2189,7 +2163,6 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Logs', url: '/guides/storage/debugging/logs' },
             { name: 'Error Codes', url: '/guides/storage/debugging/error-codes' },
-            { name: 'Troubleshooting', url: '/guides/storage/troubleshooting' },
           ],
         },
         {
@@ -3046,10 +3019,7 @@ export const telemetry: NavMenuConstant = {
     },
     {
       name: 'Detect and diagnose',
-      items: [
-        { name: 'Detection checks', url: '/guides/observability/detecting' },
-        { name: 'Troubleshooting', url: '/guides/troubleshooting' },
-      ],
+      items: [{ name: 'Detection checks', url: '/guides/observability/detecting' }],
     },
     {
       name: 'Agent prompts',
@@ -3347,14 +3317,14 @@ export const reference = {
           enabled: sdkCsharpEnabled,
         },
         {
-          name: 'supbase-python',
+          name: 'supabase-python',
           url: '/reference/python/start',
           level: 'reference_python',
           icon: '/img/icons/menu/reference-python' as `/${string}`,
           enabled: sdkPythonEnabled,
         },
         {
-          name: 'supbase-swift',
+          name: 'supabase-swift',
           url: '/reference/swift/start',
           level: 'reference_swift',
           items: [],

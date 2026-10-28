@@ -1,6 +1,6 @@
 import { assertType, describe, expect, it, vi } from 'vitest'
 
-import { client, get, post } from './fetchers'
+import { client, get, patch, post } from './fetchers'
 import { assertGrant, GrantAssertionError, guardMethod, unguarded } from './guarded-fetch'
 import { testGrant } from '@/tests/lib/test-grant'
 
@@ -97,6 +97,25 @@ describe('guarded fetch types', () => {
     // @ts-expect-error path not in the spec
     void (() => get('/v1/not-a-path', { grant: unguarded.migrating }))
   })
+
+  it('require a variant where the refinement says so', () => {
+    const branchParams = { params: { path: { branch_id_or_ref: 'branch' } }, body: {} }
+    const UPDATE_BRANCH = 'PATCH /v1/branches/{branch_id_or_ref}'
+
+    void (() =>
+      patch('/v1/branches/{branch_id_or_ref}', {
+        ...branchParams,
+        grant: testGrant(UPDATE_BRANCH, { variant: 'production' }),
+      }))
+    void (() =>
+      patch('/v1/branches/{branch_id_or_ref}', {
+        ...branchParams,
+        grant: testGrant(UPDATE_BRANCH, { variant: 'development' }),
+      }))
+    const plain = { ...branchParams, grant: testGrant(UPDATE_BRANCH) }
+    // @ts-expect-error plain grant where a variant is required
+    void (() => patch('/v1/branches/{branch_id_or_ref}', plain))
+  })
 })
 
 describe('guardMethod', () => {
@@ -159,6 +178,36 @@ describe('assertGrant', () => {
 
   it('accepts a grant without a project ref for any project', () => {
     expect(check(BRANCHES, testGrant(BRANCHES))).not.toThrow()
+  })
+
+  it.each([
+    'GET /v1/branches/{branch_id_or_ref}',
+    'PATCH /v1/branches/{branch_id_or_ref}',
+    'DELETE /v1/branches/{branch_id_or_ref}',
+    'GET /v1/branches/{branch_id_or_ref}/diff',
+    'POST /v1/branches/{branch_id_or_ref}/merge',
+    'POST /v1/branches/{branch_id_or_ref}/push',
+    'POST /v1/branches/{branch_id_or_ref}/reset',
+    'POST /v1/branches/{branch_id_or_ref}/restore',
+  ] as const)('requires a variant for %s', (endpoint) => {
+    const init = { params: { path: { branch_id_or_ref: 'branch' } } }
+    expect(check(endpoint, testGrant(endpoint), init)).toThrow('grant needs a variant')
+    expect(check(endpoint, testGrant(endpoint, { variant: 'development' }), init)).not.toThrow()
+  })
+
+  it('requires the production variant to create a default or data branch', () => {
+    const endpoint = 'POST /v1/projects/{ref}/branches'
+    const create = (body: object) => ({ params, body: { branch_name: 'dev', ...body } })
+    expect(check(endpoint, testGrant(endpoint), create({}))).not.toThrow()
+    expect(check(endpoint, testGrant(endpoint), create({ is_default: true }))).toThrow(
+      "request needs variant 'production'"
+    )
+    expect(check(endpoint, testGrant(endpoint), create({ with_data: true }))).toThrow(
+      "request needs variant 'production'"
+    )
+    expect(
+      check(endpoint, testGrant(endpoint, { variant: 'production' }), create({ with_data: true }))
+    ).not.toThrow()
   })
 
   it('rejects a grant for another organization', () => {

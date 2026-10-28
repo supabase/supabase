@@ -28,6 +28,10 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ComputeInstanceStatePill } from '../ComputeInstanceStatePill'
 import { RuntimeBadge } from '../RuntimeBadge'
+import {
+  ComputeInstanceDetailSkeleton,
+  ComputeInstanceOverviewTabSkeleton,
+} from './ComputeInstanceDetailSkeleton'
 import { ComputeInstanceLogsTab } from './ComputeInstanceLogsTab'
 import { ComputeInstanceOverviewTab } from './ComputeInstanceOverviewTab'
 import { AlertError } from '@/components/ui/AlertError'
@@ -69,7 +73,14 @@ export const ComputeInstanceDetail = () => {
   } = useQuery(computeInstanceQueryOptions({ projectRef, name: instanceName }))
 
   if (!projectRef) return null
-  if (isPending) return <GenericSkeletonLoader className="p-6" />
+  if (isPending) {
+    return (
+      <ComputeInstanceDetailSkeleton>
+        {tab === 'overview' && <ComputeInstanceOverviewTabSkeleton />}
+        {tab !== 'overview' && <GenericSkeletonLoader className="p-4" />}
+      </ComputeInstanceDetailSkeleton>
+    )
+  }
   if (isError) return <AlertError error={error} subject="Failed to retrieve instance" />
 
   if (!instance) {
