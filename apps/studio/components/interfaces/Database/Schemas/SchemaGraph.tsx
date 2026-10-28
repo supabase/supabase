@@ -82,11 +82,22 @@ import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
-export const SchemaGraph = () => {
+export const SchemaGraph = ({
+  schema: fixedSchema,
+}: {
+  /**
+   * Shows this schema, for hosts that choose the schema themselves, like an Explorer tab per
+   * schema. Without it, the graph keeps its own schema selector.
+   */
+  schema?: string
+} = {}) => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
   const { data: project } = useSelectedProjectQuery()
-  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const schemaState = useQuerySchemaState()
+  const selectedSchema = fixedSchema ?? schemaState.selectedSchema
+  const setSelectedSchema = schemaState.setSelectedSchema
+  const canSelectSchema = fixedSchema === undefined
   const [selectedTable, setSelectedTable] = useState<SafePostgresTable | null>(null)
   const snap = useTableEditorStateSnapshot()
   const { isDownloading, exportSchemaToImage } = useExportSchemaToImage()
@@ -394,23 +405,25 @@ export const SchemaGraph = () => {
         {isSuccessSchemas && (
           <>
             <div className="flex items-center gap-x-2">
-              <Shortcut
-                id={SHORTCUT_IDS.SCHEMA_VISUALIZER_FOCUS_SCHEMA}
-                onTrigger={() => setSchemaSelectorOpen(true)}
-                options={{ enabled: isSuccessSchemas }}
-                side="bottom"
-                tooltipOpen={schemaSelectorOpen ? false : undefined}
-              >
-                <SchemaSelector
-                  className="w-[180px]"
-                  size="tiny"
-                  showError={false}
-                  selectedSchemaName={selectedSchema}
-                  onSelectSchema={handleSelectSchema}
-                  open={schemaSelectorOpen}
-                  onOpenChange={setSchemaSelectorOpen}
-                />
-              </Shortcut>
+              {canSelectSchema && (
+                <Shortcut
+                  id={SHORTCUT_IDS.SCHEMA_VISUALIZER_FOCUS_SCHEMA}
+                  onTrigger={() => setSchemaSelectorOpen(true)}
+                  options={{ enabled: isSuccessSchemas }}
+                  side="bottom"
+                  tooltipOpen={schemaSelectorOpen ? false : undefined}
+                >
+                  <SchemaSelector
+                    className="w-[180px]"
+                    size="tiny"
+                    showError={false}
+                    selectedSchemaName={selectedSchema}
+                    onSelectSchema={handleSelectSchema}
+                    open={schemaSelectorOpen}
+                    onOpenChange={setSchemaSelectorOpen}
+                  />
+                </Shortcut>
+              )}
               {!hasNoTables && (
                 <Shortcut
                   id={SHORTCUT_IDS.SCHEMA_VISUALIZER_FIND_TABLE}

@@ -29,7 +29,8 @@ const ExplorerSchemaPage: NextPageWithLayout = () => {
   return (
     <div className="flex h-full w-full flex-col">
       <ReactFlowProvider key={`${ref}-${selectedSchema}`}>
-        <SchemaGraph />
+        {/* The tab is this schema's, and the sidebar's selector picks the schema. */}
+        <SchemaGraph schema={selectedSchema} />
       </ReactFlowProvider>
     </div>
   )

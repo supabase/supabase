@@ -59,6 +59,7 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_CONFIRM_UNSAVED_CHANGES: 'sql-editor-confirm-unsaved-changes',
 
   EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
+  EXPLORER_NAV_LEVEL: (ref: string) => `explorer-nav-level-${ref}`,
   NOTEBOOK_DRAFTS: (ref: string) => `notebook-drafts-${ref}`,
 
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',

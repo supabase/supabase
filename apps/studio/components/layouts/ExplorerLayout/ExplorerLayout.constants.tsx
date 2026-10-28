@@ -1,8 +1,10 @@
-import { DatabaseIcon, MessageSquareIcon, NotebookTextIcon } from 'lucide-react'
+import { TableEditor } from 'icons'
+import { MessageSquareIcon, NotebookTextIcon } from 'lucide-react'
 import { motion } from 'motion/react'
-import { type ComponentType, type PropsWithChildren } from 'react'
+import { type ComponentType, type PropsWithChildren, type ReactNode } from 'react'
 import { cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
+import { z } from 'zod'
 
 import { onSearchInputEscape } from '@/lib/keyboard'
 
@@ -10,14 +12,11 @@ import { onSearchInputEscape } from '@/lib/keyboard'
 export type ExplorerResourceType = 'notebook' | 'chat'
 
 /**
- * A level in the sidebar's drill-down stack. The layout keeps these on a stack, so going
- * back is a pop and a new level costs one member here plus the panel that renders it.
+ * A sidebar section below the root. Each is one level deep: anything that narrows a section,
+ * like the tables' schema or object type, is a control within its panel, not another level.
  */
-export type ExplorerNavLevel = ExplorerResourceType | 'database'
-
-export type ExplorerNavEntry =
-  | { level: ExplorerNavLevel }
-  | { level: 'database-schema' | 'database-tables'; schema: string }
+export const explorerNavLevelSchema = z.enum(['tables', 'notebook', 'chat'])
+export type ExplorerNavLevel = z.infer<typeof explorerNavLevelSchema>
 
 type ExplorerNavIcon = ComponentType<{ size?: number; className?: string }>
 
@@ -30,15 +29,27 @@ export const EXPLORER_RESOURCES: Record<
   chat: { icon: MessageSquareIcon, searchPlaceholder: 'Search chats' },
 }
 
-/** Top-level sidebar destinations, in display order. */
-export const EXPLORER_SECTIONS: Array<{
-  level: ExplorerNavLevel
-  label: string
-  icon: ExplorerNavIcon
-}> = [
-  { level: 'database', label: 'Database', icon: DatabaseIcon },
+export type ExplorerSection = { level: ExplorerNavLevel; label: string; icon: ExplorerNavIcon }
+
+/**
+ * The project's tables, first in the sidebar and set apart from the rest: it's the Table
+ * Editor's job, and the destination people return to most. It shares the Table Editor's icon.
+ */
+export const EXPLORER_TABLES_SECTION: ExplorerSection = {
+  level: 'tables',
+  label: 'Tables',
+  icon: TableEditor,
+}
+
+/** Sections for the user's own work, below the tables, in display order. */
+export const EXPLORER_RESOURCE_SECTIONS: ExplorerSection[] = [
   { level: 'notebook', label: 'Notebooks', icon: EXPLORER_RESOURCES.notebook.icon },
   { level: 'chat', label: 'Chats', icon: EXPLORER_RESOURCES.chat.icon },
+]
+
+export const EXPLORER_SECTIONS: ExplorerSection[] = [
+  EXPLORER_TABLES_SECTION,
+  ...EXPLORER_RESOURCE_SECTIONS,
 ]
 
 export const LEVEL_OFFSET = 8
@@ -57,16 +68,22 @@ export const ExplorerNavPanel = ({
   label,
   className,
   children,
+  header,
   search,
   setSearch,
   searchPlaceholder,
+  searchActions,
 }: PropsWithChildren<{
   label: string
   className?: string
+  /** Controls above the search field that scope the whole panel, like a schema selector. */
+  header?: ReactNode
   search?: string
   /** Renders the filter input when given. */
   setSearch?: (value: string) => void
   searchPlaceholder?: string
+  /** Controls beside the search field that refine the list, like a type filter. */
+  searchActions?: ReactNode
 }>) => {
   return (
     <motion.div
@@ -78,21 +95,27 @@ export const ExplorerNavPanel = ({
       transition={LEVEL_TRANSITION}
       className={cn('absolute inset-0 flex flex-col', className)}
     >
-      {setSearch !== undefined && (
-        <div className="px-3 pt-3">
-          <span id="explorer-sidebar-search-label" className="sr-only">
-            {searchPlaceholder}
-          </span>
-          <InnerSideBarFilters className="w-full gap-0 p-0">
-            <InnerSideBarFilterSearchInput
-              name="explorer-sidebar-search"
-              value={search}
-              placeholder={searchPlaceholder}
-              aria-labelledby="explorer-sidebar-search-label"
-              onChange={(event) => setSearch(event.target.value)}
-              onKeyDown={onSearchInputEscape(search ?? '', setSearch)}
-            />
-          </InnerSideBarFilters>
+      {(header !== undefined || setSearch !== undefined) && (
+        <div className="flex flex-col gap-2 px-3 pt-3">
+          {header}
+          {setSearch !== undefined && (
+            <>
+              <span id="explorer-sidebar-search-label" className="sr-only">
+                {searchPlaceholder}
+              </span>
+              <InnerSideBarFilters className="w-full gap-2 p-0">
+                <InnerSideBarFilterSearchInput
+                  name="explorer-sidebar-search"
+                  value={search}
+                  placeholder={searchPlaceholder}
+                  aria-labelledby="explorer-sidebar-search-label"
+                  onChange={(event) => setSearch(event.target.value)}
+                  onKeyDown={onSearchInputEscape(search ?? '', setSearch)}
+                />
+                {searchActions}
+              </InnerSideBarFilters>
+            </>
+          )}
         </div>
       )}
       {children}

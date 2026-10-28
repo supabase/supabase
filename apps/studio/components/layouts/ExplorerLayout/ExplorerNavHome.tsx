@@ -1,14 +1,18 @@
 import { useParams } from 'common'
 import { ChevronRightIcon, PlusIcon, SquareCodeIcon } from 'lucide-react'
 import { motion } from 'motion/react'
+import type { ReactNode } from 'react'
+import { Separator } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
-  EXPLORER_SECTIONS,
+  EXPLORER_RESOURCE_SECTIONS,
+  EXPLORER_TABLES_SECTION,
   LEVEL_OFFSET,
   LEVEL_TRANSITION,
   rowClassName,
   type ExplorerNavLevel,
+  type ExplorerSection,
 } from './ExplorerLayout.constants'
 import { formatRelativeTimeShort, getRecentlyUpdatedItems } from './ExplorerNavHome.utils'
 import { ExplorerNavItem } from './ExplorerNavItem'
@@ -19,6 +23,28 @@ import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+
+const ExplorerSectionRow = ({
+  section: { level, label, icon: Icon },
+  count,
+  onSelect,
+}: {
+  section: ExplorerSection
+  count?: ReactNode
+  onSelect: (level: ExplorerNavLevel) => void
+}) => (
+  <button
+    type="button"
+    tabIndex={0}
+    className={rowClassName(false)}
+    onClick={() => onSelect(level)}
+  >
+    <Icon size={14} className="shrink-0" />
+    <span className="flex-1 text-left">{label}</span>
+    {count}
+    <ChevronRightIcon size={14} className="shrink-0 text-foreground-muted" />
+  </button>
+)
 
 export const ExplorerNavHome = ({
   onSelectLevel,
@@ -57,6 +83,8 @@ export const ExplorerNavHome = ({
     >
       <div className="flex-1 min-h-0 flex flex-col gap-4 overflow-y-auto p-3">
         <nav className="flex flex-col gap-px">
+          <ExplorerSectionRow section={EXPLORER_TABLES_SECTION} onSelect={onSelectLevel} />
+          <Separator className="my-2" />
           <button
             type="button"
             tabIndex={0}
@@ -67,30 +95,22 @@ export const ExplorerNavHome = ({
             <span className="flex-1 text-left">Run SQL</span>
             <PlusIcon size={14} className="shrink-0 text-foreground-muted" />
           </button>
-          {EXPLORER_SECTIONS.map(({ level, label, icon: Icon }) => {
-            return (
-              <button
-                key={level}
-                type="button"
-                tabIndex={0}
-                className={rowClassName(false)}
-                onClick={() => onSelectLevel(level)}
-              >
-                <Icon size={14} className="shrink-0" />
-                <span className="flex-1 text-left">{label}</span>
-                {level === 'notebook' &&
-                  (isPending ? (
-                    <ShimmeringLoader className="w-3 py-2" />
-                  ) : (
-                    <span className="text-xs text-foreground-lighter">{notebookCount}</span>
-                  ))}
-                {level === 'chat' && (
-                  <span className="text-xs text-foreground-lighter">{chats.length}</span>
-                )}
-                <ChevronRightIcon size={14} className="shrink-0 text-foreground-muted" />
-              </button>
-            )
-          })}
+          {EXPLORER_RESOURCE_SECTIONS.map((section) => (
+            <ExplorerSectionRow
+              key={section.level}
+              section={section}
+              onSelect={onSelectLevel}
+              count={
+                section.level === 'notebook' && isPending ? (
+                  <ShimmeringLoader className="w-3 py-2" />
+                ) : (
+                  <span className="text-xs text-foreground-lighter">
+                    {section.level === 'notebook' ? notebookCount : chats.length}
+                  </span>
+                )
+              }
+            />
+          ))}
         </nav>
 
         <section className="flex flex-col gap-px">

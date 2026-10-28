@@ -2,7 +2,7 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { ExplorerNavEntry } from './ExplorerLayout.constants'
+import type { ExplorerNavLevel } from './ExplorerLayout.constants'
 import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ProductMenuBar } from '@/components/layouts/Navigation/ProductMenuBar'
 import { customRender } from '@/tests/lib/custom-render'
@@ -14,20 +14,14 @@ vi.mock('@/components/interfaces/Explorer/hooks', () => ({
   useCreateChat: () => ({ createChat }),
 }))
 
-const databaseStack: ExplorerNavEntry[] = [
-  { level: 'database' },
-  { level: 'database-schema', schema: 'public' },
-  { level: 'database-tables', schema: 'public' },
-]
-
-function renderHeader(navStack: ExplorerNavEntry[]) {
+function renderHeader(level: ExplorerNavLevel | undefined) {
   const onBack = vi.fn()
   customRender(
     <ProductMenuBar
       title="Explorer"
       header={
         <ExplorerNavHeader
-          navStack={navStack}
+          level={level}
           onBack={onBack}
           rootAction={<span>Explorer preferences</span>}
         />
@@ -41,22 +35,21 @@ describe('Explorer sidebar header', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('shows the root title with the preferences action and no breadcrumb', () => {
-    renderHeader([])
+    renderHeader(undefined)
     expect(screen.getAllByText('Explorer')).toHaveLength(1)
     expect(screen.getByText('Explorer preferences')).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
   it.each([
-    { stack: [{ level: 'notebook' }], parent: 'Explorer', current: 'Notebooks' },
-    { stack: [{ level: 'chat' }], parent: 'Explorer', current: 'Chats' },
-    { stack: databaseStack.slice(0, 1), parent: 'Explorer', current: 'Database' },
-    { stack: databaseStack.slice(0, 2), parent: 'Database', current: 'public' },
-    { stack: databaseStack, parent: 'public', current: 'Tables' },
-  ] satisfies { stack: ExplorerNavEntry[]; parent: string; current: string }[])(
-    'shows only $parent → $current and returns via the parent breadcrumb',
-    async ({ stack, parent, current }) => {
-      const { onBack } = renderHeader(stack)
+    { level: 'notebook', current: 'Notebooks' },
+    { level: 'chat', current: 'Chats' },
+    { level: 'tables', current: 'Tables' },
+  ] satisfies { level: ExplorerNavLevel; current: string }[])(
+    'shows only Explorer → $current and returns via the parent breadcrumb',
+    async ({ level, current }) => {
+      const parent = 'Explorer'
+      const { onBack } = renderHeader(level)
       const breadcrumb = screen.getByRole('navigation', { name: 'Explorer navigation' })
       expect(within(breadcrumb).getByRole('button', { name: parent })).toBeInTheDocument()
       expect(within(breadcrumb).getByRole('link', { name: current })).toHaveAttribute(
@@ -78,7 +71,7 @@ describe('Explorer sidebar header', () => {
   it.each(['notebook', 'chat'] as const)(
     'shows the create action only for the current %s level',
     async (level) => {
-      renderHeader([{ level }])
+      renderHeader(level)
       await userEvent.click(screen.getByRole('button', { name: `New ${level}` }))
       expect(level === 'notebook' ? createNotebook : createChat).toHaveBeenCalledOnce()
       expect(level === 'notebook' ? createChat : createNotebook).not.toHaveBeenCalled()

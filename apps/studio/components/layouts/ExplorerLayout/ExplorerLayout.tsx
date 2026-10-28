@@ -1,3 +1,4 @@
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
   HomeIcon,
   MessageCirclePlusIcon,
@@ -6,7 +7,7 @@ import {
   SquareCodeIcon,
 } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
+import { ComponentProps, ReactNode, useEffect, useEffectEvent } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -18,13 +19,11 @@ import {
 
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
-import { type ExplorerNavEntry, type ExplorerNavLevel } from './ExplorerLayout.constants'
+import { explorerNavLevelSchema } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
-import { ExplorerNavDatabase } from './ExplorerNavDatabase'
 import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
-import { ExplorerNavSchema } from './ExplorerNavSchema'
 import { ExplorerNavTables } from './ExplorerNavTables'
 import { ExplorerPreferencesDropdown } from './ExplorerPreferencesDropdown'
 import { ExplorerProvider } from './ExplorerProvider'
@@ -38,6 +37,7 @@ import {
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -57,16 +57,17 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
   const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
   const shouldShowHomeTab = isReady && (!hasCompletedOnboarding || home === 'home')
 
-  // A stack rather than a single value, so drilling in is a push and going back is a pop —
-  // so each database level keeps its schema when returning from a deeper panel.
-  const [navStack, setNavStack] = useState<ExplorerNavEntry[]>([])
-  const entry = navStack.at(-1)
-  const level = entry?.level
-
-  const pushLevel = (next: ExplorerNavLevel) => setNavStack((stack) => [...stack, { level: next }])
-  const pushSchemaLevel = (level: 'database-schema' | 'database-tables', schema: string) =>
-    setNavStack((stack) => [...stack, { level, schema }])
-  const popLevel = () => setNavStack((stack) => stack.slice(0, -1))
+  // Remembered per project, so someone who lives in the table list reopens Explorer on it
+  // rather than drilling in again from the root.
+  const { ref } = useParams()
+  const [storedLevel, setStoredLevel, { isSuccess, isError }] = useLocalStorageQuery<unknown>(
+    LOCAL_STORAGE_KEYS.EXPLORER_NAV_LEVEL(ref ?? ''),
+    null
+  )
+  // An unreadable stored value falls back to the root rather than leaving the sidebar empty.
+  const isNavLevelReady = isSuccess || isError
+  const levelResult = explorerNavLevelSchema.safeParse(storedLevel)
+  const level = levelResult.success ? levelResult.data : undefined
 
   const activeTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
   const isActiveExplorerTab =
@@ -90,34 +91,24 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
         browserTitle={mergedBrowserTitle}
         productMenuHeader={
           <ExplorerNavHeader
-            navStack={navStack}
-            onBack={popLevel}
+            level={level}
+            onBack={() => setStoredLevel(null)}
             rootAction={<ExplorerPreferencesDropdown />}
           />
         }
         productMenu={
           <div className="relative h-full overflow-hidden">
-            <AnimatePresence mode="wait">
-              {level === undefined && <ExplorerNavHome key="home" onSelectLevel={pushLevel} />}
-              {level === 'database' && (
-                <ExplorerNavDatabase
-                  key="database"
-                  onSelectSchema={(schema) => pushSchemaLevel('database-schema', schema)}
-                />
-              )}
-              {entry?.level === 'database-schema' && (
-                <ExplorerNavSchema
-                  key={`schema-${entry.schema}`}
-                  schema={entry.schema}
-                  onSelectTables={() => pushSchemaLevel('database-tables', entry.schema)}
-                />
-              )}
-              {entry?.level === 'database-tables' && (
-                <ExplorerNavTables key={`tables-${entry.schema}`} schema={entry.schema} />
-              )}
-              {level === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
-              {level === 'chat' && <ExplorerNavChats key="chats" />}
-            </AnimatePresence>
+            {/* Waits for the stored level so a remembered panel doesn't slide in over the root. */}
+            {isNavLevelReady && (
+              <AnimatePresence initial={false} mode="wait">
+                {level === undefined && (
+                  <ExplorerNavHome key="home" onSelectLevel={setStoredLevel} />
+                )}
+                {level === 'tables' && <ExplorerNavTables key="tables" />}
+                {level === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
+                {level === 'chat' && <ExplorerNavChats key="chats" />}
+              </AnimatePresence>
+            )}
           </div>
         }
       >

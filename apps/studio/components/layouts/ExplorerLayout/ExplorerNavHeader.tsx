@@ -3,45 +3,37 @@ import type { ReactNode } from 'react'
 
 import {
   EXPLORER_SECTIONS,
-  type ExplorerNavEntry,
+  type ExplorerNavLevel,
   type ExplorerResourceType,
 } from './ExplorerLayout.constants'
 import { useCreateChat, useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
 import { SidebarBreadcrumb } from '@/components/layouts/Navigation/SidebarBreadcrumb'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
-const getLevelLabel = (entry: ExplorerNavEntry | undefined) => {
-  if (!entry) return 'Explorer'
-  if (entry.level === 'database-schema') return entry.schema
-  if (entry.level === 'database-tables') return 'Tables'
-  return EXPLORER_SECTIONS.find((section) => section.level === entry.level)?.label ?? 'Explorer'
-}
+const ROOT_LABEL = 'Explorer'
 
 export const ExplorerNavHeader = ({
-  navStack,
+  level,
   onBack,
   rootAction,
 }: {
-  navStack: readonly ExplorerNavEntry[]
+  /** The open section, or `undefined` at the root. */
+  level: ExplorerNavLevel | undefined
   onBack: () => void
   rootAction?: ReactNode
 }) => {
-  const entry = navStack.at(-1)
-  const parentLabel = getLevelLabel(navStack.at(-2))
-  const currentLabel = getLevelLabel(entry)
+  const label = EXPLORER_SECTIONS.find((section) => section.level === level)?.label ?? ROOT_LABEL
   let action = rootAction
-  if (entry) {
+  if (level !== undefined) {
     action =
-      entry.level === 'notebook' || entry.level === 'chat' ? (
-        <ExplorerResourceAction type={entry.level} />
-      ) : undefined
+      level === 'notebook' || level === 'chat' ? <ExplorerResourceAction type={level} /> : undefined
   }
 
   return (
     <SidebarBreadcrumb
       aria-label="Explorer navigation"
-      label={currentLabel}
-      parent={entry ? { label: parentLabel, onClick: onBack } : undefined}
+      label={label}
+      parent={level !== undefined ? { label: ROOT_LABEL, onClick: onBack } : undefined}
       action={action}
     />
   )

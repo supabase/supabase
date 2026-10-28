@@ -3,9 +3,6 @@ import { z } from 'zod'
 
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
-/** Entity types the sidebar's Tables level lists, and that open as a `select *` query. */
-export const TABLE_ENTITY_TYPES: ENTITY_TYPE[] = [ENTITY_TYPE.TABLE, ENTITY_TYPE.PARTITIONED_TABLE]
-
 /**
  * The database entity a query was opened from. A query opened this way is an ordinary
  * editable query — the binding records only where it came from, which is what lets its tab

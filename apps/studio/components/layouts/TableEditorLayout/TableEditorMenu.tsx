@@ -1,8 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { FilterIcon, PlusIcon } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, Checkbox, Label, Popover, PopoverContent, PopoverTrigger } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -23,6 +22,7 @@ import { ErrorMatcher } from '@/components/interfaces/ErrorHandling/ErrorMatcher
 import { RestartTroubleshootingFallback } from '@/components/interfaces/ErrorHandling/RestartTroubleshootingFallback'
 import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { ALL_ENTITY_TYPES, EntityTypeFilter } from '@/components/ui/EntityTypeFilter'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -50,7 +50,7 @@ export const TableEditorMenu = () => {
   const [searchText, setSearchText] = useState<string>('')
   const [isSchemaDropdownOpen, setIsSchemaDropdownOpen] = useState(false)
   const [tableToExport, setTableToExport] = useState<SupaTable>()
-  const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
+  const [visibleTypes, setVisibleTypes] = useState<ENTITY_TYPE[]>(ALL_ENTITY_TYPES)
   const [sort, setSort] = useLocalStorage<Sort>('table-editor-sort', 'alphabetical')
 
   const { data: project } = useSelectedProjectQuery()
@@ -148,8 +148,6 @@ export const TableEditorMenu = () => {
     [project?.ref, id, isSchemaLocked, onSelectExportCLI, apiAccessByTableName]
   )
 
-  const hasFiltersApplied = visibleTypes.length !== 5
-
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
     if (entityTypes && !searchText) {
@@ -240,58 +238,11 @@ export const TableEditorMenu = () => {
               </InnerSideBarFilterSortDropdown>
             </InnerSideBarFilterSearchInput>
 
-            <Popover>
-              <PopoverTrigger asChild>
-                <ButtonTooltip
-                  className="h-[32px] md:h-[28px] px-1.5"
-                  variant={hasFiltersApplied ? 'default' : 'dashed'}
-                  icon={<FilterIcon />}
-                  aria-label="Filter"
-                  tooltip={{ content: { side: 'bottom', text: 'Filter' } }}
-                />
-              </PopoverTrigger>
-              <PopoverContent className="p-0 w-60" side="bottom" align="center">
-                <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
-                  <p className="text-xs">Filter entity types</p>
-                  <div className="flex flex-col">
-                    {Object.entries(ENTITY_TYPE).map(([key, value]) => (
-                      <div key={key} className="group flex items-center justify-between py-0.5">
-                        <div className="flex items-center gap-x-2">
-                          <Checkbox
-                            id={key}
-                            name={key}
-                            checked={visibleTypes.includes(value)}
-                            onCheckedChange={() => {
-                              if (visibleTypes.includes(value)) {
-                                setVisibleTypes(visibleTypes.filter((y) => y !== value))
-                              } else {
-                                setVisibleTypes(visibleTypes.concat([value]))
-                              }
-                            }}
-                          />
-                          <Label htmlFor={key} className="capitalize text-xs">
-                            {key.toLowerCase().replace('_', ' ')}
-                          </Label>
-                        </div>
-                        <Button
-                          size="tiny"
-                          onClick={() => setVisibleTypes([value])}
-                          className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
-                        >
-                          Select only
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <EntityTypeFilter visibleTypes={visibleTypes} onVisibleTypesChange={setVisibleTypes} />
           </InnerSideBarFilters>
 
           {visibleTypes.length === 0 && (
-            <TableMenuFilterEmptyState
-              onResetFilters={() => setVisibleTypes(Object.values(ENTITY_TYPE))}
-            />
+            <TableMenuFilterEmptyState onResetFilters={() => setVisibleTypes(ALL_ENTITY_TYPES)} />
           )}
 
           {isLoading && <EditorMenuListSkeleton />}

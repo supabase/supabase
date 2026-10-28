@@ -53,7 +53,7 @@ const ExplorerMobileMenu = ({ initialSection }: { initialSection: ExplorerResour
         currentProductMenu={<span>{section ?? 'Home'} content</span>}
         currentProductMenuHeader={
           <ExplorerNavHeader
-            navStack={section ? [{ level: section }] : []}
+            level={section}
             onBack={() => setSection(undefined)}
             rootAction={<span>Explorer preferences</span>}
           />
