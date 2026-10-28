@@ -306,21 +306,24 @@ const MergePage: NextPageWithLayout = () => {
     setWorkflowFinalStatus(null)
   }, [currentWorkflowRunId])
 
-  if (isBranch && branchesGrant.status === 'denied') {
+  if (branchesGrant.status === 'denied') {
     return (
       <PageLayout>
         <ScaffoldContainer size="full">
-          <NoPermission resourceText="review this branch's changes" />
+          <NoPermission resourceText="view this project's branches" />
         </ScaffoldContainer>
       </PageLayout>
     )
   }
 
-  if (isBranch && branchesGrant.status === 'error') {
+  if (branchesGrant.status === 'error') {
     return (
       <PageLayout>
         <ScaffoldContainer size="full">
-          <AlertError error={branchesGrant.error} subject="Failed to check permissions" />
+          <AlertError
+            error={branchesGrant.error}
+            subject="Failed to check your permissions to view branches"
+          />
         </ScaffoldContainer>
       </PageLayout>
     )
