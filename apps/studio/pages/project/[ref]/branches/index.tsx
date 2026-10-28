@@ -16,7 +16,6 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { branchesQueryOptions, type Branch } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -39,10 +38,6 @@ const BranchesPage: NextPageWithLayout = () => {
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
-
-  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ
-  )
 
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
 
@@ -72,8 +67,7 @@ const BranchesPage: NextPageWithLayout = () => {
   const isGithubConnected = githubConnection !== undefined
   const repo = githubConnection?.repository.name ?? ''
 
-  const isErrorBranchesGrant = branchesGrant.status === 'error'
-  const isLoading = isLoadingConnections || (isLoadingBranches && !isErrorBranchesGrant)
+  const isLoading = isLoadingConnections || isLoadingBranches
   const isSuccess = isSuccessConnections && isSuccessBranches
 
   const generateCreatePullRequestURL = (branch?: string) => {
@@ -90,9 +84,16 @@ const BranchesPage: NextPageWithLayout = () => {
         <ScaffoldSection>
           <div className="col-span-12">
             <div className="space-y-4">
-              {isPermissionsLoaded && !canReadBranches ? (
+              {branchesGrant.status === 'denied' && (
                 <NoPermission resourceText="view this project's branches" />
-              ) : (
+              )}
+              {branchesGrant.status === 'error' && (
+                <AlertError
+                  error={branchesGrant.error}
+                  subject="Failed to check your permissions to view branches"
+                />
+              )}
+              {(branchesGrant.status === 'loading' || branchesGrant.status === 'granted') && (
                 <>
                   {isErrorConnections && (
                     <AlertError
@@ -106,10 +107,6 @@ const BranchesPage: NextPageWithLayout = () => {
                       error={branchesError}
                       subject="Failed to retrieve preview branches"
                     />
-                  )}
-
-                  {branchesGrant.status === 'error' && (
-                    <AlertError error={branchesGrant.error} subject="Failed to check permissions" />
                   )}
 
                   <Overview
