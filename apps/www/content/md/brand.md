@@ -14,6 +14,8 @@
 
 ## Files
 
+The table lists each logo file and where to use it.
+
 | Asset                          | Artwork                                                  | Use on                    | SVG                                                                                                                      | PNG                                                                                          |
 | ------------------------------ | -------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
 | Wordmark for light backgrounds | Green symbol and black lettering, transparent background | Light backgrounds         | [supabase-logo-green-black-transparent.svg](https://supabase.com/brand-assets/supabase-logo-green-black-transparent.svg) | [PNG, 2322×449](https://supabase.com/brand-assets/supabase-logo-green-black-transparent.png) |

@@ -103,6 +103,10 @@ const Index = ({ guideText }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   editor theme.
                 </li>
                 <li>All files have a transparent background.</li>
+                <li>
+                  There is no file with the lettering alone. Every wordmark file includes the
+                  symbol.
+                </li>
               </ul>
             </section>
             <section className="flex max-w-2xl flex-col gap-2">
