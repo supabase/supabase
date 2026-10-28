@@ -1,5 +1,6 @@
 import { type SqlSnippetSource } from '../SQLEditor/querySource'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
+import type { PendingCellEdit } from '@/lib/query-result-editing'
 import type { RoleImpersonationState } from '@/lib/role-impersonation'
 
 export type QueryResult = {
@@ -15,6 +16,11 @@ export type QueryResult = {
     databaseIdentifier?: string
     roleImpersonationState?: RoleImpersonationState
   }
+  /**
+   * Cell edits made in these results and not yet saved. They identify rows by primary key
+   * and are carried over when the query runs again, so refining a query doesn't lose them.
+   */
+  pendingEdits?: readonly PendingCellEdit[]
 }
 
 /**

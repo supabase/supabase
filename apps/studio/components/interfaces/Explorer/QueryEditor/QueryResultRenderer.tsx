@@ -1,10 +1,11 @@
-import { PlayIcon } from 'lucide-react'
+import { Loader2Icon, PlayIcon } from 'lucide-react'
 
 import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { type QueryResult } from '../types'
 import { QueryResultChart } from './QueryResultChart'
 import { QueryResultError } from './QueryResultError'
 import { QueryResultTable } from './QueryResultTable'
+import type { QueryResultEditing } from './useQueryResultEditing'
 import { DataGridResults } from '@/components/ui/DataGridResults'
 import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
@@ -16,8 +17,10 @@ interface QueryResultRendererProps {
   sql?: string
   source?: SqlSnippetSource
   onDebug?: (prompt: string) => void
-  canEditRows?: boolean
-  onResultChange?: (result: QueryResult) => void
+  /** Present when the surface lets results be edited in place. */
+  editing?: QueryResultEditing
+  /** A run is under way; shown only while there's no earlier result to keep on screen. */
+  isRunning?: boolean
 }
 
 export const QueryResultRenderer = ({
@@ -27,10 +30,19 @@ export const QueryResultRenderer = ({
   sql,
   source,
   onDebug,
-  canEditRows = false,
-  onResultChange,
+  editing,
+  isRunning = false,
 }: QueryResultRendererProps) => {
   const { rows, error, autoLimit } = result ?? {}
+
+  if (!result && isRunning) {
+    return (
+      <div role="status" className="flex items-center gap-x-2 p-3 w-full">
+        <Loader2Icon size={12} className="animate-spin text-foreground-lighter" />
+        <p className="text-xs text-foreground-lighter">Running query...</p>
+      </div>
+    )
+  }
 
   if (!result) {
     return (
@@ -59,12 +71,8 @@ export const QueryResultRenderer = ({
 
   if (rows && rows.length > 0) {
     if (view === 'table')
-      return onResultChange ? (
-        <QueryResultTable
-          result={result}
-          canEditRows={canEditRows}
-          onResultChange={onResultChange}
-        />
+      return editing ? (
+        <QueryResultTable result={result} editing={editing} />
       ) : (
         <DataGridResults rows={rows} />
       )

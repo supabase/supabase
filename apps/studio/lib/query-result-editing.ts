@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash'
 import { z } from 'zod'
 
 export const editableQuerySchema = z.object({
@@ -146,28 +147,155 @@ export function getResultRowIdentifiers(
   return Object.fromEntries(identifiers)
 }
 
-export function updateResultRows({
+type ResultColumns = NonNullable<EditableQuery['columns']>
+
+/**
+ * A cell change made against a query result and not yet written to the database. It names
+ * its table and row by primary key rather than by position in the result, so it stays valid
+ * when the query is run again and the rows come back in a different order — or not at all.
+ */
+export type PendingCellEdit = {
+  table: { id: number; schema: string; name: string }
+  /** The row's primary key values when the edit was made, keyed by table column. */
+  rowIdentifiers: Record<string, unknown>
+  /** The table column being changed, which an aliased result column may name differently. */
+  columnName: string
+  /** What the cell held before it was first edited, so typing it back drops the edit. */
+  oldValue: unknown
+  newValue: unknown
+  enumArrayColumns?: string[]
+}
+
+type CellAddress = Pick<PendingCellEdit, 'rowIdentifiers' | 'columnName'> & {
+  table: Pick<PendingCellEdit['table'], 'id'>
+}
+
+const isSameRow = (
+  a: Pick<CellAddress, 'table' | 'rowIdentifiers'>,
+  b: Pick<CellAddress, 'table' | 'rowIdentifiers'>
+) => a.table.id === b.table.id && isEqual(a.rowIdentifiers, b.rowIdentifiers)
+
+const isSameCell = (a: CellAddress, b: CellAddress) =>
+  a.columnName === b.columnName && isSameRow(a, b)
+
+export function findPendingCellEdit(edits: readonly PendingCellEdit[], cell: CellAddress) {
+  return edits.find((edit) => isSameCell(edit, cell))
+}
+
+/**
+ * Adds an edit, replacing any earlier edit to the same cell. The cell keeps its first
+ * `oldValue`, so editing a value back to what the database holds drops the edit entirely
+ * instead of staging a no-op write.
+ */
+export function stagePendingCellEdit(
+  edits: readonly PendingCellEdit[],
+  edit: PendingCellEdit
+): PendingCellEdit[] {
+  const existing = findPendingCellEdit(edits, edit)
+  const staged = { ...edit, oldValue: existing ? existing.oldValue : edit.oldValue }
+  const others = edits.filter((candidate) => candidate !== existing)
+  if (isEqual(staged.newValue, staged.oldValue)) return others
+  return existing
+    ? edits.map((candidate) => (candidate === existing ? staged : candidate))
+    : [...edits, staged]
+}
+
+/**
+ * Shows a result as it will read once its pending edits are saved, along with which result
+ * columns of each shown row hold an unsaved value.
+ */
+export function applyPendingCellEdits({
   rows,
-  original,
-  updated,
+  edits,
+  table,
+  columns,
+}: {
+  rows: readonly Record<string, unknown>[]
+  edits: readonly PendingCellEdit[]
+  table: ResultTable & { id: number }
+  columns: ResultColumns
+}) {
+  const editedColumns = new Map<Record<string, unknown>, Set<string>>()
+  const tableEdits = edits.filter((edit) => edit.table.id === table.id)
+  if (tableEdits.length === 0) return { rows, editedColumns }
+
+  const editedRows = rows.map((row) => {
+    const rowIdentifiers = getResultRowIdentifiers(row, table, columns)
+    if (!rowIdentifiers) return row
+    const rowEdits = tableEdits.filter((edit) => isEqual(edit.rowIdentifiers, rowIdentifiers))
+    if (rowEdits.length === 0) return row
+
+    const next = { ...row }
+    const names = new Set<string>()
+    for (const edit of rowEdits) {
+      for (const { name, column } of columns) {
+        if (column !== edit.columnName) continue
+        next[name] = edit.newValue
+        names.add(name)
+      }
+    }
+    editedColumns.set(next, names)
+    return next
+  })
+  return { rows: editedRows, editedColumns }
+}
+
+export type EditedRow = {
+  table: PendingCellEdit['table']
+  /** How the row was identified when it was edited. */
+  rowIdentifiers: Record<string, unknown>
+  /** How the row is identified once saved, which differs only when a key column was edited. */
+  savedIdentifiers: Record<string, unknown>
+}
+
+/** The distinct rows a set of edits touches, each with the identity it will have once saved. */
+export function getEditedRows(edits: readonly PendingCellEdit[]): EditedRow[] {
+  const rows: EditedRow[] = []
+  for (const edit of edits) {
+    let row = rows.find((candidate) => isSameRow(candidate, edit))
+    if (!row) {
+      row = {
+        table: edit.table,
+        rowIdentifiers: edit.rowIdentifiers,
+        savedIdentifiers: { ...edit.rowIdentifiers },
+      }
+      rows.push(row)
+    }
+    if (Object.hasOwn(row.savedIdentifiers, edit.columnName)) {
+      row.savedIdentifiers[edit.columnName] = edit.newValue
+    }
+  }
+  return rows
+}
+
+/**
+ * Swaps result rows for fresh copies read from their table. Each replacement names the row
+ * by the identity it had in the result, so a row whose key was just changed is still found.
+ */
+export function replaceResultRows({
+  rows,
+  replacements,
   columns,
   table,
 }: {
   rows: readonly Record<string, unknown>[]
-  original: Record<string, unknown>
-  updated: Record<string, unknown>
-  columns: NonNullable<EditableQuery['columns']>
-  table: ResultTable
+  replacements: readonly {
+    table: Pick<EditedRow['table'], 'id'>
+    rowIdentifiers: Record<string, unknown>
+    row: Record<string, unknown>
+  }[]
+  columns: ResultColumns
+  table: ResultTable & { id: number }
 }) {
-  const identifiers = getResultRowIdentifiers(original, table, columns)
-  if (!identifiers) return rows
+  const tableReplacements = replacements.filter((replacement) => replacement.table.id === table.id)
+  if (tableReplacements.length === 0) return rows
   return rows.map((row) => {
     const candidate = getResultRowIdentifiers(row, table, columns)
-    if (
-      !candidate ||
-      !Object.entries(identifiers).every(([key, value]) => candidate[key] === value)
+    if (!candidate) return row
+    const replacement = tableReplacements.find(({ rowIdentifiers }) =>
+      Object.entries(rowIdentifiers).every(([key, value]) => candidate[key] === value)
     )
-      return row
-    return Object.fromEntries(columns.map(({ name, column }) => [name, updated[column]]))
+    if (!replacement) return row
+    return Object.fromEntries(columns.map(({ name, column }) => [name, replacement.row[column]]))
   })
 }

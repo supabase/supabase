@@ -20,7 +20,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns/TimestampInfo'
 
 import { BlockKeys } from '../common/BlockKeys'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useIsCellEditQueued } from '@/components/grid/context/CellEditQueueContext'
 
 interface BaseEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
   TRow,
@@ -46,7 +46,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
 }: BaseEditorProps<TRow, TSummaryRow>) {
   const ref = useRef<HTMLInputElement>(null)
   const format = FORMAT_MAP[type]
-  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const isQueueOperationsEnabled = useIsCellEditQueued()
 
   const value = row[column.key as keyof TRow] as unknown as string
   const [inputValue, setInputValue] = useState(value)

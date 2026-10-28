@@ -10,6 +10,8 @@ export type ExplorerHome = z.infer<typeof explorerHomeSchema>
 const preferencesSchema = z.object({
   home: explorerHomeSchema.catch('home'),
   hasCompletedOnboarding: z.boolean().catch(false),
+  /** Whether Explorer shows the details sidebar beside a query or the schema visualizer. */
+  showDetails: z.boolean().catch(true),
 })
 const accountsSchema = z.record(z.unknown())
 const defaultPreferences = preferencesSchema.parse({})
@@ -39,5 +41,6 @@ export const useExplorerPreferences = () => {
     isReady,
     setHome: (home: ExplorerHome) => updatePreferences({ home }),
     completeOnboarding: () => updatePreferences({ hasCompletedOnboarding: true }),
+    setShowDetails: (showDetails: boolean) => updatePreferences({ showDetails }),
   }
 }

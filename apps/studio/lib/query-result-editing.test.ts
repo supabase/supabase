@@ -2,10 +2,14 @@ import { parse } from 'libpg-query'
 import { describe, expect, it } from 'vitest'
 
 import {
+  applyPendingCellEdits,
   getEditableQuery,
+  getEditedRows,
   getResultColumnMapping,
   getResultRowIdentifiers,
-  updateResultRows,
+  replaceResultRows,
+  stagePendingCellEdit,
+  type PendingCellEdit,
 } from './query-result-editing'
 
 const table = {
@@ -135,12 +139,17 @@ describe('result row identity', () => {
     const original = { tenant: 'a', key: 1, label: 'old' }
     const other = { tenant: 'b', key: 1, label: 'unchanged' }
     expect(
-      updateResultRows({
+      replaceResultRows({
         rows: [original, other, { ...original }],
-        original,
-        updated: { tenant_id: 'a', id: 2, name: 'server value', hidden: 42 },
+        replacements: [
+          {
+            table: { id: tableId },
+            rowIdentifiers: { tenant_id: 'a', id: 1 },
+            row: { tenant_id: 'a', id: 2, name: 'server value', hidden: 42 },
+          },
+        ],
         columns,
-        table,
+        table: { ...table, id: tableId },
       })
     ).toEqual([
       { tenant: 'a', key: 2, label: 'server value' },
@@ -149,8 +158,86 @@ describe('result row identity', () => {
     ])
   })
 
-  it('leaves results untouched when the original row has no usable identity', () => {
-    const rows = [{ label: 'old' }]
-    expect(updateResultRows({ rows, original: rows[0], updated: {}, columns, table })).toBe(rows)
+  it('never copies a row read from another table into this result', () => {
+    const rows = [{ tenant: 'a', key: 1, label: 'old' }]
+    expect(
+      replaceResultRows({
+        rows,
+        replacements: [
+          {
+            table: { id: tableId + 1 },
+            rowIdentifiers: { tenant_id: 'a', id: 1 },
+            row: { tenant_id: 'a', id: 1, name: 'other table' },
+          },
+        ],
+        columns,
+        table: { ...table, id: tableId },
+      })
+    ).toBe(rows)
+  })
+})
+
+const tableId = 7
+const edit = (overrides: Partial<PendingCellEdit> = {}): PendingCellEdit => ({
+  table: { id: tableId, schema: 'public', name: 'users' },
+  rowIdentifiers: { tenant_id: 'a', id: 1 },
+  columnName: 'name',
+  oldValue: 'old',
+  newValue: 'new',
+  ...overrides,
+})
+
+describe('staged cell edits', () => {
+  it('keeps one edit per cell, so the last value typed is the one saved', () => {
+    const edits = stagePendingCellEdit([edit()], edit({ oldValue: 'new', newValue: 'newer' }))
+    expect(edits).toEqual([edit({ newValue: 'newer' })])
+  })
+
+  it('drops an edit typed back to the database value, so no pointless write is staged', () => {
+    expect(stagePendingCellEdit([edit()], edit({ oldValue: 'new', newValue: 'old' }))).toEqual([])
+    expect(stagePendingCellEdit([], edit({ newValue: 'old' }))).toEqual([])
+  })
+
+  it('compares JSON values by content, since an editor hands back a fresh object', () => {
+    const jsonEdit = edit({ columnName: 'meta', oldValue: { a: 1 }, newValue: { a: 2 } })
+    expect(stagePendingCellEdit([jsonEdit], { ...jsonEdit, newValue: { a: 1 } })).toEqual([])
+  })
+
+  it('shows staged values on every projection of the edited column and leaves other rows alone', () => {
+    const rows = [
+      { tenant: 'a', key: 1, label: 'old', copy: 'old' },
+      { tenant: 'b', key: 1, label: 'old', copy: 'old' },
+    ]
+    const shown = applyPendingCellEdits({
+      rows,
+      edits: [edit()],
+      columns: [...columns, { column: 'name', name: 'copy' }],
+      table: { ...table, id: tableId },
+    })
+    expect(shown.rows).toEqual([{ tenant: 'a', key: 1, label: 'new', copy: 'new' }, rows[1]])
+    expect(shown.editedColumns.get(shown.rows[0])).toEqual(new Set(['label', 'copy']))
+    expect(shown.editedColumns.has(shown.rows[1])).toBe(false)
+  })
+
+  it('ignores edits staged against another table, such as before the query changed', () => {
+    const rows = [{ tenant: 'a', key: 1, label: 'old' }]
+    expect(
+      applyPendingCellEdits({
+        rows,
+        edits: [edit({ table: { id: tableId + 1, schema: 'public', name: 'other' } })],
+        columns,
+        table: { ...table, id: tableId },
+      }).rows
+    ).toBe(rows)
+  })
+
+  it('reads a row back by its new key when the key itself was edited', () => {
+    expect(getEditedRows([edit(), edit({ columnName: 'id', oldValue: 1, newValue: 5 })])).toEqual([
+      {
+        table: edit().table,
+        rowIdentifiers: { tenant_id: 'a', id: 1 },
+        savedIdentifiers: { tenant_id: 'a', id: 5 },
+      },
+    ])
   })
 })

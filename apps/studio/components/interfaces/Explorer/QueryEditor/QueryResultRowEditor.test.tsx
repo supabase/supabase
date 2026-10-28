@@ -7,11 +7,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { QueryResultRowEditor } from './QueryResultRowEditor'
+import type { PendingCellEdit } from '@/lib/query-result-editing'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addAPIMock } from '@/tests/lib/msw'
 
-// Monaco and the foreign-row browser have separate coverage. Keep the real row form,
-// mutation, SQL builder, and network requests for these save/discard integration tests.
+// Monaco and the foreign-row browser have separate coverage. Keep the real row form and
+// network requests for these queue/discard integration tests.
 vi.mock('@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/TextEditor', () => ({
   TextEditor: () => null,
 }))
@@ -89,11 +90,9 @@ beforeEach(() => {
 })
 
 function mockRows({
-  failFirstSave = false,
   missing = false,
   waitForRow,
 }: {
-  failFirstSave?: boolean
   missing?: boolean
   waitForRow?: Promise<void>
 } = {}) {
@@ -103,38 +102,32 @@ function mockRows({
     path: '/platform/pg-meta/:ref/query',
     response: async ({ request }) => {
       const { query } = z.object({ query: z.string() }).parse(await request.json())
-      if (new URL(request.url).searchParams.get('key') === 'table-row-update-42') {
-        writes.push(query)
-        if (failFirstSave && writes.length === 1)
-          return HttpResponse.json<APIErrorBody>({ message: 'Permission denied' }, { status: 403 })
-        return HttpResponse.json<Record<string, unknown>[]>([
-          { ...originalRow, id: 'new-id', name: 'Server value' },
-        ])
-      }
       if (/select\s+\*/i.test(query)) {
         await waitForRow
         return HttpResponse.json<Record<string, unknown>[]>(missing ? [] : [originalRow])
       }
+      if (/\b(insert|update|delete)\b/i.test(query)) writes.push(query)
       return HttpResponse.json<Record<string, unknown>[]>([])
     },
   })
   return writes
 }
 
-function renderEditor() {
-  const onSave = vi.fn()
+function renderEditor({ pendingEdits = [] }: { pendingEdits?: PendingCellEdit[] } = {}) {
+  const onStage = vi.fn()
   const onClose = vi.fn()
   const view = customRender(
     <QueryResultRowEditor
       projectRef="default"
       table={table}
       identifiers={{ id: originalRow.id }}
+      pendingEdits={pendingEdits}
       onClose={onClose}
-      onSave={onSave}
+      onStage={onStage}
       roleImpersonationState={{ role: { type: 'custom', role: 'query_role' }, claims: undefined }}
     />
   )
-  return { ...view, onSave, onClose }
+  return { ...view, onStage, onClose }
 }
 
 describe('query result row editing', () => {
@@ -149,49 +142,53 @@ describe('query result row editing', () => {
     const sheet = await screen.findByTestId('side-panel-row-editor')
     const loading = screen.getByRole('status', { name: 'Loading row' })
     expect(loading.parentElement).toHaveClass('px-4', 'sm:px-6', 'py-4', 'sm:py-6')
-    expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Queue changes' })).not.toBeInTheDocument()
 
     releaseRow()
     expect(await screen.findByTestId('name-input')).toHaveValue(originalRow.name)
     expect(screen.getByTestId('side-panel-row-editor')).toBe(sheet)
     expect(screen.queryByRole('status', { name: 'Loading row' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Queue changes' })).toBeEnabled()
   })
 
-  it('loads the full row and saves through the original key and captured role', async () => {
+  // Changes join the result's other pending edits and are written together on Save, so
+  // the sheet itself must never write to the database.
+  it('queues changed columns, including ones the query did not select, without writing', async () => {
     const writes = mockRows()
-    const { onSave } = renderEditor()
+    const { onStage } = renderEditor()
     expect(await screen.findByTestId('hidden-input')).toHaveValue(originalRow.hidden)
-    fireEvent.change(screen.getByTestId('id-input'), { target: { value: 'new-id' } })
     fireEvent.change(screen.getByTestId('name-input'), { target: { value: 'Changed' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    fireEvent.change(screen.getByTestId('hidden-input'), { target: { value: 'Also changed' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Queue changes' }))
     await waitFor(() =>
-      expect(onSave).toHaveBeenCalledWith({ ...originalRow, id: 'new-id', name: 'Server value' })
+      expect(onStage).toHaveBeenCalledWith(originalRow, {
+        name: 'Changed',
+        hidden: 'Also changed',
+      })
     )
-    expect(writes).toHaveLength(1)
-    expect(writes[0]).toContain('query_role')
-    expect(writes[0]).toMatch(/where\s+"?id"? = 'original-id'/i)
-    expect(writes[0]).toMatch(/returning\s+\*/i)
-    expect(writes[0]).not.toContain('"hidden" =')
+    expect(writes).toHaveLength(0)
   })
 
-  it('retains input after a failed save and allows retry', async () => {
-    const writes = mockRows({ failFirstSave: true })
-    const { onSave } = renderEditor()
-    fireEvent.change(await screen.findByTestId('name-input'), { target: { value: 'Retry me' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(writes).toHaveLength(1))
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled())
-    expect(onSave).not.toHaveBeenCalled()
-    expect(screen.getByTestId('name-input')).toHaveValue('Retry me')
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(onSave).toHaveBeenCalledOnce())
-    expect(writes).toHaveLength(2)
+  it('reopens a row with its queued values, so earlier edits are not lost or overwritten', async () => {
+    mockRows()
+    renderEditor({
+      pendingEdits: [
+        {
+          table: { id: table.id, schema: table.schema, name: table.name },
+          rowIdentifiers: { id: originalRow.id },
+          columnName: 'name',
+          oldValue: originalRow.name,
+          newValue: 'Queued earlier',
+        },
+      ],
+    })
+    expect(await screen.findByTestId('name-input')).toHaveValue('Queued earlier')
+    expect(screen.getByTestId('hidden-input')).toHaveValue(originalRow.hidden)
   })
 
   it('confirms before discarding changed fields and preserves them when keeping edits', async () => {
     const writes = mockRows()
-    const { onClose } = renderEditor()
+    const { onClose, onStage } = renderEditor()
     fireEvent.change(await screen.findByTestId('name-input'), { target: { value: 'Unsaved' } })
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(await screen.findByRole('alertdialog')).toHaveTextContent('Unsaved changes')
@@ -201,6 +198,7 @@ describe('query result row editing', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     await userEvent.click(screen.getByRole('button', { name: 'Discard changes' }))
     expect(onClose).toHaveBeenCalledOnce()
+    expect(onStage).not.toHaveBeenCalled()
     expect(writes).toHaveLength(0)
   })
 
@@ -208,6 +206,6 @@ describe('query result row editing', () => {
     mockRows({ missing: true })
     renderEditor()
     expect(await screen.findByText('Failed to load row')).toBeVisible()
-    expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Queue changes' })).not.toBeInTheDocument()
   })
 })

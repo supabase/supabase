@@ -18,14 +18,54 @@ import {
   QueuedOperationType,
   type EditCellContentOperation,
 } from '@/state/table-editor-operation-queue.types'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { Dictionary, ResponseError, UseCustomMutationOptions } from '@/types'
 
-function getEditCellOperationRowKey(operation: EditCellContentOperation): string {
+/** A single cell change, as much of one as it takes to write it. */
+export type CellEditStatementInput = {
+  table: { id: number; name: string; schema: string }
+  rowIdentifiers: Dictionary<unknown>
+  columnName: string
+  newValue: unknown
+  enumArrayColumns?: string[]
+}
+
+function getCellEditRowKey({ table, rowIdentifiers }: CellEditStatementInput): string {
   const rowIdentifiersKey = JSON.stringify(
-    Object.entries(operation.payload.rowIdentifiers).sort(([a], [b]) => a.localeCompare(b))
+    Object.entries(rowIdentifiers).sort(([a], [b]) => a.localeCompare(b))
   )
 
-  return `${operation.tableId}:${rowIdentifiersKey}`
+  return `${table.id}:${rowIdentifiersKey}`
+}
+
+/**
+ * One UPDATE per edited row, so several cells changed on the same row are written in a
+ * single statement rather than one statement per cell.
+ */
+export function getCellEditUpdateStatements(
+  edits: readonly CellEditStatementInput[]
+): Array<SafeSqlFragment> {
+  const editsByRow = new Map<string, CellEditStatementInput[]>()
+  for (const edit of edits) {
+    const key = getCellEditRowKey(edit)
+    editsByRow.set(key, [...(editsByRow.get(key) ?? []), edit])
+  }
+
+  return [...editsByRow.values()].map((rowEdits) => {
+    const { table, rowIdentifiers } = rowEdits[0]
+    return stripTrailingSemicolon(
+      getTableRowUpdateSql({
+        table: { id: table.id, name: table.name, schema: table.schema },
+        configuration: { identifiers: rowIdentifiers },
+        payload: Object.fromEntries(
+          rowEdits.map(({ columnName, newValue }) => [columnName, newValue])
+        ),
+        enumArrayColumns: [
+          ...new Set(rowEdits.flatMap(({ enumArrayColumns }) => enumArrayColumns ?? [])),
+        ],
+        returning: false,
+      })
+    )
+  })
 }
 
 export type OperationQueueSaveVariables = {
@@ -103,45 +143,17 @@ export function getOperationSqlStatements(
   operations: readonly QueuedOperation[]
 ): Array<SafeSqlFragment> {
   const statements: Array<SafeSqlFragment> = []
-  const editCellOperationsByRow = new Map<string, EditCellContentOperation[]>()
+  const editCellOperations: EditCellContentOperation[] = []
 
   for (const operation of sortOperations(operations)) {
-    if (!isEditCellContentOperation(operation)) {
-      statements.push(stripTrailingSemicolon(getOperationSql(operation)))
-      continue
-    }
-
-    const key = getEditCellOperationRowKey(operation)
-    const existing = editCellOperationsByRow.get(key)
-    if (existing) {
-      existing.push(operation)
-      continue
-    }
-    editCellOperationsByRow.set(key, [operation])
+    if (isEditCellContentOperation(operation)) editCellOperations.push(operation)
+    else statements.push(stripTrailingSemicolon(getOperationSql(operation)))
   }
 
-  for (const editCellOperations of editCellOperationsByRow.values()) {
-    const firstOperation = editCellOperations[0]
-    const { table, rowIdentifiers } = firstOperation.payload
-
-    statements.push(
-      stripTrailingSemicolon(
-        getTableRowUpdateSql({
-          table: { id: table.id, name: table.name, schema: table.schema },
-          configuration: { identifiers: rowIdentifiers },
-          payload: Object.fromEntries(
-            editCellOperations.map(({ payload }) => [payload.columnName, payload.newValue])
-          ),
-          enumArrayColumns: [
-            ...new Set(editCellOperations.flatMap(({ payload }) => payload.enumArrayColumns ?? [])),
-          ],
-          returning: false,
-        })
-      )
-    )
-  }
-
-  return statements
+  return [
+    ...statements,
+    ...getCellEditUpdateStatements(editCellOperations.map(({ payload }) => payload)),
+  ]
 }
 
 /**

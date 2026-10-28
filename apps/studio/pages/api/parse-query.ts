@@ -1,6 +1,7 @@
 import { parse } from 'libpg-query'
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { getQueryRelations } from '@/lib/query-relations'
 import { getEditableQuery } from '@/lib/query-result-editing'
 
 const getOperation = (stmt: Record<string, unknown>) => {
@@ -8,32 +9,6 @@ const getOperation = (stmt: Record<string, unknown>) => {
   if ('InsertStmt' in stmt) return 'INSERT'
   if ('UpdateStmt' in stmt) return 'UPDATE'
   if ('DeleteStmt' in stmt) return 'DELETE'
-}
-
-const getTablesInQuery = (ast: unknown) => {
-  const tables: string[] = []
-
-  function traverse(node: unknown): void {
-    if (!node || typeof node !== 'object') return
-    const obj = node as Record<string, unknown>
-
-    if ('RangeVar' in obj) {
-      const rv = obj.RangeVar as { relname?: string; schemaname?: string }
-      if (rv.relname) tables.push(rv.schemaname ? `${rv.schemaname}.${rv.relname}` : rv.relname)
-    }
-
-    if ('relation' in obj && obj.relation && typeof obj.relation === 'object') {
-      const rv = obj.relation as { relname?: string; schemaname?: string }
-      if (rv.relname) tables.push(rv.schemaname ? `${rv.schemaname}.${rv.relname}` : rv.relname)
-    }
-
-    for (const value of Object.values(obj)) {
-      Array.isArray(value) ? value.forEach(traverse) : traverse(value)
-    }
-  }
-
-  traverse(ast)
-  return [...new Set(tables)].sort((a, b) => a.localeCompare(b))
 }
 
 // libpg-query nodes only expose the location of their own leading token (e.g. a BoolExpr's
@@ -115,7 +90,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const stmt = ast.stmts?.[0]?.stmt as Record<string, unknown> | undefined
     const [stmtType, stmtNode] = stmt ? Object.entries(stmt)[0] : []
 
-    const tables = getTablesInQuery(ast)
+    const relations = getQueryRelations(ast)
+    const tables = [
+      ...new Set(relations.map(({ schema, name }) => (schema ? `${schema}.${name}` : name))),
+    ].sort((a, b) => a.localeCompare(b))
     const operation = stmt ? getOperation(stmt) : null
     const whereClause =
       stmtType && stmtNode
@@ -124,6 +102,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       tables,
+      relations,
+      statementType: stmtType ?? null,
       operation,
       whereClause,
       statementCount,

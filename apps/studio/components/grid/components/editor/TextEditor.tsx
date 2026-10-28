@@ -19,7 +19,7 @@ import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
-import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { useIsCellEditQueued } from '@/components/grid/context/CellEditQueueContext'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
@@ -56,7 +56,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(initialValue)
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
-  const { isQueueEnabled } = useTableRowOperations()
+  const isQueueEnabled = useIsCellEditQueued()
   const applyChangesLabel = isQueueEnabled ? 'Queue changes' : 'Save changes'
 
   const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()

@@ -2733,7 +2733,7 @@ export interface TableDataAddedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
+ * @page /dashboard/project/{ref}/editor, /dashboard/project/{ref}/sql, or /dashboard/project/{ref}/explorer/query/{id} (query details panel)
  */
 export interface TableRlsEnabledEvent {
   action: 'table_rls_enabled'
@@ -2741,7 +2741,7 @@ export interface TableRlsEnabledEvent {
     /**
      * Method used to enable RLS
      */
-    method: 'sql_editor' | 'table_editor'
+    method: 'sql_editor' | 'table_editor' | 'explorer'
     /**
      * Schema of the table
      */

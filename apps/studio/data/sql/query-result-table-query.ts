@@ -1,14 +1,14 @@
 import { ident, literal, safeSql } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions, type QueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { executeSql } from './execute-sql-mutation'
 import { sqlKeys } from './keys'
-import { constructHeaders, fetchHandler, handleError, unguarded } from '@/data/fetchers'
+import { parsedQueryQueryOptions } from './parsed-query-query'
+import { handleError, unguarded } from '@/data/fetchers'
 import { getTable } from '@/data/tables/table-retrieve-query'
-import { BASE_PATH } from '@/lib/constants'
-import { editableQuerySchema, getResultColumnMapping } from '@/lib/query-result-editing'
+import { getResultColumnMapping } from '@/lib/query-result-editing'
 import { wrapWithRoleImpersonation, type RoleImpersonationState } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 
@@ -19,19 +19,14 @@ export type QueryResultTableVariables = {
   roleImpersonationState?: RoleImpersonationState
 }
 
-async function getQueryResultTable(args: QueryResultTableVariables, signal?: AbortSignal) {
+async function getQueryResultTable(
+  args: QueryResultTableVariables,
+  client: QueryClient,
+  signal?: AbortSignal
+) {
   if (!args.projectRef || !args.sql) throw new Error('Project and query are required')
-  const response = await fetchHandler(`${BASE_PATH}/api/parse-query`, {
-    method: 'POST',
-    headers: await constructHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ sql: args.sql }),
-    signal,
-  })
-  // Unsupported syntax must not prevent displaying results.
-  if (!response.ok) return null
-  const { editableQuery } = z
-    .object({ editableQuery: editableQuerySchema.nullable() })
-    .parse(await response.json())
+  const parsed = await client.fetchQuery(parsedQueryQueryOptions({ sql: args.sql }))
+  const editableQuery = parsed?.editableQuery
   if (!editableQuery) return null
 
   const relationName = editableQuery.schema
@@ -71,7 +66,7 @@ async function getQueryResultTable(args: QueryResultTableVariables, signal?: Abo
 export const queryResultTableQueryOptions = (args: QueryResultTableVariables) =>
   queryOptions({
     queryKey: sqlKeys.editableResult(args.projectRef, args),
-    queryFn: ({ signal }) => getQueryResultTable(args, signal),
+    queryFn: ({ client, signal }) => getQueryResultTable(args, client, signal),
     enabled: !!args.projectRef && !!args.sql,
     retry: false,
     staleTime: 5 * 60 * 1000,

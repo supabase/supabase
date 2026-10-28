@@ -115,6 +115,25 @@ export function getGridColumns(
   return gridColumns
 }
 
+/**
+ * The inline editor for a column shown outside the Table Editor grid, such as in a query
+ * result, or undefined when the column can't be edited in place. A foreign key is edited as
+ * the value it stores, since there's no referenced-row picker in those surfaces.
+ */
+export function getColumnCellEditor(
+  column: SupaColumn,
+  {
+    onExpandJSONEditor,
+    onExpandTextEditor,
+  }: {
+    onExpandJSONEditor: (column: string, row: SupaRow) => void
+    onExpandTextEditor: (column: string, row: SupaRow) => void
+  }
+) {
+  const columnType = getColumnType({ ...column, foreignKey: undefined })
+  return getCellEditor(column, columnType, true, onExpandJSONEditor, onExpandTextEditor)
+}
+
 function getCellEditor(
   columnDefinition: SupaColumn,
   columnType: ColumnType,

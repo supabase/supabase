@@ -13,6 +13,10 @@ type ResultRowIdentity = Omit<ResultQueryIdentity, 'sql'> & {
 }
 
 export const sqlKeys = {
+  // Parsing is pure and project-independent, so one parse serves every consumer of the same SQL.
+  parsedQuery: (sql: string | undefined) => ['parsed-query', sql] as const,
+  relations: (projectRef: string | undefined, sql: string | undefined) =>
+    ['projects', projectRef, 'query-relations', sql] as const,
   query: (projectRef: string | undefined, queryKey: QueryKey) =>
     ['projects', projectRef, 'query', ...queryKey] as const,
   // Encrypted connection strings can rotate on project refresh without changing the database.

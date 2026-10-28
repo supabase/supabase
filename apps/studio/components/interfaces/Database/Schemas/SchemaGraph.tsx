@@ -17,11 +17,12 @@ import {
   CopyIcon,
   DownloadIcon,
   Loader2Icon,
+  PanelRightIcon,
   PlusIcon,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
 import '@xyflow/react/dist/style.css'
@@ -43,6 +44,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -70,6 +74,7 @@ import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -82,14 +87,27 @@ import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
+type SchemaGraphTable = { id: number; schema: string; name: string }
+
 export const SchemaGraph = ({
   schema: fixedSchema,
+  details,
 }: {
   /**
    * Shows this schema, for hosts that choose the schema themselves, like an Explorer tab per
    * schema. Without it, the graph keeps its own schema selector.
    */
   schema?: string
+  /**
+   * A sidebar beside the graph, for hosts that can describe what's in it, like Explorer. It
+   * renders the selected table, or the schema as a whole when no table is selected, and
+   * selecting a table opens it.
+   */
+  details?: {
+    isOpen: boolean
+    onOpenChange: (isOpen: boolean) => void
+    render: (selectedTable: SchemaGraphTable | undefined) => ReactNode
+  }
 } = {}) => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
@@ -218,8 +236,23 @@ export const SchemaGraph = ({
   }, [schema, reactFlowInstance, setStoredPositions])
 
   const [selectedEdge, setSelectedEdge] = useState<Edge | undefined>(undefined)
+  const [detailsTable, setDetailsTable] = useState<SchemaGraphTable>()
+  // Read through a ref: the host's callbacks needn't be stable, and React Flow reports the
+  // selection again whenever this handler changes identity.
+  const detailsRef = useLatest(details)
   const handleSelectionChange = useCallback(
     (params: OnSelectionChangeParams<Node<TableNodeData>, Edge<EdgeData>>) => {
+      // A table from another schema is drawn from a foreign key and has no table id to show.
+      const [node] = params.nodes
+      const table =
+        params.nodes.length === 1 && node && !node.data.isForeign
+          ? { id: node.data.id, schema: node.data.schema, name: node.data.name }
+          : undefined
+      setDetailsTable((current) => (current?.id === table?.id ? current : table))
+      if (table && detailsRef.current && !detailsRef.current.isOpen) {
+        detailsRef.current.onOpenChange(true)
+      }
+
       if (params.edges.length === 1) {
         setSelectedEdge(params.edges[0])
       } else {
@@ -239,7 +272,7 @@ export const SchemaGraph = ({
       })
       if (hasChanges) reactFlowInstance.setEdges(nextEdges)
     },
-    [reactFlowInstance, setSelectedEdge]
+    [reactFlowInstance, setSelectedEdge, detailsRef]
   )
 
   const downloadImage = async (format: 'png' | 'svg') => {
@@ -393,6 +426,60 @@ export const SchemaGraph = ({
     [tables, snap, isDownloading, selectedEdge]
   )
 
+  const graph = (
+    <div className="w-full h-full">
+      <ReactFlow<Node<TableNodeData>, Edge<EdgeData>>
+        // FIXME: https://github.com/xyflow/xyflow/issues/4876
+        colorMode={'' as unknown as ColorMode}
+        defaultNodes={[]}
+        defaultEdges={[]}
+        defaultEdgeOptions={{
+          type: 'default',
+          animated: false,
+          deletable: false,
+        }}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        fitView
+        minZoom={0.8}
+        maxZoom={1.8}
+        onlyRenderVisibleElements
+        proOptions={{ hideAttribution: true }}
+        onNodeDragStop={saveNodePositions}
+        onSelectionChange={handleSelectionChange}
+      >
+        <Background
+          gap={16}
+          className="*:stroke-foreground-muted opacity-25"
+          variant={BackgroundVariant.Dots}
+          color={'inherit'}
+        />
+        <MiniMap
+          pannable
+          zoomable
+          nodeColor={miniMapNodeColor}
+          maskColor={miniMapMaskColor}
+          className="border rounded-md shadow-xs mb-11!"
+        />
+        <SchemaGraphLegend />
+        {hasNextPage && (
+          <Panel position="bottom-center" className="mb-11!">
+            <Button
+              size="tiny"
+              loading={isFetchingNextPage}
+              onClick={() => {
+                fitViewOnNextLayout.current = true
+                fetchNextPage()
+              }}
+            >
+              Load more tables
+            </Button>
+          </Panel>
+        )}
+      </ReactFlow>
+    </div>
+  )
+
   return (
     <>
       <div className="flex items-center justify-between p-4 border-b border-muted h-(--header-height)">
@@ -445,6 +532,21 @@ export const SchemaGraph = ({
             </div>
             {!hasNoTables && (
               <div className="flex items-center gap-x-2">
+                {details && (
+                  <ButtonTooltip
+                    className="w-7 px-0"
+                    icon={<PanelRightIcon />}
+                    aria-label={details.isOpen ? 'Hide details' : 'Show details'}
+                    aria-pressed={details.isOpen}
+                    onClick={() => details.onOpenChange(!details.isOpen)}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: details.isOpen ? 'Hide details' : 'Show details',
+                      },
+                    }}
+                  />
+                )}
                 <div className="flex items-center gap-0">
                   <ButtonTooltip
                     className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
@@ -582,57 +684,29 @@ export const SchemaGraph = ({
             </div>
           ) : (
             <SchemaGraphContextProvider value={schemaGraphContext}>
-              <div className="w-full h-full">
-                <ReactFlow<Node<TableNodeData>, Edge<EdgeData>>
-                  // FIXME: https://github.com/xyflow/xyflow/issues/4876
-                  colorMode={'' as unknown as ColorMode}
-                  defaultNodes={[]}
-                  defaultEdges={[]}
-                  defaultEdgeOptions={{
-                    type: 'default',
-                    animated: false,
-                    deletable: false,
-                  }}
-                  nodeTypes={nodeTypes}
-                  edgeTypes={edgeTypes}
-                  fitView
-                  minZoom={0.8}
-                  maxZoom={1.8}
-                  onlyRenderVisibleElements
-                  proOptions={{ hideAttribution: true }}
-                  onNodeDragStop={saveNodePositions}
-                  onSelectionChange={handleSelectionChange}
-                >
-                  <Background
-                    gap={16}
-                    className="*:stroke-foreground-muted opacity-25"
-                    variant={BackgroundVariant.Dots}
-                    color={'inherit'}
-                  />
-                  <MiniMap
-                    pannable
-                    zoomable
-                    nodeColor={miniMapNodeColor}
-                    maskColor={miniMapMaskColor}
-                    className="border rounded-md shadow-xs mb-11!"
-                  />
-                  <SchemaGraphLegend />
-                  {hasNextPage && (
-                    <Panel position="bottom-center" className="mb-11!">
-                      <Button
-                        size="tiny"
-                        loading={isFetchingNextPage}
-                        onClick={() => {
-                          fitViewOnNextLayout.current = true
-                          fetchNextPage()
-                        }}
+              {details ? (
+                <ResizablePanelGroup orientation="horizontal" className="h-full w-full">
+                  <ResizablePanel id="schema-graph">{graph}</ResizablePanel>
+                  {details.isOpen && (
+                    <>
+                      <ResizableHandle withHandle />
+                      {/* Same bounds as the Explorer sidebar on the other side. */}
+                      <ResizablePanel
+                        id="schema-graph-details"
+                        minSize={256}
+                        maxSize={512}
+                        defaultSize={288}
                       >
-                        Load more tables
-                      </Button>
-                    </Panel>
+                        <aside aria-label="Details" className="h-full overflow-y-auto">
+                          {details.render(detailsTable)}
+                        </aside>
+                      </ResizablePanel>
+                    </>
                   )}
-                </ReactFlow>
-              </div>
+                </ResizablePanelGroup>
+              ) : (
+                graph
+              )}
             </SchemaGraphContextProvider>
           )}
         </>

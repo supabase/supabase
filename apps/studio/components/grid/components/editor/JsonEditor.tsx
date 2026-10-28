@@ -15,7 +15,7 @@ import {
 import { BlockKeys } from '../common/BlockKeys'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useIsCellEditQueued } from '@/components/grid/context/CellEditQueueContext'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
@@ -66,7 +66,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
-  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const isQueueOperationsEnabled = useIsCellEditQueued()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,

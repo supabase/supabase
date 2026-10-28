@@ -73,8 +73,8 @@ describe('useExplorerPreferences', () => {
     act(() => second.result.current.completeOnboarding())
 
     expect(JSON.parse(localStorage.getItem(storageKey)!)).toEqual({
-      '1': { home: 'query', hasCompletedOnboarding: true },
-      '2': { home: 'home', hasCompletedOnboarding: true },
+      '1': { home: 'query', hasCompletedOnboarding: true, showDetails: true },
+      '2': { home: 'home', hasCompletedOnboarding: true, showDetails: true },
     })
   })
 
@@ -120,8 +120,21 @@ describe('useExplorerPreferences', () => {
     expect(result.current.hasCompletedOnboarding).toBe(false)
     act(() => result.current.completeOnboarding())
     expect(JSON.parse(localStorage.getItem(storageKey)!)).toEqual({
-      '1': { home: 'home', hasCompletedOnboarding: true },
+      '1': { home: 'home', hasCompletedOnboarding: true, showDetails: true },
     })
+  })
+
+  // The details panel takes width from the results, so someone who closes it shouldn't
+  // have it reopen on the next query tab.
+  it('remembers that the details sidebar was hidden', async () => {
+    const queryClient = new QueryClient()
+    const first = renderPreferences(1, queryClient)
+    await waitFor(() => expect(first.result.current.isReady).toBe(true))
+    expect(first.result.current.showDetails).toBe(true)
+    act(() => first.result.current.setShowDetails(false))
+
+    const second = renderPreferences(1, queryClient)
+    await waitFor(() => expect(second.result.current.showDetails).toBe(false))
   })
 
   describe('self-hosted', () => {
@@ -158,7 +171,7 @@ describe('useExplorerPreferences', () => {
       expect(result.current.hasCompletedOnboarding).toBe(true)
       act(() => result.current.setHome('home'))
       expect(JSON.parse(localStorage.getItem(storageKey)!)).toEqual({
-        'self-hosted': { home: 'home', hasCompletedOnboarding: true },
+        'self-hosted': { home: 'home', hasCompletedOnboarding: true, showDetails: true },
       })
     })
 
@@ -179,7 +192,7 @@ describe('useExplorerPreferences', () => {
       expect(result.current.hasCompletedOnboarding).toBe(true)
       act(() => result.current.setHome('home'))
       expect(JSON.parse(localStorage.getItem(storageKey)!)).toEqual({
-        'self-hosted': { home: 'home', hasCompletedOnboarding: true },
+        'self-hosted': { home: 'home', hasCompletedOnboarding: true, showDetails: true },
         '1': accountPreferences,
       })
     })

@@ -1,6 +1,6 @@
 import { CopyIcon, ExpandIcon, Loader2Icon, Maximize2Icon } from 'lucide-react'
-import { useCallback, useMemo, useRef, useState } from 'react'
-import DataGrid, { Column, RenderCellProps } from 'react-data-grid'
+import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
+import DataGrid, { Column, RenderCellProps, RenderEditCellProps } from 'react-data-grid'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -20,12 +20,17 @@ import { ResultCell } from './ResultCell'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
+export type ResultCellEditor = (props: RenderEditCellProps<ResultRow>) => ReactNode
+
 export const DataGridResults = ({
   rows,
   onEditRow,
   canEditRow,
   reserveRowActions = false,
   isLoadingRowActions = false,
+  cellEditors,
+  onCellChange,
+  isCellDirty,
 }: {
   rows: readonly ResultRow[]
   onEditRow?: (row: ResultRow) => void
@@ -33,6 +38,12 @@ export const DataGridResults = ({
   /** Keep the action gutter stable while row editability is being resolved. */
   reserveRowActions?: boolean
   isLoadingRowActions?: boolean
+  /** Inline editors by column; a column without one stays read-only. */
+  cellEditors?: Record<string, ResultCellEditor | undefined>
+  /** Called when an inline editor commits, with the row as it was shown before the edit. */
+  onCellChange?: (row: ResultRow, column: string, value: unknown) => void
+  /** Highlights cells holding a change that hasn't been saved yet. */
+  isCellDirty?: (row: ResultRow, column: string) => boolean
 }) => {
   const [expandedCell, setExpandedCell] = useState<{ column: string; value: unknown } | null>(null)
   const [contextMenuRow, setContextMenuRow] = useState<ResultRow>()
@@ -86,6 +97,10 @@ export const DataGridResults = ({
           frozen: false,
           sortable: false,
           isLastFrozenColumn: false,
+          renderEditCell: cellEditors?.[key],
+          cellClass: isCellDirty
+            ? (row: ResultRow) => (isCellDirty(row, key) ? 'rdg-cell--dirty' : undefined)
+            : undefined,
           renderCell: ({ row }: RenderCellProps<ResultRow>) => (
             <ResultCell
               column={key}
@@ -97,7 +112,7 @@ export const DataGridResults = ({
           renderHeaderCell: () => columnRender(key),
         }
       }),
-    [rows, handleContextMenu]
+    [rows, handleContextMenu, cellEditors, isCellDirty]
   )
 
   const gridColumns: Column<ResultRow>[] =
@@ -207,6 +222,15 @@ export const DataGridResults = ({
             className="grow min-h-0 border-t-0! border-b-0!"
             rowClass={() => 'group/result-row [&>.rdg-cell]:items-center'}
             onCellKeyDown={handleCellKeyDown}
+            onRowsChange={
+              onCellChange
+                ? (nextRows, { indexes, column }) => {
+                    const [index] = indexes
+                    const row = rows[index]
+                    if (row) onCellChange(row, column.key, nextRows[index][column.key])
+                  }
+                : undefined
+            }
           />
           <CellDetailPanel
             column={expandedCell?.column ?? ''}
