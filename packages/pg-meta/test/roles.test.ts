@@ -265,16 +265,21 @@ withTestDatabase('update and remove a role whose name needs quoting', async ({ e
   expect(await findRole(`it's a "role"`)).toBeUndefined()
 })
 
+// Roles are cluster-wide, so dropping the test database doesn't remove them.
 withTestDatabase('create a role with a password containing quotes', async ({ executeQuery }) => {
-  const { sql: createSql } = pgMeta.roles.create({
-    name: 'password_r1',
-    canLogin: true,
-    password: `p'ss"word`,
-  })
-  await executeQuery(createSql)
+  try {
+    const { sql: createSql } = pgMeta.roles.create({
+      name: 'password_r1',
+      canLogin: true,
+      password: `p'ss"word`,
+    })
+    await executeQuery(createSql)
 
-  const rows = await executeQuery(
-    safeSql`select rolcanlogin, rolpassword is not null as has_password from pg_authid where rolname = 'password_r1'`
-  )
-  expect(rows).toEqual([{ rolcanlogin: true, has_password: true }])
+    const rows = await executeQuery(
+      safeSql`select rolcanlogin, rolpassword is not null as has_password from pg_authid where rolname = 'password_r1'`
+    )
+    expect(rows).toEqual([{ rolcanlogin: true, has_password: true }])
+  } finally {
+    await executeQuery(safeSql`drop role if exists password_r1`)
+  }
 })
