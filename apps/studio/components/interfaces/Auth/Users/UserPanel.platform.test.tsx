@@ -21,8 +21,6 @@ const mockUser: User = {
   id: '11111111-1111-1111-1111-111111111111',
   email: 'user@example.com',
   providers: ['email'],
-  phone: null,
-  banned_until: null,
   created_at: '2026-01-01T12:00:00Z',
   raw_user_meta_data: { locale: 'en', preferences: { theme: 'dark' } },
   raw_app_meta_data: { providers: ['email'] },
