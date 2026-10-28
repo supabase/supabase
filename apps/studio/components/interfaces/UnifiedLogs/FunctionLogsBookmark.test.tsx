@@ -1,9 +1,10 @@
-import { QueryClient } from '@tanstack/react-query'
+import { QueryClient, useIsFetching, useQueryClient } from '@tanstack/react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { useQueryState } from 'nuqs'
+import { useLayoutEffect, useState } from 'react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
@@ -45,6 +46,28 @@ const BookmarkControls = () => {
         Close bookmark
       </button>
     </>
+  )
+}
+
+const CloseBookmarkAfterRefresh = () => {
+  const [, setId] = useQueryState('id')
+  const queryClient = useQueryClient()
+  const fetchingQueries = useIsFetching()
+  const [shouldClose, setShouldClose] = useState(false)
+  useLayoutEffect(() => {
+    if (shouldClose && fetchingQueries === 0) setId(null)
+  }, [shouldClose, fetchingQueries, setId])
+  return (
+    <button
+      onClick={() => {
+        setShouldClose(true)
+        queryClient.invalidateQueries({
+          predicate: (query) => query.queryKey.includes('single-log'),
+        })
+      }}
+    >
+      Close bookmark after refresh
+    </button>
   )
 }
 
@@ -151,6 +174,58 @@ describe('function log bookmarks', () => {
       ).not.toBeInTheDocument()
     )
     expect(screen.queryByText('Second bookmarked output')).not.toBeInTheDocument()
+  })
+
+  it('keeps a bookmark closed when its pending lookup updates the selected row', async () => {
+    let releaseRefresh = () => {}
+    const pendingRefresh = new Promise<void>((resolve) => {
+      releaseRefresh = resolve
+    })
+    let lookupCount = 0
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        if (sql.includes("toString(id) = 'older-log'")) {
+          lookupCount++
+          if (lookupCount > 1) await pendingRefresh
+          return HttpResponse.json<AnalyticsResponse>({
+            result: [log('older-log', `Bookmark version ${lookupCount}`)],
+          })
+        }
+        return HttpResponse.json<AnalyticsResponse>({
+          result: sql.includes('row list') ? [log('recent-log', 'Recent output')] : [],
+        })
+      },
+    })
+    customRender(
+      <>
+        <BookmarkControls />
+        <CloseBookmarkAfterRefresh />
+        <UnifiedLogs
+          scope={getEdgeFunctionLogsScope('fn-123')}
+          hasFilterSideBar={false}
+          {...EDGE_FUNCTION_LOGS_VIEW}
+        />
+      </>,
+      { queryClient, nuqs: { hasMemory: true, searchParams: '?id=older-log' } }
+    )
+    expect(
+      await screen.findByRole('status', { name: 'Bookmark version 1', hidden: true })
+    ).toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    try {
+      fireEvent.click(screen.getByText('Close bookmark after refresh', { selector: 'button' }))
+      await waitFor(() => expect(lookupCount).toBe(2))
+    } finally {
+      releaseRefresh()
+    }
+    await waitFor(() => expect(screen.getByLabelText('Current bookmark')).toHaveTextContent('none'))
+    expect(
+      screen.queryByRole('status', { name: /Bookmark version/, hidden: true })
+    ).not.toBeInTheDocument()
   })
 
   it('updates the bookmark for selected rows without fetching logs already in the table', async () => {
