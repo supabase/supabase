@@ -3,6 +3,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import type { DocsSearchV2State } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { SearchV2Provider } from './SearchV2Provider'
 import { SearchV2Trigger } from './SearchV2Trigger'
 
 const sendTelemetryEvent = vi.fn()
@@ -59,17 +60,25 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+function TriggerWithProvider() {
+  return (
+    <SearchV2Provider>
+      <SearchV2Trigger />
+    </SearchV2Provider>
+  )
+}
+
 const eventActions = () => sendTelemetryEvent.mock.calls.map(([event]) => event.action)
 
 function openDialog() {
-  const view = render(<SearchV2Trigger />)
+  const view = render(<TriggerWithProvider />)
   fireEvent.click(screen.getByRole('button', { name: /search/i }))
   return view
 }
 
 function setSearchState(view: ReturnType<typeof render>, next: DocsSearchV2State) {
   searchState = next
-  act(() => view.rerender(<SearchV2Trigger />))
+  act(() => view.rerender(<TriggerWithProvider />))
 }
 
 describe('SearchV2 telemetry', () => {
@@ -91,7 +100,7 @@ describe('SearchV2 telemetry', () => {
   })
 
   it('sends docs_search_v2_opened with keyboard_shortcut on Cmd+K', () => {
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
 
@@ -104,7 +113,7 @@ describe('SearchV2 telemetry', () => {
   })
 
   it('sends docs_search_v2_opened with keyboard_shortcut on Ctrl+K', () => {
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
 
@@ -122,7 +131,7 @@ describe('SearchV2 telemetry', () => {
   ])('keeps the legacy command menu shortcut from firing on %s', (_name, modifier) => {
     const legacyShortcut = vi.fn()
     document.addEventListener('keydown', legacyShortcut)
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(document.body, { key: 'k', ...modifier })
 
@@ -132,7 +141,7 @@ describe('SearchV2 telemetry', () => {
   })
 
   it('ignores k without Cmd or Ctrl', () => {
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(window, { key: 'k' })
 
@@ -146,7 +155,7 @@ describe('SearchV2 telemetry', () => {
     ['Cmd+Shift+K', { metaKey: true, shiftKey: true }],
     ['Cmd+Alt+K', { metaKey: true, altKey: true }],
   ])('ignores %s so browser shortcuts keep working', (_name, modifier) => {
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(window, { key: 'k', ...modifier })
 

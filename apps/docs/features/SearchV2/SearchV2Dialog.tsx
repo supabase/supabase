@@ -2,6 +2,7 @@
 
 import { useDocsSearchV2 } from 'common'
 import {
+  SearchActionItem,
   SearchDialog,
   SearchPanel,
   type SearchDialogProps,
@@ -12,11 +13,17 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 import { SEARCH_V2_ENDPOINT, SEARCH_V2_MIN_CHARACTERS } from './constants'
+import { AskAiIcon } from './AskAiIcon'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 type SearchV2DialogProps = Pick<SearchDialogProps, 'open' | 'onOpenChange'>
 
-type SearchV2PanelProps = Pick<SearchPanelProps, 'onResultNavigate' | 'onResultLinkNavigate'>
+interface SearchV2PanelProps extends Pick<
+  SearchPanelProps,
+  'onResultNavigate' | 'onResultLinkNavigate'
+> {
+  onAskAi?: (question: string) => void
+}
 
 export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
   const router = useRouter()
@@ -34,7 +41,11 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
   )
 }
 
-function SearchV2Panel({ onResultNavigate, onResultLinkNavigate }: SearchV2PanelProps) {
+export function SearchV2Panel({
+  onResultNavigate,
+  onResultLinkNavigate,
+  onAskAi,
+}: SearchV2PanelProps) {
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearchV2({
     endpoint: SEARCH_V2_ENDPOINT,
@@ -69,6 +80,32 @@ function SearchV2Panel({ onResultNavigate, onResultLinkNavigate }: SearchV2Panel
       }
       onResultNavigate={(path) => onResultNavigate(path)}
       onResultLinkNavigate={() => onResultLinkNavigate?.()}
+      renderNoResults={
+        onAskAi
+          ? ({ query }) => (
+              <SearchActionItem
+                icon={<AskAiIcon isThinking={false} className="size-4 shrink-0" />}
+                onSelect={() => onAskAi(query)}
+              >
+                Ask Supabase AI: {query}
+              </SearchActionItem>
+            )
+          : undefined
+      }
+      renderFooterStart={
+        onAskAi
+          ? ({ query }) => (
+              <button
+                type="button"
+                tabIndex={0}
+                onClick={() => onAskAi(query)}
+                className="relative -mx-2 cursor-pointer rounded-md px-2 py-1 text-foreground-light transition-colors duration-150 hover:bg-overlay-hover hover:text-foreground focus-ring"
+              >
+                Ask Supabase AI
+              </button>
+            )
+          : undefined
+      }
     />
   )
 }

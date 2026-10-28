@@ -5,6 +5,7 @@
 @import 'ui-patterns/Notch/notch.css';
 @import './code-block.css';
 @import './reference.css';
+@import './ask-ai.css';
 @import 'docs-search/styles.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
@@ -167,8 +168,8 @@ h6:not(.font-mono),
   @apply font-heading font-semibold;
 }
 
-/* Alert set its own type scale to prevent drift in docs */
-.prose
+/* Alert set its own type scale to prevent drift in docs. prose-sm keeps its own smaller scale */
+.prose:not(:where(.prose-sm))
   :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
     :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) *
   ):not(:where([data-slot='alert'] *)) {

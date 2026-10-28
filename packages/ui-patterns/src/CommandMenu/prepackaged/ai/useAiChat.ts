@@ -155,14 +155,23 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
         }),
       })
 
+      // a failed stream stops here, so a late chunk or [DONE] cannot advance the index again
+      let hasFailed = false
+
       function handleError<T>(err: T) {
+        if (hasFailed) return
+        hasFailed = true
+        eventSource.close()
         setIsLoading?.(false)
         setIsResponding(false)
         setHasError(true)
+        // the next question starts a new pair, so its answer does not stream into this failed one
+        setCurrentMessageIndex((index) => index + 2)
         console.error(err)
       }
 
       function handleMessage(e: MessageEvent) {
+        if (hasFailed) return
         try {
           setIsLoading?.(false)
 

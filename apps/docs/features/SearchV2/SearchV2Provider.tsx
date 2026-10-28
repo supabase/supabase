@@ -1,0 +1,138 @@
+'use client'
+
+import { SearchDialog, useSearchShortcut } from 'docs-search/components'
+import { useRouter } from 'next/navigation'
+import { createContext, use, useState, type ReactNode } from 'react'
+import { flushSync } from 'react-dom'
+
+import { ASK_AI_DIALOG_LABELS, AskAiPanel } from './AskAiPanel'
+import { SearchV2Panel } from './SearchV2Dialog'
+import { useSearchV2Dialog } from './useSearchV2Dialog'
+
+type SearchTriggerType = Parameters<ReturnType<typeof useSearchV2Dialog>['openDialog']>[0]
+
+interface SearchV2ContextValue {
+  isSearchOpen: boolean
+  isAskAiOpen: boolean
+  showSearch: (triggerType: SearchTriggerType) => void
+  showAskAi: (question?: string) => void
+}
+
+type DialogPanel = 'search' | 'ask-ai'
+
+interface SearchV2ProviderProps {
+  children: ReactNode
+}
+
+interface SearchV2ShortcutsProps {
+  onSearch: SearchV2ContextValue['showSearch']
+  onAskAi: SearchV2ContextValue['showAskAi']
+}
+
+const SearchV2Context = createContext<SearchV2ContextValue | null>(null)
+
+/**
+ * Owns the one search dialog on the page. The top bar renders two times (desktop and mobile).
+ * One dialog per trigger let search and Ask AI open on top of each other.
+ */
+export function SearchV2Provider({ children }: SearchV2ProviderProps) {
+  const router = useRouter()
+  const {
+    open: isSearchOpen,
+    openDialog: openSearch,
+    handleOpenChange: handleSearchOpenChange,
+  } = useSearchV2Dialog()
+  const [isAskAiOpen, setIsAskAiOpen] = useState(false)
+  const [askAiQuestion, setAskAiQuestion] = useState('')
+  // the panel stays set after close, so the closing dialog does not show the other panel
+  const [panel, setPanel] = useState<DialogPanel>('search')
+  const isOpen = isSearchOpen || isAskAiOpen
+
+  const showPanel = ({ next, update }: { next: DialogPanel; update: () => void }) => {
+    const canMorph =
+      isOpen &&
+      panel !== next &&
+      typeof document.startViewTransition === 'function' &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!canMorph) {
+      update()
+      return
+    }
+    // dialog-morph.css in docs-search reads this to pick the roll direction
+    const root = document.documentElement
+    root.dataset.searchDialogMorph = next
+    document
+      .startViewTransition(() => flushSync(update))
+      .finished.finally(() => delete root.dataset.searchDialogMorph)
+  }
+
+  const showSearch = (triggerType: SearchTriggerType) =>
+    showPanel({
+      next: 'search',
+      update: () => {
+        setIsAskAiOpen(false)
+        setPanel('search')
+        openSearch(triggerType)
+      },
+    })
+
+  const showAskAi = (question = '') =>
+    showPanel({
+      next: 'ask-ai',
+      update: () => {
+        if (isSearchOpen) handleSearchOpenChange(false)
+        setAskAiQuestion(question)
+        setPanel('ask-ai')
+        setIsAskAiOpen(true)
+      },
+    })
+
+  const closeDialog = () => {
+    setIsAskAiOpen(false)
+    if (isSearchOpen) handleSearchOpenChange(false)
+  }
+
+  const handleDialogOpenChange = (next: boolean) => {
+    if (!next) closeDialog()
+  }
+
+  const handleResultNavigate = (path: string) => {
+    router.push(path)
+    closeDialog()
+  }
+
+  return (
+    <SearchV2Context value={{ isSearchOpen, isAskAiOpen, showSearch, showAskAi }}>
+      {children}
+      <SearchV2Shortcuts onSearch={showSearch} onAskAi={showAskAi} />
+      <SearchDialog
+        open={isOpen}
+        onOpenChange={handleDialogOpenChange}
+        labels={panel === 'ask-ai' ? ASK_AI_DIALOG_LABELS : undefined}
+      >
+        {panel === 'ask-ai' ? (
+          <AskAiPanel initialQuestion={askAiQuestion} onLinkNavigate={closeDialog} />
+        ) : (
+          <SearchV2Panel
+            onResultNavigate={handleResultNavigate}
+            onResultLinkNavigate={closeDialog}
+            onAskAi={showAskAi}
+          />
+        )}
+      </SearchDialog>
+    </SearchV2Context>
+  )
+}
+
+export function useSearchV2(): SearchV2ContextValue {
+  const context = use(SearchV2Context)
+  if (!context) throw new Error('useSearchV2 must be used inside SearchV2Provider')
+  return context
+}
+
+// its own component so the shortcuts only exist while the experiment is on
+function SearchV2Shortcuts({ onSearch, onAskAi }: SearchV2ShortcutsProps) {
+  useSearchShortcut(() => onSearch('keyboard_shortcut'))
+  useSearchShortcut(() => onAskAi(), 'i')
+  return null
+}
