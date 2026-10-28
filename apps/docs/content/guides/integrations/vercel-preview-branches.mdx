@@ -4,19 +4,22 @@ title: 'Preview branches on Vercel'
 description: 'Match each Vercel preview deployment to its Supabase preview branch.'
 ---
 
-Install the Vercel integration:
+Match each Vercel preview deployment to its Supabase preview branch, so every preview runs against the right database schema, Edge Functions, and other Supabase configuration. For how branching works with other hosting providers, see [Branching integrations](/docs/guides/deployment/branching/integrations).
 
-- From the [Vercel marketplace](https://vercel.com/integrations/supabase) or
-- By clicking the blue `Deploy` button in a Supabase example app's `README` file
+## Before you begin
 
-<Admonition type="note" title="Vercel GitHub integration also required.">
+- Set up [branching with GitHub](/docs/guides/deployment/branching/github-integration) on your Supabase project.
+- Install the [Vercel GitHub integration](https://vercel.com/docs/deployments/git/vercel-for-github) on your Vercel project.
 
-For branching to work with Vercel, you also need the [Vercel GitHub integration](https://vercel.com/docs/deployments/git/vercel-for-github).
+## Connect Vercel
 
-</Admonition>
+1. Install the Supabase integration for Vercel in one of these ways:
+   - From the [Vercel marketplace](https://vercel.com/integrations/supabase).
+   - By clicking the blue **Deploy** button in a Supabase example app's `README` file.
+2. In the [**Integrations**](/dashboard/org/_/integrations) section of your organization settings, connect your Supabase project to your Vercel project.
 
-And make sure you have [connected](/dashboard/org/_/integrations) your Supabase project to your Vercel project.
+## How preview deployments get their variables
 
-Supabase automatically updates your Vercel project with the correct environment variables for the corresponding preview branches. The synchronization happens at the time of Pull Request being opened, not at the time of branch creation.
+Supabase updates your Vercel project with the environment variables for each preview branch. It syncs them when a pull request opens, not when the branch is created.
 
-As branching integration is tied to the Preview Deployments feature in Vercel, there are possible race conditions between Supabase setting correct variables, and Vercel running a deployment process. Because of that, Supabase is always automatically re-deploying the most recent deployment of the given pull request.
+The integration depends on Vercel preview deployments, so Vercel can start a deployment before Supabase sets the variables. To cover that, Supabase redeploys the most recent deployment of the pull request.
