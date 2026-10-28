@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
-import pgMeta from '../src/index'
+import pgMeta, { safeSql } from '../src/index'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
@@ -263,4 +263,70 @@ withTestDatabase('update and remove a role whose name needs quoting', async ({ e
 
   await executeQuery(pgMeta.roles.remove({ id }).sql)
   expect(await findRole(`it's a "role"`)).toBeUndefined()
+})
+
+// Roles are cluster-wide, so dropping the test database doesn't remove them.
+withTestDatabase('update a role password that needs quoting', async ({ executeQuery }) => {
+  try {
+    await executeQuery(pgMeta.roles.create({ name: 'update_pw_r1' }).sql)
+    const getPassword = async () =>
+      (
+        await executeQuery(
+          safeSql`select rolpassword from pg_authid where rolname = 'update_pw_r1'`
+        )
+      )[0].rolpassword as string | null
+
+    expect(await getPassword()).toBeNull()
+
+    const seen = new Set<string | null>()
+    for (const password of ['plain', `it's a "secret"`, '100%s%I%%']) {
+      await executeQuery(pgMeta.roles.update({ name: 'update_pw_r1' }, { password }).sql)
+      const stored = await getPassword()
+      // Hashes are salted, so assert the password was replaced, not what it hashed to.
+      expect(stored).not.toBeNull()
+      expect(seen.has(stored)).toBe(false)
+      seen.add(stored)
+    }
+  } finally {
+    await executeQuery(safeSql`drop role if exists update_pw_r1`)
+  }
+})
+
+withTestDatabase('update a password together with valid until', async ({ executeQuery }) => {
+  try {
+    await executeQuery(pgMeta.roles.create({ name: 'update_pw_r2' }).sql)
+
+    await executeQuery(
+      pgMeta.roles.update(
+        { name: 'update_pw_r2' },
+        { password: `it's`, validUntil: '2030-01-01T00:00:00.000Z' }
+      ).sql
+    )
+
+    const [row] = await executeQuery(
+      safeSql`select rolpassword is not null as has_password, rolvaliduntil from pg_authid where rolname = 'update_pw_r2'`
+    )
+    expect(row.has_password).toBe(true)
+    expect(new Date(row.rolvaliduntil).toISOString()).toBe('2030-01-01T00:00:00.000Z')
+  } finally {
+    await executeQuery(safeSql`drop role if exists update_pw_r2`)
+  }
+})
+
+withTestDatabase('update or remove a role that does not exist', async ({ executeQuery }) => {
+  await expect(
+    executeQuery(pgMeta.roles.update({ id: 999999 }, { canLogin: true }).sql)
+  ).rejects.toThrowErrorMatchingInlineSnapshot(
+    `[Error: Failed to execute query: Cannot find role with id 999999]`
+  )
+  await expect(
+    executeQuery(pgMeta.roles.update({ name: 'no_such_role' }, { canLogin: true }).sql)
+  ).rejects.toThrowErrorMatchingInlineSnapshot(
+    `[Error: Failed to execute query: Cannot find role with name no_such_role]`
+  )
+  await expect(
+    executeQuery(pgMeta.roles.remove({ id: 999999 }).sql)
+  ).rejects.toThrowErrorMatchingInlineSnapshot(
+    `[Error: Failed to execute query: Cannot find role with id 999999]`
+  )
 })
