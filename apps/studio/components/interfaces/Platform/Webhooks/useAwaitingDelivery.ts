@@ -1,24 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { AWAITING_DELIVERY_TIMEOUT_MS } from './PlatformWebhooks.constants'
-import type { AwaitingDelivery } from './PlatformWebhooksPage.utils'
 
 /**
  * A test event or retry is queued, and its delivery lands in the table a moment later. While we
- * wait for it the table polls, so the action does not look like it did nothing. Waiting ends when
- * a new row shows up, or after a timeout in case none ever does.
+ * wait for it the table polls, so the action does not look like it did nothing. The API does not
+ * tell us which delivery belongs to the action, so we wait for a fixed time.
  */
 export const useAwaitingDelivery = () => {
-  const [awaitingDelivery, setAwaitingDelivery] = useState<AwaitingDelivery | null>(null)
+  const [isAwaitingDelivery, setIsAwaitingDelivery] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  const startAwaitingDelivery = (newestDeliveryId?: string) => {
+  const startAwaitingDelivery = () => {
     clearTimeout(timeoutRef.current)
-    setAwaitingDelivery({ newestDeliveryId })
-    timeoutRef.current = setTimeout(() => setAwaitingDelivery(null), AWAITING_DELIVERY_TIMEOUT_MS)
+    setIsAwaitingDelivery(true)
+    timeoutRef.current = setTimeout(
+      () => setIsAwaitingDelivery(false),
+      AWAITING_DELIVERY_TIMEOUT_MS
+    )
   }
 
   useEffect(() => () => clearTimeout(timeoutRef.current), [])
 
-  return { awaitingDelivery, startAwaitingDelivery }
+  return { isAwaitingDelivery, startAwaitingDelivery }
 }

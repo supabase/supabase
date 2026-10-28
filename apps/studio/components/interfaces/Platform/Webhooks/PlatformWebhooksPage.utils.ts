@@ -78,33 +78,26 @@ export const resetPendingSigningSecretRevealForTests = () => {
   }
 }
 
-/** Set after a test event or retry is sent, until its delivery shows up in the table. */
-export interface AwaitingDelivery {
-  newestDeliveryId?: string
-}
-
 /**
  * Deliveries are not polled by default. Polling is on while the user chose "Live", while a delivery
- * is still pending, and right after a test event or retry was sent but its row has not appeared yet.
+ * is still pending, and for a short wait after a test event or retry was sent. That wait cannot end
+ * when the new row shows up, because the API returns an ingress ID, not the ID of the delivery.
  * It stays off after a failed load with no rows, because the error has a "Try again" button.
  */
 export const getDeliveriesRefetchInterval = ({
   isLive,
-  awaitingDelivery,
+  isAwaitingDelivery,
   deliveries,
   hasLoadFailed,
 }: {
   isLive: boolean
-  awaitingDelivery: AwaitingDelivery | null
+  isAwaitingDelivery: boolean
   deliveries: WebhookDelivery[]
   hasLoadFailed: boolean
 }) => {
   if (hasLoadFailed) return false
 
   const hasPendingDelivery = deliveries.some((delivery) => delivery.status === 'pending')
-  // Deliveries come newest first, so the same top row means nothing new has arrived yet
-  const isAwaitingNewDelivery =
-    awaitingDelivery !== null && deliveries[0]?.id === awaitingDelivery.newestDeliveryId
 
-  return isLive || hasPendingDelivery || isAwaitingNewDelivery ? DELIVERIES_POLL_INTERVAL_MS : false
+  return isLive || isAwaitingDelivery || hasPendingDelivery ? DELIVERIES_POLL_INTERVAL_MS : false
 }

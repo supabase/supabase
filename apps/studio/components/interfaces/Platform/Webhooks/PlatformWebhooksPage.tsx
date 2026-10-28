@@ -134,7 +134,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const [deliveryDetailsTab, setDeliveryDetailsTab] = useState<'event' | 'response'>('event')
   const [pendingCreatedEndpointId, setPendingCreatedEndpointId] = useState<string | null>(null)
   const [isLive, setIsLive] = useState(false)
-  const { awaitingDelivery, startAwaitingDelivery } = useAwaitingDelivery()
+  const { isAwaitingDelivery, startAwaitingDelivery } = useAwaitingDelivery()
 
   const scopeLabel = scope === 'organization' ? 'Organization Webhooks' : 'Project Webhooks'
   const scopeDescription =
@@ -180,7 +180,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       size: DELIVERIES_PAGE_SIZE + 1,
       after: pageCursors.at(-1),
     },
-    { enabled: queryEnabled && !!selectedEndpoint, isLive, awaitingDelivery }
+    { enabled: queryEnabled && !!selectedEndpoint, isLive, isAwaitingDelivery }
   )
   const deliveries = useMemo(
     () => (fetchedDeliveries ?? []).slice(0, DELIVERIES_PAGE_SIZE),
@@ -411,7 +411,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to send webhook test event', error)
       return
     }
-    startAwaitingDelivery(deliveries[0]?.id)
+    startAwaitingDelivery()
     toast.success('Test event sent — check deliveries shortly')
   }
 
@@ -451,7 +451,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to retry webhook delivery', error)
       return
     }
-    startAwaitingDelivery(deliveries[0]?.id)
+    startAwaitingDelivery()
     toast.success('Delivery queued for retry')
   }
 

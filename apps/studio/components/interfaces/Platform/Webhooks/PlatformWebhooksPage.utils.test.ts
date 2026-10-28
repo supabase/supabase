@@ -205,7 +205,7 @@ describe('PlatformWebhooksPage.utils', () => {
     const settled = [makeDelivery('newest', 'success'), makeDelivery('older', 'failure')]
     const base = {
       isLive: false,
-      awaitingDelivery: null,
+      isAwaitingDelivery: false,
       deliveries: settled,
       hasLoadFailed: false,
     }
@@ -224,23 +224,16 @@ describe('PlatformWebhooksPage.utils', () => {
       expect(getDeliveriesRefetchInterval({ ...base, deliveries })).toBe(5000)
     })
 
-    it('polls while the delivery of a test event or retry has not shown up yet', () => {
-      expect(
-        getDeliveriesRefetchInterval({ ...base, awaitingDelivery: { newestDeliveryId: 'newest' } })
-      ).toBe(5000)
-      expect(
-        getDeliveriesRefetchInterval({
-          ...base,
-          deliveries: [],
-          awaitingDelivery: { newestDeliveryId: undefined },
-        })
-      ).toBe(5000)
+    it('polls while waiting for the delivery of a test event or retry', () => {
+      expect(getDeliveriesRefetchInterval({ ...base, isAwaitingDelivery: true })).toBe(5000)
     })
 
-    it('stops waiting once a new delivery is on top of the table', () => {
-      expect(
-        getDeliveriesRefetchInterval({ ...base, awaitingDelivery: { newestDeliveryId: 'older' } })
-      ).toBe(false)
+    it('keeps polling while waiting, even when another delivery is on top of the table', () => {
+      const deliveries = [makeDelivery('unrelated', 'success'), ...settled]
+
+      expect(getDeliveriesRefetchInterval({ ...base, deliveries, isAwaitingDelivery: true })).toBe(
+        5000
+      )
     })
 
     it('does not poll after a failed load with no rows, even when Live is on', () => {

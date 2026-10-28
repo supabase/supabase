@@ -4,10 +4,7 @@ import { platformWebhooksKeys } from './keys'
 import { listWebhookDeliveries, type WebhookScopeParams } from './platform-webhooks-fetchers'
 import { toWebhookDelivery } from './platform-webhooks-mappers'
 import type { WebhookDelivery } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooks.types'
-import {
-  getDeliveriesRefetchInterval,
-  type AwaitingDelivery,
-} from '@/components/interfaces/Platform/Webhooks/PlatformWebhooksPage.utils'
+import { getDeliveriesRefetchInterval } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooksPage.utils'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 interface WebhookDeliveriesVariables {
@@ -33,11 +30,11 @@ export const useWebhookDeliveriesQuery = <TData = WebhookDeliveriesData>(
   {
     enabled = true,
     isLive = false,
-    awaitingDelivery = null,
+    isAwaitingDelivery = false,
     ...options
   }: UseCustomQueryOptions<WebhookDeliveriesData, ResponseError, TData> & {
     isLive?: boolean
-    awaitingDelivery?: AwaitingDelivery | null
+    isAwaitingDelivery?: boolean
   } = {}
 ) => {
   const { scope, endpointId, size, after, before } = variables
@@ -50,7 +47,7 @@ export const useWebhookDeliveriesQuery = <TData = WebhookDeliveriesData>(
     refetchInterval: (query) =>
       getDeliveriesRefetchInterval({
         isLive,
-        awaitingDelivery,
+        isAwaitingDelivery,
         deliveries: query.state.data ?? [],
         hasLoadFailed: query.state.status === 'error' && !query.state.data?.length,
       }),
