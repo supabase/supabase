@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Loader2Icon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
@@ -38,7 +39,7 @@ import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-co
 import { useGitHubConnectionUpdateMutation } from '@/data/integrations/github-connection-update-mutation'
 import type { GitHubConnection } from '@/data/integrations/integrations.types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -61,11 +62,13 @@ export const GitHubIntegrationConnectionForm = ({
 
   const { hasAccess: hasAccessToBranching } = useCheckEntitlements('branching_limit')
 
-  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'integrations.github_connections'
   )
-  const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'integrations.github_connections'
   )
 
   const canManageGitHubConnection = canCreateGitHubConnection && canUpdateGitHubConnection
