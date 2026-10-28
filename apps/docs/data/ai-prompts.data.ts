@@ -331,9 +331,9 @@ https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
   'monitoring-agent-performance': createMonitoringPrompt('Performance monitor', ['performance']),
   'monitoring-agent-usage': createMonitoringPrompt('Resource monitor', ['usage']),
   'testing-row-level-security': `Help me write pgTAP tests for my Row Level Security policies.
-1. Read "Write quality tests with agents" in
-   https://supabase.com/docs/guides/database/postgres/testing-row-level-security.md
-   and follow its rules.
+1. Read all of
+   https://supabase.com/docs/guides/database/postgres/testing-row-level-security.md,
+   not only its first lines. Follow the rules in "Write quality tests with agents".
 2. Before you write any tests, list the access rules to prove and confirm them
    with me.
 3. Write one test at a time. Run \`supabase test db\` and show that each test
