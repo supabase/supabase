@@ -2578,7 +2578,7 @@ export const local_development: NavMenuConstant = {
         { name: 'Database testing', url: '/guides/database/testing' },
         {
           name: 'RLS policies testing',
-          url: '/guides/database/extensions/pgtap#testing-rls-policies' as `/${string}`,
+          url: '/guides/database/postgres/testing-row-level-security',
         },
       ],
     },
