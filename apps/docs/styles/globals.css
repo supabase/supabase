@@ -6,6 +6,7 @@
 @import './code-block.css';
 @import './reference.css';
 @import './ask-ai.css';
+@import './curved-scroll-area.css';
 @import 'docs-search/styles.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';

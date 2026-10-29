@@ -22,6 +22,7 @@ import {
 import { Markdown } from 'ui-patterns/Markdown'
 
 import { AskAiIcon } from './AskAiIcon'
+import { CurvedScrollArea } from '@/features/ui/CurvedScrollArea'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface AskAiPanelProps {
@@ -47,6 +48,7 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
   const sendTelemetryEvent = useSendTelemetryEvent()
   const inputRef = useRef<HTMLInputElement>(null)
   const isPinnedRef = useRef(true)
+  const listRef = useRef<HTMLDivElement>(null)
   const isBusy = isLoading || isResponding
   const hasConversation = messages.length > 0
   const hasAnswer = messages.some(
@@ -77,17 +79,15 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
   const handleListScroll = (event: UIEvent<HTMLDivElement>) => {
     const list = event.currentTarget
     isPinnedRef.current = list.scrollHeight - list.scrollTop - list.clientHeight < 32
-    // the roll and the top edge band apply only after a scroll
-    list.toggleAttribute('data-scrolled', list.scrollTop > 0)
   }
 
   // follows the question and the streamed answer while the reader stays at the bottom.
   // a stable callback ref, so react does not create the observer again on each render
   const followConversation = useCallback((content: HTMLDivElement | null) => {
-    const list = content?.parentElement
-    if (!content || !list) return
+    if (!content) return
     const observer = new ResizeObserver(() => {
-      if (isPinnedRef.current) list.scrollTop = list.scrollHeight
+      const list = listRef.current
+      if (list && isPinnedRef.current) list.scrollTop = list.scrollHeight
     })
     observer.observe(content)
     return () => observer.disconnect()
@@ -128,19 +128,20 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
       </div>
       {hasConversation ? (
         <div className="relative">
-          <div
+          <CurvedScrollArea
+            viewportRef={listRef}
             onScroll={handleListScroll}
-            className="max-h-[min(477px,70dvh)] overflow-y-auto mx-px scroll-fade-bottom"
+            className="max-h-[min(477px,70dvh)] mx-px scroll-fade-bottom"
           >
-            <div ref={followConversation} className="ask-ai-roll">
+            <div ref={followConversation}>
               <AiMessages messages={messages} hasError={hasError} onLinkNavigate={onLinkNavigate} />
               {hasAnswer ? (
-                <p data-roll className="px-4 pt-4 pb-3 text-center text-xs text-foreground-lighter">
+                <p className="px-4 pt-4 pb-3 text-center text-xs text-foreground-lighter">
                   Supabase AI can make mistakes. Verify answers before you run them.
                 </p>
               ) : null}
             </div>
-          </div>
+          </CurvedScrollArea>
           <div aria-hidden className="ask-ai-edge" />
         </div>
       ) : null}
@@ -208,7 +209,6 @@ function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
           // messages have no id and are only ever appended, so the index is stable
           <li
             key={index}
-            data-roll
             className="max-w-[80%] self-end rounded-2xl bg-surface-400 px-3 py-1.5 text-search-dialog text-foreground wrap-break-word"
           >
             {message.content}
@@ -230,12 +230,12 @@ function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
               </Markdown>
             )}
             {isFailedAnswer(message, index) ? (
-              <p data-roll className="text-search-dialog text-foreground-lighter">
+              <p className="text-search-dialog text-foreground-lighter">
                 No answer from Supabase AI. Try again in a moment.
               </p>
             ) : null}
             {message.sources?.length ? (
-              <nav data-roll aria-label="Sources" className="mt-3">
+              <nav aria-label="Sources" className="mt-3">
                 <ul className="flex flex-wrap gap-1.5">
                   {message.sources.map((source) => (
                     <li key={source.path}>
