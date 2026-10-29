@@ -137,11 +137,10 @@ const NavContainer = memo(function NavContainer({
           <div
             className={cn(
               'transition-all ease-out duration-200',
-              'absolute left-0 right-0',
               'px-6 pt-6 pb-16 lg:pb-32',
               'bg-background',
               // desktop styles
-              'lg:relative lg:left-0 lg:pb-10 lg:px-10 lg:flex',
+              'lg:pb-10 lg:px-10 lg:flex',
               'lg:opacity-100 lg:visible'
             )}
           >
