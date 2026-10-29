@@ -1,166 +1,68 @@
 ---
 name: studio-testing
-description: Testing strategy for Supabase Studio. Use when writing tests, deciding
-  whether a change needs tests and which type, extracting logic from components into
-  testable utility functions, or reviewing test coverage. Covers unit tests, component
-  tests, and E2E test selection criteria.
+description: Testing strategy for Supabase Studio. Use when selecting, writing,
+  or reviewing tests, or extracting logic for testing. Covers meaningful unit,
+  component, and E2E coverage and scoped verification.
 ---
 
 # Studio Testing Strategy
 
-How to write and structure tests for `apps/studio/`. The core principle: push
-logic out of React components into pure utility functions, then test those
-functions exhaustively. Only use component tests for complex UI interactions.
-Use E2E tests for features shared between self-hosted and platform.
+Protect meaningful observable behavior and plausible regressions. Choose the
+fastest test that catches the failure; do not chase coverage percentages or
+exhaustive input permutations.
 
-## When to Apply
+## Choose coverage by behavior
 
-Reference these guidelines when:
+Before adding a test, identify what would get worse for a user or caller if the
+behavior broke. Read nearby tests first so new coverage fills a real gap.
 
-- Writing new tests for Studio code
-- Deciding which type of test to write (unit, component, E2E)
-- Extracting logic from a component to make it testable
-- Reviewing whether test coverage is sufficient
-- Adding a new feature that needs tests
+| Layer           | Use for                                                                                                        |
+| --------------- | -------------------------------------------------------------------------------------------------------------- |
+| Static analysis | Types, invalid imports, and other guarantees the compiler or linter already checks                             |
+| Unit tests      | Pure calculations, parsing, validation, permissions, and data transformations                                  |
+| Component tests | Rendered behavior and consequential interactions, including simple forms that submit, mutate data, or navigate |
+| E2E tests       | Critical user journeys and integration or environment differences that lower layers cannot establish           |
 
-## Rule Categories by Priority
+Extract pure logic into a co-located `.utils.ts` when that clarifies the component
+and gives the logic a useful independent contract. Do not extract solely to avoid
+testing the component's wiring. Utility tests commonly live under
+`apps/studio/tests/components/.../ComponentName.utils.test.ts`, mirroring the
+source path; follow nearby conventions for co-located tests.
 
-| Priority | Category         | Impact   | Prefix     |
-| -------- | ---------------- | -------- | ---------- |
-| 1        | Logic Extraction | CRITICAL | `testing-` |
-| 2        | Test Coverage    | CRITICAL | `testing-` |
-| 3        | Component Tests  | HIGH     | `testing-` |
-| 4        | E2E Tests        | HIGH     | `testing-` |
-| 5        | Test Speed       | HIGH     | `testing-` |
+Cover expected usage, realistic failures, relevant boundaries, and known
+regressions. For a bug fix, reproduce the failure before fixing it. Respect
+backend and API guarantees rather than inventing unsupported inputs. A change
+to prose, a constant, a re-export, pure markup, or a guarantee already established
+by static analysis does not need a new test merely because a file changed.
 
-## Quick Reference
+## Assert observable outcomes
 
-### 1. Logic Extraction (CRITICAL)
+Test what the end user sees and does, or the public contract a caller consumes.
+Prefer roles and labels to test IDs. Check visible text, disabled state,
+navigation, public callbacks, or a meaningful request contract.
 
-- `testing-extract-logic` - Remove logic from components into `.utils.ts` files
-  as pure functions: args in, return out
+Do not assert on internal state, refs, private methods, child-component render
+spies, hook calls inside components, CSS classes, DOM structure, or whole-tree
+snapshots as proxies for behavior. A behavior-preserving refactor should not
+require changing assertions. Pure utility input/output tests remain valid when
+they protect a public contract.
 
-### 2. Test Coverage (CRITICAL)
+Reuse production definitions, representative inputs, and existing test factories
+before copying configuration or API fixtures. Keep expected outcomes independent:
+do not calculate an expected result with the same helper being tested. Small
+explicit inputs are useful when they make a calculation or boundary clear.
 
-- `testing-exhaustive-permutations` - Test every permutation of utility functions:
-  happy path, malformed input, empty values, edge cases
+Remove redundant cases when they catch the same failure. Use `test.each` for
+distinct scenarios sharing a setup, not to multiply equivalent literals.
+Preserve distinct boundary, permission, security, error, and historical-data
+coverage. If a brittle assertion is the only protection for a meaningful
+regression, replace it with an observable assertion before removing it.
 
-### 3. Component Tests (HIGH)
+## Component and E2E integration
 
-- `testing-component-tests-ui-only` - Only write component tests for complex UI
-  interaction logic, not business logic
-
-### 4. E2E Tests (HIGH)
-
-- `testing-e2e-shared-features` - Write E2E tests for features used in both
-  self-hosted and platform; cover clicks AND keyboard shortcuts
-
-### 5. Test Speed (HIGH)
-
-- `testing-node-environment` - Pure-logic tests go in `.test.ts` (runs in node);
-  only `.test.tsx` gets jsdom
-- `testing-fake-timers` - Never wait on real time; advance fake timers past
-  debounces and poll intervals
-- `testing-paste-not-type` - Set input values with `user.paste` or
-  `fireEvent.change` unless keystroke behavior is under test
-- `testing-scope-queries` - Scope `*ByRole` option queries to the open listbox
-- `testing-no-redundant-tests` - Merge near-duplicates into `test.each`; delete
-  tests that can't fail or only cover libraries, class names, or snapshots
-
-## Decision Tree: Which Test Type?
-
-```
-Is the logic a pure transformation (parse, format, validate, compute)?
-  YES -> Extract to .utils.ts, write unit test with vitest
-  NO  -> Does the feature involve complex UI interactions?
-           YES -> Is it used in both self-hosted and platform?
-                    YES -> Write E2E test in e2e/studio/features/
-                    NO  -> Write component test with customRender
-           NO  -> Can you extract the logic to make it pure?
-                    YES -> Do that, then unit test it
-                    NO  -> Write a component test
-```
-
-## 1. Extract Logic Into Utility Files (CRITICAL)
-
-Remove as much logic from components as possible. Put it in co-located
-`.utils.ts` files as pure functions: arguments in, return value out.
-
-**File naming:**
-
-- Utility: `ComponentName.utils.ts` next to the component
-- Test: `tests/components/.../ComponentName.utils.test.ts` mirroring the source path
-
-```tsx
-// ❌ Logic buried in component — hard to test without rendering
-function TaxIdForm({ taxIdValue, taxIdName }: Props) {
-  const handleSubmit = () => {
-    const taxId = TAX_IDS.find((t) => t.name === taxIdName)
-    let sanitized = taxIdValue
-    if (taxId?.vatPrefix && !taxIdValue.startsWith(taxId.vatPrefix)) {
-      sanitized = taxId.vatPrefix + taxIdValue
-    }
-    submitToApi(sanitized)
-  }
-  return <form onSubmit={handleSubmit}>...</form>
-}
-
-// ✅ Logic extracted to .utils.ts — trivially testable
-// TaxID.utils.ts
-export function sanitizeTaxIdValue({ value, name }: { value: string; name: string }): string {
-  const taxId = TAX_IDS.find((t) => t.name === name)
-  if (taxId?.vatPrefix && !value.startsWith(taxId.vatPrefix)) {
-    return taxId.vatPrefix + value
-  }
-  return value
-}
-
-// TaxIdForm.tsx — thin shell
-const handleSubmit = () => {
-  const sanitized = sanitizeTaxIdValue({ value: taxIdValue, name: taxIdName })
-  submitToApi(sanitized)
-}
-```
-
-## 2. Test Every Permutation (CRITICAL)
-
-Once logic is extracted, test exhaustively. Every code path needs a test:
-
-- Valid inputs (happy path for each branch)
-- Invalid / malformed inputs
-- Empty values, null values, missing fields
-- Edge cases (timestamps with colons, special characters, boundary values)
-
-```ts
-// ❌ Only happy path
-test('parses a filter', () => {
-  expect(formatFilterURLParams('id:gte:20')).toStrictEqual({ column: 'id', operator: 'gte', value: '20' })
-})
-
-// ✅ Every permutation
-test('parses valid filter', () => { ... })
-test('handles timestamp with colons in value', () => { ... })
-test('rejects malformed filter with missing parts', () => { ... })
-test('rejects unrecognized operator', () => { ... })
-test('allows empty filter value', () => { ... })
-```
-
-When several cases share the same arrange/act/assert shape, write one
-`test.each` table instead of copy-pasted tests. Each row is a permutation;
-the table makes gaps easy to spot. See section 5 for what not to test.
-
-## 3. Component Tests for Complex UI Only (HIGH)
-
-Only write component tests when there is complex UI interaction logic that
-cannot be captured by testing utility functions alone.
-
-**Valid reasons:** conditional rendering from user interaction sequences,
-popover open/close with keyboard/mouse, multi-step form transitions.
-
-**Not valid:** testing a calculation or transformation that happens to live
-in a component — extract to `.utils.ts` and unit test instead.
-
-Studio component test conventions:
+Use `customRender` from `@/tests/lib/custom-render` for Studio providers. Mock
+API requests at the network boundary with `addAPIMock`, keeping real query and
+mutation behavior. Pass the OpenAPI body type to `HttpResponse.json<…>`:
 
 ```tsx
 import { screen } from '@testing-library/react'
@@ -181,24 +83,20 @@ customRender(<MyComponent />)
 expect(await screen.findByText('No organizations')).toBeInTheDocument()
 ```
 
-- Mock API requests at the network layer with `addAPIMock` (MSW) — unhandled requests fail the test. Don't `vi.mock('@/data/...')`. Always pass the OpenAPI body type to `HttpResponse.json<…>`.
-- `customRender` wraps the component in the providers Studio needs (React Query, router, etc.).
-- The full template, path-param syntax, and the jsdom/MSW gotchas are in the `studio-mock-api-tests` skill.
+Follow [studio-mock-api-tests](../studio-mock-api-tests/SKILL.md) for the full
+MSW template, faithful boundary replacements, and harness requirements. Do not
+add module mocks for queries, children, or shared hooks to bypass integration.
 
-## 4. E2E Tests for Shared Features (HIGH)
+A feature being shared by self-hosted and platform does not alone justify E2E
+coverage. Use E2E for critical journeys or behavior that differs across those
+environments and cannot be established in a focused test. Cover mouse and
+keyboard behavior where each protects the journey. Reuse interactions in
+`e2e/studio/utils/*-helpers.ts`, and clean up resources in `finally`. Follow
+[studio-e2e-tests](../studio-e2e-tests/SKILL.md) for execution.
 
-If a feature exists in both self-hosted and platform, create an E2E test.
-Cover mouse clicks AND keyboard shortcuts (Tab, Enter, Escape, Arrow keys).
+## Keep tests fast
 
-Extract reusable interactions into `e2e/studio/utils/*-helpers.ts`. Use
-try/finally for resource cleanup. For E2E execution details, see the
-`studio-e2e-tests` skill.
-
-## 5. Keep Tests Fast (HIGH)
-
-Studio has thousands of unit tests, and a few seconds per file adds up to
-minutes on every PR. These patterns took CI from ~14 minutes to ~9 before
-sharding. Apply them to every new test.
+Choose the appropriate environment and avoid unnecessary work in interactions.
 
 ### Put pure logic in `.test.ts` so it runs in node
 
@@ -207,15 +105,10 @@ sharding. Apply them to every new test.
 
 - Utility, schema, and resolver tests: name the file `.test.ts` and don't
   import anything from Testing Library.
-- A `.test.ts` file that genuinely needs the DOM (e.g. `renderHook`,
-  `window.localStorage`) opts in with a docblock as the **first line**:
+- Tests that need the DOM, including `renderHook` and `window.localStorage`:
+  use `.test.tsx` rather than adding an environment directive.
+- `.platform.test.tsx` files run with `NEXT_PUBLIC_IS_PLATFORM=true`.
 
-```ts
-// @vitest-environment jsdom
-import { renderHook } from '@testing-library/react'
-```
-
-Don't rename a pure-logic test to `.tsx` or add the docblock "just in case".
 DOM setup files (`tests/setup/dom.ts`, `tests/setup/radix.js`) no-op in node.
 
 ### Never wait on real time
@@ -226,12 +119,6 @@ them. `shouldAdvanceTime: true` keeps `waitFor` polling, MSW, and router
 microtasks working:
 
 ```tsx
-// ❌ Waits 4s+ of real time per poll (this file took 18s)
-expect(
-  await screen.findByText('Restoration complete!', {}, { timeout: POLL_INTERVAL_MS + 2000 })
-).toBeInTheDocument()
-
-// ✅ Advance past the poll instead (same file now takes 0.3s)
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true })
 })
@@ -246,8 +133,7 @@ expect(await screen.findByText('Restoration complete!')).toBeInTheDocument()
 ```
 
 The same applies to debounces: `act(() => vi.advanceTimersByTimeAsync(650))`
-instead of a 650ms sleep. Export the interval/debounce constant from the
-source so the test doesn't hard-code it.
+instead of a 650ms sleep. Reuse the existing interval/debounce constant rather than duplicating its value.
 
 ### Paste, don't type
 
@@ -256,19 +142,12 @@ can re-render a whole form. Unless keystroke-level behavior is what you're
 testing (input masks, shortcuts, per-key validation), set the value in one go:
 
 ```tsx
-// ❌ One re-render per character
-await user.type(screen.getByPlaceholderText('Project name'), 'my-project')
-
-// ✅ Focus then paste
 await user.click(input)
 await user.paste('my-project')
-
-// ✅ Or a single change event
-fireEvent.change(input, { target: { value: 'my-project' } })
 ```
 
-If you do need `userEvent`, create it with `userEvent.setup({ delay: null })`
-to drop the per-action delay.
+A single `fireEvent.change` is also suitable when keyboard behavior is irrelevant.
+When using `userEvent` with fake timers, configure its `advanceTimers` option.
 
 ### Scope `*ByRole` queries
 
@@ -278,39 +157,34 @@ each item, so an unscoped `findByRole('option')` on a large form checks
 hundreds of elements. Scope it to the open listbox:
 
 ```tsx
-// ❌ Scans every hidden <option> on the page
-await user.click(await screen.findByRole('option', { name: 'East US' }))
-
-// ✅ Only the open listbox
 const findOption = async (name: string | RegExp) =>
   within(await screen.findByRole('listbox')).findByRole('option', { name })
 
 await user.click(await findOption('East US'))
 ```
 
-For very large pages, `configure({ defaultHidden: true })` skips the
-per-element visibility check and makes each `*ByRole` query about 3x
-cheaper. Only use it when your assertions don't depend on visibility.
+## Verify the affected behavior
 
-### Don't write redundant tests
+1. Run relevant existing unit and integration tests with retries disabled, even
+   when no new tests are needed for the executable change. Record the command
+   and result. An environment or dependency failure is a blocker, not a pass.
+2. When investigating order dependence or flakiness, repeat affected tests and
+   shuffle where supported, with retries disabled. Record reproducible seeds.
+   Fix shared state, timing, ordering, or cleanup rather than masking failures
+   with retries, longer timeouts, or skips.
+3. For new or changed assertions and regression-critical coverage, temporarily
+   introduce a realistic scoped production fault, such as omitting a side effect
+   or removing a guard. Confirm the relevant assertion fails for that behavior;
+   import errors, compile errors, timeouts, and infrastructure failures do not
+   count. Save the original bytes first and restore them in `finally` or an
+   equivalent guaranteed cleanup, preserving unrelated edits. Rerun the restored
+   code and check that no mutation remains.
+4. Check formatting and relevant types separately; passing Vitest does not prove
+   TypeScript correctness. Report checks actually run and any blocked evidence.
 
-Every test costs CI time. Don't add tests that:
-
-- Duplicate another test with different literals. Add a `test.each` row instead.
-- Exercise a library rather than our code (e.g. that zod rejects a wrong type,
-  that dayjs formats a date).
-- Assert on class names or snapshots. They break on styling changes and don't
-  catch behavior bugs.
-- Exist only for coverage numbers.
-
-Make sure every test can fail. Common ways a test passes no matter what:
-
-- Unawaited async assertions (`expect(promise).resolves…` or `waitFor(…)`
-  without `await`).
-- A fixture equal to the default value, so the "changed" path is never hit.
-- Calling the wrong function (e.g. a `semverGte` test that calls `semverLte`).
-
-Quick check: break the code under test and confirm the test goes red.
+Use focused existing tooling; do not add automated test machinery or mutation
+probes for prose or static guarantees. For read-only reviews, report missing
+verification evidence without changing source or introducing mutations.
 
 ## Codebase References
 
