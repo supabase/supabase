@@ -73,8 +73,7 @@ Enabling `log_statement=all`, or setting `log_min_duration_statement` to a low o
 
 ### Check this if your logs seem unusually large for no clear reason
 
-**[`log_min_messages`](/docs/guides/database/postgres/postgres-log-config#logminmessages)** controls the verbosity of Postgres's own internal logging, separate from query activity. The default is `warning`. If this was turned up to a debug level while troubleshooting a specific issue and never turned back down, it can produce a large, ongoing volume of internal messages that aren't useful for day-to-day monitoring — check the current value and reset it if you don't recognize turning it up yourself.
-
+**[`log_min_messages`](/docs/guides/database/postgres/postgres-log-config#logminmessages)** controls the verbosity of [Postgres's own internal logging](/kb/troubleshooting/understanding-postgresql-logging-levels-and-how-they-impact-your-project-KXiJRm), separate from query activity. The default is `warning`. If this was turned up to a debug level while troubleshooting a specific issue and never turned back down, it can produce a large, ongoing volume of internal messages that aren't useful for day-to-day monitoring — check the current value and reset it if you don't recognize turning it up yourself.
 Custom RPC functions and stored procedures are also worth reviewing. A PL/pgSQL function that calls `RAISE NOTICE` or `RAISE LOG` produces log output every time it runs, independent of any of the settings above — if a frequently-called function logs on every invocation, it can account for a large, otherwise-unexplained share of your volume.
 
 ### Settings you can generally leave alone
