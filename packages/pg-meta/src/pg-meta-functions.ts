@@ -358,9 +358,20 @@ export function update(
   // body, so the delimiter must not appear in any of them (e.g. a body
   // containing `$$` would otherwise terminate a `$$`-quoted block early).
   const doBlockDelimiter = getDoBlockDelimiter(
-    [definition, currentFunc.schema, currentFunc.name, name, schema, identityArgs].filter(
-      (v): v is string => typeof v === 'string'
-    )
+    [
+      definition,
+      currentFunc.schema,
+      currentFunc.name,
+      name,
+      schema,
+      identityArgs,
+      currentFunc.argument_types,
+      currentFunc.return_type,
+      ...Object.entries(currentFunc.config_params ?? {}).flatMap(([param, value]) => [
+        param,
+        value,
+      ]),
+    ].filter((v): v is string => typeof v === 'string')
   )
 
   const sql = safeSql`
