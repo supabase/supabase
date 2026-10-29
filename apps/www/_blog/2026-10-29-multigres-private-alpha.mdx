@@ -15,6 +15,16 @@ toc_depth: 2
 
 Multigres brings high availability to Supabase projects, and it's now in private alpha. Organizations on a paid plan can [request access](https://supabase.com/go/multigres-early-access#form) and create projects that run Postgres on three nodes across availability zones, with automatic failover and connection pooling included.
 
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/n_zjoHIrNxY"
+    title="Announcing Multigres on Supabase as Private Alpha"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
 Today, every Supabase project writes to a single Postgres primary. This works well for most applications, and it will stay the default. The downside is what happens when the primary fails. If the underlying hardware has a fault or its availability zone has an outage, your database is unavailable until it is recovered.
 
 Teams that can't accept that downtime usually build high availability themselves. They run replicas, add a failover manager, put a pooler in front, and write runbooks for the cases the tooling doesn't handle. The hardest part is making sure no committed writes are lost when a replica is promoted. With Multigres, Supabase takes care of all of this for you.
@@ -22,6 +32,16 @@ Teams that can't accept that downtime usually build high availability themselves
 ## What is Multigres?
 
 Multigres is an open source operating system for Postgres, built by the team behind [Vitess](https://vitess.io/). Vitess was created at YouTube to scale MySQL. In 2025, we [announced Multigres](https://supabase.com/blog/multigres-vitess-for-postgres) to build the same kind of system for Postgres. We released [Multigres v0.1](https://supabase.com/blog/multigres-v0-1-alpha) as open source in June under the Apache 2.0 license, and this private alpha is the first time it runs on the Supabase platform. We first showed Multigres at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits) on October 2.
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/F14ksBwHpjc"
+    title="Supabase Multigres is now in private alpha"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
 
 Multigres is not a fork of Postgres. Your data lives in standard Postgres, and Multigres manages the cluster around it: routing connections, pooling, replication, failover, and backups.
 
