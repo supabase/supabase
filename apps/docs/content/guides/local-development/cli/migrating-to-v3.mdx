@@ -355,6 +355,9 @@ These still work in v3 and are removed in v4:
 - `--linked`, `--project-ref` (except on `supabase link`), `--db-url`, `--local`, and `gen types --project-id`. Use `--remote`.
 - The `linked` value of `db diff --from` and `--to`. Use `remote`.
 - `supabase link --password`, which is ignored.
+- `enable_signup` in `[auth.email]` and `[auth.sms]`, including `[remotes.<name>.auth.email]` and `[remotes.<name>.auth.sms]`. Use `enabled`.
+
+The CLI warns while your config uses the old `enable_signup` keys. The new name says what the key does: it turns the email or phone provider on or off, so `false` also stops existing users from signing in that way. To block new sign-ups only, set `enable_signup = false` under `[auth]`, which is not deprecated.
 
 ## `supabase-go` is no longer installed
 
