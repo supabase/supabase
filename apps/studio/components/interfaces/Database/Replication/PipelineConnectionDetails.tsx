@@ -51,10 +51,7 @@ export const PipelineConnectionDetails = ({
                 <RegionValue code={PIPELINE_REGION.code} />
               </PipelineDetailItem>
               {storageRegion && (
-                <PipelineDetailItem
-                  label="Destination storage region"
-                  description="Configured storage region."
-                >
+                <PipelineDetailItem label="Destination storage region">
                   <RegionValue code={storageRegion} />
                 </PipelineDetailItem>
               )}

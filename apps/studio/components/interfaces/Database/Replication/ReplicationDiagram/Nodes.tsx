@@ -43,6 +43,7 @@ export const PrimaryDatabaseNode = () => {
   return (
     <NodeContainer>
       <div className="text-sm flex flex-col gap-y-0.5">
+        <p className="text-xs uppercase tracking-wide text-foreground-lighter">Source</p>
         <p>Primary Database</p>
         <p className="text-foreground-light">{region?.displayName}</p>
         <p className="text-foreground-light">{region?.code}</p>
@@ -79,6 +80,7 @@ export const ReplicationNode = ({ id }: { id: string }) => {
   return (
     <NodeContainer>
       <div className="text-sm flex flex-col gap-y-0.5">
+        <p className="text-xs uppercase tracking-wide text-foreground-lighter">Destination</p>
         <div className="flex items-center">
           <p>{type}</p>
           {(statusName === 'started' || statusName === 'failed') && (

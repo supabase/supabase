@@ -98,17 +98,17 @@ export const SmoothstepEdge = ({
           className="nodrag nopan"
         >
           <div className="w-52 space-y-2 rounded-md border bg-surface-100 p-3 text-xs">
-            <div className="space-y-1">
-              <p className="text-foreground-lighter">Pipeline region</p>
-              <ReplicationRegionLabel code={PIPELINE_REGION.code} className="text-sm" />
-            </div>
-            <div className="flex items-center gap-1.5 border-t pt-2 text-foreground-light">
+            <p className="text-xs uppercase tracking-wide text-foreground-lighter">Pipeline</p>
+            <div className="flex items-center gap-1.5 text-foreground-light">
               <StatusIcon
                 size={14}
                 className={cn('shrink-0', visual.shouldSpin && 'motion-safe:animate-spin')}
                 style={{ color: visual.color, fill: visual.isFilled ? visual.color : undefined }}
               />
               <span>{displayState.label}</span>
+            </div>
+            <div className="border-t pt-2">
+              <ReplicationRegionLabel code={PIPELINE_REGION.code} className="text-sm" />
             </div>
           </div>
         </div>
