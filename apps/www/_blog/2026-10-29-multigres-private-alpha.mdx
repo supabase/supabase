@@ -1,0 +1,98 @@
+---
+title: 'Multigres private alpha: automatic failover for Supabase Postgres'
+description: 'Multigres brings automatic failover to Supabase Postgres, in private alpha for organizations on a paid plan.'
+author: aditya_maruvada,manan_gupta
+date: '2026-10-29'
+categories:
+  - product
+tags:
+  - postgres
+  - database
+imgSocial: '2026-10-29-multigres-private-alpha/og.png'
+imgThumb: '2026-10-29-multigres-private-alpha/thumb.png'
+toc_depth: 2
+---
+
+Multigres brings high availability to Supabase projects, and it's now in private alpha. Organizations on a paid plan can [request access](https://supabase.com/go/multigres-early-access#form) and create projects that run Postgres on three nodes across availability zones, with automatic failover and connection pooling included.
+
+Today, every Supabase project writes to a single Postgres primary. This works well for most applications, and it will stay the default. The downside is what happens when the primary fails. If the underlying hardware has a fault or its availability zone has an outage, your database is unavailable until it is recovered.
+
+Teams that can't accept that downtime usually build high availability themselves. They run replicas, add a failover manager, put a pooler in front, and write runbooks for the cases the tooling doesn't handle. The hardest part is making sure no committed writes are lost when a replica is promoted. With Multigres, Supabase takes care of all of this for you.
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/n_zjoHIrNxY"
+    title="Announcing Multigres on Supabase as Private Alpha"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
+## What is Multigres?
+
+Multigres is an open source operating system for Postgres, built by the team behind [Vitess](https://vitess.io/). Vitess was created at YouTube to scale MySQL. In 2025, we [announced Multigres](https://supabase.com/blog/multigres-vitess-for-postgres) to build the same kind of system for Postgres. We released [Multigres v0.1](https://supabase.com/blog/multigres-v0-1-alpha) as open source in June under the Apache 2.0 license, and this private alpha is the first time it runs on the Supabase platform. We first showed Multigres at [Supabase Select](https://supabase.com/blog/select-2026-scale-without-limits) on October 2.
+
+Multigres is not a fork of Postgres. Your data lives in standard Postgres, and Multigres manages the cluster around it: routing connections, pooling, replication, failover, and backups.
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/F14ksBwHpjc"
+    title="Supabase Multigres is now in private alpha"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
+## What's included in the alpha
+
+When you create a project with Multigres enabled, you get:
+
+- **A three-node Postgres cluster** spread across availability zones in one region, so losing a single zone doesn't take your database down.
+- **Automatic failover.** If the primary fails, Multigres promotes a replica within seconds.
+- **Built-in connection pooling.** There is no separate pooler to configure or run.
+- **One standard Postgres connection string.** You don't need to change your application code to move to Multigres.
+- **Most of Supabase.** Auth, the REST Data API, Storage, Edge Functions, and all client libraries work with Multigres projects.
+
+<Img
+  alt="Your app connects through one connection string to the Multigateway, a Postgres wire-protocol proxy with a built-in pooler. The Multigateway sends writes to the primary in Zone B and reads to replicas in Zones A and C, and the primary replicates synchronously to both replicas."
+  src="/images/blog/2026-10-29-multigres-private-alpha/topology.png"
+/>
+
+## How failover works
+
+Most Postgres high availability tools treat failover as a monitoring problem. They detect that the primary is gone, pick a replica, and promote it. The difficult part is choosing a replica that is safe to promote. If the old primary acknowledged a commit that never reached the replica you promote, that write is lost, even though your application was already told it succeeded.
+
+Multigres treats failover as a consensus problem instead. It uses a generalized consensus protocol built on top of Postgres synchronous replication. Your application only receives an acknowledgement for a write once it has been replicated to enough nodes to survive a failure. That guarantees every acknowledged write exists on at least one surviving node. When the primary fails, the remaining nodes agree on the full set of committed writes and make sure the replica being promoted has every one of them before it accepts new writes. This is how acknowledged commits survive a failover.
+
+During a failover, the Multigres gateway can hold incoming requests until the new primary is ready, instead of returning connection errors to your application.
+
+<Img
+  alt="Three stages of a Multigres failover. Write confirmed: a write counts once a quorum of nodes has it. Primary fails: writes wait while the cluster agrees which writes committed, and reads on replicas continue. New primary promoted: the most up-to-date replica takes over, without a human."
+  src="/images/blog/2026-10-29-multigres-private-alpha/failover.png"
+/>
+
+## Connection pooling without choosing a mode
+
+With PgBouncer, you pick a pooling mode up front. Transaction mode lets many clients share a small number of connections, but it restricts session-level features. Session mode supports those features, but each client holds a connection for as long as it is connected.
+
+Multigres parses each request and tracks the session state it creates, so it decides how to handle every query on its own. You don't pick a mode. Each database user also gets its own pool, and a fair-share algorithm divides the connection budget across users so one busy role can't starve the others. Prepared statements are deduplicated, which means Postgres parses and caches a statement once instead of once per client. For full details on how this works, read [Pooling without choosing a mode](https://multigres.com/blog/pooling-without-choosing-a-mode) on the Multigres blog.
+
+## Getting started
+
+1. **Request access.** Fill out the [early access form](https://supabase.com/go/multigres-early-access#form). We are adding organizations to the alpha gradually, so the option won't appear in your Dashboard until your organization has been invited.
+2. **Create a project with high availability.** Open [Create a new project](https://supabase.com/dashboard/new/_) in the Dashboard. Turn on the **High availability** toggle.
+3. **Finish setup and connect.** Set the database password, region, and compute size, then click **Create new project**. Connect to it the same way you connect to any other Supabase project.
+
+Multigres is free during the alpha for up to two projects per organization. It isn't available on the Free plan, and pricing may change once it leaves alpha.
+
+## Things to know during the private alpha
+
+- **Not for production.** Multigres projects aren't covered by the uptime SLA during the alpha.
+- **Chosen at project creation.** You can't enable Multigres on an existing project, and there is currently no managed path back to a standard Postgres project.
+- **No Realtime.** Multigres doesn't yet support logical replication, which Realtime depends on.
+- **No Point-in-Time Recovery.** Standard daily backups are available.
+- **Single region.** You can only create projects in East US (North Virginia). Cross-region read replicas aren't supported yet.
+- **Fixed size.** Compute size, disk, and the number of replicas can't be changed after the project is created. If you need more read throughput or more client connections, contact us and our team can help.
+- **Multigres or OrioleDB.** A project can use one or the other, not both.
