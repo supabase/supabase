@@ -1,6 +1,7 @@
 import type { ToolUIPart } from 'ai'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
+import { LEGACY_TOOL_CONTRACTS } from './legacy-tools'
 import { INVALID_NOTEBOOK_RUN_OUTPUT_MESSAGE } from './notebook-run-output'
 import {
   isToolAvailable,
@@ -60,6 +61,20 @@ describe('contract invariants', () => {
       expect(counterpart.needsApproval).toBe(remote.needsApproval)
     }
   })
+})
+
+describe('LEGACY_TOOL_CONTRACTS', () => {
+  it('does not overlap live contracts', () => {
+    const live = new Set([...Object.keys(TOOL_CONTRACTS), ...Object.keys(REMOTE_TOOL_CONTRACTS)])
+    expect(Object.keys(LEGACY_TOOL_CONTRACTS).filter((name) => live.has(name))).toEqual([])
+  })
+
+  it.each(Object.entries(LEGACY_TOOL_CONTRACTS))(
+    'keys %s by its contract name',
+    (key, contract) => {
+      expect(contract.name).toBe(key)
+    }
+  )
 })
 
 describe('isToolAvailable', () => {

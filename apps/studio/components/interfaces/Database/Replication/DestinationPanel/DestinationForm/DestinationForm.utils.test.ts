@@ -514,6 +514,27 @@ const baseDucklakeSupabaseFormData = {
 }
 
 describe('DestinationForm.utils DuckLake (managed)', () => {
+  it('rejects only managed catalogs on OrioleDB', () => {
+    const managed = { ducklakeMode: 'supabase' as const, ducklakeStorageBucket: 'warehouse' }
+    expect(getDucklakeValidationIssues(managed, { isOrioleDb: true })).toEqual([
+      {
+        path: 'ducklakeMode',
+        message:
+          'OrioleDB cannot host a DuckLake metadata catalog. Enter connection details for a catalog using standard Postgres.',
+      },
+    ])
+    expect(getDucklakeValidationIssues(managed, { isOrioleDb: false })).toEqual([])
+    const custom = {
+      ducklakeMode: 'custom' as const,
+      ducklakeCatalogUrl: 'postgresql://user:pass@host:5432/catalog',
+      ducklakeDataPath: 's3://bucket/path',
+      ducklakeS3AccessKeyId: 'access-key',
+      ducklakeS3SecretAccessKey: 'secret-key',
+      ducklakeS3Region: 'eu-west-1',
+      ducklakeS3Endpoint: 's3.example.com',
+    }
+    expect(getDucklakeValidationIssues(custom, { isOrioleDb: true })).toEqual([])
+  })
   it('uses the current project for the catalog and storage during validation', () => {
     const config = buildDestinationConfigForValidation({
       projectRef: 'project-ref',

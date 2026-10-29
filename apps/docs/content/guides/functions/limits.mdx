@@ -8,16 +8,16 @@ subtitle: "Limits applied Edge Functions in Supabase's hosted platform."
 ## Runtime limits
 
 - Maximum Memory: 256MB
-- Maximum Duration (Wall clock limit):
+- [Maximum Duration (Wall clock limit)](/kb/troubleshooting/edge-function-wall-clock-time-limit-reached-Nk38bW):
   This is the duration an Edge Function worker will stay active. During this period, a worker can serve multiple requests or process [background tasks](/docs/guides/functions/background-tasks).
   - Free plan: 150s
   - Paid plans: 400s
-- Maximum CPU Time: 2s (Amount of actual time spent on the CPU per request - does not include async I/O.)
+- [Maximum CPU Time](/kb/troubleshooting/edge-function-cpu-limits): 2s (Amount of actual time spent on the CPU per request - does not include async I/O.)
 - Request idle timeout: 150s (If an Edge Function doesn't send a response before the timeout, 504 Gateway Timeout will be returned)
 
 ## Platform limits
 
-- Maximum Function Size: 20MB (bundled locally via the CLI) or 5MB (bundled server-side, e.g. via the Management API or Dashboard)
+- [Maximum Function Size](/kb/troubleshooting/edge-function-bundle-size-issues): 20MB (bundled locally via the CLI) or 5MB (bundled server-side, e.g. via the Management API or Dashboard)
 - Maximum no. of Functions per project:
   - Free: 100
   - Pro: 1000

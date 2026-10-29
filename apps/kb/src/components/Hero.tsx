@@ -1,12 +1,13 @@
 import { Search } from 'lucide-react'
-import { useCallback, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useRef, useSyncExternalStore, type ReactNode } from 'react'
 import { cn, KeyboardShortcut } from 'ui'
 
 import type { Topic } from '../lib/topics'
 import { AsciiHoverText } from './AsciiHoverText'
+import { FrameGlyphs } from './FrameGlyphs'
 import { HeroGrid } from './HeroGrid'
 import { InfallText } from './InfallText'
-import { KbSearchDialog } from './KbSearchDialog'
+import { openKbSearch } from './KbSearch'
 import { TopicShape } from './TopicShape'
 import { WarpCanvas } from './WarpCanvas'
 
@@ -28,27 +29,27 @@ export interface TopicHeroProps {
 }
 
 interface CopyFrameProps {
-  lines: { id: string; className: string }[]
+  lines: { id: string; className: string; fade?: number }[]
 }
 
 interface HeroFlanksProps {
   topic: Topic
+  text: string
 }
 
 export interface HomeHeroProps {
   className?: string
 }
 
-const DRAW_OUT = 'motion-safe:animate-draw-out'
+const DRAW_OUT = 'motion-safe:group-data-frame-glyphs-ready/hero:animate-draw-out'
 
 const FLANK_BOX = cn(
-  'grain-mask-flank absolute -top-[100vh] h-[calc(100%+200vh)] w-[50vw]',
+  'flank-mask absolute -top-[100vh] h-[calc(100%+200vh)] w-[50vw]',
   'pointer-events-none py-[100vh] pl-12 pr-92 max-lg:hidden'
 )
 
-const ACROSS = 'left-1/2 h-px w-screen -translate-x-1/2 bg-border'
-const UPRIGHT =
-  'inset-y-0 w-px origin-top bg-linear-to-b from-border via-border via-70% to-transparent'
+const ACROSS = 'left-1/2 h-px w-screen -translate-x-1/2'
+const UPRIGHT = 'inset-y-0 w-px origin-top'
 
 const subscribeToNothing = () => () => {}
 
@@ -66,28 +67,34 @@ export const Hero = ({
   className,
 }: HeroProps) => {
   const isWarp = variant === 'warp'
+  const text = `${title} + ${description} + `.toUpperCase()
   const copyRef = useRef<HTMLDivElement>(null)
 
   return (
     <section
       className={cn(
-        'relative isolate flex justify-center',
+        'group/hero relative isolate flex justify-center',
         isWarp ? 'pt-39 pb-60' : 'max-lg:py-10 max-lg:border-b lg:pt-32.5 lg:pb-40',
         'overflow-hidden bg-background',
         className
       )}
     >
-      {isWarp ? <WarpCanvas anchorRef={copyRef} /> : null}
+      {isWarp ? <WarpCanvas anchorRef={copyRef} text={text} /> : null}
+      {variant === 'construction' ? (
+        <FrameGlyphs text={text} className="z-20 caret-background text-border-stronger" />
+      ) : null}
       {variant === 'construction' ? (
         <CopyFrame
           lines={[
             {
               id: 'left',
               className: cn('right-[calc(50%+20rem)] max-lg:hidden', UPRIGHT, DRAW_OUT),
+              fade: 0.7,
             },
             {
               id: 'right',
               className: cn('left-[calc(50%+20rem)] max-lg:hidden', UPRIGHT, DRAW_OUT),
+              fade: 0.7,
             },
           ]}
         />
@@ -111,7 +118,7 @@ export const Hero = ({
           )}
         >
           {variant === 'construction' && topic ? (
-            <TopicShape topic={topic} className="grain-mask h-45 w-full lg:hidden" />
+            <TopicShape topic={topic} text={text} className="h-45 w-full lg:hidden" />
           ) : null}
           {breadcrumb}
           <h1 className="m-0 text-5xl tracking-display text-foreground sm:text-6xl">
@@ -125,7 +132,7 @@ export const Hero = ({
             {isWarp ? <InfallText text={description} /> : description}
           </p>
           {children}
-          {variant === 'construction' && topic ? <HeroFlanks topic={topic} /> : null}
+          {variant === 'construction' && topic ? <HeroFlanks topic={topic} text={text} /> : null}
         </div>
       </div>
     </section>
@@ -155,20 +162,23 @@ export const TopicHero = ({ topic, description, breadcrumb, className }: TopicHe
   />
 )
 
-const HeroFlanks = ({ topic }: HeroFlanksProps) => (
+const HeroFlanks = ({ topic, text }: HeroFlanksProps) => (
   <>
-    <HeroGrid axis="rows" className={cn('right-1/2', FLANK_BOX)} />
-    <HeroGrid axis="rows" className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
+    <HeroGrid axis="rows" text={text} className={cn('right-1/2', FLANK_BOX)} />
+    <HeroGrid axis="rows" text={text} isMirrored className={cn('left-1/2', FLANK_BOX)} />
     <HeroGrid
       axis="columns"
+      text={text}
       className={cn('right-1/2 [--flank-span:calc(100%_-_20rem)]', FLANK_BOX)}
     />
     <HeroGrid
       axis="columns"
-      className={cn('left-1/2 -scale-x-100 [--flank-span:calc(100%_-_20rem)]', FLANK_BOX)}
+      text={text}
+      isMirrored
+      className={cn('left-1/2 [--flank-span:calc(100%_-_20rem)]', FLANK_BOX)}
     />
-    <TopicShape topic={topic} className={cn('right-1/2', FLANK_BOX)} />
-    <TopicShape topic={topic} className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
+    <TopicShape topic={topic} text={text} className={cn('right-1/2', FLANK_BOX)} />
+    <TopicShape topic={topic} text={text} isMirrored className={cn('left-1/2', FLANK_BOX)} />
     <CopyFrame
       lines={[
         { id: 'top', className: cn('top-0', ACROSS, DRAW_OUT) },
@@ -179,15 +189,12 @@ const HeroFlanks = ({ topic }: HeroFlanksProps) => (
         { id: 'bottom', className: cn('bottom-0', ACROSS, DRAW_OUT) },
         {
           id: 'stem',
-          className: cn('bottom-full left-1/2 h-screen w-px origin-bottom bg-border', DRAW_OUT),
+          className: cn('bottom-full left-1/2 h-screen w-px origin-bottom', DRAW_OUT),
         },
         {
           id: 'tail',
-          className: cn(
-            'top-full left-1/2 h-40 w-px origin-top bg-linear-to-b from-border to-transparent',
-            'max-lg:bg-border max-lg:bg-none',
-            DRAW_OUT
-          ),
+          className: cn('top-full left-1/2 h-40 w-px origin-top', DRAW_OUT),
+          fade: 0,
         },
       ]}
     />
@@ -195,51 +202,34 @@ const HeroFlanks = ({ topic }: HeroFlanksProps) => (
 )
 
 const CopyFrame = ({ lines }: CopyFrameProps) =>
-  lines.map(({ id, className }) => (
+  lines.map(({ id, className, fade }) => (
     <span
       key={id}
       aria-hidden
-      className={cn('grain-mask pointer-events-none absolute', className)}
+      data-glyph-frame
+      data-glyph-fade={fade}
+      className={cn('pointer-events-none invisible absolute', className)}
     />
   ))
 
 const HeroSearch = () => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const isMac = useSyncExternalStore(subscribeToNothing, getIsMac, getIsMacOnServer)
 
-  const bindSearchShortcut = useCallback((trigger: HTMLButtonElement | null) => {
-    if (!trigger) return
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.repeat || event.key?.toLowerCase() !== 'k') return
-      if (!(event.metaKey || event.ctrlKey)) return
-      event.preventDefault()
-      setIsSearchOpen((isOpen) => !isOpen)
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
-
-  const handleSearchOpen = () => setIsSearchOpen(true)
-
   return (
-    <>
-      <button
-        ref={bindSearchShortcut}
-        type="button"
-        data-warp-throat
-        aria-keyshortcuts="Meta+K Control+K"
-        onClick={handleSearchOpen}
-        className={cn(
-          'relative mt-2 flex h-12 w-full max-w-85 items-center gap-2.5 rounded-lg pl-3 pr-4 sm:max-w-107',
-          'border border-default bg-surface-75 text-left text-base text-foreground-lighter shadow-raised',
-          'transition-colors hover:border-strong hover:text-foreground-light focus-ring'
-        )}
-      >
-        <Search aria-hidden className="size-4.5 shrink-0" strokeWidth={2.25} />
-        <span className="flex-1 truncate">Search guides</span>
-        <KeyboardShortcut keys={[isMac ? '⌘' : 'Ctrl', 'K']} />
-      </button>
-      <KbSearchDialog isOpen={isSearchOpen} onOpenChange={setIsSearchOpen} />
-    </>
+    <button
+      type="button"
+      data-warp-throat
+      aria-keyshortcuts="Meta+K Control+K"
+      onClick={openKbSearch}
+      className={cn(
+        'relative mt-2 flex h-12 w-full max-w-85 items-center gap-2.5 rounded-lg pl-3 pr-4 sm:max-w-107',
+        'border border-default bg-surface-75 text-left text-base text-foreground-lighter shadow-raised',
+        'transition-colors hover:border-strong hover:text-foreground-light focus-ring'
+      )}
+    >
+      <Search aria-hidden className="size-4.5 shrink-0" strokeWidth={2.25} />
+      <span className="flex-1 truncate">Search guides</span>
+      <KeyboardShortcut keys={[isMac ? '⌘' : 'Ctrl', 'K']} />
+    </button>
   )
 }

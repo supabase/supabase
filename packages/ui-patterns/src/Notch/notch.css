@@ -1,0 +1,7 @@
+@utility notch-corner {
+  mask:
+    linear-gradient(#000 0 0),
+    var(--notch-mask) right -2px bottom -2px / calc(var(--notch-width) + 10px) 42px no-repeat;
+  mask-composite: exclude;
+  mask-clip: no-clip;
+}
