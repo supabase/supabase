@@ -14,12 +14,11 @@ export const ISO_SHAPES = {
   Database: [0, 0.9, 1.8].map((z) => ({ x: 0, y: 0, z, w: 2, d: 2, h: 0.38, shape: 'cylinder' })),
   Realtime: [{ ...cube(0, 0, 0, 2), inset: 'front' }, cube(2.9, -0.9, 1.5, 0.7)],
   Storage: [{ ...cube(0, 0, 0, 1.1), h: 0.8, inset: 'top' }],
+  // box 2 is the piece, boxes 0-1 are the platform
   'Edge Functions': [
-    cube(0, 0, 0.3, 1.34),
-    cube(3, 0.47, 0.9, 0.4),
-    cube(0.47, 3, 0, 0.4),
-    cube(-2.4, 0.47, 0.6, 0.4),
-    cube(0.47, -2.4, 1.2, 0.4),
+    { x: 0, y: 0, z: 0, w: 3, d: 2, h: 0.15 },
+    { x: 0, y: 2, z: 0, w: 2, d: 1, h: 0.15 },
+    { x: 2, y: 2, z: 0, w: 1, d: 1, h: 0.15, fillFace: 'top' },
   ],
   Queues: [0, 1, 2, 3].map((i) => cube(i * 1.35, 0, 0, 0.8)),
   Migration: [cube(0, 0, 0, 1), cube(2.3, -2.3, 1.2, 1)],
@@ -69,11 +68,12 @@ export const ISO_SHAPE_POSES: Partial<Record<IsoShapeName, IsoPose>> = {
       i === 0 ? box : { ...box, z: box.z - (SHACKLE_LIFT - 1.3) * t }
     ),
   Database: (t) => ISO_SHAPES.Database.map((box, i) => ({ ...box, z: box.z + i * 0.35 * t })),
+  'Edge Functions': (t) =>
+    ISO_SHAPES['Edge Functions'].map((box, i) => (i === 2 ? { ...box, z: box.z + 0.6 * t } : box)),
 }
 
 // boxes that hold still while the rest of the shape orbits around them
 export const ISO_SHAPE_STILL_BOXES: Partial<Record<IsoShapeName, number[]>> = {
-  'Edge Functions': [0],
   Realtime: [0],
 }
 
@@ -81,10 +81,13 @@ export const ISO_SHAPE_STILL_BOXES: Partial<Record<IsoShapeName, number[]>> = {
 export const ISO_SHAPE_FILL_BOXES: Partial<Record<IsoShapeName, number[]>> = {
   Database: [0, 1],
   Platform: [0, 1],
+  'Edge Functions': [2],
 }
 
 // shapes that swing back and forth by this many radians, not a full turn
 export const ISO_SHAPE_SWINGS: Partial<Record<IsoShapeName, number>> = {
   // a full turn moves the small cube too far out, so the shape swings
   Realtime: Math.PI / 4,
+  // 0 stops the turn, so the piece only rises and falls
+  'Edge Functions': 0,
 }

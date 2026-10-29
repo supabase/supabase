@@ -75,6 +75,7 @@ export const EXPLORE_ITEMS: ExploreItem[] = [
     description: 'Run server-side TypeScript close to your users.',
     href: '/guides/functions/quickstart',
     shape: 'Edge Functions',
+    shapeClassName: 'origin-left scale-75',
   },
 ]
 
