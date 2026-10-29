@@ -87,3 +87,26 @@ describe('dollar-quote safety with $$ in values', () => {
     expectDoBlocksIntact(String(sql), ['select 1'])
   })
 })
+
+describe('delimiter selection covers values from the recreated function SQL', () => {
+  test('functions.update survives $pg_meta$ in an argument default', () => {
+    const func = {
+      ...testFunction,
+      argument_types: safeSql`a text DEFAULT '$pg_meta$'`,
+      identity_argument_types: safeSql`text`,
+    } as unknown as PGSavedFunction
+    const { sql } = updateFunction(func, { definition: 'select 1' })
+    expect(String(sql)).toContain('DO LANGUAGE plpgsql $pg_meta_1$')
+    expectDoBlocksIntact(String(sql), [`a text DEFAULT '$pg_meta$'`])
+  })
+
+  test('functions.update survives $pg_meta$ in a config param value', () => {
+    const func = {
+      ...testFunction,
+      config_params: { 'app.setting': safeSql`'$pg_meta$'` },
+    } as unknown as PGSavedFunction
+    const { sql } = updateFunction(func, { definition: 'select 1' })
+    expect(String(sql)).toContain('DO LANGUAGE plpgsql $pg_meta_1$')
+    expectDoBlocksIntact(String(sql), [`'$pg_meta$'`])
+  })
+})
