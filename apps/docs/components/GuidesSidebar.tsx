@@ -34,8 +34,8 @@ const GuidesSidebar = ({
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
-    <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
-      <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit">
+    <div className={cn('h-fit flex-col', 'px-px', className)}>
+      <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit min-h-0">
         {video && (
           <div className="relative pl-5">
             <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} videoTitle={videoTitle} />
@@ -55,7 +55,9 @@ const GuidesSidebar = ({
             showPreferredSource
           />
         </div>
-        {!hideToc && toc.length !== 0 && <TocSection items={toc} />}
+        {!hideToc && toc.length !== 0 && (
+          <TocSection items={toc} scrollAreaClassName="-me-8.75 pe-8.75" />
+        )}
       </div>
     </div>
   )
