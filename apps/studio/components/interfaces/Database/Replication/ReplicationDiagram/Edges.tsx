@@ -108,7 +108,10 @@ export const SmoothstepEdge = ({
               <span>{displayState.label}</span>
             </div>
             <div className="border-t pt-2">
-              <ReplicationRegionLabel code={PIPELINE_REGION.code} className="text-sm" />
+              <ReplicationRegionLabel
+                code={PIPELINE_REGION.code}
+                className="text-sm text-foreground-light"
+              />
             </div>
           </div>
         </div>
