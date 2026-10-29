@@ -27,13 +27,16 @@ import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface AskAiPanelProps {
   initialQuestion: string
-  onLinkNavigate: () => void
 }
 
 interface AiMessagesProps {
   messages: Message[]
   hasError: boolean
-  onLinkNavigate: () => void
+}
+
+interface AiSourcesProps {
+  sources: NonNullable<Message['sources']>
+  onSourceClick: (sourcePath: string) => void
 }
 
 export const ASK_AI_DIALOG_LABELS: SearchDialogProps['labels'] = {
@@ -41,13 +44,14 @@ export const ASK_AI_DIALOG_LABELS: SearchDialogProps['labels'] = {
   dialogDescription: 'Ask about the Supabase docs',
 }
 
-export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps) {
+export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
   const [question, setQuestion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { submit, reset, messages, isResponding, hasError } = useAiChat({ setIsLoading })
   const sendTelemetryEvent = useSendTelemetryEvent()
   const inputRef = useRef<HTMLInputElement>(null)
   const isPinnedRef = useRef(true)
+  const lastScrollTopRef = useRef(0)
   const listRef = useRef<HTMLDivElement>(null)
   const isBusy = isLoading || isResponding
   const hasConversation = messages.length > 0
@@ -78,7 +82,9 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
 
   const handleListScroll = (event: UIEvent<HTMLDivElement>) => {
     const list = event.currentTarget
-    isPinnedRef.current = list.scrollHeight - list.scrollTop - list.clientHeight < 32
+    if (list.scrollHeight - list.scrollTop - list.clientHeight < 32) isPinnedRef.current = true
+    else if (list.scrollTop < lastScrollTopRef.current) isPinnedRef.current = false
+    lastScrollTopRef.current = list.scrollTop
   }
 
   // follows the question and the streamed answer while the reader stays at the bottom.
@@ -134,7 +140,7 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
             className="max-h-[min(477px,70dvh)] mx-px scroll-fade-bottom"
           >
             <div ref={followConversation}>
-              <AiMessages messages={messages} hasError={hasError} onLinkNavigate={onLinkNavigate} />
+              <AiMessages messages={messages} hasError={hasError} />
               {hasAnswer ? (
                 <p className="px-4 pt-4 pb-3 text-center text-xs text-foreground-lighter">
                   Supabase AI can make mistakes. Verify answers before you run them.
@@ -153,36 +159,40 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
           hasMorph={!hasConversation}
           className={hasConversation ? 'border-t' : undefined}
         >
-          <input
-            ref={inputRef}
-            autoFocus
-            autoComplete="off"
-            data-1p-ignore // 1Password
-            data-lpignore="true" // LastPass
-            data-form-type="other" // Dashlane
-            data-bwignore // Bitwarden
-            value={question}
-            onChange={handleQuestionChange}
-            onKeyDown={handleKeyDown}
-            placeholder={
-              isLoading
-                ? 'Searching the docs...'
-                : isResponding
-                  ? undefined
-                  : 'Ask Supabase AI a question...'
-            }
-            aria-label="Ask Supabase AI a question"
-            className="size-full border-none bg-transparent p-0 text-search-dialog outline-hidden placeholder:text-foreground-lighter focus:ring-0"
-          />
+          <span className="relative flex size-full items-center">
+            <input
+              ref={inputRef}
+              autoFocus
+              autoComplete="off"
+              data-1p-ignore // 1Password
+              data-lpignore="true" // LastPass
+              data-form-type="other" // Dashlane
+              data-bwignore // Bitwarden
+              value={question}
+              onChange={handleQuestionChange}
+              onKeyDown={handleKeyDown}
+              placeholder={isBusy ? undefined : 'Ask Supabase AI a question'}
+              aria-label="Ask Supabase AI a question"
+              className="size-full border-none bg-transparent p-0 text-search-dialog outline-hidden placeholder:text-foreground-lighter focus:ring-0"
+            />
+            {isLoading && !question ? (
+              <span
+                aria-hidden
+                className="shimmer pointer-events-none absolute inset-y-0 left-0 flex items-center text-search-dialog text-foreground-lighter"
+              >
+                Searching the docs
+              </span>
+            ) : null}
+          </span>
         </SearchInputRow>
       </form>
     </section>
   )
 }
 
-function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
+function AiMessages({ messages, hasError }: AiMessagesProps) {
   const sendTelemetryEvent = useSendTelemetryEvent()
-  // the input placeholder shows a pending answer. a failed request leaves its answer incomplete.
+  // the input shows a pending answer. a failed request leaves its answer incomplete.
   // the last answer failed when an error is set, and an earlier answer failed when it is incomplete
   const isFailedAnswer = (message: Message, index: number) =>
     message.status !== MessageStatus.Complete && (hasError || index < messages.length - 1)
@@ -199,11 +209,10 @@ function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
       action: 'docs_search_v2_ask_ai_source_clicked',
       properties: { sourcePath, question: messages[answerIndex - 1]?.content ?? '' },
     })
-    onLinkNavigate()
   }
 
   return (
-    <ol className="flex flex-col gap-4 px-3 py-4">
+    <ol className="flex flex-col gap-4 py-4 pr-4 pl-3">
       {messages.map((message, index) =>
         message.role === MessageRole.User ? (
           // messages have no id and are only ever appended, so the index is stable
@@ -221,7 +230,7 @@ function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
             {message.status === MessageStatus.Pending ? null : (
               <Markdown
                 codeBlock
-                className="prose-sm wrap-break-word"
+                className="ask-ai-answer prose-sm wrap-break-word"
                 components={{
                   a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
                 }}
@@ -235,29 +244,40 @@ function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
               </p>
             ) : null}
             {message.sources?.length ? (
-              <nav aria-label="Sources" className="mt-3">
-                <ul className="flex flex-wrap gap-1.5">
-                  {message.sources.map((source) => (
-                    <li key={source.path}>
-                      <Link
-                        href={source.path}
-                        prefetch={false}
-                        onClick={() =>
-                          handleSourceClick({ sourcePath: source.path, answerIndex: index })
-                        }
-                        className="inline-flex items-center gap-1.5 rounded-full bg-surface-400 px-2.5 py-1 text-xs text-foreground-light transition-colors hover:text-foreground focus-ring"
-                      >
-                        <FileText aria-hidden className="size-3.5 shrink-0" strokeWidth={2} />
-                        {source.path}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
+              <AiSources
+                sources={message.sources}
+                onSourceClick={(sourcePath) =>
+                  handleSourceClick({ sourcePath, answerIndex: index })
+                }
+              />
             ) : null}
           </li>
         )
       )}
     </ol>
+  )
+}
+
+function AiSources({ sources, onSourceClick }: AiSourcesProps) {
+  return (
+    <nav aria-label="Sources" className="mt-3">
+      <ul className="flex flex-wrap gap-1.5">
+        {sources.map((source) => (
+          <li key={source.path}>
+            <Link
+              href={source.path}
+              target="_blank"
+              rel="noopener noreferrer"
+              prefetch={false}
+              onClick={() => onSourceClick(source.path)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-surface-400 px-2.5 py-1 text-xs text-foreground-light transition-colors hover:text-foreground focus-ring"
+            >
+              <FileText aria-hidden className="size-3.5 shrink-0" strokeWidth={2} />
+              {source.path}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   )
 }

@@ -132,7 +132,7 @@ export function SearchV2Provider({ children }: SearchV2ProviderProps) {
         labels={panel === 'ask-ai' ? ASK_AI_DIALOG_LABELS : undefined}
       >
         {panel === 'ask-ai' ? (
-          <AskAiPanel initialQuestion={askAiQuestion} onLinkNavigate={closeDialog} />
+          <AskAiPanel initialQuestion={askAiQuestion} />
         ) : (
           <SearchV2Panel
             onResultNavigate={handleResultNavigate}

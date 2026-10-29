@@ -86,3 +86,12 @@
 [data-scrolled] + .ask-ai-edge {
   opacity: 1;
 }
+
+.ask-ai-answer ol > li {
+  padding-inline-start: 0.75rem;
+}
+
+.ask-ai-answer ol > li::before {
+  top: 2px;
+  line-height: 1;
+}
