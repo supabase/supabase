@@ -1,3 +1,4 @@
+import { useQueries } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { LoaderCircleIcon, SearchIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -10,6 +11,14 @@ import {
   type FilterGroup,
 } from 'ui-patterns/FilterBar'
 
+import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from '../UnifiedLogs.constants'
+import { filterFields as defaultFilterFields } from '../UnifiedLogs.fields'
+import {
+  getLogAttributeKey,
+  logAttributeFilterId,
+  parseLogsFilterUrlParams,
+} from '../UnifiedLogs.filters'
+import type { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { isOfferedFilter } from '../UnifiedLogs.utils'
 import {
   buildColumnFilterValues,
@@ -26,6 +35,8 @@ import {
 import { searchAuthUsers } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
 import { DataTableFilterTimerange } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterTimerange'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { otelLogKeysQueryOptions } from '@/data/logs/otel-log-keys-query'
+import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { UUID_REGEX } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -48,7 +59,12 @@ interface LogsFilterBarProps {
 export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { table, filterFields, columnFilters, isFetching } = useDataTable()
+  const { table, filterFields, columnFilters, isFetching, searchParameters } = useDataTable<
+    unknown,
+    unknown,
+    QuerySearchParamsType
+  >()
+  const isOtel = useUnifiedLogsBackend(searchParameters)
 
   useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_FOCUS_FILTER, () => filterBarRef.current?.focus(), {
     registerInCommandMenu: true,
@@ -89,19 +105,80 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     }
   }
 
-  const columnBackedNames = new Set(
-    filterProperties.map((p) => p.name).filter((name) => name !== USER_PROPERTY)
-  )
+  const columnBackedNames = new Set([
+    ...filterProperties.map((p) => p.name).filter((name) => name !== USER_PROPERTY),
+    ...columnFilters
+      .filter(({ id }) => !defaultFilterFields.some((field) => field.value === id))
+      .map(({ id }) => id),
+  ])
 
-  // Local state because the FilterBar carries transient states
   const [filters, setFilters] = useState<FilterGroup>(() =>
     withUserCondition(buildFilterGroup(columnFilters, columnBackedNames))
   )
 
+  const logTypes = [
+    ...parseLogsFilterUrlParams(searchParameters.filter),
+    ...(searchParameters.scope?.filters ?? []),
+  ].filter(({ column, operator }) => column === 'log_type' && operator === '=')
+  const selectedLogTypes =
+    logTypes.length > 0 ? logTypes.map(({ value }) => value) : DEFAULT_LOG_TYPES
+  const sources = [
+    ...new Set(
+      Object.entries(LOG_TYPE_TO_SOURCE)
+        .filter(([type]) => selectedLogTypes.includes(type))
+        .map(([, source]) => source)
+    ),
+  ]
+  const keyQueries = useQueries({
+    queries: sources.map((source) => ({
+      ...otelLogKeysQueryOptions({ projectRef: projectRef ?? '', source }),
+      enabled: isOtel && !!projectRef,
+    })),
+  })
+  const attributeKeys = new Set(keyQueries.flatMap(({ data }) => data ?? []))
+  if (isOtel && freeformText.trim()) attributeKeys.add(freeformText.trim())
+  for (const condition of filters.conditions) {
+    if (!('propertyName' in condition)) continue
+    const key = getLogAttributeKey(condition.propertyName)
+    if (key !== undefined) attributeKeys.add(key)
+  }
+  const legacyAttributeProperties = columnFilters
+    .filter(
+      ({ id }) =>
+        id !== USER_PROPERTY &&
+        getLogAttributeKey(id) === undefined &&
+        !defaultFilterFields.some((field) => field.value === id)
+    )
+    .map(({ id }) => ({
+      label: `Attribute: ${id}`,
+      name: id,
+      type: 'string' as const,
+      operators: [
+        { label: 'Equals', value: '=' },
+        { label: 'Not equal', value: '<>' },
+      ],
+    }))
+  const attributeProperties = isOtel
+    ? [...attributeKeys].map((key) => ({
+        label: `Attribute: ${key}`,
+        name: logAttributeFilterId(key),
+        type: 'string' as const,
+        operators: [
+          { label: 'Equals', value: '=', group: 'comparison' as const },
+          { label: 'Not equal', value: '<>', group: 'comparison' as const },
+        ],
+      }))
+    : []
+  for (const property of attributeProperties) columnBackedNames.add(property.name)
+
   const hasTimeRangeFilter = filters.conditions.some(
     (condition) => 'propertyName' in condition && condition.propertyName === TIME_RANGE_PROPERTY
   )
-  const filterPropertiesWithAvailability = filterProperties.map((property) => ({
+  const filterPropertiesWithAvailability = [
+    ...filterProperties,
+    ...attributeProperties,
+    ...legacyAttributeProperties,
+  ].map((property) => ({
     ...property,
     isAvailable: property.name !== TIME_RANGE_PROPERTY || !hasTimeRangeFilter,
   }))
@@ -132,23 +209,13 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     const timeRange = parseTimeRange(timeRangeCondition?.value)
     if (timeRangeCondition && !timeRange) return
 
-    table.getColumn(TIME_RANGE_PROPERTY)?.setFilterValue(timeRange)
     applyUser(getUserFilterValue(next.conditions as FilterCondition[]))
-
     const columnFilterValues = buildColumnFilterValues(next.conditions as FilterCondition[])
-    for (const [name, value] of columnFilterValues) {
-      table.getColumn(name)?.setFilterValue(value)
-    }
-
-    // Only clear filters owned by this bar.
-    const nextNames = new Set(columnFilterValues.keys())
-    if (timeRange) nextNames.add(TIME_RANGE_PROPERTY)
-    const filtersToRemove = table
-      .getState()
-      .columnFilters.filter((x) => columnBackedNames.has(x.id) && !nextNames.has(x.id))
-    filtersToRemove.forEach((x) => {
-      table.getColumn(x.id)?.setFilterValue(undefined)
-    })
+    table.setColumnFilters((current) => [
+      ...current.filter(({ id }) => !columnBackedNames.has(id)),
+      ...Array.from(columnFilterValues, ([id, value]) => ({ id, value })),
+      ...(timeRange ? [{ id: TIME_RANGE_PROPERTY, value: timeRange }] : []),
+    ])
   }
 
   useEffect(() => {

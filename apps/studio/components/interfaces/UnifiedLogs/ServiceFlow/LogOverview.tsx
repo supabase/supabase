@@ -1,7 +1,8 @@
+import { BracesIcon } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
 
 import type { ColumnSchema } from '../UnifiedLogs.schema'
-import { GenericLogOverview } from './components/GenericLogOverview'
+import { GenericLogOverview, LogAttributes } from './components/GenericLogOverview'
 import { PostgresFlowDetail } from './components/PostgresFlowDetail'
 import {
   MemoizedEdgeFunctionBlock,
@@ -13,6 +14,7 @@ import {
   MemoizedSupavisorBlock,
 } from './components/ServiceBlocks'
 import type { ServiceFlowBlockProps } from './types'
+import { CollapsibleDetailSection } from '@/components/ui/DataTable/CollapsibleDetailSection'
 
 type LogOverviewProps = Omit<ServiceFlowBlockProps, 'data'> & {
   data: ColumnSchema
@@ -81,19 +83,32 @@ export const hasLogOverviewRenderer = (logType: string) => logType in LOG_OVERVI
 export function LogOverview({
   header,
   attributes,
+  onAddAttributeFilter,
   ...props
-}: LogOverviewProps & { header?: ReactNode; attributes?: ColumnSchema['metadata'] }) {
+}: LogOverviewProps & {
+  header?: ReactNode
+  attributes?: ColumnSchema['metadata']
+  onAddAttributeFilter?: (key: string, value: string) => void
+}) {
   const Renderer = LOG_OVERVIEW_RENDERERS[props.data.log_type]
 
   return (
     <>
       {header}
       {Renderer ? (
-        <Renderer {...props} />
+        <>
+          <Renderer {...props} />
+          {attributes && Object.keys(attributes).length > 0 && (
+            <CollapsibleDetailSection title="Attributes" icon={BracesIcon} className="border-b">
+              <LogAttributes attributes={attributes} onAddFilter={onAddAttributeFilter} />
+            </CollapsibleDetailSection>
+          )}
+        </>
       ) : (
         <GenericLogOverview
           data={props.data}
           attributes={attributes}
+          onAddAttributeFilter={onAddAttributeFilter}
           filterFields={props.filterFields}
           table={props.table}
         />

@@ -3,8 +3,9 @@ import { useParams } from 'common'
 import type { ReactNode } from 'react'
 import { Skeleton } from 'ui'
 
-import { hasLogOverviewRenderer, LogOverview } from '../ServiceFlow/LogOverview'
+import { LogOverview } from '../ServiceFlow/LogOverview'
 import { getLogDataForMetadataVisibility } from '../ServiceFlowPanel.utils'
+import { logAttributeFilterId } from '../UnifiedLogs.filters'
 import { ColumnSchema } from '../UnifiedLogs.schema'
 import { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { getLogTypeSource, getRawLogData, getRowTimestampMs } from '../UnifiedLogs.utils'
@@ -46,8 +47,7 @@ export function LogDetail({
     { enabled: !!serviceFlowType }
   )
   const isOtel = useUnifiedLogsBackend(searchParameters)
-  const canFetchAttributes =
-    isOtel && logsMetadata && !row.metadata && !hasLogOverviewRenderer(row.log_type)
+  const canFetchAttributes = isOtel && logsMetadata && !row.metadata
   const attributesQuery = unifiedLogAttributesQueryOptions({
     projectRef,
     logId: row.id,
@@ -92,6 +92,17 @@ export function LogDetail({
         <LogOverview
           header={overviewHeader}
           attributes={attributes}
+          onAddAttributeFilter={
+            isOtel
+              ? (key, value) => {
+                  const id = logAttributeFilterId(key)
+                  table.setColumnFilters((current) => [
+                    ...current.filter((filter) => filter.id !== id),
+                    { id, value: { operator: '=', values: [value] } },
+                  ])
+                }
+              : undefined
+          }
           data={row}
           enrichedData={enrichedData}
           isLoading={isLoading}
