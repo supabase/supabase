@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { components } from 'api-types'
+import { platformComponents as components } from 'api-types'
 import { toast } from 'sonner'
 
 import { handleError, post, unguarded } from '@/data/fetchers'
