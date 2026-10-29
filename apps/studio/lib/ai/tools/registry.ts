@@ -10,6 +10,7 @@ import { contract as getActiveIncidents } from './get-active-incidents'
 import { contract as getAdvisors } from './get-advisors'
 import { contract as getNotebook } from './get-notebook'
 import { contract as getReport } from './get-report'
+import { getLegacyToolContract } from './legacy-tools'
 import { contract as listBranches } from './list-branches'
 import { contract as listDatabases } from './list-databases'
 import { contract as listEdgeFunctions } from './list-edge-functions'
@@ -23,11 +24,15 @@ import { contract as queryLogs } from './query-logs'
 import { contract as renameChat } from './rename-chat'
 import { contract as resolveSupportConversation } from './resolve-support-conversation'
 import { contract as runNotebook } from './run-notebook'
+import { contract as searchDocs } from './search-docs'
 import type {
   RemoteToolContract,
+  ToolAvailability,
   ToolContract,
   ToolContractInput,
   ToolContractOutput,
+  ToolEnvironment,
+  ToolRequirement,
 } from './types'
 import { contract as updateNotebook } from './update-notebook'
 import { contract as updateOptInLevel } from './update-opt-in-level'
@@ -94,6 +99,7 @@ export const REMOTE_TOOL_CONTRACTS = {
   list_extensions: listExtensions,
   list_tables: listTables,
   query_logs: queryLogs,
+  search_docs: searchDocs,
 } as const satisfies Partial<Record<ToolName, RemoteToolContract>>
 
 export type RemoteContractToolName = keyof typeof REMOTE_TOOL_CONTRACTS
@@ -106,14 +112,16 @@ export function getRemoteToolContract(toolName: string): RemoteToolContract | un
 
 /**
  * Applies the contract's `toModelOutput` to a persisted tool part, for history replay (where
- * the SDK doesn't call it). Returns `undefined` when the tool has no contract. An output that
- * doesn't match the contract's schema is dropped rather than passed through unchecked.
+ * the SDK doesn't call it). Falls back to a legacy contract for a tool that no longer exists.
+ * Returns `undefined` when the tool has neither. An output that doesn't match the contract's
+ * schema is dropped rather than passed through unchecked.
  */
 export function sanitizeContractPart<Part extends ToolUIPart>(
   part: Part,
   optInLevel: AiOptInLevel
 ): Part | undefined {
-  const contract = getToolContract(part.type.slice('tool-'.length))
+  const toolName = part.type.slice('tool-'.length)
+  const contract = getToolContract(toolName) ?? getLegacyToolContract(toolName)
   if (!contract) return undefined
 
   const parsed = contract.outputSchema.safeParse(part.output)
@@ -123,4 +131,16 @@ export function sanitizeContractPart<Part extends ToolUIPart>(
       ? contract.toModelOutput(parsed.data, optInLevel)
       : contract.outputOnInvalid,
   }
+}
+
+/** Whether a tool is offered in `environment`, given the requirements the request satisfies. */
+export function isToolAvailable(
+  availability: ToolAvailability,
+  {
+    environment,
+    satisfied,
+  }: { environment: ToolEnvironment; satisfied: ReadonlySet<ToolRequirement> }
+): boolean {
+  if (!availability.environments.has(environment)) return false
+  return [...(availability.requires ?? [])].every((requirement) => satisfied.has(requirement))
 }

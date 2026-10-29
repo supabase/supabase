@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type StorageArchiveCreateVariables = {
@@ -14,6 +14,7 @@ const createStorageArchive = async ({ projectRef }: StorageArchiveCreateVariable
 
   const { data, error } = await post('/platform/storage/{ref}/archive', {
     params: { path: { ref: projectRef } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

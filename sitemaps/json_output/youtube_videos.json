@@ -1,0 +1,4391 @@
+[
+  {
+    "id": "Lai9qn5TbTg",
+    "title": "Announcing Agent Prompts",
+    "url": "https://www.youtube.com/watch?v=Lai9qn5TbTg",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-20T14:54:21Z"
+  },
+  {
+    "id": "kL4M0auf4UU",
+    "title": "Introducing Supabase Middleware",
+    "url": "https://www.youtube.com/watch?v=kL4M0auf4UU",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-20T02:14:20Z"
+  },
+  {
+    "id": "TL-Oe5UDMNI",
+    "title": "Supabase CLI is now Agent Friendly",
+    "url": "https://www.youtube.com/watch?v=TL-Oe5UDMNI",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-16T12:14:55Z"
+  },
+  {
+    "id": "2k_6KLprVUU",
+    "title": "Sync real-time Stripe data to Supabase",
+    "url": "https://www.youtube.com/watch?v=2k_6KLprVUU",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-16T12:05:57Z"
+  },
+  {
+    "id": "7AmGBKNLGdA",
+    "title": "Supabase  \ud83e\udd1d  Grok Bot",
+    "url": "https://www.youtube.com/watch?v=7AmGBKNLGdA",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-15T12:07:32Z"
+  },
+  {
+    "id": "I9GymvCJRRw",
+    "title": "Everything you missed from Supabase Select 2026",
+    "url": "https://www.youtube.com/watch?v=I9GymvCJRRw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-10-13T18:38:26Z"
+  },
+  {
+    "id": "m7K6A6KgMtQ",
+    "title": "Supabase Select 2026 Keynote: Compute, Multigres, Turso",
+    "url": "https://www.youtube.com/watch?v=m7K6A6KgMtQ",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:05:37Z"
+  },
+  {
+    "id": "S82t6hRRcBE",
+    "title": "Vitess Co-Creator on Scaling Postgres with Multigres",
+    "url": "https://www.youtube.com/watch?v=S82t6hRRcBE",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:05:18Z"
+  },
+  {
+    "id": "yUcDZdh-w1Y",
+    "title": "How Supabase Scales Postgres: OrioleDB and Multigres",
+    "url": "https://www.youtube.com/watch?v=yUcDZdh-w1Y",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:05:08Z"
+  },
+  {
+    "id": "BAn47G84-7Q",
+    "title": "Turso Deep Dive: A Database for Every Agent",
+    "url": "https://www.youtube.com/watch?v=BAn47G84-7Q",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:04:55Z"
+  },
+  {
+    "id": "YsgkxiprN-8",
+    "title": "Inside the Multigres Connection Pooler",
+    "url": "https://www.youtube.com/watch?v=YsgkxiprN-8",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:04:43Z"
+  },
+  {
+    "id": "c3kn8TnudEQ",
+    "title": "Building and Debugging a Supabase App With an AI Agent",
+    "url": "https://www.youtube.com/watch?v=c3kn8TnudEQ",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:04:26Z"
+  },
+  {
+    "id": "H6R8JT5U5rU",
+    "title": "Give Your Supabase App an MCP Server",
+    "url": "https://www.youtube.com/watch?v=H6R8JT5U5rU",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:04:15Z"
+  },
+  {
+    "id": "ghDydCjn9jw",
+    "title": "Scaling a WhatsApp CRM on Supabase | L\u00edderhub",
+    "url": "https://www.youtube.com/watch?v=ghDydCjn9jw",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:40Z"
+  },
+  {
+    "id": "SSfig1Z0E3c",
+    "title": "Tiny Teams Doing the Work of 100 People | Garry Tan",
+    "url": "https://www.youtube.com/watch?v=SSfig1Z0E3c",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:32Z"
+  },
+  {
+    "id": "VzUxIpMwtlE",
+    "title": "Agents Will Be the Web's Main Users | Ex-Twitter CEO Parag Agrawal",
+    "url": "https://www.youtube.com/watch?v=VzUxIpMwtlE",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:32Z"
+  },
+  {
+    "id": "Txa_tlK8oTo",
+    "title": "OpenAI's API Team on Codex, Proactive Models and Cost per Task",
+    "url": "https://www.youtube.com/watch?v=Txa_tlK8oTo",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:29Z"
+  },
+  {
+    "id": "mXu7nhVCkBU",
+    "title": "What Changes When Agents Write the Code | Ex-GitHub CEO Thomas Dohmke",
+    "url": "https://www.youtube.com/watch?v=mXu7nhVCkBU",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:26Z"
+  },
+  {
+    "id": "l5uQgSfeueo",
+    "title": "OpenAI: How to Security-Check Your AI-Built Supabase App",
+    "url": "https://www.youtube.com/watch?v=l5uQgSfeueo",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:24Z"
+  },
+  {
+    "id": "Q6V1HtVa-mU",
+    "title": "How Anthropic Builds With Claude: Agents, Evals and Hiring",
+    "url": "https://www.youtube.com/watch?v=Q6V1HtVa-mU",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:22Z"
+  },
+  {
+    "id": "qeMMnOiF51A",
+    "title": "Andrew Ng on Coding Agents and Deciding What to Build",
+    "url": "https://www.youtube.com/watch?v=qeMMnOiF51A",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:21Z"
+  },
+  {
+    "id": "ZNVy5qpp5r8",
+    "title": "From Two-Month Releases to Twice a Day | Desygner",
+    "url": "https://www.youtube.com/watch?v=ZNVy5qpp5r8",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:20Z"
+  },
+  {
+    "id": "aFTjbZjcj4c",
+    "title": "Agents Write Most of Our Code | Replit CEO Amjad Masad",
+    "url": "https://www.youtube.com/watch?v=aFTjbZjcj4c",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:17Z"
+  },
+  {
+    "id": "w_jShOmYcPY",
+    "title": "How Agents Are Going to Kill Your Service",
+    "url": "https://www.youtube.com/watch?v=w_jShOmYcPY",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:17Z"
+  },
+  {
+    "id": "lZhERX3kDuc",
+    "title": "Do You Still Need a Co-Founder? | Michael Seibel and Dalton Caldwell",
+    "url": "https://www.youtube.com/watch?v=lZhERX3kDuc",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:14Z"
+  },
+  {
+    "id": "Lcc-LO4f3LA",
+    "title": "Stripe on Taking an AI-Built App to Production",
+    "url": "https://www.youtube.com/watch?v=Lcc-LO4f3LA",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:13Z"
+  },
+  {
+    "id": "avwWS9nwMNg",
+    "title": "How Vercel's Field Engineers Use Agents",
+    "url": "https://www.youtube.com/watch?v=avwWS9nwMNg",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:12Z"
+  },
+  {
+    "id": "GfxFz--nhIk",
+    "title": "Agentic Memory Without a Vector Store | Koodos Labs",
+    "url": "https://www.youtube.com/watch?v=GfxFz--nhIk",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:09Z"
+  },
+  {
+    "id": "km8TDJiCmtU",
+    "title": "Postman: From One Agent to Many in Production",
+    "url": "https://www.youtube.com/watch?v=km8TDJiCmtU",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:05Z"
+  },
+  {
+    "id": "xf4FM90ix5A",
+    "title": "How Not to Crash Postgres at Scale | Arena",
+    "url": "https://www.youtube.com/watch?v=xf4FM90ix5A",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-12T20:00:04Z"
+  },
+  {
+    "id": "SdLsJoeEMjo",
+    "title": "Supabase Select 26 Hackathon",
+    "url": "https://www.youtube.com/watch?v=SdLsJoeEMjo",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-10T01:19:14Z"
+  },
+  {
+    "id": "wOwhdp5JPjk",
+    "title": "Supabase Select 26",
+    "url": "https://www.youtube.com/watch?v=wOwhdp5JPjk",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-10-10T01:13:14Z"
+  },
+  {
+    "id": "UnOM7i-uZoU",
+    "title": "Supabase Compute, Turso Joining Supabase, Multigres Alpha - Weekly Changelog Live Stream Ep 15",
+    "url": "https://www.youtube.com/watch?v=UnOM7i-uZoU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-10-06T12:41:21Z"
+  },
+  {
+    "id": "UjwECdG91Ys",
+    "title": "Supabase Select 26 Build Stage",
+    "url": "https://www.youtube.com/watch?v=UjwECdG91Ys",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-10-03T01:10:39Z"
+  },
+  {
+    "id": "ulV7zhhCyE0",
+    "title": "Supabase Select 26 Main Stage",
+    "url": "https://www.youtube.com/watch?v=ulV7zhhCyE0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-10-03T01:00:21Z"
+  },
+  {
+    "id": "QmJY5foN2gs",
+    "title": "New Models, Supabase AMA - Weekly Changelog Live Stream Ep 14",
+    "url": "https://www.youtube.com/watch?v=QmJY5foN2gs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-29T12:13:34Z"
+  },
+  {
+    "id": "srHl5ZN3eog",
+    "title": "Why Admin Access Appears Unchanged: JWT Caching & RLS Checks",
+    "url": "https://www.youtube.com/watch?v=srHl5ZN3eog",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-26T13:00:35Z"
+  },
+  {
+    "id": "NFP1qZLSWHc",
+    "title": "The future of AI...",
+    "url": "https://www.youtube.com/watch?v=NFP1qZLSWHc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-23T13:00:03Z"
+  },
+  {
+    "id": "APaxSJoT3V0",
+    "title": "Supabase AMA - Weekly Changelog Live Stream Ep 13",
+    "url": "https://www.youtube.com/watch?v=APaxSJoT3V0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-22T12:35:08Z"
+  },
+  {
+    "id": "mwC5SjS1mJQ",
+    "title": "The brand new AI: Jev",
+    "url": "https://www.youtube.com/watch?v=mwC5SjS1mJQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-19T02:30:14Z"
+  },
+  {
+    "id": "HTGAsMg6884",
+    "title": "Supabase AMA - Weekly Changelog Live Stream Ep 12",
+    "url": "https://www.youtube.com/watch?v=HTGAsMg6884",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-15T12:11:04Z"
+  },
+  {
+    "id": "drewVdWqaL0",
+    "title": "JavaScript is so confusing...",
+    "url": "https://www.youtube.com/watch?v=drewVdWqaL0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-13T13:00:38Z"
+  },
+  {
+    "id": "XpuGS7t5qLY",
+    "title": "Agents write my migrations. I still read the diff. - Weekly Changelog Ep 11",
+    "url": "https://www.youtube.com/watch?v=XpuGS7t5qLY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-08T12:19:27Z"
+  },
+  {
+    "id": "F4-jn52Myqw",
+    "title": "They named this programming language for the worst reason\u2026",
+    "url": "https://www.youtube.com/watch?v=F4-jn52Myqw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-06T13:00:15Z"
+  },
+  {
+    "id": "gq-iQ0XSLaM",
+    "title": "Who knew there was much thought behind this?...",
+    "url": "https://www.youtube.com/watch?v=gq-iQ0XSLaM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-04T13:00:36Z"
+  },
+  {
+    "id": "vLLvDlpTML8",
+    "title": "Supabase Select 26 is coming up",
+    "url": "https://www.youtube.com/watch?v=vLLvDlpTML8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-01T16:00:32Z"
+  },
+  {
+    "id": "3JGlBKceE_Q",
+    "title": "Everything in Your App Is Public - Weekly Changelog Ep 10",
+    "url": "https://www.youtube.com/watch?v=3JGlBKceE_Q",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-09-01T12:07:47Z"
+  },
+  {
+    "id": "9jbOTZqcGsI",
+    "title": "RLS explained in less than 40s",
+    "url": "https://www.youtube.com/watch?v=9jbOTZqcGsI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-30T14:00:10Z"
+  },
+  {
+    "id": "PENspNEvC0U",
+    "title": "Don't pay for Supabase",
+    "url": "https://www.youtube.com/watch?v=PENspNEvC0U",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-28T14:00:26Z"
+  },
+  {
+    "id": "jrg85q3s1rs",
+    "title": "HTTP methods are vastly overcomplicated...",
+    "url": "https://www.youtube.com/watch?v=jrg85q3s1rs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-26T13:00:15Z"
+  },
+  {
+    "id": "D1uCXP_-15Y",
+    "title": "Log improvements for client libs - Weekly Changelog Live Stream Ep 9",
+    "url": "https://www.youtube.com/watch?v=D1uCXP_-15Y",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-25T12:21:14Z"
+  },
+  {
+    "id": "Sd91y_us9Nk",
+    "title": "Ask Us Anything - Weekly Changelog Live Stream Ep 8",
+    "url": "https://www.youtube.com/watch?v=Sd91y_us9Nk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-18T12:15:43Z"
+  },
+  {
+    "id": "qgXwe4sK6R8",
+    "title": "Fireside Chat with Guillermo Rauch | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=qgXwe4sK6R8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-13T23:32:00Z"
+  },
+  {
+    "id": "wNuSSYgMTEo",
+    "title": "1,000,000 Databases a Week, Almost All Created by AI - Weekly Changelog Ep 7",
+    "url": "https://www.youtube.com/watch?v=wNuSSYgMTEo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-11T12:18:43Z"
+  },
+  {
+    "id": "aMUKIb1D-h8",
+    "title": "Unix's Biggest Mistake",
+    "url": "https://www.youtube.com/watch?v=aMUKIb1D-h8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-07T14:00:02Z"
+  },
+  {
+    "id": "AJK6nhGdGAY",
+    "title": "Using Codex to Build Web and Mobile Apps with Shared Supabase Project",
+    "url": "https://www.youtube.com/watch?v=AJK6nhGdGAY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-06T13:00:56Z"
+  },
+  {
+    "id": "yDvFIbPJR-A",
+    "title": "Skills barely helped AI agents, and that's the good news - Weekly Changelog Ep 6",
+    "url": "https://www.youtube.com/watch?v=yDvFIbPJR-A",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-08-04T12:09:08Z"
+  },
+  {
+    "id": "8o3duiYqppA",
+    "title": "Introducing Supabase Pipelines",
+    "url": "https://www.youtube.com/watch?v=8o3duiYqppA",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-07-31T08:47:50Z"
+  },
+  {
+    "id": "baEgPmoiiMM",
+    "title": "Stop wasting tokens - Rules, Skills and MCP",
+    "url": "https://www.youtube.com/watch?v=baEgPmoiiMM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-30T14:00:15Z"
+  },
+  {
+    "id": "aNyA9DQZSHY",
+    "title": "Supabase Pipelines, Grafana integrations, Unified Logs - Weekly Changelog Live Stream Ep 5",
+    "url": "https://www.youtube.com/watch?v=aNyA9DQZSHY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-28T12:09:52Z"
+  },
+  {
+    "id": "HClNaGi4w8Y",
+    "title": "10X Claude Developer\ud83d\ude02...",
+    "url": "https://www.youtube.com/watch?v=HClNaGi4w8Y",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-27T13:00:13Z"
+  },
+  {
+    "id": "uLR9gUvOiUQ",
+    "title": "Turns out Betting on the 40 year old Elephant was the right call...",
+    "url": "https://www.youtube.com/watch?v=uLR9gUvOiUQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-21T13:00:19Z"
+  },
+  {
+    "id": "9yfBsAaxUgU",
+    "title": "Weekly Changelog Live Stream #4",
+    "url": "https://www.youtube.com/watch?v=9yfBsAaxUgU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-21T12:28:01Z"
+  },
+  {
+    "id": "aeGxXwSqRkk",
+    "title": "The virus that infected EVERY computer on the Internet!",
+    "url": "https://www.youtube.com/watch?v=aeGxXwSqRkk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-18T14:00:34Z"
+  },
+  {
+    "id": "Y9i36pCHdDM",
+    "title": "You can't hack what was never sent",
+    "url": "https://www.youtube.com/watch?v=Y9i36pCHdDM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-16T13:00:34Z"
+  },
+  {
+    "id": "xarnaYHFf_g",
+    "title": "Codex Helped Me Put the World Cup on My Desk",
+    "url": "https://www.youtube.com/watch?v=xarnaYHFf_g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-15T12:59:55Z"
+  },
+  {
+    "id": "W9ZOfs3T4Iw",
+    "title": "Weekly Changelog Live Stream #3",
+    "url": "https://www.youtube.com/watch?v=W9ZOfs3T4Iw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-14T13:10:21Z"
+  },
+  {
+    "id": "4bx1o0Y9lN0",
+    "title": "We\u2019ve all been lied to about the first \u201cbug\u201d \ud83d\udc1b",
+    "url": "https://www.youtube.com/watch?v=4bx1o0Y9lN0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-12T12:26:48Z"
+  },
+  {
+    "id": "SHa7XTeHYK8",
+    "title": "Cipherstash \ud83e\udd1d Supabase",
+    "url": "https://www.youtube.com/watch?v=SHa7XTeHYK8",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-07-10T00:30:21Z"
+  },
+  {
+    "id": "EDAi7JR6xRc",
+    "title": "Grafana Cloud \ud83e\udd1d Supabase",
+    "url": "https://www.youtube.com/watch?v=EDAi7JR6xRc",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-07-10T00:30:15Z"
+  },
+  {
+    "id": "ssjUtQTaki8",
+    "title": "The new Supabase Server Package changes EVERYTHING!",
+    "url": "https://www.youtube.com/watch?v=ssjUtQTaki8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-09T14:00:24Z"
+  },
+  {
+    "id": "P0KsEFrzjpQ",
+    "title": "Supabase Weekly Changelog #2",
+    "url": "https://www.youtube.com/watch?v=P0KsEFrzjpQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-07-07T12:21:01Z"
+  },
+  {
+    "id": "z6NV-0jnOYQ",
+    "title": "Supabase and OpenCode... in Minecraft",
+    "url": "https://www.youtube.com/watch?v=z6NV-0jnOYQ",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-07-02T00:16:47Z"
+  },
+  {
+    "id": "q69w7WIFNWM",
+    "title": "Supabase Weekly Changelog #1",
+    "url": "https://www.youtube.com/watch?v=q69w7WIFNWM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-06-30T13:15:51Z"
+  },
+  {
+    "id": "-HBX8gEJUg8",
+    "title": "Do you know why he called it Python? \ud83d\udc0d",
+    "url": "https://www.youtube.com/watch?v=-HBX8gEJUg8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-06-27T13:00:23Z"
+  },
+  {
+    "id": "6xchFWcHkaI",
+    "title": "Getting Started with Supabase Vector Databases",
+    "url": "https://www.youtube.com/watch?v=6xchFWcHkaI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-06-18T13:05:30Z"
+  },
+  {
+    "id": "fV2UwUlb-ck",
+    "title": "The story of Flappy Bird",
+    "url": "https://www.youtube.com/watch?v=fV2UwUlb-ck",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-06-12T13:00:01Z"
+  },
+  {
+    "id": "ayb-pdc56gY",
+    "title": "Use this if you have Edge Functions!",
+    "url": "https://www.youtube.com/watch?v=ayb-pdc56gY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-06-10T13:00:12Z"
+  },
+  {
+    "id": "6XXi-7wRBnU",
+    "title": "STOP Coding like This!!...",
+    "url": "https://www.youtube.com/watch?v=6XXi-7wRBnU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-06-04T13:00:15Z"
+  },
+  {
+    "id": "168PHFnxkok",
+    "title": "If you\u2019re doing authorization in your API, it\u2019s too late!",
+    "url": "https://www.youtube.com/watch?v=168PHFnxkok",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-06-03T13:00:01Z"
+  },
+  {
+    "id": "WCQi7xbsgZs",
+    "title": "Decorators are coming to JAVAscript...",
+    "url": "https://www.youtube.com/watch?v=WCQi7xbsgZs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-06-02T13:00:15Z"
+  },
+  {
+    "id": "4xQtOejiK8Q",
+    "title": "The most expensive pizza in the world... \ud83c\udf55",
+    "url": "https://www.youtube.com/watch?v=4xQtOejiK8Q",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-05-29T13:00:12Z"
+  },
+  {
+    "id": "_2N6ApZ0MmI",
+    "title": "Getting Started with Supabase Locally",
+    "url": "https://www.youtube.com/watch?v=_2N6ApZ0MmI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-05-26T13:00:39Z"
+  },
+  {
+    "id": "950hn7ILru0",
+    "title": "How I actually use Claude and Supabase to ship apps fast!",
+    "url": "https://www.youtube.com/watch?v=950hn7ILru0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-05-21T13:00:19Z"
+  },
+  {
+    "id": "3Po0Bl0Ent4",
+    "title": "Space Invaders would have FAILED without this bug! \ud83d\udc7e",
+    "url": "https://www.youtube.com/watch?v=3Po0Bl0Ent4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-05-19T12:54:29Z"
+  },
+  {
+    "id": "EQ5h3NSWMbk",
+    "title": "Getting Started with Supabase Edge Functions",
+    "url": "https://www.youtube.com/watch?v=EQ5h3NSWMbk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-05-13T13:06:33Z"
+  },
+  {
+    "id": "AznEQq9-NBk",
+    "title": "Vibe Coding Live with Codex + Supabase | Supabase Office Hour AMA #5",
+    "url": "https://www.youtube.com/watch?v=AznEQq9-NBk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-05-08T12:01:29Z"
+  },
+  {
+    "id": "_-y_Lnujq64",
+    "title": "Getting Started with Supabase Realtime",
+    "url": "https://www.youtube.com/watch?v=_-y_Lnujq64",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-04-28T13:00:00Z"
+  },
+  {
+    "id": "LamaAqjBA5g",
+    "title": "Should you use a Claude Connecter??",
+    "url": "https://www.youtube.com/watch?v=LamaAqjBA5g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-04-24T13:00:00Z"
+  },
+  {
+    "id": "ch2UGHMreB0",
+    "title": "Getting Started with File Storage on Supabase",
+    "url": "https://www.youtube.com/watch?v=ch2UGHMreB0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-04-14T13:03:46Z"
+  },
+  {
+    "id": "svVemg6lnsw",
+    "title": "Custom OIDC Provider | Supabase Office Hour AMA #4",
+    "url": "https://www.youtube.com/watch?v=svVemg6lnsw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-04-10T11:55:43Z"
+  },
+  {
+    "id": "WrX3FfKj6I8",
+    "title": "Announcing Custom OIDC Provider Support on Supabase",
+    "url": "https://www.youtube.com/watch?v=WrX3FfKj6I8",
+    "channelId": "UCm-_O0pn_6WuD-ytd_NyGuA",
+    "publishedAt": "2026-04-08T13:01:03Z"
+  },
+  {
+    "id": "JEFwq04IGaM",
+    "title": "SQL making your app 400x slower",
+    "url": "https://www.youtube.com/watch?v=JEFwq04IGaM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-04-06T13:00:00Z"
+  },
+  {
+    "id": "Ufx6fdRMxjU",
+    "title": "Getting Started with Supabase Auth",
+    "url": "https://www.youtube.com/watch?v=Ufx6fdRMxjU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-03-31T13:00:00Z"
+  },
+  {
+    "id": "FvMS494bIps",
+    "title": "This trick gives you 10X more storage in Supabase.",
+    "url": "https://www.youtube.com/watch?v=FvMS494bIps",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-03-17T13:00:00Z"
+  },
+  {
+    "id": "WIaf17mdQE4",
+    "title": "SQL Pagination With Offset Might Be Making Your App 400x Slower",
+    "url": "https://www.youtube.com/watch?v=WIaf17mdQE4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-03-16T13:00:00Z"
+  },
+  {
+    "id": "n8LDM9S6EOU",
+    "title": "Dashboard Updates | Supabase Office Hour AMA #3",
+    "url": "https://www.youtube.com/watch?v=n8LDM9S6EOU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-03-13T11:51:30Z"
+  },
+  {
+    "id": "C9kJwxhdw9A",
+    "title": "Getting Started with Supabase Database",
+    "url": "https://www.youtube.com/watch?v=C9kJwxhdw9A",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-03-10T13:00:00Z"
+  },
+  {
+    "id": "DoPWZt5LIZg",
+    "title": "Which is the best React framework? Next, Tanstack or Remix...",
+    "url": "https://www.youtube.com/watch?v=DoPWZt5LIZg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-28T14:00:00Z"
+  },
+  {
+    "id": "TzG44ZKiC9M",
+    "title": "New Shadcn components for Supabase! \ud83e\udd2f",
+    "url": "https://www.youtube.com/watch?v=TzG44ZKiC9M",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-26T14:00:00Z"
+  },
+  {
+    "id": "BGYKVIsD4h8",
+    "title": "Every RLS policy you actually NEED to know!",
+    "url": "https://www.youtube.com/watch?v=BGYKVIsD4h8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-24T14:00:00Z"
+  },
+  {
+    "id": "i_bPeTZVlg0",
+    "title": "Getting Started with Supabase",
+    "url": "https://www.youtube.com/watch?v=i_bPeTZVlg0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-24T13:00:03Z"
+  },
+  {
+    "id": "tQsJM9BGw6o",
+    "title": "The ending got me! \ud83d\ude02",
+    "url": "https://www.youtube.com/watch?v=tQsJM9BGw6o",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-22T14:00:00Z"
+  },
+  {
+    "id": "qGVWfu_96Ic",
+    "title": "Do this before you run any QUERY!",
+    "url": "https://www.youtube.com/watch?v=qGVWfu_96Ic",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-20T14:00:00Z"
+  },
+  {
+    "id": "f-LxIzb4vLs",
+    "title": "We just shipped an official Claude Connector for Supabase",
+    "url": "https://www.youtube.com/watch?v=f-LxIzb4vLs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-16T14:00:00Z"
+  },
+  {
+    "id": "YcJlwtBN0h8",
+    "title": "This Github repo will make you MONEY\ud83d\udcb0..",
+    "url": "https://www.youtube.com/watch?v=YcJlwtBN0h8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-12T14:00:00Z"
+  },
+  {
+    "id": "4pVPHnuW5hc",
+    "title": "why are you still writing backend API\u2019s?\u2026",
+    "url": "https://www.youtube.com/watch?v=4pVPHnuW5hc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-10T14:00:00Z"
+  },
+  {
+    "id": "hQ5xuocFsiY",
+    "title": "I no longer need an editor with this...\ud83d\udd25",
+    "url": "https://www.youtube.com/watch?v=hQ5xuocFsiY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-02-07T14:00:00Z"
+  },
+  {
+    "id": "fee18b1chZA",
+    "title": "Agent Skills | Supabase Office Hour AMA #2",
+    "url": "https://www.youtube.com/watch?v=fee18b1chZA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-29T11:59:12Z"
+  },
+  {
+    "id": "5UA_r3d_MYU",
+    "title": "Postgres is the best database",
+    "url": "https://www.youtube.com/watch?v=5UA_r3d_MYU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-24T14:00:00Z"
+  },
+  {
+    "id": "HG8opXGzGWI",
+    "title": "No more packages #webdevelopment",
+    "url": "https://www.youtube.com/watch?v=HG8opXGzGWI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-22T14:00:00Z"
+  },
+  {
+    "id": "RTifJjl25H8",
+    "title": "Huge timesaver when writing database queries!",
+    "url": "https://www.youtube.com/watch?v=RTifJjl25H8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-20T14:00:46Z"
+  },
+  {
+    "id": "ohIROAs4KVw",
+    "title": "Fastest way to add auth in Next.js 16!",
+    "url": "https://www.youtube.com/watch?v=ohIROAs4KVw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-18T14:01:15Z"
+  },
+  {
+    "id": "0CVRqggNgG8",
+    "title": "Which is the best AI Coding Model? Codex, Sonnet or Composer...",
+    "url": "https://www.youtube.com/watch?v=0CVRqggNgG8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-16T14:00:01Z"
+  },
+  {
+    "id": "JGVLZNXCMkQ",
+    "title": "Unlimited Supabase projects for FREE!",
+    "url": "https://www.youtube.com/watch?v=JGVLZNXCMkQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-14T14:00:41Z"
+  },
+  {
+    "id": "yoOxxEtm8iU",
+    "title": "If you're using Supabase without RLS, you want to switch this off!",
+    "url": "https://www.youtube.com/watch?v=yoOxxEtm8iU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-12T14:01:49Z"
+  },
+  {
+    "id": "09AEen58Gc8",
+    "title": "Fastest way to spin up free hosted Postgres database!",
+    "url": "https://www.youtube.com/watch?v=09AEen58Gc8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-10T14:00:02Z"
+  },
+  {
+    "id": "5KiSs2vMJHA",
+    "title": "Google just changed how we do Marketing",
+    "url": "https://www.youtube.com/watch?v=5KiSs2vMJHA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-09T14:00:17Z"
+  },
+  {
+    "id": "zY6rIPY-x4s",
+    "title": "Never write a DELETE query like this!",
+    "url": "https://www.youtube.com/watch?v=zY6rIPY-x4s",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-08T14:01:41Z"
+  },
+  {
+    "id": "pX1jEg9EVoY",
+    "title": "Supabase now has a first-party integration inside Trae SOLO!",
+    "url": "https://www.youtube.com/watch?v=pX1jEg9EVoY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-07T15:01:37Z"
+  },
+  {
+    "id": "YR30uzwWoDM",
+    "title": "How to Use Supabase with n8n (Database + File Storage)",
+    "url": "https://www.youtube.com/watch?v=YR30uzwWoDM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-07T14:01:06Z"
+  },
+  {
+    "id": "J54Laua2xMk",
+    "title": "Which is the best AI Builder? Replit, Lovable or Bolt...",
+    "url": "https://www.youtube.com/watch?v=J54Laua2xMk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-06T14:00:36Z"
+  },
+  {
+    "id": "APBSYjKuEq8",
+    "title": "Announcing the Supabase Integration in Trae SOLO",
+    "url": "https://www.youtube.com/watch?v=APBSYjKuEq8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-05T14:12:49Z"
+  },
+  {
+    "id": "fRgM4t2jCVQ",
+    "title": "Can't believe it's this SIMPLE to impersonate users with Supabase!",
+    "url": "https://www.youtube.com/watch?v=fRgM4t2jCVQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-04T14:01:07Z"
+  },
+  {
+    "id": "fBRh35nj86E",
+    "title": "The fastest way to build with Next.js 16 and Supabase!",
+    "url": "https://www.youtube.com/watch?v=fBRh35nj86E",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2026-01-02T14:01:11Z"
+  },
+  {
+    "id": "6g-wf4E3ADw",
+    "title": "Before any DESTRUCTIVE query, you want to do this...",
+    "url": "https://www.youtube.com/watch?v=6g-wf4E3ADw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-31T14:00:10Z"
+  },
+  {
+    "id": "riM7NmeZPqc",
+    "title": "Which is the best Web Framework? React, Svelte or Vue...",
+    "url": "https://www.youtube.com/watch?v=riM7NmeZPqc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-29T14:01:35Z"
+  },
+  {
+    "id": "Lv-O590iDQk",
+    "title": "Enums could be problematic. Use constraints instead!",
+    "url": "https://www.youtube.com/watch?v=Lv-O590iDQk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-28T13:00:46Z"
+  },
+  {
+    "id": "U9DIFRjriv0",
+    "title": "Did you know Supabase handles this automatically? \ud83e\udd2f",
+    "url": "https://www.youtube.com/watch?v=U9DIFRjriv0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-27T14:01:01Z"
+  },
+  {
+    "id": "5GMOkrg-MtM",
+    "title": "Don't forget to switch this off if using Drizzle!",
+    "url": "https://www.youtube.com/watch?v=5GMOkrg-MtM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-25T14:00:12Z"
+  },
+  {
+    "id": "B2ldwYWDf3g",
+    "title": "NEVER write an UPDATE statement like this! \u274c",
+    "url": "https://www.youtube.com/watch?v=B2ldwYWDf3g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-23T14:00:30Z"
+  },
+  {
+    "id": "cvZiu-oSDFg",
+    "title": "Which is the best AI Code Editor? Cursor, Trae or Antigravity",
+    "url": "https://www.youtube.com/watch?v=cvZiu-oSDFg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-21T14:01:05Z"
+  },
+  {
+    "id": "7HmWU_cEZeQ",
+    "title": "This will CHANGE how we all use Github.",
+    "url": "https://www.youtube.com/watch?v=7HmWU_cEZeQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-19T14:30:00Z"
+  },
+  {
+    "id": "CW39wNJY0zM",
+    "title": "Why Is Junk Email Called Spam?",
+    "url": "https://www.youtube.com/watch?v=CW39wNJY0zM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-17T14:00:00Z"
+  },
+  {
+    "id": "kSieprG6nZ0",
+    "title": "Content recommendations & Vector Buckets | Supabase Office Hour AMA #1",
+    "url": "https://www.youtube.com/watch?v=kSieprG6nZ0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-17T11:35:36Z"
+  },
+  {
+    "id": "NaONexQwBlg",
+    "title": "Don't let this happen to you!",
+    "url": "https://www.youtube.com/watch?v=NaONexQwBlg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-12T13:00:00Z"
+  },
+  {
+    "id": "YjXm6vj6RiY",
+    "title": "MAKE SURE YOU NEVER EVER DO THIS!",
+    "url": "https://www.youtube.com/watch?v=YjXm6vj6RiY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-11T14:00:57Z"
+  },
+  {
+    "id": "TEaVyrjnRAY",
+    "title": "Is it meant to take this long??",
+    "url": "https://www.youtube.com/watch?v=TEaVyrjnRAY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-09T14:00:52Z"
+  },
+  {
+    "id": "keJIied898E",
+    "title": "Realtime Broadcast now supports time travel! \ud83e\udd2f",
+    "url": "https://www.youtube.com/watch?v=keJIied898E",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-05T14:01:31Z"
+  },
+  {
+    "id": "_3xsijRDQ-w",
+    "title": "Announcement: Supabase Auth OAuth2 Provider",
+    "url": "https://www.youtube.com/watch?v=_3xsijRDQ-w",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-04T20:00:36Z"
+  },
+  {
+    "id": "RQ_V57eVfn8",
+    "title": "Announcement: Supabase ETL\ud83c\udf89",
+    "url": "https://www.youtube.com/watch?v=RQ_V57eVfn8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-12-02T20:30:10Z"
+  },
+  {
+    "id": "YmCAJl27rH0",
+    "title": "You\u2019re doing this all wrong. Stop writing migrations. Just write SQL. #sql #database  #programming",
+    "url": "https://www.youtube.com/watch?v=YmCAJl27rH0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-26T17:09:39Z"
+  },
+  {
+    "id": "CB_yGYqqHJc",
+    "title": "Hey ChatGPT show me the seahorse emoji",
+    "url": "https://www.youtube.com/watch?v=CB_yGYqqHJc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-21T17:32:41Z"
+  },
+  {
+    "id": "gWBsSMehyJo",
+    "title": "Advanced Vector Database Techniques That Power YouTube\u2019s Home Screen",
+    "url": "https://www.youtube.com/watch?v=gWBsSMehyJo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-20T14:01:26Z"
+  },
+  {
+    "id": "J_wStD7DTZA",
+    "title": "The much more fun way to delegate work to your teammates!",
+    "url": "https://www.youtube.com/watch?v=J_wStD7DTZA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-16T14:00:35Z"
+  },
+  {
+    "id": "5uAo-dEs9cM",
+    "title": "Getting started with Supabase MCP on Cursor just got way easier",
+    "url": "https://www.youtube.com/watch?v=5uAo-dEs9cM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-13T14:00:11Z"
+  },
+  {
+    "id": "vw9CFAQ-zu0",
+    "title": "hey chatgpt is my home on fire?",
+    "url": "https://www.youtube.com/watch?v=vw9CFAQ-zu0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-10T14:01:37Z"
+  },
+  {
+    "id": "0RE76MdaoDA",
+    "title": "How Spectacles Transforms Physical Objects Into Digital Controllers | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=0RE76MdaoDA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-09T14:00:01Z"
+  },
+  {
+    "id": "MXZloUFLUlA",
+    "title": "Bet you didn't know you could do this with Stripe and Supabase!",
+    "url": "https://www.youtube.com/watch?v=MXZloUFLUlA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-07T14:00:45Z"
+  },
+  {
+    "id": "jreFTgdVRnI",
+    "title": "Story Behind Creating the First iPhone | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=jreFTgdVRnI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-07T13:01:27Z"
+  },
+  {
+    "id": "igt7mH_MvFE",
+    "title": "Supabase is the NEW Zapier! \ud83e\udd2f",
+    "url": "https://www.youtube.com/watch?v=igt7mH_MvFE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-06T14:01:17Z"
+  },
+  {
+    "id": "gcVUXsz-35E",
+    "title": "What to do when they don't support Webhooks!",
+    "url": "https://www.youtube.com/watch?v=gcVUXsz-35E",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-05T14:01:18Z"
+  },
+  {
+    "id": "6y7620j6DgY",
+    "title": "Your Data, Your Control: How Supabase Keeps You in Charge | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=6y7620j6DgY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-05T14:00:20Z"
+  },
+  {
+    "id": "gpToMI15vc4",
+    "title": "Subscribe Supabase to Webhook Events from Stripe",
+    "url": "https://www.youtube.com/watch?v=gpToMI15vc4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-04T14:01:21Z"
+  },
+  {
+    "id": "SNUVnewNypw",
+    "title": "Robot Overlords or Servants?",
+    "url": "https://www.youtube.com/watch?v=SNUVnewNypw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-03T14:00:49Z"
+  },
+  {
+    "id": "ad6BuOV96BI",
+    "title": "Most devs have no idea you can do this...",
+    "url": "https://www.youtube.com/watch?v=ad6BuOV96BI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-03T13:00:04Z"
+  },
+  {
+    "id": "wBI7LrPzRA4",
+    "title": "FREE SUPABASE PROJECTS! This will definitely get taken down!",
+    "url": "https://www.youtube.com/watch?v=wBI7LrPzRA4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-02T14:01:37Z"
+  },
+  {
+    "id": "RTD98J4Zt2s",
+    "title": "How to build a Developer-First Startup | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=RTD98J4Zt2s",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-02T13:00:59Z"
+  },
+  {
+    "id": "9CT7fnIl0hU",
+    "title": "Could this be the future of Web Development?",
+    "url": "https://www.youtube.com/watch?v=9CT7fnIl0hU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-11-01T14:00:14Z"
+  },
+  {
+    "id": "F8Qx1HUdUXs",
+    "title": "Cursor 2.0 finally makes this possible!",
+    "url": "https://www.youtube.com/watch?v=F8Qx1HUdUXs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-31T14:00:33Z"
+  },
+  {
+    "id": "rs3EQIOM-wo",
+    "title": "Supabase Remote MCP Server Makes It Easier Than Ever to Build Your Apps With AI",
+    "url": "https://www.youtube.com/watch?v=rs3EQIOM-wo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-31T13:02:03Z"
+  },
+  {
+    "id": "flHwhKiZnXk",
+    "title": "Is This the END of Web Development?",
+    "url": "https://www.youtube.com/watch?v=flHwhKiZnXk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-30T13:01:31Z"
+  },
+  {
+    "id": "ga2kIJbtIZg",
+    "title": "Snapchat Spectacles With Snap Cloud",
+    "url": "https://www.youtube.com/watch?v=ga2kIJbtIZg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-29T13:01:40Z"
+  },
+  {
+    "id": "-6kY8ZE41No",
+    "title": "ChatGPT runs Doom now",
+    "url": "https://www.youtube.com/watch?v=-6kY8ZE41No",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-27T13:50:00Z"
+  },
+  {
+    "id": "YN3kjiCyeEg",
+    "title": "Could this be the future of web development?",
+    "url": "https://www.youtube.com/watch?v=YN3kjiCyeEg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-27T13:01:11Z"
+  },
+  {
+    "id": "lICh9H5skVk",
+    "title": "This Makes Engineers Run Screaming. So We Built A Business To Solve It | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=lICh9H5skVk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-26T13:01:25Z"
+  },
+  {
+    "id": "PxlZssDNrws",
+    "title": "Multigres is Built To Handle Tens of Thousands of Database Nodes | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=PxlZssDNrws",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-25T13:00:58Z"
+  },
+  {
+    "id": "jbHpBqssJV8",
+    "title": "Everything NEW in Next.js 16",
+    "url": "https://www.youtube.com/watch?v=jbHpBqssJV8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-23T13:01:30Z"
+  },
+  {
+    "id": "30YV9FFu00E",
+    "title": "In The AI Era, If You Don't Lean Into Design, You're Not Going To Make It | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=30YV9FFu00E",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-21T13:00:11Z"
+  },
+  {
+    "id": "VkZvFo3n5wY",
+    "title": "Firebase Co-Founder: This Beats Big Tech Every Time | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=VkZvFo3n5wY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-20T18:00:37Z"
+  },
+  {
+    "id": "jPuod9F0AXE",
+    "title": "Are developers ready for this?",
+    "url": "https://www.youtube.com/watch?v=jPuod9F0AXE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-19T18:40:59Z"
+  },
+  {
+    "id": "J0efYTEZBsQ",
+    "title": "We Raised $1M in 96 Seconds: Building Monzo to 14M Customers | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=J0efYTEZBsQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-17T13:00:39Z"
+  },
+  {
+    "id": "mP440z3Uagk",
+    "title": "Fastest way to generate 4K videos using AI #coding #programming",
+    "url": "https://www.youtube.com/watch?v=mP440z3Uagk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-14T13:01:37Z"
+  },
+  {
+    "id": "IkFVtlH7zq0",
+    "title": "Opening keynote from Paul Copplestone and Ant Wilson | Supabase Select 2025",
+    "url": "https://www.youtube.com/watch?v=IkFVtlH7zq0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-09T13:00:40Z"
+  },
+  {
+    "id": "GbBGYNNMWCg",
+    "title": "Supabase Select Build Stage",
+    "url": "https://www.youtube.com/watch?v=GbBGYNNMWCg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-04T11:50:03Z"
+  },
+  {
+    "id": "OaABqBG732Y",
+    "title": "Supabase Select Main Stage",
+    "url": "https://www.youtube.com/watch?v=OaABqBG732Y",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-04T01:53:08Z"
+  },
+  {
+    "id": "tFybP_HyHV0",
+    "title": "Bring AI images to life with Nano Banana and Veo 3",
+    "url": "https://www.youtube.com/watch?v=tFybP_HyHV0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-10-02T14:01:28Z"
+  },
+  {
+    "id": "GRwIa-ce7RA",
+    "title": "Master Postgres Full-text Search in 5 Minutes",
+    "url": "https://www.youtube.com/watch?v=GRwIa-ce7RA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-09-24T13:00:41Z"
+  },
+  {
+    "id": "ISk-rcDJYso",
+    "title": "5 Useful Tips For Building with Claude Code (2025)",
+    "url": "https://www.youtube.com/watch?v=ISk-rcDJYso",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-09-19T14:00:28Z"
+  },
+  {
+    "id": "8GH-afNDebI",
+    "title": "Build a Complete AI Agent with Lovable and Supabase (Full Tutorial)",
+    "url": "https://www.youtube.com/watch?v=8GH-afNDebI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-09-11T13:48:03Z"
+  },
+  {
+    "id": "iJQ5kwCQqmo",
+    "title": "Building a game with Claude Code and Supabase MCP",
+    "url": "https://www.youtube.com/watch?v=iJQ5kwCQqmo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-09-03T14:01:11Z"
+  },
+  {
+    "id": "z8EPAE658iI",
+    "title": "We Added Persistent Storage to Edge Functions!",
+    "url": "https://www.youtube.com/watch?v=z8EPAE658iI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-08-11T13:02:01Z"
+  },
+  {
+    "id": "8poJ0f3Ucik",
+    "title": "We Made Supabase Scale to Petabytes!",
+    "url": "https://www.youtube.com/watch?v=8poJ0f3Ucik",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-07-25T13:57:46Z"
+  },
+  {
+    "id": "AMQqhHxz5UI",
+    "title": "We made Branching a whole lot easier!",
+    "url": "https://www.youtube.com/watch?v=AMQqhHxz5UI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-07-23T14:00:16Z"
+  },
+  {
+    "id": "rwnOal_xRtM",
+    "title": "We made Supabase Auth way faster!",
+    "url": "https://www.youtube.com/watch?v=rwnOal_xRtM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-07-21T14:01:34Z"
+  },
+  {
+    "id": "FL0QS9uA8-s",
+    "title": "Figma Make Now Has a Backend Powered by Supabase",
+    "url": "https://www.youtube.com/watch?v=FL0QS9uA8-s",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-07-19T13:08:19Z"
+  },
+  {
+    "id": "h3mQrDC4g14",
+    "title": "Edge Functions Have Faster Boot Times and Have New Sync Functions Available!",
+    "url": "https://www.youtube.com/watch?v=h3mQrDC4g14",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-07-18T14:05:52Z"
+  },
+  {
+    "id": "pLto2PD4-O8",
+    "title": "New Observability Features Make Debugging Easy!",
+    "url": "https://www.youtube.com/watch?v=pLto2PD4-O8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-07-17T14:11:39Z"
+  },
+  {
+    "id": "CRARnyYqrOU",
+    "title": "Branching just got a whole lot easier!",
+    "url": "https://www.youtube.com/watch?v=CRARnyYqrOU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-07-16T14:11:42Z"
+  },
+  {
+    "id": "BigtFoFCVBk",
+    "title": "Supabase Now Has a Data Warehouse Solution",
+    "url": "https://www.youtube.com/watch?v=BigtFoFCVBk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-07-15T14:19:32Z"
+  },
+  {
+    "id": "htzj9SkkhhA",
+    "title": "The new way to do Auth Keys in Supabase",
+    "url": "https://www.youtube.com/watch?v=htzj9SkkhhA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-07-14T14:04:28Z"
+  },
+  {
+    "id": "-_WAcIkXdhs",
+    "title": "Lovable makes it really easy to build AWESOME apps!",
+    "url": "https://www.youtube.com/watch?v=-_WAcIkXdhs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-06-25T13:59:20Z"
+  },
+  {
+    "id": "YtTWNzOtkxU",
+    "title": "5 tips to make you a PRO at Cursor",
+    "url": "https://www.youtube.com/watch?v=YtTWNzOtkxU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-06-18T14:01:02Z"
+  },
+  {
+    "id": "iuF8NGUuE6g",
+    "title": "Supabase Broadcast: Bringing Real-Time Multi-Table Updates from the Database",
+    "url": "https://www.youtube.com/watch?v=iuF8NGUuE6g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-06-13T13:01:20Z"
+  },
+  {
+    "id": "3eH-WirT-5s",
+    "title": "Terminal.shop - The Documentary",
+    "url": "https://www.youtube.com/watch?v=3eH-WirT-5s",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-06-09T13:00:11Z"
+  },
+  {
+    "id": "9z36XIvyKRE",
+    "title": "Terminal.shop - Trailer",
+    "url": "https://www.youtube.com/watch?v=9z36XIvyKRE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-06-07T13:00:16Z"
+  },
+  {
+    "id": "98bQdapCtq4",
+    "title": "My new FAVORITE way to use Supabase",
+    "url": "https://www.youtube.com/watch?v=98bQdapCtq4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-06-04T14:17:19Z"
+  },
+  {
+    "id": "TLKxx_-fdio",
+    "title": "Using Claude Code and Supabase to Create a Hand-Tracking App",
+    "url": "https://www.youtube.com/watch?v=TLKxx_-fdio",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-06-02T13:00:40Z"
+  },
+  {
+    "id": "0RUBfAKLlf8",
+    "title": "Secure Your App: Fundamentals of App Security for Vibe Coding",
+    "url": "https://www.youtube.com/watch?v=0RUBfAKLlf8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-29T13:00:03Z"
+  },
+  {
+    "id": "1QhcGFA7qsQ",
+    "title": "Lovable Mini Documentary | Behind The Code",
+    "url": "https://www.youtube.com/watch?v=1QhcGFA7qsQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-28T13:00:05Z"
+  },
+  {
+    "id": "DeoCapvBQaA",
+    "title": "Lovable | Behind The Code Trailer",
+    "url": "https://www.youtube.com/watch?v=DeoCapvBQaA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-23T18:36:59Z"
+  },
+  {
+    "id": "6bDJ1j3SG0I",
+    "title": "Build apps with OpenAI Image Generation API and Supabase Edge Functions",
+    "url": "https://www.youtube.com/watch?v=6bDJ1j3SG0I",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-22T13:00:05Z"
+  },
+  {
+    "id": "lEzxrXy3vJI",
+    "title": "WHATS THE ID?????",
+    "url": "https://www.youtube.com/watch?v=lEzxrXy3vJI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-21T17:03:29Z"
+  },
+  {
+    "id": "za_loEtS4gs",
+    "title": "Supabase Edge Functions Explained",
+    "url": "https://www.youtube.com/watch?v=za_loEtS4gs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-20T13:01:46Z"
+  },
+  {
+    "id": "pDA4AP8m1SU",
+    "title": "Is AI actually good at coding?",
+    "url": "https://www.youtube.com/watch?v=pDA4AP8m1SU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-15T14:03:18Z"
+  },
+  {
+    "id": "Tkk1UXXR3xw",
+    "title": "Supabase Edge Functions Just Got Way Easier",
+    "url": "https://www.youtube.com/watch?v=Tkk1UXXR3xw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-12T13:00:57Z"
+  },
+  {
+    "id": "xIN_unOLXSI",
+    "title": "Building a CRM using AI with Tempo and Supabase",
+    "url": "https://www.youtube.com/watch?v=xIN_unOLXSI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-07T13:01:46Z"
+  },
+  {
+    "id": "b3FvsMbKsjk",
+    "title": "The most expensive video we've ever made!",
+    "url": "https://www.youtube.com/watch?v=b3FvsMbKsjk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-05-02T14:00:53Z"
+  },
+  {
+    "id": "EALkUlOKvAs",
+    "title": "How Supabase Simplifies Your Database Management with Declarative Schema",
+    "url": "https://www.youtube.com/watch?v=EALkUlOKvAs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-04-28T13:00:25Z"
+  },
+  {
+    "id": "loN2PPfmeR4",
+    "title": "Getting Started with the Supabase UI Library",
+    "url": "https://www.youtube.com/watch?v=loN2PPfmeR4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-04-15T15:01:13Z"
+  },
+  {
+    "id": "1SMldLoOhbg",
+    "title": "Introducing the official Supabase MCP Server",
+    "url": "https://www.youtube.com/watch?v=1SMldLoOhbg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-04-04T14:22:19Z"
+  },
+  {
+    "id": "ts7HEeCuVH0",
+    "title": "Introducing Declarative Database Schema",
+    "url": "https://www.youtube.com/watch?v=ts7HEeCuVH0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-04-03T14:16:55Z"
+  },
+  {
+    "id": "vRorVm_UbhA",
+    "title": "Introducing Realtime Broadcast from Database",
+    "url": "https://www.youtube.com/watch?v=vRorVm_UbhA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-04-02T14:01:14Z"
+  },
+  {
+    "id": "Pn7xyTbsxPI",
+    "title": "Announcing Updates to Edge Functions",
+    "url": "https://www.youtube.com/watch?v=Pn7xyTbsxPI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-04-01T13:46:17Z"
+  },
+  {
+    "id": "2TIuUjkCDFE",
+    "title": "Announcing the Supabase UI Library",
+    "url": "https://www.youtube.com/watch?v=2TIuUjkCDFE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-03-31T13:39:28Z"
+  },
+  {
+    "id": "LfAV5fmRybg",
+    "title": "Bolt.new Mini Documentary | Behind The Code",
+    "url": "https://www.youtube.com/watch?v=LfAV5fmRybg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-03-21T13:57:01Z"
+  },
+  {
+    "id": "6eUL1Wo9ZRc",
+    "title": "How to Use Cursor Agent and Supabase to Maximize Productivity!",
+    "url": "https://www.youtube.com/watch?v=6eUL1Wo9ZRc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-02-26T12:00:09Z"
+  },
+  {
+    "id": "T-qAtAKjqwc",
+    "title": "Supabase Explained",
+    "url": "https://www.youtube.com/watch?v=T-qAtAKjqwc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-02-18T20:33:21Z"
+  },
+  {
+    "id": "1V6DHNlD5mk",
+    "title": "Don't go to prison for using AI",
+    "url": "https://www.youtube.com/watch?v=1V6DHNlD5mk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-02-14T13:00:02Z"
+  },
+  {
+    "id": "GFxOwNiioT0",
+    "title": "I Built an Airbnb Clone in 30 Minutes\u2026 and You Can Too! (bolt.new + Supabase)",
+    "url": "https://www.youtube.com/watch?v=GFxOwNiioT0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-02-12T12:00:31Z"
+  },
+  {
+    "id": "gZrLm9WWuGY",
+    "title": "Bun 1.2 is actually AMAZING!",
+    "url": "https://www.youtube.com/watch?v=gZrLm9WWuGY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-02-07T13:00:58Z"
+  },
+  {
+    "id": "wnN5_sLbVbQ",
+    "title": "Using Windsurf and Supabase to build a Twitter Clone",
+    "url": "https://www.youtube.com/watch?v=wnN5_sLbVbQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-01-30T13:01:15Z"
+  },
+  {
+    "id": "t12ekS7Vgh4",
+    "title": "Tool Calling in React Native with the OpenAI WebRTC Realtime API",
+    "url": "https://www.youtube.com/watch?v=t12ekS7Vgh4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-01-17T05:33:08Z"
+  },
+  {
+    "id": "EnJxy9UibNc",
+    "title": "Cookie Auth with Hono",
+    "url": "https://www.youtube.com/watch?v=EnJxy9UibNc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-01-15T14:00:16Z"
+  },
+  {
+    "id": "9z54zkmK-to",
+    "title": "Building a SaaS with Lovable, Supabase, and Stripe",
+    "url": "https://www.youtube.com/watch?v=9z54zkmK-to",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2025-01-14T13:00:21Z"
+  },
+  {
+    "id": "uvG11I-ftfo",
+    "title": "Nuxt.js Mini Documentary | Behind The Code",
+    "url": "https://www.youtube.com/watch?v=uvG11I-ftfo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-12-18T17:01:05Z"
+  },
+  {
+    "id": "9GQtXXERnqU",
+    "title": "The secret behind Lovable's rapid growth and their Supabase integration",
+    "url": "https://www.youtube.com/watch?v=9GQtXXERnqU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-12-16T13:00:10Z"
+  },
+  {
+    "id": "ilcU4gTrPls",
+    "title": "10 new things to try for 2025",
+    "url": "https://www.youtube.com/watch?v=ilcU4gTrPls",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-12-13T15:00:52Z"
+  },
+  {
+    "id": "Fo-3uaAclBc",
+    "title": "Building an offline-first app with Flutter, Supabase, and Brick",
+    "url": "https://www.youtube.com/watch?v=Fo-3uaAclBc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-12-11T12:59:53Z"
+  },
+  {
+    "id": "IQ8xqmht-gk",
+    "title": "These 3 AI models tried to build me a database",
+    "url": "https://www.youtube.com/watch?v=IQ8xqmht-gk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-12-06T15:00:19Z"
+  },
+  {
+    "id": "UEwfaElBnZk",
+    "title": "We added the missing piece! \ud83e\udde9",
+    "url": "https://www.youtube.com/watch?v=UEwfaElBnZk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-12-05T15:00:35Z"
+  },
+  {
+    "id": "miRQPbIJOuQ",
+    "title": "We made Cron EASY!",
+    "url": "https://www.youtube.com/watch?v=miRQPbIJOuQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-12-04T15:00:47Z"
+  },
+  {
+    "id": "envrsJ8VfAU",
+    "title": "3 new things you can do with SupaCharged Edge Functions",
+    "url": "https://www.youtube.com/watch?v=envrsJ8VfAU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-12-03T15:00:46Z"
+  },
+  {
+    "id": "_fdP-aaTHgw",
+    "title": "We improved Supabase AI ... A lot!",
+    "url": "https://www.youtube.com/watch?v=_fdP-aaTHgw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-12-02T14:34:32Z"
+  },
+  {
+    "id": "9c4v27ZlH6Q",
+    "title": "Using bolt.new and Supabase to build an Instagram clone",
+    "url": "https://www.youtube.com/watch?v=9c4v27ZlH6Q",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-11-25T13:03:43Z"
+  },
+  {
+    "id": "syB7ogE0g4c",
+    "title": "How to implement pagination in a single query with Supabase",
+    "url": "https://www.youtube.com/watch?v=syB7ogE0g4c",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-11-16T11:01:04Z"
+  },
+  {
+    "id": "rSKBTJxG9VA",
+    "title": "Background Tasks - Upload OpenAI Speech to Supabase Storage",
+    "url": "https://www.youtube.com/watch?v=rSKBTJxG9VA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-11-13T14:00:52Z"
+  },
+  {
+    "id": "EuiE5VQ-rIY",
+    "title": "Capture and upload videos with JavaScript",
+    "url": "https://www.youtube.com/watch?v=EuiE5VQ-rIY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-11-08T14:00:24Z"
+  },
+  {
+    "id": "bNg_IwHmJic",
+    "title": "Quickly add dummy data into your Postgres database",
+    "url": "https://www.youtube.com/watch?v=bNg_IwHmJic",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-11-04T13:21:09Z"
+  },
+  {
+    "id": "wXXTz2eZIoM",
+    "title": "FASTEST way to build apps with Next.js 15",
+    "url": "https://www.youtube.com/watch?v=wXXTz2eZIoM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-31T13:01:18Z"
+  },
+  {
+    "id": "LLTUWZO8D0g",
+    "title": "Build with Claude as a JavaScript developer - Anthropic API",
+    "url": "https://www.youtube.com/watch?v=LLTUWZO8D0g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-30T15:44:15Z"
+  },
+  {
+    "id": "z2iOrJlOXYg",
+    "title": "Aggregating Data WITHOUT AN ORM!",
+    "url": "https://www.youtube.com/watch?v=z2iOrJlOXYg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-25T13:01:15Z"
+  },
+  {
+    "id": "e7p0irjQZfw",
+    "title": "Behind the Code of Atomic CRM",
+    "url": "https://www.youtube.com/watch?v=e7p0irjQZfw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-24T14:00:41Z"
+  },
+  {
+    "id": "no6tpWy5Zns",
+    "title": "Getting started with the Google Gemini API in TypeScript",
+    "url": "https://www.youtube.com/watch?v=no6tpWy5Zns",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-22T14:00:58Z"
+  },
+  {
+    "id": "jOcG9NgtoGM",
+    "title": "Using v0 and Supabase to build a CRM app with AI",
+    "url": "https://www.youtube.com/watch?v=jOcG9NgtoGM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-18T13:00:54Z"
+  },
+  {
+    "id": "X1Z52ITAXgE",
+    "title": "Every filter in Supabase in 90 seconds",
+    "url": "https://www.youtube.com/watch?v=X1Z52ITAXgE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-17T13:00:37Z"
+  },
+  {
+    "id": "_TgkAMm1-4U",
+    "title": "Resumable Uploads on Mobile",
+    "url": "https://www.youtube.com/watch?v=_TgkAMm1-4U",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-16T14:00:36Z"
+  },
+  {
+    "id": "WUVrtVj0aFs",
+    "title": "Subqueries vs Joins when selecting across a many-to-many relationship in Postgres",
+    "url": "https://www.youtube.com/watch?v=WUVrtVj0aFs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-11T13:00:39Z"
+  },
+  {
+    "id": "zNB2k2E6O74",
+    "title": "bolt.new works great with Supabase to create full-stack applications.",
+    "url": "https://www.youtube.com/watch?v=zNB2k2E6O74",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-10T13:01:12Z"
+  },
+  {
+    "id": "1LjSv-zTypo",
+    "title": "Text search with Supabase",
+    "url": "https://www.youtube.com/watch?v=1LjSv-zTypo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-03T13:24:15Z"
+  },
+  {
+    "id": "9FuRuD8WKyU",
+    "title": "React Native #Maps - self-hosted!",
+    "url": "https://www.youtube.com/watch?v=9FuRuD8WKyU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-10-02T14:00:14Z"
+  },
+  {
+    "id": "9c6h9dU3yJU",
+    "title": "Range columns are handy for making reservation apps! #supabase",
+    "url": "https://www.youtube.com/watch?v=9c6h9dU3yJU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-26T13:00:08Z"
+  },
+  {
+    "id": "tEZ-3IbTSTA",
+    "title": "How to build #local #first #Expo Apss - #coding #mobile",
+    "url": "https://www.youtube.com/watch?v=tEZ-3IbTSTA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-26T04:48:37Z"
+  },
+  {
+    "id": "68bM7TC9D1Q",
+    "title": "How to build local-first #Expo Apps",
+    "url": "https://www.youtube.com/watch?v=68bM7TC9D1Q",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-25T14:00:08Z"
+  },
+  {
+    "id": "F3bz8OQKBVM",
+    "title": "v0 now supports Supabase!",
+    "url": "https://www.youtube.com/watch?v=F3bz8OQKBVM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-22T15:30:22Z"
+  },
+  {
+    "id": "LwGgaUDYIcs",
+    "title": "Can I host Next.js FASTER than a PRO can solve a Rubik\u2019s Cube?",
+    "url": "https://www.youtube.com/watch?v=LwGgaUDYIcs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-20T12:54:45Z"
+  },
+  {
+    "id": "nEyTgo4l_eI",
+    "title": "Using Cursor to have AI build out a social network app powered by Next.js and Supabase",
+    "url": "https://www.youtube.com/watch?v=nEyTgo4l_eI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-19T13:00:56Z"
+  },
+  {
+    "id": "Z1RcPXNaBKw",
+    "title": "Use v0 to kick start your hackathon projects!",
+    "url": "https://www.youtube.com/watch?v=Z1RcPXNaBKw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-18T15:59:52Z"
+  },
+  {
+    "id": "WjIqk5uIPqc",
+    "title": "THE COUNTDOWN HAS STARTED!!",
+    "url": "https://www.youtube.com/watch?v=WjIqk5uIPqc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-17T14:25:29Z"
+  },
+  {
+    "id": "MFUXSmXNsUc",
+    "title": "Brain storming hackathon ideas with ChatGPT",
+    "url": "https://www.youtube.com/watch?v=MFUXSmXNsUc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-16T13:00:31Z"
+  },
+  {
+    "id": "qYVgNS5CXAs",
+    "title": "Hackathon alert \ud83d\udea8 Supabase Launch Week 12 Hackathon has begun!",
+    "url": "https://www.youtube.com/watch?v=qYVgNS5CXAs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-13T16:02:30Z"
+  },
+  {
+    "id": "WOX9g1s43-g",
+    "title": "Everything you NEED TO KNOW about Relationships",
+    "url": "https://www.youtube.com/watch?v=WOX9g1s43-g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-13T13:00:38Z"
+  },
+  {
+    "id": "Uy3G2zSrZEg",
+    "title": "Adding Supabase docs to Cursor editor #supabase",
+    "url": "https://www.youtube.com/watch?v=Uy3G2zSrZEg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-11T13:00:36Z"
+  },
+  {
+    "id": "b5bZ4IZNyRo",
+    "title": "Increase user retention by localizing your sign-up emails!",
+    "url": "https://www.youtube.com/watch?v=b5bZ4IZNyRo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-09-04T12:55:35Z"
+  },
+  {
+    "id": "AvJGFsYpQdI",
+    "title": "In-Browser Semantic AI Search - free and open source!",
+    "url": "https://www.youtube.com/watch?v=AvJGFsYpQdI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-29T17:00:08Z"
+  },
+  {
+    "id": "y-9q3RyhnHw",
+    "title": "10 new things you NEED to try!",
+    "url": "https://www.youtube.com/watch?v=y-9q3RyhnHw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-24T13:01:04Z"
+  },
+  {
+    "id": "tlA7BomSCgU",
+    "title": "Custom Auth Emails with React Email and Resend",
+    "url": "https://www.youtube.com/watch?v=tlA7BomSCgU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-23T14:00:50Z"
+  },
+  {
+    "id": "_6L-dnBn2wg",
+    "title": "Mozilla Llamafile in Supabase Edge Functions",
+    "url": "https://www.youtube.com/watch?v=_6L-dnBn2wg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-21T12:46:20Z"
+  },
+  {
+    "id": "wCwEWR4k0no",
+    "title": "You don't need a Database - use this instead!",
+    "url": "https://www.youtube.com/watch?v=wCwEWR4k0no",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-16T13:00:59Z"
+  },
+  {
+    "id": "ISFCooRMvbE",
+    "title": "The Supabase Book: an interview with David Lorenz",
+    "url": "https://www.youtube.com/watch?v=ISFCooRMvbE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-16T07:07:48Z"
+  },
+  {
+    "id": "A4GFmvgxS-E",
+    "title": "Configure Log Drains with DataDog and Custom HTTP Service using Edge Functions",
+    "url": "https://www.youtube.com/watch?v=A4GFmvgxS-E",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-15T13:11:44Z"
+  },
+  {
+    "id": "BPD7kxb5N84",
+    "title": "You don't need Supabase Auth - use this instead!",
+    "url": "https://www.youtube.com/watch?v=BPD7kxb5N84",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-14T13:00:17Z"
+  },
+  {
+    "id": "IXRrU9MpA8Q",
+    "title": "Securing your Broadcast and Presence messages on Supabase Realtime with RLS",
+    "url": "https://www.youtube.com/watch?v=IXRrU9MpA8Q",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-13T13:00:14Z"
+  },
+  {
+    "id": "LIfxj6r3bhM",
+    "title": "Copilot for SQL",
+    "url": "https://www.youtube.com/watch?v=LIfxj6r3bhM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-12T13:05:04Z"
+  },
+  {
+    "id": "ooWaPVvljlU",
+    "title": "I gave AI full control over my database (postgres.new)",
+    "url": "https://www.youtube.com/watch?v=ooWaPVvljlU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-12T13:01:01Z"
+  },
+  {
+    "id": "uT945Rh5sl8",
+    "title": "Realtime AI in the Browser",
+    "url": "https://www.youtube.com/watch?v=uT945Rh5sl8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-07T13:17:01Z"
+  },
+  {
+    "id": "MHOVGMhWMzk",
+    "title": "Truely Delightful UX for Authentication with Next.js, v0 and Supabase",
+    "url": "https://www.youtube.com/watch?v=MHOVGMhWMzk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-08-02T14:00:17Z"
+  },
+  {
+    "id": "cL4pVpaOH9o",
+    "title": "Flutter tutorial - Build an Uber clone with Flutter and Supabase",
+    "url": "https://www.youtube.com/watch?v=cL4pVpaOH9o",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-31T12:28:44Z"
+  },
+  {
+    "id": "AHPL1dwQT-4",
+    "title": "Why you NEED to be using Database Branching!",
+    "url": "https://www.youtube.com/watch?v=AHPL1dwQT-4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-26T15:02:30Z"
+  },
+  {
+    "id": "IHU_7o-8qKQ",
+    "title": "Supabase Happy Hour",
+    "url": "https://www.youtube.com/watch?v=IHU_7o-8qKQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-19T19:06:22Z"
+  },
+  {
+    "id": "g5NjMqj22qI",
+    "title": "Using Claude 3.5 Sonnet and Supabase to build an e-commerce app with AI powered related-items search",
+    "url": "https://www.youtube.com/watch?v=g5NjMqj22qI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-16T12:57:30Z"
+  },
+  {
+    "id": "NdSu4H_TmZI",
+    "title": "13min High Intensity Postgres Workout (NO REPEATS)",
+    "url": "https://www.youtube.com/watch?v=NdSu4H_TmZI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-12T14:00:21Z"
+  },
+  {
+    "id": "dFEIsaabtX0",
+    "title": "GraphQL Quickstart",
+    "url": "https://www.youtube.com/watch?v=dFEIsaabtX0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-10T14:51:52Z"
+  },
+  {
+    "id": "RpxSb4xb-4w",
+    "title": "Fully Open Source Google Maps API alternative! \ud83e\udd2f #maps #oss #postgres",
+    "url": "https://www.youtube.com/watch?v=RpxSb4xb-4w",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-08T15:23:08Z"
+  },
+  {
+    "id": "PdEutzhsrws",
+    "title": "Advanced Row Level Security (RLS) Policies // Authorization Deep Dive",
+    "url": "https://www.youtube.com/watch?v=PdEutzhsrws",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-05T14:00:27Z"
+  },
+  {
+    "id": "7hXNPnu1gNU",
+    "title": "Postgres Realtime location sharing with MapLibre",
+    "url": "https://www.youtube.com/watch?v=7hXNPnu1gNU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-04T14:00:07Z"
+  },
+  {
+    "id": "eG_9lZrrbEY",
+    "title": "Use Range to make sure your reservations don't overlap in Postgres!",
+    "url": "https://www.youtube.com/watch?v=eG_9lZrrbEY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-07-03T13:50:47Z"
+  },
+  {
+    "id": "hDi4qGSvNoU",
+    "title": "Postgres scales \u2026 when you do this!",
+    "url": "https://www.youtube.com/watch?v=hDi4qGSvNoU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-28T14:00:40Z"
+  },
+  {
+    "id": "hjrQb029LEE",
+    "title": "Mastering check constraints in Postgres to keep your database clean!",
+    "url": "https://www.youtube.com/watch?v=hjrQb029LEE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-27T15:19:48Z"
+  },
+  {
+    "id": "EdIkmp5Yj7I",
+    "title": "Open Source Google Maps API Alternative",
+    "url": "https://www.youtube.com/watch?v=EdIkmp5Yj7I",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-26T14:00:09Z"
+  },
+  {
+    "id": "53CJUZ7rQ3E",
+    "title": "Simple trick to make your queries WAY more efficient // Partial Indexes",
+    "url": "https://www.youtube.com/watch?v=53CJUZ7rQ3E",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-21T13:41:06Z"
+  },
+  {
+    "id": "l7QBpiLRwJc",
+    "title": "Self-host Maps with Protomaps and Supabase Storage",
+    "url": "https://www.youtube.com/watch?v=l7QBpiLRwJc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-19T13:27:13Z"
+  },
+  {
+    "id": "TtOdD-YRESI",
+    "title": "Use generated columns to perform queries with formulas in a scalable way",
+    "url": "https://www.youtube.com/watch?v=TtOdD-YRESI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-17T15:33:27Z"
+  },
+  {
+    "id": "fW-y-r7CgNI",
+    "title": "Are Multi-Column Indexes a good idea?",
+    "url": "https://www.youtube.com/watch?v=fW-y-r7CgNI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-14T14:12:45Z"
+  },
+  {
+    "id": "MWfB0t5u3V0",
+    "title": "Getting started with PostGIS",
+    "url": "https://www.youtube.com/watch?v=MWfB0t5u3V0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-13T13:00:20Z"
+  },
+  {
+    "id": "sOrtcoKg5zQ",
+    "title": "Debug Edge Functions with Chrome DevTools",
+    "url": "https://www.youtube.com/watch?v=sOrtcoKg5zQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-11T08:24:04Z"
+  },
+  {
+    "id": "bLxJDXqr5sI",
+    "title": "The FASTEST possible way to query data",
+    "url": "https://www.youtube.com/watch?v=bLxJDXqr5sI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-06-01T15:30:14Z"
+  },
+  {
+    "id": "KIwN2TmkTlg",
+    "title": "Generate Images with JavaScript",
+    "url": "https://www.youtube.com/watch?v=KIwN2TmkTlg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-05-30T14:00:21Z"
+  },
+  {
+    "id": "CePdDYF8crw",
+    "title": "Behind the Code of Midday AI",
+    "url": "https://www.youtube.com/watch?v=CePdDYF8crw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-05-29T13:00:14Z"
+  },
+  {
+    "id": "bBu_V8CfWgM",
+    "title": "Make your queries 43,240x faster",
+    "url": "https://www.youtube.com/watch?v=bBu_V8CfWgM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-05-24T14:33:37Z"
+  },
+  {
+    "id": "EwFjETYge9I",
+    "title": "Faster queries with index on JSONB columns in Postgres",
+    "url": "https://www.youtube.com/watch?v=EwFjETYge9I",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-05-23T08:56:23Z"
+  },
+  {
+    "id": "v6UvgfSIjQ0",
+    "title": "The Right Way to do Auth with the Next.js App Router - UPDATED",
+    "url": "https://www.youtube.com/watch?v=v6UvgfSIjQ0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-05-10T14:00:47Z"
+  },
+  {
+    "id": "WaQEHGi3ccU",
+    "title": "#llama3 spitting the rhymes through @Supabase Edge Functions and #Ollama \ud83e\udd99  #coding #ai",
+    "url": "https://www.youtube.com/watch?v=WaQEHGi3ccU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-05-08T13:00:35Z"
+  },
+  {
+    "id": "amJo48ChLGs",
+    "title": "Use this to lock down the schema if you have JSON or JSONB columns",
+    "url": "https://www.youtube.com/watch?v=amJo48ChLGs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-05-07T14:28:32Z"
+  },
+  {
+    "id": "TRBvbxFombo",
+    "title": "10 new things you need to try",
+    "url": "https://www.youtube.com/watch?v=TRBvbxFombo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-05-03T14:10:30Z"
+  },
+  {
+    "id": "6JYsFdcAr4o",
+    "title": "Llama 3 with Vercel AI",
+    "url": "https://www.youtube.com/watch?v=6JYsFdcAr4o",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-05-01T14:00:04Z"
+  },
+  {
+    "id": "nxeUiRz4G-M",
+    "title": "How to store and query JSON data in Postgres",
+    "url": "https://www.youtube.com/watch?v=nxeUiRz4G-M",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-29T14:08:35Z"
+  },
+  {
+    "id": "FmezY-vYlkg",
+    "title": "Monitor Database Queries in Next.js Apps with Sentry",
+    "url": "https://www.youtube.com/watch?v=FmezY-vYlkg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-24T13:00:20Z"
+  },
+  {
+    "id": "diL00ZZ-q50",
+    "title": "File-based Postgres Analytics with DuckDB and AWS S3",
+    "url": "https://www.youtube.com/watch?v=diL00ZZ-q50",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-20T13:27:17Z"
+  },
+  {
+    "id": "NZEbVe47DfA",
+    "title": "8 things you should NEVER do in a Database!",
+    "url": "https://www.youtube.com/watch?v=NZEbVe47DfA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-19T15:28:52Z"
+  },
+  {
+    "id": "WvvGhcNeSPk",
+    "title": "A new way to use Supabase Storage",
+    "url": "https://www.youtube.com/watch?v=WvvGhcNeSPk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-18T12:57:56Z"
+  },
+  {
+    "id": "WNN7Pp5Ftk4",
+    "title": "Improve UX with Anonymous Sign-Ins",
+    "url": "https://www.youtube.com/watch?v=WNN7Pp5Ftk4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-17T14:00:20Z"
+  },
+  {
+    "id": "w4Rr_1whU-U",
+    "title": "Why you should use Edge Functions for AI",
+    "url": "https://www.youtube.com/watch?v=w4Rr_1whU-U",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-16T14:00:40Z"
+  },
+  {
+    "id": "bRtdk8D4X8w",
+    "title": "Supabase is now GA",
+    "url": "https://www.youtube.com/watch?v=bRtdk8D4X8w",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-15T07:00:14Z"
+  },
+  {
+    "id": "FqiQKRKsfZE",
+    "title": "Self-hosting Supabase on Ubuntu with Digital Ocean",
+    "url": "https://www.youtube.com/watch?v=FqiQKRKsfZE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-15T04:56:59Z"
+  },
+  {
+    "id": "bZwHqnF7kxA",
+    "title": "\ud83d\udea8 Big Announcement! \ud83d\udea8",
+    "url": "https://www.youtube.com/watch?v=bZwHqnF7kxA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-11T15:00:24Z"
+  },
+  {
+    "id": "9CSwHNZTskc",
+    "title": "\ud83d\udea8 Big Announcement! \ud83d\udea8",
+    "url": "https://www.youtube.com/watch?v=9CSwHNZTskc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-10T15:00:07Z"
+  },
+  {
+    "id": "VVElr2n90KY",
+    "title": "The Right Way to do Auth with the Next.js App Router!",
+    "url": "https://www.youtube.com/watch?v=VVElr2n90KY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-06T14:00:18Z"
+  },
+  {
+    "id": "vJfPZyP4GGQ",
+    "title": "Building a Donut Slack App Clone",
+    "url": "https://www.youtube.com/watch?v=vJfPZyP4GGQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-03T07:00:33Z"
+  },
+  {
+    "id": "R35NR803oW4",
+    "title": "#AI Image Search with @awsdevelopers Amazon Bedrock and @Supabase vecs in #Python \ud83d\udc0d",
+    "url": "https://www.youtube.com/watch?v=R35NR803oW4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-04-02T06:00:14Z"
+  },
+  {
+    "id": "xUeuy19a-Uw",
+    "title": "3 reasons you should use Postgres Functions and Transactions",
+    "url": "https://www.youtube.com/watch?v=xUeuy19a-Uw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-29T14:00:45Z"
+  },
+  {
+    "id": "JYpgnlyH04A",
+    "title": "Add image support to Flutter web application with Supabase Storage | Flutter Figma Clone #4",
+    "url": "https://www.youtube.com/watch?v=JYpgnlyH04A",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-28T16:50:46Z"
+  },
+  {
+    "id": "A3uND5sgiO0",
+    "title": "AI Image Search with Amazon Bedrock and Supabase Vector in Python",
+    "url": "https://www.youtube.com/watch?v=A3uND5sgiO0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-26T14:00:10Z"
+  },
+  {
+    "id": "IOYFS-2lFjU",
+    "title": "Simplify complex SQL queries with Views in Postgres",
+    "url": "https://www.youtube.com/watch?v=IOYFS-2lFjU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-23T14:00:12Z"
+  },
+  {
+    "id": "B2NZvZ2uLNs",
+    "title": "Track online users with Supabase Realtime Presence | Flutter Figma Clone #3",
+    "url": "https://www.youtube.com/watch?v=B2NZvZ2uLNs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-19T15:00:17Z"
+  },
+  {
+    "id": "2SXK0TOsdNY",
+    "title": "Usage-based restrictions for SaaS subscription tiers",
+    "url": "https://www.youtube.com/watch?v=2SXK0TOsdNY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-15T14:15:00Z"
+  },
+  {
+    "id": "8VRbpx8Lxtg",
+    "title": "Manage secrets and query third-party APIs from Postgres",
+    "url": "https://www.youtube.com/watch?v=8VRbpx8Lxtg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-14T14:00:08Z"
+  },
+  {
+    "id": "Gbf-E3H824k",
+    "title": "Local Development for SaaS product in 2024 // Next.js, Supabase and Stripe",
+    "url": "https://www.youtube.com/watch?v=Gbf-E3H824k",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-08T14:00:11Z"
+  },
+  {
+    "id": "duoxLPv-4GI",
+    "title": "Content recommendation app with OpenAI, Supabase, and Flutter",
+    "url": "https://www.youtube.com/watch?v=duoxLPv-4GI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-07T16:48:24Z"
+  },
+  {
+    "id": "kwoKmi6inAw",
+    "title": "Role-based Access Control (RBAC) User Authorization in Next.js",
+    "url": "https://www.youtube.com/watch?v=kwoKmi6inAw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-06T14:00:39Z"
+  },
+  {
+    "id": "I7CFD99sp1g",
+    "title": "Fastest way to build a SaaS in 2024 - Next.js, Supabase & Stripe",
+    "url": "https://www.youtube.com/watch?v=I7CFD99sp1g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-03-01T14:00:19Z"
+  },
+  {
+    "id": "utMg6fVmX0U",
+    "title": "How to implement Google sign-in on Flutter with Supabase on iOS, Android & Web",
+    "url": "https://www.youtube.com/watch?v=utMg6fVmX0U",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-02-27T16:41:14Z"
+  },
+  {
+    "id": "WdA6b0jPNv4",
+    "title": "FASTEST way to get started with Next.js and Supabase in 2024",
+    "url": "https://www.youtube.com/watch?v=WdA6b0jPNv4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-02-23T14:00:24Z"
+  },
+  {
+    "id": "UM2a82t5lEA",
+    "title": "The story behind the Supabase Synthwave Album",
+    "url": "https://www.youtube.com/watch?v=UM2a82t5lEA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-02-17T12:17:12Z"
+  },
+  {
+    "id": "PbZe53zwGUA",
+    "title": "Faster OpenAI vector search using Matryoshka embeddings #ai #postgres",
+    "url": "https://www.youtube.com/watch?v=PbZe53zwGUA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-02-14T02:26:41Z"
+  },
+  {
+    "id": "P_jZMDmodG4",
+    "title": "Sign in with Google on Android using Credential Manager and Supabase Auth",
+    "url": "https://www.youtube.com/watch?v=P_jZMDmodG4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-02-12T18:00:10Z"
+  },
+  {
+    "id": "9T6tjTQ4Zo4",
+    "title": "FASTEST way to host a Postgres database (2024)",
+    "url": "https://www.youtube.com/watch?v=9T6tjTQ4Zo4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-02-10T09:56:24Z"
+  },
+  {
+    "id": "zKjrmAMf2Cs",
+    "title": "Draw and sync canvas in real-time | Create Flutter Figma Clone #2",
+    "url": "https://www.youtube.com/watch?v=zKjrmAMf2Cs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-02-05T14:45:07Z"
+  },
+  {
+    "id": "VWUbXF-4NGE",
+    "title": "Generate column values in Postgres with Functions, Triggers, default values and RLS",
+    "url": "https://www.youtube.com/watch?v=VWUbXF-4NGE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-02-02T12:20:58Z"
+  },
+  {
+    "id": "5OWH9c4u68M",
+    "title": "Supabase Edge Functions Quickstart",
+    "url": "https://www.youtube.com/watch?v=5OWH9c4u68M",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-02-01T05:29:56Z"
+  },
+  {
+    "id": "8EKi2dV51TY",
+    "title": "Add MongoDB compatibility to Postgres with FerretDB - NoSQL Postgres",
+    "url": "https://www.youtube.com/watch?v=8EKi2dV51TY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-31T14:00:06Z"
+  },
+  {
+    "id": "QhRNXlFLaeE",
+    "title": "Add live cursor sharing using Flutter and Supabase | Flutter Figma Clone #1",
+    "url": "https://www.youtube.com/watch?v=QhRNXlFLaeE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-26T15:26:59Z"
+  },
+  {
+    "id": "SkPrqG21Fr0",
+    "title": "Scrape websites from Edge Functions using AI - JigsawStack & Supabase",
+    "url": "https://www.youtube.com/watch?v=SkPrqG21Fr0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-25T08:00:14Z"
+  },
+  {
+    "id": "quMYT5Byxe4",
+    "title": "Get started with Ruby on Rails and Postgres using Supabase.",
+    "url": "https://www.youtube.com/watch?v=quMYT5Byxe4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-24T14:00:41Z"
+  },
+  {
+    "id": "dg1suKt-7D4",
+    "title": "Get started with Laravel and Postgres using Supabase.",
+    "url": "https://www.youtube.com/watch?v=dg1suKt-7D4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-17T12:59:49Z"
+  },
+  {
+    "id": "LUqPW-z6xbE",
+    "title": "Best backend for Next.js 14? #webdevelopment",
+    "url": "https://www.youtube.com/watch?v=LUqPW-z6xbE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-11T21:07:00Z"
+  },
+  {
+    "id": "g2k9-6Ka2QY",
+    "title": "React Query Cache Helpers",
+    "url": "https://www.youtube.com/watch?v=g2k9-6Ka2QY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-11T14:00:33Z"
+  },
+  {
+    "id": "AnRshBKUApg",
+    "title": "React Query with Next.js Server Components",
+    "url": "https://www.youtube.com/watch?v=AnRshBKUApg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-10T08:54:33Z"
+  },
+  {
+    "id": "Z4L_UE0hVmo",
+    "title": "React Query with Next.js App Router",
+    "url": "https://www.youtube.com/watch?v=Z4L_UE0hVmo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-09T12:52:48Z"
+  },
+  {
+    "id": "_OqMRtg4Gy8",
+    "title": "Working with Drizzle ORM in Edge Functions",
+    "url": "https://www.youtube.com/watch?v=_OqMRtg4Gy8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2024-01-03T14:00:22Z"
+  },
+  {
+    "id": "CiSv9E6ZKVc",
+    "title": "Send PUSH Notifications to Flutter Apps With Supabase Edge Functions & FCM",
+    "url": "https://www.youtube.com/watch?v=CiSv9E6ZKVc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-28T15:11:54Z"
+  },
+  {
+    "id": "5_GfGf4lAQ8",
+    "title": "Build AI Apps FREE  - A Free Local AI Stack You Should be Using",
+    "url": "https://www.youtube.com/watch?v=5_GfGf4lAQ8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-27T14:00:04Z"
+  },
+  {
+    "id": "7tOEJgXX3IU",
+    "title": "10 new Supabase features you need to start using",
+    "url": "https://www.youtube.com/watch?v=7tOEJgXX3IU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-22T14:27:14Z"
+  },
+  {
+    "id": "dCoRxQsHgrE",
+    "title": "Postgres TypeScript Helpers",
+    "url": "https://www.youtube.com/watch?v=dCoRxQsHgrE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-20T14:00:33Z"
+  },
+  {
+    "id": "_iXUVJ6HTHU",
+    "title": "Getting started with Android and Supabase",
+    "url": "https://www.youtube.com/watch?v=_iXUVJ6HTHU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-19T14:39:00Z"
+  },
+  {
+    "id": "uUsBSr4rCpM",
+    "title": "Supabase + Yoko (a16z)",
+    "url": "https://www.youtube.com/watch?v=uUsBSr4rCpM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-19T12:10:29Z"
+  },
+  {
+    "id": "lHmCshk4pJc",
+    "title": "Supabase + OpenBB",
+    "url": "https://www.youtube.com/watch?v=lHmCshk4pJc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-19T12:10:26Z"
+  },
+  {
+    "id": "2wlXszWz_Uc",
+    "title": "Supabase + ElectricSQL",
+    "url": "https://www.youtube.com/watch?v=2wlXszWz_Uc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-19T12:10:18Z"
+  },
+  {
+    "id": "PX3R1fXjJ2M",
+    "title": "Globally Distributed Databases with Read Replicas",
+    "url": "https://www.youtube.com/watch?v=PX3R1fXjJ2M",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-15T15:52:52Z"
+  },
+  {
+    "id": "LF8GABnAFyE",
+    "title": "5 new Auth features you need to be using \ud83d\udd12",
+    "url": "https://www.youtube.com/watch?v=LF8GABnAFyE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-14T16:00:10Z"
+  },
+  {
+    "id": "peXKxavGnBo",
+    "title": "A Postgres database for every GitHub branch \ud83e\udd1d GitHub branching strategy best practices",
+    "url": "https://www.youtube.com/watch?v=peXKxavGnBo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-13T16:00:35Z"
+  },
+  {
+    "id": "ogYNmJOFEpk",
+    "title": "Supavisor 1.0: Postgres connection pooler",
+    "url": "https://www.youtube.com/watch?v=ogYNmJOFEpk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-13T12:12:29Z"
+  },
+  {
+    "id": "eCbiywoDORw",
+    "title": "Node compatibility just got a lot better in Deno",
+    "url": "https://www.youtube.com/watch?v=eCbiywoDORw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-12T15:41:33Z"
+  },
+  {
+    "id": "hu2SQjvCXIw",
+    "title": "Use AI to enable and generate RLS policies for Postgres with Supabase",
+    "url": "https://www.youtube.com/watch?v=hu2SQjvCXIw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-11T16:00:33Z"
+  },
+  {
+    "id": "-iwLKvHNfSg",
+    "title": "How to produce SupaWave \ud83c\udfb9 #cyberpunk #synthwave #retrowave #outrun",
+    "url": "https://www.youtube.com/watch?v=-iwLKvHNfSg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-08T15:00:00Z"
+  },
+  {
+    "id": "r1POD-IdG-I",
+    "title": "Supabase Album - Synthwave/Electronic/Retrowave MIX For Study/Relax",
+    "url": "https://www.youtube.com/watch?v=r1POD-IdG-I",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-07T13:00:46Z"
+  },
+  {
+    "id": "enVDRqzmudo",
+    "title": "iOS Swift Database & Auth",
+    "url": "https://www.youtube.com/watch?v=enVDRqzmudo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-12-06T12:03:51Z"
+  },
+  {
+    "id": "8t1-Bgb4WJs",
+    "title": "Text-To-SQL with Supabase AI Editor",
+    "url": "https://www.youtube.com/watch?v=8t1-Bgb4WJs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-11-29T14:00:09Z"
+  },
+  {
+    "id": "Z_84yf7fNsc",
+    "title": "Send Push Notifications with Database Webhooks",
+    "url": "https://www.youtube.com/watch?v=Z_84yf7fNsc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-11-22T14:00:20Z"
+  },
+  {
+    "id": "ibzlEQmgPPY",
+    "title": "The missing pieces to your AI app (pgvector + RAG in prod)",
+    "url": "https://www.youtube.com/watch?v=ibzlEQmgPPY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-11-21T13:11:19Z"
+  },
+  {
+    "id": "Mmmv9g_MiBA",
+    "title": "Multilingual full text search using PGroonga in Supabase",
+    "url": "https://www.youtube.com/watch?v=Mmmv9g_MiBA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-11-17T15:38:07Z"
+  },
+  {
+    "id": "xYRbYG77M_o",
+    "title": "React Native Push Notifications with Expo and Edge Functions",
+    "url": "https://www.youtube.com/watch?v=xYRbYG77M_o",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-11-14T14:00:43Z"
+  },
+  {
+    "id": "Hca4CKE17I0",
+    "title": "Passwordless OTP Auth with SMS & WhatsApp with Twilio Verify",
+    "url": "https://www.youtube.com/watch?v=Hca4CKE17I0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-11-09T14:00:12Z"
+  },
+  {
+    "id": "AE7dKIKMJy4",
+    "title": "React Native Database & User Authentication",
+    "url": "https://www.youtube.com/watch?v=AE7dKIKMJy4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-10-31T13:00:10Z"
+  },
+  {
+    "id": "7aQnpfu77UA",
+    "title": "Fastest way to build apps with Next.js 14 \ud83c\udfc4\ud83c\udffc #nextjs",
+    "url": "https://www.youtube.com/watch?v=7aQnpfu77UA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-10-27T12:09:11Z"
+  },
+  {
+    "id": "31u3g2Uelfg",
+    "title": "Secure Edge Functions with API keys using Unkey",
+    "url": "https://www.youtube.com/watch?v=31u3g2Uelfg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-10-19T15:30:01Z"
+  },
+  {
+    "id": "8TZ6O1C8ujE",
+    "title": "Auth deep linking in Expo React Native",
+    "url": "https://www.youtube.com/watch?v=8TZ6O1C8ujE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-10-17T14:00:10Z"
+  },
+  {
+    "id": "nUCl2G1LJFk",
+    "title": "\ud83d\udc18 What do you want to learn about Postgres? \ud83d\udc18",
+    "url": "https://www.youtube.com/watch?v=nUCl2G1LJFk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-10-06T14:00:27Z"
+  },
+  {
+    "id": "vojHmGUGUGc",
+    "title": "Sign in with Google on Expo React Native",
+    "url": "https://www.youtube.com/watch?v=vojHmGUGUGc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-10-05T14:00:44Z"
+  },
+  {
+    "id": "agFsGDJxjwA",
+    "title": "How to perform geographical queries using Supabase and PostGIS",
+    "url": "https://www.youtube.com/watch?v=agFsGDJxjwA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-10-04T16:48:55Z"
+  },
+  {
+    "id": "-tpcZzTdvN0",
+    "title": "Sign in with Apple on Expo React Native",
+    "url": "https://www.youtube.com/watch?v=-tpcZzTdvN0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-09-28T14:00:00Z"
+  },
+  {
+    "id": "Qf7XvL1fjvo",
+    "title": "Send Emails in Edge Functions",
+    "url": "https://www.youtube.com/watch?v=Qf7XvL1fjvo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-09-14T16:30:05Z"
+  },
+  {
+    "id": "SZ09mPSNu4k",
+    "title": "Flutter File Storage Management and Image Upload with Supabase Storage",
+    "url": "https://www.youtube.com/watch?v=SZ09mPSNu4k",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-08-29T16:55:13Z"
+  },
+  {
+    "id": "_Z2f-gGrYu8",
+    "title": "Launch Week 8 wind down & create app with Next.js and Supabase - Supabase Happy Hour #28",
+    "url": "https://www.youtube.com/watch?v=_Z2f-gGrYu8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-08-18T02:47:42Z"
+  },
+  {
+    "id": "qzxzLSAJDfE",
+    "title": "Handle millions of database connections with Supavisor \ud83d\udc6e",
+    "url": "https://www.youtube.com/watch?v=qzxzLSAJDfE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-08-11T14:59:24Z"
+  },
+  {
+    "id": "gtJo1lTxHfs",
+    "title": "Manage Supabase projects in code with the new Management API \ud83d\ude80",
+    "url": "https://www.youtube.com/watch?v=gtJo1lTxHfs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-08-10T15:19:30Z"
+  },
+  {
+    "id": "51tCMQPiitQ",
+    "title": "Use AI to generate your Postgres snippets // Supabase AI \ud83e\udd16",
+    "url": "https://www.youtube.com/watch?v=51tCMQPiitQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-08-09T15:08:41Z"
+  },
+  {
+    "id": "N0Wb85m3YMI",
+    "title": "Local Development and Database Branching // a more collaborative Supabase workflow \ud83d\ude80",
+    "url": "https://www.youtube.com/watch?v=N0Wb85m3YMI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-08-08T16:00:12Z"
+  },
+  {
+    "id": "RJccSbJ9Go4",
+    "title": "Use Hugging Face AI models with Supabase \ud83e\udd16",
+    "url": "https://www.youtube.com/watch?v=RJccSbJ9Go4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-08-07T15:32:11Z"
+  },
+  {
+    "id": "OWhKVbg1p7Y",
+    "title": "Launch Week 8 & Next.js with-supabase template - Supabase Happy Hour #27",
+    "url": "https://www.youtube.com/watch?v=OWhKVbg1p7Y",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-08-04T14:12:20Z"
+  },
+  {
+    "id": "VSNgAIObBdw",
+    "title": "Introspect PostgreSQL schema and generate TypeScript definitions for the Next.js App Router",
+    "url": "https://www.youtube.com/watch?v=VSNgAIObBdw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-07-20T14:15:01Z"
+  },
+  {
+    "id": "6Sb8R1PYhTY",
+    "title": "Subscribe to Authenticated Realtime Events with Client Components and the Next.js 13 App Router",
+    "url": "https://www.youtube.com/watch?v=6Sb8R1PYhTY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-07-13T14:00:05Z"
+  },
+  {
+    "id": "r6q7ypXbPFI",
+    "title": "Handling PUT requests with Route Handlers in Next.js 13 App Router",
+    "url": "https://www.youtube.com/watch?v=r6q7ypXbPFI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-07-08T14:00:09Z"
+  },
+  {
+    "id": "LHw5fPX8XCk",
+    "title": "Generate SQL with the Supabase Studio locally",
+    "url": "https://www.youtube.com/watch?v=LHw5fPX8XCk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-07-05T13:09:14Z"
+  },
+  {
+    "id": "4_epZIxqCho",
+    "title": "Handle Form Submission Functions Server-side using Server Actions and the Next.js 13 App Router",
+    "url": "https://www.youtube.com/watch?v=4_epZIxqCho",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-06-30T14:00:07Z"
+  },
+  {
+    "id": "Tt45NrVIBn8",
+    "title": "Build a Chatbot with Next.js, LangChain, OpenAI, and Supabase Vector",
+    "url": "https://www.youtube.com/watch?v=Tt45NrVIBn8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-06-28T14:00:16Z"
+  },
+  {
+    "id": "ywvXGW6P4Gs",
+    "title": "Redirecting unauthenticated users with Protected Routes in the Next.js 13 App Directory",
+    "url": "https://www.youtube.com/watch?v=ywvXGW6P4Gs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-06-22T14:00:07Z"
+  },
+  {
+    "id": "-7K6DRWfEGM",
+    "title": "Implement cookie-based Auth in the Next.js 13 App Router \ud83c\udf6a",
+    "url": "https://www.youtube.com/watch?v=-7K6DRWfEGM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-06-15T14:00:09Z"
+  },
+  {
+    "id": "r7ysVtZ5Row",
+    "title": "Flutter Database & User Authentication Quickstart",
+    "url": "https://www.youtube.com/watch?v=r7ysVtZ5Row",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-06-14T14:45:03Z"
+  },
+  {
+    "id": "S7VZErcTN5Y",
+    "title": "Image Search in Python with OpenAI CLIP",
+    "url": "https://www.youtube.com/watch?v=S7VZErcTN5Y",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-06-13T13:30:08Z"
+  },
+  {
+    "id": "w3LD0Z73vgU",
+    "title": "Why you need cookie-based Auth for the Next.js App Router (2024)",
+    "url": "https://www.youtube.com/watch?v=w3LD0Z73vgU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-06-09T14:00:11Z"
+  },
+  {
+    "id": "B55Wv6G3fKk",
+    "title": "Build your own ChatGPT with Deno Fresh and OpenAI",
+    "url": "https://www.youtube.com/watch?v=B55Wv6G3fKk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-06-08T15:00:13Z"
+  },
+  {
+    "id": "ffdUZbYov9g",
+    "title": "Using AI to Generate a PostgreSQL Database for Tony Hawk's Pro Skater 2 with Zero SQL Experience \ud83d\udef9",
+    "url": "https://www.youtube.com/watch?v=ffdUZbYov9g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-06-03T14:00:10Z"
+  },
+  {
+    "id": "AazB9mQetkw",
+    "title": "Flutter Hackathon Winner Announcement",
+    "url": "https://www.youtube.com/watch?v=AazB9mQetkw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-05-30T08:33:25Z"
+  },
+  {
+    "id": "OgnYxRkxEUw",
+    "title": "Image Captioning with Huggingface.js",
+    "url": "https://www.youtube.com/watch?v=OgnYxRkxEUw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-05-23T14:11:47Z"
+  },
+  {
+    "id": "gboTC2lcgzw",
+    "title": "Listening to real-time changes on the database with Flutter and Supabase",
+    "url": "https://www.youtube.com/watch?v=gboTC2lcgzw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-05-18T16:57:21Z"
+  },
+  {
+    "id": "xmfNUCjszh4",
+    "title": "Build your own ChatGPT with Next.js and OpenAI",
+    "url": "https://www.youtube.com/watch?v=xmfNUCjszh4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-05-17T15:00:46Z"
+  },
+  {
+    "id": "4pa-eEXQHJQ",
+    "title": "Building ChatGPT Plugins with Supabase Edge Runtime",
+    "url": "https://www.youtube.com/watch?v=4pa-eEXQHJQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-05-15T15:08:26Z"
+  },
+  {
+    "id": "YyoeLwoUy6Q",
+    "title": "Generative Open Graph Art with Supabase Edge Runtime",
+    "url": "https://www.youtube.com/watch?v=YyoeLwoUy6Q",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-05-11T15:00:31Z"
+  },
+  {
+    "id": "Qc8_y9irMP4",
+    "title": "Progressively Enhanced Mutations with Next.js Server Actions",
+    "url": "https://www.youtube.com/watch?v=Qc8_y9irMP4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-05-10T14:00:08Z"
+  },
+  {
+    "id": "zd9a_Lk3jAc",
+    "title": "Type-Safe SQL on the Edge with Kysely",
+    "url": "https://www.youtube.com/watch?v=zd9a_Lk3jAc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-05-02T14:00:41Z"
+  },
+  {
+    "id": "lFhU3L8VoSQ",
+    "title": "VS Code Workspace Configuration for Edge Functions",
+    "url": "https://www.youtube.com/watch?v=lFhU3L8VoSQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-25T15:00:35Z"
+  },
+  {
+    "id": "pG95GO0Kcxs",
+    "title": "Using OpenAI embeddings on Supabase database - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=pG95GO0Kcxs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-25T14:45:03Z"
+  },
+  {
+    "id": "YAor6JTaqXI",
+    "title": "RLS explained in less than 60s! \ud83e\udde0",
+    "url": "https://www.youtube.com/watch?v=YAor6JTaqXI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-23T14:00:15Z"
+  },
+  {
+    "id": "61oT3Clq7ug",
+    "title": "Quickly populate data from a related table with Foreign Key Lookup \ud83e\udde0",
+    "url": "https://www.youtube.com/watch?v=61oT3Clq7ug",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-22T14:00:06Z"
+  },
+  {
+    "id": "d49TYcKqkOg",
+    "title": "What does Idempotent mean? #SQL #postgresql #coding #programming",
+    "url": "https://www.youtube.com/watch?v=d49TYcKqkOg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-17T14:00:20Z"
+  },
+  {
+    "id": "BbeHg8pWhS0",
+    "title": "6 things you need to be using right now! \ud83d\ude80",
+    "url": "https://www.youtube.com/watch?v=BbeHg8pWhS0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-14T15:00:09Z"
+  },
+  {
+    "id": "0rcNqHt5KWU",
+    "title": "6 new tools you need to be using in Supabase! \ud83e\udde0",
+    "url": "https://www.youtube.com/watch?v=0rcNqHt5KWU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-14T14:00:11Z"
+  },
+  {
+    "id": "zZR22wpn8cM",
+    "title": "\ud83d\udd10 SSO in Supabase Auth \ud83d\udd10",
+    "url": "https://www.youtube.com/watch?v=zZR22wpn8cM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-14T00:11:35Z"
+  },
+  {
+    "id": "NQnP7aqYRas",
+    "title": "\ud83d\udc6e\u200d\u2640\ufe0f SSO Auth with Okta \ud83d\udc6e\u200d\u2640\ufe0f",
+    "url": "https://www.youtube.com/watch?v=NQnP7aqYRas",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-13T15:00:13Z"
+  },
+  {
+    "id": "hAwJeR6mhB0",
+    "title": "Single Sign-On with SAML 2.0 and Okta",
+    "url": "https://www.youtube.com/watch?v=hAwJeR6mhB0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-13T14:00:07Z"
+  },
+  {
+    "id": "JAJ6bZd3gA4",
+    "title": "\ud83d\uddc3\ufe0f Supabase Storage v3 \ud83d\uddc3\ufe0f",
+    "url": "https://www.youtube.com/watch?v=JAJ6bZd3gA4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-12T19:00:16Z"
+  },
+  {
+    "id": "i8whlPSPF_8",
+    "title": "\ud83d\uddc3\ufe0f Resumable uploads with Storage v3 \ud83d\uddc3\ufe0f",
+    "url": "https://www.youtube.com/watch?v=i8whlPSPF_8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-12T15:00:26Z"
+  },
+  {
+    "id": "pT2PcZFq_M0",
+    "title": "Resumable Uploads with Storage v3",
+    "url": "https://www.youtube.com/watch?v=pT2PcZFq_M0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-12T14:00:09Z"
+  },
+  {
+    "id": "veCmNrI46pk",
+    "title": "Host Supabase Edge Functions anywhere you want! \ud83d\ude80",
+    "url": "https://www.youtube.com/watch?v=veCmNrI46pk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-12T00:00:31Z"
+  },
+  {
+    "id": "QXKcwEPyb9c",
+    "title": "Self Hosted Supabase Edge Functions // Day 2 #SupaLaunchWeek 7",
+    "url": "https://www.youtube.com/watch?v=QXKcwEPyb9c",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-11T15:00:14Z"
+  },
+  {
+    "id": "cPGxPl1lx4Y",
+    "title": "Self-Host Supabase Edge Functions",
+    "url": "https://www.youtube.com/watch?v=cPGxPl1lx4Y",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-11T14:00:08Z"
+  },
+  {
+    "id": "ssw_Atvve58",
+    "title": "Supabase Logs amongst the logs (trees) // Day 1 #SupaLaunchWeek 7",
+    "url": "https://www.youtube.com/watch?v=ssw_Atvve58",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-11T09:00:27Z"
+  },
+  {
+    "id": "plBzV6Rq-do",
+    "title": "Open Sourcing Supabase Logs // Day 1 #SupaLaunchWeek 7",
+    "url": "https://www.youtube.com/watch?v=plBzV6Rq-do",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-10T15:00:37Z"
+  },
+  {
+    "id": "Ai2BjHV36Ng",
+    "title": "Debug Local Development with Supabase Logs",
+    "url": "https://www.youtube.com/watch?v=Ai2BjHV36Ng",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-10T14:00:07Z"
+  },
+  {
+    "id": "SwbJNDNhGqs",
+    "title": "When you delete a user, also delete all of their data! Accidentally! \ud83e\udd26\u200d\u2642\ufe0f",
+    "url": "https://www.youtube.com/watch?v=SwbJNDNhGqs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-08T15:00:30Z"
+  },
+  {
+    "id": "e6a4yC3muew",
+    "title": "Supabase Launch Week 7",
+    "url": "https://www.youtube.com/watch?v=e6a4yC3muew",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-07T16:00:33Z"
+  },
+  {
+    "id": "c2rxxdCw7wk",
+    "title": "Which is better? UUID or Int?",
+    "url": "https://www.youtube.com/watch?v=c2rxxdCw7wk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-06T15:00:32Z"
+  },
+  {
+    "id": "_l5h83Bpi-k",
+    "title": "Realtime Components with the new Next.js App Directory \ud83d\ude80",
+    "url": "https://www.youtube.com/watch?v=_l5h83Bpi-k",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-05T15:00:20Z"
+  },
+  {
+    "id": "jPPpOojAdHE",
+    "title": "6 new game changing features in the Next.js app directory! \ud83d\ude80",
+    "url": "https://www.youtube.com/watch?v=jPPpOojAdHE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-04T15:00:35Z"
+  },
+  {
+    "id": "RAADJSqlyNg",
+    "title": "How easy it is to Upsert in PostgreSQL",
+    "url": "https://www.youtube.com/watch?v=RAADJSqlyNg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-04-03T15:00:29Z"
+  },
+  {
+    "id": "SBUbPyrMMPI",
+    "title": "Generate your #SupaLaunchWeek 7 Ticket | Win Swag!",
+    "url": "https://www.youtube.com/watch?v=SBUbPyrMMPI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-31T06:21:40Z"
+  },
+  {
+    "id": "dJk2wbdLDpE",
+    "title": "Database Webhooks and Edge Functions",
+    "url": "https://www.youtube.com/watch?v=dJk2wbdLDpE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-30T14:00:32Z"
+  },
+  {
+    "id": "KmJN-bEayeY",
+    "title": "Route Handler Cookies // Auth in the Next.js app directory",
+    "url": "https://www.youtube.com/watch?v=KmJN-bEayeY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-29T11:40:28Z"
+  },
+  {
+    "id": "6MoYy62E4rw",
+    "title": "Server-side mutations with Route Handlers // The \"new\" API Routes in Next.js app directory",
+    "url": "https://www.youtube.com/watch?v=6MoYy62E4rw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-23T15:00:08Z"
+  },
+  {
+    "id": "wkRlT_krzL8",
+    "title": "\ud83d\udea8\ud83e\udde2 10K YT SUBS GIVEAWAY \ud83e\udde2\ud83d\udea8",
+    "url": "https://www.youtube.com/watch?v=wkRlT_krzL8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-23T14:54:00Z"
+  },
+  {
+    "id": "Q1nfnQggR4c",
+    "title": "Screenshots in Edge Functions",
+    "url": "https://www.youtube.com/watch?v=Q1nfnQggR4c",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-21T13:00:17Z"
+  },
+  {
+    "id": "o4ooiE-SdUg",
+    "title": "Rate Limiting Edge Functions",
+    "url": "https://www.youtube.com/watch?v=o4ooiE-SdUg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-14T15:00:39Z"
+  },
+  {
+    "id": "YY0_I8bo_2A",
+    "title": "Multi-Factor Auth for your apps #shorts",
+    "url": "https://www.youtube.com/watch?v=YY0_I8bo_2A",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-07T20:11:20Z"
+  },
+  {
+    "id": "OPg3_oPZCh0",
+    "title": "Increment Redis Counter in Edge Functions",
+    "url": "https://www.youtube.com/watch?v=OPg3_oPZCh0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-07T14:00:25Z"
+  },
+  {
+    "id": "2rUjcmgZDwQ",
+    "title": "How to subscribe to real-time changes on your database - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=2rUjcmgZDwQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-06T16:52:21Z"
+  },
+  {
+    "id": "Bh1TOpOcGJQ",
+    "title": "Delicious Server Component Cookies // Auth in the Next.js app directory",
+    "url": "https://www.youtube.com/watch?v=Bh1TOpOcGJQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-03T14:00:12Z"
+  },
+  {
+    "id": "437s5evuI3w",
+    "title": "Building Supabase docs with NextJS and Turborepo",
+    "url": "https://www.youtube.com/watch?v=437s5evuI3w",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-03-02T07:11:19Z"
+  },
+  {
+    "id": "9N66JBRLNYU",
+    "title": "Streaming Data in Edge Functions",
+    "url": "https://www.youtube.com/watch?v=9N66JBRLNYU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-28T15:00:05Z"
+  },
+  {
+    "id": "YR-xP6PPXXA",
+    "title": "Client vs Server Components in Next.js app directory // Merging server state with realtime updates",
+    "url": "https://www.youtube.com/watch?v=YR-xP6PPXXA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-24T15:45:02Z"
+  },
+  {
+    "id": "qpsivlfElNA",
+    "title": "\u2728\ud83d\ude4c SERVE ALL THE FUNCTIONS!!! \ud83d\ude4c\u2728",
+    "url": "https://www.youtube.com/watch?v=qpsivlfElNA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-22T15:31:39Z"
+  },
+  {
+    "id": "29p8kIqyU_Y",
+    "title": "OpenAI with Edge Functions",
+    "url": "https://www.youtube.com/watch?v=29p8kIqyU_Y",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-21T15:00:01Z"
+  },
+  {
+    "id": "5RoCKuJaYPU",
+    "title": "Database Query Basics with Flutter and Supabase",
+    "url": "https://www.youtube.com/watch?v=5RoCKuJaYPU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-19T15:00:03Z"
+  },
+  {
+    "id": "GniRj1jIhFw",
+    "title": "Fetching and Caching data in Next.js Async Server Components",
+    "url": "https://www.youtube.com/watch?v=GniRj1jIhFw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-17T12:00:19Z"
+  },
+  {
+    "id": "-AUiq4jhE6w",
+    "title": "Support-First Culture",
+    "url": "https://www.youtube.com/watch?v=-AUiq4jhE6w",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-16T04:36:12Z"
+  },
+  {
+    "id": "F505n0d9iuA",
+    "title": "Caching Postgres on the Edge with PolyScale.ai",
+    "url": "https://www.youtube.com/watch?v=F505n0d9iuA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-14T15:00:10Z"
+  },
+  {
+    "id": "uZ6R9p3mgWM",
+    "title": "Deno Edge Functions Setup",
+    "url": "https://www.youtube.com/watch?v=uZ6R9p3mgWM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-09T09:37:39Z"
+  },
+  {
+    "id": "-U6DJcjVvGo",
+    "title": "Scheduling Edge Functions",
+    "url": "https://www.youtube.com/watch?v=-U6DJcjVvGo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-07T15:00:00Z"
+  },
+  {
+    "id": "cA_BBq1JBaI",
+    "title": "Startups are 90% grind",
+    "url": "https://www.youtube.com/watch?v=cA_BBq1JBaI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-06T04:31:22Z"
+  },
+  {
+    "id": "Viaed7XWCY8",
+    "title": "Remix Databases and Auth",
+    "url": "https://www.youtube.com/watch?v=Viaed7XWCY8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-03T15:45:01Z"
+  },
+  {
+    "id": "rTQoWIezcKk",
+    "title": "Remix Auth #Shorts",
+    "url": "https://www.youtube.com/watch?v=rTQoWIezcKk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-02-02T23:12:37Z"
+  },
+  {
+    "id": "cl7EuF1-RsY",
+    "title": "Connecting to Postgres from Edge Functions",
+    "url": "https://www.youtube.com/watch?v=cl7EuF1-RsY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-31T15:00:33Z"
+  },
+  {
+    "id": "6rcGnW_Mh-0",
+    "title": "How to setup custom domains in your Supabase projects - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=6rcGnW_Mh-0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-26T18:21:33Z"
+  },
+  {
+    "id": "ILr3cneZuFk",
+    "title": "JavaScript Import Maps in Edge Functions",
+    "url": "https://www.youtube.com/watch?v=ILr3cneZuFk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-25T15:00:10Z"
+  },
+  {
+    "id": "sPXpUQK5tYw",
+    "title": "Kaizen at Supabase #shorts",
+    "url": "https://www.youtube.com/watch?v=sPXpUQK5tYw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-24T20:08:18Z"
+  },
+  {
+    "id": "F2j6Q-4nLEE",
+    "title": "Getting Started with Flutter and Supabase",
+    "url": "https://www.youtube.com/watch?v=F2j6Q-4nLEE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-24T16:36:12Z"
+  },
+  {
+    "id": "j31N0cWPvi8",
+    "title": "How to create a one-to-one relationship inside the Supabase dashboard",
+    "url": "https://www.youtube.com/watch?v=j31N0cWPvi8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-18T11:28:57Z"
+  },
+  {
+    "id": "J24Bvo_m7DM",
+    "title": "Discord Bots with Edge Functions",
+    "url": "https://www.youtube.com/watch?v=J24Bvo_m7DM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-17T15:00:10Z"
+  },
+  {
+    "id": "1G3EjC-k5aE",
+    "title": "A user contributed Azure login to Supabase #shorts",
+    "url": "https://www.youtube.com/watch?v=1G3EjC-k5aE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-13T18:06:39Z"
+  },
+  {
+    "id": "OwW0znboh60",
+    "title": "Better CAPTCHA with Edge Functions",
+    "url": "https://www.youtube.com/watch?v=OwW0znboh60",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-10T15:00:11Z"
+  },
+  {
+    "id": "AWfE3a9J_uo",
+    "title": "Building a Telegram Bot with Edge Functions",
+    "url": "https://www.youtube.com/watch?v=AWfE3a9J_uo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2023-01-03T13:31:26Z"
+  },
+  {
+    "id": "6OMVWiiycLs",
+    "title": "Handling signed Stripe Webhooks with Edge Functions",
+    "url": "https://www.youtube.com/watch?v=6OMVWiiycLs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-27T15:00:02Z"
+  },
+  {
+    "id": "dLqSmxX3r7I",
+    "title": "How to resize images on the fly with Supabase - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=dLqSmxX3r7I",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-23T17:10:37Z"
+  },
+  {
+    "id": "l2KlzGrhB6w",
+    "title": "Deploying Edge Functions with GitHub Actions",
+    "url": "https://www.youtube.com/watch?v=l2KlzGrhB6w",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-20T14:00:16Z"
+  },
+  {
+    "id": "QHLPNDrdN2w",
+    "title": "Encrypted Columns in PostgreSQL - Secrets Management with Supabase Vault",
+    "url": "https://www.youtube.com/watch?v=QHLPNDrdN2w",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-17T02:22:05Z"
+  },
+  {
+    "id": "EdYQ9fF-hz4",
+    "title": "NextAuth.js Supabase Adapter",
+    "url": "https://www.youtube.com/watch?v=EdYQ9fF-hz4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-16T11:34:40Z"
+  },
+  {
+    "id": "QA2qC5F-4OU",
+    "title": "Postgres FDW framework - Supabase Wrappers",
+    "url": "https://www.youtube.com/watch?v=QA2qC5F-4OU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-15T14:16:31Z"
+  },
+  {
+    "id": "He7LI2mv9v0",
+    "title": "Multi-factor Auth + RLS in PostgreSQL",
+    "url": "https://www.youtube.com/watch?v=He7LI2mv9v0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-14T14:14:15Z"
+  },
+  {
+    "id": "NpEl20iuOtg",
+    "title": "Image resizing and Smart CDN - Supabase Storage",
+    "url": "https://www.youtube.com/watch?v=NpEl20iuOtg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-13T14:16:35Z"
+  },
+  {
+    "id": "Q1Amk6iDlF8",
+    "title": "New Supabase Docs, built with Next.js",
+    "url": "https://www.youtube.com/watch?v=Q1Amk6iDlF8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-12T14:10:57Z"
+  },
+  {
+    "id": "-BG9XptyCKI",
+    "title": "Who we hire at Supabase",
+    "url": "https://www.youtube.com/watch?v=-BG9XptyCKI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-09T16:10:11Z"
+  },
+  {
+    "id": "wW6L52v9Ldo",
+    "title": "Caching OG Images with Supabase Storage CDN",
+    "url": "https://www.youtube.com/watch?v=wW6L52v9Ldo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-06T13:34:28Z"
+  },
+  {
+    "id": "jZgyOJGWayQ",
+    "title": "Generating OG Images with Edge Functions",
+    "url": "https://www.youtube.com/watch?v=jZgyOJGWayQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-12-01T08:08:28Z"
+  },
+  {
+    "id": "7CqlTU9aOR4",
+    "title": "How to generate TypeScript types with the Supabase CLI - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=7CqlTU9aOR4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-11-23T17:18:09Z"
+  },
+  {
+    "id": "QH0P5xZt5wY",
+    "title": "Data fetching and caching with Next.js 13 - Supabase Happy Hour #26",
+    "url": "https://www.youtube.com/watch?v=QH0P5xZt5wY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-11-04T02:19:42Z"
+  },
+  {
+    "id": "rOLyOsBR1Uc",
+    "title": "Push Database Migration to Prod Using Github Actions - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=rOLyOsBR1Uc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-11-01T18:22:22Z"
+  },
+  {
+    "id": "LzDIptBGtUw",
+    "title": "Hacktoberfest: Dashibase & Supabase Cache Helpers - Supabase Happy Hour #25",
+    "url": "https://www.youtube.com/watch?v=LzDIptBGtUw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-10-28T19:26:19Z"
+  },
+  {
+    "id": "0Fs96oZ4se0",
+    "title": "Next.js Database & User Authentication Quickstart",
+    "url": "https://www.youtube.com/watch?v=0Fs96oZ4se0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-10-25T16:19:47Z"
+  },
+  {
+    "id": "Kx5nHBmIxyQ",
+    "title": "How to Manage Database Migration Using Supabase CLI - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=Kx5nHBmIxyQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-10-19T19:46:56Z"
+  },
+  {
+    "id": "-RlivqzNIso",
+    "title": "Hacktoberfest: Community OSS showcase - Supabase Happy Hour #24",
+    "url": "https://www.youtube.com/watch?v=-RlivqzNIso",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-10-14T13:10:45Z"
+  },
+  {
+    "id": "em1cpOAXknM",
+    "title": "How to add hCaptcha to your Supabase project",
+    "url": "https://www.youtube.com/watch?v=em1cpOAXknM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-10-11T08:34:20Z"
+  },
+  {
+    "id": "qRSYenBLHHQ",
+    "title": "Hacktoberfest: Postgres WASM & contributing to Supabase - Supabase Happy Hour #23",
+    "url": "https://www.youtube.com/watch?v=qRSYenBLHHQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-10-07T13:26:48Z"
+  },
+  {
+    "id": "vyHyYpvjaks",
+    "title": "How to Run Supabase Locally - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=vyHyYpvjaks",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-30T17:38:08Z"
+  },
+  {
+    "id": "IJoc6dKy03c",
+    "title": "Getting SaaS-y with Stripe: Launching to prod - Supabase Happy Hour #22",
+    "url": "https://www.youtube.com/watch?v=IJoc6dKy03c",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-30T02:17:21Z"
+  },
+  {
+    "id": "tv7ohGIZKKI",
+    "title": "Next.js Auth & supabase-js V2 - Supabase Happy Hour #21",
+    "url": "https://www.youtube.com/watch?v=tv7ohGIZKKI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-23T14:01:00Z"
+  },
+  {
+    "id": "0oYgszcqAn4",
+    "title": "Getting SaaS-y with Stripe: Payment tiers with RLS - Supabase Happy Hour #20",
+    "url": "https://www.youtube.com/watch?v=0oYgszcqAn4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-16T14:04:04Z"
+  },
+  {
+    "id": "4ERX__Y908k",
+    "title": "How to Configure Access Control on Your Supabase Storage Buckets - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=4ERX__Y908k",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-09T16:10:46Z"
+  },
+  {
+    "id": "YwV90iUaT4w",
+    "title": "Getting SaaS-y with Stripe: Customer Portals - Supabase Happy Hour #19",
+    "url": "https://www.youtube.com/watch?v=YwV90iUaT4w",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-09T02:28:14Z"
+  },
+  {
+    "id": "0lBxH6d38FM",
+    "title": "Replicache | Works With Supabase",
+    "url": "https://www.youtube.com/watch?v=0lBxH6d38FM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-07T10:40:07Z"
+  },
+  {
+    "id": "rg1RMiv6uuc",
+    "title": "Supabase Developer Stories: snappify",
+    "url": "https://www.youtube.com/watch?v=rg1RMiv6uuc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-07T10:40:03Z"
+  },
+  {
+    "id": "Am9egV4Hgi4",
+    "title": "Feelantera | Works With Supabase",
+    "url": "https://www.youtube.com/watch?v=Am9egV4Hgi4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-07T10:39:59Z"
+  },
+  {
+    "id": "ctSlcU2i9WA",
+    "title": "Zapp! | Works With Supabase",
+    "url": "https://www.youtube.com/watch?v=ctSlcU2i9WA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-07T10:39:56Z"
+  },
+  {
+    "id": "WAYA6-qBfPs",
+    "title": "Dashibase | Works With Supabase",
+    "url": "https://www.youtube.com/watch?v=WAYA6-qBfPs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-07T10:39:52Z"
+  },
+  {
+    "id": "cTNUjAQ06AE",
+    "title": "CodeSandbox Projects Beta #SupaLaunchWeek 5",
+    "url": "https://www.youtube.com/watch?v=cTNUjAQ06AE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-07T10:39:49Z"
+  },
+  {
+    "id": "4A6RKPp1b70",
+    "title": "Open Source Spotlight: pg_jsonschema #SupaLaunchWeek 5",
+    "url": "https://www.youtube.com/watch?v=4A6RKPp1b70",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-07T10:39:46Z"
+  },
+  {
+    "id": "4_duDgQeCyM",
+    "title": "How we built the Golden Tickets for #SupaLaunchWeek 5",
+    "url": "https://www.youtube.com/watch?v=4_duDgQeCyM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-07T10:39:40Z"
+  },
+  {
+    "id": "shv7uT_NM7Y",
+    "title": "Realtime Trello Board with Angular by Simon Grimm",
+    "url": "https://www.youtube.com/watch?v=shv7uT_NM7Y",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-07T10:39:31Z"
+  },
+  {
+    "id": "xsRhPMphtZ4",
+    "title": "Migrate Your Heroku Database to Supabase",
+    "url": "https://www.youtube.com/watch?v=xsRhPMphtZ4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-04T07:30:19Z"
+  },
+  {
+    "id": "Vzkb42ao1B0",
+    "title": "Getting SaaS-y with Stripe: Subscriptions and Webhook events - Supabase Happy Hour #18",
+    "url": "https://www.youtube.com/watch?v=Vzkb42ao1B0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-09-02T02:18:15Z"
+  },
+  {
+    "id": "J9mTPY8rIXE",
+    "title": "Introduction to Supabase Storage - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=J9mTPY8rIXE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-26T16:20:09Z"
+  },
+  {
+    "id": "AEiNT8nuA6A",
+    "title": "Getting SaaS-y with Stripe: Checkout sessions and Customer Portals - Supabase Happy Hour #17",
+    "url": "https://www.youtube.com/watch?v=AEiNT8nuA6A",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-26T02:19:28Z"
+  },
+  {
+    "id": "s9UePQjLT0U",
+    "title": "Supabase Launch Week 5: Day 5 - Community Day & One More Thing!",
+    "url": "https://www.youtube.com/watch?v=s9UePQjLT0U",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-20T03:48:34Z"
+  },
+  {
+    "id": "CGZr5tybW18",
+    "title": "Supabase Launch Week 5: Day 4 - Realtime: Multiplayer Edition",
+    "url": "https://www.youtube.com/watch?v=CGZr5tybW18",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-19T03:24:33Z"
+  },
+  {
+    "id": "sLl1LM02gxw",
+    "title": "Launch Week 5: Hackathon Special - Supabase Happy Hour #16",
+    "url": "https://www.youtube.com/watch?v=sLl1LM02gxw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-19T02:33:30Z"
+  },
+  {
+    "id": "6bGQotxisoY",
+    "title": "Supabase Launch Week 5: Day 3 - Security Day",
+    "url": "https://www.youtube.com/watch?v=6bGQotxisoY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-17T15:17:09Z"
+  },
+  {
+    "id": "iqZlPtl_b-I",
+    "title": "Supabase Launch Week 5: Day 2 - supabase-js v2 Release Candidate",
+    "url": "https://www.youtube.com/watch?v=iqZlPtl_b-I",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-16T15:17:12Z"
+  },
+  {
+    "id": "OpPOaJI_Z28",
+    "title": "Supabase Launch Week 5: Day 1 - Supabase CLI v1 and Admin API Beta",
+    "url": "https://www.youtube.com/watch?v=OpPOaJI_Z28",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-15T15:20:27Z"
+  },
+  {
+    "id": "4t_63HT3rZY",
+    "title": "Why is Supabase Open Source?",
+    "url": "https://www.youtube.com/watch?v=4t_63HT3rZY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-12T10:58:04Z"
+  },
+  {
+    "id": "LjGeZfBB3K0",
+    "title": "Getting SaaS-y with Stripe: File Storage in Remix - Supabase Happy Hour #15",
+    "url": "https://www.youtube.com/watch?v=LjGeZfBB3K0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-12T02:13:21Z"
+  },
+  {
+    "id": "-w-sfKVVqd0",
+    "title": "Supabase hangout with Vercel, Github, Charm & more! [Highlights]",
+    "url": "https://www.youtube.com/watch?v=-w-sfKVVqd0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-09T12:15:37Z"
+  },
+  {
+    "id": "VsGb7UxsX3M",
+    "title": "Supabase log explorer & point in time recovery [Highlights]",
+    "url": "https://www.youtube.com/watch?v=VsGb7UxsX3M",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-08T11:07:16Z"
+  },
+  {
+    "id": "_GQJa3xAfJ4",
+    "title": "How to retrieve a One to Many Relationship with SupabaseJS - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=_GQJa3xAfJ4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-05T10:42:41Z"
+  },
+  {
+    "id": "JHHAvgIU-mk",
+    "title": "Getting SaaS-y with Stripe: Stripe payments and Database Webhooks - Supabase Happy Hour #14",
+    "url": "https://www.youtube.com/watch?v=JHHAvgIU-mk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-05T02:12:15Z"
+  },
+  {
+    "id": "_K9ZBu06ck8",
+    "title": "Supabase Functions Announcement with Deno [Highlights]",
+    "url": "https://www.youtube.com/watch?v=_K9ZBu06ck8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-04T11:11:38Z"
+  },
+  {
+    "id": "6-etr8phdqA",
+    "title": "Supabase + GraphQL Launch Week Announcement [Highlights]",
+    "url": "https://www.youtube.com/watch?v=6-etr8phdqA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-08-02T12:37:41Z"
+  },
+  {
+    "id": "dpHZYqvLRQc",
+    "title": "Getting SaaS-y with Stripe: Setting up Stripe - Supabase Happy Hour #13",
+    "url": "https://www.youtube.com/watch?v=dpHZYqvLRQc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-07-22T02:19:33Z"
+  },
+  {
+    "id": "b-mgca_2Oe4",
+    "title": "How to use textSearch to perform full text search - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=b-mgca_2Oe4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-07-15T12:22:10Z"
+  },
+  {
+    "id": "6wB079ktVNQ",
+    "title": "Getting SaaS-y with Stripe: authenticated Loaders and Actions in Remix - Supabase Happy Hour #12",
+    "url": "https://www.youtube.com/watch?v=6wB079ktVNQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-07-15T02:16:17Z"
+  },
+  {
+    "id": "5VrF9OVQ6rg",
+    "title": "One to Many Relationship - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=5VrF9OVQ6rg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-07-08T08:04:35Z"
+  },
+  {
+    "id": "XBSkwrcyfvw",
+    "title": "Getting SaaS-y with Stripe: Isomorphic Supabase client in Remix - Supabase Happy Hour #11",
+    "url": "https://www.youtube.com/watch?v=XBSkwrcyfvw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-07-08T02:11:40Z"
+  },
+  {
+    "id": "vE0L4dSledE",
+    "title": "count - SupabaseTips #shorts",
+    "url": "https://www.youtube.com/watch?v=vE0L4dSledE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-07-05T15:00:29Z"
+  },
+  {
+    "id": "t7k25WdZSgI",
+    "title": "Getting SaaS-y with Stripe: Planning - Supabase Happy Hour #10",
+    "url": "https://www.youtube.com/watch?v=t7k25WdZSgI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-07-01T02:16:30Z"
+  },
+  {
+    "id": "51ChVycS__k",
+    "title": "count - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=51ChVycS__k",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-29T16:53:36Z"
+  },
+  {
+    "id": "qNqvGRt9dEE",
+    "title": "Multi-platform apps: Private chat rooms with Flutter - Supabase Happy Hour #9",
+    "url": "https://www.youtube.com/watch?v=qNqvGRt9dEE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-24T05:14:05Z"
+  },
+  {
+    "id": "E2JuTtk1LcI",
+    "title": "Multi-platform apps: Building a Flutter app - Supabase Happy Hour #8",
+    "url": "https://www.youtube.com/watch?v=E2JuTtk1LcI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-17T05:08:06Z"
+  },
+  {
+    "id": "XTE1efLJ5GY",
+    "title": "match - SupabaseTips #Shorts",
+    "url": "https://www.youtube.com/watch?v=XTE1efLJ5GY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-15T15:01:52Z"
+  },
+  {
+    "id": "Jx8unDjLaKg",
+    "title": "match - SupabaseTips",
+    "url": "https://www.youtube.com/watch?v=Jx8unDjLaKg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-15T15:00:17Z"
+  },
+  {
+    "id": "M5rJxGPPFvY",
+    "title": "Supabase with SolidJS - Creating a Realtime Todo List App Live",
+    "url": "https://www.youtube.com/watch?v=M5rJxGPPFvY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-14T02:30:31Z"
+  },
+  {
+    "id": "3QfHj6M4GOw",
+    "title": "Multi-platform apps: Laundry list for Next.js app - Supabase Happy Hour #7",
+    "url": "https://www.youtube.com/watch?v=3QfHj6M4GOw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-10T05:19:54Z"
+  },
+  {
+    "id": "VgYPGOr3F-4",
+    "title": "Supabase Auth Helpers with Remix! \ud83d\udcbf",
+    "url": "https://www.youtube.com/watch?v=VgYPGOr3F-4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-09T02:18:28Z"
+  },
+  {
+    "id": "bBV9kpfe9AM",
+    "title": "Multi-platform apps: Auth flows and private chat rooms - Supabase Happy Hour #6",
+    "url": "https://www.youtube.com/watch?v=bBV9kpfe9AM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-03T07:23:03Z"
+  },
+  {
+    "id": "x4f9UicrfRE",
+    "title": "Highlights from the Supabase Happy Hour | 2022-05-27",
+    "url": "https://www.youtube.com/watch?v=x4f9UicrfRE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-06-02T22:45:49Z"
+  },
+  {
+    "id": "_k7GqVDSFvw",
+    "title": "Chatting with Paul Copplestone (CEO at Supabase) - Supabase Happy Hour #5",
+    "url": "https://www.youtube.com/watch?v=_k7GqVDSFvw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-05-27T19:15:40Z"
+  },
+  {
+    "id": "cVZ3bN3du1I",
+    "title": "Highlights from Supabase Happy Hour 4",
+    "url": "https://www.youtube.com/watch?v=cVZ3bN3du1I",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-05-26T18:54:04Z"
+  },
+  {
+    "id": "KWU_lyUEeZU",
+    "title": "Multi-platform apps: Check constraints and RPC - Supabase Happy Hour #4",
+    "url": "https://www.youtube.com/watch?v=KWU_lyUEeZU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-05-20T07:22:11Z"
+  },
+  {
+    "id": "eqFfpfpXV_A",
+    "title": "Multi-platform apps: Private chat rooms and direct messaging - Supabase Happy Hour #3",
+    "url": "https://www.youtube.com/watch?v=eqFfpfpXV_A",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-05-13T07:14:31Z"
+  },
+  {
+    "id": "P9X_qVt10DY",
+    "title": "Multi-platform apps: Realtime chat app with Next.js - Supabase Happy Hour #2",
+    "url": "https://www.youtube.com/watch?v=P9X_qVt10DY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-05-06T07:17:48Z"
+  },
+  {
+    "id": "sOSrPDtvvaQ",
+    "title": "Multi-platform apps: Planning - Supabase Happy Hour #1",
+    "url": "https://www.youtube.com/watch?v=sOSrPDtvvaQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-04-29T07:17:08Z"
+  },
+  {
+    "id": "ZhlXnWRts04",
+    "title": "TGIF: Postgres Full Text Search & sending emails from Edge Functions",
+    "url": "https://www.youtube.com/watch?v=ZhlXnWRts04",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-04-22T13:52:31Z"
+  },
+  {
+    "id": "7JEzp21Zi-8",
+    "title": "Invoking Supabase Edge Functions",
+    "url": "https://www.youtube.com/watch?v=7JEzp21Zi-8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-04-06T15:36:44Z"
+  },
+  {
+    "id": "BelYEMJ2N00",
+    "title": "Supabase Realtime, with Multiplayer Features",
+    "url": "https://www.youtube.com/watch?v=BelYEMJ2N00",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-04-01T16:07:06Z"
+  },
+  {
+    "id": "Xci5SOv76k0",
+    "title": "Supabase Launch Week 4: Day 4 - Functions Announcement with Deno Team",
+    "url": "https://www.youtube.com/watch?v=Xci5SOv76k0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-04-01T05:10:34Z"
+  },
+  {
+    "id": "rzglqRdZUQE",
+    "title": "Supabase Edge Functions Quickstart",
+    "url": "https://www.youtube.com/watch?v=rzglqRdZUQE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-03-31T17:02:40Z"
+  },
+  {
+    "id": "aRgHKofrupU",
+    "title": "Open Source Spotlight: Charm.sh",
+    "url": "https://www.youtube.com/watch?v=aRgHKofrupU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-03-31T06:58:06Z"
+  },
+  {
+    "id": "UZrl1cwzTDg",
+    "title": "Supabase Launch Week 4: Day 3 - Log Explorer, Point-in-Time Recovery, Prometheus Endpoints",
+    "url": "https://www.youtube.com/watch?v=UZrl1cwzTDg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-03-31T04:43:00Z"
+  },
+  {
+    "id": "fApxu_U_hdw",
+    "title": "Supabase Launch Week 4: Day 2 - GraphQL + The Guild Demo App",
+    "url": "https://www.youtube.com/watch?v=fApxu_U_hdw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-03-30T05:02:15Z"
+  },
+  {
+    "id": "D0gIgjozOzc",
+    "title": "Supabase Launch Week 4: Day 1 - Lee Rob/Vercel, Nuxt, Charm, Svelte, & Remix",
+    "url": "https://www.youtube.com/watch?v=D0gIgjozOzc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-03-29T04:45:29Z"
+  },
+  {
+    "id": "bpzQCViwLLA",
+    "title": "Supabase Launch Week 4: Pre-launch party",
+    "url": "https://www.youtube.com/watch?v=bpzQCViwLLA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-03-26T06:49:02Z"
+  },
+  {
+    "id": "bQDQ021OlVg",
+    "title": "Build a Realtime Multiplayer Browser Game with Kaboomjs, Replit, and Supabase!",
+    "url": "https://www.youtube.com/watch?v=bQDQ021OlVg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-02-24T14:54:50Z"
+  },
+  {
+    "id": "v1Jom-DbKYM",
+    "title": "Build a Realtime Multiplayer Browser Game with Kaboomjs, Replit, and Supabase!",
+    "url": "https://www.youtube.com/watch?v=v1Jom-DbKYM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-02-18T14:37:52Z"
+  },
+  {
+    "id": "wa6eoo3n28Q",
+    "title": "Build a Realtime Multiplayer Browser Game with Kaboomjs, Replit, and Supabase!",
+    "url": "https://www.youtube.com/watch?v=wa6eoo3n28Q",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-02-11T13:26:46Z"
+  },
+  {
+    "id": "codAs9-NeHM",
+    "title": "Automate API requests with Database Webhooks in Supabase",
+    "url": "https://www.youtube.com/watch?v=codAs9-NeHM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-01-11T13:00:18Z"
+  },
+  {
+    "id": "I6nnp9AINJk",
+    "title": "Call Postgres functions from JavaScript with RPC",
+    "url": "https://www.youtube.com/watch?v=I6nnp9AINJk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2022-01-04T13:00:17Z"
+  },
+  {
+    "id": "0N6M5BBe9AE",
+    "title": "Using PostgreSQL triggers to automate processes with Supabase",
+    "url": "https://www.youtube.com/watch?v=0N6M5BBe9AE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-28T13:00:00Z"
+  },
+  {
+    "id": "rARgrELRCwY",
+    "title": "Using PostgreSQL functions to call an API with Supabase",
+    "url": "https://www.youtube.com/watch?v=rARgrELRCwY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-21T22:00:15Z"
+  },
+  {
+    "id": "TijBVcV4jXw",
+    "title": "Holiday Hackdays: Building an advent calendar - Day 4",
+    "url": "https://www.youtube.com/watch?v=TijBVcV4jXw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-10T05:28:13Z"
+  },
+  {
+    "id": "i777II-jUHU",
+    "title": "Holiday Hackdays: Building an advent calendar - Day 3",
+    "url": "https://www.youtube.com/watch?v=i777II-jUHU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-09T17:00:19Z"
+  },
+  {
+    "id": "gfU8d6Drm8E",
+    "title": "Holiday Hackdays: Building an advent calendar - Day 2",
+    "url": "https://www.youtube.com/watch?v=gfU8d6Drm8E",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-08T17:10:45Z"
+  },
+  {
+    "id": "b0S_PPBG224",
+    "title": "Holiday Hackdays: Building an advent calendar - Day 1",
+    "url": "https://www.youtube.com/watch?v=b0S_PPBG224",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-07T05:08:45Z"
+  },
+  {
+    "id": "BYdj3Wr9rFU",
+    "title": "Supabase Launch Week III: Five more things (Friday)",
+    "url": "https://www.youtube.com/watch?v=BYdj3Wr9rFU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-03T16:41:05Z"
+  },
+  {
+    "id": "QAm1x7KaLq4",
+    "title": "Developer Stories - Introduction",
+    "url": "https://www.youtube.com/watch?v=QAm1x7KaLq4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-03T04:20:15Z"
+  },
+  {
+    "id": "wR4xrdbplvE",
+    "title": "Supabase Launch Week III: Supabase acquires Logflare (Thursday)",
+    "url": "https://www.youtube.com/watch?v=wR4xrdbplvE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-02T16:25:58Z"
+  },
+  {
+    "id": "Lgqf3p3JsGg",
+    "title": "Security Policies now work on Supabase Realtime #Shorts",
+    "url": "https://www.youtube.com/watch?v=Lgqf3p3JsGg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-02T14:12:14Z"
+  },
+  {
+    "id": "-Mmua7XN_wI",
+    "title": "Supabase Studio Announced #shorts",
+    "url": "https://www.youtube.com/watch?v=-Mmua7XN_wI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-02T04:43:55Z"
+  },
+  {
+    "id": "-4thVj8j19s",
+    "title": "Supabase Launch Week III: Realtime Updates (Wednesday)",
+    "url": "https://www.youtube.com/watch?v=-4thVj8j19s",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-12-01T16:14:13Z"
+  },
+  {
+    "id": "6ptUrE4QRPQ",
+    "title": "Open Source Spotlight: Kong API Gateway",
+    "url": "https://www.youtube.com/watch?v=6ptUrE4QRPQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T22:33:55Z"
+  },
+  {
+    "id": "n1QGq75ZzvE",
+    "title": "Supabase Launch Week III: Supabase Studio (Tuesday)",
+    "url": "https://www.youtube.com/watch?v=n1QGq75ZzvE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T16:42:37Z"
+  },
+  {
+    "id": "0lApV525_Uw",
+    "title": "Supabase Developer Stories: Mobbin",
+    "url": "https://www.youtube.com/watch?v=0lApV525_Uw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:21:44Z"
+  },
+  {
+    "id": "CF4zkt_pgEQ",
+    "title": "Supabase Developer Stories: Dots",
+    "url": "https://www.youtube.com/watch?v=CF4zkt_pgEQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:21:40Z"
+  },
+  {
+    "id": "7wGBx4s5Ko4",
+    "title": "Supabase Developer Stories: Hapi",
+    "url": "https://www.youtube.com/watch?v=7wGBx4s5Ko4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:21:33Z"
+  },
+  {
+    "id": "clPPN41kTXw",
+    "title": "Supabase Developer Stories: Leesa",
+    "url": "https://www.youtube.com/watch?v=clPPN41kTXw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:21:26Z"
+  },
+  {
+    "id": "XtWpV0-LvaA",
+    "title": "Supabase Developer Stories: Replenysh",
+    "url": "https://www.youtube.com/watch?v=XtWpV0-LvaA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:21:21Z"
+  },
+  {
+    "id": "3QVt73tZuxc",
+    "title": "Supabase Developer Stories: MailCorgi",
+    "url": "https://www.youtube.com/watch?v=3QVt73tZuxc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:21:16Z"
+  },
+  {
+    "id": "LS4I8Dryzfs",
+    "title": "Supabase Developer Stories: appsmith_",
+    "url": "https://www.youtube.com/watch?v=LS4I8Dryzfs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:21:12Z"
+  },
+  {
+    "id": "Kldwwf0AymM",
+    "title": "Supabase Developer Stories: UI Foundations",
+    "url": "https://www.youtube.com/watch?v=Kldwwf0AymM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:21:07Z"
+  },
+  {
+    "id": "1JeUoqvmSig",
+    "title": "Supabase Developer Stories: Ultra",
+    "url": "https://www.youtube.com/watch?v=1JeUoqvmSig",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:21:03Z"
+  },
+  {
+    "id": "50Gc5FZ3Gkw",
+    "title": "Supabase Developer Stories: Tangramvision",
+    "url": "https://www.youtube.com/watch?v=50Gc5FZ3Gkw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T12:20:56Z"
+  },
+  {
+    "id": "B5nbFaTaMtk",
+    "title": "Supabase Community Day in 60 Seconds #Shorts",
+    "url": "https://www.youtube.com/watch?v=B5nbFaTaMtk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T09:22:53Z"
+  },
+  {
+    "id": "Xfyl_lKgjBM",
+    "title": "Supabase Launch Week Preview #Shorts",
+    "url": "https://www.youtube.com/watch?v=Xfyl_lKgjBM",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-30T09:18:52Z"
+  },
+  {
+    "id": "9zmaKt6evxw",
+    "title": "Supabase Launch Week III: Community Day (Monday)",
+    "url": "https://www.youtube.com/watch?v=9zmaKt6evxw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-29T16:48:02Z"
+  },
+  {
+    "id": "crXBpOe8YYA",
+    "title": "Supabase Launch Week III: The Trilogy",
+    "url": "https://www.youtube.com/watch?v=crXBpOe8YYA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-27T03:23:01Z"
+  },
+  {
+    "id": "yL5WbAKAKjE",
+    "title": "Supabase Beta | October 2021",
+    "url": "https://www.youtube.com/watch?v=yL5WbAKAKjE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-11-08T13:13:14Z"
+  },
+  {
+    "id": "MJZCCpCYEqk",
+    "title": "Create PostgreSQL Functions with Supabase",
+    "url": "https://www.youtube.com/watch?v=MJZCCpCYEqk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-10-19T02:35:23Z"
+  },
+  {
+    "id": "5fsKMTeBKKY",
+    "title": "Is the Future of Coding Code-Less - presented by General Assembly",
+    "url": "https://www.youtube.com/watch?v=5fsKMTeBKKY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-10-02T05:13:30Z"
+  },
+  {
+    "id": "YYpTh2DAvho",
+    "title": "Supabase Beta | August 2021",
+    "url": "https://www.youtube.com/watch?v=YYpTh2DAvho",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-09-11T13:42:26Z"
+  },
+  {
+    "id": "Ow_Uzedfohk",
+    "title": "Implement Authorization using Row Level Security (RLS) with Supabase (Step By Step Guide)",
+    "url": "https://www.youtube.com/watch?v=Ow_Uzedfohk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-09-03T08:04:08Z"
+  },
+  {
+    "id": "bN4B5bMHRxk",
+    "title": "Build in Public 012: GitHub Discussions + Docusaurus",
+    "url": "https://www.youtube.com/watch?v=bN4B5bMHRxk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-08-27T00:34:38Z"
+  },
+  {
+    "id": "Vj5fPA-vjfw",
+    "title": "Build in Public 011: Launch Week Recap",
+    "url": "https://www.youtube.com/watch?v=Vj5fPA-vjfw",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-08-13T00:34:08Z"
+  },
+  {
+    "id": "akScoPO01bc",
+    "title": "SMS Login with Supabase Auth and Twilio",
+    "url": "https://www.youtube.com/watch?v=akScoPO01bc",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-07-28T15:15:13Z"
+  },
+  {
+    "id": "YAaZhVKbPsA",
+    "title": "Build in Public 010: Launch Week + AMA",
+    "url": "https://www.youtube.com/watch?v=YAaZhVKbPsA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-07-23T01:18:15Z"
+  },
+  {
+    "id": "wNoVi3wAmh0",
+    "title": "Build in Public 009: Supabase Studio",
+    "url": "https://www.youtube.com/watch?v=wNoVi3wAmh0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-07-16T00:34:54Z"
+  },
+  {
+    "id": "x5TKDQ-w3OQ",
+    "title": "Build in Public 008: Supabase Studio",
+    "url": "https://www.youtube.com/watch?v=x5TKDQ-w3OQ",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-07-09T00:32:24Z"
+  },
+  {
+    "id": "m3yRPNyYolk",
+    "title": "Supabase Beta | June 2021",
+    "url": "https://www.youtube.com/watch?v=m3yRPNyYolk",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-07-02T10:11:55Z"
+  },
+  {
+    "id": "R4gJhX_JFTo",
+    "title": "Build in Public 007: Supabase Studio - API Docs",
+    "url": "https://www.youtube.com/watch?v=R4gJhX_JFTo",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-07-02T00:33:15Z"
+  },
+  {
+    "id": "LHYrqBb4q9I",
+    "title": "Build in Public 006: Supabase Studio",
+    "url": "https://www.youtube.com/watch?v=LHYrqBb4q9I",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-06-25T00:47:41Z"
+  },
+  {
+    "id": "7yhFmKmplDg",
+    "title": "Build in Public 004: Svelte Quickstart, new supabase-js release, monthly GitHub release",
+    "url": "https://www.youtube.com/watch?v=7yhFmKmplDg",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-06-11T00:34:01Z"
+  },
+  {
+    "id": "a2r-GGILQiA",
+    "title": "Build in Public 003: Redwood PR, GitHub Discussions, Pricing Pages, Postgres Policies, Styling docs",
+    "url": "https://www.youtube.com/watch?v=a2r-GGILQiA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-06-04T00:37:17Z"
+  },
+  {
+    "id": "qETcl3SUfzU",
+    "title": "Supabase Beta | May 2021",
+    "url": "https://www.youtube.com/watch?v=qETcl3SUfzU",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-06-02T05:48:01Z"
+  },
+  {
+    "id": "T120E0eSNq8",
+    "title": "Build in Public 002 - maybeSingle() and React + Supabase Tutorial",
+    "url": "https://www.youtube.com/watch?v=T120E0eSNq8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-05-28T00:34:38Z"
+  },
+  {
+    "id": "p561ogKZ63o",
+    "title": "Build in Public 001 - Building a Next.js + Supabase Tutorial",
+    "url": "https://www.youtube.com/watch?v=p561ogKZ63o",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-05-21T00:31:31Z"
+  },
+  {
+    "id": "uWJmUTCFdak",
+    "title": "Supabase Beta | April 2021",
+    "url": "https://www.youtube.com/watch?v=uWJmUTCFdak",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-05-04T11:03:17Z"
+  },
+  {
+    "id": "TtLxxaYE1rA",
+    "title": "Supabase Beta | March 2021",
+    "url": "https://www.youtube.com/watch?v=TtLxxaYE1rA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-04-06T07:12:06Z"
+  },
+  {
+    "id": "OZBWvc1NCe0",
+    "title": "Deploy a Supabase Storage Example on Vercel",
+    "url": "https://www.youtube.com/watch?v=OZBWvc1NCe0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-03-30T14:40:32Z"
+  },
+  {
+    "id": "lQ5iIxaYduI",
+    "title": "Using Supabase in Replit with node.js",
+    "url": "https://www.youtube.com/watch?v=lQ5iIxaYduI",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-03-11T08:42:48Z"
+  },
+  {
+    "id": "h-ses99G45g",
+    "title": "Supabase Beta | February 2021",
+    "url": "https://www.youtube.com/watch?v=h-ses99G45g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-03-02T02:05:16Z"
+  },
+  {
+    "id": "neqfYym_84k",
+    "title": "Supabase Auth Deep Dive Part 4: Gotrue Overview",
+    "url": "https://www.youtube.com/watch?v=neqfYym_84k",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-02-10T10:28:57Z"
+  },
+  {
+    "id": "_XM9ziOzWk4",
+    "title": "Supabase Auth Deep Dive Part 5: Google OAuth Provider",
+    "url": "https://www.youtube.com/watch?v=_XM9ziOzWk4",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-02-10T09:49:25Z"
+  },
+  {
+    "id": "DlybOLANG4s",
+    "title": "Supabase Beta | January 2021",
+    "url": "https://www.youtube.com/watch?v=DlybOLANG4s",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-02-02T01:28:02Z"
+  },
+  {
+    "id": "0LvCOlELs5U",
+    "title": "Supabase Auth Deep Dive Part 3: User Based Access Policies",
+    "url": "https://www.youtube.com/watch?v=0LvCOlELs5U",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-01-28T07:08:35Z"
+  },
+  {
+    "id": "qY_iQ10IUhs",
+    "title": "Supabase Auth Deep Dive Part 2: Restrict Table Access",
+    "url": "https://www.youtube.com/watch?v=qY_iQ10IUhs",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-01-28T06:48:45Z"
+  },
+  {
+    "id": "v3Exg5YpJvE",
+    "title": "Supabase Auth Deep Dive Part 1: JWTs",
+    "url": "https://www.youtube.com/watch?v=v3Exg5YpJvE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-01-28T06:43:18Z"
+  },
+  {
+    "id": "ofSm4BJkZ1g",
+    "title": "Supabase Beta | December 2020",
+    "url": "https://www.youtube.com/watch?v=ofSm4BJkZ1g",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2021-01-03T16:55:24Z"
+  },
+  {
+    "id": "unC_de7iytA",
+    "title": "Supabase Alpha | November 2020",
+    "url": "https://www.youtube.com/watch?v=unC_de7iytA",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2020-12-01T02:31:10Z"
+  },
+  {
+    "id": "1gNDMMsUPI0",
+    "title": "Supabase Alpha | October 2020",
+    "url": "https://www.youtube.com/watch?v=1gNDMMsUPI0",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2020-11-03T03:19:26Z"
+  },
+  {
+    "id": "XrlU0o61JW8",
+    "title": "Supabase Alpha | September 2020",
+    "url": "https://www.youtube.com/watch?v=XrlU0o61JW8",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2020-10-05T00:45:42Z"
+  },
+  {
+    "id": "3_xRLTjvEiE",
+    "title": "Supabase Hacktoberfest Meetup",
+    "url": "https://www.youtube.com/watch?v=3_xRLTjvEiE",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2020-10-02T13:37:40Z"
+  },
+  {
+    "id": "O_ZwZa673bY",
+    "title": "Supabase Alpha | August 2020",
+    "url": "https://www.youtube.com/watch?v=O_ZwZa673bY",
+    "channelId": "UCNTVzV1InxHV-YR0fSajqPQ",
+    "publishedAt": "2020-09-06T10:08:54Z"
+  }
+]

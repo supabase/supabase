@@ -141,6 +141,25 @@ describe('absolutizeLinks', () => {
     const body = '| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~'
     expect(absolutizeLinks(body)).toBe('| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~\n')
   })
+
+  it('strips a custom anchor from the end of a heading', () => {
+    expect(absolutizeLinks('## How to create a client [#create-client]')).toBe(
+      '## How to create a client\n'
+    )
+  })
+
+  it('strips a custom anchor that follows inline code in a heading', () => {
+    expect(absolutizeLinks('## Using `createClient` [#create-client]')).toBe(
+      '## Using `createClient`\n'
+    )
+  })
+
+  it('leaves bracketed text that is not a trailing heading anchor untouched', () => {
+    const body = '## Arrays [#1] explained\n\nSee [#create-client] below.'
+    expect(absolutizeLinks(body)).toBe(
+      '## Arrays \\[#1] explained\n\nSee \\[#create-client] below.\n'
+    )
+  })
 })
 
 describe('renderMarkdown', () => {

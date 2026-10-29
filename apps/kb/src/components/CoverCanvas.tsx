@@ -1,9 +1,10 @@
 import { useCallback, type RefObject } from 'react'
 import { cn } from 'ui'
+import { toOpaque } from 'ui-patterns/GlyphLines'
 
 import { CELL_HEIGHT, CELL_WIDTH, clamp, fitEdges, uniformEdges } from '../lib/ascii/field'
 import { drawFluid, FLUID_RISE_MS } from '../lib/ascii/fluid'
-import { loadGrain, punchGrain } from '../lib/ascii/grain'
+import { circlePoints, fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
 import { createLayer, sizeLayers, tracePolygon } from '../lib/ascii/layer'
 import { easeInOutCubic } from '../lib/ascii/warp'
 import {
@@ -28,6 +29,7 @@ export interface CoverCanvasProps {
   nudgeY?: number
   zoom?: number
   keepOutRef?: RefObject<HTMLElement | null>
+  text: string
   className?: string
 }
 
@@ -38,12 +40,14 @@ interface Point {
 
 interface Palette {
   line: string
+  surface: string
   fluid: string
   beam: string
 }
 
 const PROBES = {
-  line: 'text-border-muted',
+  line: 'text-border-stronger',
+  surface: 'text-background-surface-75',
   fluid: 'text-foreground-muted',
   beam: 'text-brand',
 } as const
@@ -93,7 +97,8 @@ const clearPath = (ctx: CanvasRenderingContext2D) => {
 const readPalette = (probeRoot: HTMLElement): Palette => {
   const read = (role: keyof typeof PROBES) => readProbeColor(probeRoot, role)
   return {
-    line: read('line'),
+    line: toOpaque(read('line'), read('surface')),
+    surface: read('surface'),
     fluid: read('fluid'),
     beam: read('beam'),
   }
@@ -109,6 +114,7 @@ export const CoverCanvas = ({
   nudgeY = 0,
   zoom = 1,
   keepOutRef,
+  text,
   className,
 }: CoverCanvasProps) => {
   const setupCanvas = useCallback(
@@ -121,12 +127,6 @@ export const CoverCanvas = ({
       const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const sorted = paintOrder(boxes)
       const lifts = sorted.map(() => ({ from: 0, to: 0, startedAt: 0, delay: 0 }))
-      let grain: CanvasPattern | null = null
-      loadGrain(ctx).then((pattern) => {
-        grain = pattern
-        draw()
-      })
-      // the fluid paints after the grain so the grain's holes stay on the lines only
       const fluidLayer = createLayer()
       let palette = readPalette(probeRoot)
       let fit = { scale: 1, x: 0, y: 0 }
@@ -167,18 +167,28 @@ export const CoverCanvas = ({
         const height = canvas.clientHeight
         ctx.clearRect(0, 0, width, height)
         fluidLayer?.ctx.clearRect(0, 0, width, height)
-        ctx.strokeStyle = palette.line
-        ctx.lineWidth = 1
-        ctx.beginPath()
+        ctx.fillStyle = palette.line
+        ctx.font = GLYPH_FONT
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        // each line starts at a different place in the text, so neighbor lines do not repeat
+        let offset = 0
+        const fillGlyphs = (points: Point[], isClosed = false) => {
+          fillGlyphPath({ ctx, points, isClosed, text, offset, surface: palette.surface })
+          offset += 1009
+        }
         for (const x of table.xs.slice(1, -1)) {
-          ctx.moveTo(Math.round(x) + 0.5, 0)
-          ctx.lineTo(Math.round(x) + 0.5, Math.round(tableBottom) + 0.5)
+          fillGlyphs([
+            { x, y: 0 },
+            { x, y: tableBottom },
+          ])
         }
         for (const y of table.ys.slice(1, -1).filter((row) => row <= tableBottom)) {
-          ctx.moveTo(0, Math.round(y) + 0.5)
-          ctx.lineTo(width, Math.round(y) + 0.5)
+          fillGlyphs([
+            { x: 0, y },
+            { x: width, y },
+          ])
         }
-        ctx.stroke()
         // solid rings clear the canvas inside them, so they cover the dashed orbit
         const point = VIEW_POINTS[view]
         const orbitProgress = cardHoverAt(now)
@@ -186,23 +196,21 @@ export const CoverCanvas = ({
           const [cx, cy] = toPixel(point(ring.x, ring.y, ring.z))
           return { cx, cy, radius: ring.radius * fit.scale - 2 }
         }
-        ctx.lineWidth = 1
-        ctx.strokeStyle = palette.line
         for (const ring of orbitProgress > 0 ? rings.filter((ring) => ring.isDashed) : []) {
-          const { cx, cy, radius } = circleOf(ring)
-          ctx.save()
-          ctx.setLineDash([3.6, 3.6])
-          ctx.beginPath()
-          ctx.arc(cx, cy, radius, -Math.PI / 2, -Math.PI / 2 + orbitProgress * Math.PI * 2)
-          ctx.stroke()
-          ctx.restore()
+          fillGlyphs(
+            circlePoints({
+              ...circleOf(ring),
+              from: -Math.PI / 2,
+              to: -Math.PI / 2 + orbitProgress * Math.PI * 2,
+            })
+          )
         }
         for (const ring of rings.filter((ring) => !ring.isDashed)) {
           const { cx, cy, radius } = circleOf(ring)
           ctx.beginPath()
           ctx.arc(cx, cy, radius, 0, Math.PI * 2)
           clearPath(ctx)
-          ctx.stroke()
+          fillGlyphs(circlePoints({ cx, cy, radius }))
         }
         sorted.forEach((box, index) => {
           const lift = liftAt(index, now)
@@ -219,7 +227,10 @@ export const CoverCanvas = ({
           for (const polygon of polygons) {
             tracePolygon(ctx, polygon)
             clearPath(ctx)
-            ctx.stroke()
+            fillGlyphs(
+              polygon.map(([x, y]) => ({ x, y })),
+              true
+            )
           }
           if (fluidLayer) {
             const silhouette = convexHull(faces.flat()).map(toPixel)
@@ -242,19 +253,15 @@ export const CoverCanvas = ({
             })
           }
           if (lift <= 0) return
-          ctx.save()
-          ctx.setLineDash([1, 3])
-          ctx.beginPath()
           for (const [px, py] of posts) {
             const [fromX, fromY] = toPixel(point(px, py, box.z))
             const [toX, toY] = toPixel(point(px, py, box.z + lift))
-            ctx.moveTo(fromX, fromY)
-            ctx.lineTo(toX, toY)
+            fillGlyphs([
+              { x: fromX, y: fromY },
+              { x: toX, y: toY },
+            ])
           }
-          ctx.stroke()
-          ctx.restore()
         })
-        if (grain) punchGrain({ ctx, pattern: grain, width, height })
         if (fluidLayer) ctx.drawImage(fluidLayer.canvas, 0, 0, width, height)
       }
 
@@ -367,6 +374,8 @@ export const CoverCanvas = ({
       const resizeObserver = new ResizeObserver(measure)
       resizeObserver.observe(host)
       if (keepOutRef?.current) resizeObserver.observe(keepOutRef.current)
+      // a pinch zoom changes only the visual viewport scale, so the layers resize for it too
+      visualViewport?.addEventListener('resize', measure)
 
       const unobserveTheme = observeTheme(() => {
         palette = readPalette(probeRoot)
@@ -379,12 +388,13 @@ export const CoverCanvas = ({
       return () => {
         cancelAnimationFrame(frame)
         resizeObserver.disconnect()
+        visualViewport?.removeEventListener('resize', measure)
         unobserveTheme()
         host.removeEventListener('pointermove', handlePointerMove)
         host.removeEventListener('pointerleave', handlePointerLeave)
       }
     },
-    [boxes, view, rings, fillBoxes, nudgeY, zoom, keepOutRef]
+    [boxes, view, rings, fillBoxes, nudgeY, zoom, keepOutRef, text]
   )
 
   return (

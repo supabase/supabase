@@ -43,6 +43,9 @@ export const contract = {
     })),
   outputSchema,
   minOptInLevel: null,
+  availability: {
+    environments: new Set(['platform']),
+  },
   needsApproval: true,
   toModelOutput: (output) => output,
 } as const satisfies ToolContract<StoredInput, Output>

@@ -24,7 +24,7 @@ How you connect to your database depends on where your code runs. Find your case
 | A persistent backend on IPv6, or with the IPv4 add-on     | [Direct connection](#direct-connection)                     | No pooler in the path.                                                                        |
 | A persistent backend on an IPv4-only network              | [Shared pooler, session mode](#pooler-session-mode)         | The shared pooler is IPv4-only on every plan.                                                 |
 | A third-party tool, such as a BI client or database GUI   | [Shared pooler, session mode](#pooler-session-mode)         | Reachable over IPv4 from networks you don't control, and it supports prepared statements.     |
-| A high-performance application on a paid plan             | [Dedicated pooler](#dedicated-pooler)                       | Runs on the same machine as your database, so lower latency than the shared pooler.           |
+| A high-load application on the Pro Plan and above         | [Dedicated pooler](#dedicated-pooler)                       | Runs on the same machine as your database, so lower latency than the shared pooler.           |
 | Migrations, `pg_dump`, backup and restore, or replication | [Direct connection](#direct-connection)                     | These are single sessions and Postgres native commands.                                       |
 
 <Admonition type="caution">
@@ -66,7 +66,7 @@ Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/pro
 
 ### Shared pooler, session mode [#pooler-session-mode]
 
-The session mode connection string connects to your Postgres instance through the shared pooler. Use it as an alternative to a direct connection when you connect from an IPv4-only network.
+The session mode connection string connects to your Postgres instance through the shared pooler (Supavisor). Use it as an alternative to a direct connection when you connect from an IPv4-only network.
 
 ```txt
 postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres
@@ -80,7 +80,7 @@ The transaction mode connection string connects to your Postgres instance throug
 
 <Admonition type="caution">
 
-Transaction mode does not support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html). To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
+The shared pooler doesn't support [prepared statements](https://postgresql.org/docs/current/sql-prepare.html) in transaction mode. To avoid errors, turn them off in your connection library. See [Transaction mode limitations](#transaction-mode-limitations) for the setting your driver uses and for the other session-state features this affects.
 
 </Admonition>
 
@@ -98,7 +98,7 @@ Get this string from the Supabase Dashboard by clicking [Connect](/dashboard/pro
 
 ### Dedicated pooler [#dedicated-pooler]
 
-On paid plans, Supabase provisions a dedicated pooler that runs alongside your Postgres database. The dedicated pooler runs in transaction mode only. For session mode, use the [shared pooler](#pooler-session-mode). It is reachable over IPv6, or over IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
+On the Pro Plan and above, Supabase provisions a dedicated pooler (PgBouncer) that runs alongside your Postgres database. Use it for high-load applications. The dedicated pooler runs in transaction mode only. For session mode, use the [shared pooler](#pooler-session-mode). Unlike the shared pooler, it supports prepared statements on PgBouncer 1.21 and later. It is reachable over IPv6, or over IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
 ```txt
 postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:6543/postgres
@@ -124,20 +124,20 @@ For convenience, you can also use the [Supabase client libraries](/docs/referenc
 
 ### Endpoints and IP versions [#endpoints-and-ip-versions]
 
-Each mode has its own host, port, and IP version support. IP version support depends on your plan and on whether the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
+Each mode has its own host, port, and IP version support. IP version support depends on your plan and on whether the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address), which is available on the Pro Plan and above.
 
-| Mode                               | Host:Port                                       | Free | Paid | Paid + IPv4 add-on |
-| ---------------------------------- | ----------------------------------------------- | ---- | ---- | ------------------ |
-| Direct connection                  | `db.[PROJECT-REF].supabase.co:5432`             | IPv6 | IPv6 | IPv4               |
-| Shared pooler, session mode        | `aws-[INDEX]-[REGION].pooler.supabase.com:5432` | IPv4 | IPv4 | IPv4               |
-| Shared pooler, transaction mode    | `aws-[INDEX]-[REGION].pooler.supabase.com:6543` | IPv4 | IPv4 | IPv4               |
-| Dedicated pooler, transaction mode | `db.[PROJECT-REF].supabase.co:6543`             | -    | IPv6 | IPv4               |
+| Mode                               | Host:Port                                       | Free | Pro Plan and above | With IPv4 add-on |
+| ---------------------------------- | ----------------------------------------------- | ---- | ------------------ | ---------------- |
+| Direct connection                  | `db.[PROJECT-REF].supabase.co:5432`             | IPv6 | IPv6               | IPv4             |
+| Shared pooler, session mode        | `aws-[INDEX]-[REGION].pooler.supabase.com:5432` | IPv4 | IPv4               | IPv4             |
+| Shared pooler, transaction mode    | `aws-[INDEX]-[REGION].pooler.supabase.com:6543` | IPv4 | IPv4               | IPv4             |
+| Dedicated pooler, transaction mode | `db.[PROJECT-REF].supabase.co:6543`             | -    | IPv6               | IPv4             |
 
 `[INDEX]` in the shared pooler host is a pooler cluster index, not part of the region name. A region can have more than one, so you can't work out your host from your region. Copy the host from the Connect dialog.
 
 The username differs by connection type. Direct connections and the dedicated pooler use `postgres`. Shared pooler connections use `postgres.[PROJECT-REF]`. If you connect as a custom role through the shared pooler, the username is `[ROLE].[PROJECT-REF]`.
 
-The port routes the connection to the right pooler and mode. Port `5432` reaches Postgres for a direct connection and Supavisor for session mode. Port `6543` reaches PgBouncer for the dedicated pooler and Supavisor for shared transaction mode.
+The port routes the connection to the right pooler and mode. Port `5432` reaches Postgres for a direct connection and the shared pooler for session mode. Port `6543` reaches the dedicated pooler or the shared pooler in transaction mode, depending on the host.
 
 To connect over IPv4, you have two options. The shared pooler is IPv4-only on every plan, in both session and transaction mode. Alternatively, add the [IPv4 add-on](/docs/guides/platform/ipv4-address) to your project, which makes the direct connection and the dedicated pooler reachable over IPv4 instead of IPv6.
 
@@ -149,7 +149,7 @@ In a serverless function:
 
 1. Create the client once at module scope, not per request.
 2. Set the pool to 1 connection. The client is shared by every invocation on that warm instance, so this caps the instance, not the request.
-3. Turn off prepared statements, which [transaction mode](#pooler-transaction-mode) doesn't support.
+3. Turn off prepared statements, which the shared pooler doesn't support in [transaction mode](#pooler-transaction-mode).
 4. Set SSL to `require`, so the driver refuses to connect without encryption.
 
 ```ts lib/db.ts
@@ -170,13 +170,13 @@ Library defaults are too high for serverless. [Postgres.js](https://github.com/p
 
 Raise the pool above 1 only when you have evidence that concurrent invocations on one instance are queuing for the connection.
 
-For more on sizing an application-side pool, see the [Supavisor FAQ](/kb/troubleshooting/supavisor-faq-YyP5tI). If you use Prisma, [Prisma troubleshooting](/docs/guides/database/prisma/prisma-troubleshooting) covers the equivalent `connection_limit` setting.
+If you use Prisma, [Prisma troubleshooting](/docs/guides/database/prisma/prisma-troubleshooting) covers the equivalent `connection_limit` setting.
 
 ### Transaction mode limitations
 
 [Transaction mode](#pooler-transaction-mode) returns your connection to the pool after each transaction, so anything that depends on session state doesn't survive between transactions. Four things are affected.
 
-**Prepared statements** aren't supported, so turn them off. Each driver does this differently:
+**Prepared statements** aren't supported by the shared pooler, so turn them off. The [dedicated pooler](#dedicated-pooler) supports them. Each driver does this differently:
 
 | Driver               | Setting                                   |
 | -------------------- | ----------------------------------------- |
