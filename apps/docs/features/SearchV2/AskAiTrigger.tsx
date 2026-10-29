@@ -11,7 +11,7 @@ interface AskAiTriggerProps {
 export function AskAiTrigger({ className }: AskAiTriggerProps) {
   const { isAskAiOpen, showAskAi } = useSearchV2()
 
-  const handleClick = () => showAskAi()
+  const handleClick = () => showAskAi({ triggerType: 'ask_ai_button' })
 
   return (
     <Button

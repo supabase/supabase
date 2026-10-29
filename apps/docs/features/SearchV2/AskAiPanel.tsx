@@ -22,6 +22,7 @@ import {
 import { Markdown } from 'ui-patterns/Markdown'
 
 import { AskAiIcon } from './AskAiIcon'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface AskAiPanelProps {
   initialQuestion: string
@@ -43,6 +44,7 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
   const [question, setQuestion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { submit, reset, messages, isResponding, hasError } = useAiChat({ setIsLoading })
+  const sendTelemetryEvent = useSendTelemetryEvent()
   const inputRef = useRef<HTMLInputElement>(null)
   const isPinnedRef = useRef(true)
   const isBusy = isLoading || isResponding
@@ -64,6 +66,10 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
     const trimmedQuestion = question.trim()
     if (!trimmedQuestion || isBusy) return
     submit(trimmedQuestion)
+    sendTelemetryEvent({
+      action: 'docs_search_v2_ask_ai_question_submitted',
+      properties: { question: trimmedQuestion, questionSource: 'typed' },
+    })
     setQuestion('')
     isPinnedRef.current = true
   }
@@ -174,10 +180,26 @@ export function AskAiPanel({ initialQuestion, onLinkNavigate }: AskAiPanelProps)
 }
 
 function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
+  const sendTelemetryEvent = useSendTelemetryEvent()
   // the input placeholder shows a pending answer. a failed request leaves its answer incomplete.
   // the last answer failed when an error is set, and an earlier answer failed when it is incomplete
   const isFailedAnswer = (message: Message, index: number) =>
     message.status !== MessageStatus.Complete && (hasError || index < messages.length - 1)
+
+  // an answer always follows the question it answers
+  const handleSourceClick = ({
+    sourcePath,
+    answerIndex,
+  }: {
+    sourcePath: string
+    answerIndex: number
+  }) => {
+    sendTelemetryEvent({
+      action: 'docs_search_v2_ask_ai_source_clicked',
+      properties: { sourcePath, question: messages[answerIndex - 1]?.content ?? '' },
+    })
+    onLinkNavigate()
+  }
 
   return (
     <ol className="flex flex-col gap-4 px-3 py-4">
@@ -220,7 +242,9 @@ function AiMessages({ messages, hasError, onLinkNavigate }: AiMessagesProps) {
                       <Link
                         href={source.path}
                         prefetch={false}
-                        onClick={onLinkNavigate}
+                        onClick={() =>
+                          handleSourceClick({ sourcePath: source.path, answerIndex: index })
+                        }
                         className="inline-flex items-center gap-1.5 rounded-full bg-surface-400 px-2.5 py-1 text-xs text-foreground-light transition-colors hover:text-foreground focus-ring"
                       >
                         <FileText aria-hidden className="size-3.5 shrink-0" strokeWidth={2} />

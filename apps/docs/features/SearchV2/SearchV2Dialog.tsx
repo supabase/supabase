@@ -1,6 +1,7 @@
 'use client'
 
 import { useDocsSearchV2 } from 'common'
+import type { DocsSearchV2AskAiOpenedEvent } from 'common/telemetry-constants'
 import {
   SearchActionItem,
   SearchDialog,
@@ -22,7 +23,10 @@ interface SearchV2PanelProps extends Pick<
   SearchPanelProps,
   'onResultNavigate' | 'onResultLinkNavigate'
 > {
-  onAskAi?: (question: string) => void
+  onAskAi?: (options: {
+    triggerType: DocsSearchV2AskAiOpenedEvent['properties']['triggerType']
+    question: string
+  }) => void
 }
 
 export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
@@ -85,7 +89,7 @@ export function SearchV2Panel({
           ? ({ query }) => (
               <SearchActionItem
                 icon={<AskAiIcon isThinking={false} className="size-4 shrink-0" />}
-                onSelect={() => onAskAi(query)}
+                onSelect={() => onAskAi({ triggerType: 'no_results_item', question: query })}
               >
                 Ask Supabase AI: {query}
               </SearchActionItem>
@@ -98,7 +102,7 @@ export function SearchV2Panel({
               <button
                 type="button"
                 tabIndex={0}
-                onClick={() => onAskAi(query)}
+                onClick={() => onAskAi({ triggerType: 'results_footer_button', question: query })}
                 className="relative -mx-2 cursor-pointer rounded-md px-2 py-1 text-foreground-light transition-colors duration-150 hover:bg-overlay-hover hover:text-foreground focus-ring"
               >
                 Ask Supabase AI
