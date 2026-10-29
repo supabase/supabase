@@ -1,4 +1,4 @@
-import type { WebhookEndpoint } from './PlatformWebhooks.types'
+import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 
 const secureRandomHex = (length: number) => {
   if (length <= 0) return ''
@@ -32,6 +32,9 @@ export const getTestWebhookEventType = (
   subscribedEventTypes: string[],
   fallbackEventTypes: string[]
 ) => subscribedEventTypes.find((eventType) => eventType !== '*') ?? fallbackEventTypes[0]
+
+export const isTestDelivery = (delivery: Pick<WebhookDelivery, 'eventPayload'>) =>
+  delivery.eventPayload.is_test === true
 
 const normalizeSearch = (value: string) => value.trim().toLowerCase()
 
