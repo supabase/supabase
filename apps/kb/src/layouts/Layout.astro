@@ -24,9 +24,11 @@ const navTopics = getListedTopics({
 }).map((topic) => topic.name)
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 const canonicalHref = canonicalUrl(Astro.url.pathname)
-const ogImage = title
-	? `https://obuldanrptloktxcffvn.supabase.co/functions/v1/og-images?site=kb&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description ?? 'undefined')}`
-	: 'https://supabase.com/docs/img/supabase-og-image.png'
+const miscUrl = import.meta.env.MISC_URL
+const ogImage =
+	title && miscUrl
+		? `${miscUrl}/functions/v1/og-images?site=kb&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description ?? 'undefined')}`
+		: 'https://supabase.com/docs/img/supabase-og-image.png'
 const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowledge Base'
 ---
 
