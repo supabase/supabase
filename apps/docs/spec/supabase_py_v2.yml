@@ -8660,7 +8660,7 @@ functions:
       - name: path
         isOptional: false
         type: string
-        description: The file path, including the file name. For example `folder/image.png`.
+        description: The file path, including the filename. For example `folder/image.png`.
     examples:
       - id: check-file-existence
         name: Check file existence
@@ -8686,7 +8686,7 @@ functions:
       - name: path
         isOptional: false
         type: string
-        description: The file path, including the file name. For example `folder/image.png`.
+        description: The file path, including the filename. For example `folder/image.png`.
     examples:
       - id: get-file-info
         name: Get file info
