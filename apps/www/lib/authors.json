@@ -1052,7 +1052,7 @@
     "author_id": "aditya_maruvada",
     "author": "Aditya Maruvada",
     "username": "supa-aditya",
-    "position": "Engineering",
+    "position": "Product",
     "author_url": "https://github.com/supa-aditya",
     "author_image_url": "https://github.com/supa-aditya.png"
   },
@@ -1111,5 +1111,29 @@
     "position": "Engineering",
     "author_url": "https://github.com/tr00d",
     "author_image_url": "https://github.com/tr00d.png"
+  },
+  {
+    "author_id": "raul_barroso",
+    "author": "Raúl Barroso",
+    "username": "raulb",
+    "position": "Engineering",
+    "author_url": "https://github.com/raulb",
+    "author_image_url": "https://github.com/raulb.png"
+  },
+  {
+    "author_id": "gildas_garcia",
+    "author": "Gildas Garcia",
+    "username": "djhi",
+    "position": "Engineering",
+    "author_url": "https://github.com/djhi",
+    "author_image_url": "https://github.com/djhi.png"
+  },
+  {
+    "author_id": "artur_zakirov",
+    "author": "Artur Zakirov",
+    "username": "za-arthur",
+    "position": "Engineering",
+    "author_url": "https://github.com/za-arthur",
+    "author_image_url": "https://github.com/za-arthur.png"
   }
 ]

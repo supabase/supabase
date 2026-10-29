@@ -76,6 +76,13 @@ const PLATFORM_LAYERS: IsoBox[] = [0, 1, 2].map((i) => ({
   fillFace: 'top',
 }))
 
+const FAQ_BLOCKS: IsoBox[] = [
+  cube(0, 0, 0, 1),
+  cube(1.4, 0, 0, 1),
+  cube(0, 1.4, 0, 1),
+  cube(1.4, 1.4, 0, 1),
+]
+
 export const ISO_COMPOSITIONS: Record<Topic, IsoComposition> = {
   Auth: {
     titleAt: 'bottom',
@@ -158,6 +165,10 @@ export const ISO_COMPOSITIONS: Record<Topic, IsoComposition> = {
     fillBoxes: PLATFORM_LAYERS.slice(1, 2),
     nudgeY: 13,
     zoom: 0.645,
+  },
+  FAQs: {
+    titleAt: 'top',
+    boxes: FAQ_BLOCKS,
   },
 }
 

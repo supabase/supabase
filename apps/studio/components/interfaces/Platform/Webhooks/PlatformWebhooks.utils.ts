@@ -1,4 +1,4 @@
-import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
+import type { WebhookEndpoint } from './PlatformWebhooks.types'
 
 const secureRandomHex = (length: number) => {
   if (length <= 0) return ''
@@ -44,17 +44,4 @@ export const filterWebhookEndpoints = (endpoints: WebhookEndpoint[], search: str
       `${getWebhookEndpointDisplayName(endpoint)} ${endpoint.url} ${endpoint.description}`.toLowerCase()
     return haystack.includes(normalizedSearch)
   })
-}
-
-export const filterWebhookDeliveries = (deliveries: WebhookDelivery[], search: string) => {
-  const normalizedSearch = normalizeSearch(search)
-
-  return deliveries
-    .filter((delivery) => {
-      if (normalizedSearch.length === 0) return true
-      const haystack =
-        `${delivery.eventType ?? ''} ${delivery.status} ${delivery.responseCode ?? ''}`.toLowerCase()
-      return haystack.includes(normalizedSearch)
-    })
-    .sort((a, b) => new Date(b.attemptAt).getTime() - new Date(a.attemptAt).getTime())
 }

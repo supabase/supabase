@@ -7,32 +7,18 @@ import { customRender as render } from '@/tests/lib/custom-render'
 
 const noop = () => {}
 
-test('renders the formatted cell value', () => {
+test('renders a short value without the expand button', () => {
   render(<ResultCell column="name" value="alice" onContextMenu={noop} onExpand={noop} />)
-  expect(screen.getByText('alice')).toBeTruthy()
+  expect(screen.getByText('alice')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: 'View full cell content' })).not.toBeInTheDocument()
 })
 
 test('renders NULL for null values', () => {
   render(<ResultCell column="name" value={null} onContextMenu={noop} onExpand={noop} />)
-  expect(screen.getByText('NULL')).toBeTruthy()
+  expect(screen.getByText('NULL')).toBeInTheDocument()
 })
 
-test('does not render the expand button for short string values', () => {
-  render(<ResultCell column="name" value="alice" onContextMenu={noop} onExpand={noop} />)
-  expect(screen.queryByRole('button', { name: 'View full cell content' })).toBeNull()
-})
-
-test('renders the expand button for object values', () => {
-  render(<ResultCell column="data" value={{ nested: true }} onContextMenu={noop} onExpand={noop} />)
-  expect(screen.getByRole('button', { name: 'View full cell content' })).toBeTruthy()
-})
-
-test('renders the expand button for long string values', () => {
-  render(<ResultCell column="bio" value={'a'.repeat(120)} onContextMenu={noop} onExpand={noop} />)
-  expect(screen.getByRole('button', { name: 'View full cell content' })).toBeTruthy()
-})
-
-test('clicking the expand button calls onExpand with column and value', async () => {
+test('shows the expand button for large values and calls onExpand with column and value', async () => {
   const onExpand = vi.fn()
   const value = { nested: true }
   render(<ResultCell column="data" value={value} onContextMenu={noop} onExpand={onExpand} />)

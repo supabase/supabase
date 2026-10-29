@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content'
 
+import { formatDisplayDate } from './format-date'
 import { FORMAT_TOPICS, isKnownTopic, TOPICS, topicToSlug, type Topic } from './topics'
 
 export interface GuideSummary {
@@ -51,7 +52,16 @@ export const toSummary = (guide: CollectionEntry<'guides'>): GuideSummary => ({
   description: guide.data.description,
   topics: guide.data.topics,
   href: `${import.meta.env.BASE_URL}/guides/${guide.id}`,
-  date: guide.data.date,
+  date: guide.data.lastEdited ? formatDisplayDate(guide.data.lastEdited) : undefined,
+})
+
+// FAQ entries have no description in frontmatter.
+export const toFaqSummary = (faq: CollectionEntry<'faqs'>): GuideSummary => ({
+  id: faq.id,
+  title: faq.data.title,
+  description: '',
+  topics: faq.data.topics.filter((topic): topic is Topic => isKnownTopic(topic)),
+  href: `${import.meta.env.BASE_URL}/faqs/${faq.id}`,
 })
 
 export const toTroubleshootingSummary = (

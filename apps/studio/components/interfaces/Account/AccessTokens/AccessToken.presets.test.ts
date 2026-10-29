@@ -23,19 +23,12 @@ describe('PERMISSION_PRESETS', () => {
     expect(PERMISSION_PRESETS.map((preset) => preset.id)).toEqual(['none', 'read', 'full'])
   })
 
-  test('resolves every catalog entry to a mode its row can render', () => {
+  test('resolves every catalog entry to a mode its row can render, capping full access at read for read-only resources', () => {
+    expect(PERMISSION_CATALOG.some((entry) => !entry.writable)).toBe(true)
     for (const entry of PERMISSION_CATALOG) {
       expect(NONE.resolve(entry)).toBe('none')
       expect(READ.resolve(entry)).toBe('read')
       expect(FULL.resolve(entry)).toBe(entry.writable ? 'readwrite' : 'read')
-    }
-  })
-
-  test('caps full access at read for resources with no write scopes', () => {
-    const readOnlyEntries = PERMISSION_CATALOG.filter((entry) => !entry.writable)
-    expect(readOnlyEntries.length).toBeGreaterThan(0)
-    for (const entry of readOnlyEntries) {
-      expect(FULL.resolve(entry)).toBe('read')
     }
   })
 

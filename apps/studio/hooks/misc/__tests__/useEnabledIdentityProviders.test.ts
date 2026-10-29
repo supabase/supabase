@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -21,43 +22,16 @@ function mockFeatures({ github = false, chatgpt = true }: { github?: boolean; ch
 }
 
 describe('useEnabledIdentityProviders', () => {
-  it('returns every provider when all flags are enabled', () => {
-    mockFeatures({ github: true, chatgpt: true })
+  it.each([
+    [{ github: true, chatgpt: true }, [GITHUB_IDENTITY_PROVIDER, CHATGPT_IDENTITY_PROVIDER]],
+    [{ github: true, chatgpt: false }, [GITHUB_IDENTITY_PROVIDER]],
+    [{ github: false, chatgpt: true }, [CHATGPT_IDENTITY_PROVIDER]],
+    [{ github: false, chatgpt: false }, []],
+  ])('returns only the providers whose flags are enabled: %o', (flags, expected) => {
+    mockFeatures(flags)
 
     const { result } = renderHook(() => useEnabledIdentityProviders())
 
-    expect(result.current).toEqual([GITHUB_IDENTITY_PROVIDER, CHATGPT_IDENTITY_PROVIDER])
-  })
-
-  it('returns no providers when all flags are disabled', () => {
-    mockFeatures({ github: false, chatgpt: false })
-
-    const { result } = renderHook(() => useEnabledIdentityProviders())
-
-    expect(result.current).toEqual([])
-  })
-
-  it('includes ChatGPT when its feature flag is enabled', () => {
-    mockFeatures({ chatgpt: true })
-
-    const { result } = renderHook(() => useEnabledIdentityProviders())
-
-    expect(result.current).toEqual([CHATGPT_IDENTITY_PROVIDER])
-  })
-
-  it('excludes ChatGPT when its feature flag is disabled', () => {
-    mockFeatures({ github: true, chatgpt: false })
-
-    const { result } = renderHook(() => useEnabledIdentityProviders())
-
-    expect(result.current).toEqual([GITHUB_IDENTITY_PROVIDER])
-  })
-
-  it('excludes GitHub when its feature flag is disabled', () => {
-    mockFeatures({ github: false, chatgpt: true })
-
-    const { result } = renderHook(() => useEnabledIdentityProviders())
-
-    expect(result.current).toEqual([CHATGPT_IDENTITY_PROVIDER])
+    expect(result.current).toEqual(expected)
   })
 })

@@ -117,7 +117,7 @@ drop table if exists old_analytics;
 
 <Admonition type="caution">
 
-`DROP TABLE` acquires an `ACCESS EXCLUSIVE` lock, which blocks **all** other operations on the table, including reads. On a busy table, this can queue up behind long-running queries. See [Monitoring locks](#monitoring-locks) below.
+`DROP TABLE` acquires an `ACCESS EXCLUSIVE` lock, which blocks **all** other operations on the table, including reads. On a busy table, this can queue up behind long-running queries. See [Check for blocked queries](#check-for-blocked-queries) below.
 
 </Admonition>
 
@@ -161,7 +161,7 @@ supabase inspect db index-stats --remote
 
 ### Check for blocked queries
 
-Query `pg_locks` and `pg_stat_activity` to see currently active queries and queries waiting for locks.
+Query `pg_locks` and `pg_stat_activity` to see currently active queries and [queries waiting for locks](/kb/troubleshooting/how-to-check-if-my-queries-are-being-blocked-by-other-queries-NSKtR1).
 
 The [Supabase CLI](/docs/reference/cli/supabase-inspect-db-locks) provides commands to view these metrics:
 
@@ -180,7 +180,7 @@ supabase inspect db bloat --remote
 
 ## Reclaiming disk space
 
-To reclaim the disk space freed by deleted rows, Postgres' autovacuum process runs automatically to mark deleted rows as reusable, but it may not always keep up with large deletes.
+To [reclaim the disk space](/kb/troubleshooting/disk-size-not-shrinking-after-deleting-data) freed by deleted rows, Postgres' autovacuum process runs automatically to mark deleted rows as reusable, but it may not always keep up with large deletes.
 
 If autovacuum is not keeping up, you can trigger a manual vacuum:
 

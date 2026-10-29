@@ -1,6 +1,7 @@
 'use client'
 
-import { consentState, isBrowser } from 'common'
+import { consentState } from 'common/consent-state'
+import { isBrowser } from 'common/helpers'
 import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { cn } from 'ui'

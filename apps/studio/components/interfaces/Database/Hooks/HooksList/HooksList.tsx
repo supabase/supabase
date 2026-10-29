@@ -93,7 +93,7 @@ export const HooksList = () => {
               },
             }}
           >
-            Create a new hook
+            Create webhook
           </ButtonTooltip>
         </div>
       </div>

@@ -16,7 +16,6 @@ describe(`isNonNullable`, () => {
     [``, true],
     [NaN, true],
     [0, true],
-    [0, true],
     [false, true],
     // Type coercion
     [[], true],
