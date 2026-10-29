@@ -7,11 +7,20 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { generateStrongPassword } from '@/lib/project'
 
+interface RolePasswordFieldProps {
+  /** Whether leaving the field empty is allowed. Defaults to true. */
+  isOptional?: boolean
+  layout?: 'horizontal' | 'vertical'
+}
+
 /**
- * Optional password field for a role form. Render it inside a `<Form>` whose values include
- * a `password` string, and only while the role can log in.
+ * Password field for a role form. Render it inside a `<Form>` whose values include a
+ * `password` string, and only while the role can log in.
  */
-export const RolePasswordField = () => {
+export const RolePasswordField = ({
+  isOptional = true,
+  layout = 'horizontal',
+}: RolePasswordFieldProps) => {
   const { control, setValue } = useFormContext<{ password: string }>()
   const [isPasswordGenerated, setIsPasswordGenerated] = useState(false)
 
@@ -21,11 +30,12 @@ export const RolePasswordField = () => {
       name="password"
       render={({ field }) => (
         <FormItemLayout
-          layout="horizontal"
+          layout={layout}
           label="Password"
           description={
             <>
-              Optional. Without a password, the role can't log in using password authentication.{' '}
+              {isOptional &&
+                `Optional. Without a password, the role can't log in using password authentication. `}
               <button
                 type="button"
                 tabIndex={0}
