@@ -471,6 +471,33 @@ export const lintInfoMap: LintInfo[] = [
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
     category: 'health',
   },
+  {
+    name: 'realtime_authorization_timeouts',
+    title: 'Realtime authorization checks are slow',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/realtime/policies`,
+    linkText: 'View policies',
+    docsLink: `${DOCS_URL}/guides/realtime/authorization`,
+    category: 'health',
+  },
+  {
+    name: 'realtime_postgres_changes_spike',
+    title: 'Realtime Postgres Changes volume increased sharply',
+    icon: <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/observability/realtime`,
+    linkText: 'View Realtime report',
+    docsLink: `${DOCS_URL}/guides/realtime/postgres-changes`,
+    category: 'health',
+  },
+  {
+    name: 'realtime_concurrent_users_near_limit',
+    title: 'Realtime concurrent clients are close to the limit',
+    icon: <GaugeIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/realtime/settings`,
+    linkText: 'View Realtime settings',
+    docsLink: `${DOCS_URL}/guides/realtime/limits`,
+    category: 'health',
+  },
 ]
 
 export const LintCTA = ({
