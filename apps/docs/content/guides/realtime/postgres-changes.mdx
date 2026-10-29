@@ -246,14 +246,14 @@ const changes = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('schema-db-changes')
+final channel = supabase.channel('schema-db-changes');
+channel
     .onPostgresChanges(
-        schema: 'public', // Subscribes to the "public" schema in Postgres
-        event: PostgresChangeEvent.all, // Listen to all changes
-
-        callback: (payload) => print(payload))
-    .subscribe();
+      schema: 'public', // Subscribes to the "public" schema in Postgres
+      event: PostgresChangeEvent.all, // Listen to all changes
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -442,52 +442,44 @@ const changes = supabase
 <TabPanel id="insert" label="Insert">
 
 ```dart
-supabase
-    .channel('schema-db-changes')
-    .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        callback: (payload) => print(payload))
-    .subscribe();
+final channel = supabase.channel('schema-db-changes');
+channel
+    .onPostgresChanges(event: PostgresChangeEvent.insert, schema: 'public')
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
 <TabPanel id="update" label="Update">
 
 ```dart
-supabase
-    .channel('schema-db-changes')
-    .onPostgresChanges(
-        event: PostgresChangeEvent.update,
-        schema: 'public',
-        callback: (payload) => print(payload))
-    .subscribe();
+final channel = supabase.channel('schema-db-changes');
+channel
+    .onPostgresChanges(event: PostgresChangeEvent.update, schema: 'public')
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
 <TabPanel id="delete" label="Delete">
 
 ```dart
-supabase
-    .channel('schema-db-changes')
-    .onPostgresChanges(
-        event: PostgresChangeEvent.delete,
-        schema: 'public',
-        callback: (payload) => print(payload))
-    .subscribe();
+final channel = supabase.channel('schema-db-changes');
+channel
+    .onPostgresChanges(event: PostgresChangeEvent.delete, schema: 'public')
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
 <TabPanel id="all" label="All events">
 
 ```dart
-supabase
-    .channel('schema-db-changes')
-    .onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        callback: (payload) => print(payload))
-    .subscribe();
+final channel = supabase.channel('schema-db-changes');
+channel
+    .onPostgresChanges(event: PostgresChangeEvent.all, schema: 'public')
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -835,14 +827,32 @@ const changes = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('table-db-changes')
+final channel = supabase.channel('table-db-changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: 'todos',
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: 'todos',
+    )
+    .listen(print);
+channel.subscribe();
+```
+
+With the [generated Dart types](/docs/guides/api/rest/generating-types#generating-dart-types), `onTableChanges` listens to a table and decodes its rows:
+
+```dart
+final channel = supabase.channel('table-db-changes');
+channel.onTableChanges(Todos.table).listen((change) {
+  switch (change) {
+    case TypedPostgresInsert(:final newRow):
+      print('Inserted todo ${newRow.id}');
+    case TypedPostgresUpdate(:final newRow):
+      print('Updated todo ${newRow.id}');
+    case TypedPostgresDelete(:final oldRow):
+      print('Deleted todo ${oldRow.read(Todos.id)}');
+  }
+});
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -967,19 +977,15 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('db-changes')
+final channel = supabase.channel('db-changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: 'messages',
-        callback: (payload) => print(payload))
-    .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'users',
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: 'messages',
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -1086,20 +1092,23 @@ const changes = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-  supabase
-      .channel('table-filter-changes')
-      .onPostgresChanges(
-          event: PostgresChangeEvent.insert,
-          schema: 'public',
-          table: 'todos',
-          filter: PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'id',
-            value: 1,
-          ),
-          callback: (payload) => print(payload))
-      .subscribe();
+final channel = supabase.channel('table-filter-changes');
+channel
+    .onPostgresChanges(
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'todos',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.eq,
+        column: 'id',
+        value: 1,
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
+
+`onTableChanges` takes the same filters as a typed query, `filters: [Todos.id.eq(1)]`.
 
 </TabPanel>
 </$Show>
@@ -1283,19 +1292,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.update,
-        schema: 'public',
-        table: 'messages',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.eq,
-          column: 'body',
-          value: 'hey',
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.update,
+      schema: 'public',
+      table: 'messages',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.eq,
+        column: 'body',
+        value: 'hey',
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -1445,19 +1455,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'messages',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.neq,
-          column: 'body',
-          value: 'bye',
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'messages',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.neq,
+        column: 'body',
+        value: 'bye',
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -1608,19 +1619,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'profiles',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.lt,
-          column: 'age',
-          value: 65,
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'profiles',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.lt,
+        column: 'age',
+        value: 65,
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -1770,19 +1782,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'profiles',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.lte,
-          column: 'age',
-          value: 65,
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'profiles',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.lte,
+        column: 'age',
+        value: 65,
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -1932,19 +1945,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'products',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.gt,
-          column: 'quantity',
-          value: 10,
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'products',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.gt,
+        column: 'quantity',
+        value: 10,
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -2094,19 +2108,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'products',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.gte,
-          column: 'quantity',
-          value: 10,
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'products',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.gte,
+        column: 'quantity',
+        value: 10,
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -2256,19 +2271,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'colors',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.inFilter,
-          column: 'name',
-          value: ['red', 'blue', 'yellow'],
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'colors',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.inFilter,
+        column: 'name',
+        value: ['red', 'blue', 'yellow'],
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -2419,19 +2435,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'articles',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.ilike,
-          column: 'title',
-          value: '%breaking%',
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'articles',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.ilike,
+        column: 'title',
+        value: '%breaking%',
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -2582,19 +2599,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'posts',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.match,
-          column: 'slug',
-          value: r'^post-\d+$',
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'posts',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.match,
+        column: 'slug',
+        value: r'^post-\d+$',
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -2745,19 +2763,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.update,
-        schema: 'public',
-        table: 'todos',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.isFilter,
-          column: 'completed_at',
-          value: null,
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.update,
+      schema: 'public',
+      table: 'todos',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.isFilter,
+        column: 'completed_at',
+        value: null,
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -2908,19 +2927,20 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.update,
-        schema: 'public',
-        table: 'orders',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.isDistinct,
-          column: 'status',
-          value: 'shipped',
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.update,
+      schema: 'public',
+      table: 'orders',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.isDistinct,
+        column: 'status',
+        value: 'shipped',
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -3071,20 +3091,21 @@ const channel = supabase
 Set `negate: true` on a `PostgresChangeFilter` to apply the `not.` prefix.
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: 'posts',
-        filter: PostgresChangeFilter(
-          type: PostgresChangeFilterType.inFilter,
-          column: 'status',
-          value: ['draft', 'archived'],
-          negate: true,
-        ),
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: 'posts',
+      filter: PostgresChangeFilter(
+        type: PostgresChangeFilterType.inFilter,
+        column: 'status',
+        value: ['draft', 'archived'],
+        negate: true,
+      ),
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -3235,26 +3256,27 @@ const channel = supabase
 Pass a list of filters to `filters` to combine them with `AND`.
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.insert,
-        schema: 'public',
-        table: 'orders',
-        filters: [
-          PostgresChangeFilter(
-            type: PostgresChangeFilterType.gt,
-            column: 'amount',
-            value: 100,
-          ),
-          PostgresChangeFilter(
-            type: PostgresChangeFilterType.eq,
-            column: 'status',
-            value: 'open',
-          ),
-        ],
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'orders',
+      filters: [
+        PostgresChangeFilter(
+          type: PostgresChangeFilterType.gt,
+          column: 'amount',
+          value: 100,
+        ),
+        PostgresChangeFilter(
+          type: PostgresChangeFilterType.eq,
+          column: 'status',
+          value: 'open',
+        ),
+      ],
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -3380,15 +3402,16 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase
-    .channel('changes')
+final channel = supabase.channel('changes');
+channel
     .onPostgresChanges(
-        event: PostgresChangeEvent.all,
-        schema: 'public',
-        table: 'profiles',
-        select: ['id', 'username'],
-        callback: (payload) => print(payload))
-    .subscribe();
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: 'profiles',
+      select: ['id', 'username'],
+    )
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>
@@ -3508,10 +3531,10 @@ const channel = supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-supabase.realtime.setAuth('your-custom-jwt');
+await supabase.realtime.setAccessToken('your-custom-jwt');
 
-supabase
-    .channel('db-changes')
+final channel = supabase.channel('db-changes');
+channel
     .onPostgresChanges(
       event: PostgresChangeEvent.all,
       schema: 'public',
@@ -3521,9 +3544,9 @@ supabase
         column: 'body',
         value: 'bye',
       ),
-      callback: (payload) => print(payload),
     )
-    .subscribe();
+    .listen(print);
+channel.subscribe();
 ```
 
 </TabPanel>

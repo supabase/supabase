@@ -1,0 +1,13 @@
+{
+  "id": "auth-admin",
+  "title": "Auth Admin",
+  "notes": "- Any method under the `supabase.auth.admin` namespace requires a `secret` key.\n- These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the Flutter app.\n- On a server, create the client from `package:supabase` with the `secret` key. A server has no user session to refresh or persist.\n",
+  "examples": [
+    {
+      "id": "create-auth-admin-client",
+      "name": "Create server-side auth client",
+      "isSpotlight": true,
+      "code": "```dart\nfinal supabase = SupabaseClient(\n  'https://your-project.supabase.co',\n  'your-secret-key',\n  authOptions: const AuthClientOptions(autoRefreshToken: false),\n);\n```\n"
+    }
+  ]
+}

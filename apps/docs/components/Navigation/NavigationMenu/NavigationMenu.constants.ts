@@ -3444,6 +3444,17 @@ export const reference_dart_v2 = {
   },
 }
 
+export const reference_dart_v3 = {
+  icon: 'reference-dart',
+  title: 'Flutter',
+  url: '/guides/reference/dart',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase_flutter',
+    repo: 'https://github.com/supabase/supabase-flutter',
+  },
+}
+
 export const reference_csharp_v0 = {
   icon: 'reference-csharp',
   title: 'C#',

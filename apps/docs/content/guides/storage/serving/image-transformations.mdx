@@ -655,7 +655,7 @@ supabase.storage.from('bucket').download('image.jpg', {
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = supabase.storage.from('bucket').download(
+final data = await supabase.storage.from('bucket').download(
       'image.jpg',
       transform: const TransformOptions(
         width: 800,

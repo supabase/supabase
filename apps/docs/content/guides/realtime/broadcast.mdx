@@ -64,10 +64,11 @@ Get the Project URL and key from [the project's **Connect** dialog](/dashboard/p
   <TabPanel id="dart" label="Dart">
 
     ```dart
+    import 'package:flutter/material.dart';
     import 'package:supabase_flutter/supabase_flutter.dart';
 
-    void main() async {
-      Supabase.initialize(
+    Future<void> main() async {
+      await Supabase.initialize(
         url: 'https://<project>.supabase.co',
         publishableKey: '<sb_publishable_... key>',
       );
@@ -190,18 +191,13 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
     ```dart
     final myChannel = supabase.channel('test-channel');
 
-    // Log any messages we receive
-    void messageReceived(payload) {
-      print(payload);
-    }
+    // Listen for "shout". Can be "*" to listen to all events
+    myChannel
+        .onBroadcast(event: 'shout')
+        .listen((message) => print(message['payload']));
 
     // Subscribe to the Channel
-    myChannel
-        .onBroadcast(
-            event: 'shout', // Listen for "shout". Can be "*" to listen to all events
-            callback: (payload) => messageReceived(payload)
-        )
-        .subscribe();
+    myChannel.subscribe();
     ```
 
   </TabPanel>
@@ -311,7 +307,7 @@ You can use the Supabase client libraries to send Broadcast messages.
 
 <Admonition type="note">
 
-Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint8Array`) over WebSocket from **supabase-js 2.91.0** and **supabase-swift 2.44.0**. Binary payloads sent to clients running older SDK versions are **silently dropped** and never arrive over the WebSocket. The Dart, Kotlin, and Python clients don't support binary payloads yet.
+Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint8Array`) over WebSocket from **supabase-js 2.91.0**, **supabase-swift 2.44.0** and **supabase_flutter 3.0.0**. Binary payloads sent to clients running older SDK versions are **silently dropped** and never arrive over the WebSocket. The Kotlin and Python clients don't support binary payloads yet.
 
 </Admonition>
 
@@ -380,24 +376,25 @@ Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint
     ```dart
     final myChannel = supabase.channel('test-channel');
 
-    // Sending a message before subscribing will use HTTP
-    final res = await myChannel.sendBroadcastMessage(
-      event: "shout",
-      payload: { 'message': 'Hi' },
-    );
-    print(res);
+    // httpSend uses HTTP and needs no subscription
+    await myChannel.httpSend(event: 'shout', payload: {'message': 'Hi'});
 
     // Sending a message after subscribing will use WebSockets
-    myChannel.subscribe((status, error) {
-      if (status != RealtimeSubscribeStatus.subscribed) {
-        return;
-      }
+    myChannel.onStatusChange.listen((change) async {
+      if (change.status != RealtimeSubscribeStatus.subscribed) return;
 
-      myChannel.sendBroadcastMessage(
+      await myChannel.sendBroadcastMessage(
         event: 'shout',
-        payload: { 'message': 'hello, world' },
+        payload: {'message': 'hello, world'},
+      );
+
+      // The payload can be binary data
+      await myChannel.sendBroadcastMessage(
+        event: 'cursor-pos',
+        payload: Uint8List.fromList([1, 2, 3]),
       );
     });
+    myChannel.subscribe();
     ```
 
   </TabPanel>
@@ -672,24 +669,21 @@ With self-send enabled, each message delivered back to the sender is billed as a
     ```dart
     final myChannel = supabase.channel(
       'room-2',
-      opts: const RealtimeChannelConfig(
-        self: true,
-      ),
+      options: const RealtimeChannelConfig(self: true),
     );
 
-    myChannel.onBroadcast(
-      event: 'test-my-messages',
-      callback: (payload) => print(payload),
-    );
+    myChannel
+        .onBroadcast(event: 'test-my-messages')
+        .listen((message) => print(message['payload']));
 
-    myChannel.subscribe((status, error) {
-      if (status != RealtimeSubscribeStatus.subscribed) return;
-      // channelC.send({
-      myChannel.sendBroadcastMessage(
+    myChannel.onStatusChange.listen((change) async {
+      if (change.status != RealtimeSubscribeStatus.subscribed) return;
+      await myChannel.sendBroadcastMessage(
         event: 'test-my-messages',
         payload: {'message': 'talking to myself'},
       );
     });
+    myChannel.subscribe();
     ```
 
   </TabPanel>
@@ -848,23 +842,22 @@ With self-send enabled, each message delivered back to the sender is billed as a
   <TabPanel id="dart" label="Dart">
 
     ```dart
-    final myChannel = supabase.channel('room-3',opts: const RealtimeChannelConfig(
-      ack: true,
-    ),
-
+    final myChannel = supabase.channel(
+      'room-3',
+      options: const RealtimeChannelConfig(ack: true),
     );
 
-    myChannel.subscribe( (status, error) async {
-      if (status != RealtimeSubscribeStatus.subscribed) return;
+    myChannel.onStatusChange.listen((change) async {
+      if (change.status != RealtimeSubscribeStatus.subscribed) return;
 
       final serverResponse = await myChannel.sendBroadcastMessage(
-
         event: 'acknowledge',
         payload: {},
       );
 
       print('serverResponse: $serverResponse');
     });
+    myChannel.subscribe();
     ```
 
   </TabPanel>
@@ -973,13 +966,18 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
     // No need to subscribe to channel
 
     final channel = supabase.channel('test-channel');
-    final res = await channel.sendBroadcastMessage(
-      event: "test",
-      payload: {
-        'message': 'Hi',
-      },
+
+    // JSON payload
+    await channel.httpSend(event: 'test', payload: {'message': 'Hi'});
+
+    // Binary payload, sent as application/octet-stream
+    await channel.httpSend(
+      event: 'cursor-pos',
+      payload: Uint8List.fromList([1, 2, 3]),
     );
-    print(res);
+
+    // Remember to clean up the channel
+    await supabase.removeChannel(channel);
     ```
 
   </TabPanel>
@@ -1204,7 +1202,7 @@ Messages are stored in daily partitions, and partitions older than 72 hours are 
     // Configure broadcast with replay
     final channel = supabase.channel(
       'my-channel',
-      RealtimeChannelConfig(
+      options: const RealtimeChannelConfig(
         self: true,
         ack: true,
         private: true,
@@ -1215,16 +1213,14 @@ Messages are stored in daily partitions, and partitions older than 72 hours are 
       ),
     );
 
-    // Broadcast callback receives meta field
-    channel.onBroadcast(
-      event: 'position',
-      callback: (payload) {
-        final meta = payload['meta'] as Map<String, dynamic>?;
-        if (meta?['replayed'] == true) {
-          print('Replayed message: ${meta?['id']}');
-        }
-      },
-    ).subscribe();
+    // Broadcast messages carry a meta field
+    channel.onBroadcast(event: 'position').listen((message) {
+      final meta = message['meta'] as Map<String, dynamic>?;
+      if (meta?['replayed'] == true) {
+        print('Replayed message: ${meta?['id']}');
+      }
+    });
+    channel.subscribe();
     ```
 
   </TabPanel>

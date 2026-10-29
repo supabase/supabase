@@ -133,8 +133,15 @@ const sectionsWithInstruments: SectionsWithInstruments = data
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.from('orchestral_sections').select('id, name, instruments(id, name)');
+final sections = await supabase.table(OrchestralSections.table).selectOnly([
+  OrchestralSections.id,
+  OrchestralSections.name,
+  OrchestralSections.instruments.select([Instruments.id, Instruments.name]),
+]);
+final instruments = sections.first.read(OrchestralSections.instruments);
 ```
+
+`OrchestralSections` and `Instruments` come from the [generated Dart types](/docs/guides/api/rest/generating-types#generating-dart-types), which have a relation for every foreign key.
 
 </TabPanel>
 </$Show>
@@ -333,14 +340,20 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase
-  .from('orchestral_sections')
-  .select('''
-    id,
-    name,
-    instruments ( id, name )
-  ''')
-  .eq('instruments.name', 'flute');
+final sections = await supabase
+    .table(OrchestralSections.table)
+    .selectOnly([
+      OrchestralSections.id,
+      OrchestralSections.name,
+      OrchestralSections.instruments.select([
+        Instruments.id,
+        Instruments.name,
+      ]),
+    ])
+    .embedded(
+      OrchestralSections.instruments,
+      (instruments) => instruments.where(Instruments.name.eq('flute')),
+    );
 ```
 
 </TabPanel>
@@ -461,14 +474,20 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase
-  .from('orchestral_sections')
-  .select('''
-    id,
-    name,
-    instruments!inner ( id, name )
-  ''')
-  .eq('instruments.name', 'flute');
+final sections = await supabase
+    .table(OrchestralSections.table)
+    .selectOnly([
+      OrchestralSections.id,
+      OrchestralSections.name,
+      OrchestralSections.instruments.select([
+        Instruments.id,
+        Instruments.name,
+      ]),
+    ])
+    .requiring(
+      OrchestralSections.instruments,
+      (instruments) => instruments.where(Instruments.name.eq('flute')),
+    );
 ```
 
 </TabPanel>
@@ -579,14 +598,20 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase
-  .from('instruments')
-  .select('''
-    id,
-    name,
-    orchestral_sections!inner ( id, name )
-  ''')
-  .eq('orchestral_sections.name', 'woodwinds');
+final instruments = await supabase
+    .table(Instruments.table)
+    .selectOnly([
+      Instruments.id,
+      Instruments.name,
+      Instruments.orchestralSections.select([
+        OrchestralSections.id,
+        OrchestralSections.name,
+      ]),
+    ])
+    .requiring(
+      Instruments.orchestralSections,
+      (sections) => sections.where(OrchestralSections.name.eq('woodwinds')),
+    );
 ```
 
 </TabPanel>
@@ -723,8 +748,12 @@ const { data, error } = await supabase.from('teams').select(`
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.from('teams').select('id, team_name, users(id, name)');
+final teams = await supabase
+    .from('teams')
+    .select('id, team_name, users(id, name)');
 ```
+
+The generated types have no relation through a joining table, so this query uses the untyped `from()`.
 
 </TabPanel>
 </$Show>
@@ -894,20 +923,22 @@ const { data, error } = await supabase.from('shifts').select(
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.from('shifts').select('''
-  *,
-  start_scan:scans!scan_id_start (
-    id,
-    user_id,
-    badge_scan_time
-  ),
-end_scan:scans!scan_id_end (
-    id,
-    user_id,
-    badge_scan_time
-  )
-''');
+final shifts = await supabase.table(Shifts.table).selectOnly([
+  Shifts.table.allColumns,
+  Shifts.scansByScanIdStart.select([
+    Scans.id,
+    Scans.userId,
+    Scans.badgeScanTime,
+  ]),
+  Shifts.scansByScanIdEnd.select([
+    Scans.id,
+    Scans.userId,
+    Scans.badgeScanTime,
+  ]),
+]);
 ```
+
+The generated types name each relation after its foreign key column and add the hint for you. The embedded rows come back under `scans_by_scan_id_start` and `scans_by_scan_id_end`.
 
 </TabPanel>
 </$Show>

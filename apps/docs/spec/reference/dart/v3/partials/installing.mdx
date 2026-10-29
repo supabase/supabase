@@ -1,0 +1,93 @@
+---
+title: 'Installing'
+---
+
+### Install from pub.dev
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Install [supabase_flutter](https://pub.dev/packages/supabase_flutter) from pub.dev in a Flutter app, or [supabase](https://pub.dev/packages/supabase) in any other Dart project.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="flutter"
+      queryGroup="framework"
+    >
+      <TabPanel id="flutter" label="Flutter">
+
+        ```sh Terminal
+        flutter pub add supabase_flutter
+        ```
+
+      </TabPanel>
+      <TabPanel id="dart" label="Other Dart Project">
+
+        ```sh Terminal
+        dart pub add supabase
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Generate types
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Generate Dart types from your database schema, so you can query every table through the typed table API, `supabase.table()`. Add [supabase_typegen](https://pub.dev/packages/supabase_typegen) as a dev dependency and generate the types with the [Supabase CLI](/docs/guides/local-development/cli/getting-started) 2.122.0 or newer.
+
+    `--local` reads the schema of your local Supabase stack. Use `--linked` or `--project-id` to generate from a hosted project instead. Run the command again after every migration, so the types follow the schema. See [Generating types](/docs/guides/api/rest/generating-types) for details.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```sh Terminal
+    dart pub add dev:supabase_typegen
+    supabase gen types --lang dart --local > lib/supabase_schema.g.dart
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Enable Data API access
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    supabase_flutter uses the Data API to query and mutate your Postgres data. You first need to grant Data API roles permissions to access your tables and functions.
+
+    In [Data API integrations settings](/dashboard/project/_/integrations/data_api/settings), expose the specific tables and functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
+
+    Alternatively, use SQL to grant the required permissions:
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    ```sql
+    -- Before granting access to client roles, make sure RLS is enabled
+    -- and create the policies required for each role's allowed operations.
+    alter table public.your_table enable row level security;
+    -- create policy ... on public.your_table ...;
+
+    -- Grant least-privilege access to tables after RLS and policies are in place
+    grant select on public.your_table to anon;
+    grant select, insert, update, delete on public.your_table to authenticated;
+    grant all on public.your_table to service_role;
+
+    -- Grant execute on functions after verifying any table access they rely on
+    grant execute on function public.your_function to authenticated, service_role;
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>

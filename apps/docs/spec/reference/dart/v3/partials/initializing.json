@@ -1,0 +1,218 @@
+{
+  "id": "initializing",
+  "title": "Initializing",
+  "description": "Initialize Supabase once, before `runApp`, with the static `initialize()` method of the `Supabase` class. It restores the persisted session before it returns. Then use the client from `Supabase.instance.client` everywhere in the app.\n\nIn Dart projects without Flutter, create a `SupabaseClient` instead. It takes the URL and the key as positional parameters and the same options, plus `functionsOptions`. `realtimeLifecycleOptions` does not exist there, and `authOptions` is an `AuthClientOptions`, which keeps the session in memory unless you set `persistSession` and pass an `asyncStorage`.\n\nThe SDK never prints anything. All packages log through [package:logging](https://pub.dev/packages/logging) under the `supabase` logger, so attach a listener to see the logs.\n",
+  "params": [
+    {
+      "name": "url",
+      "isOptional": false,
+      "type": "String",
+      "description": "The URL of your project, found in the dashboard under **Project Settings > API Keys**."
+    },
+    {
+      "name": "publishableKey",
+      "isOptional": false,
+      "type": "String",
+      "description": "The publishable key of your project. A legacy anon key also works here. Never use the secret key in a Flutter app."
+    },
+    {
+      "name": "authOptions",
+      "isOptional": true,
+      "type": "FlutterAuthClientOptions",
+      "description": "Options for the auth client.",
+      "subContent": [
+        {
+          "name": "authFlowType",
+          "isOptional": true,
+          "type": "AuthFlowType",
+          "description": "Whether to use the `pkce` flow or the `implicit` flow. Defaults to `pkce`."
+        },
+        {
+          "name": "autoRefreshToken",
+          "isOptional": true,
+          "type": "bool",
+          "description": "Whether to refresh the session in the background before it expires. Defaults to `true`."
+        },
+        {
+          "name": "persistSession",
+          "isOptional": true,
+          "type": "bool",
+          "description": "Whether to store the session and restore it when the app starts. Defaults to `true`."
+        },
+        {
+          "name": "asyncStorage",
+          "isOptional": true,
+          "type": "AuthAsyncStorage",
+          "description": "Where the session and the pkce code verifiers are stored. Defaults to `SharedPreferencesAsync`, or `localStorage` on the web."
+        },
+        {
+          "name": "storageKey",
+          "isOptional": true,
+          "type": "String",
+          "description": "The key the session is stored under. Defaults to the key the other Supabase client libraries derive from the project URL."
+        },
+        {
+          "name": "oauthLauncher",
+          "isOptional": true,
+          "type": "OAuthLauncher",
+          "description": "Opens the URL of an OAuth, SSO or identity linking flow. Defaults to `UrlLauncherOAuthLauncher`, which opens a browser. The [supabase_flutter_web_auth](https://pub.dev/packages/supabase_flutter_web_auth) package provides a launcher that closes itself when the redirect returns to the app."
+        },
+        {
+          "name": "detectSessionInUri",
+          "isOptional": true,
+          "type": "bool",
+          "description": "Whether to exchange auth callback deep links, such as magic links and OAuth redirects, for a session. Defaults to `true`."
+        },
+        {
+          "name": "detectSessionInUriPredicate",
+          "isOptional": true,
+          "type": "bool Function(Uri uri)",
+          "description": "Decides whether an incoming deep link is an auth callback. By default, a link with an `access_token`, `code` or `error` parameter is."
+        },
+        {
+          "name": "retryOptions",
+          "isOptional": true,
+          "type": "SupabaseRetryOptions",
+          "description": "How a token refresh that never reached the server is retried. Defaults to 8 retries."
+        }
+      ]
+    },
+    {
+      "name": "postgrestOptions",
+      "isOptional": true,
+      "type": "PostgrestClientOptions",
+      "description": "Options for the database client.",
+      "subContent": [
+        {
+          "name": "schema",
+          "isOptional": true,
+          "type": "String",
+          "description": "The schema `from()` and `rpc` query. Defaults to `public`. Tables used through `table()` carry their own schema."
+        },
+        {
+          "name": "retryOptions",
+          "isOptional": true,
+          "type": "SupabaseRetryOptions",
+          "description": "How GET and HEAD requests that fail with a network error or a retryable status code are retried. Defaults to 3 retries."
+        },
+        {
+          "name": "requestTimeout",
+          "isOptional": true,
+          "type": "Duration",
+          "description": "How long a request may go without progress before it is cancelled. Overrides the client wide `requestTimeout`."
+        }
+      ]
+    },
+    {
+      "name": "realtimeOptions",
+      "isOptional": true,
+      "type": "RealtimeClientOptions",
+      "description": "Options for the realtime client.",
+      "subContent": [
+        {
+          "name": "logLevel",
+          "isOptional": true,
+          "type": "RealtimeLogLevel",
+          "description": "The level of the realtime server logs to send to the client."
+        },
+        {
+          "name": "timeout",
+          "isOptional": true,
+          "type": "Duration",
+          "description": "How long to wait for the server to reply to a message."
+        },
+        {
+          "name": "heartbeatInterval",
+          "isOptional": true,
+          "type": "Duration",
+          "description": "The interval at which a heartbeat is sent to the server."
+        }
+      ]
+    },
+    {
+      "name": "realtimeLifecycleOptions",
+      "isOptional": true,
+      "type": "RealtimeLifecycleOptions",
+      "description": "How the realtime connection follows the app lifecycle. By default it disconnects as soon as the app is paused and reconnects, rejoining every channel, when the app is resumed. Use `disconnectAfterPause` to keep it open through short pauses, or `RealtimeLifecycleOptions.manual()` to manage it yourself."
+    },
+    {
+      "name": "storageOptions",
+      "isOptional": true,
+      "type": "StorageClientOptions",
+      "description": "Options for the storage client.",
+      "subContent": [
+        {
+          "name": "retryOptions",
+          "isOptional": true,
+          "type": "SupabaseRetryOptions",
+          "description": "How an upload that failed because of a network interruption is retried. Uploads are not retried by default."
+        },
+        {
+          "name": "useNewHostname",
+          "isOptional": true,
+          "type": "bool",
+          "description": "Whether to send storage requests to the dedicated storage host (`<ref>.storage.supabase.co`). Set to `true` only if your project has it enabled. Defaults to `false`."
+        },
+        {
+          "name": "requestTimeout",
+          "isOptional": true,
+          "type": "Duration",
+          "description": "How long a request may go without progress before it is cancelled. Overrides the client wide `requestTimeout`."
+        }
+      ]
+    },
+    {
+      "name": "requestTimeout",
+      "isOptional": true,
+      "type": "Duration",
+      "description": "How long a request to the database, auth, storage or functions service may go without progress before it is cancelled. The timer restarts whenever data is sent or received."
+    },
+    {
+      "name": "accessToken",
+      "isOptional": true,
+      "type": "Future<String?> Function()",
+      "description": "Returns the access token of a third-party auth provider to send with every request. When set, `supabase.auth` cannot be used."
+    },
+    {
+      "name": "headers",
+      "isOptional": true,
+      "type": "Map<String, String>",
+      "description": "Headers sent with every request."
+    },
+    {
+      "name": "httpClient",
+      "isOptional": true,
+      "type": "Client",
+      "description": "The HTTP client used for every request. By default the client creates its own and closes it when the client is disposed."
+    }
+  ],
+  "examples": [
+    {
+      "id": "flutter-initialize",
+      "name": "For Flutter",
+      "code": "```dart\nFuture<void> main() async {\n  WidgetsFlutterBinding.ensureInitialized();\n  await Supabase.initialize(\n    url: 'https://your-project.supabase.co',\n    publishableKey: 'your-publishable-key',\n  );\n  runApp(const MyApp());\n}\n\n// Use this one client everywhere in the app.\nfinal supabase = Supabase.instance.client;\n```\n"
+    },
+    {
+      "id": "for-other-dart-projects",
+      "name": "For other Dart projects",
+      "code": "```dart\nfinal supabase = SupabaseClient(\n  'https://your-project.supabase.co',\n  'your-secret-key', // Only use the secret key on a server.\n);\n```\n"
+    },
+    {
+      "id": "with-custom-options",
+      "name": "With custom options",
+      "code": "```dart\nawait Supabase.initialize(\n  url: 'https://your-project.supabase.co',\n  publishableKey: 'your-publishable-key',\n  authOptions: const FlutterAuthClientOptions(\n    authFlowType: AuthFlowType.implicit,\n  ),\n  postgrestOptions: const PostgrestClientOptions(\n    schema: 'inventory',\n  ),\n  storageOptions: const StorageClientOptions(\n    retryOptions: SupabaseRetryOptions(count: 5),\n  ),\n  realtimeOptions: const RealtimeClientOptions(\n    logLevel: RealtimeLogLevel.info,\n  ),\n  requestTimeout: const Duration(seconds: 30),\n);\n```\n"
+    },
+    {
+      "id": "with-an-oauth-launcher",
+      "name": "With an OAuth launcher",
+      "description": "The [supabase_flutter_web_auth](https://pub.dev/packages/supabase_flutter_web_auth) package runs OAuth flows in a system authentication session that closes itself when the redirect returns to the app.\n",
+      "code": "```dart\nawait Supabase.initialize(\n  url: 'https://your-project.supabase.co',\n  publishableKey: 'your-publishable-key',\n  authOptions: const FlutterAuthClientOptions(\n    oauthLauncher: FlutterWebAuth2OAuthLauncher(),\n  ),\n);\n```\n"
+    },
+    {
+      "id": "print-logs",
+      "name": "Print logs",
+      "description": "Add the [logging](https://pub.dev/packages/logging) package to your app and listen to the records of the `supabase` loggers. `Logger.root.level` defaults to `Level.INFO`.\n",
+      "code": "```dart\nvoid main() {\n  Logger.root.onRecord.listen((record) {\n    if (record.loggerName.startsWith('supabase.')) {\n      debugPrint(\n        '${record.loggerName}: ${record.level.name}: '\n        '${record.message} ${record.error ?? ''}',\n      );\n    }\n  });\n  runApp(const MyApp());\n}\n```\n"
+    }
+  ]
+}

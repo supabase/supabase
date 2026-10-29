@@ -106,7 +106,7 @@ const REFERENCES: Ref[] = [
     title: 'Dart Client Library Reference',
     outFile: 'dart.md',
     mdxDir: path.join(MDX_ROOT, 'dart'),
-    contentDir: path.join(process.cwd(), 'content/reference/dart/v2'),
+    contentDir: path.join(process.cwd(), 'content/reference/dart/v3'),
     feature: 'sdk:dart',
   },
   {

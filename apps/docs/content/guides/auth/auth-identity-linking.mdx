@@ -151,7 +151,7 @@ final googleUser = await googleSignIn.signIn();
 final googleAuth = await googleUser!.authentication;
 
 // Link the Google identity to the current user
-final response = await supabase.auth.linkIdentityWithIdToken(
+final session = await supabase.auth.linkIdentityWithIdToken(
   provider: OAuthProvider.google,
   idToken: googleAuth.idToken!,
   accessToken: googleAuth.accessToken!,

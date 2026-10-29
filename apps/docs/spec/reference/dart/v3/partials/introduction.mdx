@@ -1,0 +1,45 @@
+---
+title: 'Introduction'
+---
+
+This reference documents every object and method available in Supabase's Flutter library, [supabase_flutter](https://pub.dev/packages/supabase_flutter). You can use it to query your Postgres database, listen to database changes, invoke Edge Functions, sign users in and manage them, and store large files.
+
+### Use the typed table API
+
+Generate Dart types from your database schema with the Supabase CLI and query every table through `table()`. This is the recommended way to use the database from Dart and Flutter, and the rest of this reference leads with it. Compared to untyped queries:
+
+- Rows come back as generated types instead of `Map<String, dynamic>`.
+- Filters, orderings and writes are checked against the column types at compile time.
+- Interceptors, such as offline support, only apply to typed requests.
+
+Generate the types, then query a table through its generated definition:
+
+```sh Terminal
+dart pub add dev:supabase_typegen
+supabase gen types --lang dart --local > lib/supabase_schema.g.dart
+```
+
+```dart
+final List<CountriesRow> countries = await supabase
+    .table(Countries.table)
+    .select()
+    .where(Countries.name.eq('Denmark'));
+```
+
+Only use `from()`, the untyped fallback, for a table the generated file does not cover. Run the generator again after every migration so the types follow the schema. See [Installing](/docs/reference/dart/installing) and [Generating types](/docs/guides/api/rest/generating-types) for the setup.
+
+### Packages
+
+For Dart projects without Flutter, such as servers and command line tools, use the [supabase](https://pub.dev/packages/supabase) package. It has the same API, without the Flutter integrations such as session persistence and deep link handling.
+
+Each service also has a standalone package for when you only need that one: [supabase_auth](https://pub.dev/packages/supabase_auth), [postgrest](https://pub.dev/packages/postgrest), [supabase_realtime](https://pub.dev/packages/supabase_realtime), [supabase_storage](https://pub.dev/packages/supabase_storage) and [supabase_functions](https://pub.dev/packages/supabase_functions).
+
+### Package skills for AI agents
+
+The packages ship [package skills](https://dart.dev/ai/package-skills), instructions that teach AI coding agents such as Claude Code, Cursor, Gemini and Copilot the current API, including the typed table API. Install them from your project directory:
+
+```sh Terminal
+dart run skills@ get --all
+```
+
+Run the command again after every upgrade to update the skills. The [migration guide](https://github.com/supabase/supabase-flutter/blob/main/MIGRATION.md#install-the-package-skills) describes the other options.

@@ -50,7 +50,6 @@ Creating a client for the Web is as easy as passing the `accessToken` async func
 await Supabase.initialize(
   url: supabaseUrl,
   publishableKey: publishableKey,
-  debug: false,
   accessToken: () async {
     final token = await FirebaseAuth.instance.currentUser?.getIdToken();
     return token;

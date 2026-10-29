@@ -1,0 +1,51 @@
+{
+  "id": "using-filters",
+  "title": "Using filters",
+  "description": "Filters return only the rows that match certain conditions. They apply\nto `select()`, `update()`, `delete()` and database functions that return\na table.\n\nOn `table()`, a filter is a method on a generated column constant, passed\nto `where()`. The value must match the type of the column, so\n`Countries.id.eq('one')` does not compile. Combine filters with `&` (and)\nand `|` (or), and negate one with `not()`. Repeated `where()` calls\ncombine with AND. The examples use types\n[generated from your database schema](/docs/guides/api/rest/generating-types).\n\nOn `from()`, each filter is a method of the query that takes the column\nname as a string, such as `.eq('name', 'Albania')`.\n",
+  "examples": [
+    {
+      "id": "applying-filters",
+      "name": "Applying filters",
+      "description": "Filters come after `select()`, `update()`, `delete()` or a database\nfunction call, and before [modifiers](/docs/reference/dart/using-modifiers).\n",
+      "code": "```dart\nfinal data = await supabase\n    .table(Cities.table)\n    .selectOnly([Cities.name, Cities.countryId])\n    .where(Cities.name.eq('The Shire'));\n```\n"
+    },
+    {
+      "id": "combining-filters",
+      "name": "Combining filters",
+      "description": "`&` matches rows that satisfy both filters, `|` rows that satisfy\neither, and `not()` rows that don't satisfy a filter. Use parentheses\nto group them.\n",
+      "code": "```dart\nfinal data = await supabase\n    .table(Cities.table)\n    .select()\n    .where(\n      (Cities.population.gte(1000) & Cities.population.lt(10000)) |\n          Cities.name.eq('The Shire').not(),\n    );\n```\n"
+    },
+    {
+      "id": "conditional-filters",
+      "name": "Conditional filters",
+      "description": "A filter is a value, so you can build it up one step at a time.\n",
+      "code": "```dart\nFuture<List<CitiesRow>> findCities({\n  String? name,\n  int minimumPopulation = 0,\n}) {\n  var filter = Cities.population.gte(minimumPopulation);\n  if (name != null) filter = filter & Cities.name.eq(name);\n  return supabase.table(Cities.table).select().where(filter);\n}\n```\n"
+    },
+    {
+      "id": "filter-by-value-within-json-column",
+      "name": "Filter by values within a JSON column",
+      "description": "`jsonText()` reads a key of a JSON column as text and `jsonObject()`\nreads it as JSON, to go deeper. Both filter like any other column.\n",
+      "code": "```dart\nfinal data = await supabase\n    .table(Users.table)\n    .select()\n    .where(Users.address.jsonText('postcode').eq('90210'));\n```\n",
+      "data": {
+        "sql": "```sql\ncreate table\n  users (\n    id int8 primary key,\n    name text,\n    address jsonb\n  );\n\ninsert into\n  users (id, name, address)\nvalues\n  (1, 'Michael', '{ \"postcode\": 90210 }'),\n  (2, 'Jane', null);\n```\n"
+      },
+      "response": "```json\n[\n  {\n    \"id\": 1,\n    \"name\": \"Michael\",\n    \"address\": {\n      \"postcode\": 90210\n    }\n  }\n]\n```\n"
+    },
+    {
+      "id": "filter-referenced-tables",
+      "name": "Filter referenced tables",
+      "description": "[`requiring()`](/docs/reference/dart/requiring) filters the rows of an\nembedded table and drops the parent rows without a match.\n[`embedded()`](/docs/reference/dart/embedded) takes the same filter\nbut keeps every parent row.\n",
+      "code": "```dart\nfinal data = await supabase\n    .table(OrchestralSections.table)\n    .selectOnly([\n      OrchestralSections.name,\n      OrchestralSections.instruments.select([Instruments.name]),\n    ])\n    .requiring(\n      OrchestralSections.instruments,\n      (instruments) => instruments.where(Instruments.name.eq('flute')),\n    );\n```\n",
+      "data": {
+        "sql": "```sql\ncreate table\n  orchestral_sections (id int8 primary key, name text);\ncreate table\n  instruments (\n    id int8 primary key,\n    section_id int8 not null references orchestral_sections,\n    name text\n  );\n\ninsert into\n  orchestral_sections (id, name)\nvalues\n  (1, 'strings'),\n  (2, 'woodwinds');\ninsert into\n  instruments (id, section_id, name)\nvalues\n  (1, 2, 'flute'),\n  (2, 1, 'violin');\n```\n"
+      },
+      "response": "```json\n[\n  {\n    \"name\": \"woodwinds\",\n    \"instruments\": [\n      {\n        \"name\": \"flute\"\n      }\n    ]\n  }\n]\n```\n"
+    },
+    {
+      "id": "with-from",
+      "name": "With `from()`",
+      "description": "On `from()`, filters are chained and combine with AND.\n",
+      "code": "```dart\nfinal data = await supabase\n    .from('cities')\n    .select('name, country_id')\n    .gte('population', 1000)\n    .lt('population', 10000);\n```\n"
+    }
+  ]
+}

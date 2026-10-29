@@ -3,9 +3,10 @@
  * pipeline (`scripts/build-reference-content.ts`).
  *
  * Dart has no upstream TypeDoc output, so this script is the "pre-step" the
- * reference README describes: it adapts the hand-authored legacy spec
- * (`spec/supabase_dart_v2.yml`) into a TypeDoc-shaped JSON dump at
- * `spec/reference/dart/v2/supabase_flutter.json`.
+ * reference README describes: it adapts each hand-authored spec
+ * (`spec/supabase_dart_<version>.yml`) into a TypeDoc-shaped JSON dump at
+ * `spec/reference/dart/<version>/supabase_flutter.json`, for every version in
+ * `VERSIONS`.
  *
  * Each method's section comes from `category` / `subcategory` fields on its own
  * YAML entry, so adding or moving a method only ever touches this one file. The
@@ -23,7 +24,8 @@
  * Overview/header entries (e.g. "Using filters", "Auth MFA") and the top-level
  * markdown sections (introduction, installing, upgrade-guide, initializing) are
  * not emitted here. They live as hand-authored partials under
- * `spec/reference/dart/v2/partials/`, matching how the JavaScript lib is set up.
+ * `spec/reference/dart/<version>/partials/`, matching how the JavaScript lib is
+ * set up.
  *
  * The dump is gitignored (like every other reference dump); only `config.json`
  * and `partials/` are committed. Run via `pnpm codegen:references:new` (the
@@ -39,10 +41,10 @@ import { parse } from 'yaml'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DOCS_DIR = join(__dirname, '..')
-const YAML_PATH = join(DOCS_DIR, 'spec/supabase_dart_v2.yml')
-const VERSION_DIR = join(DOCS_DIR, 'spec/reference/dart/v2')
-const CONFIG_PATH = join(VERSION_DIR, 'config.json')
-const OUT_PATH = join(VERSION_DIR, 'supabase_flutter.json')
+
+/** Dart versions driven by the new reference pipeline. */
+export const VERSIONS = ['v3', 'v2'] as const
+export type DartVersion = (typeof VERSIONS)[number]
 
 /**
  * Ids whose YAML entry is a section header rather than a method. Each header
@@ -139,9 +141,16 @@ function slugify(value: string): string {
   return value.toLowerCase().trim().replace(/\s+/g, '-')
 }
 
-export async function generateDartReferenceDump(): Promise<{ methodCount: number }> {
-  const doc = parse(await readFile(YAML_PATH, 'utf-8')) as { functions: DartFunction[] }
-  const config = JSON.parse(await readFile(CONFIG_PATH, 'utf-8')) as {
+export async function generateDartReferenceDump(
+  version: DartVersion
+): Promise<{ methodCount: number }> {
+  const yamlPath = join(DOCS_DIR, `spec/supabase_dart_${version}.yml`)
+  const versionDir = join(DOCS_DIR, `spec/reference/dart/${version}`)
+  const configPath = join(versionDir, 'config.json')
+  const outPath = join(versionDir, 'supabase_flutter.json')
+
+  const doc = parse(await readFile(yamlPath, 'utf-8')) as { functions: DartFunction[] }
+  const config = JSON.parse(await readFile(configPath, 'utf-8')) as {
     navigationPrefixes?: NavigationPrefixes
   }
   const navigationPrefixes = config.navigationPrefixes ?? {}
@@ -230,19 +239,19 @@ export async function generateDartReferenceDump(): Promise<{ methodCount: number
     children,
   }
 
-  await mkdir(dirname(OUT_PATH), { recursive: true })
-  await writeFile(OUT_PATH, JSON.stringify(dump, null, 2))
+  await mkdir(dirname(outPath), { recursive: true })
+  await writeFile(outPath, JSON.stringify(dump, null, 2))
 
   if (orphaned.length) {
     throw new Error(
       `Dart converter: ${orphaned.length} ids have no section (they appear before any ` +
-        `section header in supabase_dart_v2.yml). Move them under a header, add a header ` +
+        `section header in supabase_dart_${version}.yml). Move them under a header, add a header ` +
         `before them, or list them in SKIP_IDS if they are not methods: ${orphaned.join(', ')}`
     )
   }
 
   console.log(
-    `[dart/v2] wrote ${children.length} method declarations to ${OUT_PATH.replace(DOCS_DIR + '/', '')}`
+    `[dart/${version}] wrote ${children.length} method declarations to ${outPath.replace(DOCS_DIR + '/', '')}`
   )
 
   return { methodCount: children.length }
@@ -251,7 +260,7 @@ export async function generateDartReferenceDump(): Promise<{ methodCount: number
 // Only run when invoked as a script (via `tsx`); importing from a test must not
 // trigger the side-effecting file write.
 if (import.meta.url === `file://${process.argv[1]}`) {
-  generateDartReferenceDump().catch((err) => {
+  Promise.all(VERSIONS.map((version) => generateDartReferenceDump(version))).catch((err) => {
     console.error(err)
     process.exit(1)
   })

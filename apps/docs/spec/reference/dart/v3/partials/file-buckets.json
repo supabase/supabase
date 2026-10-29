@@ -1,0 +1,5 @@
+{
+  "id": "file-buckets",
+  "title": "File Buckets",
+  "notes": "This section contains methods for working with File Buckets, invoked through `supabase.storage`.\n\nA failed request throws a `StorageApiException` with the HTTP `statusCode` and the storage `errorCode`, such as `NoSuchKey`. A request that gets no response throws a `StorageTransportException`, and an aborted one a `RequestAbortedException`.\n"
+}

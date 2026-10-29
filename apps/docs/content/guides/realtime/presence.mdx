@@ -74,8 +74,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 <TabPanel id="dart" label="Dart">
 
 ```dart
-void main() {
-  Supabase.initialize(
+Future<void> main() async {
+  await Supabase.initialize(
     url: 'https://<project>.supabase.co',
     publishableKey: '<sb_publishable_... key>',
   );
@@ -187,14 +187,13 @@ final supabase = Supabase.instance.client;
 
 final roomOne = supabase.channel('room_01');
 
-roomOne.onPresenceSync((_) {
+roomOne.onPresenceSync.listen((_) {
   final newState = roomOne.presenceState();
   print('sync: $newState');
-}).onPresenceJoin((payload) {
-  print('join: $payload');
-}).onPresenceLeave((payload) {
-  print('leave: $payload');
-}).subscribe();
+});
+roomOne.onPresenceJoin.listen((payload) => print('join: $payload'));
+roomOne.onPresenceLeave.listen((payload) => print('leave: $payload'));
+roomOne.subscribe();
 ```
 
 </TabPanel>
@@ -333,12 +332,13 @@ final userStatus = {
   'online_at': DateTime.now().toIso8601String(),
 };
 
-roomOne.subscribe((status, error) async {
-  if (status != RealtimeSubscribeStatus.subscribed) return;
+roomOne.onStatusChange.listen((change) async {
+  if (change.status != RealtimeSubscribeStatus.subscribed) return;
 
   final presenceTrackStatus = await roomOne.track(userStatus);
   print(presenceTrackStatus);
 });
+roomOne.subscribe();
 ```
 
 </TabPanel>
@@ -467,12 +467,12 @@ untrackPresence()
 ```dart
 final roomOne = supabase.channel('room_01');
 
-untrackPresence() async {
+Future<void> untrackPresence() async {
   final presenceUntrackStatus = await roomOne.untrack();
   print(presenceUntrackStatus);
 }
 
-untrackPresence();
+await untrackPresence();
 ```
 
 </TabPanel>
@@ -557,7 +557,7 @@ const channelC = supabase.channel('test', {
 ```dart
 final channelC = supabase.channel(
   'test',
-  opts: const RealtimeChannelConfig(key: 'userId-123'),
+  options: const RealtimeChannelConfig(presenceKey: 'userId-123'),
 );
 ```
 

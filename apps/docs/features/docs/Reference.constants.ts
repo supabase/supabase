@@ -18,6 +18,7 @@
  */
 export const SUPPORTS_NEW_REFERENCE_PROCESS = new Set([
   'javascript-v2',
+  'dart-v3',
   'dart-v2',
   'server-v1',
   'middleware-v1',

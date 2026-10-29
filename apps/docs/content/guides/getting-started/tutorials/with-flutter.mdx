@@ -29,15 +29,26 @@ an app called `supabase_quickstart`:
 flutter create supabase_quickstart
 ```
 
-Then install the only additional dependency: [`supabase_flutter`](https://pub.dev/packages/supabase_flutter)
+Then install [`supabase_flutter`](https://pub.dev/packages/supabase_flutter), and [`supabase_typegen`](https://pub.dev/packages/supabase_typegen) as a dev dependency:
 
-Copy and paste the following line in your pubspec.yaml to install the package:
-
-```yaml
-supabase_flutter: ^2.0.0
+```bash
+flutter pub add supabase_flutter
+flutter pub add dev:supabase_typegen
 ```
 
-Run `flutter pub get` to install the dependencies.
+### Generate the database types
+
+`supabase_typegen` turns your database schema into Dart types, so queries return typed rows instead of maps.
+Generate them with the [Supabase CLI](/docs/guides/local-development/cli/getting-started), version 2.122.0 or newer.
+Replace `YOUR_PROJECT_REF` with the reference in your project's dashboard URL:
+
+```bash
+supabase login
+supabase gen types --lang dart --project-id YOUR_PROJECT_REF > lib/supabase_schema.g.dart
+```
+
+The generated file has a `Profiles` class for the `profiles` table, a `ProfilesRow` type for its rows, and a `ProfilesInsert` type for writes.
+Regenerate it whenever the database schema changes. Read more in [Generating types](/docs/guides/api/rest/generating-types#generating-dart-types).
 
 ### Setup deep links
 
@@ -153,6 +164,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
     publishableKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
@@ -252,9 +264,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     _authStateSubscription = supabase.auth.onAuthStateChange.listen(
-      (data) {
+      (state) {
         if (_redirecting) return;
-        final session = data.session;
+        final session = state.session;
         if (session != null) {
           _redirecting = true;
           Navigator.of(context).pushReplacement(
@@ -319,6 +331,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/main.dart';
 import 'package:supabase_quickstart/pages/login_page.dart';
+import 'package:supabase_quickstart/supabase_schema.g.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -342,11 +355,14 @@ class _AccountPageState extends State<AccountPage> {
 
     try {
       final userId = supabase.auth.currentSession!.user.id;
-      final data =
-          await supabase.from('profiles').select().eq('id', userId).single();
-      _usernameController.text = (data['username'] ?? '') as String;
-      _websiteController.text = (data['website'] ?? '') as String;
-      _avatarUrl = (data['avatar_url'] ?? '') as String;
+      final profile = await supabase
+          .table(Profiles.table)
+          .select()
+          .where(Profiles.id.eq(userId))
+          .single();
+      _usernameController.text = profile.username ?? '';
+      _websiteController.text = profile.website ?? '';
+      _avatarUrl = profile.avatarUrl;
     } on PostgrestException catch (error) {
       if (mounted) context.showSnackBar(error.message, isError: true);
     } catch (error) {
@@ -370,14 +386,14 @@ class _AccountPageState extends State<AccountPage> {
     final userName = _usernameController.text.trim();
     final website = _websiteController.text.trim();
     final user = supabase.auth.currentUser;
-    final updates = {
-      'id': user!.id,
-      'username': userName,
-      'website': website,
-      'updated_at': DateTime.now().toIso8601String(),
-    };
+    final updates = ProfilesInsert(
+      id: user!.id,
+      username: userName,
+      website: website,
+      updatedAt: DateTime.now(),
+    );
     try {
-      await supabase.from('profiles').upsert(updates);
+      await supabase.table(Profiles.table).upsert(updates);
       if (mounted) context.showSnackBar('Successfully updated profile!');
     } on PostgrestException catch (error) {
       if (mounted) context.showSnackBar(error.message, isError: true);
@@ -472,6 +488,7 @@ import 'package:supabase_quickstart/pages/account_page.dart';
 import 'package:supabase_quickstart/pages/login_page.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
     url: 'YOUR_SUPABASE_URL',
     publishableKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
@@ -680,6 +697,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/components/avatar.dart';
 import 'package:supabase_quickstart/main.dart';
 import 'package:supabase_quickstart/pages/login_page.dart';
+import 'package:supabase_quickstart/supabase_schema.g.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -703,11 +721,14 @@ class _AccountPageState extends State<AccountPage> {
 
     try {
       final userId = supabase.auth.currentSession!.user.id;
-      final data =
-          await supabase.from('profiles').select().eq('id', userId).single();
-      _usernameController.text = (data['username'] ?? '') as String;
-      _websiteController.text = (data['website'] ?? '') as String;
-      _avatarUrl = (data['avatar_url'] ?? '') as String;
+      final profile = await supabase
+          .table(Profiles.table)
+          .select()
+          .where(Profiles.id.eq(userId))
+          .single();
+      _usernameController.text = profile.username ?? '';
+      _websiteController.text = profile.website ?? '';
+      _avatarUrl = profile.avatarUrl;
     } on PostgrestException catch (error) {
       if (mounted) context.showSnackBar(error.message, isError: true);
     } catch (error) {
@@ -731,14 +752,14 @@ class _AccountPageState extends State<AccountPage> {
     final userName = _usernameController.text.trim();
     final website = _websiteController.text.trim();
     final user = supabase.auth.currentUser;
-    final updates = {
-      'id': user!.id,
-      'username': userName,
-      'website': website,
-      'updated_at': DateTime.now().toIso8601String(),
-    };
+    final updates = ProfilesInsert(
+      id: user!.id,
+      username: userName,
+      website: website,
+      updatedAt: DateTime.now(),
+    );
     try {
-      await supabase.from('profiles').upsert(updates);
+      await supabase.table(Profiles.table).upsert(updates);
       if (mounted) context.showSnackBar('Successfully updated profile!');
     } on PostgrestException catch (error) {
       if (mounted) context.showSnackBar(error.message, isError: true);
@@ -777,15 +798,10 @@ class _AccountPageState extends State<AccountPage> {
   Future<void> _onUpload(String imageUrl) async {
     try {
       final userId = supabase.auth.currentUser!.id;
-      await supabase.from('profiles').upsert({
-        'id': userId,
-        'avatar_url': imageUrl,
-      });
-      if (mounted) {
-        const SnackBar(
-          content: Text('Updated your profile image!'),
-        );
-      }
+      await supabase
+          .table(Profiles.table)
+          .upsert(ProfilesInsert(id: userId, avatarUrl: imageUrl));
+      if (mounted) context.showSnackBar('Updated your profile image!');
     } on PostgrestException catch (error) {
       if (mounted) context.showSnackBar(error.message, isError: true);
     } catch (error) {

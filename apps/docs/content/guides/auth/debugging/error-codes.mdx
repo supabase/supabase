@@ -38,11 +38,22 @@ Errors originating from the server API classed as `AuthApiError` always have a `
 </TabPanel>
 <$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
-All errors originating from the `supabase.auth` namespace of the client library will be wrapped by the `AuthException` class.
+All errors originating from the `supabase.auth` namespace of the client library are an `AuthException`, which extends the shared `SupabaseException`.
 
-Error objects are split in a few classes. `AuthApiException` is an exception which originates from the Supabase Auth API.
+`AuthApiException` is an exception which originates from the Supabase Auth API. Its `errorCode` property identifies the error returned by the server, and the `ErrorCode` enum lists the known codes. Its `statusCode` property is the HTTP status code of the response, as an `int`.
 
-Errors originating from the server API classed as `AuthApiException` always have a `code` property that can be used to identify the error returned by the server. The `statusCode` property is also present, encoding the HTTP status code received in the response.
+```dart
+try {
+  await supabase.auth.signInWithPassword(
+    email: 'valid.email@supabase.io',
+    password: 'example-password',
+  );
+} on AuthApiException catch (error) {
+  if (error.errorCode == ErrorCode.emailNotConfirmed.code) {
+    // Ask the user to confirm their email address.
+  }
+}
+```
 
 </TabPanel>
 </$Show>

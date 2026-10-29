@@ -68,13 +68,11 @@ const { data, error } = await supabase.storage.from('avatars').download('avatar1
 ```dart
 // Download with additional query parameters
 final response = await supabase.storage
-  .from('avatars')
-  .download(
-    'avatar1.png',
-    queryParams: {
-      'download': 'my-custom-name.png',
-    },
-  );
+    .from('avatars')
+    .download(
+      'avatar1.png',
+      queryParameters: {'download': 'my-custom-name.png'},
+    );
 ```
 
 [Reference.](/docs/reference/dart/file-buckets-download)
