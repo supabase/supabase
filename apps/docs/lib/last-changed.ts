@@ -14,7 +14,6 @@ const PAGE_SIZE = 1000
  * a stalled database must fall back to rendering without a date instead of
  * holding up static generation.
  */
-// TEMP: raised to 30s for benchmarking. Restore to 5_000 before merge.
 const LOOKUP_TIMEOUT_MS = 30_000
 
 /**
@@ -57,21 +56,11 @@ async function fetchAllPageDates() {
 let pageDates: Promise<Map<string, string>> | undefined
 
 function loadPageDates() {
-  // TEMP benchmark: remove before merge
-  const started = performance.now()
-  pageDates ??= fetchAllPageDates()
-    .then((dates) => {
-      console.log(
-        `[last-changed] TEMP ok in ${Math.round(performance.now() - started)} ms, ${dates.size} pages`
-      )
-      return dates
-    })
-    .catch((error) => {
-      console.log(`[last-changed] TEMP failed after ${Math.round(performance.now() - started)} ms`)
-      Sentry.captureException(error)
-      pageDates = undefined
-      return new Map<string, string>()
-    })
+  pageDates ??= fetchAllPageDates().catch((error) => {
+    Sentry.captureException(error)
+    pageDates = undefined
+    return new Map<string, string>()
+  })
 
   return pageDates
 }
