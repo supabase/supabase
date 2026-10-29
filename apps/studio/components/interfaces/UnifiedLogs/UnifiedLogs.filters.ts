@@ -47,24 +47,18 @@ export const isLogsFilterColumnValue = (value: unknown): value is LogsColumnFilt
 
 export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[] => {
   if (!Array.isArray(filter)) return []
-  const parsed: LogsFilter[] = []
-  for (const raw of filter) {
+  return filter.flatMap((raw): LogsFilter[] => {
     const [column, abbrev, ...rest] = raw.split(':')
     const operator = ABBREV_TO_OPERATOR[abbrev]
-    if (!column || !operator) continue
+    if (!column || !operator) return []
+    const value = rest.join(':')
+    if (!column.startsWith('attribute.')) return [{ column, operator, value }]
     try {
-      const decodedColumn = column.startsWith('attribute.') ? decodeURIComponent(column) : column
-      const value = rest.join(':')
-      parsed.push({
-        column: decodedColumn,
-        operator,
-        value: column.startsWith('attribute.') ? decodeURIComponent(value) : value,
-      })
+      return [{ column: decodeURIComponent(column), operator, value: decodeURIComponent(value) }]
     } catch {
-      continue
+      return []
     }
-  }
-  return parsed
+  })
 }
 
 export const logsFiltersToUrlParams = (filters: LogsFilter[]): string[] => {

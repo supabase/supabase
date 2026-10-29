@@ -222,3 +222,19 @@ it.each(['comma,value:colon%percent', 'literal%2C:comma,plus+space value'])(
     expect(parseLogsFilterUrlParams(parsed)).toEqual(original)
   }
 )
+
+it('ignores malformed attribute encodings without losing valid neighboring or legacy filters', () => {
+  expect(
+    parseLogsFilterUrlParams([
+      'attribute.request_id:eq:req-1',
+      'attribute.broken%:eq:ignored',
+      'event_message:ilike:100% ready:now',
+      'attribute.trace_id:eq:%C3%28',
+      'attribute.span_id:neq:span%3A1',
+    ])
+  ).toEqual([
+    { column: 'attribute.request_id', operator: '=', value: 'req-1' },
+    { column: 'event_message', operator: '~~*', value: '100% ready:now' },
+    { column: 'attribute.span_id', operator: '<>', value: 'span:1' },
+  ])
+})
