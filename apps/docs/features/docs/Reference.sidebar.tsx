@@ -1,6 +1,8 @@
 'use client'
 
-import { Feedback } from '~/components/Feedback'
+import { Feedback } from '~/components/Feedback/Feedback'
+import { FeedbackControl } from '~/components/Feedback/FeedbackControl'
+import { useFeedbackDockVariant } from '~/components/Feedback/useFeedbackDockVariant'
 import { useTocAnchors } from '~/features/docs/GuidesMdx.state'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { isFeatureEnabled } from 'common'
@@ -48,18 +50,23 @@ export function ReferenceSidebar({ className, links = [] }: ReferenceSidebarProp
   const pathname = usePathname()
   const { toc } = useTocAnchors()
   const showFeedback = isFeatureEnabled('feedback:docs')
+  const feedbackVariant = useFeedbackDockVariant()
 
   return (
-    <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
+    <div
+      data-feedback-region="rail"
+      className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}
+    >
       <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit">
-        {showFeedback && (
+        {showFeedback && feedbackVariant === 'control' ? (
           <div className="pl-5">
             <Feedback key={pathname} />
           </div>
-        )}
+        ) : null}
         {/* `static`: the default sticky offset pins the list while the links below scroll over it */}
         {toc.length !== 0 && <TocSection items={toc} className="static" />}
         {links.length !== 0 && <ReferenceLinks links={links} className="pl-5" />}
+        {feedbackVariant === 'dock' ? <FeedbackControl className="pl-5" /> : null}
       </div>
     </div>
   )

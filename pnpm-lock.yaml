@@ -447,6 +447,9 @@ importers:
       hast-util-to-html:
         specifier: ^9.0.5
         version: 9.0.5
+      html-to-image:
+        specifier: ^1.11.13
+        version: 1.11.13
       icons:
         specifier: workspace:*
         version: link:../../packages/icons
@@ -8087,6 +8090,7 @@ packages:
   '@smithy/core@3.31.1':
     resolution: {integrity: sha512-CyogUINxvi7C7LDsh8Syo6hVJOT9ckz4rG8dRZfTJ8r91HkMY59PnNooaj7WcHyxEkxPfBAmbgztZU+xTo76lg==}
     engines: {node: '>=18.0.0'}
+    deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/credential-provider-imds@4.2.14':
     resolution: {integrity: sha512-Au28zBN48ZAoXdooGUHemuVBrkE+Ie6RPmGNIAJsFqj33Vhb6xAgRifUydZ2aY+M+KaMAETAlKk5NC5h1G7wpg==}
@@ -19624,7 +19628,7 @@ snapshots:
       '@aws-sdk/core': 3.974.8
       '@aws-sdk/types': 3.973.8
       '@aws-sdk/util-arn-parser': 3.972.3
-      '@smithy/core': 3.31.1
+      '@smithy/core': 3.23.17
       '@smithy/node-config-provider': 4.3.14
       '@smithy/protocol-http': 5.3.14
       '@smithy/signature-v4': 5.3.14
@@ -19663,7 +19667,7 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.972.10
       '@aws-sdk/util-user-agent-node': 3.973.24
       '@smithy/config-resolver': 4.4.17
-      '@smithy/core': 3.31.1
+      '@smithy/core': 3.23.17
       '@smithy/fetch-http-handler': 5.3.17
       '@smithy/hash-node': 4.2.14
       '@smithy/invalid-dependency': 4.2.14
