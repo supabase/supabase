@@ -10,11 +10,20 @@ import { supabaseAdmin } from '~/lib/supabaseAdmin'
 const PAGE_SIZE = 1000
 
 /**
+ * Upper bound on the whole paginated read. Guide pages wait on this lookup, so
+ * a stalled database must fall back to rendering without a date instead of
+ * holding up static generation.
+ */
+const LOOKUP_TIMEOUT_MS = 5_000
+
+/**
  * Reads every guide row from `last_changed` and reduces them to one date per
  * page: the newest `last_updated` across that page's section rows.
  */
 async function fetchAllPageDates() {
   const dates = new Map<string, string>()
+  // One deadline shared by every page, so the total wait is bounded
+  const signal = AbortSignal.timeout(LOOKUP_TIMEOUT_MS)
 
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await supabaseAdmin()
@@ -22,6 +31,7 @@ async function fetchAllPageDates() {
       .select('id, parent_page, last_updated')
       .like('parent_page', '/content/guides/%')
       .order('id', { ascending: true })
+      .abortSignal(signal)
       .range(from, from + PAGE_SIZE - 1)
 
     if (error) throw error

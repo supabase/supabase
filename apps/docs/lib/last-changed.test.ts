@@ -1,9 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { range, captureException } = vi.hoisted(() => ({
-  range: vi.fn(),
-  captureException: vi.fn(),
-}))
+const { range, abortSignal, captureException } = vi.hoisted(() => {
+  const range = vi.fn()
+  return {
+    range,
+    abortSignal: vi.fn(() => ({ range })),
+    captureException: vi.fn(),
+  }
+})
 
 vi.mock('server-only', () => ({}))
 vi.mock('@sentry/nextjs', () => ({ captureException }))
@@ -12,7 +16,7 @@ vi.mock('~/lib/supabaseAdmin', () => ({
     from: () => ({
       select: () => ({
         like: () => ({
-          order: () => ({ range }),
+          order: () => ({ abortSignal }),
         }),
       }),
     }),
@@ -28,6 +32,7 @@ describe('getGuideLastUpdated', () => {
   beforeEach(() => {
     vi.resetModules()
     range.mockReset()
+    abortSignal.mockClear()
     captureException.mockReset()
   })
 
@@ -127,5 +132,47 @@ describe('getGuideLastUpdated', () => {
     expect(await getGuideLastUpdated(['auth'])).toBeUndefined()
     expect(await getGuideLastUpdated(['auth'])).toBe('2026-10-02T00:00:00+00:00')
     expect(range).toHaveBeenCalledTimes(2)
+  })
+
+  it('shares one abort signal across every page of the lookup', async () => {
+    const fullPage = Array.from({ length: 1000 }, (_, i) => ({
+      id: i + 1,
+      parent_page: `/content/guides/auth/page-${i}.mdx`,
+      last_updated: '2026-10-01T00:00:00+00:00',
+    }))
+    range.mockResolvedValueOnce({ data: fullPage, error: null }).mockResolvedValueOnce({
+      data: [],
+      error: null,
+    })
+    const getGuideLastUpdated = await loadGetGuideLastUpdated()
+
+    await getGuideLastUpdated(['auth'])
+
+    expect(abortSignal).toHaveBeenCalledTimes(2)
+    const [first] = abortSignal.mock.calls[0]
+    const [second] = abortSignal.mock.calls[1]
+    expect(first).toBeInstanceOf(AbortSignal)
+    expect(second).toBe(first)
+  })
+
+  it('returns undefined and reports the error when the lookup times out', async () => {
+    const controller = new AbortController()
+    const timeoutSpy = vi.spyOn(AbortSignal, 'timeout').mockReturnValueOnce(controller.signal)
+    range.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          controller.signal.addEventListener('abort', () =>
+            resolve({ data: null, error: new Error('aborted') })
+          )
+        })
+    )
+    const getGuideLastUpdated = await loadGetGuideLastUpdated()
+
+    const lookup = getGuideLastUpdated(['auth'])
+    controller.abort()
+
+    expect(await lookup).toBeUndefined()
+    expect(captureException).toHaveBeenCalledTimes(1)
+    timeoutSpy.mockRestore()
   })
 })
