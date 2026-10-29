@@ -17,10 +17,10 @@ const PAGE_SIZE = 1000
 const LOOKUP_TIMEOUT_MS = 30_000
 
 /**
- * After a timed-out lookup, skip new lookups for this long. Otherwise every guide
- * render during a stall would start a new scan and wait out another timeout.
+ * After a failed lookup, skip new lookups for this long. Otherwise every guide
+ * render during an outage would start a new scan and wait out another timeout.
  */
-const TIMEOUT_COOLDOWN_MS = 60_000
+const FAILURE_COOLDOWN_MS = 60_000
 
 /**
  * Reads every guide row from `last_changed` and reduces them to one date per
@@ -55,8 +55,8 @@ async function fetchAllPageDates(signal: AbortSignal) {
 
 /**
  * Builds map of all pages and then reads from this, so the table is read once per worker
- * rather than once per page. A failed load is not cached, so the next call retries,
- * except after a timeout, which starts a cooldown before the next attempt.
+ * rather than once per page. A failed load is not cached: it starts a cooldown, and
+ * the first call after it retries.
  */
 let pageDates: Promise<Map<string, string>> | undefined
 let cooldownUntil = 0
@@ -67,11 +67,10 @@ function loadPageDates() {
   }
 
   if (!pageDates) {
-    const signal = AbortSignal.timeout(LOOKUP_TIMEOUT_MS)
-    pageDates = fetchAllPageDates(signal).catch((error) => {
+    pageDates = fetchAllPageDates(AbortSignal.timeout(LOOKUP_TIMEOUT_MS)).catch((error) => {
       Sentry.captureException(error)
       pageDates = undefined
-      if (signal.aborted) cooldownUntil = Date.now() + TIMEOUT_COOLDOWN_MS
+      cooldownUntil = Date.now() + FAILURE_COOLDOWN_MS
       return new Map<string, string>()
     })
   }

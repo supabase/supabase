@@ -88,7 +88,6 @@ describe('techArticleSchema', () => {
     const schema = techArticleSchema({ url, headline: 'JWTs' })
 
     expect(schema).not.toHaveProperty('datePublished')
-    expect(schema.dateModified).toBeUndefined()
     expect(JSON.parse(JSON.stringify(schema))).not.toHaveProperty('dateModified')
   })
 
