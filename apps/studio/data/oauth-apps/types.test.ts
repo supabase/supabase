@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { DEVELOPER_ROLE, READ_ONLY_ROLE } from './mocks'
+import { DEVELOPER_ROLE } from './mocks'
 import type { OAuthAppsAuthorizeOrganizationProject, OAuthExistingGrant } from './types'
 import { getFailedProjects, getPreselectedProjectRefs, isRoleValidationFailure } from './types'
 
@@ -98,7 +98,7 @@ describe('isRoleValidationFailure', () => {
         status: 'error',
         error_code: 'role_validation_failed',
         message: 'nope',
-        validation: { scope_target: 'organization', role: READ_ONLY_ROLE },
+        validation: { scope_target: 'organization', role: { name: 'read-only' } },
       })
     ).toBe(true)
   })
@@ -112,8 +112,7 @@ describe('getFailedProjects', () => {
   test('returns the failures of a projects-level failure', () => {
     const failure = {
       ref: 'alpha',
-      name: 'alpha',
-      role: READ_ONLY_ROLE,
+      role: { name: 'read-only' as const },
       failed_scopes: ['database:write' as const],
     }
 
@@ -133,7 +132,7 @@ describe('getFailedProjects', () => {
         status: 'error',
         error_code: 'role_validation_failed',
         message: 'nope',
-        validation: { scope_target: 'organization', role: READ_ONLY_ROLE },
+        validation: { scope_target: 'organization', role: { name: 'read-only' } },
       })
     ).toEqual([])
   })

@@ -74,22 +74,25 @@ export type OAuthAuthorizeApproveRequest = {
 export type OAuthAppsAuthorizeRedirect =
   components['schemas']['ApproveAuthorizationResponse_Output']
 
+export type OAuthValidationRole = {
+  name: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
+}
+
 export type OAuthScopeValidationResult =
   | {
       scope_target: 'organization'
-      role: OrganizationRole
+      role: OAuthValidationRole
     }
   | {
       scope_target: 'all_projects'
-      role: OrganizationRole
+      role: OAuthValidationRole
       failed_scopes: OAuthScope[]
     }
   | {
       scope_target: 'projects'
       failures: Array<{
         ref: string
-        name: string
-        role: OrganizationRole
+        role: OAuthValidationRole
         failed_scopes: OAuthScope[]
       }>
     }
