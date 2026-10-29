@@ -40,6 +40,14 @@ test('user details support copying fields and raw JSON with mouse and keyboard',
   } finally {
     if (!page.isClosed()) {
       await navigateToAuthUsers(page, ref)
+      const loadedUsers = page
+        .getByRole('gridcell')
+        .first()
+        .or(page.getByText('No users in your project', { exact: true }))
+      await expect(
+        loadedUsers,
+        'Cleanup should wait for users or the loaded empty state'
+      ).toBeVisible()
       const userRow = page.getByRole('row').filter({ hasText: email })
       if ((await userRow.count()) > 0) {
         await deleteUserViaUI(page, ref, email)
