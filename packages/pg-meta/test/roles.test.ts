@@ -1,6 +1,7 @@
+import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
-import pgMeta from '../src/index'
+import pgMeta, { ident, literal, safeSql } from '../src/index'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
@@ -263,4 +264,19 @@ withTestDatabase('update and remove a role whose name needs quoting', async ({ e
 
   await executeQuery(pgMeta.roles.remove({ id }).sql)
   expect(await findRole(`it's a "role"`)).toBeUndefined()
+})
+
+withTestDatabase('create a role with a password containing quotes', async ({ executeQuery }) => {
+  // Roles are cluster-wide, so use a unique name and only drop it once it has been created.
+  const name = `password_${randomUUID().replace(/-/g, '_')}`
+  await executeQuery(pgMeta.roles.create({ name, canLogin: true, password: `p'ss"word` }).sql)
+
+  try {
+    const rows = await executeQuery(
+      safeSql`select rolcanlogin, rolpassword is not null as has_password from pg_authid where rolname = ${literal(name)}`
+    )
+    expect(rows).toEqual([{ rolcanlogin: true, has_password: true }])
+  } finally {
+    await executeQuery(safeSql`drop role if exists ${ident(name)}`)
+  }
 })

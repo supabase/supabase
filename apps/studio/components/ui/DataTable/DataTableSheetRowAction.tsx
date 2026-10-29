@@ -37,7 +37,7 @@ interface DataTableSheetRowActionProps<
   value: string | number
   table?: Table<TData>
   label?: string
-  alignOffset?: number
+  onAddFilter?: () => void
 }
 
 export function DataTableSheetRowAction<TData, TFields extends DataTableFilterField<TData>>({
@@ -48,7 +48,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   className,
   table,
   label,
-  alignOffset = 8,
+  onAddFilter,
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
@@ -201,10 +201,19 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         {children}
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" alignOffset={alignOffset} side="bottom" className="w-56">
+      <DropdownMenuContent align="end" alignOffset={12} side="bottom" className="w-56">
         {!!field && !!column && (
           <>
             {renderOptions()}
+            <DropdownMenuSeparator />
+          </>
+        )}
+        {!column && !!onAddFilter && (
+          <>
+            <DropdownMenuItem onClick={onAddFilter} className="flex items-center gap-2">
+              <FilterIcon size={12} />
+              Add filter
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}

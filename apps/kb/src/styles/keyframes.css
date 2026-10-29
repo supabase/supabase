@@ -11,12 +11,6 @@
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
 @keyframes draw-out {
   from {
     scale: 0;

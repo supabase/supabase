@@ -167,12 +167,12 @@ Why this matters for Postgres:
 
 Actions you can take:
 
-| Action                                                                                                                 | Description                                                                             |
-| ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [Use connection pooling](/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works) | Route clients through Supavisor or PgBouncer to cap fork-driven commit pressure.        |
-| Lower `max_connections` or per-pool sizes                                                                              | Reduce the upper bound on concurrent backends so spikes cannot exceed the Commit limit. |
-| [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                                        | Reduce per-operation memory allocations on workloads with many concurrent queries.      |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                                            | Raise both physical RAM and the Commit limit so the workload fits with headroom.        |
+| Action                                                                                                                 | Description                                                                                         |
+| ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [Use connection pooling](/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works) | Route clients through the shared pooler or the dedicated pooler to cap fork-driven commit pressure. |
+| Lower `max_connections` or per-pool sizes                                                                              | Reduce the upper bound on concurrent backends so spikes cannot exceed the Commit limit.             |
+| [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                                        | Reduce per-operation memory allocations on workloads with many concurrent queries.                  |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                                            | Raise both physical RAM and the Commit limit so the workload fits with headroom.                    |
 
 ### CPU usage
 
@@ -308,7 +308,7 @@ Actions you can take:
 
 ### Query Performance
 
-Links to the [Query Performance Advisory page](/docs/guides/platform/performance#examine-query-performance) in the dashboard, which provides a detailed analysis of slow database queries
+Links to the [Query Performance Advisory page](/docs/guides/platform/performance#examining-query-performance) in the dashboard, which provides a detailed analysis of slow database queries
 
 ### Database connections
 
@@ -349,11 +349,11 @@ Actions you can take:
 | Implement [connection pooling](/docs/guides/database/connecting-to-postgres#choose-a-connection-method) | Optimize connection management for high direct connection usage |
 | Review application code                                                                                 | Ensure proper connection handling and cleanup                   |
 
-### Dedicated Pooler (PgBouncer) Client Connections
+### Dedicated Pooler Client Connections
 
 Available on Team and Enterprise plans.
 
-This chart displays the number of PgBouncer connections over time.
+This chart displays the number of dedicated pooler connections over time.
 
 How it helps debug issues:
 
@@ -375,7 +375,7 @@ Actions you can take:
 
 Available on Team and Enterprise plans.
 
-This chart displays the number of Supavisor connections over time.
+This chart displays the number of shared pooler connections over time.
 
 How it helps debug issues:
 

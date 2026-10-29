@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { operations } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -162,7 +162,8 @@ describe('PlatformWebhooksPage (project scope)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Create endpoint' }))
 
     const urlInput = await screen.findByPlaceholderText('https://api.example.com/webhooks/supabase')
-    await userEvent.type(urlInput, 'https://hooks.example.com/project')
+    await userEvent.click(urlInput)
+    await userEvent.paste('https://hooks.example.com/project')
     await userEvent.click(screen.getByRole('checkbox', { name: /subscribe to all events/i }))
 
     fireEvent.click(screen.getByRole('button', { name: 'Create endpoint' }))
@@ -207,7 +208,7 @@ describe('PlatformWebhooksPage (project scope)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Edit' }))
     const urlInput = await screen.findByDisplayValue(ENDPOINT_ATTRIBUTES.url)
     await userEvent.clear(urlInput)
-    await userEvent.type(urlInput, updatedUrl)
+    await userEvent.paste(updatedUrl)
     fireEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
 
     await waitFor(() => expect(requests).toHaveLength(1))
@@ -320,6 +321,391 @@ describe('PlatformWebhooksPage (project scope)', () => {
     fireEvent.click(await screen.findByLabelText(`Retry ${DELIVERY_ID}`))
 
     await waitFor(() => expect(retryCalled).toBe(true))
+  })
+
+  describe('deliveries errors', () => {
+    test('shows an error when the first deliveries load fails', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () =>
+          HttpResponse.json<APIErrorBody>({ message: 'Something went wrong' }, { status: 500 }),
+      })
+
+      renderPage(ENDPOINT_ID)
+
+      expect(await screen.findByText('Failed to retrieve deliveries')).toBeInTheDocument()
+      expect(screen.queryByText('No deliveries found')).not.toBeInTheDocument()
+    })
+
+    test('shows the error when the first load was empty and a refresh fails', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          // The first load is empty, the refresh after it fails
+          if (requests > 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Something went wrong' },
+              { status: 500 }
+            )
+          }
+          return HttpResponse.json<DeliveryListResponse>({
+            data: [],
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('No deliveries found')
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Refresh deliveries' }))
+
+      expect(await screen.findByText('Failed to retrieve deliveries')).toBeInTheDocument()
+    })
+
+    test('"Try again" loads the rows after a failed first load', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          // Only the first request fails, so the next one has to come from the button
+          if (requests === 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Something went wrong' },
+              { status: 500 }
+            )
+          }
+          return HttpResponse.json<DeliveryListResponse>({
+            data: [{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }],
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('Failed to retrieve deliveries')
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }))
+
+      expect(await screen.findByLabelText(`Retry ${DELIVERY_ID}`)).toBeInTheDocument()
+      expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
+    })
+
+    test('keeps the rows and warns they may be out of date when a refresh fails', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          // The first load works, the refresh after it fails
+          if (requests > 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Something went wrong' },
+              { status: 500 }
+            )
+          }
+          return HttpResponse.json<DeliveryListResponse>({
+            data: [{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }],
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByLabelText(`Retry ${DELIVERY_ID}`)
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Refresh deliveries' }))
+
+      expect(await screen.findByText('Unable to refresh deliveries')).toBeInTheDocument()
+      expect(screen.getByLabelText(`Retry ${DELIVERY_ID}`)).toBeInTheDocument()
+      expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
+    })
+
+    test('shows the search empty state, not an error, when a refresh fails after rows loaded', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          // The first load works, the refresh after it fails
+          if (requests > 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Something went wrong' },
+              { status: 500 }
+            )
+          }
+          return HttpResponse.json<DeliveryListResponse>({
+            data: [{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }],
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByLabelText(`Retry ${DELIVERY_ID}`)
+      const user = userEvent.setup()
+      await user.click(screen.getByRole('button', { name: 'Refresh deliveries' }))
+      await waitFor(() => expect(requests).toBeGreaterThan(1))
+
+      await user.type(screen.getByPlaceholderText('Search deliveries'), 'no match')
+
+      expect(await screen.findByText('No deliveries found')).toBeInTheDocument()
+      expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('deliveries refreshing', () => {
+    const mockDeliveries = (getRows: (requests: number) => DeliveryResource[]) => {
+      let requests = 0
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          return HttpResponse.json<DeliveryListResponse>({
+            data: getRows(requests),
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+      return { getRequests: () => requests }
+    }
+    const delivery = (status: DeliveryResource['attributes']['status']): DeliveryResource => ({
+      id: DELIVERY_ID,
+      type: 'delivery',
+      attributes: { ...DELIVERY_ATTRIBUTES, status },
+    })
+
+    // Fake clock (still ticking for findBy/waitFor), so we can skip the polling wait
+    beforeEach(() => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    const skipPollingInterval = () => act(() => vi.advanceTimersByTimeAsync(5500))
+
+    test('does not poll by default', async () => {
+      const { getRequests } = mockDeliveries(() => [delivery('success')])
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('success')
+
+      // Longer than the 5s polling interval
+      await skipPollingInterval()
+      expect(getRequests()).toBe(1)
+    })
+
+    test('refreshes once when Refresh is clicked', async () => {
+      const { getRequests } = mockDeliveries(() => [delivery('success')])
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('success')
+
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Refresh deliveries' }))
+
+      await waitFor(() => expect(getRequests()).toBe(2))
+    })
+
+    test('polls while Live is on and stops when it is turned off', async () => {
+      const { getRequests } = mockDeliveries(() => [delivery('success')])
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('success')
+
+      const liveButton = screen.getByRole('button', { name: 'Live' })
+      await user.click(liveButton)
+      expect(liveButton).toHaveAttribute('aria-pressed', 'true')
+      await skipPollingInterval()
+      await waitFor(() => expect(getRequests()).toBeGreaterThan(1))
+
+      await user.click(liveButton)
+      expect(liveButton).toHaveAttribute('aria-pressed', 'false')
+      const requestsWhenTurnedOff = getRequests()
+      await skipPollingInterval()
+      expect(getRequests()).toBe(requestsWhenTurnedOff)
+    })
+
+    test('polls while a delivery is pending, until it finishes', async () => {
+      mockDeliveries((requests) => [delivery(requests === 1 ? 'pending' : 'success')])
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('pending')
+
+      await skipPollingInterval()
+      expect(await screen.findByText('success')).toBeInTheDocument()
+    })
+
+    test('Live keeps working after a failed first load', async () => {
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      let requests = 0
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: () => {
+          requests += 1
+          // Only the first request fails, so the rows can only come from polling
+          if (requests === 1) {
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Something went wrong' },
+              { status: 500 }
+            )
+          }
+          return HttpResponse.json<DeliveryListResponse>({
+            data: [delivery('success')],
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('Failed to retrieve deliveries')
+
+      await userEvent
+        .setup({ advanceTimers: vi.advanceTimersByTime })
+        .click(screen.getByRole('button', { name: 'Live' }))
+
+      await skipPollingInterval()
+      expect(await screen.findByText('success')).toBeInTheDocument()
+      expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
+    })
+
+    test('polls after a test event is sent, until its delivery appears', async () => {
+      // The first requests show no rows, as if the test event had not been delivered yet
+      mockDeliveries((requests) => (requests < 3 ? [] : [delivery('success')]))
+      addAPIMock({
+        method: 'post',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/test',
+        response: () =>
+          HttpResponse.json<EndpointTestResponse>(
+            { data: { id: 'evt_1', type: 'ingress' } },
+            { status: 201 }
+          ),
+      })
+
+      renderPage(ENDPOINT_ID)
+      await screen.findByText('No deliveries found')
+
+      await userEvent.click(await waitFor(() => findMoreActionsButton()))
+      fireEvent.click(await screen.findByText('Send test event'))
+      await waitFor(() => expect(toast.success).toHaveBeenCalled())
+
+      // Two polls: the first still shows no rows, the second shows the delivery
+      await skipPollingInterval()
+      await skipPollingInterval()
+      expect(await screen.findByText('success')).toBeInTheDocument()
+    })
+  })
+
+  describe('deliveries pagination', () => {
+    const mockPagedDeliveries = (ids: string[]) => {
+      const requests: Array<{ size: string | null; after: string | null }> = []
+      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
+      addAPIMock({
+        method: 'get',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
+        response: ({ request }) => {
+          const url = new URL(request.url)
+          const size = url.searchParams.get('page[size]')
+          const after = url.searchParams.get('page[after]')
+          requests.push({ size, after })
+
+          // Same rules as the real API: newest first, and the cursor row itself is skipped.
+          const rows = ids
+            .filter((id) => after === null || id < after)
+            .slice(0, Number(size))
+            .map((id) => ({
+              id,
+              type: 'delivery' as const,
+              attributes: { ...DELIVERY_ATTRIBUTES, id },
+            }))
+          return HttpResponse.json<DeliveryListResponse>({
+            data: rows,
+            links: { first: null, last: null, next: null, prev: null },
+          })
+        },
+      })
+      return requests
+    }
+
+    test('pages forward and back, asking for one extra row to detect a next page', async () => {
+      const requests = mockPagedDeliveries([7, 6, 5, 4, 3, 2, 1].map((n) => `delivery-${n}`))
+      renderPage(ENDPOINT_ID)
+
+      expect(await screen.findByLabelText('Retry delivery-7')).toBeInTheDocument()
+      expect(screen.getByLabelText('Retry delivery-3')).toBeInTheDocument()
+      expect(screen.queryByLabelText('Retry delivery-2')).not.toBeInTheDocument()
+      expect(requests[0]).toEqual({ size: '6', after: null })
+      expect(screen.getByLabelText('Previous page')).toBeDisabled()
+      expect(screen.getByLabelText('Next page')).toBeEnabled()
+
+      fireEvent.click(screen.getByLabelText('Next page'))
+
+      expect(await screen.findByLabelText('Retry delivery-2')).toBeInTheDocument()
+      expect(screen.queryByLabelText('Retry delivery-7')).not.toBeInTheDocument()
+      expect(requests).toContainEqual({ size: '6', after: 'delivery-3' })
+      expect(screen.getByLabelText('Next page')).toBeDisabled()
+      expect(screen.getByLabelText('Previous page')).toBeEnabled()
+
+      fireEvent.click(screen.getByLabelText('Previous page'))
+
+      expect(await screen.findByLabelText('Retry delivery-7')).toBeInTheDocument()
+      expect(screen.getByLabelText('Retry delivery-3')).toBeInTheDocument()
+      expect(screen.getByLabelText('Previous page')).toBeDisabled()
+    })
+
+    test('disables both buttons when the deliveries exactly fill one page', async () => {
+      mockPagedDeliveries([5, 4, 3, 2, 1].map((n) => `delivery-${n}`))
+      renderPage(ENDPOINT_ID)
+
+      expect(await screen.findByLabelText('Retry delivery-1')).toBeInTheDocument()
+      expect(screen.getByLabelText('Previous page')).toBeDisabled()
+      expect(screen.getByLabelText('Next page')).toBeDisabled()
+    })
+
+    test('goes back to the first page after a test event, where its delivery will appear', async () => {
+      const requests = mockPagedDeliveries([7, 6, 5, 4, 3, 2, 1].map((n) => `delivery-${n}`))
+      addAPIMock({
+        method: 'post',
+        path: '/v2/projects/:ref/webhooks/endpoints/:id/test',
+        response: () =>
+          HttpResponse.json<EndpointTestResponse>(
+            { data: { id: 'evt_1', type: 'ingress' } },
+            { status: 201 }
+          ),
+      })
+      renderPage(ENDPOINT_ID)
+
+      await screen.findByLabelText('Retry delivery-7')
+      fireEvent.click(screen.getByLabelText('Next page'))
+      await screen.findByLabelText('Retry delivery-2')
+      expect(screen.getByLabelText('Previous page')).toBeEnabled()
+
+      await userEvent.click(await waitFor(() => findMoreActionsButton()))
+      fireEvent.click(await screen.findByText('Send test event'))
+
+      expect(await screen.findByLabelText('Retry delivery-7')).toBeInTheDocument()
+      expect(screen.queryByLabelText('Retry delivery-2')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('Previous page')).toBeDisabled()
+      expect(requests.at(-1)).toEqual({ size: '6', after: null })
+    })
   })
 
   test('shows a friendly message when retry hits the rate limit', async () => {

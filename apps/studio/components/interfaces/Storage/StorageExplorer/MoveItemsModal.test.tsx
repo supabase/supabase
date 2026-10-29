@@ -147,20 +147,16 @@ describe('MoveItemsModal', () => {
     mockObjectsList()
   })
 
-  it('names the item being moved and defaults the destination to the bucket root', async () => {
+  it('names the item, lists folders only, and blocks moving into the current folder', async () => {
     renderModal()
 
     expect(await screen.findByText('Move avatar.png')).toBeInTheDocument()
     expect(await screen.findByRole('button', { name: 'photos' })).toBeInTheDocument()
-    expect(screen.getByText('avatars', { selector: 'span.font-mono' })).toBeInTheDocument()
-  })
-
-  it('lists folders only, leaving files out entirely', async () => {
-    renderModal()
-
-    await screen.findByRole('button', { name: 'photos' })
     expect(screen.getByRole('button', { name: 'invoices' })).toBeInTheDocument()
     expect(screen.queryByText('avatar.png')).not.toBeInTheDocument()
+    // Destination defaults to the bucket root, which is where the item already lives
+    expect(screen.getByText('avatars', { selector: 'span.font-mono' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Move to avatars' })).toBeAriaDisabled()
   })
 
   it('marks the destination folder in the search results', async () => {
@@ -170,7 +166,8 @@ describe('MoveItemsModal', () => {
     await user.click(await screen.findByRole('button', { name: 'photos' }))
     await screen.findByRole('button', { name: 'Move to photos' })
 
-    await user.type(screen.getByPlaceholderText('Search folders in avatars...'), 'photos')
+    await user.click(screen.getByPlaceholderText('Search folders in avatars...'))
+    await user.paste('photos')
 
     expect(await screen.findByRole('button', { name: 'photos in avatars' })).toHaveAttribute(
       'aria-current',
@@ -226,27 +223,6 @@ describe('MoveItemsModal', () => {
     expect(await screen.findByRole('button', { name: 'Move to photos' })).toBeInTheDocument()
   })
 
-  it('keeps a shallow path fully visible', async () => {
-    const user = userEvent.setup()
-    renderModal()
-
-    await user.click(await screen.findByRole('button', { name: 'photos' }))
-    await screen.findByRole('button', { name: 'Move to photos' })
-
-    const breadcrumb = screen.getByRole('navigation', { name: 'breadcrumb' })
-    expect(within(breadcrumb).getByText('photos')).toBeInTheDocument()
-    expect(
-      within(breadcrumb).queryByLabelText('Show the folders in between')
-    ).not.toBeInTheDocument()
-  })
-
-  it('blocks moving items into the folder they are already in', async () => {
-    renderModal()
-
-    const moveButton = await screen.findByRole('button', { name: 'Move to avatars' })
-    expect(moveButton).toBeAriaDisabled()
-  })
-
   it('opens a folder on click and moves items into it', async () => {
     const user = userEvent.setup()
     const { onSelectMove } = renderModal()
@@ -261,38 +237,37 @@ describe('MoveItemsModal', () => {
     expect(onSelectMove).toHaveBeenCalledWith('photos')
   })
 
-  it('navigates back up through the breadcrumb', async () => {
+  it('keeps a shallow path fully visible and navigates back up through the breadcrumb', async () => {
     const user = userEvent.setup()
     renderModal()
 
     await user.click(await screen.findByRole('button', { name: 'photos' }))
     await screen.findByRole('button', { name: 'Move to photos' })
 
+    // A shallow path stays fully visible, with nothing collapsed
     const breadcrumb = screen.getByRole('navigation', { name: 'breadcrumb' })
+    expect(within(breadcrumb).getByText('photos')).toBeInTheDocument()
+    expect(
+      within(breadcrumb).queryByLabelText('Show the folders in between')
+    ).not.toBeInTheDocument()
+
     await user.click(within(breadcrumb).getByRole('button', { name: 'avatars' }))
 
     expect(await screen.findByRole('button', { name: 'Move to avatars' })).toBeInTheDocument()
   })
 
-  it('swaps the listing for matching folders while searching', async () => {
-    const user = userEvent.setup()
-    renderModal()
-
-    await screen.findByRole('button', { name: 'photos' })
-    await user.type(screen.getByPlaceholderText('Search folders in avatars...'), '2024')
-
-    expect(await screen.findByRole('button', { name: '2024 in photos' })).toBeInTheDocument()
-    await waitFor(() => expect(screen.queryByText('invoices')).not.toBeInTheDocument())
-  })
-
-  it('selects a searched folder as the destination', async () => {
+  it('swaps the listing for matching folders while searching and selects one as the destination', async () => {
     const user = userEvent.setup()
     const { onSelectMove } = renderModal()
 
     await screen.findByRole('button', { name: 'photos' })
-    await user.type(screen.getByPlaceholderText('Search folders in avatars...'), '2024')
+    await user.click(screen.getByPlaceholderText('Search folders in avatars...'))
+    await user.paste('2024')
 
-    await user.click(await screen.findByRole('button', { name: '2024 in photos' }))
+    const result = await screen.findByRole('button', { name: '2024 in photos' })
+    await waitFor(() => expect(screen.queryByText('invoices')).not.toBeInTheDocument())
+
+    await user.click(result)
     await user.click(await screen.findByRole('button', { name: 'Move to 2024' }))
 
     expect(onSelectMove).toHaveBeenCalledWith('photos/2024')

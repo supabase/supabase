@@ -1,9 +1,17 @@
 import type { ToolUIPart } from 'ai'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
+import { LEGACY_TOOL_CONTRACTS } from './legacy-tools'
 import { INVALID_NOTEBOOK_RUN_OUTPUT_MESSAGE } from './notebook-run-output'
-import { sanitizeContractPart, TOOL_CONTRACTS, type StudioUIMessage } from './registry'
-import type { ToolContract } from './types'
+import {
+  isToolAvailable,
+  REMOTE_TOOL_CONTRACTS,
+  sanitizeContractPart,
+  TOOL_CONTRACTS,
+  type StudioUIMessage,
+} from './registry'
+import { TOOL_FACTORIES } from './registry.server'
+import type { RemoteToolContract, ToolAvailability, ToolContract } from './types'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 describe('TOOL_CONTRACTS', () => {
@@ -14,6 +22,95 @@ describe('TOOL_CONTRACTS', () => {
     >
     expectTypeOf<Part['input']>().toHaveProperty('expected_updated_at')
     expectTypeOf<Part['output']>().toHaveProperty('name')
+  })
+})
+
+describe('contract invariants', () => {
+  const contracts: Record<string, { name: string }> = {
+    ...TOOL_CONTRACTS,
+    ...REMOTE_TOOL_CONTRACTS,
+  }
+
+  it.each(Object.entries(contracts))('%s is keyed by its own name', (key, contract) => {
+    expect(contract.name).toBe(key)
+  })
+
+  it('has a server factory for exactly the local contracts', () => {
+    expect(Object.keys(TOOL_FACTORIES).sort()).toEqual(Object.keys(TOOL_CONTRACTS).sort())
+  })
+
+  it.each([...Object.values(TOOL_CONTRACTS), ...Object.values(REMOTE_TOOL_CONTRACTS)])(
+    '$name is available in at least one environment',
+    (contract) => {
+      expect(contract.availability.environments.size).toBeGreaterThan(0)
+    }
+  )
+
+  it('keeps a name shared by a local and a remote contract in disjoint environments with the same access rules', () => {
+    const local: Record<string, ToolContract> = TOOL_CONTRACTS
+    const remotes: RemoteToolContract[] = Object.values(REMOTE_TOOL_CONTRACTS)
+    for (const remote of remotes) {
+      const counterpart = local[remote.name]
+      if (!counterpart) continue
+
+      const overlap = [...counterpart.availability.environments].filter((environment) =>
+        remote.availability.environments.has(environment)
+      )
+      expect(overlap, `${remote.name} environments overlap`).toEqual([])
+      expect(counterpart.minOptInLevel).toBe(remote.minOptInLevel)
+      expect(counterpart.needsApproval).toBe(remote.needsApproval)
+    }
+  })
+})
+
+describe('LEGACY_TOOL_CONTRACTS', () => {
+  it('does not overlap live contracts', () => {
+    const live = new Set([...Object.keys(TOOL_CONTRACTS), ...Object.keys(REMOTE_TOOL_CONTRACTS)])
+    expect(Object.keys(LEGACY_TOOL_CONTRACTS).filter((name) => live.has(name))).toEqual([])
+  })
+
+  it.each(Object.entries(LEGACY_TOOL_CONTRACTS))(
+    'keys %s by its contract name',
+    (key, contract) => {
+      expect(contract.name).toBe(key)
+    }
+  )
+})
+
+describe('isToolAvailable', () => {
+  const availability: ToolAvailability = {
+    environments: new Set(['platform']),
+    requires: new Set(['explorer', 'baseUrl']),
+  }
+
+  it('requires the environment', () => {
+    expect(
+      isToolAvailable(availability, {
+        environment: 'self-hosted',
+        satisfied: new Set(['explorer', 'baseUrl']),
+      })
+    ).toBe(false)
+  })
+
+  it('requires every requirement to be satisfied', () => {
+    expect(
+      isToolAvailable(availability, { environment: 'platform', satisfied: new Set(['explorer']) })
+    ).toBe(false)
+    expect(
+      isToolAvailable(availability, {
+        environment: 'platform',
+        satisfied: new Set(['explorer', 'baseUrl']),
+      })
+    ).toBe(true)
+  })
+
+  it('needs nothing beyond the environment when there are no requirements', () => {
+    expect(
+      isToolAvailable(
+        { environments: new Set(['platform']) },
+        { environment: 'platform', satisfied: new Set() }
+      )
+    ).toBe(true)
   })
 })
 
@@ -210,7 +307,9 @@ describe('read-only contracts', () => {
       output,
     } as ToolUIPart
 
-    it.each(levels)('shows the output unchanged on replay at %s', (level) => {
+    it.each(levels)('shows the output unchanged, live and on replay, at %s', (level) => {
+      const contract: ToolContract = TOOL_CONTRACTS[name as keyof typeof outputs]
+      expect(contract.toModelOutput(output, level)).toEqual(output)
       expect(sanitizeContractPart(part, level)?.output).toEqual(output)
     })
 
@@ -218,11 +317,6 @@ describe('read-only contracts', () => {
       expect(sanitizeContractPart({ ...part, output: 12345 } as ToolUIPart, 'schema')?.output).toBe(
         undefined
       )
-    })
-
-    it.each(levels)('shows the live output unchanged at %s', (level) => {
-      const contract: ToolContract = TOOL_CONTRACTS[name as keyof typeof outputs]
-      expect(contract.toModelOutput(output, level)).toEqual(output)
     })
   })
 

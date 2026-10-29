@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
 import { configKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -27,6 +27,7 @@ export async function getProjectUpgradingStatus(
   const { data, error } = await get(`/v1/projects/{ref}/upgrade/status`, {
     params: { path: { ref: projectRef }, query: queryParams },
     signal,
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
 

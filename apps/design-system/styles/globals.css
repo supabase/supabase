@@ -1,6 +1,7 @@
 @import 'config/tailwind.config.css';
 @import 'config/inline-code.css';
 @import 'config/typography.css';
+@import 'ui-patterns/CodeBlock/code-block.css';
 
 @source '../app/**/*.{js,ts,jsx,tsx}';
 @source '../components/**/*.{js,ts,jsx,tsx}';

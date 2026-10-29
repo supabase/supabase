@@ -1,0 +1,3 @@
+/* Styles the search components rely on. Import once from the consuming app's Tailwind entry. */
+@import './styles/loading-beam.css';
+@import './styles/scroll-fade.css';

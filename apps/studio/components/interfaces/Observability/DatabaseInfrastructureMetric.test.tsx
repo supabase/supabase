@@ -91,21 +91,19 @@ function card(label: string) {
 }
 
 describe('DatabaseInfrastructureSection batched metrics', () => {
-  it.each([false, true])(
-    'renders all metrics from one request (errors field: %s)',
-    async (includeErrors) => {
-      const requests = mockMetrics(undefined, includeErrors)
-      renderMetrics()
+  // Responses with an `errors` field are exercised by the isolation cases below
+  it('renders all metrics from one request without an errors field', async () => {
+    const requests = mockMetrics(undefined, false)
+    renderMetrics()
 
-      expect(await card('CPU').findByText('25%')).toBeInTheDocument()
-      expect(await card('Memory').findByText('60%')).toBeInTheDocument()
-      expect(await card('Disk IO balance').findByText('99%')).toBeInTheDocument()
-      expect(await card('Disk Usage').findByText('50%')).toBeInTheDocument()
-      expect(await card('Peak Connections').findByText('12/100')).toBeInTheDocument()
-      expect(requests).toHaveLength(1)
-      expect(requests[0].sort()).toEqual(Object.keys(values).sort())
-    }
-  )
+    expect(await card('CPU').findByText('25%')).toBeInTheDocument()
+    expect(await card('Memory').findByText('60%')).toBeInTheDocument()
+    expect(await card('Disk IO balance').findByText('99%')).toBeInTheDocument()
+    expect(await card('Disk Usage').findByText('50%')).toBeInTheDocument()
+    expect(await card('Peak Connections').findByText('12/100')).toBeInTheDocument()
+    expect(requests).toHaveLength(1)
+    expect(requests[0].sort()).toEqual(Object.keys(values).sort())
+  })
 
   it.each([
     ['disk_io_budget', 'Disk IO balance'],
