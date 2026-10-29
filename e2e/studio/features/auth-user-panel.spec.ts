@@ -10,9 +10,9 @@ test('user details support copying fields and raw JSON with mouse and keyboard',
 }) => {
   const email = `test-user-panel-${Date.now()}@example.com`
   await navigateToAuthUsers(page, ref)
-  await createUserViaUI(page, ref, email, 'testpassword123')
 
   try {
+    await createUserViaUI(page, ref, email, 'testpassword123')
     await page.getByRole('row').filter({ hasText: email }).getByText(email, { exact: true }).click()
     const overview = page.getByRole('tabpanel', { name: 'Overview' })
     const emailField = overview.getByRole('button', { name: `Email ${email}`, exact: true })
@@ -40,7 +40,10 @@ test('user details support copying fields and raw JSON with mouse and keyboard',
   } finally {
     if (!page.isClosed()) {
       await navigateToAuthUsers(page, ref)
-      await deleteUserViaUI(page, ref, email)
+      const userRow = page.getByRole('row').filter({ hasText: email })
+      if ((await userRow.count()) > 0) {
+        await deleteUserViaUI(page, ref, email)
+      }
     }
   }
 })
