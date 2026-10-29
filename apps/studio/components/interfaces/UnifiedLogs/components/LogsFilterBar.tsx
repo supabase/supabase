@@ -11,19 +11,15 @@ import {
   type FilterGroup,
 } from 'ui-patterns/FilterBar'
 
-import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from '../UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from '../UnifiedLogs.fields'
-import {
-  getLogAttributeKey,
-  logAttributeFilterId,
-  parseLogsFilterUrlParams,
-} from '../UnifiedLogs.filters'
+import { getLogAttributeKey, logAttributeFilterId } from '../UnifiedLogs.filters'
 import type { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { isOfferedFilter } from '../UnifiedLogs.utils'
 import {
   buildColumnFilterValues,
   buildFilterGroup,
   buildFilterProperties,
+  getLogAttributeSources,
   getUserFilterValue,
   TIME_RANGE_PROPERTY,
   USER_PROPERTY,
@@ -116,19 +112,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     withUserCondition(buildFilterGroup(columnFilters, columnBackedNames))
   )
 
-  const logTypes = [
-    ...parseLogsFilterUrlParams(searchParameters.filter),
-    ...(searchParameters.scope?.filters ?? []),
-  ].filter(({ column, operator }) => column === 'log_type' && operator === '=')
-  const selectedLogTypes: readonly string[] =
-    logTypes.length > 0 ? logTypes.map(({ value }) => value) : DEFAULT_LOG_TYPES
-  const sources = [
-    ...new Set(
-      Object.entries(LOG_TYPE_TO_SOURCE)
-        .filter(([type]) => selectedLogTypes.includes(type))
-        .map(([, source]) => source)
-    ),
-  ]
+  const sources = getLogAttributeSources(searchParameters)
   const keyQueries = useQueries({
     queries: sources.map((source) => ({
       ...otelLogKeysQueryOptions({ projectRef: projectRef ?? '', source }),

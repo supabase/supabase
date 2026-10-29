@@ -7,11 +7,15 @@ import {
 } from 'ui-patterns/FilterBar'
 import { z } from 'zod'
 
+import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from '../UnifiedLogs.constants'
 import {
+  groupLogsFiltersByColumn,
   isLogsFilterColumnValue,
+  parseLogsFilterUrlParams,
   type LogsColumnFilterValue,
   type LogsFilterOperator,
 } from '../UnifiedLogs.filters'
+import type { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { REPORTS_DATEPICKER_HELPERS } from '@/components/interfaces/Reports/Reports.constants'
 import {
   findMatchingDateHelper,
@@ -161,4 +165,30 @@ export const formatTimeRangeValue = (value: FilterCondition['value']): string =>
   const [from, to] = range
   const helper = findMatchingDateHelper(from, to, REPORTS_DATEPICKER_HELPERS)
   return helper?.text ?? formatDateRange(from.toISOString(), to.toISOString())
+}
+
+export const getLogAttributeSources = (search: QuerySearchParamsType): string[] => {
+  const filter = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter)).log_type
+  const hasUser = !!search.user?.trim()
+  const hasDefaultSources = !filter && !search.scope && !hasUser
+  let types = Object.keys(LOG_TYPE_TO_SOURCE)
+  if (hasDefaultSources) types = [...DEFAULT_LOG_TYPES]
+  if (filter?.operator === '=') types = types.filter((type) => filter.values.includes(type))
+  if (filter?.operator === '<>') {
+    types = types.filter(
+      (type) =>
+        !filter.values.includes(type) && (!!search.scope || type !== 'edge function runtime')
+    )
+  }
+  const scopeTypes = search.scope?.filters.filter(({ column }) => column === 'log_type') ?? []
+  const includedScopeTypes = scopeTypes.filter(({ operator }) => operator === '=')
+  const excludedScopeTypes = scopeTypes.filter(({ operator }) => operator === '<>')
+  if (includedScopeTypes.length > 0) {
+    types = types.filter((type) => includedScopeTypes.some(({ value }) => value === type))
+  }
+  types = types.filter((type) => !excludedScopeTypes.some(({ value }) => value === type))
+  if (hasUser) types = types.filter((type) => type === 'edge' || type === 'auth')
+  return Object.entries(LOG_TYPE_TO_SOURCE)
+    .filter(([type]) => types.includes(type))
+    .map(([, source]) => source)
 }
