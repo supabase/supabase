@@ -68,10 +68,12 @@ export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[]
 }
 
 export const logsFiltersToUrlParams = (filters: LogsFilter[]): string[] => {
-  return filters.map(
-    (f) =>
-      `${f.column.startsWith('attribute.') ? encodeURIComponent(f.column) : f.column}:${OPERATOR_TO_ABBREV[f.operator]}:${f.column.startsWith('attribute.') ? encodeURIComponent(f.value) : f.value}`
-  )
+  return filters.map((filter) => {
+    const isAttributeFilter = filter.column.startsWith('attribute.')
+    const column = isAttributeFilter ? encodeURIComponent(filter.column) : filter.column
+    const value = isAttributeFilter ? encodeURIComponent(filter.value) : filter.value
+    return `${column}:${OPERATOR_TO_ABBREV[filter.operator]}:${value}`
+  })
 }
 
 export const groupLogsFiltersByColumn = (
