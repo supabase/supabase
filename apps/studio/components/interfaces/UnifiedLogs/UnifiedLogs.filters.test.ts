@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
+import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import {
   buildDefaultColumnFilters,
   buildFilterSearchUpdate,
   columnFiltersToLogsFilters,
+  groupLogsFiltersByColumn,
+  logAttributeFilterId,
   logsFiltersToColumnFilters,
   logsFiltersToUrlParams,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
+import { serializeUnifiedLogsSearchParams } from './UnifiedLogs.utils'
 
 describe('columnFiltersToLogsFilters', () => {
   it('serializes a bare string[] (defensive fallback for un-wrapped input) using the default `=` operator', () => {
@@ -160,3 +164,60 @@ describe('buildDefaultColumnFilters', () => {
     expect(columnFilters).toEqual([{ id: 'date', value: range }])
   })
 })
+
+describe('attribute filter URLs', () => {
+  it.each([
+    'request_id',
+    'attribute.status',
+    'attribute.request:header',
+    'attribute.a%3Ab',
+    '__proto__',
+    'constructor',
+  ])('preserves %s when changing a builtin filter after reload', (column) => {
+    const original = [{ column, operator: '<>' as const, value: "value:with'quotes\\and:colons" }]
+    const params = logsFiltersToUrlParams(original)
+    const reloaded = buildDefaultColumnFilters({ filter: params })
+    const update = buildFilterSearchUpdate(
+      [...reloaded, { id: 'method', value: ['POST'] }],
+      [
+        { value: 'method', type: 'checkbox' },
+        { value: 'date', type: 'timerange' },
+      ]
+    )
+    expect(parseLogsFilterUrlParams(update.filter as string[])).toEqual([
+      ...original,
+      { column: 'method', operator: '=', value: 'POST' },
+    ])
+  })
+
+  it('keeps attributes named like builtins and nested attribute prefixes distinct', () => {
+    const columns = [
+      'status',
+      logAttributeFilterId('status'),
+      logAttributeFilterId('attribute.status'),
+    ]
+    const grouped = groupLogsFiltersByColumn(
+      columns.map((column, index) => ({ column, operator: '=', value: String(index) }))
+    )
+    expect(Object.values(grouped).map(({ values }) => values)).toEqual([['0'], ['1'], ['2']])
+  })
+})
+
+it.each(['comma,value:colon%percent', 'literal%2C:comma,plus+space value'])(
+  'round-trips attribute keys and %s through the public logs URL',
+  (value) => {
+    const original = [
+      {
+        column: logAttributeFilterId('request.headers.x:custom,%2C'),
+        operator: '<>' as const,
+        value,
+      },
+    ]
+    const url = serializeUnifiedLogsSearchParams('/project/abc/logs', {
+      filter: logsFiltersToUrlParams(original),
+    })
+    const params = new URL(url, 'https://example.com').searchParams
+    const parsed = SEARCH_PARAMS_PARSER.filter.parse(params.get('filter') ?? '')
+    expect(parseLogsFilterUrlParams(parsed)).toEqual(original)
+  }
+)

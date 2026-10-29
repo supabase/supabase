@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { logAttributeFilterId, logsFiltersToUrlParams } from './UnifiedLogs.filters'
 import {
   getFacetCountQuery,
   getLogsChartQuery,
@@ -656,4 +657,28 @@ describe('request timeline', () => {
   it('refuses to build an unbounded query', () => {
     expect(() => getRequestTimelineQuery({ requestIds: [], executionIds: [] })).toThrow()
   })
+})
+
+describe('explicit attribute filters', () => {
+  it.each(['status', 'user', 'date', 'request:header', "key' OR 1=1 --", 'attribute.status'])(
+    'uses the stored %s key in every query surface',
+    (key) => {
+      const filter = logsFiltersToUrlParams([
+        { column: logAttributeFilterId(key), operator: '<>', value: "quoted'value" },
+      ])
+      const search = createUnifiedLogsSearch({ ...baseSearch, filter })
+      const escapedKey = key.replaceAll("'", "''")
+      for (const sql of [
+        getUnifiedLogsQuery(search),
+        getLogsCountQuery(search),
+        getLogsChartQuery(search),
+        getFacetCountQuery({ search, facet: 'pathname' }),
+      ]) {
+        expect(sql).toContain(`log_attributes['${escapedKey}'] NOT IN ('quoted''value')`)
+      }
+      expect(() => getUnifiedLogsQueryBQ(search)).toThrow(
+        'Log attribute filters are only supported on ClickHouse'
+      )
+    }
+  )
 })
