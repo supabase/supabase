@@ -158,6 +158,33 @@ Code snippets for manually adding content listings are available in [`.vscode/co
 
 ## Search
 
-Search uses a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) collects guides, reference documentation, and other content. The script creates OpenAI embeddings and stores the search index in a Supabase database.
+Search is keyword-based, backed by the `docs_search_v2` table and RPC in Postgres (see [`supabase/migrations/*_docs_search_v2*.sql`](../../supabase/migrations/)).
 
-Search combines native Postgres full-text search (FTS) with embedding similarity search based on [`pgvector`](https://github.com/pgvector/pgvector). At runtime, a PostgREST call invokes the weighted FTS RPC. An [Edge Function](https://github.com/supabase/supabase/tree/master/supabase/functions) runs the embedding search.
+- **UI**: [`features/SearchV2`](features/SearchV2) holds `SearchV2Trigger` (top bar, Cmd+K), `SearchV2Dialog`, and `useSearchV2Dialog`. The presentational pieces (`SearchTrigger`, `SearchPanel`, `useSearchShortcut`) live in the [`docs-search`](../../packages/docs-search) package.
+- **Hook**: `useDocsSearchV2` in [`packages/common/hooks`](../../packages/common/hooks/useDocsSearchV2.ts) calls an endpoint with `?q=` and manages the search state. It also feeds the 404 page recommendations.
+- **API**: [`app/api/search_v2/route.ts`](app/api/search_v2/route.ts) calls the RPC.
+- **Ingestion**: `pnpm ingest:search_v2` ([`scripts/search_v2`](scripts/search_v2)) chunks the generated markdown with `docs-search/ingest` and upserts it into the table. The [Ingest Docs Content for Search V2](../../.github/workflows/docs-search-v2-ingest.yml) workflow runs it on content changes to `master` and nightly.
+
+### Try search locally
+
+1. Start a local Supabase stack from the repo root. It applies the `docs_search_v2` migrations:
+
+   ```bash
+   supabase start
+   ```
+
+2. Add the following to `apps/docs/.env.local`, taking the values from `supabase status`:
+
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+   SUPABASE_SECRET_KEY=<secret key>
+   # Federated content is fetched from GitHub during ingestion
+   GH_TOKEN=<token>   # or run: export GH_TOKEN=$(gh auth token)
+   ```
+
+3. Ingest the content, then start the app and use the search box:
+
+   ```bash
+   pnpm ingest:search_v2
+   pnpm dev
+   ```
