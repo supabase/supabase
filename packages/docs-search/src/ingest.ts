@@ -7,6 +7,16 @@ import type { IngestOptions } from './types.js'
 
 const INSERT_BATCH_SIZE = 200
 
+// Rows are stamped by the database clock and the cutoff by ours, so keep a margin before treating
+// a row as untouched. Too small and a fresh row could be removed, too large only delays cleanup.
+// 24 * 60 * 60 * 1000 is one day in milliseconds, matching the nightly ingest cron: only rows left
+// over from a run more than a day old are removed.
+const STALE_AFTER_MS = 24 * 60 * 60 * 1000
+
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, '\\$&')
+}
+
 function chunk<T>(items: T[], size: number): T[][] {
   const out: T[][] = []
   for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size))
@@ -28,6 +38,7 @@ export async function ingestMarkdown({
   }
   console.log(`Found ${files.length} markdown file(s) under ${contentRoot}`)
 
+  const startedAt = Date.now()
   let totalRows = 0
 
   for (const file of files.sort()) {
@@ -46,6 +57,18 @@ export async function ingestMarkdown({
     totalRows += rows.length
     console.log(`  ✓ ${slug || '(root)'}  (${rows.length} section${rows.length === 1 ? '' : 's'})`)
   }
+
+  // Every ingested page was re-inserted above, so rows that weren't touched belong to pages that
+  // were deleted, renamed or are now ignored. Scoped to the slug prefix so other sources sharing
+  // the table are left alone.
+  const cutoff = new Date(startedAt - STALE_AFTER_MS).toISOString()
+  let staleQuery = supabase.from(table).delete().lt('updated_at', cutoff)
+  if (slugPrefix) staleQuery = staleQuery.like('slug', `${escapeLike(slugPrefix)}%`)
+  const { data: removed, error: cleanupError } = await staleQuery.select('slug')
+  if (cleanupError) throw new Error(`Failed to remove stale pages: ${cleanupError.message}`)
+  const removedSlugs = [...new Set((removed ?? []).map(({ slug }) => slug))]
+  for (const slug of removedSlugs)
+    console.log(`  ✗ ${slug || '(root)'}  (removed, no longer in content)`)
 
   console.log(`Done. Ingested ${totalRows} section(s) from ${files.length} file(s).`)
   return totalRows
