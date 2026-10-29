@@ -10,6 +10,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CopyIcon,
+  RefreshCwIcon,
   RotateCcwIcon,
   SearchIcon,
 } from 'lucide-react'
@@ -20,12 +21,16 @@ import {
   Card,
   CardContent,
   CardFooter,
+  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -66,12 +71,14 @@ interface PlatformWebhooksEndpointDetailsProps {
   hasNextPage: boolean
   hasPreviousPage: boolean
   hasRefreshError: boolean
+  isLive: boolean
   isLoadingDeliveries: boolean
   isRefetchingDeliveries: boolean
   orgSlug?: string
   projectRef?: string
   selectedEndpoint: WebhookEndpoint
   onCopyUrl: () => void
+  onLiveChange: (isLive: boolean) => void
   onRefetchDeliveries: () => void
   onDeliverySearchChange: (value: string) => void
   onNextPage: () => void
@@ -87,9 +94,23 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
     accessorKey: 'status',
     header: ({ column }) => <TanStackTableHeadSort column={column}>Status</TanStackTableHeadSort>,
-    cell: ({ row }) => (
-      <Badge variant={statusBadgeVariant[row.original.status]}>{row.original.status}</Badge>
-    ),
+    cell: ({ row }) => {
+      const badge = (
+        <Badge variant={statusBadgeVariant[row.original.status]}>{row.original.status}</Badge>
+      )
+      if (row.original.status !== 'failure') return badge
+
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>{badge}</span>
+          </TooltipTrigger>
+          <TooltipContent side="top">
+            Failed deliveries are usually retried automatically with increasing delays.
+          </TooltipContent>
+        </Tooltip>
+      )
+    },
   },
   {
     accessorKey: 'eventType',
@@ -173,12 +194,14 @@ export const PlatformWebhooksEndpointDetails = ({
   hasNextPage,
   hasPreviousPage,
   hasRefreshError,
+  isLive,
   isLoadingDeliveries,
   isRefetchingDeliveries,
   orgSlug,
   projectRef,
   selectedEndpoint,
   onCopyUrl,
+  onLiveChange,
   onRefetchDeliveries,
   onDeliverySearchChange,
   onNextPage,
@@ -293,6 +316,39 @@ export const PlatformWebhooksEndpointDetails = ({
             onChange={(event) => onDeliverySearchChange(event.target.value)}
             onKeyDown={onSearchInputEscape(deliverySearch, onDeliverySearchChange)}
           />
+          <div className="flex items-center gap-2">
+            <ButtonTooltip
+              size="tiny"
+              variant={isLive ? 'primary' : 'default'}
+              aria-pressed={isLive}
+              icon={
+                <span
+                  className={cn(
+                    'size-2 rounded-full',
+                    isLive ? 'bg-brand-400 animate-pulse' : 'bg-foreground-muted'
+                  )}
+                />
+              }
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: isLive ? 'Stop refreshing automatically' : 'Refresh automatically',
+                },
+              }}
+              onClick={() => onLiveChange(!isLive)}
+            >
+              Live
+            </ButtonTooltip>
+            <ButtonTooltip
+              size="tiny"
+              className="w-7"
+              icon={<RefreshCwIcon />}
+              loading={isRefetchingDeliveries}
+              aria-label="Refresh deliveries"
+              tooltip={{ content: { side: 'top', text: 'Refresh' } }}
+              onClick={onRefetchDeliveries}
+            />
+          </div>
         </div>
         {hasRefreshError && (
           <Admonition

@@ -1,3 +1,4 @@
+import { DELIVERIES_POLL_INTERVAL_MS } from './PlatformWebhooks.constants'
 import type { WebhookDelivery, WebhookScope } from './PlatformWebhooks.types'
 
 export const shouldHandleEndpointNotFound = ({
@@ -75,4 +76,23 @@ export const resetPendingSigningSecretRevealForTests = () => {
   for (const key of Object.keys(pendingSigningSecretRevealByScope) as WebhookScope[]) {
     delete pendingSigningSecretRevealByScope[key]
   }
+}
+
+/**
+ * Deliveries are not polled by default. Polling is on while the user chose "Live", while a delivery
+ * is still pending, and for a short wait after a test event or retry was sent. That wait cannot end
+ * when the new row shows up, because the API returns an ingress ID, not the ID of the delivery.
+ */
+export const getDeliveriesRefetchInterval = ({
+  isLive,
+  isAwaitingDelivery,
+  deliveries,
+}: {
+  isLive: boolean
+  isAwaitingDelivery: boolean
+  deliveries: WebhookDelivery[]
+}) => {
+  const hasPendingDelivery = deliveries.some((delivery) => delivery.status === 'pending')
+
+  return isLive || isAwaitingDelivery || hasPendingDelivery ? DELIVERIES_POLL_INTERVAL_MS : false
 }

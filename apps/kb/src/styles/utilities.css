@@ -15,17 +15,11 @@
     radial-gradient(circle at 100% 0, var(--tab-flare-fill));
 }
 
-@utility grain-mask {
-  mask: url('../assets/grain.webp') 0 0 / 132px 132px;
-}
-
 /* --flank-span is how wide the bands above and below the copy show.
    the grid columns pass calc(100% - 20rem), so they stop at the copy frame */
-@utility grain-mask-flank {
+@utility flank-mask {
   mask:
-    url('../assets/grain.webp') 0 0 / 132px 132px,
     linear-gradient(#000 0 0) top left / var(--flank-span, 100%) 100vh no-repeat,
     linear-gradient(#000, transparent 10rem) bottom left / var(--flank-span, 100%) 100vh no-repeat,
     linear-gradient(#000 0 0) top left / calc(100% - 20rem) calc(100% - 100vh) no-repeat;
-  mask-composite: intersect, add, add, add;
 }
