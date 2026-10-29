@@ -97,6 +97,17 @@ The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/
 
 Add an entry with the `name`, `url`, and optional `icon` for your page.
 
+### Skip anchor link CI check
+
+When you remove a header that is linked to elsewhere, CI fails.
+You may want to merge your change anyway. For example, you may want to correct the links in a separate PR to avoid PR bloat.
+
+To merge anyway:
+
+1. Confirm the removal is deliberate.
+2. Add the `skip-anchor-check` label to the PR.
+3. Wait for the check to rerun. It passes and lists the broken links as warnings.
+
 ## Reference structure
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
