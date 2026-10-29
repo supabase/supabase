@@ -646,15 +646,12 @@ export const REQUEST_CORRELATION_KEYS = {
     function_edge_logs: ['execution_id'],
     function_logs: ['execution_id'],
   },
-  nativeRequestId: {
-    edge_logs: ['request_id'],
-    auth_logs: ['request_id'],
-    function_edge_logs: ['request_id'],
-    function_logs: ['request_id'],
-  },
-  traceId: {
-    edge_logs: ['trace_id'],
-  },
+  nativeRequestId: Object.fromEntries(
+    Object.values(LOG_TYPE_TO_SOURCE).map((source) => [source, ['request_id']])
+  ),
+  traceId: Object.fromEntries(
+    Object.values(LOG_TYPE_TO_SOURCE).map((source) => [source, ['trace_id']])
+  ),
 } as const satisfies Record<string, Record<string, readonly string[]>>
 
 export type RequestCorrelationIds = {
