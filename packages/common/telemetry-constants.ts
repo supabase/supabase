@@ -1259,7 +1259,9 @@ export interface DocsAiPromptCopiedEvent {
 }
 
 /**
- * User clicked a curated orientation link from a content listings MDX component.
+ * User clicked a curated orientation link from a content listings MDX component, or a
+ * link card or quickstart link in the getting started stepper (`listingId` is
+ * `getting-started-stepper`).
  *
  * @group Events
  * @source docs
@@ -1287,6 +1289,32 @@ export interface ExampleLinkClickedEvent {
      * Path after examples/ in the GitHub URL, e.g. auth/nextjs.
      */
     examplePath: string
+  }
+}
+
+/**
+ * User picked an option in the getting started stepper: how to start, a framework, or a
+ * feature for the agent prompt.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides/getting-started
+ */
+export interface DocsGettingStartedOptionClickedEvent {
+  action: 'docs_getting_started_option_clicked'
+  properties: {
+    /**
+     * Stepper step the option belongs to.
+     */
+    optionType: 'start' | 'framework' | 'feature'
+    /**
+     * Start option id, framework slug, or feature id.
+     */
+    optionId: string
+    /**
+     * For a feature, true when the click selected it and false when it cleared it.
+     */
+    isSelected?: boolean
   }
 }
 
@@ -4756,6 +4784,7 @@ export type TelemetryEvent =
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
   | ExampleLinkClickedEvent
+  | DocsGettingStartedOptionClickedEvent
   | DocsSearchV2OpenedEvent
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
