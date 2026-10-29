@@ -1124,8 +1124,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0(babel-plugin-macros@3.1.0)(effect@4.0.0-rc.112)
       '@supabase/mcp-server-supabase':
-        specifier: ^0.12.0
-        version: 0.12.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
+        specifier: ^0.15.0
+        version: 0.15.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
       '@supabase/pg-meta':
         specifier: workspace:*
         version: link:../../packages/pg-meta
@@ -5561,6 +5561,12 @@ packages:
     resolution: {integrity: sha512-z8QBKqdfXLPzkLQuG4xp8hrVEMm1PZ1IgxMN2sMbJiFiAKOWXnAzogXn2W4aqIBlP1ea6U5yiqVquvUNM1Cj6Q==}
     engines: {node: '>=20'}
 
+  '@modelcontextprotocol/node@2.1.2':
+    resolution: {integrity: sha512-IIcIqBpr6NCQQs5DgJTgvbSOAw+3iaR/uquqg+e0nXCdudfjPg/80x0TseUnQx14AUAtE4fsJCEpJKPyb6WPVA==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@modelcontextprotocol/server': ^2.4.0
+
   '@modelcontextprotocol/sdk@1.32.0':
     resolution: {integrity: sha512-8BviX/hK4Gd2eL1KdTwm0gfl4d3wdoErW0Jd00h6nomUAtk6IJk5vwQJc6kfWtJTzN5OEV/lgIiJKI8fiDGAlA==}
     engines: {node: '>=18'}
@@ -8449,15 +8455,15 @@ packages:
     resolution: {integrity: sha512-6GuizbP4N5xWaxEVUsI+UQpJdmMmn0t3sYNpObo9gCAldvM22gFjnYzRVmkHxp5ylU21azEYmiWVwk9iDgCMkQ==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/mcp-server-supabase@0.12.0':
-    resolution: {integrity: sha512-Rjh3k7pQel+vePiffG8m8DkqCT2y3pD9Z4dKejzjACfvrzGeFsaoRhgXoDeZio6kjgOvi8Wy7mgdezEwPklJhg==}
+  '@supabase/mcp-server-supabase@0.15.0':
+    resolution: {integrity: sha512-+Zhu0iKjgKfN1gJlGuaQmzjiXvlHtN+LHMj22piHgErC/miWsre+TmLtCH2AVse+n0xB2eehyHhhFQOJbjkCGQ==}
     hasBin: true
     peerDependencies:
       '@modelcontextprotocol/server': ^2.0.0
       zod: ^3.25.0 || ^4.0.0
 
-  '@supabase/mcp-utils@0.8.0':
-    resolution: {integrity: sha512-T3PpwysWEFBuvD7TMekFSv7xLqO6DjoUUh2ZHojyRdJD7UNaydffJx8ZGoUW2Ju9NOf5ffomfuzreioJUTFFcQ==}
+  '@supabase/mcp-utils@0.9.0':
+    resolution: {integrity: sha512-OsWQL6zPqm+VbchSyp7PuJx4tL39WSgaNdD+IPSko1KCsdX7xZ6Cmmj4As52KuJWmeymX/4cSS+8lNAwyaqFmA==}
     peerDependencies:
       '@modelcontextprotocol/server': ^2.0.0
       zod: ^3.25.0 || ^4.0.0
@@ -22139,6 +22145,12 @@ snapshots:
     dependencies:
       zod: 4.6.7
 
+  '@modelcontextprotocol/node@2.1.2(@modelcontextprotocol/server@2.4.0)':
+    dependencies:
+      '@hono/node-server': 1.19.17(hono@4.13.14)
+      '@modelcontextprotocol/server': 2.4.0
+      hono: 4.13.14
+
   '@modelcontextprotocol/sdk@1.32.0(supports-color@8.1.1)(zod@3.25.76)':
     dependencies:
       '@hono/node-server': 1.19.17(hono@4.13.14)
@@ -25370,18 +25382,19 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/mcp-server-supabase@0.12.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
+  '@supabase/mcp-server-supabase@0.15.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
+      '@modelcontextprotocol/node': 2.1.2(@modelcontextprotocol/server@2.4.0)
       '@modelcontextprotocol/server': 2.4.0
-      '@supabase/mcp-utils': 0.8.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
+      '@supabase/mcp-utils': 0.9.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
       common-tags: 1.8.2
       gqlmin: 0.3.1
       graphql: 16.11.0
       openapi-fetch: 0.13.8
       zod: 3.25.76
 
-  '@supabase/mcp-utils@0.8.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
+  '@supabase/mcp-utils@0.9.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
     dependencies:
       '@modelcontextprotocol/server': 2.4.0
       zod: 3.25.76
