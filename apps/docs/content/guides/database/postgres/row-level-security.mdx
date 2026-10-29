@@ -63,7 +63,7 @@ Adding policies doesn't take those grants back. A table protected only by polici
 
 Not every project grants these automatically. See [Default privileges](/docs/guides/api/securing-your-api#default-privileges). Grant each role only the operations it needs.
 
-A missing grant raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy. To set them, see [Enable RLS and set the grants](#enable-rls-and-set-the-grants).
+A [missing grant](/kb/troubleshooting/database-api-42501-errors) raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy. To set them, see [Enable RLS and set the grants](#enable-rls-and-set-the-grants).
 
 ### Authenticated and unauthenticated roles
 
@@ -755,7 +755,7 @@ The JWT-based `service_role` key is a legacy alternative. Prefer a secret key wh
 
 <Admonition type="note">
 
-A secret key bypasses RLS only when the request carries no user access token. If the request carries one, it runs under the RLS policies of that signed-in user, even when the client library was initialized with a secret key.
+A secret key bypasses RLS only when the request carries no user access token. If the request carries one, it runs under the RLS policies of that signed-in user, even when the client library was [initialized with a secret key](/kb/troubleshooting/why-is-my-service-role-key-client-getting-rls-errors-or-not-returning-data-7_1K9z).
 
 </Admonition>
 
