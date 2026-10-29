@@ -1001,7 +1001,9 @@ export interface CustomReportAssistantSqlBlockAddedEvent {
 }
 
 /**
- * User voted on the feedback button on a docs page. The feedback button is located at the sidebar of every docs page.
+ * User voted on the docs feedback control in the sidebar. In the docs-feedback-dock
+ * variant, the vote opens the feedback dock, and the event also fires when the user
+ * switches their vote inside an open dock.
  *
  * @group Events
  * @source docs
@@ -1010,10 +1012,165 @@ export interface DocsFeedbackClickedEvent {
   action: 'docs_feedback_clicked'
   properties: {
     /**
-     * 'yes' means clicking on the tick button, 'no' means clicking on the cross button.
+     * 'yes' means clicking on the tick or thumbs-up button, 'no' means clicking on the cross or thumbs-down button.
      */
     response: 'yes' | 'no'
   }
+}
+
+/**
+ * User submitted docs feedback from the feedback dock and the request succeeded.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackSubmittedEvent {
+  action: 'docs_feedback_submitted'
+  properties: {
+    /**
+     * Vote attached to the submission: 'yes' is thumbs-up, 'no' is thumbs-down.
+     */
+    response: 'yes' | 'no'
+    /**
+     * Number of page elements the user pinned to the feedback.
+     */
+    pinCount: number
+    /**
+     * Number of images attached to the feedback.
+     */
+    imageCount: number
+    /**
+     * Character length of the comment. The comment text itself is never sent.
+     */
+    commentLength: number
+    /**
+     * Whether the user was signed in when submitting.
+     */
+    isSignedIn: boolean
+  }
+}
+
+/**
+ * User tried to submit docs feedback from the feedback dock and the request failed.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackSubmissionFailedEvent {
+  action: 'docs_feedback_submission_failed'
+  properties: {
+    /**
+     * Vote attached to the failed submission: 'yes' is thumbs-up, 'no' is thumbs-down.
+     */
+    response: 'yes' | 'no'
+    /**
+     * Whether the browser reported being offline when the submission failed.
+     */
+    isOffline: boolean
+  }
+}
+
+/**
+ * User closed the docs feedback dock.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackDockClosedEvent {
+  action: 'docs_feedback_dock_closed'
+  properties: {
+    /**
+     * How the dock closed: 'dismissed' closed it with an empty draft,
+     * 'discarded' confirmed throwing away a non-empty draft, 'after_submit'
+     * closed it after a successful submission.
+     */
+    reason: 'dismissed' | 'discarded' | 'after_submit'
+  }
+}
+
+/**
+ * User pinned a page element to their docs feedback.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackPinAddedEvent {
+  action: 'docs_feedback_pin_added'
+  properties: {
+    /**
+     * Number of pins on the feedback after this one was added.
+     */
+    pinCount: number
+    /**
+     * Role of the pinned element, such as 'heading', 'code' or 'paragraph'. Never the element's text.
+     */
+    elementRole: string
+  }
+}
+
+/**
+ * User removed a pinned page element from their docs feedback.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackPinRemovedEvent {
+  action: 'docs_feedback_pin_removed'
+  properties: {
+    /**
+     * Number of pins on the feedback after this one was removed.
+     */
+    pinCount: number
+  }
+}
+
+/**
+ * User attached images to their docs feedback, by capturing part of the page or
+ * by pasting into the comment. Fires once per capture or paste that adds at least
+ * one image.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackImageAddedEvent {
+  action: 'docs_feedback_image_added'
+  properties: {
+    /**
+     * Number of images on the feedback after this paste or capture.
+     */
+    imageCount: number
+    /**
+     * How the images were attached: 'paste' is the clipboard, 'capture' is a screenshot of
+     * part of the page.
+     */
+    method: 'paste' | 'capture'
+  }
+}
+
+/**
+ * User removed an attached image from their docs feedback.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackImageRemovedEvent {
+  action: 'docs_feedback_image_removed'
+  properties: {
+    /**
+     * Number of images on the feedback after this one was removed.
+     */
+    imageCount: number
+  }
+}
+
+/**
+ * User clicked the bug report link in the docs feedback dock.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackBugReportClickedEvent {
+  action: 'docs_feedback_bug_report_clicked'
 }
 
 export type MarkdownAffordancePageType =
@@ -4355,6 +4512,14 @@ export type TelemetryEvent =
   | AssistantEditInSqlEditorClickedEvent
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
+  | DocsFeedbackSubmittedEvent
+  | DocsFeedbackSubmissionFailedEvent
+  | DocsFeedbackDockClosedEvent
+  | DocsFeedbackPinAddedEvent
+  | DocsFeedbackPinRemovedEvent
+  | DocsFeedbackImageAddedEvent
+  | DocsFeedbackImageRemovedEvent
+  | DocsFeedbackBugReportClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | PreferredSourceClickedEvent
