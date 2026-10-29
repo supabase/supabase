@@ -17,13 +17,17 @@ const PAGE_SIZE = 1000
 const LOOKUP_TIMEOUT_MS = 30_000
 
 /**
+ * After a timed-out lookup, skip new lookups for this long. Otherwise every guide
+ * render during a stall would start a new scan and wait out another timeout.
+ */
+const TIMEOUT_COOLDOWN_MS = 60_000
+
+/**
  * Reads every guide row from `last_changed` and reduces them to one date per
  * page: the newest `last_updated` across that page's section rows.
  */
-async function fetchAllPageDates() {
+async function fetchAllPageDates(signal: AbortSignal) {
   const dates = new Map<string, string>()
-  // One deadline shared by every page, so the total wait is bounded
-  const signal = AbortSignal.timeout(LOOKUP_TIMEOUT_MS)
 
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await supabaseAdmin()
@@ -51,16 +55,26 @@ async function fetchAllPageDates() {
 
 /**
  * Builds map of all pages and then reads from this, so the table is read once per worker
- * rather than once per page. A failed load is not cached, so the next call retries.
+ * rather than once per page. A failed load is not cached, so the next call retries,
+ * except after a timeout, which starts a cooldown before the next attempt.
  */
 let pageDates: Promise<Map<string, string>> | undefined
+let cooldownUntil = 0
 
 function loadPageDates() {
-  pageDates ??= fetchAllPageDates().catch((error) => {
-    Sentry.captureException(error)
-    pageDates = undefined
-    return new Map<string, string>()
-  })
+  if (Date.now() < cooldownUntil) {
+    return Promise.resolve(new Map<string, string>())
+  }
+
+  if (!pageDates) {
+    const signal = AbortSignal.timeout(LOOKUP_TIMEOUT_MS)
+    pageDates = fetchAllPageDates(signal).catch((error) => {
+      Sentry.captureException(error)
+      pageDates = undefined
+      if (signal.aborted) cooldownUntil = Date.now() + TIMEOUT_COOLDOWN_MS
+      return new Map<string, string>()
+    })
+  }
 
   return pageDates
 }

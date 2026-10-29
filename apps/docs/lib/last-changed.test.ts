@@ -155,6 +155,56 @@ describe('getGuideLastUpdated', () => {
     expect(second).toBe(first)
   })
 
+  it('skips new lookups during the cooldown after a timeout', async () => {
+    const controller = new AbortController()
+    vi.spyOn(AbortSignal, 'timeout').mockReturnValueOnce(controller.signal)
+    range.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          controller.signal.addEventListener('abort', () =>
+            resolve({ data: null, error: new Error('aborted') })
+          )
+        })
+    )
+    const getGuideLastUpdated = await loadGetGuideLastUpdated()
+
+    const first = getGuideLastUpdated(['auth'])
+    controller.abort()
+    await first
+
+    expect(await getGuideLastUpdated(['auth'])).toBeUndefined()
+    expect(range).toHaveBeenCalledTimes(1)
+  })
+
+  it('starts a new lookup once the cooldown after a timeout has passed', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    try {
+      const controller = new AbortController()
+      vi.spyOn(AbortSignal, 'timeout').mockReturnValueOnce(controller.signal)
+      range.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            controller.signal.addEventListener('abort', () =>
+              resolve({ data: null, error: new Error('aborted') })
+            )
+          })
+      )
+      range.mockResolvedValueOnce({ data: [], error: null })
+      const getGuideLastUpdated = await loadGetGuideLastUpdated()
+
+      const first = getGuideLastUpdated(['auth'])
+      controller.abort()
+      await first
+
+      vi.setSystemTime(new Date(Date.now() + 60_001))
+      await getGuideLastUpdated(['auth'])
+
+      expect(range).toHaveBeenCalledTimes(2)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('returns undefined and reports the error when the lookup times out', async () => {
     const controller = new AbortController()
     const timeoutSpy = vi.spyOn(AbortSignal, 'timeout').mockReturnValueOnce(controller.signal)
