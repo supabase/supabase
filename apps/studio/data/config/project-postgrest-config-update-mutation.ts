@@ -28,8 +28,8 @@ export async function updateProjectPostgrestConfig({
     db_schema: dbSchema,
     max_rows: maxRows,
     db_extra_search_path: dbExtraSearchPath,
+    db_pool: dbPool,
   }
-  if (dbPool) payload.db_pool = dbPool
 
   const { data, error } = await patch('/platform/projects/{ref}/config/postgrest', {
     params: { path: { ref: projectRef } },
