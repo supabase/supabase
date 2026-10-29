@@ -17,7 +17,7 @@ import {
 import { retrieveUnifiedLogs } from '@/data/logs/get-unified-logs'
 import { getUnifiedLogs } from '@/data/logs/unified-logs-infinite-query'
 import type { UnifiedLogsQueryRow } from '@/data/logs/unified-logs.utils'
-import { customRender } from '@/tests/lib/custom-render'
+import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
 
 type AnalyticsResponse = components['schemas']['AnalyticsResponse_Output']
@@ -260,6 +260,98 @@ describe('UnifiedLogs', () => {
     expect(queries[1]).toContain('LIMIT 100')
     for (const sql of queries)
       expect(sql).toContain("log_attributes['trace_id'] NOT IN ('trace-1')")
+  })
+
+  it.each([
+    ['an excluded log type', '?filter=log_type:neq:postgres', 'storage_logs', 'req.storage_key'],
+    ['a user filter', '?user=user-1', 'auth_logs', 'auth_event.custom_key'],
+  ])('discovers matching source attributes with %s', async (_, searchParams, source, key) => {
+    const user = userEvent.setup()
+    const discoveryQueries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        if (sql.includes('arrayJoin(mapKeys')) discoveryQueries.push(sql)
+        const hasKey = sql.includes('arrayJoin(mapKeys') && sql.includes(`source = '${source}'`)
+        return HttpResponse.json<AnalyticsResponse>({ result: hasKey ? [{ key, n: 1 }] : [] })
+      },
+    })
+    customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      nuqs: { hasMemory: true, searchParams },
+    })
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
+    await user.click(screen.getByTestId('filter-bar-freeform-input'))
+    expect(await screen.findByRole('option', { name: `Attribute: ${key}` })).toBeVisible()
+    expect(discoveryQueries.some((sql) => sql.includes("source = 'postgres_logs'"))).toBe(false)
+  })
+
+  it('restores attribute and date filters when navigating between URLs without remounting', async () => {
+    const requests: { sql: string; iso_timestamp_start: string; iso_timestamp_end: string }[] = []
+    const onUrlUpdate = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        requests.push(
+          z
+            .object({
+              sql: z.string(),
+              iso_timestamp_start: z.string(),
+              iso_timestamp_end: z.string(),
+            })
+            .parse(await request.json())
+        )
+        return HttpResponse.json<AnalyticsResponse>({ result: [] })
+      },
+    })
+    const firstUrl = '?filter=attribute.trace_id:eq:first&date=1778230800000-1778234400000'
+    const secondUrl = '?filter=attribute.trace_id:neq:second&date=1778317200000-1778320800000'
+    let location = firstUrl
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const view = customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      wrapper: ({ children }) => (
+        <CustomWrapper
+          queryClient={queryClient}
+          nuqs={{ hasMemory: true, searchParams: location, onUrlUpdate }}
+        >
+          {children}
+        </CustomWrapper>
+      ),
+    })
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
+    expect(screen.getByTestId('filter-value-attribute.trace_id')).toHaveValue('first')
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    onUrlUpdate.mockClear()
+    location = secondUrl
+    view.rerender(<UnifiedLogs hasFilterSideBar={false} />)
+    await waitFor(() =>
+      expect(screen.getByTestId('filter-value-attribute.trace_id')).toHaveValue('second')
+    )
+    expect(screen.getByTestId<HTMLInputElement>('filter-value-date').value).toContain('09 May')
+    await waitFor(() =>
+      expect(
+        requests.some(
+          ({ sql, iso_timestamp_start }) =>
+            sql.includes("log_attributes['trace_id'] NOT IN ('second')") &&
+            iso_timestamp_start === new Date(1778317200000).toISOString()
+        )
+      ).toBe(true)
+    )
+    location = firstUrl
+    view.rerender(<UnifiedLogs hasFilterSideBar={false} />)
+    await waitFor(() =>
+      expect(screen.getByTestId('filter-value-attribute.trace_id')).toHaveValue('first')
+    )
+    expect(screen.getByTestId<HTMLInputElement>('filter-value-date').value).toContain('08 May')
+    expect(
+      onUrlUpdate.mock.calls.every(
+        ([event]) =>
+          !event.searchParams.get('filter')?.includes('second') ||
+          event.searchParams.get('date') === '1778317200000-1778320800000'
+      )
+    ).toBe(true)
   })
 
   it('keeps loaded logs readable without claiming zero matches when counts fail', async () => {

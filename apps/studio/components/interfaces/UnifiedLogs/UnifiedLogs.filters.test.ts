@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import {
@@ -184,7 +185,7 @@ describe('attribute filter URLs', () => {
         { value: 'date', type: 'timerange' },
       ]
     )
-    expect(parseLogsFilterUrlParams(update.filter as string[])).toEqual([
+    expect(parseLogsFilterUrlParams(z.array(z.string()).nullable().parse(update.filter))).toEqual([
       ...original,
       { column: 'method', operator: '=', value: 'POST' },
     ])
