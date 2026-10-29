@@ -8,7 +8,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type StopPipelineParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
   waitUntilStopped?: boolean
 }
 

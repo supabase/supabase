@@ -18,7 +18,7 @@ import {
 
 import type { GlobalMenuItems } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
-import { useNavItems } from '@/features/IaNav'
+import { useIaNavReady, useNavItems } from '@/features/IaNav'
 
 /**
  * Get TopNav active label based on current pathname
@@ -59,12 +59,18 @@ export const useActiveMenuLabel = (menu: GlobalMenuItems) => {
 
 const GlobalNavigationMenu: FC = () => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
+  const isNavReady = useIaNavReady()
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
   const triggerClassName =
     'h-(--header-height) p-2 bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-light hover:bg-transparent hover:text-foreground data-open:bg-transparent! data-open:text-foreground! focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
 
   return (
-    <div className="flex relative gap-2 justify-start items-end w-full h-full">
+    <div
+      className={cn(
+        'flex relative gap-2 justify-start items-end w-full h-full',
+        !isNavReady && 'invisible noscript:visible'
+      )}
+    >
       <NavigationMenu
         delayDuration={0}
         skipDelayDuration={0}
@@ -120,6 +126,7 @@ const GlobalNavigationMenu: FC = () => {
                                     title={item.label}
                                     community={item.community}
                                     new={item.new}
+                                    experimental={item.experimental}
                                     icon={item.icon}
                                   />
                                 </NavigationMenuLink>
@@ -166,30 +173,37 @@ export const MenuItem = React.forwardRef<
     icon?: string
     community?: boolean
     new?: boolean
+    experimental?: boolean
   }
->(({ className, title, href = '', icon, community, new: isNew, children, ...props }, ref) => {
-  return (
-    <Link
-      href={href}
-      ref={ref}
-      className={cn(
-        'group/menu-item flex items-center gap-2',
-        'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground',
-        className
-      )}
-      {...props}
-    >
-      {children ?? (
-        <>
-          {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
-          <span className="flex-1">{title}</span>
-          {community && <Badge>Community</Badge>}
-          {isNew && <Badge variant="success">New</Badge>}
-        </>
-      )}
-    </Link>
-  )
-})
+>(
+  (
+    { className, title, href = '', icon, community, new: isNew, experimental, children, ...props },
+    ref
+  ) => {
+    return (
+      <Link
+        href={href}
+        ref={ref}
+        className={cn(
+          'group/menu-item flex items-center gap-2',
+          'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground',
+          className
+        )}
+        {...props}
+      >
+        {children ?? (
+          <>
+            {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
+            <span className="flex-1">{title}</span>
+            {community && <Badge>Community</Badge>}
+            {isNew && <Badge variant="success">New</Badge>}
+            {experimental && <Badge variant="warning">Experimental</Badge>}
+          </>
+        )}
+      </Link>
+    )
+  }
+)
 
 GlobalNavigationMenu.displayName = 'GlobalNavigationMenu'
 MenuItem.displayName = 'MenuItem'

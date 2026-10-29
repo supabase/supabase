@@ -46,8 +46,9 @@
     "start": "next start",
     "sync": "tsx --conditions=react-server ./resources/rootSync.ts",
     "test": "pnpm supabase start && pnpm run test:local && pnpm supabase stop",
-    "test:local": "vitest --exclude \"**/*.smoke.test.ts\"",
-    "test:local:unwatch": "vitest --exclude \"**/*.smoke.test.ts\" --run",
+    "test:local": "vitest --exclude \"**/*.smoke.test.ts\" --exclude \"**/*.nav-check.test.ts\"",
+    "test:local:unwatch": "vitest --exclude \"**/*.smoke.test.ts\" --exclude \"**/*.nav-check.test.ts\" --run",
+    "test:nav-checks": "vitest --run nav-check",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
     "typecheck": "tsc --noEmit"
   },

@@ -284,6 +284,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             new: true,
           },
           {
+            label: 'TanStack DB',
+            icon: 'reference-javascript',
+            href: '/reference/tanstack_db' as `/${string}`,
+            level: 'reference_tanstack_db',
+            experimental: true,
+          },
+          {
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
@@ -3317,14 +3324,14 @@ export const reference = {
           enabled: sdkCsharpEnabled,
         },
         {
-          name: 'supbase-python',
+          name: 'supabase-python',
           url: '/reference/python/start',
           level: 'reference_python',
           icon: '/img/icons/menu/reference-python' as `/${string}`,
           enabled: sdkPythonEnabled,
         },
         {
-          name: 'supbase-swift',
+          name: 'supabase-swift',
           url: '/reference/swift/start',
           level: 'reference_swift',
           items: [],
@@ -3400,6 +3407,17 @@ export const reference_middleware_v1 = {
   pkg: {
     name: '@supabase/middleware',
     repo: 'https://github.com/supabase/middleware',
+  },
+}
+
+export const reference_tanstack_db_v1 = {
+  icon: 'reference-javascript',
+  title: 'TanStack DB',
+  url: '/reference/tanstack_db',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase-labs/tanstack-db',
+    repo: 'https://github.com/supabase/tanstack-db',
   },
 }
 

@@ -1,12 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { components } from 'api-types'
 
 import { warehouseKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import { pipelineIdSchema } from '@/data/replication/pipeline-id'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type WarehouseSetupStatusResponse =
-  components['schemas']['WarehouseSetupStatusResponse_Output']
+export type WarehouseSetupStatusResponse = Awaited<ReturnType<typeof getWarehouseSetupStatus>>
 
 type WarehouseSetupStatusVariables = { projectRef?: string }
 
@@ -24,7 +23,11 @@ async function getWarehouseSetupStatus(
     handleError(error)
   }
 
-  return data
+  return {
+    ...data,
+    pipeline_id:
+      data.pipeline_id === undefined ? undefined : pipelineIdSchema.parse(data.pipeline_id),
+  }
 }
 
 export type WarehouseSetupStatusData = Awaited<ReturnType<typeof getWarehouseSetupStatus>>

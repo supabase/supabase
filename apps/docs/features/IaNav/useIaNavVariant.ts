@@ -3,12 +3,7 @@
 import { posthogClient, useConsentState, useFeatureFlags, useSearchParamsShallow } from 'common'
 import { useEffect } from 'react'
 
-import { IA_NAV_FLAG, type IaNavVariant } from './constants'
-
-const VARIANTS: IaNavVariant[] = ['control', 'option-1']
-
-const isVariant = (value: unknown): value is IaNavVariant =>
-  VARIANTS.includes(value as IaNavVariant)
+import { IA_NAV_FLAG, isIaNavVariant as isVariant, type IaNavVariant } from './constants'
 
 /**
  * Reads the `docs-ia-mvp-v1` PostHog experiment flag.
