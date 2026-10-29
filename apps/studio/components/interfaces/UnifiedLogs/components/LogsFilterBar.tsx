@@ -120,7 +120,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     ...parseLogsFilterUrlParams(searchParameters.filter),
     ...(searchParameters.scope?.filters ?? []),
   ].filter(({ column, operator }) => column === 'log_type' && operator === '=')
-  const selectedLogTypes =
+  const selectedLogTypes: readonly string[] =
     logTypes.length > 0 ? logTypes.map(({ value }) => value) : DEFAULT_LOG_TYPES
   const sources = [
     ...new Set(
