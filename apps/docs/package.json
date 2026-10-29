@@ -38,7 +38,7 @@
     "predev": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",
     "preembeddings": "pnpm run codegen:references",
     "preinstall": "npx only-allow pnpm",
-    "preingest:search_v2": "pnpm run build:federated-content && pnpm run build:guides-markdown",
+    "preingest:search_v2": "pnpm run build:federated-content && pnpm run build:guides-markdown && pnpm run codegen:references",
     "presync": "pnpm run codegen:graphql",
     "pretest": "pnpm run codegen:examples",
     "pretypecheck": "pnpm run codegen:graphql && next typegen",
