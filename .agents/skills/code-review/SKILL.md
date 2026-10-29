@@ -9,7 +9,7 @@ description: Review repository changes for correctness, type boundaries, structu
 
 **Read-only assessment:** use for explicit reviews and audits. Resolve the requested PR, branch, commit, or file scope; otherwise inspect current changes against the actual base branch. If neither changes nor a clear target exist, ask for the target. Do not edit, format, mutate source for testing, push, open a PR, or publish review comments. Run only checks compatible with the requested scope.
 
-**Readiness:** use when verifying implementation as part of an authorized development task. Follow [task](../task/SKILL.md) for implementation ownership and delivery scope. Delegate fixes, formatting, and temporary source mutations to the implementation worker when available. Review every later fix and repeat affected checks before claiming readiness.
+**Readiness:** use when verifying implementation. Follow applicable instructions and the user's requested scope. Delegate fixes, formatting, and temporary source mutations to the implementation worker when available. Review every later fix and repeat affected checks before claiming readiness.
 
 Read the applicable [AGENTS.md](../../../AGENTS.md) instructions and domain skills. Inspect the complete diff, stated intent, surrounding code, relevant callers, tests, and available check results. A summary or author report is not a substitute for reading the change.
 
