@@ -40,9 +40,17 @@ export async function createDatabaseQueue({
 
   const { partitionInterval, retentionInterval } = configuration ?? {}
 
+  // pgmq.create_partitioned expects partition_interval / retention_interval as text
+  // (e.g. '10000'), but literal() renders numbers unquoted, producing integers that
+  // fail function resolution. Convert to strings explicitly so quoted text literals
+  // are generated; when unset, fall back to the function defaults.
+  const partitionedArgs =
+    partitionInterval !== undefined && retentionInterval !== undefined
+      ? safeSql`, ${literal(String(partitionInterval))}, ${literal(String(retentionInterval))}`
+      : safeSql``
   const createFragment =
     type === 'partitioned'
-      ? safeSql`select from pgmq.create_partitioned(${literal(name)}, ${literal(partitionInterval)}, ${literal(retentionInterval)});`
+      ? safeSql`select from pgmq.create_partitioned(${literal(name)}${partitionedArgs});`
       : type === 'unlogged'
         ? safeSql`SELECT pgmq.create_unlogged(${literal(name)});`
         : safeSql`SELECT pgmq.create(${literal(name)});`
