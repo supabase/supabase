@@ -4,6 +4,7 @@ import type { WebhookDelivery } from './PlatformWebhooks.types'
 import {
   clearPendingSigningSecretReveal,
   findDeliveryToRetry,
+  getDeliveriesRefetchInterval,
   getPendingSigningSecretReveal,
   resetPendingSigningSecretRevealForTests,
   setPendingSigningSecretReveal,
@@ -185,6 +186,61 @@ describe('PlatformWebhooksPage.utils', () => {
           pageDeliveries: [onPage],
         })
       ).toBeUndefined()
+    })
+  })
+
+  describe('getDeliveriesRefetchInterval', () => {
+    const makeDelivery = (id: string, status: WebhookDelivery['status']): WebhookDelivery => ({
+      id,
+      endpointId,
+      eventId: 'evt_1',
+      eventType: 'v1.project.paused',
+      eventPayload: {},
+      status,
+      responseCode: 200,
+      responseBody: null,
+      responseHeaders: null,
+      attemptAt: '2026-02-27T08:04:00.000Z',
+    })
+    const settled = [makeDelivery('newest', 'success'), makeDelivery('older', 'failure')]
+    const base = {
+      isLive: false,
+      isAwaitingDelivery: false,
+      deliveries: settled,
+    }
+
+    it('does not poll by default', () => {
+      expect(getDeliveriesRefetchInterval(base)).toBe(false)
+    })
+
+    it('polls while Live is on', () => {
+      expect(getDeliveriesRefetchInterval({ ...base, isLive: true })).toBe(5000)
+    })
+
+    it('polls while a delivery is pending', () => {
+      const deliveries = [makeDelivery('newest', 'pending'), ...settled]
+
+      expect(getDeliveriesRefetchInterval({ ...base, deliveries })).toBe(5000)
+    })
+
+    it('polls while waiting for the delivery of a test event or retry', () => {
+      expect(getDeliveriesRefetchInterval({ ...base, isAwaitingDelivery: true })).toBe(5000)
+    })
+
+    it('keeps polling while waiting, even when another delivery is on top of the table', () => {
+      const deliveries = [makeDelivery('unrelated', 'success'), ...settled]
+
+      expect(getDeliveriesRefetchInterval({ ...base, deliveries, isAwaitingDelivery: true })).toBe(
+        5000
+      )
+    })
+
+    it('keeps polling while Live is on or waiting, even with no rows after a failed load', () => {
+      expect(getDeliveriesRefetchInterval({ ...base, isLive: true, deliveries: [] })).toBe(5000)
+      expect(
+        getDeliveriesRefetchInterval({ ...base, isAwaitingDelivery: true, deliveries: [] })
+      ).toBe(5000)
+      expect(getDeliveriesRefetchInterval({ ...base, deliveries: [] })).toBe(false)
     })
   })
 })

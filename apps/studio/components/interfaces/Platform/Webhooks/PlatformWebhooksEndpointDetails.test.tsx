@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps, ReactNode } from 'react'
+import { TooltipProvider } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
@@ -43,6 +44,8 @@ vi.mock('@/components/ui/ButtonTooltip', () => ({
     size: _size,
     tooltip: _tooltip,
     type: _type,
+    loading: _loading,
+    variant: _variant,
     ...props
   }: any) => (
     <button tabIndex={0} type="button" {...props}>
@@ -179,25 +182,29 @@ describe('PlatformWebhooksEndpointDetails', () => {
     props?: Partial<ComponentProps<typeof PlatformWebhooksEndpointDetails>>
   ) =>
     render(
-      <PlatformWebhooksEndpointDetails
-        deliveriesError={null}
-        deliverySearch=""
-        filteredDeliveries={allDeliveries.slice(0, 5)}
-        hasNextPage={false}
-        hasPreviousPage={false}
-        hasRefreshError={false}
-        isLoadingDeliveries={false}
-        isRefetchingDeliveries={false}
-        selectedEndpoint={selectedEndpoint}
-        onCopyUrl={vi.fn()}
-        onDeliverySearchChange={vi.fn()}
-        onNextPage={vi.fn()}
-        onPreviousPage={vi.fn()}
-        onOpenDelivery={vi.fn()}
-        onRefetchDeliveries={vi.fn()}
-        onRetryDelivery={vi.fn()}
-        {...props}
-      />
+      <TooltipProvider>
+        <PlatformWebhooksEndpointDetails
+          deliveriesError={null}
+          deliverySearch=""
+          filteredDeliveries={allDeliveries.slice(0, 5)}
+          hasNextPage={false}
+          hasPreviousPage={false}
+          hasRefreshError={false}
+          isLive={false}
+          isLoadingDeliveries={false}
+          isRefetchingDeliveries={false}
+          selectedEndpoint={selectedEndpoint}
+          onCopyUrl={vi.fn()}
+          onLiveChange={vi.fn()}
+          onDeliverySearchChange={vi.fn()}
+          onNextPage={vi.fn()}
+          onPreviousPage={vi.fn()}
+          onOpenDelivery={vi.fn()}
+          onRefetchDeliveries={vi.fn()}
+          onRetryDelivery={vi.fn()}
+          {...props}
+        />
+      </TooltipProvider>
     )
 
   it('shows every delivery it is given, without slicing them into pages', () => {
@@ -304,6 +311,49 @@ describe('PlatformWebhooksEndpointDetails', () => {
     renderComponent()
 
     expect(screen.queryByText('Unable to refresh deliveries')).not.toBeInTheDocument()
+  })
+
+  it('turns Live on from the toolbar button', async () => {
+    const user = userEvent.setup()
+    const onLiveChange = vi.fn()
+
+    renderComponent({ isLive: false, onLiveChange })
+
+    expect(screen.getByRole('button', { name: 'Live' })).toHaveAttribute('aria-pressed', 'false')
+    await user.click(screen.getByRole('button', { name: 'Live' }))
+    expect(onLiveChange).toHaveBeenCalledWith(true)
+  })
+
+  it('turns Live off from the toolbar button when it is on', async () => {
+    const user = userEvent.setup()
+    const onLiveChange = vi.fn()
+
+    renderComponent({ isLive: true, onLiveChange })
+
+    expect(screen.getByRole('button', { name: 'Live' })).toHaveAttribute('aria-pressed', 'true')
+    await user.click(screen.getByRole('button', { name: 'Live' }))
+    expect(onLiveChange).toHaveBeenCalledWith(false)
+  })
+
+  it('refreshes the deliveries from the Refresh button', async () => {
+    const user = userEvent.setup()
+    const onRefetchDeliveries = vi.fn()
+
+    renderComponent({ onRefetchDeliveries })
+    await user.click(screen.getByRole('button', { name: 'Refresh deliveries' }))
+
+    expect(onRefetchDeliveries).toHaveBeenCalledTimes(1)
+  })
+
+  it('explains on hover that a failed delivery is retried automatically', async () => {
+    const user = userEvent.setup()
+
+    renderComponent()
+    await user.hover(screen.getAllByText('failure')[0])
+
+    expect(
+      await screen.findAllByText(/Failed deliveries are usually retried automatically/)
+    ).not.toHaveLength(0)
   })
 
   it('keeps showing deliveries when a refetch fails after they loaded', () => {
