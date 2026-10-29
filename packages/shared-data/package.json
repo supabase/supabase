@@ -7,10 +7,11 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo"
   },
   "devDependencies": {
-    "tsconfig": "workspace:"
+    "tsconfig": "workspace:",
+    "tsrs": "catalog:"
   },
   "author": "",
   "license": "MIT",

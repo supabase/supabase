@@ -50,7 +50,7 @@
     "test:local:unwatch": "vitest --exclude \"**/*.smoke.test.ts\" --exclude \"**/*.nav-check.test.ts\" --run",
     "test:nav-checks": "vitest --run nav-check",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo"
   },
   "dependencies": {
     "@har-sdk/openapi-sampler": "^2.2.0",
@@ -157,6 +157,7 @@
     "@types/react-dom": "catalog:",
     "@types/unist": "^2.0.6",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "amaro": "^1.1.5",
     "api-types": "workspace:*",
     "cheerio": "^1.0.0-rc.12",

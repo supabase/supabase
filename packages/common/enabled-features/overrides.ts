@@ -1,4 +1,5 @@
-import enabledFeaturesRaw from './enabled-features.json' with { type: 'json' }
+// See index.ts: keep the plain JSON import so TS 7.1 does not type this module as `any`.
+import enabledFeaturesRaw from './enabled-features.json'
 
 const knownFeatureKeys = Object.keys(enabledFeaturesRaw).filter((key) => key !== '$schema')
 
