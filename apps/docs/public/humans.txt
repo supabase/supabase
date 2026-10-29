@@ -255,6 +255,7 @@ Matthias Luft
 Mats Kindahl
 Meg Corren
 Mert Yerekapan
+Michael Zalimeni
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
@@ -326,6 +327,7 @@ Santos Flores de Leon
 Sasi Kanumuri
 Sara Read
 Satya Rohith Gannamanedi
+Satyanarayana Uppada
 Sean Geoghegan
 Sean Oliver
 Sean Romberg

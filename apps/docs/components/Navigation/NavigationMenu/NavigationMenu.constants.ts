@@ -284,6 +284,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             new: true,
           },
           {
+            label: 'TanStack DB',
+            icon: 'reference-javascript',
+            href: '/reference/tanstack_db' as `/${string}`,
+            level: 'reference_tanstack_db',
+            experimental: true,
+          },
+          {
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
@@ -2571,7 +2578,7 @@ export const local_development: NavMenuConstant = {
         { name: 'Database testing', url: '/guides/database/testing' },
         {
           name: 'RLS policies testing',
-          url: '/guides/database/extensions/pgtap#testing-rls-policies' as `/${string}`,
+          url: '/guides/database/postgres/testing-row-level-security',
         },
       ],
     },
@@ -3404,6 +3411,17 @@ export const reference_middleware_v1 = {
   pkg: {
     name: '@supabase/middleware',
     repo: 'https://github.com/supabase/middleware',
+  },
+}
+
+export const reference_tanstack_db_v1 = {
+  icon: 'reference-javascript',
+  title: 'TanStack DB',
+  url: '/reference/tanstack_db',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase-labs/tanstack-db',
+    repo: 'https://github.com/supabase/tanstack-db',
   },
 }
 

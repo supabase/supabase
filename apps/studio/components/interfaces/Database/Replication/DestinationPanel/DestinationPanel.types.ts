@@ -10,7 +10,7 @@ export type FlowDestination = Exclude<DestinationType, 'Analytics Bucket'>
 export type ExistingDestination = {
   sourceId?: number
   destinationId: number
-  pipelineId?: number
+  pipelineId?: string
   enabled: boolean
   statusName?: string
 }

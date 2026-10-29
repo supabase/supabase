@@ -34,7 +34,6 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { DELIVERIES_PAGE_SIZE, PLATFORM_WEBHOOK_EVENT_TYPES } from './PlatformWebhooks.constants'
 import type { WebhookEndpoint, WebhookScope } from './PlatformWebhooks.types'
 import {
-  filterWebhookDeliveries,
   filterWebhookEndpoints,
   generateSigningSecret,
   getTestWebhookEventType,
@@ -57,6 +56,7 @@ import {
   shouldHandleEndpointNotFound,
   shouldRedirectFromWebhooks,
 } from './PlatformWebhooksPage.utils'
+import { useAwaitingDelivery } from './useAwaitingDelivery'
 import {
   useFeaturePreviewContext,
   useIsPlatformWebhooksEnabled,
@@ -117,10 +117,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     'search',
     parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
   )
-  const [deliverySearch, setDeliverySearch] = useQueryState(
-    'deliverySearch',
-    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
-  )
 
   const [endpointIdPendingDelete, setEndpointIdPendingDelete] = useState<string | null>(null)
   const [signingSecretReveal, setSigningSecretReveal] = useState<{ signingSecret: string } | null>(
@@ -132,6 +128,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const [editEnabledOverride, setEditEnabledOverride] = useState<boolean | null>(null)
   const [deliveryDetailsTab, setDeliveryDetailsTab] = useState<'event' | 'response'>('event')
   const [pendingCreatedEndpointId, setPendingCreatedEndpointId] = useState<string | null>(null)
+  const [isLive, setIsLive] = useState(false)
+  const { isAwaitingDelivery, startAwaitingDelivery } = useAwaitingDelivery()
 
   const scopeLabel = scope === 'organization' ? 'Organization Webhooks' : 'Project Webhooks'
   const scopeDescription =
@@ -177,7 +175,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       size: DELIVERIES_PAGE_SIZE + 1,
       after: pageCursors.at(-1),
     },
-    { enabled: queryEnabled && !!selectedEndpoint }
+    { enabled: queryEnabled && !!selectedEndpoint, isLive, isAwaitingDelivery }
   )
   const deliveries = useMemo(
     () => (fetchedDeliveries ?? []).slice(0, DELIVERIES_PAGE_SIZE),
@@ -287,11 +285,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     return filterWebhookEndpoints(endpoints, search)
   }, [endpoints, search])
 
-  const filteredDeliveries = useMemo(() => {
-    if (!selectedEndpoint) return []
-    return filterWebhookDeliveries(deliveries, deliverySearch)
-  }, [deliveries, deliverySearch, selectedEndpoint])
-
   const deliveryEventPayload = useMemo(() => {
     if (!selectedDelivery) return ''
     return JSON.stringify(
@@ -330,7 +323,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     }
     if (endpointPendingDelete.id === endpointId) {
       router.push(webhooksHref)
-      setDeliverySearch('')
     }
     setEndpointIdPendingDelete(null)
     toast.success('Endpoint deleted')
@@ -408,6 +400,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to send webhook test event', error)
       return
     }
+    // A new delivery is newer than every cursor, so it can only show up on the first page
+    setDeliveryPages({ endpointId: selectedEndpoint.id, cursors: [] })
+    startAwaitingDelivery()
     toast.success('Test event sent — check deliveries shortly')
   }
 
@@ -447,6 +442,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to retry webhook delivery', error)
       return
     }
+    startAwaitingDelivery()
     toast.success('Delivery queued for retry')
   }
 
@@ -572,18 +568,18 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 deliveriesError={fetchedDeliveries?.length ? null : deliveriesError}
                 orgSlug={scope === 'organization' ? slug : undefined}
                 projectRef={scope === 'project' ? ref : undefined}
-                deliverySearch={deliverySearch}
-                filteredDeliveries={filteredDeliveries}
+                deliveries={deliveries}
                 hasNextPage={hasNextPage}
                 hasPreviousPage={hasPreviousPage}
                 // The rows are kept when a refresh fails, so tell the user they may be out of date
                 hasRefreshError={!!deliveriesError && !!fetchedDeliveries?.length}
+                isLive={isLive}
                 isLoadingDeliveries={isLoadingDeliveries}
                 isRefetchingDeliveries={isFetchingDeliveries}
+                onLiveChange={setIsLive}
                 onRefetchDeliveries={refetchDeliveries}
                 selectedEndpoint={selectedEndpoint}
                 onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}
-                onDeliverySearchChange={setDeliverySearch}
                 onNextPage={handleNextPage}
                 onPreviousPage={handlePreviousPage}
                 onOpenDelivery={(id) => {

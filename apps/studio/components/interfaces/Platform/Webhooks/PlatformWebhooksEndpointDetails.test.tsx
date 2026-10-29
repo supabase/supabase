@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps, ReactNode } from 'react'
+import { TooltipProvider } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
@@ -43,6 +44,8 @@ vi.mock('@/components/ui/ButtonTooltip', () => ({
     size: _size,
     tooltip: _tooltip,
     type: _type,
+    loading: _loading,
+    variant: _variant,
     ...props
   }: any) => (
     <button tabIndex={0} type="button" {...props}>
@@ -179,25 +182,27 @@ describe('PlatformWebhooksEndpointDetails', () => {
     props?: Partial<ComponentProps<typeof PlatformWebhooksEndpointDetails>>
   ) =>
     render(
-      <PlatformWebhooksEndpointDetails
-        deliveriesError={null}
-        deliverySearch=""
-        filteredDeliveries={allDeliveries.slice(0, 5)}
-        hasNextPage={false}
-        hasPreviousPage={false}
-        hasRefreshError={false}
-        isLoadingDeliveries={false}
-        isRefetchingDeliveries={false}
-        selectedEndpoint={selectedEndpoint}
-        onCopyUrl={vi.fn()}
-        onDeliverySearchChange={vi.fn()}
-        onNextPage={vi.fn()}
-        onPreviousPage={vi.fn()}
-        onOpenDelivery={vi.fn()}
-        onRefetchDeliveries={vi.fn()}
-        onRetryDelivery={vi.fn()}
-        {...props}
-      />
+      <TooltipProvider>
+        <PlatformWebhooksEndpointDetails
+          deliveriesError={null}
+          deliveries={allDeliveries.slice(0, 5)}
+          hasNextPage={false}
+          hasPreviousPage={false}
+          hasRefreshError={false}
+          isLive={false}
+          isLoadingDeliveries={false}
+          isRefetchingDeliveries={false}
+          selectedEndpoint={selectedEndpoint}
+          onCopyUrl={vi.fn()}
+          onLiveChange={vi.fn()}
+          onNextPage={vi.fn()}
+          onPreviousPage={vi.fn()}
+          onOpenDelivery={vi.fn()}
+          onRefetchDeliveries={vi.fn()}
+          onRetryDelivery={vi.fn()}
+          {...props}
+        />
+      </TooltipProvider>
     )
 
   it('shows every delivery it is given, without slicing them into pages', () => {
@@ -228,14 +233,14 @@ describe('PlatformWebhooksEndpointDetails', () => {
     expect(onPreviousPage).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps the pagination controls when search filters the current page to nothing', () => {
-    renderComponent({ filteredDeliveries: [], hasNextPage: true })
+  it('keeps the pagination controls when the current page has no deliveries', () => {
+    renderComponent({ deliveries: [], hasNextPage: true })
 
     expect(screen.getByLabelText('Next page')).toBeEnabled()
   })
 
   it('shows five skeleton rows instead of the empty state while deliveries load', () => {
-    const { container } = renderComponent({ filteredDeliveries: [], isLoadingDeliveries: true })
+    const { container } = renderComponent({ deliveries: [], isLoadingDeliveries: true })
 
     // 5 skeleton rows in the table body plus 1 in the footer
     expect(container.querySelectorAll('.shimmering-loader')).toHaveLength(6)
@@ -245,7 +250,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
   it('shows an error instead of the empty state when deliveries fail to load', () => {
     renderComponent({
-      filteredDeliveries: [],
+      deliveries: [],
       deliveriesError: { message: 'Something went wrong' } as ResponseError,
     })
 
@@ -255,7 +260,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
   it('passes the project to the error so the support link is pre-filled', () => {
     renderComponent({
-      filteredDeliveries: [],
+      deliveries: [],
       deliveriesError: { message: 'Something went wrong' } as ResponseError,
       projectRef: 'abcdefghijklmnopqrst',
     })
@@ -271,7 +276,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
     const onRefetchDeliveries = vi.fn()
 
     renderComponent({
-      filteredDeliveries: [],
+      deliveries: [],
       deliveriesError: { message: 'Something went wrong' } as ResponseError,
       onRefetchDeliveries,
     })
@@ -304,6 +309,49 @@ describe('PlatformWebhooksEndpointDetails', () => {
     renderComponent()
 
     expect(screen.queryByText('Unable to refresh deliveries')).not.toBeInTheDocument()
+  })
+
+  it('turns Live on from the toolbar button', async () => {
+    const user = userEvent.setup()
+    const onLiveChange = vi.fn()
+
+    renderComponent({ isLive: false, onLiveChange })
+
+    expect(screen.getByRole('button', { name: 'Live' })).toHaveAttribute('aria-pressed', 'false')
+    await user.click(screen.getByRole('button', { name: 'Live' }))
+    expect(onLiveChange).toHaveBeenCalledWith(true)
+  })
+
+  it('turns Live off from the toolbar button when it is on', async () => {
+    const user = userEvent.setup()
+    const onLiveChange = vi.fn()
+
+    renderComponent({ isLive: true, onLiveChange })
+
+    expect(screen.getByRole('button', { name: 'Live' })).toHaveAttribute('aria-pressed', 'true')
+    await user.click(screen.getByRole('button', { name: 'Live' }))
+    expect(onLiveChange).toHaveBeenCalledWith(false)
+  })
+
+  it('refreshes the deliveries from the Refresh button', async () => {
+    const user = userEvent.setup()
+    const onRefetchDeliveries = vi.fn()
+
+    renderComponent({ onRefetchDeliveries })
+    await user.click(screen.getByRole('button', { name: 'Refresh deliveries' }))
+
+    expect(onRefetchDeliveries).toHaveBeenCalledTimes(1)
+  })
+
+  it('explains on hover that a failed delivery is retried automatically', async () => {
+    const user = userEvent.setup()
+
+    renderComponent()
+    await user.hover(screen.getAllByText('failure')[0])
+
+    expect(
+      await screen.findAllByText(/Failed deliveries are usually retried automatically/)
+    ).not.toHaveLength(0)
   })
 
   it('keeps showing deliveries when a refetch fails after they loaded', () => {
@@ -340,7 +388,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
       status: 'failure',
     })
 
-    renderComponent({ filteredDeliveries: [pending, finished], onOpenDelivery })
+    renderComponent({ deliveries: [pending, finished], onOpenDelivery })
 
     await user.click(screen.getByText('event.pending'))
     expect(onOpenDelivery).not.toHaveBeenCalled()
@@ -358,7 +406,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
       status: 'pending',
     })
 
-    renderComponent({ filteredDeliveries: [pending], onOpenDelivery })
+    renderComponent({ deliveries: [pending], onOpenDelivery })
 
     screen.getByText('event.pending').closest('tr')?.focus()
     await user.keyboard('{Enter}')
@@ -375,7 +423,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
       status: 'pending',
     })
 
-    renderComponent({ filteredDeliveries: [pending], onRetryDelivery })
+    renderComponent({ deliveries: [pending], onRetryDelivery })
 
     await user.click(screen.getByLabelText('Retry pending-delivery'))
 
@@ -384,7 +432,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
   it('renders a zero response code instead of the placeholder', () => {
     renderComponent({
-      filteredDeliveries: [{ ...allDeliveries[0], id: 'org-delivery-zero', responseCode: 0 }],
+      deliveries: [{ ...allDeliveries[0], id: 'org-delivery-zero', responseCode: 0 }],
     })
 
     expect(screen.getByText('0')).toBeInTheDocument()

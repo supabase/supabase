@@ -2,16 +2,17 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { SearchButton } from './NotFound.client'
-import type { SearchV2Variant } from '@/features/SearchV2/constants'
+import { Recommendations, SearchButton } from './NotFound.client'
 
 const sendTelemetryEvent = vi.fn()
-const setCommandMenuOpen = vi.fn()
-let variant: SearchV2Variant
+const handleDocsSearch = vi.fn()
+const buttonCard = vi.fn((_props: { to: string; title: string; description?: string }) => null)
+let searchState: Record<string, unknown> = { status: 'initial', key: 0 }
 
 vi.mock('@/lib/telemetry', () => ({ useSendTelemetryEvent: () => sendTelemetryEvent }))
-vi.mock('@/features/SearchV2/useSearchV2Variant', () => ({ useSearchV2Variant: () => variant }))
-vi.mock('@/components/ButtonCard', () => ({ default: () => null }))
+vi.mock('@/components/ButtonCard', () => ({
+  default: (props: { to: string; title: string; description?: string }) => buttonCard(props),
+}))
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
   usePathname: () => '/guides/missing',
@@ -23,14 +24,13 @@ vi.mock('next/link', () => ({
   }: React.ComponentProps<'a'> & { prefetch?: boolean }) => <a {...props} />,
 }))
 vi.mock('common', () => ({
-  useDocsSearch: vi.fn(),
   useDocsSearchV2: () => ({
-    searchState: { status: 'initial', key: 0 },
+    searchState,
+    handleDocsSearch,
     handleDocsSearchDebounced: vi.fn(),
     resetSearch: vi.fn(),
   }),
 }))
-vi.mock('ui-patterns/CommandMenu', () => ({ useSetCommandMenuOpen: () => setCommandMenuOpen }))
 vi.mock('ui-patterns/ShimmeringLoader', () => ({ GenericSkeletonLoader: () => null }))
 
 // cmdk and Radix lean on browser APIs jsdom doesn't ship
@@ -44,63 +44,78 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  searchState = { status: 'initial', key: 0 }
   cleanup()
   vi.clearAllMocks()
 })
 
 describe('404 SearchButton', () => {
-  describe('in the control variant', () => {
-    beforeEach(() => {
-      variant = 'control'
-    })
+  it('opens the Search V2 dialog', () => {
+    render(<SearchButton />)
 
-    it('opens the legacy command menu', () => {
-      render(<SearchButton />)
+    fireEvent.click(screen.getByRole('button', { name: 'Search for page' }))
 
-      fireEvent.click(screen.getByRole('button', { name: 'Search for page' }))
+    expect(screen.getByRole('combobox')).toBeTruthy()
+  })
 
-      expect(setCommandMenuOpen).toHaveBeenCalledWith(true)
-      expect(screen.queryByRole('combobox')).toBeNull()
-      expect(sendTelemetryEvent).not.toHaveBeenCalled()
+  it('sends docs_search_v2_opened with not_found_button', () => {
+    render(<SearchButton />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Search for page' }))
+
+    expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_opened',
+      properties: { triggerType: 'not_found_button' },
     })
   })
 
-  describe('in the search-v2-active variant', () => {
-    beforeEach(() => {
-      variant = 'search-v2-active'
-    })
+  it('sends docs_search_v2_closed when the dialog closes', () => {
+    render(<SearchButton />)
+    fireEvent.click(screen.getByRole('button', { name: 'Search for page' }))
+    sendTelemetryEvent.mockClear()
 
-    it('opens the Search V2 dialog instead of the legacy command menu', () => {
-      render(<SearchButton />)
+    fireEvent.keyDown(screen.getByRole('combobox'), { key: 'Escape' })
 
-      fireEvent.click(screen.getByRole('button', { name: 'Search for page' }))
+    expect(screen.queryByRole('combobox')).toBeNull()
+    expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({ action: 'docs_search_v2_closed' })
+  })
+})
 
-      expect(screen.getByRole('combobox')).toBeTruthy()
-      expect(setCommandMenuOpen).not.toHaveBeenCalled()
-    })
+describe('404 Recommendations', () => {
+  it('searches with the words of the missing path', () => {
+    render(<Recommendations />)
 
-    it('sends docs_search_v2_opened with not_found_button', () => {
-      render(<SearchButton />)
+    expect(handleDocsSearch).toHaveBeenCalledWith('missing')
+  })
 
-      fireEvent.click(screen.getByRole('button', { name: 'Search for page' }))
+  it('lists each matching page once', () => {
+    const result = { title: 'Auth', heading: 'Intro', excerpt: 'About auth', headingPath: [] }
+    searchState = {
+      status: 'results',
+      key: 1,
+      query: 'missing',
+      results: [
+        { ...result, path: '/guides/auth', score: 2 },
+        { ...result, path: '/guides/auth', heading: 'Other', score: 1 },
+        { ...result, path: '/guides/auth/jwts', score: 1 },
+      ],
+    }
 
-      expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
-      expect(sendTelemetryEvent).toHaveBeenCalledWith({
-        action: 'docs_search_v2_opened',
-        properties: { triggerType: 'not_found_button' },
-      })
-    })
+    render(<Recommendations />)
 
-    it('sends docs_search_v2_closed when the dialog closes', () => {
-      render(<SearchButton />)
-      fireEvent.click(screen.getByRole('button', { name: 'Search for page' }))
-      sendTelemetryEvent.mockClear()
+    expect(buttonCard.mock.calls.map(([props]) => props.to)).toEqual([
+      '/guides/auth',
+      '/guides/auth/jwts',
+    ])
+  })
 
-      fireEvent.keyDown(screen.getByRole('combobox'), { key: 'Escape' })
+  it('shows a fallback when nothing matches', () => {
+    searchState = { status: 'noResults', key: 1, query: 'missing' }
 
-      expect(screen.queryByRole('combobox')).toBeNull()
-      expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
-      expect(sendTelemetryEvent).toHaveBeenCalledWith({ action: 'docs_search_v2_closed' })
-    })
+    render(<Recommendations />)
+
+    expect(screen.getByText('No recommendations found.')).toBeTruthy()
   })
 })

@@ -95,6 +95,7 @@ const SectionMenuItems = ({
               title={item.label}
               community={item.community}
               new={item.new}
+              experimental={item.experimental}
               icon={item.icon}
             />
           )

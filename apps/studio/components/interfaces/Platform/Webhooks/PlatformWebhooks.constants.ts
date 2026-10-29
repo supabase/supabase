@@ -27,3 +27,5 @@ export const PLATFORM_WEBHOOK_EVENT_TYPES = [
 
 // Rows requested per page of the deliveries table (the API pages by cursor, not page number).
 export const DELIVERIES_PAGE_SIZE = 5
+export const DELIVERIES_POLL_INTERVAL_MS = 5000
+export const AWAITING_DELIVERY_TIMEOUT_MS = 30_000

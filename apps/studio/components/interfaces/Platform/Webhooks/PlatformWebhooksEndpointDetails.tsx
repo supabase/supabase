@@ -1,36 +1,31 @@
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type SortingState,
-} from '@tanstack/react-table'
+import { flexRender, getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CopyIcon,
+  RefreshCwIcon,
   RotateCcwIcon,
-  SearchIcon,
 } from 'lucide-react'
-import { useRef, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import {
   Badge,
   Button,
   Card,
   CardContent,
   CardFooter,
+  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { TanStackTableHeadSort } from 'ui-patterns/Table'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { DELIVERIES_PAGE_SIZE } from './PlatformWebhooks.constants'
@@ -41,9 +36,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { ResponseError } from '@/types'
 
 interface DetailItemProps {
@@ -60,20 +53,20 @@ const DetailItem = ({ label, children, ddClassName = 'text-sm' }: DetailItemProp
 )
 
 interface PlatformWebhooksEndpointDetailsProps {
-  deliverySearch: string
+  deliveries: WebhookDelivery[]
   deliveriesError: ResponseError | null
-  filteredDeliveries: WebhookDelivery[]
   hasNextPage: boolean
   hasPreviousPage: boolean
   hasRefreshError: boolean
+  isLive: boolean
   isLoadingDeliveries: boolean
   isRefetchingDeliveries: boolean
   orgSlug?: string
   projectRef?: string
   selectedEndpoint: WebhookEndpoint
   onCopyUrl: () => void
+  onLiveChange: (isLive: boolean) => void
   onRefetchDeliveries: () => void
-  onDeliverySearchChange: (value: string) => void
   onNextPage: () => void
   onPreviousPage: () => void
   onOpenDelivery: (deliveryId: string) => void
@@ -81,29 +74,37 @@ interface PlatformWebhooksEndpointDetailsProps {
 }
 
 const DELIVERY_ACTIONS_COLUMN_ID = 'actions'
-const DEFAULT_DELIVERY_SORTING: SortingState = [{ id: 'attemptAt', desc: true }]
 
 const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
     accessorKey: 'status',
-    header: ({ column }) => <TanStackTableHeadSort column={column}>Status</TanStackTableHeadSort>,
-    cell: ({ row }) => (
-      <Badge variant={statusBadgeVariant[row.original.status]}>{row.original.status}</Badge>
-    ),
+    header: 'Status',
+    cell: ({ row }) => {
+      const badge = (
+        <Badge variant={statusBadgeVariant[row.original.status]}>{row.original.status}</Badge>
+      )
+      if (row.original.status !== 'failure') return badge
+
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>{badge}</span>
+          </TooltipTrigger>
+          <TooltipContent side="top">
+            Failed deliveries are usually retried automatically with increasing delays.
+          </TooltipContent>
+        </Tooltip>
+      )
+    },
   },
   {
     accessorKey: 'eventType',
-    header: ({ column }) => <TanStackTableHeadSort column={column}>Event</TanStackTableHeadSort>,
+    header: 'Event',
     cell: ({ row }) => <code className="text-xs">{row.original.eventType}</code>,
   },
   {
     accessorKey: 'responseCode',
-    header: ({ column }) => <TanStackTableHeadSort column={column}>Response</TanStackTableHeadSort>,
-    sortingFn: (rowA, rowB, columnId) => {
-      const responseA = rowA.getValue<number | undefined>(columnId) ?? -1
-      const responseB = rowB.getValue<number | undefined>(columnId) ?? -1
-      return responseA - responseB
-    },
+    header: 'Response',
     cell: ({ row }) =>
       row.original.responseCode != null ? (
         <DataTableColumnStatusCode
@@ -117,9 +118,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   },
   {
     accessorKey: 'attemptAt',
-    header: ({ column }) => (
-      <TanStackTableHeadSort column={column}>Attempted</TanStackTableHeadSort>
-    ),
+    header: 'Attempted',
     cell: ({ row }) => (
       <TimestampInfo
         className="text-sm text-foreground-lighter"
@@ -129,7 +128,6 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   },
   {
     id: DELIVERY_ACTIONS_COLUMN_ID,
-    enableSorting: false,
     header: () => <span className="sr-only">Actions</span>,
     cell: ({ row, table }) => {
       const { onRetryDelivery } = table.options.meta as {
@@ -167,20 +165,20 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
 ]
 
 export const PlatformWebhooksEndpointDetails = ({
-  deliverySearch,
+  deliveries,
   deliveriesError,
-  filteredDeliveries,
   hasNextPage,
   hasPreviousPage,
   hasRefreshError,
+  isLive,
   isLoadingDeliveries,
   isRefetchingDeliveries,
   orgSlug,
   projectRef,
   selectedEndpoint,
   onCopyUrl,
+  onLiveChange,
   onRefetchDeliveries,
-  onDeliverySearchChange,
   onNextPage,
   onPreviousPage,
   onOpenDelivery,
@@ -188,22 +186,13 @@ export const PlatformWebhooksEndpointDetails = ({
 }: PlatformWebhooksEndpointDetailsProps) => {
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
   const hasDescription = selectedEndpoint.description.trim().length > 0
-  const deliverySearchRef = useRef<HTMLInputElement>(null)
-  const [sorting, setSorting] = useState<SortingState>(DEFAULT_DELIVERY_SORTING)
-
-  useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, () => deliverySearchRef.current?.focus(), {
-    label: 'Search deliveries',
-  })
 
   const table = useReactTable({
-    data: filteredDeliveries,
+    data: deliveries,
     columns: DELIVERY_COLUMNS,
-    state: { sorting },
     meta: { onRetryDelivery },
     getRowId: (row) => row.id,
-    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
   })
 
   const deliveryRows = table.getRowModel().rows
@@ -281,18 +270,41 @@ export const PlatformWebhooksEndpointDetails = ({
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-foreground text-xl">Deliveries</h2>
         <div className="flex items-center justify-between gap-2">
-          <Input
-            ref={deliverySearchRef}
-            placeholder="Search deliveries"
-            size="tiny"
-            icon={<SearchIcon />}
-            value={deliverySearch}
-            className="w-full lg:w-52"
-            onChange={(event) => onDeliverySearchChange(event.target.value)}
-            onKeyDown={onSearchInputEscape(deliverySearch, onDeliverySearchChange)}
-          />
+          <h2 className="text-foreground text-xl">Deliveries</h2>
+          <div className="flex items-center gap-2">
+            <ButtonTooltip
+              size="tiny"
+              variant={isLive ? 'primary' : 'default'}
+              aria-pressed={isLive}
+              icon={
+                <span
+                  className={cn(
+                    'size-2 rounded-full',
+                    isLive ? 'bg-brand-400 animate-pulse' : 'bg-foreground-muted'
+                  )}
+                />
+              }
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: isLive ? 'Stop refreshing automatically' : 'Refresh automatically',
+                },
+              }}
+              onClick={() => onLiveChange(!isLive)}
+            >
+              Live
+            </ButtonTooltip>
+            <ButtonTooltip
+              size="tiny"
+              className="w-7"
+              icon={<RefreshCwIcon />}
+              loading={isRefetchingDeliveries}
+              aria-label="Refresh deliveries"
+              tooltip={{ content: { side: 'top', text: 'Refresh' } }}
+              onClick={onRefetchDeliveries}
+            />
+          </div>
         </div>
         {hasRefreshError && (
           <Admonition
@@ -309,22 +321,10 @@ export const PlatformWebhooksEndpointDetails = ({
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
-                    const columnId = header.column.id
-                    const sort = header.column.getIsSorted()
-
                     return (
                       <TableHead
                         key={header.id}
-                        aria-sort={
-                          header.column.getCanSort()
-                            ? sort === 'asc'
-                              ? 'ascending'
-                              : sort === 'desc'
-                                ? 'descending'
-                                : 'none'
-                            : undefined
-                        }
-                        className={columnId === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1' : ''}
+                        className={header.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1' : ''}
                       >
                         {header.isPlaceholder
                           ? null
@@ -396,7 +396,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   <TableCell colSpan={DELIVERY_COLUMNS.length}>
                     <p className="text-sm text-foreground">No deliveries found</p>
                     <p className="text-sm text-foreground-lighter">
-                      Try adjusting your search to see more webhook attempts.
+                      Webhook attempts will show up here once this endpoint receives events.
                     </p>
                   </TableCell>
                 </TableRow>

@@ -63,10 +63,6 @@ describe('Option 1 navigation', () => {
           'Map team members to Postgres roles',
           '/guides/platform/temporary-access#configure-user-access',
         ],
-        [
-          'Test RLS policies with pgTAP',
-          '/guides/local-development/testing/overview#database-unit-testing-with-pgtap',
-        ],
       ])
     )
   })

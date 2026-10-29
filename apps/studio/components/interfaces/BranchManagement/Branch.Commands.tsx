@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import { ForwardIcon, GitBranchIcon, PlusIcon } from 'lucide-react'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
@@ -6,7 +5,6 @@ import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-p
 import { COMMAND_MENU_SECTIONS } from '../App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from '../App/CommandMenu/ordering'
 import { branchesQueryOptions } from '@/data/branches/branches-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -22,13 +20,12 @@ export function useBranchCommands() {
   const ref = selectedProject?.ref || '_'
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
-  const { can: canCreateBranches } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'preview_branches',
-    { resource: { is_default: false } }
-  )
-
   const parentProjectRef = selectedProject?.parent_project_ref || selectedProject?.ref
+  const createBranchGrant = useGrant('POST /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  const canCreateBranches = createBranchGrant.status === 'granted'
+
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: parentProjectRef,
   })
