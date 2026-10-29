@@ -95,6 +95,7 @@ export const FileExplorerRowEditing = ({
       id={getExplorerRowId(columnIndex, itemIndex)}
       role="option"
       aria-selected={false}
+      aria-label={item.name}
       style={style}
       className="storage-row flex items-center justify-between rounded-sm bg-gray-500"
     >
