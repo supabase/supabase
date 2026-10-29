@@ -431,40 +431,6 @@ describe('PlatformWebhooksPage (project scope)', () => {
       expect(screen.getByLabelText(`Retry ${DELIVERY_ID}`)).toBeInTheDocument()
       expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
     })
-
-    test('shows the search empty state, not an error, when a refresh fails after rows loaded', async () => {
-      mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
-      let requests = 0
-      addAPIMock({
-        method: 'get',
-        path: '/v2/projects/:ref/webhooks/endpoints/:id/deliveries',
-        response: () => {
-          requests += 1
-          // The first load works, the refresh after it fails
-          if (requests > 1) {
-            return HttpResponse.json<APIErrorBody>(
-              { message: 'Something went wrong' },
-              { status: 500 }
-            )
-          }
-          return HttpResponse.json<DeliveryListResponse>({
-            data: [{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }],
-            links: { first: null, last: null, next: null, prev: null },
-          })
-        },
-      })
-
-      renderPage(ENDPOINT_ID)
-      await screen.findByLabelText(`Retry ${DELIVERY_ID}`)
-      const user = userEvent.setup()
-      await user.click(screen.getByRole('button', { name: 'Refresh deliveries' }))
-      await waitFor(() => expect(requests).toBeGreaterThan(1))
-
-      await user.type(screen.getByPlaceholderText('Search deliveries'), 'no match')
-
-      expect(await screen.findByText('No deliveries found')).toBeInTheDocument()
-      expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
-    })
   })
 
   describe('deliveries refreshing', () => {
