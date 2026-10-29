@@ -11,7 +11,8 @@ To enable X / Twitter Auth for your project, you need to set up an X OAuth 2.0 a
 <Admonition type="caution">
 
 We recommend using the **X / Twitter (OAuth 2.0)** provider. The legacy **Twitter (OAuth 1.0a)**
-provider will be deprecated in future releases.
+provider will be deprecated in future releases. If your app already uses the legacy provider, see
+[Migrate from Twitter (OAuth 1.0a)](#migrate-from-twitter-oauth-10a) before switching.
 
 </Admonition>
 
@@ -236,6 +237,56 @@ await supabase.Auth.SignOut();
 </TabPanel>
 </$Show>
 </Tabs>
+
+## Migrate from Twitter (OAuth 1.0a) [#migrate-from-twitter-oauth-10a]
+
+Supabase Auth treats the legacy `twitter` provider and the `x` provider as separate providers. When an existing `twitter` user signs in with `x` for the first time, the new `x` identity is attached to their account only through [automatic linking](/docs/guides/auth/auth-identity-linking#automatic-linking), which matches identities by email address. The X user ID isn't compared.
+
+<Admonition type="caution">
+
+If a user changed the email address on their X account after signing up with `twitter`, the emails no longer match. Their first `x` sign-in creates a new, separate user. Later sign-ins use the new `x` identity, so the user keeps landing in the duplicate account.
+
+</Admonition>
+
+To migrate existing users without creating duplicates:
+
+1. Keep both the **Twitter (OAuth 1.0a)** and **X / Twitter (OAuth 2.0)** providers enabled during the migration.
+2. Enable [manual linking](/docs/guides/auth/auth-identity-linking#manual-linking-beta) for your project.
+3. While a user is still signed in with their `twitter` identity, link their `x` identity to the same account. Manual linking doesn't require the email addresses to match:
+
+   ```js
+   import { createClient } from '@supabase/supabase-js'
+
+   const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
+
+   // ---cut---
+   async function linkXIdentity() {
+     const { data, error } = await supabase.auth.getUserIdentities()
+     if (error) return
+
+     const hasX = data.identities.some((identity) => identity.provider === 'x')
+     if (!hasX) {
+       await supabase.auth.linkIdentity({ provider: 'x' })
+     }
+   }
+   ```
+
+4. Switch your sign-in code to `provider: 'x'` once your active users have linked their `x` identity.
+
+To check for users that were already duplicated, find `twitter` and `x` identities that share a `provider_id` but belong to different users:
+
+```sql
+select
+  twitter.provider_id,
+  twitter.user_id as twitter_user_id,
+  x.user_id as x_user_id
+from
+  auth.identities as twitter
+  join auth.identities as x on x.provider_id = twitter.provider_id and x.provider = 'x'
+where twitter.provider = 'twitter' and x.user_id != twitter.user_id;
+```
+
+How you merge each pair depends on your application data. For example, you can move any data created by the duplicate user to the original user, delete the duplicate user, and have the user link their `x` identity again from the original account.
 
 ## Resources
 
