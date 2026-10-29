@@ -30,6 +30,11 @@ const ABBREV_TO_OPERATOR: Record<string, LogsFilterOperator> = {
   notilike: '!~~*',
 }
 
+export const logAttributeFilterId = (key: string) => `attribute.${key}`
+
+export const getLogAttributeKey = (id: string): string | undefined =>
+  id.startsWith('attribute.') ? id.slice('attribute.'.length) : undefined
+
 export const isLogsFilterColumnValue = (value: unknown): value is LogsColumnFilterValue => {
   return (
     typeof value === 'object' &&
@@ -47,19 +52,27 @@ export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[]
     const [column, abbrev, ...rest] = raw.split(':')
     const operator = ABBREV_TO_OPERATOR[abbrev]
     if (!column || !operator) continue
-    parsed.push({ column, operator, value: rest.join(':') })
+    try {
+      const decodedColumn = column.startsWith('attribute.') ? decodeURIComponent(column) : column
+      parsed.push({ column: decodedColumn, operator, value: rest.join(':') })
+    } catch {
+      continue
+    }
   }
   return parsed
 }
 
 export const logsFiltersToUrlParams = (filters: LogsFilter[]): string[] => {
-  return filters.map((f) => `${f.column}:${OPERATOR_TO_ABBREV[f.operator]}:${f.value}`)
+  return filters.map(
+    (f) =>
+      `${f.column.startsWith('attribute.') ? encodeURIComponent(f.column) : f.column}:${OPERATOR_TO_ABBREV[f.operator]}:${f.value}`
+  )
 }
 
 export const groupLogsFiltersByColumn = (
   filters: LogsFilter[]
 ): Record<string, LogsColumnFilterValue> => {
-  const grouped: Record<string, LogsColumnFilterValue> = {}
+  const grouped: Record<string, LogsColumnFilterValue> = Object.create(null)
   for (const { column, operator, value } of filters) {
     const existing = grouped[column]
     if (!existing) {
@@ -120,11 +133,11 @@ export const buildFilterSearchUpdate = (
   columnFilters: { id: string; value: unknown }[],
   filterFields: { value: string; type: string }[]
 ): Record<string, unknown> => {
-  const filterableNames = new Set(
-    filterFields.filter((field) => field.type !== 'timerange').map((field) => field.value)
+  const timerangeNames = new Set(
+    filterFields.filter((field) => field.type === 'timerange').map((field) => field.value)
   )
   const filterEntries = logsFiltersToUrlParams(
-    columnFiltersToLogsFilters(columnFilters, filterableNames)
+    columnFiltersToLogsFilters(columnFilters.filter(({ id }) => !timerangeNames.has(id)))
   )
   const update: Record<string, unknown> = {
     filter: filterEntries.length > 0 ? filterEntries : null,
