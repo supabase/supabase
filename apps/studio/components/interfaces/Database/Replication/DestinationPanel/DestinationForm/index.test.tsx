@@ -33,7 +33,7 @@ const existingBatch = {
 
 const existingDestination = {
   destinationId: 7,
-  pipelineId: 8,
+  pipelineId: '8',
   enabled: true,
   statusName: 'started',
 }
