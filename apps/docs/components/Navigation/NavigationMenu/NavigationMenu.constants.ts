@@ -2636,6 +2636,10 @@ export const security: NavMenuConstant = {
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
+        {
+          name: 'Rotate a leaked API key',
+          url: '/guides/security/rotate-leaked-api-keys',
+        },
       ],
     },
   ],

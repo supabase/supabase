@@ -135,7 +135,7 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
         {
           name: 'Rotate a leaked API key',
-          url: '/guides/getting-started/api-keys#leaked-key',
+          url: '/guides/security/rotate-leaked-api-keys',
         },
         {
           name: 'Production security checklist',
