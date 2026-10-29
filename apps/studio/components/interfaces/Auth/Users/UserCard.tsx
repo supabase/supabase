@@ -24,7 +24,7 @@ export function UserCard({
   className,
 }: UserCardProps) {
   const primaryLabel = getUserPrimaryLabel(user)
-  const hasDisplayName = !!getDisplayName(user, '')
+  const hasDisplayName = !!getDisplayName(user, '').trim()
   const secondaryLabel = hasDisplayName ? (user.email ?? user.phone) : undefined
   const initials = getUserInitials(user)
 

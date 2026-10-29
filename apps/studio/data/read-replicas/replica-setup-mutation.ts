@@ -24,7 +24,6 @@ export type Region =
 export type ReadReplicaSetUpVariables = {
   projectRef: string
   region: Region
-  size: string // Not used in API yet, purely for UI atm
 }
 
 export async function setUpReadReplica({ projectRef, region }: ReadReplicaSetUpVariables) {

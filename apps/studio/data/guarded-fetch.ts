@@ -37,8 +37,16 @@ export const unguarded = {
 
 type GrantForVariant<K extends FgaGuardedEndpoint, V> = V extends VariantOf<K> ? Grant<K, V> : never
 
-/** The grants a call to endpoint `K` accepts: a plain grant or a grant for any of its variants. */
-type AcceptedGrant<K extends FgaGuardedEndpoint> = Grant<K> | GrantForVariant<K, VariantOf<K>>
+type IsVariantRequired<K extends string> = FgaRefinements extends {
+  readonly [X in K]: { readonly variantRequired: true }
+}
+  ? true
+  : false
+
+/** The grants a call to endpoint `K` accepts: a grant for any of its variants, or a plain grant unless a variant is required. */
+type AcceptedGrant<K extends FgaGuardedEndpoint> =
+  | (IsVariantRequired<K> extends true ? never : Grant<K>)
+  | GrantForVariant<K, VariantOf<K>>
 
 type OwnedQueryKeys<K extends string> = FgaRefinements extends {
   readonly [X in K]: { readonly ownedQuery: infer O }
@@ -187,6 +195,9 @@ export function assertGrant(endpoint: string, grant: unknown, init: RefinableIni
   }
 
   const refinement = getRefinement(endpoint)
+  if (grant.variant === undefined && refinement?.variantRequired) {
+    throw new GrantAssertionError(endpoint, 'grant needs a variant')
+  }
   if (grant.variant !== undefined && !refinement?.variants[grant.variant]) {
     throw new GrantAssertionError(endpoint, `unknown variant '${grant.variant}'`)
   }

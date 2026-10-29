@@ -31,7 +31,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-import { PLATFORM_WEBHOOK_EVENT_TYPES } from './PlatformWebhooks.constants'
+import { DELIVERIES_PAGE_SIZE, PLATFORM_WEBHOOK_EVENT_TYPES } from './PlatformWebhooks.constants'
 import type { WebhookEndpoint, WebhookScope } from './PlatformWebhooks.types'
 import {
   filterWebhookDeliveries,
@@ -51,11 +51,13 @@ import {
 import { PlatformWebhooksHeader } from './PlatformWebhooksHeader'
 import {
   clearPendingSigningSecretReveal,
+  findDeliveryToRetry,
   getPendingSigningSecretReveal,
   setPendingSigningSecretReveal,
   shouldHandleEndpointNotFound,
   shouldRedirectFromWebhooks,
 } from './PlatformWebhooksPage.utils'
+import { useAwaitingDelivery } from './useAwaitingDelivery'
 import {
   useFeaturePreviewContext,
   useIsPlatformWebhooksEnabled,
@@ -131,6 +133,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const [editEnabledOverride, setEditEnabledOverride] = useState<boolean | null>(null)
   const [deliveryDetailsTab, setDeliveryDetailsTab] = useState<'event' | 'response'>('event')
   const [pendingCreatedEndpointId, setPendingCreatedEndpointId] = useState<string | null>(null)
+  const [isLive, setIsLive] = useState(false)
+  const { isAwaitingDelivery, startAwaitingDelivery } = useAwaitingDelivery()
 
   const scopeLabel = scope === 'organization' ? 'Organization Webhooks' : 'Project Webhooks'
   const scopeDescription =
@@ -153,10 +157,57 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     () => endpoints.find((endpoint) => endpoint.id === endpointId) ?? null,
     [endpoints, endpointId]
   )
-  const { data: deliveries = [] } = useWebhookDeliveriesQuery(
-    { scope: apiScope, endpointId: selectedEndpoint?.id ?? '' },
-    { enabled: queryEnabled && !!selectedEndpoint }
+  // `cursors` lists the `after` cursor of every page we moved forward to, so page 1 is `[]` and the
+  // last entry is the page on screen. It is stored with its endpoint, so after switching endpoints
+  // we fall back to page 1 instead of sending another endpoint's cursors.
+  const [deliveryPages, setDeliveryPages] = useState<{ endpointId: string; cursors: string[] }>({
+    endpointId: '',
+    cursors: [],
+  })
+  const pageCursors = deliveryPages.endpointId === selectedEndpoint?.id ? deliveryPages.cursors : []
+
+  // One extra row is requested only to learn whether a next page exists. It is never shown.
+  const {
+    data: fetchedDeliveries,
+    error: deliveriesError,
+    isLoading: isLoadingDeliveries,
+    isFetching: isFetchingDeliveries,
+    refetch: refetchDeliveries,
+  } = useWebhookDeliveriesQuery(
+    {
+      scope: apiScope,
+      endpointId: selectedEndpoint?.id ?? '',
+      size: DELIVERIES_PAGE_SIZE + 1,
+      after: pageCursors.at(-1),
+    },
+    { enabled: queryEnabled && !!selectedEndpoint, isLive, isAwaitingDelivery }
   )
+  const deliveries = useMemo(
+    () => (fetchedDeliveries ?? []).slice(0, DELIVERIES_PAGE_SIZE),
+    [fetchedDeliveries]
+  )
+  const hasNextPage = (fetchedDeliveries?.length ?? 0) > DELIVERIES_PAGE_SIZE
+  const hasPreviousPage = pageCursors.length > 0
+
+  const handleNextPage = () => {
+    const lastDeliveryId = deliveries.at(-1)?.id
+    if (!selectedEndpoint || !lastDeliveryId) return
+
+    setDeliveryPages({
+      endpointId: selectedEndpoint.id,
+      cursors: [...pageCursors, lastDeliveryId],
+    })
+  }
+
+  const handlePreviousPage = () => {
+    if (!selectedEndpoint) return
+
+    setDeliveryPages({
+      endpointId: selectedEndpoint.id,
+      cursors: pageCursors.slice(0, -1),
+    })
+  }
+
   const {
     data: selectedDelivery = null,
     isSuccess: isSelectedDeliveryLoaded,
@@ -243,15 +294,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     if (!selectedEndpoint) return []
     return filterWebhookDeliveries(deliveries, deliverySearch)
   }, [deliveries, deliverySearch, selectedEndpoint])
-
-  const deliveryAttempt = useMemo(() => {
-    if (!selectedDelivery) return null
-    const sortedDeliveries = [...deliveries].sort(
-      (a, b) => new Date(b.attemptAt).getTime() - new Date(a.attemptAt).getTime()
-    )
-    const index = sortedDeliveries.findIndex((delivery) => delivery.id === selectedDelivery.id)
-    return index >= 0 ? index + 1 : null
-  }, [deliveries, selectedDelivery])
 
   const deliveryEventPayload = useMemo(() => {
     if (!selectedDelivery) return ''
@@ -369,6 +411,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to send webhook test event', error)
       return
     }
+    // A new delivery is newer than every cursor, so it can only show up on the first page
+    setDeliveryPages({ endpointId: selectedEndpoint.id, cursors: [] })
+    startAwaitingDelivery()
     toast.success('Test event sent — check deliveries shortly')
   }
 
@@ -391,7 +436,11 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
   const handleRetryDelivery = async (deliveryId: string) => {
     if (!selectedEndpoint) return
-    const delivery = deliveries.find((item) => item.id === deliveryId)
+    const delivery = findDeliveryToRetry({
+      deliveryId,
+      selectedDelivery,
+      pageDeliveries: deliveries,
+    })
     if (!delivery || delivery.status === 'success') return
 
     try {
@@ -404,6 +453,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to retry webhook delivery', error)
       return
     }
+    startAwaitingDelivery()
     toast.success('Delivery queued for retry')
   }
 
@@ -525,11 +575,26 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
               />
             ) : (
               <PlatformWebhooksEndpointDetails
+                // A failed refresh keeps the loaded rows, so only report errors when there are none
+                deliveriesError={fetchedDeliveries?.length ? null : deliveriesError}
+                orgSlug={scope === 'organization' ? slug : undefined}
+                projectRef={scope === 'project' ? ref : undefined}
                 deliverySearch={deliverySearch}
                 filteredDeliveries={filteredDeliveries}
+                hasNextPage={hasNextPage}
+                hasPreviousPage={hasPreviousPage}
+                // The rows are kept when a refresh fails, so tell the user they may be out of date
+                hasRefreshError={!!deliveriesError && !!fetchedDeliveries?.length}
+                isLive={isLive}
+                isLoadingDeliveries={isLoadingDeliveries}
+                isRefetchingDeliveries={isFetchingDeliveries}
+                onLiveChange={setIsLive}
+                onRefetchDeliveries={refetchDeliveries}
                 selectedEndpoint={selectedEndpoint}
                 onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}
                 onDeliverySearchChange={setDeliverySearch}
+                onNextPage={handleNextPage}
+                onPreviousPage={handlePreviousPage}
                 onOpenDelivery={(id) => {
                   setDeliveryDetailsTab('event')
                   setDeliveryId(id)
@@ -542,7 +607,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       </PageContainer>
 
       <PlatformWebhooksDeliveryDetailsSheet
-        deliveryAttempt={deliveryAttempt}
         deliveryDetailsTab={deliveryDetailsTab}
         deliveryEventPayload={deliveryEventPayload}
         deliveryResponsePayload={deliveryResponsePayload}

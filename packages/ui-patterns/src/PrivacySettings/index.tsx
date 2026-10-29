@@ -1,6 +1,6 @@
 'use client'
 
-import { useConsentState } from 'common'
+import { useConsentState } from 'common/consent-state'
 import Link from 'next/link'
 import { PropsWithChildren, useState } from 'react'
 import {

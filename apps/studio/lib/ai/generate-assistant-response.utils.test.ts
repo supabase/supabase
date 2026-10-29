@@ -1,4 +1,4 @@
-import type { ModelMessage, ToolUIPart, UIMessage } from 'ai'
+import { convertToModelMessages, type ModelMessage, type ToolUIPart, type UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -141,6 +141,41 @@ describe('prepareMessagesForModel', () => {
         output: { id: 'notebook-1', name: 'Signup funnel' },
       }),
     ])
+  })
+
+  it('replays a self-hosted chat with legacy tool parts into model messages', async () => {
+    const rows = [
+      { data: { definitions: [{ id: 16384, sql: 'CREATE TABLE public.todos (id bigint)' }] } },
+    ]
+    const messages = [
+      assistantMessage([
+        toolPart({ type: 'tool-getSchemaTables', toolCallId: 'c1', output: rows }),
+        toolPart({ type: 'tool-getFunctions', toolCallId: 'c2', output: 'Function: add' }),
+        toolPart({ type: 'tool-getRlsKnowledge', toolCallId: 'c3', output: 42 }),
+        toolPart({ type: 'tool-getEdgeFunctionKnowledge', toolCallId: 'c4', output: 'Guidance' }),
+      ]),
+    ]
+
+    const outputs = async (level: 'disabled' | 'schema') => {
+      const prepared = prepareMessagesForModel(messages, level)
+      const modelMessages = await convertToModelMessages(prepared)
+      return modelMessages
+        .filter((message) => message.role === 'tool')
+        .flatMap((message) => message.content)
+        .flatMap((content) => (content.type === 'tool-result' ? [content.output] : []))
+    }
+
+    expect(await outputs('schema')).toEqual([
+      { type: 'json', value: rows },
+      { type: 'text', value: 'Function: add' },
+      { type: 'text', value: expect.stringContaining('could not be read') },
+      { type: 'text', value: 'Guidance' },
+    ])
+
+    const hidden = await outputs('disabled')
+    expect(hidden[0]).toEqual({ type: 'text', value: expect.stringContaining('`schema`') })
+    expect(hidden[1]).toEqual(hidden[0])
+    expect(hidden[3]).toEqual({ type: 'text', value: 'Guidance' })
   })
 
   it('keeps non-tool parts untouched', () => {

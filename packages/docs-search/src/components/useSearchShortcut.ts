@@ -13,10 +13,10 @@ export function useSearchShortcut(onTrigger: () => void) {
       const usesPrimaryModifier = event.metaKey || event.ctrlKey
       const otherModifiersActive = event.altKey || event.shiftKey
 
-      if (event.key === 'k' && usesPrimaryModifier && !otherModifiersActive) {
+      if (event.key?.toLowerCase() === 'k' && usesPrimaryModifier && !otherModifiersActive) {
         event.stopImmediatePropagation()
         event.preventDefault()
-        onTrigger()
+        if (!event.repeat) onTrigger()
       }
     }
 

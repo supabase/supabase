@@ -202,7 +202,7 @@ describe('UnifiedLogs', () => {
     )
     const log: UnifiedLogsQueryRow = {
       id: 'function-log',
-      log_type: 'edge function',
+      log_type: 'edge function runtime',
       timestamp: Date.now() * 1000,
       event_message: 'Function started',
       level: 'success',

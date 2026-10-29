@@ -13,13 +13,18 @@ import { FeaturePreviewContextProvider } from '@/components/interfaces/App/Featu
 import type { User } from '@/data/auth/users-infinite-query'
 import { miscKeys } from '@/data/misc/keys'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import { NO_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
 import { createMockProfile, createMockProfileContext } from '@/tests/lib/profile-helpers'
 
 const mockUser: User = {
   id: '11111111-1111-1111-1111-111111111111',
   email: 'user@example.com',
   providers: ['email'],
+  created_at: '2026-01-01T12:00:00Z',
+  raw_user_meta_data: { locale: 'en', preferences: { theme: 'dark' } },
+  raw_app_meta_data: { providers: ['email'] },
 }
 
 vi.unmock('common')
@@ -30,9 +35,6 @@ const removeRouteParser = routerMock.useParser(
 )
 afterAll(removeRouteParser)
 
-vi.mock('./UserOverview', () => ({
-  UserOverview: () => <div data-testid="user-overview" />,
-}))
 vi.mock('./UserLogs', () => ({
   UserLogs: () => <div data-testid="user-logs" />,
 }))
@@ -42,6 +44,12 @@ const renderPanel = (
   { otel = false, unifiedLogs = false }: { otel?: boolean | null; unifiedLogs?: boolean } = {}
 ) => {
   localStorage.setItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, JSON.stringify(unifiedLogs))
+  mockPermissions(NO_PERMISSIONS)
+  addAPIMock({
+    method: 'get',
+    path: '/platform/auth/:ref/config',
+    response: () => HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 403 }),
+  })
   addAPIMock({
     method: 'get',
     path: '/platform/projects/:ref',
@@ -122,17 +130,24 @@ describe('UserPanel', () => {
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  it('identifies the user and copies their complete JSON from the Raw JSON tab', async () => {
+  it('copies overview fields and complete raw JSON from the selected user', async () => {
     const user = userEvent.setup()
     const copy = vi.spyOn(navigator.clipboard, 'writeText')
     const { queryClient } = renderPanel()
-    expect(await screen.findByText('user@example.com')).toBeInTheDocument()
+    expect(
+      await screen.findByRole('button', { name: 'Email user@example.com' })
+    ).toBeInTheDocument()
+    const emailField = screen.getByRole('button', { name: 'Email user@example.com' })
+    emailField.focus()
+    await user.keyboard('{Enter}')
+    await user.click(await screen.findByRole('menuitem', { name: 'Copy Email' }))
+    expect(copy).toHaveBeenLastCalledWith(mockUser.email)
     expect(screen.getByText('U')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Close panel' })).toBeInTheDocument()
     await user.click(screen.getByRole('tab', { name: 'Raw JSON' }))
     await user.click(await screen.findByRole('button', { name: 'Copy user as JSON' }))
-    expect(copy).toHaveBeenCalledOnce()
-    expect(JSON.parse(copy.mock.calls[0][0])).toEqual(mockUser)
+    expect(copy).toHaveBeenCalledTimes(2)
+    expect(JSON.parse(copy.mock.calls[1][0])).toEqual(mockUser)
     expect(screen.queryByPlaceholderText('Filter...')).not.toBeInTheDocument()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })

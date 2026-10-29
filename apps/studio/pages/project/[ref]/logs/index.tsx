@@ -8,6 +8,7 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ProjectLayout } from '@/components/layouts/ProjectLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { withAuth } from '@/hooks/misc/withAuth'
 import type { NextPageWithLayout } from '@/types'
 
 export const LogPage: NextPageWithLayout = () => {
@@ -51,4 +52,4 @@ export const LogPage: NextPageWithLayout = () => {
 // chain under TanStack since the shell already supplies one.
 LogPage.getLayout = (page) => <DefaultLayout>{page}</DefaultLayout>
 
-export default LogPage
+export default withAuth(LogPage)

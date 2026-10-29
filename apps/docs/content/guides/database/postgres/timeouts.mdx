@@ -5,7 +5,7 @@ subtitle: Extend database timeouts to execute longer transactions
 
 <Admonition type="note">
 
-Dashboard and [Client](/docs/guides/api/rest/client-libs) queries have a max-configurable timeout of 60 seconds. For longer transactions, use [Supavisor or direct connections](/docs/guides/database/connecting-to-postgres#choose-a-connection-method).
+Dashboard and [Client](/docs/guides/api/rest/client-libs) queries have a max-configurable timeout of 60 seconds. For longer transactions, use [the shared pooler or direct connections](/docs/guides/database/connecting-to-postgres#choose-a-connection-method).
 
 </Admonition>
 
@@ -28,7 +28,7 @@ Set the session timeout by running:
 set statement_timeout = '10min';
 ```
 
-Because it applies to sessions only, it can only be used with connections through Supavisor in session mode (port 5432) or a direct connection. It cannot be used in the Dashboard, with the Supabase Client API, nor with Supavisor in Transaction mode (port 6543).
+Because it applies to sessions only, it can only be used with connections through the shared pooler in session mode (port 5432) or a direct connection. It cannot be used in the Dashboard, with the Supabase Client API, nor with Supavisor in Transaction mode (port 6543).
 
 This is most often used for single, long running, administrative tasks, such as creating an HSNW index. Once the setting is implemented, you can view it by executing:
 
