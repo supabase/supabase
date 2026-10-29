@@ -6,15 +6,15 @@ take. Each entry leads with when the component is warranted, then its syntax.
 "Component" means the MDX components the docs app provides, such as `<Admonition>` and
 `<Tabs>`. "Element" means a plain Markdown construct, such as a list or a heading.
 
-| If you're deciding                                                   | Read                                          |
-| -------------------------------------------------------------------- | --------------------------------------------- |
-| Which form the information should take                               | [Choosing a component](#choosing-a-component) |
-| How to handle admonitions, accordions, emphasis, headings, and lists | [Text](#text)                                 |
-| How to write steps, code, and tabs                                   | [Steps and code](#steps-and-code)             |
-| How to show structured data or a diagram                             | [Data and diagrams](#data-and-diagrams)       |
-| How to add an image or a video                                       | [Media](#media)                               |
-| How to link out or list related pages                                | [Navigation](#navigation)                     |
-| Which constructs to leave out                                        | [Don't use these](#dont-use-these)            |
+| If you're deciding                                       | Read                                          |
+| -------------------------------------------------------- | --------------------------------------------- |
+| Which form the information should take                   | [Choosing a component](#choosing-a-component) |
+| How to handle admonitions, emphasis, headings, and lists | [Text](#text)                                 |
+| How to write steps, code, and tabs                       | [Steps and code](#steps-and-code)             |
+| How to show structured data or a diagram                 | [Data and diagrams](#data-and-diagrams)       |
+| How to add an image or a video                           | [Media](#media)                               |
+| How to link out or list related pages                    | [Navigation](#navigation)                     |
+| Which constructs to leave out                            | [Don't use these](#dont-use-these)            |
 
 ## Choosing a component
 
@@ -88,48 +88,6 @@ Structure an admonition with these props:
 Your content here
 
 </Admonition>
-```
-
-Leave a blank line between the admonition tags and the content inside them. This stops
-Prettier from breaking the lines of the content. The `type` value is one of `danger`,
-`deprecation`, `caution`, or `note`:
-
-```mdx
-<Admonition type="danger">
-
-This could lead to data loss.
-
-</Admonition>
-```
-
-### Accordions
-
-#### Use an accordion for content that most readers can skip
-
-An accordion hides optional detail behind a header, so the main flow stays short. Don't
-hide information that the reader needs to finish the task. Give each item a
-unique `id`.
-
-```mdx
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-  <AccordionItem header="Accordion item 1" id="item-1">
-
-Your content here.
-
-  </AccordionItem>
-
-  <AccordionItem header="Accordion item 2" id="item-2">
-
-More content here.
-
-  </AccordionItem>
-</Accordion>
 ```
 
 ### Emphasis
@@ -272,56 +230,6 @@ Paste this standard snippet before the SQL block:
 Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 ```
 
-#### Use `StepHike` for step-by-step tutorials
-
-Tutorials that pair each step with code use the `StepHikeCompact` pattern. Put the
-explanation in `Details` and the code in `Code`. Set `fullWidth` on a step that has no
-code. Leave a blank line inside each tag.
-
-````mdx
-<StepHikeCompact>
-
-  <StepHikeCompact.Step step={1}>
-
-    <StepHikeCompact.Details title="The first step">
-
-    Explanation of what to do first.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```sql
-      select ...
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={2}>
-
-    <StepHikeCompact.Details title="No code in this step" fullWidth>
-
-    Explanation of what to do next. This text stretches the full width of the section.
-
-    </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
-
-</StepHikeCompact>
-````
-
-#### Show project values with `ProjectConfigVariables`
-
-When a guide asks the reader to copy the project URL or a key, show the value inline.
-The reader sees their own value when they are signed in.
-
-```mdx
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishable" />
-```
-
 ### Code blocks
 
 #### Keep code lines short so the reader doesn't scroll
@@ -351,118 +259,6 @@ Optionally highlight lines with `mark=${lineNumber}`:
 
 ```
 ````
-
-Name a file with `name=` as an alternative to the filename shorthand:
-
-````md
-```js name=file.js
-const PI = 3.14
-```
-````
-
-#### Include code from a source file with `$CodeSample`
-
-Use `<$CodeSample />` to include code from a file instead of pasting it. This keeps the
-sample in step with code that is tested elsewhere.
-
-If the file is in the `examples` directory of the `supabase/supabase` repository:
-
-<!-- prettier-ignore -->
-```mdx
-<$CodeSample
-path="/relative/path/from/examples/directory.js"
-{/* Array of [start, end] line numbers to include.
-Line numbers are 1-indexed and inclusive.
--1 indicates the final line. */}
-lines={[[1, 3], [5, -1]]}
-{/* Optional, displays as a file name on the code block */}
-meta="name=display/path.js"
-{/* Optional, strips TypeScript types to produce JavaScript, which you also include with another <CodeSample /> */}
-convertToJs={true}
-/>
-```
-
-If the file is in another GitHub repository:
-
-```mdx
-<$CodeSample
-external={true}
-org="supabase"
-repo="cli"
-commit="1623aa9b95ec90e21c5bae5a0d50dcf272abe92f"
-path="/relative/path/from/root.js"
-lines={[[1, 3], [5, -1]]}
-meta="name=display/path.js"
-convertToJs={true}
-/>
-```
-
-The repository must be public, the organization must be on the allow list, and the
-commit must be an immutable SHA. Don't use a mutable tag or a branch name.
-
-#### Convert TypeScript to JavaScript with `convertToJs`
-
-Set `convertToJs` to show a JavaScript sample from a TypeScript source file:
-
-```mdx
-<$CodeSample
-path="/path/to/typescript-file.ts"
-lines={[[1, -1]]}
-convertToJs={true}
-/>
-```
-
-The conversion does the following:
-
-- Removes all TypeScript type annotations, interfaces, and type definitions.
-- Changes the language identifier from `typescript` to `javascript`, or from `tsx` to `jsx`.
-- Runs before any line selection or elision.
-- Defaults to `false`, which keeps the TypeScript code.
-
-#### Group multi-file samples with `$CodeTabs`
-
-Wrap several code blocks in `<$CodeTabs>` to show one sample that spans files. Each
-block appears in its own tab. Leave a blank line inside the tags.
-
-````mdx
-<$CodeTabs>
-
-```js name=a.js
-console.log('Hello, world!')
-```
-
-```js name=b.js
-console.log('Goodbye, world!')
-```
-
-</$CodeTabs>
-````
-
-#### Use type hints in JavaScript and TypeScript blocks
-
-JavaScript and TypeScript code blocks show type hints when the reader hovers over a
-symbol. The whole code block must be a valid TypeScript compilation target. If a
-variable is undefined or an import is missing, the block shows no hints.
-
-To define variables or imports that the reader doesn't need to see, add statements
-above a `// ---cut---` line. The docs hide everything above the line but still use it
-to compute the hints. For example, import the `supabase-js` library above the cut:
-
-````mdx
-```js
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient('dummy', 'client')
-
-// ---cut---
-const result = supabase.auth.signInWithPassword({
-  email: 'test@example.com',
-  password: 'test1234',
-})
-```
-````
-
-In this example, the reader can hover over `signInWithPassword` to see the hint.
 
 ### Tabs
 
@@ -571,27 +367,6 @@ A dashboard control that's hard to describe in words is the usual case. Upload i
 Use `.svg` for vector illustrations and `.png` for screenshots and other non-vector
 graphics. Supported browsers receive `.webp` versions automatically.
 
-Include an image with standard Markdown syntax:
-
-```mdx
-![Supabase architectural diagram](/docs/img/supabase-architecture.svg)
-```
-
-If the image has separate light and dark versions, or if the reader should be able to
-zoom it, use the `Image` component:
-
-```mdx
-<Image
-  alt="Supabase architectural diagram"
-  src={{
-    dark: '/docs/img/supabase-architecture.svg',
-    light: '/docs/img/supabase-architecture--light.svg',
-  }}
-  width={1600}
-  height={767}
-/>
-```
-
 #### Redact sensitive information
 
 Remove API keys and any other secret visible in a screenshot before you upload it.
@@ -615,20 +390,6 @@ it has no other source.
 #### Don't use an image of text, code, or terminal output
 
 Use real text, which can be read aloud, searched, copied, and translated.
-
-### Icons
-
-#### Use an icon component only when the page needs one
-
-Use an icon component inline, for example to show a status. Style it with
-[Tailwind](https://tailwindcss.com/) classes. Don't use an icon in place of a label.
-See [Name a control by its label](#name-a-control-by-its-label).
-
-```mdx
-<IconArrowDown />
-<IconCheck />
-<IconX />
-```
 
 ### Videos
 

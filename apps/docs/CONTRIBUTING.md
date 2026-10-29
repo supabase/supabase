@@ -108,20 +108,6 @@ To merge anyway:
 2. Add the `skip-anchor-check` label to the PR.
 3. Wait for the check to rerun. It passes and lists the broken links as warnings.
 
-## Move or rename a page
-
-When you move, rename, or delete a page, add a permanent redirect so that existing links keep working. Also update the page's entry in [`NavigationMenu.constants.ts`](https://github.com/supabase/supabase/blob/master/apps/docs/components/Navigation/NavigationMenu/NavigationMenu.constants.ts).
-
-Docs redirects live in [`apps/docs/lib/redirects`](./lib/redirects/README.md). Use full public paths that include the `/docs` prefix. Add a one-to-one mapping to `static-redirects.json`:
-
-```json
-{ "source": "/docs/guides/old-path", "destination": "/docs/guides/new-path", "permanent": true }
-```
-
-Use `dynamic-redirects.js` for rules with params, splats, regex, or conditions. Don't add `.md` variants for `/docs/guides/` entries by hand, because the build generates them. The [redirects README](./lib/redirects/README.md) has the full steps and the checks to run.
-
-Most redirects live in that folder. A few older ones live in [`apps/www/lib/redirects.js`](../www/lib/redirects.js). Where the same source appears in both places, the `www` rule wins. The `redirects()` function in `next.config.mjs` reads `dynamic-redirects.js`. Its dev and preview redirects (`/`, `/dashboard/*`, and `/blog/*`) sit in a separate section at the end of that file.
-
 ## Reference structure
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
@@ -158,28 +144,6 @@ If you're a library maintainer, follow these steps when updating function parame
 If you copy the same content multiple times across different files, create a **partial** for content reuse instead. Partials are MDX files contained in [`apps/docs/content/_partials`](https://github.com/supabase/supabase/tree/master/apps/docs/content/_partials). They contain reusable snippets that can be inserted in multiple pages. For example, you can create a partial to define a common setup step for a group of tutorials.
 
 To use a partial, import it into your MDX file. You can also set up a partial to automatically import by including it in the `components` within [`apps/docs/features/docs/MdxBase.shared.tsx`](https://github.com/supabase/supabase/blob/master/apps/docs/features/docs/MdxBase.shared.tsx).
-
-To make a partial:
-
-1. Make a new MDX file in `apps/docs/content/_partials`.
-2. Write the reusable content.
-3. Use the partial in any other MDX file with `<$Partial path="path/from/_partials/directory.mdx" />`.
-
-For example, `<$Partial path="database_setup.mdx" />` and `<$Partial path="create_client_snippet.mdx" />` are commonly used partials.
-
-If you need compile-time variable replacement, pass strings with the `variables` prop:
-
-```mdx
-<$Partial path="path/to/file.mdx" variables={{ "substitute": "this" }} />
-```
-
-In the partial, mark where the value goes:
-
-```mdx
-Here is the partial text to {{ .substitute }}.
-```
-
-Only string replacements work. For more complex use cases, make a custom component.
 
 ## Content listings
 
