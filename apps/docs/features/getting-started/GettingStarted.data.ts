@@ -79,6 +79,7 @@ export const EXPLORE_ITEMS: ExploreItem[] = [
     description: 'Run TypeScript close to your users, for webhooks, emails, and AI calls.',
     href: '/guides/functions/quickstart',
     shape: 'Edge Functions',
+    shapeClassName: 'origin-left scale-75',
   },
 ]
 
