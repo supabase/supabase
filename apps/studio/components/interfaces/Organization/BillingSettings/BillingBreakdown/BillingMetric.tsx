@@ -90,11 +90,6 @@ export const BillingMetric = ({
               <div className="group flex items-center gap-1">
                 <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer items-center">
                   <span>{metric.name}</span>
-                  {isLogMetricOnNonPlatformPlan && (
-                    <Badge className="ml-2" variant={'warning'}>
-                      Upcoming
-                    </Badge>
-                  )}
                 </p>
                 {usageMeta.available_in_plan && (
                   <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">

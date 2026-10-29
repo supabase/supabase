@@ -412,7 +412,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           description:
             subscription?.plan.id === 'platform'
               ? 'Total amount of logs queried across all projects.\nBilling is based on the total amount of logs queried in Gigabyte.'
-              : "Total amount of logs queried across all projects.\nLogs Query usage isn't billed directly. Instead, your organization gets a log query allowance that scales with how much log data you ingest. The allowance covers the volume of log data scanned when you read logs through the Studio UI, the Management API, the CLI, or any other interface.\nEnforcement starts after the grace period ends in early 2027.",
+              : "Total amount of logs queried across all projects.\nLogs Query usage isn't billed directly. Instead, your organization gets a log query allowance that scales with how much log data you ingest. The allowance covers the volume of log data scanned when you read logs through the Studio UI, the Management API, the CLI, or any other interface.\nAn enforcement timeline will be announced at a future date before it will take effect.",
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
