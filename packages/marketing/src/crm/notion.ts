@@ -129,14 +129,33 @@ export class NotionClient {
   }
 }
 
+/** Notion rejects rich text objects whose content is longer than 2,000 characters. */
+const NOTION_RICH_TEXT_MAX_LENGTH = 2000
+
+/** Splits a string across as many rich text objects as needed to stay under Notion's limit. */
+function toRichText(str: string): Array<{ text: { content: string } }> {
+  const chunks: Array<{ text: { content: string } }> = []
+  let content = ''
+  // Iterate by code point so a chunk boundary never splits a surrogate pair.
+  for (const char of str) {
+    if (content.length + char.length > NOTION_RICH_TEXT_MAX_LENGTH) {
+      chunks.push({ text: { content } })
+      content = ''
+    }
+    content += char
+  }
+  if (content) chunks.push({ text: { content } })
+  return chunks
+}
+
 function encodePropertyValue(type: string, value: unknown): unknown {
   const str = typeof value === 'string' ? value : String(value)
 
   switch (type) {
     case 'title':
-      return { title: [{ text: { content: str } }] }
+      return { title: toRichText(str) }
     case 'rich_text':
-      return { rich_text: [{ text: { content: str } }] }
+      return { rich_text: toRichText(str) }
     case 'email':
       return { email: str }
     case 'phone_number':
@@ -163,6 +182,6 @@ function encodePropertyValue(type: string, value: unknown): unknown {
           .filter((o) => o.name),
       }
     default:
-      return { rich_text: [{ text: { content: str } }] }
+      return { rich_text: toRichText(str) }
   }
 }
