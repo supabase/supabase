@@ -85,14 +85,16 @@ const timelineRows: (UnifiedLogsQueryRow & { source: string })[] = [
 function PanelHarness({
   scope,
   row = gatewayLog,
+  onSelectRow,
 }: {
   scope?: UnifiedLogsScope
   row?: ColumnSchema
+  onSelectRow?: (id: string) => void
 }) {
   const [searchParameters] = useQueryStates(SEARCH_PARAMS_PARSER)
   const { columns } = generateDynamicColumns({ data: [row] })
   const table = useReactTable({
-    data: [row],
+    data: onSelectRow ? [row, { ...row, id: 'next-log' }] : [row],
     columns,
     getRowId: (row) => row.id,
     getCoreRowModel: getCoreRowModel(),
@@ -107,6 +109,8 @@ function PanelHarness({
       isLoading={false}
       isFetching={false}
       isLoadingCounts={false}
+      openRowId={row.id}
+      onSelectRow={onSelectRow}
     >
       <ResizablePanelGroup orientation="horizontal">
         <ServiceFlowPanel
@@ -127,11 +131,13 @@ function renderPanel(
     flag = true,
     timezone,
     selectedLog,
+    onSelectRow,
   }: {
     scope?: UnifiedLogsScope
     flag?: boolean | null
     timezone?: string
     selectedLog?: ColumnSchema
+    onSelectRow?: (id: string) => void
   } = {}
 ) {
   const queries: string[] = []
@@ -192,7 +198,7 @@ function renderPanel(
     >
       <FeaturePreviewContextProvider>
         <TimezoneProvider>
-          <PanelHarness scope={scope} row={selectedLog} />
+          <PanelHarness scope={scope} row={selectedLog} onSelectRow={onSelectRow} />
         </TimezoneProvider>
       </FeaturePreviewContextProvider>
     </FeatureFlagContext.Provider>,
@@ -344,6 +350,35 @@ describe('request timeline tab', () => {
     await user.click(screen.getByRole('tab', { name: 'User' }))
     expect(await screen.findAllByText('opened@example.com')).toHaveLength(2)
     expect(screen.queryByText('initial@example.com')).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+  it('copies the user ID with arrow keys without navigating away from the log', async () => {
+    const user = userEvent.setup()
+    const copy = vi.spyOn(navigator.clipboard, 'writeText')
+    const userId = '11111111-1111-4111-8111-111111111111'
+    const onSelectRow = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () => HttpResponse.json<User[]>([{ id: userId, providers: ['email'] }]),
+    })
+    const { queryClient } = renderPanel(timelineRows, {
+      selectedLog: { ...gatewayLog, auth_user: userId },
+      onSelectRow,
+    })
+    await user.click(screen.getByRole('tab', { name: 'User' }))
+    const field = await screen.findByRole('button', { name: `User ID ${userId}` })
+    field.focus()
+    await user.keyboard('{Enter}')
+    expect(await screen.findByRole('menuitem', { name: 'Add filter' })).toHaveFocus()
+    await user.keyboard('{ArrowDown}')
+    expect(screen.getByRole('menuitem', { name: 'Copy User ID' })).toHaveFocus()
+    expect(onSelectRow).not.toHaveBeenCalled()
+    await user.keyboard('{Enter}')
+    expect(copy).toHaveBeenCalledWith(userId)
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    await user.keyboard('{ArrowDown}')
+    expect(onSelectRow).toHaveBeenCalledWith('next-log', { shiftKey: false })
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 })
