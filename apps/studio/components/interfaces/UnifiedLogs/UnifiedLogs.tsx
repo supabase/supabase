@@ -394,7 +394,12 @@ export const UnifiedLogs = ({
   }, [facets, offeredFilters, queryLogTypeVisibility])
 
   const applyFilterSearch = () => {
-    const update = buildFilterSearchUpdate(columnFilters, filterFields)
+    const offeredColumnFilters = columnFilters.filter(
+      ({ id }) =>
+        !defaultFilterFields.some((field) => field.value === id) ||
+        isOfferedFilter(id, offeredFilters)
+    )
+    const update = buildFilterSearchUpdate(offeredColumnFilters, filterFields)
     if (Array.isArray(update.filter)) {
       update.filter = gateLogTypeFilters(update.filter.map(String), queryLogTypeVisibility)
     }

@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { UnifiedLogs } from './UnifiedLogs'
-import { createUnifiedLogsSearch } from './UnifiedLogs.utils'
+import { createUnifiedLogsSearch, serializeUnifiedLogsSearchParams } from './UnifiedLogs.utils'
 import {
   EDGE_FUNCTION_LOGS_VIEW,
   getEdgeFunctionLogsScope,
@@ -141,6 +141,51 @@ describe('UnifiedLogs', () => {
       expect(sql).toContain("log_attributes['function_id'] IN ('fn-123')")
       expect(sql).toContain("source = 'function_logs'")
     }
+  })
+
+  it('removes unavailable builtins from function URLs while preserving attributes and resource scope', async () => {
+    const queries: string[] = []
+    const onUrlUpdate = vi.fn()
+    const filters = [
+      'status:eq:500',
+      'level:eq:error',
+      'attribute.status:eq:runtime-status',
+      'request_id:eq:req-123',
+      'function_id:eq:fn-123',
+      'log_type:eq:edge function runtime',
+    ]
+    const date = [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')]
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        queries.push(z.object({ sql: z.string() }).parse(await request.json()).sql)
+        return HttpResponse.json<AnalyticsResponse>({ result: [] })
+      },
+    })
+    customRender(
+      <UnifiedLogs scope={FUNCTION_SCOPE} hasFilterSideBar={false} {...EDGE_FUNCTION_LOGS_VIEW} />,
+      {
+        nuqs: {
+          hasMemory: true,
+          onUrlUpdate,
+          searchParams: serializeUnifiedLogsSearchParams('', { filter: filters, date }),
+        },
+      }
+    )
+    await waitFor(() => {
+      const update = onUrlUpdate.mock.lastCall?.[0]
+      expect(update?.searchParams.get('filter')).toBe(filters.slice(1).join(','))
+      expect(update?.searchParams.get('date')).toBe(`${date[0].getTime()}-${date[1].getTime()}`)
+    })
+    await waitFor(() => {
+      const rowQuery = queries.filter((sql) => sql.includes('row list')).at(-1)
+      expect(rowQuery).toContain("log_attributes['status'] IN ('runtime-status')")
+      expect(rowQuery).toContain("log_attributes['request_id'] IN ('req-123')")
+      expect(rowQuery).toContain("log_attributes['function_id'] IN ('fn-123')")
+      expect(rowQuery).toContain("source = 'function_logs'")
+      expect(rowQuery).not.toContain("IN ('500')")
+    })
   })
 
   it('discovers attributes after opening the picker and applies manual keys across requests', async () => {
