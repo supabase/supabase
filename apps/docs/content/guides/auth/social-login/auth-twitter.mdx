@@ -275,10 +275,15 @@ To migrate existing users without creating duplicates:
      }
 
      if (twitterIdentity && xIdentity.id !== twitterIdentity.id) {
+       // Remove the wrong X account so it can't sign in to this user.
+       const { error: unlinkError } = await supabase.auth.unlinkIdentity(xIdentity)
+       if (unlinkError) throw unlinkError
        throw new Error('The linked X account does not match the original Twitter account.')
      }
    }
    ```
+
+   If the user returns from X with an error, for example because that X account is already linked to another user, don't call `linkXIdentity()` again. Use the query below to find the other user.
 
 4. Switch your sign-in code to `provider: 'x'` once most active users have linked their `x` identity. Keep a way to sign in with `twitter` for users who haven't linked yet, so they can complete step 3 instead of creating a new user.
 
