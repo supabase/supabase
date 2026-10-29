@@ -683,7 +683,7 @@ export const getRequestCorrelationIds = (
         if (typeof value !== 'string' || !pattern.test(value) || ZERO_ID_PATTERN.test(value)) {
           continue
         }
-        if (isLegacyRequest && source === 'auth_logs' && UUID_PATTERN.test(value)) continue
+        if (isLegacyRequest && UUID_PATTERN.test(value)) continue
         ids.add(value)
       }
     }
