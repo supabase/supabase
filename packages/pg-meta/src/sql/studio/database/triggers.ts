@@ -3,6 +3,7 @@ import {
   joinSqlFragments,
   keyword,
   literal,
+  rawSql,
   safeSql,
   type SafeSqlFragment,
 } from '../../../pg-format'
@@ -56,7 +57,15 @@ export function getDatabaseTriggerUpdateSQL({
   // FOR EACH STATEMENT triggers to FOR EACH ROW and strips conditional
   // triggers of their condition.
   const triggerOrientation = orientation ?? originalTrigger.orientation
-  const triggerCondition = condition ? safeSql` WHEN (${condition})` : safeSql``
+  // An omitted condition keeps the original WHEN condition; an explicitly
+  // passed one (including an empty fragment) wins. The original condition is
+  // a raw expression string from introspection, so it crosses the fragment
+  // trust boundary via rawSql.
+  const originalCondition = originalTrigger.condition
+    ? rawSql(originalTrigger.condition)
+    : undefined
+  const effectiveCondition = condition !== undefined ? condition : originalCondition
+  const triggerCondition = effectiveCondition ? safeSql` WHEN (${effectiveCondition})` : safeSql``
   return safeSql`BEGIN;
 DROP TRIGGER ${ident(originalTrigger.name)} ON ${ident(originalTrigger.schema)}.${ident(originalTrigger.table)};
 CREATE TRIGGER ${ident(name)} ${keyword(activation)} ${eventsList} ON ${ident(schema)}.${ident(table)}
