@@ -24,7 +24,32 @@ test('partitioned queues pass the intervals as text literals', async () => {
     configuration: { partitionInterval: 10000, retentionInterval: 100000 },
   })
 
-  expect(capturedSql()).toContain("pgmq.create_partitioned('q', '10000', '100000')")
+  expect(capturedSql()).toContain(
+    "pgmq.create_partitioned('q', partition_interval => '10000', retention_interval => '100000')"
+  )
+})
+
+test('partitioned queues keep a single supplied interval', async () => {
+  await createDatabaseQueue({
+    projectRef: 'ref',
+    name: 'q',
+    type: 'partitioned',
+    enableRls: false,
+    configuration: { retentionInterval: 100000 },
+  })
+
+  expect(capturedSql()).toContain("pgmq.create_partitioned('q', retention_interval => '100000')")
+})
+
+test('partitioned queues without intervals use the function defaults', async () => {
+  await createDatabaseQueue({
+    projectRef: 'ref',
+    name: 'q',
+    type: 'partitioned',
+    enableRls: false,
+  })
+
+  expect(capturedSql()).toContain("pgmq.create_partitioned('q')")
 })
 
 test('basic queues use pgmq.create', async () => {
