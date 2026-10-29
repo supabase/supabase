@@ -244,7 +244,7 @@ Supabase Auth treats the legacy `twitter` provider and the `x` provider as separ
 
 <Admonition type="caution">
 
-If a user changed the email address on their X account after signing up with `twitter`, the emails no longer match. Their first `x` sign-in creates a new, separate user. Later sign-ins use the new `x` identity, so the user keeps landing in the duplicate account.
+If a user changed the email address on their X account after signing up with `twitter`, the emails no longer match. Their first `x` sign-in creates a new, separate user, or links the `x` identity to a different existing user that already has the new email address. Later sign-ins use the `x` identity, so the user keeps landing in the wrong account.
 
 </Admonition>
 
@@ -252,7 +252,7 @@ To migrate existing users without creating duplicates:
 
 1. Keep both the **Twitter (OAuth 1.0a)** and **X / Twitter (OAuth 2.0)** providers enabled during the migration.
 2. Enable [manual linking](/docs/guides/auth/auth-identity-linking#manual-linking-beta) for your project.
-3. While a user is still signed in with their `twitter` identity, link their `x` identity to the same account. Manual linking doesn't require the email addresses to match:
+3. While a user is still signed in with their `twitter` identity, link their `x` identity to the same account. Manual linking doesn't require the email addresses to match. After the user returns from X, check that they authorized the same X account. The `id` of each identity is the X user ID, so both identities must have the same `id`:
 
    ```js
    import { createClient } from '@supabase/supabase-js'
@@ -262,18 +262,27 @@ To migrate existing users without creating duplicates:
    // ---cut---
    async function linkXIdentity() {
      const { data, error } = await supabase.auth.getUserIdentities()
-     if (error) return
+     if (error) throw error
 
-     const hasX = data.identities.some((identity) => identity.provider === 'x')
-     if (!hasX) {
-       await supabase.auth.linkIdentity({ provider: 'x' })
+     const twitterIdentity = data.identities.find((identity) => identity.provider === 'twitter')
+     const xIdentity = data.identities.find((identity) => identity.provider === 'x')
+
+     if (!xIdentity) {
+       // Redirects the user to X. Call linkXIdentity() again after they return.
+       const { error: linkError } = await supabase.auth.linkIdentity({ provider: 'x' })
+       if (linkError) throw linkError
+       return
+     }
+
+     if (twitterIdentity && xIdentity.id !== twitterIdentity.id) {
+       throw new Error('The linked X account does not match the original Twitter account.')
      }
    }
    ```
 
-4. Switch your sign-in code to `provider: 'x'` once your active users have linked their `x` identity.
+4. Switch your sign-in code to `provider: 'x'` once most active users have linked their `x` identity. Keep a way to sign in with `twitter` for users who haven't linked yet, so they can complete step 3 instead of creating a new user.
 
-To check for users that were already duplicated, find `twitter` and `x` identities that share a `provider_id` but belong to different users:
+To check for users that were already affected, find `twitter` and `x` identities that share a `provider_id` but belong to different users. Run this query again after you switch sign-in to `x`:
 
 ```sql
 select
@@ -286,7 +295,7 @@ from
 where twitter.provider = 'twitter' and x.user_id != twitter.user_id;
 ```
 
-How you merge each pair depends on your application data. For example, you can move any data created by the duplicate user to the original user, delete the duplicate user, and have the user link their `x` identity again from the original account.
+How you resolve each pair depends on your application data. The user that holds the `x` identity might be an account the person created separately with the same email, so confirm before you merge or delete anything. Before you delete a user, check its other identities and MFA factors so the person doesn't lose a way to sign in. For example, you can move any data created by the duplicate user to the original user, delete the duplicate user, and have the user link their `x` identity again from the original account.
 
 ## Resources
 
