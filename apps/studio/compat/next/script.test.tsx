@@ -99,6 +99,56 @@ describe('next/script compat shim', () => {
     expect(onError).toHaveBeenCalledTimes(1)
   })
 
+  it('retries a src script on a later mount after it failed to load', async () => {
+    const src = 'https://example.com/flaky.js'
+    const first = render(<Script src={src} />)
+    await act(async () => {
+      document.querySelector(`script[src="${src}"]`)?.dispatchEvent(new Event('error'))
+    })
+    first.unmount()
+
+    const onLoad = vi.fn()
+    const onReady = vi.fn()
+    render(<Script src={src} onLoad={onLoad} onReady={onReady} />)
+
+    // Not treated as loaded: no onReady until the retried script loads.
+    expect(onReady).not.toHaveBeenCalled()
+    const retried = document.querySelectorAll(`script[src="${src}"]`)
+    expect(retried).toHaveLength(1)
+    act(() => {
+      retried[0].dispatchEvent(new Event('load'))
+    })
+    expect(onLoad).toHaveBeenCalledTimes(1)
+    expect(onReady).toHaveBeenCalledTimes(1)
+  })
+
+  it('runs onLoad, onReady and onError for every instance sharing an in-flight src', async () => {
+    const loaded = 'https://example.com/shared.js'
+    const firstReady = vi.fn()
+    const secondLoad = vi.fn()
+    const secondReady = vi.fn()
+    render(<Script src={loaded} onReady={firstReady} />)
+    render(<Script src={loaded} onLoad={secondLoad} onReady={secondReady} />)
+    expect(document.querySelectorAll(`script[src="${loaded}"]`)).toHaveLength(1)
+    await act(async () => {
+      document.querySelector(`script[src="${loaded}"]`)?.dispatchEvent(new Event('load'))
+    })
+    expect(firstReady).toHaveBeenCalledTimes(1)
+    expect(secondLoad).toHaveBeenCalledTimes(1)
+    expect(secondReady).toHaveBeenCalledTimes(1)
+
+    const failed = 'https://example.com/shared-broken.js'
+    const firstError = vi.fn()
+    const secondError = vi.fn()
+    render(<Script src={failed} onError={firstError} />)
+    render(<Script src={failed} onError={secondError} />)
+    await act(async () => {
+      document.querySelector(`script[src="${failed}"]`)?.dispatchEvent(new Event('error'))
+    })
+    expect(firstError).toHaveBeenCalledTimes(1)
+    expect(secondError).toHaveBeenCalledTimes(1)
+  })
+
   it('fires onReady on remount without re-injecting an already loaded script', () => {
     const src = 'https://example.com/b.js'
     const first = render(<Script src={src} />)

@@ -84,11 +84,17 @@ function loadScript(props: ScriptProps) {
   if (cacheKey && LoadCache.has(cacheKey)) return
 
   // Same remote script already loading: don't inject again, but still run
-  // this instance's onLoad (in order) once it resolves.
+  // this instance's callbacks once it settles.
   const pending = src ? ScriptCache.get(src) : undefined
   if (pending) {
-    if (cacheKey) LoadCache.add(cacheKey)
-    pending.then(() => onLoad?.(new Event('load')), onError)
+    pending.then(
+      () => {
+        if (cacheKey) LoadCache.add(cacheKey)
+        onLoad?.(new Event('load'))
+        onReady?.()
+      },
+      (e) => onError?.(e)
+    )
     return
   }
 
@@ -105,7 +111,12 @@ function loadScript(props: ScriptProps) {
       afterLoad()
     })
     el.addEventListener('error', (e) => reject(e))
-  }).catch((e) => {
+  })
+  // Stays rejected for instances waiting on it. Dropping the failed entry
+  // lets a later mount retry the script instead of treating it as loaded.
+  loadPromise.catch((e) => {
+    if (src) ScriptCache.delete(src)
+    el.remove()
     onError?.(e)
   })
 
