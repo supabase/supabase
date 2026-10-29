@@ -13,6 +13,7 @@ import {
   PromptTitle,
 } from '~/features/ui/PromptPanel'
 import { TabPanel } from '~/features/ui/Tabs'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useSearchParamsShallow } from 'common'
 import { ArrowRight, ArrowUpRight, Check } from 'lucide-react'
 import { animate, useMotionValue, useMotionValueEvent, useReducedMotion } from 'motion/react'
@@ -40,6 +41,7 @@ export const GettingStartedStepperClient = ({
   const choices = parseChoices(searchParams)
   const framework = getFramework(choices.fw)
   const isAgent = choices.start === 'agent'
+  const sendTelemetryEvent = useSendTelemetryEvent()
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
   // until the reader picks a group, show the first group that holds the framework
   const activeGroup =
@@ -47,16 +49,46 @@ export const GettingStartedStepperClient = ({
     FRAMEWORK_GROUPS.find((group) => group.frameworks.some((item) => item.slug === choices.fw)) ??
     FRAMEWORK_GROUPS[0]
 
-  const handleStartChange = (start: string) => searchParams.set('start', start)
-  const handleFrameworkChange = (fw: string) => searchParams.set('fw', fw)
+  const handleStartChange = (start: string) => {
+    searchParams.set('start', start)
+    sendTelemetryEvent({
+      action: 'docs_getting_started_option_clicked',
+      properties: { optionType: 'start', optionId: start },
+    })
+  }
+  const handleFrameworkChange = (fw: string) => {
+    searchParams.set('fw', fw)
+    sendTelemetryEvent({
+      action: 'docs_getting_started_option_clicked',
+      properties: { optionType: 'framework', optionId: fw },
+    })
+  }
   // an empty list means the reader skipped the step, so the prompt asks
-  const handleFeatureToggle = (id: string) =>
+  const handleFeatureToggle = (id: string) => {
+    const wasSelected = choices.features.includes(id)
     searchParams.set(
       'features',
-      choices.features.includes(id)
+      wasSelected
         ? choices.features.filter((feature) => feature !== id).join(',')
         : [...choices.features, id].join(',')
     )
+    sendTelemetryEvent({
+      action: 'docs_getting_started_option_clicked',
+      properties: { optionType: 'feature', optionId: id, isSelected: !wasSelected },
+    })
+  }
+  const handleQuickstartClick = () => {
+    if (!framework) return
+    sendTelemetryEvent({
+      action: 'docs_content_listing_clicked',
+      properties: {
+        targetPath: framework.href,
+        linkTitle: `${framework.name} quickstart`,
+        groupTitle: 'Connect your app',
+        listingId: 'getting-started-stepper',
+      },
+    })
+  }
   const handleGroupChange = (groupId: string) => {
     const group = FRAMEWORK_GROUPS.find((item) => item.id === groupId)
     if (!group) return
@@ -190,7 +222,9 @@ export const GettingStartedStepperClient = ({
               <div className="flex flex-col gap-4">
                 {framework.install ? installCodes[framework.install] : null}
                 <Button asChild variant="default" size="small" className="w-fit">
-                  <Link href={framework.href}>Follow the {framework.name} quickstart</Link>
+                  <Link href={framework.href} onClick={handleQuickstartClick}>
+                    Follow the {framework.name} quickstart
+                  </Link>
                 </Button>
               </div>
             </StepHikeCompact.Code>
@@ -239,7 +273,10 @@ export const GettingStartedStepperClient = ({
               </p>
             </StepHikeCompact.Details>
             <StepHikeCompact.Code>
-              <AgentPrompt prompt={buildPrompt({ fw: choices.fw, features: choices.features })} />
+              <AgentPrompt
+                promptId="getting-started-setup"
+                prompt={buildPrompt({ fw: choices.fw, features: choices.features })}
+              />
             </StepHikeCompact.Code>
           </StepHikeCompact.Step>
         ) : null}
@@ -253,7 +290,10 @@ export const GettingStartedStepperClient = ({
               </p>
             </StepHikeCompact.Details>
             <StepHikeCompact.Code>
-              <AgentPrompt prompt={buildVerifyPrompt(choices.fw)} />
+              <AgentPrompt
+                promptId="getting-started-verify"
+                prompt={buildVerifyPrompt(choices.fw)}
+              />
             </StepHikeCompact.Code>
           </StepHikeCompact.Step>
         ) : null}
@@ -267,7 +307,7 @@ export const GettingStartedStepperClient = ({
           {isAgent
             ? getNextSteps(choices.fw).map((step) => (
                 <li key={step.id}>
-                  <LinkCard href={step.href}>
+                  <LinkCard href={step.href} title={step.title} groupTitle="Next steps">
                     <FeatureCardBody item={{ name: step.title, description: step.description }} />
                   </LinkCard>
                 </li>
@@ -292,7 +332,12 @@ const ExploreCard = ({ item }: ExploreCardProps) => {
   const grainId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
 
   return (
-    <LinkCard href={item.href} motionHandlers={motionHandlers}>
+    <LinkCard
+      href={item.href}
+      title={item.name}
+      groupTitle="Add features"
+      motionHandlers={motionHandlers}
+    >
       <span style={{ filter: `url(#${grainId})` }} className="flex">
         <svg aria-hidden className="absolute size-0">
           {/* srgb keeps the dark fill's color. the default linear rgb shifts it toward green */}
@@ -323,27 +368,48 @@ const ExploreCard = ({ item }: ExploreCardProps) => {
 
 interface LinkCardProps {
   href: string
+  title: string
+  groupTitle: string
   motionHandlers?: ShapeMotion['motionHandlers']
   children: ReactNode
 }
 
-const LinkCard = ({ href, motionHandlers, children }: LinkCardProps) => (
-  <Link href={href} {...motionHandlers} className="group/card block h-full rounded-lg focus-ring">
-    <NotchCard
-      notch={
-        <ArrowRight
-          strokeWidth={2.25}
-          className={cn(
-            'size-3.5 -translate-x-7 transition-transform duration-200 ease-enter motion-reduce:transition-none',
-            'group-hover/card:translate-x-px group-focus-visible/card:translate-x-px'
-          )}
-        />
-      }
+const LinkCard = ({ href, title, groupTitle, motionHandlers, children }: LinkCardProps) => {
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  const handleClick = () =>
+    sendTelemetryEvent({
+      action: 'docs_content_listing_clicked',
+      properties: {
+        targetPath: href,
+        linkTitle: title,
+        groupTitle,
+        listingId: 'getting-started-stepper',
+      },
+    })
+
+  return (
+    <Link
+      href={href}
+      {...motionHandlers}
+      onClick={handleClick}
+      className="group/card block h-full rounded-lg focus-ring"
     >
-      {children}
-    </NotchCard>
-  </Link>
-)
+      <NotchCard
+        notch={
+          <ArrowRight
+            strokeWidth={2.25}
+            className={cn(
+              'size-3.5 -translate-x-7 transition-transform duration-200 ease-enter motion-reduce:transition-none',
+              'group-hover/card:translate-x-px group-focus-visible/card:translate-x-px'
+            )}
+          />
+        }
+      >
+        {children}
+      </NotchCard>
+    </Link>
+  )
+}
 
 interface FeatureToggleCardProps {
   item: ExploreItem
@@ -533,11 +599,12 @@ const StartChoiceCards = ({ value, onValueChange }: StartChoiceCardsProps) => (
 )
 
 interface AgentPromptProps {
+  promptId: string
   prompt: string
 }
 
-const AgentPrompt = ({ prompt }: AgentPromptProps) => (
-  <PromptPanel telemetry={{ source: 'guide' }}>
+const AgentPrompt = ({ promptId, prompt }: AgentPromptProps) => (
+  <PromptPanel telemetry={{ source: 'guide', promptId }}>
     <Prompt value="prompt" expandable>
       <PromptTitle>Agent Prompt</PromptTitle>
       <PromptCopy>{prompt}</PromptCopy>
