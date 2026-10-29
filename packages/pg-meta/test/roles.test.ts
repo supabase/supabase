@@ -298,6 +298,21 @@ withTestDatabase('update a role password that needs quoting', async ({ executeQu
   }
 })
 
+withTestDatabase('create a role with a password containing quotes', async ({ executeQuery }) => {
+  // Roles are cluster-wide, so use a unique name and only drop it once it has been created.
+  const name = `password_${randomUUID().replace(/-/g, '_')}`
+  await executeQuery(pgMeta.roles.create({ name, canLogin: true, password: `p'ss"word` }).sql)
+
+  try {
+    const rows = await executeQuery(
+      safeSql`select rolcanlogin, rolpassword is not null as has_password from pg_authid where rolname = ${literal(name)}`
+    )
+    expect(rows).toEqual([{ rolcanlogin: true, has_password: true }])
+  } finally {
+    await executeQuery(safeSql`drop role if exists ${ident(name)}`)
+  }
+})
+
 withTestDatabase('update a password together with valid until', async ({ executeQuery }) => {
   const name = uniqueRoleName('update_pw_until')
   await executeQuery(pgMeta.roles.create({ name }).sql)

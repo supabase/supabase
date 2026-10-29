@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { useState } from 'react'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Form,
@@ -12,12 +13,16 @@ import {
   SidePanel,
   Switch,
 } from 'ui'
+import { Input as PatternInput } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { ROLE_PERMISSIONS } from './Roles.constants'
 import { FormActions } from '@/components/ui/Forms/FormActions'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRoleCreateMutation } from '@/data/database-roles/database-role-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { generateStrongPassword } from '@/lib/project'
 
 interface CreateRolePanelProps {
   visible: boolean
@@ -32,6 +37,7 @@ const FormSchema = z.object({
   canCreateDb: z.boolean().default(false),
   isReplicationRole: z.boolean().default(false),
   canBypassRls: z.boolean().default(false),
+  password: z.string().default(''),
 })
 
 const initialValues = {
@@ -42,6 +48,7 @@ const initialValues = {
   canCreateDb: false,
   isReplicationRole: false,
   canBypassRls: false,
+  password: '',
 }
 
 export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
@@ -61,18 +68,24 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
     },
   })
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+  const canLogin = useWatch({ control: form.control, name: 'canLogin' })
+  const [isPasswordGenerated, setIsPasswordGenerated] = useState(false)
+
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async ({ password, ...values }) => {
     if (!project) return console.error('Project is required')
+    // An empty password is omitted so the role is created without one
+    const shouldSetPassword = values.canLogin && password.length > 0
     createDatabaseRole({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      payload: values,
+      payload: shouldSetPassword ? { ...values, password } : values,
     })
   }
 
   const handleClose = () => {
     onClose()
     form.reset(initialValues)
+    setIsPasswordGenerated(false)
   }
 
   return (
@@ -134,12 +147,12 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                       name={permissionKey}
                       render={({ field }) => (
                         <FormItem className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                          <FormControl className="col-span-8 flex items-center gap-4">
-                            <div className="w-full text-sm">
+                          <div className="col-span-8 flex w-full items-center gap-4 text-sm">
+                            <FormControl>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
-                              <FormLabel>{permission.description}</FormLabel>
-                            </div>
-                          </FormControl>
+                            </FormControl>
+                            <FormLabel>{permission.description}</FormLabel>
+                          </div>
                           <FormMessage className="col-start-5 col-span-8" />
                         </FormItem>
                       )}
@@ -163,17 +176,17 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                         name={permissionKey}
                         render={({ field }) => (
                           <FormItem className="space-y-0 opacity-70">
-                            <FormControl className="flex items-center gap-4">
-                              <div className="w-full text-sm">
+                            <div className="flex w-full items-center gap-4 text-sm">
+                              <FormControl>
                                 <Switch
                                   checked={field.value}
                                   onCheckedChange={field.onChange}
                                   disabled
                                   aria-readonly
                                 />
-                                <FormLabel>{permission.description}</FormLabel>
-                              </div>
-                            </FormControl>
+                              </FormControl>
+                              <FormLabel>{permission.description}</FormLabel>
+                            </div>
                             <FormMessage className="col-start-5 col-span-8" />
                           </FormItem>
                         )}
@@ -183,6 +196,53 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
               </div>
             </div>
           </div>
+          {canLogin && (
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label="Password"
+                  description={
+                    <>
+                      Optional. Without a password, the role can't log in using password
+                      authentication.{' '}
+                      <button
+                        type="button"
+                        tabIndex={0}
+                        className={InlineLinkClassName}
+                        onClick={() => {
+                          form.setValue('password', generateStrongPassword(), { shouldDirty: true })
+                          setIsPasswordGenerated(true)
+                        }}
+                      >
+                        Generate a password
+                      </button>
+                      .
+                    </>
+                  }
+                >
+                  <FormControl>
+                    <PatternInput
+                      {...field}
+                      onChange={(event) => {
+                        field.onChange(event)
+                        setIsPasswordGenerated(false)
+                      }}
+                      copy={field.value.length > 0}
+                      type="password"
+                      autoComplete="new-password"
+                      placeholder="Type in a password"
+                    />
+                  </FormControl>
+                  <span role="status" aria-live="polite" className="sr-only">
+                    {isPasswordGenerated ? 'Password generated' : ''}
+                  </span>
+                </FormItemLayout>
+              )}
+            />
+          )}
         </form>
       </Form>
     </SidePanel>
