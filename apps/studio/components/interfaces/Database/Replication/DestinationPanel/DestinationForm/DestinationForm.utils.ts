@@ -23,6 +23,7 @@ import {
   type DucklakeMode,
 } from './DuckLake/DuckLake.constants'
 import { type DucklakeApiConfig } from './DuckLake/DuckLake.utils'
+import { getPipelineRegion } from './PipelineRegionField'
 import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
 import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
 import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
@@ -95,6 +96,7 @@ export const generateDefaultValues = ({
     'table_ids' in tableSyncCopy ? tableSyncCopy.table_ids.map((id) => String(id)) : []
 
   return {
+    pipelineRegion: getPipelineRegion(region).code,
     // Common fields
     name: destinationData?.name ?? '',
     publicationName: pipelineData?.config.publication_name ?? '',

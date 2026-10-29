@@ -12,6 +12,7 @@ const MAX_TABLE_SYNC_WORKERS_MIN_ERROR = 'Max table sync workers must be greater
 const MAX_COPY_CONNECTIONS_MIN_ERROR = 'Max copy connections per table must be greater than 0.'
 
 const CommonFormSchema = z.object({
+  pipelineRegion: z.string().optional(),
   name: z.string().min(1, 'Name is required.'),
   publicationName: z.string().min(1, 'Publication is required.'),
   tableSyncCopyMode: z.enum([

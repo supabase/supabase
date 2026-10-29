@@ -1,13 +1,16 @@
 import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 import { useParams, useReducedMotion } from 'common'
 import { useMemo } from 'react'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { PIPELINE_REGION } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import { getStatusName } from '../Pipeline.utils'
 import {
   EdgeVisualChip,
   getEdgeVisual,
   type ReplicationState,
 } from '@/components/ui/ReactFlow/EdgeVisual'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import {
@@ -100,7 +103,21 @@ export const SmoothstepEdge = ({
           }}
           className="nodrag nopan"
         >
-          <EdgeVisualChip visual={visual} />
+          <div className="relative">
+            <EdgeVisualChip visual={visual} />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="absolute left-1/2 top-full mt-1.5 flex -translate-x-1/2 flex-col items-center gap-1 whitespace-nowrap rounded-md border bg-surface-100 px-3 py-2 text-xs">
+                  <span className="text-foreground-light">Pipeline region</span>
+                  <span className="flex items-center gap-1.5 font-mono">
+                    <RegionFlag className="w-4" region={PIPELINE_REGION.code} />
+                    {PIPELINE_REGION.code}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{PIPELINE_REGION.displayName}</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       </EdgeLabelRenderer>
     </>

@@ -23,7 +23,7 @@ export const PipelineConnectionSection = ({
     <div className="flex flex-col gap-y-4 p-5">
       <h3 className="text-sm font-medium text-foreground">Destination connection</h3>
       <DestinationNameInput form={form} destinationType={type} />
-      <PipelineRegionField destinationType={type} />
+      <PipelineRegionField destinationType={type} control={form.control} />
     </div>
     <DialogSectionSeparator />
     {children}

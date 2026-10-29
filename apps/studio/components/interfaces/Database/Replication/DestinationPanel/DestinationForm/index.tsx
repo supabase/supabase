@@ -531,7 +531,10 @@ export const DestinationForm = ({
                           onSelectNewPublication={() => setPublicationPanelVisible(true)}
                         />
                         <TableCopySelection form={form} editMode={editMode} />
-                        <PipelineRegionField destinationType={selectedType} />
+                        <PipelineRegionField
+                          destinationType={selectedType}
+                          control={editMode ? undefined : form.control}
+                        />
                       </div>
                     </div>
 

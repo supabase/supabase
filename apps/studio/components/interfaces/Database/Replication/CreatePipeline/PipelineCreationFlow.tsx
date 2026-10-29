@@ -37,6 +37,7 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const getDocsUrl = (step: string, destination: FlowDestination) => {
@@ -57,6 +58,7 @@ export const PipelineCreationFlow = ({
   availableDestinations: FlowDestination[]
   onClose: () => void
 }) => {
+  const { data: project } = useSelectedProjectQuery()
   const router = useRouter()
   const [step, setStep] = useQueryState('step', stepParser)
   const hasInitializedStepRef = useRef(false)
@@ -64,7 +66,11 @@ export const PipelineCreationFlow = ({
   const [type, setType] = useState<FlowDestination>(availableDestinations[0] ?? 'BigQuery')
   const [isPublicationPanelVisible, setIsPublicationPanelVisible] = useState(false)
   const form = useForm<DestinationPanelSchemaType>({
-    defaultValues: generateDefaultValues({ catalogToken: '', editMode: false }),
+    defaultValues: generateDefaultValues({
+      catalogToken: '',
+      editMode: false,
+      region: project?.region,
+    }),
     shouldUnregister: false,
   })
   const initialTypeRef = useRef(type)

@@ -6,6 +6,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DestinationLogo } from '../DestinationLogo'
 import { getStatusName } from '../Pipeline.utils'
+import { getDestinationStorageRegion } from '../PipelineConnectionDetails.utils'
 import { getReplicationDestinationType } from './Nodes.utils'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -72,6 +73,7 @@ export const ReplicationNode = ({ id }: { id: string }) => {
   const statusName = getStatusName(pipelineStatusData?.status)
 
   const type = getReplicationDestinationType(destination?.config)
+  const storageRegion = getDestinationStorageRegion(destination?.config)
 
   return (
     <NodeContainer>
@@ -98,6 +100,11 @@ export const ReplicationNode = ({ id }: { id: string }) => {
         </div>
         <p className="text-foreground-light">{destination?.name}</p>
         <p className="text-foreground-light">ID: {destination?.id}</p>
+        {storageRegion && (
+          <p className="max-w-56 truncate text-xs text-foreground-light" title={storageRegion}>
+            Storage region: {storageRegion}
+          </p>
+        )}
       </div>
       {type ? <DestinationLogo type={type} /> : null}
       <Handle type="target" position={Position.Left} className="opacity-25" />

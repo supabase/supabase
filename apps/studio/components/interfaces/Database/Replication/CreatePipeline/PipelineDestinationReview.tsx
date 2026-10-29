@@ -61,6 +61,7 @@ export const PipelineDestinationReview = ({
   onEditConnection?: () => void
   validationFailures?: ValidationFailure[]
 }) => {
+  const pipelineRegion = useWatch({ control, name: 'pipelineRegion' })
   const [
     name,
     projectId,
@@ -215,9 +216,9 @@ export const PipelineDestinationReview = ({
             isReactForm={false}
             layout="horizontal"
             label="Pipeline region"
-            description={`All pipelines run from this region. ${type} connections originate here.`}
+            description={`${type} connections originate here.`}
           >
-            <PipelineRegionReadonly />
+            <PipelineRegionReadonly regionCode={pipelineRegion} />
           </FormItemLayout>
         </div>
         <PipelineValidationAdmonition failures={validationFailures} />
