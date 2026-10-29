@@ -289,6 +289,7 @@ export const GettingStartedStepperClient = ({
             </StepHikeCompact.Details>
             <StepHikeCompact.Code>
               <AgentPrompt
+                title="Setup Prompt"
                 promptId="getting-started-setup"
                 prompt={buildPrompt({ fw: choices.fw, features: choices.features })}
               />
@@ -306,6 +307,7 @@ export const GettingStartedStepperClient = ({
             </StepHikeCompact.Details>
             <StepHikeCompact.Code>
               <AgentPrompt
+                title="Check Prompt"
                 promptId="getting-started-verify"
                 prompt={buildVerifyPrompt(choices.fw)}
               />
@@ -614,14 +616,15 @@ const StartChoiceCards = ({ value, onValueChange }: StartChoiceCardsProps) => (
 )
 
 interface AgentPromptProps {
+  title: string
   promptId: string
   prompt: string
 }
 
-const AgentPrompt = ({ promptId, prompt }: AgentPromptProps) => (
+const AgentPrompt = ({ title, promptId, prompt }: AgentPromptProps) => (
   <PromptPanel telemetry={{ source: 'guide', promptId }}>
     <Prompt value="prompt" expandable>
-      <PromptTitle>Agent Prompt</PromptTitle>
+      <PromptTitle>{title}</PromptTitle>
       <PromptCopy>{prompt}</PromptCopy>
       <PromptContent>
         <PromptMarkdown>{prompt}</PromptMarkdown>
