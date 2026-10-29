@@ -143,10 +143,11 @@ describe('UnifiedLogs', () => {
     }
   })
 
-  it('discovers attributes and applies a manual key through shared row, count, and chart requests', async () => {
+  it('discovers attributes after opening the picker and applies manual keys across requests', async () => {
     const user = userEvent.setup()
     const queries: string[] = []
     const onUrlUpdate = vi.fn()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     addAPIMock({
       method: 'post',
       path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
@@ -159,9 +160,12 @@ describe('UnifiedLogs', () => {
       },
     })
     customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      queryClient,
       nuqs: { hasMemory: true, onUrlUpdate },
     })
     expect(await screen.findByText('No results found')).toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    expect(queries.some((sql) => sql.includes('arrayJoin(mapKeys'))).toBe(false)
     const input = screen.getByTestId('filter-bar-freeform-input')
     await user.click(input)
     expect(await screen.findByRole('option', { name: 'Attribute: request_id' })).toBeVisible()
@@ -268,6 +272,7 @@ describe('UnifiedLogs', () => {
   ])('discovers matching source attributes with %s', async (_, searchParams, source, key) => {
     const user = userEvent.setup()
     const discoveryQueries: string[] = []
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     addAPIMock({
       method: 'post',
       path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
@@ -279,9 +284,12 @@ describe('UnifiedLogs', () => {
       },
     })
     customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      queryClient,
       nuqs: { hasMemory: true, searchParams },
     })
     expect(await screen.findByText('No results found')).toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    expect(discoveryQueries).toHaveLength(0)
     await user.click(screen.getByTestId('filter-bar-freeform-input'))
     expect(await screen.findByRole('option', { name: `Attribute: ${key}` })).toBeVisible()
     expect(discoveryQueries.some((sql) => sql.includes("source = 'postgres_logs'"))).toBe(false)

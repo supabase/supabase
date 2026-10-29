@@ -68,6 +68,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
 
   const filterBarRef = useRef<FilterBarHandle>(null)
   const [freeformText, setFreeformText] = useState('')
+  const [hasFocusedFilterBar, setHasFocusedFilterBar] = useState(false)
 
   // [Joshen] We're separately declaring useQueryState for user here, as there's no "user" column
   // in the Tanstack table.
@@ -116,7 +117,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
   const keyQueries = useQueries({
     queries: sources.map((source) => ({
       ...otelLogKeysQueryOptions({ projectRef: projectRef ?? '', source }),
-      enabled: isOtel && !!projectRef,
+      enabled: isOtel && !!projectRef && hasFocusedFilterBar,
     })),
   })
   const attributeKeys = new Set(keyQueries.flatMap(({ data }) => data ?? []))
@@ -207,25 +208,27 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
   }, [columnFilters, user])
 
   return (
-    <FilterBar
-      ref={filterBarRef}
-      variant="pill"
-      freeformDefaultProperty="event_message"
-      className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"
-      filterProperties={filterPropertiesWithAvailability}
-      freeformText={freeformText}
-      filters={filters}
-      onFilterChange={setFilters}
-      onApply={onApply}
-      onFreeformTextChange={setFreeformText}
-      isLoading={isFetching}
-      icon={
-        isFetching ? (
-          <LoaderCircleIcon className="h-4 w-4 animate-spin text-foreground-muted opacity-50" />
-        ) : (
-          <SearchIcon className="text-foreground-muted w-4 h-4 sticky" />
-        )
-      }
-    />
+    <div onFocusCapture={() => setHasFocusedFilterBar(true)}>
+      <FilterBar
+        ref={filterBarRef}
+        variant="pill"
+        freeformDefaultProperty="event_message"
+        className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"
+        filterProperties={filterPropertiesWithAvailability}
+        freeformText={freeformText}
+        filters={filters}
+        onFilterChange={setFilters}
+        onApply={onApply}
+        onFreeformTextChange={setFreeformText}
+        isLoading={isFetching}
+        icon={
+          isFetching ? (
+            <LoaderCircleIcon className="h-4 w-4 animate-spin text-foreground-muted opacity-50" />
+          ) : (
+            <SearchIcon className="text-foreground-muted w-4 h-4 sticky" />
+          )
+        }
+      />
+    </div>
   )
 }
