@@ -18,7 +18,7 @@ import { retrieveUnifiedLogs } from '@/data/logs/get-unified-logs'
 import { getUnifiedLogs } from '@/data/logs/unified-logs-infinite-query'
 import type { UnifiedLogsQueryRow } from '@/data/logs/unified-logs.utils'
 import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
-import { addAPIMock, mswServer } from '@/tests/lib/msw'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
 type AnalyticsResponse = components['schemas']['AnalyticsResponse_Output']
 type ProjectResponse = components['schemas']['ProjectDetailResponse_Output']
@@ -193,6 +193,63 @@ describe('UnifiedLogs', () => {
         .filter((sql) => sql.includes('arrayJoin(mapKeys'))
         .some((sql) => sql.includes("source = 'edge_logs'"))
     ).toBe(true)
+  })
+
+  it.each([
+    { scenario: 'successful discovery', hasError: false, completion: 'Log attributes loaded.' },
+    {
+      scenario: 'partially failed discovery',
+      hasError: true,
+      completion: 'Some log attributes could not be loaded.',
+    },
+  ])('announces $scenario only after every source settles', async ({ hasError, completion }) => {
+    const user = userEvent.setup()
+    const postgresResponse = Promise.withResolvers<void>()
+    const edgeResponse = Promise.withResolvers<void>()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        if (!sql.includes('arrayJoin(mapKeys'))
+          return HttpResponse.json<AnalyticsResponse>({ result: [] })
+        if (sql.includes("source = 'postgres_logs'")) {
+          await postgresResponse.promise
+          return HttpResponse.json<AnalyticsResponse>({ result: [{ key: 'postgres_key', n: 1 }] })
+        }
+        await edgeResponse.promise
+        if (hasError)
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Discovery unavailable' },
+            { status: 500 }
+          )
+        return HttpResponse.json<AnalyticsResponse>({ result: [{ key: 'edge_key', n: 1 }] })
+      },
+    })
+    customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      queryClient,
+      nuqs: { hasMemory: true },
+    })
+    try {
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      const status = screen.getByRole('status')
+      expect(status).toBeEmptyDOMElement()
+      expect(status).toHaveAttribute('aria-live', 'polite')
+      expect(status).toHaveAttribute('aria-atomic', 'true')
+      await user.click(screen.getByTestId('filter-bar-freeform-input'))
+      expect(status).toHaveTextContent('Loading log attributes.')
+      postgresResponse.resolve()
+      expect(await screen.findByRole('option', { name: 'Attribute: postgres_key' })).toBeVisible()
+      expect(status).toHaveTextContent('Loading log attributes.')
+      edgeResponse.resolve()
+      await waitFor(() => expect(status).toHaveTextContent(completion))
+      expect(screen.getByRole('status')).toBe(status)
+    } finally {
+      postgresResponse.resolve()
+      edgeResponse.resolve()
+      await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    }
   })
 
   it('keeps restored attribute exclusions when changing builtin filters', async () => {

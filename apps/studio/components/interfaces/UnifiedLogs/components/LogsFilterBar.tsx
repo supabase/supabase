@@ -113,13 +113,24 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     withUserCondition(buildFilterGroup(columnFilters, columnBackedNames))
   )
 
+  const canDiscoverAttributes = isOtel && !!projectRef && hasFocusedFilterBar
   const sources = getLogAttributeSources(searchParameters)
   const keyQueries = useQueries({
     queries: sources.map((source) => ({
       ...otelLogKeysQueryOptions({ projectRef: projectRef ?? '', source }),
-      enabled: isOtel && !!projectRef && hasFocusedFilterBar,
+      enabled: canDiscoverAttributes,
     })),
   })
+  let attributeDiscoveryStatus = ''
+  if (canDiscoverAttributes) {
+    if (keyQueries.some(({ isFetching }) => isFetching)) {
+      attributeDiscoveryStatus = 'Loading log attributes.'
+    } else if (keyQueries.some(({ isError }) => isError)) {
+      attributeDiscoveryStatus = 'Some log attributes could not be loaded.'
+    } else if (keyQueries.length > 0 && keyQueries.every(({ isSuccess }) => isSuccess)) {
+      attributeDiscoveryStatus = 'Log attributes loaded.'
+    }
+  }
   const attributeKeys = new Set(keyQueries.flatMap(({ data }) => data ?? []))
   if (isOtel && freeformText.trim()) attributeKeys.add(freeformText.trim())
   for (const condition of filters.conditions) {
@@ -209,6 +220,9 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
 
   return (
     <div onFocusCapture={() => setHasFocusedFilterBar(true)}>
+      <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {attributeDiscoveryStatus}
+      </span>
       <FilterBar
         ref={filterBarRef}
         variant="pill"
