@@ -35,6 +35,12 @@ import {
 } from './GettingStarted.data'
 import { FRAMEWORK_GROUPS, getFramework } from './GettingStarted.frameworks'
 import { buildPrompt } from './GettingStarted.prompts'
+import { useGettingStartedVariant } from './useGettingStartedVariant'
+
+interface GettingStartedVariantSwitchProps {
+  control: ReactNode
+  children: ReactNode
+}
 
 interface GettingStartedStepperClientProps {
   localCommandsCode: ReactNode
@@ -162,6 +168,20 @@ const useShapeMotion = (): ShapeMotion => {
       onBlur: handleDeactivate,
     },
   }
+}
+
+// flags load in the browser, so the server html and readers without javascript get the control
+export const GettingStartedVariantSwitch = ({
+  control,
+  children,
+}: GettingStartedVariantSwitchProps) => {
+  const { variant, isReady } = useGettingStartedVariant()
+
+  return (
+    <div className={cn(!isReady && 'invisible noscript:visible')}>
+      {variant === 'stepper' ? children : control}
+    </div>
+  )
 }
 
 export const GettingStartedStepperClient = ({
