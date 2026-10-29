@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronUpIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -23,6 +23,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { RolePasswordField } from './RolePasswordField'
 import { ROLE_PERMISSIONS, SYSTEM_ROLES } from './Roles.constants'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useDatabaseRoleUpdateMutation } from '@/data/database-roles/database-role-update-mutation'
@@ -36,15 +37,19 @@ interface RoleRowProps {
 }
 
 const permissionSchema = z.boolean().optional()
-const formSchema = z.object(
-  Object.keys(ROLE_PERMISSIONS).reduce(
+const formSchema = z.object({
+  ...Object.keys(ROLE_PERMISSIONS).reduce(
     (acc, key) => ({
       ...acc,
       [key]: permissionSchema,
     }),
     {} as Record<keyof typeof ROLE_PERMISSIONS, z.ZodBoolean>
-  )
-)
+  ),
+  password: z.string(),
+})
+
+// The password is never loaded from the role, so the field always starts empty
+const getFormValues = (role: PgRole) => ({ ...role, password: '' })
 
 export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
   const isSystemRole = SYSTEM_ROLES.some((name) => name === role.name)
@@ -53,17 +58,23 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
   const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: role,
+    defaultValues: getFormValues(role),
   })
 
   const { reset, formState } = form
   const { isDirty } = formState
+  const canLogin = useWatch({ control: form.control, name: 'canLogin' })
+  // Only a role that is gaining login here can be given a password
+  const canSetPassword = !disabled && !role.canLogin && canLogin
 
   useEffect(() => {
-    reset(role)
+    reset(getFormValues(role))
   }, [role, reset])
 
-  const onSaveChanges: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {
+  const onSaveChanges: SubmitHandler<z.infer<typeof formSchema>> = async ({
+    password,
+    ...values
+  }) => {
     if (!project) return console.error('Project is required')
 
     const changed = Object.fromEntries(
@@ -72,10 +83,13 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         return v !== role[key]
       })
     )
+    // An empty password is omitted so the role gains login without one
+    const payload =
+      !role.canLogin && values.canLogin && password.length > 0 ? { ...changed, password } : changed
 
-    if (Object.keys(changed).length === 0) {
+    if (Object.keys(payload).length === 0) {
       // No actual changes to persist; avoid sending an empty update payload
-      reset(role)
+      reset(getFormValues(role))
       return
     }
 
@@ -84,12 +98,12 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         projectRef: project.ref,
         connectionString: project.connectionString,
         id: role.id,
-        payload: changed,
+        payload,
       },
       {
         onSuccess: () => {
           toast.success(`Successfully updated role "${role.name}"`)
-          reset(values)
+          reset({ ...values, password: '' })
         },
       }
     )
@@ -228,6 +242,11 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                 )
               )}
             </div>
+            {canSetPassword && (
+              <div className="py-4">
+                <RolePasswordField />
+              </div>
+            )}
             {!disabled && (
               <div className="py-4 flex items-center space-x-2 justify-end">
                 <Button disabled={!isDirty || isUpdating} onClick={() => reset()}>
