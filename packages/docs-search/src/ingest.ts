@@ -9,9 +9,10 @@ const INSERT_BATCH_SIZE = 200
 
 // Rows are stamped by the database clock and the cutoff by ours, so keep a margin before treating
 // a row as untouched. Too small and a fresh row could be removed, too large only delays cleanup.
-// 24 * 60 * 60 * 1000 is one day in milliseconds, matching the nightly ingest cron: only rows left
-// over from a run more than a day old are removed.
-const STALE_AFTER_MS = 24 * 60 * 60 * 1000
+// 25 * 60 * 60 * 1000 is 25 hours in milliseconds: the nightly ingest cron interval plus an hour of
+// slack for run drift and clock skew. Only rows left over from a run more than 25 hours old are
+// removed.
+const STALE_AFTER_MS = 25 * 60 * 60 * 1000
 
 function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, '\\$&')
