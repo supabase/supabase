@@ -14,6 +14,7 @@ import {
   getDatabaseOperations,
   getDebuggingOperations,
   getDevelopmentOperations,
+  getFeedbackOperations,
 } from '@/lib/api/self-hosted/mcp'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
@@ -28,7 +29,13 @@ const supabase = createClient(
   }
 )
 
-const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
+const supportedFeatureGroupSchema = z.enum([
+  'docs',
+  'database',
+  'development',
+  'debugging',
+  'feedback',
+])
 const mcpOAuthEnabled = process.env.ENABLED_FEATURES_MCP_OAUTH === 'true'
 const mcpResourceUrl =
   process.env.SUPABASE_PUBLIC_URL! + '/.well-known/oauth-protected-resource/mcp'
@@ -115,6 +122,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     database: getDatabaseOperations({ headers }),
     development: getDevelopmentOperations({ headers }),
     debugging: getDebuggingOperations({ headers }),
+    feedback: getFeedbackOperations(),
   }
 
   try {

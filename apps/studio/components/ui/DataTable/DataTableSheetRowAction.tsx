@@ -201,7 +201,13 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
         {children}
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" alignOffset={12} side="bottom" className="w-56">
+      <DropdownMenuContent
+        align="end"
+        alignOffset={12}
+        side="bottom"
+        className="w-56"
+        onKeyDown={(event) => event.stopPropagation()}
+      >
         {!!field && !!column && (
           <>
             {renderOptions()}

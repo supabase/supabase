@@ -756,6 +756,10 @@ export default defineConfig(({ command, mode }) => {
             if (id.includes('packages/ui/src/components/shadcn/ui/slider.tsx')) {
               return 'ui-slider'
             }
+            // Keep Avatar in its own chunk to prevent a users-page import cycle through ui.
+            if (id.includes('packages/ui/src/components/shadcn/ui/avatar.tsx')) {
+              return 'ui-avatar'
+            }
             return undefined
           },
         },
