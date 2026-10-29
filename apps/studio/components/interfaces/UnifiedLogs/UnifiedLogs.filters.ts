@@ -54,7 +54,12 @@ export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[]
     if (!column || !operator) continue
     try {
       const decodedColumn = column.startsWith('attribute.') ? decodeURIComponent(column) : column
-      parsed.push({ column: decodedColumn, operator, value: rest.join(':') })
+      const value = rest.join(':')
+      parsed.push({
+        column: decodedColumn,
+        operator,
+        value: column.startsWith('attribute.') ? decodeURIComponent(value) : value,
+      })
     } catch {
       continue
     }
@@ -65,7 +70,7 @@ export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[]
 export const logsFiltersToUrlParams = (filters: LogsFilter[]): string[] => {
   return filters.map(
     (f) =>
-      `${f.column.startsWith('attribute.') ? encodeURIComponent(f.column) : f.column}:${OPERATOR_TO_ABBREV[f.operator]}:${f.value}`
+      `${f.column.startsWith('attribute.') ? encodeURIComponent(f.column) : f.column}:${OPERATOR_TO_ABBREV[f.operator]}:${f.column.startsWith('attribute.') ? encodeURIComponent(f.value) : f.value}`
   )
 }
 

@@ -78,8 +78,6 @@ const LOG_OVERVIEW_RENDERERS: Partial<
   supavisor: SupavisorOverview,
 }
 
-export const hasLogOverviewRenderer = (logType: string) => logType in LOG_OVERVIEW_RENDERERS
-
 export function LogOverview({
   header,
   attributes,
