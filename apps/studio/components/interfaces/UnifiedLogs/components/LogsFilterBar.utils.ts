@@ -60,7 +60,8 @@ const COMPARISON_OPERATORS: FilterProperty['operators'] = [
 ]
 
 export const buildAttributeFilterProperty = (id: string): FilterProperty => ({
-  label: `Attribute: ${getLogAttributeKey(id) ?? id}`,
+  label: getLogAttributeKey(id) ?? id,
+  propertyGroupLabel: 'Attributes',
   name: id,
   type: 'string',
   operators: COMPARISON_OPERATORS,

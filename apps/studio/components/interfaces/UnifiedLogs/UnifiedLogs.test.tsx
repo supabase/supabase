@@ -213,10 +213,16 @@ describe('UnifiedLogs', () => {
     expect(queries.some((sql) => sql.includes('arrayJoin(mapKeys'))).toBe(false)
     const input = screen.getByTestId('filter-bar-freeform-input')
     await user.click(input)
-    expect(await screen.findByRole('option', { name: 'Attribute: request_id' })).toBeVisible()
+    expect(await screen.findByRole('option', { name: 'Attributes: request_id' })).toHaveTextContent(
+      /^request_id$/
+    )
+    expect(screen.getByText('Attributes')).toBeVisible()
     fireEvent.change(input, { target: { value: 'manual:key' } })
-    await user.click(await screen.findByRole('option', { name: 'Attribute: manual:key' }))
+    await user.click(await screen.findByRole('option', { name: 'Attributes: manual:key' }))
     const valueInput = screen.getByTestId('filter-value-attribute.manual:key')
+    expect(
+      screen.getByRole('button', { name: 'Change property from manual:key' })
+    ).toHaveTextContent('manual:key')
     fireEvent.change(valueInput, { target: { value: "value'with:colon" } })
     await user.keyboard('{Enter}')
     await waitFor(() => {
@@ -285,7 +291,7 @@ describe('UnifiedLogs', () => {
       await user.click(screen.getByTestId('filter-bar-freeform-input'))
       expect(status).toHaveTextContent('Loading log attributes.')
       postgresResponse.resolve()
-      expect(await screen.findByRole('option', { name: 'Attribute: postgres_key' })).toBeVisible()
+      expect(await screen.findByRole('option', { name: 'Attributes: postgres_key' })).toBeVisible()
       expect(status).toHaveTextContent('Loading log attributes.')
       edgeResponse.resolve()
       await waitFor(() => expect(status).toHaveTextContent(completion))
@@ -393,7 +399,7 @@ describe('UnifiedLogs', () => {
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
     expect(discoveryQueries).toHaveLength(0)
     await user.click(screen.getByTestId('filter-bar-freeform-input'))
-    expect(await screen.findByRole('option', { name: `Attribute: ${key}` })).toBeVisible()
+    expect(await screen.findByRole('option', { name: `Attributes: ${key}` })).toBeVisible()
     expect(discoveryQueries.some((sql) => sql.includes("source = 'postgres_logs'"))).toBe(false)
   })
 

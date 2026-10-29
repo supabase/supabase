@@ -37,6 +37,50 @@ describe('FilterBar', () => {
   const mockOnFilterChange = vi.fn()
   const mockOnFreeformTextChange = vi.fn()
 
+  it.each([
+    { keys: '{Enter}', propertyName: 'status' },
+    { keys: '{ArrowDown}{Enter}', propertyName: 'attribute.status' },
+    { keys: '{ArrowDown}{ArrowUp}{Enter}', propertyName: 'status' },
+  ])(
+    'selects $propertyName by keyboard across a property heading with $keys',
+    async ({ keys, propertyName }) => {
+      const user = userEvent.setup({ delay: null })
+      const onFilterChange = vi.fn()
+      render(
+        <FilterBar
+          filterProperties={[
+            { label: 'status', name: 'status', type: 'string', operators: ['='] },
+            {
+              label: 'status',
+              name: 'attribute.status',
+              type: 'string',
+              operators: ['='],
+              propertyGroupLabel: 'Attributes',
+            },
+          ]}
+          filters={initialFilters}
+          onFilterChange={onFilterChange}
+          freeformText=""
+          onFreeformTextChange={vi.fn()}
+        />
+      )
+
+      await user.click(screen.getByTestId('filter-bar-freeform-input'))
+      expect(screen.getByText('Attributes')).toBeVisible()
+      expect(screen.getByRole('option', { name: 'status', exact: true })).toHaveTextContent(
+        'status'
+      )
+      expect(
+        screen.getByRole('option', { name: 'Attributes: status', exact: true })
+      ).toHaveTextContent(/^status$/)
+      await user.keyboard(keys)
+      expect(onFilterChange).toHaveBeenCalledWith({
+        logicalOperator: 'AND',
+        conditions: [{ propertyName, operator: '=', value: '' }],
+      })
+    }
+  )
+
   it('formats a value for display without changing its stored or editable value', async () => {
     const user = userEvent.setup()
     const onApply = vi.fn()
