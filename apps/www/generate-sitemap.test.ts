@@ -29,7 +29,7 @@ function writeFixture(files: Record<string, string>): string {
   return dir
 }
 
-function runGenerator(fixtureDir: string, env: NodeJS.ProcessEnv = {}) {
+function runGenerator(fixtureDir: string, env: Partial<NodeJS.ProcessEnv> = {}) {
   return spawnSync(process.execPath, [GENERATOR], {
     cwd: fixtureDir,
     encoding: 'utf-8',
@@ -182,10 +182,12 @@ describe('generate-sitemap lastmod', () => {
     for (const lastmod of lastmods) expect(lastmod).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
-  it('leaves the sitemap index untouched', () => {
+  it('lists the www, docs, kb and partner catalog sitemaps in the index', () => {
     const index = fs.readFileSync(path.join(fixtureDir, 'public', 'sitemap.xml'), 'utf-8')
     expect(index).toContain('<loc>https://supabase.com/sitemap_www.xml</loc>')
     expect(index).toContain('<loc>https://supabase.com/docs/sitemap.xml</loc>')
+    expect(index).toContain('<loc>https://supabase.com/kb/sitemap-index.xml</loc>')
+    expect(index).toContain('<loc>https://supabase.com/partners/catalog/sitemap.xml</loc>')
   })
 })
 

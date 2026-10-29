@@ -248,6 +248,9 @@ async function generate() {
   <sitemap>
     <loc>https://supabase.com/kb/sitemap-index.xml</loc>
   </sitemap>
+  <sitemap>
+    <loc>https://supabase.com/partners/catalog/sitemap.xml</loc>
+  </sitemap>
 </sitemapindex>
 `
 
