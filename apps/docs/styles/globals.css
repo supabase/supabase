@@ -6,6 +6,7 @@
 @import './code-block.css';
 @import './reference.css';
 @import 'docs-search/styles.css';
+@import './utilities.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';

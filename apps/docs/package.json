@@ -167,6 +167,7 @@
     "fast-glob": "^3.3.3",
     "globby": "^13.2.2",
     "graphiql": "^4.0.2",
+    "jsdom": "^28.1.0",
     "openapi-types": "^12.1.3",
     "postcss": "catalog:",
     "remark-frontmatter": "^5.0.0",
