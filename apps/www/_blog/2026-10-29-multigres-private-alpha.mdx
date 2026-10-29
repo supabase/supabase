@@ -45,11 +45,6 @@ Multigres is not a fork of Postgres. Your data lives in standard Postgres, and M
   />
 </div>
 
-<Img
-  alt="Your app connects through one connection string to the Multigateway, a Postgres wire-protocol proxy with a built-in pooler. The Multigateway sends writes to the primary in Zone B and reads to replicas in Zones A and C, and the primary replicates synchronously to both replicas."
-  src="/images/blog/2026-10-29-multigres-private-alpha/topology.png"
-/>
-
 ## What's included in the alpha
 
 When you create a project with Multigres enabled, you get:
@@ -59,6 +54,11 @@ When you create a project with Multigres enabled, you get:
 - **Built-in connection pooling.** There is no separate pooler to configure or run.
 - **One standard Postgres connection string.** You don't need to change your application code to move to Multigres.
 - **Most of Supabase.** Auth, the REST Data API, Storage, Edge Functions, and all client libraries work with Multigres projects.
+
+<Img
+  alt="Your app connects through one connection string to the Multigateway, a Postgres wire-protocol proxy with a built-in pooler. The Multigateway sends writes to the primary in Zone B and reads to replicas in Zones A and C, and the primary replicates synchronously to both replicas."
+  src="/images/blog/2026-10-29-multigres-private-alpha/topology.png"
+/>
 
 ## How failover works
 
