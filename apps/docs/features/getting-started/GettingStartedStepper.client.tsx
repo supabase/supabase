@@ -32,6 +32,21 @@ import {
 } from './GettingStarted.data'
 import { FRAMEWORK_GROUPS, getFramework } from './GettingStarted.frameworks'
 import { buildPrompt, buildVerifyPrompt } from './GettingStarted.prompts'
+import { useGettingStartedVariant } from './useGettingStartedVariant'
+
+// flags load in the browser, so the server html and readers without javascript get the control
+export const GettingStartedVariantSwitch = ({
+  control,
+  children,
+}: GettingStartedVariantSwitchProps) => {
+  const { variant, isReady } = useGettingStartedVariant()
+
+  return (
+    <div className={cn(!isReady && 'invisible noscript:visible')}>
+      {variant === 'stepper' ? children : control}
+    </div>
+  )
+}
 
 export const GettingStartedStepperClient = ({
   localCommandsCode,
@@ -620,6 +635,11 @@ const HAS_FRAMEWORKS = FRAMEWORK_GROUPS.length > 0
 const FULL_TURN = Math.PI * 2
 const TURN_DURATION_S = 2.4
 const ACTIVATE_DURATION_S = 0.7
+
+interface GettingStartedVariantSwitchProps {
+  control: ReactNode
+  children: ReactNode
+}
 
 interface GettingStartedStepperClientProps {
   localCommandsCode: ReactNode
