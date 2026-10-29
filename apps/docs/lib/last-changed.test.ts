@@ -4,7 +4,7 @@ const { range, abortSignal, captureException } = vi.hoisted(() => {
   const range = vi.fn()
   return {
     range,
-    abortSignal: vi.fn(() => ({ range })),
+    abortSignal: vi.fn((_signal: AbortSignal) => ({ range })),
     captureException: vi.fn(),
   }
 })
