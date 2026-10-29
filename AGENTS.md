@@ -62,6 +62,8 @@ Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.ge
 
 The skills in `.agents/skills/` are the source of truth for conventions. Load the relevant ones before working, don't guess. One exception: for docs **content** style, `apps/docs/style-guide/` is the source of truth and the docs skills are the process that applies it.
 
+- [task](.agents/skills/task/SKILL.md) — development tasks, from planning through verification and an authorized draft PR
+- [code-review](.agents/skills/code-review/SKILL.md) — read-only assessments and development-task readiness checks
 - `copywriting` — any user-facing text, anywhere in the monorepo
 - `pm-the-docs` / `write-the-docs` / `edit-the-docs` / `ask-the-docs` / `review-the-docs` — anything under `apps/docs` (see `apps/docs/CONTRIBUTING.md` for the authoring skill model, and `apps/docs/style-guide/` for the content style rules they apply)
 - `telemetry-standards` — PostHog events, `packages/common/telemetry-constants.ts`
