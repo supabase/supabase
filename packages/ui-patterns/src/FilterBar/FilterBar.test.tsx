@@ -67,12 +67,10 @@ describe('FilterBar', () => {
 
       await user.click(screen.getByTestId('filter-bar-freeform-input'))
       expect(screen.getByText('Attributes')).toBeVisible()
-      expect(screen.getByRole('option', { name: 'status', exact: true })).toHaveTextContent(
-        'status'
+      expect(screen.getByRole('option', { name: 'status' })).toHaveTextContent('status')
+      expect(screen.getByRole('option', { name: 'Attributes: status' })).toHaveTextContent(
+        /^status$/
       )
-      expect(
-        screen.getByRole('option', { name: 'Attributes: status', exact: true })
-      ).toHaveTextContent(/^status$/)
       await user.keyboard(keys)
       expect(onFilterChange).toHaveBeenCalledWith({
         logicalOperator: 'AND',
