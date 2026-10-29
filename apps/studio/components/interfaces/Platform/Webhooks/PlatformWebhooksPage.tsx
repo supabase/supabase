@@ -57,6 +57,7 @@ import {
   shouldHandleEndpointNotFound,
   shouldRedirectFromWebhooks,
 } from './PlatformWebhooksPage.utils'
+import { useAwaitingDelivery } from './useAwaitingDelivery'
 import {
   useFeaturePreviewContext,
   useIsPlatformWebhooksEnabled,
@@ -132,6 +133,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const [editEnabledOverride, setEditEnabledOverride] = useState<boolean | null>(null)
   const [deliveryDetailsTab, setDeliveryDetailsTab] = useState<'event' | 'response'>('event')
   const [pendingCreatedEndpointId, setPendingCreatedEndpointId] = useState<string | null>(null)
+  const [isLive, setIsLive] = useState(false)
+  const { isAwaitingDelivery, startAwaitingDelivery } = useAwaitingDelivery()
 
   const scopeLabel = scope === 'organization' ? 'Organization Webhooks' : 'Project Webhooks'
   const scopeDescription =
@@ -177,7 +180,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       size: DELIVERIES_PAGE_SIZE + 1,
       after: pageCursors.at(-1),
     },
-    { enabled: queryEnabled && !!selectedEndpoint }
+    { enabled: queryEnabled && !!selectedEndpoint, isLive, isAwaitingDelivery }
   )
   const deliveries = useMemo(
     () => (fetchedDeliveries ?? []).slice(0, DELIVERIES_PAGE_SIZE),
@@ -408,6 +411,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to send webhook test event', error)
       return
     }
+    // A new delivery is newer than every cursor, so it can only show up on the first page
+    setDeliveryPages({ endpointId: selectedEndpoint.id, cursors: [] })
+    startAwaitingDelivery()
     toast.success('Test event sent — check deliveries shortly')
   }
 
@@ -447,6 +453,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to retry webhook delivery', error)
       return
     }
+    startAwaitingDelivery()
     toast.success('Delivery queued for retry')
   }
 
@@ -578,8 +585,10 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 hasPreviousPage={hasPreviousPage}
                 // The rows are kept when a refresh fails, so tell the user they may be out of date
                 hasRefreshError={!!deliveriesError && !!fetchedDeliveries?.length}
+                isLive={isLive}
                 isLoadingDeliveries={isLoadingDeliveries}
                 isRefetchingDeliveries={isFetchingDeliveries}
+                onLiveChange={setIsLive}
                 onRefetchDeliveries={refetchDeliveries}
                 selectedEndpoint={selectedEndpoint}
                 onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}

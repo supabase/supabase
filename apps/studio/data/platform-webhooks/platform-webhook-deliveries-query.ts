@@ -4,6 +4,7 @@ import { platformWebhooksKeys } from './keys'
 import { listWebhookDeliveries, type WebhookScopeParams } from './platform-webhooks-fetchers'
 import { toWebhookDelivery } from './platform-webhooks-mappers'
 import type { WebhookDelivery } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooks.types'
+import { getDeliveriesRefetchInterval } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooksPage.utils'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 interface WebhookDeliveriesVariables {
@@ -28,8 +29,13 @@ export const useWebhookDeliveriesQuery = <TData = WebhookDeliveriesData>(
   variables: WebhookDeliveriesVariables,
   {
     enabled = true,
+    isLive = false,
+    isAwaitingDelivery = false,
     ...options
-  }: UseCustomQueryOptions<WebhookDeliveriesData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<WebhookDeliveriesData, ResponseError, TData> & {
+    isLive?: boolean
+    isAwaitingDelivery?: boolean
+  } = {}
 ) => {
   const { scope, endpointId, size, after, before } = variables
 
@@ -38,10 +44,12 @@ export const useWebhookDeliveriesQuery = <TData = WebhookDeliveriesData>(
     queryFn: ({ signal }) =>
       getWebhookDeliveries({ scope, endpointId, size, after, before }, signal),
     enabled: enabled && Boolean(endpointId),
-    // With no rows to show, a failed load leaves an error card with a "Try again" button, so
-    // polling stops. With rows on screen it keeps going and recovers by itself.
     refetchInterval: (query) =>
-      query.state.status === 'error' && !query.state.data?.length ? false : 5000,
+      getDeliveriesRefetchInterval({
+        isLive,
+        isAwaitingDelivery,
+        deliveries: query.state.data ?? [],
+      }),
     ...options,
   })
 }
