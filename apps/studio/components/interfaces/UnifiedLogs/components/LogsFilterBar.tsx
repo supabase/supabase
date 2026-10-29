@@ -16,6 +16,7 @@ import { getLogAttributeKey, logAttributeFilterId } from '../UnifiedLogs.filters
 import type { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { isOfferedFilter } from '../UnifiedLogs.utils'
 import {
+  buildAttributeFilterProperty,
   buildColumnFilterValues,
   buildFilterGroup,
   buildFilterProperties,
@@ -102,7 +103,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     }
   }
 
-  const columnBackedNames = new Set([
+  const ownedFilterNames = new Set([
     ...filterProperties.map((p) => p.name).filter((name) => name !== USER_PROPERTY),
     ...columnFilters
       .filter(({ id }) => !defaultFilterFields.some((field) => field.value === id))
@@ -110,7 +111,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
   ])
 
   const [filters, setFilters] = useState<FilterGroup>(() =>
-    withUserCondition(buildFilterGroup(columnFilters, columnBackedNames))
+    withUserCondition(buildFilterGroup(columnFilters, ownedFilterNames))
   )
 
   const canDiscoverAttributes = isOtel && !!projectRef && hasFocusedFilterBar
@@ -138,50 +139,32 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     const key = getLogAttributeKey(condition.propertyName)
     if (key !== undefined) attributeKeys.add(key)
   }
-  const legacyAttributeProperties = columnFilters
+  const legacyAttributeIds = columnFilters
     .filter(
       ({ id }) =>
         id !== USER_PROPERTY &&
         getLogAttributeKey(id) === undefined &&
         !defaultFilterFields.some((field) => field.value === id)
     )
-    .map(({ id }) => ({
-      label: `Attribute: ${id}`,
-      name: id,
-      type: 'string' as const,
-      operators: [
-        { label: 'Equals', value: '=' },
-        { label: 'Not equal', value: '<>' },
-      ],
-    }))
-  const attributeProperties = isOtel
-    ? [...attributeKeys].map((key) => ({
-        label: `Attribute: ${key}`,
-        name: logAttributeFilterId(key),
-        type: 'string' as const,
-        operators: [
-          { label: 'Equals', value: '=', group: 'comparison' as const },
-          { label: 'Not equal', value: '<>', group: 'comparison' as const },
-        ],
-      }))
-    : []
-  for (const property of attributeProperties) columnBackedNames.add(property.name)
+    .map(({ id }) => id)
+  const attributeIds = isOtel ? [...attributeKeys].map(logAttributeFilterId) : []
+  const attributeProperties = [...attributeIds, ...legacyAttributeIds].map(
+    buildAttributeFilterProperty
+  )
 
   const hasTimeRangeFilter = filters.conditions.some(
     (condition) => 'propertyName' in condition && condition.propertyName === TIME_RANGE_PROPERTY
   )
-  const filterPropertiesWithAvailability = [
-    ...filterProperties,
-    ...attributeProperties,
-    ...legacyAttributeProperties,
-  ].map((property) => ({
-    ...property,
-    isAvailable: property.name !== TIME_RANGE_PROPERTY || !hasTimeRangeFilter,
-  }))
+  const filterPropertiesWithAvailability = [...filterProperties, ...attributeProperties].map(
+    (property) => ({
+      ...property,
+      isAvailable: property.name !== TIME_RANGE_PROPERTY || !hasTimeRangeFilter,
+    })
+  )
 
   // Read latest values without making the effect depend on their (per-render) identity.
   const syncFromColumnFilters = useEffectEvent(() => {
-    setFilters(withUserCondition(buildFilterGroup(columnFilters, columnBackedNames)))
+    setFilters(withUserCondition(buildFilterGroup(columnFilters, ownedFilterNames)))
   })
 
   const applyUser = (raw: string | undefined) => {
@@ -208,7 +191,7 @@ export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
     applyUser(getUserFilterValue(next.conditions as FilterCondition[]))
     const columnFilterValues = buildColumnFilterValues(next.conditions as FilterCondition[])
     table.setColumnFilters((current) => [
-      ...current.filter(({ id }) => !columnBackedNames.has(id)),
+      ...current.filter(({ id }) => !ownedFilterNames.has(id)),
       ...Array.from(columnFilterValues, ([id, value]) => ({ id, value })),
       ...(timeRange ? [{ id: TIME_RANGE_PROPERTY, value: timeRange }] : []),
     ])

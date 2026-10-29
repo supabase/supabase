@@ -9,6 +9,7 @@ import { z } from 'zod'
 
 import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from '../UnifiedLogs.constants'
 import {
+  getLogAttributeKey,
   groupLogsFiltersByColumn,
   isLogsFilterColumnValue,
   parseLogsFilterUrlParams,
@@ -57,6 +58,13 @@ const COMPARISON_OPERATORS: FilterProperty['operators'] = [
   { label: 'Equals', value: '=', group: 'comparison' },
   { label: 'Not equal', value: '<>', group: 'comparison' },
 ]
+
+export const buildAttributeFilterProperty = (id: string): FilterProperty => ({
+  label: `Attribute: ${getLogAttributeKey(id) ?? id}`,
+  name: id,
+  type: 'string',
+  operators: COMPARISON_OPERATORS,
+})
 
 const PATTERN_OPERATORS: FilterProperty['operators'] = [
   { label: 'iLike', value: '~~*', group: 'pattern' },
