@@ -204,7 +204,6 @@ const genGuideMeta =
       openGraph: {
         ...parentOg,
         type: 'article',
-        publishedTime: undefined,
         modifiedTime: lastUpdated,
         url: `${BASE_PATH}${pathname}`,
         images: generateOpenGraphImageMeta({

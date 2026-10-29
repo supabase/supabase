@@ -40,8 +40,8 @@ async function fetchAllPageDates() {
 }
 
 /**
- * Memoized per process, so the table is read once per worker rather than once
- * per page. A failed load is not cached, so the next call retries.
+ * Builds map of all pages and then reads from this, so the table is read once per worker
+ * rather than once per page. A failed load is not cached, so the next call retries.
  */
 let pageDates: Promise<Map<string, string>> | undefined
 
