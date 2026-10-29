@@ -127,8 +127,14 @@ export const FileExplorerKeyboardNavigationProvider = ({
       // would march the view down the tree. There, a folder opens when it is chosen.
       if (source === 'browsing' && isListView) return
 
-      const isAlreadyOpen = state.openedFolders[target.columnIndex]?.name === item.name
-      if (isAlreadyOpen) return
+      const isOpenInColumn = state.openedFolders[target.columnIndex]?.name === item.name
+      if (isOpenInColumn) {
+        if (source === 'browsing') return
+        // Choosing an open folder again closes whatever was opened inside it: deeper
+        // columns, or a file preview. With neither there is nothing to collapse.
+        const hasDeeperColumns = latestColumns.current.length > target.columnIndex + 2
+        if (!hasDeeperColumns && state.selectedFilePreview === undefined) return
+      }
       clearArchivedSelection()
       openFolderAtIndex(target.columnIndex, item, {
         history: source === 'explicit' ? 'push' : 'replace',
@@ -189,14 +195,18 @@ export const FileExplorerKeyboardNavigationProvider = ({
   }
 
   /** Right: into the folder under the cursor, landing on its first row */
-  const enterFolder = async (columnIndex: number, item: StorageItem | undefined) => {
+  const enterFolder = async (
+    columnIndex: number,
+    item: StorageItem | undefined,
+    history: 'push' | 'replace' = 'replace'
+  ) => {
     if (!isReadyFolder(item)) return
 
     const isAlreadyOpen =
       snap.openedFolders[columnIndex]?.name === item.name && columns.length > columnIndex + 1
     if (!isAlreadyOpen) {
       activateWhenCursorSettles.cancel()
-      await openFolderAtIndex(columnIndex, item, { history: 'replace' })
+      await openFolderAtIndex(columnIndex, item, { history })
     }
 
     // An empty folder has no row to move onto, so the cursor stays on the folder itself.
@@ -238,8 +248,9 @@ export const FileExplorerKeyboardNavigationProvider = ({
     item: StorageItem | undefined,
     { isRangeSelect }: { isRangeSelect: boolean }
   ) => {
-    // Selection drives the bulk actions, which only ever apply to files
-    if (!isReadyFile(item)) return
+    // Selection drives the bulk actions, which only ever apply to live files: an archived
+    // row has no object to download, move or delete
+    if (!isReadyFile(item) || item.archived !== undefined) return
     // Space is a deliberate selection, so the preview browsing would open loses out
     activateWhenCursorSettles.cancel()
 
@@ -286,6 +297,8 @@ export const FileExplorerKeyboardNavigationProvider = ({
   const onColumnKeyDown = (columnIndex: number, event: KeyboardEvent<HTMLElement>) => {
     // Keys typed in a row's checkbox, action menu or rename field belong to that control
     if (event.target !== event.currentTarget) return
+    // Alt, Ctrl and Meta combinations are browser and OS shortcuts (Alt+Left is Back)
+    if (event.altKey || event.ctrlKey || event.metaKey) return
 
     const column = columns[columnIndex]
     if (!column) return
@@ -333,7 +346,8 @@ export const FileExplorerKeyboardNavigationProvider = ({
       case 'Enter':
         event.preventDefault()
         if (isReadyFolder(item)) {
-          enterFolder(columnIndex, item)
+          // Opening a folder outright is a navigation, unlike Right, which is browsing
+          enterFolder(columnIndex, item, 'push')
           return
         }
         // Choosing a file outright, so it does not wait out the debounce
@@ -355,6 +369,8 @@ export const FileExplorerKeyboardNavigationProvider = ({
     // close it. The shortcut is global on this page, so this is where that is ruled out.
     const activeElement = document.activeElement
     if (activeElement?.closest('[role="menu"],[role="dialog"],[role="menuitem"]')) return
+    // Space and Enter on a focused button mean "press it", and arrows may belong to it
+    if (activeElement?.matches('button,[role="button"]')) return
 
     const { columnIndex } = cursor
     const itemCount = columns[columnIndex]?.items.length ?? 0

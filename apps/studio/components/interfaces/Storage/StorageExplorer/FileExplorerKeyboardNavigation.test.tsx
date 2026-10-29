@@ -121,6 +121,7 @@ const setSnapshot = (
     columns: StorageColumn[]
     openedFolders: StorageItem[]
     selectedItems: (StorageItem & { columnIndex: number })[]
+    selectedFilePreview: StorageItem
     setSelectedItems: () => void
     selectRangeItems: () => void
   }> = {}
@@ -454,6 +455,68 @@ describe('FileExplorerKeyboardNavigation', () => {
     expect(setSelectedItems).not.toHaveBeenCalled()
   })
 
+  it('does not select an archived file', async () => {
+    const setSelectedItems = vi.fn()
+    const archivedFile = { ...makeItem('old.png'), archived: { archivedObjectId: 'archived-1' } }
+    setSnapshot({
+      columns: [makeColumn('my-bucket', [archivedFile])],
+      openedFolders: [],
+      setSelectedItems,
+    })
+    renderColumns()
+    await focusColumn('my-bucket')
+
+    await userEvent.keyboard('{ }')
+
+    expect(setSelectedItems).not.toHaveBeenCalled()
+  })
+
+  it('ignores keys pressed with Alt, Ctrl or Meta', async () => {
+    renderColumns()
+    await focusColumn('my-bucket')
+
+    await userEvent.keyboard('{Alt>}{ArrowDown}{/Alt}')
+    await userEvent.keyboard('{Control>}{ArrowDown}{/Control}')
+    await userEvent.keyboard('{Meta>}{ArrowDown}{/Meta}')
+
+    expect(getCursor()).toBe('0:0')
+  })
+
+  it('opens a folder as a navigation on Enter, unlike ArrowRight', async () => {
+    setSnapshot({ columns: [columns[0]], openedFolders: [] })
+    renderColumns()
+    await focusColumn('my-bucket')
+
+    await userEvent.keyboard('{Enter}')
+
+    expect(mockOpenFolderAtIndex).toHaveBeenCalledWith(
+      0,
+      expect.objectContaining({ name: 'images' }),
+      { history: 'push' }
+    )
+  })
+
+  it('closes a file preview when an open folder is chosen again', async () => {
+    setSnapshot({ selectedFilePreview: columns[1].items[0] })
+    renderColumns()
+
+    await userEvent.click(screen.getByRole('button', { name: 'click images' }))
+
+    expect(mockOpenFolderAtIndex).toHaveBeenCalledWith(
+      0,
+      expect.objectContaining({ name: 'images' }),
+      { history: 'push' }
+    )
+  })
+
+  it('does nothing when an open folder is chosen again with nothing inside it open', async () => {
+    renderColumns()
+
+    await userEvent.click(screen.getByRole('button', { name: 'click images' }))
+
+    expect(mockOpenFolderAtIndex).not.toHaveBeenCalled()
+  })
+
   it('leaves keys typed inside a row control to that control', async () => {
     renderColumns()
     await focusColumn('my-bucket')
@@ -478,8 +541,6 @@ describe('FileExplorerKeyboardNavigation', () => {
 
   it('moves focus into the list from outside it', async () => {
     renderColumns()
-    const outside = screen.getByRole('button', { name: 'outside the list' })
-    outside.focus()
     expect(screen.getByTestId('is-focused')).toHaveTextContent('false')
 
     await userEvent.keyboard('{ArrowDown}')
@@ -488,6 +549,15 @@ describe('FileExplorerKeyboardNavigation', () => {
       expect(screen.getByRole('listbox', { name: 'Contents of my-bucket' })).toHaveFocus()
     )
     expect(getCursor()).toBe('0:0')
+  })
+
+  it('leaves the arrow keys to a focused button outside the list', async () => {
+    renderColumns()
+    screen.getByRole('button', { name: 'outside the list' }).focus()
+
+    await userEvent.keyboard('{ArrowDown}')
+
+    expect(screen.getByTestId('is-focused')).toHaveTextContent('false')
   })
 
   it('does not open folders it passes over in list view', async () => {
