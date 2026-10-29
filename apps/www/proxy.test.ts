@@ -21,20 +21,12 @@ function makeRequest(
     hasCookie,
     accept,
     userAgent,
-    routerStateTree,
-  }: {
-    referer?: string
-    hasCookie?: boolean
-    accept?: string
-    userAgent?: string
-    routerStateTree?: string
-  } = {}
+  }: { referer?: string; hasCookie?: boolean; accept?: string; userAgent?: string } = {}
 ): NextRequest {
   const headers: Record<string, string> = {}
   if (referer) headers.referer = referer
   if (accept) headers.accept = accept
   if (userAgent) headers['user-agent'] = userAgent
-  if (routerStateTree) headers['next-router-state-tree'] = routerStateTree
   const req = new NextRequest(new URL(url, 'https://supabase.com'), { headers })
   if (hasCookie) {
     req.cookies.set(FIRST_REFERRER_COOKIE_NAME, 'existing')
@@ -43,49 +35,6 @@ function makeRequest(
 }
 
 describe('www proxy', () => {
-  describe('Next.js 15 router state tree', () => {
-    // Shape sent by a Next.js 15 client: the root layout segment has `isRootLayout: true`.
-    const v15Tree = encodeURIComponent(
-      JSON.stringify(['', { children: ['blog', { children: ['__PAGE__', {}] }] }, null, null, true])
-    )
-    // Shape sent by a Next.js 16 client: the fifth element is a numeric flags bitmask.
-    const v16Tree = encodeURIComponent(
-      JSON.stringify(['', { children: ['blog', { children: ['__PAGE__', {}] }] }, null, null, 1])
-    )
-
-    it('rejects v15-shaped state with a 400 instead of letting the renderer throw', () => {
-      const res = proxy(makeRequest('/blog?_rsc=abc', { routerStateTree: v15Tree }))
-
-      expect(res.status).toBe(400)
-      expect(res.headers.get('Cache-Control')).toBe('no-store')
-    })
-
-    it.each(['/docs/guides/auth', '/docs', '/dashboard/project/x', '/kb/guides/x'])(
-      'does not touch v15-shaped state on other zones (%s)',
-      (path) => {
-        const res = proxy(makeRequest(`${path}?_rsc=abc`, { routerStateTree: v15Tree }))
-
-        expect(res.status).toBe(200)
-      }
-    )
-
-    it('passes v16-shaped state through', () => {
-      const res = proxy(makeRequest('/blog?_rsc=abc', { routerStateTree: v16Tree }))
-
-      expect(res.status).toBe(200)
-    })
-
-    it('passes requests without the header through', () => {
-      expect(proxy(makeRequest('/blog')).status).toBe(200)
-    })
-
-    it('leaves malformed state for Next.js to handle', () => {
-      const res = proxy(makeRequest('/blog?_rsc=abc', { routerStateTree: '%7Bnot-json' }))
-
-      expect(res.status).toBe(200)
-    })
-  })
-
   describe('cookie stamping on www paths', () => {
     it('stamps cookie for external referrer on www path', () => {
       const req = makeRequest('/pricing', { referer: 'https://google.com' })
