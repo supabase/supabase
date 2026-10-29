@@ -77,6 +77,25 @@ describe('getDatabaseTriggerUpdateSQL', () => {
     expect(sql).toContain('FOR EACH ROW WHEN (NEW.id > 0) EXECUTE FUNCTION')
   })
 
+  test('preserves the original WHEN condition when the update omits it', () => {
+    const sql = getDatabaseTriggerUpdateSQL({
+      originalTrigger: { ...originalTrigger, condition: 'NEW.id > 0' },
+      updatedTrigger: baseUpdatedTrigger,
+    })
+
+    expect(sql).toContain('FOR EACH ROW WHEN (NEW.id > 0) EXECUTE FUNCTION')
+  })
+
+  test('an explicitly empty condition clears the original WHEN condition', () => {
+    const sql = getDatabaseTriggerUpdateSQL({
+      originalTrigger: { ...originalTrigger, condition: 'NEW.id > 0' },
+      updatedTrigger: { ...baseUpdatedTrigger, condition: safeSql`` },
+    })
+
+    expect(sql).toContain('FOR EACH ROW EXECUTE FUNCTION')
+    expect(sql).not.toContain('WHEN')
+  })
+
   test('renames the trigger while recreating it', () => {
     const sql = getDatabaseTriggerUpdateSQL({
       originalTrigger,
