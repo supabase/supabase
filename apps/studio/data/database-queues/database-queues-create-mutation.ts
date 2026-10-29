@@ -40,9 +40,10 @@ export async function createDatabaseQueue({
 
   const { partitionInterval, retentionInterval } = configuration ?? {}
 
+  // pgmq declares both intervals as text, so they must be passed as string literals
   const createFragment =
     type === 'partitioned'
-      ? safeSql`select from pgmq.create_partitioned(${literal(name)}, ${literal(partitionInterval)}, ${literal(retentionInterval)});`
+      ? safeSql`select from pgmq.create_partitioned(${literal(name)}, ${literal(String(partitionInterval))}, ${literal(String(retentionInterval))});`
       : type === 'unlogged'
         ? safeSql`SELECT pgmq.create_unlogged(${literal(name)});`
         : safeSql`SELECT pgmq.create(${literal(name)});`
