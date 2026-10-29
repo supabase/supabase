@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { operations } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -490,6 +490,17 @@ describe('PlatformWebhooksPage (project scope)', () => {
       attributes: { ...DELIVERY_ATTRIBUTES, status },
     })
 
+    // Fake clock (still ticking for findBy/waitFor), so we can skip the polling wait
+    beforeEach(() => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    const skipPollingInterval = () => act(() => vi.advanceTimersByTimeAsync(5500))
+
     test('does not poll by default', async () => {
       const { getRequests } = mockDeliveries(() => [delivery('success')])
 
@@ -497,9 +508,9 @@ describe('PlatformWebhooksPage (project scope)', () => {
       await screen.findByText('success')
 
       // Longer than the 5s polling interval
-      await new Promise((resolve) => setTimeout(resolve, 5500))
+      await skipPollingInterval()
       expect(getRequests()).toBe(1)
-    }, 20000)
+    })
 
     test('refreshes once when Refresh is clicked', async () => {
       const { getRequests } = mockDeliveries(() => [delivery('success')])
@@ -514,7 +525,7 @@ describe('PlatformWebhooksPage (project scope)', () => {
 
     test('polls while Live is on and stops when it is turned off', async () => {
       const { getRequests } = mockDeliveries(() => [delivery('success')])
-      const user = userEvent.setup()
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
 
       renderPage(ENDPOINT_ID)
       await screen.findByText('success')
@@ -522,11 +533,15 @@ describe('PlatformWebhooksPage (project scope)', () => {
       const liveButton = screen.getByRole('button', { name: 'Live' })
       await user.click(liveButton)
       expect(liveButton).toHaveAttribute('aria-pressed', 'true')
-      await waitFor(() => expect(getRequests()).toBeGreaterThan(1), { timeout: 9000 })
+      await skipPollingInterval()
+      await waitFor(() => expect(getRequests()).toBeGreaterThan(1))
 
       await user.click(liveButton)
       expect(liveButton).toHaveAttribute('aria-pressed', 'false')
-    }, 20000)
+      const requestsWhenTurnedOff = getRequests()
+      await skipPollingInterval()
+      expect(getRequests()).toBe(requestsWhenTurnedOff)
+    })
 
     test('polls while a delivery is pending, until it finishes', async () => {
       mockDeliveries((requests) => [delivery(requests === 1 ? 'pending' : 'success')])
@@ -534,8 +549,9 @@ describe('PlatformWebhooksPage (project scope)', () => {
       renderPage(ENDPOINT_ID)
       await screen.findByText('pending')
 
-      expect(await screen.findByText('success', {}, { timeout: 9000 })).toBeInTheDocument()
-    }, 20000)
+      await skipPollingInterval()
+      expect(await screen.findByText('success')).toBeInTheDocument()
+    })
 
     test('Live keeps working after a failed first load', async () => {
       mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
@@ -562,11 +578,14 @@ describe('PlatformWebhooksPage (project scope)', () => {
       renderPage(ENDPOINT_ID)
       await screen.findByText('Failed to retrieve deliveries')
 
-      await userEvent.setup().click(screen.getByRole('button', { name: 'Live' }))
+      await userEvent
+        .setup({ advanceTimers: vi.advanceTimersByTime })
+        .click(screen.getByRole('button', { name: 'Live' }))
 
-      expect(await screen.findByText('success', {}, { timeout: 9000 })).toBeInTheDocument()
+      await skipPollingInterval()
+      expect(await screen.findByText('success')).toBeInTheDocument()
       expect(screen.queryByText('Failed to retrieve deliveries')).not.toBeInTheDocument()
-    }, 20000)
+    })
 
     test('polls after a test event is sent, until its delivery appears', async () => {
       // The first requests show no rows, as if the test event had not been delivered yet
@@ -586,9 +605,13 @@ describe('PlatformWebhooksPage (project scope)', () => {
 
       await userEvent.click(await waitFor(() => findMoreActionsButton()))
       fireEvent.click(await screen.findByText('Send test event'))
+      await waitFor(() => expect(toast.success).toHaveBeenCalled())
 
-      expect(await screen.findByText('success', {}, { timeout: 12000 })).toBeInTheDocument()
-    }, 25000)
+      // Two polls: the first still shows no rows, the second shows the delivery
+      await skipPollingInterval()
+      await skipPollingInterval()
+      expect(await screen.findByText('success')).toBeInTheDocument()
+    })
   })
 
   describe('deliveries pagination', () => {
