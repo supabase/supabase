@@ -35,7 +35,7 @@ export function MessageField({ form, originalError }: MessageFieldProps) {
         <FormItemLayout
           layout="vertical"
           label="Message"
-          labelOptional={`${field.value.length.toLocaleString()} / ${MESSAGE_MAX_LENGTH.toLocaleString()}`}
+          labelOptional={`${field.value.length.toLocaleString('en-US')} / ${MESSAGE_MAX_LENGTH.toLocaleString('en-US')}`}
           description={
             <div className="flex flex-col gap-y-3">
               <p>
