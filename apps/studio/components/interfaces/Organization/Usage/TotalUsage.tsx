@@ -122,7 +122,10 @@ export const TotalUsage = ({
       }
 
       if (sortLastA && sortLastB) {
-        return breakdownMetrics.indexOf(a) - breakdownMetrics.indexOf(b)
+        return (
+          Number(usageMetaB?.available_in_plan) - Number(usageMetaA?.available_in_plan) ||
+          breakdownMetrics.indexOf(a) - breakdownMetrics.indexOf(b)
+        )
       }
 
       const usageRatioA =
