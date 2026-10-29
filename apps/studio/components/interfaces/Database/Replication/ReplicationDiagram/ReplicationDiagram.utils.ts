@@ -4,7 +4,7 @@ import { Edge, Node, Position } from '@xyflow/react'
 import { NODE_WIDTH } from './Nodes'
 
 const NODE_SEP = 0
-const NODE_ROW_HEIGHT = 260
+const NODE_ROW_HEIGHT = 320
 
 export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()

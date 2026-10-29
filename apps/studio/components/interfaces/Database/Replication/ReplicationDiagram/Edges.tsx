@@ -1,16 +1,11 @@
 import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath, type EdgeProps } from '@xyflow/react'
 import { useParams, useReducedMotion } from 'common'
-import { useMemo } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn } from 'ui'
 
 import { PIPELINE_REGION } from '../DestinationPanel/DestinationForm/PipelineRegionField'
-import { getStatusName } from '../Pipeline.utils'
-import {
-  EdgeVisualChip,
-  getEdgeVisual,
-  type ReplicationState,
-} from '@/components/ui/ReactFlow/EdgeVisual'
-import { RegionFlag } from '@/components/ui/RegionFlag'
+import { getPipelineDisplayState, getStatusName } from '../Pipeline.utils'
+import { ReplicationRegionLabel } from '../ReplicationRegionLabel'
+import { getEdgeVisual } from '@/components/ui/ReactFlow/EdgeVisual'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import {
@@ -52,15 +47,13 @@ export const SmoothstepEdge = ({
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
-  const replicationState = useMemo<ReplicationState>(() => {
-    const isTransitioning = requestStatus !== PipelineStatusRequestStatus.None
-    const statusName = getStatusName(pipelineStatusData?.status)
-    return {
-      isReplicating: statusName === 'started' && !isTransitioning,
-      isComingUp: isTransitioning || statusName === 'starting' || statusName === 'stopping',
-      isFailed: statusName === 'failed',
-    }
-  }, [pipelineStatusData?.status, requestStatus])
+  const statusName = getStatusName(pipelineStatusData?.status)
+  const displayState = getPipelineDisplayState(requestStatus, statusName)
+  const replicationState = {
+    isReplicating: displayState.type === 'success',
+    isComingUp: displayState.type === 'loading',
+    isFailed: displayState.type === 'failure',
+  }
 
   const edgeTargetX = shiftEdgeEnd ? targetX - 8 : targetX
   const [edgePath, labelX, labelY] = getSmoothStepPath({
@@ -71,11 +64,12 @@ export const SmoothstepEdge = ({
     targetY,
     targetPosition,
   })
-  // Branched paths label their shared vertical bend, so move the chip onto each final segment.
-  const chipX = shiftEdgeEnd ? (labelX + edgeTargetX) / 2 : labelX
+  // Center each pipeline box in the space between source and destination.
+  const chipX = shiftEdgeEnd ? (sourceX + edgeTargetX) / 2 : labelX
   const chipY = shiftEdgeEnd ? targetY : labelY
 
   const visual = getEdgeVisual(replicationState)
+  const StatusIcon = visual.Icon
 
   return (
     <>
@@ -103,20 +97,19 @@ export const SmoothstepEdge = ({
           }}
           className="nodrag nopan"
         >
-          <div className="relative">
-            <EdgeVisualChip visual={visual} />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="absolute left-1/2 top-full mt-1.5 flex -translate-x-1/2 flex-col items-center gap-1 whitespace-nowrap rounded-md border bg-surface-100 px-3 py-2 text-xs">
-                  <span className="text-foreground-light">Pipeline region</span>
-                  <span className="flex items-center gap-1.5 font-mono">
-                    <RegionFlag className="w-4" region={PIPELINE_REGION.code} />
-                    {PIPELINE_REGION.code}
-                  </span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>{PIPELINE_REGION.displayName}</TooltipContent>
-            </Tooltip>
+          <div className="w-52 space-y-2 rounded-md border bg-surface-100 p-3 text-xs">
+            <div className="space-y-1">
+              <p className="text-foreground-lighter">Pipeline region</p>
+              <ReplicationRegionLabel code={PIPELINE_REGION.code} className="text-sm" />
+            </div>
+            <div className="flex items-center gap-1.5 border-t pt-2 text-foreground-light">
+              <StatusIcon
+                size={14}
+                className={cn('shrink-0', visual.shouldSpin && 'motion-safe:animate-spin')}
+                style={{ color: visual.color, fill: visual.isFilled ? visual.color : undefined }}
+              />
+              <span>{displayState.label}</span>
+            </div>
           </div>
         </div>
       </EdgeLabelRenderer>

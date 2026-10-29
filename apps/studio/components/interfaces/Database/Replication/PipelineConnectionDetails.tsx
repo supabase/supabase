@@ -11,7 +11,7 @@ import {
 import { PIPELINE_REGION } from './DestinationPanel/DestinationForm/PipelineRegionField'
 import { getDestinationStorageRegion } from './PipelineConnectionDetails.utils'
 import { PipelineDetailItem } from './ReplicationPipelineStatus/PipelineDetailItem'
-import { RegionFlag } from '@/components/ui/RegionFlag'
+import { ReplicationRegionLabel } from './ReplicationRegionLabel'
 import type { ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
 
 const RegionValue = ({ code }: { code?: string }) => {
@@ -19,10 +19,7 @@ const RegionValue = ({ code }: { code?: string }) => {
   const region = Object.values(AWS_REGIONS).find((region) => region.code === code)
   return (
     <div className="space-y-1">
-      <span className="flex items-center gap-2">
-        {region && <RegionFlag className="w-5" region={code} />}
-        {region?.displayName ?? code}
-      </span>
+      <ReplicationRegionLabel code={code} />
       {region && <span className="block font-mono text-xs text-foreground-lighter">{code}</span>}
     </div>
   )
@@ -58,7 +55,7 @@ export const PipelineConnectionDetails = ({
                   label="Destination storage region"
                   description="Configured storage region."
                 >
-                  <span className="font-mono">{storageRegion}</span>
+                  <RegionValue code={storageRegion} />
                 </PipelineDetailItem>
               )}
             </dl>
