@@ -109,8 +109,15 @@ export const FileExplorerColumn = ({
   const { can: canUpdateStorage } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.STORAGE_WRITE
   )
-  const { cursor, isListFocused, registerColumn, onColumnFocus, onColumnBlur, onColumnKeyDown } =
-    useFileExplorerKeyboardNavigation()
+  const {
+    cursor,
+    isCursorVisible,
+    registerColumn,
+    onColumnFocus,
+    onColumnBlur,
+    onColumnKeyDown,
+    dismissCursor,
+  } = useFileExplorerKeyboardNavigation()
 
   const isCursorColumn = cursor.columnIndex === index
   const activeItemIndex = isCursorColumn ? cursor.itemIndex : undefined
@@ -171,9 +178,9 @@ export const FileExplorerColumn = ({
       view: view,
       columnIndex: index,
       selectedItems,
-      activeItemIndex: isListFocused ? activeItemIndex : undefined,
+      activeItemIndex: isCursorVisible ? activeItemIndex : undefined,
     }),
-    [view, index, selectedItems, isListFocused, activeItemIndex]
+    [view, index, selectedItems, isCursorVisible, activeItemIndex]
   )
 
   const onSelectCreateFolder = () => {
@@ -231,6 +238,8 @@ export const FileExplorerColumn = ({
           onBlur={onColumnBlur}
           onKeyDown={(event) => onColumnKeyDown(index, event)}
           onClick={() => {
+            // The click landed on no row, so the cursor goes away with the selection
+            dismissCursor()
             onSelectColumnEmptySpace(index)
           }}
         >

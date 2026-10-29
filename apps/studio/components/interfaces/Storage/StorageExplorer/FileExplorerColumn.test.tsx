@@ -198,6 +198,24 @@ describe('FileExplorerColumn keyboard navigation', () => {
     expect(folderRow).not.toHaveClass('bg-foreground/10')
   })
 
+  it('stops drawing the cursor when a click lands on the column but on no row', async () => {
+    renderColumn()
+    await focusListbox()
+    const [folderRow, firstFileRow] = screen.getAllByRole('option')
+    expect(folderRow).toHaveClass('bg-foreground/10')
+
+    // Clicking a column's empty space closes whatever was open below it and selects
+    // nothing, so the row the cursor was left on is no longer drawn as chosen
+    await userEvent.click(getListbox())
+
+    expect(folderRow).not.toHaveClass('bg-foreground/10')
+
+    // The column keeps focus, so the keyboard picks the cursor up where it was left
+    await userEvent.keyboard('{ArrowDown}')
+
+    expect(firstFileRow).toHaveClass('bg-foreground/10')
+  })
+
   it('previews the file the cursor is on with Enter', async () => {
     renderColumn()
     getListbox().focus()

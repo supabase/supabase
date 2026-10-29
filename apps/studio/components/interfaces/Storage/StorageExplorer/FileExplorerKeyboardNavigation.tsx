@@ -43,14 +43,16 @@ type ActivationSource = 'explicit' | 'browsing'
 interface FileExplorerKeyboardNavigationContextValue {
   /** The row the keyboard is on, always pointing at a row that exists */
   cursor: ExplorerCursor
-  /** True while a column has focus — the cursor is only drawn when it can be driven */
-  isListFocused: boolean
+  /** True while the cursor is drawn: a column has focus and no click has put it away */
+  isCursorVisible: boolean
   registerColumn: (columnIndex: number, element: HTMLElement | null) => void
   onColumnFocus: (columnIndex: number) => void
   onColumnBlur: (event: FocusEvent<HTMLElement>) => void
   onColumnKeyDown: (columnIndex: number, event: KeyboardEvent<HTMLElement>) => void
   /** Puts the cursor on a row that was clicked, and opens it */
   activateRow: (cursor: ExplorerCursor) => void
+  /** Stops drawing the cursor when a click lands on a column but on none of its rows */
+  dismissCursor: () => void
 }
 
 const FileExplorerKeyboardNavigationContext =
@@ -100,6 +102,12 @@ export const FileExplorerKeyboardNavigationProvider = ({
     itemIndex: 0,
   })
   const [isListFocused, setIsListFocused] = useState(false)
+  /**
+   * Clicking a column's empty space chooses nothing in it — it closes whatever was open
+   * below and clears the selection — so the row the cursor sat on stops being drawn too.
+   * Focus stays on the column, so the next keystroke carries on from where it was left.
+   */
+  const [isCursorDismissed, setIsCursorDismissed] = useState(false)
 
   const columnElements = useRef(new Map<number, HTMLElement>())
   /** Set by the keys that move between columns, so only they pull focus along */
@@ -188,6 +196,7 @@ export const FileExplorerKeyboardNavigationProvider = ({
     { followFocus = false, activate = false }: { followFocus?: boolean; activate?: boolean } = {}
   ) => {
     if (followFocus) shouldFollowCursorRef.current = true
+    setIsCursorDismissed(false)
     setRequestedCursor(next)
 
     activateWhenCursorSettles.cancel()
@@ -299,6 +308,8 @@ export const FileExplorerKeyboardNavigationProvider = ({
     if (event.target !== event.currentTarget) return
     // Alt, Ctrl and Meta combinations are browser and OS shortcuts (Alt+Left is Back)
     if (event.altKey || event.ctrlKey || event.metaKey) return
+    // The keyboard is driving again, so a cursor a click put away comes back
+    setIsCursorDismissed(false)
 
     const column = columns[columnIndex]
     if (!column) return
@@ -363,6 +374,8 @@ export const FileExplorerKeyboardNavigationProvider = ({
     }
   }
 
+  const dismissCursor = () => setIsCursorDismissed(true)
+
   /** Entry point from outside the list: park the cursor on an edge row and take focus */
   const startNavigation = (edge: 'first' | 'last') => {
     // A menu or dialog drives its own arrow keys, and pulling focus out of one would
@@ -393,12 +406,13 @@ export const FileExplorerKeyboardNavigationProvider = ({
     <FileExplorerKeyboardNavigationContext.Provider
       value={{
         cursor,
-        isListFocused,
+        isCursorVisible: isListFocused && !isCursorDismissed,
         registerColumn,
         onColumnFocus,
         onColumnBlur,
         onColumnKeyDown,
         activateRow,
+        dismissCursor,
       }}
     >
       {children}

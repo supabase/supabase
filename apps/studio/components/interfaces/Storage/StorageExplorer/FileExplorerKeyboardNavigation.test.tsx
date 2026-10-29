@@ -78,7 +78,7 @@ const openedFolders = [makeItem('images', STORAGE_ROW_TYPES.FOLDER)]
 const Columns = () => {
   const {
     cursor,
-    isListFocused,
+    isCursorVisible,
     registerColumn,
     onColumnFocus,
     onColumnBlur,
@@ -90,7 +90,7 @@ const Columns = () => {
   return (
     <>
       <p data-testid="cursor">{`${cursor.columnIndex}:${cursor.itemIndex}`}</p>
-      <p data-testid="is-focused">{String(isListFocused)}</p>
+      <p data-testid="is-cursor-visible">{String(isCursorVisible)}</p>
       <button tabIndex={0}>outside the list</button>
       {/* Stands in for the folder row in the bucket root being clicked */}
       <button tabIndex={0} onClick={() => activateRow({ columnIndex: 0, itemIndex: 0 })}>
@@ -167,7 +167,7 @@ describe('FileExplorerKeyboardNavigation', () => {
   it('moves down and up through a folder, stopping at its ends', async () => {
     renderColumns()
     await focusColumn('my-bucket')
-    expect(screen.getByTestId('is-focused')).toHaveTextContent('true')
+    expect(screen.getByTestId('is-cursor-visible')).toHaveTextContent('true')
 
     await userEvent.keyboard('{ArrowDown}')
     expect(getCursor()).toBe('0:1')
@@ -541,7 +541,7 @@ describe('FileExplorerKeyboardNavigation', () => {
 
   it('moves focus into the list from outside it', async () => {
     renderColumns()
-    expect(screen.getByTestId('is-focused')).toHaveTextContent('false')
+    expect(screen.getByTestId('is-cursor-visible')).toHaveTextContent('false')
 
     await userEvent.keyboard('{ArrowDown}')
 
@@ -557,7 +557,7 @@ describe('FileExplorerKeyboardNavigation', () => {
 
     await userEvent.keyboard('{ArrowDown}')
 
-    expect(screen.getByTestId('is-focused')).toHaveTextContent('false')
+    expect(screen.getByTestId('is-cursor-visible')).toHaveTextContent('false')
   })
 
   it('does not open folders it passes over in list view', async () => {
