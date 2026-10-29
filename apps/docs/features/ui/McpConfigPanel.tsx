@@ -135,7 +135,7 @@ function ProjectSelector({
           </PopoverTrigger>
         )}
       </div>
-      <PopoverContent className="mt-0 p-0 w-56" side="bottom" align="start">
+      <PopoverContent data-feedback-redact className="mt-0 p-0 w-56" side="bottom" align="start">
         <Command shouldFilter={false}>
           <CommandInput
             placeholder="Search ..."
@@ -229,7 +229,12 @@ function PlatformSelector({
           </Button>
         </PopoverTrigger>
       </div>
-      <PopoverContent className="mt-0 p-0 max-w-48" side="bottom" align="start">
+      <PopoverContent
+        data-feedback-redact
+        className="mt-0 p-0 max-w-48"
+        side="bottom"
+        align="start"
+      >
         <Command>
           <CommandList>
             <CommandGroup>
@@ -307,7 +312,7 @@ export function McpConfigPanel() {
 
   return (
     <>
-      <div className="not-prose">
+      <div data-feedback-redact className="not-prose">
         <div className="flex flex-wrap gap-3 mb-3">
           <PlatformSelector
             selectedPlatform={selectedPlatform}
