@@ -173,14 +173,73 @@ resources:
                                       - any: true
 
                       - match:
-                          prefix: /.well-known/oauth-authorization-server
+                          prefix: /auth/v1/.well-known/oauth-authorization-server
                         route:
                           cluster: auth
+                          prefix_rewrite: /.well-known/oauth-authorization-server
                           timeout: 30s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
-                              value: /.well-known/oauth-authorization-server
+                              value: /auth/v1/.well-known/oauth-authorization-server
+                            append_action: ADD_IF_ABSENT
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+
+                      - match:
+                          prefix: /auth/v1/.well-known/openid-configuration
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /.well-known/openid-configuration
+                          timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /auth/v1/.well-known/openid-configuration
+                            append_action: ADD_IF_ABSENT
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+
+                      - match:
+                          path: /.well-known/oauth-authorization-server/auth/v1
+                        route:
+                          cluster: auth
+                          prefix_rewrite: /.well-known/oauth-authorization-server
+                          timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /.well-known/oauth-authorization-server/auth/v1
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:

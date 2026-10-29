@@ -5,6 +5,7 @@ import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getAIDetails } from '@/lib/ai/ai-details'
@@ -27,11 +28,11 @@ import {
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
 import { getTools } from '@/lib/ai/tools'
-import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
+import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getBasePathURL } from '@/lib/helpers'
-import { isServerFlagEnabled, trustedUserEmail } from '@/lib/server/configcat'
+import { trustedUserEmail } from '@/lib/server/configcat'
 
 export const maxDuration = 300
 
@@ -153,10 +154,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
-  const [explorerEnabled, useStatusPageWidget] = await Promise.all([
-    isExplorerEnabled(trustedUserEmail(claims?.email)),
-    isServerFlagEnabled('incidentIoStatusPage'),
-  ])
+  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
 
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
@@ -195,7 +193,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       baseUrl: getBasePathURL(),
       supportMode,
       isExplorerEnabled: explorerEnabled,
-      useStatusPageWidget,
       signal: abortController.signal,
     })
 
@@ -209,6 +206,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
           projectRef,
           connectionString,
           sql: pgMetaSchemasList.sql,
+          grant: unguarded.migrating,
         },
         undefined,
         {

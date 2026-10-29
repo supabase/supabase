@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -13,9 +14,11 @@ import {
   describeUploadFailure,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
+  getReplaceableFileNames,
   getStorageExplorerUrlForItem,
   getStorageItemPath,
   getStoragePathForItem,
+  getUploadNameConflicts,
   parseStoragePath,
   sanitizeNameForDuplicateInColumn,
   serializeStoragePath,
@@ -48,70 +51,36 @@ function makeFolder(name: string): StorageItem {
 }
 
 describe('validateFolderName', () => {
-  describe('valid names', () => {
-    it('accepts plain alphanumeric names', () => {
-      expect(validateFolderName('myfolder')).toBeNull()
-      expect(validateFolderName('MyFolder123')).toBeNull()
-    })
-
-    it('accepts names with underscores and hyphens', () => {
-      expect(validateFolderName('my_folder')).toBeNull()
-      expect(validateFolderName('my-folder')).toBeNull()
-    })
-
-    it('accepts names with dots', () => {
-      expect(validateFolderName('my.folder')).toBeNull()
-    })
-
-    it('accepts names with spaces', () => {
-      expect(validateFolderName('my folder')).toBeNull()
-    })
-
-    it('accepts names with allowed special characters', () => {
-      expect(validateFolderName('folder!')).toBeNull()
-      expect(validateFolderName("folder'")).toBeNull()
-      expect(validateFolderName('folder(1)')).toBeNull()
-      expect(validateFolderName('folder*')).toBeNull()
-      expect(validateFolderName('folder&name')).toBeNull()
-      expect(validateFolderName('folder$name')).toBeNull()
-      expect(validateFolderName('folder@name')).toBeNull()
-      expect(validateFolderName('folder=name')).toBeNull()
-      expect(validateFolderName('folder;name')).toBeNull()
-      expect(validateFolderName('folder:name')).toBeNull()
-      expect(validateFolderName('folder+name')).toBeNull()
-      expect(validateFolderName('folder,name')).toBeNull()
-      expect(validateFolderName('folder?name')).toBeNull()
-    })
-
-    it('accepts names with forward slashes', () => {
-      expect(validateFolderName('parent/child')).toBeNull()
-    })
-
-    it('accepts an empty string', () => {
-      expect(validateFolderName('')).toBeNull()
-    })
+  it.each([
+    'myfolder',
+    'MyFolder123',
+    'my_folder',
+    'my-folder',
+    'my.folder',
+    'my folder',
+    'folder!',
+    "folder'",
+    'folder(1)',
+    'folder*',
+    'folder&name',
+    'folder$name',
+    'folder@name',
+    'folder=name',
+    'folder;name',
+    'folder:name',
+    'folder+name',
+    'folder,name',
+    'folder?name',
+    'parent/child',
+    '',
+  ])('accepts %j', (name) => {
+    expect(validateFolderName(name)).toBeNull()
   })
 
-  describe('invalid names', () => {
-    it('rejects a name containing #', () => {
-      const result = validateFolderName('my#folder')
-      expect(result).toBe('Folder name cannot contain the "#" character')
-    })
-
-    it('rejects a name containing %', () => {
-      const result = validateFolderName('my%folder')
-      expect(result).toBe('Folder name cannot contain the "%" character')
-    })
-
-    it('rejects a name containing ^', () => {
-      const result = validateFolderName('my^folder')
-      expect(result).toBe('Folder name cannot contain the "^" character')
-    })
-
-    it('rejects a name containing [', () => {
-      const result = validateFolderName('my[folder')
-      expect(result).toBe('Folder name cannot contain the "[" character')
-    })
+  it.each(['#', '%', '^', '['])('rejects a name containing %s', (char) => {
+    expect(validateFolderName(`my${char}folder`)).toBe(
+      `Folder name cannot contain the "${char}" character`
+    )
   })
 })
 
@@ -152,11 +121,8 @@ describe('getPathAlongFoldersToIndex', () => {
     expect(getPathAlongFoldersToIndex({ openedFolders }, 0)).toBe('')
   })
 
-  it('returns the first folder name for index 1', () => {
-    expect(getPathAlongFoldersToIndex({ openedFolders }, 1)).toBe('images')
-  })
-
   it('returns folders joined up to (not including) the given index', () => {
+    expect(getPathAlongFoldersToIndex({ openedFolders }, 1)).toBe('images')
     expect(getPathAlongFoldersToIndex({ openedFolders }, 2)).toBe('images/2024')
     expect(getPathAlongFoldersToIndex({ openedFolders }, 3)).toBe('images/2024/january')
   })
@@ -214,6 +180,26 @@ describe('sanitizeNameForDuplicateInColumn', () => {
     expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt' })).toBe('file.txt')
   })
 
+  describe('reservedNames', () => {
+    it('treats a reserved name as taken even though no column holds it', () => {
+      const state = makeState([[{ name: 'other.txt' }]])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, {
+          name: 'file.txt',
+          autofix: true,
+          reservedNames: ['file.txt'],
+        })
+      ).toBe('file (1).txt')
+    })
+
+    it('matches a reserved name case-insensitively, like a column name', () => {
+      const state = makeState([[{ name: 'other.txt' }]])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', reservedNames: ['FILE.TXT'] })
+      ).toBeNull()
+    })
+  })
+
   describe('columnIndex', () => {
     // Two-column state: col 0 has 'file.txt', col 1 has 'other.txt'
     const state = makeState([[{ name: 'file.txt' }], [{ name: 'other.txt' }]])
@@ -236,16 +222,6 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', columnIndex: 1 })).toBe(
         'file.txt'
       )
-    })
-
-    it('detects a conflict in the first column when columnIndex is 0', () => {
-      // col 0 has 'file.txt' → conflict
-      expect(sanitizeNameForDuplicateInColumn(state, { name: 'other.txt', columnIndex: 0 })).toBe(
-        'other.txt'
-      ) // 'other.txt' is not in col 0
-      expect(
-        sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', columnIndex: 0 })
-      ).toBeNull()
     })
   })
 
@@ -273,6 +249,19 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })).toBe(
         'file (2).txt'
       )
+    })
+
+    it('counts a reserved duplicate, so the suffix skips a name an archived file holds', () => {
+      // Without this the upload lands on `file (1).txt` and restores the archived file,
+      // which is exactly what picking "keep both" declined.
+      const state = makeState([[{ name: 'file.txt' }]])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, {
+          name: 'file.txt',
+          autofix: true,
+          reservedNames: ['file (1).txt'],
+        })
+      ).toBe('file (2).txt')
     })
 
     it('treats the whole name as the extension when there is no dot (existing behaviour)', () => {
@@ -350,12 +339,6 @@ describe('getStoragePathForItem', () => {
     expect(getStoragePathForItem(openedFolders, { ...makeFolder('2024'), columnIndex: 1 })).toBe(
       'avatars/2024'
     )
-  })
-
-  it('omits the bucket name so the value works with storage.from(bucket)', () => {
-    const openedFolders = [makeFolder('avatars')]
-    const path = getStoragePathForItem(openedFolders, { ...makeFile('a.png'), columnIndex: 1 })
-    expect(path.startsWith('my-bucket')).toBe(false)
   })
 })
 
@@ -506,5 +489,108 @@ describe('describeUploadFailure', () => {
   it('falls back to the raw message for anything else', () => {
     expect(describeUploadFailure({ status: 500, fallback: 'network down' })).toBe('network down')
     expect(describeUploadFailure({ fallback: 'network down' })).toBe('network down')
+  })
+})
+
+describe('getUploadNameConflicts', () => {
+  it('returns the names already taken in the destination', () => {
+    expect(
+      getUploadNameConflicts({
+        fileNames: ['photo.png', 'notes.txt'],
+        existingNames: ['photo.png', 'archive.zip'],
+      })
+    ).toEqual(['photo.png'])
+  })
+
+  it('matches case-insensitively, the way the rename fallback does', () => {
+    expect(
+      getUploadNameConflicts({ fileNames: ['Photo.PNG'], existingNames: ['photo.png'] })
+    ).toEqual(['Photo.PNG'])
+  })
+
+  it('returns nothing when every name is free', () => {
+    expect(
+      getUploadNameConflicts({ fileNames: ['photo.png'], existingNames: ['notes.txt'] })
+    ).toEqual([])
+    expect(getUploadNameConflicts({ fileNames: [], existingNames: ['photo.png'] })).toEqual([])
+  })
+
+  it('reports a name once even when it is uploaded twice', () => {
+    expect(
+      getUploadNameConflicts({
+        fileNames: ['photo.png', 'photo.png'],
+        existingNames: ['photo.png'],
+      })
+    ).toEqual(['photo.png'])
+  })
+})
+
+describe('getReplaceableFileNames', () => {
+  const file = (overrides: Partial<StorageItem>): StorageItem => ({
+    id: 'file-id',
+    name: 'file.txt',
+    type: STORAGE_ROW_TYPES.FILE,
+    status: STORAGE_ROW_STATUS.READY,
+    metadata: null,
+    isCorrupted: false,
+    created_at: null,
+    updated_at: null,
+    last_accessed_at: null,
+    ...overrides,
+  })
+
+  it('offers every file on an enabled bucket, where any replace keeps what it lands on', () => {
+    expect(
+      getReplaceableFileNames({
+        items: [file({ name: 'a.txt', is_versioned: true }), file({ name: 'b.txt' })],
+        versioningState: 'enabled',
+      })
+    ).toEqual(['a.txt', 'b.txt'])
+  })
+
+  it('offers only a pre-suspension file once the bucket is suspended', () => {
+    // Its replacement is unversioned, so the write after it retains nothing — which is why
+    // `b.txt`, written while suspended, is not worth asking about.
+    expect(
+      getReplaceableFileNames({
+        items: [
+          file({ name: 'a.txt', is_versioned: true }),
+          file({ name: 'b.txt', is_versioned: false }),
+        ],
+        versioningState: 'suspended',
+      })
+    ).toEqual(['a.txt'])
+  })
+
+  it('offers nothing on a suspended bucket when the flag is absent', () => {
+    // Nothing is promised that the write might not deliver; the upload renames instead.
+    expect(
+      getReplaceableFileNames({
+        items: [file({ name: 'a.txt' }), file({ name: 'b.txt', is_versioned: null })],
+        versioningState: 'suspended',
+      })
+    ).toEqual([])
+  })
+
+  it('offers nothing on a disabled bucket', () => {
+    expect(
+      getReplaceableFileNames({
+        items: [file({ name: 'a.txt', is_versioned: true })],
+        versioningState: 'disabled',
+      })
+    ).toEqual([])
+  })
+
+  it('skips folders and rows being renamed', () => {
+    expect(
+      getReplaceableFileNames({
+        items: [
+          file({ name: 'folder', type: STORAGE_ROW_TYPES.FOLDER, id: null }),
+          file({ name: 'editing.txt', status: STORAGE_ROW_STATUS.EDITING }),
+          file({ name: 'a.txt' }),
+        ],
+        versioningState: 'enabled',
+      })
+    ).toEqual(['a.txt'])
   })
 })

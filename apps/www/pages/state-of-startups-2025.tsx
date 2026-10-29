@@ -5,7 +5,7 @@ import { SurveyChapterSection } from '~/components/SurveyResults/SurveyChapterSe
 import { SurveySectionBreak } from '~/components/SurveyResults/SurveySectionBreak'
 import pageData from '~/data/surveys/state-of-startups-2025'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { forwardRef, useEffect, useRef, useState } from 'react'

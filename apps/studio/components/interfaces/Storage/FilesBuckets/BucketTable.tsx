@@ -1,5 +1,5 @@
 import { FilesBucket as FilesBucketIcon } from 'icons'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import {
   Badge,
@@ -188,7 +188,7 @@ export const BucketTableRow = ({
 
       <BucketTableCell>
         <div className="flex justify-end items-center h-full">
-          <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
+          <ChevronRightIcon aria-hidden={true} size={14} className="text-foreground-muted/60" />
         </div>
         <button tabIndex={-1} className="sr-only">
           Go to bucket details

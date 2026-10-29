@@ -35,7 +35,7 @@ export const useWebhookDeliveryRetryMutation = ({
     mutationFn: retryDelivery,
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
-        queryKey: platformWebhooksKeys.deliveries(variables.scope, variables.endpointId),
+        queryKey: platformWebhooksKeys.deliveriesAll(variables.scope, variables.endpointId),
       })
 
       await onSuccess?.(data, variables, context)
@@ -43,7 +43,7 @@ export const useWebhookDeliveryRetryMutation = ({
     async onError(data, variables, context) {
       if (onError === undefined) {
         if (isWebhookRateLimitError(data)) {
-          toast.error('Too many retries — wait a minute and try again (limit: 10 per minute).')
+          toast.error('Too many requests. Wait a minute and try again (limit: 10 per minute).')
         } else {
           toast.error(`Failed to retry delivery: ${data.message}`)
         }

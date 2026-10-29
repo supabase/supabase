@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { Edit, Upload } from 'lucide-react'
+import { EditIcon, UploadIcon } from 'lucide-react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Control, SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -44,6 +44,7 @@ import {
 import { ScopesPanel } from './Scopes'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
@@ -113,7 +114,7 @@ export const PublishAppSidePanel = ({
 }: PublishAppSidePanelProps) => {
   const { slug } = useParams()
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
-  const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants')
+  const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants') && USE_MOCKS
 
   const { mutateAsync: createOAuthApp } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {
@@ -325,7 +326,7 @@ export const PublishAppSidePanel = ({
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button className="px-1">
-                            <Edit />
+                            <EditIcon />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" side="bottom">
@@ -360,7 +361,7 @@ export const PublishAppSidePanel = ({
                       uploadButtonRef.current?.click()
                     }}
                   >
-                    <Upload size={18} strokeWidth={1.5} className="text-foreground" />
+                    <UploadIcon size={18} strokeWidth={1.5} className="text-foreground" />
                     <p className="text-xs text-foreground-light">Upload logo</p>
                   </div>
                 )}

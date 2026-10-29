@@ -88,7 +88,7 @@ vi.mock('common', () => ({
   useFlag: () => false,
 }))
 
-vi.mock('framer-motion', () => ({
+vi.mock('motion/react', () => ({
   AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -412,7 +412,7 @@ describe('ProjectLayout title', () => {
     })
   })
 
-  it('renders the Stripe project banner across project surfaces when the selected project is Stripe-connected', () => {
+  it('renders the Stripe project banner with a project-specific dismiss key when the selected project is Stripe-connected', () => {
     mockProjectState.current = {
       ...mockProjectState.current,
       integration_source: 'stripe_projects',
@@ -420,21 +420,11 @@ describe('ProjectLayout title', () => {
 
     renderLayout()
 
-    expect(screen.getByText('This project is connected to Stripe')).toBeTruthy()
+    expect(screen.getByText('This project is connected to Stripe')).toBeInTheDocument()
     expect(
       screen.getByText('Changes made here may affect your connected Stripe project.')
-    ).toBeTruthy()
-    expect(screen.getByTestId('partner-icon')).toBeTruthy()
-  })
-
-  it('uses a project-specific dismiss key for the Stripe project banner', () => {
-    mockProjectState.current = {
-      ...mockProjectState.current,
-      integration_source: 'stripe_projects',
-    }
-
-    renderLayout()
-
+    ).toBeInTheDocument()
+    expect(screen.getByTestId('partner-icon')).toBeInTheDocument()
     expect(mockUseLocalStorageQuery).toHaveBeenCalledWith(
       LOCAL_STORAGE_KEYS.PROJECT_INTEGRATION_BANNER_DISMISSED('default', 'stripe_projects'),
       false
@@ -490,41 +480,34 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     })
   })
 
-  it('calls dismissBanner when banner was previously dismissed', async () => {
-    mockBannerDismissedState.current = true
-
-    renderLayout()
-
-    await waitFor(() => {
-      expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
-    })
-    expect(mockAddBanner).not.toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
-    )
-  })
-
-  it('calls dismissBanner when compute warnings are cleared', async () => {
-    mockResourceWarningsState.current = [
-      {
-        project: 'default',
-        cpu_exhaustion: false,
-        memory_and_swap_exhaustion: false,
-        disk_space_exhaustion: false,
+  it.each([
+    [
+      'the banner was previously dismissed',
+      () => {
+        mockBannerDismissedState.current = true
       },
-    ]
-
-    renderLayout()
-
-    await waitFor(() => {
-      expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
-    })
-    expect(mockAddBanner).not.toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
-    )
-  })
-
-  it('calls dismissBanner when project is not nano compute', async () => {
-    mockProjectState.current = { ...mockProjectState.current, infra_compute_size: 'micro' }
+    ],
+    [
+      'compute warnings are cleared',
+      () => {
+        mockResourceWarningsState.current = [
+          {
+            project: 'default',
+            cpu_exhaustion: false,
+            memory_and_swap_exhaustion: false,
+            disk_space_exhaustion: false,
+          },
+        ]
+      },
+    ],
+    [
+      'the project is not nano compute',
+      () => {
+        mockProjectState.current = { ...mockProjectState.current, infra_compute_size: 'micro' }
+      },
+    ],
+  ])('calls dismissBanner instead of addBanner when %s', async (_, arrange) => {
+    arrange()
 
     renderLayout()
 

@@ -23,12 +23,12 @@ export const ExpirationModeToggle = ({ mode, onModeChange }: ExpirationModeToggl
       <RadioGroupStackedItem
         value="and"
         label="Both conditions are met"
-        description="It exceeds both the age limit and the retained-versions cap."
+        description="Keep everything within the age limit, plus the newest versions up to the count."
       />
       <RadioGroupStackedItem
         value="or"
         label="Either condition is met"
-        description="It exceeds either the age limit or the retained-versions cap."
+        description="Keep only the newest versions up to the count, and none past the age limit."
       />
     </RadioGroupStacked>
   </div>

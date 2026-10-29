@@ -1,41 +1,55 @@
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
-  type PaginationState,
   type SortingState,
 } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight, Copy, RotateCcw, Search } from 'lucide-react'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CopyIcon,
+  RefreshCwIcon,
+  RotateCcwIcon,
+  SearchIcon,
+} from 'lucide-react'
+import { useRef, useState, type ReactNode } from 'react'
 import {
   Badge,
   Button,
   Card,
   CardContent,
   CardFooter,
+  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TanStackTableHeadSort } from 'ui-patterns/Table'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { DELIVERIES_PAGE_SIZE } from './PlatformWebhooks.constants'
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import type { ResponseError } from '@/types'
 
 interface DetailItemProps {
   label: string
@@ -52,15 +66,27 @@ const DetailItem = ({ label, children, ddClassName = 'text-sm' }: DetailItemProp
 
 interface PlatformWebhooksEndpointDetailsProps {
   deliverySearch: string
+  deliveriesError: ResponseError | null
   filteredDeliveries: WebhookDelivery[]
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+  hasRefreshError: boolean
+  isLive: boolean
+  isLoadingDeliveries: boolean
+  isRefetchingDeliveries: boolean
+  orgSlug?: string
+  projectRef?: string
   selectedEndpoint: WebhookEndpoint
   onCopyUrl: () => void
+  onLiveChange: (isLive: boolean) => void
+  onRefetchDeliveries: () => void
   onDeliverySearchChange: (value: string) => void
+  onNextPage: () => void
+  onPreviousPage: () => void
   onOpenDelivery: (deliveryId: string) => void
   onRetryDelivery: (deliveryId: string) => void
 }
 
-const DELIVERIES_PAGE_SIZE = 5
 const DELIVERY_ACTIONS_COLUMN_ID = 'actions'
 const DEFAULT_DELIVERY_SORTING: SortingState = [{ id: 'attemptAt', desc: true }]
 
@@ -68,9 +94,28 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
     accessorKey: 'status',
     header: ({ column }) => <TanStackTableHeadSort column={column}>Status</TanStackTableHeadSort>,
-    cell: ({ row }) => (
-      <Badge variant={statusBadgeVariant[row.original.status]}>{row.original.status}</Badge>
-    ),
+    cell: ({ row }) => {
+      const badge = (
+        <Badge variant={statusBadgeVariant[row.original.status]}>{row.original.status}</Badge>
+      )
+      if (row.original.status !== 'failure') return badge
+
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>{badge}</span>
+          </TooltipTrigger>
+          <TooltipContent side="top">
+            Failed deliveries are usually retried automatically with increasing delays.
+          </TooltipContent>
+        </Tooltip>
+      )
+    },
+  },
+  {
+    accessorKey: 'eventType',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Event</TanStackTableHeadSort>,
+    cell: ({ row }) => <code className="text-xs">{row.original.eventType}</code>,
   },
   {
     accessorKey: 'responseCode',
@@ -118,7 +163,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
             <ButtonTooltip
               size="tiny"
               className="w-7 shrink-0 hit-area-2"
-              icon={<RotateCcw />}
+              icon={<RotateCcwIcon />}
               aria-label={`Retry ${row.original.id}`}
               tooltip={{ content: { side: 'top', text: 'Retry' } }}
               onClick={(event) => {
@@ -131,7 +176,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
             <Button
               size="tiny"
               className="w-7 shrink-0 hit-area-2 invisible pointer-events-none"
-              icon={<RotateCcw />}
+              icon={<RotateCcwIcon />}
               aria-hidden
               tabIndex={-1}
             />
@@ -144,15 +189,27 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
 
 export const PlatformWebhooksEndpointDetails = ({
   deliverySearch,
+  deliveriesError,
   filteredDeliveries,
+  hasNextPage,
+  hasPreviousPage,
+  hasRefreshError,
+  isLive,
+  isLoadingDeliveries,
+  isRefetchingDeliveries,
+  orgSlug,
+  projectRef,
   selectedEndpoint,
   onCopyUrl,
+  onLiveChange,
+  onRefetchDeliveries,
   onDeliverySearchChange,
+  onNextPage,
+  onPreviousPage,
   onOpenDelivery,
   onRetryDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
-  const hasName = selectedEndpoint.name.trim().length > 0
   const hasDescription = selectedEndpoint.description.trim().length > 0
   const deliverySearchRef = useRef<HTMLInputElement>(null)
   const [sorting, setSorting] = useState<SortingState>(DEFAULT_DELIVERY_SORTING)
@@ -160,36 +217,25 @@ export const PlatformWebhooksEndpointDetails = ({
   useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, () => deliverySearchRef.current?.focus(), {
     label: 'Search deliveries',
   })
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: DELIVERIES_PAGE_SIZE,
-  })
 
   const table = useReactTable({
     data: filteredDeliveries,
     columns: DELIVERY_COLUMNS,
-    state: { pagination, sorting },
+    state: { sorting },
     meta: { onRetryDelivery },
     getRowId: (row) => row.id,
-    onPaginationChange: setPagination,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
   })
 
-  const paginatedDeliveries = table.getRowModel().rows
-  const deliveryStartIndex =
-    table.getState().pagination.pageIndex * table.getState().pagination.pageSize
-  const deliveryRangeStart = filteredDeliveries.length === 0 ? 0 : deliveryStartIndex + 1
-  const deliveryRangeEnd = Math.min(
-    deliveryStartIndex + table.getState().pagination.pageSize,
-    filteredDeliveries.length
-  )
+  const deliveryRows = table.getRowModel().rows
 
-  useEffect(() => {
-    setPagination((currentPagination) => ({ ...currentPagination, pageIndex: 0 }))
-  }, [deliverySearch, selectedEndpoint.id])
+  const tryAgainButton = (
+    <Button loading={isRefetchingDeliveries} onClick={onRefetchDeliveries}>
+      Try again
+    </Button>
+  )
 
   return (
     <div className="space-y-16">
@@ -198,8 +244,6 @@ export const PlatformWebhooksEndpointDetails = ({
         <Card className="overflow-hidden">
           <CardContent className="pb-5">
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
-              {hasName && <DetailItem label="Name">{selectedEndpoint.name}</DetailItem>}
-
               <DetailItem label="URL" ddClassName="flex items-start gap-2 text-sm">
                 <span className="break-all">{selectedEndpoint.url}</span>
                 <ShortcutTooltip
@@ -210,7 +254,7 @@ export const PlatformWebhooksEndpointDetails = ({
                     variant="text"
                     size="tiny"
                     className="mt-0.5 shrink-0 h-5 w-5 p-0"
-                    icon={<Copy size={12} />}
+                    icon={<CopyIcon size={12} />}
                     aria-label="Copy endpoint URL"
                     onClick={onCopyUrl}
                   />
@@ -226,10 +270,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   ? ['All events (*)']
                   : selectedEndpoint.eventTypes
                 ).map((eventType) => (
-                  <code
-                    key={eventType}
-                    className="text-code-inline rounded-md border px-3 py-1.5 text-2xs"
-                  >
+                  <code key={eventType} className="rounded-md border px-3 py-1.5 text-2xs">
                     {eventType}
                   </code>
                 ))}
@@ -241,6 +282,7 @@ export const PlatformWebhooksEndpointDetails = ({
                     {selectedEndpoint.customHeaders.map((header) => (
                       <div
                         key={header.id}
+                        data-code-style="plain"
                         className="px-2 py-2 font-mono font-medium text-xs flex items-center gap-2 flex-wrap"
                       >
                         <code className="text-code_block-4">{header.key}:</code>
@@ -268,13 +310,55 @@ export const PlatformWebhooksEndpointDetails = ({
             ref={deliverySearchRef}
             placeholder="Search deliveries"
             size="tiny"
-            icon={<Search />}
+            icon={<SearchIcon />}
             value={deliverySearch}
             className="w-full lg:w-52"
             onChange={(event) => onDeliverySearchChange(event.target.value)}
             onKeyDown={onSearchInputEscape(deliverySearch, onDeliverySearchChange)}
           />
+          <div className="flex items-center gap-2">
+            <ButtonTooltip
+              size="tiny"
+              variant={isLive ? 'primary' : 'default'}
+              aria-pressed={isLive}
+              icon={
+                <span
+                  className={cn(
+                    'size-2 rounded-full',
+                    isLive ? 'bg-brand-400 animate-pulse' : 'bg-foreground-muted'
+                  )}
+                />
+              }
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: isLive ? 'Stop refreshing automatically' : 'Refresh automatically',
+                },
+              }}
+              onClick={() => onLiveChange(!isLive)}
+            >
+              Live
+            </ButtonTooltip>
+            <ButtonTooltip
+              size="tiny"
+              className="w-7"
+              icon={<RefreshCwIcon />}
+              loading={isRefetchingDeliveries}
+              aria-label="Refresh deliveries"
+              tooltip={{ content: { side: 'top', text: 'Refresh' } }}
+              onClick={onRefetchDeliveries}
+            />
+          </div>
         </div>
+        {hasRefreshError && (
+          <Admonition
+            type="warning"
+            layout="responsive"
+            title="Unable to refresh deliveries"
+            description="These deliveries may be out of date."
+            actions={tryAgainButton}
+          />
+        )}
         <Card className="overflow-hidden">
           <Table>
             <TableHeader>
@@ -308,32 +392,61 @@ export const PlatformWebhooksEndpointDetails = ({
               ))}
             </TableHeader>
             <TableBody>
-              {paginatedDeliveries.length > 0 ? (
-                paginatedDeliveries.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className="cursor-pointer focus-inset"
-                    onClick={() => onOpenDelivery(row.original.id)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault()
-                        onOpenDelivery(row.original.id)
-                      }
-                    }}
-                    tabIndex={0}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={
-                          cell.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1 text-right' : ''
-                        }
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
+              {isLoadingDeliveries ? (
+                Array.from({ length: DELIVERIES_PAGE_SIZE }, (_, index) => (
+                  <TableRow key={`loading-${index}`} className="[&>td]:hover:bg-inherit">
+                    <TableCell colSpan={DELIVERY_COLUMNS.length}>
+                      <ShimmeringLoader />
+                    </TableCell>
                   </TableRow>
                 ))
+              ) : deliveryRows.length > 0 ? (
+                deliveryRows.map((row) => {
+                  // A pending delivery has no result yet, so there is nothing to show in the sheet
+                  const canOpen = row.original.status !== 'pending'
+                  return (
+                    <TableRow
+                      key={row.id}
+                      className={canOpen ? 'cursor-pointer focus-inset' : 'focus-inset'}
+                      aria-disabled={!canOpen || undefined}
+                      onClick={() => canOpen && onOpenDelivery(row.original.id)}
+                      onKeyDown={(event) => {
+                        if (canOpen && (event.key === 'Enter' || event.key === ' ')) {
+                          event.preventDefault()
+                          onOpenDelivery(row.original.id)
+                        }
+                      }}
+                      tabIndex={0}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className={
+                            cell.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1 text-right' : ''
+                          }
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  )
+                })
+              ) : deliveriesError ? (
+                <TableRow className="[&>td]:hover:bg-inherit">
+                  <TableCell
+                    colSpan={DELIVERY_COLUMNS.length}
+                    className="p-0! rounded-b! overflow-hidden"
+                  >
+                    <AlertError
+                      className="border-0 rounded-none"
+                      error={deliveriesError}
+                      orgSlug={orgSlug}
+                      projectRef={projectRef}
+                      subject="Failed to retrieve deliveries"
+                      additionalActions={tryAgainButton}
+                    />
+                  </TableCell>
+                </TableRow>
               ) : (
                 <TableRow className="[&>td]:hover:bg-inherit">
                   <TableCell colSpan={DELIVERY_COLUMNS.length}>
@@ -346,28 +459,32 @@ export const PlatformWebhooksEndpointDetails = ({
               )}
             </TableBody>
           </Table>
-          {filteredDeliveries.length > 0 && (
+          {(isLoadingDeliveries || deliveryRows.length > 0 || hasNextPage || hasPreviousPage) && (
             <CardFooter className="border-t p-4 flex items-center justify-between">
-              <p className="text-foreground-muted text-sm">
-                Showing {deliveryRangeStart} to {deliveryRangeEnd} of {filteredDeliveries.length}{' '}
-                deliveries
-              </p>
+              {isLoadingDeliveries ? (
+                <ShimmeringLoader className="w-28" />
+              ) : (
+                <p className="text-foreground-muted text-sm">
+                  Showing {deliveryRows.length}{' '}
+                  {deliveryRows.length === 1 ? 'delivery' : 'deliveries'}
+                </p>
+              )}
               <div className="flex items-center gap-x-2" aria-label="Pagination">
                 <Button
-                  icon={<ChevronLeft />}
+                  icon={<ChevronLeftIcon />}
                   className="w-7 hit-area-2"
                   aria-label="Previous page"
                   size="tiny"
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={() => table.previousPage()}
+                  disabled={!hasPreviousPage}
+                  onClick={onPreviousPage}
                 />
                 <Button
-                  icon={<ChevronRight />}
+                  icon={<ChevronRightIcon />}
                   className="w-7 hit-area-2"
                   aria-label="Next page"
                   size="tiny"
-                  disabled={!table.getCanNextPage()}
-                  onClick={() => table.nextPage()}
+                  disabled={!hasNextPage}
+                  onClick={onNextPage}
                 />
               </div>
             </CardFooter>

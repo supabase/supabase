@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Check, Eye, EyeOff, Plus } from 'lucide-react'
+import { CheckIcon, EyeIcon, EyeOffIcon, PlusIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -36,6 +36,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SelectionListState } from 'ui-patterns/SelectionListState'
@@ -59,6 +60,7 @@ import {
 } from './DuckLake.constants'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
 import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
+import { useIsOrioleDb } from '@/hooks/misc/useSelectedProject'
 
 const DUCKLAKE_MODE_OPTIONS = [
   {
@@ -77,9 +79,11 @@ const DUCKLAKE_MODE_OPTIONS = [
 const DuckLakeModeSelector = ({
   value,
   onChange,
+  isOrioleDb,
 }: {
   value: DucklakeMode
   onChange: (value: DucklakeMode) => void
+  isOrioleDb: boolean
 }) => {
   return (
     <RadioGroupStacked
@@ -93,6 +97,7 @@ const DuckLakeModeSelector = ({
           value={option.value}
           label={option.label}
           description={option.description}
+          disabled={isOrioleDb && option.value === DUCKLAKE_MODE_SUPABASE}
         />
       ))}
     </RadioGroupStacked>
@@ -271,7 +276,7 @@ const DuckLakeCustomFields = ({
                         <Button
                           className="w-7"
                           aria-label={showCatalogUrl ? 'Hide catalog URL' : 'Show catalog URL'}
-                          icon={showCatalogUrl ? <Eye /> : <EyeOff />}
+                          icon={showCatalogUrl ? <EyeIcon /> : <EyeOffIcon />}
                           onClick={() => setShowCatalogUrl(!showCatalogUrl)}
                         />
                       </div>
@@ -366,7 +371,7 @@ const DuckLakeCustomFields = ({
                             ? 'Hide S3 secret access key'
                             : 'Show S3 secret access key'
                         }
-                        icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                        icon={showSecretAccessKey ? <EyeIcon /> : <EyeOffIcon />}
                         onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
                       />
                     )
@@ -520,6 +525,7 @@ export const DuckLakeFields = ({
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
 }) => {
+  const isOrioleDb = !!useIsOrioleDb()
   const ducklakeMode = (useWatch({ control: form.control, name: 'ducklakeMode' }) ??
     DUCKLAKE_MODE_SUPABASE) as DucklakeMode
   // The platform API resolves the managed config into a flat catalog URL + provisioned S3
@@ -536,6 +542,7 @@ export const DuckLakeFields = ({
           <FormControl>
             <DuckLakeModeSelector
               value={effectiveMode}
+              isOrioleDb={isOrioleDb}
               onChange={(value) =>
                 form.setValue('ducklakeMode', value, { shouldValidate: true, shouldDirty: true })
               }
@@ -544,9 +551,17 @@ export const DuckLakeFields = ({
         </FormItemLayout>
       )}
 
-      {effectiveMode === DUCKLAKE_MODE_SUPABASE ? (
+      {!editMode && isOrioleDb && (
+        <Admonition
+          type="warning"
+          title="This project cannot host a DuckLake catalog"
+          description="OrioleDB is not supported for the metadata catalog. Select Enter connection details to use a catalog on standard Postgres."
+        />
+      )}
+      {effectiveMode === DUCKLAKE_MODE_SUPABASE && !isOrioleDb && (
         <DuckLakeSupabaseFields form={form} />
-      ) : (
+      )}
+      {effectiveMode === DUCKLAKE_MODE_CUSTOM && (
         <DuckLakeCustomFields form={form} editMode={editMode} />
       )}
     </div>
@@ -649,7 +664,7 @@ const BucketSelection = ({
                     >
                       <span>{bucket.name}</span>
                       {value === bucket.id && (
-                        <Check className="text-primary" strokeWidth={2} size={13} />
+                        <CheckIcon className="text-primary" strokeWidth={2} size={13} />
                       )}
                     </CommandItem>
                   ))}
@@ -666,7 +681,7 @@ const BucketSelection = ({
                   onCreateBucket()
                 }}
               >
-                <Plus size={14} strokeWidth={1.5} className="mr-2" />
+                <PlusIcon size={14} strokeWidth={1.5} className="mr-2" />
                 New bucket
               </CommandItem>
             </CommandGroup>

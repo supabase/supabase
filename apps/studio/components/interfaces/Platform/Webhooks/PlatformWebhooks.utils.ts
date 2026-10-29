@@ -1,50 +1,5 @@
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 
-const WEBHOOK_NAME_ADJECTIVES = [
-  'swift',
-  'winged',
-  'wayfinding',
-  'moonlit',
-  'fleet',
-  'nimble',
-  'roving',
-  'brisk',
-  'gliding',
-  'steady',
-  'northbound',
-  'starlit',
-  'quiet',
-  'amber',
-  'far-flung',
-  'secret',
-  'flying',
-]
-
-const WEBHOOK_NAME_NOUNS = [
-  'pigeon',
-  'courier',
-  'postmark',
-  'relay',
-  'dispatch',
-  'lantern',
-  'beacon',
-  'messenger',
-  'waypost',
-  'sparrow',
-  'satchel',
-  'signalfire',
-  'envelope',
-  'parcel',
-  'gull',
-  'kite',
-  'beagle',
-]
-
-const getRandomItem = (values: string[]) => values[Math.floor(Math.random() * values.length)]
-
-export const generateWebhookEndpointName = () =>
-  `${getRandomItem(WEBHOOK_NAME_ADJECTIVES)}-${getRandomItem(WEBHOOK_NAME_NOUNS)}`
-
 const secureRandomHex = (length: number) => {
   if (length <= 0) return ''
 
@@ -64,8 +19,19 @@ const secureRandomHex = (length: number) => {
 
 export const generateSigningSecret = () => `whsec_${secureRandomHex(16)}`
 
-export const getWebhookEndpointDisplayName = (endpoint: Pick<WebhookEndpoint, 'name' | 'url'>) =>
-  endpoint.name.trim() || endpoint.url
+export const getWebhookEndpointDisplayName = (
+  endpoint: Pick<WebhookEndpoint, 'url' | 'eventTypes'>
+) => {
+  const eventTypesLabel = endpoint.eventTypes.includes('*')
+    ? 'all events'
+    : endpoint.eventTypes.join(', ')
+  return `${endpoint.url} (${eventTypesLabel})`
+}
+
+export const getTestWebhookEventType = (
+  subscribedEventTypes: string[],
+  fallbackEventTypes: string[]
+) => subscribedEventTypes.find((eventType) => eventType !== '*') ?? fallbackEventTypes[0]
 
 const normalizeSearch = (value: string) => value.trim().toLowerCase()
 

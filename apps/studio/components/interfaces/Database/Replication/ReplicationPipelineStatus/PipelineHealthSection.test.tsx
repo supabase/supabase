@@ -13,11 +13,28 @@ const baseMetrics = {
 }
 
 describe('PipelineHealthSection', () => {
-  it('renders null safe WAL size as unlimited retention', () => {
-    customRender(<PipelineHealthSection metrics={{ ...baseMetrics, safe_wal_size_bytes: null }} />)
+  it.each([null, undefined])(
+    'renders unavailable headroom (%s) without claiming unlimited retention',
+    (headroom) => {
+      customRender(
+        <PipelineHealthSection metrics={{ ...baseMetrics, safe_wal_size_bytes: headroom }} />
+      )
 
-    expect(screen.getByText('WAL retention remaining')).toBeInTheDocument()
-    expect(screen.getByText('Unlimited')).toBeInTheDocument()
+      expect(screen.getByText('WAL retention remaining')).toBeInTheDocument()
+      expect(screen.getByText('Unavailable')).toBeInTheDocument()
+      expect(screen.queryByText('Unlimited')).not.toBeInTheDocument()
+    }
+  )
+
+  it('does not show caught up when slot lag is null', () => {
+    customRender(
+      <PipelineHealthSection
+        metrics={{ ...baseMetrics, confirmed_flush_lsn_bytes: null, safe_wal_size_bytes: 1024 }}
+      />
+    )
+
+    expect(screen.getByText('Unavailable')).toBeInTheDocument()
+    expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
   })
 
   it('formats a numeric safe WAL size normally', () => {

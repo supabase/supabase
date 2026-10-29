@@ -4,6 +4,7 @@ import type { ToolSet } from 'ai'
 
 import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
+import { REMOTE_TOOL_CONTRACTS } from './registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 /**
@@ -15,7 +16,7 @@ import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
  */
 type SupabaseMcpToolName = keyof typeof SupabaseMcp.supabaseMcpToolSchemas
 
-// UI-executed tools handled locally by Studio (see getStudioTools); the remote
+// UI-executed tools handled locally by Studio (see TOOL_FACTORIES); the remote
 // MCP server's versions are removed so the UI-controlled Studio versions win.
 const UI_EXECUTED_TOOLS = [
   'execute_sql',
@@ -78,7 +79,20 @@ export const getMcpTools = async ({
   signal.addEventListener('abort', closeClient, { once: true })
 
   try {
-    const availableMcpTools = (await mcpClient.tools()) as ToolSet
+    const remoteTools = (await mcpClient.tools()) as ToolSet
+
+    const availableMcpTools: ToolSet = { ...remoteTools }
+    for (const contract of Object.values(REMOTE_TOOL_CONTRACTS)) {
+      if (!(contract.name in remoteTools)) continue
+      // Reject a malformed entry here: if the opt-in filter below stubbed it, the spread would
+      // turn it into an object and it would pass validation.
+      const remoteTool = remoteTools[contract.name]
+      if (typeof remoteTool !== 'object' || remoteTool === null) {
+        console.error(`MCP tool ${contract.name} is not an object`)
+        throw new Error('Internal error: MCP tools validation failed')
+      }
+      availableMcpTools[contract.name] = { ...remoteTool, needsApproval: contract.needsApproval }
+    }
 
     // Runtime drift detection: `EXPECTED_MCP_TOOLS` is compile-time-checked
     // against the pinned package (see its declaration), but the *deployed* remote

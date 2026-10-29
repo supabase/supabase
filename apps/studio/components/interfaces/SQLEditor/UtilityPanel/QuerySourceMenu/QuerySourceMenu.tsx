@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { Check, ChevronDown } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -105,7 +105,7 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
           <Button
             aria-label={`Query source: ${QUERY_SOURCE_LABELS[currentSource]}`}
             icon={<QuerySourceIcon source={currentSource} className="text-foreground-light" />}
-            iconRight={<ChevronDown size={14} className="text-foreground-light" />}
+            iconRight={<ChevronDownIcon size={14} className="text-foreground-light" />}
           >
             {QUERY_SOURCE_LABELS[currentSource]}
           </Button>
@@ -124,7 +124,7 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
                 <QuerySourceIcon source={source._tag} className="text-foreground-light" />
                 {QUERY_SOURCE_LABELS[source._tag]}
               </span>
-              {currentSource === source._tag && <Check size={14} />}
+              {currentSource === source._tag && <CheckIcon size={14} />}
             </DropdownMenuItem>
           ))}
 

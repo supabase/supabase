@@ -1,6 +1,14 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
-import { AlertCircle, Archive, ChevronDown, Copy, Download, Trash2, Upload, X } from 'lucide-react'
+import {
+  AlertCircleIcon,
+  ArchiveIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  DownloadIcon,
+  Trash2Icon,
+  UploadIcon,
+  XIcon,
+} from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -39,7 +47,7 @@ import {
   type LifecyclePolicy,
   type ObjectVersion,
 } from '@/data/storage/versioning/object-versions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -117,7 +125,7 @@ const CurrentFilePreview = ({
       <div className="shrink">
         {/* No `title`: the explorer rows use it as their handle, and a second
             element carrying the same one makes `getByTitle` ambiguous. */}
-        <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+        <p className="truncate text-sm font-medium text-foreground">{getBaseFileName(file.name)}</p>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
           {mimeType}
           {size && <>, {size}</>}
@@ -129,7 +137,7 @@ const CurrentFilePreview = ({
         </div>
         {file.isCorrupted && (
           <div className="mt-1 flex items-center gap-x-1.5">
-            <AlertCircle size={12} className="shrink-0 text-foreground-light" />
+            <AlertCircleIcon size={12} className="shrink-0 text-foreground-light" />
             <p className="text-xs text-foreground-light">File is corrupted</p>
           </div>
         )}
@@ -139,7 +147,7 @@ const CurrentFilePreview = ({
         <ButtonTooltip
           variant="outline"
           className="px-2"
-          icon={<Download size={14} />}
+          icon={<DownloadIcon size={14} />}
           disabled={file.isCorrupted}
           onClick={onDownload}
           tooltip={{ content: { side: 'top', text: 'Download current' } }}
@@ -151,7 +159,7 @@ const CurrentFilePreview = ({
           <Button
             variant="outline"
             size="tiny"
-            icon={<Copy size={14} />}
+            icon={<CopyIcon size={14} />}
             disabled={file.isCorrupted}
             onClick={() => onCopyUrl(file.path!)}
           >
@@ -163,8 +171,8 @@ const CurrentFilePreview = ({
               <Button
                 variant="outline"
                 size="tiny"
-                icon={<Copy size={14} />}
-                iconRight={<ChevronDown size={14} />}
+                icon={<CopyIcon size={14} />}
+                iconRight={<ChevronDownIcon size={14} />}
                 disabled={file.isCorrupted}
                 aria-label={`Get URL for ${file.name}`}
               >
@@ -193,7 +201,7 @@ const CurrentFilePreview = ({
               variant="outline"
               size="tiny"
               className="rounded-r-none"
-              icon={<Archive size={14} />}
+              icon={<ArchiveIcon size={14} />}
               onClick={onDelete}
             >
               Archive
@@ -204,7 +212,7 @@ const CurrentFilePreview = ({
                   variant="outline"
                   size="tiny"
                   className="-ml-px shrink-0 rounded-l-none border-l-transparent px-1.5"
-                  icon={<ChevronDown size={14} />}
+                  icon={<ChevronDownIcon size={14} />}
                   aria-label="More delete options"
                 />
               </DropdownMenuTrigger>
@@ -214,7 +222,7 @@ const CurrentFilePreview = ({
                   onClick={onPurge}
                 >
                   <div className="flex items-center space-x-1 text-foreground">
-                    <Trash2 size={14} className="shrink-0 text-destructive" />
+                    <Trash2Icon size={14} className="shrink-0 text-destructive" />
                     <p>Delete permanently</p>
                   </div>
                   <p className="block text-foreground-light">
@@ -230,7 +238,7 @@ const CurrentFilePreview = ({
           <ButtonTooltip
             variant="outline"
             size="tiny"
-            icon={<Trash2 size={14} />}
+            icon={<Trash2Icon size={14} />}
             onClick={onDelete}
             tooltip={{ content: { side: 'top', text: 'Delete file' } }}
           >
@@ -249,7 +257,7 @@ export const PreviewPane = () => {
     selectedFilePreview: file,
     openedFolders,
     setSelectedItemsToDelete,
-    setItemToPurge,
+    setItemsToPurge,
     refetchAllOpenedFolders,
     replaceFile,
     setSelectedFileCustomExpiry,
@@ -258,7 +266,7 @@ export const PreviewPane = () => {
   const { clearPreviewedFile } = useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
 
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
   const [, setShowEditBucketModal] = useQueryState(
@@ -360,7 +368,7 @@ export const PreviewPane = () => {
           onClick={clearPreviewedFile}
           aria-label="Close preview"
         >
-          <X size={14} />
+          <XIcon size={14} />
         </Button>
       </div>
 
@@ -389,7 +397,7 @@ export const PreviewPane = () => {
                 <ButtonTooltip
                   variant="outline"
                   className="px-2"
-                  icon={<Upload size={14} />}
+                  icon={<UploadIcon size={14} />}
                   onClick={onReplaceFile}
                   aria-label={replaceLabel}
                   tooltip={{ content: { side: 'top', text: replaceLabel } }}
@@ -403,7 +411,7 @@ export const PreviewPane = () => {
             onDownload={() => downloadFile(file)}
             onCustomExpiry={() => setSelectedFileCustomExpiry(file)}
             onDelete={() => setSelectedItemsToDelete([file])}
-            onPurge={() => setItemToPurge(file)}
+            onPurge={() => setItemsToPurge([file])}
           />
         )}
 
@@ -433,4 +441,8 @@ export const PreviewPane = () => {
       </div>
     </div>
   )
+}
+
+const getBaseFileName = (name: string) => {
+  return name.split('/').filter(Boolean).pop() ?? name
 }

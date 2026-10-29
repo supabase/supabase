@@ -33,7 +33,6 @@ describe('ActionPanel', () => {
       expect.objectContaining({
         id: SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY,
         onTrigger: onClick,
-        side: 'bottom',
         options: { enabled: true },
       }),
       undefined

@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { getBranchDiff } from './branch-diff-query'
 import { branchKeys } from './keys'
 import { upsertMigration } from '@/data/database/migration-upsert-mutation'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BranchMergeVariables = {
@@ -43,6 +43,7 @@ export async function mergeBranch({
   const { data, error } = await post('/v1/branches/{branch_id_or_ref}/merge', {
     params: { path: { branch_id_or_ref: branchProjectRef } },
     body: { migration_version },
+    grant: unguarded.migrating,
   })
 
   if (error) {

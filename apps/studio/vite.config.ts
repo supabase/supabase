@@ -12,6 +12,7 @@ import viteReact from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
+import { getCdnUrlForBuiltFile, getTanstackAssetCdnUrl } from './asset-cdn'
 import { vercelSpaRoutes } from './scripts/vercel-spa-routes'
 import { getSecurityHeaders } from './security-headers'
 
@@ -552,6 +553,14 @@ export default defineConfig(({ command, mode }) => {
   // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
   // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
+  // Client JS/CSS (and CSS-referenced fonts/images) load from the R2 asset CDN
+  // on production builds, uploaded by scripts/upload-static-assets.sh. Vite's
+  // base stays `/dashboard` so documents, server functions and API routes stay
+  // on Vercel. The shell's asset tags are rewritten by server.ts. Reads the
+  // process env, not `env`: the upload script only sees the process env, so a
+  // CDN switch set in a `.env*` file must not point the build at assets that
+  // were never uploaded.
+  const assetCdnUrl = command === 'build' ? getTanstackAssetCdnUrl(process.env) : undefined
   const shouldUploadSourceMaps =
     process.env.SKIP_ASSET_UPLOAD !== '1' && !!process.env.SENTRY_AUTH_TOKEN
 
@@ -604,6 +613,12 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       tsconfigPaths: true,
       alias: [
+        // Blocking requires TanStack's native history API. Keep the original
+        // Next hook for the rollback runtime, which has no TanStack provider.
+        {
+          find: /^@\/hooks\/ui\/usePreventNavigationOnUnsavedChanges$/,
+          replacement: path.resolve(rootDir, 'compat/usePreventNavigationOnUnsavedChanges.ts'),
+        },
         // `@sentry/nextjs`'s client entry drags in Next runtime internals
         // (`next/dist/shared/lib/constants`), whose module scope evaluates
         // `process?.features?.typescript` — optional chaining doesn't guard
@@ -640,7 +655,19 @@ export default defineConfig(({ command, mode }) => {
     define: {
       ...publicEnvDefines,
       ...sharedDefines,
+      __STUDIO_ASSET_CDN_URL__: JSON.stringify(assetCdnUrl) ?? 'undefined',
     },
+    ...(assetCdnUrl && {
+      experimental: {
+        // Absolute CDN URLs for client assets referenced from JS and CSS. With
+        // this set, Vite's preload helper resolves a lazy chunk's deps against
+        // the importing chunk's URL, so they follow it to the CDN.
+        renderBuiltUrl(filename: string, { ssr }: { ssr: boolean }) {
+          if (ssr) return
+          return getCdnUrlForBuiltFile(filename, assetCdnUrl)
+        },
+      },
+    }),
     // Circular-dep workaround: pin shared library code into dedicated
     // chunks so per-component chunks don't import from a chunk that
     // (transitively) imports them back.

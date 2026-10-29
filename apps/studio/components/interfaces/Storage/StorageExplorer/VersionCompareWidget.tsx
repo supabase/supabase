@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ArrowRight, RotateCcw, X } from 'lucide-react'
+import { ArrowRightIcon, RotateCcwIcon, XIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { FilePreview } from './FilePreview'
@@ -27,7 +27,7 @@ export const VersionCompareWidget = ({
 }: VersionCompareWidgetProps) => (
   <div className="space-y-3 border-b border-overlay bg-brand-200/30 p-3">
     <div className="flex items-center gap-x-1.5">
-      <RotateCcw size={13} className="shrink-0 text-brand" />
+      <RotateCcwIcon size={13} className="shrink-0 text-brand" />
       <p className="truncate text-sm font-medium text-foreground">
         Restore v.{selectedVersion.versionId}?
       </p>
@@ -38,7 +38,7 @@ export const VersionCompareWidget = ({
         onClick={onDismiss}
         aria-label="Cancel comparison"
       >
-        <X size={13} />
+        <XIcon size={13} />
       </button>
     </div>
 
@@ -57,7 +57,7 @@ export const VersionCompareWidget = ({
           {dayjs(selectedVersion.createdAt).format('MMM D')} · {formatBytes(selectedVersion.size)}
         </p>
       </div>
-      <ArrowRight size={14} className="shrink-0 text-foreground-lighter" />
+      <ArrowRightIcon size={14} className="shrink-0 text-foreground-lighter" />
       <div className="flex-1 space-y-1.5">
         <div className="flex h-24 items-center justify-center overflow-hidden rounded-md border border-overlay bg-surface-200">
           {/* No `versionId`, so the endpoint resolves the current version. */}
@@ -72,7 +72,7 @@ export const VersionCompareWidget = ({
     <Button
       variant="primary"
       block
-      icon={<RotateCcw size={14} />}
+      icon={<RotateCcwIcon size={14} />}
       loading={isRestoring}
       onClick={onRestore}
     >

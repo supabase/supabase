@@ -73,10 +73,11 @@ const VERCEL_SCOPES: OAuthScope[] = [
   'environment:read',
   'environment:write',
   'secrets:read',
-  'secrets:write',
   'projects:read',
   'edge_functions:read',
   'storage:read',
+  'analytics:read',
+  'analytics:write',
 ]
 
 const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
@@ -279,7 +280,15 @@ const MOCK_ORGANIZATION_PROJECTS: Record<string, OAuthAppsAuthorizeOrganizationP
 }
 
 const TAILSPIN_VERCEL_EXISTING_GRANT: OAuthExistingGrant = {
-  approved_scopes: ['database:read', 'database:write', 'projects:read'],
+  approved_scopes: [
+    'database:read',
+    'database:write',
+    'analytics:read',
+    'projects:read',
+    'secrets:read',
+    'secrets:write',
+    'rest:read',
+  ],
   project_refs: ['tailspinshop1', 'tailspindeleted1'],
   approved_at: '2026-08-14T09:12:00.000Z',
 }
@@ -379,20 +388,18 @@ const MOCK_APP_GRANTS: Record<string, ListOrgAppGrantsResponse> = {
         approved_scopes: ['database:read', 'database:write', 'projects:read'],
         approved_at: '2026-08-18T09:12:00.000Z',
       },
-      ...Array(50)
-        .keys()
-        .map((index) => ({
-          grant_id: `grant-vercel-developer-${index}`,
-          kind: 'member_bound' as const,
-          user: {
-            gotrue_id: `b1d3e2f4-0000-4000-8000-0000000000${index.toString().padStart(2, '0')}`,
-            email: `developer${index}@example.com`,
-            avatar_url: 'https://avatars.example/developer.png',
-          },
-          projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
-          approved_scopes: ['projects:read'],
-          approved_at: '2026-08-16T11:30:00.000Z',
-        })),
+      ...Array.from({ length: 50 }, (_, index) => ({
+        grant_id: `grant-vercel-developer-${index}`,
+        kind: 'member_bound' as const,
+        user: {
+          gotrue_id: `b1d3e2f4-0000-4000-8000-0000000000${index.toString().padStart(2, '0')}`,
+          email: `developer${index}@example.com`,
+          avatar_url: 'https://avatars.example/developer.png',
+        },
+        projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
+        approved_scopes: ['projects:read'],
+        approved_at: '2026-08-16T11:30:00.000Z',
+      })),
     ],
     pagination: { next_cursor: null },
   },

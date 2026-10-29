@@ -1,13 +1,14 @@
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, Loading, WarningIcon } from 'ui'
 import { ChartEmptyState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { Row } from 'ui-patterns/Row'
 
+import { isChartIntervalKey, resolveChartInterval } from './ChartInterval.utils'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   buildUnifiedLogsUrl,
@@ -20,6 +21,7 @@ import { UsageApiCounts, useProjectLogStatsQuery } from '@/data/analytics/projec
 import { fillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -29,8 +31,6 @@ type LogsBarChartDatum = {
   ok_count: number
   warning_count: number
 }
-
-type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 type ServiceKey = 'db' | 'auth' | 'storage' | 'realtime'
 
@@ -63,13 +63,11 @@ export const ProjectUsageSection = () => {
   const retentionDays = getEntitlementMax()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
-  const DEFAULT_INTERVAL: ChartIntervalKey =
-    retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day'
-  const [interval, setInterval] = useState<ChartIntervalKey>(DEFAULT_INTERVAL)
-
-  useEffect(() => {
-    setInterval(retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day')
-  }, [retentionDays])
+  const [storedInterval, setStoredInterval] = useLocalStorageQuery<string | undefined>(
+    LOCAL_STORAGE_KEYS.HOME_CHART_INTERVAL(projectRef ?? ''),
+    undefined
+  )
+  const interval = resolveChartInterval(storedInterval, retentionDays)
 
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === interval) || CHART_INTERVALS[1]
 
@@ -227,7 +225,9 @@ export const ProjectUsageSection = () => {
         </div>
         <ChartIntervalDropdown
           value={interval}
-          onChange={(interval) => setInterval(interval as ChartIntervalKey)}
+          onChange={(next) => {
+            if (isChartIntervalKey(next)) setStoredInterval(next)
+          }}
           organizationSlug={organization?.slug}
           dropdownAlign="end"
           tooltipSide="left"

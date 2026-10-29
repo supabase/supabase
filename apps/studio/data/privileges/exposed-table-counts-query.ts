@@ -2,6 +2,7 @@ import { getExposedTableCountsSql } from '@supabase/pg-meta'
 import { queryOptions } from '@tanstack/react-query'
 
 import { privilegeKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import type { ResponseError } from '@/types'
@@ -34,6 +35,7 @@ export async function getExposedTableCounts(
       connectionString,
       sql,
       queryKey: ['exposed-table-counts', selectedSchemas],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -49,7 +51,6 @@ export const exposedTableCountsQueryOptions = (
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   return queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: privilegeKeys.exposedTableCounts(projectRef, selectedSchemas),
     queryFn: ({ signal }) =>
       getExposedTableCounts(

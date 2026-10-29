@@ -1,13 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
+import type { UnifiedLogsScope } from './UnifiedLogs.types'
 import {
   buildUnifiedLogsUrl,
+  createUnifiedLogsSearch,
   gateLogTypeFilters,
   gateLogTypeOptions,
   getComputeLogsAvailability,
   getEventMessageDisplay,
+  getFacetValueCount,
+  getLogRowClassName,
+  getLogTypeVisibility,
   getRawLogData,
+  getUniqueLogRows,
+  isOfferedFilter,
   parseMultigresEventMessage,
+  toQuerySearchParams,
   wrapIlikePattern,
 } from './UnifiedLogs.utils'
 
@@ -29,22 +37,21 @@ describe('buildUnifiedLogsUrl', () => {
     expect(params.get('filter')).toBe('log_type:eq:edge function')
   })
 
-  it('adds the date range as an epoch-ms pair when start and end are provided', () => {
-    const start = new Date('2026-05-08T00:00:00.000Z')
-    const end = new Date('2026-05-08T01:00:00.000Z')
-    const { params } = parse(
-      buildUnifiedLogsUrl({ projectRef: 'abc', logType: 'auth', start, end })
-    )
-    expect(params.get('date')).toBe(`${start.valueOf()}-${end.valueOf()}`)
-  })
-
-  it('accepts ISO strings for the date range', () => {
-    const start = '2026-05-08T00:00:00.000Z'
-    const end = '2026-05-08T01:00:00.000Z'
+  it.each([
+    ['Date objects', new Date('2026-05-08T00:00:00.000Z'), new Date('2026-05-08T01:00:00.000Z')],
+    ['ISO strings', '2026-05-08T00:00:00.000Z', '2026-05-08T01:00:00.000Z'],
+  ])('adds the date range as an epoch-ms pair from %s', (_, start, end) => {
     const { params } = parse(
       buildUnifiedLogsUrl({ projectRef: 'abc', logType: 'auth', start, end })
     )
     expect(params.get('date')).toBe(`${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
+  })
+
+  it('adds the user filter and leaves out params that are not set', () => {
+    expect(buildUnifiedLogsUrl({ projectRef: 'abc' })).toBe('/project/abc/logs')
+    const { params } = parse(buildUnifiedLogsUrl({ projectRef: 'abc', user: 'user@example.com' }))
+    expect(params.get('user')).toBe('user@example.com')
+    expect(params.has('filter')).toBe(false)
   })
 
   it('omits the date range when only one bound is provided', () => {
@@ -108,7 +115,7 @@ describe('getRawLogData', () => {
         launch_id: '1788424715503435269',
         log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
         log_stream: 'launch-1788424715503435269',
-        source: 'worker_guest_logs',
+        subservice: 'worker_guest_logs',
         worker: 'api',
       },
       project: 'cxkpapyhaaywrtudnqpl',
@@ -203,6 +210,221 @@ describe('gateLogTypeFilters', () => {
   })
 })
 
+const FUNCTION_SCOPE: UnifiedLogsScope = {
+  filters: [
+    { column: 'log_type', operator: '=', value: 'edge function' },
+    { column: 'log_type', operator: '=', value: 'edge function runtime' },
+    { column: 'function_id', operator: '=', value: 'fn-123' },
+  ],
+}
+
+describe('getFacetValueCount', () => {
+  const facets = {
+    level: {
+      total: 7,
+      rows: [
+        { value: 'error', total: 3 },
+        { value: 'success', total: 4 },
+      ],
+    },
+  }
+
+  it("reads one value's count from a facet", () => {
+    expect(getFacetValueCount(facets, 'level', 'error')).toBe(3)
+  })
+
+  it('counts zero for values and facets the query found nothing for', () => {
+    expect(getFacetValueCount(facets, 'level', 'warning')).toBe(0)
+    expect(getFacetValueCount(facets, 'log_type', 'edge function')).toBe(0)
+    expect(getFacetValueCount(undefined, 'level', 'error')).toBe(0)
+  })
+})
+
+describe('isOfferedFilter', () => {
+  it('offers every filter when the view lists none', () => {
+    expect(isOfferedFilter('user')).toBe(true)
+    expect(isOfferedFilter('pathname')).toBe(true)
+  })
+
+  it('offers only the listed filters', () => {
+    const offeredFilters = ['date', 'level']
+    expect(isOfferedFilter('level', offeredFilters)).toBe(true)
+    expect(isOfferedFilter('user', offeredFilters)).toBe(false)
+    expect(isOfferedFilter('pathname', offeredFilters)).toBe(false)
+  })
+})
+
+describe('getLogTypeVisibility', () => {
+  it('hides edge function runtime logs from the project-wide view and keeps other gates', () => {
+    expect(getLogTypeVisibility({ compute: false })).toEqual({
+      compute: false,
+      'edge function runtime': false,
+    })
+  })
+
+  it('only shows the edge function log types in a function-scoped view', () => {
+    const visibility = getLogTypeVisibility({ compute: true }, FUNCTION_SCOPE)
+    const visibleLogTypes = Object.entries(visibility)
+      .filter(([, isVisible]) => isVisible)
+      .map(([logType]) => logType)
+
+    expect(visibleLogTypes).toEqual(['edge function', 'edge function runtime'])
+    expect(visibility.compute).toBe(false)
+    expect(visibility.postgres).toBe(false)
+  })
+
+  it('treats a scope that fixes no log types like the project-wide view', () => {
+    const attributeScope: UnifiedLogsScope = {
+      filters: [{ column: 'function_id', operator: '=', value: 'fn-123' }],
+    }
+    expect(getLogTypeVisibility({ compute: false }, attributeScope)).toEqual({
+      compute: false,
+      'edge function runtime': false,
+    })
+  })
+
+  it('drops out-of-scope log type filters from a function-scoped view', () => {
+    expect(
+      gateLogTypeFilters(
+        ['log_type:eq:postgres', 'log_type:eq:edge function runtime', 'level:eq:error'],
+        getLogTypeVisibility({}, FUNCTION_SCOPE)
+      )
+    ).toEqual(['log_type:eq:edge function runtime', 'level:eq:error'])
+  })
+})
+
+describe('createUnifiedLogsSearch', () => {
+  it('preserves fixed function filters for log previews', () => {
+    const search = createUnifiedLogsSearch({}, FUNCTION_SCOPE)
+    expect(search.scope).toEqual(FUNCTION_SCOPE)
+  })
+
+  it.each([
+    {
+      scenario: 'a missing filter value',
+      payload: '{"filters":[{"column":"function_id","operator":"="}]}',
+    },
+    {
+      scenario: 'an empty filter column',
+      payload: '{"filters":[{"column":"","operator":"=","value":""}]}',
+    },
+  ])('rejects a fixed scope with $scenario instead of opening an unscoped view', ({ payload }) => {
+    const scope = JSON.parse(payload)
+    expect(() => createUnifiedLogsSearch({}, scope)).toThrow(
+      'Invalid unified logs search parameters'
+    )
+  })
+
+  it('does not restrict project-wide searches to a resource', () => {
+    expect(createUnifiedLogsSearch({})).not.toHaveProperty('scope')
+  })
+
+  it('keeps preview filters while excluding view state from query keys', () => {
+    const search = createUnifiedLogsSearch({
+      filter: ['level:eq:error'],
+      id: 'log-1',
+      live: true,
+    })
+
+    expect(search.filter).toEqual(['level:eq:error'])
+    expect(search.size).toBe(40)
+    expect(search).not.toHaveProperty('id')
+    expect(search).not.toHaveProperty('live')
+    expect(search).not.toHaveProperty('date')
+  })
+
+  it.each([undefined, {}, { size: undefined }])(
+    'keeps the default preview size when optional search settings are absent: %j',
+    (params) => {
+      expect(createUnifiedLogsSearch(params).size).toBe(40)
+    }
+  )
+})
+
+describe('toQuerySearchParams', () => {
+  it('preserves supplied filters, date ranges and explicit query settings', () => {
+    const date = [new Date('2026-10-01T00:00:00Z'), new Date('2026-10-01T01:00:00Z')]
+    const search = toQuerySearchParams({
+      filter: ['log_type:eq:edge function', 'level:eq:error'],
+      uuid: 'request-id',
+      user: 'user@example.com',
+      date,
+      latency: [0, 100],
+      'timing.dns': [0, 50],
+      sort: { id: 'custom-field', desc: false },
+      size: 0,
+      start: 0,
+      direction: 'prev',
+      cursor: date[0],
+      edge_auth: false,
+      id: 'opened-log',
+      live: true,
+    })
+
+    expect(search).toMatchObject({
+      filter: ['log_type:eq:edge function', 'level:eq:error'],
+      uuid: 'request-id',
+      user: 'user@example.com',
+      date,
+      latency: [0, 100],
+      'timing.dns': [0, 50],
+      sort: { id: 'custom-field', desc: false },
+      size: 0,
+      start: 0,
+      direction: 'prev',
+      cursor: date[0],
+      edge_auth: false,
+    })
+    expect(search).not.toHaveProperty('id')
+    expect(search).not.toHaveProperty('live')
+  })
+
+  it('rejects invalid runtime filters instead of silently querying an unfiltered list', () => {
+    const search = JSON.parse('{"filter":"level:eq:error"}')
+    expect(() => toQuerySearchParams(search)).toThrow('Invalid unified logs search parameters')
+  })
+})
+
+describe('getUniqueLogRows', () => {
+  it('shows each log once when timestamp-based query pages overlap', () => {
+    const rows = getUniqueLogRows([
+      {
+        data: [
+          { id: 'a', page: 1 },
+          { id: 'b', page: 1 },
+        ],
+      },
+      {
+        data: [
+          { id: 'b', page: 2 },
+          { id: 'c', page: 2 },
+        ],
+      },
+      {},
+    ])
+
+    expect(rows).toEqual([
+      { id: 'a', page: 1 },
+      { id: 'b', page: 1 },
+      { id: 'c', page: 2 },
+    ])
+  })
+
+  it('keeps the preview empty until query pages arrive', () => {
+    expect(getUniqueLogRows(undefined)).toEqual([])
+  })
+})
+
+describe('getLogRowClassName', () => {
+  it('distinguishes errors and dims logs received before live mode started', () => {
+    const errorRow = { level: 'error' as const, timestamp: 1000 }
+
+    expect(getLogRowClassName(errorRow)).toContain('bg-destructive/5')
+    expect(getLogRowClassName(errorRow)).toContain('opacity-100')
+    expect(getLogRowClassName(errorRow, 2000)).toContain('opacity-50')
+  })
+})
+
 describe('getComputeLogsAvailability', () => {
   const computeFilter = ['log_type:eq:compute']
 
@@ -220,59 +442,38 @@ describe('getComputeLogsAvailability', () => {
     expect(availability.readyToSyncFilters).toBe(false)
   })
 
-  it('allows Compute filters and queries when the platform flag is enabled', () => {
-    const availability = getComputeLogsAvailability({
-      isPlatform: true,
-      flagsLoaded: true,
-      computeEnabled: true,
-    })
-
-    expect(availability).toEqual({
-      canQueryCompute: true,
-      preserveComputeFilter: true,
-      readyToSyncFilters: true,
-    })
-  })
-
-  it('removes Compute filters and queries when the platform flag is disabled', () => {
-    const availability = getComputeLogsAvailability({
-      isPlatform: true,
-      flagsLoaded: true,
-      computeEnabled: false,
-    })
-
-    expect(availability).toEqual({
-      canQueryCompute: false,
-      preserveComputeFilter: false,
-      readyToSyncFilters: true,
-    })
-  })
-
-  it('syncs generic filters immediately while keeping Compute unavailable on self-hosted', () => {
-    const availability = getComputeLogsAvailability({
-      isPlatform: false,
-      computeEnabled: false,
-    })
-
-    expect(availability).toEqual({
-      canQueryCompute: false,
-      preserveComputeFilter: false,
+  it.each([
+    [
+      'allows Compute when the platform flag is enabled',
+      { isPlatform: true, flagsLoaded: true, computeEnabled: true },
+      true,
+    ],
+    [
+      'removes Compute when the platform flag is disabled',
+      { isPlatform: true, flagsLoaded: true, computeEnabled: false },
+      false,
+    ],
+    [
+      'syncs generic filters immediately while keeping Compute unavailable on self-hosted',
+      { isPlatform: false, computeEnabled: false },
+      false,
+    ],
+  ])('%s', (_, input, computeAvailable) => {
+    expect(getComputeLogsAvailability(input)).toEqual({
+      canQueryCompute: computeAvailable,
+      preserveComputeFilter: computeAvailable,
       readyToSyncFilters: true,
     })
   })
 })
 
 describe('wrapIlikePattern', () => {
-  it('wraps a bare value in %...% for a contains match', () => {
-    expect(wrapIlikePattern('foo')).toBe('%foo%')
-  })
-
-  it('leaves the value untouched when it already contains a % wildcard', () => {
-    expect(wrapIlikePattern('foo%')).toBe('foo%')
-    expect(wrapIlikePattern('%foo')).toBe('%foo')
-  })
-
-  it('leaves the value untouched when it already contains a _ wildcard', () => {
-    expect(wrapIlikePattern('fo_bar')).toBe('fo_bar')
+  it.each([
+    ['foo', '%foo%'],
+    ['foo%', 'foo%'],
+    ['%foo', '%foo'],
+    ['fo_bar', 'fo_bar'],
+  ])('wraps %s only when it has no %% or _ wildcard', (value, expected) => {
+    expect(wrapIlikePattern(value)).toBe(expected)
   })
 })
