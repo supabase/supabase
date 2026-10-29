@@ -11,7 +11,7 @@ export interface CrossfadeIconProps {
 const iconClassName = (isShown: boolean) =>
   cn(
     'absolute inset-0 flex items-center justify-center',
-    'transition duration-300 ease-[cubic-bezier(0.2,0,0,1)]',
+    'transition duration-300 ease-crossfade',
     'motion-reduce:transition-none',
     isShown ? 'scale-100 opacity-100 blur-none' : 'scale-25 opacity-0 blur-xs'
   )
