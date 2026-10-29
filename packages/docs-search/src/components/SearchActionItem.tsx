@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { cn, CommandGroup, CommandItem } from 'ui'
+import { cn, CommandItem } from 'ui'
 
 export interface SearchActionItemProps {
   icon?: ReactNode
@@ -10,18 +10,18 @@ export interface SearchActionItemProps {
 
 export function SearchActionItem({ icon, children, onSelect, className }: SearchActionItemProps) {
   return (
-    <CommandGroup className="pt-1.25">
-      <CommandItem
-        value="search-action"
-        onSelect={onSelect}
-        className={cn(
-          'cursor-pointer gap-2.5 rounded-md px-2 py-2 text-sm text-foreground',
-          className
-        )}
-      >
-        {icon}
+    <CommandItem
+      value="search-action"
+      onSelect={onSelect}
+      className={cn(
+        'group inline-flex cursor-pointer items-center gap-1.5 p-0 align-bottom text-sm text-foreground data-[selected=true]:bg-transparent',
+        className
+      )}
+    >
+      {icon}
+      <span className="underline decoration-foreground-muted underline-offset-4 group-hover:decoration-foreground">
         {children}
-      </CommandItem>
-    </CommandGroup>
+      </span>
+    </CommandItem>
   )
 }

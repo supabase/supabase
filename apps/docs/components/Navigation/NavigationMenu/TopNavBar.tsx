@@ -66,7 +66,7 @@ const TopNavBar: FC<TopNavBarProps> = ({
               <MobileHeaderLogo scrolledTitle={scrolledTitle} />
             </div>
 
-            <div className={cn('flex items-center', isSearchV2 ? 'gap-3' : 'gap-2')}>
+            <div className="flex gap-3 items-center">
               <DevToolbarTrigger />
               {onMenuToggle && isOpen ? (
                 <MobileNavThemeButton value={theme} onValueChange={setTheme} />
@@ -85,14 +85,13 @@ const TopNavBar: FC<TopNavBarProps> = ({
             </div>
           </div>
           <div className="hidden lg:flex items-center justify-end gap-3">
-            {/* search v2 shows Ask AI in this bar, so it drops Dashboard for logged-in users */}
-            {!isUserLoading && !(isSearchV2 && isLoggedIn) && (
+            {!isUserLoading && !isLoggedIn ? (
               <Button variant="primary" asChild>
                 <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
-                  {isLoggedIn ? 'Dashboard' : 'Sign up'}
+                  Sign up
                 </a>
               </Button>
-            )}
+            ) : null}
             {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
               <Button asChild>
                 <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>

@@ -34,9 +34,8 @@ export interface SearchPanelProps {
   /** Fires when a result link is about to navigate in this tab (not a new-tab click). */
   onResultLinkNavigate?: () => void
   /**
-   * Shows while the query has no results to list: while typing, while loading and when nothing
-   * matches. It replaces the "no results" message, for example with a `SearchActionItem`.
-   * `query` is trimmed.
+   * Replaces the "no results" message once a search finds nothing, for example with a message and
+   * a `SearchActionItem`. `query` is the search that found nothing.
    */
   renderNoResults?: (context: { query: string }) => ReactNode
   /** Fills the start of the footer that shows under results. `query` is trimmed. */
@@ -68,18 +67,8 @@ export function SearchPanel({
   const highlightQuery = getHighlightQuery(searchState)
   const results = getVisibleResults(searchState)
 
-  const trimmedQuery = query.trim()
-  // the slot unmounts when results arrive, so cmdk selects the first result and enter opens it
-  const isNoResultsSlotVisible =
-    Boolean(renderNoResults) &&
-    trimmedQuery !== '' &&
-    results.length === 0 &&
-    searchState.status !== 'error'
   const isListVisible =
-    results.length > 0 ||
-    isNoResultsSlotVisible ||
-    searchState.status === 'noResults' ||
-    searchState.status === 'error'
+    results.length > 0 || searchState.status === 'noResults' || searchState.status === 'error'
   const isSearching = getIsSearching({ searchState, query, minCharacters })
 
   // only reports a query that differs from the last one reported, so "abc" followed by "abc "
@@ -150,7 +139,7 @@ export function SearchPanel({
           onValueChange={handleValueChange}
           showSearchIcon={false}
           wrapperClassName="size-full border-0 p-0"
-          className="h-full p-0 text-search-dialog placeholder:text-foreground-lighter"
+          className="h-full p-0 text-search-dialog! placeholder:text-foreground-lighter"
         />
       </SearchInputRow>
       {/*
@@ -165,12 +154,18 @@ export function SearchPanel({
         label={copy.resultsLabel}
         className="h-(--cmdk-list-height) max-h-[min(477px,70dvh)] outline-hidden inset-shadow-2xs inset-shadow-border mx-px transition-all duration-150 ease-enter motion-reduce:transition-none scroll-fade-bottom"
       >
-        {isNoResultsSlotVisible ? (
-          renderNoResults?.({ query: trimmedQuery })
-        ) : searchState.status === 'noResults' ? (
-          <CommandEmpty>{copy.noResults}</CommandEmpty>
+        {searchState.status === 'noResults' ? (
+          renderNoResults ? (
+            <div className="py-6 text-center text-sm">
+              {renderNoResults({ query: highlightQuery })}
+            </div>
+          ) : (
+            <CommandEmpty className="text-sm">{copy.noResults}</CommandEmpty>
+          )
         ) : null}
-        {searchState.status === 'error' && <CommandEmpty>{copy.error}</CommandEmpty>}
+        {searchState.status === 'error' && (
+          <CommandEmpty className="text-sm">{copy.error}</CommandEmpty>
+        )}
         {results.length > 0 && (
           <CommandGroup className="pt-1.25">
             {results.map((result) => (
@@ -191,7 +186,7 @@ export function SearchPanel({
         <SearchFooter labels={copy}>
           {renderFooterStart ? (
             <span onKeyDown={handleFooterKeyDown} className="contents">
-              {renderFooterStart({ query: trimmedQuery })}
+              {renderFooterStart({ query: query.trim() })}
             </span>
           ) : null}
         </SearchFooter>

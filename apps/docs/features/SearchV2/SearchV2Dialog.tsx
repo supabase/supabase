@@ -13,8 +13,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-import { SEARCH_V2_ENDPOINT, SEARCH_V2_MIN_CHARACTERS } from './constants'
 import { AskAiIcon } from './AskAiIcon'
+import { SEARCH_V2_ENDPOINT, SEARCH_V2_MIN_CHARACTERS } from './constants'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 type SearchV2DialogProps = Pick<SearchDialogProps, 'open' | 'onOpenChange'>
@@ -87,12 +87,15 @@ export function SearchV2Panel({
       renderNoResults={
         onAskAi
           ? ({ query }) => (
-              <SearchActionItem
-                icon={<AskAiIcon isThinking={false} className="size-4 shrink-0" />}
-                onSelect={() => onAskAi({ triggerType: 'no_results_item', question: query })}
-              >
-                Ask Supabase AI: {query}
-              </SearchActionItem>
+              <>
+                No results found for “{query}”.{' '}
+                <SearchActionItem
+                  icon={<AskAiIcon isThinking={false} className="size-3.5" />}
+                  onSelect={() => onAskAi({ triggerType: 'no_results_item', question: query })}
+                >
+                  Ask Supabase AI
+                </SearchActionItem>
+              </>
             )
           : undefined
       }

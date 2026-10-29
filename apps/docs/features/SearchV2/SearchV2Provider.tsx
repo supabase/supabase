@@ -28,11 +28,6 @@ interface SearchV2ProviderProps {
   children: ReactNode
 }
 
-interface SearchV2ShortcutsProps {
-  onSearch: SearchV2ContextValue['showSearch']
-  onAskAi: SearchV2ContextValue['showAskAi']
-}
-
 const SearchV2Context = createContext<SearchV2ContextValue | null>(null)
 
 /**
@@ -122,10 +117,12 @@ export function SearchV2Provider({ children }: SearchV2ProviderProps) {
     closeDialog()
   }
 
+  useSearchShortcut(() => showSearch('keyboard_shortcut'))
+  useSearchShortcut(() => showAskAi({ triggerType: 'keyboard_shortcut' }), 'i')
+
   return (
     <SearchV2Context value={{ isSearchOpen, isAskAiOpen, showSearch, showAskAi }}>
       {children}
-      <SearchV2Shortcuts onSearch={showSearch} onAskAi={showAskAi} />
       <SearchDialog
         open={isOpen}
         onOpenChange={handleDialogOpenChange}
@@ -149,11 +146,4 @@ export function useSearchV2(): SearchV2ContextValue {
   const context = use(SearchV2Context)
   if (!context) throw new Error('useSearchV2 must be used inside SearchV2Provider')
   return context
-}
-
-// its own component so the shortcuts only exist while the experiment is on
-function SearchV2Shortcuts({ onSearch, onAskAi }: SearchV2ShortcutsProps) {
-  useSearchShortcut(() => onSearch('keyboard_shortcut'))
-  useSearchShortcut(() => onAskAi({ triggerType: 'keyboard_shortcut' }), 'i')
-  return null
 }
