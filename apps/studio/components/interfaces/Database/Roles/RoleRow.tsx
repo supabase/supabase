@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronUpIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
+import { ChevronUpIcon, KeyRoundIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -23,6 +23,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { ResetRolePasswordDialog } from './ResetRolePasswordDialog'
 import { RolePasswordField } from './RolePasswordField'
 import { ROLE_PERMISSIONS, SYSTEM_ROLES } from './Roles.constants'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -53,8 +54,10 @@ const getFormValues = (role: PgRole) => ({ ...role, password: '' })
 
 export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
   const isSystemRole = SYSTEM_ROLES.some((name) => name === role.name)
+  const canResetPassword = !isSystemRole && role.canLogin
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false)
   const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -185,7 +188,26 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               </TooltipTrigger>
               <TooltipContent side="bottom">More options</TooltipContent>
             </Tooltip>
-            <DropdownMenuContent side="bottom" align="end" className="w-[120px]">
+            <DropdownMenuContent side="bottom" align="end" className="w-[160px]">
+              <DropdownMenuItemTooltip
+                className="space-x-2"
+                disabled={!canResetPassword}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: isSystemRole
+                      ? `The ${role.name} role is a system role and its password cannot be reset here`
+                      : `The ${role.name} role cannot log in. Turn on "User can login" to set a password`,
+                  },
+                }}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setIsResetPasswordOpen(true)
+                }}
+              >
+                <KeyRoundIcon size="14" strokeWidth={2} />
+                <p>Reset password</p>
+              </DropdownMenuItemTooltip>
               <DropdownMenuItemTooltip
                 className="space-x-2"
                 disabled={isSystemRole}
@@ -265,6 +287,11 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           </form>
         </Form>
       </CollapsibleContent>
+      <ResetRolePasswordDialog
+        role={role}
+        open={isResetPasswordOpen}
+        onOpenChange={setIsResetPasswordOpen}
+      />
     </Collapsible>
   )
 }

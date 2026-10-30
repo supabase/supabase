@@ -143,4 +143,59 @@ describe('RoleRow', () => {
     expect(getUpdateQuery()).toContain('createdb')
     expect(getUpdateQuery()).not.toContain('password')
   })
+
+  describe('reset password', () => {
+    const openMenu = async (role: PgRole) => {
+      customRender(
+        <ProjectContextProvider projectRef="default">
+          <RoleRow role={role} onSelectDelete={vi.fn()} />
+        </ProjectContextProvider>
+      )
+      const user = userEvent.setup()
+      await user.click(await screen.findByRole('button', { name: `${role.name} actions` }))
+      return user
+    }
+
+    test('is available for a custom role that can log in', async () => {
+      await openMenu(createRole({ canLogin: true }))
+
+      expect(await screen.findByRole('menuitem', { name: 'Reset password' })).not.toHaveAttribute(
+        'data-disabled'
+      )
+    })
+
+    test.each([
+      ['a system role', createRole({ name: 'postgres', canLogin: true })],
+      ['a role that cannot log in', createRole({ canLogin: false })],
+    ])('is disabled for %s', async (_, role) => {
+      await openMenu(role)
+
+      expect(await screen.findByRole('menuitem', { name: 'Reset password' })).toHaveAttribute(
+        'data-disabled'
+      )
+    })
+
+    test('requires a password', async () => {
+      const user = await openMenu(createRole({ canLogin: true }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+
+      fireEvent.submit(document.getElementById('reset-role-password-form')!)
+
+      expect(await screen.findByText('You must provide a password')).toBeInTheDocument()
+      expect(getUpdateQuery()).toBeUndefined()
+    })
+
+    test('sets the new password and closes the dialog', async () => {
+      const user = await openMenu(createRole({ canLogin: true }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+
+      await user.click(await screen.findByLabelText('Password'))
+      await user.paste('n3w-s3cret')
+      fireEvent.submit(document.getElementById('reset-role-password-form')!)
+
+      await waitFor(() => expect(getUpdateQuery()).toBeDefined())
+      expect(getUpdateQuery()).toContain(`'n3w-s3cret'`)
+      await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
+    })
+  })
 })

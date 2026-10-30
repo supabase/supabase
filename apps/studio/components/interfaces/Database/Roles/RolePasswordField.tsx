@@ -8,15 +8,22 @@ import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { generateStrongPassword } from '@/lib/project'
 
 interface RolePasswordFieldProps {
+  /** Whether leaving the field empty is allowed. Defaults to true. */
+  isOptional?: boolean
   /** Whether the role already exists, so it may already have a password. Defaults to false. */
   isExistingRole?: boolean
+  layout?: 'horizontal' | 'vertical'
 }
 
 /**
- * Optional password field for a role form. Render it inside a `<Form>` whose values include
- * a `password` string, and only while the role can log in.
+ * Password field for a role form. Render it inside a `<Form>` whose values include a
+ * `password` string, and only while the role can log in.
  */
-export const RolePasswordField = ({ isExistingRole = false }: RolePasswordFieldProps) => {
+export const RolePasswordField = ({
+  isOptional = true,
+  isExistingRole = false,
+  layout = 'horizontal',
+}: RolePasswordFieldProps) => {
   const { control, setValue } = useFormContext<{ password: string }>()
   const [isPasswordGenerated, setIsPasswordGenerated] = useState(false)
 
@@ -31,11 +38,11 @@ export const RolePasswordField = ({ isExistingRole = false }: RolePasswordFieldP
       name="password"
       render={({ field }) => (
         <FormItemLayout
-          layout="horizontal"
+          layout={layout}
           label="Password"
           description={
             <>
-              {hint}{' '}
+              {isOptional && `${hint} `}
               <button
                 type="button"
                 tabIndex={0}
