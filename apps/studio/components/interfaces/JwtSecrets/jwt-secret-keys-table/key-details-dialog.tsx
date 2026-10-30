@@ -1,4 +1,4 @@
-import { FileKey } from 'lucide-react'
+import { FileKeyIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   Button,
@@ -47,13 +47,13 @@ export function KeyDetailsDialog({
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="jwk" className="flex flex-row gap-2 items-center">
-            <FileKey className="size-4 text-foreground-light" />
+            <FileKeyIcon className="size-4 text-foreground-light" />
             Public key set (JSON Web Key Set format)
           </Label>
           <div className="relative">
             <Textarea className="font-mono text-sm pr-10" rows={8} value={jwks} readOnly />
             <CopyButton
-              type="default"
+              variant="default"
               iconOnly
               text={jwks}
               className="absolute top-2 right-2"

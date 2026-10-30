@@ -5,6 +5,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Badge, Button, Card, CardContent, CardFooter, CardHeader, CardTitle } from 'ui'
+
 import { markdownComponents } from './markdownComponents'
 
 interface Reply {
@@ -87,12 +88,7 @@ export function RepliesList({ replies, questionAuthor, totalReplyCount }: Replie
         </CardContent>
         {hasMoreThanThree && (
           <CardFooter className="flex justify-center">
-            <Button
-              type="default"
-              size="tiny"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="w-min"
-            >
+            <Button size="tiny" onClick={() => setIsExpanded(!isExpanded)} className="w-min">
               {isExpanded
                 ? 'Show fewer replies'
                 : `Show ${replies.length - 3} more ${replies.length - 3 === 1 ? 'reply' : 'replies'}`}

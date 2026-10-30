@@ -2,7 +2,8 @@ import { literal, safeSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { pgGraphqlKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { UseCustomQueryOptions } from '@/types'
@@ -30,6 +31,7 @@ export async function getSchemaComment(
       connectionString,
       sql,
       queryKey: ['pg-graphql', 'schema-comment', schema],
+      grant: unguarded.migrating,
     },
     signal
   )

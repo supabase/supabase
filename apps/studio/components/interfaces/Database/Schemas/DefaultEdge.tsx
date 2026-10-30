@@ -7,14 +7,13 @@ import {
   Position,
   useReactFlow,
 } from '@xyflow/react'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { memo, useState } from 'react'
+import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
+import { memo, useCallback, useState } from 'react'
 import { Badge, cn } from 'ui'
 
 import { useSchemaGraphContext } from './SchemaGraphContext'
 import { EdgeData } from './Schemas.constants'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 const DefaultEdgeComponent = ({
   id,
@@ -53,7 +52,9 @@ const DefaultEdgeComponent = ({
       <BaseEdge
         id={id}
         path={edgePath}
-        className={cn(selected ? 'stroke-brand!' : isDownloading ? 'stroke-black!' : undefined)}
+        className={cn(
+          selected ? 'stroke-primary-bright!' : isDownloading ? 'stroke-black!' : undefined
+        )}
         stroke="#000000"
         {...props}
       />
@@ -96,7 +97,7 @@ const EdgeRelationInfo = ({
   const [show, setShow] = useState(false)
   const reactFlowInstance = useReactFlow()
 
-  const checkIfShouldBeDisplayed = useStaticEffectEvent(
+  const checkIfShouldBeDisplayed = useCallback(
     (relationInfoElement: HTMLDivElement | null) => {
       if (!relationInfoElement) return
       const sourceNode = reactFlowInstance.getNode(source)
@@ -133,7 +134,8 @@ const EdgeRelationInfo = ({
 
       // If it is, hide it as they are too close
       setShow(!isNodeIntersectingWithSource && !isNodeIntersectingWithTarget)
-    }
+    },
+    [reactFlowInstance, source, target]
   )
 
   return (
@@ -141,7 +143,7 @@ const EdgeRelationInfo = ({
       <Badge
         ref={checkIfShouldBeDisplayed}
         className={cn(
-          'absolute pointer-events-auto z-50 p-1 rounded-[4px] gap-1 outline outline-1 outline-brand',
+          'absolute pointer-events-auto z-50 p-1 rounded-[4px] gap-1 outline outline-1 outline-primary-bright',
           show ? 'opacity-100' : 'opacity-0'
         )}
         style={{
@@ -157,7 +159,7 @@ const EdgeRelationInfo = ({
                 table={data.sourceName}
                 column={data.sourceColumnName}
               />
-              <ArrowRight size={12} />
+              <ArrowRightIcon size={12} />
               <EdgeNodeData
                 schema={data.targetSchemaName}
                 table={data.targetName}
@@ -171,7 +173,7 @@ const EdgeRelationInfo = ({
                 table={data.targetName}
                 column={data.targetColumnName}
               />
-              <ArrowLeft size={12} />
+              <ArrowLeftIcon size={12} />
               <EdgeNodeData
                 schema={data.sourceSchemaName}
                 table={data.sourceName}

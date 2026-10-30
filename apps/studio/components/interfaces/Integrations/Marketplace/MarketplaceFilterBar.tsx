@@ -1,4 +1,5 @@
-import { ChevronDown, LayoutGrid, List, Search } from 'lucide-react'
+import { ChevronDownIcon, LayoutGridIcon, ListIcon, SearchIcon } from 'lucide-react'
+import type { Ref } from 'react'
 import {
   Button,
   cn,
@@ -19,12 +20,14 @@ import {
   type MarketplaceIntegrationType,
   type MarketplaceSource,
 } from './Marketplace.constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 
 export type ViewMode = 'list' | 'grid'
 
 interface MarketplaceFilterBarProps {
   resultCount: number
   search: string
+  searchInputRef?: Ref<HTMLInputElement>
   onSearchChange: (value: string) => void
   category: string | null
   onCategoryChange: (value: string | null) => void
@@ -49,6 +52,7 @@ const triggerCls = 'inline-flex flex-row gap-2'
 export const MarketplaceFilterBar = ({
   resultCount,
   search,
+  searchInputRef,
   onSearchChange,
   category,
   onCategoryChange,
@@ -75,23 +79,25 @@ export const MarketplaceFilterBar = ({
   return (
     <div
       className={cn(
-        'sticky top-0 z-5 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
+        'sticky top-0 z-20 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
         'bg-dash-sidebar/95 backdrop-blur',
         showClear ? 'border-b border-muted' : 'border-b border-transparent'
       )}
     >
       <Input
+        ref={searchInputRef}
         value={search}
         size="tiny"
         onChange={(e) => onSearchChange(e.target.value)}
+        onKeyDown={onSearchInputEscape(search, onSearchChange)}
         placeholder={`Search integration${resultCount === 1 ? '' : 's'}…`}
-        icon={<Search size={14} />}
+        icon={<SearchIcon size={14} />}
         containerClassName="w-full min-w-40 max-w-60 grow flex-1"
       />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button iconRight={<ChevronDownIcon />} className={triggerCls}>
             <span className="truncate">Category: {categoryLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -130,7 +136,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button iconRight={<ChevronDownIcon />} className={triggerCls}>
             <span className="truncate">Type: {typeLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -164,7 +170,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button iconRight={<ChevronDownIcon />} className={triggerCls}>
             <span className="truncate">Source: {sourceLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -195,43 +201,47 @@ export const MarketplaceFilterBar = ({
       </DropdownMenu>
 
       {showClear && (
-        <button
+        <Button
           type="button"
+          variant="text"
+          size="tiny"
           onClick={onClearFilters}
-          className="px-1 text-xs text-foreground-light underline-offset-2 hover:underline"
+          className="text-foreground-light"
         >
           Clear all
-        </button>
+        </Button>
       )}
 
       <div className="ml-auto flex rounded-md border">
         <button
           type="button"
+          tabIndex={0}
           aria-label="Grid view"
           onClick={() => onViewModeChange('grid')}
           className={cn(
-            'border-r px-2 py-1.5 rounded-l-md',
-            'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+            'border-r px-2 py-1.5 rounded-l-md cursor-pointer',
+            'focus-visible:z-10 focus-ring',
             viewMode === 'grid'
               ? 'bg-surface-200 text-foreground'
               : 'text-foreground-light hover:bg-surface-100'
           )}
         >
-          <LayoutGrid size={13} />
+          <LayoutGridIcon size={13} />
         </button>
         <button
           type="button"
+          tabIndex={0}
           aria-label="List view"
           onClick={() => onViewModeChange('list')}
           className={cn(
-            'px-2 py-1.5 rounded-r-md',
-            'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+            'px-2 py-1.5 rounded-r-md cursor-pointer',
+            'focus-visible:z-10 focus-ring',
             viewMode === 'list'
               ? 'bg-surface-200 text-foreground'
               : 'text-foreground-light hover:bg-surface-100'
           )}
         >
-          <List size={13} />
+          <ListIcon size={13} />
         </button>
       </div>
     </div>

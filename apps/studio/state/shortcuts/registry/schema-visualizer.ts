@@ -7,6 +7,7 @@ export const SCHEMA_VISUALIZER_SHORTCUT_IDS = {
   SCHEMA_VISUALIZER_DOWNLOAD_SVG: 'schema-visualizer.download-svg',
   SCHEMA_VISUALIZER_AUTO_LAYOUT: 'schema-visualizer.auto-layout',
   SCHEMA_VISUALIZER_FOCUS_SCHEMA: 'schema-visualizer.focus-schema',
+  SCHEMA_VISUALIZER_FIND_TABLE: 'schema-visualizer.find-table',
 }
 
 export type SchemaVisualizerShortcutId =
@@ -52,6 +53,13 @@ export const schemaVisualizerRegistry: RegistryDefinations<SchemaVisualizerShort
     id: SCHEMA_VISUALIZER_SHORTCUT_IDS.SCHEMA_VISUALIZER_FOCUS_SCHEMA,
     label: 'Open schema selector',
     sequence: ['O', 'S'],
+    showInSettings: false,
+    options: { ignoreInputs: true, registerInCommandMenu: true },
+  },
+  [SCHEMA_VISUALIZER_SHORTCUT_IDS.SCHEMA_VISUALIZER_FIND_TABLE]: {
+    id: SCHEMA_VISUALIZER_SHORTCUT_IDS.SCHEMA_VISUALIZER_FIND_TABLE,
+    label: 'Find table in schema',
+    sequence: ['O', 'T'],
     showInSettings: false,
     options: { ignoreInputs: true, registerInCommandMenu: true },
   },

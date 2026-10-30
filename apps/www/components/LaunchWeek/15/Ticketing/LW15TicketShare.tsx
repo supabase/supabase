@@ -76,7 +76,7 @@ export default function LW15TicketShare() {
     <div className="flex flex-row flex-wrap justify-stretch w-full gap-1 pointer-events-auto">
       <Button
         onClick={() => handleShare('twitter')}
-        type={userData.shared_on_twitter ? 'secondary' : 'default'}
+        variant={userData.shared_on_twitter ? 'secondary' : 'default'}
         icon={userData.shared_on_twitter && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
         className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-1 w-full"
@@ -88,7 +88,7 @@ export default function LW15TicketShare() {
       </Button>
       <Button
         onClick={() => handleShare('linkedin')}
-        type={userData.shared_on_linkedin ? 'secondary' : 'default'}
+        variant={userData.shared_on_linkedin ? 'secondary' : 'default'}
         icon={userData.shared_on_linkedin && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
         className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-1 w-full"

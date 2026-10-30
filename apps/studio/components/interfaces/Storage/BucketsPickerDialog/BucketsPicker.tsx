@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { ArrowDownNarrowWide, Search } from 'lucide-react'
+import { ArrowDownNarrowWideIcon, SearchIcon } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import {
   Button,
@@ -11,18 +11,18 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { CreateBucketModal } from '../CreateBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
+import { CreateBucketModal } from '../FilesBuckets/CreateBucketModal'
 import { CreateBucketButton } from '../NewBucketButton'
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketsTable } from './BucketsTable'
 import type { AllowedBucketType } from './types'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { usePaginatedBucketsQuery, type Bucket } from '@/data/storage/buckets-query'
@@ -114,11 +114,11 @@ export const BucketsPicker = ({
                     placeholder="Search for a bucket"
                     value={filterString}
                     onChange={(e) => setFilterString(e.target.value)}
-                    icon={<Search />}
+                    icon={<SearchIcon />}
                   />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" icon={<ArrowDownNarrowWide />}>
+                      <Button icon={<ArrowDownNarrowWideIcon />}>
                         Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
                       </Button>
                     </DropdownMenuTrigger>

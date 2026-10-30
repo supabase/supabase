@@ -41,7 +41,8 @@ vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
   }),
 }))
 
-vi.mock('ui', () => ({
+vi.mock('ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('ui')>()),
   Button: ({ children, loading, ...props }: ButtonMockProps) => (
     <button {...props} disabled={props.disabled || loading}>
       {children}

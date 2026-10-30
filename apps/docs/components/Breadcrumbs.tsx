@@ -118,7 +118,7 @@ const BreadcrumbsInternal = ({
                     </div>
                     <DrawerFooter className="pt-4">
                       <DrawerClose asChild>
-                        <Button type="outline">Close</Button>
+                        <Button variant="outline">Close</Button>
                       </DrawerClose>
                     </DrawerFooter>
                   </DrawerContent>

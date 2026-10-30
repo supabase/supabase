@@ -75,14 +75,13 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
       restriction_status: null,
       restriction_data: null,
       organization_missing_address: false,
+      requires_indirect_tax_declaration: false,
     },
   }),
 }))
 
-vi.mock('@/data/telemetry/send-event-mutation', () => ({
-  useSendEventMutation: () => ({
-    mutate: vi.fn(),
-  }),
+vi.mock('@/lib/telemetry/track', () => ({
+  useTrack: () => vi.fn(),
 }))
 
 const resetSidebarManagerState = () => {
@@ -100,7 +99,6 @@ describe('LayoutSidebar', () => {
   afterEach(() => {
     resetSidebarManagerState()
     localStorage.clear()
-    vi.clearAllMocks()
   })
 
   const renderSidebar = () =>
@@ -150,25 +148,15 @@ describe('LayoutSidebar', () => {
       mockProjectData = mockProject
     })
 
-    it('does not register project-related sidebars when no project is available', async () => {
+    it('registers only the advisor panel, so project-related sidebars cannot be toggled', async () => {
       renderSidebar()
 
-      // Wait a bit to ensure sidebars have been registered
-      await waitFor(() => {
-        // Project-related sidebars should not be registered
-        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.AI_ASSISTANT]).toBeUndefined()
-        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.EDITOR_PANEL]).toBeUndefined()
-        // Advisor panel should still be available (doesn't require project)
-        expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
-      })
-    })
-
-    it('does not render project-related sidebars even when toggled', async () => {
-      renderSidebar()
-
+      // Advisor panel doesn't require a project, so it is still registered
       await waitFor(() => {
         expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.ADVISOR_PANEL]).toBeDefined()
       })
+      expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.AI_ASSISTANT]).toBeUndefined()
+      expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.EDITOR_PANEL]).toBeUndefined()
 
       // Try to toggle AI_ASSISTANT - should not work since it's not registered
       act(() => {

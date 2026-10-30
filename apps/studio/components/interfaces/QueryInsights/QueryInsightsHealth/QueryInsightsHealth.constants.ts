@@ -19,6 +19,6 @@ export const HEALTH_LEVELS: Record<HealthLevel, { label: string; min: number }> 
 
 export const HEALTH_COLORS: Record<HealthLevel, string> = {
   healthy: 'hsl(var(--brand-default))',
-  warning: 'hsl(var(--warning-default))',
+  warning: 'var(--warning)',
   critical: 'hsl(var(--destructive-default))',
 }

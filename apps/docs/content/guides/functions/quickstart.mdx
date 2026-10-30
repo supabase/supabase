@@ -3,13 +3,14 @@ id: 'functions-quickstart'
 title: 'Getting Started with Edge Functions'
 description: 'Get started with Supabase Edge Functions.'
 subtitle: 'Learn how to create, test, and deploy your first Edge Function using the Supabase CLI.'
+tocVideo: 'EQ5h3NSWMbk'
 ---
 
 This guide walks you through creating, testing locally, deploying, and invoking a Supabase Edge Function using the CLI. By the end, you'll have a working function running on Supabase's global edge network.
 
 You can also create and deploy functions directly from the Supabase Dashboard. Read [the Dashboard Quickstart guide](/docs/guides/functions/quickstart-dashboard) for more information.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Supabase Edge Functions **only** supports creating functions in TypeScript with [the Deno runtime](https://deno.com/). This is because Deno was designed with extensibility in mind and its Rust codebase offers a modern developer experience, memory safety, and other features ideal for running edge functions.
 
@@ -17,7 +18,7 @@ Supabase Edge Functions **only** supports creating functions in TypeScript with 
 
 ## Prerequisites
 
-- Make sure you have the Supabase CLI installed and configured. Read [the CLI installation guide](/docs/guides/cli) for installation methods and troubleshooting.
+- Make sure you have the Supabase CLI installed and configured. Read [the CLI installation guide](/docs/guides/local-development) for installation methods and troubleshooting.
 - Running and testing Supabase Edge Functions locally requires [Docker](https://www.docker.com/) or a Docker-compatible runtime.
 
 ## Step 1: Create or configure your project
@@ -53,7 +54,7 @@ supabase functions new hello-world
 
 {/* TODO: Link to parameter documentation */}
 
-<Admonition type="tip" title="Secure your function with Supabase Auth">
+<Admonition type="note" title="Secure your function with Supabase Auth">
 
 When an HTTP request is sent to Edge Functions, you can use Supabase Auth to secure endpoints. By default, the `supabase functions new` command adds handling a valid publishable or secret key to the basic template. However, you can change this behavior with the `--auth` flag when creating a new function.
 
@@ -103,6 +104,7 @@ Your function is now running at [`http://localhost:54321/functions/v1/hello-worl
 
 - Check what's running with `supabase status`
 - Stop other Supabase instances with `supabase stop`
+- If your function still won't serve locally, see [Issues serving Edge Functions locally](/kb/troubleshooting/issues-serving-edge-functions-locally).
 
 ## Step 4: Send a test request
 
@@ -132,13 +134,13 @@ After this step, you should have successfully tested your Edge Function locally 
 
 To deploy your function globally, you need to connect your local project to a Supabase project.
 
-<Admonition type="tip" title="Need to create a new Supabase project?">
+<Admonition type="note" title="Need to create a new Supabase project?">
 
 Create one at [database.new](https://database.new/).
 
 </Admonition>
 
-First, login to the CLI if you haven't already, and authenticate with Supabase. This opens your browser to authenticate with Supabase; complete the login process in your browser.
+First, sign in to the CLI if you haven't already, and authenticate with Supabase. This opens your browser to authenticate with Supabase; complete the sign-in process in your browser.
 
 ```bash
 supabase login

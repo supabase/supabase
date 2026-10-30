@@ -20,6 +20,7 @@ export default function TicketURLCopy({
 
   return (
     <button
+      tabIndex={0}
       type="button"
       name="Copy"
       ref={buttonRef}

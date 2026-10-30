@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { branchKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -24,15 +24,13 @@ export async function getBranchDiff({
   const { data: diffData, error } = await get('/v1/branches/{branch_id_or_ref}/diff', {
     params: {
       path: { branch_id_or_ref: branchRef },
-      query:
-        Object.keys(query).length > 0
-          ? (query as { included_schemas?: string; pgdelta?: boolean })
-          : undefined,
+      query: Object.keys(query).length > 0 ? query : undefined,
     },
     headers: {
       Accept: 'text/plain',
     },
     parseAs: 'text',
+    grant: unguarded.migrating,
   })
 
   if (error) {

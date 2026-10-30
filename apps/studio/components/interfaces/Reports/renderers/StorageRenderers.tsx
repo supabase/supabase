@@ -1,5 +1,7 @@
+import { useFlag } from 'common'
 import { Fragment } from 'react'
 
+import { safeDecodeURIComponent } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 import { TextFormatter } from '@/components/interfaces/Settings/Logs/LogsFormatters'
 import Table from '@/components/to-be-cleaned/Table'
@@ -12,6 +14,7 @@ export const CacheHitRateChartRenderer = (
     miss_count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const stackedData = props.data.flatMap((datum) => [
     {
       timestamp: +datum.timestamp / 1000,
@@ -27,6 +30,7 @@ export const CacheHitRateChartRenderer = (
 
   return (
     <StackedBarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       hideHeader
       variant="percentages"
       data={stackedData}
@@ -70,7 +74,7 @@ export const TopCacheMissesRenderer = (
                       <TextFormatter className="text-foreground-light" value={datum.path} />
                       <TextFormatter
                         className="max-w-sm text-foreground-lighter truncate "
-                        value={decodeURIComponent(datum.search || '')}
+                        value={safeDecodeURIComponent(datum.search || '')}
                       />
                     </div>
                   </Table.td>

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { apiKeysKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
+import { del, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type APIKeyDeleteVariables = {
@@ -16,8 +16,9 @@ export async function deleteAPIKey(payload: APIKeyDeleteVariables) {
   const { data, error } = await del('/v1/projects/{ref}/api-keys/{id}', {
     params: {
       path: { ref: payload.projectRef, id: payload.id },
-      query: { reveal: false },
+      query: { reveal: 'false' },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

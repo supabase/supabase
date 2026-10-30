@@ -1,9 +1,9 @@
 import { useParams } from 'common'
-import { ArrowUpRight, BookOpen, LayoutGrid, PlusSquare } from 'lucide-react'
+import { ArrowUpRightIcon, BookOpenIcon, LayoutGridIcon, PlusSquareIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DOCS_URL } from '@/lib/constants'
@@ -42,12 +42,12 @@ const SidebarLink = ({ href, active, icon, label, count, className }: SidebarLin
 
 const HELP_LINKS: Array<{ icon: React.ReactNode; label: string; href: string }> = [
   {
-    icon: <BookOpen className="text-foreground-lighter" size={13} />,
+    icon: <BookOpenIcon className="text-foreground-lighter" size={13} />,
     label: 'Integrations docs',
     href: `${DOCS_URL}/guides/integrations`,
   },
   {
-    icon: <PlusSquare className="text-foreground-lighter" size={13} />,
+    icon: <PlusSquareIcon className="text-foreground-lighter" size={13} />,
     label: 'Build an integration',
     href: `${DOCS_URL}/guides/integrations/build-a-supabase-oauth-integration`,
   },
@@ -69,8 +69,8 @@ export const MarketplaceSidebar = () => {
       <SidebarLink
         href={baseHref}
         active={isDiscoverActive}
-        icon={<LayoutGrid size={13} />}
-        label="Marketplace"
+        icon={<LayoutGridIcon size={13} />}
+        label="Explore all"
       />
 
       {isLoading ? (
@@ -121,7 +121,7 @@ export const MarketplaceSidebar = () => {
             {icon}
             {label}
           </span>
-          <ArrowUpRight size={11} className="opacity-50" />
+          <ArrowUpRightIcon size={11} className="opacity-50" />
         </a>
       ))}
     </aside>

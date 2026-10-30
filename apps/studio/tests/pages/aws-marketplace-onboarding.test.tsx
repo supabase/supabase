@@ -1,7 +1,9 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AwsMarketplaceOnboardingScreen } from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboarding'
@@ -12,10 +14,15 @@ import type {
 import { CREATE_AWS_MANAGED_ORG_FORM_ID } from '@/components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrgForm'
 import { API_URL } from '@/lib/constants'
 import type { ProfileContextType } from '@/lib/profile'
-import { createMockOrganization } from '@/tests/helpers'
+import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
-import type { Organization } from '@/types'
+
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn() },
+}))
+
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
 const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
   profile: {
@@ -38,13 +45,13 @@ const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
   isSuccess: true,
 }
 
-const LINKABLE_ORG = createMockOrganization({
+const LINKABLE_ORG = createMockOrganizationResponse({
   id: 1,
   name: 'Acme Production',
   slug: 'acme-production',
   plan: { id: 'pro', name: 'Pro' },
 })
-const UNAVAILABLE_ORG = createMockOrganization({
+const UNAVAILABLE_ORG = createMockOrganizationResponse({
   id: 2,
   name: 'Legacy Billing',
   slug: 'legacy-billing',
@@ -63,7 +70,7 @@ function createOnboardingInfo({
   organizations = [LINKABLE_ORG, UNAVAILABLE_ORG],
   eligibleSlugs = [LINKABLE_ORG.slug],
 }: {
-  organizations?: Organization[]
+  organizations?: OrganizationResponse[]
   eligibleSlugs?: string[]
 } = {}): CloudMarketplaceOnboardingInfo {
   return {
@@ -86,24 +93,24 @@ function mockAwsEndpoints({
   eligibility = ELIGIBLE_CONTRACT,
   onboardingInfo = createOnboardingInfo({ organizations }),
 }: {
-  organizations?: Organization[]
+  organizations?: OrganizationResponse[]
   eligibility?: CloudMarketplaceContractLinkingEligibility
   onboardingInfo?: CloudMarketplaceOnboardingInfo
 } = {}) {
   addAPIMock({
     method: 'get',
     path: '/platform/organizations',
-    response: () => HttpResponse.json(organizations),
+    response: () => HttpResponse.json<OrganizationResponse[]>(organizations),
   })
   addAPIMock({
     method: 'get',
     path: '/platform/cloud-marketplace/buyers/:buyer_id/contract-linking-eligibility',
-    response: () => HttpResponse.json(eligibility),
+    response: () => HttpResponse.json<CloudMarketplaceContractLinkingEligibility>(eligibility),
   })
   addAPIMock({
     method: 'get',
     path: '/platform/cloud-marketplace/buyers/:buyer_id/onboarding-info',
-    response: () => HttpResponse.json(onboardingInfo),
+    response: () => HttpResponse.json<CloudMarketplaceOnboardingInfo>(onboardingInfo),
   })
 }
 
@@ -115,7 +122,6 @@ function renderScreen(props: Partial<Parameters<typeof AwsMarketplaceOnboardingS
 
 describe('AwsMarketplaceOnboardingScreen', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     window.localStorage.clear()
   })
 
@@ -168,6 +174,28 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     await screen.findByText('Organization linked')
   })
 
+  test('renders a link failure inline and keeps the action available', async () => {
+    const user = userEvent.setup()
+    mockAwsEndpoints()
+    mswServer.use(
+      http.put(`${API_URL}/platform/organizations/:slug/cloud-marketplace/link`, () =>
+        HttpResponse.json({ message: 'Marketplace link failed' }, { status: 500 })
+      )
+    )
+
+    renderScreen()
+
+    await user.click(await screen.findByRole('button', { name: /Acme Production/ }))
+    await user.click(screen.getByRole('button', { name: 'Link organization' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Failed to link organization: Marketplace link failed'
+    )
+    expect(toast.error).not.toHaveBeenCalled()
+    expect(screen.queryByText(/Learn more/)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Link organization' })).toBeEnabled()
+  })
+
   test('creates an AWS-managed organization with buyerId and returns to linked state', async () => {
     const user = userEvent.setup()
     let createRequest: unknown
@@ -180,7 +208,7 @@ describe('AwsMarketplaceOnboardingScreen', () => {
       http.post(`${API_URL}/platform/organizations/cloud-marketplace`, async ({ request }) => {
         createRequest = await request.json()
         return HttpResponse.json(
-          createMockOrganization({
+          createMockOrganizationResponse({
             id: 3,
             name: 'Mock Marketplace Org',
             slug: 'mock-marketplace-org',
@@ -192,8 +220,15 @@ describe('AwsMarketplaceOnboardingScreen', () => {
 
     renderScreen()
 
-    await user.click(await screen.findByRole('button', { name: 'Create organization' }))
-    await user.type(screen.getByPlaceholderText('Organization name'), 'Mock Marketplace Org')
+    // With no existing organizations, only the primary create action is offered
+    const createButton = await screen.findByRole('button', { name: 'Create organization' })
+    expect(
+      screen.queryByRole('button', { name: /Create new organization/ })
+    ).not.toBeInTheDocument()
+
+    await user.click(createButton)
+    await user.click(screen.getByPlaceholderText('Organization name'))
+    await user.paste('Mock Marketplace Org')
     fireEvent.submit(document.getElementById(CREATE_AWS_MANAGED_ORG_FORM_ID)!)
 
     await waitFor(() => {
@@ -263,15 +298,15 @@ describe('AwsMarketplaceOnboardingScreen', () => {
 
   test('promotes the last visited organization into the first visible organizations', async () => {
     const organizations = [
-      createMockOrganization({ id: 1, name: 'Alpha Team', slug: 'alpha-team' }),
-      createMockOrganization({ id: 2, name: 'Beta Team', slug: 'beta-team' }),
-      createMockOrganization({ id: 3, name: 'Delta Team', slug: 'delta-team' }),
-      createMockOrganization({ id: 4, name: 'Gamma Team', slug: 'gamma-team' }),
-      createMockOrganization({ id: 5, name: 'Zeta Team', slug: 'zeta-team' }),
+      createMockOrganizationResponse({ id: 1, name: 'Alpha Team', slug: 'alpha-team' }),
+      createMockOrganizationResponse({ id: 2, name: 'Beta Team', slug: 'beta-team' }),
+      createMockOrganizationResponse({ id: 3, name: 'Delta Team', slug: 'delta-team' }),
+      createMockOrganizationResponse({ id: 4, name: 'Gamma Team', slug: 'gamma-team' }),
+      createMockOrganizationResponse({ id: 5, name: 'Zeta Team', slug: 'zeta-team' }),
     ]
 
     window.localStorage.setItem(
-      LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+      LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION(DEFAULT_PROFILE_CONTEXT.profile?.id),
       JSON.stringify('zeta-team')
     )
     mockAwsEndpoints({
@@ -287,19 +322,5 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     const alpha = await screen.findByText('Alpha Team')
     expect(zeta.compareDocumentPosition(alpha) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Show 2 more' })).toBeInTheDocument()
-  })
-
-  test('renders a create organization action when there are no existing organizations', async () => {
-    mockAwsEndpoints({
-      organizations: [],
-      onboardingInfo: createOnboardingInfo({ organizations: [] }),
-    })
-
-    renderScreen()
-
-    expect(await screen.findByRole('button', { name: 'Create organization' })).toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: /Create new organization/ })
-    ).not.toBeInTheDocument()
   })
 })

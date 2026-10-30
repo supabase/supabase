@@ -14,7 +14,7 @@ import {
   SheetFooter,
   SheetSection,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -24,15 +24,15 @@ import {
   reservedSuffixes,
   validBucketNameRegex,
 } from './CreateAnalyticsBucketForm.utils'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useAnalyticsBucketCreateMutation } from '@/data/storage/analytics-bucket-create-mutation'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
 import { useIcebergWrapperCreateMutation } from '@/data/storage/iceberg-wrapper-create-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FormSchema = z
   .object({
@@ -119,7 +119,6 @@ export const CreateAnalyticsBucketForm = ({
   onOpenChange,
 }: CreateAnalyticsBucketFormProps) => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
   const { extension: wrappersExtension, state: wrappersExtensionState } =
     useIcebergWrapperExtension()
@@ -127,7 +126,7 @@ export const CreateAnalyticsBucketForm = ({
   const { data: buckets = [] } = useAnalyticsBucketsQuery({ projectRef: ref })
   const wrappersExtensionNeedsUpgrading = wrappersExtensionState === 'needs-upgrade'
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutateAsync: createAnalyticsBucket, isPending: isCreatingAnalyticsBucket } =
     useAnalyticsBucketCreateMutation({
@@ -174,11 +173,7 @@ export const CreateAnalyticsBucketForm = ({
 
       await createIcebergWrapper({ bucketName: values.name })
 
-      sendEvent({
-        action: 'storage_bucket_created',
-        properties: { bucketType: 'analytics' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      track('storage_bucket_created', { bucketType: 'analytics' })
 
       form.reset()
       toast.success(`Created bucket “${values.name}”`)
@@ -230,11 +225,8 @@ export const CreateAnalyticsBucketForm = ({
                 title="Wrappers extension must be updated for Iceberg Wrapper support"
               >
                 <p className="prose max-w-full text-sm leading-normal!">
-                  Update the <code className="text-code-inline">wrappers</code> extension by
-                  upgrading your project from your{' '}
-                  <InlineLink href={`/project/${ref}/settings/infrastructure`}>
-                    project settings
-                  </InlineLink>{' '}
+                  Update the <code>wrappers</code> extension by upgrading your project from your{' '}
+                  <InlineLink href={getServiceVersionsPath(ref)}>project settings</InlineLink>{' '}
                   before creating an Analytics bucket.{' '}
                   <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
                     Learn more
@@ -263,12 +255,13 @@ export const CreateAnalyticsBucketForm = ({
       </Section>
 
       <Footer>
-        <Button type="default" disabled={isCreating} onClick={() => onOpenChange(false)}>
+        <Button disabled={isCreating} onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button
+          variant="primary"
           form={formId}
-          htmlType="submit"
+          type="submit"
           loading={isCreating}
           disabled={wrappersExtensionNeedsUpgrading || isCreating}
         >

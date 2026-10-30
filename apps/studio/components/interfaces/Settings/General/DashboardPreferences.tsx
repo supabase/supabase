@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -21,7 +21,7 @@ import {
   FormControl,
   FormField,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -30,7 +30,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
@@ -147,15 +147,11 @@ export const DashboardPreferences = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
-                    <Button
-                      type="default"
-                      htmlType="button"
-                      onClick={() => form.reset(dashboardPreferences)}
-                    >
+                    <Button type="button" onClick={() => form.reset(dashboardPreferences)}>
                       Cancel
                     </Button>
                   )}
-                  <Button type="primary" htmlType="submit" disabled={!form.formState.isDirty}>
+                  <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                     Save changes
                   </Button>
                 </CardFooter>
@@ -173,7 +169,7 @@ const DashboardQueriesDialog = () => {
   return (
     <Dialog>
       <DialogTrigger className="ml-1 translate-y-0.5">
-        <HelpCircle size={14} className="hover:text-foreground transition" />
+        <HelpCircleIcon size={14} className="hover:text-foreground transition" />
       </DialogTrigger>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
@@ -197,7 +193,7 @@ const DashboardQueriesDialog = () => {
 
         <DialogFooter>
           <DialogClose asChild className="opacity-100">
-            <Button type="default">Understood</Button>
+            <Button>Understood</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

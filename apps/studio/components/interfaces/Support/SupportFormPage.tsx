@@ -1,12 +1,12 @@
 import * as Sentry from '@sentry/nextjs'
-import { Loader2, Wrench } from 'lucide-react'
+import { Loader2Icon, WrenchIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useReducer, type Dispatch, type PropsWithChildren } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { AIAssistantOption } from './AIAssistantOption'
 import { DiscordCTACard } from './DiscordCTACard'
@@ -22,17 +22,18 @@ import {
 } from './SupportForm.state'
 import { NO_PROJECT_MARKER } from './SupportForm.utils'
 import { SupportFormV2 } from './SupportFormV2'
+import { DEFAULT_STATUS_PAGE_URL, getSupportStatusLabel } from './SupportStatus.utils'
 import { useSupportForm } from './useSupportForm'
+import { useSupportStatus } from './useSupportStatus'
 import CopyButton from '@/components/ui/CopyButton'
-import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export { SupportForm, SupportFormStatusButton } from './SupportSidebarForm'
 
 function useSupportFormTelemetry() {
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return useCallback(
     ({
@@ -44,17 +45,12 @@ function useSupportFormTelemetry() {
       orgSlug: string | undefined
       category: ExtendedSupportCategories
     }) =>
-      sendEvent({
-        action: 'support_ticket_submitted',
-        properties: {
-          ticketCategory: category,
-        },
-        groups: {
-          project: projectRef,
-          organization: orgSlug,
-        },
-      }),
-    [sendEvent]
+      track(
+        'support_ticket_submitted',
+        { ticketCategory: category },
+        { project: projectRef, organization: orgSlug }
+      ),
+    [track]
   )
 }
 
@@ -66,14 +62,11 @@ function SupportFormPageContent() {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
   const { form, initialError, projectRef, orgSlug } = useSupportForm(dispatch)
 
-  const {
-    data: allStatusPageEvents,
-    isPending: isIncidentsPending,
-    isError: isIncidentsError,
-  } = useIncidentStatusQuery()
-  const { incidents = [] } = allStatusPageEvents ?? {}
-  const hasActiveIncidents =
-    !isIncidentsPending && !isIncidentsError && incidents && incidents.length > 0
+  const supportStatus = useSupportStatus()
+  const hasActiveIncidents = supportStatus.status === 'success' && supportStatus.hasActiveIncidents
+  const admonition = supportStatus.status === 'success' ? supportStatus.admonition : null
+  const statusPageUrl =
+    supportStatus.status === 'success' ? supportStatus.pageUrl : DEFAULT_STATUS_PAGE_URL
 
   const sendTelemetry = useSupportFormTelemetry()
   useStateTransition(state, 'submitting', 'success', (_, curr) => {
@@ -87,7 +80,9 @@ function SupportFormPageContent() {
 
   useStateTransition(state, 'submitting', 'error', (_, curr) => {
     toast.error(`Failed to submit support ticket: ${curr.message}`)
-    Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    if (curr.code !== 429) {
+      Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    }
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
@@ -97,7 +92,12 @@ function SupportFormPageContent() {
     <SupportFormWrapper>
       <SupportFormHeader />
 
-      <IncidentAdmonition isActive={hasActiveIncidents} />
+      <IncidentAdmonition
+        isActive={admonition !== null}
+        title={admonition?.title ?? ''}
+        description={admonition?.description ?? ''}
+        statusPageUrl={statusPageUrl}
+      />
 
       {!isSuccess && !hasActiveIncidents && (
         <div className="flex flex-col gap-y-4">
@@ -129,10 +129,11 @@ function SupportFormWrapper({ children }: PropsWithChildren) {
 }
 
 function SupportFormHeader() {
-  const { data: allStatusPageEvents, isPending: isLoading, isError } = useIncidentStatusQuery()
-  const { incidents = [], maintenanceEvents = [] } = allStatusPageEvents ?? {}
-  const isMaintenance = maintenanceEvents.length > 0
-  const isIncident = incidents.length > 0
+  const supportStatus = useSupportStatus()
+  const isLoading = supportStatus.status === 'pending'
+  const isIncident = supportStatus.status === 'success' && supportStatus.hasActiveIncidents
+  const statusPageUrl =
+    supportStatus.status === 'success' ? supportStatus.pageUrl : DEFAULT_STATUS_PAGE_URL
 
   return (
     <div className="flex flex-col items-start justify-between gap-y-2 sm:flex-row sm:items-center">
@@ -142,7 +143,7 @@ function SupportFormHeader() {
       </div>
 
       <div className="flex items-center gap-x-3">
-        <Button asChild type="default" icon={<Wrench />}>
+        <Button asChild icon={<WrenchIcon />}>
           <Link
             href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
             target="_blank"
@@ -155,27 +156,21 @@ function SupportFormHeader() {
           <TooltipTrigger asChild>
             <Button
               asChild
-              type="default"
               icon={
                 isLoading ? (
-                  <Loader2 className="animate-spin" />
+                  <Loader2Icon className="animate-spin" />
                 ) : (
                   <div
-                    className={cn('h-2 w-2 rounded-full', isIncident ? 'bg-warning' : 'bg-brand')}
+                    className={cn(
+                      'h-2 w-2 rounded-full',
+                      isIncident ? 'bg-warning' : 'bg-brand-default'
+                    )}
                   />
                 )
               }
             >
-              <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
-                {isLoading
-                  ? 'Checking status'
-                  : isError
-                    ? 'Failed to check status'
-                    : isIncident
-                      ? 'Active incident ongoing'
-                      : isMaintenance
-                        ? 'Scheduled maintenance'
-                        : 'All systems operational'}
+              <Link href={statusPageUrl} target="_blank" rel="noreferrer">
+                {getSupportStatusLabel(supportStatus)}
               </Link>
             </Button>
           </TooltipTrigger>
@@ -211,12 +206,12 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 href={`mailto:support@supabase.com?subject=${encodeURIComponent('Support Request')}${hasProjectRef ? `${encodeURIComponent(' for Project ID: ')}${encodeURIComponent(projectRef)}` : ''}&body=${encodeURIComponent('Here is a detailed description of the problem I am experiencing and any other information that might be helpful...')}`}
                 className="hover:text-foreground transition-colors duration-100"
               >
-                <code className="text-code-inline text-foreground-light! underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
+                <code className="text-foreground-light! underline decoration-foreground-lighter/50 hover:decoration-foreground-lighter/80 transition-colors duration-100">
                   support@supabase.com
                 </code>
               </a>
               <CopyButton
-                type="text"
+                variant="text"
                 text="support@supabase.com"
                 iconOnly
                 onClick={() => toast.success('Copied email address to clipboard')}
@@ -227,10 +222,10 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
             <p className="flex items-center gap-x-1.5 flex-wrap">
               Project ID:{' '}
               <span className="inline-flex items-center gap-x-1">
-                <code className="text-code-inline text-foreground-light!">{projectRef}</code>
+                <code className="text-foreground-light!">{projectRef}</code>
                 <CopyButton
                   iconOnly
-                  type="text"
+                  variant="text"
                   text={projectRef}
                   onClick={() => toast.success('Copied project ID to clipboard')}
                 />
@@ -263,8 +258,7 @@ function SupportFormBody({
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md',
-        `${isSuccess ? 'pt-8' : 'py-8'}`,
+        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md py-8',
         'border-default'
       )}
     >

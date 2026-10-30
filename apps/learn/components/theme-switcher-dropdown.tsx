@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
   RadioGroup,
   singleThemes,
-  Theme,
 } from 'ui'
 
 const ThemeSwitcherDropdown = () => {
@@ -56,7 +55,7 @@ const ThemeSwitcherDropdown = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             className="px-1 group"
             icon={
@@ -75,7 +74,7 @@ const ThemeSwitcherDropdown = () => {
             value={theme}
             onValueChange={(themeValue) => setTheme(themeValue)}
           >
-            {singleThemes.map((theme: Theme) => (
+            {singleThemes.map((theme) => (
               <DropdownMenuRadioItem key={theme.value} value={theme.value}>
                 {theme.name}
               </DropdownMenuRadioItem>

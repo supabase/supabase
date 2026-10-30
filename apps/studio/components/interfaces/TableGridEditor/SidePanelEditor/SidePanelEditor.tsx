@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { SonnerProgress } from 'ui'
+import { SonnerProgress, StatusIcon } from 'ui'
 
 import { ColumnEditor } from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -35,11 +35,8 @@ import {
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
-import {
-  acceptGeneratedPolicy,
-  type GeneratedPolicy,
-} from '@/components/interfaces/Auth/Policies/Policies.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from '@/data/database-publications/database-publications-create-mutation'
@@ -47,19 +44,15 @@ import { useDatabasePublicationsQuery } from '@/data/database-publications/datab
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
 import type { Constraint } from '@/data/database/constraints-query'
 import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
-import { databaseKeys } from '@/data/database/keys'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
-import { entityTypeKeys } from '@/data/entity-types/keys'
-import { lintKeys } from '@/data/lint/keys'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
-import { tableEditorKeys } from '@/data/table-editor/keys'
 import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { getTables } from '@/data/tables/tables-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useUrlState } from '@/hooks/ui/useUrlState'
@@ -69,6 +62,7 @@ import { isObjectContainingKeys } from '@/lib/helpers'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
+import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 import { useTableEditorStateSnapshot, type TableEditorState } from '@/state/table-editor'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 import type { Dictionary } from '@/types'
@@ -83,7 +77,6 @@ type SaveTableParamsBase = {
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   resolve: () => void
-  generatedPolicies?: GeneratedPolicy[]
 }
 
 type SaveTableParamsNew = SaveTableParamsBase & {
@@ -196,9 +189,9 @@ export const SidePanelEditor = ({
   const track = useTrack()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const csvImportKey = useVisibleKey(snap.sidePanel?.type === 'csv-import')
@@ -320,7 +313,7 @@ export const SidePanelEditor = ({
       const { row, column } = selectedValueForJsonEdit
       payload = { [column]: value === null ? null : JSON.parse(value as any) }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
+      configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     } else if (snap.sidePanel?.type === 'cell') {
       const column = snap.sidePanel.value?.column
       const row = snap.sidePanel.value?.row
@@ -328,7 +321,7 @@ export const SidePanelEditor = ({
       if (!column || !row) return
       payload = { [column]: value === null ? null : value }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
+      configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     }
 
     if (payload !== undefined && configuration !== undefined) {
@@ -356,7 +349,10 @@ export const SidePanelEditor = ({
       })
 
       const isNewRecord = false
-      const configuration = { identifiers, rowIdx: row.idx }
+      const configuration = {
+        identifiers: getStableRowIdentifiers(row, identifiers),
+        rowIdx: row.idx,
+      }
 
       await saveRow(value, isNewRecord, configuration, (error) => {
         if (error) {
@@ -427,26 +423,13 @@ export const SidePanelEditor = ({
         reAddRenamedColumnSortAndFilter(selectedColumnToEdit.name, payload.name)
       }
 
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: tableEditorKeys.tableEditor(project?.ref, selectedTable?.id),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: databaseKeys.foreignKeyConstraints(project?.ref, selectedTable?.schema),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: databaseKeys.tableDefinition(project?.ref, selectedTable?.id),
-        }),
-        queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
-        queryClient.invalidateQueries({
-          queryKey: tableKeys.list(project?.ref, selectedTable?.schema, includeColumns),
-        }),
-      ])
-
-      // We need to invalidate tableRowsAndCount after tableEditor
-      // to ensure the query sent is correct
-      await queryClient.invalidateQueries({
-        queryKey: tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id),
+      await invalidateTableMetadata(queryClient, {
+        projectRef: project?.ref,
+        schema: selectedTable?.schema,
+        tableId: selectedTable?.id,
+        tableName: selectedTable?.name,
+        includeRows: true,
+        includeLint: true,
       })
 
       setIsEdited(false)
@@ -507,7 +490,7 @@ export const SidePanelEditor = ({
         // Switch it to individual tables via an array of strings
         // Refer to PublicationStore for more information about this
         const publicTables = await queryClient.fetchQuery({
-          queryKey: tableKeys.list(project.ref, 'public', includeColumns),
+          queryKey: tableKeys.list(project.ref, 'public', { includeColumns }),
           queryFn: ({ signal }) =>
             getTables(
               {
@@ -593,7 +576,6 @@ export const SidePanelEditor = ({
     configuration,
     columns,
     foreignKeyRelations,
-    generatedPolicies = [],
     resolve,
   }: SaveTableParams) => {
     let toastId
@@ -645,10 +627,10 @@ export const SidePanelEditor = ({
                 .map(([, data]) => data?.pages?.[0]?.data?.count)
                 .find((count) => typeof count === 'number') ??
               queryClient.getQueryData<unknown[]>(
-                tableKeys.list(project?.ref, payload.schema, true)
+                tableKeys.list(project?.ref, payload.schema, { includeColumns: true })
               )?.length ??
               queryClient.getQueryData<unknown[]>(
-                tableKeys.list(project?.ref, payload.schema, false)
+                tableKeys.list(project?.ref, payload.schema, { includeColumns: false })
               )?.length
 
             createTableSpan.setAttributes({
@@ -658,7 +640,6 @@ export const SidePanelEditor = ({
               'table.has_rls': isRLSEnabled ? 1 : 0,
               'table.has_foreign_keys': foreignKeyRelations.length > 0 ? 1 : 0,
               'table.has_import': importContent !== undefined ? 1 : 0,
-              'table.generated_policies_count': generatedPolicies.length,
               'project.region': project?.region ?? 'local',
               ...(project?.cloud_provider && {
                 'project.cloud_provider': project.cloud_provider,
@@ -669,13 +650,7 @@ export const SidePanelEditor = ({
             })
 
             try {
-              // The Save click is the explicit user gesture that promotes generated policy
-              // SQL (programmatic or AI) to executable. Programmatic fragments are already
-              // SafeSqlFragment; AI fragments are UntrustedSqlFragment — both are accepted
-              // here before being passed into createTable.
-              const acceptedPolicies = generatedPolicies.map(acceptGeneratedPolicy)
-
-              const { table, failedPolicies } = await createTable({
+              const { table } = await createTable({
                 projectRef: project?.ref!,
                 connectionString: project?.connectionString,
                 toastId,
@@ -684,13 +659,10 @@ export const SidePanelEditor = ({
                 foreignKeyRelations,
                 isRLSEnabled,
                 importContent,
-                organizationSlug: org?.slug,
-                generatedPolicies: acceptedPolicies,
-                onCreatePoliciesSuccess: () => track('rls_generated_policies_created'),
+                track,
               })
 
               createTableSpan.setAttribute('table.created', 1)
-              createTableSpan.setAttribute('table.failed_policies', failedPolicies.length)
 
               await Sentry.startSpan(
                 { name: 'create_table.post_creation', op: 'db.table.post_creation' },
@@ -711,11 +683,11 @@ export const SidePanelEditor = ({
                 { name: 'create_table.cache_invalidation', op: 'cache.invalidate' },
                 async () => {
                   await Promise.all([
-                    queryClient.invalidateQueries({
-                      queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
-                    }),
-                    queryClient.invalidateQueries({
-                      queryKey: entityTypeKeys.list(project?.ref),
+                    invalidateTableMetadata(queryClient, {
+                      projectRef: project?.ref,
+                      schema: table.schema,
+                      tableName: table.name,
+                      includeLint: true,
                     }),
                     queryClient.invalidateQueries({
                       queryKey: databasePoliciesKeys.list(project?.ref),
@@ -723,29 +695,14 @@ export const SidePanelEditor = ({
                     queryClient.invalidateQueries({
                       queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
                     }),
-                    queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) }),
                   ])
                 }
               )
 
-              // Show success toast after everything is complete
-              if (failedPolicies.length > 0) {
-                toast.success(
-                  `Table ${table.name} is created successfully, but we ran into issues creating ${failedPolicies.length} policie${failedPolicies.length > 1 ? 's' : ''}`,
-                  {
-                    id: toastId,
-                    description: (
-                      <ul className="list-disc pl-6">
-                        {failedPolicies.map((x) => (
-                          <li key={x.name}>{x.name}</li>
-                        ))}
-                      </ul>
-                    ),
-                  }
-                )
-              } else {
-                toast.success(`Table ${table.name} is good to go!`, { id: toastId })
-              }
+              toast.success(`Table ${table.name} is good to go!`, {
+                id: toastId,
+                icon: <StatusIcon variant="default" />,
+              })
 
               onTableCreated(table)
             } catch (error) {
@@ -778,14 +735,16 @@ export const SidePanelEditor = ({
         }
 
         await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+          invalidateTableMetadata(queryClient, {
+            projectRef: project?.ref,
+            schema: table.schema,
+            tableId: table.id,
+            tableName: table.name,
+            includeLint: true,
           }),
-          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
           queryClient.invalidateQueries({
             queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
           }),
-          queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) }),
         ])
 
         toast.success(
@@ -806,7 +765,7 @@ export const SidePanelEditor = ({
           foreignKeyRelations,
           existingForeignKeyRelations,
           primaryKey,
-          organizationSlug: org?.slug,
+          track,
         })
 
         if (table === undefined) {
@@ -866,13 +825,14 @@ export const SidePanelEditor = ({
         table: selectedTable,
         selectedHeaders,
         emptyStringAsNullHeaders,
+        roleImpersonationState: getImpersonatedRoleState(),
         onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
               progress={progress}
               message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
             />,
-            { id: toastId }
+            { id: toastId, icon: null }
           )
         },
       })
@@ -891,6 +851,7 @@ export const SidePanelEditor = ({
         rows: importContent.rows,
         selectedHeaders,
         emptyStringAsNullHeaders,
+        roleImpersonationState: getImpersonatedRoleState(),
         onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
@@ -899,7 +860,7 @@ export const SidePanelEditor = ({
                 selectedTable.name
               }`}
             />,
-            { id: toastId }
+            { id: toastId, icon: null }
           )
         },
       })
@@ -917,6 +878,7 @@ export const SidePanelEditor = ({
     })
     toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
+      icon: <StatusIcon variant="default" />,
     })
     resolve()
     snap.closeSidePanel()

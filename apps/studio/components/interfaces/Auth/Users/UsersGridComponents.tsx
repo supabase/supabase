@@ -1,4 +1,4 @@
-import { ChevronDown, SortAsc, SortDesc } from 'lucide-react'
+import { ChevronDownIcon, SortAscIcon, SortDescIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useHeaderRowSelection } from 'react-data-grid'
 import {
@@ -76,8 +76,8 @@ export const HeaderCell = ({
         >
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
-              icon={<ChevronDown />}
+              variant="text"
+              icon={<ChevronDownIcon />}
               className="p-0 h-5 w-5"
               onClick={() => setOpen(!open)}
             />
@@ -90,7 +90,7 @@ export const HeaderCell = ({
                 setSortByValue(`${col.id}:desc`)
               }}
             >
-              <SortDesc size={14} />
+              <SortDescIcon size={14} />
               Sort descending
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -100,7 +100,7 @@ export const HeaderCell = ({
                 setSortByValue(`${col.id}:asc`)
               }}
             >
-              <SortAsc size={14} />
+              <SortAscIcon size={14} />
               Sort ascending
             </DropdownMenuItem>
           </DropdownMenuContent>

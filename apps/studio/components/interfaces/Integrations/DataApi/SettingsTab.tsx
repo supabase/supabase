@@ -12,7 +12,7 @@ export const DataApiSettingsTab = () => {
 
   if (IS_PLATFORM && !isPending && !isEnabled) {
     return (
-      <ConstrainedIntegrationTabScaffold>
+      <ConstrainedIntegrationTabScaffold className="p-0!">
         <DataApiDisabledState description="configure settings" />
       </ConstrainedIntegrationTabScaffold>
     )

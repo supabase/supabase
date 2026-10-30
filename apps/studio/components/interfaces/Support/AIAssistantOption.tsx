@@ -1,11 +1,11 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquareIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { AiIconAnimation, Button } from 'ui'
 
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface AIAssistantOptionProps {
   projectRef?: string | null
@@ -18,7 +18,7 @@ export const AIAssistantOption = ({
   organizationSlug,
   onClick,
 }: AIAssistantOptionProps) => {
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -27,19 +27,16 @@ export const AIAssistantOption = ({
   }, [])
 
   const onAiAssistantClicked = useCallback(() => {
-    sendEvent({
-      action: 'ai_assistant_in_support_form_clicked',
-      groups: {
-        project: projectRef === null || projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
-        organization:
-          organizationSlug === null || organizationSlug === NO_ORG_MARKER
-            ? undefined
-            : organizationSlug,
-      },
+    track('ai_assistant_in_support_form_clicked', undefined, {
+      project: projectRef === null || projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
+      organization:
+        organizationSlug === null || organizationSlug === NO_ORG_MARKER
+          ? undefined
+          : organizationSlug,
     })
 
     onClick?.()
-  }, [onClick, projectRef, organizationSlug, sendEvent])
+  }, [onClick, projectRef, organizationSlug, track])
 
   // If no specific project selected, use the wildcard route
   const aiLink = `/project/${projectRef !== NO_PROJECT_MARKER ? projectRef : '_'}?sidebar=ai-assistant&slug=${organizationSlug}`
@@ -67,7 +64,6 @@ export const AIAssistantOption = ({
                 {onClick ? (
                   <Button
                     size="tiny"
-                    type="default"
                     icon={<AiIconAnimation size={14} />}
                     onClick={onAiAssistantClicked}
                   >
@@ -75,7 +71,7 @@ export const AIAssistantOption = ({
                   </Button>
                 ) : (
                   <Link href={aiLink} onClick={onAiAssistantClicked}>
-                    <Button size="tiny" type="default" icon={<AiIconAnimation size={14} />}>
+                    <Button size="tiny" icon={<AiIconAnimation size={14} />}>
                       Ask the Assistant
                     </Button>
                   </Link>
@@ -87,7 +83,7 @@ export const AIAssistantOption = ({
               <div className="relative grow flex flex-col gap-3 w-[400px]">
                 <div className="flex items-start gap-3 pl-12">
                   <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
-                    <MessageSquare size={16} className="text-foreground-lighter" />
+                    <MessageSquareIcon size={16} className="text-foreground-lighter" />
                   </div>
                   <div className="flex-1 bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
                     <p className="text-sm text-foreground-lighter">

@@ -2,8 +2,9 @@ import { getTableConstraintsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetTableConstraintsVariables = {
   id?: number
@@ -30,7 +31,7 @@ export type TableConstraintsVariables = GetTableConstraintsVariables & {
 }
 
 export type TableConstraintsData = Constraint[]
-export type TableConstraintsError = ExecuteSqlError
+export type TableConstraintsError = ResponseError
 
 export async function getTableConstraints(
   { projectRef, connectionString, id }: TableConstraintsVariables,
@@ -40,7 +41,13 @@ export async function getTableConstraints(
 
   const sql = getTableConstraintsSql({ id })
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['table-constraints', id] },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['table-constraints', id],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

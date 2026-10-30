@@ -6,11 +6,11 @@ app.use('*', supabaseMiddleware())
 
 const routes = app.get('/api/user', async (c) => {
   const supabase = getSupabase(c)
-  const { data, error } = await supabase.auth.getUser()
+  const { data, error } = await supabase.auth.getClaims()
 
   if (error) console.log('error', error)
 
-  if (!data?.user) {
+  if (!data?.claims) {
     return c.json({
       message: 'You are not logged in.',
     })
@@ -18,7 +18,7 @@ const routes = app.get('/api/user', async (c) => {
 
   return c.json({
     message: 'You are logged in!',
-    userId: data.user,
+    userId: data.claims.sub,
   })
 })
 

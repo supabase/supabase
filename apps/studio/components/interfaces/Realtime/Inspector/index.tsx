@@ -8,20 +8,18 @@ import { SendMessageModal } from './SendMessageModal'
 import { useRealtimeInspectorShortcuts } from './useRealtimeInspectorShortcuts'
 import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 /**
  * Acts as a container component for the entire log display
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
 
   // Check if realtime publications are available
-  const { data: publications } = useDatabasePublicationsQuery({
+  const { data: publications, isSuccess: isPublicationsSuccess } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -51,11 +49,16 @@ export const RealtimeInspector = () => {
     enableBroadcast: true,
   })
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
 
   const hasChannel = realtimeConfig.channelName.length > 0
   const isListening = realtimeConfig.enabled
+
+  // Only show setup guidance once publications confirm that Postgres Changes
+  // is not configured. An empty Inspector session does not imply Realtime is unused.
+  const showMessagesTable =
+    !isPublicationsSuccess || isRealtimeAvailable || hasChannel || (logData ?? []).length > 0
 
   const handleJoinChannel = useCallback(() => {
     if (!hasChannel) {
@@ -100,7 +103,7 @@ export const RealtimeInspector = () => {
       />
       <div className="relative flex flex-col grow">
         <div className="flex grow">
-          {(logData ?? []).length > 0 ? (
+          {showMessagesTable ? (
             <MessagesTable
               hasChannelSet={hasChannel}
               enabled={isListening}
@@ -116,10 +119,7 @@ export const RealtimeInspector = () => {
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          sendEvent({
-            action: 'realtime_inspector_broadcast_sent',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('realtime_inspector_broadcast_sent')
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />

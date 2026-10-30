@@ -1,24 +1,124 @@
 import { type Table as TTable } from '@tanstack/react-table'
+import { createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
-import { FacetMetadataSchema } from './UnifiedLogs.schema'
+import {
+  LOG_TYPE_TO_SOURCE,
+  LOG_TYPES,
+  LOG_TYPES_LABELS,
+  SEARCH_PARAMS_PARSER,
+} from './UnifiedLogs.constants'
+import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
+import { ColumnSchema, FacetMetadataSchema, querySearchParamsSchema } from './UnifiedLogs.schema'
+import type { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
+import { Option } from '@/components/ui/DataTable/DataTable.types'
+import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 
-export const logEventBus = {
-  listeners: new Map<string, Set<(rowId: string) => void>>(),
+export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 
-  on(event: 'selectTraceTab', callback: (rowId: string) => void) {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set())
-    }
-    this.listeners.get(event)?.add(callback)
-    return () => this.listeners.get(event)?.delete(callback)
-  },
+export function getComputeLogsAvailability({
+  isPlatform,
+  flagsLoaded,
+  computeEnabled,
+}: {
+  isPlatform: boolean
+  flagsLoaded?: boolean
+  computeEnabled: boolean
+}) {
+  const flagsReady = flagsLoaded === true
 
-  emit(event: 'selectTraceTab', rowId: string) {
-    this.listeners.get(event)?.forEach((callback) => callback(rowId))
-  },
+  return {
+    canQueryCompute: isPlatform && flagsReady && computeEnabled,
+    preserveComputeFilter: isPlatform && (!flagsReady || computeEnabled),
+    readyToSyncFilters: !isPlatform || flagsReady,
+  }
 }
+
+export function getLogTypeVisibility(
+  visibility: Partial<Record<UnifiedLogType, boolean>>,
+  scope?: UnifiedLogsScope
+): Partial<Record<UnifiedLogType, boolean>> {
+  const scopeLogTypes = scope?.filters
+    .filter((filter) => filter.column === 'log_type' && filter.operator === '=')
+    .map((filter) => filter.value)
+  if (!scopeLogTypes?.length) return { ...visibility, 'edge function runtime': false }
+
+  return Object.fromEntries(
+    LOG_TYPES.map((logType) => [
+      logType,
+      scopeLogTypes.includes(logType) && visibility[logType] !== false,
+    ])
+  )
+}
+
+export const isOfferedFilter = (name: string, offeredFilters?: readonly string[]) =>
+  !offeredFilters || offeredFilters.includes(name)
+
+export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
+
+export function toQuerySearchParams(
+  search: Partial<SearchParamsType>,
+  scope?: UnifiedLogsScope
+): QuerySearchParamsType {
+  const query: Partial<QuerySearchParamsType> = Object.fromEntries(
+    Object.entries(search).filter(([, value]) => value !== null && value !== undefined)
+  )
+  if (scope !== undefined) query.scope = scope
+  const result = querySearchParamsSchema.safeParse(query)
+  if (!result.success) {
+    throw new Error('Invalid unified logs search parameters', { cause: result.error })
+  }
+  return result.data
+}
+
+export const createUnifiedLogsSearch = (
+  params: Partial<SearchParamsType> = {},
+  scope?: UnifiedLogsScope
+) => toQuerySearchParams(params, scope)
+
+export function getUniqueLogRows<T extends { id: string }>(
+  pages: { data?: T[] }[] | undefined
+): T[] {
+  return deduplicateUnifiedLogs((pages ?? []).flatMap((page) => page.data ?? []))
+}
+
+export function getLogRowClassName(
+  row: Pick<ColumnSchema, 'level' | 'timestamp'>,
+  liveTimestamp?: number
+): string {
+  const isPast = Number(row.timestamp) <= (liveTimestamp || -1)
+  return cn(getLevelRowClassName(row.level), isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
+}
+
+export const buildUnifiedLogsUrl = ({
+  projectRef,
+  logType,
+  user,
+  start,
+  end,
+  logId,
+}: {
+  projectRef: string
+  logType?: UnifiedLogType
+  /** Pre-applies the cross-cutting "filter by user" (?user=) — an id or email. */
+  user?: string
+  start?: string | Date
+  end?: string | Date
+  logId?: string
+}) =>
+  serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
+    filter: logType ? [`log_type:eq:${logType}`] : null,
+    user: user ?? null,
+    date: start && end ? [new Date(start), new Date(end)] : null,
+    id: logId ?? null,
+  })
+
+export const getFacetValueCount = (
+  facets: Record<string, FacetMetadataSchema> | undefined,
+  facet: string,
+  value: string
+) => facets?.[facet]?.rows.find((row) => row.value === value)?.total ?? 0
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {
@@ -37,6 +137,11 @@ export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetad
   }
 }
 
+export function getLogTypeSource(logType: string) {
+  const sources: Partial<Record<string, string>> = LOG_TYPE_TO_SOURCE
+  return sources[logType]
+}
+
 /**
  * Returns a unified-logs row's timestamp in epoch milliseconds.
  *
@@ -50,6 +155,21 @@ export function getRowTimestampMs(
   if (row?.date instanceof Date) return row.date.getTime()
   if (typeof row?.timestamp === 'number') return row.timestamp / 1000
   return null
+}
+
+type ComputeRawLogData = Pick<ColumnSchema, 'id' | 'event_message' | 'metadata'> & {
+  timestamp: string | number
+}
+
+export function getRawLogData<T extends ComputeRawLogData>(row: T): T | ComputeRawLogData {
+  if (!('log_type' in row) || row.log_type !== 'compute') return row
+
+  return {
+    id: row.id,
+    timestamp: row.timestamp,
+    event_message: row.event_message,
+    metadata: row.metadata,
+  }
 }
 
 export const getLevelLabel = (value: (typeof LEVELS)[number]): string => {
@@ -75,7 +195,7 @@ export const getStatusLevel = (status?: number | string): string => {
   return 'success'
 }
 
-export function getLevelRowClassName(value: (typeof LEVELS)[number]): string {
+export function getLevelRowClassName(value: (typeof LEVELS)[number] | null | undefined): string {
   switch (value) {
     case 'success':
       return ''
@@ -111,6 +231,10 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
     postgres: 'Postgres',
     auth: 'Auth',
     storage: 'Storage',
+    realtime: 'Realtime',
+    supavisor: 'Supavisor',
+    pgbouncer: 'PgBouncer',
+    multigres: 'Multigres',
   }
 
   return specialCases[serviceType.toLowerCase()] || serviceType
@@ -124,16 +248,118 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
  */
 export function parseAuthLogEventMessage(value: string | undefined): string | undefined {
   if (!value) return value
+
   try {
     const parsed = JSON.parse(value)
+
     if (parsed && typeof parsed === 'object') {
+      const err = parsed.error || parsed.error_code
+      if (typeof err === 'string' && err.trim()) {
+        return !/^\d{3}:/.test(err) ? err.replaceAll('_', ' ') : err
+      }
+
       const msg = parsed.msg
-      const err = parsed.error
-      if (typeof msg === 'string' && msg.trim()) return msg
-      if (typeof err === 'string' && err.trim()) return err
+      if (typeof msg === 'string' && msg.trim()) {
+        const action = parsed.action ?? parsed.auth_event?.action
+        const authEvent = typeof action === 'string' ? action.replaceAll('_', ' ') : undefined
+        return `${authEvent ? `${authEvent}: ` : ''}${msg}`
+      }
     }
+
     return value
-  } catch {
+  } catch (error) {
     return value
   }
+}
+
+/**
+ * Parses a Multigres log event_message, which is a stringified JSON object
+ * (e.g. {"time":"...","level":"INFO","msg":"user pool capacity updated",...}).
+ * Extracts the human-readable msg field, falling back to the raw string so
+ * unexpected formats still render.
+ */
+export function parseMultigresEventMessage(value: string | undefined): string | undefined {
+  if (!value) return value
+
+  try {
+    const parsed = JSON.parse(value)
+
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      typeof parsed.msg === 'string' &&
+      parsed.msg.trim()
+    ) {
+      return parsed.msg
+    }
+
+    return value
+  } catch (error) {
+    return value
+  }
+}
+
+/**
+ * Returns the display text for a log row's event_message alongside whether it
+ * should be rendered as a capitalized sentence. Keeps the per-service parsing
+ * and its capitalization rule in one place so callers don't re-derive the list.
+ */
+export function getEventMessageDisplay(
+  logType: string,
+  value: string | undefined
+): { message: string | undefined; capitalize: boolean } {
+  if (logType === 'auth') return { message: parseAuthLogEventMessage(value), capitalize: true }
+  if (logType === 'multigres')
+    return { message: parseMultigresEventMessage(value), capitalize: true }
+  return { message: value, capitalize: false }
+}
+
+export function gateLogTypeOptions<T extends { value: string; options?: Option[] }>(
+  fields: T[],
+  visibility: Partial<Record<UnifiedLogType, boolean>>
+): T[] {
+  const hiddenLogTypes = new Set(
+    Object.entries(visibility)
+      .filter(([, visible]) => !visible)
+      .map(([logType]) => logType)
+  )
+
+  if (hiddenLogTypes.size === 0) return fields
+
+  return fields.map((field) => {
+    if (field.value !== 'log_type' || !field.options) return field
+    return {
+      ...field,
+      options: field.options.filter((option) => !hiddenLogTypes.has(option.value)),
+    }
+  })
+}
+
+/**
+ * Wraps a raw ILIKE/NOT ILIKE search term in `%...%` for a "contains" match,
+ * unless it already includes a `%` or `_` wildcard — in which case the user
+ * has crafted their own pattern and it's passed through unchanged.
+ */
+export function wrapIlikePattern(value: string): string {
+  return value.includes('%') || value.includes('_') ? value : `%${value}%`
+}
+
+export function gateLogTypeFilters(
+  filters: string[] | null | undefined,
+  visibility: Partial<Record<UnifiedLogType, boolean>>
+): string[] | null | undefined {
+  if (!filters) return filters
+
+  const hiddenLogTypes = new Set(
+    Object.entries(visibility)
+      .filter(([, visible]) => !visible)
+      .map(([logType]) => logType)
+  )
+
+  if (hiddenLogTypes.size === 0) return filters
+
+  return filters.filter((filter) => {
+    const parsed = parseLogsFilterUrlParams([filter])[0]
+    return parsed?.column !== 'log_type' || !hiddenLogTypes.has(parsed.value)
+  })
 }

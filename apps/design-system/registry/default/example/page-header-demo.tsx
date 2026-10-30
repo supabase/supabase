@@ -27,10 +27,8 @@ export default function PageHeaderDemo() {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <Button type="default" size="small">
-              Secondary
-            </Button>
-            <Button type="primary" size="small">
+            <Button size="small">Secondary</Button>
+            <Button variant="primary" size="small">
               Deploy Function
             </Button>
           </PageHeaderAside>

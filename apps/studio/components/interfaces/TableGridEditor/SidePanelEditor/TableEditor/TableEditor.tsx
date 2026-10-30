@@ -2,8 +2,7 @@ import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
@@ -16,7 +15,6 @@ import { ApiAccessToggle, type TableApiAccessHandlerWithHistoryReturn } from './
 import { ColumnManagement } from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import { HeaderTitle } from './HeaderTitle'
-import { RLSDisableModalContent } from './RLSDisableModal'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 import {
@@ -26,6 +24,7 @@ import {
   mergeForeignKeyMeta,
   validateFields,
 } from './TableEditor.utils'
+import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from '@/data/database/constraints-query'
@@ -62,6 +61,30 @@ export interface TableEditorProps {
   saveChanges: (params: SaveTableParams) => void
   updateEditorDirty: () => void
   apiAccessToggleHandler: TableApiAccessHandlerWithHistoryReturn
+}
+
+interface TableRealtimeToggleProps {
+  checked: boolean
+  onCheckedChange: () => void
+}
+
+export const TableRealtimeToggle = ({ checked, onCheckedChange }: TableRealtimeToggleProps) => {
+  return (
+    <div className="items-start flex space-x-2">
+      <Checkbox id="enable-realtime" checked={checked} onCheckedChange={onCheckedChange} />
+      <div className="grid gap-1.5 leading-none">
+        <label
+          htmlFor="enable-realtime"
+          className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Enable Realtime
+        </label>
+        <p className="text-sm text-foreground-muted">
+          Broadcast changes on this table to authorized subscribers.
+        </p>
+      </div>
+    </div>
+  )
 }
 
 export const TableEditor = ({
@@ -243,7 +266,6 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies: [],
           })
         } else if (isDuplicating) {
           const payload: SaveTablePayloadFor<'duplicate'> = {
@@ -257,7 +279,6 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies: [],
           })
         } else {
           const payload: SaveTablePayloadFor<'update'> = {
@@ -272,7 +293,6 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies: [],
           })
         }
       } else {
@@ -437,7 +457,7 @@ export const TableEditor = ({
       <SidePanel.Separator />
 
       <SidePanel.Content className="space-y-10 py-6">
-        <div className="items-top flex space-x-2">
+        <div className="items-start flex space-x-2">
           <Checkbox
             id="enable-rls"
             checked={tableFields.isRLSEnabled}
@@ -479,7 +499,7 @@ export const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
-              className="mt-2"
+              className="mt-2 w-min"
               href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
@@ -497,39 +517,25 @@ export const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
-              className="mt-2"
+              className="mt-2 w-min"
               href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
         )}
 
         {realtimeEnabled && (
-          <div className="items-top flex space-x-2">
-            <Checkbox
-              id="enable-realtime"
-              checked={tableFields.isRealtimeEnabled}
-              onCheckedChange={() => {
-                track('realtime_toggle_table_clicked', {
-                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                  origin: 'tableSidePanel',
-                })
-                onUpdateField({
-                  isRealtimeEnabled: !tableFields.isRealtimeEnabled,
-                })
-              }}
-            />
-            <div className="grid gap-1.5 leading-none">
-              <label
-                htmlFor="enable-realtime"
-                className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Enable Realtime
-              </label>
-              <p className="text-sm text-foreground-muted">
-                Broadcast changes on this table to authorized subscribers.
-              </p>
-            </div>
-          </div>
+          <TableRealtimeToggle
+            checked={tableFields.isRealtimeEnabled}
+            onCheckedChange={() => {
+              track('realtime_toggle_table_clicked', {
+                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                origin: 'tableSidePanel',
+              })
+              onUpdateField({
+                isRealtimeEnabled: !tableFields.isRealtimeEnabled,
+              })
+            }}
+          />
         )}
       </SidePanel.Content>
 
@@ -555,7 +561,7 @@ export const TableEditor = ({
         )}
         {isDuplicating && (
           <>
-            <div className="items-top flex space-x-2">
+            <div className="items-start flex space-x-2">
               <Checkbox
                 id="duplicate-rows"
                 checked={isDuplicateRows}
@@ -586,19 +592,16 @@ export const TableEditor = ({
           closePanel={() => setIsImportingSpreadsheet(false)}
         />
 
-        <ConfirmationModal
-          visible={rlsConfirmVisible}
-          title="Turn off Row Level Security"
-          confirmLabel="Confirm"
-          size="medium"
-          onCancel={() => setRlsConfirmVisible(false)}
+        <RLSToggleDialog
+          open={rlsConfirmVisible}
+          tableName={tableFields.name}
+          isEnabled={tableFields.isRLSEnabled}
+          onOpenChange={setRlsConfirmVisible}
           onConfirm={() => {
-            onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+            onUpdateField({ isRLSEnabled: false })
             setRlsConfirmVisible(false)
           }}
-        >
-          <RLSDisableModalContent />
-        </ConfirmationModal>
+        />
       </SidePanel.Content>
 
       {!isDuplicating && (

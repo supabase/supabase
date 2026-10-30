@@ -25,7 +25,7 @@ export const EnableIndexAdvisorButton = () => {
   return (
     <>
       <Button
-        type="primary"
+        variant="primary"
         onClick={() => {
           setIsDialogOpen(true)
           track('index_advisor_enable_button_clicked', { origin: 'banner' })
@@ -101,10 +101,9 @@ export const EnableIndexAdvisorDialog = ({
               on your actual query patterns.
             </p>
             <p>
-              This will install the{' '}
-              <code className="text-code-inline break-normal!">index_advisor</code> and{' '}
-              <code className="text-code-inline break-normal!">hypopg</code> Postgres extensions so
-              Index Advisor can analyse queries and suggest performance-improving indexes.
+              This will install the <code className="break-normal!">index_advisor</code> and{' '}
+              <code className="break-normal!">hypopg</code> Postgres extensions so Index Advisor can
+              analyse queries and suggest performance-improving indexes.
             </p>
           </AlertDialogDescription>
         </AlertDialogHeader>

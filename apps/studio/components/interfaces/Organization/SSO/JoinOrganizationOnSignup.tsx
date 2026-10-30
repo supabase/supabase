@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   FormControl,
   FormField,
@@ -19,7 +19,7 @@ export const JoinOrganizationOnSignup = ({
 }: {
   form: ReturnType<typeof useForm<SSOConfigFormSchema>>
 }) => {
-  const joinOrgOnSignup = form.watch('joinOrgOnSignup')
+  const joinOrgOnSignup = useWatch({ control: form.control, name: 'joinOrgOnSignup' })
 
   return (
     <div className="space-y-4">
@@ -30,7 +30,7 @@ export const JoinOrganizationOnSignup = ({
           <FormItemLayout
             layout="flex-row-reverse"
             label="Automatically add users to organization on sign up"
-            description="If disabled, users will need to be invited to the organization after signing up"
+            description="If disabled, users will need to be invited to the organization after signing up."
           >
             <FormControl className="flex items-center gap-2">
               <Switch checked={field.value} onCheckedChange={field.onChange} />

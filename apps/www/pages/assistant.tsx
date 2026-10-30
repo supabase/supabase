@@ -2,7 +2,7 @@ import DotGrid from '~/components/AIDemo/DotGrid'
 import { AIDemoPanel } from '~/components/AIDemo/Panel'
 import { SqlSnippet } from '~/components/AIDemo/SqlSnippet'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -682,13 +682,13 @@ function Assistant() {
                 </p>
                 <div className="min-h-12 flex items-center gap-x-2">
                   {!isUserLoading && (
-                    <Button type="primary" size="medium" asChild>
-                      <Link href="/dashboard/project/_?sidebar=ai-assistant">
+                    <Button variant="primary" size="medium" asChild>
+                      <a href="/dashboard/project/_?sidebar=ai-assistant">
                         {isLoggedIn ? 'Dashboard' : 'Start your project'}
-                      </Link>
+                      </a>
                     </Button>
                   )}
-                  <Button type="default" size="medium" asChild>
+                  <Button size="medium" asChild>
                     <Link
                       target="_blank"
                       rel="noreferrer noopener"
@@ -726,7 +726,6 @@ function Assistant() {
                       >
                         <Button
                           className="rounded-full"
-                          type="default"
                           onClick={() => handleNewMessage(query.messages)}
                         >
                           {query.label}

@@ -5,8 +5,9 @@ import { toast } from 'sonner'
 
 import { fdwKeys } from './keys'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type FDWDropForeignTableVariables = {
@@ -24,7 +25,12 @@ export async function dropForeignTable({
   const sql = wrapWithTransaction(
     getDropForeignTableSql({ schema: rest.schemaName, table: rest.tableName })
   )
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    grant: unguarded.migrating,
+  })
   return result
 }
 

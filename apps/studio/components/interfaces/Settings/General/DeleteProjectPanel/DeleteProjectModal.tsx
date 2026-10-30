@@ -1,20 +1,22 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { TextArea } from 'ui'
+import { Card, CardContent, cn, TextArea } from 'ui'
+import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
 import { LogicalBackupCliInstructions } from '@/components/layouts/ProjectLayout/LogicalBackupCliInstructions'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useSendDowngradeFeedbackMutation } from '@/data/feedback/exit-survey-send'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProjectDeleteMutation } from '@/data/projects/project-delete-mutation'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 import type { Organization } from '@/types'
 
 export const DeleteProjectModal = ({
@@ -36,15 +38,12 @@ export const DeleteProjectModal = ({
   const project = projectProp || projectFromQuery
   const organization = organizationProp || organizationFromQuery
 
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const projectRef = project?.ref
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const projectPlan = subscription?.plan?.id ?? 'free'
-  const isFree = projectPlan === 'free'
+  const shouldShowExitSurvey = ['pro', 'team'].includes(projectPlan)
 
   const [message, setMessage] = useState<string>('')
   const [selectedReason, setSelectedReason] = useState<string[]>([])
@@ -69,20 +68,6 @@ export const DeleteProjectModal = ({
 
   const { mutate: deleteProject, isPending: isDeleting } = useProjectDeleteMutation({
     onSuccess: async () => {
-      if (!isFree) {
-        try {
-          await sendExitSurvey({
-            orgSlug: organization?.slug,
-            projectRef,
-            message,
-            reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
-            exitAction: 'delete',
-          })
-        } catch (error) {
-          // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
-        }
-      }
-
       toast.success(`Successfully deleted ${project?.name}`)
 
       // Only redirect if still viewing the deleted project
@@ -95,13 +80,32 @@ export const DeleteProjectModal = ({
       }
     },
   })
-  const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation()
+  const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation({
+    // The user should not get a toast saying "submitting survey failed"
+    onError: () => {},
+  })
   const isSubmitting = isDeleting || isSending
 
   async function handleDeleteProject() {
     if (project === undefined) return
-    if (!isFree && selectedReason.length === 0) {
+    if (shouldShowExitSurvey && selectedReason.length === 0) {
       return toast.error('Please select a reason for deleting your project')
+    }
+
+    if (shouldShowExitSurvey) {
+      // The survey must be sent before the delete: deleting the project removes its permissions,
+      // so the survey endpoint would reject the request afterwards.
+      try {
+        await sendExitSurvey({
+          orgSlug: organization?.slug,
+          projectRef: project.ref,
+          message,
+          reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
+          exitAction: 'delete',
+        })
+      } catch {
+        // A failed survey should never block the user from deleting their project
+      }
     }
 
     deleteProject({ projectRef: project.ref, organizationSlug: organization?.slug })
@@ -118,20 +122,26 @@ export const DeleteProjectModal = ({
     <TextConfirmModal
       visible={visible}
       loading={isSubmitting}
-      size={isFree ? 'medium' : 'xlarge'}
+      size={shouldShowExitSurvey ? 'xlarge' : 'medium'}
       title={`Confirm deletion of ${project?.name}`}
       variant="destructive"
       alert={{
-        title: isFree
-          ? 'This action cannot be undone.'
-          : `This will permanently delete the ${project?.name}`,
-        description: !isFree ? `All project data will be lost, and cannot be undone` : '',
+        title: shouldShowExitSurvey
+          ? `This will permanently delete the ${project?.name}`
+          : 'This action cannot be undone.',
+        description: (
+          <>
+            {shouldShowExitSurvey
+              ? 'All project data will be lost, and cannot be undone. '
+              : `This will permanently delete the ${project?.name} project and all of its data. `}
+            Read the{' '}
+            <InlineLink href={`${DOCS_URL}/guides/platform/delete-project`}>
+              documentation
+            </InlineLink>{' '}
+            for prerequisites, implications, and recovery information.
+          </>
+        ),
       }}
-      text={
-        isFree
-          ? `This will permanently delete the ${project?.name} project and all of its data.`
-          : undefined
-      }
       confirmPlaceholder="Type the project name in here"
       confirmString={project?.name || ''}
       confirmLabel="I understand, delete this project"
@@ -141,14 +151,26 @@ export const DeleteProjectModal = ({
       }}
     >
       <div className="space-y-6">
-        <LogicalBackupCliInstructions enabled={visible} showResetPassword={false} />
+        <Card>
+          <CardContent
+            className={cn(
+              '[&>div>button]:tracking-normal',
+              '[&>div>button]:text-foreground [&>div>button]:hover:text-foreground',
+              '[&>div>button]:data-open:text-foreground [&>div>button]:text-sm'
+            )}
+          >
+            <CollapsibleCardSection title="Back up your database with the Supabase CLI">
+              <LogicalBackupCliInstructions enabled={visible} showResetPassword={false} />
+            </CollapsibleCardSection>
+          </CardContent>
+        </Card>
 
         {/*
           [Joshen] This is basically ExitSurvey.tsx, ideally we have one shared component but the one
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
           but leaving that for the future.
         */}
-        {!isFree && (
+        {shouldShowExitSurvey && (
           <div className="flex flex-col gap-y-6">
             <FormItemLayout
               isReactForm={false}
@@ -171,6 +193,7 @@ export const DeleteProjectModal = ({
                       ].join(' ')}
                     >
                       <input
+                        aria-label="reasons"
                         type="radio"
                         name="options"
                         value={option.value}
@@ -187,6 +210,7 @@ export const DeleteProjectModal = ({
 
             <FormItemLayout isReactForm={false} label={textareaLabel}>
               <TextArea
+                autoFocus
                 name="message"
                 rows={3}
                 value={message}

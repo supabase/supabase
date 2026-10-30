@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   Accordion,
@@ -172,7 +172,7 @@ export const CreateTableInstructions = ({
               />
               <div className="flex items-center gap-x-1.5 absolute top-2 right-2">
                 <CopyButton
-                  type="default"
+                  variant="default"
                   loading={isFetchingSecretsOnCopy}
                   asyncText={async () => {
                     if (!!decryptedS3AccessKey && !!decryptedS3SecretKey && !!decryptedToken) {
@@ -208,11 +208,10 @@ export const CreateTableInstructions = ({
                   }}
                 />
                 <ButtonTooltip
-                  type="default"
                   className="w-7"
                   loading={isFetchingSecretValues}
                   onClick={() => setShowKeys(!showKeys)}
-                  icon={showKeys ? <EyeOff /> : <Eye />}
+                  icon={showKeys ? <EyeOffIcon /> : <EyeIcon />}
                   tooltip={{
                     content: {
                       side: 'bottom',

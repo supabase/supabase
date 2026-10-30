@@ -1,9 +1,10 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { cn } from 'ui'
 
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { BASE_PATH } from '@/lib/constants'
 
 type ForgotPasswordLayoutProps = {
@@ -14,7 +15,7 @@ type ForgotPasswordLayoutProps = {
   className?: string
 }
 
-const ForgotPasswordLayout = ({
+export const ForgotPasswordLayout = ({
   heading,
   subheading,
   logoLinkToMarketingSite = false,
@@ -23,6 +24,12 @@ const ForgotPasswordLayout = ({
   children,
 }: PropsWithChildren<ForgotPasswordLayoutProps>) => {
   const { resolvedTheme } = useTheme()
+  const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
+  const marketingSiteUrl = dashboardAuthLogoLinkUrl ?? 'https://supabase.com'
+
+  // Addresses hydration issue with `resolvedTheme` as its undefined during SSR and the first (hydrating) client render
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   return (
     <div
@@ -35,10 +42,10 @@ const ForgotPasswordLayout = ({
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/organizations'}>
+              <Link href={logoLinkToMarketingSite ? marketingSiteUrl : '/organizations'}>
                 <Image
                   src={
-                    resolvedTheme?.includes('dark')
+                    mounted && resolvedTheme?.includes('dark')
                       ? `${BASE_PATH}/img/supabase-dark.svg`
                       : `${BASE_PATH}/img/supabase-light.svg`
                   }
@@ -67,5 +74,3 @@ const ForgotPasswordLayout = ({
     </div>
   )
 }
-
-export default ForgotPasswordLayout

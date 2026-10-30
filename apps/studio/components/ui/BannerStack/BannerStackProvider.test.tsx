@@ -1,61 +1,100 @@
-import { act, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import { type PropsWithChildren } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { BANNER_ID, BannerStackProvider, useBannerStack } from './BannerStackProvider'
 
-function BannerStackTestConsumer() {
-  const { addBanner, banners, dismissBanner } = useBannerStack()
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() =>
-          addBanner({
-            id: BANNER_ID.ONBOARDING_SURVEY,
-            isDismissed: false,
-            content: <span>Survey</span>,
-          })
-        }
-      >
-        Add banner
-      </button>
-      <button type="button" onClick={() => dismissBanner(BANNER_ID.ONBOARDING_SURVEY)}>
-        Dismiss banner
-      </button>
-      <div data-testid="banner-state">
-        {banners.map((banner) => `${banner.id}:${banner.isDismissed ? 'dismissed' : 'active'}`)}
-      </div>
-    </>
-  )
-}
+const wrapper = ({ children }: PropsWithChildren) => (
+  <BannerStackProvider>{children}</BannerStackProvider>
+)
 
 describe('BannerStackProvider', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
   afterEach(() => {
     vi.useRealTimers()
   })
 
-  it('revives an existing dismissed banner when it is re-added before removal', () => {
-    vi.useFakeTimers()
+  it('keeps a banner that is revived before the dismiss animation finishes', () => {
+    const { result } = renderHook(() => useBannerStack(), { wrapper })
 
-    render(
-      <BannerStackProvider>
-        <BannerStackTestConsumer />
-      </BannerStackProvider>
-    )
+    act(() => {
+      result.current.addBanner({
+        id: BANNER_ID.EXPLORER,
+        isDismissed: false,
+        content: null,
+      })
+    })
 
-    act(() => screen.getByText('Add banner').click())
-    expect(screen.getByTestId('banner-state').textContent).toBe('onboarding-survey-banner:active')
+    act(() => {
+      result.current.dismissBanner(BANNER_ID.EXPLORER)
+    })
 
-    act(() => screen.getByText('Dismiss banner').click())
-    expect(screen.getByTestId('banner-state').textContent).toBe(
-      'onboarding-survey-banner:dismissed'
-    )
+    act(() => {
+      result.current.addBanner({
+        id: BANNER_ID.EXPLORER,
+        isDismissed: false,
+        content: null,
+      })
+    })
 
-    act(() => screen.getByText('Add banner').click())
-    expect(screen.getByTestId('banner-state').textContent).toBe('onboarding-survey-banner:active')
+    act(() => {
+      vi.advanceTimersByTime(300)
+    })
 
-    act(() => vi.advanceTimersByTime(300))
-    expect(screen.getByTestId('banner-state').textContent).toBe('onboarding-survey-banner:active')
+    expect(result.current.banners).toEqual([
+      expect.objectContaining({
+        id: BANNER_ID.EXPLORER,
+        isDismissed: false,
+      }),
+    ])
+  })
+
+  it('removes a banner after the dismiss animation when it stays dismissed', () => {
+    const { result } = renderHook(() => useBannerStack(), { wrapper })
+
+    act(() => {
+      result.current.addBanner({
+        id: BANNER_ID.EXPLORER,
+        isDismissed: false,
+        content: null,
+      })
+    })
+
+    act(() => {
+      result.current.dismissBanner(BANNER_ID.EXPLORER)
+    })
+
+    expect(result.current.banners[0]?.isDismissed).toBe(true)
+
+    act(() => {
+      vi.advanceTimersByTime(300)
+    })
+
+    expect(result.current.banners).toEqual([])
+  })
+
+  it('cancels the pending removal when the provider unmounts', () => {
+    const { result, unmount } = renderHook(() => useBannerStack(), { wrapper })
+
+    act(() => {
+      result.current.addBanner({
+        id: BANNER_ID.EXPLORER,
+        isDismissed: false,
+        content: null,
+      })
+    })
+
+    act(() => {
+      result.current.dismissBanner(BANNER_ID.EXPLORER)
+    })
+
+    expect(vi.getTimerCount()).toBe(1)
+
+    unmount()
+
+    expect(vi.getTimerCount()).toBe(0)
   })
 })

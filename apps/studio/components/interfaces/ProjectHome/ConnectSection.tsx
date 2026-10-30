@@ -1,5 +1,4 @@
-import { IS_PLATFORM } from 'common'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
@@ -8,7 +7,7 @@ import { Card, CardContent, cn } from 'ui'
 import { useAvailableConnectModes } from '../ConnectSheet/useAvailableConnectModes'
 import { CONNECT_ACTIONS } from './ConnectSection.config'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH, PROJECT_STATUS } from '@/lib/constants'
+import { BASE_PATH, IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -73,18 +72,27 @@ export const ConnectSection = () => {
         </div>
 
         <CardContent className="relative z-10 p-0">
-          <div className="grid grid-cols-1 xl:grid-cols-5 divide-y xl:divide-y-0 xl:divide-x border-muted">
+          <div className="grid grid-cols-1 xl:grid-cols-6 divide-y xl:divide-y-0 xl:divide-x border-muted">
             {availableActions.map((action) => (
               <button
                 key={action.id}
                 type="button"
+                tabIndex={
+                  (action.requiresActiveProject ?? true)
+                    ? !isActiveHealthy
+                      ? -1
+                      : 0
+                    : !selectedProject?.ref
+                      ? -1
+                      : 0
+                }
                 disabled={
                   (action.requiresActiveProject ?? true) ? !isActiveHealthy : !selectedProject?.ref
                 }
                 onClick={() => handleActionClick(action)}
                 className={cn(
                   'group flex items-center gap-3 p-4 text-left transition-colors min-h-[72px] w-full',
-                  'hover:bg-surface-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand',
+                  'hover:bg-surface-100 focus-ring',
                   'xl:min-h-32 xl:flex-col xl:justify-center xl:p-6 xl:text-center',
                   ((action.requiresActiveProject ?? true)
                     ? !isActiveHealthy
@@ -98,7 +106,7 @@ export const ConnectSection = () => {
                   <p className="text-sm">{action.heading}</p>
                   <p className="text-sm text-foreground-lighter">{action.subheading}</p>
                 </div>
-                <ChevronRight
+                <ChevronRightIcon
                   size={16}
                   className="shrink-0 text-foreground-lighter group-hover:text-foreground xl:hidden"
                 />

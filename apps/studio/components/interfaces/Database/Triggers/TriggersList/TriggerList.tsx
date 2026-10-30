@@ -1,7 +1,14 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { includes, sortBy } from 'lodash'
-import { Check, Copy, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+import {
+  CheckIcon,
+  CopyIcon,
+  Edit2Icon,
+  EditIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+  XIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import {
@@ -14,6 +21,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import {
@@ -24,8 +34,9 @@ import {
 import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabaseTriggersQuery } from '@/data/database-triggers/database-triggers-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -44,9 +55,8 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
 
-  const { can: canUpdateTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  const { can: canUpdateTriggers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { selectedSchema: schema } = useQuerySchemaState()
@@ -89,16 +99,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
   }
 
   if (_triggers.length === 0 && filterString.length > 0) {
-    return (
-      <TableRow key={schema}>
-        <TableCell colSpan={7}>
-          <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-foreground-light">
-            Your search for "{filterString}" did not return any results
-          </p>
-        </TableCell>
-      </TableRow>
-    )
+    return <TableRowNoResults key={schema} colSpan={7} search={filterString} />
   }
 
   return (
@@ -107,7 +108,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
         <TableRow key={x.id}>
           <TableCell className="space-x-2">
             <Button
-              type="text"
+              variant="text"
               disabled={isLocked || !canUpdateTriggers}
               onClick={() => editTrigger(x)}
               title={x.name}
@@ -162,9 +163,9 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
           <TableCell>
             <div className="flex items-center justify-center">
               {x.enabled_mode !== 'DISABLED' ? (
-                <Check strokeWidth={2} className="text-brand" />
+                <CheckIcon strokeWidth={2} className="text-primary" />
               ) : (
-                <X strokeWidth={2} />
+                <XIcon strokeWidth={2} />
               )}
             </div>
           </TableCell>
@@ -174,14 +175,18 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        aria-label="More options"
-                        type="default"
-                        className="px-1"
-                        icon={<MoreVertical />}
-                      />
-                    </DropdownMenuTrigger>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-label={`${x.function_name} actions`}
+                            className="px-1"
+                            icon={<MoreVerticalIcon />}
+                          />
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">More options</TooltipContent>
+                    </Tooltip>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem
                         className="space-x-2"
@@ -189,7 +194,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                           editTrigger(x)
                         }}
                       >
-                        <Edit2 size={14} />
+                        <Edit2Icon size={14} />
                         <p>Edit trigger</p>
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -223,16 +228,16 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                           })
                         }}
                       >
-                        <Edit size={14} />
+                        <EditIcon size={14} />
                         <p>Edit with Assistant</p>
                       </DropdownMenuItem>
                       <DropdownMenuItem className="space-x-2" onClick={() => duplicateTrigger(x)}>
-                        <Copy size={14} />
+                        <CopyIcon size={14} />
                         <p>Duplicate trigger</p>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
-                        <Trash stroke="red" size={14} />
+                        <TrashIcon stroke="red" size={14} />
                         <p>Delete trigger</p>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -240,9 +245,8 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                 ) : (
                   <ButtonTooltip
                     disabled
-                    type="default"
                     className="px-1"
-                    icon={<MoreVertical />}
+                    icon={<MoreVerticalIcon />}
                     tooltip={{
                       content: {
                         side: 'bottom',

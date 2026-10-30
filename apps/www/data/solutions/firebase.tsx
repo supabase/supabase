@@ -62,7 +62,7 @@ const data = {
       },
       {
         label: 'Start your migration',
-        href: 'https://supabase.com/docs/guides/platform/migrating-to-supabase/firestore-data',
+        href: 'https://supabase.com/kb/guides/migrate-from-firestore-data',
         type: 'primary' as any,
         icon: <ArrowUpRight className="w-4 h-4 text-current" />,
       },
@@ -204,7 +204,7 @@ const data = {
                 absolute pointer-events-none
                 w-full h-full
                 inset-0 top-auto
-                bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
               "
             />
           </div>
@@ -270,7 +270,7 @@ const data = {
         ),
         className: 'border-l-0! sm:border-l!',
         image: (
-          <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+          <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
         ),
       },
       {
@@ -503,7 +503,7 @@ const data = {
                 absolute pointer-events-none
                 w-full h-full
                 inset-0 top-auto
-                bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]
+                bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]
               "
             />
             <Image
@@ -530,7 +530,7 @@ const data = {
           <RealtimeLogs
             isActive={false}
             isInView={true}
-            className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]!"
+            className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,var(--background-default)_0%,transparent_100%)]!"
           />
         ),
       },
@@ -695,7 +695,7 @@ const data = {
     ),
     primaryCta: {
       label: 'Open migration guide',
-      url: 'https://supabase.com/docs/guides/platform/migrating-to-supabase/firestore-data',
+      url: 'https://supabase.com/kb/guides/migrate-from-firestore-data',
       target: '_blank',
       icon: <ArrowUpRight className="w-4 h-4 text-current" />,
     },

@@ -6,18 +6,19 @@
   "types": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./forms": "./src/forms/index.ts",
     "./crm": "./src/crm/index.ts"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@types/react": "catalog:",
     "react": "catalog:",
     "react-markdown": "^10.1.0",
     "server-only": "^0.0.1",
-    "shiki": "^4.0.1",
+    "shiki": "catalog:",
     "ui": "workspace:*",
     "zod": "catalog:"
   },
@@ -25,6 +26,7 @@
     "config": "workspace:*",
     "tailwindcss": "^4.2.4",
     "tsconfig": "workspace:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   },
   "license": "MIT"

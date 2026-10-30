@@ -1,4 +1,4 @@
-import { ChevronRight, MoreVertical } from 'lucide-react'
+import { ChevronRightIcon, MoreVerticalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 import {
@@ -68,9 +68,9 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="text"
+                variant="text"
                 className="px-1"
-                icon={<MoreVertical size={16} />}
+                icon={<MoreVerticalIcon size={16} />}
                 onClick={(e) => {
                   e.stopPropagation()
                 }}
@@ -91,7 +91,7 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          onClick && <ChevronRight strokeWidth={1.5} size={16} />
+          onClick && <ChevronRightIcon strokeWidth={1.5} size={16} />
         )}
       </>
     )

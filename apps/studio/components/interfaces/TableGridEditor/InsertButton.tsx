@@ -1,6 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { ArrowUp, ChevronDown, FileText } from 'lucide-react'
+import { ArrowUpIcon, ChevronDownIcon, FileTextIcon } from 'lucide-react'
 import {
   Button,
   cn,
@@ -11,25 +9,21 @@ import {
 } from 'ui'
 
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export const InsertButton = () => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const snap = useTableEditorTableStateSnapshot()
   const tableEditorSnap = useTableEditorStateSnapshot()
-  const { can: canCreateColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
+  const { can: canCreateColumns } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const onAddRow =
     snap.editable && (snap.table.columns ?? []).length > 0 ? tableEditorSnap.onAddRow : undefined
@@ -58,9 +52,9 @@ export const InsertButton = () => {
       <DropdownMenuTrigger asChild>
         <Button
           data-testid="table-editor-insert-new-row"
-          type="primary"
+          variant="primary"
           size="tiny"
-          icon={<ChevronDown strokeWidth={1.5} />}
+          icon={<ChevronDownIcon strokeWidth={1.5} />}
         >
           Insert
         </Button>
@@ -80,7 +74,7 @@ export const InsertButton = () => {
                     <div
                       className={cn([
                         'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                        'transition duration-200 group-data-highlighted:border-brand group-data-highlighted:translate-x-0',
+                        'transition duration-200 group-data-highlighted:border-primary-bright group-data-highlighted:translate-x-0',
                       ])}
                     />
                   </div>
@@ -101,7 +95,7 @@ export const InsertButton = () => {
                     <div
                       className={cn([
                         'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                        'transition duration-200 group-data-highlighted:border-brand group-data-highlighted:translate-y-0',
+                        'transition duration-200 group-data-highlighted:border-primary-bright group-data-highlighted:translate-y-0',
                       ])}
                     />
                   </div>
@@ -120,22 +114,15 @@ export const InsertButton = () => {
                   className="group gap-x-3"
                   onClick={() => {
                     onImportData()
-                    sendEvent({
-                      action: 'import_data_button_clicked',
-                      properties: { tableType: 'Existing Table' },
-                      groups: {
-                        project: projectRef ?? 'Unknown',
-                        organization: org?.slug ?? 'Unknown',
-                      },
-                    })
+                    track('import_data_button_clicked', { tableType: 'Existing Table' })
                   }}
                 >
                   <div className="relative shrink-0 w-4">
-                    <FileText size={18} strokeWidth={1.5} className="translate-x-[-2px]" />
-                    <ArrowUp
+                    <FileTextIcon size={18} strokeWidth={1.5} className="translate-x-[-2px]" />
+                    <ArrowUpIcon
                       className={cn(
                         'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
-                        'group-data-highlighted:translate-y-0 group-data-highlighted:text-brand group-data-highlighted:opacity-100'
+                        'group-data-highlighted:translate-y-0 group-data-highlighted:text-primary group-data-highlighted:opacity-100'
                       )}
                       strokeWidth={3}
                       size={12}

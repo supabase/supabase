@@ -1,18 +1,19 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { type ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { render } from '@/tests/helpers'
 
 const {
-  mockSendEvent,
+  mockTrack,
   mockUseEdgeFunctionQuery,
   mockUseParams,
   mockUseProjectSettingsV2Query,
   mockUseSelectedOrganizationQuery,
 } = vi.hoisted(() => ({
-  mockSendEvent: vi.fn(),
+  mockTrack: vi.fn(),
   mockUseEdgeFunctionQuery: vi.fn(),
   mockUseParams: vi.fn(),
   mockUseProjectSettingsV2Query: vi.fn(),
@@ -36,8 +37,8 @@ vi.mock('@/data/edge-functions/edge-function-query', () => ({
   useEdgeFunctionQuery: mockUseEdgeFunctionQuery,
 }))
 
-vi.mock('@/data/telemetry/send-event-mutation', () => ({
-  useSendEventMutation: () => ({ mutate: mockSendEvent }),
+vi.mock('@/lib/telemetry/track', () => ({
+  useTrack: () => mockTrack,
 }))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
@@ -58,27 +59,40 @@ vi.mock('../EdgeFunctionBlock/EdgeFunctionBlock', () => ({
       {showReplaceWarning && (
         <div>
           <p>An edge function with this name already exists.</p>
-          <button onClick={onCancelReplace}>Cancel</button>
-          <button onClick={onConfirmReplace}>Replace function</button>
+          <button tabIndex={0} onClick={onCancelReplace}>
+            Cancel
+          </button>
+          <button tabIndex={0} onClick={onConfirmReplace}>
+            Replace function
+          </button>
         </div>
       )}
     </div>
   ),
 }))
 
-vi.mock('./ConfirmFooter', () => ({
-  ConfirmFooter: ({
+vi.mock('./Confirm', () => ({
+  Confirm: ({
+    children,
     confirmLabel,
     onConfirm,
   }: {
+    children?: ReactNode
     confirmLabel?: string
     onConfirm?: () => void
-  }) => <button onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>,
+  }) => (
+    <div>
+      {children}
+      <button tabIndex={0} onClick={onConfirm}>
+        {confirmLabel ?? 'Confirm'}
+      </button>
+    </div>
+  ),
 }))
 
 describe('EdgeFunctionRenderer', () => {
   beforeEach(() => {
-    mockSendEvent.mockReset()
+    mockTrack.mockReset()
     mockUseEdgeFunctionQuery.mockReset()
     mockUseParams.mockReturnValue({ ref: 'project-ref' })
     mockUseProjectSettingsV2Query.mockReturnValue({ data: undefined })
@@ -96,6 +110,7 @@ describe('EdgeFunctionRenderer', () => {
         label="Deploy Edge Function"
         code="Deno.serve(() => new Response('ok'))"
         functionName="hello-world"
+        confirmState="approval-requested"
         onApprove={onApprove}
       />
     )
@@ -106,11 +121,11 @@ describe('EdgeFunctionRenderer', () => {
 
     await user.click(screen.getByRole('button', { name: 'Deploy' }))
     expect(onApprove).not.toHaveBeenCalled()
-    expect(mockSendEvent).not.toHaveBeenCalled()
+    expect(mockTrack).not.toHaveBeenCalled()
 
     await user.click(screen.getByRole('button', { name: 'Replace function' }))
     expect(onApprove).toHaveBeenCalledTimes(1)
-    expect(mockSendEvent).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 
   it('deploys immediately when no existing function is found', async () => {
@@ -124,6 +139,7 @@ describe('EdgeFunctionRenderer', () => {
         label="Deploy Edge Function"
         code="Deno.serve(() => new Response('ok'))"
         functionName="hello-world"
+        confirmState="approval-requested"
         onApprove={onApprove}
       />
     )
@@ -131,6 +147,6 @@ describe('EdgeFunctionRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Deploy' }))
 
     expect(onApprove).toHaveBeenCalledTimes(1)
-    expect(mockSendEvent).toHaveBeenCalledTimes(1)
+    expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 })

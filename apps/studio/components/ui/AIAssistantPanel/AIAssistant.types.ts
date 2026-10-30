@@ -10,5 +10,3 @@ export interface AssistantSnippetProps {
   yAxis?: string
   name?: string
 }
-
-export type SqlSnippet = string | { label: string; content: string }

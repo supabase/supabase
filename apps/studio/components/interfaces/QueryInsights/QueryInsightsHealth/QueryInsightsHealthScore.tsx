@@ -11,7 +11,7 @@ export const QueryInsightsHealthScore = ({
     <div
       className="h-12 w-12 rounded-full flex items-center justify-center"
       style={{
-        background: `conic-gradient(${color} ${score * 3.6}deg, hsl(var(--border-default)) ${score * 3.6}deg)`,
+        background: `conic-gradient(${color} ${score * 3.6}deg, var(--border-default) ${score * 3.6}deg)`,
       }}
     >
       <div

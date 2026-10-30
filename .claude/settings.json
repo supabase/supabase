@@ -1,4 +1,14 @@
 {
+  "permissions": {
+    "deny": [
+      "Edit(packages/api-types/types/**)",
+      "Edit(**/routeTree.gen.ts)",
+      "Edit(**/__generated__/**)",
+      "Edit(apps/docs/features/docs/generated/**)",
+      "Edit(apps/www/.generated/**)",
+      "Edit(supabase/functions/common/database-types.ts)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {

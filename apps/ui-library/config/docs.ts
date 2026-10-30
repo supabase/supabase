@@ -10,29 +10,16 @@ export const gettingStarted: SidebarNavGroup = {
       commandItemLabel: 'Introduction',
     },
     {
-      title: 'Quick Start',
+      title: 'Quickstart',
       href: '/docs/getting-started/quickstart',
       items: [],
-      commandItemLabel: 'Quick Start',
+      commandItemLabel: 'Quickstart',
     },
     {
       title: 'FAQ',
       href: '/docs/getting-started/faq',
       items: [],
       commandItemLabel: 'FAQ',
-    },
-  ],
-}
-
-export const aiEditorsRules: SidebarNavGroup = {
-  title: 'AI Skills',
-  items: [
-    {
-      title: 'Skills',
-      href: '/docs/ai-editors-rules/skills',
-      items: [],
-      new: true,
-      commandItemLabel: 'AI Skills',
     },
   ],
 }
@@ -45,6 +32,41 @@ export const platformBlocks: SidebarNavGroup = {
       href: '/docs/platform/platform-kit',
       items: [],
       commandItemLabel: 'Platform Kit',
+    },
+  ],
+}
+
+export const oauthBlocks: SidebarNavGroup = {
+  title: 'OAuth',
+  items: [
+    {
+      title: 'OAuth Consent',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/oauth-consent',
+      items: [],
+      new: true,
+      commandItemLabel: 'OAuth Consent',
+    },
+  ],
+}
+
+export const mcpBlocks: SidebarNavGroup = {
+  title: 'MCP',
+  items: [
+    {
+      title: 'MCP Server',
+      href: '/docs/headless/mcp',
+      items: [],
+      new: true,
+      commandItemLabel: 'MCP Server',
+    },
+    {
+      title: 'Headless App',
+      supportedFrameworks: ['tanstack'],
+      href: '/docs/tanstack/headless-app',
+      items: [],
+      new: true,
+      commandItemLabel: 'Headless App',
     },
   ],
 }
@@ -94,7 +116,16 @@ export const componentPages: SidebarNavGroup = {
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
       href: '/docs/nextjs/realtime-monaco',
       items: [],
+      new: true,
       commandItemLabel: 'Realtime Monaco',
+    },
+    {
+      title: 'Realtime Flow',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-flow',
+      items: [],
+      new: true,
+      commandItemLabel: 'Realtime Flow',
     },
     {
       title: 'Current User Avatar',
@@ -127,21 +158,6 @@ export const componentPages: SidebarNavGroup = {
     },
   ],
 }
-
-export const COMMAND_ITEMS = [
-  ...gettingStarted.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...aiEditorsRules.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...componentPages.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-]
 
 // Framework titles for display
 export const frameworkTitles: Record<string, string> = {

@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import type { DatabaseEventTrigger } from './database-event-triggers-query'
 import { databaseEventTriggerKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseEventTriggerDeleteVariables = {
@@ -25,6 +26,7 @@ export async function deleteDatabaseEventTrigger({
     connectionString,
     sql,
     queryKey: ['event-trigger', 'delete', trigger.oid],
+    grant: unguarded.migrating,
   })
 
   return result

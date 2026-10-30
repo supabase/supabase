@@ -1,41 +1,45 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download, Move, Trash2, X } from 'lucide-react'
+import { ArchiveIcon, DownloadIcon, MoveIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { Button } from 'ui'
 
+import { isVersioningActive } from '../StorageVersioning.constants'
+import { bulkActionBarClassName } from './storageExplorerChrome'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const FileExplorerHeaderSelection = () => {
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
 
   const {
+    selectedBucket,
     selectedItems,
     downloadFile,
     downloadSelectedFiles,
     clearSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemsToMove,
+    setItemsToPurge,
   } = useStorageExplorerStateSnapshot()
 
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+  const canArchive = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
+
+  const count = selectedItems.length
+
   return (
-    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow-sm in-data-[theme*=dark]:bg-brand-500">
-      <Button
-        icon={<X size={16} strokeWidth={2} />}
-        type="text"
-        onClick={() => clearSelectedItems()}
-      />
-      <div className="ml-1 flex items-center space-x-3">
-        <p className="mb-0 text-sm text-foreground">
-          <span style={{ fontVariantNumeric: 'tabular-nums' }}>{selectedItems.length}</span> items
-          selected
-        </p>
+    <div className={bulkActionBarClassName}>
+      <span className="font-mono text-xs text-foreground-light">
+        <span className="tabular-nums">{count}</span> item{count !== 1 ? 's' : ''} selected
+      </span>
+
+      <div className="ml-auto flex items-center gap-1">
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_DOWNLOAD_SELECTED} side="bottom">
           <Button
-            icon={<Download size={16} strokeWidth={2} />}
-            type="primary"
+            size="tiny"
+            icon={<DownloadIcon size={12} />}
             onClick={async () => {
               if (selectedItems.length === 1) {
                 await downloadFile(selectedItems[0])
@@ -47,7 +51,6 @@ export const FileExplorerHeaderSelection = () => {
             Download
           </Button>
         </ShortcutTooltip>
-        <div className="border-r border-green-900 py-3 opacity-50" />
 
         <ShortcutTooltip
           shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_DELETE_SELECTED}
@@ -55,8 +58,8 @@ export const FileExplorerHeaderSelection = () => {
           open={!canUpdateFiles ? false : undefined}
         >
           <ButtonTooltip
-            icon={<Trash2 size={16} strokeWidth={2} />}
-            type="primary"
+            size="tiny"
+            icon={canArchive ? <ArchiveIcon size={12} /> : <Trash2Icon size={12} />}
             disabled={!canUpdateFiles}
             onClick={() => setSelectedItemsToDelete(selectedItems)}
             tooltip={{
@@ -68,9 +71,29 @@ export const FileExplorerHeaderSelection = () => {
               },
             }}
           >
-            Delete
+            {canArchive ? 'Archive' : 'Delete'}
           </ButtonTooltip>
         </ShortcutTooltip>
+        {canArchive && (
+          <ButtonTooltip
+            size="tiny"
+            icon={
+              <Trash2Icon size={12} className={canUpdateFiles ? 'text-destructive' : undefined} />
+            }
+            disabled={!canUpdateFiles}
+            onClick={() => setItemsToPurge(selectedItems)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateFiles
+                  ? 'You need additional permissions to delete files'
+                  : 'Deletes every version, leaving nothing to restore',
+              },
+            }}
+          >
+            Delete permanently
+          </ButtonTooltip>
+        )}
 
         <ShortcutTooltip
           shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_MOVE_SELECTED}
@@ -78,8 +101,8 @@ export const FileExplorerHeaderSelection = () => {
           open={!canUpdateFiles ? false : undefined}
         >
           <ButtonTooltip
-            icon={<Move size={16} strokeWidth={2} />}
-            type="primary"
+            size="tiny"
+            icon={<MoveIcon size={12} />}
             disabled={!canUpdateFiles}
             onClick={() => setSelectedItemsToMove(selectedItems)}
             tooltip={{
@@ -92,6 +115,15 @@ export const FileExplorerHeaderSelection = () => {
             Move
           </ButtonTooltip>
         </ShortcutTooltip>
+
+        <Button
+          variant="text"
+          size="tiny"
+          icon={<XIcon size={12} />}
+          title="Clear selection"
+          className="px-1.5 text-foreground-lighter hover:text-foreground"
+          onClick={() => clearSelectedItems()}
+        />
       </div>
     </div>
   )

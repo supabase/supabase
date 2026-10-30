@@ -1,9 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogBody,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -13,12 +14,13 @@ import {
   AlertDialogTrigger,
   Button,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { type AuthTemplate } from './EmailTemplates.types'
 import { getAuthTemplateType } from './EmailTemplates.utils'
 import { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const ResetTemplateDialog = ({
   template,
@@ -31,40 +33,50 @@ export const ResetTemplateDialog = ({
 }) => {
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const [error, setError] = useState<string | null>(null)
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { id } = template
   const templateType = getAuthTemplateType(id)
 
-  const { mutate: resetAuthTemplate, isPending: isResettingTemplate } =
-    useAuthTemplateResetMutation()
+  const { mutateAsync: resetAuthTemplate, isPending: isResetting } = useAuthTemplateResetMutation({
+    onSuccess: (config) => {
+      toast.success('Email template reset to default')
+      onResetSuccess(config)
+    },
+    onError: () => {},
+  })
 
-  const resetTemplateToDefault = () => {
-    if (!projectRef) return console.error('Project ref is required')
-    if (!templateType) return console.error('Template type is required')
+  const resetTemplateToDefault = async () => {
+    if (!projectRef) throw new Error('Project ref is required')
+    if (!templateType) throw new Error('Template type is required')
 
-    resetAuthTemplate(
-      {
-        projectRef,
-        template: templateType,
-      },
-      {
-        onSuccess: (config) => {
-          toast.success('Email template reset to default')
-          onResetSuccess(config)
-          setOpen(false)
-        },
-      }
-    )
+    setError(null)
+
+    try {
+      await resetAuthTemplate({ projectRef, template: templateType })
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'An unknown error occurred while resetting the template'
+      )
+      throw error
+    }
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next)
+        if (!next) setError(null)
+      }}
+    >
       <AlertDialogTrigger asChild>
-        <Button type="default" htmlType="button" disabled={!canUpdateConfig || isResettingTemplate}>
+        <Button type="button" disabled={!canUpdateConfig}>
           Reset template
         </Button>
       </AlertDialogTrigger>
@@ -77,11 +89,24 @@ export const ResetTemplateDialog = ({
               : 'This will remove your custom subject line and email body content. The default values will be used instead.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
+        {error && (
+          <AlertDialogBody>
+            <Admonition
+              type="destructive"
+              title="Unable to reset email template"
+              description={error}
+            />
+          </AlertDialogBody>
+        )}
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isResettingTemplate}>Cancel</AlertDialogCancel>
-          <Button type="warning" onClick={resetTemplateToDefault} loading={isResettingTemplate}>
+          <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            variant="warning"
+            loading={isResetting}
+            onClick={resetTemplateToDefault}
+          >
             Reset
-          </Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

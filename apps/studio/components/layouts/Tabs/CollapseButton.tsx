@@ -1,5 +1,5 @@
 import { useBreakpoint } from 'common'
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -20,6 +20,7 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
     <Tooltip>
       <TooltipTrigger asChild>
         <button
+          tabIndex={0}
           className={cn(
             'hidden md:flex items-center justify-center w-10 h-(--header-height) hover:bg-surface-100 shrink-0',
             !hideTabs && 'border-b border-b-default'
@@ -28,7 +29,7 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
         >
           {showSidebar ? (
             <>
-              <PanelLeftClose
+              <PanelLeftCloseIcon
                 size={16}
                 strokeWidth={1.5}
                 className="text-foreground-lighter hover:text-foreground-light"
@@ -37,7 +38,7 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
             </>
           ) : (
             <>
-              <PanelLeftOpen
+              <PanelLeftOpenIcon
                 size={16}
                 strokeWidth={1.5}
                 className="text-foreground-lighter hover:text-foreground-light"

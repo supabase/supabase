@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { AlertCircle, Book, Check } from 'lucide-react'
+import { AlertCircleIcon, BookIcon, CheckIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -36,15 +36,16 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { BASE_PATH } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -116,7 +117,7 @@ const NewFunctionPage = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const { openSidebar } = useSidebarManagerSnapshot()
 
@@ -171,11 +172,7 @@ const NewFunctionPage = () => {
       files: files.map(({ name, content }) => ({ name, content })),
     })
 
-    sendEvent({
-      action: 'edge_function_deploy_button_clicked',
-      properties: { origin: 'functions_editor' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('edge_function_deploy_button_clicked', { origin: 'functions_editor' })
   }
 
   const handleChat = () => {
@@ -209,11 +206,7 @@ const NewFunctionPage = () => {
         ],
       },
     })
-    sendEvent({
-      action: 'edge_function_ai_assistant_button_clicked',
-      properties: { origin: 'functions_editor_chat' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('edge_function_ai_assistant_button_clicked', { origin: 'functions_editor_chat' })
   }
 
   const onSelectTemplate = (templateValue: string) => {
@@ -225,10 +218,9 @@ const NewFunctionPage = () => {
         )
       )
       setOpen(false)
-      sendEvent({
-        action: 'edge_function_template_clicked',
-        properties: { templateName: template.name, origin: 'editor_page' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      track('edge_function_template_clicked', {
+        templateName: template.name,
+        origin: 'editor_page',
       })
     }
     setIsPreviewingTemplate(false)
@@ -285,6 +277,10 @@ const NewFunctionPage = () => {
   }, [template])
 
   const hasUnsavedChanges = useMemo(() => !isEqual(INITIAL_FILES, files), [files])
+  const { handleCancelNavigation, handleConfirmNavigation, shouldConfirmNavigation } =
+    usePreventNavigationOnUnsavedChanges({
+      hasChanges: hasUnsavedChanges && !hasDeployed,
+    })
 
   return (
     <PageLayout
@@ -303,11 +299,10 @@ const NewFunctionPage = () => {
             <PopoverTrigger asChild>
               <Button
                 size="tiny"
-                type="default"
                 role="combobox"
                 aria-expanded={open}
                 aria-controls={templatesListboxId}
-                icon={<Book size={14} />}
+                icon={<BookIcon size={14} />}
               >
                 Templates
               </Button>
@@ -329,7 +324,7 @@ const NewFunctionPage = () => {
                       >
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center">
-                            <Check
+                            <CheckIcon
                               className={cn(
                                 'mr-2 h-4 w-4',
                                 files.some((f) => f.content === template.content)
@@ -350,12 +345,7 @@ const NewFunctionPage = () => {
               </Command>
             </PopoverContent>
           </Popover>
-          <Button
-            size="tiny"
-            type="default"
-            onClick={handleChat}
-            icon={<AiIconAnimation size={16} />}
-          >
+          <Button size="tiny" onClick={handleChat} icon={<AiIconAnimation size={16} />}>
             Chat
           </Button>
         </>
@@ -400,7 +390,7 @@ const NewFunctionPage = () => {
                     {form.formState.errors.functionName && (
                       <Tooltip>
                         <TooltipTrigger>
-                          <AlertCircle className="w-4 h-4 text-destructive ml-2" />
+                          <AlertCircleIcon className="w-4 h-4 text-destructive ml-2" />
                         </TooltipTrigger>
                         <TooltipContent>
                           {form.formState.errors.functionName.message}
@@ -413,6 +403,7 @@ const NewFunctionPage = () => {
             />
           </div>
           <Button
+            variant="primary"
             loading={isDeploying}
             size="medium"
             disabled={files.length === 0 || isDeploying}
@@ -422,7 +413,11 @@ const NewFunctionPage = () => {
           </Button>
         </form>
       </Form>
-      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges && !hasDeployed} />
+      <DiscardChangesConfirmationDialog
+        visible={shouldConfirmNavigation}
+        onCancel={handleCancelNavigation}
+        onClose={handleConfirmNavigation}
+      />
     </PageLayout>
   )
 }

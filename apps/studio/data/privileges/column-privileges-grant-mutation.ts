@@ -3,7 +3,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { privilegeKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ColumnPrivilegesGrant = {
@@ -38,6 +39,7 @@ export async function grantColumnPrivileges({
     connectionString,
     sql,
     queryKey: ['column-privileges', 'grant'],
+    grant: unguarded.migrating,
   })
 
   return result

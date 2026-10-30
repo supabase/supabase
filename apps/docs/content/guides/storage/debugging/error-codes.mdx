@@ -1,6 +1,6 @@
 ---
 id: 'storage-errors-codes'
-title: 'Error Codes'
+title: 'Storage error codes'
 description: 'Supabase Error Codes'
 subtitle: 'Learn about the Storage error codes and how to resolve them'
 sidebar_label: 'Debugging'
@@ -46,6 +46,25 @@ except Exception as error:
     # Access error details
     print(f'Error: {error}')
     # The SDK now handles bad responses from the server gracefully
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+try
+{
+    var bytes = await supabase.Storage.From("avatars").Download("avatar.png");
+}
+catch (SupabaseStorageException error)
+{
+    // Access error details
+    Console.WriteLine($"Error message: {error.Message}");
+    Console.WriteLine($"HTTP status: {error.StatusCode}");
+    Console.WriteLine($"Reason: {error.Reason}");
+}
 ```
 
 </TabPanel>
@@ -144,6 +163,7 @@ You don't have permission to action this request
 
 - Add RLS policy to grant permission. See our [Access Control docs](/docs/guides/storage/security/access-control) for more information.
 - Ensure you include the user `Authorization` header
+- If the error is `new row violates row-level security policy`, see [Fix RLS upload errors](/kb/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload)
 
 ### 429 `too many requests`
 

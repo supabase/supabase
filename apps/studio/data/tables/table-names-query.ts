@@ -1,9 +1,10 @@
 import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { executeSql } from '../sql/execute-sql-mutation'
 import { tableKeys } from './keys'
-import type { UseCustomQueryOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type TableName = {
   id: number
@@ -39,14 +40,20 @@ export async function getTableNames(
   signal?: AbortSignal
 ) {
   const { result } = await executeSql<TableName[]>(
-    { projectRef, connectionString, sql: TABLE_NAMES_SQL, queryKey: ['table-names'] },
+    {
+      projectRef,
+      connectionString,
+      sql: TABLE_NAMES_SQL,
+      queryKey: ['table-names'],
+      grant: unguarded.migrating,
+    },
     signal
   )
   return result
 }
 
 export type TableNamesData = Awaited<ReturnType<typeof getTableNames>>
-export type TableNamesError = ExecuteSqlError
+export type TableNamesError = ResponseError
 
 export const useTableNamesQuery = <TData = TableNamesData>(
   { projectRef, connectionString }: TableNamesVariables,

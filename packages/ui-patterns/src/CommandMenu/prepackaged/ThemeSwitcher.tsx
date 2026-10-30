@@ -8,7 +8,7 @@ import {
 } from '..'
 import { Monitor, MonitorDot, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { themes } from 'ui/src/components/ThemeProvider/themes'
+import { singleThemes } from 'ui'
 
 const THEME_SWITCHER_PAGE_NAME = 'Switch theme'
 
@@ -29,7 +29,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: CommandOptions } = {}
       {
         id: 'switch-theme',
         name: 'Switch theme',
-        commands: themes
+        commands: singleThemes
           .filter(({ name }) => name === 'System' || name === 'Light' || name === 'Dark')
           .map((theme) => ({
             id: `switch-theme-${theme.value}`,

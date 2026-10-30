@@ -1,4 +1,4 @@
-import { IS_PLATFORM, useParams } from 'common'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Badge, Menu } from 'ui'
@@ -10,6 +10,7 @@ import {
   useIsAnalyticsBucketsEnabled,
   useIsVectorBucketsEnabled,
 } from '@/data/config/project-storage-config-query'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -25,6 +26,8 @@ export const StorageMenuV2 = () => {
   const { ref } = useParams()
   const page = useStorageV2Page()
 
+  const { isCli, isPlatform } = useDeploymentMode()
+
   const { storageAnalytics, storageVectors } = useIsFeatureEnabled([
     'storage:analytics',
     'storage:vectors',
@@ -33,8 +36,8 @@ export const StorageMenuV2 = () => {
   const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
   const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
 
-  const showAnalytics = IS_PLATFORM && storageAnalytics
-  const showVectors = IS_PLATFORM && storageVectors
+  const showAnalytics = isPlatform && storageAnalytics
+  const showVectors = (isPlatform && storageVectors) || isCli
 
   useShortcut(SHORTCUT_IDS.NAV_STORAGE_FILES, () => router.push(`/project/${ref}/storage/files`))
   useShortcut(
@@ -48,8 +51,13 @@ export const StorageMenuV2 = () => {
     { enabled: showVectors }
   )
   useShortcut(SHORTCUT_IDS.NAV_STORAGE_S3, () => router.push(`/project/${ref}/storage/s3`), {
-    enabled: IS_PLATFORM,
+    enabled: isPlatform,
   })
+  useShortcut(
+    SHORTCUT_IDS.NAV_STORAGE_SIGNING_KEYS,
+    () => router.push(`/project/${ref}/storage/signing-keys`),
+    { enabled: isPlatform }
+  )
 
   const bucketTypes = Object.entries(BUCKET_TYPES).filter(([key]) => {
     if (key === 'analytics') return showAnalytics
@@ -95,7 +103,7 @@ export const StorageMenuV2 = () => {
           })}
         </div>
 
-        {IS_PLATFORM && (
+        {isPlatform && (
           <>
             <div className="h-px w-[calc(100%-1.5rem)] mx-auto md:w-full bg-border" />
             <div className="md:mx-3">
@@ -109,6 +117,18 @@ export const StorageMenuV2 = () => {
                 <Link href={`/project/${ref}/storage/s3`}>
                   <Menu.Item rounded active={page === 's3'}>
                     <p className="truncate">S3</p>
+                  </Menu.Item>
+                </Link>
+              </ShortcutTooltip>
+
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.NAV_STORAGE_SIGNING_KEYS}
+                side="right"
+                delayDuration={1000}
+              >
+                <Link href={`/project/${ref}/storage/signing-keys`}>
+                  <Menu.Item rounded active={page === 'signing-keys'}>
+                    <p className="truncate">URL signing keys</p>
                   </Menu.Item>
                 </Link>
               </ShortcutTooltip>

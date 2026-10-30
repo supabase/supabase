@@ -1,12 +1,19 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
-import type { LogData } from './Logs.types'
+import { LogsTableName } from './Logs.constants'
+import type { Filters, LogData } from './Logs.types'
 import {
   buildLogsPrompt,
+  checkForLimitClause,
+  ensureNoTimestampConflict,
   extractEdgeFunctionName,
   formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
+  genChartQuery,
+  genDefaultQuery,
+  getAuthLogSeverity,
+  parseMultigresEventMessage,
 } from './Logs.utils'
 
 const createLog = (overrides: Partial<LogData> = {}): LogData => ({
@@ -132,12 +139,34 @@ describe('Logs.utils', () => {
   })
 
   describe('buildLogsPrompt', () => {
+    test.each([
+      '2026-10-27T10:15:00.000000',
+      '2026-10-27 10:15:00.000000',
+      '2026-10-27T10:15:00Z',
+      '2026-10-27T11:15:00+01:00',
+    ])(
+      'preserves the UTC log time in Assistant prompts regardless of the local timezone: %s',
+      (timestamp) => {
+        vi.stubEnv('TZ', 'Europe/Madrid')
+        try {
+          expect(new Date('2026-10-27T10:15:00').getTimezoneOffset()).toBe(-60)
+          const prompt = buildLogsPrompt([
+            { id: 'log', timestamp, event_message: 'Function failed' },
+          ])
+          expect(prompt).toContain('**Timestamp:** 2026-10-27T10:15:00.000Z')
+        } finally {
+          vi.unstubAllEnvs()
+        }
+      }
+    )
+
     test('builds prompt with single log', () => {
       const rows: LogData[] = [createLog({ id: '1', event_message: 'error occurred' })]
       const result = buildLogsPrompt(rows)
       expect(result).toContain('1 Supabase log entry')
       expect(result).toContain('error occurred')
       expect(result).toContain('What do these logs indicate')
+      expect(result).not.toContain('more matching log')
     })
 
     test('builds prompt with multiple logs', () => {
@@ -149,10 +178,24 @@ describe('Logs.utils', () => {
       expect(result).toContain('2 Supabase log entries')
     })
 
-    test('handles singular correctly', () => {
-      const rows: LogData[] = [createLog({ id: '1', event_message: 'single error' })]
-      const result = buildLogsPrompt(rows)
-      expect(result).toContain('1 Supabase log entry')
+    test.each([
+      [1, '+1 more matching log entry not included.'],
+      [45, '+45 more matching log entries not included.'],
+      [1234, '+1,234 more matching log entries not included.'],
+    ])('tells the assistant that %i matching preview logs were omitted', (omittedCount, note) => {
+      const rows: LogData[] = [createLog({ id: '1', event_message: 'latest error' })]
+      const result = buildLogsPrompt(rows, {
+        queryType: 'functions',
+        sqlQuery: 'select event_message from function_logs limit 1',
+        omittedCount,
+      })
+      expect(result).toContain('from the **Edge Functions** service')
+      expect(result).toContain('latest error')
+      expect(result.indexOf('latest error')).toBeLessThan(result.indexOf(note))
+      expect(result).toContain(note)
+      expect(result).toContain(
+        '**Query used:**\n```sql\nselect event_message from function_logs limit 1\n```'
+      )
     })
   })
 
@@ -161,18 +204,12 @@ describe('Logs.utils', () => {
       expect(extractEdgeFunctionName('/functions/v1/hello-world-1')).toBe('hello-world-1')
     })
 
-    test('returns empty string for null', () => {
-      expect(extractEdgeFunctionName(null)).toBe('')
-    })
-
-    test('returns empty string for undefined', () => {
-      expect(extractEdgeFunctionName(undefined)).toBe('')
-    })
-
-    test('returns empty string for non-string values', () => {
-      expect(extractEdgeFunctionName(42)).toBe('')
-      expect(extractEdgeFunctionName({})).toBe('')
-    })
+    test.each([null, undefined, 42, {}])(
+      'returns empty string for non-string value %o',
+      (value) => {
+        expect(extractEdgeFunctionName(value)).toBe('')
+      }
+    )
 
     test('handles pathname with no slashes', () => {
       expect(extractEdgeFunctionName('my-function')).toBe('my-function')
@@ -180,6 +217,168 @@ describe('Logs.utils', () => {
 
     test('handles trailing slash', () => {
       expect(extractEdgeFunctionName('/functions/v1/hello-world-1/')).toBe('hello-world-1')
+    })
+  })
+
+  describe('parseMultigresEventMessage', () => {
+    test('parses a JSON object event_message into a plain object', () => {
+      const eventMessage = JSON.stringify({
+        time: '2026-06-02T15:44:52.84043038Z',
+        level: 'ERROR',
+        msg: 'Failed to write heartbeat',
+        error: 'context deadline exceeded',
+      })
+      expect(parseMultigresEventMessage(eventMessage)).toEqual({
+        time: '2026-06-02T15:44:52.84043038Z',
+        level: 'ERROR',
+        msg: 'Failed to write heartbeat',
+        error: 'context deadline exceeded',
+      })
+    })
+
+    test('returns null when event_message is not valid JSON', () => {
+      expect(parseMultigresEventMessage('connection closed')).toBeNull()
+    })
+
+    test('returns null when event_message parses to an array', () => {
+      expect(parseMultigresEventMessage('[1, 2, 3]')).toBeNull()
+    })
+
+    test('returns null when event_message parses to a primitive', () => {
+      expect(parseMultigresEventMessage('42')).toBeNull()
+      expect(parseMultigresEventMessage('"a string"')).toBeNull()
+    })
+
+    test('returns null for non-string input', () => {
+      expect(parseMultigresEventMessage(undefined)).toBeNull()
+      expect(parseMultigresEventMessage(null)).toBeNull()
+      expect(parseMultigresEventMessage(42)).toBeNull()
+    })
+  })
+
+  describe('getAuthLogSeverity', () => {
+    test('reports server errors (5xx) as error', () => {
+      expect(getAuthLogSeverity('info', 500)).toBe('error')
+      expect(getAuthLogSeverity('info', 503)).toBe('error')
+    })
+
+    test('reports client errors (4xx) as warning', () => {
+      expect(getAuthLogSeverity('info', 400)).toBe('warning')
+      expect(getAuthLogSeverity('info', 401)).toBe('warning')
+      expect(getAuthLogSeverity('info', 429)).toBe('warning')
+      expect(getAuthLogSeverity('info', 499)).toBe('warning')
+    })
+
+    test('handles status passed as a string', () => {
+      expect(getAuthLogSeverity('info', '500')).toBe('error')
+      expect(getAuthLogSeverity('info', '404')).toBe('warning')
+      expect(getAuthLogSeverity('info', '200')).toBe('info')
+    })
+
+    test('preserves the original level for non-error statuses', () => {
+      expect(getAuthLogSeverity('info', 200)).toBe('info')
+      expect(getAuthLogSeverity('info', 302)).toBe('info')
+      expect(getAuthLogSeverity('info', 399)).toBe('info')
+    })
+
+    test('falls back to the level when status is missing or invalid', () => {
+      expect(getAuthLogSeverity('info')).toBe('info')
+      expect(getAuthLogSeverity('warning', null)).toBe('warning')
+      expect(getAuthLogSeverity('info', 'not-a-number')).toBe('info')
+    })
+
+    test('keeps explicit error levels even with a non-error status', () => {
+      expect(getAuthLogSeverity('error')).toBe('error')
+      expect(getAuthLogSeverity('fatal')).toBe('fatal')
+      expect(getAuthLogSeverity('error', 200)).toBe('error')
+      expect(getAuthLogSeverity('fatal', 404)).toBe('fatal')
+    })
+
+    test('returns an empty string when level is missing', () => {
+      expect(getAuthLogSeverity()).toBe('')
+      expect(getAuthLogSeverity(null, 200)).toBe('')
+    })
+
+    test('ignores non-string levels and non-numeric statuses', () => {
+      expect(getAuthLogSeverity({}, {})).toBe('')
+      expect(getAuthLogSeverity(42, 500)).toBe('error')
+      expect(getAuthLogSeverity('info', {})).toBe('info')
+      expect(getAuthLogSeverity('info', [500])).toBe('info')
+    })
+  })
+
+  describe('auth_logs severity filter query', () => {
+    const queryFor = (severity: Filters['severity']) =>
+      genDefaultQuery(LogsTableName.AUTH, { severity } as Filters, 100)
+
+    test('error severity filter matches 5xx status as well as the log level', () => {
+      const sql = queryFor({ error: true })
+      expect(sql).toContain("IFNULL(metadata.level, '') IN ('error', 'fatal')")
+      expect(sql).toContain('IFNULL(SAFE_CAST(metadata.status AS INT64), 0) >= 500')
+    })
+
+    test('warning severity filter matches 4xx status as well as the log level', () => {
+      const sql = queryFor({ warning: true })
+      expect(sql).toContain("IFNULL(metadata.level, '') = 'warning'")
+      expect(sql).toContain('IFNULL(SAFE_CAST(metadata.status AS INT64), 0) BETWEEN 400 AND 499')
+    })
+
+    test('info severity filter excludes error and warning rows', () => {
+      const sql = queryFor({ info: true })
+      expect(sql).toContain('NOT (')
+    })
+  })
+
+  describe('checkForLimitClause', () => {
+    test('detects a limit clause regardless of casing', () => {
+      expect(checkForLimitClause('select event_message from edge_logs limit 100')).toBe(true)
+      expect(checkForLimitClause('SELECT event_message FROM edge_logs LIMIT 5')).toBe(true)
+    })
+
+    test('detects a limit clause across newlines', () => {
+      expect(checkForLimitClause('select event_message\nfrom edge_logs\nlimit 50')).toBe(true)
+    })
+
+    test('returns false when no limit clause is present', () => {
+      expect(checkForLimitClause('select event_message from edge_logs')).toBe(false)
+    })
+
+    test('returns false for a bare limit keyword without a row count', () => {
+      expect(checkForLimitClause('select event_message from edge_logs limit')).toBe(false)
+    })
+
+    test('ignores a column named like limit', () => {
+      expect(checkForLimitClause('select limit_reached from edge_logs')).toBe(false)
+    })
+
+    test('ignores the word limit inside a string literal', () => {
+      expect(checkForLimitClause("select event_message from edge_logs where s = 'limit 10'")).toBe(
+        false
+      )
+    })
+
+    test('ignores a limit clause that is commented out', () => {
+      expect(checkForLimitClause('select event_message from edge_logs -- limit 10')).toBe(false)
+    })
+  })
+
+  describe('genChartQuery', () => {
+    // Regression: an unparseable iso_timestamp_start used to reach
+    // startOffset.toISOString() as an Invalid Date and throw RangeError.
+    test('falls back to minute buckets for an unparseable time range without throwing', () => {
+      const params = { iso_timestamp_start: 'not-a-date', iso_timestamp_end: 'also-bad' }
+      expect(() => genChartQuery(LogsTableName.AUTH, params as any, {})).not.toThrow()
+      expect(genChartQuery(LogsTableName.AUTH, params as any, {})).toContain(
+        'timestamp_trunc(t.timestamp, minute)'
+      )
+    })
+  })
+
+  describe('ensureNoTimestampConflict', () => {
+    test('does not throw for unparseable initial timestamps', () => {
+      expect(() =>
+        ensureNoTimestampConflict(['not-a-date', 'also-bad'], ['', '2024-01-01T00:00:00.000Z'])
+      ).not.toThrow()
     })
   })
 })

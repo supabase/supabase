@@ -49,7 +49,7 @@ export default function ComboboxDropdownMenu() {
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             icon={<MoreHorizontal className="text-foreground-muted" />}
           ></Button>

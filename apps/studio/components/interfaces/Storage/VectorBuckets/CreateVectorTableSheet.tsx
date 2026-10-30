@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { literal, safeSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus, Trash2 } from 'lucide-react'
+import { PlusIcon, Trash2Icon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
@@ -23,17 +22,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
+import { inverseValidBucketNameRegex } from '../Storage.utils'
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
 import { useVectorBucketIndexCreateMutation } from '@/data/storage/vector-bucket-index-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -104,12 +104,15 @@ interface CreateVectorTableSheetProps {
 
 export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { isCli } = useDeploymentMode()
 
   const [visible, setVisible] = useQueryState(
     'newTable',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canCreateBuckets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_WRITE
+  )
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId: bucketName })
   const schema = (wrapperInstance?.server_options ?? [])
@@ -117,7 +120,8 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     ?.split('supabase_target_schema=')[1]
 
   // [Joshen] Can remove this once this restriction is removed
-  const showIndexCreationNotice = isStagingLocal && !!project && project?.region !== 'us-east-1'
+  const showIndexCreationNotice =
+    isStagingLocal && !isCli && !!project && project?.region !== 'us-east-1'
 
   const defaultValues = {
     name: '',
@@ -197,9 +201,9 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         <ButtonTooltip
           block
           size="tiny"
-          type="primary"
+          variant="primary"
           className="w-fit"
-          icon={<Plus size={14} />}
+          icon={<PlusIcon size={14} />}
           disabled={!canCreateBuckets}
           onClick={() => setVisible(true)}
           tooltip={{
@@ -370,17 +374,17 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                       />
                     </div>
                     <Button
-                      type="text"
+                      variant="text"
                       className="w-[34px] h-[34px]" // Match the height of the input
                       size="tiny"
-                      icon={<Trash2 size={12} />}
+                      icon={<Trash2Icon size={12} />}
                       onClick={() => remove(index)}
                     />
                   </div>
                 ))}
               </div>
               <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
-                <Button type="default" size="tiny" onClick={() => append({ value: '' })}>
+                <Button size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>
               </div>
@@ -389,12 +393,13 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         </Form>
 
         <SheetFooter>
-          <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
+          <Button disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
           <Button
+            variant="primary"
             form={formId}
-            htmlType="submit"
+            type="submit"
             loading={isCreating}
             disabled={isCreating || !bucketName}
           >

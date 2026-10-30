@@ -2,8 +2,9 @@ import { getIndexStatusesSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
-import { executeSql, type ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type UsersIndexStatusesVariables = {
   projectRef?: string
@@ -14,7 +15,7 @@ type UsersIndexStatusesData = {
   is_valid: boolean
   is_ready: boolean
 }[]
-export type UsersIndexStatusesError = ExecuteSqlError
+export type UsersIndexStatusesError = ResponseError
 
 export async function getUserIndexStatuses(
   { projectRef, connectionString }: UsersIndexStatusesVariables,
@@ -28,6 +29,7 @@ export async function getUserIndexStatuses(
       connectionString,
       sql,
       queryKey: ['index-statuses'],
+      grant: unguarded.migrating,
     },
     signal
   )

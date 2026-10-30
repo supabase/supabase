@@ -19,17 +19,6 @@ const defaults = {
     alternative: 'border-alternative',
   },
   placeholder: 'placeholder-border-stronger',
-  focus: `
-    outline-hidden
-    focus:ring-current focus:ring-2
-  `,
-  'focus-visible': `
-    outline-hidden
-    transition-all
-    outline-0
-    focus-visible:outline-4
-    focus-visible:outline-offset-1
-  `,
   size: {
     // buttons, inputs, input labels use these sizes
     text: {

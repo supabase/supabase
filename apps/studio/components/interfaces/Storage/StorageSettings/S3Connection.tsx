@@ -1,6 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -9,6 +7,7 @@ import { toast } from 'sonner'
 import {
   Alert,
   AlertDescription,
+  AlertTitle,
   Button,
   Card,
   CardContent,
@@ -44,14 +43,14 @@ import { CreateCredentialModal } from './CreateCredentialModal'
 import { RevokeCredentialModal } from './RevokeCredentialModal'
 import { StorageCredItem } from './StorageCredItem'
 import { getConnectionURL } from './StorageSettings.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
 import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -64,13 +63,11 @@ export const S3Connection = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [deleteCred, setDeleteCred] = useState<{ id: string; description: string }>()
 
-  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_READ,
-    '*'
+  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ
   )
-  const { can: canUpdateStorageSettings } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
   )
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -220,8 +217,7 @@ export const S3Connection = () => {
                     <CardFooter className="justify-end space-x-2">
                       {form.formState.isDirty && (
                         <Button
-                          type="default"
-                          htmlType="reset"
+                          type="reset"
                           onClick={() => form.reset()}
                           disabled={
                             !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
@@ -231,8 +227,8 @@ export const S3Connection = () => {
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         loading={isUpdating}
                         disabled={
                           !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
@@ -250,7 +246,7 @@ export const S3Connection = () => {
                       To connect to your S3 bucket, you need to restore your project.
                     </AlertDescription>
                     <div className="mt-3 flex items-center space-x-2">
-                      <Button asChild type="default">
+                      <Button asChild>
                         <Link href={`/project/${projectRef}`}>Restore project</Link>
                       </Button>
                     </div>
@@ -287,7 +283,7 @@ export const S3Connection = () => {
                   To fetch your S3 access keys, you need to restore your project.
                 </AlertDescription>
                 <AlertDescription>
-                  <Button asChild type="default" className="mt-3">
+                  <Button asChild className="mt-3">
                     <Link href={`/project/${projectRef}`}>Restore project</Link>
                   </Button>
                 </AlertDescription>

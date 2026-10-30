@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -20,10 +19,10 @@ import {
   FormControl,
   FormField,
   Switch,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -42,12 +41,12 @@ import z from 'zod'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 const FormSchema = z.object({
@@ -71,15 +70,17 @@ export const EdgeFunctionDetails = () => {
   const [selectedTab, setSelectedTab] = useState(invocationTabs[0].id)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const { can: canUpdateEdgeFunctionPermission } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_WRITE,
-    '*'
+  const { can: canUpdateEdgeFunctionPermission } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_WRITE
   )
 
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
+  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
 
@@ -99,7 +100,6 @@ export const EdgeFunctionDetails = () => {
     defaultValues: { name: '', verify_jwt: false },
   })
 
-  const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   const { managementCommands } = generateCLICommands({
@@ -187,12 +187,8 @@ export const EdgeFunctionDetails = () => {
                                   <em className="text-foreground not-italic">
                                     only by the legacy secret
                                   </em>{' '}
-                                  in the{' '}
-                                  <code className="text-code-inline break-keep!">
-                                    Authorization
-                                  </code>{' '}
-                                  header. The <code className="text-code-inline">anon</code> key
-                                  satisfies this.
+                                  in the <code className="break-keep!">Authorization</code> header.
+                                  The <code>anon</code> key satisfies this.
                                 </p>
                                 <p>
                                   Recommended: OFF with JWT and custom auth logic in your function
@@ -215,13 +211,11 @@ export const EdgeFunctionDetails = () => {
 
                     <CardFooter className="flex justify-end space-x-2">
                       {form.formState.isDirty && (
-                        <Button type="default" onClick={() => form.reset()}>
-                          Cancel
-                        </Button>
+                        <Button onClick={() => form.reset()}>Cancel</Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         loading={isUpdating}
                         disabled={!canUpdateEdgeFunction || !form.formState.isDirty}
                       >
@@ -259,7 +253,6 @@ export const EdgeFunctionDetails = () => {
                   ))}
                   {selectedTab === 'curl' && (
                     <Button
-                      type="default"
                       className="ml-auto -translate-y-2 translate-x-3"
                       onClick={() => setShowKey(!showKey)}
                     >
@@ -325,7 +318,7 @@ export const EdgeFunctionDetails = () => {
                         description: 'Download the function to your local machine',
                         jsx: () => (
                           <>
-                            <span className="text-brand">supabase</span> functions download{' '}
+                            <span className="text-primary">supabase</span> functions download{' '}
                             {selectedFunction?.slug}
                           </>
                         ),
@@ -354,7 +347,7 @@ export const EdgeFunctionDetails = () => {
                 </AlertDescription>
                 <AlertDescription className="mt-3">
                   <Button
-                    type="danger"
+                    variant="danger"
                     disabled={!canUpdateEdgeFunction}
                     loading={selectedFunction?.id === undefined}
                     onClick={() => setShowDeleteModal(true)}

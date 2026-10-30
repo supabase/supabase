@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronRight, Trash } from 'lucide-react'
+import { ChevronRightIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -12,15 +12,15 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LintInfo } from '../Linter/Linter.constants'
 import { generateRuleText } from './AdvisorRules.utils'
 import { CreateRuleSheet } from './CreateRuleSheet'
 import { DisableRuleModal } from './DisableRuleModal'
 import { EnableRuleModal } from './EnableRuleModal'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useLintRuleDeleteMutation } from '@/data/lint/delete-lint-rule-mutation'
@@ -123,7 +123,6 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
               <div className="flex items-center gap-x-2">
                 <DocsButton href={lint.docsLink} />
                 <Button
-                  type="default"
                   onClick={(e) => {
                     e.stopPropagation()
                     setOpen(true)
@@ -132,7 +131,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
                   Create rule
                 </Button>
               </div>
-              <ChevronRight strokeWidth={1.5} size={16} className="transition" />
+              <ChevronRightIcon strokeWidth={1.5} size={16} className="transition" />
             </CardContent>
           </Card>
         </CollapsibleTrigger>
@@ -187,8 +186,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
                           tooltip={{ content: { side: 'bottom', text: 'Edit rule' } }}
                         /> */}
                         <ButtonTooltip
-                          type="default"
-                          icon={<Trash />}
+                          icon={<TrashIcon />}
                           className="w-7"
                           onClick={() => setSelectedRuleToDelete(rule.id)}
                           tooltip={{ content: { side: 'bottom', text: 'Delete rule' } }}

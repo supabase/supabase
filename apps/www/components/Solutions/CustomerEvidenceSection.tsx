@@ -49,7 +49,7 @@ const CustomerEvidenceSection = ({
           <ul className="space-y-3 mb-6 grow">
             {customer.highlights.map((highlight, i) => (
               <li key={i} className="flex items-start gap-3 text-foreground-lighter text-sm">
-                <Check className="w-4 h-4 text-brand shrink-0 mt-0.5" />
+                <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <span>{highlight}</span>
               </li>
             ))}
@@ -57,7 +57,7 @@ const CustomerEvidenceSection = ({
           {customer.cta && (
             <Link
               href={customer.cta.href}
-              className="inline-flex items-center gap-2 text-sm text-brand hover:text-brand-600 transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-primary hover:text-brand-600 transition-colors"
             >
               {customer.cta.label}
               <ArrowRight className="w-4 h-4" />

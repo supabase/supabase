@@ -1,4 +1,4 @@
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { type MouseEventHandler } from 'react'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
@@ -39,10 +39,10 @@ export function LogsSidebarItem({ label, icon, dropdownItems, href, isActive, on
             }}
           >
             <Button
-              type="text"
+              variant="text"
               title="Actions"
               className="space-x-0 h-7 px-1.5 opacity-0 group-hover:opacity-100 bg-transparent! data-open:opacity-100"
-              icon={<MoreHorizontal size={14} />}
+              icon={<MoreHorizontalIcon size={14} />}
             >
               <div className="sr-only">Actions</div>
             </Button>

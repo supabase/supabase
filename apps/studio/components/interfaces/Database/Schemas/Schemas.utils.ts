@@ -5,7 +5,7 @@ import { uniqBy } from 'lodash'
 
 import '@xyflow/react/dist/style.css'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 
 import { TableNodeData } from './Schemas.constants'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH } from './SchemaTableNode'
@@ -163,7 +163,7 @@ export async function getGraphDataFromTables(
     }
   }
 
-  const savedPositionsLocalStorage = localStorage.getItem(
+  const savedPositionsLocalStorage = safeLocalStorage.getItem(
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref ?? 'project', schema?.id ?? 0)
   )
   const savedPositions = tryParseJson(savedPositionsLocalStorage)
@@ -280,4 +280,65 @@ const escapeForMarkdown = (str: string) => {
       // Remove new lines
       .replace(/\n/g, ' ')
   )
+}
+
+// ── Enum / Custom Type markdown ────────────────────────────
+
+export type EnumForMarkdown = {
+  name: string
+  schema: string
+  enums: string[]
+}
+
+export const getEnumsAsMarkdown = (schema: string, enums: EnumForMarkdown[]): string => {
+  const filtered = enums.filter((e) => e.schema === schema && e.enums.length > 0)
+  if (filtered.length === 0) return ''
+
+  let md = `## Custom Types / Enums\n\n`
+  for (const enumType of filtered) {
+    const values = enumType.enums.map((v) => `\`${escapeForMarkdown(v)}\``).join(' | ')
+    md += `### \`${escapeForMarkdown(enumType.name)}\`\n\n${values}\n\n`
+  }
+  return md
+}
+
+// ── RLS Policy markdown ────────────────────────────────────
+
+export type PolicyForMarkdown = {
+  name: string
+  schema: string
+  table: string
+  command: string
+  roles: string[]
+  action: string
+  definition: string | null
+  check: string | null
+}
+
+export const getPoliciesAsMarkdown = (schema: string, policies: PolicyForMarkdown[]): string => {
+  const filtered = policies.filter((p) => p.schema === schema)
+  if (filtered.length === 0) return ''
+
+  // Group by table
+  const byTable = new Map<string, PolicyForMarkdown[]>()
+  for (const policy of filtered) {
+    const existing = byTable.get(policy.table) ?? []
+    existing.push(policy)
+    byTable.set(policy.table, existing)
+  }
+
+  let md = `## RLS Policies\n\n`
+  for (const [table, tablePolicies] of byTable) {
+    md += `### \`${escapeForMarkdown(table)}\`\n\n`
+    md += `| Policy | Command | Roles | Action | USING | WITH CHECK |\n`
+    md += `|--------|---------|-------|--------|-------|------------|\n`
+    for (const p of tablePolicies) {
+      const roles = p.roles.map((r) => escapeForMarkdown(r)).join(', ')
+      const using = p.definition ? `\`${escapeForMarkdown(p.definition)}\`` : '—'
+      const check = p.check ? `\`${escapeForMarkdown(p.check)}\`` : '—'
+      md += `| \`${escapeForMarkdown(p.name)}\` | ${p.command} | ${roles} | ${p.action} | ${using} | ${check} |\n`
+    }
+    md += `\n`
+  }
+  return md
 }

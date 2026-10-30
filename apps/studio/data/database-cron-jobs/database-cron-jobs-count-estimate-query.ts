@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import type { ConnectionVars } from '@/data/common.types'
 import { getLiveTupleEstimateKey } from '@/data/database/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { UseCustomQueryOptions } from '@/types'
 
 type DatabaseCronJobsCountEstimateVariables = ConnectionVars
@@ -23,6 +24,7 @@ export async function getCronJobsCountEstimate({
     connectionString,
     sql: cronJobsCountEstimateSql,
     queryKey: cronJobsCountEstimateKey(projectRef),
+    grant: unguarded.migrating,
   })
 
   return result?.[0]?.live_tuple_estimate

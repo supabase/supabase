@@ -1,4 +1,4 @@
-import { Copy, RotateCcw } from 'lucide-react'
+import { CopyIcon, RotateCcwIcon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -11,12 +11,12 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookDelivery } from './PlatformWebhooks.types'
 import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'
@@ -28,7 +28,6 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface PlatformWebhooksDeliveryDetailsSheetProps {
-  deliveryAttempt: number | null
   deliveryDetailsTab: 'event' | 'response'
   deliveryEventPayload: string
   deliveryResponsePayload: string
@@ -41,7 +40,6 @@ interface PlatformWebhooksDeliveryDetailsSheetProps {
 }
 
 export const PlatformWebhooksDeliveryDetailsSheet = ({
-  deliveryAttempt,
   deliveryDetailsTab,
   deliveryEventPayload,
   deliveryResponsePayload,
@@ -89,13 +87,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                 <CardContent className="grid grid-cols-1 gap-4 p-4 @md:grid-cols-2">
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Delivery ID</p>
-                    <code className="text-code-inline">{selectedDelivery.id}</code>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-foreground-light">Attempt</p>
-                    <p className="text-sm text-foreground">
-                      {deliveryAttempt ? `#${deliveryAttempt}` : '-'}
-                    </p>
+                    <code>{selectedDelivery.id}</code>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Timestamp</p>
@@ -132,11 +124,11 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                 <TabsContent value="event" className="space-y-4 pt-4">
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Event type</p>
-                    <code className="text-code-inline">{selectedDelivery.eventType}</code>
+                    <code>{selectedDelivery.eventType}</code>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Event ID</p>
-                    <code className="text-code-inline">{selectedDelivery.id}</code>
+                    <code>{selectedDelivery.id}</code>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Event timestamp</p>
@@ -150,8 +142,8 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                         label="Copy event payload"
                       >
                         <Button
-                          type="text"
-                          icon={<Copy size={14} />}
+                          variant="text"
+                          icon={<CopyIcon size={14} />}
                           onClick={() => onCopy(deliveryEventPayload, 'event payload')}
                         >
                           Copy
@@ -193,8 +185,8 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                         label="Copy response payload"
                       >
                         <Button
-                          type="text"
-                          icon={<Copy size={14} />}
+                          variant="text"
+                          icon={<CopyIcon size={14} />}
                           onClick={() => onCopy(deliveryResponsePayload, 'response payload')}
                         >
                           Copy
@@ -220,8 +212,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
               onTrigger={() => onRetryDelivery(retryableDelivery.id)}
             >
               <Button
-                type="default"
-                icon={<RotateCcw />}
+                icon={<RotateCcwIcon />}
                 onClick={() => onRetryDelivery(retryableDelivery.id)}
               >
                 Retry delivery

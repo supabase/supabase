@@ -1,6 +1,6 @@
 import SectionContainer from 'components/Layouts/SectionContainer'
-import { motion, useInView } from 'framer-motion'
 import { DEFAULT_EASE } from 'lib/animations'
+import { motion, useInView } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { FC } from 'react'
@@ -32,7 +32,7 @@ const LW15Hackathon: FC = () => {
             </p>
             <p>Compete solo or in a team, submit a quick demo and win.</p>
           </div>
-          <Button type="secondary" size="medium" asChild>
+          <Button variant="secondary" size="medium" asChild>
             <Link href="/blog/lw15-hackathon">Join Hackathon</Link>
           </Button>
         </div>

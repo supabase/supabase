@@ -1,6 +1,5 @@
 import { useBreakpoint, useParams } from 'common'
-import { Boxes, ChevronsUpDown, Plus } from 'lucide-react'
-import Link from 'next/link'
+import { BoxesIcon, ChevronsUpDownIcon, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -8,7 +7,6 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
   CommandSeparator,
   Popover,
@@ -23,6 +21,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { OrgSelectorSheet } from './OrgSelectorSheet'
 import { OrgCommandItem } from '@/components/layouts/AppLayout/OrgCommandItem'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -41,7 +40,7 @@ export function OrgSelector() {
   const isPlatformOrg = selectedOrganization?.plan?.id === 'platform'
   const selectedOrgInitial = selectedOrganization?.name?.trim().charAt(0).toUpperCase() || 'O'
   const { data: projects } = useOrgProjectsInfiniteQuery(
-    { slug, limit: 1 },
+    { slug },
     { enabled: Boolean(slug) && !isPlatformOrg }
   )
 
@@ -71,12 +70,12 @@ export function OrgSelector() {
         </div>
         {selectedOrganization && (
           <div className="flex items-center gap-1 truncate text-foreground-light leading-tight text-xs">
-            <Boxes className="shrink-0 size-3" strokeWidth={1.5} />
+            <BoxesIcon className="shrink-0 size-3" strokeWidth={1.5} />
             <span>{projectsLabel}</span>
           </div>
         )}
       </div>
-      <ChevronsUpDown
+      <ChevronsUpDownIcon
         strokeWidth={1}
         className="ml-auto text-foreground-light md:hidden md:group-hover:block w-4! h-4!"
       />
@@ -129,36 +128,26 @@ export function OrgSelector() {
                 </CommandGroup>
                 <CommandSeparator />
                 <CommandGroup>
-                  <CommandItem
-                    className="cursor-pointer w-full"
-                    onSelect={() => {
-                      setOpen(false)
-                      router.push('/organizations')
-                    }}
-                    onClick={() => setOpen(false)}
+                  <CommandItemLink
+                    href="/organizations"
+                    className="cursor-pointer w-full gap-2"
+                    onSelect={() => setOpen(false)}
                   >
-                    <Link href="/organizations" className="flex items-center gap-2 w-full">
-                      <p>All Organizations</p>
-                    </Link>
-                  </CommandItem>
+                    <p>All Organizations</p>
+                  </CommandItemLink>
                 </CommandGroup>
                 {organizationCreationEnabled && (
                   <>
                     <CommandSeparator />
                     <CommandGroup>
-                      <CommandItem
-                        className="cursor-pointer w-full"
-                        onSelect={() => {
-                          setOpen(false)
-                          router.push('/new')
-                        }}
-                        onClick={() => setOpen(false)}
+                      <CommandItemLink
+                        href="/new"
+                        className="cursor-pointer w-full gap-2"
+                        onSelect={() => setOpen(false)}
                       >
-                        <Link href="/new" className="flex items-center gap-2 w-full">
-                          <Plus size={14} strokeWidth={1.5} />
-                          <p>New organization</p>
-                        </Link>
-                      </CommandItem>
+                        <PlusIcon size={14} strokeWidth={1.5} />
+                        <p>New organization</p>
+                      </CommandItemLink>
                     </CommandGroup>
                   </>
                 )}

@@ -48,11 +48,11 @@ export const RevokeCredentialModal = ({
           </DialogDescription>
         </DialogSection>
         <DialogFooter className="flex justify-end gap-x-1">
-          <Button type="outline" onClick={() => onClose()}>
+          <Button variant="outline" onClick={() => onClose()}>
             Cancel
           </Button>
           <Button
-            type="danger"
+            variant="danger"
             loading={isDeleting}
             onClick={async () => {
               if (!selectedCredential) return

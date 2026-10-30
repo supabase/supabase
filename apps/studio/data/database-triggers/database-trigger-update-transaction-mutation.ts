@@ -8,7 +8,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseTriggerKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating
@@ -35,6 +36,7 @@ export async function updateDatabaseTrigger({
     connectionString,
     sql,
     queryKey: ['trigger', 'update', originalTrigger.id],
+    grant: unguarded.migrating,
   })
   return updatedTrigger
 }

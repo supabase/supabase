@@ -38,12 +38,14 @@ const LW15MainStage = ({ className }: { className?: string }) => {
           <h3 className="text-2xl lg:text-3xl">Main Stage</h3>
           <div className="flex xl:hidden items-center gap-2 text-foreground-muted">
             <button
+              tabIndex={0}
               onClick={() => controlledSwiper?.slidePrev()}
               className="p-2 rounded-full hover:text-foreground border hover:border-foreground transition-colors"
             >
               <ChevronLeft className="w-4 h-4 -translate-x-px text-current" />
             </button>
             <button
+              tabIndex={0}
               onClick={() => controlledSwiper?.slideNext()}
               className="p-2 rounded-full hover:text-foreground border hover:border-foreground transition-colors"
             >
@@ -134,7 +136,11 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
             className="block lg:opacity-0 lg:blur-lg duration-300 group-hover/main:lg:blur-none transition-all group-hover/main:lg:opacity-100"
             ref={hiddenRef}
           >
-            <Button type="outline" size="small" className="text-current rounded-xs border-dashed">
+            <Button
+              variant="outline"
+              size="small"
+              className="text-current rounded-xs border-dashed"
+            >
               <Link href={day.blog!}>Read more</Link>
             </Button>
           </div>

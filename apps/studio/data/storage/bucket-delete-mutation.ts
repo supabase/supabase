@@ -45,9 +45,21 @@ export const useBucketDeleteMutation = ({
   return useMutation<BucketDeleteData, ResponseError, BucketDeleteVariables>({
     mutationFn: (vars) => deleteBucket(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
+      const { projectRef, id } = variables
+
+      const deletedBucketQueryKey = storageKeys.bucket(projectRef, id)
+      await queryClient.cancelQueries({ queryKey: deletedBucketQueryKey })
+      queryClient.removeQueries({ queryKey: deletedBucketQueryKey })
+
       await onSuccess?.(data, variables, context)
+
+      // Keyed on `buckets`, not `bucketsList`: the latter spells out every param as
+      // `undefined`, which partial matching never matches against a registered list key.
+      // `refetchType: 'all'` because the list query is inactive on the bucket page.
+      void queryClient.invalidateQueries({
+        queryKey: storageKeys.buckets(projectRef),
+        refetchType: 'all',
+      })
     },
     async onError(data, variables, context) {
       if (onError === undefined) {

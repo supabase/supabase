@@ -1,12 +1,11 @@
+import { useBreakpoint } from 'common'
 import { range } from 'lib/helpers'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { cn } from 'ui'
-import { TweetCard } from 'ui-patterns/TweetCard'
-
-import { useBreakpoint } from 'common'
 import React from 'react'
 import { topTweets } from 'shared-data/tweets'
+import { cn } from 'ui'
+import { TweetCard } from 'ui-patterns/TweetCard'
 
 interface Props {
   className?: string
@@ -66,7 +65,7 @@ const TwitterSocialProof: React.FC<Props> = ({ className }) => {
             absolute pointer-events-none
             w-full h-full max-h-[400px] lg:max-h-none
             inset-0 top-auto
-            lg:bg-[radial-gradient(50%_100%_at_50%_0,transparent_0%,transparent_50%,hsl(var(--background-default))_100%)]
+            lg:bg-[radial-gradient(50%_100%_at_50%_0,transparent_0%,transparent_50%,var(--background-default)_100%)]
           "
       />
     </>

@@ -1,28 +1,29 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { GitMerge } from 'lucide-react'
+import { GitMergeIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const MergeRequestButton = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: projectDetails } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const projectRef = projectDetails?.parent_project_ref || ref
 
-  const { data: branches } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
-
-  const { mutate: sendEvent } = useSendEventMutation()
-  const track = useTrack()
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef, grant: branchesGrant.grant }),
+    enabled: Boolean(projectDetails),
+  })
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
@@ -53,16 +54,9 @@ export const MergeRequestButton = () => {
           onSuccess: () => {
             toast.success('Merge request created')
             router.push(`/project/${selectedBranch.project_ref}/merge`)
-            sendEvent({
-              action: 'branch_create_merge_request_button_clicked',
-              properties: {
-                branchType: selectedBranch.persistent ? 'persistent' : 'preview',
-                origin: 'header',
-              },
-              groups: {
-                project: projectRef ?? 'Unknown',
-                organization: selectedOrg?.slug ?? 'Unknown',
-              },
+            track('branch_create_merge_request_button_clicked', {
+              branchType: selectedBranch.persistent ? 'persistent' : 'preview',
+              origin: 'header',
             })
           },
         }
@@ -72,7 +66,6 @@ export const MergeRequestButton = () => {
 
   return (
     <ButtonTooltip
-      type="default"
       className="rounded-full w-[26px] h-[26px]"
       onClick={handleClick}
       loading={isUpdating}
@@ -86,9 +79,9 @@ export const MergeRequestButton = () => {
       icon={
         <div className="relative">
           {hasReviewRequested && (
-            <span className="w-1 h-1 absolute top-0 right-0 rounded-full bg-brand" />
+            <span className="w-1 h-1 absolute top-0 right-0 rounded-full bg-primary-bright" />
           )}
-          <GitMerge size={16} strokeWidth={1.5} />
+          <GitMergeIcon size={16} strokeWidth={1.5} />
         </div>
       }
     />

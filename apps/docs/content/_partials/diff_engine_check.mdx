@@ -1,0 +1,1 @@
+Which diff engine your project uses depends on `config.toml`. If it contains an `[experimental.pgdelta]` section with `enabled = true`, your project uses `pg-delta`. If the section is missing or `enabled` is `false`, your project uses the legacy `migra` engine. See [Diff engines](/docs/guides/local-development/diff-engines) for how the two differ and how to switch.

@@ -1,11 +1,10 @@
 import dayjs from 'dayjs'
-import { Github } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { GithubIcon, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { WorkflowLogs } from './WorkflowLogs'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -96,7 +95,6 @@ export const BranchRow = ({
         {branch.git_branch && isGithubConnected && (
           <ButtonTooltip
             asChild
-            type="default"
             className="px-1.5"
             tooltip={{ content: { side: 'bottom', text: 'View branch on GitHub' } }}
           >
@@ -105,7 +103,7 @@ export const BranchRow = ({
               rel="noreferrer noopener"
               href={`https://github.com/${repo}/tree/${branch.git_branch}`}
             >
-              <Github size={14} className="text-foreground-light" />
+              <GithubIcon size={14} className="text-foreground-light" />
             </a>
           </ButtonTooltip>
         )}

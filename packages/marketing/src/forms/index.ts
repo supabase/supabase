@@ -3,6 +3,7 @@ export type {
   MarketingFormCrmConfig,
   MarketingFormField,
   MarketingFormProps,
+  MarketingFormRef,
 } from './MarketingForm'
 
 export { default as HubSpotFormEmbed } from './HubSpotFormEmbed'

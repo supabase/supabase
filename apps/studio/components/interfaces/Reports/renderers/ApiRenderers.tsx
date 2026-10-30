@@ -1,7 +1,9 @@
+import { useFlag } from 'common'
 import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import { Fragment, useRef, useState, type ReactNode } from 'react'
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import {
@@ -16,7 +18,7 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
-import { queryParamsToObject } from '../Reports.utils'
+import { queryParamsToObject, safeDecodeURIComponent } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
@@ -35,31 +37,32 @@ import {
   TextFormatter,
 } from '@/components/interfaces/Settings/Logs/LogsFormatters'
 import Table from '@/components/to-be-cleaned/Table'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import BarChart from '@/components/ui/Charts/BarChart'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
-import { BASE_PATH } from '@/lib/constants'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
     ingress: number
-    egress: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
+  const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
   const { data, error, isError } = useFillTimeseriesSorted({
     data: props.data,
     timestampKey: 'timestamp',
-    valueKey: ['ingress_mb', 'egress_mb'],
+    valueKey: 'ingress_mb',
     defaultValue: 0,
     startDate: props.params?.iso_timestamp_start,
     endDate: props.params?.iso_timestamp_end,
   })
 
   const totalIngress = sumBy(props.data, 'ingress_mb')
-  const totalEgress = sumBy(props.data, 'egress_mb')
 
   function determinePrecision(valueInMb: number) {
     return valueInMb < 0.001 ? 7 : totalIngress > 1 ? 2 : 4
@@ -83,6 +86,7 @@ export const NetworkTrafficRenderer = (
   return (
     <div className="flex flex-col gap-12 w-full">
       <BarChart
+        chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
         size="small"
         title="Ingress"
         highlightedValue={sumBy(props.data, 'ingress_mb')}
@@ -95,18 +99,19 @@ export const NetworkTrafficRenderer = (
         displayDateInUtc
       />
 
-      <BarChart
-        size="small"
-        title="Egress"
-        highlightedValue={totalEgress}
-        format="MB"
-        valuePrecision={determinePrecision(totalEgress)}
-        className="w-full"
-        data={data}
-        yAxisKey="egress_mb"
-        xAxisKey="timestamp"
-        displayDateInUtc
-      />
+      {organization && (
+        <div className="flex items-center justify-between gap-4 rounded border border-default bg-surface-200 px-4 py-3">
+          <div>
+            <p className="text-sm text-foreground">Billable egress</p>
+            <p className="text-sm text-foreground-light">
+              View your organization&apos;s Usage page for billable egress.
+            </p>
+          </div>
+          <Button asChild variant="default" size="tiny">
+            <Link href={`/org/${organization.slug}/usage#egress`}>View Usage</Link>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
@@ -117,6 +122,7 @@ export const TotalRequestsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -146,6 +152,7 @@ export const TotalRequestsChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       highlightedValue={total}
@@ -225,7 +232,7 @@ export const TopApiRoutesRenderer = (
       />
       <div className="flex flex-row justify-end w-full gap-2 p-1">
         <Button
-          type="text"
+          variant="text"
           onClick={() => setShowMore(!showMore)}
           className={[
             'transition',
@@ -246,6 +253,7 @@ export const ErrorCountsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -276,6 +284,7 @@ export const ErrorCountsChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       className="w-full"
@@ -294,6 +303,7 @@ export const ResponseSpeedChartRenderer = (
     avg: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const transformedData = props.data.map((datum) => ({
     timestamp: datum.timestamp,
     avg: datum.avg,
@@ -327,6 +337,7 @@ export const ResponseSpeedChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       highlightedValue={lastAvg}
       format="ms"
@@ -350,9 +361,9 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
   <Collapsible>
     <CollapsibleTrigger asChild>
       <div className="flex gap-2 items-center">
-        <Button asChild type="text" className=" py-0! p-1!" title="Show more route details">
+        <Button asChild variant="text" className=" py-0! p-1!" title="Show more route details">
           <span>
-            <ChevronRight
+            <ChevronRightIcon
               size={14}
               className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
             />
@@ -372,7 +383,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           <TextFormatter className="text-foreground-light" value={datum.path} />
           <TextFormatter
             className="max-w-sm text-foreground-lighter truncate "
-            value={decodeURIComponent(datum.search || '')}
+            value={safeDecodeURIComponent(datum.search || '')}
           />
         </div>
       </div>

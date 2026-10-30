@@ -1,5 +1,5 @@
 import { useBreakpoint } from 'common'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeftIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Button,
@@ -48,9 +48,9 @@ export function LogoPicker({ open, onOpenChange, onSelect }: StorageFilePickerPr
             {selectedBucket ? (
               <SheetHeader className="flex flex-row items-center gap-2 border-b border-overlay px-6 py-4">
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
-                  icon={<ChevronLeft size={16} />}
+                  icon={<ChevronLeftIcon size={16} />}
                   className="shrink-0"
                   onClick={() => setSelectedBucket(null)}
                 >
@@ -87,9 +87,9 @@ export function LogoPicker({ open, onOpenChange, onSelect }: StorageFilePickerPr
             {selectedBucket ? (
               <DialogHeader className="flex flex-row items-center gap-2 border-b border-overlay px-6 py-4 h-[60px]">
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
-                  icon={<ChevronLeft size={16} />}
+                  icon={<ChevronLeftIcon size={16} />}
                   className="shrink-0"
                   onClick={() => setSelectedBucket(null)}
                 >

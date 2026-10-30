@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { databaseExtensionsKeys } from './keys'
 import { configKeys } from '@/data/config/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseExtensionDisableVariables = {
@@ -29,6 +30,7 @@ export async function disableDatabaseExtension({
     connectionString,
     sql,
     queryKey: ['extension', 'delete', id],
+    grant: unguarded.migrating,
   })
 
   return result

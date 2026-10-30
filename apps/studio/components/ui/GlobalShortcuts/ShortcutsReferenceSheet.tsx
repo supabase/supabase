@@ -1,5 +1,5 @@
 import { useHotkeyRegistrations, type SequenceRegistrationView } from '@tanstack/react-hotkeys'
-import { CircleX } from 'lucide-react'
+import { CircleXIcon } from 'lucide-react'
 import { Fragment, useMemo, useState } from 'react'
 import {
   Button,
@@ -19,7 +19,7 @@ import {
   SHORTCUT_REFERENCE_GROUP_ORDER,
   SHORTCUT_REFERENCE_GROUPS,
 } from '@/state/shortcuts/referenceGroups'
-import type { ShortcutHotkeyMeta } from '@/state/shortcuts/useShortcut'
+import type { ShortcutHotkeyMeta } from '@/state/shortcuts/types'
 
 interface ShortcutsReferenceSheetProps {
   open: boolean
@@ -42,7 +42,9 @@ interface ShortcutGroup {
 const GROUP_LABELS: Record<string, string> = {
   ...SHORTCUT_REFERENCE_GROUP_LABELS,
   'action-bar': 'Actions',
+  'advisors-page': 'Advisors',
   'ai-assistant': 'AI Assistant',
+  'api-keys': 'API Keys',
   'auth-users': 'Auth Users',
   'command-menu': 'Command Menu',
   'data-table': 'Data Tables',
@@ -53,6 +55,8 @@ const GROUP_LABELS: Record<string, string> = {
   'list-page': 'List pages',
   'platform-webhooks': 'Platform Webhooks',
   'logs-preview': 'Logs Explorer',
+  'jwt-keys': 'JWT Keys',
+  'log-drains': 'Log Drains',
   nav: 'Navigation',
   'operation-queue': 'Operation Queue',
   results: 'Results',
@@ -200,8 +204,8 @@ function ShortcutsReferenceSheetContent() {
               <Button
                 aria-label="Clear search"
                 size="tiny"
-                type="text"
-                icon={<CircleX size={14} />}
+                variant="text"
+                icon={<CircleXIcon size={14} />}
                 onClick={() => setSearch('')}
                 className="h-5 w-5 p-0"
               />

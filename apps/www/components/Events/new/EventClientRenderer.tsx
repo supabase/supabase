@@ -48,7 +48,7 @@ export function EventClientRenderer({
       onDemandMdxEvents={onDemandMdxEvents}
     >
       <DefaultLayout className="flex flex-col">
-        <EventsContainer className="border-x border-b py-8">
+        <EventsContainer className="border-x border-b">
           <h1 className="h3 p-0! m-0!">
             <span className="sr-only">Supabase</span> Events
           </h1>
@@ -57,7 +57,7 @@ export function EventClientRenderer({
 
         <EventBannerSection />
 
-        <EventsContainer className="border-x flex-1 py-8">
+        <EventsContainer className="border-x flex-1">
           <EventGallery />
         </EventsContainer>
       </DefaultLayout>

@@ -1,4 +1,4 @@
-import { ChevronsUpDown, GitBranch } from 'lucide-react'
+import { ChevronsUpDownIcon, GitBranchIcon } from 'lucide-react'
 import { forwardRef } from 'react'
 import { cn, SidebarMenuButton } from 'ui'
 
@@ -46,12 +46,12 @@ export const ProjectBranchSelectorTrigger = forwardRef<
               isBranch ? 'text-foreground-lighter' : 'text-warning'
             )}
           >
-            <GitBranch className="shrink-0 size-3" strokeWidth={1.5} />
+            <GitBranchIcon className="shrink-0 size-3" strokeWidth={1.5} />
             <span className="truncate min-w-0 leading-tight text-xs">{branchDisplayName}</span>
           </div>
         </div>
 
-        <ChevronsUpDown
+        <ChevronsUpDownIcon
           strokeWidth={1.5}
           className="ml-auto text-foreground-lighter w-4! h-4! md:hidden md:group-hover:flex"
         />

@@ -3,8 +3,7 @@ import { PropsWithChildren } from 'react'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
 import { Markdown } from '../Markdown'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ContentSnippetProps {
   apikey?: string
@@ -28,8 +27,7 @@ const ContentSnippet = ({
   children,
 }: PropsWithChildren<ContentSnippetProps>) => {
   const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const codeSnippet = snippet[selectedLanguage]?.(apikey, endpoint).replaceAll(
     '[ref]',
@@ -37,17 +35,7 @@ const ContentSnippet = ({
   )
 
   const handleCopy = () => {
-    sendEvent({
-      action: 'api_docs_code_copy_button_clicked',
-      properties: {
-        title: snippet.title,
-        selectedLanguage,
-      },
-      groups: {
-        project: projectRef ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('api_docs_code_copy_button_clicked', { title: snippet.title, selectedLanguage })
   }
 
   return (

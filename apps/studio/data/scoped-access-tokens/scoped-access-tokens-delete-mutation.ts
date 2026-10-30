@@ -32,17 +32,17 @@ export const useScopedAccessTokenDeleteMutation = ({
 
   return useMutation<ScopedAccessTokenDeleteData, ResponseError, ScopedAccessTokenDeleteVariables>({
     mutationFn: (vars) => deleteScopedAccessToken(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({ queryKey: scopedAccessTokenKeys.list() })
       await queryClient.invalidateQueries({ queryKey: scopedAccessTokenKeys.detail(variables.id) })
 
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to delete access token: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

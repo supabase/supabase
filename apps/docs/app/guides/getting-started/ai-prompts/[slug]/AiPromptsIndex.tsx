@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { GlassPanel } from 'ui-patterns'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
 
 import { getAiPrompts } from './AiPrompts.utils'
 

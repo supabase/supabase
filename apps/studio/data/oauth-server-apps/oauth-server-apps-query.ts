@@ -15,7 +15,7 @@ export type OAuthServerAppsVariables = {
 
 const APPS_PER_PAGE = 100
 
-export type OAuthApp = components['schemas']['OAuthAppResponse']
+export type OAuthApp = components['schemas']['OAuthAppResponse_Output']
 
 export async function getOAuthServerApps({
   projectRef,

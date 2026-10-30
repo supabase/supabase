@@ -2,7 +2,7 @@
 
 import { ChevronRight, Expand } from 'lucide-react'
 import * as React from 'react'
-import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, FloatingPlate } from 'ui'
 
 import { Index } from '@/__registry__'
 import { useConfig } from '@/hooks/use-config'
@@ -51,11 +51,7 @@ export function ComponentPreview({
     if (!Component) {
       return (
         <p className="text-sm text-muted-foreground">
-          Component{' '}
-          <code className="relative rounded-sm bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
-            {name}
-          </code>{' '}
-          not found in registry.
+          Component <code>{name}</code> not found in registry.
         </p>
       )
     }
@@ -97,14 +93,14 @@ export function ComponentPreview({
       <div className={cn('@container mt-4 mb-12', wideClasses)}>
         <div
           className={cn(
-            'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
+            'relative overflow-hidden rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
           )}
         >
           {showGrid && (
-            <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,hsla(var(--foreground-default)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
+            <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,oklch(from_var(--foreground-default)_l_c_h_/_0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
           )}
           {showDottedGrid && (
-            <div className="z-0 pointer-events-none absolute h-full w-full bg-[radial-gradient(hsla(var(--foreground-default)/0.02)_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+            <div className="z-0 pointer-events-none absolute h-full w-full bg-[radial-gradient(oklch(from_var(--foreground-default)_l_c_h_/_0.02)_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
           )}
           <div className="z-10 relative">{ComponentPreview}</div>
           {/* <div className="preview-grid-background"></div> */}
@@ -122,14 +118,15 @@ export function ComponentPreview({
           >
             {Code}
             <div className="absolute bottom-0 w-full flex justify-center mb-4">
-              <Button
-                className="rounded-full"
-                onClick={() => setExpandState(!expand)}
-                type="default"
-                icon={<Expand className="text-foreground-lighter" />}
-              >
-                {expand ? 'Collapse code' : 'Expand code'}
-              </Button>
+              <FloatingPlate rounded="full">
+                <Button
+                  className="rounded-full"
+                  onClick={() => setExpandState(!expand)}
+                  icon={<Expand className="text-foreground-lighter" />}
+                >
+                  {expand ? 'Collapse code' : 'Expand code'}
+                </Button>
+              </FloatingPlate>
             </div>
           </div>
         </div>
@@ -140,16 +137,16 @@ export function ComponentPreview({
   return (
     <div className={cn('mt-4 mb-12', wideClasses)}>
       <div
-        className={cn('relative bg-studio', {
+        className={cn('relative overflow-hidden bg-studio', {
           'rounded-tl-md rounded-tr-md border-t border-l border-r': !hideCode,
           'rounded-md border': hideCode,
         })}
       >
         {showGrid && (
-          <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,hsla(var(--foreground-default)/0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
+          <div className="pointer-events-none absolute h-full w-full bg-[linear-gradient(to_right,oklch(from_var(--foreground-default)_l_c_h_/_0.02)_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
         )}
         {showDottedGrid && (
-          <div className="z-0 pointer-events-none absolute h-full w-full bg-[radial-gradient(hsla(var(--foreground-default)/0.02)_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+          <div className="z-0 pointer-events-none absolute h-full w-full bg-[radial-gradient(oklch(from_var(--foreground-default)_l_c_h_/_0.02)_1px,transparent_1px)] bg-size-[16px_16px] mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
         )}
         <div className="z-10 relative">{ComponentPreview}</div>
       </div>

@@ -5,8 +5,9 @@ import { toast } from 'sonner'
 
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import type { ConnectionVars } from '@/data/common.types'
+import { unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import {
   API_ACCESS_ROLES,
   API_PRIVILEGE_TYPES,
@@ -67,6 +68,7 @@ export async function updateTableApiAccessPrivileges({
     connectionString,
     sql: joinSqlFragments(sqlStatements, '\n'),
     queryKey: ['table-api-access', 'update-privileges'],
+    grant: unguarded.migrating,
   })
 
   return result

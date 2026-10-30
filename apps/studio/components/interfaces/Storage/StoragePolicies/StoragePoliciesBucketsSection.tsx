@@ -1,8 +1,14 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { ChevronUp, Search, X } from 'lucide-react'
-import { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
+import { ChevronUpIcon, SearchIcon, XIcon } from 'lucide-react'
+import {
+  forwardRef,
+  useEffect,
+  useEffectEvent,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
@@ -12,14 +18,14 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { type Bucket } from '@/data/storage/buckets-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 export type SelectBucketPolicyForAction = {
   addPolicy: (bucketName?: string, table?: string) => void
@@ -62,18 +68,14 @@ export const BucketsPolicies = ({
               Write policies for each bucket to control access to the bucket and its contents
             </PageSectionDescription>
           </PageSectionSummary>
-          <CollapsibleTrigger asChild>
-            <button>
-              <span className="sr-only">Toggle bucket list</span>
-              <ChevronUp
-                size={14}
-                className={cn(
-                  !expanded && 'rotate-180',
-                  'transition',
-                  'text-foreground-light hover:text-foreground'
-                )}
-              />
-            </button>
+          <CollapsibleTrigger
+            aria-label="Toggle bucket list"
+            className={cn(
+              'rounded-md p-1 text-foreground-light hover:text-foreground',
+              'focus-ring'
+            )}
+          >
+            <ChevronUpIcon size={14} className={cn(!expanded && 'rotate-180', 'transition')} />
           </CollapsibleTrigger>
         </PageSectionMeta>
         <CollapsibleContent>
@@ -92,14 +94,14 @@ export const BucketsPolicies = ({
                     const str = e.target.value
                     setSearch(str)
                   }}
-                  icon={<Search />}
+                  icon={<SearchIcon />}
                   actions={
                     search ? (
                       <Button
                         size="tiny"
-                        type="text"
+                        variant="text"
                         className="p-0 h-5 w-5"
-                        icon={<X />}
+                        icon={<XIcon />}
                         onClick={() => setSearch('')}
                       />
                     ) : null
@@ -151,12 +153,14 @@ const BucketsPoliciesVirtualizedList = ({
   const virtualItems = virtualizer.getVirtualItems()
   const lastItem = virtualItems[virtualItems.length - 1]
 
-  const fetchNext = useStaticEffectEvent(() => {
+  const fetchNext = useEffectEvent(() => {
     if (lastItem && lastItem.index >= items.length - 1 && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
     }
   })
-  useEffect(fetchNext, [lastItem, fetchNext])
+  useEffect(() => {
+    fetchNext()
+  }, [lastItem])
 
   return (
     <div

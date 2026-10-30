@@ -66,7 +66,7 @@ export function OnboardingSurveyToastPrompt({
             </div>
             <div className="flex gap-2">
               <Button
-                type="primary"
+                variant="primary"
                 size="tiny"
                 onClick={() => {
                   dismissBanner(BANNER_ID.ONBOARDING_SURVEY)
@@ -77,7 +77,7 @@ export function OnboardingSurveyToastPrompt({
                 Answer
               </Button>
               <Button
-                type="default"
+                variant="default"
                 size="tiny"
                 onClick={() => {
                   dismissBanner(BANNER_ID.ONBOARDING_SURVEY)

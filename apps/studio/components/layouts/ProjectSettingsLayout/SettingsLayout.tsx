@@ -4,6 +4,7 @@ import type { PropsWithChildren } from 'react'
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateSettingsMenu } from './SettingsMenu.utils'
 import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { withAuth } from '@/hooks/misc/withAuth'
 
 /**
@@ -20,7 +21,12 @@ export const SettingsProductMenu = () => {
 
   const menu = useGenerateSettingsMenu()
 
-  return <ProductMenu page={page} menu={menu} />
+  return (
+    <>
+      <ProductMenuShortcuts menu={menu} />
+      <ProductMenu page={page} menu={menu} />
+    </>
+  )
 }
 
 interface SettingsLayoutProps {

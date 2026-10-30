@@ -8,6 +8,7 @@ export const PROJECT_ANALYTICS_URL = process.env.LOGFLARE_URL
 export const PROJECT_REST_URL = `${PUBLIC_URL.origin}/rest/v1/`
 export const PROJECT_ENDPOINT = PUBLIC_URL.host
 export const PROJECT_ENDPOINT_PROTOCOL = PUBLIC_URL.protocol.replace(':', '')
+export const PROJECT_DB_HOST = PUBLIC_URL.hostname
 
 export const DEFAULT_PROJECT = {
   id: 1,

@@ -1,12 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import {
   Button,
+  ExpandingTextArea,
   Form,
   FormControl,
   FormField,
@@ -18,7 +19,6 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -85,7 +85,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
           <SheetTitle>Edit secret</SheetTitle>
         </SheetHeader>
 
-        <SheetSection className="h-full">
+        <SheetSection className="grow min-h-0 overflow-y-auto">
           <Form {...form}>
             <form
               id={FORM_ID}
@@ -117,25 +117,29 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                     description="Secrets can’t be retrieved once saved. Enter a new value to overwrite the existing value."
                   >
                     <FormControl>
-                      <PasswordInput
-                        {...field}
-                        type={showSecretValue ? 'text' : 'password'}
-                        placeholder="my-secret-value"
-                        data-1p-ignore
-                        data-lpignore="true"
-                        data-form-type="other"
-                        data-bwignore
-                        actions={
-                          <div className="mr-1">
-                            <Button
-                              type="text"
-                              className="px-1"
-                              icon={showSecretValue ? <EyeOff /> : <Eye />}
-                              onClick={() => setShowSecretValue(!showSecretValue)}
-                            />
-                          </div>
-                        }
-                      />
+                      <div className="relative">
+                        <ExpandingTextArea
+                          {...field}
+                          value={field.value ?? ''}
+                          placeholder="my-secret-value"
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                          className="font-mono max-h-[320px] overflow-y-auto pr-10"
+                          style={
+                            {
+                              WebkitTextSecurity: showSecretValue ? undefined : 'disc',
+                            } as React.CSSProperties
+                          }
+                        />
+                        <Button
+                          variant="text"
+                          className="absolute right-3 top-2 px-1"
+                          icon={showSecretValue ? <EyeOffIcon /> : <EyeIcon />}
+                          onClick={() => setShowSecretValue(!showSecretValue)}
+                        />
+                      </div>
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -145,10 +149,16 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
         </SheetSection>
 
         <SheetFooter>
-          <Button disabled={isUpdating} type="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdating} onClick={confirmOnClose}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={!isValid} loading={isUpdating}>
+          <Button
+            variant="primary"
+            form={FORM_ID}
+            type="submit"
+            disabled={!isValid}
+            loading={isUpdating}
+          >
             Save
           </Button>
         </SheetFooter>

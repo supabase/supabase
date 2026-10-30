@@ -1,7 +1,15 @@
-import React from 'react'
+import SectionContainer from 'components/Layouts/SectionContainer'
+import {
+  appTypeSolutions,
+  migrationSolutions,
+  skillBasedSolutions,
+  SolutionTypes,
+  useCaseSolutions,
+} from 'data/Solutions'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import React from 'react'
 import {
   Button,
   cn,
@@ -10,15 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-
-import SectionContainer from 'components/Layouts/SectionContainer'
-import {
-  SolutionTypes,
-  appTypeSolutions,
-  migrationSolutions,
-  skillBasedSolutions,
-  useCaseSolutions,
-} from 'data/Solutions'
 
 interface Props {
   activeItem: SolutionTypes
@@ -59,7 +58,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="text"
+                  variant="text"
                   iconRight={<ChevronDown />}
                   className="w-full min-w-[200px] flex justify-between items-center py-2"
                 >
@@ -80,7 +79,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
             </DropdownMenu>
           </SectionContainer>
           {/* desktop */}
-          <SectionContainer className="py-0! hidden md:flex gap-3 items-center">
+          <SectionContainer className="w-full py-0! hidden md:flex gap-3 items-center">
             {items.map((item: any) => {
               const isActive = item.id === activeItem
 
@@ -89,7 +88,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
                   key={item.name}
                   className={cn(
                     'flex items-center gap-1.5 px-2 first:-ml-2 py-4 border-b border-transparent text-sm text-foreground-lighter hover:text-foreground',
-                    'focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground focus-visible:outline-brand-600',
+                    'focus-ring focus-visible:text-foreground',
                     isActive && 'border-foreground-light text-foreground'
                   )}
                   href={item.href}

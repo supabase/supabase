@@ -12,7 +12,10 @@ source:
 
 Alert Dialog interrupts the user’s workflow to communicate critical information or confirm an action that cannot be taken lightly. It presents a short, focused message and requires the user to explicitly confirm or cancel before proceeding.
 
-Use Alert Dialog for actions such as deleting data, performing irreversible changes, or acknowledging important warnings where dismissal without a decision would be unsafe.
+Use Alert Dialog for actions such as deleting data, performing irreversible changes, or
+acknowledging important warnings where dismissal without a decision would be unsafe. It is the
+preferred starting point for critical confirmations when the decision can be explained in a short,
+focused message.
 
 <ComponentPreview name="alert-dialog-demo" peekCode wide />
 
@@ -108,7 +111,7 @@ inline error feedback.
 - **Use for dirty-form discard confirmation:** A short discard-confirmation step after a dirty form dismissal attempt (backdrop, Escape, or `Cancel`) is a valid Alert Dialog pattern. In Studio, prefer `DiscardChangesConfirmationDialog` for this flow.
 - **Always provide a cancel action:** Include AlertDialogCancel so users can safely back out, in addition to supporting the Escape key.
 - **Use AlertDialogBody for inline feedback:** If async actions can fail, render inline feedback such as an Admonition inside AlertDialogBody so spacing stays consistent.
-- **Avoid rich content:** If the dialog requires detailed explanations, callouts, or form inputs, use [Confirmation Modal](../fragments/confirmation-modal) or [Dialog](../components/dialog) instead.
+- **Avoid rich content:** If the decision requires detailed explanations, callouts, multiple paragraphs, or form inputs, move to [Confirmation Modal](../fragments/confirmation-modal) or [Dialog](../components/dialog) instead.
 
 See [Modality](../ui-patterns/modality) for guidance on choosing the appropriate dialog pattern.
 

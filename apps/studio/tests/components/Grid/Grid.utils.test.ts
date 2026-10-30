@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { copyToClipboard } from 'ui'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
@@ -23,7 +24,10 @@ vi.mock('sonner', () => ({
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
   test('should return an array of sort options based on URL params', () => {
     const mockInput = ['id:asc', 'name:desc']
-    const output = formatSortURLParams('fakeTable', mockInput)
+    const output = formatSortURLParams(
+      { name: 'fakeTable', columns: [{ name: 'id' }, { name: 'name' }] },
+      mockInput
+    )
     expect(output).toStrictEqual([
       { table: 'fakeTable', column: 'id', ascending: true },
       { table: 'fakeTable', column: 'name', ascending: false },
@@ -31,7 +35,10 @@ describe('SupabaseGrid.utils: formatSortURLParams', () => {
   })
   test('should reject any malformed sort options based on URL params', () => {
     const mockInput = ['id', 'name:asc', ':asc']
-    const output = formatSortURLParams('fakeTable', mockInput)
+    const output = formatSortURLParams(
+      { name: 'fakeTable', columns: [{ name: 'name' }] },
+      mockInput
+    )
     expect(output).toStrictEqual([
       {
         table: 'fakeTable',
@@ -39,6 +46,15 @@ describe('SupabaseGrid.utils: formatSortURLParams', () => {
         ascending: true,
       },
     ])
+  })
+
+  test('should reject any sort options with non-existent columns based on URL params', () => {
+    const mockInput = ['name2:asc']
+    const output = formatSortURLParams(
+      { name: 'fakeTable', columns: [{ name: 'name' }] },
+      mockInput
+    )
+    expect(output).toStrictEqual([])
   })
 })
 
@@ -162,5 +178,15 @@ describe('shared clipboard util', () => {
     await copyToClipboard('hello from safari', onCopy)
     expect(writeText).toHaveBeenCalledWith('hello from safari')
     expect(onCopy).toHaveBeenCalled()
+  })
+
+  test('should not invoke the callback when the Clipboard API is unavailable', async () => {
+    const onCopy = vi.fn()
+
+    vi.stubGlobal('navigator', {})
+
+    await copyToClipboard('no clipboard here', onCopy)
+    expect(onCopy).not.toHaveBeenCalled()
+    expect(toastError).toHaveBeenCalledWith('Unable to copy to clipboard')
   })
 })

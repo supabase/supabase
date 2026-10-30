@@ -1,30 +1,23 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useTheme } from 'next-themes'
 import { useRouter } from 'next/compat/router'
+import { useEffect } from 'react'
+
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export function useForceDeepDark() {
   const router = useRouter()
-  const { resolvedTheme, theme } = useTheme()
-
-  const isDarkTheme = resolvedTheme?.includes('dark')
   const forceDarkMode = useDarkLaunchWeeks()
 
+  // next-themes already sets `data-theme`/`color-scheme` correctly and
+  // synchronously for the resolved theme. This hook only needs to step in
+  // to force dark mode during launch weeks, regardless of the user's theme.
   useEffect(() => {
+    if (!forceDarkMode) return
+
     const handleDocumentLoad = () => {
-      // Update the HTML element attributes
-      const theme = forceDarkMode || isDarkTheme ? 'dark' : 'light'
-
-      document.documentElement.setAttribute('data-theme', theme)
-      document.documentElement.style.colorScheme = theme
-
-      // wait before setting the theme
-      setTimeout(() => {
-        document.documentElement.setAttribute('data-theme', theme)
-        document.documentElement.style.colorScheme = theme
-      }, 200)
+      document.documentElement.setAttribute('data-theme', 'dark')
+      document.documentElement.style.colorScheme = 'dark'
 
       // Clean up the event listener
       window.removeEventListener('load', handleDocumentLoad)
@@ -42,5 +35,5 @@ export function useForceDeepDark() {
     return () => {
       window.removeEventListener('load', handleDocumentLoad)
     }
-  }, [resolvedTheme, theme, isDarkTheme, router])
+  }, [forceDarkMode, router])
 }

@@ -16,15 +16,17 @@ import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { ChevronDown, List } from 'lucide-react'
+import { ChevronDownIcon, ListIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DropdownControl } from '../../common/DropdownControl'
 import SortRow from './SortRow'
+import { getColumnFormat } from '@/components/grid/components/grid/ColumnHeader.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { Sort } from '@/components/grid/types'
+import { getColumnType } from '@/components/grid/utils/gridColumns'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -105,13 +107,14 @@ export const SortPopoverPrimitive = ({
     })
   }, [snap?.table?.columns, localSorts])
 
-  // Format the columns for the dropdown
+  // Prefer display labels that match column headers (format, with arrays as int4[]).
+  // Avoid raw dataType, which is "USER-DEFINED" for extension types like geography.
   const dropdownOptions = useMemo(() => {
     return (
       columns?.map((x) => ({
         value: x.name,
         label: x.name,
-        postLabel: x.dataType,
+        postLabel: getColumnFormat(getColumnType(x), x.format),
         disabled: x.dataType === 'json' || x.dataType === 'jsonb',
         tooltip:
           x.dataType === 'json' || x.dataType === 'jsonb'
@@ -233,7 +236,7 @@ export const SortPopoverPrimitive = ({
     <>
       <Popover modal={false} open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button type={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
+          <Button variant={localSorts.length > 0 ? 'link' : 'text'} icon={<ListIcon />}>
             {displayButtonText}
           </Button>
         </PopoverTrigger>
@@ -288,9 +291,9 @@ export const SortPopoverPrimitive = ({
                 >
                   <Button
                     asChild
-                    type="dashed"
-                    iconRight={<ChevronDown size="14" className="text-foreground-light" />}
-                    className="sb-grid-dropdown__item-trigger"
+                    variant="dashed"
+                    iconRight={<ChevronDownIcon size="14" className="text-foreground-light" />}
+                    className="my-1"
                     data-testid="table-editor-pick-column-to-sort-button"
                   >
                     <span>Pick {localSorts.length > 1 ? 'another' : 'a'} column to sort by</span>
@@ -302,7 +305,7 @@ export const SortPopoverPrimitive = ({
               <div className="flex items-center">
                 <Button
                   disabled={!hasChanges}
-                  type="default"
+                  variant="default"
                   onClick={() => {
                     if (isLargeTable && localSorts.length > 0) {
                       // [Joshen] Note we're only checking PKs - unable to check indexes properly

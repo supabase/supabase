@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
-import { Loader2 } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Loader2Icon } from 'lucide-react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { AiIconAnimation, Button, Calendar } from 'ui'
 import {
   CustomOptionProps,
@@ -12,13 +12,12 @@ import {
   isGroup,
   SerializableFilterProperty,
   updateGroupAtPath,
-} from 'ui-patterns'
+} from 'ui-patterns/FilterBar'
 
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { Filter } from '@/components/grid/types'
 import { useSqlFilterGenerateMutation } from '@/data/ai/sql-filter-mutation'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterPopoverProps {
@@ -78,10 +77,8 @@ function DatePickerOption({ onChange, onCancel, search }: CustomOptionProps) {
         className="w-full"
       />
       <div className="flex justify-end gap-2 py-3 px-4 border-t">
-        <Button type="default" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
+        <Button onClick={onCancel}>Cancel</Button>
+        <Button variant="primary" onClick={() => onChange(date ? format(date, 'yyyy-MM-dd') : '')}>
           Apply
         </Button>
       </div>
@@ -138,13 +135,13 @@ export const FilterPopoverNew = ({
   // so transient edits don't fire data requests.
   const [filterGroup, setFilterGroup] = useState<FilterGroup>(() => filtersToFilterGroup(filters))
 
-  const syncFromFilters = useStaticEffectEvent(() => {
+  const syncFromFilters = useEffectEvent(() => {
     setFilterGroup(filtersToFilterGroup(filters))
   })
 
   useEffect(() => {
     syncFromFilters()
-  }, [filters, syncFromFilters])
+  }, [filters])
 
   const columns = useMemo(() => snap.table?.columns ?? [], [snap.table?.columns])
 
@@ -230,7 +227,10 @@ export const FilterPopoverNew = ({
   const icon = isGenerating ? (
     <AiIconAnimation size={16} loading />
   ) : isRefetching ? (
-    <Loader2 className="animate-spin text-brand h-4 w-4 shrink-0" aria-label="Loading table data" />
+    <Loader2Icon
+      className="animate-spin text-primary h-4 w-4 shrink-0"
+      aria-label="Loading table data"
+    />
   ) : null
 
   return (

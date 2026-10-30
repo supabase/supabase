@@ -132,7 +132,7 @@ export function OnboardingSurveyDialog({
         </DialogSection>
 
         <DialogFooter className="px-5 py-4">
-          <Button type="default" disabled={isSubmitting} onClick={onSkip}>
+          <Button variant="default" disabled={isSubmitting} onClick={onSkip}>
             Skip
           </Button>
           <Button loading={isSubmitting} onClick={handleSubmit}>

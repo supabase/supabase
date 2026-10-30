@@ -31,7 +31,7 @@ const ContactSales = () => {
       <Head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `!function(e,t){var _=0;e.__default__=e.__default__||{},e.__default__.form_id=299973,e.__default__.team_id=715,e.__default__.listenToIds=["hsForm_de9a785a-fb65-4164-bd7d-000ae6eff219_5037","de9a785a-fb65-4164-bd7d-000ae6eff219_5037"],function e(){var o=t.createElement("script");o.async=!0,o.src="https://import-cdn.default.com",o.onload=function(){!0,console.info("[Default.com] Powered by Default.com")},o.onerror=function(){++_<=3&&setTimeout(e,1e3*_)},t.head.appendChild(o)}()}(window,document);`,
+            __html: `!function(e,t){var _=0;e.__default__=e.__default__||{},e.__default__.form_id=879120,e.__default__.team_id=715,e.__default__.listenToIds=["support-form"],function e(){var o=t.createElement("script");o.async=!0,o.src="https://import-cdn.default.com",o.onload=function(){!0,console.info("[Default.com] Powered by Default.com")},o.onerror=function(){++_<=3&&setTimeout(e,1e3*_)},t.head.appendChild(o)}()}(window,document);`,
           }}
         />
       </Head>
@@ -50,7 +50,10 @@ const ContactSales = () => {
               tabs={[
                 {
                   label: (
-                    <CustomerLogo title="Goodtape" logo="/images/customers/logos/good-tape.png" />
+                    <CustomerLogo
+                      title="Goodtape"
+                      logo="/images/customers/logos/on-light/good-tape.png"
+                    />
                   ),
                   panel: (
                     <CustomerQuote
@@ -60,7 +63,12 @@ const ContactSales = () => {
                   ),
                 },
                 {
-                  label: <CustomerLogo title="Xendit" logo="/images/customers/logos/xendit.png" />,
+                  label: (
+                    <CustomerLogo
+                      title="Xendit"
+                      logo="/images/customers/logos/on-light/xendit.png"
+                    />
+                  ),
                   panel: (
                     <CustomerQuote
                       quote="The full solution was built and in production in less than one week."
@@ -70,7 +78,10 @@ const ContactSales = () => {
                 },
                 {
                   label: (
-                    <CustomerLogo title="Chatbase" logo="/images/customers/logos/chatbase.png" />
+                    <CustomerLogo
+                      title="Chatbase"
+                      logo="/images/customers/logos/on-light/chatbase.png"
+                    />
                   ),
                   panel: (
                     <CustomerQuote
@@ -89,7 +100,10 @@ const ContactSales = () => {
             tabs={[
               {
                 label: (
-                  <CustomerLogo title="Goodtape" logo="/images/customers/logos/good-tape.png" />
+                  <CustomerLogo
+                    title="Goodtape"
+                    logo="/images/customers/logos/on-light/good-tape.png"
+                  />
                 ),
                 panel: (
                   <CustomerQuote
@@ -99,7 +113,9 @@ const ContactSales = () => {
                 ),
               },
               {
-                label: <CustomerLogo title="Xendit" logo="/images/customers/logos/xendit.png" />,
+                label: (
+                  <CustomerLogo title="Xendit" logo="/images/customers/logos/on-light/xendit.png" />
+                ),
                 panel: (
                   <CustomerQuote
                     quote="The full solution was built and in production in less than one week."
@@ -109,7 +125,10 @@ const ContactSales = () => {
               },
               {
                 label: (
-                  <CustomerLogo title="Chatbase" logo="/images/customers/logos/chatbase.png" />
+                  <CustomerLogo
+                    title="Chatbase"
+                    logo="/images/customers/logos/on-light/chatbase.png"
+                  />
                 ),
                 panel: (
                   <CustomerQuote

@@ -13,6 +13,7 @@ import type { VaultSecret } from '@/types'
 
 const secret: VaultSecret = {
   id: '47ca58b4-01c5-4a71-8814-c73856b02e0e',
+  key_id: null,
   name: 'test',
   description: 'new text',
   secret: 'NASR0SoksURJ0OorMJ9FzraTzcqSWk5u1PQa2r4c3w9rUVc=',
@@ -47,7 +48,6 @@ describe(`EditSecretModal`, () => {
     addAPIMock({
       method: `post`,
       path: `/platform/pg-meta/:ref/query`,
-      // @ts-expect-error this path erroneously has a `never` return type when it should be `unknown` since it executes a SQL query
       response: async ({ request }) => {
         const body = (await request.json()) as { query: string }
         const query = body.query
@@ -87,9 +87,10 @@ describe(`EditSecretModal`, () => {
 
     expect(nameInput).toHaveValue(secret.name)
     expect(descriptionInput).toHaveValue(secret.description)
-    expect(valueInput).toHaveAttribute(`type`, `password`)
+    expect(valueInput.tagName).toBe('TEXTAREA')
+    expect((valueInput as any).style.WebkitTextSecurity).toBe('disc')
     await userEvent.click(togglePasswordButton)
-    expect(valueInput).toHaveAttribute(`type`, `text`)
+    expect((valueInput as any).style.WebkitTextSecurity).toBe('')
 
     await userEvent.type(nameInput, `updated-name`)
     await userEvent.clear(descriptionInput)

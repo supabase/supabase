@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM } from 'common'
 import Link from 'next/link'
-import { ReactNode, useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { ReactNode, useEffect, useMemo, useRef } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -51,11 +51,13 @@ import {
   logDrainHeaderEntriesSchema,
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
+import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
-import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { LogDrainData } from '@/data/log-drains/log-drains-query'
 import { DOCS_URL } from '@/lib/constants'
-import { useTrack } from '@/lib/telemetry/track'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -107,18 +109,6 @@ const lokiFormSchema = z.object({
 const lokiSubmitSchema = z.object({
   ...lokiFields,
   headers: headerRecordSchema,
-})
-
-const postgresSchema = z.object({
-  type: z.literal('postgres'),
-})
-
-const bigquerySchema = z.object({
-  type: z.literal('bigquery'),
-})
-
-const clickhouseSchema = z.object({
-  type: z.literal('clickhouse'),
 })
 
 const s3Schema = z.object({
@@ -195,9 +185,6 @@ const formUnion = z.discriminatedUnion('type', [
   webhookFormSchema,
   datadogSchema,
   lokiFormSchema,
-  postgresSchema,
-  bigquerySchema,
-  clickhouseSchema,
   s3Schema,
   sentrySchema,
   axiomSchema,
@@ -210,9 +197,6 @@ const submitUnion = z.discriminatedUnion('type', [
   webhookSubmitSchema,
   datadogSchema,
   lokiSubmitSchema,
-  postgresSchema,
-  bigquerySchema,
-  clickhouseSchema,
   s3Schema,
   sentrySchema,
   axiomSchema,
@@ -261,7 +245,9 @@ type LogDrainDestinationSubmitValues = z.infer<typeof submitSchema>
 
 const HEADER_ENABLED_TYPES = ['webhook', 'loki', 'otlp'] as const
 
-function toSubmitValues(values: LogDrainDestinationFormValues): LogDrainDestinationSubmitValues {
+export function toSubmitValues(
+  values: LogDrainDestinationFormValues
+): LogDrainDestinationSubmitValues {
   if (!HEADER_ENABLED_TYPES.includes(values.type as (typeof HEADER_ENABLED_TYPES)[number])) {
     return submitSchema.parse(values)
   }
@@ -310,7 +296,7 @@ function LogDrainFormItem({
   )
 }
 
-type DefaultValues = { type: LogDrainType } & Partial<LogDrainData>
+type DefaultValues = Partial<LogDrainData>
 
 export function LogDrainDestinationSheetForm({
   open,
@@ -319,6 +305,8 @@ export function LogDrainDestinationSheetForm({
   onSubmit,
   isLoading,
   mode,
+  existingDrainNames = [],
+  onSaveClick,
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
@@ -326,41 +314,32 @@ export function LogDrainDestinationSheetForm({
   isLoading?: boolean
   onSubmit: (values: LogDrainDestinationSubmitValues) => void
   mode: 'create' | 'update'
+  existingDrainNames?: string[]
+  onSaveClick?: (type: LogDrainType) => void
 }) {
   // NOTE(kamil): This used to be `any` for a long long time, but after moving to Zod,
   // it produces a correct union type of all possible configs. Unfortunately, this type was not designed correctly
   // and it does not include `type` inside the config itself, so it's not trivial to create `discriminatedUnion`
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
-  const defaultType = defaultValues?.type || 'webhook'
+  const defaultType =
+    LOG_DRAIN_TYPES.find(({ value }) => value === defaultValues?.type)?.value || 'webhook'
   const defaultHeaderEntries = useMemo(() => {
     const config = (defaultValues?.config || {}) as any
-    const type = defaultValues?.type || 'webhook'
     return headerRecordToRows(
-      mode === 'create' ? getDefaultHeadersByType(type) : config?.headers || {}
+      mode === 'create' ? getDefaultHeadersByType(defaultType) : config?.headers || {}
     )
-  }, [defaultValues, mode])
+  }, [defaultValues, mode, defaultType])
 
-  const sentryEnabled = useFlag('SentryLogDrain')
-  const s3Enabled = useFlag('S3logdrain')
-  const axiomEnabled = useFlag('axiomLogDrain')
-  const otlpEnabled = useFlag('otlpLogDrain')
-  const last9Enabled = useFlag('Last9LogDrain')
-  const syslogEnabled = useFlag('syslogLogDrain')
+  const enabledLogDrainTypes = useEnabledLogDrainTypes()
 
-  const { ref } = useParams()
-  const { data: logDrains } = useLogDrainsQuery({
-    ref,
-  })
-
-  const track = useTrack()
+  const formRef = useRef<HTMLFormElement>(null)
 
   const formValues = useMemo(() => {
     const config = (defaultValues?.config || {}) as any
-    const type = defaultValues?.type || 'webhook'
     return {
       name: defaultValues?.name || '',
       description: defaultValues?.description || '',
-      type,
+      type: defaultType,
       http: config?.http || 'http2',
       gzip: mode === 'create' ? true : config?.gzip || false,
       headerEntries: defaultHeaderEntries,
@@ -388,15 +367,15 @@ export function LogDrainDestinationSheetForm({
       client_cert: config?.client_cert || '',
       client_key: config?.client_key || '',
     }
-  }, [defaultValues, mode, defaultHeaderEntries])
+  }, [defaultValues, mode, defaultHeaderEntries, defaultType])
 
   const form = useForm<LogDrainDestinationFormValues>({
     resolver: zodResolver(formSchema),
     values: formValues,
   })
 
-  const type = form.watch('type')
-  const tls = form.watch('tls')
+  const type = useWatch({ control: form.control, name: 'type' })
+  const tls = useWatch({ control: form.control, name: 'tls' })
 
   useEffect(() => {
     if (mode === 'create' && !open) {
@@ -413,35 +392,30 @@ export function LogDrainDestinationSheetForm({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        tabIndex={undefined}
-        showClose={false}
-        size="lg"
-        className="overflow-y-auto flex flex-col"
-      >
+      <SheetContent showClose={false} size="lg" className="overflow-y-auto flex flex-col">
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
         <SheetSection className="px-0! pb-0!">
           <Form {...form}>
             <form
+              ref={formRef}
               id={FORM_ID}
               onSubmit={(e) => {
                 e.preventDefault()
 
                 // Temp check to make sure the name is unique
                 const logDrainName = form.getValues('name')
-                const logDrainExists =
-                  !!logDrains?.length && logDrains?.find((drain) => drain.name === logDrainName)
+                const logDrainExists = existingDrainNames.includes(logDrainName)
                 if (logDrainExists && mode === 'create') {
                   toast.error('Log drain name already exists')
                   return
                 }
 
-                form.handleSubmit((values) => onSubmit(toSubmitValues(values)))(e)
-                track('log_drain_save_button_clicked', {
-                  destination: form.getValues('type'),
-                })
+                form.handleSubmit((values) => {
+                  onSubmit(toSubmitValues(values))
+                  onSaveClick?.(values.type)
+                })(e)
               }}
             >
               <div className="space-y-8 px-content">
@@ -465,22 +439,16 @@ export function LogDrainDestinationSheetForm({
                   >
                     <Select
                       defaultValue={defaultType}
-                      value={form.getValues('type')}
-                      onValueChange={(v: LogDrainType) => form.setValue('type', v)}
+                      value={type}
+                      onValueChange={(v: LogDrainDestinationFormValues['type']) =>
+                        form.setValue('type', v)
+                      }
                     >
                       <SelectTrigger>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger>
                       <SelectContent>
-                        {LOG_DRAIN_TYPES.filter((t) => {
-                          if (t.value === 'sentry') return sentryEnabled
-                          if (t.value === 's3') return s3Enabled
-                          if (t.value === 'axiom') return axiomEnabled
-                          if (t.value === 'otlp') return otlpEnabled
-                          if (t.value === 'last9') return last9Enabled
-                          if (t.value === 'syslog') return syslogEnabled
-                          return true
-                        }).map((type) => (
+                        {enabledLogDrainTypes.map((type) => (
                           <SelectItem
                             value={type.value}
                             key={type.value}
@@ -517,16 +485,8 @@ export function LogDrainDestinationSheetForm({
                                 onValueChange={field.onChange}
                                 value={field.value}
                               >
-                                <FormItem asChild>
-                                  <FormControl>
-                                    <RadioGroupCardItem value="http1" label="HTTP/1" />
-                                  </FormControl>
-                                </FormItem>
-                                <FormItem asChild>
-                                  <FormControl>
-                                    <RadioGroupCardItem value="http2" label="HTTP/2" />
-                                  </FormControl>
-                                </FormItem>
+                                <RadioGroupCardItem value="http1" label="HTTP/1" />
+                                <RadioGroupCardItem value="http2" label="HTTP/2" />
                               </RadioGroupCard>
                             </FormControl>
                           </FormItemLayout>
@@ -1034,9 +994,16 @@ export function LogDrainDestinationSheetForm({
               </span>
               <TaxDisclaimer />
             </div>
-            <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
-              Save destination
-            </Button>
+            <Shortcut
+              id={SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION}
+              onTrigger={() => formRef.current?.requestSubmit()}
+              options={{ enabled: open && !isLoading }}
+              side="top"
+            >
+              <Button form={FORM_ID} loading={isLoading} type="submit" variant="primary">
+                Save destination
+              </Button>
+            </Shortcut>
           </SheetFooter>
         </div>
       </SheetContent>

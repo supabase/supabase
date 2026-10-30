@@ -1,8 +1,9 @@
 import { useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 import { Alert, AlertTitle } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
   PageSectionAside,
@@ -11,8 +12,7 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
@@ -21,7 +21,6 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export const DataApiProjectUrlCard = () => {
@@ -39,14 +38,14 @@ export const DataApiProjectUrlCard = () => {
   } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
 
-  const syncSelectedDb = useStaticEffectEvent(() => {
+  const syncSelectedDb = useEffectEvent(() => {
     if (querySource && querySource !== state.selectedDatabaseId) {
       state.setSelectedDatabaseId(querySource)
     }
   })
   useEffect(() => {
     syncSelectedDb()
-  }, [syncSelectedDb, querySource, projectRef])
+  }, [querySource, projectRef])
 
   const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
   const loadBalancerSelected = state.selectedDatabaseId === 'load-balancer'
@@ -94,7 +93,7 @@ export const DataApiProjectUrlCard = () => {
           </div>
         ) : isError ? (
           <Alert variant="destructive">
-            <AlertCircle size={16} />
+            <AlertCircleIcon size={16} />
             <AlertTitle>Failed to retrieve project URL</AlertTitle>
           </Alert>
         ) : (

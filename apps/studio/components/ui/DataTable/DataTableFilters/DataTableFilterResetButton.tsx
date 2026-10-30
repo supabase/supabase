@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import type { DataTableFilterField } from '../DataTable.types'
@@ -15,8 +15,8 @@ export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFi
 
   return (
     <Button
-      type="outline"
-      icon={<X />}
+      variant="outline"
+      icon={<XIcon />}
       className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:translate-y-[-0.6px] space-x-1"
       onClick={(e) => {
         e.stopPropagation()

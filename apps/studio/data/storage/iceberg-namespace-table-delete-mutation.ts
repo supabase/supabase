@@ -25,7 +25,7 @@ async function deleteIcebergNamespaceTable({
     {
       params: {
         path: { ref: projectRef, id: warehouse, namespace, table },
-        query: { purge: true },
+        query: { purge: 'true' },
       },
     }
   )

@@ -7,7 +7,8 @@ import { getPrimaryKeys } from './utils'
 import type { SupaRow } from '@/components/grid/types'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { Entity } from '@/data/table-editor/table-editor-types'
 import { DOCS_URL } from '@/lib/constants'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -29,13 +30,20 @@ export function getTableRowDeleteSql({
   const { primaryKeys, error } = getPrimaryKeys({ table })
   if (error) throw error
 
-  let queryChains = new Query().from(table.name, table.schema ?? undefined).delete()
-  primaryKeys?.forEach((key) => {
-    const primaryKeyValues = rows.map((x) => x[key])
-    queryChains = queryChains.filter(key, 'in', primaryKeyValues)
-  })
+  const queryChains = new Query().from(table.name, table.schema ?? undefined).delete()
+  if (!primaryKeys || primaryKeys.length === 0) return queryChains.toSql()
 
-  return queryChains.toSql()
+  if (primaryKeys.length === 1) {
+    const [key] = primaryKeys
+    const values = rows.map((row) => row[key])
+    return queryChains.filter(key, 'in', values).toSql()
+  }
+
+  // Composite primary keys must be matched as whole tuples. Filtering each key
+  // column independently matches the cartesian product of the selected values
+  // and would delete rows that were never selected.
+  const tuples = rows.map((row) => primaryKeys.map((key) => row[key]))
+  return queryChains.filter(primaryKeys, 'in', tuples).toSql()
 }
 
 export async function deleteTableRow({
@@ -55,6 +63,7 @@ export async function deleteTableRow({
     connectionString,
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -105,7 +114,7 @@ export const useTableRowDeleteMutation = ({
             action: (
               <div className="w-full flex gap-x-2 mx-0! mt-3">
                 {/* [Joshen] Ideally we also are able to add this CTA but we can't guarantee this info without an on-demand fetch */}
-                {/* <Button asChild key="cta-1" type="default">
+                {/* <Button asChild key="cta-1" variant="default">
                     <Link href={`/project/${projectRef}/editor`}>
                       View "{referencingTable}" table
                     </Link>

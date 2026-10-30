@@ -1,12 +1,12 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { BookText } from 'lucide-react'
+import { BookTextIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
-} from 'ui-patterns'
-import { InnerSideMenuDataItem } from 'ui-patterns/InnerSideMenu'
+  InnerSideMenuDataItem,
+} from 'ui-patterns/InnerSideMenu'
 
 import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
@@ -51,7 +51,7 @@ export function ReferenceSnippetsSection() {
               href={`/project/${ref}/sql/${pageId}`}
               className="capitalize"
             >
-              <BookText size={16} className="text-foreground-muted" />
+              <BookTextIcon size={16} className="text-foreground-muted" />
               {pageId}
             </InnerSideMenuDataItem>
           )

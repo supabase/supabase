@@ -4,7 +4,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { ConnectionVars } from '@/data/common.types'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateExposedEntitiesVariables = ConnectionVars & {
@@ -49,6 +50,7 @@ export async function updateExposedEntities({
     connectionString,
     sql: joinSqlFragments(sqlParts, '\n'),
     queryKey: ['update-exposed-entities'],
+    grant: unguarded.migrating,
   })
 }
 

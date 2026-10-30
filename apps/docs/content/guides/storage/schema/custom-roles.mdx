@@ -12,7 +12,7 @@ Supabase Storage uses the same role-based access control system as any other Sup
 
 ## Create a custom role
 
-Let's create a custom role `manager` to provide full read access to a specific bucket. For a more advanced setup, see the [RBAC Guide](/docs/guides/api/custom-claims-and-role-based-access-control-rbac#create-auth-hook-to-apply-user-role).
+Create a custom role `manager` to provide full read access to a specific bucket. For a more advanced setup, see the [RBAC Guide](/docs/guides/api/custom-claims-and-role-based-access-control-rbac#create-auth-hook-to-apply-user-role).
 
 ```sql
 create role 'manager';
@@ -24,7 +24,7 @@ grant anon to manager;
 
 ## Create a policy
 
-Let's create a policy that gives full read permissions to all objects in the bucket `teams` for the `manager` role.
+Create a policy that gives full read permissions to all objects in the bucket `teams` for the `manager` role.
 
 ```sql
 create policy "Manager can view all files in the bucket 'teams'"
@@ -39,7 +39,7 @@ using (
 ## Test the policy
 
 To impersonate the `manager` role, you will need a valid JWT token with the `manager` role.
-You can quickly create one using the `jsonwebtoken` library in Node.js.
+You can create one using the `jsonwebtoken` library in Node.js.
 
 <Admonition type="danger">
 

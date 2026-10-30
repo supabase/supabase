@@ -63,7 +63,7 @@ export default function PageLayoutListSimple() {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <Button type="primary" size="small">
+            <Button variant="primary" size="small">
               Create Project
             </Button>
           </PageHeaderAside>
@@ -92,7 +92,7 @@ export default function PageLayoutListSimple() {
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button type="text" size="small">
+                            <Button variant="text" size="small">
                               Actions
                             </Button>
                           </DropdownMenuTrigger>

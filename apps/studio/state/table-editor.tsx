@@ -47,6 +47,8 @@ export type SidePanel =
 
 export type ConfirmationDialog =
   | { type: 'table'; isDeleteWithCascade: boolean }
+  | { type: 'view'; isDeleteWithCascade: boolean }
+  | { type: 'materialized-view'; isDeleteWithCascade: boolean }
   | { type: 'column'; column: SafePostgresColumn; isDeleteWithCascade: boolean }
   // [Joshen] Just FYI callback, numRows, allRowsSelected is a temp workaround so that
   // DeleteConfirmationDialog can trigger dispatch methods after the successful deletion of rows.
@@ -133,6 +135,18 @@ export const createTableEditorState = () => {
       state.ui = {
         open: 'confirmation-dialog',
         confirmationDialog: { type: 'table', isDeleteWithCascade: false },
+      }
+    },
+    onDeleteView: () => {
+      state.ui = {
+        open: 'confirmation-dialog',
+        confirmationDialog: { type: 'view', isDeleteWithCascade: false },
+      }
+    },
+    onDeleteMaterializedView: () => {
+      state.ui = {
+        open: 'confirmation-dialog',
+        confirmationDialog: { type: 'materialized-view', isDeleteWithCascade: false },
       }
     },
 
@@ -225,7 +239,9 @@ export const createTableEditorState = () => {
       if (
         state.ui.open === 'confirmation-dialog' &&
         (state.ui.confirmationDialog.type === 'column' ||
-          state.ui.confirmationDialog.type === 'table')
+          state.ui.confirmationDialog.type === 'table' ||
+          state.ui.confirmationDialog.type === 'view' ||
+          state.ui.confirmationDialog.type === 'materialized-view')
       ) {
         state.ui.confirmationDialog.isDeleteWithCascade =
           overrideIsDeleteWithCascade ?? !state.ui.confirmationDialog.isDeleteWithCascade

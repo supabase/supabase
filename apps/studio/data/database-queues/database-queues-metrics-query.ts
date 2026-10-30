@@ -6,7 +6,8 @@ import {
   isQueueNameValid,
   pgmqQueueTable,
 } from '@/components/interfaces/Integrations/Queues/Queues.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesMetricsVariables = {
@@ -58,6 +59,7 @@ export async function getDatabaseQueuesMetrics({
       projectRef,
       connectionString,
       sql: preciseMetricsSqlQuery(queueName),
+      grant: unguarded.migrating,
     })
     return {
       queue_name: queueName,
@@ -71,6 +73,7 @@ export async function getDatabaseQueuesMetrics({
         projectRef,
         connectionString,
         sql: estimateMetricsSqlQuery(queueName),
+        grant: unguarded.migrating,
       })
       return {
         queue_name: queueName,

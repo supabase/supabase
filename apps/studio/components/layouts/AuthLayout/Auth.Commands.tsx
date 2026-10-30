@@ -38,19 +38,12 @@ export function useAuthGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/auth/users`,
         defaultHidden: true,
       },
-      {
-        id: 'nav-auth-policies',
-        name: 'Policies',
-        value: 'Auth: Policies (RLS)',
-        route: `/project/${ref}/auth/policies`,
-        defaultHidden: true,
-      },
       ...(authenticationSignInProviders
         ? [
             {
               id: 'nav-auth-providers',
               name: 'Providers',
-              value: 'Auth: Providers (Social Login, SSO)',
+              value: 'Auth: Providers (Social Sign-in, SSO, Social Login)',
               route: `/project/${ref}/auth/providers`,
               defaultHidden: true,
             } as IRouteCommand,

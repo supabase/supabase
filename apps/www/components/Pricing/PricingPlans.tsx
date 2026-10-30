@@ -8,6 +8,7 @@ import { plans } from 'shared-data/plans'
 import { Button, cn } from 'ui'
 
 import UpgradePlan from './UpgradePlan'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 interface PricingPlansProps {
   organizations?: Organization[]
@@ -83,12 +84,18 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                     <Button
                       block
                       size="large"
-                      type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                      variant={plan.name === 'Enterprise' ? 'default' : 'primary'}
                       asChild
                     >
-                      <Link href={plan.href} onClick={sendPricingEvent}>
-                        {plan.cta}
-                      </Link>
+                      {isCrossZoneHref(plan.href) ? (
+                        <a href={plan.href} onClick={sendPricingEvent}>
+                          {plan.cta}
+                        </a>
+                      ) : (
+                        <Link href={plan.href} onClick={sendPricingEvent}>
+                          {plan.cta}
+                        </Link>
+                      )}
                     </Button>
                   )}
 
@@ -168,7 +175,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                             <Check
                               className={cn(
                                 'h-4 w-4',
-                                plan.name === 'Enterprise' ? 'text-foreground' : 'text-brand'
+                                plan.name === 'Enterprise' ? 'text-foreground' : 'text-primary'
                               )}
                               aria-hidden="true"
                               strokeWidth={3}

@@ -14,7 +14,7 @@ date: '2024-11-13'
 toc_depth: 3
 ---
 
-We're always looking for ways to improve the developer experience and reduce complexity across your application development pipeline. One way you can use Supabase to do that is with dynamic JavaScript in Edge Functions. This greatly increases the versatility of your edge functions and reduces the need for you to redeploy your functions if you need to change business logic.
+We're always looking for ways to improve the developer experience and reduce complexity across your application development pipeline. One way you can use Supabase to do that is with dynamic JavaScript in [Edge Functions](/edge-functions). This greatly increases the versatility of your edge functions and reduces the need for you to redeploy your functions if you need to change business logic.
 
 ## Introduction to Edge Functions
 
@@ -29,7 +29,7 @@ Dynamic code execution allows you to modify and run JavaScript code on the fly w
 To follow along, you will need:
 
 - A Supabase project
-- Supabase CLI installed on your local machine
+- [Supabase CLI](/features/cli) installed on your local machine
 - Orb Stack or Docker Desktop installed on your local machine
 - Environment variables set up in Vault, ensuring it passes validation in the function (e.g., `service_role`)
 
@@ -226,7 +226,7 @@ END;
 $$;
 ```
 
-This function can retrieve the `service_role` secret from [Vault](https://supabase.com/dashboard/project/_/settings/vault/secrets), it also ensures that only authorized roles can access sensitive environment variables.
+This function can retrieve the `service_role` secret from [Vault](https://supabase.com/dashboard/project/_/integrations/vault/secrets), it also ensures that only authorized roles can access sensitive environment variables.
 
 ## Setting Up the Edge Function
 
@@ -339,7 +339,7 @@ return new Response(JSON.stringify({ data }), {
 
 To deploy this Edge Function, you'll need to use the Supabase CLI. Ensure you have Docker installed and running on your local machine. Follow these steps to deploy:
 
-1. **Install the Supabase CLI**: If you haven't already, install the Supabase CLI by following the instructions in the [Supabase CLI Documentation](https://supabase.com/docs/guides/cli).
+1. **Install the Supabase CLI**: If you haven't already, install the Supabase CLI by following the instructions in the [Supabase CLI Documentation](https://supabase.com/docs/guides/local-development).
 2. **Log In to Supabase**: Use the command `supabase login` to authenticate your account.
 3. **Deploy the Function**: Run the command `supabase functions deploy <function_name>` to deploy your Edge Function. Replace `<function_name>` with the desired name for your function.
 

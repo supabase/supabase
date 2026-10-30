@@ -8,7 +8,7 @@ You can find a step by step guide on how to build this app on [How to build a re
 
 ### 1. Create new project
 
-Sign up to Supabase - [app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
+Sign up to Supabase - [supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
 
 ### 2. Get the URL and Key
 

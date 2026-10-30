@@ -15,6 +15,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { AiTools } from '@/components/AiTools'
+import SectionContainer from '@/components/Layouts/SectionContainer'
+
 // table of contents extractor
 const toc = require('markdown-toc')
 
@@ -128,12 +131,7 @@ function CaseStudyPage(props: any) {
         />
       </Head>
       <DefaultLayout>
-        <div
-          className="
-            container mx-auto p-8 sm:py-16 sm:px-16
-            xl:px-20
-          "
-        >
+        <SectionContainer className="py-8 sm:py-16!">
           <div className="grid grid-cols-12 gap-4">
             <div className="hidden xl:block col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
@@ -152,7 +150,7 @@ function CaseStudyPage(props: any) {
                   <div className="flex flex-col gap-4 sm:gap-8 max-w-xxl">
                     <Link
                       href="/customers"
-                      className="text-brand hover:text-brand-600 sm:mb-2 mt-0"
+                      className="text-primary hover:text-brand-600 sm:mb-2 mt-0"
                     >
                       Customer Stories
                     </Link>
@@ -212,10 +210,17 @@ function CaseStudyPage(props: any) {
                           )
                         })}
 
+                        <AiTools
+                          pagePath={`/customers/${slug}`}
+                          pageType="customers"
+                          titleClassName="sr-only"
+                          className="not-prose"
+                        />
+
                         <div>
                           <p>Ready to get started?</p>
                           <div>
-                            <Button asChild type="default" iconRight={<ChevronRight />}>
+                            <Button asChild iconRight={<ChevronRight />}>
                               <Link
                                 href="https://supabase.com/contact/enterprise"
                                 className="no-underline"
@@ -235,7 +240,7 @@ function CaseStudyPage(props: any) {
               </div>
             </div>
           </div>
-        </div>
+        </SectionContainer>
 
         <CTABanner />
       </DefaultLayout>

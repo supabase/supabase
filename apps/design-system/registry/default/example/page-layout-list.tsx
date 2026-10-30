@@ -102,7 +102,7 @@ export default function PageLayoutList() {
                     </InputGroupAddon>
                   </InputGroup>
                 </div>
-                <Button type="primary">Create a new function</Button>
+                <Button variant="primary">Create a new function</Button>
               </div>
 
               <Card>
@@ -126,7 +126,7 @@ export default function PageLayoutList() {
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="text" size="small">
+                              <Button variant="text" size="small">
                                 Actions
                               </Button>
                             </DropdownMenuTrigger>

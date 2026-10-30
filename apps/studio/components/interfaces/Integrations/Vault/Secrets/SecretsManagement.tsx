@@ -1,9 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { sortBy } from 'lodash'
-import { RefreshCw, Search, X } from 'lucide-react'
+import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 import {
   Button,
@@ -14,6 +13,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -21,13 +23,16 @@ import { AddNewSecretModal } from './AddNewSecretModal'
 import { DeleteSecretModal } from './DeleteSecretModal'
 import { EditSecretModal } from './EditSecretModal'
 import { formatSecretColumns } from './Secrets.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { VaultSecret } from '@/types'
 
 export const SecretsManagement = () => {
@@ -38,9 +43,8 @@ export const SecretsManagement = () => {
   const [, setShowAddSecretModal] = useQueryState('new', parseAsBoolean.withDefault(false))
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const {
@@ -62,7 +66,8 @@ export const SecretsManagement = () => {
         ? allSecrets.filter(
             (secret) =>
               (secret?.name ?? '').toLowerCase().includes(searchValue.trim().toLowerCase()) ||
-              (secret?.id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase())
+              (secret?.id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase()) ||
+              (secret?.key_id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase())
           )
         : allSecrets
 
@@ -78,6 +83,22 @@ export const SecretsManagement = () => {
     if (search !== undefined) setSearchValue(search)
   }, [search])
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search secrets' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setSearchValue(''))
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setShowAddSecretModal(true), {
+    label: 'Add new secret',
+    enabled: canManageSecrets,
+  })
+
   return (
     <>
       <div className="h-full w-full space-y-4">
@@ -85,22 +106,32 @@ export const SecretsManagement = () => {
           <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap">
             <div className="flex items-center gap-2">
               <Input
+                ref={searchInputRef}
                 size="tiny"
                 className="w-52"
                 placeholder="Search by name or key ID"
-                icon={<Search />}
+                icon={<SearchIcon />}
                 value={searchValue ?? ''}
                 onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={onSearchInputEscape(searchValue ?? '', setSearchValue)}
                 actions={[
                   searchValue && (
-                    <Button
-                      key="clear"
-                      size="tiny"
-                      type="text"
-                      icon={<X />}
-                      onClick={() => setSearchValue('')}
-                      className="p-0 h-5 w-5"
-                    />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          key="clear"
+                          size="tiny"
+                          variant="text"
+                          icon={<XIcon />}
+                          onClick={() => setSearchValue('')}
+                          className="p-0 h-5 w-5"
+                          aria-label="Clear search"
+                          // Tooltip repeats the label; screen readers would read it twice
+                          aria-describedby={undefined}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Clear search</TooltipContent>
+                    </Tooltip>
                   ),
                 ]}
               />
@@ -123,17 +154,12 @@ export const SecretsManagement = () => {
             </div>
 
             <div className="flex items-center gap-x-2">
-              <Button
-                type="default"
-                icon={<RefreshCw />}
-                loading={isRefetching}
-                onClick={() => refetch()}
-              >
+              <Button icon={<RefreshCwIcon />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
               <DocsButton href={`${DOCS_URL}/guides/database/vault`} />
               <ButtonTooltip
-                type="primary"
+                variant="primary"
                 disabled={!canManageSecrets}
                 onClick={() => setShowAddSecretModal(true)}
                 tooltip={{
@@ -158,7 +184,7 @@ export const SecretsManagement = () => {
             </div>
           ) : (
             <DataGrid
-              className="grow border-t-0"
+              className="grow border-t-0! border-b-0!"
               rowHeight={52}
               headerRowHeight={36}
               columns={columns}

@@ -1,54 +1,120 @@
-import { groupBy } from 'lodash'
-import { LoaderCircle, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { FilterBar, FilterCondition, type FilterGroup, type FilterProperty } from 'ui-patterns'
+import { useParams } from 'common'
+import { LoaderCircleIcon, SearchIcon } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import {
+  FilterBar,
+  FilterCondition,
+  type CustomOptionProps,
+  type FilterBarHandle,
+  type FilterGroup,
+} from 'ui-patterns/FilterBar'
 
+import { isOfferedFilter } from '../UnifiedLogs.utils'
+import {
+  buildColumnFilterValues,
+  buildFilterGroup,
+  buildFilterProperties,
+  getUserFilterValue,
+  TIME_RANGE_PROPERTY,
+  USER_PROPERTY,
+} from './LogsFilterBar.utils'
+import {
+  parseTimeRange,
+  serializeTimeRange,
+} from '@/components/interfaces/Settings/Logs/Logs.timeRange'
+import { searchAuthUsers } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
+import { DataTableFilterTimerange } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterTimerange'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { UUID_REGEX } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const buildFilterGroup = (
-  columnFilters: { id: string; value: unknown }[],
-  filterableNames: Set<string>
-): FilterGroup => {
-  const conditions: FilterCondition[] = []
-  for (const { id, value } of columnFilters) {
-    if (!filterableNames.has(id) || value === null || value === undefined) continue
-    const values = Array.isArray(value) ? value : [value]
-    for (const v of values) {
-      conditions.push({
-        propertyName: id,
-        value: v as FilterCondition['value'],
-        operator: '=',
-      })
-    }
-  }
-  return { logicalOperator: 'AND', conditions }
+const TimeRangeOption = ({ onChange }: CustomOptionProps) => (
+  <DataTableFilterTimerange
+    label="Time range"
+    value={TIME_RANGE_PROPERTY}
+    type="timerange"
+    variant="inline"
+    onChange={(range) => onChange(serializeTimeRange(range))}
+  />
+)
+
+interface LogsFilterBarProps {
+  offeredFilters?: readonly string[]
 }
 
-export const LogsFilterBar = () => {
+export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
+  const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const { table, filterFields, columnFilters, isFetching } = useDataTable()
 
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_FOCUS_FILTER, () => filterBarRef.current?.focus(), {
+    registerInCommandMenu: true,
+  })
+
+  const filterBarRef = useRef<FilterBarHandle>(null)
   const [freeformText, setFreeformText] = useState('')
 
-  const filterProperties: FilterProperty[] = filterFields
-    .filter((x) => x.type !== 'timerange')
-    .map((filter) => ({
-      label: filter.label,
-      name: filter.value,
-      type: 'string',
-      options: filter.options ?? [],
-      operators: ['='],
-    }))
+  // [Joshen] We're separately declaring useQueryState for user here, as there's no "user" column
+  // in the Tanstack table.
+  const [user, setUser] = useQueryState(USER_PROPERTY, parseAsString)
+
+  // A UUID is matched exactly rather than searched (it's already a resolved id, not a keyword).
+  const searchUserOptions = async (search?: string) => {
+    const value = search?.trim() ?? ''
+    if (UUID_REGEX.test(value)) return [{ label: value, value }]
+    if (!projectRef) return []
+    const users = await searchAuthUsers(projectRef, project?.connectionString ?? null, value).catch(
+      () => []
+    )
+    return users.map((u) => ({ label: u.email ?? u.id, value: u.id }))
+  }
+
+  const filterProperties = buildFilterProperties({
+    fields: filterFields,
+    userOptions: searchUserOptions,
+    timeRangeOptions: { component: TimeRangeOption },
+  }).filter((property) => isOfferedFilter(property.name, offeredFilters))
+
+  const withUserCondition = (group: FilterGroup): FilterGroup => {
+    if (!user) return group
+    return {
+      ...group,
+      conditions: [
+        ...group.conditions,
+        { propertyName: USER_PROPERTY, value: user, operator: '=' },
+      ],
+    }
+  }
+
+  const columnBackedNames = new Set(
+    filterProperties.map((p) => p.name).filter((name) => name !== USER_PROPERTY)
+  )
 
   // Local state because the FilterBar carries transient states
   const [filters, setFilters] = useState<FilterGroup>(() =>
-    buildFilterGroup(columnFilters, new Set(filterProperties.map((p) => p.name)))
+    withUserCondition(buildFilterGroup(columnFilters, columnBackedNames))
   )
 
-  // Read latest filterProperties without making the effect depend on its (per-render) identity.
-  const syncFromColumnFilters = useStaticEffectEvent(() => {
-    setFilters(buildFilterGroup(columnFilters, new Set(filterProperties.map((p) => p.name))))
+  const hasTimeRangeFilter = filters.conditions.some(
+    (condition) => 'propertyName' in condition && condition.propertyName === TIME_RANGE_PROPERTY
+  )
+  const filterPropertiesWithAvailability = filterProperties.map((property) => ({
+    ...property,
+    isAvailable: property.name !== TIME_RANGE_PROPERTY || !hasTimeRangeFilter,
+  }))
+
+  // Read latest values without making the effect depend on their (per-render) identity.
+  const syncFromColumnFilters = useEffectEvent(() => {
+    setFilters(withUserCondition(buildFilterGroup(columnFilters, columnBackedNames)))
   })
+
+  const applyUser = (raw: string | undefined) => {
+    const value = raw?.trim() ?? ''
+    setUser(value || null)
+  }
 
   // No nested conditions in unified logs — type-cast to FilterCondition on read.
   const onApply = (next: FilterGroup) => {
@@ -60,19 +126,26 @@ export const LogsFilterBar = () => {
     )
     if (!isValid) return
 
-    const filterConditions = next.conditions as FilterCondition[]
-    const groupedFilterConditions = groupBy(filterConditions, 'propertyName')
-    Object.entries(groupedFilterConditions).forEach(([name, conditions]) => {
-      table.getColumn(name)?.setFilterValue(conditions.map((x) => x.value))
-    })
+    const timeRangeCondition = (next.conditions as FilterCondition[]).find(
+      (condition) => condition.propertyName === TIME_RANGE_PROPERTY
+    )
+    const timeRange = parseTimeRange(timeRangeCondition?.value)
+    if (timeRangeCondition && !timeRange) return
 
-    // Only clear filters owned by this bar — leaves externally-set filters
-    // (e.g. the timeline date range) untouched.
-    const managedNames = new Set(filterProperties.map((p) => p.name))
-    const nextNames = new Set(Object.keys(groupedFilterConditions))
+    table.getColumn(TIME_RANGE_PROPERTY)?.setFilterValue(timeRange)
+    applyUser(getUserFilterValue(next.conditions as FilterCondition[]))
+
+    const columnFilterValues = buildColumnFilterValues(next.conditions as FilterCondition[])
+    for (const [name, value] of columnFilterValues) {
+      table.getColumn(name)?.setFilterValue(value)
+    }
+
+    // Only clear filters owned by this bar.
+    const nextNames = new Set(columnFilterValues.keys())
+    if (timeRange) nextNames.add(TIME_RANGE_PROPERTY)
     const filtersToRemove = table
       .getState()
-      .columnFilters.filter((x) => managedNames.has(x.id) && !nextNames.has(x.id))
+      .columnFilters.filter((x) => columnBackedNames.has(x.id) && !nextNames.has(x.id))
     filtersToRemove.forEach((x) => {
       table.getColumn(x.id)?.setFilterValue(undefined)
     })
@@ -80,14 +153,15 @@ export const LogsFilterBar = () => {
 
   useEffect(() => {
     syncFromColumnFilters()
-  }, [columnFilters, syncFromColumnFilters])
+  }, [columnFilters, user])
 
   return (
     <FilterBar
+      ref={filterBarRef}
       variant="pill"
       freeformDefaultProperty="event_message"
       className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"
-      filterProperties={filterProperties}
+      filterProperties={filterPropertiesWithAvailability}
       freeformText={freeformText}
       filters={filters}
       onFilterChange={setFilters}
@@ -96,9 +170,9 @@ export const LogsFilterBar = () => {
       isLoading={isFetching}
       icon={
         isFetching ? (
-          <LoaderCircle className="h-4 w-4 animate-spin text-foreground-muted opacity-50" />
+          <LoaderCircleIcon className="h-4 w-4 animate-spin text-foreground-muted opacity-50" />
         ) : (
-          <Search className="text-foreground-muted w-4 h-4 sticky" />
+          <SearchIcon className="text-foreground-muted w-4 h-4 sticky" />
         )
       }
     />

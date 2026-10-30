@@ -24,9 +24,15 @@ Inbound requests to your Edge Functions and requests to external APIs (e.g., Str
 
 ## Rate limit budget
 
-Each request chain has a budget of at least **5,000 requests per minute**. In busier regions, this budget may be higher. All function-to-function calls within the same request chain share this budget.
+Each request chain (or _trace_) has a budget of **30 requests within a 60-second window**. All function-to-function calls that share the same trace count toward this budget.
 
-For example, if Function A calls Function B, and Function B calls Function C, all three calls count toward the same budget pool.
+For example, if Function A calls Function B, and Function B calls Function C, all three calls count toward the same 30-request budget.
+
+<Admonition type="note">
+
+A trace is the chain of calls that starts when one Edge Function invokes another. The budget applies per trace, not per project, so two separate invocations of the same function each get their own budget.
+
+</Admonition>
 
 ## Handling rate limit errors
 
@@ -97,7 +103,7 @@ Deno.serve(async (req) => {
     const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${SUPABASE_DEFAULT_PUBLISHABLE_KEY}`,
+        apikey: SUPABASE_DEFAULT_PUBLISHABLE_KEY,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ foo: 'bar' }),
@@ -256,7 +262,7 @@ export async function save(data: any) {
 
 ```typescript
 // supabase/functions/process-data/index.ts
-import { validate, transform, save } from '../_shared/transform.ts'
+import { save, transform, validate } from '../_shared/transform.ts'
 
 Deno.serve(async (req) => {
   const data = await req.json()
@@ -284,7 +290,7 @@ async function processWithDelay(items: any[]) {
 
 | Pattern                         | Budget consumption | Recommendation    |
 | ------------------------------- | ------------------ | ----------------- |
-| Simple chain (A to B to C)      | Low                | Generally safe    |
+| Basic chain (A to B to C)       | Low                | Generally safe    |
 | Fan-out (A to B, C, D, E)       | Moderate           | Limit concurrency |
 | Deep recursion (A to A to A...) | High               | Set max depth     |
 | Unbounded loops                 | Very high          | Avoid, use queues |

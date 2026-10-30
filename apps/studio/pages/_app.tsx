@@ -1,6 +1,4 @@
 import '@/styles/code.css'
-import '@/styles/editor.css'
-import '@/styles/focus.css'
 import '@/styles/globals.css'
 import '@/styles/graphiql-base.css'
 import '@/styles/grid.css'
@@ -14,7 +12,6 @@ import '@/styles/ui.css'
 import 'react-data-grid/lib/styles.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 
-import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
 import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -35,32 +32,42 @@ import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
-import { TimestampInfoProvider } from 'ui-patterns'
+import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { RecoveryReminderController } from '@/components/interfaces/Account/RecoveryReminderController'
+import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
+import { clearBootTimeoutFallback } from '@/components/ui/BootTimeoutFallback/BootTimeoutFallback'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
 import { useRootQueryClient } from '@/data/query-client'
-import { customFont, sourceCodePro } from '@/fonts'
+import { inter, manrope, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { getChunkLoadReloadDecision, isChunkLoadError } from '@/lib/chunk-load-error'
+import { toUnixSecondsString } from '@/lib/configcat-attributes'
+import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
+import { ToastErrorTracker } from '@/lib/toast-errors'
 import { Toaster } from '@/lib/toaster'
 import { AiAssistantStateContextProvider } from '@/state/ai-assistant-state'
 import type { AppPropsWithLayout } from '@/types'
@@ -81,8 +88,22 @@ const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() =>
+      import('@/components/ui/DevToolbar/ProjectStatusTab').then((m) => m.ProjectStatusTab)
+    )
+  : () => null
+
+const MetricsTab = IS_DEV_TOOLBAR_ENABLED
+  ? dynamic(() => import('@/components/ui/DevToolbar/MetricsTab').then((m) => m.MetricsTab))
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
-  ? [{ id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> }]
+  ? [
+      { id: 'metrics', label: 'Metrics', content: <MetricsTab /> },
+      { id: 'warnings', label: 'Warnings', content: <ResourceWarningsTab /> },
+      { id: 'project-status', label: 'Project Status', content: <ProjectStatusTab /> },
+    ]
   : []
 
 const FeatureFlagProviderWithOrgContext = ({
@@ -90,6 +111,7 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const { data: organizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
   const cloudProvider = useDefaultProvider()
 
   const getConfigCatFlags = useCallback(
@@ -97,9 +119,17 @@ const FeatureFlagProviderWithOrgContext = ({
       const customAttributes: Record<string, string> = {}
       if (cloudProvider) customAttributes.cloud_provider = cloudProvider
       if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      if (selectedOrganization?.slug) customAttributes.organization_slug = selectedOrganization.slug
+      const createdAtUnixSeconds = toUnixSecondsString(organizationCreatedAt)
+      if (createdAtUnixSeconds) customAttributes.organization_created_at = createdAtUnixSeconds
       return getFlags(userEmail, customAttributes)
     },
-    [cloudProvider, selectedOrganization?.plan?.id]
+    [
+      cloudProvider,
+      selectedOrganization?.plan?.id,
+      selectedOrganization?.slug,
+      organizationCreatedAt,
+    ]
   )
 
   return (
@@ -118,18 +148,7 @@ const TimestampInfoTimezoneBridge = ({ children }: { children: React.ReactNode }
   return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
 }
 
-loader.config({
-  // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
-  // locally. We're however, only storing the assets which we need (based on what the network tab loads
-  // while using monaco). If we end up facing more effort trying to maintain this, probably to either
-  // use cloudflare or find some way to pull all the files from a CDN via a CLI, rather than tracking individual files
-  // The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
-  paths: {
-    vs: IS_PLATFORM
-      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs'
-      : `${BASE_PATH}/monaco-editor`,
-  },
-})
+configureMonacoLoader()
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
 // a lot of them are unnecessary and introduce way too many cluttered CSS especially with the height styles that make
@@ -137,6 +156,7 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+  const recoveryRouter = useRouter()
   const queryClient = useRootQueryClient()
   const { appTitle } = useCustomContent(['app:title'])
   const [isCLI, setIsCLI] = useState(false)
@@ -144,8 +164,16 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page)
 
   const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
+    // A chunk failure a reload recovers from isn't worth reporting; one that
+    // recurs inside the reload guard window is reported below
+    if (getChunkLoadReloadDecision(error)) {
+      window.location.reload()
+      return
+    }
+
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
+      if (isChunkLoadError(error)) scope.setTag('chunkLoadError', true)
       const eventId = Sentry.captureException(error)
       // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
       if (eventId && error && typeof error === 'object') {
@@ -158,10 +186,21 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useThemeSandbox()
 
+  useEffect(() => {
+    clearBootTimeoutFallback()
+  }, [])
+
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   // [Joshen] Should target hosted staging, local dev, and local CLI only
   const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
+  const isLocalEnv =
+    process.env.NODE_ENV === 'development' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    isCLI
+  let faviconRoute = '/favicon'
+  if (isNonProdEnv) faviconRoute = '/favicon/staging'
+  if (isLocalEnv) faviconRoute = '/favicon/local'
 
   const checkCliEnvironment = async () => {
     const data = await getCLIReleaseVersion()
@@ -185,12 +224,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <Head>
                         <title>{appTitle ?? 'Supabase'}</title>
                         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                        <meta property="og:image" content={`${BASE_PATH}/img/supabase-logo.png`} />
+                        <meta property="og:image" content={`${BASE_PATH}/img/supabase-og.png`} />
                         <meta name="googlebot" content="notranslate" />
                         {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
                         <style
                           dangerouslySetInnerHTML={{
-                            __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                            __html: `:root{--font-sans:${inter.style.fontFamily};--font-heading:${manrope.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
                           }}
                         />
                         {/* Speed up initial API loading times by pre-connecting to the API domain */}
@@ -205,9 +244,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <MetaFaviconsPagesRouter
                         includeManifest
                         applicationName="Supabase Studio"
-                        route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                        route={faviconRoute}
                       />
-                      <TooltipProvider delayDuration={0}>
+                      <TooltipProvider>
                         <RouteValidationWrapper>
                           <ThemeProvider>
                             <DevToolbarProvider apiUrl={API_URL}>
@@ -216,15 +255,19 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                   <BannerStackProvider>
                                     <FeaturePreviewContextProvider>
                                       <MainScrollContainerProvider>
-                                        {getLayout(<Component {...pageProps} />)}
+                                        <RecoveryReminderController href={recoveryRouter.asPath}>
+                                          {getLayout(<Component {...pageProps} />)}
+                                        </RecoveryReminderController>
                                       </MainScrollContainerProvider>
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />
                                       <FeaturePreviewModal />
+                                      <IndirectTaxDeclarationModal />
                                     </FeaturePreviewContextProvider>
                                   </BannerStackProvider>
                                   <Toaster />
                                   <MonacoThemeProvider />
+                                  <AppearanceSettingsProvider />
                                 </CommandProvider>
                               </AiAssistantStateContextProvider>
                               <DevToolbar extraTabs={devToolbarExtraTabs} />
@@ -234,6 +277,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         </RouteValidationWrapper>
                       </TooltipProvider>
                       <Telemetry />
+                      <ToastErrorTracker />
                       {!isTestEnv && (
                         <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
                       )}

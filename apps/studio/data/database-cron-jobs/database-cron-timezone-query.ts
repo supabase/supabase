@@ -2,7 +2,8 @@ import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseCronJobsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseCronJobsVariables = {
@@ -20,6 +21,7 @@ export async function getDatabaseCronTimezone({
     projectRef,
     connectionString,
     sql: safeSql`select setting from pg_settings where name = 'cron.timezone';`,
+    grant: unguarded.migrating,
   })
   return result[0].setting
 }

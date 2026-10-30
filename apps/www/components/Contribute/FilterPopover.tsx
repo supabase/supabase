@@ -72,7 +72,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
             >
               {((productAreas && productAreas.length > 0) || (stacks && stacks.length > 0)) && (
                 <Button
-                  type="outline"
+                  variant="outline"
                   onClick={handleClearAll}
                   iconRight={<X className="h-4 w-4" />}
                 >
@@ -96,7 +96,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
                       return (
                         <Button
                           key={area}
-                          type={isSelected ? 'secondary' : 'dashed'}
+                          variant={isSelected ? 'secondary' : 'dashed'}
                           size="tiny"
                           onClick={() => handleProductAreaClick(area)}
                           className="justify-start w-fit"
@@ -120,7 +120,7 @@ export function FilterPopover({ allProductAreas, allStacks, trigger }: FilterPop
                         <Button
                           key={tech}
                           // [Danny] We should switch to using Toggle component here, like downgrade plan flow
-                          type={isSelected ? 'secondary' : 'dashed'}
+                          variant={isSelected ? 'secondary' : 'dashed'}
                           size="tiny"
                           onClick={() => handleStackClick(tech)}
                           className="justify-start w-fit"

@@ -1,4 +1,3 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
@@ -6,20 +5,20 @@ import { ShimmeringCard } from '@/components/interfaces/Home/ProjectList/Shimmer
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { ScaffoldContainerLegacy } from '@/components/layouts/Scaffold'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import type { NextPageWithLayout } from '@/types'
 
 const OrgIndexPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const [lastVisitedOrganization, _, { isSuccess }] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization, isSuccess } = useLastVisitedOrganization()
 
   useEffect(() => {
     if (isSuccess) {
-      if (lastVisitedOrganization.length > 0) router.push(`/org/${lastVisitedOrganization}`)
-      else router.push('/organizations')
+      if (lastVisitedOrganization) {
+        router.push(`/org/${lastVisitedOrganization}`)
+      } else {
+        router.push('/organizations')
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess])

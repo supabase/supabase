@@ -1,4 +1,4 @@
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 export const BackupsStorageAlert = () => {
   return (

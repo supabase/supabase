@@ -224,6 +224,7 @@ alter table posts enable row level security;`,
     },
     {
       type: 'form',
+      id: 'form',
       title: 'Get in touch',
       description: 'Fill out the form below and our team will get back to you shortly.',
       fields: [

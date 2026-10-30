@@ -18,7 +18,7 @@ export const MarketplaceCard = ({ integration, isInstalled }: MarketplaceCardPro
   return (
     <Link
       href={`/project/${ref}/integrations/${integration.id}/overview`}
-      className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+      className="rounded-md focus-ring"
     >
       <Card className="flex min-h-[168px] h-full flex-col gap-2.5 hover:border-stronger p-4">
         <div className="flex items-start justify-between">

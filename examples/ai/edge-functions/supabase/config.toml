@@ -33,7 +33,7 @@ sql_paths = ['./seed.sql']
 
 [functions.generate-embedding]
 enabled = true
-# verify_jwt = true
+verify_jwt = false
 # import_map = "./functions/generate-embedding/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -41,7 +41,7 @@ enabled = true
 
 [functions.search]
 enabled = true
-# verify_jwt = true
+verify_jwt = false
 # import_map = "./functions/search/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx

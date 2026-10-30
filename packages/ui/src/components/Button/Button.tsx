@@ -5,134 +5,106 @@ import { Loader2 } from 'lucide-react'
 import { Slot } from 'radix-ui'
 import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 
-import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
+import { SIZE_VARIANTS } from '../../lib/constants'
+import { controlRadiusBySize } from '../../lib/raised-control-surface'
 import { cn } from '../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
   `relative
-  flex items-center justify-center
+  inline-flex items-center justify-center
   cursor-pointer
-  inline-flex
-  items-center
   space-x-2
   text-center
-  font-regular
-  ease-out
+  font-medium
+  ease-[cubic-bezier(0.22,1,0.36,1)]
   duration-200
   rounded-md
-  outline-hidden
-  transition-all
-  outline-0
-  focus-visible:outline-4
-  focus-visible:outline-offset-1
+  transition-[background-color,border-color,color,scale]
+  [&:not([aria-haspopup])]:motion-safe:active:scale-[0.97]
+  focus-ring
   border
+  control-surface-shadows
   `,
   {
     variants: {
-      type: {
+      variant: {
         primary: `
-          bg-brand-400 dark:bg-brand-500
-          hover:bg-brand/80 dark:hover:bg-brand/50
-          text-foreground
-          border-brand-500/75 dark:border-brand/30
-          hover:border-brand-600 dark:hover:border-brand
-          focus-visible:outline-brand-600
-          data-[state=open]:bg-brand-400/80 dark:data-[state=open]:bg-brand-500/80
-          data-[state=open]:outline-brand-600
+          border-0
+          bg-primary-solid
+          bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          text-primary-solid-foreground
+          shadow-[var(--button-shadow-raised)]
+          hover:bg-[var(--primary-solid-hover)]
+          data-[state=open]:bg-[var(--primary-solid-hover)]
           `,
-        default: `
-          text-foreground
-          bg-alternative dark:bg-muted  hover:bg-selection
-          border-strong hover:border-stronger
-          focus-visible:outline-brand-600
-          data-[state=open]:bg-selection
-          data-[state=open]:outline-brand-600
-          data-[state=open]:border-button-hover
-          `,
+        default: 'border-0 raised-control-surface',
         secondary: `
           bg-foreground
-          text-background hover:text-border-stronger
-          focus-visible:text-border-control
-          border-foreground-light hover:border-foreground-lighter
-          focus-visible:outline-border-strong
-          data-[state=open]:border-foreground-lighter
-          data-[state=open]:outline-border-strong
-        `,
-        /** @deprecated use 'primary' instead */
-        alternative: `
-          text-foreground
-          bg-brand-400 hover:bg-brand-500
-          border-brand-500
-          focus-visible:border-brand-500
-          focus-visible:outline-brand-600
-          data-[state=open]:bg-brand-500
-          data-[state=open]:border-brand-500
-          data-[state=open]:outline-brand-600
+          text-background
+          border-0
+          shadow-[var(--button-shadow-drop)]
+          hover:bg-foreground/90
+          data-[state=open]:bg-foreground/90
         `,
         outline: `
           text-foreground
           bg-transparent
           border-strong hover:border-foreground-muted
-          focus-visible:outline-border-strong
           data-[state=open]:border-stronger
-          data-[state=open]:outline-border-strong
         `,
         dashed: `
           text-foreground
           border
           border-dashed
-          border-strong hover:border-stronger
+          border-strong hover:border-control-hover
           bg-transparent
-          focus-visible:outline-border-strong
-          data-[state=open]:border-stronger
-          data-[state=open]:outline-border-strong
+          data-[state=open]:border-control-hover
         `,
         link: `
-          text-brand-600
+          text-primary
           border
           border-transparent/0
-          hover:bg-brand-400
+          hover:bg-primary-bright/15
           shadow-none
-          focus-visible:outline-border-strong
-          data-[state=open]:bg-brand-400
-          data-[state=open]:outline-border-strong
+          data-[state=open]:bg-primary-bright/15
         `,
         text: `
           text-foreground
-          hover:bg-surface-300
+          hover:bg-accent
           shadow-none
-          focus-visible:outline-border-strong
-          data-[state=open]:bg-surface-300
-          data-[state=open]:outline-border-strong
+          data-[state=open]:bg-accent
           border-transparent
         `,
         danger: `
-          text-foreground
-          bg-destructive-300 dark:bg-destructive-400 hover:bg-destructive-400 dark:hover:bg-destructive/50
-          border-destructive-500 hover:border-destructive
-          hover:text-hi-contrast
-          focus-visible:outline-amber-700
-          data-[state=open]:border-destructive
-          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive-/50
-          data-[state=open]:outline-destructive
+          border-0
+          bg-destructive
+          bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          text-destructive-foreground
+          shadow-[var(--button-shadow-raised)]
+          hover:bg-[var(--destructive-hover)]
+          data-[state=open]:bg-[var(--destructive-hover)]
         `,
         warning: `
-          text-foreground
-          bg-warning-300 dark:bg-warning-400 hover:bg-warning-400 dark:hover:bg-warning/50
-          border-warning-500 hover:border-warning
-          hover:text-hi-contrast
-          focus-visible:outline-amber-700
-          data-[state=open]:border-warning
-          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning-/50
-          data-[state=open]:outline-warning
+          border-0
+          bg-warning
+          bg-[linear-gradient(to_bottom,hsl(var(--colors-white)/0.015),hsl(var(--colors-black)/0.01))]
+          text-warning-foreground
+          shadow-[var(--button-shadow-raised)]
+          hover:bg-[var(--warning-hover)]
+          data-[state=open]:bg-[var(--warning-hover)]
         `,
       },
       block: {
         true: 'w-full flex items-center justify-center',
       },
       size: {
-        ...SIZE_VARIANTS,
+        tiny: `${SIZE_VARIANTS.tiny} ${controlRadiusBySize.tiny}`,
+        small: `${SIZE_VARIANTS.small} ${controlRadiusBySize.small}`,
+        medium: `${SIZE_VARIANTS.medium} ${controlRadiusBySize.medium}`,
+        large: `${SIZE_VARIANTS.large} ${controlRadiusBySize.large}`,
+        xlarge: `${SIZE_VARIANTS.xlarge} ${controlRadiusBySize.xlarge}`,
       },
       overlay: {
         base: `absolute inset-0 bg-background opacity-50`,
@@ -141,16 +113,20 @@ const buttonVariants = cva(
       disabled: {
         true: 'opacity-50 cursor-not-allowed pointer-events-none',
       },
+      focusableWhenDisabled: {
+        true: 'opacity-50 cursor-not-allowed',
+      },
       rounded: {
         true: 'rounded-full',
       },
-      defaultVariants: {
-        //   variant: 'default',
-        //   size: 'default',
-        size: {
-          SIZE_VARIANTS_DEFAULT,
-        },
+      iconOnly: {
+        true: 'hit-area-1 w-6.5',
       },
+    },
+    // Match <Button size="tiny"> so raw buttonVariants({ variant }) keeps sizing.
+    // Fixed icon shells that omit size must override padding (e.g. px-0 with h/w-[30px]).
+    defaultVariants: {
+      size: 'tiny',
     },
   }
 )
@@ -166,17 +142,17 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
       xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
     },
-    type: {
-      primary: 'text-brand-600',
+    variant: {
+      primary: 'text-primary-solid-foreground/50',
       default: 'text-foreground-lighter',
-      secondary: 'text-border-muted',
+      secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
-      link: 'text-brand-600',
+      link: 'text-primary',
       text: 'text-foreground-lighter',
-      danger: 'text-destructive-600',
-      warning: 'text-warning',
+      danger: 'text-destructive-foreground/50',
+      warning: 'text-warning-foreground/50',
     },
   },
 })
@@ -184,17 +160,17 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
 export type LoadingVariantProps = VariantProps<typeof loadingVariants>
 const loadingVariants = cva('', {
   variants: {
-    type: {
-      primary: 'text-brand-600',
+    variant: {
+      primary: 'text-primary-solid-foreground/50',
       default: 'text-foreground-lighter',
-      secondary: 'text-border-muted',
+      secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
-      link: 'text-brand-600',
+      link: 'text-primary',
       text: 'text-foreground-muted',
-      danger: 'text-destructive-600',
-      warning: 'text-warning',
+      danger: 'text-destructive-foreground/50',
+      warning: 'text-warning-foreground/50',
     },
     loading: {
       default: '',
@@ -207,17 +183,22 @@ export interface ButtonProps
   // omit `type` as we use it to change type of button
   // replaced with `htmlType`
   extends
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type'>,
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
     // omit 'disabled' as it is included in HTMLButtonElement
-    Omit<ButtonVariantProps, 'disabled'>,
-    Omit<LoadingVariantProps, 'type'> {
+    Omit<ButtonVariantProps, 'disabled' | 'iconOnly'>,
+    LoadingVariantProps {
   asChild?: boolean
-  type?: ButtonVariantProps['type']
-  htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>['type']
+  variant?: ButtonVariantProps['variant']
   icon?: React.ReactNode
   iconLeft?: React.ReactNode
   iconRight?: React.ReactNode
   rounded?: boolean
+  /**
+   * Keeps a disabled button keyboard-focusable by using `aria-disabled`
+   * instead of native `disabled`. Use this when the control needs a tooltip
+   * or other explanation.
+   */
+  focusableWhenDisabled?: boolean
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -225,83 +206,108 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       asChild = false,
       size = 'tiny',
-      type = 'primary',
+      variant = 'default',
       children,
       loading,
       block,
       icon,
       iconRight,
       iconLeft,
-      htmlType = 'button',
+      type = 'button',
       rounded,
+      focusableWhenDisabled: focusableWhenDisabledProp,
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot.Slot : 'button'
-    const { className, tabIndex } = props
+    const { className, tabIndex, disabled: disabledProp, onClick, ...rest } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
+    const isLoading = loading === true
     // if loading, button is disabled
-    const disabled = loading === true || props.disabled
+    const disabled = isLoading || disabledProp === true
+    const focusableWhenDisabled = disabled && focusableWhenDisabledProp === true
+    const nativeDisabled = disabled && !focusableWhenDisabled
 
-    // Set default tabIndex for proper Safari focus handling
-    // - Explicit tabIndex prop takes precedence
-    // - If disabled, default to -1 (unless explicitly set)
-    // - Otherwise, default to 0 for keyboard accessibility
-    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+    const computedTabIndex = getExplicitTabIndex(tabIndex, nativeDisabled)
+
+    const renderIconContainer = (content: ReactNode) => (
+      <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
+        {content}
+      </div>
+    )
+
+    const handleActivation = (e: React.MouseEvent, childOnClick?: React.MouseEventHandler) => {
+      if (disabled) {
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+
+      childOnClick?.(e)
+      if (!e.defaultPrevented) {
+        onClick?.(e as React.MouseEvent<HTMLButtonElement>)
+      }
+    }
 
     return (
       <Comp
         ref={ref}
         data-size={size}
-        type={htmlType}
-        {...props}
-        disabled={disabled}
+        type={type}
+        {...rest}
+        aria-disabled={focusableWhenDisabled || undefined}
+        disabled={nativeDisabled}
         tabIndex={computedTabIndex}
-        className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
-        onClick={(e) => {
-          // [Joshen] Prevents redirecting if Button is used with a link-based child element
-          if (disabled) return e.preventDefault()
-          else props?.onClick?.(e)
-        }}
+        className={cn(
+          buttonVariants({
+            variant,
+            size,
+            disabled: nativeDisabled,
+            focusableWhenDisabled,
+            block,
+            rounded,
+            iconOnly: children == null || children === false,
+          }),
+          className
+        )}
+        onClick={asChild ? undefined : (e) => handleActivation(e)}
       >
         {asChild ? (
-          isValidElement<{ children: ReactNode }>(children) ? (
+          isValidElement<{ children: ReactNode; onClick?: React.MouseEventHandler }>(children) ? (
             cloneElement(
               children,
-              undefined,
+              {
+                onClick: (e) => handleActivation(e, children.props.onClick),
+              },
               showIcon &&
-                (loading ? (
-                  <div className={cn(IconContainerVariants({ size, type }))}>
-                    <Loader2 className={cn(loadingVariants({ loading, type }))} />
-                  </div>
-                ) : _iconLeft ? (
-                  <div className={cn(IconContainerVariants({ size, type }))}>{_iconLeft}</div>
-                ) : null),
+                (loading
+                  ? renderIconContainer(
+                      <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                    )
+                  : _iconLeft
+                    ? renderIconContainer(_iconLeft)
+                    : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
-              iconRight && !loading && (
-                <div className={cn(IconContainerVariants({ size, type }))}>{iconRight}</div>
-              )
+              iconRight && !loading && renderIconContainer(iconRight)
             )
           ) : null
         ) : (
           <>
             {showIcon &&
-              (loading ? (
-                <div className={cn(IconContainerVariants({ size, type }))}>
-                  <Loader2 className={cn(loadingVariants({ loading, type }))} />
-                </div>
-              ) : _iconLeft ? (
-                <div className={cn(IconContainerVariants({ size, type }))}>{_iconLeft}</div>
-              ) : null)}{' '}
+              (loading
+                ? renderIconContainer(
+                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                  )
+                : _iconLeft
+                  ? renderIconContainer(_iconLeft)
+                  : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
-            {iconRight && !loading && (
-              <div className={cn(IconContainerVariants({ size, type }))}>{iconRight}</div>
-            )}
+            {iconRight && !loading && renderIconContainer(iconRight)}
           </>
         )}
       </Comp>

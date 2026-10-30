@@ -52,20 +52,18 @@ export interface LumaHost {
   avatar_url: string
 }
 
+export interface LumaTag {
+  api_id?: string
+  name: string
+}
+
 interface LumaResponse {
-  entries: { event: LumaPayloadEvent }[]
+  entries: { event: LumaPayloadEvent; tags?: (string | LumaTag)[] }[]
   has_more: boolean
   next_cursor?: string
 }
 
-export type LumaCalendar = 'community' | 'hackathon'
-
-async function fetchLumaCalendar(
-  apiKey: string,
-  calendar: LumaCalendar,
-  after: string | null,
-  before: string | null
-) {
+async function fetchLumaCalendar(apiKey: string, after: string | null, before: string | null) {
   const lumaUrl = new URL('https://public-api.lu.ma/public/v1/calendar/list-events')
   if (after) lumaUrl.searchParams.append('after', after)
   if (before) lumaUrl.searchParams.append('before', before)
@@ -79,16 +77,18 @@ async function fetchLumaCalendar(
   })
 
   if (!response.ok) {
-    throw new Error(`Luma API error (${calendar}): ${response.status} ${response.statusText}`)
+    throw new Error(`Luma API error: ${response.status} ${response.statusText}`)
   }
 
   const data: LumaResponse = await response.json()
 
   return data.entries
     .filter(({ event }) => event.visibility === 'public')
-    .map(({ event }) => ({
+    .map(({ event, tags }) => ({
       id: event.api_id,
-      calendar,
+      tags: (tags ?? [])
+        .map((tag) => (typeof tag === 'string' ? tag : tag?.name))
+        .filter((name): name is string => Boolean(name)),
       start_at: event.start_at,
       end_at: event.end_at,
       name: event.name,
@@ -104,11 +104,10 @@ async function fetchLumaCalendar(
 
 export async function GET(request: NextRequest) {
   try {
-    const communityKey = process.env.LUMA_API_KEY
-    const hackathonKey = process.env.LUMA_HACKATHONS_API_KEY
+    const apiKey = process.env.LUMA_API_KEY
 
-    if (!communityKey && !hackathonKey) {
-      console.error('No Luma API keys configured (LUMA_API_KEY / LUMA_HACKATHONS_API_KEY)')
+    if (!apiKey) {
+      console.error('No Luma API key configured (LUMA_API_KEY)')
       return NextResponse.json({ error: 'API configuration error' }, { status: 500 })
     }
 
@@ -116,22 +115,9 @@ export async function GET(request: NextRequest) {
     const after = searchParams.get('after')
     const before = searchParams.get('before')
 
-    const calendarFetches: Array<Promise<Awaited<ReturnType<typeof fetchLumaCalendar>>>> = []
-    if (communityKey)
-      calendarFetches.push(fetchLumaCalendar(communityKey, 'community', after, before))
-    if (hackathonKey)
-      calendarFetches.push(fetchLumaCalendar(hackathonKey, 'hackathon', after, before))
-
-    const results = await Promise.allSettled(calendarFetches)
-
-    const events = results
-      .flatMap((result) => {
-        if (result.status === 'fulfilled') return result.value
-        Sentry.captureException(result.reason)
-        console.error(result.reason)
-        return []
-      })
-      .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime())
+    const events = (await fetchLumaCalendar(apiKey, after, before)).sort(
+      (a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
+    )
 
     return NextResponse.json({
       success: true,

@@ -18,13 +18,13 @@ const PageNav = ({ className, ...props }: PageNavProps) => {
     <PageContainer
       data-slot="page-nav"
       size="full"
-      className={cn('flex min-h-12 items-center border-b', pageChromeClassName)}
+      className={cn('flex min-h-(--header-height) items-center border-b', pageChromeClassName)}
     >
       <div
         data-slot="page-nav-menu"
         className={cn(
-          'flex min-h-12 w-full items-center',
-          '[&>nav]:flex [&>nav]:h-12 [&>nav]:items-center [&>nav]:border-b-0',
+          'flex min-h-(--header-height) w-full items-center',
+          '[&>nav]:flex [&>nav]:h-(--header-height) [&>nav]:items-center [&>nav]:border-b-0',
           '[&>nav>ul]:h-full [&>nav>ul]:items-center',
           '[&>nav>ul>li]:h-full',
           className

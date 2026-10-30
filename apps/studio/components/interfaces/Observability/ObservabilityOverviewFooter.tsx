@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export const ObservabilityOverviewFooter = () => {
   return (
-    <div className="py-12 flex items-center justify-center">
+    <div className="pt-4 pb-12 flex items-center justify-center">
       <p className="text-sm text-foreground-light">
         <Link
           href="https://supabase.com/docs/guides/troubleshooting"

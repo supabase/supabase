@@ -1,14 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
   Form,
   Sheet,
@@ -18,7 +17,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -34,9 +33,8 @@ import type { components } from '@/data/api'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { BASE_PATH } from '@/lib/constants'
 
 interface ProviderFormProps {
@@ -58,9 +56,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const { data: endpoint } = useProjectApiUrl({ projectRef })
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const shouldDisableField = (field: string): boolean => {
@@ -84,7 +81,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const hasEntitlementAccess = useHasEntitlementAccess()
 
-  const getValuesForProvider = useStaticEffectEvent(
+  const getValuesForProvider = useCallback(
     (config: components['schemas']['GoTrueConfigResponse']) => {
       const values: { [x: string]: string | boolean } = {}
       Object.keys(provider.properties).forEach((key) => {
@@ -112,7 +109,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         }
       })
       return values
-    }
+    },
+    [provider]
   )
 
   const INITIAL_VALUES = useMemo(() => {
@@ -188,18 +186,9 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
           />
         }
         meta={
-          isActive ? (
-            <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
-              <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
-                <Check strokeWidth={2} size={12} />
-              </span>
-              <span className="px-1">Enabled</span>
-            </div>
-          ) : (
-            <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
-              Disabled
-            </div>
-          )
+          <Badge variant={isActive ? 'success' : 'default'}>
+            {isActive ? 'Enabled' : 'Disabled'}
+          </Badge>
         }
       >
         {provider.title}
@@ -279,8 +268,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
               <DocsButton href={provider.link} />
               <div className="flex items-center gap-x-3">
                 <Button
-                  type="default"
-                  htmlType="reset"
+                  type="reset"
                   onClick={() => {
                     setOpen(false)
                     setUrlProvider(null)
@@ -291,8 +279,9 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                   Cancel
                 </Button>
                 <ButtonTooltip
+                  variant="primary"
                   form={formId}
-                  htmlType="submit"
+                  type="submit"
                   loading={isUpdatingConfig}
                   disabled={isUpdatingConfig || !canUpdateConfig || !form.formState.isDirty}
                   tooltip={{

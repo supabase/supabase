@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
+import { LockIcon, PaintbrushIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
@@ -51,7 +51,7 @@ export const QueueTab = () => {
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: 'pgmq',
+    schemas: ['pgmq'],
   })
   const queuePolicies = (policies ?? []).filter((policy) => policy.table === queueRelname)
 
@@ -110,20 +110,20 @@ export const QueueTab = () => {
           <QueueSettings />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="px-1.5"
             onClick={() => setPurgeQueueModalShown(true)}
-            icon={<Paintbrush />}
+            icon={<PaintbrushIcon />}
             title="Purge messages"
             aria-label="Purge messages"
             tooltip={{ content: { side: 'bottom', text: 'Purge messages' } }}
           />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="px-1.5"
             onClick={() => setDeleteQueueModalShown(true)}
-            icon={<Trash2 />}
+            icon={<Trash2Icon />}
             title="Delete queue"
             aria-label="Delete queue"
             tooltip={{ content: { side: 'bottom', text: 'Delete queue' } }}
@@ -138,9 +138,8 @@ export const QueueTab = () => {
               {queuePolicies.length === 0 ? (
                 <ButtonTooltip
                   asChild
-                  type="default"
                   className="group"
-                  icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
+                  icon={<PlusCircleIcon strokeWidth={1.5} className="text-foreground-muted" />}
                   tooltip={{
                     content: {
                       side: 'bottom',
@@ -151,7 +150,7 @@ export const QueueTab = () => {
                 >
                   <Link
                     passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                    href={`/project/${ref}/database/policies?search=${queueTable?.id}&schema=pgmq`}
                   >
                     Add RLS policy
                   </Link>
@@ -159,7 +158,6 @@ export const QueueTab = () => {
               ) : (
                 <Button
                   asChild
-                  type="default"
                   className="group"
                   icon={
                     <div
@@ -176,7 +174,7 @@ export const QueueTab = () => {
                 >
                   <Link
                     passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                    href={`/project/${ref}/database/policies?search=${queueTable?.id}&schema=pgmq`}
                   >
                     Auth {queuePolicies.length > 1 ? 'policies' : 'policy'}
                   </Link>
@@ -190,13 +188,16 @@ export const QueueTab = () => {
               onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
             >
               <PopoverTrigger asChild>
-                <Button type={isExposed ? 'warning' : 'default'} icon={<Lock strokeWidth={1.5} />}>
+                <Button
+                  variant={isExposed ? 'warning' : 'default'}
+                  icon={<LockIcon strokeWidth={1.5} />}
+                >
                   RLS disabled
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 text-sm" align="end">
                 <h3 className="text-xs flex items-center gap-x-2">
-                  <Lock size={14} /> Row Level Security (RLS)
+                  <LockIcon size={14} /> Row Level Security (RLS)
                 </h3>
                 <div className="grid gap-2 mt-2 text-foreground-light text-xs">
                   {isExposed ? (
@@ -207,7 +208,6 @@ export const QueueTab = () => {
                       </p>
                       <p>With RLS enabled, anonymous users will not have access to this queue.</p>
                       <Button
-                        type="default"
                         className="w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -224,7 +224,6 @@ RLS for queues is only relevant if exposure through PostgREST has been enabled, 
 You may opt to manage your queues via any Supabase client libraries or PostgREST endpoints by enabling this in the [queues settings](/project/${project?.ref}/integrations/queues/settings).`}
                       />
                       <Button
-                        type="default"
                         className="w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -237,7 +236,7 @@ You may opt to manage your queues via any Supabase client libraries or PostgREST
             </Popover>
           )}
 
-          <Button type="primary" onClick={() => setSendMessageModalShown(true)}>
+          <Button variant="primary" onClick={() => setSendMessageModalShown(true)}>
             Add message
           </Button>
 

@@ -1,6 +1,6 @@
 ---
 id: 'auth-third-party-clerk'
-title: 'Clerk'
+title: 'Clerk third-party auth'
 subtitle: 'Use Clerk with your Supabase project'
 ---
 
@@ -77,7 +77,7 @@ import Supabase
 
 let supabase = SupabaseClient(
   supabaseURL: URL(string: "https://project-ref.supabase.io")!,
-  supabaseKey: "supabase.anon.key",
+  supabaseKey: "supabase.publishable.key",
   options: SupabaseClientOptions(
     auth: SupabaseClientOptions.AuthOptions(
       accessToken: {

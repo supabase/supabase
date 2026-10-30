@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Home, Plus } from 'lucide-react'
+import { HomeIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Command,
@@ -17,13 +17,14 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { DEPRECATED_REPORTS } from './Reports.constants'
+import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from './Reports.constants'
+import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentQuery } from '@/data/content/content-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { Metric, METRIC_CATEGORIES, METRICS } from '@/lib/constants/metrics'
+import { useTrack } from '@/lib/telemetry/track'
 import { editorPanelState } from '@/state/editor-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import type { Dashboards } from '@/types'
@@ -41,7 +42,7 @@ interface MetricOptionsProps {
 
 export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
   const { ref: projectRef } = useParams()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: project } = useSelectedProjectQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const [search, setSearch] = useState('')
 
@@ -50,13 +51,15 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
     'project_storage:all',
   ])
 
+  const supportsBurstableIO = hasBurstableIO(project?.infra_compute_size)
+
   const metricCategories = Object.values(METRIC_CATEGORIES).filter(({ key }) => {
     if (key === 'api_auth') return authEnabled
     if (key === 'api_storage') return storageEnabled
     return true
   })
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const debouncedSearch = useDebounce(search, 300)
   const {
@@ -76,14 +79,16 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
         return (
           <DropdownMenuSub key={cat.key}>
             <DropdownMenuSubTrigger className="space-x-2">
-              {cat.icon ? cat.icon() : <Home size={14} />}
+              {cat.icon ? cat.icon() : <HomeIcon size={14} />}
               <p>{cat.label}</p>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
                 {METRICS.filter(
                   (metric) =>
-                    !DEPRECATED_REPORTS.includes(metric.key) && metric?.category?.key === cat.key
+                    !DEPRECATED_REPORTS.includes(metric.key) &&
+                    metric?.category?.key === cat.key &&
+                    (supportsBurstableIO || !BURSTABLE_IO_METRIC_KEYS.includes(metric.key))
                 ).map((metric) => {
                   return (
                     <DropdownMenuCheckboxItem
@@ -152,13 +157,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                             },
                             isAddingChart: true,
                           })
-                          sendEvent({
-                            action: 'custom_report_add_sql_block_clicked',
-                            groups: {
-                              project: projectRef ?? 'Unknown',
-                              organization: selectedOrganization?.slug ?? 'Unknown',
-                            },
-                          })
+                          track('custom_report_add_sql_block_clicked')
                         }
                       }}
                     >
@@ -179,7 +178,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                   }}
                 >
                   <div className="w-full flex items-center gap-2">
-                    <Plus size={14} strokeWidth={1.5} />
+                    <PlusIcon size={14} strokeWidth={1.5} />
                     <p>Create snippet</p>
                   </div>
                 </CommandItem>

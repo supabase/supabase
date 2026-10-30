@@ -1,15 +1,15 @@
 // End of third-party imports
 
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, ExternalLinkIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, cn, CommandGroup, CommandItem, FormControl, FormField } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -22,7 +22,8 @@ interface ProjectAndPlanProps {
   form: UseFormReturn<SupportFormValues>
   orgSlug: string | null
   projectRef: string | null
-  category: ExtendedSupportCategories
+  // Unused — kept optional so SupportFormV2 (which still passes it) doesn't need updating.
+  category?: ExtendedSupportCategories
   subscriptionPlanId: string | undefined
 }
 
@@ -30,7 +31,6 @@ export function ProjectAndPlanInfo({
   form,
   orgSlug,
   projectRef,
-  category: _category,
   subscriptionPlanId: _subscriptionPlanId,
 }: ProjectAndPlanProps) {
   const hasProjectSelected = projectRef && projectRef !== NO_PROJECT_MARKER
@@ -54,14 +54,14 @@ interface ProjectSelectorProps {
 }
 
 function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
-  const { projectRef: urlProjectRef } = useParams()
+  const { ref: routeProjectRef } = useParams()
 
   return (
     <FormField
       name="projectRef"
       control={form.control}
       render={({ field }) => (
-        <FormItemLayout hideMessage layout="vertical" label="Which project is affected?">
+        <FormItemLayout layout="vertical" label="Which project is affected?">
           <FormControl>
             <OrganizationProjectSelector
               key={orgSlug}
@@ -71,22 +71,25 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
               slug={!orgSlug || orgSlug === NO_ORG_MARKER ? undefined : orgSlug}
               selectedRef={field.value}
               onInitialLoad={(projects) => {
-                if (!urlProjectRef && (!projectRef || projectRef === NO_PROJECT_MARKER))
+                const hasSelectedProject = !!projectRef && projectRef !== NO_PROJECT_MARKER
+                const hasRouteProjectInList =
+                  !!routeProjectRef && projects.some((project) => project.ref === routeProjectRef)
+                if (!hasRouteProjectInList && !hasSelectedProject) {
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
+                }
               }}
               onSelect={(project) => field.onChange(project.ref)}
               renderTrigger={({ isLoading, project, listboxId, open }) => {
                 return (
                   <Button
                     block
-                    type="default"
                     role="combobox"
                     aria-label="Select a project"
                     aria-expanded={open}
                     aria-controls={listboxId}
                     size="small"
                     className="justify-between"
-                    iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                    iconRight={<ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
                   >
                     {!!orgSlug && isLoading ? (
                       <ShimmeringLoader className="w-44 py-2" />
@@ -107,7 +110,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                       setOpen(false)
                     }}
                   >
-                    {field.value === NO_PROJECT_MARKER && <Check size={16} />}
+                    {field.value === NO_PROJECT_MARKER && <CheckIcon size={16} />}
                     <p className={cn(field.value !== NO_PROJECT_MARKER && 'ml-6')}>
                       No specific project
                     </p>
@@ -140,12 +143,11 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
           className="flex items-center gap-x-1"
         >
           <p className="text-sm transition text-foreground-lighter">
-            Project ID:{' '}
-            <code className="text-code-inline text-foreground-light!">{projectRef}</code>
+            Project ID: <code className="text-foreground-light!">{projectRef}</code>
           </p>
           <CopyButton
             iconOnly
-            type="text"
+            variant="text"
             text={projectRef}
             onClick={() => toast.success('Copied project ID to clipboard')}
           />
@@ -195,14 +197,14 @@ export const PlanExpectationInfoContent = ({
 
       {shouldShowUpgradeActions && (
         <div className="flex flex-wrap gap-2 pt-1">
-          <Button asChild size="tiny">
+          <Button variant="primary" asChild size="tiny">
             <Link
               href={`/org/${orgSlug}/billing?panel=subscriptionPlan&source=planSupportExpectationInfoBox`}
             >
               Upgrade plan
             </Link>
           </Button>
-          <Button asChild type="default" size="tiny" icon={<ExternalLink />}>
+          <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
             <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
               Enquire about Enterprise
             </Link>

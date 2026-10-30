@@ -1,0 +1,53 @@
+---
+title: Skip to Content
+description: Keyboard-accessible skip link that jumps past chrome to the main landmark.
+component: true
+fragment: true
+---
+
+<ComponentPreview name="skip-to-content-demo" peekCode wide />
+
+Keyboard-accessible skip link composed from [Button](../components/button) for apps with persistent header and sidebar chrome. Hidden until focused via Tab, then slides into view so users can jump past navigation to the main landmark.
+
+The preview above shows the focused appearance. In product apps, the link stays off-screen until keyboard focus.
+
+See [Accessibility](../accessibility#jumping-ahead) for more information on when to use skip links, and how they coexist alongside other navigation aids.
+
+## Usage
+
+```tsx
+import { SkipToContent } from 'ui-patterns/SkipToContent'
+```
+
+```tsx
+<SkipToContent href="#main" />
+
+<main id="main" tabIndex={-1} className="scroll-mt-(--header-height) outline-hidden">
+  {children}
+</main>
+```
+
+Place the skip link at the root of the app chrome so Tab reaches it before navigation. The target landmark must be content only. Do not wrap a sidebar inside the same `<main>`, otherwise a Tab after skip will land in the sidebar navigation.
+
+## Props
+
+### `href`
+
+Hash href to the main content landmark, e.g. `#main`.
+
+### `children`
+
+Link label. Defaults to `Skip to content`.
+
+### `className`
+
+Optional classes merged onto the positioning wrapper (useful for demos or layout overrides).
+
+## Target landmark
+
+Callers own the landmark the skip link points at:
+
+- Matching `id`
+- `tabIndex={-1}` so Enter moves focus onto the landmark
+- `scroll-mt` when a sticky header is present
+- `outline-hidden` so the landmark has no visible focus ring. The subsequent Tab will land on the first interactive child
