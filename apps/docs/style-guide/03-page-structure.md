@@ -81,14 +81,22 @@ those items are about. A procedure can have six steps and still cover two tasks.
 
 Every guide sets `title` and `description` in its frontmatter. `subtitle` is optional.
 
+### Title
+
+Keep the title to 35 characters or fewer, in sentence case.
+
+- **Task pages:** start with an imperative, such as `Create a table`.
+- **Explainers:** use a noun phrase, such as `Auth architecture`.
+- **Gerunds:** avoid them, such as `Creating a table`.
+
 ### Subtitle
 
 The subtitle is a short line under the title. Add one only when the title doesn't say what
 the page covers. Write it as an imperative with no period. It can match the description.
 As a rule of thumb, if it matches the first sentence of the page, leave it out.
 
-- **Recommended**: `Vault` with `Manage secrets in Postgres`, and `Branching` with `Use Supabase Branches to test and preview changes`.
-- **Not recommended**: `Configure your Supabase client to use cookies`, above a first sentence of `Learn how to configure your Supabase client to use cookies.`
+For example, a page titled `Vault` has the subtitle `Manage secrets in Postgres`, and a
+page titled `Branching` has `Use Supabase Branches to test and preview changes`.
 
 ### Description
 
