@@ -31,6 +31,8 @@ export const ONBOARDING_SURVEY_VARIANTS = [
 
 export type OnboardingSurveyVariant = (typeof ONBOARDING_SURVEY_VARIANTS)[number]
 
+// Both org-form arms show the survey section open. org_form_collapsed is kept so
+// users already assigned to it still get the survey until the flag drops it.
 const ORG_FORM_VARIANTS: ReadonlySet<OnboardingSurveyVariant> = new Set([
   'org_form_collapsed',
   'org_form_expanded',

@@ -168,7 +168,6 @@ export const NewOrgForm = ({
 
   const { variant: onboardingSurveyVariant } = useOnboardingSurveyVariant()
   const showOnboardingSurveyInOrgForm = isOrgFormVariant(onboardingSurveyVariant)
-  const showOnboardingSurveyExpanded = onboardingSurveyVariant === 'org_form_expanded'
   // Skip kind/size on org creation when the survey section is shown: the survey
   // endpoint saves them after creation, and it dedupes on (user, org_slug) at the
   // parent row, so sending them on both paths would swallow the survey call.
@@ -803,7 +802,7 @@ export const NewOrgForm = ({
                 <CollapsibleCardSection
                   title="Help improve Supabase"
                   description="Optional questions to help improve the Supabase experience"
-                  defaultOpen={showOnboardingSurveyExpanded}
+                  defaultOpen
                 >
                   {onboardingSurveyFields}
                 </CollapsibleCardSection>
