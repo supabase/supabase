@@ -6,7 +6,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type RestartPipelineParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
 }
 
 export async function restartPipeline(

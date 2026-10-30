@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { organizationKeys } from './keys'
 import type { components } from '@/data/api'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationMembersVariables = {
@@ -26,6 +26,7 @@ export async function getOrganizationMembers(
     get('/platform/organizations/{slug}/members/invitations', {
       params: { path: { slug } },
       signal,
+      grant: unguarded.migrating,
     }),
   ])
 

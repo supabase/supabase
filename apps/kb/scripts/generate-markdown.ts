@@ -10,11 +10,11 @@ import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import remarkStringify from 'remark-stringify'
 import { unified } from 'unified'
-import { visit } from 'unist-util-visit'
 import YAML from 'yaml'
 
 import { BASE_PATH } from '../src/lib/constants.ts'
 import { isInTopic, TOPICS, topicToSlug, type Topic } from '../src/lib/topics.ts'
+import { addBaseUrlPrefix, stripHeadingCustomIds } from './helpers.ts'
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
 const CONTENT_DIR = path.join(SCRIPT_DIR, '..', 'src', 'content')
@@ -49,6 +49,8 @@ const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
   .use(remarkStringify, { bullet: '-', listItemIndent: 'one', emphasis: '_', rule: '-' })
+
+export type MarkdownTree = ReturnType<typeof processor.parse>
 
 /**
  * Absolute base URL to prepend to root-relative links, mirroring apps/docs'
@@ -93,20 +95,13 @@ export function parseFrontmatter(raw: string): { data: Frontmatter; body: string
  * the body to an mdast tree, visiting its `link` nodes, and serializing it
  * back — the AST equivalent of apps/docs' `addBaseUrlPrefix()`, so this file
  * still makes sense read outside of the site (no regex over the raw text).
- *
+ * Heading custom anchors are stripped in the same pass.
  */
 export function absolutizeLinks(body: string): string {
   const tree = processor.parse(body)
-  const baseUrl = getInternalLinkBaseUrl()
 
-  visit(tree, 'link', (node) => {
-    if (!node.url.startsWith('/') || node.url.startsWith('//')) return
-    const withBase =
-      node.url === BASE_PATH || node.url.startsWith(`${BASE_PATH}/`)
-        ? node.url
-        : `${BASE_PATH}${node.url}`
-    node.url = `${baseUrl}${withBase}`
-  })
+  stripHeadingCustomIds(tree)
+  addBaseUrlPrefix(tree, getInternalLinkBaseUrl())
 
   return String(processor.stringify(tree))
 }
@@ -147,17 +142,19 @@ const renderLinkList = (entries: Entry[]) =>
 
 /**
  * Renders the root sitemap: the site title as an h1 with its description
- * beneath, then one section per kind of page (topics, troubleshooting
- * articles, guides), each a bullet list of links to the `.md` exports.
+ * beneath, then one section per kind of page (topics, guides, FAQs,
+ * troubleshooting articles), each a bullet list of links to the `.md` exports.
  */
 export function renderSitemapMarkdown({
   topics,
-  troubleshooting,
   guides,
+  faqs,
+  troubleshooting,
 }: {
   topics: Entry[]
-  troubleshooting: Entry[]
   guides: Entry[]
+  faqs: Entry[]
+  troubleshooting: Entry[]
 }): string {
   return (
     [
@@ -165,10 +162,12 @@ export function renderSitemapMarkdown({
       SITE_DESCRIPTION,
       '## Topics',
       renderLinkList(topics),
-      '## Troubleshooting',
-      renderLinkList(troubleshooting),
       '## Guides',
       renderLinkList(guides),
+      '## FAQs',
+      renderLinkList(faqs),
+      '## Troubleshooting',
+      renderLinkList(troubleshooting),
     ].join('\n\n') + '\n'
   )
 }
@@ -211,7 +210,11 @@ async function main() {
   const files = await findContentFiles(CONTENT_DIR)
 
   const guidesByTopic = new Map<Topic, Entry[]>(TOPICS.map((topic) => [topic.name, []]))
-  const entriesByCollection: Record<string, Entry[]> = { guides: [], troubleshooting: [] }
+  const entriesByCollection: Record<'guides' | 'faqs' | 'troubleshooting', Entry[]> = {
+    guides: [],
+    faqs: [],
+    troubleshooting: [],
+  }
 
   await Promise.all(
     files.map(async (file) => {
@@ -223,8 +226,8 @@ async function main() {
       const outputPath = path.join(OUTPUT_DIR, toMdExtension(relativePath))
       await writeFileEnsuringDir(outputPath, markdown)
 
-      // the first folder under src/content is the collection, e.g. guides or troubleshooting
-      const collection = relativePath.split(path.sep)[0] as 'guides' | 'troubleshooting'
+      // the first folder under src/content is the collection, e.g. guides, faqs or troubleshooting
+      const collection = relativePath.split(path.sep)[0] as keyof typeof entriesByCollection
       const topics: string[] = Array.isArray(data.topics) ? data.topics : []
       const entry: Entry = { title: data.title ?? relativePath, url: toMdUrl(relativePath) }
       entriesByCollection[collection]?.push(entry)
@@ -249,8 +252,9 @@ async function main() {
       path.join(OUTPUT_DIR, 'sitemap.md'),
       renderSitemapMarkdown({
         topics: topicEntries,
-        troubleshooting: entriesByCollection.troubleshooting.sort(byTitle),
         guides: entriesByCollection.guides.sort(byTitle),
+        faqs: entriesByCollection.faqs.sort(byTitle),
+        troubleshooting: entriesByCollection.troubleshooting.sort(byTitle),
       })
     ),
   ])

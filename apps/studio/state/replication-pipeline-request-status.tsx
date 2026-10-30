@@ -16,10 +16,10 @@ type PipelineRequest = {
 }
 
 interface PipelineRequestStatusContextType {
-  getRequestStatus: (pipelineId: number) => PipelineStatusRequestStatus
-  isRequestPending: (pipelineId: number) => boolean
+  getRequestStatus: (pipelineId: string | undefined) => PipelineStatusRequestStatus
+  isRequestPending: (pipelineId: string | undefined) => boolean
   runWithRequestStatus: <T>(
-    pipelineId: number,
+    pipelineId: string,
     status: PipelineStatusRequestStatus,
     action: () => Promise<T>
   ) => Promise<T>
@@ -32,7 +32,7 @@ const PipelineRequestStatusContext = createContext<PipelineRequestStatusContextT
 export const PipelineRequestStatusProvider = ({ children }: { children: ReactNode }) => {
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
-  const [requests, setRequests] = useState<Record<number, PipelineRequest>>({})
+  const [requests, setRequests] = useState<Record<string, PipelineRequest>>({})
 
   const runWithRequestStatus: PipelineRequestStatusContextType['runWithRequestStatus'] = async (
     pipelineId,
@@ -72,8 +72,10 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
     <PipelineRequestStatusContext.Provider
       value={{
         getRequestStatus: (pipelineId) =>
-          requests[pipelineId]?.status ?? PipelineStatusRequestStatus.None,
-        isRequestPending: (pipelineId) => requests[pipelineId] !== undefined,
+          (pipelineId === undefined ? undefined : requests[pipelineId]?.status) ??
+          PipelineStatusRequestStatus.None,
+        isRequestPending: (pipelineId) =>
+          pipelineId !== undefined && requests[pipelineId] !== undefined,
         runWithRequestStatus,
       }}
     >

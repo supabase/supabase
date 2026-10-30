@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { actionKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ActionLogsVariables = {
@@ -21,6 +21,7 @@ export async function getActionRunLogs(
     parseAs: 'text',
     headers: { Accept: 'text/plain' },
     signal,
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
 

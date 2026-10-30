@@ -9,7 +9,8 @@ const ProjectWebhookEndpointSettings: NextPageWithLayout = () => {
   const { query } = useRouter()
   const endpointId = Array.isArray(query.endpointId) ? query.endpointId[0] : query.endpointId
 
-  return <PlatformWebhooksPage scope="project" endpointId={endpointId} />
+  // The key resets the page state (such as delivery page cursors) when the endpoint changes
+  return <PlatformWebhooksPage key={endpointId} scope="project" endpointId={endpointId} />
 }
 
 ProjectWebhookEndpointSettings.getLayout = (page) => (

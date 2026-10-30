@@ -6,6 +6,7 @@ import { IS_PLATFORM } from 'common'
 import { tableRowKeys } from './keys'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from '@/components/grid/types'
+import { unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
@@ -80,6 +81,7 @@ export async function getTableRowsCount(
       sql,
       queryKey: ['table-rows-count', table.id],
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      grant: unguarded.migrating,
     },
     signal
   )

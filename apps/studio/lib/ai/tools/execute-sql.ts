@@ -31,6 +31,9 @@ export const contract = {
   inputSchema,
   outputSchema: executeSqlOutputSchema,
   minOptInLevel: null,
+  availability: {
+    environments: new Set(['platform', 'self-hosted']),
+  },
   needsApproval: true,
   toModelOutput: toModelExecuteSqlOutput,
 } as const satisfies ToolContract

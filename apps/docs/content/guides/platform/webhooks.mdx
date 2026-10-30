@@ -288,7 +288,7 @@ Supabase considers a delivery successful when your endpoint returns a `2xx` resp
 
 After five failed attempts, the delivery is marked as failed with no further retries. Supabase does not notify you when this happens — check delivery history to find permanently failed deliveries.
 
-You can retry a delivery manually. A manual retry is a single attempt: if it fails, no automatic retries follow.
+You can retry a delivery manually. A manual retry is a single attempt: if it fails, no automatic retries follow. To troubleshoot webhook deliveries that fail, see [Webhook debugging guide](/kb/troubleshooting/webhook-debugging-guide-M8sk47).
 
 Delivery history is retained for 14 days. An expired delivery is no longer listed and can't be retried.
 

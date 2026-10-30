@@ -45,8 +45,7 @@ export const RestartTableDialog = ({
   onResetStart,
   onResetComplete,
 }: RestartTableDialogProps) => {
-  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
-  const pipelineId = Number(_pipelineId)
+  const { ref: projectRef, pipelineId } = useParams()
   const { runWithRequestStatus } = usePipelineRequestStatus()
   const restartRequestStatus = getRestartRequestStatus(pipelineStatusName)
   const tableName = `${table.schema}.${table.name}`

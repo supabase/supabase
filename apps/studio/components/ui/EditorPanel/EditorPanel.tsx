@@ -58,6 +58,7 @@ import { useContentQuery, type Content } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import type { Snippet } from '@/data/content/sql-folders-query'
+import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -253,6 +254,7 @@ export const EditorPanel = () => {
         throw executeError
       },
       contextualInvalidation: true,
+      grant: unguarded.migrating,
     })
   }
 

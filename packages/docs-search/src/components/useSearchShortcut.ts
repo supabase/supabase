@@ -3,17 +3,20 @@
 import { useEffect } from 'react'
 
 /**
- * Calls `onTrigger` on Cmd+K, ahead of any other handler. It runs in the capture phase and
- * stops propagation, so another search dialog listening for the same shortcut doesn't open
+ * Calls `onTrigger` on Cmd+K or Ctrl+K, ahead of any other handler. It runs in the capture phase
+ * and stops propagation, so another search dialog listening for the same shortcut doesn't open
  * too, and `preventDefault` stops the browser's own Cmd+K command.
  */
 export function useSearchShortcut(onTrigger: () => void) {
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'k' && event.metaKey) {
+      const usesPrimaryModifier = event.metaKey || event.ctrlKey
+      const otherModifiersActive = event.altKey || event.shiftKey
+
+      if (event.key?.toLowerCase() === 'k' && usesPrimaryModifier && !otherModifiersActive) {
         event.stopImmediatePropagation()
         event.preventDefault()
-        onTrigger()
+        if (!event.repeat) onTrigger()
       }
     }
 
