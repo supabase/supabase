@@ -31,6 +31,7 @@ export const SignInSSOForm = () => {
   const queryClient = useQueryClient()
   const captchaRef = useRef<HCaptcha>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [isCaptchaFallback, setIsCaptchaFallback] = useState(false)
   const [_, setLastSignInUsed] = useLastSignIn()
   const track = useTrack()
   const trackFunnelError = useTrackFunnelError()
@@ -47,6 +48,7 @@ export const SignInSSOForm = () => {
     if (!token) {
       const captcha = await resolveCaptchaToken(captchaRef, trackFunnelError, toastId)
       if (!captcha.ok) {
+        setIsCaptchaFallback(true)
         setCaptchaToken(null)
         captchaRef.current?.resetCaptcha()
         return
@@ -115,9 +117,10 @@ export const SignInSSOForm = () => {
 
         <div className="self-center">
           <HCaptcha
+            key={isCaptchaFallback ? 'interactive' : 'invisible'}
             ref={captchaRef}
             sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-            size="invisible"
+            size={isCaptchaFallback ? 'normal' : 'invisible'}
             onVerify={(token) => {
               setCaptchaToken(token)
             }}
@@ -125,6 +128,12 @@ export const SignInSSOForm = () => {
               setCaptchaToken(null)
             }}
           />
+          {isCaptchaFallback && (
+            <p role="status" className="mt-2 max-w-72 text-center text-sm text-foreground-lighter">
+              Complete the security check, then select Sign in. If it doesn&apos;t load, allow
+              hcaptcha.com in your browser and reload the page.
+            </p>
+          )}
         </div>
 
         <Button
@@ -134,6 +143,7 @@ export const SignInSSOForm = () => {
           type="submit"
           size="large"
           loading={isSubmitting}
+          disabled={isCaptchaFallback && !captchaToken}
         >
           Sign in
         </Button>
