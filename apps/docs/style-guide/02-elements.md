@@ -436,10 +436,17 @@ Name the thing instead.
 - **Recommended**: `[HTTP/1.1 RFC](https://www.rfc-editor.org/rfc/rfc2616)`
 - **Not recommended**: `[https://www.rfc-editor.org/rfc/rfc2616](https://www.rfc-editor.org/rfc/rfc2616)`
 
-#### Introduce a link with `see`, and say what the reader will find
+#### Introduce a link with `see`
 
-Write `For more information about X, see Y` rather than `For more information on X, see
-Y`. The `about` clause is what tells a reader whether the link is worth following.
+Write `For more information, see Y`. Add an `about` clause only when the link text alone
+doesn't say what the reader will find, such as when the topic is one part of a broader
+page. Leave it out when it would repeat the link text. When you add a topic, write
+`about`, not `on`.
+
+- **Recommended**: `For more information, see [Row Level Security](/docs/guides/database/postgres/row-level-security).`
+- **Recommended**: `For more information about policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security).`
+- **Not recommended**: `For more information about Row Level Security, see [Row Level Security](/docs/guides/database/postgres/row-level-security).`
+- **Not recommended**: `For more information on policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security).`
 
 #### Keep sentence punctuation outside the link
 
