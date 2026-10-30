@@ -32,7 +32,7 @@ export function MagicLinkForm({ className, ...props }: React.ComponentPropsWitho
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/verify`,
+          emailRedirectTo: `${window.location.origin}/example/magic-auth/auth/verify`,
         },
       })
 
