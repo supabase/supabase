@@ -135,7 +135,9 @@ vi.mock('../MainScrollContainerContext', () => ({
 vi.mock('./BuildingState', () => ({ default: () => null }))
 vi.mock('./ConnectingState', () => ({ default: () => null }))
 vi.mock('./LoadingState', () => ({ LoadingState: () => null }))
-vi.mock('./PausedState/ProjectPausedState', () => ({ ProjectPausedState: () => null }))
+vi.mock('./PausedState/ProjectPausedState', () => ({
+  ProjectPausedState: () => <div>Project paused</div>,
+}))
 vi.mock('./PauseFailedState', () => ({ PauseFailedState: () => null }))
 vi.mock('./PausingState', () => ({ PausingState: () => null }))
 vi.mock('./ProductMenuBar', () => ({
@@ -429,6 +431,24 @@ describe('ProjectLayout title', () => {
       LOCAL_STORAGE_KEYS.PROJECT_INTEGRATION_BANNER_DISMISSED('default', 'stripe_projects'),
       false
     )
+  })
+
+  it('renders the paused state for a paused project', () => {
+    mockProjectState.current = { ...mockProjectState.current, status: 'INACTIVE' }
+
+    renderLayout()
+
+    expect(screen.getByText('Project paused')).toBeInTheDocument()
+  })
+
+  it('renders the branches page instead of the paused state for a paused project', () => {
+    mockProjectState.current = { ...mockProjectState.current, status: 'INACTIVE' }
+    mockRouter.pathname = '/project/[ref]/branches'
+    mockRouter.asPath = '/project/default/branches'
+
+    renderLayout()
+
+    expect(screen.queryByText('Project paused')).not.toBeInTheDocument()
   })
 })
 
