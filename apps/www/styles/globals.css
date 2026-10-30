@@ -572,6 +572,7 @@ launch week
 
 :root {
   --auth-ui-card-height: 50vh;
+  --header-height: 56px;
   --lw-secondary-color: #8a8f98;
 }
 
@@ -850,7 +851,7 @@ launch week
 
 .dg.ac {
   z-index: 9999 !important;
-  margin-top: 65px !important;
+  margin-top: var(--header-height) !important;
 }
 
 /* Zoomable image */
