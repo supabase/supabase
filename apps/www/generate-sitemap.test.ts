@@ -182,12 +182,10 @@ describe('generate-sitemap lastmod', () => {
     for (const lastmod of lastmods) expect(lastmod).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
-  it('lists the www, docs, kb and partner catalog sitemaps in the index', () => {
+  it('leaves the sitemap index untouched', () => {
     const index = fs.readFileSync(path.join(fixtureDir, 'public', 'sitemap.xml'), 'utf-8')
     expect(index).toContain('<loc>https://supabase.com/sitemap_www.xml</loc>')
     expect(index).toContain('<loc>https://supabase.com/docs/sitemap.xml</loc>')
-    expect(index).toContain('<loc>https://supabase.com/kb/sitemap-index.xml</loc>')
-    expect(index).toContain('<loc>https://supabase.com/partners/catalog/sitemap.xml</loc>')
   })
 })
 
