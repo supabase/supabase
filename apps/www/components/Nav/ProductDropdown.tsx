@@ -1,14 +1,16 @@
 'use client'
 
-import { Sparkles } from 'lucide-react'
+import { ChevronRight, Sparkles } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { NavigationMenuLink } from 'ui'
 import {
   TopNavMenuGroup,
   TopNavMenuGroupLink,
   TopNavMenuPanel,
 } from 'ui-patterns/TopNav/TopNavMenu'
 
+import { MenuAside } from './MenuAside'
 import { getLinkComponent, MenuItemContent } from './MenuItem'
 import ComparisonsData from '@/data/Comparisons'
 import CustomersData from '@/data/CustomerStories'
@@ -19,7 +21,55 @@ export const ProductDropdown = () => {
   const [customer] = CustomersData
 
   return (
-    <TopNavMenuPanel className="section-container">
+    <TopNavMenuPanel
+      className="section-container"
+      aside={
+        <>
+          <MenuAside>
+            <TopNavMenuGroup
+              label={
+                <NavigationMenuLink asChild>
+                  <Link
+                    href="/customers"
+                    className="group/label inline-flex items-center gap-1 hover:text-foreground focus-ring"
+                  >
+                    Customer stories
+                    <ChevronRight className="size-3 transition-transform group-hover/label:translate-x-0.5" />
+                  </Link>
+                </NavigationMenuLink>
+              }
+            >
+              <TopNavMenuGroupLink linkAs={Link} href={customer.url} className="gap-3">
+                <span className="relative h-14 w-20 shrink-0 rounded-md border bg-background">
+                  <Image
+                    src={`/${customer.imgUrl}`}
+                    alt=""
+                    fill
+                    className="p-3! object-contain brightness-70 contrast-[.35] filter"
+                  />
+                </span>
+                <span className="line-clamp-3 leading-tight">{customer.title}</span>
+              </TopNavMenuGroupLink>
+            </TopNavMenuGroup>
+          </MenuAside>
+          <MenuAside>
+            <TopNavMenuGroup label={ComparisonsData.label}>
+              {ComparisonsData.comparisons.map(({ icon: Icon, ...link }) => (
+                <TopNavMenuGroupLink
+                  key={link.name}
+                  linkAs={getLinkComponent(link.url)}
+                  href={link.url}
+                >
+                  <span>vs</span>
+                  {Icon ? <Icon className="size-4" /> : null}
+                  <span>{link.name}</span>
+                </TopNavMenuGroupLink>
+              ))}
+            </TopNavMenuGroup>
+          </MenuAside>
+        </>
+      }
+    >
       <TopNavMenuGroup label="Features">
         {Object.values(MainProductsData)
           .filter((product) => product.name !== 'Vector')
@@ -68,29 +118,6 @@ export const ProductDropdown = () => {
             hasChevron
           />
         </TopNavMenuGroupLink>
-      </TopNavMenuGroup>
-      <TopNavMenuGroup label="Customer stories">
-        <TopNavMenuGroupLink linkAs={Link} href={customer.url} className="gap-3">
-          <span className="relative h-14 w-20 shrink-0 rounded-md border bg-background">
-            <Image
-              src={`/${customer.imgUrl}`}
-              alt={customer.title}
-              fill
-              className="p-3! object-contain brightness-70 contrast-[.35] filter"
-            />
-          </span>
-          <span className="line-clamp-3 leading-tight">{customer.title}</span>
-        </TopNavMenuGroupLink>
-        <TopNavMenuGroupLink linkAs={Link} href="/customers">
-          All customer stories
-        </TopNavMenuGroupLink>
-      </TopNavMenuGroup>
-      <TopNavMenuGroup label={ComparisonsData.label}>
-        {ComparisonsData.comparisons.map((link) => (
-          <TopNavMenuGroupLink key={link.text} linkAs={getLinkComponent(link.url)} href={link.url}>
-            {link.text}
-          </TopNavMenuGroupLink>
-        ))}
       </TopNavMenuGroup>
     </TopNavMenuPanel>
   )
