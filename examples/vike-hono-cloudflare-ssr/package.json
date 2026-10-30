@@ -1,0 +1,23 @@
+{
+  "name": "vike-hono-supabase-ssr",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "vite build",
+    "preview": "wrangler dev --local=false"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.39.0",
+    "@vike/hono": "^0.4.236",
+    "hono": "^4.x",
+    "vike": "^0.4.236"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "wrangler": "^3.0.0"
+  }
+}
