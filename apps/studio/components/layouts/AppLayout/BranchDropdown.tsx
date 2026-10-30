@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -11,10 +10,9 @@ import {
 import { BranchBadge } from './BranchBadge'
 import { BranchDropdownCommandContent } from './BranchDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
-import { branchesQueryOptions } from '@/data/branches/branches-query'
+import { useBranchesQuery } from '@/data/branches/branches-query'
 import type { Branch } from '@/data/branches/branches-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -44,24 +42,12 @@ export const BranchDropdown = ({
 
   const projectRef = projectDetails?.parent_project_ref || ref
 
-  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
   const {
     data: branches,
-    isPending: isPendingBranches,
-    isError: isBranchesError,
-    isSuccess: isBranchesSuccess,
-  } = useQuery({
-    ...branchesQueryOptions({ projectRef, grant: branchesGrant.grant }),
-    enabled: Boolean(projectDetails),
-  })
-
-  const isDenied = branchesGrant.status === 'denied' && Boolean(projectDetails)
-  const isLoading =
-    branchesGrant.status === 'loading' ||
-    (branchesGrant.status === 'granted' && isPendingBranches) ||
-    (branchesGrant.status === 'denied' && !projectDetails)
-  const isError = isBranchesError || branchesGrant.status === 'error'
-  const isSuccess = isBranchesSuccess || isDenied
+    isPending: isLoading,
+    isError,
+    isSuccess,
+  } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
 
   const isBranchingEnabled = projectDetails?.is_branch_enabled === true
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
@@ -94,7 +80,7 @@ export const BranchDropdown = ({
       selectedBranch={selectedBranch}
       branchesCount={branches?.length ?? 0}
       isBranchingEnabled={isBranchingEnabled}
-      projectRef={ref}
+      projectRef={projectRef}
       onClose={close}
       onCreateBranch={() => snap.setShowCreateBranchModal(true)}
     />
