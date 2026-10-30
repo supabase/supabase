@@ -534,7 +534,11 @@ parameters:
     description: |
       Enable the local SMTP testing server.
 
-      Note: Supabase CLI versions before v2.108.0 use `[inbucket]` instead of `[local_smtp]`. Newer versions still accept `[inbucket]` but print a deprecation warning, so rename the section after you upgrade.
+      <Admonition type="note">
+
+      Supabase CLI versions before v2.108.0 use `[inbucket]` instead of `[local_smtp]`. Newer versions still accept `[inbucket]` but print a deprecation warning, so rename the section after you upgrade.
+
+      </Admonition>
     links:
       - name: 'Mailpit documentation'
         link: 'https://mailpit.axllent.org'
