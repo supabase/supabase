@@ -16,7 +16,8 @@ import { Mdx } from '@/components/mdx-components'
 import { OpenInV0Button } from '@/components/open-in-v0-button'
 import { SourcePanel } from '@/components/source-panel'
 import { libraryBlocks } from '@/config/library'
-import { absoluteUrl, cn } from '@/lib/utils'
+import { canonicalAlternates, libraryUrl } from '@/lib/canonical'
+import { cn } from '@/lib/utils'
 
 interface DocPageProps {
   params: Promise<{
@@ -43,15 +44,16 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
     return {}
   }
 
-  const markdownPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'}/docs/${doc.slugAsParams}.md`
+  const docPath = `/docs/${doc.slugAsParams}`
 
   const metadata: Metadata = {
     ...mainMetadata,
     title: doc.title,
     description: doc.description,
     alternates: {
+      ...canonicalAlternates(docPath),
       types: {
-        'text/markdown': `https://supabase.com${markdownPath}`,
+        'text/markdown': libraryUrl(`${docPath}.md`),
       },
     },
     openGraph: {
@@ -59,7 +61,7 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
       title: doc.title,
       description: doc.description,
       type: 'article',
-      url: absoluteUrl(doc.slug),
+      url: libraryUrl(docPath),
     },
   }
   return metadata
