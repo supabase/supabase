@@ -374,7 +374,11 @@ export const FileExplorerKeyboardNavigationProvider = ({
     }
   }
 
-  const dismissCursor = () => setIsCursorDismissed(true)
+  const dismissCursor = () => {
+    // A pending activation would otherwise reopen what the click just cleared
+    activateWhenCursorSettles.cancel()
+    setIsCursorDismissed(true)
+  }
 
   /** Entry point from outside the list: park the cursor on an edge row and take focus */
   const startNavigation = (edge: 'first' | 'last') => {

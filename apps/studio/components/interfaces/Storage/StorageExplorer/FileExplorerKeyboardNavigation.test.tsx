@@ -84,6 +84,7 @@ const Columns = () => {
     onColumnBlur,
     onColumnKeyDown,
     activateRow,
+    dismissCursor,
   } = useFileExplorerKeyboardNavigation()
   const snapshot = mockUseStorageExplorerStateSnapshot()
 
@@ -95,6 +96,10 @@ const Columns = () => {
       {/* Stands in for the folder row in the bucket root being clicked */}
       <button tabIndex={0} onClick={() => activateRow({ columnIndex: 0, itemIndex: 0 })}>
         click images
+      </button>
+      {/* Stands in for a click on the empty space of a column */}
+      <button tabIndex={0} onClick={dismissCursor}>
+        click empty space
       </button>
       {snapshot.columns.map((column: StorageColumn, index: number) => (
         <div
@@ -346,6 +351,17 @@ describe('FileExplorerKeyboardNavigation', () => {
         expect.objectContaining({ name: 'a.png', columnIndex: 0 })
       )
     )
+  })
+
+  it('does not activate the row the cursor was on once it is dismissed', async () => {
+    renderColumns()
+    await focusColumn('my-bucket')
+
+    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.click(screen.getByRole('button', { name: 'click empty space' }))
+    await new Promise((resolve) => setTimeout(resolve, ACTIVATION_SETTLED_MS))
+
+    expect(mockSetPreviewedFile).not.toHaveBeenCalled()
   })
 
   it('only opens the row the cursor settles on, not the ones passed over', async () => {
