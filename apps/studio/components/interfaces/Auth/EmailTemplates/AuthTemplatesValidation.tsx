@@ -63,8 +63,7 @@ const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
     value: '{{ .Data }}',
     description: (
       <>
-        User's <code className="text-code-inline">user_metadata</code>, use this to personalize the
-        message
+        User's <code>user_metadata</code>, use this to personalize the message
       </>
     ),
   },
@@ -73,8 +72,7 @@ const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
     value: '{{ .RedirectTo }}',
     description: (
       <>
-        Redirect URL passed as the <code className="text-code-inline">redirectTo</code> option in
-        the auth method call
+        Redirect URL passed as the <code>redirectTo</code> option in the auth method call
       </>
     ),
   },

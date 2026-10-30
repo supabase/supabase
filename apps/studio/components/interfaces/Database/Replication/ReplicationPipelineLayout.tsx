@@ -1,13 +1,13 @@
 import { useParams } from 'common'
 import {
-  ArrowRight,
-  ArrowUpCircle,
-  CircleStop,
-  Edit,
-  MoreVertical,
-  Play,
-  RotateCcw,
-  Trash,
+  ArrowRightIcon,
+  ArrowUpCircleIcon,
+  CircleStopIcon,
+  EditIcon,
+  MoreVerticalIcon,
+  PlayIcon,
+  RotateCcwIcon,
+  TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -68,14 +68,13 @@ type LifecycleAction = 'start' | 'stop' | 'restart'
 const LIFECYCLE_BY_STATUS: Partial<
   Record<PipelineStatusName, { label: string; action: LifecycleAction; icon: ReactNode }>
 > = {
-  [PipelineStatusName.STOPPED]: { label: 'Start', action: 'start', icon: <Play /> },
-  [PipelineStatusName.STARTED]: { label: 'Stop', action: 'stop', icon: <CircleStop /> },
-  [PipelineStatusName.FAILED]: { label: 'Restart', action: 'restart', icon: <RotateCcw /> },
+  [PipelineStatusName.STOPPED]: { label: 'Start', action: 'start', icon: <PlayIcon /> },
+  [PipelineStatusName.STARTED]: { label: 'Stop', action: 'stop', icon: <CircleStopIcon /> },
+  [PipelineStatusName.FAILED]: { label: 'Restart', action: 'restart', icon: <RotateCcwIcon /> },
 }
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
-  const { ref: projectRef, pipelineId: pipelineIdParam } = useParams()
-  const pipelineId = Number(pipelineIdParam)
+  const { ref: projectRef, pipelineId } = useParams()
   const router = useRouter()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
@@ -92,10 +91,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     data: pipeline,
     error: pipelineError,
     isPending: isPipelineLoading,
-  } = useReplicationPipelineByIdQuery(
-    { projectRef, pipelineId },
-    { enabled: Number.isSafeInteger(pipelineId) }
-  )
+  } = useReplicationPipelineByIdQuery({ projectRef, pipelineId }, { enabled: !!pipelineId })
   const {
     data: pipelineStatusData,
     error: pipelineStatusError,
@@ -282,7 +278,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                 </span>
                 <span className="flex items-center gap-x-1.5 text-foreground-light">
                   <span>Primary database</span>
-                  <ArrowRight size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <ArrowRightIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   {isPipelineIdentityLoading ? (
                     <span className="inline-flex items-center">
                       <span className="sr-only">Loading destination</span>
@@ -300,7 +296,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                 {hasUpdate && (
                   <Button
                     variant="primary"
-                    icon={<ArrowUpCircle />}
+                    icon={<ArrowUpCircleIcon />}
                     onClick={() => setShowUpdateVersionModal(true)}
                     disabled={isPipelineRequestPending || isTransitioning}
                   >
@@ -337,7 +333,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                       variant="default"
                       className="w-6.5 hit-area-1"
                       aria-label="Pipeline options"
-                      icon={<MoreVertical />}
+                      icon={<MoreVerticalIcon />}
                       disabled={isPipelineRequestPending || isTransitioning}
                     />
                   </DropdownMenuTrigger>
@@ -347,7 +343,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                         className="gap-x-2"
                         onClick={() => onLifecycleAction('restart')}
                       >
-                        <RotateCcw size={14} />
+                        <RotateCcwIcon size={14} />
                         <span>Restart pipeline</span>
                       </DropdownMenuItem>
                     )}
@@ -356,7 +352,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                         className="gap-x-2"
                         onClick={() => onLifecycleAction('stop')}
                       >
-                        <CircleStop size={14} />
+                        <CircleStopIcon size={14} />
                         <span>Stop pipeline</span>
                       </DropdownMenuItem>
                     )}
@@ -368,7 +364,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                         if (pipeline !== undefined) setEdit(pipeline.destination_id)
                       }}
                     >
-                      <Edit size={14} />
+                      <EditIcon size={14} />
                       <span>Edit pipeline</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -376,7 +372,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                       disabled={pipeline === undefined}
                       onClick={() => setShowDeleteDestination(true)}
                     >
-                      <Trash size={14} />
+                      <TrashIcon size={14} />
                       <span>Delete pipeline</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>

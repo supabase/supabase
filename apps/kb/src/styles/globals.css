@@ -1,10 +1,18 @@
 @import 'config/tailwind.config.css';
+@import 'config/inline-code.css';
+@import 'ui-patterns/CodeBlock/code-block.css';
+@import 'ui-patterns/Toc/toc-menu.css';
+@import 'ui-patterns/Notch/notch.css';
+@import './utilities.css';
+@import './keyframes.css';
+@import 'docs-search/styles.css';
 
 @source '../pages/**/*.astro';
 @source '../components/**/*.{astro,tsx}';
 @source '../layouts/**/*.astro';
 @source './../../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../../packages/docs-search/src/**/*.{tsx,ts}';
 
 /* apps/docs loads Inter/Manrope via next/font, which injects these two
  * variables as inline styles on <html>. kb loads the same fonts via the
@@ -21,6 +29,24 @@
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-manrope, var(--font-sans));
   --font-mono: 'Source Code Pro', ui-monospace, Menlo, monospace;
+}
+
+@theme {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --animate-draw-out: draw-out 700ms cubic-bezier(0.65, 0, 0.35, 1) both;
+  --animate-draw-line: draw-line 1.8s linear both;
+}
+
+@theme {
+  --tracking-display: -0.03em;
+  --tracking-title: -0.015em;
+  --tracking-body: -0.012em;
+  --tracking-label: 0.08em;
+}
+
+@theme inline {
+  --shadow-raised: var(--raised-shadow, 0 0 #0000);
+  --drop-shadow-raised: var(--raised-drop-shadow, 0 0 #0000);
 }
 
 /* Same type scale as apps/docs/styles/globals.css — without this, utilities
@@ -65,47 +91,28 @@ h6:not(.font-mono),
   @apply font-heading font-semibold;
 }
 
-*,
-::after,
-::before,
-::backdrop,
-::file-selector-button {
-  border-color: var(--border-default, currentColor);
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border-default, currentColor);
+  }
 }
 
-/* Code block theme colors for use with Supabase Theme */
 [data-theme='dark'] {
-  --code-token-keyword: #bda4ff;
-  --code-foreground: #ffffff;
-  --code-token-constant: #3ecf8e;
-  --code-token-string: #ffcda1;
-  --code-token-comment: #949494;
-  --code-token-parameter: #ffffff;
-  --code-token-function: #3ecf8e;
-  --code-token-string-expression: #ffcda1;
-  --code-token-punctuation: #ffffff;
-  --code-token-link: #ffffff;
-  --code-token-number: #ffffff;
-  --code-token-property: #3ecf8e;
-  --code-highlight-color: #232323;
-}
-
-[data-theme='light'] {
-  --code-token-keyword: #5f2fc4;
-  --code-foreground: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-constant: #15593b;
-  --code-token-string: #9a5200;
-  --code-token-comment: #6a6a6a;
-  --code-token-parameter: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-function: #15593b;
-  --code-token-string-expression: #9a5200;
-  --code-token-punctuation: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-link: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-number: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-property: #15593b;
-  --code-highlight-color: #1c1c1c;
+  --raised-shadow:
+    0 0 0 0 var(--border-default), 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --raised-drop-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
 }
 
 .prose [role='alert'] {
   margin: 1.25rem 0;
+}
+
+@media (width < 64rem) {
+  html:has([data-toc-menu]) {
+    scroll-padding-top: calc(var(--header-height) + 2.5rem);
+  }
 }

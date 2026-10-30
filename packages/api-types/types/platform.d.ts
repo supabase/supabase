@@ -435,6 +435,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/database/{ref}/db-integrity/operations/{op}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Reads the current db-integrity task for an operation on the project primary. */
+    get: operations['DatabaseDbIntegrityController_status']
+    put?: never
+    /** Submits a db-integrity operation on the project primary. */
+    post: operations['DatabaseDbIntegrityController_submit']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/database/{ref}/hook-enable': {
     parameters: {
       query?: never
@@ -1279,6 +1297,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/burndown': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Retrieves the burndown of prepaid credit blocks for an organization */
+    get: operations['OrgCreditsController_getBurndown']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/preview': {
     parameters: {
       query?: never
@@ -1657,7 +1692,7 @@ export interface paths {
     options?: never
     head?: never
     /** Assign organization member with new role */
-    patch: operations['MembersController_assignMemberRoleV2']
+    patch: operations['MembersController_assignMemberRoleV2_2']
     trace?: never
   }
   '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
@@ -5020,6 +5055,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/support/csat': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Submit a support CSAT survey response
+     * @description Called by the Supabase dashboard when a customer answers the satisfaction survey linked from a resolved support ticket. Records the answer on the Front conversation as custom fields and a tag. One answer per conversation.
+     */
+    post: operations['CsatController_submit']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/support/verify-email': {
     parameters: {
       query?: never
@@ -5210,6 +5265,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/warehouse/{ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Disable Warehouse
+     * @description Asynchronously stop and delete Warehouse replication, remove its publication and FDW, and revoke external catalog access. Optionally delete the DuckLake catalog schema and managed Storage bucket with delete_data=true, requiring SQL and Storage admin write permissions on the configured destination. Poll setup-status for completion. Source tables are preserved.
+     */
+    delete: operations['WarehouseController_deleteWarehouse']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/warehouse/{ref}/catalog': {
     parameters: {
       query?: never
@@ -5265,7 +5340,7 @@ export interface paths {
     put?: never
     /**
      * Set up Warehouse
-     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. An empty targets array stops and deletes the Warehouse pipeline and publication, disables external catalog access, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection.
+     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. For backward compatibility, an empty targets array asynchronously stops and deletes the Warehouse pipeline and publication, disables external catalog access, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection. Prefer DELETE to disable Warehouse and optionally delete its data; poll setup-status for completion.
      */
     post: operations['WarehouseController_setup']
     delete?: never
@@ -5283,7 +5358,7 @@ export interface paths {
     }
     /**
      * Get Warehouse setup status
-     * @description Return the async Warehouse setup status for the project. Overall completion follows the replication pipeline and table copy state; project database FDW markers are informational.
+     * @description Return Warehouse setup or disable status. During and after teardown, persisted lifecycle state is returned without querying ETL or inspecting the project FDW. Otherwise completion follows replication and table copy state.
      */
     get: operations['WarehouseController_getSetupStatus']
     put?: never
@@ -5829,19 +5904,7 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
-        | 'webhook'
-        | 'datadog'
-        | 'loki'
-        | 'sentry'
-        | 's3'
-        | 'axiom'
-        | 'last9'
-        | 'otlp'
-        | 'syslog'
+      type: 'webhook' | 'datadog' | 'loki' | 'sentry' | 's3' | 'axiom' | 'last9' | 'otlp' | 'syslog'
     }
     CreateBucketIndexBody: {
       /** @enum {string} */
@@ -6701,6 +6764,11 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
+        | 'organization_config_read'
+        | 'organization_config_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -6721,8 +6789,12 @@ export interface components {
         | 'api_gateway_keys_write'
         | 'auth_config_read'
         | 'auth_config_write'
+        | 'auth_hooks_read'
+        | 'auth_hooks_write'
         | 'auth_signing_keys_read'
         | 'auth_signing_keys_write'
+        | 'auth_users_read'
+        | 'auth_users_write'
         | 'backups_read'
         | 'backups_write'
         | 'branching_development_create'
@@ -6766,6 +6838,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -6823,6 +6896,7 @@ export interface components {
             | 't4g.nano'
             | 't3a.nano'
             | 't3.nano'
+            | 't8i.nano'
             | 't4g.micro'
             | 't3a.micro'
             | 't3.micro'
@@ -7013,6 +7087,12 @@ export interface components {
             code: 'americas' | 'emea' | 'apac'
             /** @enum {string} */
             type: 'smartGroup'
+          }
+        | {
+            /** @enum {string} */
+            code: 'auto'
+            /** @enum {string} */
+            type: 'auto'
           }
       /**
        * @description Release channel. If not provided, GA will be used.
@@ -7661,6 +7741,11 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
+        | 'organization_config_read'
+        | 'organization_config_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -7681,8 +7766,12 @@ export interface components {
         | 'api_gateway_keys_write'
         | 'auth_config_read'
         | 'auth_config_write'
+        | 'auth_hooks_read'
+        | 'auth_hooks_write'
         | 'auth_signing_keys_read'
         | 'auth_signing_keys_write'
+        | 'auth_users_read'
+        | 'auth_users_write'
         | 'backups_read'
         | 'backups_write'
         | 'branching_development_create'
@@ -7726,6 +7815,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -7905,6 +7995,7 @@ export interface components {
       code: string
     }
     CreditRedemptionResponse_Output: {
+      already_redeemed_partner_credits: number
       amount_cents: number
       credits_expire_at: string | null
     }
@@ -7938,6 +8029,15 @@ export interface components {
         | 'requires_confirmation'
         | 'requires_payment_method'
         | 'succeeded'
+    }
+    CsatBody: {
+      comment?: string
+      conversation_id: string
+      satisfied: boolean
+    }
+    CsatResponse_Output: {
+      /** @enum {string} */
+      result: 'success'
     }
     CustomerResponse_Output: {
       additional_emails: string[] | null
@@ -8040,6 +8140,22 @@ export interface components {
         | 'INIT_READ_REPLICA_FAILED'
         | 'RESTARTING'
         | 'RESIZING'
+    }
+    DbIntegritySubmitBody: {
+      idempotency_key?: string
+      metadata?: {
+        [key: string]: string
+      }
+      parameters?: {
+        [key: string]: unknown
+      }
+      rerun?: boolean
+    }
+    DbIntegrityTaskResponse_Output: {
+      error?: string
+      host_lock_yield?: unknown
+      result?: unknown
+      status: string
     }
     DeclineAuthorizationResponse_Output: {
       id: string
@@ -8801,6 +8917,17 @@ export interface components {
       favorites: number
       private: number
       shared: number
+    }
+    GetCreditBurndownResponse_Output: {
+      data: {
+        amount_cents: number
+        breakdown: {
+          amount_cents: number
+          item: string
+        }[]
+        day: string
+        ending_balance_cents: number
+      }[]
     }
     GetGitHubConnectionConfigResponse_Output: {
       /** @description JSON representation of the parsed `supabase/config.toml`. Its shape is owned by the Supabase CLI and is passed through as-is. */
@@ -10475,6 +10602,8 @@ export interface components {
       billing_email: string | null
       /** @enum {string|null} */
       billing_partner: 'aws_marketplace' | 'vercel_marketplace' | null
+      /** Format: date-time */
+      created_at: string
       has_oriole_project: boolean
       id: number
       integration_source: string | null
@@ -10800,10 +10929,10 @@ export interface components {
          */
         active: boolean
         /**
-         * @description Bytes between the current WAL location and the confirmed flush LSN.
+         * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
          * @example 2048
          */
-        confirmed_flush_lsn_bytes: number
+        confirmed_flush_lsn_bytes?: number | null
         /**
          * @description Flush lag expressed in milliseconds.
          * @example 1200
@@ -10815,10 +10944,10 @@ export interface components {
          */
         reply_time_lag?: number | null
         /**
-         * @description Bytes between the current WAL location and the slot restart LSN.
+         * @description WAL retained for the slot, measured from the primary WAL write position. Null on standbys, for lost slots, or without a restart position.
          * @example 1024
          */
-        restart_lsn_bytes: number
+        restart_lsn_bytes?: number | null
         /**
          * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
          * @example 8192
@@ -10920,10 +11049,10 @@ export interface components {
            */
           active: boolean
           /**
-           * @description Bytes between the current WAL location and the confirmed flush LSN.
+           * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
            * @example 2048
            */
-          confirmed_flush_lsn_bytes: number
+          confirmed_flush_lsn_bytes?: number | null
           /**
            * @description Flush lag expressed in milliseconds.
            * @example 1200
@@ -10935,10 +11064,10 @@ export interface components {
            */
           reply_time_lag?: number | null
           /**
-           * @description Bytes between the current WAL location and the slot restart LSN.
+           * @description WAL retained for the slot, measured from the primary WAL write position. Null on standbys, for lost slots, or without a restart position.
            * @example 1024
            */
-          restart_lsn_bytes: number
+          restart_lsn_bytes?: number | null
           /**
            * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
            * @example 8192
@@ -12344,8 +12473,15 @@ export interface components {
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean | null
     }
-    RegionsInfo_Output: {
+    RegionsInfoPlatform_Output: {
       all: {
+        auto?: {
+          /** @enum {string} */
+          code: 'auto'
+          name: string
+          /** @enum {string} */
+          type: 'auto'
+        }
         smartGroup: {
           /** @enum {string} */
           code: 'americas' | 'emea' | 'apac'
@@ -12384,14 +12520,21 @@ export interface components {
         }[]
       }
       recommendations: {
-        smartGroup: {
+        auto?: {
+          /** @enum {string} */
+          code: 'auto'
+          name: string
+          /** @enum {string} */
+          type: 'auto'
+        }
+        smartGroup?: {
           /** @enum {string} */
           code: 'americas' | 'emea' | 'apac'
           name: string
           /** @enum {string} */
           type: 'smartGroup'
         }
-        specific: {
+        specific?: {
           /** @enum {string} */
           code:
             | 'us-east-1'
@@ -13250,9 +13393,6 @@ export interface components {
       name?: string
       /** @enum {string} */
       type?:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
         | 'webhook'
         | 'datadog'
         | 'loki'
@@ -14264,6 +14404,11 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
+        | 'organization_config_read'
+        | 'organization_config_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -14284,8 +14429,12 @@ export interface components {
         | 'api_gateway_keys_write'
         | 'auth_config_read'
         | 'auth_config_write'
+        | 'auth_hooks_read'
+        | 'auth_hooks_write'
         | 'auth_signing_keys_read'
         | 'auth_signing_keys_write'
+        | 'auth_users_read'
+        | 'auth_users_write'
         | 'backups_read'
         | 'backups_write'
         | 'branching_development_create'
@@ -14329,6 +14478,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -16120,6 +16270,10 @@ export interface components {
       /** @description Whether external catalog access is enabled */
       enabled: boolean
     }
+    WarehouseDeleteResponse_Output: {
+      /** @enum {string} */
+      status: 'accepted'
+    }
     WarehouseSetupBody: {
       /**
        * @description Supabase project to use for both the DuckLake PostgreSQL catalog and Supabase Storage. Defaults to this project on first setup and to the configured destination on later requests. The destination must be active and healthy, and another project requires SQL and Storage admin write permissions. An existing destination cannot be changed through setup. Ignored when targets is empty.
@@ -16131,7 +16285,7 @@ export interface components {
        * @example false
        */
       install_fdw?: boolean
-      /** @description Complete selection of schemas and individual tables to copy, replacing the previous selection. Schema targets expand to the eligible tables present when the request is processed. An empty array disables Warehouse replication and external catalog access and uninstalls the Warehouse FDW. */
+      /** @description Complete selection of schemas and individual tables to copy, replacing the previous selection. Schema targets expand to the eligible tables present when the request is processed. An empty array asynchronously disables Warehouse while retaining its data. Prefer DELETE to disable Warehouse; poll setup-status for completion. */
       targets: (
         | {
             /**
@@ -16157,10 +16311,15 @@ export interface components {
             type: 'table'
           }
       )[]
+      /**
+       * @description Optional Warehouse compute region, independent of the source and catalog regions. Defaults to the existing assignment, or ap-southeast-1 in staging and eu-west-1 in production for a new assignment. DNS routing requires a registered cluster in that environment. Unsupported regions and changes to an existing assignment are rejected. Ignored when targets is empty.
+       * @example ap-southeast-1
+       */
+      warehouse_region?: string
     }
     WarehouseSetupResponse_Output: {
       /**
-       * @description Warehouse replication pipeline id, or null when Warehouse is disabled
+       * @description Warehouse replication pipeline id, or null when Warehouse disable has been requested
        * @example 101
        */
       pipeline_id: number | null
@@ -16206,7 +16365,18 @@ export interface components {
       }[]
     }
     WarehouseSetupStatusResponse_Output: {
-      /** @description Project database FDW setup markers used to derive the Warehouse FDW phase */
+      /** @description Whether the current disable request deletes DuckLake data. */
+      delete_data?: boolean
+      /** @description Warehouse DNS delivery status. Ready means the DNS API accepted the route; client DNS caches may still be updating. */
+      dns?: {
+        hostname: string
+        region: string
+        /** @enum {string} */
+        status: 'pending' | 'ready' | 'error' | 'removed'
+      }
+      /** @description Warehouse cleanup failure, when present. */
+      error?: string
+      /** @description Project database FDW setup markers; null during or after teardown, when setup inspection is inapplicable. */
       fdw_status: {
         /**
          * @description Whether fdw_warehouse is available to install on the project database instance
@@ -16238,18 +16408,26 @@ export interface components {
          * @example true
          */
         wrapper_installed: boolean
-      }
+      } | null
       /**
        * @description Warehouse replication pipeline id when it exists
        * @example 101
        */
       pipeline_id?: number
       /**
-       * @description Overall Warehouse setup status derived from replication state
+       * @description Overall Warehouse lifecycle status, using persisted state during teardown and replication state during setup
        * @example copying
        * @enum {string}
        */
-      setup_status: 'not_started' | 'setting_up' | 'copying' | 'complete' | 'error'
+      setup_status:
+        | 'not_started'
+        | 'setting_up'
+        | 'copying'
+        | 'complete'
+        | 'error'
+        | 'disabling'
+        | 'disabled'
+        | 'deletion_failed'
       /** @description Warehouse setup phases in execution order */
       steps: {
         /**
@@ -17777,6 +17955,96 @@ export interface operations {
       }
     }
   }
+  DatabaseDbIntegrityController_status: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        op: 'collation' | 'collation_check'
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DbIntegrityTaskResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  DatabaseDbIntegrityController_submit: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        op: 'collation' | 'collation_check'
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DbIntegritySubmitBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DbIntegrityTaskResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   HooksController_enableHooks: {
     parameters: {
       query?: never
@@ -17847,6 +18115,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['UpdateConversationCustomFieldsResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update conversation custom fields */
       500: {
@@ -19168,6 +19457,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetOAuthAuthorizationResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -20497,6 +20807,59 @@ export interface operations {
       }
     }
   }
+  OrgCreditsController_getBurndown: {
+    parameters: {
+      query?: {
+        end_date?: string
+        start_date?: string
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetCreditBurndownResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve prepaid credit block burndown */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrgCreditsController_previewTopUp: {
     parameters: {
       query?: never
@@ -21779,7 +22142,7 @@ export interface operations {
       }
     }
   }
-  MembersController_assignMemberRoleV2: {
+  MembersController_assignMemberRoleV2_2: {
     parameters: {
       query?: never
       header?: never
@@ -22980,7 +23343,7 @@ export interface operations {
         limit?: number
         /** @description Number of projects to skip */
         offset?: number
-        /** @description Search projects by name */
+        /** @description Search projects by name, or by exact project ref */
         search?: string
         /** @description Sort order for projects */
         sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
@@ -29843,7 +30206,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RegionsInfo_Output']
+          'application/json': components['schemas']['RegionsInfoPlatform_Output']
         }
       }
     }
@@ -34839,6 +35202,30 @@ export interface operations {
       }
     }
   }
+  CsatController_submit: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CsatBody']
+      }
+    }
+    responses: {
+      /** @description Survey response recorded */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CsatResponse_Output']
+        }
+      }
+    }
+  }
   VerifyEmailController_verifyEmail: {
     parameters: {
       query?: never
@@ -35118,6 +35505,83 @@ export interface operations {
         }
       }
       /** @description Failed to get Vercel redirect url */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  WarehouseController_deleteWarehouse: {
+    parameters: {
+      query?: {
+        /** @description Permanently delete the managed DuckLake catalog schema and Storage bucket. Defaults to false. */
+        delete_data?: 'true' | 'false'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Warehouse disable accepted. Poll setup-status for completion. */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['WarehouseDeleteResponse_Output']
+        }
+      }
+      /** @description Invalid deletion option or unmanaged Warehouse destination. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Another Warehouse mutation is running or the cleanup policy cannot be changed. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to request Warehouse disable. */
       500: {
         headers: {
           [name: string]: unknown

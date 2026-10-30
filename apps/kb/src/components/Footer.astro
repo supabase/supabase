@@ -2,6 +2,8 @@
 import { CheckCircle, FlaskConical, LifeBuoy } from 'lucide-react'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 
+import { PrivacySettingsIsland } from './PrivacySettingsIsland'
+
 const primaryLinks = [
 	{
 		Icon: LifeBuoy,
@@ -30,7 +32,7 @@ const secondaryLinks = [
 ]
 ---
 
-<footer role="contentinfo" aria-label="footer" class="max-w-6xl px-6 mx-auto pt-12 pb-6">
+<footer role="contentinfo" aria-label="footer" class="section-container pt-12 pb-6">
 	<ul class="flex flex-col gap-2">
 		{
 			primaryLinks.map(({ Icon, text, ctaLabel, url }) => (
@@ -56,6 +58,7 @@ const secondaryLinks = [
 					</a>
 				))
 			}
+			<PrivacySettingsIsland client:only="react" />
 		</div>
 		<div class="flex items-center gap-4">
 			<a href="https://twitter.com/supabase" class="text-foreground-muted hover:text-foreground transition">

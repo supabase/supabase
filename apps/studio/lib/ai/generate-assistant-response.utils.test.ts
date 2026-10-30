@@ -1,8 +1,12 @@
-import type { ToolUIPart, UIMessage } from 'ai'
+import { convertToModelMessages, type ModelMessage, type ToolUIPart, type UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
-import { prepareMessagesForModel } from './generate-assistant-response.utils'
-import { encodeNotebookToolError, NotebookToolError } from './tools/notebook-tools'
+import {
+  hideToolErrorsFromModel,
+  prepareMessagesForModel,
+} from './generate-assistant-response.utils'
+import { NO_DATA_ERROR } from './tools/execute-sql-output'
+import { encodeNotebookToolError, NotebookToolError } from './tools/notebook-tool-error'
 
 function assistantMessage(parts: UIMessage['parts']): UIMessage {
   return { id: 'msg-1', role: 'assistant', parts }
@@ -139,11 +143,85 @@ describe('prepareMessagesForModel', () => {
     ])
   })
 
+  it('replays a self-hosted chat with legacy tool parts into model messages', async () => {
+    const rows = [
+      { data: { definitions: [{ id: 16384, sql: 'CREATE TABLE public.todos (id bigint)' }] } },
+    ]
+    const messages = [
+      assistantMessage([
+        toolPart({ type: 'tool-getSchemaTables', toolCallId: 'c1', output: rows }),
+        toolPart({ type: 'tool-getFunctions', toolCallId: 'c2', output: 'Function: add' }),
+        toolPart({ type: 'tool-getRlsKnowledge', toolCallId: 'c3', output: 42 }),
+        toolPart({ type: 'tool-getEdgeFunctionKnowledge', toolCallId: 'c4', output: 'Guidance' }),
+      ]),
+    ]
+
+    const outputs = async (level: 'disabled' | 'schema') => {
+      const prepared = prepareMessagesForModel(messages, level)
+      const modelMessages = await convertToModelMessages(prepared)
+      return modelMessages
+        .filter((message) => message.role === 'tool')
+        .flatMap((message) => message.content)
+        .flatMap((content) => (content.type === 'tool-result' ? [content.output] : []))
+    }
+
+    expect(await outputs('schema')).toEqual([
+      { type: 'json', value: rows },
+      { type: 'text', value: 'Function: add' },
+      { type: 'text', value: expect.stringContaining('could not be read') },
+      { type: 'text', value: 'Guidance' },
+    ])
+
+    const hidden = await outputs('disabled')
+    expect(hidden[0]).toEqual({ type: 'text', value: expect.stringContaining('`schema`') })
+    expect(hidden[1]).toEqual(hidden[0])
+    expect(hidden[3]).toEqual({ type: 'text', value: 'Guidance' })
+  })
+
   it('keeps non-tool parts untouched', () => {
     const messages = [assistantMessage([{ type: 'text', text: 'hello' }])]
 
     const result = prepareMessagesForModel(messages, 'schema')
 
     expect(result[0].parts).toEqual([{ type: 'text', text: 'hello' }])
+  })
+})
+
+describe('hideToolErrorsFromModel', () => {
+  const toolError = (toolName: string): ModelMessage => ({
+    role: 'tool',
+    content: [
+      {
+        type: 'tool-result',
+        toolCallId: 'call-1',
+        toolName,
+        output: { type: 'error-text', value: 'duplicate key (email)=(a@b.c)' },
+      },
+    ],
+  })
+
+  it('hides execute_sql errors below the data level', () => {
+    expect(hideToolErrorsFromModel([toolError('execute_sql')], 'schema')).toEqual([
+      {
+        role: 'tool',
+        content: [
+          {
+            type: 'tool-result',
+            toolCallId: 'call-1',
+            toolName: 'execute_sql',
+            output: { type: 'error-text', value: NO_DATA_ERROR },
+          },
+        ],
+      },
+    ])
+  })
+
+  it('keeps errors at the data level and from other tools', () => {
+    const messages = [toolError('execute_sql'), toolError('search_docs')]
+
+    expect(hideToolErrorsFromModel(messages, 'schema_and_log_and_data')).toEqual(messages)
+    expect(hideToolErrorsFromModel([toolError('search_docs')], 'schema')).toEqual([
+      toolError('search_docs'),
+    ])
   })
 })

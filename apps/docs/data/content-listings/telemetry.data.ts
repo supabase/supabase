@@ -58,19 +58,6 @@ export const telemetryDetect: ContentListingGroup = {
   ],
 }
 
-export const telemetryDiagnose: ContentListingGroup = {
-  id: 'telemetry-diagnose',
-  type: 'grid',
-  items: [
-    {
-      title: 'Diagnose and resolve',
-      href: '/guides/troubleshooting',
-      description:
-        'Use a concrete finding, symptom, or error code to identify the cause and apply a known solution.',
-    },
-  ],
-}
-
 export const telemetryHireAgent: ContentListingGroup = {
   id: 'telemetry-hire-agent',
   type: 'grid',

@@ -1,36 +1,33 @@
-import { AnimatePresence } from 'framer-motion'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { AnimatePresence } from 'motion/react'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { Badge, DialogSection, DialogSectionSeparator, FormControl, FormField, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { type BucketVersioningFormValues } from './BucketVersioningFields.schema'
+import { type BucketFormValues } from '../FilesBucket.schema'
 import {
   getRetentionTightening,
   RETENTION_TIGHTENING_DESCRIPTION,
   toNullableNumber,
 } from './BucketVersioningFields.utils'
 import { LifecyclePolicySection } from './LifecyclePolicySection'
-import type {
-  BucketVersioningState,
-  ExpirationMode,
-} from '@/components/interfaces/Storage/StorageVersioning.constants'
+import type { BucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 
 interface BucketVersioningFieldsProps {
+  form: UseFormReturn<BucketFormValues>
   initialVersioningState?: BucketVersioningState
   initialRetentionDays?: number | null
   initialMaxVersions?: number | null
   isPublicBucket?: boolean
-  /** The bucket's stored lifecycle policy is still being fetched. */
   isLoadingPolicy?: boolean
-  /** The stored policy holds rules these fields cannot represent, so it is left alone. */
   isUnsupportedPolicy?: boolean
-  /** The bucket's stored lifecycle policy could not be fetched. */
   policyError?: { message: string } | null
+  bucketName?: string
 }
 
 export const BucketVersioningFields = ({
+  form,
   initialVersioningState = 'disabled',
   initialRetentionDays,
   initialMaxVersions,
@@ -38,18 +35,20 @@ export const BucketVersioningFields = ({
   isLoadingPolicy = false,
   isUnsupportedPolicy = false,
   policyError,
+  bucketName,
 }: BucketVersioningFieldsProps) => {
-  const { control, setValue } = useFormContext<BucketVersioningFormValues>()
+  const { control } = form
 
   const isVersioningEnabled = useWatch({ control, name: 'enable_versioning' })
   const retentionDays = useWatch({ control, name: 'version_expiry_days' })
   const maxVersions = useWatch({ control, name: 'max_noncurrent_versions' })
   const expirationMode = useWatch({ control, name: 'expiration_mode' })
 
-  // Turning the switch off suspends rather than disables, so this is a heads-up.
   const isSuspending = !isVersioningEnabled && initialVersioningState !== 'disabled'
+  const canEditLifecycle = isVersioningEnabled || initialVersioningState === 'suspended'
 
-  // A bound nobody has read, or that the fields only partly represent, can't be compared against.
+  // bounds are only known if the policy is loaded and supported,
+  // otherwise we can't know if the user is tightening or loosening retention
   const hasKnownBounds = !isLoadingPolicy && !isUnsupportedPolicy && !policyError
 
   const tightening = getRetentionTightening({
@@ -63,10 +62,6 @@ export const BucketVersioningFields = ({
 
   const hasDays = typeof retentionDays === 'number' && retentionDays > 0
   const hasVersions = typeof maxVersions === 'number' && maxVersions > 0
-
-  const handleModeChange = (mode: ExpirationMode) => {
-    setValue('expiration_mode', mode, { shouldDirty: true })
-  }
 
   return (
     <>
@@ -91,7 +86,6 @@ export const BucketVersioningFields = ({
             >
               <FormControl>
                 <Switch
-                  // Matches the field name, which is what the layout's label points at.
                   id="enable_versioning"
                   aria-label="Object versioning"
                   size="large"
@@ -144,17 +138,17 @@ export const BucketVersioningFields = ({
             </FormSectionCollapse>
           )}
 
-          {isVersioningEnabled && (
+          {canEditLifecycle && (
             <FormSectionCollapse key="lifecycle-policy">
               <LifecyclePolicySection
-                control={control}
+                form={form}
                 hasDays={hasDays}
                 hasVersions={hasVersions}
                 mode={expirationMode}
-                onModeChange={handleModeChange}
                 isLoading={isLoadingPolicy}
                 isUnsupported={isUnsupportedPolicy}
                 error={policyError}
+                bucketName={bucketName}
               />
             </FormSectionCollapse>
           )}

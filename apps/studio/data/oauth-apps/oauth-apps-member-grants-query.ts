@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthAppGrants, USE_MOCKS } from './mocks'
 import type { ListOrgAppGrantsResponse } from './types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 export type OAuthAppMemberGrantsVariables = {
   slug?: string
@@ -33,11 +33,19 @@ export const useOAuthAppMemberGrantsQuery = <TData = OAuthAppMemberGrantsData>(
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<OAuthAppMemberGrantsData, OAuthAppMemberGrantsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    OAuthAppMemberGrantsData,
+    OAuthAppMemberGrantsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) =>
-  useQuery<OAuthAppMemberGrantsData, OAuthAppMemberGrantsError, TData>({
+  useInfiniteQuery({
     queryKey: oauthAppsKeys.appMemberGrants(slug, appId, cursor),
-    queryFn: () => getOAuthAppMemberGrants({ slug, appId, cursor }),
+    queryFn: ({ pageParam }) => getOAuthAppMemberGrants({ slug, appId, cursor: pageParam }),
+    initialPageParam: cursor,
+    getNextPageParam: (lastPage) => lastPage.pagination.next_cursor,
     enabled: enabled && USE_MOCKS && Boolean(slug) && Boolean(appId),
     ...options,
   })

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-mutation'
 import { databasePoliciesKeys } from './keys'
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { unguarded } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -28,6 +29,7 @@ export async function getDatabasePolicies(
       connectionString,
       sql,
       queryKey: ['policies', schemas],
+      grant: unguarded.migrating,
     },
     signal,
     headersInit

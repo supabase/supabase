@@ -449,6 +449,25 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * omitted = PostHog flags had not loaded at the time of project creation
      */
     dataApiRevokeOnCreateDefaultEnabled?: boolean | string
+    /**
+     * freeTierGeneralRegionExperiment variant at submission time. Omitted when the org isn't
+     * in the experiment (paid plan, smart regions disabled for the selected cloud provider,
+     * or not enrolled via the freeTierGeneralRegionEnrollment ConfigCat flag).
+     */
+    freeTierGeneralRegionExperiment?: 'control' | 'test'
+    /**
+     * How the submitted region was arrived at. 'auto' = the user never touched the region field
+     * and kept the auto-assigned default. 'general' = the user picked a smart region group (e.g.
+     * Americas). 'specific' = the user picked an exact region (e.g. us-east-1). Only set when
+     * smart regions are enabled for the selected cloud provider.
+     */
+    regionSelectionType?: 'general' | 'auto' | 'specific'
+    /**
+     * The exact region code the project was provisioned in (e.g. sa-east-1), as returned by
+     * the create-project API. This is the resolved region — for a smart group selection (e.g.
+     * Americas) it's the specific region the backend picked, not the group name.
+     */
+    regionCode?: string
   }
   groups: TelemetryGroups
 }
@@ -503,6 +522,61 @@ export interface ProjectCreationFormExposedEvent {
      */
     surface?: 'main' | 'vercel'
   }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Org was targeted for the freeTierGeneralRegionExperiment: a free-plan org with smart
+ * regions enabled for the selected cloud provider, enrolled (control or test arm) via the
+ * freeTierGeneralRegionEnrollment ConfigCat flag.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionExperimentExposedEvent {
+  action: 'free_tier_general_region_experiment_exposed'
+  properties: {
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Upgrade to Pro" link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionUpgradeClickedEvent {
+  action: 'free_tier_general_region_upgrade_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "specific region" docs link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionDocsLinkClickedEvent {
+  action: 'free_tier_general_region_docs_link_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Need a specific region?" link to reveal the specific regions
+ * list in the project creation region selector.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationSpecificRegionLinkClickedEvent {
+  action: 'project_creation_specific_region_link_clicked'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -949,6 +1023,7 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
+  | 'troubleshooting'
 
 /**
  * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
@@ -975,6 +1050,22 @@ export interface CopyAsMarkdownClickedEvent {
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
+}
+
+/**
+ * User clicked the sidebar link to add Supabase as a preferred source on Google.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface PreferredSourceClickedEvent {
+  action: 'preferred_source_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
 }
 
 /**
@@ -1057,7 +1148,7 @@ export interface DocsSearchV2OpenedEvent {
     /**
      * The trigger that opened the Search V2 dialog.
      */
-    triggerType: 'keyboard_shortcut' | 'search_input'
+    triggerType: 'keyboard_shortcut' | 'search_input' | 'not_found_button'
   }
 }
 
@@ -1074,6 +1165,10 @@ export interface DocsSearchV2SearchSubmittedEvent {
      * The search term sent to the Search V2 endpoint.
      */
     query: string
+    /**
+     * Whether the Search V2 endpoint returned at least one result for the query.
+     */
+    hasResults: boolean
   }
 }
 
@@ -1468,7 +1563,7 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
- * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ * User clicked on the "Cancel subscription" Button on the billing settings page.
  *
  * @group Events
  * @source studio
@@ -1535,32 +1630,6 @@ export interface StudioPricingSidePanelOpenedEvent {
  */
 export interface ReportsDatabaseGrafanaBannerClickedEvent {
   action: 'reports_database_grafana_banner_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
- * denominator for the dismiss rate. Migration outcome itself is measured via decay in
- * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerExposedEvent {
-  action: 'logs_all_deprecation_banner_exposed'
-  groups: TelemetryGroups
-}
-
-/**
- * User dismissed the logs.all deprecation banner.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
-  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -2107,6 +2176,109 @@ export interface StorageBucketCreatedEvent {
      * The type of the bucket created. E.g. standard or analytics iceberg.
      */
     bucketType?: string
+    /** Whether object versioning was turned on at creation time. */
+    hasVersioningEnabled?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when object versioning is turned on for a bucket that has never had it.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageBucketVersioningEnabledEvent {
+  action: 'storage_bucket_versioning_enabled'
+  properties: {
+    /** Whether a lifecycle policy was configured at the same time. */
+    hasLifecyclePolicy?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a standby URL signing key is created for a project's Storage.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/signing-keys
+ */
+export interface StorageUrlSigningKeyCreatedEvent {
+  action: 'storage_url_signing_key_created'
+  properties: {
+    /** The algorithm the standby key was created with. */
+    algorithm: 'ES256' | 'HS512'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a URL signing key's role changes: a standby key is rotated to active,
+ * a standby key is revoked, or a revoked key is moved back to standby.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/storage/signing-keys
+ */
+export interface StorageUrlSigningKeyUpdatedEvent {
+  action: 'storage_url_signing_key_updated'
+  properties: {
+    /** What happened to the key. */
+    change: 'rotated' | 'revoked' | 'moved_to_standby'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a lifecycle rule is added to a bucket from its card on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleCreatedEvent {
+  action: 'storage_bucket_lifecycle_rule_created'
+  properties: {
+    /** The new rule's status, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is edited, enabled, or disabled on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleUpdatedEvent {
+  action: 'storage_bucket_lifecycle_rule_updated'
+  properties: {
+    /** The rule's status after the save, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is deleted on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleRemovedEvent {
+  action: 'storage_bucket_lifecycle_rule_removed'
+  properties: {
+    /** How many rules remain; 0 means the configuration was removed. */
+    ruleCount: number
   }
   groups: TelemetryGroups
 }
@@ -3153,6 +3325,7 @@ export type AiAssistantSource =
   | 'error_code'
   | 'advisor_signal_detail'
   | 'database_connections'
+  | 'edge_function_errors'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3785,25 +3958,6 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
- * User was exposed to the plan-change panel presentation experiment.
- * Fires once per session per enrolled user in any variant (including control), so the
- * conversion analysis has a baseline cohort. Conversion itself is tracked server-side.
- * GROWTH experiment: `pricingPanelPlanPresentation`.
- *
- * @group Events
- * @page /org/[slug]/billing (plan-change side panel)
- * @source studio
- */
-export interface PricingPanelPlanPresentationExperimentExposedEvent {
-  action: 'pricing_panel_plan_presentation_experiment_exposed'
-  properties: {
-    /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -3870,6 +4024,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'auth'
       | 'storage'
       | 'edge function'
+      | 'edge function runtime'
       | 'realtime'
       | 'supavisor'
       | 'pgbouncer'
@@ -4089,9 +4244,58 @@ export interface WarehouseDisabledEvent {
 }
 
 /**
+ * Account recovery rollout exposure when the takeover opens.
+ * @group Events
+ * @source Automatic reminder controller
+ * @page /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface AccountRecoveryReminderExposed {
+  action: 'account_recovery_reminder_exposed'
+  properties: { gap: 'missing' | 'exhausted' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a recovery task
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryActionClicked {
+  action: 'account_recovery_action_clicked'
+  properties: { actionType: 'generate_codes' | 'regenerate_codes' | 'add_factor' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User saves recovery codes or verifies another authenticator
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryTaskCompleted {
+  action: 'account_recovery_task_completed'
+  properties: { taskType: 'recovery_codes' | 'authenticator' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User skips or continues from the recovery interstitial
+ * @page /organizations, /org/*, /project/*, /new
+ */
+export interface AccountRecoveryReminderClosed {
+  action: 'account_recovery_reminder_closed'
+  properties: { hasCompletedTask: boolean }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | AccountRecoveryReminderExposed
+  | AccountRecoveryActionClicked
+  | AccountRecoveryTaskCompleted
+  | AccountRecoveryReminderClosed
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4121,6 +4325,10 @@ export type TelemetryEvent =
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationFormExposedEvent
+  | FreeTierGeneralRegionExperimentExposedEvent
+  | FreeTierGeneralRegionUpgradeClickedEvent
+  | FreeTierGeneralRegionDocsLinkClickedEvent
+  | ProjectCreationSpecificRegionLinkClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
@@ -4149,6 +4357,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
+  | PreferredSourceClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
@@ -4190,8 +4399,6 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | LogsAllDeprecationBannerExposedEvent
-  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
@@ -4224,6 +4431,12 @@ export type TelemetryEvent =
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
+  | StorageBucketVersioningEnabledEvent
+  | StorageUrlSigningKeyCreatedEvent
+  | StorageUrlSigningKeyUpdatedEvent
+  | StorageBucketLifecycleRuleCreatedEvent
+  | StorageBucketLifecycleRuleUpdatedEvent
+  | StorageBucketLifecycleRuleRemovedEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent
@@ -4291,7 +4504,6 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent

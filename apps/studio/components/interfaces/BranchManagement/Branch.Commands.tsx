@@ -1,13 +1,12 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Forward, GitBranch, Plus } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { ForwardIcon, GitBranchIcon, PlusIcon } from 'lucide-react'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 
 import { COMMAND_MENU_SECTIONS } from '../App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from '../App/CommandMenu/ordering'
-import { BRANCHING_GITHUB_DISCUSSION_LINK } from './BranchManagement.constants'
-import { useBranchesQuery } from '@/data/branches/branches-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 const SWITCH_BRANCH_PAGE_NAME = 'Switch branch'
@@ -21,16 +20,19 @@ export function useBranchCommands() {
   const ref = selectedProject?.ref || '_'
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
-  const { can: canCreateBranches } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'preview_branches',
-    { resource: { is_default: false } }
-  )
+  const parentProjectRef = selectedProject?.parent_project_ref || selectedProject?.ref
+  const createBranchGrant = useGrant('POST /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  const canCreateBranches = createBranchGrant.status === 'granted'
 
-  let { data: branches } = useBranchesQuery(
-    { projectRef: selectedProject?.parent_project_ref || selectedProject?.ref },
-    { enabled: isBranchingEnabled }
-  )
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  let { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    enabled: isBranchingEnabled,
+  })
 
   branches ??= EMPTY_ARRAY
 
@@ -46,7 +48,7 @@ export function useBranchCommands() {
             id: `branch-${branch.id}`,
             name: branch.name,
             route: `/project/${branch.project_ref}`,
-            icon: () => <Forward />,
+            icon: () => <ForwardIcon />,
           })),
         },
       ],
@@ -62,7 +64,7 @@ export function useBranchCommands() {
         name: 'Switch branch',
         value: 'Switch branch, Change branch, Select branch',
         action: () => setPage(SWITCH_BRANCH_PAGE_NAME),
-        icon: () => <GitBranch />,
+        icon: () => <GitBranchIcon />,
       },
     ],
     {
@@ -80,7 +82,7 @@ export function useBranchCommands() {
         name: 'Create branch',
         value: 'Create branch, New branch',
         action: () => setShowCreateBranchModal(true),
-        icon: () => <Plus />,
+        icon: () => <PlusIcon />,
       },
     ],
     {
@@ -107,12 +109,4 @@ export function useBranchCommands() {
     ],
     { enabled: !!selectedProject }
   )
-
-  useRegisterCommands(COMMAND_MENU_SECTIONS.NAVIGATE, [
-    {
-      id: 'nav-branch-feedback',
-      name: 'Branching feedback',
-      route: BRANCHING_GITHUB_DISCUSSION_LINK,
-    },
-  ])
 }

@@ -4,6 +4,7 @@ import { MDXClient, type SerializeResult as MDXRemoteSerializeResult } from 'nex
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
+import { Heading } from 'ui'
 
 import { CHANGELOG_PAGES } from '@/app/api-v2/md/content.generated'
 import { ChangelogDetailSidebar } from '@/components/Changelog/ChangelogDetailSidebar'
@@ -12,11 +13,13 @@ import CTABanner from '@/components/CTABanner'
 import DefaultLayout from '@/components/Layouts/Default'
 import { getChangelogEntries, type ChangelogEntryFrontmatter } from '@/lib/changelog-repo'
 import { stripTitleMarkdown } from '@/lib/changelog.utils'
+import { breadcrumbListSchema, serializeJsonLd, techArticleSchema } from '@/lib/json-ld'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
 
 type PageProps = {
   title: string
+  summary: string
   created_at: string
   slug: string
   frontmatter: ChangelogEntryFrontmatter
@@ -26,6 +29,7 @@ type PageProps = {
 
 const ChangelogDetailPage = ({
   title,
+  summary,
   created_at,
   slug,
   frontmatter,
@@ -33,8 +37,27 @@ const ChangelogDetailPage = ({
   hasMarkdownVariant,
 }: PageProps) => {
   const plainTitle = stripTitleMarkdown(title)
+  const url = `https://supabase.com/changelog/${slug}`
+  const techArticleJsonLd = techArticleSchema({
+    url,
+    headline: plainTitle,
+    description: summary,
+    datePublished: created_at,
+  })
+  const breadcrumbJsonLd = breadcrumbListSchema([
+    { name: 'Changelog', url: 'https://supabase.com/changelog' },
+    { name: plainTitle, url },
+  ])
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(techArticleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+      />
       {hasMarkdownVariant && (
         <Head>
           <link rel="alternate" type="text/markdown" href={`/changelog/${slug}.md`} />
@@ -76,7 +99,14 @@ const ChangelogDetailPage = ({
                 {'error' in source ? (
                   <p>Error rendering changelog entry: {source.error.message}</p>
                 ) : (
-                  <MDXClient {...source} components={mdxComponents('blog')} />
+                  <MDXClient
+                    {...source}
+                    components={{
+                      ...mdxComponents('blog'),
+                      // The page title already renders as the h1
+                      h1: (props: any) => <Heading {...props} tag="h2" />,
+                    }}
+                  />
                 )}
               </article>
             </div>
@@ -113,6 +143,7 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
   return {
     props: {
       title: entry.frontmatter.title,
+      summary: stripTitleMarkdown(entry.summary).replace(/\s+/g, ' '),
       created_at: entry.sortDate,
       slug: entry.slug,
       frontmatter: entry.frontmatter,

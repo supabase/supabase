@@ -95,6 +95,7 @@ describe('isRoleValidationFailure', () => {
   test('recognises a role validation failure', () => {
     expect(
       isRoleValidationFailure({
+        status: 'error',
         error_code: 'role_validation_failed',
         message: 'nope',
         validation: { scope_target: 'organization', role: READ_ONLY_ROLE },
@@ -118,6 +119,7 @@ describe('getFailedProjects', () => {
 
     expect(
       getFailedProjects({
+        status: 'error',
         error_code: 'role_validation_failed',
         message: 'nope',
         validation: { scope_target: 'projects', failures: [failure] },
@@ -128,6 +130,7 @@ describe('getFailedProjects', () => {
   test('is empty for an organization-level failure', () => {
     expect(
       getFailedProjects({
+        status: 'error',
         error_code: 'role_validation_failed',
         message: 'nope',
         validation: { scope_target: 'organization', role: READ_ONLY_ROLE },

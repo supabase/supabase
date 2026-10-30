@@ -140,8 +140,6 @@ pnpm dev   # http://localhost:3001/docs
 ```
 
 - **`predev`** runs GraphQL and reference codegen plus example copy.
-- A concurrent watcher syncs troubleshooting content
-  (`dev:watch:troubleshooting`).
 - Community contributors: set `NEXT_PUBLIC_IS_PLATFORM=false` in `.env`.
 - Supabase employees: `pnpm run dev:secrets:pull` for internal env vars
   (AWS profile + `scripts/getSecrets.js`).

@@ -3,6 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
+import { RecoveryCodesModal } from './RecoveryCodesModal'
 import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
@@ -31,6 +32,27 @@ const codes = [
 ]
 
 describe('GenerateRecoveryCodesModal', () => {
+  test('shows shimmer content while codes are being generated', () => {
+    customRender(
+      <RecoveryCodesModal
+        open
+        onOpenChange={vi.fn()}
+        mutation={{
+          data: undefined,
+          status: 'pending',
+          error: null,
+          isError: false,
+          isPending: true,
+          isSuccess: false,
+          reset: vi.fn(),
+        }}
+      />
+    )
+    expect(screen.getByRole('status', { name: 'Generating recovery codes' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Done' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
+  })
+
   test('generate the recovery codes and allow users to copy them', async () => {
     vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue({
       data: {
@@ -85,8 +107,8 @@ describe('GenerateRecoveryCodesModal', () => {
     customRender(<GenerateRecoveryCodesModal />)
     fireEvent.click(await screen.findByRole('button', { name: 'Generate recovery codes' }))
     await screen.findByText('Unable to generate recovery codes')
-    await screen.findByText(
-      'Try refreshing your browser, but if the issue persists for more than a few minutes, please reach out to us via support.'
+    expect(await screen.findByText(/Try refreshing your browser/)).toHaveTextContent(
+      'Try refreshing your browser, but if the issue persists for more than a few minutes, contact support.'
     )
 
     fireEvent.click(await screen.findByRole('button', { name: 'Close' }))

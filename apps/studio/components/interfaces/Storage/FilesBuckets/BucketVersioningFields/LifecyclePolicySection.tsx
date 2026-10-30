@@ -1,8 +1,10 @@
 import { useParams } from 'common'
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'motion/react'
+import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { useFormContext, type Control } from 'react-hook-form'
+import type { UseFormReturn } from 'react-hook-form'
 import {
+  Button,
   FormControl,
   FormField,
   FormInputGroupInput,
@@ -12,52 +14,79 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { BucketVersioningFormValues } from './BucketVersioningFields.schema'
+import type { BucketFormValues } from '../FilesBucket.schema'
 import { ExpirationModeToggle } from './ExpirationModeToggle'
 import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 const toFieldValue = (rawInput: string): '' | number => {
   const digits = rawInput.replace(/[^0-9]/g, '')
   return digits === '' ? '' : Number(digits)
 }
 
-const SectionHeading = () => (
-  <div className="flex flex-col gap-y-0.5">
-    <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
-    <p className="text-sm text-foreground-lighter">Automatically expire noncurrent versions</p>
+const getRulesHref = (projectRef?: string, bucketName?: string) =>
+  projectRef && bucketName
+    ? `/project/${projectRef}/storage/files/policies?search=${encodeURIComponent(bucketName)}`
+    : undefined
+
+const LabelWithTooltip = ({ label, tooltip }: { label: string; tooltip: string }) => (
+  <div className="flex items-center gap-x-1">
+    <span>{label}</span>
+    <InfoTooltip side="bottom" className="max-w-60">
+      {tooltip}
+    </InfoTooltip>
+  </div>
+)
+
+const SectionHeading = ({ rulesHref }: { rulesHref?: string }) => (
+  <div className="flex items-start justify-between gap-x-2">
+    <div className="flex flex-col gap-y-0.5">
+      <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
+      <p className="text-sm text-foreground-lighter">Automatically expire noncurrent versions</p>
+    </div>
+    {rulesHref && (
+      <Button asChild type="button" size="tiny">
+        <Link href={rulesHref} className="text-sm shrink-0">
+          View rules
+        </Link>
+      </Button>
+    )}
   </div>
 )
 
 interface LifecyclePolicySectionProps {
-  control: Control<BucketVersioningFormValues>
+  form: UseFormReturn<BucketFormValues>
   hasDays: boolean
   hasVersions: boolean
   mode: ExpirationMode
-  onModeChange: (mode: ExpirationMode) => void
   /** The stored policy is still in flight, so there is nothing truthful to show yet. */
   isLoading?: boolean
   /** The stored policy holds rules these fields cannot represent, let alone round-trip. */
   isUnsupported?: boolean
   /** The stored policy could not be read, so the fields would be showing a guess. */
   error?: { message: string } | null
+  /** Set for an existing bucket, to link to its rules on the Storage policies page. */
+  bucketName?: string
 }
 
 export const LifecyclePolicySection = ({
-  control,
+  form,
   hasDays,
   hasVersions,
   mode,
-  onModeChange,
   isLoading = false,
   isUnsupported = false,
   error,
+  bucketName,
 }: LifecyclePolicySectionProps) => {
   const { ref } = useParams()
-  const { setValue } = useFormContext<BucketVersioningFormValues>()
+  const rulesHref = getRulesHref(ref, bucketName)
+  const { control, setValue } = form
   const hasNoPolicy = !hasDays && !hasVersions
   const hasBothConditions = hasDays && hasVersions
 
@@ -99,8 +128,17 @@ export const LifecyclePolicySection = ({
         <SectionHeading />
         <Admonition
           type="default"
-          title="Lifecycle policy set outside the dashboard"
-          description="It uses rules the dashboard cannot show, so saving leaves the policy as it is. Manage it with the S3 or Storage API."
+          title="This bucket has a custom lifecycle policy"
+          description={
+            rulesHref ? (
+              <>
+                The policy uses rules these fields can't show, so saving won't change it.{' '}
+                <InlineLink href={rulesHref}>Edit rules</InlineLink> individually instead.
+              </>
+            ) : (
+              "The policy uses rules these fields can't show, so saving won't change it. Edit it with the S3 or Storage API."
+            )
+          }
         />
       </div>
     )
@@ -108,13 +146,21 @@ export const LifecyclePolicySection = ({
 
   return (
     <div className="flex flex-col gap-y-2">
-      <SectionHeading />
+      <SectionHeading rulesHref={rulesHref} />
 
       <FormField
         name="version_expiry_days"
         control={control}
         render={({ field }) => (
-          <FormItemLayout label="Noncurrent version expiration" layout="flex-row-reverse">
+          <FormItemLayout
+            label={
+              <LabelWithTooltip
+                label="Delete noncurrent versions after"
+                tooltip="The current version is never deleted."
+              />
+            }
+            layout="flex-row-reverse"
+          >
             <FormControl>
               <InputGroup>
                 <FormInputGroupInput
@@ -141,7 +187,13 @@ export const LifecyclePolicySection = ({
         control={control}
         render={({ field }) => (
           <FormItemLayout
-            label="Retained noncurrent versions"
+            label={
+              <LabelWithTooltip
+                label="Newest noncurrent versions to keep"
+                tooltip="Leave blank to keep every version until the age limit. Max 100."
+              />
+            }
+            labelOptional="Optional"
             description={hasDays ? undefined : 'Requires an expiration age to be set.'}
             layout="flex-row-reverse"
             className={hasDays ? undefined : 'opacity-60'}
@@ -171,7 +223,10 @@ export const LifecyclePolicySection = ({
       <AnimatePresence initial={false}>
         {hasBothConditions && (
           <FormSectionCollapse key="mode">
-            <ExpirationModeToggle mode={mode} onModeChange={onModeChange} />
+            <ExpirationModeToggle
+              mode={mode}
+              onModeChange={(value) => setValue('expiration_mode', value, { shouldDirty: true })}
+            />
           </FormSectionCollapse>
         )}
 
@@ -181,7 +236,7 @@ export const LifecyclePolicySection = ({
               type="warning"
               className="mt-2"
               title="No lifecycle policy"
-              description="Lifecycle policies are recommended to manage and reduce storage costs for noncurrent versions."
+              description="Noncurrent versions accumulate and increase storage costs. Set an expiration to delete them automatically."
             />
           </FormSectionCollapse>
         )}
