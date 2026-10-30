@@ -176,6 +176,40 @@ describe('PageTelemetryIsland', () => {
     )
   })
 
+  it('attributes a same-tab return from an external source', () => {
+    sessionStorage.setItem('kb_first_pageview_sent', '1')
+    window.history.replaceState(null, '', '/kb?utm_source=google&gclid=abc')
+    setReferrer('https://www.google.com/')
+    consentState.hasConsented = true
+    render()
+
+    expect(posthogClient.capturePageView).toHaveBeenCalledWith(
+      expect.objectContaining({ $utm_source: 'google', gclid: 'abc' })
+    )
+  })
+
+  it('sends no pageview when the page is restored from the back-forward cache', () => {
+    consentState.hasConsented = true
+    render()
+
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }))
+
+    expect(posthogClient.capturePageView).toHaveBeenCalledOnce()
+  })
+
+  it('still sends a pageview when sessionStorage is unavailable', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked')
+    })
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked')
+    })
+    consentState.hasConsented = true
+    render()
+
+    expect(posthogClient.capturePageView).toHaveBeenCalledOnce()
+  })
+
   it('sends landing-page UTMs captured before consent', async () => {
     window.history.replaceState(null, '', '/kb?utm_source=google&gclid=abc')
     setReferrer('https://www.google.com/')

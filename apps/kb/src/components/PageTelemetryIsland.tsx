@@ -1,6 +1,10 @@
 import { useConsentState } from 'common/consent-state'
 import { IS_PLATFORM } from 'common/constants'
-import { parseFirstReferrerCookie, parseMwDiagCookie } from 'common/first-referrer-cookie'
+import {
+  isExternalReferrer,
+  parseFirstReferrerCookie,
+  parseMwDiagCookie,
+} from 'common/first-referrer-cookie'
 import { useFirstTouchStore } from 'common/hooks/useFirstTouchStore'
 import { handlePageLeaveTelemetry, handlePageTelemetry } from 'common/page-telemetry'
 import { posthogClient } from 'common/posthog-client'
@@ -37,7 +41,8 @@ export function PageTelemetryIsland() {
 
     posthogClient.init()
 
-    const isFirstPageview = !hasSentFirstPageview()
+    const isFirstPageview =
+      !hasSentFirstPageview() || !document.referrer || isExternalReferrer(document.referrer)
     const cookieHeader = document.cookie
     const firstTouchData = isFirstPageview ? getFirstTouchData() : null
     try {
