@@ -235,7 +235,7 @@ async function generate() {
   /**
    * generate sitemap router
    *
-   * this points to www and docs sitemaps
+   * this points to www, docs, kb, and library sitemaps
    */
   const sitemapRouter = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -247,6 +247,9 @@ async function generate() {
   </sitemap>
   <sitemap>
     <loc>https://supabase.com/kb/sitemap-index.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://supabase.com/library/sitemap.xml</loc>
   </sitemap>
 </sitemapindex>
 `

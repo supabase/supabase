@@ -186,6 +186,7 @@ describe('generate-sitemap lastmod', () => {
     const index = fs.readFileSync(path.join(fixtureDir, 'public', 'sitemap.xml'), 'utf-8')
     expect(index).toContain('<loc>https://supabase.com/sitemap_www.xml</loc>')
     expect(index).toContain('<loc>https://supabase.com/docs/sitemap.xml</loc>')
+    expect(index).toContain('<loc>https://supabase.com/library/sitemap.xml</loc>')
   })
 })
 
