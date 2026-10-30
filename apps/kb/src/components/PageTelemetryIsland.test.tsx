@@ -188,6 +188,21 @@ describe('PageTelemetryIsland', () => {
     )
   })
 
+  it('attributes a same-tab return with no referrer', () => {
+    sessionStorage.setItem('kb_first_pageview_sent', '1')
+    setFirstReferrerCookie()
+    setReferrer('')
+    consentState.hasConsented = true
+    render()
+
+    expect(posthogClient.capturePageView).toHaveBeenCalledWith(
+      expect.objectContaining({
+        $referrer: 'https://www.google.com/',
+        first_referrer_cookie_present: true,
+      })
+    )
+  })
+
   it('sends no pageview when the page is restored from the back-forward cache', () => {
     consentState.hasConsented = true
     render()
