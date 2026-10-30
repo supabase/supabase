@@ -76,7 +76,7 @@ export const TopNavMenu = ({ children, className }: TopNavMenuProps) => {
 }
 
 export const TopNavMenuItem = ({ label, children, className, ...props }: TopNavMenuItemProps) => (
-  <NavigationMenuItem className="text-sm">
+  <NavigationMenuItem className="text-[0.8125rem] font-medium">
     <NavigationMenuTrigger
       className={cn(
         'inline-flex h-full items-center px-3.5 text-foreground-light transition-colors',
@@ -107,7 +107,7 @@ export const TopNavMenuLink = ({
   className,
   ...props
 }: TopNavMenuLinkProps) => (
-  <NavigationMenuItem className="text-sm">
+  <NavigationMenuItem className="text-[0.8125rem] font-medium">
     <NavigationMenuLink asChild>
       <Link
         className={cn(
@@ -136,7 +136,7 @@ export const TopNavMenuPanel = ({ className, ...props }: ComponentProps<'div'>) 
 export const TopNavMenuGroup = ({ label, children, className }: TopNavMenuGroupProps) => (
   <section className={cn('row-span-2 mb-10 grid grid-rows-subgrid', className)}>
     {label ? (
-      <h2 className="pb-5 font-mono text-xs uppercase tracking-widest text-foreground-lighter">
+      <h2 className="pb-2 font-mono text-xs uppercase tracking-widest text-foreground-lighter">
         {label}
       </h2>
     ) : null}
@@ -153,7 +153,7 @@ export const TopNavMenuGroupLink = ({
     <NavigationMenuLink asChild>
       <Link
         className={cn(
-          '-mx-2 flex items-center gap-2 rounded-md px-2 py-2 text-base text-foreground',
+          '-mx-2 flex items-center gap-2 rounded-md px-2 py-2 text-[0.9375rem] text-foreground',
           'hover:bg-surface-200 focus-ring',
           className
         )}
