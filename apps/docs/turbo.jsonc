@@ -2,14 +2,46 @@
   "$schema": "./../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
+    // Generated artifacts are gitignored, so tasks downstream of an uncached task list the
+    // files it writes in `inputs` explicitly. Otherwise a cache hit could restore output built
+    // from stale remote content.
+
+    "codegen:graphql": {
+      "outputs": ["__generated__/**"],
+    },
     "codegen:examples": {
-      "inputs": ["../../examples/**"],
+      "inputs": ["$TURBO_ROOT$/examples/**"],
       "outputs": ["examples/**"],
     },
-    "codegen:references": {
-      "inputs": ["spec/**"],
-      "outputs": ["features/docs/generated/**"],
+    // Downloads the TypeDoc dumps only when they're missing, so it depends on local state
+    // rather than on inputs.
+    "codegen:references:new:ensure": {
+      "cache": false,
     },
+    "codegen:references:dart": {
+      "outputs": ["spec/reference/dart/v2/supabase_flutter.json"],
+    },
+    "codegen:references:new": {
+      "dependsOn": ["codegen:references:new:ensure", "codegen:references:dart"],
+      "inputs": ["$TURBO_DEFAULT$", "spec/reference/**"],
+      "outputs": ["content/reference/**"],
+    },
+    // Shares features/docs/generated/ with build:federated-content, so only claim this
+    // script's own files.
+    "codegen:references:legacy": {
+      "outputs": [
+        "features/docs/generated/*.functions.json",
+        "features/docs/generated/*.sections.json",
+        "features/docs/generated/*.flat.json",
+        "features/docs/generated/*.bySlug.json",
+        "features/docs/generated/*.endpointsById.json",
+      ],
+    },
+    // No script: runs both reference codegen steps.
+    "codegen:references": {
+      "dependsOn": ["codegen:references:legacy", "codegen:references:new"],
+    },
+
     // Fetches remote (GitHub) content and the JSON artifacts the markdown generator reads.
     // Not cached: the inputs are remote, so a cache restore could resurrect stale content.
     "build:federated-content": {
@@ -19,20 +51,114 @@
         "DOCS_GITHUB_APP_INSTALLATION_ID",
         "DOCS_GITHUB_APP_PRIVATE_KEY",
       ],
+      // Local-run fallback credentials.
+      "passThroughEnv": ["GH_TOKEN", "GITHUB_TOKEN"],
     },
-    // Generates the guide/reference .md files and manifest.json under public/markdown/.
-    // Declaring outputs lets Turbo restore these artifacts on a cache hit; without it a
-    // cached run would skip the script and leave the generated markdown missing for `next build`.
-    "build:markdown": {
+    "build:guides-markdown": {
       "dependsOn": ["build:federated-content"],
-      "outputs": ["public/markdown/**", "public/markdown/manifest.json"],
+      "inputs": ["$TURBO_DEFAULT$", "content/guides/**", "features/docs/generated/**"],
+      "env": [
+        "CI",
+        "NODE_ENV",
+        "NEXT_PUBLIC_API_URL",
+        "NEXT_PUBLIC_BASE_PATH",
+        "NEXT_PUBLIC_IS_PLATFORM",
+        "NEXT_PUBLIC_MISC_URL",
+        "NEXT_PUBLIC_VERCEL_ENV",
+        "VERCEL_ENV",
+        "VERCEL_URL",
+      ],
+      "outputs": ["public/markdown/guides/**", "public/markdown/manifest.json"],
+    },
+    "build:reference-markdown": {
+      "dependsOn": ["codegen:references"],
+      "env": [
+        "CI",
+        "NODE_ENV",
+        "ENABLED_FEATURES_OVERRIDE_DISABLE_ALL",
+        "NEXT_PUBLIC_API_URL",
+        "NEXT_PUBLIC_BASE_PATH",
+        "NEXT_PUBLIC_IS_PLATFORM",
+        "NEXT_PUBLIC_MISC_URL",
+        "NEXT_PUBLIC_VERCEL_ENV",
+        "VERCEL_ENV",
+        "VERCEL_URL",
+      ],
+      "outputs": ["public/markdown/reference/**"],
+    },
+    // No script: generates the guide and reference markdown under public/markdown/.
+    "build:markdown": {
+      "dependsOn": ["build:guides-markdown", "build:reference-markdown"],
+    },
+    "build:gz-archive": {
+      "dependsOn": ["build:markdown"],
+      "outputs": ["public/docs.tar.gz"],
+    },
+    "build:sitemap": {
+      "dependsOn": ["build:federated-content", "codegen:references"],
+      "inputs": ["$TURBO_DEFAULT$", "content/guides/**"],
+      "outputs": ["public/sitemap.xml"],
+    },
+    "redirects:generate": {
+      "outputs": ["lib/redirects/generated/**"],
+    },
+
+    "dev": {
+      "dependsOn": ["codegen:graphql", "codegen:examples", "codegen:references"],
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck", "codegen:graphql"],
     },
     "test": {
+      "dependsOn": ["codegen:examples"],
       // Lets the smoke tests target a preview deploy or localhost instead of production.
       "env": ["DOCS_SMOKE_URL"],
     },
+    "test:smoke": {
+      "dependsOn": ["codegen:references"],
+      "cache": false,
+      "env": ["DOCS_SMOKE_URL"],
+    },
+
+    // Write to remote databases, so never cached.
+    "embeddings": {
+      "dependsOn": ["codegen:references"],
+      "cache": false,
+      "passThroughEnv": [
+        "ENABLED_FEATURES_OVERRIDE_DISABLE_ALL",
+        "NEXT_PUBLIC_MISC_ANON_KEY",
+        "NEXT_PUBLIC_MISC_URL",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "OPENAI_API_KEY",
+        "SUPABASE_SECRET_KEY",
+      ],
+    },
+    "ingest:search_v2": {
+      "dependsOn": ["build:guides-markdown", "codegen:references"],
+      "cache": false,
+      "passThroughEnv": ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SECRET_KEY"],
+    },
+    "sync": {
+      "dependsOn": ["codegen:graphql"],
+      "cache": false,
+      "passThroughEnv": [
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "SUPABASE_SECRET_KEY",
+      ],
+    },
+
     "build": {
-      "dependsOn": ["^build", "codegen:examples", "codegen:references", "build:markdown"],
+      "dependsOn": [
+        "^build",
+        "codegen:graphql",
+        "codegen:examples",
+        "codegen:references",
+        "build:markdown",
+        "build:gz-archive",
+        "build:sitemap",
+        "redirects:generate",
+      ],
       "env": [
         "ANALYZE",
         "NEXT_PUBLIC_SUPABASE_URL",
@@ -86,7 +212,14 @@
         "SUPABASE_SECRET_KEY",
       ],
       "passThroughEnv": ["SENTRY_AUTH_TOKEN"],
-      "inputs": ["$TURBO_DEFAULT$"],
+      // Gitignored files written by the uncached fetch tasks, hashed so new remote content
+      // invalidates the build.
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "content/guides/**",
+        "features/docs/generated/**",
+        "spec/reference/**",
+      ],
       "outputs": [".next/**", "!.next/cache/**"],
     },
   },
