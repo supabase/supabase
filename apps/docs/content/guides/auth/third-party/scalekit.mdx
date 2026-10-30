@@ -1,0 +1,97 @@
+---
+id: 'auth-third-party-scalekit'
+title: 'Scalekit'
+subtitle: 'Use Scalekit with your Supabase project'
+---
+
+Use Scalekit to authorize requests to your Supabase project. You can use it alongside Supabase Auth, or on its own.
+
+## Getting started
+
+1. In the Scalekit Dashboard, under **Developers**, open **Settings**, then **API Credentials**. Copy **Environment URL**. If **Settings** is absent, open **API Credentials** under **Developers**.
+2. Add that URL in the Supabase Dashboard as a Custom OIDC integration. See [Add the integration](#add-the-integration).
+3. Add a `role` claim with the value `authenticated` on the Scalekit access token. See [Add the role claim](#add-the-role-claim).
+4. Return that access token from the Supabase client. See [Set up the Supabase client](#set-up-the-supabase-client).
+
+## Add the integration
+
+In the Supabase Dashboard, go to **Authentication** > **Sign In / Providers** > [**Third-Party Auth**](/dashboard/project/_/auth/third-party).
+
+1. Click **Add provider** and select **Custom OIDC**.
+2. In **Issuer URL**, enter the Scalekit **Environment URL**.
+3. Click **Add provider**.
+
+The integration appears in the Third-Party Auth list with that issuer URL. To remove it, delete it from the same list.
+
+Scalekit signs access tokens with RS256 and includes a `kid` header. Supabase loads the signing keys from `<Environment URL>/.well-known/openid-configuration`. **Issuer URL** takes the Environment URL on its own.
+
+To add the same issuer from a terminal, create a [personal access token](/docs/guides/platform/personal-access-tokens) and call the [create third-party auth integration](/docs/reference/api/v1-create-project-tpa-integration) endpoint. Set `oidc_issuer_url` to the Environment URL.
+
+## Add the role claim
+
+Supabase reads the `role` claim on each JWT and uses that value as the Postgres role for the Data API, Storage, and Realtime. For a signed-in user, set `role` to `authenticated`. With no `role` claim, the request runs as `anon`.
+
+A Scalekit access token carries `roles` as a list. Supabase uses the separate string claim `role` as the Postgres role. Add that claim in Token Claims before you rely on it.
+
+In the Scalekit Dashboard, go to **Configure** > **Authentication** > **Token Claims**.
+
+1. Click **Add custom claim**.
+2. In **Claim key**, enter `role`.
+3. In **Expression**, enter `authenticated`.
+4. Click **Add**.
+
+Enter `authenticated` as a single word. Leave the `roles` claim in place.
+
+## Set up the Supabase client
+
+Install `@scalekit-sdk/node` on your server. In the login callback, exchange the authorization code and store the `accessToken` string. This package uses your client secret, so keep this code on the server.
+
+```typescript
+import { Scalekit } from '@scalekit-sdk/node'
+
+const scalekit = new Scalekit(
+  '<SCALEKIT_ENVIRONMENT_URL>',
+  '<SCALEKIT_CLIENT_ID>',
+  '<SCALEKIT_CLIENT_SECRET>'
+)
+
+const { accessToken } = await scalekit.authenticateWithCode(code, redirectUri)
+```
+
+`code` is the value Scalekit sends to your redirect URI. Save `accessToken` in your server session.
+
+Pass that stored string from the Supabase client. Return `null` when no user is signed in.
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      return storedAccessToken
+    },
+  }
+)
+```
+
+`storedAccessToken` is the string you saved. `getSession()` and `currentUser()` return claims and expiry, so use the saved string here.
+
+## Identify the user in Row Level Security
+
+The `sub` claim identifies the user. `auth.uid()` casts `sub` to `uuid`, so it fails when `sub` is not a UUID. Read the claim directly instead.
+
+Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+
+```sql
+create policy "Users can read their own rows"
+  on table_name
+  for select
+  to authenticated
+  using (user_id = (select auth.jwt()->>'sub'));
+```
+
+Here `user_id` must be a `text` column.
+
+If the project trusts more than one issuer, also restrict policies by `iss`. See [Restrict access by issuer](/docs/guides/auth/third-party/custom-oidc#restrict-access-by-issuer).
