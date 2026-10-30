@@ -99,7 +99,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
     case 'scalekit':
       return (
         <>
-          Supabase verifies Scalekit access tokens from this issuer. Read more in the{' '}
+          Scalekit issues the access token for this issuer. Read more in the{' '}
           <a
             className="hover:decoration-primary underline hover:text-foreground transition"
             href={`${DOCS_URL}/guides/auth/third-party/scalekit`}

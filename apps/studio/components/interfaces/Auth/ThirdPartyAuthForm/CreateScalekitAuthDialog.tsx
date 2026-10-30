@@ -93,7 +93,7 @@ export const CreateScalekitAuthDialog = ({ visible, onClose }: CreateScalekitAut
                 render={({ field }) => (
                   <FormItemLayout
                     label="Issuer URL"
-                    description="HTTPS only. A custom domain is allowed. No query string or fragment."
+                    description="Enter the HTTPS Environment URL, including a custom domain, with no query or fragment."
                   >
                     <FormControl>
                       <Input {...field} placeholder="https://yourorg.scalekit.com" />
