@@ -513,7 +513,7 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
-type OnboardingSurveySurface = 'org_form' | 'project_home'
+type OnboardingSurveySurface = 'org_form'
 
 /**
  * Onboarding survey prompt UI became visible.
@@ -523,18 +523,6 @@ type OnboardingSurveySurface = 'org_form' | 'project_home'
  */
 export interface OnboardingSurveyPromptOpenedEvent {
   action: 'onboarding_survey_prompt_opened'
-  properties: { surface: OnboardingSurveySurface }
-  groups: Partial<TelemetryGroups>
-}
-
-/**
- * User clicked the Answer button on the toast banner. Toast variant only.
- *
- * @group Events
- * @source studio
- */
-export interface OnboardingSurveyAnswerButtonClickedEvent {
-  action: 'onboarding_survey_answer_button_clicked'
   properties: { surface: OnboardingSurveySurface }
   groups: Partial<TelemetryGroups>
 }
@@ -551,7 +539,6 @@ export interface OnboardingSurveySubmitButtonClickedEvent {
   action: 'onboarding_survey_submit_button_clicked'
   properties: {
     surface: OnboardingSurveySurface
-    hasHeardFrom: boolean
     hasBuilding: boolean
   }
   groups: Partial<TelemetryGroups>
@@ -567,7 +554,7 @@ export interface OnboardingSurveyDismissedEvent {
   action: 'onboarding_survey_dismissed'
   properties: {
     surface: OnboardingSurveySurface
-    reason: 'skip_button' | 'dialog_dismissed' | 'toast_skip' | 'org_form_blank' | 'close_button'
+    reason: 'org_form_blank'
   }
   groups: Partial<TelemetryGroups>
 }
@@ -582,7 +569,6 @@ export interface OnboardingSurveySubmitFailedEvent {
   action: 'onboarding_survey_submit_failed'
   properties: {
     surface: OnboardingSurveySurface
-    hasHeardFrom: boolean
     hasBuilding: boolean
   }
   groups: Partial<TelemetryGroups>
@@ -4411,7 +4397,6 @@ export type TelemetryEvent =
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | OnboardingSurveyPromptOpenedEvent
-  | OnboardingSurveyAnswerButtonClickedEvent
   | OnboardingSurveySubmitButtonClickedEvent
   | OnboardingSurveyDismissedEvent
   | OnboardingSurveySubmitFailedEvent

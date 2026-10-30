@@ -129,8 +129,6 @@ export const LOCAL_STORAGE_KEYS = {
   SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
-  ONBOARDING_SURVEY_PROMPT_STATE: (profileId: string, orgSlug: string) =>
-    `supabase-onboarding-survey-prompt-${profileId}-${orgSlug}`,
 
   /**
    * COMMON

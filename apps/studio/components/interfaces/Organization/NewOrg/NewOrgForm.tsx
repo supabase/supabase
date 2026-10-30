@@ -50,7 +50,7 @@ import {
   ORG_SIZE_TYPES,
   SURVEY_ORG_KIND_TYPES,
 } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
-import { useOnboardingSurveyPrompt } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyPrompt'
+import { useOnboardingSurveyVariant } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyVariant'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useOnboardingSurveyMutation } from '@/data/organizations/onboarding-survey-mutation'
@@ -165,16 +165,13 @@ export const NewOrgForm = ({
     },
   })
 
-  const { variant: onboardingSurveyVariant } = useOnboardingSurveyPrompt({
-    surface: 'org_form',
-  })
+  const { variant: onboardingSurveyVariant } = useOnboardingSurveyVariant()
   const showOnboardingSurveyInOrgForm = isOrgFormVariant(onboardingSurveyVariant)
   const showOnboardingSurveyExpanded = onboardingSurveyVariant === 'org_form_expanded'
-  // Skip kind/size on org creation for any variant that will later fire the
-  // survey endpoint — sendOrgCreationSurvey dedupes on (user, org_slug) at the
-  // parent row, so letting both paths fire would swallow the later call.
-  const omitKindFromOrgCreation =
-    onboardingSurveyVariant !== undefined && onboardingSurveyVariant !== 'control'
+  // Skip kind/size on org creation when the survey section is shown: the survey
+  // endpoint saves them after creation, and it dedupes on (user, org_slug) at the
+  // parent row, so sending them on both paths would swallow the survey call.
+  const omitKindFromOrgCreation = showOnboardingSurveyInOrgForm
 
   useEffect(() => {
     if (!showOnboardingSurveyInOrgForm) return
@@ -314,7 +311,7 @@ export const NewOrgForm = ({
       } else {
         track(
           'onboarding_survey_submit_button_clicked',
-          { surface: 'org_form', hasHeardFrom: false, hasBuilding },
+          { surface: 'org_form', hasBuilding },
           groupOverrides
         )
       }
@@ -331,7 +328,7 @@ export const NewOrgForm = ({
       } catch {
         track(
           'onboarding_survey_submit_failed',
-          { surface: 'org_form', hasHeardFrom: false, hasBuilding },
+          { surface: 'org_form', hasBuilding },
           groupOverrides
         )
       }

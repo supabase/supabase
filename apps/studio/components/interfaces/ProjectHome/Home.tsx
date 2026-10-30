@@ -25,8 +25,6 @@ import { NotebooksSection } from './NotebooksSection'
 import { ProjectUsageSection } from './ProjectUsageSection'
 import { ProjectUsageSectionDeltas } from './ProjectUsageSectionDeltas'
 import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { OnboardingSurveyToastPrompt } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyToastPrompt'
-import { useOnboardingSurveyPrompt } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyPrompt'
 import { TopSection } from '@/components/interfaces/ProjectHome/TopSection'
 import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
@@ -48,26 +46,11 @@ export const ProjectHome = () => {
   const showHomepageUsageDeltas = useFlag('newHomepageUsageDeltas')
   const isExplorerEnabled = useIsExplorerEnabled()
 
-  const isMatureProject = dayjs.utc(project?.inserted_at).isBefore(dayjs.utc().subtract(10, 'day'))
+  const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
   const hasShownEnableBranchingModalRef = useRef(false)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
   const isComingUp = project?.status === PROJECT_STATUS.COMING_UP
-  const { variant: onboardingSurveyVariant } = useOnboardingSurveyPrompt({
-    surface: 'project_home',
-  })
-  // Platform's `inserted_at` is UTC but lacks a `Z` suffix, so we parse it explicitly as UTC.
-  const isRecentlyCreatedProject =
-    !!project?.inserted_at &&
-    dayjs.utc(project.inserted_at).isAfter(dayjs.utc().subtract(1, 'hour'))
-  const inProvisioningWindow = isComingUp || isRecentlyCreatedProject
-
-  const showOnboardingSurveyToast =
-    !!project &&
-    !isPaused &&
-    inProvisioningWindow &&
-    (onboardingSurveyVariant === 'toast' || onboardingSurveyVariant === 'dialog')
-  const shouldAutoOpenOnboardingSurveyDialog = isComingUp && onboardingSurveyVariant === 'dialog'
 
   const [sectionOrder, setSectionOrder] = useLocalStorage<string[]>(
     `home-section-order-${project?.ref || 'default'}`,
@@ -124,9 +107,6 @@ export const ProjectHome = () => {
 
   return (
     <ProjectNeedsSecuring>
-      {showOnboardingSurveyToast && (
-        <OnboardingSurveyToastPrompt autoOpen={shouldAutoOpenOnboardingSurveyDialog} />
-      )}
       <div className="w-full h-full">
         <ScaffoldContainer size="large" className={cn(isPaused && 'h-full')}>
           <ScaffoldSection
