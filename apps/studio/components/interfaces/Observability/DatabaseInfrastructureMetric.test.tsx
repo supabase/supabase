@@ -65,7 +65,7 @@ function mockMetrics(failedAttribute?: string, includeErrors = true) {
   return requests
 }
 
-function renderMetrics() {
+function renderMetrics({ hasMaxConnections = true } = {}) {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, staleTime: Infinity } },
   })
@@ -74,13 +74,16 @@ function renderMetrics() {
     status: 'ACTIVE_HEALTHY',
     connectionString: 'postgresql://localhost/postgres',
   })
-  queryClient.setQueryData(databaseKeys.maxConnections('default'), { maxConnections: 100 })
+  if (hasMaxConnections) {
+    queryClient.setQueryData(databaseKeys.maxConnections('default'), { maxConnections: 100 })
+  }
   customRender(
     <DatabaseInfrastructureSection
       interval="1day"
       refreshKey={0}
       dbErrorRate={0}
       isLoading={false}
+      slowQueriesCount={7}
     />,
     { queryClient }
   )
@@ -113,10 +116,11 @@ describe('DatabaseInfrastructureSection batched metrics', () => {
     const requests = mockMetrics(attribute)
     renderMetrics()
 
-    expect(await card(label).findByText('Metric is not supported')).toBeInTheDocument()
+    expect(await card(label).findByText('Unable to load')).toBeInTheDocument()
     expect(await card('CPU').findByText('25%')).toBeInTheDocument()
     expect(await card('Memory').findByText('60%')).toBeInTheDocument()
-    expect(screen.getAllByText('Metric is not supported')).toHaveLength(1)
+    expect(screen.getAllByText('Unable to load')).toHaveLength(1)
+    expect(screen.queryByText('Metric is not supported')).not.toBeInTheDocument()
     expect(card(label).queryByText('0%')).not.toBeInTheDocument()
     expect(requests).toHaveLength(1)
   })
@@ -124,18 +128,38 @@ describe('DatabaseInfrastructureSection batched metrics', () => {
   it('shows every affected card error when all results fail', async () => {
     const requests = mockMetrics('*')
     renderMetrics()
-    await waitFor(() => expect(screen.getAllByText('Metric is not supported')).toHaveLength(5))
+    await waitFor(() => expect(screen.getAllByText('Unable to load')).toHaveLength(5))
     expect(requests).toHaveLength(1)
   })
 
   it('does not display missing series as zero', async () => {
     mockMetrics('disk_io_budget', false)
     renderMetrics()
-    expect(await card('Disk IO balance').findByText('Error loading data')).toBeInTheDocument()
+    expect(await card('Disk IO balance').findByText('Unable to load')).toBeInTheDocument()
     expect(await card('CPU').findByText('25%')).toBeInTheDocument()
   })
 
-  it('shows request-wide failures on every infrastructure card', async () => {
+  it('isolates a connection limit failure to the connections card', async () => {
+    mockMetrics()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () =>
+        HttpResponse.json<APIErrorBody>(
+          { message: 'Connection limit query failed' },
+          { status: 500 }
+        ),
+    })
+    renderMetrics({ hasMaxConnections: false })
+
+    expect(await card('Peak Connections').findByText('Unable to load')).toBeInTheDocument()
+    expect(await card('CPU').findByText('25%')).toBeInTheDocument()
+    expect(await card('Memory').findByText('60%')).toBeInTheDocument()
+    expect(screen.getAllByText('Unable to load')).toHaveLength(1)
+    expect(screen.queryByText('Connection limit query failed')).not.toBeInTheDocument()
+  })
+
+  it('shows one friendly request-wide failure and preserves slow queries', async () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref/infra-monitoring',
@@ -143,6 +167,20 @@ describe('DatabaseInfrastructureSection batched metrics', () => {
         HttpResponse.json<APIErrorBody>({ message: 'Project not found' }, { status: 404 }),
     })
     renderMetrics()
-    await waitFor(() => expect(screen.getAllByText('Project not found')).toHaveLength(5))
+    expect(await screen.findByText('Failed to load database metrics')).toBeInTheDocument()
+    expect(screen.getAllByText('Failed to load database metrics')).toHaveLength(1)
+    expect(screen.queryByText('Project not found')).not.toBeInTheDocument()
+    expect(screen.queryByText('Unable to load')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /CPU/ })).not.toBeInTheDocument()
+    expect(card('Slow Queries').getByText('7')).toBeInTheDocument()
+    expect(screen.getByText(/Try refreshing your browser/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'contact support' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('projectRef=default')
+    )
+    expect(screen.getByRole('link', { name: 'Supabase status page' })).toHaveAttribute(
+      'href',
+      'https://status.supabase.com/'
+    )
   })
 })

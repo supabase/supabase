@@ -88,10 +88,6 @@ export const DatabaseInfrastructureMetric = ({
     metricError ??
     (isConnections ? maxConnectionsQuery.error : null) ??
     (hasMissingSeries ? { message: 'Error loading data' } : null)
-  const errorMessage =
-    error && typeof error === 'object' && 'message' in error
-      ? String(error.message)
-      : 'Error loading data'
 
   let value = '--'
   if (data) {
@@ -112,9 +108,7 @@ export const DatabaseInfrastructureMetric = ({
           <MetricCardLabel tooltip={tooltip}>{label}</MetricCardLabel>
         </MetricCardHeader>
         <MetricCardContent>
-          {!!error && (
-            <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
-          )}
+          {!!error && <div className="text-xs text-foreground-light">Unable to load</div>}
           {!error && <MetricCardValue>{value}</MetricCardValue>}
         </MetricCardContent>
       </MetricCard>
