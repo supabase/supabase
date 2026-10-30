@@ -1,6 +1,7 @@
 ---
 title: Can I use Supabase Postgres as a message queue?
 topics: ['Database', 'Queues']
+lastEdited: 2026-10-30
 ---
 
 Yes. [Supabase Queues](/docs/guides/queues) is built on the `pgmq` extension and stores messages in Postgres tables, so you can run background jobs without a separate queue service. You send and read messages with SQL, or from your app through the [Data API](/docs/guides/api) if you expose the queue functions in the `pgmq_public` schema.
