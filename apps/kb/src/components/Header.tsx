@@ -77,7 +77,7 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
             <TopNavMenu className="hidden lg:flex">
               {menus.map((menu) => (
                 <TopNavMenuItem key={menu.label} label={menu.label}>
-                  <TopNavMenuPanel>
+                  <TopNavMenuPanel className="mx-auto max-w-6xl pr-6 pl-[calc(var(--nav-inset)+1.75rem-1px)]">
                     {menu.groups.map((group) => (
                       <TopNavMenuGroup key={group.label} label={group.label}>
                         {group.links.map((link) => (
