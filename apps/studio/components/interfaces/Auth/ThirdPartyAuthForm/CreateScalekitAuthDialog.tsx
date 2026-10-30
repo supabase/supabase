@@ -20,7 +20,9 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { isValidOidcIssuerUrl } from './ThirdPartyAuthForm.utils'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface CreateScalekitAuthDialogProps {
   visible: boolean
@@ -48,10 +50,17 @@ export const CreateScalekitAuthDialog = ({ visible, onClose }: CreateScalekitAut
     defaultValues,
   })
 
+  const isDirty = form.formState.isDirty
+
   const handleClose = () => {
     form.reset(defaultValues)
     onClose()
   }
+
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: handleClose,
+  })
 
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
@@ -65,7 +74,7 @@ export const CreateScalekitAuthDialog = ({ visible, onClose }: CreateScalekitAut
   }
 
   return (
-    <Dialog open={visible} onOpenChange={(open) => !open && handleClose()}>
+    <Dialog open={visible} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="truncate">Add Scalekit provider</DialogTitle>
@@ -75,8 +84,8 @@ export const CreateScalekitAuthDialog = ({ visible, onClose }: CreateScalekitAut
           <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <p className="text-sm text-foreground-light">
-                Paste the Environment URL from the Scalekit Dashboard. That URL is the issuer.
-                Signing keys are found at <code>/.well-known/openid-configuration</code>.
+                The Environment URL is the issuer. Signing keys are at{' '}
+                <code>/.well-known/openid-configuration</code>.
               </p>
               <FormField
                 control={form.control}
@@ -84,7 +93,7 @@ export const CreateScalekitAuthDialog = ({ visible, onClose }: CreateScalekitAut
                 render={({ field }) => (
                   <FormItemLayout
                     label="Issuer URL"
-                    description="In Scalekit, open Developers, then Settings, then API Credentials, and copy Environment URL. A custom domain works here too."
+                    description="HTTPS only. A custom domain is allowed. No query string or fragment."
                   >
                     <FormControl>
                       <Input {...field} placeholder="https://yourorg.scalekit.com" />
@@ -96,20 +105,21 @@ export const CreateScalekitAuthDialog = ({ visible, onClose }: CreateScalekitAut
           </Form>
         </DialogSection>
         <DialogFooter>
-          <Button disabled={isPending} onClick={handleClose}>
+          <Button disabled={isPending} onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button
             variant="primary"
             form={FORM_ID}
             type="submit"
-            disabled={isPending}
+            disabled={!isDirty || isPending}
             loading={isPending}
           >
             Add provider
           </Button>
         </DialogFooter>
       </DialogContent>
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </Dialog>
   )
 }

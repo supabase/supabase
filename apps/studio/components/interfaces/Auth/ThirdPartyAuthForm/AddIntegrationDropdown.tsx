@@ -1,4 +1,4 @@
-import { useFeatureFlags } from 'common'
+import { useFlag } from 'common'
 import { ChevronDownIcon } from 'lucide-react'
 import Image from 'next/image'
 import {
@@ -58,8 +58,7 @@ export const AddIntegrationDropdown = ({
   onOpenChange,
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
-  const { configcat } = useFeatureFlags()
-  const isScalekitEnabled = configcat[SCALEKIT_TPA_FLAG] === true
+  const isScalekitEnabled = useFlag<boolean>(SCALEKIT_TPA_FLAG)
 
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>

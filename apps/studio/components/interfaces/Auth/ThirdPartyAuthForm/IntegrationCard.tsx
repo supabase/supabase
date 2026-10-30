@@ -99,8 +99,7 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
     case 'scalekit':
       return (
         <>
-          Allow users to use Supabase with Scalekit. Paste the Environment URL as the issuer. You
-          can read more in the{' '}
+          Supabase verifies Scalekit access tokens from this issuer. Read more in the{' '}
           <a
             className="hover:decoration-primary underline hover:text-foreground transition"
             href={`${DOCS_URL}/guides/auth/third-party/scalekit`}
