@@ -16,5 +16,6 @@ export const contract = {
     environments: new Set(['platform', 'self-hosted']),
   },
   needsApproval: false,
+  promptGuidance: `- At the start of each conversation, if the chat is unnamed, call \`rename_chat\` with a succinct 2–4 word descriptive name (e.g., "User Authentication Setup", "Sales Data Analysis", "Product Table Creation").`,
   toModelOutput: ({ status }) => ({ status }),
 } as const satisfies ToolContract

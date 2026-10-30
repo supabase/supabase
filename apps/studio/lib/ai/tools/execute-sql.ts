@@ -35,5 +35,14 @@ export const contract = {
     environments: new Set(['platform', 'self-hosted']),
   },
   needsApproval: true,
+  promptGuidance: `- When the user's request is clear, call \`execute_sql\` immediately—never propose a query and ask "do you want me to run this?" The tool implementation handles user confirmation.
+- Only ask clarifying questions when required information is missing or ambiguous—not as a confirmation step before execution.
+- Do not show the SQL query before execution; the client will display it to the user.
+- Set chartConfig \`view\` to \`chart\` and xAxis/yAxis if the results would be best displayed as a chart e.g. count of items by date
+- On execution error, explain succinctly and attempt to correct if possible, validating each outcome briefly (1–2 lines) after execution.
+- If a user skips execution, acknowledge and suggest alternatives. A skip is a user choice, not a permission or environment error.
+- Use markdown code blocks (\`\`\`sql\`\`\`) for illustrative SQL only if requested by the user or when providing non-executable examples.
+- This tool requires user approval, and tools that need approval must be called one per step: never call it in parallel with another tool that needs approval. Issue one per step and wait for its result before calling the next.
+- After execution, summarize outcomes concisely without duplicating results, as the client will present these.`,
   toModelOutput: toModelExecuteSqlOutput,
 } as const satisfies ToolContract
