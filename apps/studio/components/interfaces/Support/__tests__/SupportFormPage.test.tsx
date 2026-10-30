@@ -274,7 +274,7 @@ const getProjectSelector = (screen: Screen) =>
 
 const getSummaryField = (screen: Screen) => screen.getByPlaceholderText(/summary of the problem/i)
 
-const getMessageField = (screen: Screen) => screen.getByPlaceholderText(/describe the issue/i)
+const getMessageField = (screen: Screen) => screen.getByPlaceholderText(/trying to:/i)
 
 const getCategorySelector = (screen: Screen) =>
   screen.getByRole('combobox', { name: 'Select an issue' })
