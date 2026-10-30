@@ -237,6 +237,34 @@ function qualifiedIdent(value: string): SafeSqlFragment {
     )
 }
 
+// PostgreSQL stores GUC_LIST_QUOTE parameters in `pg_proc.proconfig` as an
+// already-quoted comma-separated list (e.g. `search_path=public, auth`), while
+// every other parameter is stored as a plain scalar string. When re-emitting a
+// value read from the catalog, list parameters must keep their list form and
+// scalar values must be quoted as SQL string literals, otherwise values
+// containing spaces, quotes, or other non-identifier characters are corrupted
+// or produce invalid SQL. Mirrors `pg_get_functiondef`'s proconfig handling.
+const GUC_LIST_QUOTE_PARAMS = new Set(
+  [
+    'search_path',
+    'temp_tablespaces',
+    'session_preload_libraries',
+    'shared_preload_libraries',
+    'local_preload_libraries',
+    'unix_socket_directories',
+    'output_plugin_libraries',
+    'oauth_validator_libraries',
+    'datestyle',
+  ].map((param) => param.toLowerCase())
+)
+
+function formatCatalogConfigParam(param: string, value: SafeSqlFragment): SafeSqlFragment {
+  if (value === 'FROM CURRENT' || GUC_LIST_QUOTE_PARAMS.has(param.toLowerCase())) {
+    return value
+  }
+  return literal(value)
+}
+
 function _generateCreateFunctionSql(
   {
     name,
@@ -337,7 +365,12 @@ export function update(
             ...currentFunc,
             definition,
             args,
-            config_params: currentFunc.config_params ?? {},
+            config_params: Object.fromEntries(
+              Object.entries(currentFunc.config_params ?? {}).map(([param, value]) => [
+                param,
+                formatCatalogConfigParam(param, value),
+              ])
+            ),
             type: currentFunc.type,
           },
           { replace: true }
