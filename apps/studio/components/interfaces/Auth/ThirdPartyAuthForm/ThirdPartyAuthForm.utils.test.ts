@@ -57,6 +57,7 @@ describe('getIntegrationType', () => {
     ['https://scalekit.com', 'scalekit'],
     ['https://yourorg.scalekit.com', 'scalekit'],
     ['https://yourorg.scalekit.cloud', 'scalekit'],
+    ['https://yourorg.scalekit.dev', 'scalekit'],
     ['https://auth.yourapp.ai', 'custom'],
     ['https://evilscalekit.com', 'custom'],
     ['https://scalekit.com.attacker.com', 'custom'],

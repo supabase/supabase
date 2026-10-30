@@ -50,7 +50,9 @@ export const CreateScalekitAuthDialog = ({ visible, onClose }: CreateScalekitAut
     defaultValues,
   })
 
-  const isDirty = form.formState.isDirty
+  const {
+    formState: { isDirty },
+  } = form
 
   const handleClose = () => {
     form.reset(defaultValues)
@@ -84,8 +86,8 @@ export const CreateScalekitAuthDialog = ({ visible, onClose }: CreateScalekitAut
           <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <p className="text-sm text-foreground-light">
-                The Environment URL is the issuer. Signing keys are at{' '}
-                <code>/.well-known/openid-configuration</code>.
+                The Environment URL is the issuer. Its discovery document at{' '}
+                <code>/.well-known/openid-configuration</code> names the signing keys.
               </p>
               <FormField
                 control={form.control}

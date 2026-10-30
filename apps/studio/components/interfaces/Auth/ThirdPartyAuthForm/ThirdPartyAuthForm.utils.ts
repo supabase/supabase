@@ -11,7 +11,7 @@ export const INTEGRATION_TYPES = [
   'custom',
 ] as const
 
-const SCALEKIT_ENVIRONMENT_HOSTS = ['scalekit.com', 'scalekit.cloud']
+const SCALEKIT_ENVIRONMENT_HOSTS = ['scalekit.com', 'scalekit.cloud', 'scalekit.dev']
 
 export const isScalekitEnvironmentHost = (issuerUrl?: string | null) => {
   if (!issuerUrl) return false
