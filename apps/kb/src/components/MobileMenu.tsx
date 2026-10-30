@@ -59,7 +59,7 @@ export const MobileMenu = ({
       className={className}
       footer={
         <Button variant="primary" size="large" block asChild>
-          <a href={SIGN_UP_URL}>Start your project</a>
+          <a href={SIGN_UP_URL}>Sign up</a>
         </Button>
       }
     >
