@@ -90,7 +90,7 @@ dbarenactl results $SWEEP_ID
 ## Current limitations
 
 - **One workload:** All results come from a single workload derived from TPC-C.
-- **Throughput only:** Because think time is disabled, the results show maximum throughput, not the behavior of a typical application with idle periods.
+- **No think time:** Because think time is disabled, the results show maximum throughput, not the behavior of a typical application with idle periods.
 - **One region per cloud:** Tests run in AWS us-east-1 and GCP us-east1. They don't cover other regions, cross-region latency, or replicas.
 - **List prices:** Costs use public on-demand list prices with no discounts.
 - **Matched by vCPU.** Products are matched by vCPU count rather than memory, so providers with more RAM per vCPU have an advantage at some sizes.
