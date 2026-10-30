@@ -43,7 +43,6 @@ import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
 import {
   BUILDING_MAX_LENGTH,
   BUILDING_PLACEHOLDER,
-  isOrgFormVariant,
   ORG_KIND_DEFAULT,
   ORG_KIND_TYPES,
   ORG_SIZE_DEFAULT,
@@ -167,7 +166,7 @@ export const NewOrgForm = ({
   })
 
   const { variant: onboardingSurveyVariant } = useOnboardingSurveyVariant()
-  const showOnboardingSurveyInOrgForm = isOrgFormVariant(onboardingSurveyVariant)
+  const showOnboardingSurveyInOrgForm = onboardingSurveyVariant === 'control'
   // Skip kind/size on org creation when the survey section is shown: the survey
   // endpoint saves them after creation, and it dedupes on (user, org_slug) at the
   // parent row, so sending them on both paths would swallow the survey call.

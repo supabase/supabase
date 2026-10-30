@@ -21,19 +21,16 @@ describe('useOnboardingSurveyVariant', () => {
     mockTrackExperimentExposure.mockClear()
   })
 
-  it.each(['control', 'org_form_collapsed', 'org_form_expanded'])(
-    'returns and tracks the %s arm',
-    (arm) => {
-      flagState.current = arm
+  it.each(['control'])('returns and tracks the %s arm', (arm) => {
+    flagState.current = arm
 
-      const { result } = renderHook(() => useOnboardingSurveyVariant())
+    const { result } = renderHook(() => useOnboardingSurveyVariant())
 
-      expect(result.current.variant).toBe(arm)
-      expect(mockTrackExperimentExposure).toHaveBeenCalledWith('onboardingSurveyPlacement', arm)
-    }
-  )
+    expect(result.current.variant).toBe(arm)
+    expect(mockTrackExperimentExposure).toHaveBeenCalledWith('onboardingSurveyPlacement', arm)
+  })
 
-  it.each(['dialog', 'toast', false, undefined])(
+  it.each(['org_form_collapsed', 'org_form_expanded', 'dialog', 'toast', false, undefined])(
     'treats %s as no survey and records no exposure',
     (value) => {
       flagState.current = value

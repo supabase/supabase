@@ -23,27 +23,14 @@ export const SURVEY_ORG_KIND_TYPES: Record<OrgKind, string> = {
 
 export const ONBOARDING_SURVEY_EXPERIMENT_ID = 'onboardingSurveyPlacement'
 
-export const ONBOARDING_SURVEY_VARIANTS = [
-  'control',
-  'org_form_collapsed',
-  'org_form_expanded',
-] as const
+// Users in `control` get the survey and its follow-up; users the flag doesn't
+// assign get the default form.
+export const ONBOARDING_SURVEY_VARIANTS = ['control'] as const
 
 export type OnboardingSurveyVariant = (typeof ONBOARDING_SURVEY_VARIANTS)[number]
-
-// Both org-form arms show the survey section open. org_form_collapsed is kept so
-// users already assigned to it still get the survey until the flag drops it.
-const ORG_FORM_VARIANTS: ReadonlySet<OnboardingSurveyVariant> = new Set([
-  'org_form_collapsed',
-  'org_form_expanded',
-])
 
 export function isOnboardingSurveyVariant(value: unknown): value is OnboardingSurveyVariant {
   return (
     typeof value === 'string' && (ONBOARDING_SURVEY_VARIANTS as readonly string[]).includes(value)
   )
-}
-
-export function isOrgFormVariant(variant?: OnboardingSurveyVariant) {
-  return !!variant && ORG_FORM_VARIANTS.has(variant)
 }
