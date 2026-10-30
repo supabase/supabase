@@ -26,8 +26,12 @@ export interface TopNavMenuLinkProps extends ComponentProps<'a'> {
   linkAs?: ElementType
 }
 
+export interface TopNavMenuPanelProps extends ComponentProps<'div'> {
+  aside?: ReactNode
+}
+
 export interface TopNavMenuGroupProps {
-  label?: string
+  label?: ReactNode
   children: ReactNode
   className?: string
 }
@@ -122,15 +126,27 @@ export const TopNavMenuLink = ({
   </NavigationMenuItem>
 )
 
-export const TopNavMenuPanel = ({ className, ...props }: ComponentProps<'div'>) => (
+export const TopNavMenuPanel = ({ aside, className, children, ...props }: TopNavMenuPanelProps) => (
   <div
     className={cn(
-      'grid max-h-[calc(100dvh-var(--header-height)-6rem)] grid-cols-[repeat(auto-fill,15rem)] gap-x-7',
+      'max-h-[calc(100dvh-var(--header-height)-6rem)]',
       'overflow-y-auto overscroll-contain pt-6 pb-2 pr-6 pl-(--top-nav-menu-inset)',
+      aside ? 'flex gap-x-14' : 'grid grid-cols-[repeat(auto-fill,15rem)] gap-x-7',
       className
     )}
     {...props}
-  />
+  >
+    {aside ? (
+      <>
+        <div className="grid min-w-0 grid-flow-col grid-rows-[auto_auto] auto-cols-[minmax(0,15rem)] gap-x-7">
+          {children}
+        </div>
+        <aside className="mb-10 grid min-w-72 flex-1 content-start gap-4">{aside}</aside>
+      </>
+    ) : (
+      children
+    )}
+  </div>
 )
 
 export const TopNavMenuGroup = ({ label, children, className }: TopNavMenuGroupProps) => (
