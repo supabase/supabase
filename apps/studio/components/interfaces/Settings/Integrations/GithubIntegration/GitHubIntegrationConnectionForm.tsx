@@ -145,6 +145,7 @@ export const GitHubIntegrationConnectionForm = ({
       new_branch_per_pr: z.boolean().default(true),
       supabaseDirectory: z.string().default('.'),
       supabaseChangesOnly: z.boolean().default(true),
+      shouldCommentOnNoChanges: z.boolean().default(true),
       branchLimit: z.string().default('50'),
     })
     .superRefine(async (val, ctx) => {
@@ -179,6 +180,7 @@ export const GitHubIntegrationConnectionForm = ({
         new_branch_per_pr: connection.new_branch_per_pr,
         supabaseDirectory: connection.workdir || '',
         supabaseChangesOnly: connection.supabase_changes_only,
+        shouldCommentOnNoChanges: connection.comment_on_no_changes ?? true,
         branchLimit: String(connection.branch_limit),
       }
     : undefined
@@ -194,6 +196,7 @@ export const GitHubIntegrationConnectionForm = ({
       new_branch_per_pr: true,
       supabaseDirectory: '.',
       supabaseChangesOnly: true,
+      shouldCommentOnNoChanges: true,
       branchLimit: '3',
     },
     values: connectionValues,
@@ -207,6 +210,10 @@ export const GitHubIntegrationConnectionForm = ({
   const newBranchPerPr = useWatch({
     control: githubSettingsForm.control,
     name: 'new_branch_per_pr',
+  })
+  const supabaseChangesOnly = useWatch({
+    control: githubSettingsForm.control,
+    name: 'supabaseChangesOnly',
   })
   const currentRepositoryId = useWatch({
     control: githubSettingsForm.control,
@@ -254,6 +261,7 @@ export const GitHubIntegrationConnectionForm = ({
         workdir: data.supabaseDirectory,
         ...(hasAccessToBranching && {
           supabase_changes_only: data.supabaseChangesOnly,
+          comment_on_no_changes: data.shouldCommentOnNoChanges,
           branch_limit: Number(data.branchLimit),
           new_branch_per_pr: data.new_branch_per_pr ?? false,
         }),
@@ -315,6 +323,7 @@ export const GitHubIntegrationConnectionForm = ({
         workdir: data.supabaseDirectory,
         ...(hasAccessToBranching && {
           supabase_changes_only: data.supabaseChangesOnly,
+          comment_on_no_changes: data.shouldCommentOnNoChanges,
           branch_limit: Number(data.branchLimit),
           new_branch_per_pr: data.new_branch_per_pr ?? false,
         }),
@@ -373,6 +382,7 @@ export const GitHubIntegrationConnectionForm = ({
           new_branch_per_pr: true,
           supabaseDirectory: '.',
           supabaseChangesOnly: true,
+          shouldCommentOnNoChanges: true,
           branchLimit: '3',
         },
         { keepDirtyValues: false }
@@ -419,6 +429,8 @@ export const GitHubIntegrationConnectionForm = ({
     (!!gitHubAuthorization && isLoadingRepositoryOptions)
 
   const isFieldDisabled = !canUpdateGitHubConnection || !gitHubAuthorization
+  const isCommentOnNoChangesDisabled =
+    !hasAccessToBranching || !newBranchPerPr || !supabaseChangesOnly || isFieldDisabled
 
   let repositoryDescription = 'Select the repository to connect to your project'
   if (connection) {
@@ -674,6 +686,34 @@ export const GitHubIntegrationConnectionForm = ({
                             </FormItemLayout>
                           )}
                         />
+
+                        <div
+                          className={cn(
+                            'pl-6 border-l',
+                            !supabaseChangesOnly && 'opacity-25 pointer-events-none'
+                          )}
+                        >
+                          <FormField
+                            control={githubSettingsForm.control}
+                            name="shouldCommentOnNoChanges"
+                            render={({ field }) => (
+                              <FormItemLayout
+                                layout="flex-row-reverse"
+                                label="Comment on skipped pull requests"
+                                description="Comment on pull requests that are skipped because no Supabase files changed"
+                              >
+                                <FormControl>
+                                  <Switch
+                                    aria-label="Toggle comment on skipped pull requests"
+                                    checked={!hasAccessToBranching ? false : field.value}
+                                    onCheckedChange={field.onChange}
+                                    disabled={isCommentOnNoChangesDisabled}
+                                  />
+                                </FormControl>
+                              </FormItemLayout>
+                            )}
+                          />
+                        </div>
                       </div>
                     </div>
                   </CardContent>
