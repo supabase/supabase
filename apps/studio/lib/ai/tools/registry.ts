@@ -136,11 +136,14 @@ export function sanitizeContractPart<Part extends ToolUIPart>(
 /** Whether a tool is offered in `environment`, given the requirements the request satisfies. */
 export function isToolAvailable(
   availability: ToolAvailability,
-  {
-    environment,
-    satisfied,
-  }: { environment: ToolEnvironment; satisfied: ReadonlySet<ToolRequirement> }
+  { environment, satisfied }: ToolRequest
 ): boolean {
   if (!availability.environments.has(environment)) return false
   return [...(availability.requires ?? [])].every((requirement) => satisfied.has(requirement))
+}
+
+/** The request conditions that decide which tools exist: the environment and the requirements met. */
+export type ToolRequest = {
+  environment: ToolEnvironment
+  satisfied: ReadonlySet<ToolRequirement>
 }
