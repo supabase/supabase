@@ -82,6 +82,7 @@
 :root {
   --sidebar-width: 300px;
   --header-height: 56px;
+  --nav-logo-width: 8.5rem;
 }
 
 html {

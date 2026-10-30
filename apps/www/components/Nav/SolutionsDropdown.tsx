@@ -15,7 +15,7 @@ type LinkProps = {
 }
 
 export const SolutionsDropdown = () => (
-  <TopNavMenuPanel>
+  <TopNavMenuPanel className="section-container">
     {SolutionsData['navigation'].map((column) => (
       <TopNavMenuGroup key={column.label} label={column.label}>
         {column.links.map(({ icon: Icon, ...link }: LinkProps) => (

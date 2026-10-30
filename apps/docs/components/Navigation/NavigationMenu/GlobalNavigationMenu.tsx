@@ -74,7 +74,7 @@ const GlobalNavigationMenu: FC = () => {
             aria-current={ariaCurrent}
             className={itemClassName}
           >
-            <TopNavMenuPanel>
+            <TopNavMenuPanel className="pr-5 pl-[calc(var(--nav-logo-width)+4.75rem)]">
               {section.menuItems.map((group, index) => (
                 <GlobalMenuGroup
                   key={group[0].label}

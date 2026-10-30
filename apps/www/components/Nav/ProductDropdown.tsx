@@ -19,7 +19,7 @@ export const ProductDropdown = () => {
   const [customer] = CustomersData
 
   return (
-    <TopNavMenuPanel>
+    <TopNavMenuPanel className="section-container">
       <TopNavMenuGroup label="Features">
         {Object.values(MainProductsData)
           .filter((product) => product.name !== 'Vector')

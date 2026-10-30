@@ -21,7 +21,7 @@ export const DevelopersDropdown = () => {
   const { jobsCount, latestBlogPosts } = staticContent
 
   return (
-    <TopNavMenuPanel>
+    <TopNavMenuPanel className="section-container">
       {DevelopersData['navigation'].map((column) => (
         <TopNavMenuGroup key={column.label} label={column.label}>
           {column.links.map(({ icon: Icon, ...link }: LinkProps) => (

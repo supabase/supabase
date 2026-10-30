@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, type ComponentProps, type ElementType, type ReactNode } from 'react'
+import type { ComponentProps, ElementType, ReactNode } from 'react'
 import {
   cn,
   NavigationMenu,
@@ -38,46 +38,27 @@ export interface TopNavMenuGroupProps {
 
 // the panel spans the closest positioned parent and its closed edge draws the bar's bottom line,
 // so render the menu inside a `relative` bar with no bottom border of its own on desktop
-export const TopNavMenu = ({ children, className }: TopNavMenuProps) => {
-  const rootRef = useRef<HTMLElement>(null)
-
-  // the panel is as wide as the bar, so its columns start under the first item's text
-  const handleValueChange = (value: string) => {
-    const root = rootRef.current
-    const bar = root?.offsetParent
-    const trigger = root?.querySelector('li > *')
-    if (!value || !root || !bar || !trigger) return
-    const inset =
-      trigger.getBoundingClientRect().left -
-      bar.getBoundingClientRect().left +
-      parseFloat(getComputedStyle(trigger).paddingLeft)
-    root.style.setProperty('--top-nav-menu-inset', `${inset}px`)
-  }
-
-  return (
-    <NavigationMenu
-      ref={rootRef}
-      delayDuration={80}
-      skipDelayDuration={300}
-      renderViewport={false}
-      onValueChange={handleValueChange}
-      className={cn('static h-full items-stretch', className)}
-    >
-      <NavigationMenuList className="h-full items-stretch space-x-0">{children}</NavigationMenuList>
-      <NavigationMenuViewport
-        forceMount
-        containerProps={{ className: 'inset-x-0' }}
-        className={cn(
-          'mt-0 w-full rounded-none border-0 border-b border-default bg-background shadow-none md:w-full',
-          'h-[calc(var(--radix-navigation-menu-viewport-height,0px)+1px)] data-[state=closed]:h-0',
-          'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
-          'motion-safe:transition-[height] motion-safe:duration-200 motion-safe:ease-[cubic-bezier(0.23,1,0.32,1)]',
-          'data-[state=closed]:duration-300 data-[state=closed]:ease-[cubic-bezier(0.32,0.72,0,1)]'
-        )}
-      />
-    </NavigationMenu>
-  )
-}
+export const TopNavMenu = ({ children, className }: TopNavMenuProps) => (
+  <NavigationMenu
+    delayDuration={80}
+    skipDelayDuration={300}
+    renderViewport={false}
+    className={cn('static h-full items-stretch', className)}
+  >
+    <NavigationMenuList className="h-full items-stretch space-x-0">{children}</NavigationMenuList>
+    <NavigationMenuViewport
+      forceMount
+      containerProps={{ className: 'inset-x-0' }}
+      className={cn(
+        'mt-0 w-full rounded-none border-0 border-b border-default bg-background shadow-none md:w-full',
+        'h-[calc(var(--radix-navigation-menu-viewport-height,0px)+1px)] data-[state=closed]:h-0',
+        'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
+        'motion-safe:transition-[height] motion-safe:duration-200 motion-safe:ease-[cubic-bezier(0.23,1,0.32,1)]',
+        'data-[state=closed]:duration-300 data-[state=closed]:ease-[cubic-bezier(0.32,0.72,0,1)]'
+      )}
+    />
+  </NavigationMenu>
+)
 
 export const TopNavMenuItem = ({ label, children, className, ...props }: TopNavMenuItemProps) => (
   <NavigationMenuItem className="text-[0.8125rem] font-medium">
@@ -130,7 +111,7 @@ export const TopNavMenuPanel = ({ aside, className, children, ...props }: TopNav
   <div
     className={cn(
       'max-h-[calc(100dvh-var(--header-height)-6rem)]',
-      'overflow-y-auto overscroll-contain pt-6 pb-2 pr-6 pl-(--top-nav-menu-inset)',
+      'overflow-y-auto overscroll-contain pt-6 pb-2',
       aside ? 'flex gap-x-14' : 'grid grid-cols-[repeat(auto-fill,15rem)] gap-x-7',
       className
     )}
