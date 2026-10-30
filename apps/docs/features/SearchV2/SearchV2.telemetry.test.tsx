@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { DocsSearchV2State } from 'common'
+import { TooltipProvider } from 'ui'
+import { MessageRole, MessageStatus, type Message } from 'ui-patterns/CommandMenu/prepackaged/ai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SearchV2Provider } from './SearchV2Provider'
@@ -13,12 +15,13 @@ const resetSearch = vi.fn()
 let searchState: DocsSearchV2State
 
 vi.mock('@/lib/telemetry', () => ({ useSendTelemetryEvent: () => sendTelemetryEvent }))
+const aiMessages: Message[] = []
 vi.mock('ui-patterns/CommandMenu/prepackaged/ai', async (importOriginal) => ({
   ...(await importOriginal<typeof import('ui-patterns/CommandMenu/prepackaged/ai')>()),
   useAiChat: () => ({
     submit: vi.fn(),
     reset: () => {},
-    messages: [],
+    messages: aiMessages,
     isResponding: false,
     hasError: false,
   }),
@@ -63,6 +66,7 @@ beforeEach(() => {
   }
   Element.prototype.scrollIntoView ??= () => {}
   searchState = { status: 'initial', key: 0 }
+  aiMessages.length = 0
 })
 
 afterEach(() => {
@@ -429,5 +433,38 @@ describe('Ask AI telemetry', () => {
       action: 'docs_search_v2_ask_ai_question_submitted',
       properties: { question: 'a'.repeat(300), questionLength: 400, questionSource: 'typed' },
     })
+  })
+
+  it('copies an answer as Markdown with full source links', async () => {
+    aiMessages.push(
+      { role: MessageRole.User, content: 'How do I turn on RLS?', status: MessageStatus.Complete },
+      {
+        role: MessageRole.Assistant,
+        content: 'Enable RLS on the table.',
+        status: MessageStatus.Complete,
+        sources: [{ path: '/guides/auth', url: 'https://supabase.com/docs/guides/auth' }],
+      }
+    )
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
+    vi.spyOn(document, 'hasFocus').mockReturnValue(true)
+    render(
+      <TooltipProvider>
+        <TriggerWithProvider />
+      </TooltipProvider>
+    )
+    fireEvent.keyDown(window, { key: 'i', metaKey: true })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Copy as Markdown' }))
+
+    await waitFor(() =>
+      expect(sendTelemetryEvent).toHaveBeenCalledWith({
+        action: 'copy_as_markdown_clicked',
+        properties: { pageType: 'ask_ai_answer' },
+      })
+    )
+    expect(writeText).toHaveBeenCalledWith(
+      'Enable RLS on the table.\n\n### Sources\n\n- https://supabase.com/docs/guides/auth'
+    )
   })
 })

@@ -1024,9 +1024,11 @@ export type MarkdownAffordancePageType =
   | 'changelog'
   | 'guide'
   | 'troubleshooting'
+  | 'ask_ai_answer'
 
 /**
- * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
+ * User clicked 'Copy as Markdown' on a page or under a Supabase AI answer, and the markdown was copied
+ * successfully.
  * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events

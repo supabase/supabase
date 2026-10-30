@@ -20,6 +20,7 @@ import {
   useAiChat,
   type Message,
 } from 'ui-patterns/CommandMenu/prepackaged/ai'
+import { CodeCopyButton } from 'ui-patterns/CodeBlock/CodeBlockControls'
 import { Markdown } from 'ui-patterns/Markdown'
 
 import { AskAiIcon } from './AskAiIcon'
@@ -163,7 +164,7 @@ export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
           >
             <div ref={followConversation}>
               <AiMessages messages={messages} hasError={hasError} />
-              {hasAnswer ? (
+              {hasAnswer && !isBusy ? (
                 <p className="px-4 pt-4 pb-3 text-center text-xs text-foreground-lighter">
                   Supabase AI can make mistakes. Verify answers before you run them.
                 </p>
@@ -227,6 +228,13 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
     })
   }
 
+  const handleAnswerCopy = () => {
+    sendTelemetryEvent({
+      action: 'copy_as_markdown_clicked',
+      properties: { pageType: 'ask_ai_answer' },
+    })
+  }
+
   const handleAnswerLinkClick = (href: string) => {
     sendTelemetryEvent({
       action: 'docs_search_v2_ask_ai_answer_link_clicked',
@@ -275,6 +283,20 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
             ) : null}
             {message.sources?.length ? (
               <AiSources sources={message.sources} onSourceClick={handleSourceClick} />
+            ) : null}
+            {message.status === MessageStatus.Complete ? (
+              <CodeCopyButton
+                // an agent cannot open docs paths, so the sources go in as full urls
+                content={
+                  message.sources?.length
+                    ? `${message.content}\n\n### Sources\n\n${message.sources.map(({ url }) => `- ${url}`).join('\n')}`
+                    : message.content
+                }
+                label="Copy as Markdown"
+                copiedLabel="Answer copied as Markdown"
+                onCopied={handleAnswerCopy}
+                className="mt-2 border-transparent bg-transparent hover:border-transparent hover:bg-transparent"
+              />
             ) : null}
           </li>
         )
