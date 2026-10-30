@@ -28,15 +28,16 @@ import type { ComputeInstance } from '../Compute.types'
 import {
   formatComputeHours,
   formatComputeRequests,
-  formatComputeUnits,
+  formatGbHours,
+  formatVcpuHours,
   sumBy,
 } from '../ComputeUsage.utils'
 import { computeInstanceUsageQueryOptions } from '@/data/compute/compute-usage-query'
 
 const USAGE_WINDOW_DAYS = 30
 
-const computeUnitsConfig = {
-  computeUnits: { label: 'Compute units' },
+const activeHoursConfig = {
+  activeHours: { label: 'Active hours' },
 } satisfies ChartConfig
 
 const instancesConfig = {
@@ -63,14 +64,14 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
   const points = data?.points ?? []
   const isEmpty = !isPending && points.length === 0
 
-  const totalComputeUnits = sumBy(points, (point) => point.computeUnits)
   const totalActiveHours = sumBy(points, (point) => point.activeHours)
+  const totalVcpuHours = sumBy(points, (point) => point.vcpuHours)
+  const totalGbHours = sumBy(points, (point) => point.gbHours)
   const totalRequests = sumBy(points, (point) => point.requests)
-  const peakInstances = points.length === 0 ? 0 : Math.max(...points.map((p) => p.instances))
 
   const chartData = points.map((point) => ({
     timestamp: point.timestamp,
-    computeUnits: point.computeUnits,
+    activeHours: point.activeHours,
     instances: point.instances,
   }))
 
@@ -80,8 +81,8 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
         <PageSectionSummary>
           <PageSectionTitle>Usage</PageSectionTitle>
           <PageSectionDescription>
-            Compute units and instances over the last {USAGE_WINDOW_DAYS} days. Figures are
-            estimates while Compute is in alpha.
+            What this compute's instances consumed over the last {USAGE_WINDOW_DAYS} days. Figures
+            are estimates while Compute is in alpha.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
@@ -91,44 +92,44 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
             <div className="grid grid-cols-2 divide-x divide-y rounded-md border border-default bg-surface-100 sm:grid-cols-4 sm:divide-y-0">
               <div className="px-5 py-4">
                 <ChartMetric
-                  label="Compute units"
-                  value={formatComputeUnits(totalComputeUnits)}
-                  tooltip="Active hours weighted by instance size. A 4 GB instance counts twice a 2 GB one."
+                  label="Active hours"
+                  value={formatComputeHours(totalActiveHours)}
+                  tooltip="Hours this compute's instances spent serving traffic rather than suspended."
                 />
               </div>
               <div className="px-5 py-4">
                 <ChartMetric
-                  label="Active hours"
-                  value={formatComputeHours(totalActiveHours)}
-                  tooltip="Hours instances spent serving traffic rather than suspended."
+                  label="vCPU-hours"
+                  value={formatVcpuHours(totalVcpuHours)}
+                  tooltip="Active hours multiplied by the vCPU each instance size reserves."
+                />
+              </div>
+              <div className="px-5 py-4">
+                <ChartMetric
+                  label="GB-hours"
+                  value={formatGbHours(totalGbHours)}
+                  tooltip="Active hours multiplied by the memory each instance size reserves."
                 />
               </div>
               <div className="px-5 py-4">
                 <ChartMetric
                   label="Requests"
                   value={formatComputeRequests(totalRequests)}
-                  tooltip="Requests handled across every instance of this deployment."
-                />
-              </div>
-              <div className="px-5 py-4">
-                <ChartMetric
-                  label="Peak instances"
-                  value={peakInstances.toFixed(peakInstances < 10 ? 1 : 0)}
-                  tooltip="Highest number of instances live at once during the period."
+                  tooltip="Requests handled across every instance of this compute."
                 />
               </div>
             </div>
           </Chart>
 
-          {/* Compute units and instances are different measures, so they get a chart each
+          {/* Active hours and instance counts are different measures, so they get a chart each
               rather than sharing one y-axis. Both use the neutral ink the other usage
               charts use — nothing here is a status, so nothing is coloured. */}
           <div className="grid gap-4 lg:grid-cols-2">
             <Chart isLoading={isPending} isErrored={isError}>
               <ChartCard>
                 <ChartHeader align="start">
-                  <ChartTitle tooltip="Active hours weighted by instance size, per day.">
-                    Compute units
+                  <ChartTitle tooltip="Hours instances spent serving traffic each day.">
+                    Active hours
                   </ChartTitle>
                 </ChartHeader>
                 <ChartContent
@@ -149,7 +150,7 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
                     />
                   }
                 >
-                  <ChartContainer config={computeUnitsConfig} className="h-44 w-full">
+                  <ChartContainer config={activeHoursConfig} className="h-44 w-full">
                     <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                       <CartesianGrid
                         vertical={false}
@@ -172,7 +173,7 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
                           />
                         }
                       />
-                      <Bar dataKey="computeUnits" className="fill-foreground" />
+                      <Bar dataKey="activeHours" className="fill-foreground" />
                     </BarChart>
                   </ChartContainer>
                 </ChartContent>
@@ -182,7 +183,7 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
             <Chart isLoading={isPending} isErrored={isError}>
               <ChartCard>
                 <ChartHeader align="start">
-                  <ChartTitle tooltip="Mean number of instances live each day.">
+                  <ChartTitle tooltip="Mean number of this compute's instances live each day.">
                     Instances
                   </ChartTitle>
                 </ChartHeader>

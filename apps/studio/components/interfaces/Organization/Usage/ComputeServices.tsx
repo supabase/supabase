@@ -35,10 +35,12 @@ import {
   buildComputeBurndown,
   formatComputeHours,
   formatComputeRequests,
-  formatComputeUnits,
+  formatGbHours,
+  formatVcpuHours,
   getUsageConcentration,
   sumBy,
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
+import type { ComputeUsageByProject } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import { computeOrgUsageQueryOptions } from '@/data/compute/compute-usage-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 
@@ -70,7 +72,8 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
   const burndown = buildComputeBurndown(points, allowanceHours, COMPUTE_ALLOWANCE_WARNING_THRESHOLD)
 
   const isEmpty = !isPending && points.length === 0
-  const totalComputeUnits = sumBy(points, (point) => point.computeUnits)
+  const totalVcpuHours = sumBy(points, (point) => point.vcpuHours)
+  const totalGbHours = sumBy(points, (point) => point.gbHours)
   const totalRequests = sumBy(points, (point) => point.requests)
   const concentration = getUsageConcentration(byProject)
 
@@ -94,7 +97,7 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
         section={{
           name: 'Compute',
           description:
-            'Usage for Compute instances across the organization. Active hours count the time instances spend serving traffic; suspended instances do not accrue usage.\nCompute is in alpha and these figures are estimates. Nothing here is billed yet.',
+            'Usage across every compute in the organization. Each compute runs one or more instances, and usage is counted on the instances: how long they stay alive, and the vCPU and memory their size reserves while they do.\nSuspended instances do not accrue usage. Compute is in alpha and these figures are estimates. Nothing here is billed yet.',
           links: [],
         }}
       >
@@ -219,11 +222,11 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
             <ChartCard>
               <ChartHeader align="start">
                 <div className="flex flex-col gap-1">
-                  <ChartTitle tooltip="Active hours split by instance size, and the compute units they weigh.">
+                  <ChartTitle tooltip="Active hours split by instance size. Larger sizes reserve more vCPU and memory per hour.">
                     Instance hours by size
                   </ChartTitle>
                   <p className="text-sm text-foreground-light">
-                    {formatComputeUnits(totalComputeUnits)} compute units this period
+                    {formatVcpuHours(totalVcpuHours)} · {formatGbHours(totalGbHours)} this period
                   </p>
                 </div>
               </ChartHeader>
@@ -278,7 +281,7 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
             <ChartCard>
               <ChartHeader align="start">
                 <div className="flex flex-col gap-1">
-                  <ChartTitle tooltip="Compute usage attributed to each project in the organization.">
+                  <ChartTitle tooltip="Computes, instances and active hours attributed to each project.">
                     Usage by project
                   </ChartTitle>
                   <p className="text-sm text-foreground-light">
@@ -308,7 +311,7 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
                   />
                 }
               >
-                <ComputeProjectTable rows={byProject} totalComputeUnits={totalComputeUnits} />
+                <ComputeProjectTable rows={byProject} />
               </ChartContent>
             </ChartCard>
           </Chart>
@@ -318,58 +321,53 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
   )
 }
 
-const ComputeProjectTable = ({
-  rows,
-  totalComputeUnits,
-}: {
-  rows: {
-    projectRef: string
-    projectName: string
-    activeHours: number
-    computeUnits: number
-    instances: number
-    requests: number
-  }[]
-  totalComputeUnits: number
-}) => (
-  <div className="divide-y">
-    <div className="grid grid-cols-12 gap-2 px-card py-2 text-xs font-mono uppercase text-foreground-lighter">
-      <span className="col-span-4">Project</span>
-      <span className="col-span-2 text-right">Instances</span>
-      <span className="col-span-2 text-right">Active hours</span>
-      <span className="col-span-2 text-right">Requests</span>
-      <span className="col-span-2 text-right">Share</span>
-    </div>
-    {rows.map((row) => {
-      const share = totalComputeUnits <= 0 ? 0 : row.computeUnits / totalComputeUnits
-      return (
-        <div key={row.projectRef} className="grid grid-cols-12 items-center gap-2 px-card py-2.5">
-          <span className="col-span-4 truncate text-sm text-foreground">{row.projectName}</span>
-          <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
-            {row.instances}
-          </span>
-          <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
-            {formatComputeHours(row.activeHours)}
-          </span>
-          <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
-            {formatComputeRequests(row.requests)}
-          </span>
-          <span className="col-span-2 flex items-center justify-end gap-2">
-            <span
-              aria-hidden
-              className="hidden h-1.5 w-12 overflow-hidden rounded-full bg-surface-300 sm:block"
-            >
+const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
+  const totalActiveHours = sumBy(rows, (row) => row.activeHours)
+
+  return (
+    <div className="divide-y">
+      <div className="grid grid-cols-12 gap-2 px-card py-2 text-xs font-mono uppercase text-foreground-lighter">
+        <span className="col-span-3">Project</span>
+        <span className="col-span-2 text-right">Computes</span>
+        <span className="col-span-2 text-right">Instances</span>
+        <span className="col-span-2 text-right">Active hours</span>
+        <span className="col-span-1 text-right">Requests</span>
+        <span className="col-span-2 text-right">Share</span>
+      </div>
+      {rows.map((row) => {
+        const share = totalActiveHours <= 0 ? 0 : row.activeHours / totalActiveHours
+        return (
+          <div key={row.projectRef} className="grid grid-cols-12 items-center gap-2 px-card py-2.5">
+            <span className="col-span-3 truncate text-sm text-foreground">{row.projectName}</span>
+            <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
+              {row.deployments}
+            </span>
+            <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
+              {row.instances}
+            </span>
+            <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
+              {formatComputeHours(row.activeHours)}
+            </span>
+            <span className="col-span-1 text-right text-sm tabular-nums text-foreground-light">
+              {formatComputeRequests(row.requests)}
+            </span>
+            <span className="col-span-2 flex items-center justify-end gap-2">
               <span
-                className="block h-full rounded-full bg-foreground"
-                style={{ width: `${Math.round(share * 100)}%` }}
-              />
+                aria-hidden
+                className="hidden h-1.5 w-12 overflow-hidden rounded-full bg-surface-300 sm:block"
+              >
+                <span
+                  className="block h-full rounded-full bg-foreground"
+                  style={{ width: `${Math.round(share * 100)}%` }}
+                />
+              </span>
+              <span className="text-sm tabular-nums text-foreground-light">
+                {Math.round(share * 100)}%
+              </span>
             </span>
-            <span className="text-sm tabular-nums text-foreground-light">
-              {Math.round(share * 100)}%
-            </span>
-          </span>
-        </div>
-      )
-    })}
-  </div>
-)
+          </div>
+        )
+      })}
+    </div>
+  )
+}

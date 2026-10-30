@@ -51,11 +51,24 @@ export const getRuntimeMeta = (runtime: string | undefined): RuntimeMeta | undef
 export const formatRuntime = (runtime: string | undefined): string =>
   getRuntimeMeta(runtime)?.label ?? runtime ?? 'Custom'
 
-// The API reports size as e.g. "2gb-1vcpu"; render the parts when they parse, the raw value if not.
-export const formatSize = (size: string): string => {
+export interface ComputeSizeSpec {
+  memoryGb: number
+  vcpu: number
+}
+
+// The API reports size as e.g. "2gb-1vcpu". Returns undefined for a shape we don't recognise,
+// so callers decide what to do rather than silently getting zeroes.
+export const parseComputeSize = (size: string): ComputeSizeSpec | undefined => {
   const match = size.match(/^(\d+)gb-(\d+)vcpu$/)
-  if (!match) return size
-  return `${match[1]} GB · ${match[2]} vCPU`
+  if (!match) return undefined
+  return { memoryGb: Number(match[1]), vcpu: Number(match[2]) }
+}
+
+// Render the parts when they parse, the raw value if not.
+export const formatSize = (size: string): string => {
+  const spec = parseComputeSize(size)
+  if (spec === undefined) return size
+  return `${spec.memoryGb} GB · ${spec.vcpu} vCPU`
 }
 
 export const formatResources = (instance: ComputeInstance): string =>

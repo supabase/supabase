@@ -1,16 +1,17 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { platformComponents } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { ComputeInstance } from './Compute.types'
 import { ComputePlanUsage } from './ComputePlanUsage'
+import type { OrgPlan } from '@/data/subscriptions/types'
 import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type OrganizationResponse = platformComponents['schemas']['OrganizationResponse']
+type OrganizationResponse = platformComponents['schemas']['OrganizationResponse_Output']
 type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse_Output']
 
 vi.mock('common', async (importOriginal) => ({
@@ -42,6 +43,14 @@ const PROFILE_CONTEXT: ProfileContextType = {
   isSuccess: true,
 }
 
+/** Each meter is a block headed by its label; scope assertions to the one under test. */
+const meter = async (label: string) => {
+  const heading = await screen.findByText(label)
+  const block = heading.closest('div')?.parentElement
+  if (block === null || block === undefined) throw new Error(`No meter block for ${label}`)
+  return within(block)
+}
+
 const instance = (overrides: Partial<ComputeInstance> = {}): ComputeInstance => ({
   name: 'embed',
   buildState: 'active',
@@ -54,7 +63,7 @@ const instance = (overrides: Partial<ComputeInstance> = {}): ComputeInstance => 
 })
 
 /** The component only reads `plan`, but the org lookup needs the project detail too. */
-const mockOrganizationOnPlan = (id: string, name: string) => {
+const mockOrganizationOnPlan = (id: OrgPlan['id'], name: string) => {
   addAPIMock({
     method: 'get',
     path: '/platform/organizations',
@@ -81,7 +90,7 @@ const mockOrganizationOnPlan = (id: string, name: string) => {
 }
 
 describe('ComputePlanUsage', () => {
-  it('shows active hours and instances against what the plan includes', async () => {
+  it('meters active hours, computes and instances against what the plan includes', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
@@ -89,28 +98,32 @@ describe('ComputePlanUsage', () => {
 
     expect(await screen.findByText('Plan usage')).toBeInTheDocument()
     expect(await screen.findByText('Active hours')).toBeInTheDocument()
+    expect(await screen.findByText('Computes')).toBeInTheDocument()
     expect(await screen.findByText('Instances')).toBeInTheDocument()
-    // Pro includes 10 instances; one is deployed.
+    // Pro includes 5 computes and 10 instances; one compute running one instance is deployed.
+    expect(await screen.findByText('1 of 5')).toBeInTheDocument()
     expect(await screen.findByText('1 of 10')).toBeInTheDocument()
   })
 
-  it('counts declared instances across every deployment', async () => {
+  it('counts computes separately from the instances they run', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(
       <ComputePlanUsage
         projectRef="default"
         instances={[
           instance({ name: 'a', declaredInstances: 3 }),
-          instance({ name: 'b', declaredInstances: 2 }),
+          instance({ name: 'b', declaredInstances: 4 }),
         ]}
       />,
       { profileContext: PROFILE_CONTEXT }
     )
 
-    expect(await screen.findByText('5 of 10')).toBeInTheDocument()
+    // Two computes, seven instances between them.
+    expect(await screen.findByText('2 of 5')).toBeInTheDocument()
+    expect(await screen.findByText('7 of 10')).toBeInTheDocument()
   })
 
-  it('flags the instance meter once the plan limit is exceeded', async () => {
+  it('flags a count that exceeds the plan limit, but not one that merely fills it', async () => {
     mockOrganizationOnPlan('free', 'Free')
     customRender(
       <ComputePlanUsage
@@ -120,9 +133,16 @@ describe('ComputePlanUsage', () => {
       { profileContext: PROFILE_CONTEXT }
     )
 
-    // Free includes a single instance.
-    expect(await screen.findByText('2 of 1')).toBeInTheDocument()
-    expect(await screen.findByText('Over limit')).toBeInTheDocument()
+    // Free includes one compute and one instance: the single compute fills its limit,
+    // while two instances exceed theirs.
+    const computes = await meter('Computes')
+    expect(computes.getByText('1 of 1')).toBeInTheDocument()
+    expect(computes.getByText('At limit')).toBeInTheDocument()
+    expect(computes.queryByText('Over limit')).not.toBeInTheDocument()
+
+    const instanceMeter = await meter('Instances')
+    expect(instanceMeter.getByText('2 of 1')).toBeInTheDocument()
+    expect(instanceMeter.getByText('Over limit')).toBeInTheDocument()
   })
 
   it('reports no fixed limit on enterprise rather than inventing one', async () => {
@@ -143,6 +163,7 @@ describe('ComputePlanUsage', () => {
     })
 
     expect(await screen.findByText(/Team Plan · last 30 days/)).toBeInTheDocument()
+    expect(await screen.findByText('1 of 15')).toBeInTheDocument()
     expect(await screen.findByText('1 of 25')).toBeInTheDocument()
   })
 })

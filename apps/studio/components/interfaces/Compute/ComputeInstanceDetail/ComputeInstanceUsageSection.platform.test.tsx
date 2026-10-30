@@ -25,25 +25,25 @@ describe('ComputeInstanceUsageSection', () => {
   it('renders the usage metrics for the instance', async () => {
     customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
 
-    expect(await screen.findByText('Active hours')).toBeInTheDocument()
+    // "Active hours" labels both the metric and its chart.
+    expect(await screen.findAllByText('Active hours')).not.toHaveLength(0)
+    expect(await screen.findByText('vCPU-hours')).toBeInTheDocument()
+    expect(await screen.findByText('GB-hours')).toBeInTheDocument()
     expect(await screen.findByText('Requests')).toBeInTheDocument()
-    expect(await screen.findByText('Peak instances')).toBeInTheDocument()
-    // Rendered in both the metric strip and the chart header.
-    expect(await screen.findAllByText('Compute units')).not.toHaveLength(0)
   })
 
   it('states that figures are estimates while Compute is in alpha', async () => {
     customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
 
     expect(
-      await screen.findByText(/Figures are\s+estimates while Compute is in alpha/)
+      await screen.findByText(/Figures are estimates while Compute is in alpha/)
     ).toBeInTheDocument()
   })
 
   it('renders non-zero usage figures rather than empty placeholders', async () => {
     const { container } = customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
 
-    await screen.findByText('Active hours')
+    await screen.findAllByText('Active hours')
     await waitFor(() => {
       const values = [...container.querySelectorAll('.tabular-nums')]
         .map((node) => Number(node.textContent?.replace(/[^0-9.]/g, '')))

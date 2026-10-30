@@ -1,12 +1,20 @@
-import { getComputeUnitWeight } from './ComputeUsage.constants'
+import { parseComputeSize } from './Compute.utils'
 
+/**
+ * Usage is measured on instances, not on deployments. Four measures, all derived from
+ * things the platform can actually count:
+ *
+ *   instanceHours — instances x hours alive
+ *   activeHours   — hours spent serving rather than suspended
+ *   vcpuHours     — activeHours x the vCPU the size reserves
+ *   gbHours       — activeHours x the memory the size reserves
+ */
 export interface ComputeUsagePoint {
   /** ISO timestamp for the start of the bucket. */
   timestamp: string
-  /** Instance-hours accrued in this bucket, before size weighting. */
   activeHours: number
-  /** Size-weighted compute units accrued in this bucket. */
-  computeUnits: number
+  vcpuHours: number
+  gbHours: number
   /** Mean number of instances live during the bucket. */
   instances: number
   requests: number
@@ -15,23 +23,32 @@ export interface ComputeUsagePoint {
 export interface ComputeUsageBySize {
   size: string
   activeHours: number
-  computeUnits: number
+  vcpuHours: number
+  gbHours: number
 }
 
 export interface ComputeUsageByProject {
   projectRef: string
   projectName: string
-  activeHours: number
-  computeUnits: number
+  /** Compute deployments in the project. Each runs one or more instances. */
+  deployments: number
   instances: number
+  activeHours: number
+  vcpuHours: number
+  gbHours: number
   requests: number
 }
 
 export const sumBy = <T>(items: T[], select: (item: T) => number): number =>
   items.reduce((total, item) => total + select(item), 0)
 
-export const toComputeUnits = (activeHours: number, size: string): number =>
-  activeHours * getComputeUnitWeight(size)
+/** vCPU-hours reserved by an instance of this size over the given alive hours. */
+export const toVcpuHours = (activeHours: number, size: string): number =>
+  activeHours * (parseComputeSize(size)?.vcpu ?? 0)
+
+/** GB-hours reserved by an instance of this size over the given alive hours. */
+export const toGbHours = (activeHours: number, size: string): number =>
+  activeHours * (parseComputeSize(size)?.memoryGb ?? 0)
 
 /* ------------------------------------------------------------------ *
  * Burn-down                                                           *
@@ -105,43 +122,54 @@ export const buildComputeBurndown = (
  * Aggregation                                                         *
  * ------------------------------------------------------------------ */
 
+/** Groups active hours by instance size, the way database compute reports its own hours. */
 export const aggregateUsageBySize = (
   rows: { size: string; activeHours: number }[]
 ): ComputeUsageBySize[] => {
   const bySize = new Map<string, ComputeUsageBySize>()
 
   for (const row of rows) {
-    const existing = bySize.get(row.size) ?? { size: row.size, activeHours: 0, computeUnits: 0 }
+    const existing = bySize.get(row.size) ?? {
+      size: row.size,
+      activeHours: 0,
+      vcpuHours: 0,
+      gbHours: 0,
+    }
     existing.activeHours += row.activeHours
-    existing.computeUnits += toComputeUnits(row.activeHours, row.size)
+    existing.vcpuHours += toVcpuHours(row.activeHours, row.size)
+    existing.gbHours += toGbHours(row.activeHours, row.size)
     bySize.set(row.size, existing)
   }
 
   return [...bySize.values()]
     .map((entry) => ({
-      ...entry,
+      size: entry.size,
       activeHours: Number(entry.activeHours.toFixed(2)),
-      computeUnits: Number(entry.computeUnits.toFixed(2)),
+      vcpuHours: Number(entry.vcpuHours.toFixed(2)),
+      gbHours: Number(entry.gbHours.toFixed(2)),
     }))
-    .sort((a, b) => b.computeUnits - a.computeUnits)
+    .sort((a, b) => b.activeHours - a.activeHours)
 }
 
-/** Share of the total taken by the largest consumer, as a fraction. */
-export const getUsageConcentration = (rows: { computeUnits: number }[]): number => {
-  const total = sumBy(rows, (row) => row.computeUnits)
+/** Share of total active hours taken by the largest consumer, as a fraction. */
+export const getUsageConcentration = (rows: { activeHours: number }[]): number => {
+  const total = sumBy(rows, (row) => row.activeHours)
   if (total <= 0) return 0
-  return Math.max(...rows.map((row) => row.computeUnits)) / total
+  return Math.max(...rows.map((row) => row.activeHours)) / total
 }
 
 /* ------------------------------------------------------------------ *
  * Formatting                                                          *
  * ------------------------------------------------------------------ */
 
-export const formatComputeHours = (hours: number): string =>
-  `${hours.toLocaleString(undefined, { maximumFractionDigits: hours < 10 ? 1 : 0 })} hrs`
+const round = (value: number) =>
+  value.toLocaleString(undefined, { maximumFractionDigits: value < 10 ? 1 : 0 })
 
-export const formatComputeUnits = (units: number): string =>
-  units.toLocaleString(undefined, { maximumFractionDigits: units < 10 ? 1 : 0 })
+export const formatComputeHours = (hours: number): string => `${round(hours)} hrs`
+
+export const formatVcpuHours = (hours: number): string => `${round(hours)} vCPU-hrs`
+
+export const formatGbHours = (hours: number): string => `${round(hours)} GB-hrs`
 
 export const formatComputeRequests = (requests: number): string => {
   if (requests >= 1_000_000) return `${(requests / 1_000_000).toFixed(1)}M`

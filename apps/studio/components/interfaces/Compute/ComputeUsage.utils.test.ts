@@ -1,40 +1,68 @@
 import { describe, expect, it } from 'vitest'
 
+import { parseComputeSize } from './Compute.utils'
 import {
+  COMPUTE_ACTIVE_HOURS_ALLOWANCE,
   COMPUTE_ALLOWANCE_WARNING_THRESHOLD,
+  COMPUTE_DEPLOYMENT_ALLOWANCE,
+  COMPUTE_INSTANCE_ALLOWANCE,
   getComputeActiveHoursAllowance,
+  getComputeDeploymentAllowance,
   getComputeInstanceAllowance,
-  getComputeUnitWeight,
 } from './ComputeUsage.constants'
 import {
   aggregateUsageBySize,
   buildComputeBurndown,
   formatComputeHours,
   formatComputeRequests,
-  formatComputeUnits,
+  formatGbHours,
+  formatVcpuHours,
   getUsageConcentration,
-  toComputeUnits,
+  toGbHours,
+  toVcpuHours,
   type ComputeUsagePoint,
 } from './ComputeUsage.utils'
+import type { OrgPlan } from '@/data/subscriptions/types'
 
 const point = (activeHours: number, timestamp = '2026-10-01T00:00:00.000Z'): ComputeUsagePoint => ({
   timestamp,
   activeHours,
-  computeUnits: activeHours,
+  vcpuHours: activeHours,
+  gbHours: activeHours * 2,
   instances: 1,
   requests: 0,
 })
 
-describe('compute unit weighting', () => {
-  it('weights a 4gb instance at twice a 2gb one', () => {
-    expect(getComputeUnitWeight('2gb-1vcpu')).toBe(1)
-    expect(getComputeUnitWeight('4gb-2vcpu')).toBe(2)
-    expect(toComputeUnits(10, '4gb-2vcpu')).toBe(20)
+describe('size parsing', () => {
+  it('reads the memory and vCPU the size reserves', () => {
+    expect(parseComputeSize('2gb-1vcpu')).toEqual({ memoryGb: 2, vcpu: 1 })
+    expect(parseComputeSize('4gb-2vcpu')).toEqual({ memoryGb: 4, vcpu: 2 })
   })
 
-  it('falls back to a weight of 1 for an unrecognised size', () => {
-    expect(getComputeUnitWeight('16gb-8vcpu')).toBe(1)
-    expect(toComputeUnits(10, 'something-new')).toBe(10)
+  it('returns undefined for a shape it does not recognise, rather than guessing', () => {
+    expect(parseComputeSize('something-new')).toBeUndefined()
+    expect(parseComputeSize('')).toBeUndefined()
+  })
+
+  it('parses a size it has never seen, as long as the shape holds', () => {
+    expect(parseComputeSize('16gb-8vcpu')).toEqual({ memoryGb: 16, vcpu: 8 })
+  })
+})
+
+describe('resource-hours', () => {
+  it('multiplies active hours by the vCPU the size reserves', () => {
+    expect(toVcpuHours(10, '2gb-1vcpu')).toBe(10)
+    expect(toVcpuHours(10, '4gb-2vcpu')).toBe(20)
+  })
+
+  it('multiplies active hours by the memory the size reserves', () => {
+    expect(toGbHours(10, '2gb-1vcpu')).toBe(20)
+    expect(toGbHours(10, '4gb-2vcpu')).toBe(40)
+  })
+
+  it('contributes nothing for an unparseable size rather than inventing a figure', () => {
+    expect(toVcpuHours(10, 'something-new')).toBe(0)
+    expect(toGbHours(10, 'something-new')).toBe(0)
   })
 })
 
@@ -49,9 +77,38 @@ describe('plan allowances', () => {
     expect(getComputeActiveHoursAllowance('enterprise')).toBeNull()
   })
 
-  it('falls back to the free allowance for an unknown or missing plan', () => {
+  it('falls back to the free allowance for a missing plan', () => {
     expect(getComputeActiveHoursAllowance(undefined)).toBe(50)
-    expect(getComputeActiveHoursAllowance('some-future-plan')).toBe(50)
+  })
+
+  it('falls back to the free allowance for a plan id the table does not know', () => {
+    // The plan union is closed at compile time, but the API can start returning a new id
+    // before this table is updated. The cast reproduces that case deliberately.
+    const unknownPlan = 'some-future-plan' as OrgPlan['id']
+    expect(getComputeActiveHoursAllowance(unknownPlan)).toBe(50)
+    expect(getComputeDeploymentAllowance(unknownPlan)).toBe(1)
+    expect(getComputeInstanceAllowance(unknownPlan)).toBe(1)
+  })
+
+  it('covers every plan the API can return, so none silently falls back', () => {
+    const plans: OrgPlan['id'][] = ['free', 'pro', 'team', 'platform', 'enterprise']
+    for (const plan of plans) {
+      expect(COMPUTE_ACTIVE_HOURS_ALLOWANCE).toHaveProperty(plan)
+      expect(COMPUTE_DEPLOYMENT_ALLOWANCE).toHaveProperty(plan)
+      expect(COMPUTE_INSTANCE_ALLOWANCE).toHaveProperty(plan)
+    }
+  })
+})
+
+describe('plan deployment allowances', () => {
+  it('returns the configured compute limit per plan', () => {
+    expect(getComputeDeploymentAllowance('free')).toBe(1)
+    expect(getComputeDeploymentAllowance('pro')).toBe(5)
+    expect(getComputeDeploymentAllowance('team')).toBe(15)
+  })
+
+  it('returns null for enterprise, which has no fixed limit', () => {
+    expect(getComputeDeploymentAllowance('enterprise')).toBeNull()
   })
 })
 
@@ -66,9 +123,8 @@ describe('plan instance allowances', () => {
     expect(getComputeInstanceAllowance('enterprise')).toBeNull()
   })
 
-  it('falls back to the free limit for an unknown or missing plan', () => {
+  it('falls back to the free limit for a missing plan', () => {
     expect(getComputeInstanceAllowance(undefined)).toBe(1)
-    expect(getComputeInstanceAllowance('some-future-plan')).toBe(1)
   })
 })
 
@@ -131,7 +187,7 @@ describe('buildComputeBurndown', () => {
 })
 
 describe('aggregateUsageBySize', () => {
-  it('groups rows by size and weights the compute units', () => {
+  it('groups active hours by size and derives the resource-hours each reserves', () => {
     const result = aggregateUsageBySize([
       { size: '2gb-1vcpu', activeHours: 10 },
       { size: '4gb-2vcpu', activeHours: 10 },
@@ -139,17 +195,17 @@ describe('aggregateUsageBySize', () => {
     ])
 
     expect(result).toEqual([
-      { size: '4gb-2vcpu', activeHours: 10, computeUnits: 20 },
-      { size: '2gb-1vcpu', activeHours: 15, computeUnits: 15 },
+      { size: '2gb-1vcpu', activeHours: 15, vcpuHours: 15, gbHours: 30 },
+      { size: '4gb-2vcpu', activeHours: 10, vcpuHours: 20, gbHours: 40 },
     ])
   })
 
-  it('sorts by compute units, so the heaviest size leads', () => {
+  it('sorts by active hours, the measure the section is titled after', () => {
     const result = aggregateUsageBySize([
       { size: '2gb-1vcpu', activeHours: 30 },
       { size: '4gb-2vcpu', activeHours: 20 },
     ])
-    expect(result.map((entry) => entry.size)).toEqual(['4gb-2vcpu', '2gb-1vcpu'])
+    expect(result.map((entry) => entry.size)).toEqual(['2gb-1vcpu', '4gb-2vcpu'])
   })
 
   it('returns an empty array for no rows', () => {
@@ -158,20 +214,17 @@ describe('aggregateUsageBySize', () => {
 })
 
 describe('getUsageConcentration', () => {
-  it('reports the share taken by the largest consumer', () => {
-    expect(getUsageConcentration([{ computeUnits: 75 }, { computeUnits: 25 }])).toBeCloseTo(
-      0.75,
-      10
-    )
+  it('reports the share of active hours taken by the largest consumer', () => {
+    expect(getUsageConcentration([{ activeHours: 75 }, { activeHours: 25 }])).toBeCloseTo(0.75, 10)
   })
 
   it('reports 1 when a single project accounts for everything', () => {
-    expect(getUsageConcentration([{ computeUnits: 40 }])).toBe(1)
+    expect(getUsageConcentration([{ activeHours: 40 }])).toBe(1)
   })
 
   it('returns 0 rather than NaN when there is no usage', () => {
     expect(getUsageConcentration([])).toBe(0)
-    expect(getUsageConcentration([{ computeUnits: 0 }, { computeUnits: 0 }])).toBe(0)
+    expect(getUsageConcentration([{ activeHours: 0 }, { activeHours: 0 }])).toBe(0)
   })
 })
 
@@ -187,8 +240,8 @@ describe('formatting', () => {
     expect(formatComputeRequests(3_200_000)).toBe('3.2M')
   })
 
-  it('formats compute units consistently with hours', () => {
-    expect(formatComputeUnits(2.44)).toBe('2.4')
-    expect(formatComputeUnits(18_500)).toBe('18,500')
+  it('names the unit on resource-hours so they cannot be confused with wall-clock hours', () => {
+    expect(formatVcpuHours(2.44)).toBe('2.4 vCPU-hrs')
+    expect(formatGbHours(18_500)).toBe('18,500 GB-hrs')
   })
 })

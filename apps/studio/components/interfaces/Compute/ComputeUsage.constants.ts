@@ -1,58 +1,66 @@
 import type { OrgPlan } from '@/data/subscriptions/types'
 
 /**
- * Compute usage figures are experimental while the product is in alpha. Allowances and
- * weights below are placeholders so the usage surfaces have something to render — they
- * are not the final packaging, and nothing here is billed today.
+ * Compute usage allowances are experimental while the product is in alpha. The figures below
+ * are placeholders so the usage surfaces have something to measure against — they are not the
+ * final packaging, and nothing here is billed today.
+ *
+ * A "compute" is one deployment (what `supabase compute new` creates). Each one runs one or
+ * more instances. Usage is counted on the instances: how many are declared, how long they stay
+ * alive, and the vCPU and memory their size reserves while they do.
  */
-
-/**
- * Size-weighted compute units. A 4gb-2vcpu instance draws twice the resources of the
- * default 2gb-1vcpu, so an hour on it counts twice toward usage.
- */
-export const COMPUTE_UNIT_WEIGHTS: Record<string, number> = {
-  '2gb-1vcpu': 1,
-  '4gb-2vcpu': 2,
-}
-
-export const DEFAULT_COMPUTE_UNIT_WEIGHT = 1
 
 /** Active hours included per billing cycle, by plan. `null` means no fixed allowance. */
 export const COMPUTE_ACTIVE_HOURS_ALLOWANCE: Record<string, number | null> = {
   free: 50,
   pro: 500,
   team: 2000,
+  platform: 2000,
   enterprise: null,
 }
 
 export const DEFAULT_COMPUTE_ACTIVE_HOURS_ALLOWANCE = 50
 
-/** Instances included per plan. `null` means no fixed limit. */
+/** Compute deployments included per plan. `null` means no fixed limit. */
+export const COMPUTE_DEPLOYMENT_ALLOWANCE: Record<string, number | null> = {
+  free: 1,
+  pro: 5,
+  team: 15,
+  platform: 15,
+  enterprise: null,
+}
+
+export const DEFAULT_COMPUTE_DEPLOYMENT_ALLOWANCE = 1
+
+/** Instances included per plan, summed across every deployment. `null` means no fixed limit. */
 export const COMPUTE_INSTANCE_ALLOWANCE: Record<string, number | null> = {
   free: 1,
   pro: 10,
   team: 25,
+  platform: 25,
   enterprise: null,
 }
 
 export const DEFAULT_COMPUTE_INSTANCE_ALLOWANCE = 1
 
-/** The point at which the burn-down starts warning, as a fraction of the allowance. */
+/** The point at which a meter starts warning, as a fraction of the allowance. */
 export const COMPUTE_ALLOWANCE_WARNING_THRESHOLD = 0.8
 
-export const getComputeActiveHoursAllowance = (
+const lookup = (
+  table: Record<string, number | null>,
+  fallback: number,
   planId: OrgPlan['id'] | undefined
 ): number | null => {
-  if (planId === undefined) return DEFAULT_COMPUTE_ACTIVE_HOURS_ALLOWANCE
-  if (!(planId in COMPUTE_ACTIVE_HOURS_ALLOWANCE)) return DEFAULT_COMPUTE_ACTIVE_HOURS_ALLOWANCE
-  return COMPUTE_ACTIVE_HOURS_ALLOWANCE[planId]
+  if (planId === undefined) return fallback
+  if (!(planId in table)) return fallback
+  return table[planId]
 }
 
-export const getComputeInstanceAllowance = (planId: OrgPlan['id'] | undefined): number | null => {
-  if (planId === undefined) return DEFAULT_COMPUTE_INSTANCE_ALLOWANCE
-  if (!(planId in COMPUTE_INSTANCE_ALLOWANCE)) return DEFAULT_COMPUTE_INSTANCE_ALLOWANCE
-  return COMPUTE_INSTANCE_ALLOWANCE[planId]
-}
+export const getComputeActiveHoursAllowance = (planId: OrgPlan['id'] | undefined) =>
+  lookup(COMPUTE_ACTIVE_HOURS_ALLOWANCE, DEFAULT_COMPUTE_ACTIVE_HOURS_ALLOWANCE, planId)
 
-export const getComputeUnitWeight = (size: string): number =>
-  COMPUTE_UNIT_WEIGHTS[size] ?? DEFAULT_COMPUTE_UNIT_WEIGHT
+export const getComputeDeploymentAllowance = (planId: OrgPlan['id'] | undefined) =>
+  lookup(COMPUTE_DEPLOYMENT_ALLOWANCE, DEFAULT_COMPUTE_DEPLOYMENT_ALLOWANCE, planId)
+
+export const getComputeInstanceAllowance = (planId: OrgPlan['id'] | undefined) =>
+  lookup(COMPUTE_INSTANCE_ALLOWANCE, DEFAULT_COMPUTE_INSTANCE_ALLOWANCE, planId)

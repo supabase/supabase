@@ -2,11 +2,11 @@ import { queryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
 import { computeKeys } from './keys'
-import { getComputeUnitWeight } from '@/components/interfaces/Compute/ComputeUsage.constants'
 import type {
   ComputeUsageByProject,
   ComputeUsagePoint,
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
+import { toGbHours, toVcpuHours } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import { IS_PLATFORM } from '@/lib/constants'
 
 /**
@@ -67,7 +67,6 @@ const generateUsagePoints = ({
   requestsPerActiveHour,
 }: GenerateUsageParams): ComputeUsagePoint[] => {
   const random = createRandom(hashSeed(seed))
-  const weight = getComputeUnitWeight(size)
   const start = dayjs()
     .utc()
     .subtract(days - 1, 'day')
@@ -83,7 +82,8 @@ const generateUsagePoints = ({
     return {
       timestamp: day.toISOString(),
       activeHours,
-      computeUnits: Number((activeHours * weight).toFixed(2)),
+      vcpuHours: Number(toVcpuHours(activeHours, size).toFixed(2)),
+      gbHours: Number(toGbHours(activeHours, size).toFixed(2)),
       instances: liveInstances,
       requests: Math.round(activeHours * requestsPerActiveHour * (0.7 + random() * 0.6)),
     }
@@ -147,8 +147,11 @@ export interface ComputeProjectUsageVariables {
 export interface ComputeProjectUsage {
   points: ComputeUsagePoint[]
   activeHours: number
-  computeUnits: number
+  vcpuHours: number
+  gbHours: number
   requests: number
+  /** Instance-hours: instances x hours alive, the figure a rollup would bill on. */
+  instanceHours: number
 }
 
 /** Sums each instance's generated series into one project-level total. */
@@ -176,7 +179,8 @@ export const computeProjectUsageQueryOptions = ({
         return {
           timestamp: bucket[0]?.timestamp ?? dayjs().utc().toISOString(),
           activeHours: Number(bucket.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
-          computeUnits: Number(bucket.reduce((sum, p) => sum + p.computeUnits, 0).toFixed(2)),
+          vcpuHours: Number(bucket.reduce((sum, p) => sum + p.vcpuHours, 0).toFixed(2)),
+          gbHours: Number(bucket.reduce((sum, p) => sum + p.gbHours, 0).toFixed(2)),
           instances: Number(bucket.reduce((sum, p) => sum + p.instances, 0).toFixed(2)),
           requests: bucket.reduce((sum, p) => sum + p.requests, 0),
         }
@@ -185,8 +189,10 @@ export const computeProjectUsageQueryOptions = ({
       return {
         points,
         activeHours: Number(points.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
-        computeUnits: Number(points.reduce((sum, p) => sum + p.computeUnits, 0).toFixed(2)),
+        vcpuHours: Number(points.reduce((sum, p) => sum + p.vcpuHours, 0).toFixed(2)),
+        gbHours: Number(points.reduce((sum, p) => sum + p.gbHours, 0).toFixed(2)),
         requests: points.reduce((sum, p) => sum + p.requests, 0),
+        instanceHours: Number(points.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
       }
     },
     enabled: IS_PLATFORM && projectRef !== undefined && instances.length > 0,
@@ -208,6 +214,8 @@ export interface ComputeOrgUsage {
   byProject: ComputeUsageByProject[]
   /** Flattened instance rows, for the by-size breakdown. */
   instanceRows: { size: string; activeHours: number }[]
+  deployments: number
+  instances: number
 }
 
 /** Stand-in project set until the rollup can report real per-project figures. */
@@ -216,27 +224,31 @@ const MOCK_PROJECTS = [
     projectRef: 'prod-api',
     projectName: 'Production API',
     size: '4gb-2vcpu',
-    instances: 3,
+    deployments: 3,
+    instances: 7,
     dutyCycle: 0.92,
   },
   {
     projectRef: 'media-jobs',
     projectName: 'Media jobs',
     size: '4gb-2vcpu',
-    instances: 2,
+    deployments: 2,
+    instances: 4,
     dutyCycle: 0.35,
   },
   {
     projectRef: 'webhooks',
     projectName: 'Webhook relay',
     size: '2gb-1vcpu',
-    instances: 2,
+    deployments: 2,
+    instances: 3,
     dutyCycle: 0.68,
   },
   {
     projectRef: 'staging',
     projectName: 'Staging',
     size: '2gb-1vcpu',
+    deployments: 1,
     instances: 1,
     dutyCycle: 0.22,
   },
@@ -244,6 +256,7 @@ const MOCK_PROJECTS = [
     projectRef: 'sandbox',
     projectName: 'Sandbox',
     size: '2gb-1vcpu',
+    deployments: 1,
     instances: 1,
     dutyCycle: 0.08,
   },
@@ -279,7 +292,8 @@ export const computeOrgUsageQueryOptions = ({
         return {
           timestamp: bucket[0]?.timestamp ?? dayjs().utc().toISOString(),
           activeHours: Number(bucket.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
-          computeUnits: Number(bucket.reduce((sum, p) => sum + p.computeUnits, 0).toFixed(2)),
+          vcpuHours: Number(bucket.reduce((sum, p) => sum + p.vcpuHours, 0).toFixed(2)),
+          gbHours: Number(bucket.reduce((sum, p) => sum + p.gbHours, 0).toFixed(2)),
           instances: Number(bucket.reduce((sum, p) => sum + p.instances, 0).toFixed(2)),
           requests: bucket.reduce((sum, p) => sum + p.requests, 0),
         }
@@ -289,18 +303,20 @@ export const computeOrgUsageQueryOptions = ({
         .map(({ project, points: projectPoints }) => ({
           projectRef: project.projectRef,
           projectName: project.projectName,
-          activeHours: Number(projectPoints.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
-          computeUnits: Number(
-            projectPoints.reduce((sum, p) => sum + p.computeUnits, 0).toFixed(2)
-          ),
+          deployments: project.deployments,
           instances: project.instances,
+          activeHours: Number(projectPoints.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
+          vcpuHours: Number(projectPoints.reduce((sum, p) => sum + p.vcpuHours, 0).toFixed(2)),
+          gbHours: Number(projectPoints.reduce((sum, p) => sum + p.gbHours, 0).toFixed(2)),
           requests: projectPoints.reduce((sum, p) => sum + p.requests, 0),
         }))
-        .sort((a, b) => b.computeUnits - a.computeUnits)
+        .sort((a, b) => b.activeHours - a.activeHours)
 
       return {
         points,
         byProject,
+        deployments: byProject.reduce((sum, row) => sum + row.deployments, 0),
+        instances: byProject.reduce((sum, row) => sum + row.instances, 0),
         instanceRows: perProject.map(({ project, points: projectPoints }) => ({
           size: project.size,
           activeHours: Number(projectPoints.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),

@@ -5,6 +5,7 @@ import type { ComputeInstance } from './Compute.types'
 import {
   COMPUTE_ALLOWANCE_WARNING_THRESHOLD,
   getComputeActiveHoursAllowance,
+  getComputeDeploymentAllowance,
   getComputeInstanceAllowance,
 } from './ComputeUsage.constants'
 import { formatComputeHours } from './ComputeUsage.utils'
@@ -20,8 +21,9 @@ interface ComputePlanUsageProps {
 }
 
 /**
- * Compares what the plan includes against what the project is using. Figures are estimates
- * while Compute is in alpha — nothing here is billed yet.
+ * Compares what the plan includes against what the project is using. Counts the two entities
+ * separately: computes are the deployments, instances are what each one runs. Figures are
+ * estimates while Compute is in alpha — nothing here is billed yet.
  */
 export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
@@ -41,8 +43,9 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
   )
 
   const activeHoursAllowance = getComputeActiveHoursAllowance(planId)
+  const deploymentAllowance = getComputeDeploymentAllowance(planId)
   const instanceAllowance = getComputeInstanceAllowance(planId)
-  const deployedInstances = instances.reduce(
+  const declaredInstances = instances.reduce(
     (total, instance) => total + instance.declaredInstances,
     0
   )
@@ -61,16 +64,29 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
         description="Hours instances spend serving traffic. Suspended instances do not accrue usage."
         used={usage?.activeHours ?? 0}
         included={activeHoursAllowance}
+        limitKind="allowance"
         isLoading={isPending}
         format={formatComputeHours}
         planName={planName}
       />
 
       <UsageMeter
+        label="Computes"
+        description="Deployments in this project. Each one runs its own instances."
+        used={instances.length}
+        included={deploymentAllowance}
+        limitKind="capacity"
+        isLoading={false}
+        format={(value) => value.toLocaleString()}
+        planName={planName}
+      />
+
+      <UsageMeter
         label="Instances"
-        description="Instances declared across every deployment in this project."
-        used={deployedInstances}
+        description="Instances declared across every compute in this project."
+        used={declaredInstances}
         included={instanceAllowance}
+        limitKind="capacity"
         isLoading={false}
         format={(value) => value.toLocaleString()}
         planName={planName}
@@ -85,6 +101,11 @@ interface UsageMeterProps {
   used: number
   /** `null` when the plan carries no fixed limit. */
   included: number | null
+  /**
+   * An allowance is consumed, so spending all of it is exhaustion. Capacity is occupied, so
+   * filling it is valid — only asking for more than it holds is over the limit.
+   */
+  limitKind: 'allowance' | 'capacity'
   isLoading: boolean
   format: (value: number) => string
   planName: string | undefined
@@ -95,19 +116,22 @@ const UsageMeter = ({
   description,
   used,
   included,
+  limitKind,
   isLoading,
   format,
   planName,
 }: UsageMeterProps) => {
   const hasLimit = included !== null && included > 0
   const usageRatio = hasLimit ? used / included : 0
-  const isExceeded = hasLimit && usageRatio >= 1
-  const isApproaching = hasLimit && !isExceeded && usageRatio >= COMPUTE_ALLOWANCE_WARNING_THRESHOLD
+  const isExceeded = hasLimit && (limitKind === 'allowance' ? usageRatio >= 1 : used > included)
+  const isAtCapacity = hasLimit && limitKind === 'capacity' && used === included
+  const isApproaching =
+    hasLimit && !isExceeded && !isAtCapacity && usageRatio >= COMPUTE_ALLOWANCE_WARNING_THRESHOLD
 
   // Neutral by default; colour only once the number means something.
   const barClass = isExceeded
     ? 'bg-destructive'
-    : isApproaching
+    : isApproaching || isAtCapacity
       ? 'bg-warning'
       : 'bg-foreground-light'
 
@@ -135,6 +159,7 @@ const UsageMeter = ({
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-xs text-foreground-lighter">{description}</p>
         {isExceeded && <p className="shrink-0 text-xs text-destructive">Over limit</p>}
+        {isAtCapacity && <p className="shrink-0 text-xs text-warning">At limit</p>}
         {isApproaching && <p className="shrink-0 text-xs text-warning">Approaching limit</p>}
       </div>
 
