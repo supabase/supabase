@@ -55,12 +55,6 @@ Creates an HTTP GET request returning the request's ID. HTTP requests are not st
 
 ### Signature [#get-signature]
 
-<Admonition type="caution">
-
-This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function.
-
-</Admonition>
-
 ```sql
 net.http_get(
     -- url for the request
@@ -100,12 +94,6 @@ Creates an HTTP POST request with a JSON body, returning the request's ID. HTTP 
 The body's character set encoding matches the database's `server_encoding` setting.
 
 ### Signature [#post-signature]
-
-<Admonition type="caution">
-
-This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
-
-</Admonition>
 
 ```sql
 net.http_post(
@@ -148,12 +136,6 @@ Creates an HTTP DELETE request, returning the request's ID. HTTP requests are no
 
 ### Signature [#post-signature]
 
-<Admonition type="caution">
-
-This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
-
-</Admonition>
-
 ```sql
 net.http_delete(
     -- url for the request
@@ -172,7 +154,6 @@ net.http_delete(
     volatile
     parallel safe
     language plpgsql
-    security definer
 ```
 
 ### Usage [#delete-usage]
