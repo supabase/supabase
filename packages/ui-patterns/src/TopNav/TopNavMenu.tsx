@@ -80,8 +80,7 @@ export const TopNavMenuItem = ({ label, children, className, ...props }: TopNavM
       className={cn(
         'inline-flex h-full items-center px-3.5 text-foreground-light transition-colors',
         'hover:text-foreground data-open:text-foreground focus-ring focus-visible:text-foreground',
-        'aria-[current=true]:text-foreground aria-[current=true]:underline',
-        'aria-[current=true]:decoration-2 aria-[current=true]:underline-offset-8',
+        'aria-[current=true]:text-foreground',
         className
       )}
       {...props}
@@ -113,8 +112,7 @@ export const TopNavMenuLink = ({
         className={cn(
           'inline-flex h-full items-center px-3.5 text-foreground-light transition-colors',
           'hover:text-foreground focus-ring focus-visible:text-foreground',
-          'aria-[current=true]:text-foreground aria-[current=true]:underline',
-          'aria-[current=true]:decoration-2 aria-[current=true]:underline-offset-8',
+          'aria-[current=true]:text-foreground',
           className
         )}
         {...props}
