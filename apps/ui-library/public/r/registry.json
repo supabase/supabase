@@ -362,9 +362,9 @@
           "target": "app/auth/magic-link/page.tsx"
         },
         {
-          "path": "registry/default/blocks/magic-auth-nextjs/app/auth/verify/page.tsx",
+          "path": "registry/default/blocks/magic-auth-nextjs/app/auth/verify/route.ts",
           "type": "registry:page",
-          "target": "app/auth/verify/page.tsx"
+          "target": "app/auth/verify/route.ts"
         },
         {
           "path": "registry/default/blocks/magic-auth-nextjs/app/auth/error/page.tsx",
