@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import {
   createContext,
   useContext,
@@ -22,6 +23,7 @@ import { upsertContent } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { TabsStateContext, type Tab } from '@/state/tabs'
 
 type SaveCoordinator = Pick<SaveScheduler, 'requestSave'> & {
@@ -47,6 +49,16 @@ export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren
   useEffect(() => {
     saveModeRef.current = isManualSaveEnabled ? 'manual' : 'auto'
   }, [isManualSaveEnabled])
+
+  // Read from the tab handler below, which runs outside React's render cycle.
+  const [confirmUnsavedChanges, setConfirmUnsavedChanges] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_CONFIRM_UNSAVED_CHANGES,
+    true
+  )
+  const confirmUnsavedChangesRef = useRef(confirmUnsavedChanges)
+  useEffect(() => {
+    confirmUnsavedChangesRef.current = confirmUnsavedChanges
+  }, [confirmUnsavedChanges])
 
   const coordinator = useMemo(() => {
     const mechanism = createSaveMechanism({
@@ -98,8 +110,9 @@ export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren
   // snippet's store content or cache — nulling a still-mounted editor's content
   // crashes Monaco on dispose, and a snippet left with `content: undefined`
   // silently drops the next edit (breaking autosave). Only when there are edits
-  // to discard do we confirm first, then clear the local content and evict the
-  // cached server copy so the snippet re-fetches clean when reopened.
+  // to discard do we confirm first (unless the user turned the prompt off), then
+  // clear the local content and evict the cached server copy so the snippet
+  // re-fetches clean when reopened.
   const tabsStore = useContext(TabsStateContext)
   useEffect(() => {
     // A snippet has unsaved edits worth discarding only in manual mode.
@@ -118,6 +131,8 @@ export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren
         queryClient.removeQueries({ queryKey: contentKeys.resource(projectRef, snippetId) })
       },
       confirmClose: (tabs) => {
+        // The user opted out of the prompt; closing still discards the edits.
+        if (!confirmUnsavedChangesRef.current) return null
         const dirtyCount = tabs.filter(snippetHasUnsavedEdits).length
         if (dirtyCount === 0) return null
         return {
@@ -126,10 +141,14 @@ export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren
             dirtyCount === 1
               ? 'You have unsaved changes in this SQL snippet. Closing it will discard them.'
               : `You have unsaved changes in ${dirtyCount} SQL snippets. Closing them will discard those changes.`,
+          optOut: {
+            label: "Don't ask again",
+            onOptOut: () => setConfirmUnsavedChanges(false),
+          },
         }
       },
     })
-  }, [tabsStore, queryClient])
+  }, [tabsStore, queryClient, setConfirmUnsavedChanges])
 
   // Warn before the tab is closed/reloaded while any snippet still has unsaved
   // work (a failed save, a save in flight, or a never-saved snippet). In-app

@@ -11,7 +11,6 @@ const BASE_PARAMS = {
   accessToken: 'token',
   projectRef: 'abcdefghijklmnopqrst',
   aiOptInLevel: 'schema_and_log_and_data' as const,
-  isRestrictedByHipaa: false,
   // A fresh, non-aborted signal by default; lifecycle tests override it
   signal: new AbortController().signal,
 }
@@ -52,6 +51,22 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
     expect(result).toHaveProperty('query_logs')
     expect(result).not.toHaveProperty('execute_sql')
     expect(result).not.toHaveProperty('deploy_edge_function')
+  })
+
+  it('takes needsApproval from the contract', async () => {
+    const result = await getMcpTools(BASE_PARAMS)
+
+    for (const name of [
+      'search_docs',
+      'list_tables',
+      'list_extensions',
+      'list_edge_functions',
+      'list_branches',
+      'get_advisors',
+      'query_logs',
+    ] as const) {
+      expect(result[name]?.needsApproval).toBe(false)
+    }
   })
 
   it('warns when the remote server is missing an expected tool (contract drift)', async () => {
@@ -116,6 +131,15 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
     tools.mockResolvedValueOnce({ ...FULL_REMOTE_TOOLS, list_tables: 'not-an-object' })
 
     await expect(getMcpTools(BASE_PARAMS)).rejects.toThrow('MCP tools validation failed')
+    expect(close).toHaveBeenCalledTimes(1)
+  })
+
+  it('rejects a malformed contract tool even when the opt-in level would stub it', async () => {
+    tools.mockResolvedValueOnce({ ...FULL_REMOTE_TOOLS, list_tables: 'not-an-object' })
+
+    await expect(getMcpTools({ ...BASE_PARAMS, aiOptInLevel: 'disabled' })).rejects.toThrow(
+      'MCP tools validation failed'
+    )
     expect(close).toHaveBeenCalledTimes(1)
   })
 })

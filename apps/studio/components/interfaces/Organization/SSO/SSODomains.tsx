@@ -1,4 +1,4 @@
-import { Plus, Trash } from 'lucide-react'
+import { PlusIcon, TrashIcon } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { Button, FormControl, FormField, FormItem, FormMessage, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -37,7 +37,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
       >
         <div className="grid gap-2 w-full">
           {fields.map((field, idx) => (
-            <div key={field.id} className="flex gap-2 items-top">
+            <div key={field.id} className="flex gap-2 items-start">
               <FormField
                 name={`domains.${idx}.value`}
                 render={({ field }) => (
@@ -51,7 +51,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
               />
 
               <Button
-                icon={<Trash size={12} />}
+                icon={<TrashIcon size={12} />}
                 className="h-[34px] w-[34px]"
                 onClick={() => remove(idx)}
               />
@@ -59,7 +59,7 @@ export const SSODomains = ({ form }: { form: ReturnType<typeof useForm<SSOConfig
           ))}
           <div>
             <Button
-              icon={<Plus className="w-4 h-4" />}
+              icon={<PlusIcon className="w-4 h-4" />}
               size="tiny"
               onClick={() => append({ value: '' })}
             >

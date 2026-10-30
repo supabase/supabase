@@ -1,6 +1,6 @@
 'use client'
 
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useState } from 'react'
 import { AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
 
@@ -116,7 +116,7 @@ export function TroubleshootingGuideSection({
                 ctaType: 'troubleshooting_guide',
               })
             }
-            iconRight={<ExternalLink />}
+            iconRight={<ExternalLinkIcon />}
           >
             <a href={href} target="_blank" rel="noopener noreferrer">
               View troubleshooting guide

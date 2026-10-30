@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookOpen, Globe } from 'lucide-react'
+import { ArrowUpRightIcon, BookOpenIcon, GlobeIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
 
@@ -22,7 +22,7 @@ const RailRow = ({ label, value, href, mono, icon }: RailRowProps) => {
   const content = (
     <>
       {value}
-      {href && <ArrowUpRight size={11} />}
+      {href && <ArrowUpRightIcon size={11} />}
     </>
   )
   return (
@@ -85,10 +85,10 @@ export const MarketplaceDetailRail = ({ integration, isInstalled }: MarketplaceD
       {(docsUrl || siteUrl) && (
         <RailGroup title="Links">
           {docsUrl && (
-            <RailRow value="Documentation" icon={<BookOpen size={14} />} href={docsUrl} />
+            <RailRow value="Documentation" icon={<BookOpenIcon size={14} />} href={docsUrl} />
           )}
           {siteUrl && siteHost && (
-            <RailRow value={siteHost} icon={<Globe size={14} />} href={siteUrl} />
+            <RailRow value={siteHost} icon={<GlobeIcon size={14} />} href={siteUrl} />
           )}
         </RailGroup>
       )}

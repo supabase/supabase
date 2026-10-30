@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, IconDiscord } from 'ui'
 
@@ -42,7 +42,7 @@ export const Success = ({
 
   return (
     <div className="flex w-full flex-col items-center gap-4 px-4 py-4 text-center">
-      <Check strokeWidth={1.5} size={24} className="text-brand" />
+      <CheckIcon strokeWidth={1.5} size={24} className="text-primary" />
 
       <div className="flex max-w-[620px] flex-col items-center gap-2">
         <h3 className="text-xl">Support request sent</h3>

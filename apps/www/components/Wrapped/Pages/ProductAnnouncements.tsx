@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { cn } from 'ui'
 
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 type Announcement = {
   title: string
@@ -344,7 +345,7 @@ function MonthSection({ month }: { month: Month }) {
       <div className="px-6 lg:px-8 py-2.5 md:py-4 flex flex-wrap items-center gap-1 *:whitespace-nowrap *:mr-2">
         <span className="text-base font-medium">{month.name}</span>
         {month.isLaunchWeek && (
-          <span className="text-xs bg-brand/10 text-brand-link dark:text-brand px-2 py-0.5 rounded-full">
+          <span className="text-xs bg-brand-default/10 text-primary px-2 py-0.5 rounded-full">
             Launch Week
           </span>
         )}
@@ -356,17 +357,31 @@ function MonthSection({ month }: { month: Month }) {
       <ul className="px-6 lg:px-8 pb-4 space-y-2">
         {month.announcements.map((announcement) => (
           <li key={announcement.title}>
-            <Link
-              href={announcement.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex items-center gap-2 text-sm text-foreground-light hover:text-foreground transition-colors"
-            >
-              <span className="text-foreground-muted group-hover:text-foreground transition-colors">
-                →
-              </span>
-              {announcement.title}
-            </Link>
+            {isCrossZoneHref(announcement.url) ? (
+              <a
+                href={announcement.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 text-sm text-foreground-light hover:text-foreground transition-colors"
+              >
+                <span className="text-foreground-muted group-hover:text-foreground transition-colors">
+                  →
+                </span>
+                {announcement.title}
+              </a>
+            ) : (
+              <Link
+                href={announcement.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 text-sm text-foreground-light hover:text-foreground transition-colors"
+              >
+                <span className="text-foreground-muted group-hover:text-foreground transition-colors">
+                  →
+                </span>
+                {announcement.title}
+              </Link>
+            )}
           </li>
         ))}
       </ul>

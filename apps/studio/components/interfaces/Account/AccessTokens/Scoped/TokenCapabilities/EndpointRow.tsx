@@ -1,4 +1,4 @@
-import { Check, Copy } from 'lucide-react'
+import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { cn, copyToClipboard } from 'ui'
 
@@ -95,9 +95,9 @@ export const EndpointRow = ({
       </span>
       <span className="shrink-0 pl-2">
         {showCopiedIcon ? (
-          <Check size={14} className="text-brand" />
+          <CheckIcon size={14} className="text-primary" />
         ) : (
-          <Copy
+          <CopyIcon
             size={14}
             className="text-foreground-lighter opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
           />

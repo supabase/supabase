@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
@@ -35,6 +35,12 @@ vi.mock('@/lib/constants', async (importOriginal) => {
 
 const user = userEvent.setup()
 
+/**
+ * Each permission row renders a hidden native <select>, so an unscoped option query has to
+ * check the visibility of hundreds of options. Scope it to the open listbox.
+ */
+const getListbox = async () => within(await screen.findByRole('listbox'))
+
 describe('ResourceAccessStep organization selector', () => {
   beforeEach(() => {
     mockScopedTokenEnvironment()
@@ -54,7 +60,11 @@ describe('ResourceAccessStep organization selector', () => {
     mockPermissionsApi(readonlyRows(MOCK_ORG.slug, [MOCK_PROJECT.ref]))
     await openOrganizationSelector()
 
-    const option = await screen.findByRole('option', { name: new RegExp(MOCK_ORG.name) })
+    const option = await (
+      await getListbox()
+    ).findByRole('option', {
+      name: new RegExp(MOCK_ORG.name),
+    })
     expect(option).toHaveAttribute('aria-disabled', 'true')
     expect(
       await screen.findByText(
@@ -67,7 +77,11 @@ describe('ResourceAccessStep organization selector', () => {
     mockPermissionsApi(readonlyRows(MOCK_ORG.slug))
     await openOrganizationSelector()
 
-    const option = await screen.findByRole('option', { name: new RegExp(MOCK_ORG.name) })
+    const option = await (
+      await getListbox()
+    ).findByRole('option', {
+      name: new RegExp(MOCK_ORG.name),
+    })
     expect(option).not.toHaveAttribute('aria-disabled', 'true')
     expect(
       screen.queryByText(
@@ -92,19 +106,10 @@ describe('ResourceAccessStep project selector', () => {
 
   const selectOrganization = async (name: string) => {
     fireEvent.click(await screen.findByRole('combobox', { name: 'Organization' }))
-    fireEvent.click(await screen.findByRole('option', { name }))
+    fireEvent.click(await (await getListbox()).findByRole('option', { name }))
   }
 
-  test('loads projects scoped to the selected organization', async () => {
-    mockPermissionsApi(readonlyRows(MOCK_ORG.slug))
-    await openTokenForm()
-    await selectOrganization(MOCK_ORG.name)
-
-    fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
-    expect(await screen.findByRole('option', { name: MOCK_PROJECT.name })).toBeInTheDocument()
-  })
-
-  // Regression test: the project list used to be fetched cross-org (a single page of the user's
+  // Also covers loading projects for the selected organization. Regression test: the project list used to be fetched cross-org (a single page of the user's
   // first 100 projects, filtered client-side by org), so switching to an org whose projects
   // didn't fall in that page left the selector permanently empty.
   test('refreshes the project list when switching organizations', async () => {
@@ -122,11 +127,14 @@ describe('ResourceAccessStep project selector', () => {
     await openTokenForm()
     await selectOrganization(MOCK_ORG.name)
     fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
-    expect(await screen.findByRole('option', { name: MOCK_PROJECT.name })).toBeInTheDocument()
+    expect(
+      await (await getListbox()).findByRole('option', { name: MOCK_PROJECT.name })
+    ).toBeInTheDocument()
 
     await selectOrganization(MOCK_ORG_2.name)
     fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
-    expect(await screen.findByRole('option', { name: MOCK_PROJECT_2.name })).toBeInTheDocument()
-    expect(screen.queryByRole('option', { name: MOCK_PROJECT.name })).toBeNull()
+    const projects = await getListbox()
+    expect(await projects.findByRole('option', { name: MOCK_PROJECT_2.name })).toBeInTheDocument()
+    expect(projects.queryByRole('option', { name: MOCK_PROJECT.name })).toBeNull()
   })
 })

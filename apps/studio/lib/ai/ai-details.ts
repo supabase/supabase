@@ -1,22 +1,18 @@
-import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { getProjectSettings } from '@/data/config/project-settings-v2-query'
 import { checkEntitlement } from '@/data/entitlements/entitlements-query'
 import { getOrganizations } from '@/data/organizations/organizations-query'
 import { getProjectDetail } from '@/data/projects/project-detail-query'
-import { getOrgSubscription } from '@/data/subscriptions/org-subscription-query'
 import { getAiOptInLevel, type AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 export type AIDetails = {
   aiOptInLevel: AiOptInLevel
   hasAccessToAdvanceModel: boolean
-  hasHipaaAddon: boolean | undefined
   orgId: number | undefined
   orgSlug: string | undefined
   planId: string | undefined
   region: string | undefined
-  isSensitive: boolean | null | undefined
-  // True when HIPAA forced the opt-in level to `disabled`, rather than the org choosing it.
-  isRestrictedByHipaa: boolean
+  /** "High Compliance" in the dashboard, `is_sensitive` in the platform API. */
+  isHighComplianceProject: boolean | undefined
 }
 
 // Resolves the AI opt-in level, model access and tracing inputs for one org/project pair.
@@ -36,19 +32,17 @@ export const getAIDetails = async ({
     ...(authorization && { Authorization: authorization }),
   }
 
-  const [organizations, subscription, advanceModelAccess, project, projectSettings] =
-    await Promise.all([
-      getOrganizations({ headers }),
-      getOrgSubscription({ orgSlug }, undefined, headers),
-      checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
-      // skipWake: only organization_id and region are needed, neither requires a running project
-      getProjectDetail({ ref: projectRef, skipWake: true }, undefined, headers),
-      getProjectSettings({ projectRef }, undefined, headers),
-    ])
+  const [organizations, advanceModelAccess, project, projectSettings] = await Promise.all([
+    getOrganizations({ headers }),
+    checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
+    // skipWake: only organization_id and region are needed, neither requires a running project
+    getProjectDetail({ ref: projectRef, skipWake: true }, undefined, headers),
+    getProjectSettings({ projectRef }, undefined, headers),
+  ])
 
   const selectedOrg = organizations.find((org) => org.slug === orgSlug)
   const region = project?.region
-  const isSensitive = projectSettings?.is_sensitive
+  const isHighComplianceProject = projectSettings?.is_sensitive ?? undefined
 
   const isProjectInOrg = selectedOrg !== undefined && project?.organization_id === selectedOrg.id
 
@@ -56,31 +50,22 @@ export const getAIDetails = async ({
     return {
       aiOptInLevel: 'disabled',
       hasAccessToAdvanceModel: false,
-      // Undefined rather than false so isTracingAllowed fails closed
-      hasHipaaAddon: undefined,
       orgId: undefined,
       orgSlug: undefined,
       planId: undefined,
-      region,
-      isSensitive,
-      isRestrictedByHipaa: false,
+      // Undefined rather than the real region so isTracingAllowed fails closed
+      region: undefined,
+      isHighComplianceProject: undefined,
     }
   }
 
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-
-  // Mirrors the client-side gate in useOrgAiOptInLevel, which had no server-side equivalent
-  const isRestrictedByHipaa = hasHipaaAddon && isSensitive !== false
-
   return {
-    aiOptInLevel: isRestrictedByHipaa ? 'disabled' : getAiOptInLevel(selectedOrg.opt_in_tags),
+    aiOptInLevel: getAiOptInLevel(selectedOrg.opt_in_tags),
     hasAccessToAdvanceModel: advanceModelAccess.hasAccess,
-    hasHipaaAddon,
     orgId: selectedOrg.id,
     orgSlug: selectedOrg.slug,
     planId: selectedOrg.plan.id,
     region,
-    isSensitive,
-    isRestrictedByHipaa,
+    isHighComplianceProject,
   }
 }

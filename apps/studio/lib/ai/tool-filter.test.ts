@@ -8,13 +8,72 @@ import {
   TOOL_CATEGORIES,
   TOOL_CATEGORY_MAP,
   toolSetValidationSchema,
+  withoutApprovalTools,
 } from './tool-filter'
+import { contract as createNotebookContract } from './tools/create-notebook'
+import { contract as deleteNotebookContract } from './tools/delete-notebook'
+import { contract as getNotebookContract } from './tools/get-notebook'
+import { contract as getReportContract } from './tools/get-report'
+import { contract as listDatabasesContract } from './tools/list-databases'
+import { contract as listNotebooksContract } from './tools/list-notebooks'
+import { contract as listPoliciesContract } from './tools/list-policies'
+import { contract as listReportsContract } from './tools/list-reports'
+import { getRemoteToolContract, getToolContract } from './tools/registry'
+import { contract as runNotebookContract } from './tools/run-notebook'
+import { contract as updateNotebookContract } from './tools/update-notebook'
 
 describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
-    expect(TOOL_CATEGORY_MAP['execute_sql']).toBe(TOOL_CATEGORIES.UI)
-    expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
-    expect(TOOL_CATEGORY_MAP['run_notebook']).toBe(TOOL_CATEGORIES.SCHEMA)
+    expect(TOOL_CATEGORY_MAP['getSchemaTables']).toBe(TOOL_CATEGORIES.SCHEMA)
+  })
+})
+
+describe('tools with a contract', () => {
+  const contracts = {
+    create_notebook: createNotebookContract,
+    delete_notebook: deleteNotebookContract,
+    get_notebook: getNotebookContract,
+    get_report: getReportContract,
+    list_databases: listDatabasesContract,
+    list_notebooks: listNotebooksContract,
+    list_policies: listPoliciesContract,
+    list_reports: listReportsContract,
+    run_notebook: runNotebookContract,
+    update_notebook: updateNotebookContract,
+  }
+
+  it.each(Object.entries(contracts))(
+    '%s is gated by the contract minOptInLevel, not the category map',
+    (name, contract) => {
+      const tools = {
+        [name]: { description: 'A notebook tool', execute: vitest.fn() },
+      } as unknown as ToolSet
+
+      expect(contract.minOptInLevel).toBe('schema')
+      expect(Object.hasOwn(TOOL_CATEGORY_MAP, name)).toBe(false)
+
+      const blocked = filterToolsByOptInLevel(tools, 'disabled')[name]
+      const allowed = filterToolsByOptInLevel(tools, 'schema')[name]
+
+      expect(blocked.description).toContain('Requires opting in')
+      expect(allowed.description).toBe('A notebook tool')
+    }
+  )
+})
+
+describe('always-available tools with a contract', () => {
+  it.each([
+    'escalate_to_human',
+    'resolve_support_conversation',
+    'get_active_incidents',
+    'search_docs',
+  ])('%s is allowed at every opt-in level', (name) => {
+    const tools = {
+      [name]: { description: 'A tool', execute: vitest.fn() },
+    } as unknown as ToolSet
+
+    expect((getToolContract(name) ?? getRemoteToolContract(name))?.minOptInLevel).toBeNull()
+    expect(filterToolsByOptInLevel(tools, 'disabled')[name].description).toBe('A tool')
   })
 })
 
@@ -38,7 +97,7 @@ describe('tool allowance by opt-in level', () => {
       query_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
 
-    const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any, false)
+    const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any)
     const allowedTools: string[] = []
 
     Object.entries(filtered).forEach(([toolName, tool]) => {
@@ -147,7 +206,7 @@ describe('filterToolsByOptInLevel', () => {
 
     return (
       parsedResult.success &&
-      parsedResult.data.status.includes("You don't have permission to use this tool")
+      parsedResult.data.status.includes('This tool needs a higher opt-in level')
     )
   }
 
@@ -163,14 +222,14 @@ describe('filterToolsByOptInLevel', () => {
   }
 
   it('should filter out unknown tools entirely', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'disabled', false)
+    const tools = filterToolsByOptInLevel(mockTools, 'disabled')
 
     // Unknown tools should be completely filtered out (not present in result)
     expect(tools).not.toHaveProperty('some_other_tool')
   })
 
   it('should always allow UI tools regardless of opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'disabled', false)
+    const tools = filterToolsByOptInLevel(mockTools, 'disabled')
 
     expect(tools).toHaveProperty('execute_sql')
     expect(tools).toHaveProperty('deploy_edge_function')
@@ -189,7 +248,7 @@ describe('filterToolsByOptInLevel', () => {
   })
 
   it('should stub all managed tools for disabled opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'disabled', false)
+    const tools = filterToolsByOptInLevel(mockTools, 'disabled')
 
     await expectStubsFor(tools, [
       'list_tables',
@@ -203,7 +262,7 @@ describe('filterToolsByOptInLevel', () => {
   })
 
   it('should stub log tools for schema opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'schema', false)
+    const tools = filterToolsByOptInLevel(mockTools, 'schema')
 
     await expectStubsFor(tools, ['get_advisors', 'query_logs'])
   })
@@ -211,7 +270,7 @@ describe('filterToolsByOptInLevel', () => {
   // No execute_sql tool, so nothing additional to stub for schema_and_log opt-in level
 
   it('should not stub any tools for schema_and_log_and_data opt-in level', async () => {
-    const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data', false)
+    const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data')
 
     await expectStubsFor(tools, [])
   })
@@ -226,33 +285,15 @@ describe('createPrivacyMessageTool', () => {
       toModelOutput: vitest.fn(),
     }
 
-    const privacyTool = createPrivacyMessageTool(originalTool, false)
+    const privacyTool = createPrivacyMessageTool(originalTool)
 
     expect(privacyTool.description).toContain('Original description')
     expect(privacyTool.description).toContain('Requires opting in')
     expect(privacyTool.toModelOutput).toBeUndefined()
 
     const result = await privacyTool.execute({}, {})
-    expect(result.status).toContain("You don't have permission to use this tool")
+    expect(result.status).toContain('This tool needs a higher opt-in level')
     expect(result.status).toContain('third-party AI providers')
-  })
-
-  it('uses HIPAA copy when the project is HIPAA-restricted', async () => {
-    const originalTool = {
-      description: 'Original description',
-      inputSchema: z.object({}),
-      execute: vitest.fn(),
-    }
-
-    const hipaaTool = createPrivacyMessageTool(originalTool, true)
-    const optInTool = createPrivacyMessageTool(originalTool, false)
-
-    const hipaaStatus = (await hipaaTool.execute({}, {})).status
-    const optInStatus = (await optInTool.execute({}, {})).status
-
-    expect(hipaaStatus).toContain('HIPAA')
-    expect(hipaaStatus).not.toEqual(optInStatus)
-    expect(hipaaTool.description).not.toEqual(optInTool.description)
   })
 })
 
@@ -311,5 +352,22 @@ describe('toolSetValidationSchema', () => {
 
     const incompleteValidationResult = toolSetValidationSchema.safeParse(incompleteTools)
     expect(incompleteValidationResult.success).toBe(true) // Should still pass as we allow subsets
+  })
+})
+
+describe('withoutApprovalTools', () => {
+  const makeTool = (needsApproval?: Tool['needsApproval']) =>
+    ({ description: 'A tool', execute: vitest.fn(), needsApproval }) as unknown as Tool
+
+  it('keeps tools without approval and drops gated ones', () => {
+    const tools: ToolSet = {
+      unset: makeTool(undefined),
+      off: makeTool(false),
+      on: makeTool(true),
+      conditional: makeTool(() => false),
+      stub: createPrivacyMessageTool(makeTool(true)) as Tool,
+    }
+
+    expect(Object.keys(withoutApprovalTools(tools))).toEqual(['unset', 'off'])
   })
 })

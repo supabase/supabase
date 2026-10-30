@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { LogsTableName } from './Logs.constants'
 import type { Filters, LogData } from './Logs.types'
@@ -13,7 +13,6 @@ import {
   genChartQuery,
   genDefaultQuery,
   getAuthLogSeverity,
-  getShiftClickSelection,
   parseMultigresEventMessage,
 } from './Logs.utils'
 
@@ -140,12 +139,34 @@ describe('Logs.utils', () => {
   })
 
   describe('buildLogsPrompt', () => {
+    test.each([
+      '2026-10-27T10:15:00.000000',
+      '2026-10-27 10:15:00.000000',
+      '2026-10-27T10:15:00Z',
+      '2026-10-27T11:15:00+01:00',
+    ])(
+      'preserves the UTC log time in Assistant prompts regardless of the local timezone: %s',
+      (timestamp) => {
+        vi.stubEnv('TZ', 'Europe/Madrid')
+        try {
+          expect(new Date('2026-10-27T10:15:00').getTimezoneOffset()).toBe(-60)
+          const prompt = buildLogsPrompt([
+            { id: 'log', timestamp, event_message: 'Function failed' },
+          ])
+          expect(prompt).toContain('**Timestamp:** 2026-10-27T10:15:00.000Z')
+        } finally {
+          vi.unstubAllEnvs()
+        }
+      }
+    )
+
     test('builds prompt with single log', () => {
       const rows: LogData[] = [createLog({ id: '1', event_message: 'error occurred' })]
       const result = buildLogsPrompt(rows)
       expect(result).toContain('1 Supabase log entry')
       expect(result).toContain('error occurred')
       expect(result).toContain('What do these logs indicate')
+      expect(result).not.toContain('more matching log')
     })
 
     test('builds prompt with multiple logs', () => {
@@ -157,10 +178,24 @@ describe('Logs.utils', () => {
       expect(result).toContain('2 Supabase log entries')
     })
 
-    test('handles singular correctly', () => {
-      const rows: LogData[] = [createLog({ id: '1', event_message: 'single error' })]
-      const result = buildLogsPrompt(rows)
-      expect(result).toContain('1 Supabase log entry')
+    test.each([
+      [1, '+1 more matching log entry not included.'],
+      [45, '+45 more matching log entries not included.'],
+      [1234, '+1,234 more matching log entries not included.'],
+    ])('tells the assistant that %i matching preview logs were omitted', (omittedCount, note) => {
+      const rows: LogData[] = [createLog({ id: '1', event_message: 'latest error' })]
+      const result = buildLogsPrompt(rows, {
+        queryType: 'functions',
+        sqlQuery: 'select event_message from function_logs limit 1',
+        omittedCount,
+      })
+      expect(result).toContain('from the **Edge Functions** service')
+      expect(result).toContain('latest error')
+      expect(result.indexOf('latest error')).toBeLessThan(result.indexOf(note))
+      expect(result).toContain(note)
+      expect(result).toContain(
+        '**Query used:**\n```sql\nselect event_message from function_logs limit 1\n```'
+      )
     })
   })
 
@@ -169,18 +204,12 @@ describe('Logs.utils', () => {
       expect(extractEdgeFunctionName('/functions/v1/hello-world-1')).toBe('hello-world-1')
     })
 
-    test('returns empty string for null', () => {
-      expect(extractEdgeFunctionName(null)).toBe('')
-    })
-
-    test('returns empty string for undefined', () => {
-      expect(extractEdgeFunctionName(undefined)).toBe('')
-    })
-
-    test('returns empty string for non-string values', () => {
-      expect(extractEdgeFunctionName(42)).toBe('')
-      expect(extractEdgeFunctionName({})).toBe('')
-    })
+    test.each([null, undefined, 42, {}])(
+      'returns empty string for non-string value %o',
+      (value) => {
+        expect(extractEdgeFunctionName(value)).toBe('')
+      }
+    )
 
     test('handles pathname with no slashes', () => {
       expect(extractEdgeFunctionName('my-function')).toBe('my-function')
@@ -350,122 +379,6 @@ describe('Logs.utils', () => {
       expect(() =>
         ensureNoTimestampConflict(['not-a-date', 'also-bad'], ['', '2024-01-01T00:00:00.000Z'])
       ).not.toThrow()
-    })
-  })
-
-  describe('getShiftClickSelection', () => {
-    const orderedKeys = ['a', 'b', 'c', 'd', 'e']
-
-    test('selects the range downward from the anchor', () => {
-      const result = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(['b']),
-        anchorKey: 'b',
-        targetKey: 'd',
-      })
-      expect([...result].sort()).toEqual(['b', 'c', 'd'])
-    })
-
-    test('selects the range upward from the anchor', () => {
-      const result = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(['d']),
-        anchorKey: 'd',
-        targetKey: 'b',
-      })
-      expect([...result].sort()).toEqual(['b', 'c', 'd'])
-    })
-
-    test('toggles just the anchor when it is also the target', () => {
-      const added = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(),
-        anchorKey: 'c',
-        targetKey: 'c',
-      })
-      expect([...added]).toEqual(['c'])
-
-      const removed = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(['c']),
-        anchorKey: 'c',
-        targetKey: 'c',
-      })
-      expect([...removed]).toEqual([])
-    })
-
-    test('removes the range when it is already fully selected, keeping keys outside it', () => {
-      const result = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(['a', 'b', 'c', 'd']),
-        anchorKey: 'b',
-        targetKey: 'd',
-      })
-      expect([...result].sort()).toEqual(['a'])
-    })
-
-    test('selects the whole range when it is only partially selected', () => {
-      const result = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(['c']),
-        anchorKey: 'b',
-        targetKey: 'd',
-      })
-      expect([...result].sort()).toEqual(['b', 'c', 'd'])
-    })
-
-    test('falls back to adding the target when there is no anchor', () => {
-      const result = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(['a']),
-        anchorKey: null,
-        targetKey: 'c',
-      })
-      expect([...result].sort()).toEqual(['a', 'c'])
-    })
-
-    test('falls back to removing the target when there is no anchor and it is selected', () => {
-      const result = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(['a', 'c']),
-        anchorKey: null,
-        targetKey: 'c',
-      })
-      expect([...result].sort()).toEqual(['a'])
-    })
-
-    test('falls back to a plain toggle when the anchor is no longer in the rows', () => {
-      const result = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(),
-        anchorKey: 'gone',
-        targetKey: 'd',
-      })
-      expect([...result]).toEqual(['d'])
-    })
-
-    test('falls back to a plain toggle when the target is not in the rows', () => {
-      const result = getShiftClickSelection({
-        orderedKeys,
-        selectedKeys: new Set(['a']),
-        anchorKey: 'a',
-        targetKey: 'gone',
-      })
-      expect([...result].sort()).toEqual(['a', 'gone'])
-    })
-
-    test('does not mutate its inputs', () => {
-      const selectedKeys = new Set(['b'])
-      const keys = [...orderedKeys]
-      const result = getShiftClickSelection({
-        orderedKeys: keys,
-        selectedKeys,
-        anchorKey: 'b',
-        targetKey: 'd',
-      })
-      expect(result).not.toBe(selectedKeys)
-      expect([...selectedKeys]).toEqual(['b'])
-      expect(keys).toEqual(orderedKeys)
     })
   })
 })

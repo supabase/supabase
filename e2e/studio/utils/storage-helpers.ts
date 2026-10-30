@@ -176,7 +176,9 @@ export const uploadFile = async (page: Page, filePath: string, fileName: string)
   const fileInput = page.locator('input[type="file"]')
   await fileInput.setInputFiles(filePath)
 
-  await expect(page.getByRole('status')).not.toBeVisible()
+  // Wait out the upload progress toast. Scoped to the toast itself — a page-wide
+  // `getByRole('status')` also matches any live region the explorer renders.
+  await expect(page.locator('[data-sonner-toast]')).not.toBeVisible()
   // Verify file appears in the explorer by title
   await expect(
     page.getByTitle(fileName),
@@ -200,8 +202,9 @@ export const deleteItem = async (page: Page, itemName: string) => {
   // Click delete option from context menu
   await page.getByRole('menuitem', { name: 'Delete' }).click()
 
-  // Confirm deletion in the modal
-  await page.getByRole('button', { name: 'Submit' }).click()
+  // Confirm deletion in the modal. The label says what it does rather than
+  // carrying ConfirmationModal's "Submit" default.
+  await page.getByRole('button', { name: 'Delete', exact: true }).click()
 
   // Wait for deletion to complete
   await page.waitForTimeout(1000)

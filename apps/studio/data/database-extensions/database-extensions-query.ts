@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { databaseExtensionsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -24,7 +25,13 @@ export async function getDatabaseExtensions(
 ) {
   const sql = getDatabaseExtensionsSQL()
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['database-extensions'] },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['database-extensions'],
+      grant: unguarded.migrating,
+    },
     signal
   )
   return (Array.isArray(result) ? result : EMPTY_ARR) as DatabaseExtension[]

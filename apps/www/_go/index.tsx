@@ -6,6 +6,8 @@ import aiEngineerEuropeContestThankYou from './events/ai-engineer-europe-2026/co
 import datadogContest from './events/dash-2026/contest'
 import datadogDinner from './events/dash-2026/exec-dinner'
 import datadogContestThankYou from './events/dash-2026/exec-dinner-thank-you'
+import pgDownUnder2026Contest from './events/pg-down-under-2026/contest'
+import pgDownUnder2026ContestThankYou from './events/pg-down-under-2026/contest-thank-you'
 import pgconfDev2026Contest from './events/pgconf-dev-2026/contest'
 import pgconfDev2026ContestThankYou from './events/pgconf-dev-2026/contest-thank-you'
 import postgresSummit2026Contest from './events/postgres-summit-2026/contest'
@@ -29,22 +31,24 @@ import stripeMeetingScheduler from './events/stripe-sessions-2026/meeting-schedu
 import stripeParty from './events/stripe-sessions-2026/party'
 import vercelShipSydneyContest from './events/vercel-ship-sydney-2026/contest'
 import vercelShipSydneyContestThankYou from './events/vercel-ship-sydney-2026/contest-thank-you'
+import askSupabaseSelect from './lead-gen/ask-supabase-select'
 import awsActivateOffer from './lead-gen/aws-activate-offer'
 import exampleLeadGen from './lead-gen/example-lead-gen'
 import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
 import contestRules from './legal/contest-rules'
 import byocEarlyAccess from './pre-release/byoc-early-access'
-import supabasePipelinesNewDestinations from './pre-release/supabase-pipelines-new-destinations'
-import supabasePipelinesNewDestinationsThankYou from './pre-release/supabase-pipelines-new-destinations-thank-you'
+import multigresEarlyAccess from './pre-release/multigres-early-access'
+import multigresEarlyAccessThankYou from './pre-release/multigres-early-access-thank-you'
 import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 
 const pages: GoPageInput[] = [
+  askSupabaseSelect, // maintain forever
   awsActivateOffer, // maintain forever
   exampleLeadGen, // sample lead gen page
   byocEarlyAccess, // maintain until PM says to remove
-  supabasePipelinesNewDestinations, // maintain while Pipelines destination early access is active
-  supabasePipelinesNewDestinationsThankYou, // maintain while Pipelines destination early access is active
+  multigresEarlyAccess, // maintain while the Multigres private alpha is active
+  multigresEarlyAccessThankYou, // maintain while the Multigres private alpha is active
   amoe, // maintain forever
   amoeThankYou, // maintain forever
   contestRules, // maintain forever
@@ -58,6 +62,8 @@ const pages: GoPageInput[] = [
   postgresconfContestThankYou, // remove after May 31, 2026
   pgconfDev2026Contest, // remove after May 31, 2026
   pgconfDev2026ContestThankYou, // remove after May 31, 2026
+  pgDownUnder2026Contest, // remove after November 30, 2026
+  pgDownUnder2026ContestThankYou, // remove after November 30, 2026
   postgresSummit2026Contest, // remove after October 31, 2026
   postgresSummit2026ContestThankYou, // remove after October 31, 2026
   datadogContest, // remove after June 30, 2026

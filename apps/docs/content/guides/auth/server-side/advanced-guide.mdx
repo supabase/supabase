@@ -26,8 +26,6 @@ To maintain the session, these tokens must be stored in a storage medium securel
 
 ## Frequently asked questions
 
-{/* supa-mdx-lint-disable Rule004ExcludeWords */}
-
 ### No session on the server side with Next.js route prefetching?
 
 When you use route prefetching in Next.js using `<Link href="/...">` components or the `Router.push()` APIs can send server-side requests before the browser processes the access and refresh tokens. This means that those requests may not have any cookies set and your server code will render unauthenticated content.
@@ -36,9 +34,7 @@ To improve experience for your users, we recommend redirecting users to one spec
 
 ### How do I make the cookies `HttpOnly`?
 
-This is not necessary. Both the access token and refresh token are designed to be passed around to different components in your application. The browser-based side of your application needs access to the refresh token to properly maintain a browser session anyway.
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+This is not necessary. Both the access token and refresh token are designed to be passed around to different components in your application. The browser-based side of your application needs access to the refresh token to properly maintain a browser session anyway. See also [How do I make the cookies HttpOnly](/kb/troubleshooting/how-do-i-make-the-cookies-httponly-vwweFx).
 
 ### My server is getting invalid refresh token errors. What's going on?
 
@@ -50,7 +46,7 @@ A common cause is calling `supabase.auth.signOut()` without a `scope`. It defaul
 
 ### Should I set a shorter `Max-Age` parameter on the cookies?
 
-The `Max-Age` or `Expires` cookie parameters only control whether the browser sends the value to the server. Since a refresh token represents the long-lived authentication session of the user on that browser, setting a short `Max-Age` or `Expires` parameter on the cookies only results in a degraded user experience.
+The `Max-Age` or `Expires` [cookie parameters](/kb/troubleshooting/should-i-set-a-shorter-max-age-parameter-on-the-cookies-8sbF4V) only control whether the browser sends the value to the server. Since a refresh token represents the long-lived authentication session of the user on that browser, setting a short `Max-Age` or `Expires` parameter on the cookies only results in a degraded user experience.
 
 The only way to detect that a session ended server-side, for example because the user signed out on another device, is to fetch the user with `getUser()`. `getClaims()` verifies the token's signature and expiry, which is what authorizes a request, but an unexpired token stays valid even when the session behind it was revoked. Call `getUser()` where that gap matters.
 

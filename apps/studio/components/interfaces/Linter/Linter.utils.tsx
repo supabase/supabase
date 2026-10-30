@@ -1,20 +1,19 @@
 import {
-  Activity,
-  AlertTriangle,
-  Box,
-  Clock,
-  Database,
-  Eye,
-  Gauge,
-  Lock,
+  ActivityIcon,
+  AlertTriangleIcon,
+  BoxIcon,
+  ClockIcon,
+  DatabaseIcon,
+  EyeIcon,
+  GaugeIcon,
   LockIcon,
-  Ruler,
-  Scaling,
-  Server,
-  Table2,
-  TextSearch,
-  Unlock,
-  User,
+  RulerIcon,
+  ScalingIcon,
+  ServerIcon,
+  Table2Icon,
+  TextSearchIcon,
+  UnlockIcon,
+  UserIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
@@ -29,7 +28,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'unindexed_foreign_keys',
     title: 'Unindexed foreign keys',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/indexes?schema=${encodeURIComponent(metadata?.schema ?? '')}`,
     linkText: 'Create an index',
@@ -39,7 +38,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'auth_users_exposed',
     title: 'Exposed Auth Users',
-    icon: <Lock className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/editor`,
     linkText: 'View table',
     docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0002_auth_users_exposed`,
@@ -48,7 +47,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'auth_rls_initplan',
     title: 'Auth RLS Initialization Plan',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/database/policies`,
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0003_auth_rls_initplan`,
@@ -57,7 +56,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'no_primary_key',
     title: 'No Primary Key',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/editor`,
     linkText: 'View table',
     docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0004_no_primary_key`,
@@ -66,7 +65,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'unused_index',
     title: 'Unused Index',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/indexes?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View index',
@@ -76,7 +75,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'multiple_permissive_policies',
     title: 'Multiple Permissive Policies',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
@@ -86,7 +85,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'policy_exists_rls_disabled',
     title: 'Policy Exists RLS Disabled',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
@@ -96,7 +95,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'rls_enabled_no_policy',
     title: 'RLS Enabled No Policy',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View table',
@@ -106,7 +105,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'duplicate_index',
     title: 'Duplicate Index',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/indexes?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View index',
@@ -116,7 +115,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'security_definer_view',
     title: 'Security Definer View',
-    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <EyeIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: () =>
       `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0010_security_definer_view`,
     linkText: 'View docs',
@@ -126,7 +125,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'function_search_path_mutable',
     title: 'Function Search Path Mutable',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/functions?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View functions',
@@ -136,7 +135,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'auth_allow_anonymous_sign_ins',
     title: 'Anonymous Sign-Ins Allowed',
-    icon: <User className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <UserIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0012_auth_allow_anonymous_sign_ins`,
@@ -145,7 +144,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'rls_disabled_in_public',
     title: 'RLS Disabled in Public',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
@@ -155,7 +154,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'extension_in_public',
     title: 'Extension in Public',
-    icon: <Unlock className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <UnlockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/extensions?filter=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View extension',
@@ -165,7 +164,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'auth_otp_long_expiry',
     title: 'Auth OTP Long Expiry',
-    icon: <Clock className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <ClockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/going-into-prod#security`,
@@ -174,7 +173,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'auth_otp_short_length',
     title: 'Auth OTP Short Length',
-    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <RulerIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/going-into-prod#security`,
@@ -183,7 +182,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'auth_db_connections_absolute',
     title: 'Auth Absolute Connection Management Strategy',
-    icon: <Scaling className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <ScalingIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/performance`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/going-into-prod`,
@@ -192,7 +191,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'rls_references_user_metadata',
     title: 'RLS references user metadata',
-    icon: <User className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <UserIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/database/policies`,
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/observability/advisors?queryGroups=lint&lint=0015_rls_references_user_metadata`,
@@ -201,7 +200,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'materialized_view_in_api',
     title: 'Materialized View in API',
-    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <EyeIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: () => `${DOCS_URL}/guides/observability/advisors?lint=0016_materialized_view_in_api`,
     linkText: 'View docs',
     docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0016_materialized_view_in_api`,
@@ -210,7 +209,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'foreign_table_in_api',
     title: 'Foreign Table in API',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: () => `${DOCS_URL}/guides/observability/advisors?lint=0017_foreign_table_in_api`,
     linkText: 'View docs',
     docsLink: `${DOCS_URL}/guides/observability/advisors?lint=0017_foreign_table_in_api`,
@@ -219,7 +218,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'unsupported_reg_types',
     title: 'Unsupported reg types',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: () =>
       `${DOCS_URL}/guides/observability/advisors?lint=0018_unsupported_reg_types&queryGroups=lint`,
     linkText: 'View docs',
@@ -229,7 +228,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'ssl_not_enforced',
     title: 'SSL not enforced',
-    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <RulerIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/database/settings`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/ssl-enforcement`,
@@ -238,7 +237,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'network_restrictions_not_set',
     title: 'No network restrictions',
-    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <RulerIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/database/settings`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/network-restrictions`,
@@ -247,7 +246,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'password_requirements_min_length',
     title: 'Minimum password length not set or inadequate',
-    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <RulerIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/providers?provider=Email`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/going-into-prod#security`,
@@ -256,7 +255,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'pitr_not_enabled',
     title: 'PITR not enabled',
-    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <RulerIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/database/backups/pitr`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/backups#point-in-time-recovery`,
@@ -265,7 +264,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'pitr_archiving_stale',
     title: 'PITR archiving may be broken',
-    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <RulerIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/database/backups/pitr`,
     linkText: 'View settings',
     // anchor explains what PITR is, not how to fix a stale archive; PITR-archiving-specific docs tracked in TODO: INDATA-1149
@@ -305,7 +304,7 @@ export const lintInfoMap: LintInfo[] = [
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/settings/api-keys`,
     linkText: 'View settings',
-    docsLink: `${DOCS_URL}/guides/api/api-keys#the-servicerole-key`,
+    docsLink: `${DOCS_URL}/guides/security/rotate-leaked-api-keys`,
     category: 'security',
   },
   {
@@ -329,7 +328,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'sensitive_columns_exposed',
     title: 'Sensitive Columns Exposed',
-    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <EyeIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/editor?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View table',
@@ -339,7 +338,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'rls_policy_always_true',
     title: 'RLS Policy Always True',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    icon: <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
@@ -349,7 +348,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'public_bucket_allows_listing',
     title: 'Public Bucket Allows Listing',
-    icon: <Box className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <BoxIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef, metadata }) => {
       const bucketId = (metadata as Record<string, string | undefined> | undefined)?.bucket_id
       return `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId ?? metadata?.name ?? '')}`
@@ -361,7 +360,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'pg_graphql_anon_table_exposed',
     title: 'Public Can See Object in GraphQL Schema',
-    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <EyeIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/editor?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View object',
@@ -371,7 +370,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'pg_graphql_authenticated_table_exposed',
     title: 'Signed-In Users Can See Object in GraphQL Schema',
-    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <EyeIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef, metadata }) =>
       `/project/${projectRef}/editor?schema=${encodeURIComponent(metadata?.schema ?? '')}&table=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View object',
@@ -403,7 +402,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'instance_db_down',
     title: 'Database process is down',
-    icon: <Database className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <DatabaseIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/logs/postgres-logs`,
     linkText: 'View database logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
@@ -412,7 +411,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'db_not_reachable',
     title: 'Database not usable',
-    icon: <Server className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <ServerIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/database/settings`,
     linkText: 'View connection settings',
     docsLink: `${DOCS_URL}/guides/database/connecting-to-postgres`,
@@ -421,7 +420,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'db_connection_limit_reached',
     title: 'Database connection limit reached',
-    icon: <Gauge className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <GaugeIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/observability/connections`,
     linkText: 'View connections',
     docsLink: `${DOCS_URL}/guides/database/connection-management`,
@@ -430,7 +429,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'log_data_api_error_rate_high',
     title: 'Data API error rate is persistently high',
-    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
     linkText: 'View logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
@@ -439,7 +438,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'log_auth_error_rate_high',
     title: 'Auth error rate is persistently high',
-    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
     linkText: 'View logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
@@ -448,7 +447,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'log_storage_error_rate_high',
     title: 'Storage error rate is persistently high',
-    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
     linkText: 'View logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
@@ -457,7 +456,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'log_edge_function_error_rate_high',
     title: 'Edge Function error rate is persistently high',
-    icon: <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/logs/edge-logs`,
     linkText: 'View logs',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
@@ -466,7 +465,7 @@ export const lintInfoMap: LintInfo[] = [
   {
     name: 'instance_alert_firing',
     title: 'Infrastructure alerts firing',
-    icon: <AlertTriangle className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    icon: <AlertTriangleIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />,
     link: ({ projectRef }) => `/project/${projectRef}/settings/infrastructure`,
     linkText: 'View infrastructure',
     docsLink: `${DOCS_URL}/guides/platform/troubleshooting`,
@@ -518,15 +517,15 @@ export const LintCTA = ({
 export const EntityTypeIcon = ({ type }: { type: string | undefined }) => {
   switch (type) {
     case 'table':
-      return <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />
+      return <Table2Icon className="text-foreground-muted" size={15} strokeWidth={1} />
     case 'view':
-      return <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />
+      return <EyeIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />
     case 'auth':
-      return <Lock className="text-foreground-muted" size={15} strokeWidth={1.5} />
+      return <LockIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />
     case 'health':
-      return <Activity className="text-foreground-muted" size={15} strokeWidth={1.5} />
+      return <ActivityIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />
     default:
-      return <Box className="text-foreground-muted" size={15} strokeWidth={1.5} />
+      return <BoxIcon className="text-foreground-muted" size={15} strokeWidth={1.5} />
   }
 }
 
@@ -546,7 +545,7 @@ export const NoIssuesFound = ({ level }: { level: string }) => {
   const noun = level === LINTER_LEVELS.ERROR ? 'errors' : 'warnings'
   return (
     <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-      <TextSearch className="text-foreground-muted" strokeWidth={1} />
+      <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
       <div className="text-center">
         <p className="text-foreground">No {noun} detected</p>
         <p className="text-foreground-light">

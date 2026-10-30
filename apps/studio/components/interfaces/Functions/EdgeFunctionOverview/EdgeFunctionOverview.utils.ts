@@ -5,6 +5,8 @@ import sumBy from 'lodash/sumBy'
 import type { ChartConfig } from 'ui'
 
 import { calculateBarClickTimeRange } from '@/components/interfaces/Settings/Logs/LogsBarChart.utils'
+import type { UnifiedLogsScope } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { serializeUnifiedLogsSearchParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import type { ChartIntervals } from '@/types'
 
 export type EdgeFunctionChartRawDatum = {
@@ -84,7 +86,7 @@ export const EDGE_FUNCTION_CHART_INTERVALS: ChartIntervals[] = [
 export const INVOCATION_CHART_CONFIG = {
   ok_count: {
     label: 'Ok',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
   warning_count: {
     label: 'Warnings',
@@ -99,7 +101,7 @@ export const INVOCATION_CHART_CONFIG = {
 export const CPU_TIME_CHART_CONFIG = {
   max_cpu_time_used: {
     label: 'Max CPU Time',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
 } satisfies ChartConfig
 
@@ -110,31 +112,19 @@ export const EXECUTION_TIME_CHART_CONFIG = {
   },
   max_execution_time: {
     label: 'Max Execution Time',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
 } satisfies ChartConfig
 
 export const MEMORY_CHART_CONFIG = {
   avg_memory_used: {
     label: 'Memory Usage',
-    color: 'hsl(var(--brand-default))',
+    color: 'var(--primary-bright)',
   },
 } satisfies ChartConfig
 
 const toManipulateUnit = (unit: ChartIntervals['startUnit']) => unit as dayjs.ManipulateType
 const toNumber = (value: string | number | undefined) => Number(value ?? 0)
-
-export const getBucketedTimeRange = (
-  interval: ChartIntervals,
-  now: Date = new Date()
-): [Date, Date] => {
-  const currentTime = dayjs(now)
-  const unit = toManipulateUnit(interval.startUnit)
-  const start = currentTime.subtract(interval.startValue, unit).startOf(unit)
-  const end = currentTime.startOf(unit)
-
-  return [start.toDate(), end.toDate()]
-}
 
 export const getRollingTimeRange = (
   interval: ChartIntervals,
@@ -162,9 +152,108 @@ export const getInvocationChartNavigationUrl = ({
   clickedTimestamp: string
 }) => {
   const { start, end } = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTimestamp)
-  const destination = isUnifiedLogsEnabled ? 'logs' : 'invocations'
 
-  return `/project/${projectRef}/functions/${functionSlug}/${destination}?its=${encodeURIComponent(start)}&ite=${encodeURIComponent(end)}`
+  if (isUnifiedLogsEnabled) {
+    return getEdgeFunctionLogsUrl({ projectRef, functionSlug, start, end })
+  }
+
+  return getLegacyEdgeFunctionLogsUrl({ projectRef, functionSlug, tab: 'invocations', start, end })
+}
+
+export const getEdgeFunctionLogsScope = (functionId: string): UnifiedLogsScope => ({
+  filters: [
+    { column: 'log_type', operator: '=', value: 'edge function' },
+    { column: 'log_type', operator: '=', value: 'edge function runtime' },
+    { column: 'function_id', operator: '=', value: functionId },
+  ],
+})
+
+export const EDGE_FUNCTION_LOGS_VIEW = {
+  offeredFilters: ['date', 'log_type', 'level', 'event_message'],
+  columnPreferencesKey: 'edge-function',
+} as const
+
+export const getFunctionLogsDateRange = (start?: string, end?: string): Date[] | null => {
+  if (!start || !end) return null
+  const from = new Date(start)
+  const to = new Date(end)
+  if (!Number.isFinite(from.getTime()) || !Number.isFinite(to.getTime()) || from > to) return null
+  return [from, to]
+}
+
+export const getEdgeFunctionLogsUrl = ({
+  projectRef,
+  functionSlug,
+  start,
+  end,
+  filters,
+  logId,
+}: {
+  projectRef: string
+  functionSlug: string
+  start?: string
+  end?: string
+  filters?: readonly string[]
+  logId?: string
+}) =>
+  serializeUnifiedLogsSearchParams(`/project/${projectRef}/functions/${functionSlug}/logs`, {
+    filter: filters?.length ? [...filters] : null,
+    date: getFunctionLogsDateRange(start, end),
+    id: logId ?? null,
+  })
+
+export const getLegacyEdgeFunctionLogsUrl = ({
+  projectRef,
+  functionSlug,
+  tab,
+  start,
+  end,
+  logId,
+}: {
+  projectRef: string
+  functionSlug: string
+  tab: 'invocations' | 'logs'
+  start?: string
+  end?: string
+  logId?: string
+}) => {
+  const params = new URLSearchParams()
+  if (start && end) {
+    params.set('its', start)
+    params.set('ite', end)
+  }
+  if (logId) params.set('log', logId)
+
+  const query = params.toString()
+  return `/project/${projectRef}/functions/${functionSlug}/${tab}${query ? `?${query}` : ''}`
+}
+
+export function getFunctionOverviewLogsUrl({
+  projectRef,
+  functionSlug,
+  start,
+  end,
+  logType,
+  isUnifiedLogsEnabled,
+}: {
+  projectRef: string
+  functionSlug: string
+  start: string
+  end: string
+  logType: 'edge function' | 'edge function runtime'
+  isUnifiedLogsEnabled: boolean
+}) {
+  if (isUnifiedLogsEnabled) {
+    return getEdgeFunctionLogsUrl({
+      projectRef,
+      functionSlug,
+      start,
+      end,
+      filters: [`log_type:eq:${logType}`],
+    })
+  }
+  const destination = logType === 'edge function' ? 'invocations' : 'logs'
+  return `/project/${projectRef}/functions/${functionSlug}/${destination}?its=${start}`
 }
 
 export const formatChartTimestamp = (value: Date | string | number | undefined, format: string) => {

@@ -10,10 +10,10 @@ export const gettingStarted: SidebarNavGroup = {
       commandItemLabel: 'Introduction',
     },
     {
-      title: 'Quick Start',
+      title: 'Quickstart',
       href: '/docs/getting-started/quickstart',
       items: [],
-      commandItemLabel: 'Quick Start',
+      commandItemLabel: 'Quickstart',
     },
     {
       title: 'FAQ',
@@ -55,7 +55,7 @@ export const mcpBlocks: SidebarNavGroup = {
   items: [
     {
       title: 'MCP Server',
-      href: '/docs/headless/mcp-server',
+      href: '/docs/headless/mcp',
       items: [],
       new: true,
       commandItemLabel: 'MCP Server',
@@ -158,25 +158,6 @@ export const componentPages: SidebarNavGroup = {
     },
   ],
 }
-
-export const COMMAND_ITEMS = [
-  ...gettingStarted.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...componentPages.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...oauthBlocks.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...mcpBlocks.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-]
 
 // Framework titles for display
 export const frameworkTitles: Record<string, string> = {

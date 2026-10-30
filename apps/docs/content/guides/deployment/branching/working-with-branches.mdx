@@ -185,7 +185,7 @@ The preview branch inherits the migration history of your base project, so it on
 
 ### Default privileges on branches
 
-New branches are secure by default. They are created without [default privileges](/docs/guides/api/securing-your-api#default-privileges) on the `public` schema, regardless of the setting on your base project. New tables, functions, and sequences on a branch require explicit grants before `anon`, `authenticated`, or `service_role` can reach them through the Data API.
+New branches are secure by default. They are created without [default privileges](/docs/guides/api/securing-your-api#default-privileges) on the `public` schema, regardless of the setting on your base project. New tables and sequences on a branch require explicit grants before `anon`, `authenticated`, or `service_role` can reach them through the Data API. New functions stay callable, because Postgres grants `execute` on every new function to `PUBLIC`. For how to restrict them, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges).
 
 Your migrations control whether a branch re-enables these privileges. If your base project has default privileges enabled and your migration history was initialized by Supabase Branching or the Supabase CLI, the initial migration already contains the `alter default privileges` statements that grant access on `public`. Running it on a new branch restores the same access your base project has, so no changes are needed.
 
@@ -202,7 +202,7 @@ If your migration history was not initialized by Supabase Branching or the Supab
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Turn on default privileges on your base project" fullWidth>
 
-      Open the [Data API settings](/dashboard/project/_/integrations/data_api/settings) in the Supabase Dashboard and turn on **Default privileges for new entities**.
+      Open the [Data API settings](/dashboard/project/_/integrations/data_api/settings) in the Supabase Dashboard and turn on **Automatically expose new tables**.
 
     </StepHikeCompact.Details>
 
@@ -245,7 +245,7 @@ For improved security, we recommend not exposing the `public` schema automatical
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Turn off default privileges on your base project" fullWidth>
 
-      Open the [Data API settings](/dashboard/project/_/integrations/data_api/settings) in the Supabase Dashboard and turn off **Default privileges for new entities**.
+      Open the [Data API settings](/dashboard/project/_/integrations/data_api/settings) in the Supabase Dashboard and turn off **Automatically expose new tables**.
 
     </StepHikeCompact.Details>
 
@@ -268,6 +268,8 @@ For improved security, we recommend not exposing the `public` schema automatical
       alter default privileges for role postgres in schema public revoke usage, select, update on sequences from anon, authenticated, service_role;
       ```
 
+      These statements leave new tables with `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`, and leave new functions callable through `PUBLIC`. To also remove those privileges, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges).
+
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
@@ -284,7 +286,7 @@ For improved security, we recommend not exposing the `public` schema automatical
 
 ### Using ORM or custom seed scripts
 
-If you want to use your own ORM for managing migrations and seed scripts, you will need to run them in GitHub Actions after the preview branch is ready. The branch credentials can be fetched using the following example GHA workflow.
+If you want to use your own ORM for managing migrations and seed scripts, you will need to run them in [GitHub Actions](/docs/guides/deployment/managing-environments#configure-github-actions) after the preview branch is ready. The branch credentials can be fetched using the following example GHA workflow.
 
 ```yaml name=.github/workflows/custom-orm.yaml
 name: Custom ORM
@@ -358,6 +360,8 @@ You can develop with branches using either local or remote development workflows
 4. Test your changes locally
 5. Commit and push to GitHub
 6. Open a pull request to create a preview branch
+
+If your project uses [declarative schemas](/docs/guides/local-development/declarative-database-schemas), edit your files in `supabase/schemas/` and generate migrations with `supabase db schema declarative sync` instead of `supabase db diff`, which on `pg-delta` never uses your schema files as its baseline. If your project hasn't enabled `pg-delta`, follow [Declarative schemas on the legacy `migra` engine](/docs/guides/local-development/declarative-database-schemas#declarative-schemas-on-the-legacy-migra-engine) instead. Branching applies only committed migration files, so commit the schema files and the generated migrations together.
 
 ### Remote development workflow
 

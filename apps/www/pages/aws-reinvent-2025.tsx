@@ -48,7 +48,7 @@ const AWSReInvent2025: NextPage = () => {
                 <ul className="space-y-3 mb-8">
                   {data.consultationSection.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
-                      <CheckCircle className="size-4 lg:size-5 text-brand mt-1 lg:mt-0.5 shrink-0" />
+                      <CheckCircle className="size-4 lg:size-5 text-primary mt-1 lg:mt-0.5 shrink-0" />
                       <span className="text-foreground-light">{feature}</span>
                     </li>
                   ))}

@@ -1,5 +1,6 @@
 import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
 
+import { getMemoryCommitmentRanges } from './database-charts.utils'
 import {
   hasBurstableIO,
   mapComputeSizeNameToAddonVariantId,
@@ -13,6 +14,14 @@ import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability.consta
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
+// High Availability projects run on volumes without a burst credit pool, so the
+// Disk IO Burst Balance chart has no data to show for them.
+export const shouldShowDiskIOBurstBalanceChart = (
+  project: Project | undefined,
+  isFlagEnabled: boolean
+): boolean =>
+  isFlagEnabled && hasBurstableIO(project?.infra_compute_size) && !resolveHighAvailability(project)
+
 export const getReportAttributesV2: (
   entitledFeatures: string[],
   project: Project,
@@ -21,7 +30,8 @@ export const getReportAttributesV2: (
   pgBouncerMaxConnections?: number,
   isSpendCapEnabled?: boolean,
   showDiskIOBurstBalanceChart?: boolean,
-  showMemoryCommitmentChart?: boolean
+  showMemoryCommitmentChart?: boolean,
+  showMemoryCommitmentRiskZones?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
@@ -30,7 +40,8 @@ export const getReportAttributesV2: (
   pgBouncerMaxConnections,
   isSpendCapEnabled,
   showDiskIOBurstBalanceChart,
-  showMemoryCommitmentChart
+  showMemoryCommitmentChart,
+  showMemoryCommitmentRiskZones = true
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   // High Availability projects run Multigres, whose dedicated pooler is multipooler rather
@@ -42,12 +53,10 @@ export const getReportAttributesV2: (
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
-  // High Availability projects run on volumes without a burst credit pool, so the
-  // Disk IO Burst Balance chart has no data to show for them.
-  const showBurstBalanceChart =
-    !!showDiskIOBurstBalanceChart &&
-    hasBurstableIO(project?.infra_compute_size) &&
-    !isHighAvailability
+  const showBurstBalanceChart = shouldShowDiskIOBurstBalanceChart(
+    project,
+    !!showDiskIOBurstBalanceChart
+  )
   const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
   const baselineThroughputLabel =
     typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
@@ -62,7 +71,7 @@ export const getReportAttributesV2: (
       showLegend: true,
       hideChartType: false,
       defaultChartStyle: 'bar',
-      showMaxValue: false,
+      showMaxValue: true,
       showGrid: true,
       syncId: 'database-reports',
       valuePrecision: 2,
@@ -88,15 +97,6 @@ export const getReportAttributesV2: (
           fill: 'var(--chart-2-fill)',
           tooltip:
             'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
-        },
-        {
-          attribute: 'ram_usage_free',
-          provider: 'infra-monitoring',
-          label: 'Free',
-          color: 'var(--chart-muted)',
-          fill: 'var(--chart-muted-fill)',
-          tooltip:
-            'Unallocated memory available for use. A small portion is always reserved by the operating system',
         },
         {
           attribute: 'ram_usage_total',
@@ -126,7 +126,6 @@ export const getReportAttributesV2: (
       showLegend: true,
       hideChartType: false,
       defaultChartStyle: 'bar',
-      showMaxValue: true,
       showGrid: true,
       syncId: 'database-reports',
       valuePrecision: 2,
@@ -134,6 +133,51 @@ export const getReportAttributesV2: (
         width: 75,
         tickFormatter: (value: number) => formatBytesMinMB(value, 2),
       },
+      titleTooltip: showMemoryCommitmentRiskZones
+        ? 'Risk thresholds estimate memory commitment risk from physical RAM plus 1 GiB of swap and do not predict when the database will run out of memory.'
+        : undefined,
+      thresholdZoneAttribute: showMemoryCommitmentRiskZones ? 'ram_commit_used' : undefined,
+      thresholdZones: showMemoryCommitmentRiskZones
+        ? [
+            {
+              label: 'Acknowledgment',
+              badgeLabel: 'Warning',
+              tooltipLabel: '50% threshold',
+              color: 'var(--color-yellow-900)',
+              textColor: 'var(--color-yellow-1100)',
+              tooltip:
+                'Above 50% of physical RAM plus 1 GiB: monitor memory usage and enable memory investigation tools to understand what your database has promised to operations.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 0.5, 0.8),
+            },
+            {
+              label: 'Problematic',
+              badgeLabel: 'Problematic',
+              tooltipLabel: '80% threshold',
+              color: 'var(--color-orange-900)',
+              textColor: 'var(--color-orange-1100)',
+              tooltip:
+                'Above 80% of physical RAM plus 1 GiB: optimize memory usage or upgrade compute, since using idle memory commitments at once can exhaust resources and trigger recovery.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 0.8, 0.9),
+            },
+            {
+              label: 'Severe',
+              badgeLabel: 'Severe',
+              tooltipLabel: '90% threshold',
+              color: 'hsl(var(--destructive-600))',
+              tooltip:
+                'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 0.9),
+            },
+            {
+              label: 'Full commitment capacity',
+              color: 'var(--chart-reference)',
+              isAlwaysVisible: true,
+              tooltip:
+                'Estimated physical RAM plus 1 GiB of swap, based on the infrastructure capacity at each timestamp.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 1, 1),
+            },
+          ]
+        : undefined,
       attributes: [
         {
           attribute: 'ram_commit_used',
@@ -142,17 +186,13 @@ export const getReportAttributesV2: (
           color: 'var(--chart-1)',
           fill: 'var(--chart-1-fill)',
           tooltip:
-            'Total memory the kernel has promised to processes (RAM plus swap). Sustained values near or above the commit limit indicate overcommitment and a high risk of out-of-memory failures',
+            'Memory the kernel has promised to processes, which may remain unused until needed and does not by itself indicate an out-of-memory failure',
         },
         {
           attribute: 'ram_commit_limit',
           provider: 'infra-monitoring',
-          label: 'Commit limit',
-          color: 'var(--chart-reference)',
-          isMaxValue: true,
+          enabled: false,
           omitFromTotal: true,
-          tooltip:
-            'Maximum memory the kernel will commit (RAM plus swap, adjusted by the overcommit ratio). Committed memory approaching this limit puts the database at risk of being killed when the system runs out of memory',
         },
       ],
     },
@@ -413,7 +453,7 @@ export const getReportAttributesV2: (
     {
       id: 'disk-io-burst-balance',
       label: 'Disk IO Burst Balance',
-      titleTooltip: `The burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
+      titleTooltip: `The EBS burst credit pool your compute draws on to sustain IO above its baseline. When the balance hits 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
       syncId: 'database-reports',
       hide: !showBurstBalanceChart,

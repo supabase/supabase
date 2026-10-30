@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Rewind } from 'lucide-react'
+import { RewindIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
@@ -19,7 +19,7 @@ import { calculateBarClickTimeRange } from './LogsBarChart.utils'
 import { LogTable } from './LogTable'
 import UpgradePrompt from './UpgradePrompt'
 import { useLogsPreviewShortcuts } from './useLogsPreviewShortcuts'
-import PreviewFilterPanel from '@/components/interfaces/Settings/Logs/PreviewFilterPanel'
+import { PreviewFilterPanel } from '@/components/interfaces/Settings/Logs/PreviewFilterPanel'
 import LoadingOpacity from '@/components/ui/LoadingOpacity'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -327,7 +327,7 @@ export const LogsPreviewer = ({
           <ShortcutTooltip shortcutId={SHORTCUT_IDS.LOGS_PREVIEW_LOAD_OLDER} side="top">
             <Button
               onClick={loadOlder}
-              icon={<Rewind />}
+              icon={<RewindIcon />}
               loading={isLoadingOlder}
               disabled={isLoadingOlder}
             >

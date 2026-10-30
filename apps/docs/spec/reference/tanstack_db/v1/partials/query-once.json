@@ -1,0 +1,26 @@
+{
+  "title": "queryOnce()",
+  "description": "Runs a single, non-reactive query against a collection. Filters, ordering, limits, and joins are pushed to PostgREST where possible. Aggregates like `count` and `sum` run on the server. Other operations, like `distinct` and computed fields, are applied client-side.",
+  "params": [
+    {
+      "name": "callback",
+      "isOptional": false,
+      "type": "(q: InitialQueryBuilder) => QueryBuilder",
+      "description": "A query builder function describing the query to run once."
+    },
+    {
+      "name": "supabase",
+      "isOptional": false,
+      "type": "SupabaseClient",
+      "description": "The Supabase client instance to run the query against."
+    }
+  ],
+  "notes": "- Aggregates use PostgREST aggregate functions, which are disabled by default. Enable them with `alter role authenticator set pgrst.db_aggregates_enabled = 'true';` followed by `notify pgrst, 'reload config';`.\n- Queries with aggregates run as a single PostgREST request and require fully pushable `where` expressions. Unsupported filters throw instead of aggregating over unfiltered rows.\n- `groupBy` and `having` aren't supported.",
+  "examples": [
+    {
+      "id": "query-once-example",
+      "name": "Run a one-time query",
+      "code": "```tsx\nimport { eq } from '@tanstack/react-db'\nimport { queryOnce } from '@supabase-labs/tanstack-db'\n\nconst completed = await queryOnce(\n  (q) => q.from({ todo: todos }).where(({ todo }) => eq(todo.completed, true)),\n  supabase\n)\n```"
+    }
+  ]
+}

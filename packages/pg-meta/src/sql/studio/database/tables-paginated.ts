@@ -1,5 +1,5 @@
 import { DEFAULT_SYSTEM_SCHEMAS } from '../../../constants'
-import { coalesceRowsToArray, filterByList } from '../../../helpers'
+import { coalesceRowsToArray, escapeIlikeLiteral, filterByList } from '../../../helpers'
 import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 import { getColumnsSql } from '../../columns'
 
@@ -209,8 +209,3 @@ export const getTablesPaginatedSql = ({
     order by tables.id
   `
 }
-
-// Escape LIKE/ILIKE wildcards so user input is matched literally. ILIKE's
-// default escape character is `\`, so we escape `\`, `%`, and `_` and let the
-// pattern carry its own surrounding `%`s as wildcards.
-const escapeIlikeLiteral = (value: string) => value.replace(/([\\%_])/g, '\\$1')

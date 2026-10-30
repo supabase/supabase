@@ -15,11 +15,14 @@ import { addAPIMock } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 
 const testContext = vi.hoisted(() => ({
+  track: vi.fn(),
   flags: { otelLegacyLogs: true } as Record<string, boolean>,
   params: { ref: 'default', id: 'query-test' } as { ref?: string; id?: string },
   /** Simulated editor selection — the mocked CodeEditor's fake editor reads this. */
   selectedText: undefined as string | undefined,
 }))
+
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => testContext.track }))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -217,7 +220,30 @@ const createDraft = (
   })
 }
 
+/**
+ * Mocks the generic pg-meta query endpoint and returns the SQL of every executed query.
+ * Background prefetches (intellisense keywords/functions/schemas/table-columns, event
+ * triggers) hit the same endpoint, distinguished from an actual run by their non-empty
+ * `key` search param — an executed query's `key` is `''`.
+ */
+const mockExecutedQueries = () => {
+  const executedQueries: string[] = []
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: async ({ request }) => {
+      const key = new URL(request.url).searchParams.get('key')
+      if (key !== '') return HttpResponse.json([])
+      const { query } = (await request.json()) as { query: string }
+      executedQueries.push(query)
+      return HttpResponse.json([])
+    },
+  })
+  return executedQueries
+}
+
 beforeEach(() => {
+  testContext.track.mockClear()
   setupSqlEditorMocks()
   testContext.flags.otelLegacyLogs = true
   testContext.params = { ref: 'default', id: 'query-test' }
@@ -248,6 +274,20 @@ describe('QueryTab execution', () => {
     await waitFor(() => expect(explorerQueryState.results['query-test']).toBeDefined())
     expect(explorerQueryState.results['query-test']).toMatchObject({ rows: [] })
     expect(explorerQueryState.drafts['query-test']?.pendingAutoRun).toBe(false)
+    const queryEvents = testContext.track.mock.calls.filter(([action]) =>
+      action.startsWith('explorer_query_')
+    )
+    expect(queryEvents.map(([action]) => action)).toEqual([
+      'explorer_query_submitted',
+      'explorer_query_completed',
+    ])
+    expect(queryEvents[0][1]).toMatchObject({
+      surface: 'query_tab',
+      queryId: 'query-test',
+      source: 'database',
+    })
+    expect(queryEvents[1][1].runId).toBe(queryEvents[0][1].runId)
+    expect(queryEvents[0][1]).not.toHaveProperty('sql')
   })
 
   it('does not auto-run a draft created without autoRun', async () => {
@@ -285,6 +325,53 @@ describe('QueryTab execution', () => {
       await screen.findByText("Error: Querying logs isn't available for this project yet.")
     ).toBeInTheDocument()
     expect(requests).toHaveLength(0)
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_query_'))
+    ).toEqual([
+      [
+        'explorer_query_submitted',
+        expect.objectContaining({ source: 'logs', surface: 'query_tab' }),
+        expect.objectContaining({ project: 'default' }),
+      ],
+      [
+        'explorer_query_failed',
+        expect.objectContaining({ failureReason: 'logs_unavailable' }),
+        expect.objectContaining({ project: 'default' }),
+      ],
+    ])
+  })
+
+  it('records a terminal failure when database execution rejects', async () => {
+    createDraft({ _tag: 'database' })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: ({ request }) =>
+        new URL(request.url).searchParams.get('key') === ''
+          ? HttpResponse.json({ message: 'Query failed' }, { status: 500 })
+          : HttpResponse.json([]),
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    await waitFor(() =>
+      expect(
+        testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_query_'))
+      ).toHaveLength(2)
+    )
+    const [submitted, failed] = testContext.track.mock.calls.filter(([action]) =>
+      action.startsWith('explorer_query_')
+    )
+    expect(submitted[0]).toBe('explorer_query_submitted')
+    expect(failed[0]).toBe('explorer_query_failed')
+    expect(failed[1]).toMatchObject({
+      runId: submitted[1].runId,
+      failureReason: 'execution_error',
+    })
+    expect(failed[1]).not.toHaveProperty('message')
   })
 
   it('exposes and persists the shared notebook result view options', async () => {
@@ -324,21 +411,7 @@ describe('QueryTab execution', () => {
         return HttpResponse.json<ReadReplicasData>([])
       },
     })
-    // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
-    // fetches against this same generic pg-meta query endpoint (differentiated by the `key`
-    // search param) as soon as the editor mounts — those are expected and unrelated to the
-    // actual run. Only a request with no recognized intellisense `key` counts as an execution.
-    const INTELLISENSE_KEYS = ['keywords', 'database-functions', 'schemas', 'table-columns']
-    const requests: Request[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: ({ request }) => {
-        const key = new URL(request.url).searchParams.get('key')
-        if (!key || !INTELLISENSE_KEYS.includes(key)) requests.push(request)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
@@ -351,7 +424,7 @@ describe('QueryTab execution', () => {
     expect(
       await screen.findByText('Error: Unable to run query: Connection string is missing')
     ).toBeInTheDocument()
-    expect(requests).toHaveLength(0)
+    expect(executedQueries).toHaveLength(0)
   })
 
   it('resolves a relative logs range before sending the request', async () => {
@@ -418,23 +491,14 @@ describe('QueryTab execution', () => {
     renderQueryTab(tabsState)
 
     const sqlEditor = await screen.findByRole('textbox', { name: 'SQL editor' })
-    await userEvent.type(sqlEditor, ' where true')
+    await userEvent.type(sqlEditor, 'x')
 
     await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
   })
 
   it('blocks a destructive query behind a confirmation modal, then runs it once confirmed', async () => {
     createDraft({ _tag: 'database' }, 'delete from foo')
-    const executedQueries: string[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: async ({ request }) => {
-        const { query } = (await request.json()) as { query: string }
-        if (query.trim().toLowerCase().startsWith('delete')) executedQueries.push(query)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
@@ -443,6 +507,9 @@ describe('QueryTab execution', () => {
 
     expect(await screen.findByText('Potential issue detected')).toBeInTheDocument()
     expect(executedQueries).toHaveLength(0)
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_query_'))
+    ).toEqual([])
 
     await userEvent.click(screen.getByRole('button', { name: 'Run query' }))
 
@@ -451,16 +518,7 @@ describe('QueryTab execution', () => {
 
   it('cancels a blocked query without running it', async () => {
     createDraft({ _tag: 'database' }, 'update foo set bar = 1')
-    const executedQueries: string[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: async ({ request }) => {
-        const { query } = (await request.json()) as { query: string }
-        if (query.trim().toLowerCase().startsWith('update')) executedQueries.push(query)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
@@ -477,16 +535,7 @@ describe('QueryTab execution', () => {
 
   it('runs a CREATE TABLE query with RLS enabled once "Run and enable RLS" is chosen', async () => {
     createDraft({ _tag: 'database' }, 'create table foo (id int)')
-    const executedQueries: string[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: async ({ request }) => {
-        const { query } = (await request.json()) as { query: string }
-        if (query.trim().toLowerCase().startsWith('create table')) executedQueries.push(query)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
@@ -507,18 +556,7 @@ describe('QueryTab execution', () => {
     createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
     testContext.selectedText = 'select 2;'
 
-    const executedQueries: string[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: async ({ request }) => {
-        const key = new URL(request.url).searchParams.get('key')
-        if (key !== '') return HttpResponse.json([])
-        const { query } = (await request.json()) as { query: string }
-        executedQueries.push(query)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
@@ -534,21 +572,7 @@ describe('QueryTab execution', () => {
     createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
     testContext.selectedText = 'select 2;'
 
-    // Background prefetches (intellisense keywords/functions/schemas/table-columns, event
-    // triggers) hit this same generic pg-meta query endpoint, distinguished from an actual
-    // run by their non-empty `key` search param — an executed query's `key` is `''`.
-    const executedQueries: string[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: async ({ request }) => {
-        const key = new URL(request.url).searchParams.get('key')
-        if (key !== '') return HttpResponse.json([])
-        const { query } = (await request.json()) as { query: string }
-        executedQueries.push(query)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     const runButton = await screen.findByRole('button', { name: 'Run' })
@@ -566,18 +590,7 @@ describe('QueryTab execution', () => {
     createDraft({ _tag: 'database' }, 'select 1;\nselect 2;')
     testContext.selectedText = 'select 2;'
 
-    const executedQueries: string[] = []
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: async ({ request }) => {
-        const key = new URL(request.url).searchParams.get('key')
-        if (key !== '') return HttpResponse.json([])
-        const { query } = (await request.json()) as { query: string }
-        executedQueries.push(query)
-        return HttpResponse.json([])
-      },
-    })
+    const executedQueries = mockExecutedQueries()
 
     renderQueryTab()
     await userEvent.click(await screen.findByRole('button', { name: 'More actions' }))

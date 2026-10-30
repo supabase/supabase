@@ -1,23 +1,30 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2, MinusCircle } from 'lucide-react'
+import {
+  AlertTriangleIcon,
+  CheckCircle2Icon,
+  ChevronRightIcon,
+  Loader2Icon,
+  MinusCircleIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
 import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewContext'
-import { resolveRealtimeServiceStatus, type ProjectServiceStatus } from './ServiceStatus.utils'
+import type { ProjectServiceStatus } from './ServiceStatus.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { SingleStat } from '@/components/ui/SingleStat'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from '@/data/service-status/edge-functions-status-query'
 import {
   useProjectServiceStatusQuery,
   type ServiceHealthResponse,
 } from '@/data/service-status/service-status-query'
-import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
@@ -28,10 +35,10 @@ const iconProps = {
   size: 18,
   strokeWidth: 1.5,
 }
-const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
-const AlertIcon = () => <AlertTriangle {...iconProps} />
-const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
-const DisabledIcon = () => <MinusCircle {...iconProps} className="text-foreground-lighter" />
+const LoaderIcon = () => <Loader2Icon {...iconProps} className="animate-spin" />
+const AlertIcon = () => <AlertTriangleIcon {...iconProps} />
+const CheckIcon = () => <CheckCircle2Icon {...iconProps} className="text-primary" />
+const DisabledIcon = () => <MinusCircleIcon {...iconProps} className="text-foreground-lighter" />
 
 export const StatusIcon = ({
   isLoading,
@@ -104,7 +111,6 @@ const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
 export const ServiceStatus = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const {
@@ -122,12 +128,18 @@ export const ServiceStatus = () => {
   const isBranch = project?.parentRef !== project?.ref
 
   // Get branches data when on a branch
-  const { data: branches, isPending: isBranchesLoading } = useBranchesQuery(
-    { projectRef: isBranch ? project?.parentRef : undefined },
-    {
-      enabled: isBranch,
-    }
-  )
+  const branchesProjectRef = isBranch ? project?.parentRef : undefined
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: branchesProjectRef,
+  })
+  const { data: branches, isPending: isBranchesPending } = useQuery({
+    ...branchesQueryOptions({ projectRef: branchesProjectRef, grant: branchesGrant.grant }),
+    enabled: isBranch,
+  })
+  const isBranchesLoading =
+    isBranch &&
+    (branchesGrant.status === 'loading' ||
+      (branchesGrant.status === 'granted' && isBranchesPending))
 
   const currentBranch = isBranch
     ? branches?.find((branch) => branch.project_ref === ref)
@@ -140,9 +152,6 @@ export const ServiceStatus = () => {
       refetchInterval: (query) => {
         const data = query.state.data
         const isServiceUnhealthy = data?.some((service) => {
-          if (isHighAvailability && service.name === 'realtime') {
-            return false
-          }
           // if the postgrest service has an empty schema, postgrest has been disabled
           if (service.name === 'rest' && extractDbSchema(service) === '') {
             return false
@@ -220,7 +229,7 @@ export const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            status: resolveRealtimeServiceStatus(isHighAvailability, realtimeStatus?.status),
+            status: realtimeStatus?.status ?? 'UNHEALTHY',
             logsUrl: isUnifiedLogsEnabled
               ? '/logs?filter=log_type:eq:realtime'
               : '/logs/realtime-logs',
@@ -319,7 +328,7 @@ export const ServiceStatus = () => {
           icon={
             // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
             isProjectComingUp ? (
-              <Loader2 className="animate-spin" size={18} />
+              <Loader2Icon className="animate-spin" size={18} />
             ) : (
               <div className="grid grid-cols-3 gap-1">
                 {services.map((service, index) => (
@@ -332,7 +341,7 @@ export const ServiceStatus = () => {
                         (isProjectNew && service.status !== 'ACTIVE_HEALTHY')
                         ? 'bg-foreground-lighter animate-pulse'
                         : service.status === 'ACTIVE_HEALTHY'
-                          ? 'bg-brand'
+                          ? 'bg-brand-default'
                           : 'bg-selection'
                     )}
                   />
@@ -388,7 +397,7 @@ export const ServiceStatus = () => {
               {serviceInfo}
               <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100">
                 <span className="text-xs text-foreground">View logs</span>
-                <ChevronRight size={14} className="text-foreground" />
+                <ChevronRightIcon size={14} className="text-foreground" />
               </div>
             </Link>
           )

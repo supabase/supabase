@@ -5,43 +5,43 @@ title: Release Notes
 
 ## 8.1.0 - 2026-09-07
 
-- Stream Edge Function responses ([#417](https://github.com/supabase-community/supabase-csharp/issues/417)).
-- Realtime: add an `enabled` flag to opt into the initial presence sync ([#407](https://github.com/supabase-community/supabase-csharp/issues/407)).
-- Fix: keep `!` and unary `-` attached to their values in `Where` filter expressions ([#414](https://github.com/supabase-community/supabase-csharp/issues/414)).
-- Fix: write integer arrays as JSON arrays and reject invalid literals with a `JsonException` ([#408](https://github.com/supabase-community/supabase-csharp/issues/408)).
+- Stream Edge Function responses ([#417](https://github.com/supabase/supabase-csharp/issues/417)).
+- Realtime: add an `enabled` flag to opt into the initial presence sync ([#407](https://github.com/supabase/supabase-csharp/issues/407)).
+- Fix: keep `!` and unary `-` attached to their values in `Where` filter expressions ([#414](https://github.com/supabase/supabase-csharp/issues/414)).
+- Fix: write integer arrays as JSON arrays and reject invalid literals with a `JsonException` ([#408](https://github.com/supabase/supabase-csharp/issues/408)).
 
 ## 8.0.0 - 2026-09-03
 
-Major release. All `Supabase.*` packages are versioned in lockstep. See the [migration guide](https://github.com/supabase-community/supabase-csharp/blob/master/docs/migrations/v8.0.0.md) for upgrade steps.
+Major release. All `Supabase.*` packages are versioned in lockstep. See the [migration guide](https://github.com/supabase/supabase-csharp/blob/master/docs/migrations/v8.0.0.md) for upgrade steps.
 
 **Breaking changes**
 
-- Migrate from `Newtonsoft.Json` to `System.Text.Json` across every package. Custom models with `[JsonProperty]` should move to `[JsonPropertyName]`; direct `JsonConvert` calls should move to `JsonSerializer` ([#360](https://github.com/supabase-community/supabase-csharp/issues/360)).
+- Migrate from `Newtonsoft.Json` to `System.Text.Json` across every package. Custom models with `[JsonProperty]` should move to `[JsonPropertyName]`; direct `JsonConvert` calls should move to `JsonSerializer` ([#360](https://github.com/supabase/supabase-csharp/issues/360)).
 - Retarget every package to `netstandard2.1` (from `netstandard2.0`). .NET Framework and pre-`netstandard2.1` runtimes (Mono < 6.4, older Xamarin/Unity) are no longer supported — move to a `netstandard2.1`-capable target (.NET Core 3.0+/.NET 5+).
-- Postgrest: parameterless `Table.Delete()` now returns `Task<ModeledResponse<T>>` (the deleted rows) instead of `Task` ([#342](https://github.com/supabase-community/supabase-csharp/issues/342)).
-- Postgrest: `Single()` now throws a `PostgrestException` (status `406`) when more than one row matches, instead of returning `null` ([#346](https://github.com/supabase-community/supabase-csharp/issues/346)).
-- Realtime: registering a `postgres_changes` listener after `Subscribe()` now throws a `RealtimeException` ([#385](https://github.com/supabase-community/supabase-csharp/issues/385)).
-- Gotrue: stop sending the OAuth `state` parameter to `/authorize`; `SignInOptions.State` and `ProviderAuthState.State` are removed ([#388](https://github.com/supabase-community/supabase-csharp/issues/388)).
+- Postgrest: parameterless `Table.Delete()` now returns `Task<ModeledResponse<T>>` (the deleted rows) instead of `Task` ([#342](https://github.com/supabase/supabase-csharp/issues/342)).
+- Postgrest: `Single()` now throws a `PostgrestException` (status `406`) when more than one row matches, instead of returning `null` ([#346](https://github.com/supabase/supabase-csharp/issues/346)).
+- Realtime: registering a `postgres_changes` listener after `Subscribe()` now throws a `RealtimeException` ([#385](https://github.com/supabase/supabase-csharp/issues/385)).
+- Gotrue: stop sending the OAuth `state` parameter to `/authorize`; `SignInOptions.State` and `ProviderAuthState.State` are removed ([#388](https://github.com/supabase/supabase-csharp/issues/388)).
 - Gotrue: rename `NetworkStatus.PingCheck` to `PingCheckAsync`.
 
 **Features**
 
-- Add the `Supabase.Extensions.DependencyInjection` package for DI registration ([#387](https://github.com/supabase-community/supabase-csharp/issues/387)).
-- Add retry/backoff and injectable `HttpClient` support across all services ([#383](https://github.com/supabase-community/supabase-csharp/issues/383)).
-- Support publishable and secret API keys ([#397](https://github.com/supabase-community/supabase-csharp/issues/397)).
-- Gotrue: support async session persistence ([#399](https://github.com/supabase-community/supabase-csharp/issues/399)) and soft-delete on admin `DeleteUser` ([#402](https://github.com/supabase-community/supabase-csharp/issues/402)).
-- Storage: expose the service error code ([#380](https://github.com/supabase-community/supabase-csharp/issues/380)).
+- Add the `Supabase.Extensions.DependencyInjection` package for DI registration ([#387](https://github.com/supabase/supabase-csharp/issues/387)).
+- Add retry/backoff and injectable `HttpClient` support across all services ([#383](https://github.com/supabase/supabase-csharp/issues/383)).
+- Support publishable and secret API keys ([#397](https://github.com/supabase/supabase-csharp/issues/397)).
+- Gotrue: support async session persistence ([#399](https://github.com/supabase/supabase-csharp/issues/399)) and soft-delete on admin `DeleteUser` ([#402](https://github.com/supabase/supabase-csharp/issues/402)).
+- Storage: expose the service error code ([#380](https://github.com/supabase/supabase-csharp/issues/380)).
 
 **Fixes**
 
-- Gotrue: a failed token refresh no longer signs the user out — only a server-reported invalid refresh token does ([#394](https://github.com/supabase-community/supabase-csharp/issues/394)).
-- Postgrest: drop the `.` before nested `and`/`or` groups ([#389](https://github.com/supabase-community/supabase-csharp/issues/389)).
-- Storage: percent-encode the object key in CDN purge URLs ([#384](https://github.com/supabase-community/supabase-csharp/issues/384)).
+- Gotrue: a failed token refresh no longer signs the user out — only a server-reported invalid refresh token does ([#394](https://github.com/supabase/supabase-csharp/issues/394)).
+- Postgrest: drop the `.` before nested `and`/`or` groups ([#389](https://github.com/supabase/supabase-csharp/issues/389)).
+- Storage: percent-encode the object key in CDN purge URLs ([#384](https://github.com/supabase/supabase-csharp/issues/384)).
 
 ## 1.6.0 - 2026-08-07
 
-- Bump Supabase dependencies ([#301](https://github.com/supabase-community/supabase-csharp/issues/301)).
-- Fix: match auth header names case-insensitively, enabling developer overrides ([#295](https://github.com/supabase-community/supabase-csharp/issues/295)).
+- Bump Supabase dependencies ([#301](https://github.com/supabase/supabase-csharp/issues/301)).
+- Fix: match auth header names case-insensitively, enabling developer overrides ([#295](https://github.com/supabase/supabase-csharp/issues/295)).
 
 ## 1.5.0 - 2026-07-30
 
@@ -57,7 +57,7 @@ Major release. All `Supabase.*` packages are versioned in lockstep. See the [mig
 
 This is the observability release: every child library now emits diagnostics through `System.Diagnostics`, making the SDK compatible with OpenTelemetry.
 
-- Expose aggregated telemetry source names for OpenTelemetry ([#285](https://github.com/supabase-community/supabase-csharp/issues/285)).
+- Expose aggregated telemetry source names for OpenTelemetry ([#285](https://github.com/supabase/supabase-csharp/issues/285)).
 - Update dependency: `Supabase.Core@1.2.0`
   - Add OpenTelemetry-compatible diagnostics primitives ([#6](https://github.com/supabase-community/core-csharp/issues/6)).
 - Update dependency: `Supabase.Gotrue@6.2.0`
@@ -71,7 +71,7 @@ This is the observability release: every child library now emits diagnostics thr
 
 ## 1.3.0 - 2026-07-20
 
-- Wire Realtime's Postgrest client automatically so models received from `postgres_changes` support `Update()` and `Delete()` ([#282](https://github.com/supabase-community/supabase-csharp/issues/282)).
+- Wire Realtime's Postgrest client automatically so models received from `postgres_changes` support `Update()` and `Delete()` ([#282](https://github.com/supabase/supabase-csharp/issues/282)).
 - Update dependency: `Supabase.Postgrest@4.3.0`
   - Add `Client.Attach<T>()` to populate a model's client context for `Update`/`Delete` ([#135](https://github.com/supabase-community/postgrest-csharp/issues/135)).
   - Add `ClientOptions.SerializeEnumsAsStrings` to opt into string enum serialization ([#134](https://github.com/supabase-community/postgrest-csharp/issues/134)).
@@ -81,7 +81,7 @@ This is the observability release: every child library now emits diagnostics thr
 
 ## 1.2.0 - 2026-07-16
 
-- Lower the `Newtonsoft.Json` minimum version to `13.0.2` across all packages to ease dependency resolution ([#275](https://github.com/supabase-community/supabase-csharp/issues/275)).
+- Lower the `Newtonsoft.Json` minimum version to `13.0.2` across all packages to ease dependency resolution ([#275](https://github.com/supabase/supabase-csharp/issues/275)).
 - Update dependency: `Supabase.Gotrue@6.1.0`
   - Add an option for setting `redirect_url` on MagicLink sign-in.
   - Add `state` parameter support to OAuth provider sign-in.
@@ -117,7 +117,7 @@ This is the observability release: every child library now emits diagnostics thr
 - Update dependency: `Supabase.Realtime@7.0.2`
   - Updates dependency: `Websocket.Client@5.1.2`.
   - Updates dependency: `Supabase.Postgrest@4.0.3`.
-  - Adds support for specifying `GetHeaders` on the `RealtimeClient`, which are included on the initial request to establish the websocket connection ([#167](https://github.com/supabase-community/supabase-csharp/issues/167)).
+  - Adds support for specifying `GetHeaders` on the `RealtimeClient`, which are included on the initial request to establish the websocket connection ([#167](https://github.com/supabase/supabase-csharp/issues/167)).
 
 ## 1.1.0 - 2024-07-25
 
@@ -170,10 +170,10 @@ This is the observability release: every child library now emits diagnostics thr
 - Assembly Name has been changed to `Supabase.dll`
 - Update dependency: `postgrest-csharp@5.0.0`
   - [MAJOR] Moves namespaces from `Postgrest` to `Supabase.Postgrest`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `postgrest-csharp` to `Supabase.Postgrest`
 - Update dependency: `gotrue-csharp@5.0.0`
-  - Re: [#135](supabase-community/supabase-csharp#135) Update nuget package name `gotrue-csharp` to `Supabase.Gotrue`
+  - Re: [#135](supabase/supabase-csharp#135) Update nuget package name `gotrue-csharp` to `Supabase.Gotrue`
   - Re: [#89](https://github.com/supabase-community/gotrue-csharp/issues/89), Only add `access_token` to request body
     when it is explicitly declared.
   - [MINOR] Re: [#89](https://github.com/supabase-community/gotrue-csharp/issues/89) Update signature
@@ -185,16 +185,16 @@ This is the observability release: every child library now emits diagnostics thr
 - Update dependency: `realtime-csharp@7.0.0`
   - Merges [#45](https://github.com/supabase-community/realtime-csharp/pull/45) - Updating
     the `Websocket.Client@5.1.1`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `realtime-csharp` to `Supabase.Realtime`
 - Update dependency: `storage-csharp@2.0.0`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `storage-csharp` to `Supabase.Storage`
 - Update dependency: `functions-csharp@2.0.0`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `functions-csharp` to `Supabase.Functions`
 - Update dependency: `core-csharp@1.0.0`
-  - Re: [#135](https://github.com/supabase-community/supabase-csharp/issues/135) Update nuget package
+  - Re: [#135](https://github.com/supabase/supabase-csharp/issues/135) Update nuget package
     name `supabase-core`
     to `Supabase.Core`
 - Adds comments to the remaining undocumented code.

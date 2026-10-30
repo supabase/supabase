@@ -511,7 +511,7 @@ connection authenticated: identity="pgbouncer" method=scram-sha-256
 
 <Admonition type="note">
 
-The logged IP address is from the device directly communicating with Postgres. If you connect through [Supavisor](/docs/guides/database/connecting-to-postgres#poolers), the [dedicated pooler](/docs/guides/database/connecting-to-postgres#poolers), or the [Data API](/docs/guides/database/connecting-to-postgres#data-apis-and-client-libraries), those service IPs will appear instead of the original client.
+The logged IP address is from the device directly communicating with Postgres. If you connect through the [shared pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler), the [dedicated pooler](/docs/guides/database/connecting-to-postgres#dedicated-pooler), or the [Data API](/docs/guides/database/connecting-to-postgres#data-apis-and-client-libraries), those service IPs will appear instead of the original client.
 
 </Admonition>
 
@@ -561,7 +561,7 @@ disconnection: session time: 0:00:01.492 user=postgres database=postgres host=12
 
 <Admonition type="note">
 
-The logged IP address is from the device directly communicating with Postgres. If you connect through [Supavisor](/docs/guides/database/connecting-to-postgres#poolers), the [dedicated pooler](/docs/guides/database/connecting-to-postgres#poolers), or the [Data API](/docs/guides/database/connecting-to-postgres#data-apis-and-client-libraries), those service IPs will appear instead of the original client.
+The logged IP address is from the device directly communicating with Postgres. If you connect through the [shared pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler), the [dedicated pooler](/docs/guides/database/connecting-to-postgres#dedicated-pooler), or the [Data API](/docs/guides/database/connecting-to-postgres#data-apis-and-client-libraries), those service IPs will appear instead of the original client.
 
 </Admonition>
 <Accordion
@@ -667,43 +667,7 @@ postgres-config update --config cron.log_statement=false --no-restart \
 
 ### `auto_explain.*`
 
-[auto_explain](https://www.postgresql.org/docs/current/auto-explain.html) is a Postgres module that is installed on all Supabase projects. It logs the statements and [explain plans](https://www.postgresql.org/docs/current/sql-explain.html) of queries that took more than the setting's limit.
-
-**Useful for:**
-
-- Monitoring and optimizing slow queries
-
-**Example log:**
-
-```sh
-duration: 1661.934 ms plan: Query Text: SELECT * FROM example;
-Seq Scan on example (cost=0.00..1443.00 rows=100000 width=36)
-```
-
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
-
-<Admonition type="note">
-
-`auto_explain` is a family of configurations. The primary one is `auto_explain.log_min_duration`. However, there are other configs of note, such as `auto_explain.log_analyze` and `auto_explain.log_buffers` that control the details of the query plan recorded. Reference the module's [official docs](https://www.postgresql.org/docs/current/auto-explain.html) for more information.
-
-</Admonition>
-
-```sql name=SQL
-alter role "postgres" set "auto_explain.log_min_duration" to '2s';
-```
-
-</AccordionItem>
-</Accordion>
+Logs the query plan of each statement that runs longer than a threshold. To set it up, see [Log slow and failing queries](/docs/guides/observability/log-slow-queries).
 
 ### `log_duration`
 
@@ -747,75 +711,11 @@ alter role "postgres" set "log_duration" to true;
 
 ### `log_min_duration_statement`
 
-It is similar to `auto_explain.log_min_duration`, but it lighter weight. It only logs query statements that run longer than the setting's limit.
-
-**Useful for:**
-
-- Monitoring and optimizing slow queries
-
-**Example log:**
-
-```sh
-duration: 1.097 ms statement: select * from example_table limit 100;
-```
-
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
-
-```sql name=SQL
-alter role "postgres" set "log_min_duration_statement" to '2s';
-```
-
-</AccordionItem>
-</Accordion>
+Logs each statement that runs longer than a threshold. To set it up, see [Log slow and failing queries](/docs/guides/observability/log-slow-queries).
 
 ### `log_min_error_statement`
 
-When an event is logged, beyond the primary message, multiple subfields are also captured, such as the [status code](https://www.postgresql.org/docs/current/errcodes-appendix.html). The `log_min_error_statement` field determines if the query responsible for the log should be recorded, too, under the `query` subfield.
-
-If the event is equally or more severe than `log_min_error_statement`, the query will be captured. To view the varying severity levels, reference [log_min_messages](#logminmessages).
-
-**Useful for:**
-
-- Detecting what queries induced specific logs
-- Detecting what queries induced a specific error
-
-**Example log:**
-
-```sh
-duplicate key value violates unique constraint "example_pkey"
-...
-# affiliated subfield
-query: "insert into example (id) values (1), (1);
-```
-
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Configuration examples"
-      id="item-1"
-    >
-
-```sql name=SQL
-alter role "postgres" set "log_min_error_statement" to 'error';
-```
-
-</AccordionItem>
-</Accordion>
+Records the statement behind each error, and is on by default. To find that statement in your logs, see [Log slow and failing queries](/docs/guides/observability/log-slow-queries).
 
 ### `log_min_messages`
 
@@ -823,16 +723,16 @@ Determines what _query generated_ logs (not background or networking logs) are r
 
 As an example of how `log_min_messages` works, if the setting were changed to `error`, Postgres would stop recording logs with the severity levels `warning`, `notice`, `info`, and `debug1 ... debug5` events. However, it would continue recording all `error`, `log`, `fatal`, and `panic` occurrences.
 
-| Severity              | Description                                                                                                                                                                                                                                                          | Example log                                                                                                                                                                          |
-| :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **debug1 ... debug5** | Successively detailed debugging and server info, predominantly used by Postgres developers and extension maintainers.                                                                                                                                                | `DEBUG1: rehashing catalog cache id 6...`                                                                                                                                            |
-| **info**              | Information explicitly requested by the user during an operation.                                                                                                                                                                                                    | `INFO: analyzing "public.example..."` <br/><br/> Example returned by the [`analyze verbose`](https://www.postgresql.org/docs/current/sql-analyze.html) command                       |
-| **notice**            | Helpful, non-essential information about automatic background actions.                                                                                                                                                                                               | `NOTICE: table "old_logs" does not exist, skipping` <br/><br/> Example returned by the [`drop table if exists`](https://www.postgresql.org/docs/current/sql-droptable.html) commands |
-| **warning**           | A query completed, but skipped requested actions.                                                                                                                                                                                                                    | `WARNING: no privileges were granted for "some_user"` <br/><br/> Example returned by the [`grant`](https://www.postgresql.org/docs/current/sql-grant.html) command                   |
-| **error**             | A specific query failed, but the overall database connection remains alive.                                                                                                                                                                                          | `ERROR: duplicate key value violates unique constraint "example_pkey"`                                                                                                               |
-| **log**               | Operational events. Usually generated by [background activity log settings](/docs/guides/database/postgres/postgres-log-config#background-activity) or by [database functions](/docs/guides/database/functions?queryGroups=language&language=js#debugging-functions) | `LOG: connection received...`                                                                                                                                                        |
-| **fatal**             | An error that causes a database connection to abruptly terminate.                                                                                                                                                                                                    | `FATAL: terminating connection due to administrator command`                                                                                                                         |
-| **panic**             | A critical, system-wide failure that forces the database to shut down and crash-recover.                                                                                                                                                                             | `PANIC: could not locate a valid checkpoint record at 0/61013608`                                                                                                                    |
+| Severity              | Description                                                                                                                                                                                                               | Example log                                                                                                                                                                          |
+| :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **debug1 ... debug5** | Successively detailed debugging and server info, predominantly used by Postgres developers and extension maintainers.                                                                                                     | `DEBUG1: rehashing catalog cache id 6...`                                                                                                                                            |
+| **info**              | Information explicitly requested by the user during an operation.                                                                                                                                                         | `INFO: analyzing "public.example..."` <br/><br/> Example returned by the [`analyze verbose`](https://www.postgresql.org/docs/current/sql-analyze.html) command                       |
+| **notice**            | Helpful, non-essential information about automatic background actions.                                                                                                                                                    | `NOTICE: table "old_logs" does not exist, skipping` <br/><br/> Example returned by the [`drop table if exists`](https://www.postgresql.org/docs/current/sql-droptable.html) commands |
+| **warning**           | A query completed, but skipped requested actions.                                                                                                                                                                         | `WARNING: no privileges were granted for "some_user"` <br/><br/> Example returned by the [`grant`](https://www.postgresql.org/docs/current/sql-grant.html) command                   |
+| **error**             | A specific query failed, but the overall database connection remains alive.                                                                                                                                               | `ERROR: duplicate key value violates unique constraint "example_pkey"`                                                                                                               |
+| **log**               | Operational events. Usually generated by [background activity log settings](/docs/guides/database/postgres/postgres-log-config#background-activity) or by [database functions](/docs/guides/database/debugging-functions) | `LOG: connection received...`                                                                                                                                                        |
+| **fatal**             | An error that causes a database connection to abruptly terminate.                                                                                                                                                         | `FATAL: terminating connection due to administrator command`                                                                                                                         |
+| **panic**             | A critical, system-wide failure that forces the database to shut down and crash-recover.                                                                                                                                  | `PANIC: could not locate a valid checkpoint record at 0/61013608`                                                                                                                    |
 
 <Admonition type="note">
 
@@ -931,5 +831,5 @@ Review the [pgAudit docs](/docs/guides/database/extensions/pgaudit) for more con
 ## Resources
 
 - [Advanced Log Filtering](/docs/guides/observability/advanced-log-filtering)
-- [Database Function Logging](/docs/guides/database/functions#general-logging)
+- [Database Function Logging](/docs/guides/database/debugging-functions#general-logging)
 - [Supabase Logging](/docs/guides/observability/logs)

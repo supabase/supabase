@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Loader2, MessageSquare } from 'lucide-react'
+import { Loader2Icon, MessageSquareIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
 import { Button } from 'ui'
@@ -8,6 +8,7 @@ import { ExplorerChatToolbar } from './ExplorerChatToolbar'
 import { useCreateChat } from './hooks'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AssistantChat } from '@/components/ui/AIAssistantPanel/AssistantChat'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -20,6 +21,7 @@ export const ExplorerChatTab = () => {
   const aiAssistantState = useAiAssistantState()
   const { createChat, openChat } = useCreateChat()
   const { activeSidebar } = useSidebarManagerSnapshot()
+  const { setLastVisitedExplorerTab } = useDashboardHistory()
   const chat = id ? aiAssistant.chats[id] : undefined
   const chatInstance = id ? aiAssistant.chatInstances[id] : undefined
   const tabId = id ? createTabId('chat', { id }) : undefined
@@ -37,7 +39,7 @@ export const ExplorerChatTab = () => {
       id: tabId,
       router,
       editor: 'explorer',
-      onClearDashboardHistory: () => {},
+      onClearDashboardHistory: () => setLastVisitedExplorerTab(undefined),
     })
   })
 
@@ -50,7 +52,7 @@ export const ExplorerChatTab = () => {
   if (!aiAssistant.isInitialized || (chat && !chatInstance)) {
     return (
       <div className="h-full bg-surface-100 flex items-center justify-center">
-        <Loader2 className="animate-spin text-foreground-muted" />
+        <Loader2Icon className="animate-spin text-foreground-muted" />
       </div>
     )
   }
@@ -58,7 +60,7 @@ export const ExplorerChatTab = () => {
   if (!id || !chat) {
     return (
       <div className="h-full bg-surface-100 flex flex-col items-center justify-center gap-3 px-6 text-center">
-        <MessageSquare className="text-foreground-muted" />
+        <MessageSquareIcon className="text-foreground-muted" />
         <div>
           <h2 className="text-sm text-foreground">Chat not found</h2>
           <p className="text-sm text-foreground-lighter">

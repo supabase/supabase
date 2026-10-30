@@ -14,14 +14,14 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
+  buildSchemasWithTables,
   buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
   getSchemaTableKey,
-  getSelectedTableCount,
   hasSelectionChanged,
-  isSelectableWarehouseSchema,
   type SchemaTableSelection,
   type SchemaWithTables,
+  type WarehouseSetupTable,
   type WarehouseSetupTarget,
 } from './Warehouse.utils'
 import { AlertError } from '@/components/ui/AlertError'
@@ -31,7 +31,6 @@ import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
-import type { ResponseError } from '@/types'
 
 export interface WarehouseSchemaTablePickerProps {
   onSubmit: (targets: WarehouseSetupTarget[]) => void
@@ -39,7 +38,8 @@ export interface WarehouseSchemaTablePickerProps {
   /** Set when editing an already-enabled Warehouse rather than setting one up for the first time. */
   isEditing?: boolean
   /** Failure from the submit itself, rendered inline rather than as a toast the user can lose. */
-  error?: ResponseError | null
+  error?: { message: string } | null
+  initialTables?: Pick<WarehouseSetupTable, 'schema' | 'name'>[]
 }
 
 export const WarehouseSchemaTablePicker = ({
@@ -47,6 +47,7 @@ export const WarehouseSchemaTablePicker = ({
   isSubmitting,
   isEditing = false,
   error,
+  initialTables,
 }: WarehouseSchemaTablePickerProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -102,27 +103,24 @@ export const WarehouseSchemaTablePicker = ({
       (sourceId !== undefined && publication === undefined && !isPublicationsError))
 
   const initialSelection = useMemo(
-    () => (isEditing ? buildSelectionFromPublicationTables(publication?.tables ?? []) : {}),
-    [isEditing, publication]
+    () =>
+      buildSelectionFromPublicationTables(
+        isEditing ? (publication?.tables ?? []) : (initialTables ?? [])
+      ),
+    [isEditing, publication, initialTables]
   )
 
   const schemasWithTables: SchemaWithTables[] = useMemo(() => {
     if (!schemas || !tables) return []
-    return schemas
-      .filter((schema) => isSelectableWarehouseSchema(schema.name))
-      .map((schema) => ({
-        schema: schema.name,
-        tables: tables.filter((table) => table.schema === schema.name).map((table) => table.name),
-      }))
-      .sort((a, b) => a.schema.localeCompare(b.schema))
+    return buildSchemasWithTables(schemas, tables)
   }, [schemas, tables])
 
   const tableKeys = schemasWithTables.flatMap(({ schema, tables }) =>
     tables.map((table) => getSchemaTableKey(schema, table))
   )
   const selection = selectionOverride ?? initialSelection
-  const selectedCount = getSelectedTableCount(selection)
   const selectedTableKeys = tableKeys.filter((key) => selection[key])
+  const selectedCount = selectedTableKeys.length
   const hasChanges = hasSelectionChanged(selection, initialSelection)
 
   const updateSelection = (updater: (current: SchemaTableSelection) => SchemaTableSelection) => {
@@ -221,6 +219,8 @@ export const WarehouseSchemaTablePicker = ({
             }
             error={error}
             projectRef={projectRef}
+            showInstructions={false}
+            hideContactSupport
           />
         )}
         <Card>
@@ -310,15 +310,24 @@ export const WarehouseSchemaTablePicker = ({
               </MultiSelector>
             </FormLayout>
           </CardContent>
-          <CardFooter className="justify-end">
+          <CardFooter className="justify-end gap-2">
             {/*
               An empty selection is a valid request that tears Warehouse down, so submitting one
               from here would destroy a project's Warehouse with no confirmation. Disabling keeps
               teardown on the dedicated action, which asks first.
             */}
+            {isEditing && hasChanges && (
+              <Button
+                variant="default"
+                disabled={isSubmitting}
+                onClick={() => setSelectionOverride(null)}
+              >
+                Cancel
+              </Button>
+            )}
             <Button
               variant="primary"
-              disabled={selectedCount === 0 || !hasChanges}
+              disabled={selectedCount === 0 || (isEditing && !hasChanges)}
               loading={isSubmitting}
               onClick={handleSubmit}
             >

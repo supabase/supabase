@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CustomOAuthProvider } from '@supabase/auth-js'
 import { useParams } from 'common'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -259,7 +259,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                 'disabled:pointer-events-none data-[state=open]:bg-secondary'
               )}
             >
-              <X className="h-3 w-3" />
+              <XIcon className="h-3 w-3" />
               <span className="sr-only">Close</span>
             </SheetClose>
             <SheetTitle className="truncate">

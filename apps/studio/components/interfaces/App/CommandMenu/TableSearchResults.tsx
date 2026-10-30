@@ -1,6 +1,6 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Database, Loader2 } from 'lucide-react'
+import { DatabaseIcon, Loader2Icon } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 
 import {
@@ -92,31 +92,32 @@ export function TableSearchResults({ debouncedFilterString }: TableSearchResults
           <SkeletonResults />
         ) : isErrorTables ? (
           <div className="h-full flex flex-col items-center justify-center py-12 px-4 gap-4 text-center text-foreground-lighter">
-            <Database className="h-6 w-6" strokeWidth={1.5} />
+            <DatabaseIcon className="h-6 w-6" strokeWidth={1.5} />
             <p className="text-sm">Failed to load tables</p>
           </div>
         ) : tableResults.length === 0 ? (
-          <EmptyState icon={Database} label="Database Tables" query={debouncedFilterString} />
+          <EmptyState icon={DatabaseIcon} label="Database Tables" query={debouncedFilterString} />
         ) : (
           <>
-            <ResultsList
-              results={tableResults}
-              icon={Database}
-              getRoute={(result) => {
-                const table = tables?.find((t) => String(t.id) === result.id)
-                if (!table || !projectRef) return `/project/${projectRef}/editor` as `/${string}`
+            <div className="h-full pb-9">
+              <ResultsList
+                results={tableResults}
+                icon={DatabaseIcon}
+                getRoute={(result) => {
+                  const table = tables?.find((t) => String(t.id) === result.id)
+                  if (!table || !projectRef) return `/project/${projectRef}/editor` as `/${string}`
 
-                const schemaParam = table.schema ? `?schema=${table.schema}` : ''
-                return `/project/${projectRef}/editor/${table.id}${schemaParam}` as `/${string}`
-              }}
-              infiniteLoadingObserverRef={sentinelRef}
-              className="pb-9"
-            />
+                  const schemaParam = table.schema ? `?schema=${table.schema}` : ''
+                  return `/project/${projectRef}/editor/${table.id}${schemaParam}` as `/${string}`
+                }}
+                infiniteLoadingObserverRef={sentinelRef}
+              />
+            </div>
             <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
               <div className="flex items-center gap-x-2">
                 {isLoadingTables ? (
                   <span className="flex items-center gap-2">
-                    <Loader2 size={14} className="animate-spin" /> Loading...
+                    <Loader2Icon size={14} className="animate-spin" /> Loading...
                   </span>
                 ) : (
                   <span>

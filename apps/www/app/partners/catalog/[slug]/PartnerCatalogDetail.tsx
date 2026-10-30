@@ -6,8 +6,8 @@ import { CH } from '@code-hike/mdx/components'
 import DefaultLayout from '~/components/Layouts/Default'
 import { type ListingDetail, type Partner } from '~/types/partners'
 import { useBreakpoint } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUpRight, ChevronLeft, ExternalLink } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client'
 import { MDXClient } from 'next-mdx-remote-client/csr'
 import Image from 'next/image'
@@ -166,11 +166,11 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
               {/* Listings tabs */}
               <div className="flex">
                 {allListings.map((listing, i) => (
-                  <button
-                    tabIndex={0}
+                  <Link
                     key={listing.slug}
-                    type="button"
-                    onClick={() => {
+                    href={`?tab=${encodeURIComponent(listing.slug)}`}
+                    onNavigate={(event) => {
+                      event.preventDefault()
                       setActiveSlug(listing.slug)
                       setFocusedImage(null)
                     }}
@@ -182,7 +182,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                     )}
                   >
                     {listing.label}
-                  </button>
+                  </Link>
                 ))}
               </div>
             </SectionContainerWithCn>
@@ -361,7 +361,7 @@ function PartnerDetails({
               <span className="text-lighter">Category</span>
               <Link
                 href={`/partners/catalog?cat=${encodeURIComponent(category.slug)}`}
-                className="text-brand-link hover:underline transition-colors"
+                className="text-primary hover:underline transition-colors"
               >
                 {category.name}
               </Link>
@@ -379,7 +379,7 @@ function PartnerDetails({
                 }
                 target="_blank"
                 rel="noreferrer"
-                className="text-brand-link hover:underline transition-colors"
+                className="text-primary hover:underline transition-colors"
               >
                 {(() => {
                   try {
@@ -402,7 +402,7 @@ function PartnerDetails({
                 href={activeListing.docsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-brand-link hover:underline transition-colors"
+                className="text-primary hover:underline transition-colors"
               >
                 <span className="flex items-center space-x-1">
                   <span>Learn</span>

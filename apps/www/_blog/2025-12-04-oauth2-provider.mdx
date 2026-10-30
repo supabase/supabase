@@ -15,9 +15,9 @@ date: '2025-12-04'
 toc_depth: 2
 ---
 
-You've used "Sign in with Google" and "Sign in with GitHub" countless times. But what if your Supabase project could be the identity provider? Today, we're adding OAuth 2.1 and OpenID Connect server capabilities to Supabase Auth, turning your project into a full-fledged identity provider.
+You've used "Sign in with Google" and "Sign in with GitHub" countless times. But what if your Supabase project could be the identity provider? Today, we're adding OAuth 2.1 and OpenID Connect server capabilities to [Supabase Auth](/auth), turning your project into a full-fledged identity provider.
 
-This opens up powerful new possibilities: AI agents authenticating through your app via the Model Context Protocol (MCP), third-party developers building on your platform, partner integrations accessing your APIs securely, and enterprise single sign-on. All using the same battle-tested auth infrastructure you already rely on.
+This opens up powerful new possibilities: AI agents authenticating through your app via the [Model Context Protocol (MCP)](/docs/guides/ai-tools/mcp), third-party developers building on your platform, partner integrations accessing your APIs securely, and enterprise single sign-on. All using the same battle-tested auth infrastructure you already rely on.
 
 ## Why We Built This
 
@@ -62,7 +62,7 @@ Supabase Auth implements **OAuth 2.1 with OpenID Connect** (OIDC), the modern, s
 
 The implementation uses the authorization code flow, the most secure OAuth flow for server-side apps and native applications. PKCE protects against authorization code interception attacks. Access tokens are JWTs containing standard Supabase claims (`user_id`, `role`) plus OAuth-specific claims like `client_id`. For OpenID Connect flows, clients also receive ID tokens, standardized identity tokens with user profile information, and can access the UserInfo endpoint to retrieve user data. Refresh tokens enable long-lived sessions without re-authentication, while the JWKS endpoint provides public key infrastructure for third parties to validate tokens.
 
-The best part? Your existing Supabase security model extends naturally to OAuth: **Row Level Security (RLS) policies apply to OAuth access tokens** just like they do to regular session tokens.
+The best part? Your existing Supabase security model extends naturally to OAuth: **[Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) policies apply to OAuth access tokens** just like they do to regular session tokens.
 
 ## Works with Your Existing Auth Stack
 

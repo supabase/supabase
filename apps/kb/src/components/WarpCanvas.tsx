@@ -1,0 +1,559 @@
+import { useCallback, type RefObject } from 'react'
+import { cn } from 'ui'
+import { toOpaque } from 'ui-patterns/GlyphLines'
+
+import {
+  BEAM_ALPHA,
+  clamp,
+  drawStep,
+  GLYPH_PITCH,
+  hash,
+  isBeamAt,
+  phase,
+  rampGlyph,
+  type PixelRect,
+} from '../lib/ascii/field'
+import { fillGlyphPath, GLYPH_FONT } from '../lib/ascii/glyph-path'
+import { createInfall } from '../lib/ascii/infall'
+import { createLayer, sizeLayers } from '../lib/ascii/layer'
+import {
+  easeInOutCubic,
+  easeOutCubic,
+  frontRadius,
+  isBehindWall,
+  locateCell,
+  projectWarp,
+  ringRadii,
+  type WarpCell,
+  type WarpPoint,
+  type WarpShape,
+} from '../lib/ascii/warp'
+import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
+
+export interface WarpCanvasProps {
+  anchorRef: RefObject<HTMLElement | null>
+  text: string
+  className?: string
+}
+
+interface CellShownParams {
+  ring: number
+  spoke: number
+  radii: number[]
+  ringVisible: boolean[][]
+}
+
+interface CellOutlineParams extends CellShownParams {
+  project: (r: number, angle: number) => WarpPoint
+}
+
+interface CellGlyphsParams {
+  ring: number
+  spoke: number
+  strength: number
+  radii: number[]
+  project: (r: number, angle: number) => WarpPoint
+}
+
+interface PlacedGlyph extends WarpPoint {
+  glyph: string
+  isBeam: boolean
+}
+
+interface Pulse {
+  spoke: number
+  start: number
+  ringPos: number
+  age: number
+}
+
+interface Palette {
+  line: string
+  surface: string
+  glyph: string
+  beam: string
+}
+
+const PROBES = {
+  line: 'text-border-stronger',
+  surface: 'text-background',
+  glyph: 'text-foreground-lighter',
+  beam: 'text-brand',
+} as const
+
+const THROAT_RADIUS = 150
+const ANCHOR_MARGIN = 24
+const BOTTOM_FADE = 200
+const THROAT_DROP = 90
+const RING_ANGLES = Array.from({ length: 160 }, (_, k) => (k / 160) * Math.PI * 2)
+const SPOKE_ANGLES = Array.from({ length: 32 }, (_, s) => (s / 32) * Math.PI * 2)
+const SAMPLES_PER_CELL = RING_ANGLES.length / SPOKE_ANGLES.length
+const SPOKE_STEPS = 6
+const MAX_FLATTEN = 0.15
+const EXPAND_STEPS = 60
+const FRONT_ARC_ANGLES = Array.from({ length: 81 }, (_, k) => (k / 80) * Math.PI)
+
+const SPAWN_MIN_RING = 5
+const FADE_IN_S = 0.3
+const CELL_PADDING = 0.18
+
+const subdivide = (radii: number[]) =>
+  radii.flatMap((r, i) => {
+    const next = radii[i + 1]
+    if (next === undefined) return [r]
+    return Array.from({ length: SPOKE_STEPS }, (_, step) => r + ((next - r) * step) / SPOKE_STEPS)
+  })
+
+const cellSamples = (spoke: number) =>
+  Array.from(
+    { length: SAMPLES_PER_CELL + 1 },
+    (_, step) => (spoke * SAMPLES_PER_CELL + step) % RING_ANGLES.length
+  )
+
+const isCellShown = ({ ring, spoke, radii, ringVisible }: CellShownParams) =>
+  ring >= 0 &&
+  ring + 1 < radii.length &&
+  cellSamples(spoke).every((k) => ringVisible[ring][k] && ringVisible[ring + 1][k])
+
+const cellOutline = ({
+  ring,
+  spoke,
+  radii,
+  ringVisible,
+  project,
+}: CellOutlineParams): WarpPoint[] | null => {
+  if (!isCellShown({ ring, spoke, radii, ringVisible })) return null
+  const samples = cellSamples(spoke)
+  const inner = samples.map((k) => project(radii[ring], RING_ANGLES[k]))
+  const outer = samples.map((k) => project(radii[ring + 1], RING_ANGLES[k]))
+  return [...inner, ...outer.reverse()]
+}
+
+const cellGlyphs = ({ ring, spoke, strength, radii, project }: CellGlyphsParams): PlacedGlyph[] => {
+  const spokeWidth = (Math.PI * 2) / SPOKE_ANGLES.length
+  const rInner = radii[ring] + (radii[ring + 1] - radii[ring]) * CELL_PADDING
+  const rOuter = radii[ring + 1] - (radii[ring + 1] - radii[ring]) * CELL_PADDING
+  const aStart = SPOKE_ANGLES[spoke] + spokeWidth * CELL_PADDING
+  const aEnd = SPOKE_ANGLES[spoke] + spokeWidth * (1 - CELL_PADDING)
+  const rMid = (rInner + rOuter) / 2
+  const aMid = (aStart + aEnd) / 2
+  const width = distance(project(rMid, aStart), project(rMid, aEnd))
+  const height = distance(project(rInner, aMid), project(rOuter, aMid))
+  const cols = Math.max(1, Math.floor(width / GLYPH_PITCH))
+  const rows = Math.max(1, Math.floor(height / 14))
+
+  const glyphs: PlacedGlyph[] = []
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const cellCol = spoke * cols + col
+      const cellRow = ring * rows + row
+      const glyph = rampGlyph(strength * hash(cellCol, cellRow))
+      if (glyph === ' ') continue
+      const r = rInner + ((rOuter - rInner) * (row + 0.5)) / rows
+      const angle = aStart + ((aEnd - aStart) * (col + 0.5)) / cols
+      const isBeam = isBeamAt({ col: cellCol, row: cellRow })
+      glyphs.push({ glyph, isBeam, ...project(r, angle) })
+    }
+  }
+  return glyphs
+}
+
+const distance = (a: WarpPoint, b: WarpPoint) => Math.hypot(a.x - b.x, a.y - b.y)
+
+const readPalette = (probeRoot: HTMLElement): Palette => {
+  const read = (role: keyof typeof PROBES) => readProbeColor(probeRoot, role)
+  return {
+    line: toOpaque(read('line'), read('surface')),
+    surface: read('surface'),
+    glyph: read('glyph'),
+    beam: read('beam'),
+  }
+}
+
+export const WarpCanvas = ({ anchorRef, text, className }: WarpCanvasProps) => {
+  const setupCanvas = useCallback(
+    (canvas: HTMLCanvasElement | null) => {
+      const host = canvas?.parentElement
+      const ctx = canvas?.getContext('2d')
+      const probeRoot = canvas?.nextElementSibling
+      const gridLayer = createLayer()
+      if (!canvas || !host || !ctx || !gridLayer || !(probeRoot instanceof HTMLElement)) return
+      const grid = gridLayer.ctx
+
+      const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const revealStartedAt = performance.now()
+      const revealAt = (now: number) =>
+        isReducedMotion ? 1 : Math.min(1, (now - revealStartedAt) / 600)
+      let palette = readPalette(probeRoot)
+      let baseShape: WarpShape = { cx: 0, rimY: 0, throatY: 0, r0: THROAT_RADIUS }
+      let baseRadii: number[] = []
+      let expandStep = -1
+      let shape = baseShape
+      let radii: number[] = []
+      let spokeRadii: number[] = []
+      let ringVisible: boolean[][] = []
+      let spokeVisible: boolean[][] = []
+      let anchorBox: PixelRect | null = null
+      let boundaryRing = -1
+      let boundaryY = 0
+      let pulses: Pulse[] = []
+      let hovered: WarpCell | null = null
+      let isVisible = false
+      let frame = 0
+      let lastTime = 0
+      let lastSpawn = 0
+      let isAnchorObserved = false
+      const infall = createInfall({ getAnchor: () => anchorRef.current })
+      let ringdownWave = -1
+      // the rings and spokes change only with scroll, size and theme, so frames reuse this layer
+      let gridKey = ''
+
+      const isRunning = () => isVisible && document.visibilityState === 'visible'
+
+      const getScrollProgress = () => {
+        const rect = host.getBoundingClientRect()
+        return clamp(-rect.top / rect.height, 0, 1)
+      }
+
+      const draw = () => {
+        const width = canvas.clientWidth
+        const height = canvas.clientHeight
+        const progress = getScrollProgress()
+        const step = Math.round(easeOutCubic(progress) * EXPAND_STEPS)
+        if (step !== expandStep) {
+          expandStep = step
+          const grow = (THROAT_RADIUS * 0.65 * step) / EXPAND_STEPS
+          shape = { ...baseShape, r0: baseShape.r0 + grow }
+          const edge = baseRadii[boundaryRing]
+          const edgeGrow = boundaryRing > 0 ? frontRadius({ shape, y: boundaryY }) - edge : grow
+          radii = baseRadii.map((r, i) =>
+            i < boundaryRing
+              ? r + grow + ((edgeGrow - grow) * (r - THROAT_RADIUS)) / (edge - THROAT_RADIUS)
+              : r + edgeGrow
+          )
+          spokeRadii = subdivide(radii)
+          const isShown = (r: number, angle: number) => !isBehindWall({ shape, radii, r, angle })
+          ringVisible = radii.map((r) => RING_ANGLES.map((angle) => isShown(r, angle)))
+          spokeVisible = SPOKE_ANGLES.map((angle) => spokeRadii.map((r) => isShown(r, angle)))
+        }
+        const flatten = MAX_FLATTEN * easeInOutCubic(progress)
+        const lineY = height - 1.5
+        const project = (r: number, angle: number) =>
+          projectWarp({ shape, r, angle, flatten, lineY })
+        const clipToBoundary = (target: CanvasRenderingContext2D) => {
+          if (boundaryRing < 0) return
+          const span = Math.max(width, height) * 4
+          target.beginPath()
+          target.moveTo(-span, -span)
+          target.lineTo(span, -span)
+          for (const angle of FRONT_ARC_ANGLES) {
+            const { x, y } = project(radii[boundaryRing], angle)
+            target.lineTo(x, y + 1)
+          }
+          target.closePath()
+          target.clip()
+        }
+
+        const t = revealAt(performance.now())
+        // bending pulls the rings past the boundary up to it, so they would show inside the slack
+        const ringCount = boundaryRing < 0 ? radii.length : boundaryRing + 1
+        // rings that fit inside the copy are hidden behind its fade, so they show at once
+        const copyHalfWidth = anchorBox ? (anchorBox.right - anchorBox.left) / 2 : 0
+        const firstSweptRing = Math.max(
+          0,
+          radii.findIndex((r) => r > copyHalfWidth)
+        )
+        const shownRings =
+          firstSweptRing +
+          Math.ceil((ringCount - firstSweptRing) * phase({ t, start: 0, length: 0.6 }))
+        const down = drawStep(phase({ t, start: 0.35, length: 0.65 }))
+        if (gridKey !== `${expandStep}:${flatten}:${shownRings}:${down}`) {
+          gridKey = `${expandStep}:${flatten}:${shownRings}:${down}`
+          grid.clearRect(0, 0, width, height)
+          grid.save()
+          clipToBoundary(grid)
+          grid.fillStyle = palette.line
+          grid.font = GLYPH_FONT
+          grid.textAlign = 'center'
+          grid.textBaseline = 'middle'
+          // each line starts at a different place in the text, so neighbor lines do not repeat
+          radii.slice(0, shownRings).forEach((r, i) => {
+            const points = RING_ANGLES.map((angle) => project(r, angle))
+            fillGlyphPath({
+              ctx: grid,
+              points,
+              visible: ringVisible[i],
+              isClosed: true,
+              text,
+              offset: i * 1009,
+              surface: palette.surface,
+            })
+          })
+          SPOKE_ANGLES.forEach((angle, s) => {
+            const points = spokeRadii
+              .slice(0, Math.round(((ringCount - 1) * SPOKE_STEPS + 1) * down))
+              .map((r) => project(r, angle))
+            fillGlyphPath({
+              ctx: grid,
+              points,
+              visible: spokeVisible[s],
+              isClosed: false,
+              text,
+              offset: s * 503,
+              surface: palette.surface,
+            })
+          })
+          grid.restore()
+        }
+        ctx.clearRect(0, 0, width, height)
+        ctx.drawImage(gridLayer.canvas, 0, 0, width, height)
+        if (!isReducedMotion && infall.paint({ shape, flatten, lineY, progress })) {
+          // the wave owns the grid while it runs, so pulses stop and no new ones spawn
+          ringdownWave = 0
+          pulses = []
+        }
+
+        ctx.save()
+        clipToBoundary(ctx)
+        ctx.font = '11px ui-monospace, SFMono-Regular, Menlo, monospace'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        const paintCell = (cell: WarpCell, strength: number) => {
+          if (!isCellShown({ ...cell, radii, ringVisible })) return
+          const alpha = Math.min(1, strength) * (1 - flatten)
+          for (const { glyph, isBeam, x, y } of cellGlyphs({ ...cell, strength, radii, project })) {
+            ctx.fillStyle = isBeam ? palette.beam : palette.glyph
+            ctx.globalAlpha = alpha * (isBeam ? BEAM_ALPHA : 1)
+            ctx.fillText(glyph, x, y)
+          }
+        }
+        for (const pulse of pulses) {
+          const fadeIn = Math.min(1, pulse.age / FADE_IN_S)
+          const head = Math.floor(pulse.ringPos)
+          for (const [offset, strength] of [1, 0.45, 0.18].entries()) {
+            const ring = head + offset
+            if (ring <= pulse.start) paintCell({ ring, spoke: pulse.spoke }, strength * fadeIn)
+          }
+        }
+        if (ringdownWave >= 0) {
+          const head = Math.floor(ringdownWave)
+          const fade = 1 - (ringdownWave / ringCount) ** 2
+          SPOKE_ANGLES.forEach((_, spoke) => {
+            for (const [offset, strength] of [1, 0.7, 0.4].entries()) {
+              const ring = head - offset
+              if (ring >= 0 && hash(spoke, ring) > 0.15) paintCell({ ring, spoke }, strength * fade)
+            }
+          })
+        }
+        if (hovered && ringdownWave < 0) paintCell(hovered, 1)
+        ctx.restore()
+
+        const bottomFade = ctx.createLinearGradient(0, height - BOTTOM_FADE, 0, height)
+        bottomFade.addColorStop(0, 'rgb(0 0 0 / 0)')
+        bottomFade.addColorStop(1, 'rgb(0 0 0 / 1)')
+        ctx.globalCompositeOperation = 'destination-out'
+        ctx.globalAlpha = 1
+        ctx.fillStyle = bottomFade
+        ctx.fillRect(0, height - BOTTOM_FADE, width, BOTTOM_FADE)
+        ctx.globalCompositeOperation = 'source-over'
+      }
+
+      const isPaintable = ({ ring, spoke }: WarpCell, canBeUnderCopy = false) => {
+        const outline = cellOutline({
+          ring,
+          spoke,
+          radii,
+          ringVisible,
+          project: (r, angle) => projectWarp({ shape, r, angle, flatten: 0, lineY: 0 }),
+        })
+        if (!outline) return false
+        const { x, y } = outline[Math.floor(outline.length / 4)]
+        const isOffCanvas = x < 0 || x > canvas.clientWidth || y < 0 || y > canvas.clientHeight
+        const isUnderCopy =
+          anchorBox !== null &&
+          x >= anchorBox.left &&
+          x <= anchorBox.right &&
+          y >= anchorBox.top &&
+          y <= anchorBox.bottom
+        return !isOffCanvas && (canBeUnderCopy || !isUnderCopy)
+      }
+
+      const launch = ({ ring, spoke }: WarpCell, age = 0) => {
+        pulses.push({ spoke, start: ring, ringPos: ring + 0.999, age })
+      }
+
+      const spawn = () => {
+        for (let attempt = 0; attempt < 8; attempt++) {
+          const cell = {
+            ring: SPAWN_MIN_RING + Math.floor(Math.random() * (radii.length - 1 - SPAWN_MIN_RING)),
+            spoke: Math.floor(Math.random() * SPOKE_ANGLES.length),
+          }
+          if (isPaintable(cell)) return launch(cell)
+        }
+      }
+
+      const handlePointerMove = (event: PointerEvent) => {
+        const origin = canvas.getBoundingClientRect()
+        const cell = locateCell({
+          shape,
+          radii,
+          spokeCount: SPOKE_ANGLES.length,
+          x: event.clientX - origin.left,
+          y: event.clientY - origin.top,
+          flatten: MAX_FLATTEN * easeInOutCubic(getScrollProgress()),
+          lineY: canvas.clientHeight - 0.5,
+        })
+        hovered = cell && isPaintable(cell, true) ? cell : null
+        requestDraw()
+      }
+
+      const handlePointerLeave = () => {
+        hovered = null
+        requestDraw()
+      }
+
+      const handleClick = () => {
+        if (!hovered || isReducedMotion) return
+        launch(hovered, FADE_IN_S)
+      }
+
+      const tick = (time: number) => {
+        frame = 0
+        if (!isRunning()) return
+        const dt = lastTime ? Math.min(0.05, (time - lastTime) / 1000) : 0
+        lastTime = time
+        if (
+          revealAt(time) >= 1 &&
+          ringdownWave < 0 &&
+          time - lastSpawn > 450 &&
+          pulses.length < 10
+        ) {
+          lastSpawn = time
+          spawn()
+        }
+        infall.advance(dt)
+        if (ringdownWave >= 0) {
+          ringdownWave += 14 * dt
+          // past the last drawn ring the fade turns negative, which has no ramp glyph
+          if (ringdownWave >= (boundaryRing < 0 ? radii.length : boundaryRing + 1))
+            ringdownWave = -1
+        }
+        pulses = pulses.flatMap((pulse) => {
+          const speed = 2.5 * (1 + 0.25 * (pulse.start - pulse.ringPos))
+          const ringPos = pulse.ringPos - speed * dt
+          if (ringPos < 0) return []
+          return [{ ...pulse, ringPos, age: pulse.age + dt }]
+        })
+        draw()
+        frame = requestAnimationFrame(tick)
+      }
+
+      const wake = () => {
+        if (isReducedMotion || frame || !isRunning()) return
+        lastTime = 0
+        frame = requestAnimationFrame(tick)
+      }
+
+      const requestDraw = () => {
+        if (!isReducedMotion || frame) return
+        frame = requestAnimationFrame(() => {
+          frame = 0
+          draw()
+        })
+      }
+
+      const measure = () => {
+        const width = host.clientWidth
+        const height = host.clientHeight
+        sizeLayers({ contexts: [ctx, grid], width, height })
+        gridKey = ''
+
+        if (anchorRef.current && !isAnchorObserved) {
+          isAnchorObserved = true
+          resizeObserver.observe(anchorRef.current)
+        }
+        const origin = host.getBoundingClientRect()
+        const covered = [...(anchorRef.current?.children ?? [])].map((child) =>
+          child.getBoundingClientRect()
+        )
+        anchorBox =
+          covered.length > 0
+            ? {
+                left: Math.min(...covered.map((rect) => rect.left)) - origin.left - ANCHOR_MARGIN,
+                top: Math.min(...covered.map((rect) => rect.top)) - origin.top - ANCHOR_MARGIN,
+                right: Math.max(...covered.map((rect) => rect.right)) - origin.left + ANCHOR_MARGIN,
+                bottom:
+                  Math.max(...covered.map((rect) => rect.bottom)) - origin.top + ANCHOR_MARGIN,
+              }
+            : null
+        const throatTarget = anchorRef.current
+          ?.querySelector('[data-warp-throat]')
+          ?.getBoundingClientRect()
+        const throatBox = throatTarget ?? anchorRef.current?.getBoundingClientRect()
+        const throatY = throatBox
+          ? (throatBox.top + throatBox.bottom) / 2 -
+            origin.top +
+            (throatTarget ? infall.getLift() : THROAT_DROP)
+          : height / 2
+        baseShape = { cx: width / 2, rimY: throatY - 190, throatY, r0: THROAT_RADIUS }
+        infall.measure({ origin, throat: { x: width / 2, y: throatY } })
+        baseRadii = ringRadii({ r0: THROAT_RADIUS, maxRadius: Math.hypot(width, height * 3) })
+        const frontYs = baseRadii.map(
+          (r) => projectWarp({ shape: baseShape, r, angle: Math.PI / 2, flatten: 0, lineY: 0 }).y
+        )
+        boundaryRing = frontYs.findLastIndex((y) => y <= height - 2)
+        boundaryY = frontYs[boundaryRing] ?? 0
+        expandStep = -1
+        draw()
+      }
+
+      const resizeObserver = new ResizeObserver(measure)
+      resizeObserver.observe(host)
+      // a pinch zoom changes only the visual viewport scale, so the layers resize for it too
+      visualViewport?.addEventListener('resize', measure)
+
+      const intersectionObserver = new IntersectionObserver(([entry]) => {
+        isVisible = entry.isIntersecting
+        wake()
+      })
+      intersectionObserver.observe(canvas)
+
+      const unobserveTheme = observeTheme(() => {
+        palette = readPalette(probeRoot)
+        gridKey = ''
+        draw()
+      })
+
+      window.addEventListener('scroll', requestDraw, { passive: true })
+      host.addEventListener('pointermove', handlePointerMove)
+      host.addEventListener('pointerleave', handlePointerLeave)
+      host.addEventListener('click', handleClick)
+      document.addEventListener('visibilitychange', wake)
+
+      return () => {
+        cancelAnimationFrame(frame)
+        resizeObserver.disconnect()
+        visualViewport?.removeEventListener('resize', measure)
+        intersectionObserver.disconnect()
+        unobserveTheme()
+        window.removeEventListener('scroll', requestDraw)
+        host.removeEventListener('pointermove', handlePointerMove)
+        host.removeEventListener('pointerleave', handlePointerLeave)
+        host.removeEventListener('click', handleClick)
+        document.removeEventListener('visibilitychange', wake)
+      }
+    },
+    [text]
+  )
+
+  return (
+    <>
+      <canvas
+        ref={setupCanvas}
+        aria-hidden
+        className={cn('pointer-events-none absolute inset-0 size-full', className)}
+      />
+      <ColorProbes probes={PROBES} />
+    </>
+  )
+}

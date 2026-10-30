@@ -5,6 +5,7 @@ import { API_KEYS_SHORTCUT_IDS, apiKeysRegistry } from './registry/api-keys'
 import { AUTH_NAV_SHORTCUT_IDS, authNavRegistry } from './registry/auth-nav'
 import { AUTH_USERS_SHORTCUT_IDS, authUsersRegistry } from './registry/auth-users'
 import { DATABASE_NAV_SHORTCUT_IDS, databaseNavRegistry } from './registry/database-nav'
+import { EXPLORER_SHORTCUT_IDS, explorerRegistry } from './registry/explorer'
 import { FUNCTIONS_DETAIL_SHORTCUT_IDS, functionsDetailRegistry } from './registry/functions-detail'
 import {
   FUNCTIONS_DETAIL_NAV_SHORTCUT_IDS,
@@ -87,9 +88,6 @@ export const SHORTCUT_IDS = {
   DATA_TABLE_RESET_COLUMNS: 'data-table.reset-columns',
   DATA_TABLE_TOGGLE_LIVE: 'data-table.toggle-live',
   ACTION_BAR_SAVE: 'action-bar.save',
-  OPERATION_QUEUE_SAVE: 'operation-queue.save',
-  OPERATION_QUEUE_TOGGLE: 'operation-queue.toggle',
-  OPERATION_QUEUE_UNDO: 'operation-queue.undo',
   NAV_HOME: 'nav.home',
   NAV_TABLE_EDITOR: 'nav.table-editor',
   NAV_SQL_EDITOR: 'nav.sql-editor',
@@ -145,6 +143,9 @@ export const SHORTCUT_IDS = {
 
   // Database sub-page navigation chords
   ...DATABASE_NAV_SHORTCUT_IDS,
+
+  // Explorer notebook shortcuts
+  ...EXPLORER_SHORTCUT_IDS,
 
   // Auth users page shortcuts
   ...AUTH_USERS_SHORTCUT_IDS,
@@ -324,24 +325,6 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.ACTION_BAR_SAVE,
     label: 'Save form',
     sequence: ['Mod+Enter'],
-    showInSettings: false,
-  },
-  [SHORTCUT_IDS.OPERATION_QUEUE_SAVE]: {
-    id: SHORTCUT_IDS.OPERATION_QUEUE_SAVE,
-    label: 'Save pending table edits',
-    sequence: ['Mod+S'],
-    showInSettings: false,
-  },
-  [SHORTCUT_IDS.OPERATION_QUEUE_TOGGLE]: {
-    id: SHORTCUT_IDS.OPERATION_QUEUE_TOGGLE,
-    label: 'Toggle operation queue panel',
-    sequence: ['Mod+.'],
-    showInSettings: false,
-  },
-  [SHORTCUT_IDS.OPERATION_QUEUE_UNDO]: {
-    id: SHORTCUT_IDS.OPERATION_QUEUE_UNDO,
-    label: 'Undo latest table edit',
-    sequence: ['Mod+Z'],
     showInSettings: false,
   },
   [SHORTCUT_IDS.NAV_HOME]: {
@@ -535,6 +518,9 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
 
   // Database sub-page navigation chord registration
   ...databaseNavRegistry,
+
+  // Explorer notebook shortcut registration
+  ...explorerRegistry,
 
   // Auth users page shortcut registration
   ...authUsersRegistry,

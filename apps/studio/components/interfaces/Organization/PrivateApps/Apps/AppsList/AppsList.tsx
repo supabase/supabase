@@ -1,4 +1,4 @@
-import { AppWindow, Plus } from 'lucide-react'
+import { AppWindowIcon, PlusIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -71,18 +71,18 @@ export function AppsList({ onCreateApp, createShortcutId }: AppsListProps) {
         <AppsListLoading />
       ) : apps.length === 0 ? (
         <EmptyStatePresentational
-          icon={AppWindow}
+          icon={AppWindowIcon}
           title="No private apps yet"
           description="Create a private app to generate scoped access tokens for your organization."
         >
           {createShortcutId ? (
             <Shortcut id={createShortcutId} onTrigger={onCreateApp} side="bottom">
-              <Button variant="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
+              <Button variant="primary" icon={<PlusIcon size={14} />} onClick={onCreateApp}>
                 Create app
               </Button>
             </Shortcut>
           ) : (
-            <Button variant="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
+            <Button variant="primary" icon={<PlusIcon size={14} />} onClick={onCreateApp}>
               Create app
             </Button>
           )}

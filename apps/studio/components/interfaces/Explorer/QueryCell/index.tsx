@@ -1,4 +1,4 @@
-import { AlignLeft } from 'lucide-react'
+import { AlignLeftIcon } from 'lucide-react'
 import { forwardRef, useState } from 'react'
 import { KeyboardShortcut } from 'ui'
 import { type Snapshot } from 'valtio'
@@ -110,7 +110,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
   return (
     <SortableSection
       id={cell._id}
-      sectionWidth="72rem"
+      sectionWidth="48rem"
       actions={<AddCellDropdown cellId={cell._id} />}
       gripDropdownContent={<MoveCellDropdownContent cellId={cell._id} />}
       gripClassName="mt-2 sm:opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
@@ -118,6 +118,15 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
       <QueryEditor
         ref={ref}
         id={cell._id}
+        location={
+          currentNotebook
+            ? {
+                surface: 'notebook_cell',
+                notebookId: currentNotebook.notebook.id,
+                cellId: cell._id,
+              }
+            : undefined
+        }
         variant="embedded"
         className="min-h-0"
         title={title}
@@ -136,7 +145,7 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
         onDisplayChange={handleDisplayChange}
         toolbarActions={
           <ExplorerToolbarAction
-            icon={<AlignLeft size={16} strokeWidth={2} />}
+            icon={<AlignLeftIcon size={16} strokeWidth={2} />}
             tooltip={
               <div className="flex items-center gap-2.5">
                 <span>Prettify SQL</span>

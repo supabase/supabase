@@ -122,7 +122,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
                 className={cn(
                   'text-xs font-mono leading-[1.1] px-2 py-1 rounded-full border font-normal whitespace-nowrap transition-colors duration-200',
                   allowedClientLibraryMethods.includes(method)
-                    ? 'bg-brand/10 text-brand-600 border-brand-500'
+                    ? 'bg-brand-default/10 text-brand-600 border-brand-500'
                     : 'bg-surface-75 text-foreground-lighter border-muted'
                 )}
               >
@@ -137,7 +137,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 }
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
-  <div className="flex w-full items-center justify-end gap-x-2 border-t px-6 py-3 border-default">
+  <div className="sticky bottom-0 z-10 flex w-full items-center justify-end gap-x-2 border-t px-6 py-3 border-default bg-dash-sidebar">
     <Button onClick={onViewTemplates}>View templates</Button>
     <Button variant="primary" onClick={onReviewPolicy}>
       Review

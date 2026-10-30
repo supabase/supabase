@@ -64,15 +64,6 @@ export interface VSCodeMcpConfig {
   }
 }
 
-export interface WindsurfMcpConfig {
-  mcpServers: {
-    supabase: {
-      command: 'npx'
-      args: ['-y', 'mcp-remote', string]
-    }
-  }
-}
-
 export interface ClaudeCodeMcpConfig extends McpClientBaseConfig {
   mcpServers: {
     supabase: {
@@ -247,7 +238,6 @@ export type McpClientConfig =
   | OpenCodeMcpConfig
   | OtherMcpConfig
   | VSCodeMcpConfig
-  | WindsurfMcpConfig
 
 // Type guards
 export function isVSCodeMcpConfig(config: McpClientConfig): config is VSCodeMcpConfig {

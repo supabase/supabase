@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffectEvent, useOnChange } from 'common'
+import { useEffectEvent } from 'common/hooks/useEffectEvent'
+import { useOnChange } from 'common/hooks/useOnChange'
 import { useEffect, useRef, type HTMLAttributes, type RefObject } from 'react'
 
 import * as Primitive from './toc-primitive'

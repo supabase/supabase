@@ -5,9 +5,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 09 Jul 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 06 Oct 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/flick-games</guid>
+  <title>How a two-person studio keeps two live games in sync on Supabase</title>
+  <link>https://supabase.com/customers/flick-games</link>
+  <description>Flick Games is an indie UK studio running two live products, Art of Solitaire and Goalman, on Supabase. A single backend covers authentication, cross-device cloud saves, and remote content delivery across iOS, Android, and Steam for a team of two.</description>
+  <pubDate>Tue, 06 Oct 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/polymet</guid>
+  <title>How Polymet gives every user a real backend without a backend team</title>
+  <link>https://supabase.com/customers/polymet</link>
+  <description>Polymet is an AI product designer that turns a prompt or an image into working code. A three-person team runs the backend for tens of thousands of user projects a month, on Supabase, without hiring a single backend engineer.</description>
+  <pubDate>Wed, 23 Sep 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/lingodotdev</guid>
+  <title>How Lingo.dev clears enterprise security reviews without a single database question</title>
+  <link>https://supabase.com/customers/lingodotdev</link>
+  <description>Lingo.dev is the localization engineering platform behind retrieval augmented localization, translation APIs with a memory for glossary, brand voice, and quality. It has run on Supabase since day one.</description>
+  <pubDate>Wed, 26 Aug 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/qa-tech</guid>
+  <title>How QA.tech built enterprise-ready AI testing agents on Supabase</title>
+  <link>https://supabase.com/customers/qa-tech</link>
+  <description>QA.tech is an autonomous AI testing platform whose QA agents run end-to-end testing of web and mobile products by goal and intent. Three years on Supabase took QA.tech from three founders to a global customer base, enterprise-scale daily test volume, and SOC 2 compliance.</description>
+  <pubDate>Tue, 04 Aug 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/lovable</guid>
   <title>How Supabase helps power millions of apps on Lovable</title>
   <link>https://supabase.com/customers/lovable</link>

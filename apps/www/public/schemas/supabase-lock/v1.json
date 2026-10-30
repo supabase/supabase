@@ -1,0 +1,307 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://supabase.com/schemas/supabase-lock/v1.json",
+  "title": "supabase.lock",
+  "description": "The service versions that supabase start pins in supabase/supabase.lock.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "enum": [
+        "https://supabase.com/docs/cli/supabase-lock/v1.schema.json",
+        "https://supabase.com/schemas/supabase-lock/v1.json"
+      ]
+    },
+    "lockfileVersion": {
+      "type": "number",
+      "enum": [
+        1
+      ]
+    },
+    "linked": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "object",
+          "properties": {
+            "ref": {
+              "type": "string"
+            },
+            "isDefault": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "ref",
+            "isDefault"
+          ],
+          "additionalProperties": true
+        },
+        "observedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "project",
+        "branch",
+        "observedAt"
+      ],
+      "additionalProperties": true
+    },
+    "services": {
+      "type": "object",
+      "properties": {
+        "database": {
+          "$ref": "#/definitions/DatabaseLock"
+        },
+        "rest": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "auth": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "realtime": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "storage": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "imgproxy": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "functions": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "studio": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "pgmeta": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "mail": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "analytics": {
+          "$ref": "#/definitions/ServiceLock"
+        },
+        "pooler": {
+          "$ref": "#/definitions/ServiceLock"
+        }
+      },
+      "required": [
+        "database",
+        "rest",
+        "auth",
+        "realtime",
+        "storage",
+        "imgproxy",
+        "functions",
+        "studio",
+        "pgmeta",
+        "mail",
+        "analytics",
+        "pooler"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "$schema",
+    "lockfileVersion",
+    "services"
+  ],
+  "additionalProperties": true,
+  "definitions": {
+    "LinkedVersion": {
+      "type": "object",
+      "properties": {
+        "raw": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "raw",
+        "version"
+      ],
+      "additionalProperties": true
+    },
+    "NativePin": {
+      "type": "object",
+      "properties": {
+        "archive": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "manifest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "archive",
+        "manifest"
+      ],
+      "additionalProperties": true
+    },
+    "DatabaseLock": {
+      "type": "object",
+      "properties": {
+        "specifier": {
+          "type": "string"
+        },
+        "linked": {
+          "$ref": "#/definitions/LinkedVersion"
+        },
+        "resolution": {
+          "type": "string",
+          "enum": [
+            "resolved",
+            "unlinked",
+            "unobserved",
+            "unpublished"
+          ]
+        },
+        "resolved": {
+          "type": "object",
+          "properties": {
+            "upstreamVersion": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "integer"
+            },
+            "image": {
+              "type": "string"
+            },
+            "upstreamImage": {
+              "type": "string"
+            },
+            "natives": {
+              "type": "object",
+              "properties": {
+                "darwin-arm64": {
+                  "$ref": "#/definitions/NativePin"
+                },
+                "linux-amd64": {
+                  "$ref": "#/definitions/NativePin"
+                },
+                "linux-arm64": {
+                  "$ref": "#/definitions/NativePin"
+                }
+              },
+              "required": [
+                "darwin-arm64",
+                "linux-amd64",
+                "linux-arm64"
+              ],
+              "additionalProperties": true
+            }
+          },
+          "required": [
+            "upstreamVersion",
+            "revision",
+            "image",
+            "upstreamImage",
+            "natives"
+          ],
+          "additionalProperties": true
+        },
+        "majorVersion": {
+          "type": "integer"
+        },
+        "line": {
+          "type": "string",
+          "enum": [
+            "stock",
+            "orioledb"
+          ]
+        }
+      },
+      "required": [
+        "specifier",
+        "resolution",
+        "resolved",
+        "majorVersion",
+        "line"
+      ],
+      "additionalProperties": true
+    },
+    "ServiceLock": {
+      "type": "object",
+      "properties": {
+        "specifier": {
+          "type": "string"
+        },
+        "linked": {
+          "$ref": "#/definitions/LinkedVersion"
+        },
+        "resolution": {
+          "type": "string",
+          "enum": [
+            "resolved",
+            "unlinked",
+            "unobserved",
+            "unpublished"
+          ]
+        },
+        "resolved": {
+          "type": "object",
+          "properties": {
+            "upstreamVersion": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "integer"
+            },
+            "image": {
+              "type": "string"
+            },
+            "upstreamImage": {
+              "type": "string"
+            },
+            "natives": {
+              "type": "object",
+              "properties": {
+                "darwin-arm64": {
+                  "$ref": "#/definitions/NativePin"
+                },
+                "linux-amd64": {
+                  "$ref": "#/definitions/NativePin"
+                },
+                "linux-arm64": {
+                  "$ref": "#/definitions/NativePin"
+                }
+              },
+              "required": [
+                "darwin-arm64",
+                "linux-amd64",
+                "linux-arm64"
+              ],
+              "additionalProperties": true
+            }
+          },
+          "required": [
+            "upstreamVersion",
+            "revision",
+            "image",
+            "upstreamImage",
+            "natives"
+          ],
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "specifier",
+        "resolution",
+        "resolved"
+      ],
+      "additionalProperties": true
+    }
+  }
+}

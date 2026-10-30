@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { Fragment, useMemo } from 'react'
 import { cn } from 'ui'
 
+import { isCrossZoneHref } from '@/lib/cross-zone'
+
 const ComputePricingTable = () => {
   const columnNames = useMemo(
     () =>
@@ -49,13 +51,23 @@ const ComputePricingTable = () => {
                       translate={column.key === 'pricing' ? 'no' : undefined}
                     >
                       {column.url ? (
-                        <Link
-                          href={column.url}
-                          className="underline text-brand hover:text-brand-600"
-                          target="_blank"
-                        >
-                          {column.value}
-                        </Link>
+                        isCrossZoneHref(column.url) ? (
+                          <a
+                            href={column.url}
+                            className="underline text-primary hover:text-brand-600"
+                            target="_blank"
+                          >
+                            {column.value}
+                          </a>
+                        ) : (
+                          <Link
+                            href={column.url}
+                            className="underline text-primary hover:text-brand-600"
+                            target="_blank"
+                          >
+                            {column.value}
+                          </Link>
+                        )
                       ) : (
                         column.value
                       )}
@@ -83,7 +95,7 @@ const ComputePricingTable = () => {
                   </th>
                   <td
                     className={`px-4 py-3 ${
-                      column.key === 'plan' ? 'text-brand pt-16 lg:pt-3' : ''
+                      column.key === 'plan' ? 'text-primary pt-16 lg:pt-3' : ''
                     }`}
                   >
                     {column.value}

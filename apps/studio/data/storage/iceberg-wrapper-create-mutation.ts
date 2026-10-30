@@ -1,9 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
-  getAnalyticsBucketFDWName,
+  getAnalyticsBucketFDWServerName,
   getAnalyticsBucketS3KeyName,
 } from '@/components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import {
@@ -13,13 +11,15 @@ import {
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useIcebergWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ
+  )
   const { data: apiKeysData } = useAPIKeys(
     { projectRef: project?.ref, reveal: true },
     { enabled: canReadAPIKeys }
@@ -33,9 +33,8 @@ export const useIcebergWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
-  const { can: canCreateCredentials } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
+  const { can: canCreateCredentials } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
   )
 
   const { mutateAsync: createS3AccessKey, isPending: isCreatingS3AccessKey } =
@@ -49,15 +48,12 @@ export const useIcebergWrapperCreateMutation = () => {
       description: getAnalyticsBucketS3KeyName(bucketName),
     })
 
-    const wrapperName = getAnalyticsBucketFDWName(bucketName)
-
     const params: FDWCreateVariables = {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapperMeta: wrapperMeta!,
       formState: {
-        wrapper_name: wrapperName,
-        server_name: `${wrapperName}_server`,
+        server_name: getAnalyticsBucketFDWServerName(bucketName),
         vault_aws_access_key_id: createS3KeyData?.access_key,
         vault_aws_secret_access_key: createS3KeyData?.secret_key,
         vault_token: apiKey,

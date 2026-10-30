@@ -10,9 +10,12 @@
  * Spec: https://github.com/agentskills/agentskills/pull/254
  * Uses AGENT_SKILLS_GITHUB_TOKEN if set to avoid GitHub's unauthenticated
  * rate limit (60 req/hr per IP, shared across Vercel build machines).
+ *
+ * If the fetch fails outside production, the committed index.json is kept so
+ * preview and local builds don't break on GitHub rate limits.
  */
 
-import { promises as fs } from 'node:fs'
+import { existsSync, promises as fs } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -50,5 +53,12 @@ async function main() {
 
 main().catch((err) => {
   console.error(err)
+  const canFallBack = process.env.VERCEL_ENV !== 'production'
+  const hasPreviousWrite = existsSync(join(OUT_DIR, 'index.json'))
+
+  if (canFallBack && hasPreviousWrite) {
+    console.warn('Done — keeping committed public/.well-known/agent-skills/index.json')
+    process.exit(0)
+  }
   process.exit(1)
 })

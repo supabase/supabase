@@ -7,7 +7,7 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils/cn'
 
 const switchRootVariants = cva(
-  'peer inline-flex shrink-0 cursor-pointer items-center rounded-full border transition-colors focus-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-brand data-[state=checked]:hover:bg-brand-600/90 data-[state=unchecked]:bg-control data-[state=unchecked]:hover:bg-border',
+  'peer inline-flex shrink-0 cursor-pointer items-center rounded-full border transition-colors focus-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary-bright data-[state=checked]:hover:bg-[var(--primary-bright-hover)] data-[state=unchecked]:bg-control data-[state=unchecked]:hover:bg-border',
   {
     variants: {
       size: {
@@ -23,7 +23,7 @@ const switchRootVariants = cva(
 )
 
 const switchThumbVariants = cva(
-  'pointer-events-none block rounded-full bg-foreground-lighter data-[state=checked]:bg-white shadow-lg ring-0 transition-transform',
+  'pointer-events-none block rounded-full bg-foreground-lighter data-[state=checked]:bg-primary-foreground shadow-lg ring-0 transition-transform',
   {
     variants: {
       size: {
