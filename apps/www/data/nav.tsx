@@ -11,21 +11,21 @@ export const getMenu = () => ({
   primaryNav: [
     {
       title: 'Product' as const,
-      hasDropdown: true,
+      hasDropdown: true as const,
       dropdown: <ProductDropdown />,
       dropdownContainerClassName: 'rounded-xl',
       subMenu: MainProductsData,
     },
     {
       title: 'Developers' as const,
-      hasDropdown: true,
+      hasDropdown: true as const,
       dropdown: <DevelopersDropdown />,
       dropdownContainerClassName: 'rounded-xl',
       subMenu: DevelopersData,
     },
     {
       title: 'Solutions' as const,
-      hasDropdown: true,
+      hasDropdown: true as const,
       dropdown: <SolutionsDropdown />,
       dropdownContainerClassName: 'rounded-xl',
       subMenu: SolutionsData,

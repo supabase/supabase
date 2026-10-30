@@ -1,10 +1,10 @@
-import { useBreakpoint, useReducedMotion } from 'common'
-import { navData as DevelopersData } from 'data/Solutions'
-import { ArrowLeftRight, ChevronRight } from 'lucide-react'
-import { AnimatePresence, motion } from 'motion/react'
+import { navData as SolutionsData } from 'data/Solutions'
 import Link from 'next/link'
-import { useState } from 'react'
-import { useMedia } from 'react-use'
+import {
+  TopNavMenuGroup,
+  TopNavMenuGroupLink,
+  TopNavMenuPanel,
+} from 'ui-patterns/TopNav/TopNavMenu'
 
 type LinkProps = {
   text: string
@@ -15,123 +15,16 @@ type LinkProps = {
 }
 
 export const SolutionsDropdown = () => (
-  <div className="bg-surface-75 flex flex-col lg:flex-row">
-    <div className="w-full lg:w-[600px] px-6 py-5 grid gap-3 grid-cols-2 lg:grid-cols-3">
-      {/* Skill Level, Who it's for, App Type */}
-      {DevelopersData['navigation'].slice(0, 3).map((column) => (
-        <LinksGroup key={column.label} links={column.links} label={column.label} />
-      ))}
-    </div>
-
-    <div className="flex flex-col w-full lg:flex-1 border-t lg:border-t-0 lg:border-l">
-      <div className="flex flex-col gap-6 p-5">
-        <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
-          {DevelopersData['navigation'][3].label}
-        </label>
-
-        <div className="flex flex-col gap-4">
-          {DevelopersData['navigation'][3].links.map((link) => (
-            <MigrationLinkCard key={link.text} link={link} />
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-)
-
-const LinksGroup = ({ links, label }: { links: LinkProps[]; label: string }) => {
-  return (
-    <div key={label} className="p-0 flex flex-col gap-6">
-      <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
-        {label}
-      </label>
-      <ul className="flex flex-col gap-4">
-        {links.map(({ icon: Icon, ...link }: LinkProps) => (
-          <li key={link.text}>
-            <Link
-              href={link.url!}
-              className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-ring rounded-sm"
-            >
-              {Icon && <Icon size={16} strokeWidth={1.3} />}
-              <span>{link.text}</span>
-              <ChevronRight
-                strokeWidth={2}
-                className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
-              />
-            </Link>
-          </li>
+  <TopNavMenuPanel>
+    {SolutionsData['navigation'].map((column) => (
+      <TopNavMenuGroup key={column.label} label={column.label}>
+        {column.links.map(({ icon: Icon, ...link }: LinkProps) => (
+          <TopNavMenuGroupLink key={link.text} linkAs={Link} href={link.url!}>
+            {Icon && <Icon className="size-4" strokeWidth={1.3} />}
+            <span>{link.text}</span>
+          </TopNavMenuGroupLink>
         ))}
-      </ul>
-    </div>
-  )
-}
-
-const MotionLink = motion(Link)
-
-const MigrationLinkCard = ({ link }: { link: LinkProps }) => {
-  const [isHighlighted, setIsHighlighted] = useState(false)
-  const canHover = useMedia('(hover: hover)', true)
-  const reduceMotion = useReducedMotion()
-  const isDesktop = !useBreakpoint('lg')
-  const duration = isDesktop && !reduceMotion ? 0.2 : 0
-  const isIconVisible = isHighlighted || !isDesktop || !canHover
-
-  return (
-    <MotionLink
-      href={link.url!}
-      className="bg-background p-3 rounded-md border flex items-center gap-4 group overflow-hidden"
-      onMouseEnter={() => setIsHighlighted(true)}
-      onMouseLeave={() => setIsHighlighted(false)}
-      onFocus={() => setIsHighlighted(true)}
-      onBlur={() => setIsHighlighted(false)}
-      layout
-      layoutDependency={isHighlighted}
-      transition={{ duration, ease: 'easeInOut' }}
-    >
-      <AnimatePresence mode="popLayout">
-        {isIconVisible && (
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            transition={{ duration, ease: 'easeInOut' }}
-            layout
-            layoutDependency={isHighlighted}
-          >
-            {link.icon && <link.icon className="size-6" />}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        className="size-6 flex items-center justify-center"
-        layout
-        layoutDependency={isHighlighted}
-        transition={{ duration, ease: 'easeInOut' }}
-      >
-        <ArrowLeftRight className="size-4 text-foreground-light" strokeWidth={1.3} />
-      </motion.div>
-
-      <motion.div
-        className="flex items-center gap-1"
-        layout
-        layoutDependency={isHighlighted}
-        transition={{ duration, ease: 'easeInOut' }}
-      >
-        <span className="text-base font-medium">{link.text}</span>
-      </motion.div>
-
-      <motion.div
-        layout
-        layoutDependency={isHighlighted}
-        transition={{ duration, ease: 'easeInOut' }}
-        className="ml-auto"
-      >
-        <ChevronRight
-          strokeWidth={2}
-          className="w-3 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
-        />
-      </motion.div>
-    </MotionLink>
-  )
-}
+      </TopNavMenuGroup>
+    ))}
+  </TopNavMenuPanel>
+)
