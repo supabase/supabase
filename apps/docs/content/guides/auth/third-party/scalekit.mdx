@@ -4,14 +4,14 @@ title: 'Scalekit'
 subtitle: 'Use Scalekit with your Supabase project'
 ---
 
-Use Scalekit to authorize requests to your Supabase project. You can use it alongside Supabase Auth, or on its own.
+Scalekit authenticates your users and issues an access token. Supabase uses that token to authorize requests to your project. You can use Scalekit alongside Supabase Auth, or on its own.
 
 ## Getting started
 
-1. In the Scalekit Dashboard, under **Developers**, open **Settings**, then **API Credentials**. Copy **Environment URL**. If **Settings** is absent, open **API Credentials** under **Developers**.
-2. Add that URL in the Supabase Dashboard as a Custom OIDC integration. See [Add the integration](#add-the-integration).
-3. Add a `role` claim with the value `authenticated` on the Scalekit access token. See [Add the role claim](#add-the-role-claim).
-4. Return that access token from the Supabase client. See [Set up the Supabase client](#set-up-the-supabase-client).
+1. In the Scalekit Dashboard, under **Developers**, open **Settings**, then **API Credentials**. Copy **Environment URL**. When **API Credentials** is its own item, open it under **Developers**.
+2. In the Supabase Dashboard, add that URL as a **Custom OIDC** integration. See [Add the integration](#add-the-integration).
+3. On the Scalekit access token, add a `role` claim set to `authenticated`. See [Add the role claim](#add-the-role-claim).
+4. On your server, return that access token from the Supabase client library. See [Set up the Supabase client library](#set-up-the-supabase-client-library).
 
 ## Add the integration
 
@@ -21,17 +21,17 @@ In the Supabase Dashboard, go to **Authentication** > **Sign In / Providers** > 
 2. In **Issuer URL**, enter the Scalekit **Environment URL**.
 3. Click **Add provider**.
 
-The integration appears in the Third-Party Auth list with that issuer URL. To remove it, delete it from the same list.
+The integration appears in the Third-Party Auth list with that issuer URL. To remove the integration, delete it from that list.
 
-Scalekit signs access tokens with RS256 and includes a `kid` header. Supabase loads the signing keys from `<Environment URL>/.well-known/openid-configuration`. **Issuer URL** takes the Environment URL on its own.
+Scalekit signs access tokens with RS256 and includes a `kid` header. Supabase loads the signing keys from `<Environment URL>/.well-known/openid-configuration`. **Issuer URL** is the Environment URL.
 
-To add the same issuer from a terminal, create a [personal access token](/docs/guides/platform/personal-access-tokens) and call the [create third-party auth integration](/docs/reference/api/v1-create-project-tpa-integration) endpoint. Set `oidc_issuer_url` to the Environment URL.
+To add the same issuer from a terminal, create a [personal access token](/docs/guides/platform/personal-access-tokens). Call the [create third-party auth integration](/docs/reference/api/v1-create-project-tpa-integration) endpoint. Set `oidc_issuer_url` to the Environment URL.
 
 ## Add the role claim
 
-Supabase reads the `role` claim on each JWT and uses that value as the Postgres role for the Data API, Storage, and Realtime. For a signed-in user, set `role` to `authenticated`. With no `role` claim, the request runs as `anon`.
+Supabase reads the `role` claim on each JWT. It uses that value as the Postgres role for the Data API, Storage, and Realtime. For a signed-in user, set `role` to `authenticated`. A request with no `role` claim runs as `anon`.
 
-A Scalekit access token carries `roles` as a list. Supabase uses the separate string claim `role` as the Postgres role. Add that claim in Token Claims before you rely on it.
+A Scalekit access token includes `roles` as a list. Supabase uses the string claim `role` as the Postgres role. Add `role` in Token Claims.
 
 In the Scalekit Dashboard, go to **Configure** > **Authentication** > **Token Claims**.
 
@@ -40,11 +40,11 @@ In the Scalekit Dashboard, go to **Configure** > **Authentication** > **Token Cl
 3. In **Expression**, enter `authenticated`.
 4. Click **Add**.
 
-Enter `authenticated` as a single word. Leave the `roles` claim in place.
+Enter `authenticated` as the whole expression. Keep the existing `roles` claim.
 
-## Set up the Supabase client
+## Set up the Supabase client library
 
-Install `@scalekit-sdk/node` on your server. In the login callback, exchange the authorization code and store the `accessToken` string. This package uses your client secret, so keep this code on the server.
+Install `@scalekit-sdk/node` on your server. After the user signs in, exchange the authorization code in your server callback and store the `accessToken` string. The package sends your client secret, so run it on the server.
 
 ```typescript
 import { Scalekit } from '@scalekit-sdk/node'
@@ -60,7 +60,7 @@ const { accessToken } = await scalekit.authenticateWithCode(code, redirectUri)
 
 `code` is the value Scalekit sends to your redirect URI. Save `accessToken` in your server session.
 
-Pass that stored string from the Supabase client. Return `null` when no user is signed in.
+Pass that stored string from the Supabase client library. Return `null` when no user is signed in.
 
 ```typescript
 import { createClient } from '@supabase/supabase-js'
@@ -76,7 +76,7 @@ const supabase = createClient(
 )
 ```
 
-`storedAccessToken` is the string you saved. `getSession()` and `currentUser()` return claims and expiry, so use the saved string here.
+`storedAccessToken` is the string you saved. `getSession()` and `currentUser()` return claims and expiry. Return the saved string here.
 
 ## Identify the user in Row Level Security
 
@@ -92,6 +92,6 @@ create policy "Users can read their own rows"
   using (user_id = (select auth.jwt()->>'sub'));
 ```
 
-Here `user_id` must be a `text` column.
+Use a `text` column for `user_id`.
 
-If the project trusts more than one issuer, also restrict policies by `iss`. See [Restrict access by issuer](/docs/guides/auth/third-party/custom-oidc#restrict-access-by-issuer).
+When the project trusts more than one issuer, also restrict policies by `iss`. See [Restrict access by issuer](/docs/guides/auth/third-party/custom-oidc#restrict-access-by-issuer).
