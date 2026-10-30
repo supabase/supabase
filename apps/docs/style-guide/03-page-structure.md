@@ -87,7 +87,8 @@ Keep the title to 35 characters or fewer, in sentence case.
 
 - **Task pages:** start with an imperative, such as `Create a table`.
 - **Explainers:** use a noun phrase, such as `Auth architecture`.
-- **Gerunds:** avoid them, such as `Creating a table`.
+
+**Not recommended:** Avoid gerunds. For example, `Creating a table`.
 
 ### Subtitle
 
