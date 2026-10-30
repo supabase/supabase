@@ -7,6 +7,7 @@ import {
   TopNavMenuPanel,
 } from 'ui-patterns/TopNav/TopNavMenu'
 
+import { MenuAside } from './MenuAside'
 import { getLinkComponent } from './MenuItem'
 
 type LinkProps = {
@@ -21,7 +22,28 @@ export const DevelopersDropdown = () => {
   const { jobsCount, latestBlogPosts } = staticContent
 
   return (
-    <TopNavMenuPanel className="section-container">
+    <TopNavMenuPanel
+      className="section-container"
+      aside={
+        <MenuAside>
+          <TopNavMenuGroup label="Blog">
+            {latestBlogPosts?.slice(0, 2).map((post: any) => (
+              <TopNavMenuGroupLink
+                key={post.title}
+                linkAs={Link}
+                href={post.url}
+                className="flex-col items-start gap-1"
+              >
+                <span className="line-clamp-2">{post.title}</span>
+                <span className="line-clamp-2 text-xs text-foreground-lighter leading-relaxed">
+                  {post.description}
+                </span>
+              </TopNavMenuGroupLink>
+            ))}
+          </TopNavMenuGroup>
+        </MenuAside>
+      }
+    >
       {DevelopersData['navigation'].map((column) => (
         <TopNavMenuGroup key={column.label} label={column.label}>
           {column.links.map(({ icon: Icon, ...link }: LinkProps) => (
@@ -39,21 +61,6 @@ export const DevelopersDropdown = () => {
           ))}
         </TopNavMenuGroup>
       ))}
-      <TopNavMenuGroup label="Blog">
-        {latestBlogPosts?.slice(0, 2).map((post: any) => (
-          <TopNavMenuGroupLink
-            key={post.title}
-            linkAs={Link}
-            href={post.url}
-            className="flex-col items-start gap-1"
-          >
-            <span className="line-clamp-2">{post.title}</span>
-            <span className="line-clamp-2 text-xs text-foreground-lighter leading-relaxed">
-              {post.description}
-            </span>
-          </TopNavMenuGroupLink>
-        ))}
-      </TopNavMenuGroup>
     </TopNavMenuPanel>
   )
 }

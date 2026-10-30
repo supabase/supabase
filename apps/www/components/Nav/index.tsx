@@ -69,7 +69,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
       >
         <div
           className={cn(
-            'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95 transition-all duration-300',
+            'absolute inset-0 h-full w-full bg-background transition-all duration-300',
             !showLaunchWeekNavMode && !isTransparent && 'opacity-100!',
             showLaunchWeekNavMode && 'bg-transparent! dark:bg-black!',
             isGAWeekSection && 'dark:bg-alternative!',
@@ -78,9 +78,9 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         />
         <nav
           className={cn(
-            `relative z-40 border-default max-lg:border-b backdrop-blur-xs transition-all duration-300`,
+            `relative z-40 border-default max-lg:border-b transition-all duration-300`,
             showLaunchWeekNavMode && 'border-muted border-b bg-transparent',
-            isTransparent && 'border-transparent backdrop-blur-none'
+            isTransparent && 'border-transparent'
           )}
         >
           <div className="section-container flex justify-between h-(--header-height)">
