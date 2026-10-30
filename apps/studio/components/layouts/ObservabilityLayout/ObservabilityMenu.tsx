@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -22,28 +21,25 @@ import { ProductMenu } from '@/components/ui/ProductMenu'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { ContentOfType } from '@/data/content/content-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
-import { useProfile } from '@/lib/profile'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const ObservabilityMenu = () => {
   const router = useRouter()
-  const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4] || 'observability') as string
 
   const menuItems = useGenerateObservabilityMenu()
   const { data: customReportItems, isLoading } = useGenerateCustomReportsMenu()
 
-  const { can: canCreateCustomReport } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    {
-      resource: { type: 'report', owner_id: profile?.id },
-      subject: { id: profile?.id },
-    }
+  const { can: canCreateCustomReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'report' }
   )
 
   const { mutateAsync: deleteReport } = useContentDeleteMutation({
@@ -123,9 +119,8 @@ export const ObservabilityMenu = () => {
                         <span className="uppercase font-mono">Custom Reports</span>
                         {customReportItems.length > 0 && (
                           <ButtonTooltip
-                            variant="default"
                             size="tiny"
-                            icon={<Plus />}
+                            icon={<PlusIcon />}
                             disabled={!canCreateCustomReport}
                             className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
                             onClick={() => {
@@ -167,8 +162,7 @@ export const ObservabilityMenu = () => {
                       description="Create and save custom reports to track your project metrics"
                       actions={
                         <ButtonTooltip
-                          variant="default"
-                          icon={<Plus />}
+                          icon={<PlusIcon />}
                           disabled={!canCreateCustomReport}
                           onClick={() => {
                             setShowNewReportModal(true)

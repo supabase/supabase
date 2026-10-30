@@ -14,7 +14,7 @@ import {
 } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { isValidConnString } from '@/data/fetchers'
+import { isValidConnString, unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
@@ -72,7 +72,7 @@ export function useSqlEditorExecution({
       queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
       refocusEditorAfterRunIfNeeded()
     },
-    onError(error: any, vars) {
+    onError(error, vars) {
       if (id) {
         editor.highlightErrorLine(error, hasSelection)
         sessionSnap.addResultError(id, error, vars.autoLimit)
@@ -137,6 +137,7 @@ export function useSqlEditorExecution({
         handleError: (error) => {
           throw error
         },
+        grant: unguarded.migrating,
       })
 
       track('sql_editor_query_run_button_clicked', { source: 'database' })

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLinkIcon, RefreshCw } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from 'ui'
@@ -17,7 +17,7 @@ import {
 } from '@/components/interfaces/Reports/renderers/StorageRenderers'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
@@ -104,9 +104,8 @@ export const StorageReport: NextPageWithLayout = () => {
                 side="bottom"
               >
                 <Button
-                  variant="default"
                   disabled={report.isLoading}
-                  icon={<RefreshCw className={report.isLoading ? 'animate-spin' : ''} />}
+                  icon={<RefreshCwIcon className={report.isLoading ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
@@ -125,7 +124,7 @@ export const StorageReport: NextPageWithLayout = () => {
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
-                    <ArrowRight size={12} />
+                    <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
@@ -185,7 +184,7 @@ export const StorageReport: NextPageWithLayout = () => {
             params={params.networkTraffic}
             error={error.networkTraffic}
             title="Network Traffic"
-            tooltip="Ingress and egress of requests and responses respectively"
+            tooltip="Ingress is measured from request logs."
             data={data.networkTraffic || []}
             renderer={NetworkTrafficRenderer}
           />

@@ -48,7 +48,7 @@ SUPABASE_KEY="YOUR_SUPABASE_PUBLISHABLE_KEY"
 
 </$CodeTabs>
 
-These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
+These variables will be exposed on the browser, and that's completely fine since we have [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled on our Database.
 Amazing thing about [Nuxt Supabase](https://supabase.nuxtjs.org/) is that setting environment variables is all we need to do in order to start using Supabase.
 No need to initialize Supabase. The library will take care of it automatically.
 
@@ -73,7 +73,7 @@ export default defineNuxtConfig({
 
 ### Set up Auth component
 
-Set up a Vue component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
+Set up a Vue component to manage sign-ins and sign-ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
 <$CodeTabs>
 

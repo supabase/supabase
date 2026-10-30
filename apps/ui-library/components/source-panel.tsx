@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { forwardRef } from 'react'
 import { Button, cn } from 'ui'
 
-import { Doc } from '@/.contentlayer/generated'
+import { Doc } from '@/.velite'
 
 const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { doc: Doc }>(
   ({ doc, children, ...props }, ref) => {

@@ -11,10 +11,7 @@ export default function KeyboardShortcutDemo() {
     <div className="flex w-full max-w-2xl flex-col gap-6">
       <div className="flex flex-wrap gap-3">
         <Button iconRight={<KeyboardShortcut keys={['Meta', 'S']} variant="inline" />}>Save</Button>
-        <Button
-          variant="default"
-          iconRight={<KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />}
-        >
+        <Button iconRight={<KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />}>
           Run query
         </Button>
       </div>

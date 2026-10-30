@@ -1,12 +1,11 @@
 'use client'
 
+import { Feedback } from '~/components/Feedback'
+import { useBreakpoint } from 'common'
 import { Menu } from 'lucide-react'
 import type { HTMLAttributes } from 'react'
 import { useEffect, useState } from 'react'
-
-import { useBreakpoint } from 'common'
 import { cn, Separator, Sheet, SheetContent, SheetHeader, SheetTrigger } from 'ui'
-import { Feedback } from '~/components/Feedback'
 
 interface TocItem extends HTMLAttributes<HTMLElement> {
   label: string
@@ -19,7 +18,9 @@ export function ContributingToc({ className }: { className?: string }) {
 
   useEffect(() => {
     const headings = [
-      ...document.querySelectorAll('article.prose > h2,h3:not(#feedback-title)'),
+      ...document.querySelectorAll(
+        'article.prose > h2:not(#feedback-title),h3:not(#feedback-title)'
+      ),
     ] as Array<HTMLHeadingElement>
     const tocItems = headings
       .filter((heading) => !!heading.id && heading.textContent)
@@ -39,7 +40,7 @@ export function ContributingToc({ className }: { className?: string }) {
         '[--local-top-spacing:5rem]',
         'border-l thin-scrollbar overflow-y-auto px-2 hidden lg:block',
         'col-span-3 self-start sticky',
-        'top-[calc(var(--header-height)+1px+2rem)] max-h-[calc(100vh-var(--header-height)-3rem)]',
+        'top-[calc(var(--header-height)+2rem)] max-h-[calc(100vh-var(--header-height)-3rem)]',
         className
       )}
     />

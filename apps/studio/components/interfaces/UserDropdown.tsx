@@ -1,5 +1,5 @@
 import { useDevToolbar } from 'dev-tools'
-import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
+import { FlaskConicalIcon, Loader2Icon, ScrollTextIcon, User2Icon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -68,13 +68,12 @@ export function UserDropdown({
     >
       <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
         <ButtonTooltip
-          variant="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
           tooltip={{ content: { text: 'Account settings' } }}
         >
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
-              <Loader2 className="animate-spin text-foreground-lighter" size={16} />
+              <Loader2Icon className="animate-spin text-foreground-lighter" size={16} />
             </div>
           ) : (
             <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
@@ -119,7 +118,7 @@ export function UserDropdown({
                     }
                   }}
                 >
-                  <User2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <User2Icon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   Account
                 </Link>
               </DropdownMenuItem>
@@ -127,7 +126,7 @@ export function UserDropdown({
                 className="flex gap-2 cursor-pointer"
                 onClick={() => toggleFeaturePreviewModal(true)}
               >
-                <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                <FlaskConicalIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
               <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
@@ -136,7 +135,7 @@ export function UserDropdown({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <ScrollText size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <ScrollTextIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   Changelog
                 </Link>
               </DropdownMenuItem>
@@ -200,7 +199,7 @@ export function UserDropdown({
                   router.push('/logout')
                 }}
               >
-                Log out
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </>

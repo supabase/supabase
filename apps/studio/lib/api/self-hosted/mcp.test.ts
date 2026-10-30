@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getDebuggingOperations, getDevelopmentOperations } from './mcp'
+import { getDebuggingOperations, getDevelopmentOperations, getFeedbackOperations } from './mcp'
 
 vi.mock('./settings', () => ({
   getProjectSettings: vi.fn(),
@@ -23,7 +23,6 @@ describe('api/self-hosted/mcp', () => {
     let getProjectSettingsMock: ReturnType<typeof vi.fn>
 
     beforeEach(async () => {
-      vi.clearAllMocks()
       vi.unstubAllEnvs()
       const settings = await import('./settings')
       getProjectSettingsMock = vi.mocked(settings.getProjectSettings)
@@ -91,7 +90,6 @@ describe('api/self-hosted/mcp', () => {
     let retrieveAnalyticsDataMock: ReturnType<typeof vi.fn>
 
     beforeEach(async () => {
-      vi.clearAllMocks()
       vi.unstubAllEnvs()
       const logs = await import('./logs')
       retrieveAnalyticsDataMock = vi.mocked(logs.retrieveAnalyticsData)
@@ -135,6 +133,48 @@ describe('api/self-hosted/mcp', () => {
           params: expect.objectContaining({ sql: 'select * from edge_logs' }),
         })
       )
+    })
+  })
+
+  describe('getFeedbackOperations', () => {
+    const DELETE_TOKEN = '6f1f2b9e-3c4d-4a5b-8c7d-9e0f1a2b3c4d'
+
+    it('submits feedback without the self-hosted project ref', async () => {
+      const fetch = vi.fn().mockResolvedValue(Response.json(DELETE_TOKEN))
+
+      const result = await getFeedbackOperations({ fetch }).submit({
+        feedback: 'list_tables is slow',
+        projectId: 'default',
+        clientInfo: { name: 'test-client', version: '1.0.0' },
+      })
+
+      expect(result).toEqual({ deleteToken: DELETE_TOKEN })
+      const [url, init] = fetch.mock.calls[0]
+      expect(url).toMatch(/\/rest\/v1\/rpc\/submit_interfaces_feedback$/)
+      const body = JSON.parse(init.body)
+      expect(body).toMatchObject({
+        feedback: 'list_tables is slow',
+        metadata: { source: 'mcp', client_name: 'test-client', client_version: '1.0.0' },
+      })
+      expect(body.project_ref).toBeUndefined()
+      expect(body.user_id).toBeUndefined()
+    })
+
+    it('deletes feedback by token without the self-hosted project ref', async () => {
+      const fetch = vi
+        .fn()
+        .mockResolvedValue(new Response(null, { headers: { 'Content-Range': '*/1' } }))
+
+      const result = await getFeedbackOperations({ fetch }).delete({
+        deleteToken: DELETE_TOKEN,
+        projectId: 'default',
+      })
+
+      expect(result).toEqual({ deleted: true })
+      const [, init] = fetch.mock.calls[0]
+      expect(init.method).toBe('DELETE')
+      expect(init.headers['x-feedback-token']).toBe(DELETE_TOKEN)
+      expect(init.headers).not.toHaveProperty('x-feedback-project-ref')
     })
   })
 })

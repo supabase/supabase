@@ -1,4 +1,10 @@
-import { ChevronRight, CircleX, Minus, MoreVertical, StopCircle } from 'lucide-react'
+import {
+  ChevronRightIcon,
+  CircleXIcon,
+  MinusIcon,
+  MoreVerticalIcon,
+  StopCircleIcon,
+} from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -210,7 +216,7 @@ export const ActivityRow = ({
       >
         <TableCell className="relative w-[70px]">
           {selectedPid === activity.pid && (
-            <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter" />
+            <div className="absolute h-full bg-primary-bright top-0 left-0 w-1" />
           )}
 
           {/* Absolute (not inline in the flex row) so top-0/bottom-0 ignore the cell's padding and touch the adjacent row */}
@@ -238,7 +244,7 @@ export const ActivityRow = ({
                 variant="outline"
                 className="px-1 mr-3"
                 onClick={onExpand}
-                icon={<ChevronRight className={cn('transition', expanded && 'rotate-90')} />}
+                icon={<ChevronRightIcon className={cn('transition', expanded && 'rotate-90')} />}
               />
             )}
 
@@ -331,7 +337,7 @@ export const ActivityRow = ({
             {durationSeconds !== null ? (
               formatDuration(durationSeconds * 1000, 0)
             ) : (
-              <Minus size={12} className="text-foreground-lighter" />
+              <MinusIcon size={12} className="text-foreground-lighter" />
             )}
           </p>
         </TableCell>
@@ -426,7 +432,7 @@ export const ActivityRow = ({
               )
             })
           ) : (
-            <Minus size={12} className="text-foreground-lighter" />
+            <MinusIcon size={12} className="text-foreground-lighter" />
           )}
         </TableCell>
 
@@ -437,7 +443,7 @@ export const ActivityRow = ({
                 aria-label="More actions"
                 variant="text"
                 className="px-1"
-                icon={<MoreVertical />}
+                icon={<MoreVerticalIcon />}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
@@ -457,7 +463,7 @@ export const ActivityRow = ({
                   },
                 }}
               >
-                <CircleX size={12} />
+                <CircleXIcon size={12} />
                 <span>Cancel query</span>
               </DropdownMenuItemTooltip>
 
@@ -474,7 +480,7 @@ export const ActivityRow = ({
                   },
                 }}
               >
-                <StopCircle size={12} />
+                <StopCircleIcon size={12} />
                 <span>Terminate session</span>
               </DropdownMenuItemTooltip>
             </DropdownMenuContent>

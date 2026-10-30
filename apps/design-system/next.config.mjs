@@ -1,5 +1,3 @@
-import { withContentlayer } from 'next-contentlayer2'
-
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
 
 /** @type {import('next').NextConfig} */
@@ -37,8 +35,6 @@ const nextConfig = {
     ]
   },
   // Turbopack configuration to handle .md files with raw-loader
-  // This mirrors the webpack configuration added by withContentlayer
-  // and ensures both bundlers can process content files properly
   turbopack: {
     rules: {
       '*.md': {
@@ -49,4 +45,4 @@ const nextConfig = {
   },
 }
 
-export default withContentlayer(nextConfig)
+export default nextConfig

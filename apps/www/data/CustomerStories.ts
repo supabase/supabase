@@ -27,7 +27,7 @@ export const data: CustomerStoryType[] = [
     imgUrl: 'images/customers/logos/on-light/lingo-dev.png',
     logo: '/images/customers/logos/on-light/lingo-dev.png',
     logo_inverse: '/images/customers/logos/on-dark/lingo-dev.png',
-    url: '/customers/lingo-dev',
+    url: '/customers/lingodotdev',
     ctaText: 'View story',
   },
   {

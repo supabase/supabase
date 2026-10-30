@@ -10,6 +10,7 @@ import { RegistryDefinations } from '../types'
  * global key. `A` is already in use by Auth.
  */
 export const ADVISORS_NAV_SHORTCUT_IDS = {
+  NAV_ADVISORS_HEALTH: 'nav.advisors-health',
   NAV_ADVISORS_SECURITY: 'nav.advisors-security',
   NAV_ADVISORS_PERFORMANCE: 'nav.advisors-performance',
   NAV_ADVISORS_RULES: 'nav.advisors-rules',
@@ -19,6 +20,13 @@ export type AdvisorsNavShortcutId =
   (typeof ADVISORS_NAV_SHORTCUT_IDS)[keyof typeof ADVISORS_NAV_SHORTCUT_IDS]
 
 export const advisorsNavRegistry: RegistryDefinations<AdvisorsNavShortcutId> = {
+  [ADVISORS_NAV_SHORTCUT_IDS.NAV_ADVISORS_HEALTH]: {
+    id: ADVISORS_NAV_SHORTCUT_IDS.NAV_ADVISORS_HEALTH,
+    label: 'Go to Health Advisor',
+    sequence: ['V', 'H'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ADVISORS,
+  },
   [ADVISORS_NAV_SHORTCUT_IDS.NAV_ADVISORS_SECURITY]: {
     id: ADVISORS_NAV_SHORTCUT_IDS.NAV_ADVISORS_SECURITY,
     label: 'Go to Security Advisor',

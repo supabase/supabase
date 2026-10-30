@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Box, Plus } from 'lucide-react'
+import { BoxIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { ComponentProps } from 'react'
@@ -41,13 +41,7 @@ function ProjectDropdownNewProjectActions({
 
   if (embedded) {
     return (
-      <Button
-        variant="default"
-        block
-        size="small"
-        asChild
-        icon={<Plus size={14} strokeWidth={1.5} />}
-      >
+      <Button block size="small" asChild icon={<PlusIcon size={14} strokeWidth={1.5} />}>
         <Link
           href={href}
           onClick={onClose}
@@ -62,7 +56,7 @@ function ProjectDropdownNewProjectActions({
   return (
     <CommandGroup>
       <CommandItemLink href={href} className="cursor-pointer w-full gap-2" onSelect={onClose}>
-        <Plus size={14} strokeWidth={1.5} />
+        <PlusIcon size={14} strokeWidth={1.5} />
         <p>New project</p>
       </CommandItemLink>
     </CommandGroup>
@@ -92,7 +86,7 @@ function ProjectDropdownPlatformView({
   return (
     <div className="flex items-center shrink-0">
       <Link href={`/project/${projectRef}`} className="flex items-center gap-2 shrink-0 text-sm">
-        <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+        <BoxIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
         <span title={projectName} className="text-foreground max-w-32 lg:max-w-64 truncate">
           {projectName}
         </span>

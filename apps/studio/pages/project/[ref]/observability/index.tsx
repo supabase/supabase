@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -11,15 +10,16 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from '@/data/content/content-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useProfile } from '@/lib/profile'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import type { NextPageWithLayout } from '@/types'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const { profile } = useProfile()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const showOverview = useFlag('observabilityOverview')
   const [showCreateReportModal, setShowCreateReportModal] = useQueryState(
@@ -48,12 +48,11 @@ export const UserReportPage: NextPageWithLayout = () => {
     if (reports.length === 0) router.replace(`/project/${ref}/observability/api-overview`)
   }, [isSuccess, data, router, ref, showOverview, flagsLoaded])
 
-  const { can: canCreateReport } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
+  const { can: canCreateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
     {
-      resource: { type: 'report', owner_id: profile?.id },
-      subject: { id: profile?.id },
+      mode: 'create',
+      type: 'report',
     }
   )
 

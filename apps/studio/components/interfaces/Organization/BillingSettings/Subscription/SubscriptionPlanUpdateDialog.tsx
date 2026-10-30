@@ -1,7 +1,7 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { Check, InfoIcon } from 'lucide-react'
+import { CheckIcon, ExternalLinkIcon, InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
@@ -21,6 +21,7 @@ import {
   billingPartnerLabel,
   getPlanChangeType,
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { type OrganizationBillingSubscriptionPreviewQueryResult } from '@/data/organizations/organization-billing-subscription-preview'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
@@ -64,6 +65,8 @@ type BreakdownItem =
 interface Props {
   selectedTier: 'tier_free' | 'tier_pro' | 'tier_team' | undefined
   onClose: () => void
+  /** Called after the subscription update succeeds, in addition to onClose. */
+  onSuccess?: () => void
   planMeta?: OrgPlan | null
   currentPlanMeta?: Partial<OrgPlan> & { features: (string | string[])[] }
   subscriptionPreviewQueryResult: OrganizationBillingSubscriptionPreviewQueryResult
@@ -77,6 +80,7 @@ interface Props {
 export const SubscriptionPlanUpdateDialog = ({
   selectedTier,
   onClose,
+  onSuccess,
   planMeta,
   subscriptionPreviewQueryResult,
   currentPlanMeta,
@@ -132,6 +136,7 @@ export const SubscriptionPlanUpdateDialog = ({
       `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
     )
     onClose()
+    onSuccess?.()
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
@@ -432,7 +437,7 @@ export const SubscriptionPlanUpdateDialog = ({
                             {' '}
                             <Link
                               href={`/org/${selectedOrganization?.slug}/billing#breakdown`}
-                              className="text-sm text-brand hover:text-brand-600 transition"
+                              className="text-sm text-primary hover:text-primary-hover transition"
                               target="_blank"
                             >
                               + current spend
@@ -478,18 +483,28 @@ export const SubscriptionPlanUpdateDialog = ({
                   </div>
                 )}
 
-              {projects.filter(
-                (it) =>
-                  it.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-                  it.status === PROJECT_STATUS.COMING_UP
-              ).length === 1 &&
+              {subscription?.plan?.id === 'free' &&
                 subscriptionPlanMeta?.planId === 'pro' &&
                 changeType === 'upgrade' && (
                   <div className="pb-2">
-                    <Admonition type="note">
+                    <Admonition type="note" title="Micro Compute included for one project">
                       <div className="text-sm prose">
-                        First project included. Additional projects cost{' '}
-                        <span translate="no">$10</span>+/month regardless of activity.{' '}
+                        {projects[0]?.ref && (
+                          <>
+                            After upgrading to Pro, switch one project to Micro for free in{' '}
+                            <Link
+                              href={getInfrastructurePath(projects[0].ref)}
+                              target="_blank"
+                              className="underline inline-flex items-center gap-1"
+                            >
+                              Infrastructure settings
+                              <ExternalLinkIcon size={12} aria-hidden="true" />
+                            </Link>
+                            .{' '}
+                          </>
+                        )}
+                        Each additional project costs <span translate="no">$10</span>+/mo,
+                        regardless of compute size.{' '}
                         <Link
                           href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                           target="_blank"
@@ -561,7 +576,7 @@ export const SubscriptionPlanUpdateDialog = ({
                           className="flex items-center gap-2"
                         >
                           <div className="w-4">
-                            <Check className="h-3 w-3 text-brand" strokeWidth={3} />
+                            <CheckIcon className="h-3 w-3 text-primary" strokeWidth={3} />
                           </div>
                           <div className="text-sm">
                             <p>{typeof feature === 'string' ? feature : feature[0]}</p>

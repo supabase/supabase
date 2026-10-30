@@ -7,15 +7,15 @@ import ServerEnvContent from './content'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ApiKeyResponse = components['schemas']['ApiKeyResponse']
-type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse']
+type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
+type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Output']
 
 const { mockUseAsyncCheckPermissions } = vi.hoisted(() => ({
   mockUseAsyncCheckPermissions: vi.fn(),
 }))
-vi.mock('@/hooks/misc/useCheckPermissions', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissions')>()),
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { API_GATEWAY_KEYS_READ: 'api_gateway_keys_read' } },
 }))
 
 // CopyButton writes via copyToClipboard from 'ui'. Stub just that export

@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Undo2 } from 'lucide-react'
+import { Undo2Icon } from 'lucide-react'
 import { Card, CardContent, CardHeader } from 'ui'
 
 import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
@@ -52,7 +52,7 @@ export const AddRowOperationItem = ({
       <CardHeader className="py-2 px-3 flex flex-row gap-2 space-y-0 items-center">
         <div className="min-w-0 flex-1 flex items-start gap-2">
           <div className="min-w-0 flex-1">
-            <code className="text-code-inline dark:bg-surface-300 dark:border-foreground-muted/50">
+            <code className="dark:bg-surface-300 dark:border-foreground-muted/50">
               {fullTableName}
             </code>
             <div className="text-xs text-foreground mt-1 ml-0.5">
@@ -64,7 +64,7 @@ export const AddRowOperationItem = ({
           variant="text"
           aria-label="Discard change"
           className="w-7"
-          icon={<Undo2 />}
+          icon={<Undo2Icon />}
           onClick={handleDelete}
           tooltip={{
             content: {
@@ -76,7 +76,7 @@ export const AddRowOperationItem = ({
         />
       </CardHeader>
 
-      <CardContent className="py-2 px-3 font-mono text-xs text-brand-link">
+      <CardContent className="py-2 px-3 font-mono text-xs text-primary">
         {previewColumns.length === 0 && (
           <span className="text-foreground-light">
             No data provided, default values will be used
@@ -84,7 +84,7 @@ export const AddRowOperationItem = ({
         )}
         {previewColumns.map(([key, value]) => (
           <div key={key} className="flex gap-2 py-0.5">
-            <span className="text-brand-link select-none font-medium">+</span>
+            <span className="text-primary select-none font-medium">+</span>
             <span className="shrink-0">{key}:</span>
             <span className="truncate min-w-0" title={formatOperationItemValue(value)}>
               {formatOperationItemValue(value)}
@@ -93,7 +93,7 @@ export const AddRowOperationItem = ({
         ))}
         {remainingCount > 0 && (
           <div className="flex gap-2 py-0.5">
-            <span className="text-brand-link select-none font-medium">+</span>
+            <span className="text-primary select-none font-medium">+</span>
             <span>+{remainingCount} more column(s)</span>
           </div>
         )}

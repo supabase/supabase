@@ -1,4 +1,4 @@
-import { Copy, Expand } from 'lucide-react'
+import { CopyIcon, ExpandIcon } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn, RenderCellProps } from 'react-data-grid'
 import {
@@ -43,7 +43,11 @@ export const DataGridResults = ({ rows }: { rows: readonly ResultRow[] }) => {
   }, [])
 
   const columnRender = (name: string) => {
-    return <div className="flex h-full items-center justify-center font-mono text-xs">{name}</div>
+    return (
+      <div className="flex h-full items-center overflow-hidden text-ellipsis text-xs select-text text-foreground">
+        {name}
+      </div>
+    )
   }
 
   const columns: CalculatedColumn<ResultRow>[] = useMemo(
@@ -80,7 +84,7 @@ export const DataGridResults = ({ rows }: { rows: readonly ResultRow[] }) => {
   return (
     <>
       {rows.length === 0 ? (
-        <p className="px-4 py-3 font-mono text-sm text-foreground-light">
+        <p className="px-4 py-3 font-sans text-sm text-foreground-light">
           Success. No rows returned
         </p>
       ) : (
@@ -98,7 +102,7 @@ export const DataGridResults = ({ rows }: { rows: readonly ResultRow[] }) => {
                 }}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <Copy size={12} />
+                <CopyIcon size={12} />
                 Copy cell content
               </ContextMenuItem>
               <ContextMenuItem
@@ -109,7 +113,7 @@ export const DataGridResults = ({ rows }: { rows: readonly ResultRow[] }) => {
                 }}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <Expand size={12} />
+                <ExpandIcon size={12} />
                 View cell content
               </ContextMenuItem>
             </ContextMenuContent>

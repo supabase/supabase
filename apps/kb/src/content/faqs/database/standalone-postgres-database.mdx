@@ -1,0 +1,11 @@
+---
+title: Can I use Supabase as a standalone Postgres database?
+topics: ['Database']
+lastEdited: 2026-10-27
+---
+
+Yes. Every Supabase project is a [dedicated Postgres database](/solutions/hosted-postgres), and you can use it on its own. You connect with a regular [Postgres connection string](/docs/guides/database/connecting-to-postgres#get-your-connection-string) from any client, driver, or ORM.
+
+Because it's standard Postgres, the usual tooling works: `psql`, `pg_dump`, your migration tool of choice, and extensions like [pgvector](/docs/guides/database/extensions/pgvector) and [PostGIS](/docs/guides/database/extensions/postgis). It also means you can bring an existing database in, or take yours out later, with [`pg_dump` and `pg_restore`](/kb/guides/migrate-from-postgres).
+
+Supabase is a great fit here because - if your needs expand beyond standalone Postgres - you can later integrate [Auth](/docs/guides/auth), [Storage](/docs/guides/storage), [Edge Functions](/docs/guides/functions), [Realtime](/docs/guides/realtime), and other Supabase features without adding another provider.

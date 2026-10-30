@@ -160,7 +160,7 @@ export default (isMobile?: boolean) => ({
       <>
         <span className="heading-gradient">Simple yet</span>
         <br />
-        <span className="text-brand">powerful APIs</span>
+        <span className="text-primary">powerful APIs</span>
       </>
     ),
     paragraph: 'Easy-to-use client libraries for managing and querying vector stores in Postgres.',
@@ -240,7 +240,7 @@ docs.query(
       <>
         <span className="heading-gradient">Powerful Features</span>
         <br />
-        <span className="text-brand">Scale to millions</span>
+        <span className="text-primary">Scale to millions</span>
       </>
     ),
     paragraph:

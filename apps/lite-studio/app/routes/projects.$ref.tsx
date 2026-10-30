@@ -76,8 +76,8 @@ export default function ProjectPage() {
             <Separator />
             <div className="flex flex-wrap gap-3">
               <Button variant="primary">New Table</Button>
-              <Button variant="default">SQL Editor</Button>
-              <Button variant="default">View Logs</Button>
+              <Button>SQL Editor</Button>
+              <Button>View Logs</Button>
               <Button
                 variant="outline"
                 loading={loading}
@@ -169,7 +169,7 @@ export default function ProjectPage() {
 
             <div className="flex gap-3">
               <Button variant="primary">Save Changes</Button>
-              <Button variant="default">Cancel</Button>
+              <Button>Cancel</Button>
             </div>
           </Card>
         </TabsContent>

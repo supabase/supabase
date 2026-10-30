@@ -10,7 +10,7 @@ import { useApiKeysCommands } from './ApiKeys'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ApiKeyResponse = components['schemas']['ApiKeyResponse']
+type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
 
 const { mockUseAsyncCheckPermissions, mockUseHighAvailability, mockUseSelectedProjectQuery } =
   vi.hoisted(() => ({
@@ -19,8 +19,9 @@ const { mockUseAsyncCheckPermissions, mockUseHighAvailability, mockUseSelectedPr
     mockUseSelectedProjectQuery: vi.fn(),
   }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { API_GATEWAY_KEYS_READ: 'api_gateway_keys_read' } },
 }))
 
 vi.mock('@/hooks/misc/useHighAvailability', () => ({
@@ -80,9 +81,7 @@ async function renderCommandPage() {
 
 describe('useApiKeysCommands', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
-    mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
+    mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isLoading: false })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { id: 1, ref: 'default', name: 'default' },
     })

@@ -1,6 +1,6 @@
 import { AiAssistantSource } from 'common/telemetry-constants'
 import { Chatgpt, Claude } from 'icons'
-import { Check, ChevronDown, Copy } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon, CopyIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import {
@@ -151,12 +151,12 @@ export function AiAssistantDropdown({
             size={size}
             disabled={disabled}
             className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-            icon={<ChevronDown size={12} />}
+            icon={<ChevronDownIcon size={12} />}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem onClick={handleCopyPrompt} className="gap-2">
-            {showCopied ? <Check size={14} className="text-brand" /> : <Copy size={14} />}
+            {showCopied ? <CheckIcon size={14} className="text-primary" /> : <CopyIcon size={14} />}
             {showCopied ? 'Copied!' : copyLabel}
           </DropdownMenuItem>
 

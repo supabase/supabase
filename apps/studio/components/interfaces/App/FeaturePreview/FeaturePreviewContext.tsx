@@ -1,4 +1,10 @@
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS, safeLocalStorage, useFlag } from 'common'
+import {
+  FeatureFlagContext,
+  LOCAL_STORAGE_KEYS,
+  safeLocalStorage,
+  useFlag,
+  useParams,
+} from 'common'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
@@ -13,7 +19,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -82,8 +88,7 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
     isInitialized,
     onUpdateFlag: (key: string, value: boolean) => {
       safeLocalStorage.setItem(key, value ? 'true' : 'false')
-      const updatedFlags = { ...flags, [key]: value }
-      setFlags(updatedFlags)
+      setFlags((prevFlags) => ({ ...prevFlags, [key]: value }))
     },
   }
 
@@ -91,6 +96,18 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
 }
 
 // Helpers
+
+export const usePipelineCreationPreview = () => {
+  const { flags, isInitialized } = useFeaturePreviewContext()
+  const isAvailable = useFlag('pipelineCreationWizard')
+  const isEnabled =
+    IS_PLATFORM &&
+    isInitialized &&
+    isAvailable &&
+    flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION] === true
+
+  return { isEnabled, isLoading: !isInitialized }
+}
 
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
@@ -150,25 +167,25 @@ export const useIsMarketplaceEnabled = () => {
   return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
 }
 
-export const useIsDatabaseConnectionsEnabled = () => {
-  const { flags, isInitialized } = useFeaturePreviewContext()
-  const [localStorageFlag] = useLocalStorageQuery<boolean | null>(
-    LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
-    null
-  )
-  const previouslyToggled = localStorageFlag !== null
-
-  return {
-    enabled: flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS],
-    isInitialized,
-    previouslyToggled,
-  }
-}
-
 export const useIsExplorerEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const isExplorerEnabled = useFlag('explorer')
   return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
+}
+
+/** Three gates: the ConfigCat kill switch, the project's capability, and the user's opt-in. */
+export const useIsStorageVersioningEnabled = () => {
+  const { ref } = useParams()
+  const { flags } = useFeaturePreviewContext()
+  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const isObjectVersioningAvailable = !!data?.capabilities?.object_versioning
+
+  return (
+    isStorageVersioningEnabled &&
+    isObjectVersioningAvailable &&
+    flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]
+  )
 }
 
 export const useFeaturePreviewModal = () => {

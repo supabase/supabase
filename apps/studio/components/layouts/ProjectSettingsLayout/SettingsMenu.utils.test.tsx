@@ -9,11 +9,15 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const getShortcutId = (item: unknown) => (item as { shortcutId?: string } | undefined)?.shortcutId
 
+const { mockIsPlatform } = vi.hoisted(() => ({ mockIsPlatform: { value: true } }))
+
 vi.mock('@/lib/constants', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
   return {
     ...actual,
-    IS_PLATFORM: true,
+    get IS_PLATFORM() {
+      return mockIsPlatform.value
+    },
   }
 })
 
@@ -37,6 +41,69 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
   useIsPlatformWebhooksEnabled: vi.fn().mockReturnValue(true),
 }))
+
+const FEATURES = {
+  projectSettingsLegacyJwtKeys: false,
+  billingAll: true,
+  logsAll: true,
+  projectSettingsLogDrains: true,
+}
+
+const getConfigurationKeys = () => {
+  const { result } = renderHook(() => useGenerateSettingsMenu())
+  return result.current
+    .find((group) => group.title === 'Configuration')
+    ?.items.map((item) => item.key)
+}
+
+beforeEach(() => {
+  mockIsPlatform.value = true
+})
+
+describe.each([
+  ['platform', true],
+  ['self-hosted', false],
+])('useGenerateSettingsMenu log drains (%s)', (_, isPlatform) => {
+  beforeEach(() => {
+    mockIsPlatform.value = isPlatform
+  })
+
+  it.each([
+    [{}, true],
+    [{ logsAll: false }, false],
+    [{ projectSettingsLogDrains: false }, false],
+  ])('with feature overrides %o shows log drains: %s', (overrides, expected) => {
+    vi.mocked(useIsFeatureEnabled).mockReturnValue({ ...FEATURES, ...overrides } as any)
+    expect(getConfigurationKeys()?.includes('log-drains')).toBe(expected)
+  })
+})
+
+describe('useGenerateSettingsMenu (self-hosted)', () => {
+  beforeEach(() => {
+    mockIsPlatform.value = false
+    vi.mocked(useIsPlatformWebhooksEnabled).mockReturnValue(false)
+    vi.mocked(useIsFeatureEnabled).mockReturnValue(FEATURES as any)
+  })
+
+  it('includes only the self-hosted configuration items and integrations, with no billing group', () => {
+    const { result } = renderHook(() => useGenerateSettingsMenu())
+    const configGroup = result.current.find((group) => group.title === 'Configuration')
+    const configKeys = configGroup?.items.map((item) => item.key)
+    const integrationKeys = result.current
+      .find((group) => group.title === 'Integrations')
+      ?.items.map((item) => item.key)
+
+    expect(configKeys).toEqual(expect.arrayContaining(['general', 'api-keys', 'jwt', 'log-drains']))
+    expect(configKeys).not.toContain('dashboard')
+    expect(configKeys).not.toContain('infrastructure')
+    expect(configKeys).not.toContain('addons')
+    expect(getShortcutId(configGroup?.items.find((item) => item.key === 'log-drains'))).toBe(
+      SHORTCUT_IDS.NAV_PROJECT_SETTINGS_LOG_DRAINS
+    )
+    expect(integrationKeys).toEqual(expect.arrayContaining(['api', 'vault']))
+    expect(result.current.some((group) => group.title === 'Billing')).toBe(false)
+  })
+})
 
 describe('useGenerateSettingsMenu', () => {
   beforeEach(() => {
@@ -120,41 +187,6 @@ describe('useGenerateSettingsMenu', () => {
     const configurationGroup = result.current.find((group) => group.title === 'Configuration')
 
     expect(configurationGroup?.items.some((item) => item.name === 'Dashboard')).toBe(false)
-  })
-
-  it('includes log drains when logs:all and project_settings:log_drains are enabled', () => {
-    const { result } = renderHook(() => useGenerateSettingsMenu())
-    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
-
-    expect(configurationGroup?.items.some((item) => item.key === 'log-drains')).toBe(true)
-  })
-
-  it('hides log drains when logs:all is disabled', () => {
-    vi.mocked(useIsFeatureEnabled).mockReturnValue({
-      projectSettingsLegacyJwtKeys: false,
-      billingAll: true,
-      logsAll: false,
-      projectSettingsLogDrains: true,
-    } as any)
-
-    const { result } = renderHook(() => useGenerateSettingsMenu())
-    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
-
-    expect(configurationGroup?.items.some((item) => item.key === 'log-drains')).toBe(false)
-  })
-
-  it('hides log drains when project_settings:log_drains is disabled', () => {
-    vi.mocked(useIsFeatureEnabled).mockReturnValue({
-      projectSettingsLegacyJwtKeys: false,
-      billingAll: true,
-      logsAll: true,
-      projectSettingsLogDrains: false,
-    } as any)
-
-    const { result } = renderHook(() => useGenerateSettingsMenu())
-    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
-
-    expect(configurationGroup?.items.some((item) => item.key === 'log-drains')).toBe(false)
   })
 
   it('adds shortcuts to eligible configuration settings items', () => {

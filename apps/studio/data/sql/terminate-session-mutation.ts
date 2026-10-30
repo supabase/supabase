@@ -2,7 +2,8 @@ import { getTerminateSessionSQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { sqlKeys } from './keys'
+import { databaseKeys } from '@/data/database/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, type UseCustomMutationOptions } from '@/types'
 
@@ -26,6 +27,7 @@ export async function terminateSession({
     connectionString,
     sql,
     queryKey: ['terminate-session'],
+    grant: unguarded.migrating,
   })
   if (backendStart !== undefined && result.length === 0) {
     throw new ResponseError(
@@ -50,7 +52,7 @@ export const useSessionTerminateMutation = ({
     mutationFn: (vars) => terminateSession(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: sqlKeys.ongoingQueries(projectRef) })
+      await queryClient.invalidateQueries({ queryKey: databaseKeys.databaseActivity(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

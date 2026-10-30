@@ -1,5 +1,5 @@
 import { usePrevious } from '@uidotdev/usehooks'
-import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
+import { AlertCircleIcon, CheckIcon, Loader2Icon, RefreshCcwIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -50,7 +50,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           <Button
             variant="text"
             size="tiny"
-            icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
+            icon={<RefreshCcwIcon className="text-gray-1100" strokeWidth={2} />}
             onClick={retry}
           >
             Retry
@@ -59,14 +59,14 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
         {showSavedText ? (
           <Tooltip>
             <TooltipTrigger>
-              <Check className="text-brand" size={14} strokeWidth={3} />
+              <CheckIcon className="text-primary" size={14} strokeWidth={3} />
             </TooltipTrigger>
             <TooltipContent side="bottom">All changes saved</TooltipContent>
           </Tooltip>
         ) : saving ? (
           <Tooltip>
             <TooltipTrigger>
-              <Loader2 className="animate-spin" size={14} strokeWidth={2} />
+              <Loader2Icon className="animate-spin" size={14} strokeWidth={2} />
             </TooltipTrigger>
             <TooltipContent>Saving changes...</TooltipContent>
           </Tooltip>
@@ -74,7 +74,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
           snippetIsOwned ? (
             <Tooltip>
               <TooltipTrigger>
-                <AlertCircle className="text-red-900" size={14} strokeWidth={2} />
+                <AlertCircleIcon className="text-red-900" size={14} strokeWidth={2} />
               </TooltipTrigger>
               <TooltipContent>Failed to save changes</TooltipContent>
             </Tooltip>

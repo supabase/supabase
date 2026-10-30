@@ -256,6 +256,9 @@ export function deriveNotebookDiff(
         }
 
         entries.splice(found.index, 1)
+        // Cells already inserted after this anchor stay behind at its old position, so a
+        // later insert anchored on it should start counting from its new position again.
+        insertedAfter.delete(operation.cell_id)
         const error = insertAfter(operation.after_cell_id, {
           _tag: 'moved',
           cell: found.cell,

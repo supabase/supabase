@@ -4,33 +4,6 @@
  */
 
 export interface paths {
-  '/v1/webhooks/events': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Publish event
-     * @description Ingests and schedules a new webhook event to be published out to all subscribed endpoints.
-     *
-     *     In case of non-successful response status codes, early termination, networking issues,
-     *     requests to this endpoint should be retried until it succeeds, otherwise there is a risk of
-     *     loosing events.
-     *
-     *     `meta.idempotency_key` is used to ensure idempotency when retrying the requests and so it
-     *     must always be provided.
-     */
-    post: operations['v1-webhooks-events-post']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/v2/organizations/{slug}/integrations/github/connections': {
     parameters: {
       query?: never
@@ -369,6 +342,120 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/projects/{ref}/branches': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Create a database branch
+     * @description Creates a database branch from the specified project. Compute and disk size can be set here so the branch is provisioned at the requested size, instead of being resized after creation.
+     */
+    post: operations['v2-create-a-branch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List all compute instances
+     * @description Returns all compute instances you've previously deployed to the specified project.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-list-all-compute-instances']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Retrieve a compute instance
+     * @description Returns a compute instance along with the counts of its running instances. Poll this after a deploy until `build_state` leaves `building`.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    get: operations['v2-get-a-compute-instance']
+    put?: never
+    post?: never
+    /**
+     * Delete a compute instance
+     * @description Tombstones the compute instance. Its running instances and image are torn down asynchronously.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    delete: operations['v2-delete-a-compute-instance']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute/{name}/deploy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Deploy a compute instance
+     * @description Creates the compute instance if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the compute instance reaches `build_state` `active` or `failed` later.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-deploy-a-compute-instance']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/compute/{name}/uploads': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Mint a presigned slot for a build-context upload
+     * @description PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v2-create-compute-instance-upload']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/projects/{ref}/config': {
     parameters: {
       query?: never
@@ -377,8 +464,10 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Alpha] Get a project's service configuration
+     * Get a project's service configuration
      * @description Returns the project's database, pooler, Auth, Data API, Realtime and Storage configuration — the same configuration a branch inherits from its base project. Each is the effective config, so a setting the project has never overridden is reported at its platform default rather than as null. Auth secrets are returned as an HMAC of their value. `storage` is read live from the storage service; the rest come from this platform's own records.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
      */
     get: operations['v2-get-project-config']
     put?: never
@@ -387,6 +476,52 @@ export interface paths {
     options?: never
     head?: never
     patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/notebooks': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List notebooks of a project
+     * @description Returns a cursor-paginated list of the project notebooks. Notebook bodies are omitted — read a single notebook to get its cells.
+     */
+    get: operations['v2-list-notebooks']
+    put?: never
+    /**
+     * Create a notebook
+     * @description Creates a notebook shared with everyone who has access to the project. Cell ids are assigned by the server and returned in the response.
+     */
+    post: operations['v2-create-notebook']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/notebooks/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get a notebook */
+    get: operations['v2-get-notebook']
+    put?: never
+    post?: never
+    /** Delete a notebook */
+    delete: operations['v2-delete-notebook']
+    options?: never
+    head?: never
+    /**
+     * Update a notebook
+     * @description Updates the attributes provided and leaves the rest untouched. Sending `content` replaces the whole notebook body.
+     */
+    patch: operations['v2-update-notebook']
     trace?: never
   }
   '/v2/projects/{ref}/private-link/associations': {
@@ -637,99 +772,76 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v2/projects/{ref}/workers': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * [Alpha] List all workers
-     * @description Returns all workers you've previously deployed to the specified project.
-     */
-    get: operations['v2-list-all-workers']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers/{name}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * [Alpha] Retrieve a worker
-     * @description Returns a worker along with its instance tally. Poll this after a deploy until `build_state` leaves `building`.
-     */
-    get: operations['v2-get-a-worker']
-    put?: never
-    post?: never
-    /**
-     * [Alpha] Delete a worker
-     * @description Tombstones the worker. Its instances and image are torn down asynchronously.
-     */
-    delete: operations['v2-delete-a-worker']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers/{name}/deploy': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * [Alpha] Deploy a worker
-     * @description Creates the worker if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the worker reaches `build_state` `active` or `failed` later.
-     */
-    post: operations['v2-deploy-a-worker']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/v2/projects/{ref}/workers/{name}/uploads': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * [Alpha] Mint a presigned slot for a build-context upload
-     * @description PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.
-     */
-    post: operations['v2-create-worker-upload']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
 }
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
     APIErrorObject: {
-      code: string
+      /** @enum {string} */
+      code:
+        | 'bad_request'
+        | 'forbidden'
+        | 'internal_server_error'
+        | 'not_found'
+        | 'payment_required'
+        | 'rate_limit_exceeded'
+        | 'request_timeout'
+        | 'request_too_large'
+        | 'unauthorized'
+        | 'validation_failed'
+        | 'agentic_credential_not_found'
+        | 'branch_admin_required'
+        | 'compute_build_context_too_large'
+        | 'compute_build_in_progress'
+        | 'compute_deploy_rate_limit_exceeded'
+        | 'compute_instance_limit_exceeded'
+        | 'compute_instance_not_found'
+        | 'compute_not_enabled'
+        | 'compute_request_rejected'
+        | 'compute_unavailable'
+        | 'notebook_cell_duplicate'
+        | 'notebook_cell_unknown'
+        | 'notebook_disabled'
+        | 'notebook_not_found'
+        | 'notebook_sort_invalid'
+        | 'organization_invitation_email_delivery_failed'
+        | 'organization_invitations_partially_failed'
+        | 'organization_role_name_invalid'
+        | 'organization_role_not_entitled'
+        | 'pagination_cursor_invalid'
+        | 'project_branch_resync_unsupported'
+        | 'project_not_found'
+        | 'project_privatelink_disabled'
+        | 'project_transfer_disabled'
+        | 'delivery_not_found'
+        | 'endpoint_disabled'
+        | 'endpoint_event_type_not_subscribed'
+        | 'endpoint_not_found'
+        | 'endpoint_url_unresolvable'
+        | 'webhooks_access_disabled'
       description?: string
       id?: string
-      issues?: components['schemas']['APIErrorObject'][]
+      issues?: {
+        code: string
+        description?: string
+        id?: string
+        links?: {
+          [key: string]: {
+            describedby?: string
+            href: string
+            meta?: {
+              [key: string]: unknown
+            }
+            rel?: string
+            title?: string
+            type?: string
+          }
+        }
+        message: string
+        meta?: {
+          [key: string]: unknown
+        }
+      }[]
       links?: {
         [key: string]: {
           describedby?: string
@@ -844,10 +956,71 @@ export interface components {
       error: components['schemas']['ErrorResponseBodyAPIErrorObject']
     }
     ErrorResponseBodyAPIErrorObject: {
-      code: string
+      /** @enum {string} */
+      code:
+        | 'bad_request'
+        | 'forbidden'
+        | 'internal_server_error'
+        | 'not_found'
+        | 'payment_required'
+        | 'rate_limit_exceeded'
+        | 'request_timeout'
+        | 'request_too_large'
+        | 'unauthorized'
+        | 'validation_failed'
+        | 'agentic_credential_not_found'
+        | 'branch_admin_required'
+        | 'compute_build_context_too_large'
+        | 'compute_build_in_progress'
+        | 'compute_deploy_rate_limit_exceeded'
+        | 'compute_instance_limit_exceeded'
+        | 'compute_instance_not_found'
+        | 'compute_not_enabled'
+        | 'compute_request_rejected'
+        | 'compute_unavailable'
+        | 'notebook_cell_duplicate'
+        | 'notebook_cell_unknown'
+        | 'notebook_disabled'
+        | 'notebook_not_found'
+        | 'notebook_sort_invalid'
+        | 'organization_invitation_email_delivery_failed'
+        | 'organization_invitations_partially_failed'
+        | 'organization_role_name_invalid'
+        | 'organization_role_not_entitled'
+        | 'pagination_cursor_invalid'
+        | 'project_branch_resync_unsupported'
+        | 'project_not_found'
+        | 'project_privatelink_disabled'
+        | 'project_transfer_disabled'
+        | 'delivery_not_found'
+        | 'endpoint_disabled'
+        | 'endpoint_event_type_not_subscribed'
+        | 'endpoint_not_found'
+        | 'endpoint_url_unresolvable'
+        | 'webhooks_access_disabled'
       description?: string
       id?: string
-      issues?: components['schemas']['ErrorResponseBodyAPIErrorObject'][]
+      issues?: {
+        code: string
+        description?: string
+        id?: string
+        links?: {
+          [key: string]: {
+            describedby?: string
+            href: string
+            meta?: {
+              [key: string]: unknown
+            }
+            rel?: string
+            title?: string
+            type?: string
+          }
+        }
+        message: string
+        meta?: {
+          [key: string]: unknown
+        }
+      }[]
       links?: {
         [key: string]: {
           describedby?: string
@@ -1184,13 +1357,178 @@ export interface components {
            * @example developer
            * @enum {string}
            */
-          role: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
         }
         /**
          * @description Resource type.
          * @enum {string}
          */
         type: 'organization_member_role'
+      }
+    }
+    V2BranchResponse_Output: {
+      data: {
+        attributes: {
+          /**
+           * Format: date-time
+           * @description Creation timestamp.
+           */
+          created_at: string
+          /** @description Git branch being tracked. */
+          git_branch?: string
+          /** @description Whether this is the default branch of the project. */
+          is_default: boolean
+          /** @description Name of the branch. */
+          name: string
+          /**
+           * Format: uri
+           * @description HTTP endpoint receiving branch status updates.
+           */
+          notify_url?: string
+          /** @description Ref of the project it branches from. */
+          parent_project_ref: string
+          /** @description Whether the branch is kept when its git branch is deleted or its PR is merged. */
+          persistent: boolean
+          /** @description Ref of the project backing this branch. */
+          project_ref: string
+          /**
+           * Format: date-time
+           * @description Last update timestamp.
+           */
+          updated_at: string
+          /** @description Whether the branch is seeded from the project's data. */
+          with_data: boolean
+        }
+        /**
+         * Format: uuid
+         * @description ID of the branch.
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'branch'
+      }
+    }
+    V2ComputeInstanceResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          build_state: 'building' | 'active' | 'failed'
+          deleting?: boolean
+          image_version?: string
+          instances?: {
+            declared: number
+            live: number
+            ready: number
+            stale: number
+          }
+          instances_error?: string
+          secret_generation: string
+          spec: {
+            /** @example public */
+            exposure: string
+            /** @example 1 */
+            instances: number
+            /** @example node */
+            runtime?: string
+            /** @example 2gb-1vcpu */
+            size: string
+          }
+          state_reason?: string
+        }
+        /**
+         * @description Compute instance name.
+         * @example hello-world
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_compute_instance'
+      }
+    }
+    V2ComputeInstanceUploadResponse_Output: {
+      data: {
+        attributes: {
+          /** @description When the slot stops accepting the upload. */
+          expires_at: string
+          /** @example PUT */
+          method: string
+          /** @description Presigned destination for the `.tar.gz` build context. */
+          url: string
+        }
+        /**
+         * @description Upload id to pass to the deploy endpoint as `context_upload_id`.
+         * @example cafe0000000000000000000000000000
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_compute_instance_upload'
+      }
+    }
+    V2CreateBranchRequest: {
+      data: {
+        attributes: {
+          /** @description Desired disk size in GB. Omit this field to default to the smallest disk size available on the plan. */
+          desired_disk_size_gb?: number
+          /**
+           * @description Desired instance size. Omit this field to always default to the smallest possible size.
+           * @enum {string}
+           */
+          desired_instance_size?:
+            | 'nano'
+            | 'micro'
+            | 'small'
+            | 'medium'
+            | 'large'
+            | 'xlarge'
+            | '2xlarge'
+            | '4xlarge'
+            | '8xlarge'
+            | '12xlarge'
+            | '16xlarge'
+            | '24xlarge'
+            | '24xlarge_optimized_memory'
+            | '24xlarge_optimized_cpu'
+            | '24xlarge_high_memory'
+            | '48xlarge'
+            | '48xlarge_optimized_memory'
+            | '48xlarge_optimized_cpu'
+            | '48xlarge_high_memory'
+          /**
+           * @description Git branch to track. Must exist on the connected GitHub repository when the project has one.
+           * @example feature/login-page
+           */
+          git_branch?: string
+          /**
+           * @description Name of the branch.
+           * @example preview-login-page
+           */
+          name: string
+          /**
+           * Format: uri
+           * @description HTTP endpoint to receive branch status updates.
+           * @example https://example.com/webhooks/branches
+           */
+          notify_url?: string
+          /** @description Whether the branch is kept when its git branch is deleted or its PR is merged. */
+          persistent?: boolean
+          /** @description Region to create the branch in. Omit to inherit the region of the project it branches from. */
+          region?: string
+          /** @description Whether to seed the branch from the project's latest physical backup. */
+          with_data?: boolean
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'branch'
       }
     }
     V2CreateInvitationsRequest: {
@@ -1212,11 +1550,11 @@ export interface components {
           }[]
           require_sso?: boolean
           /**
-           * @description Role name to assign. Must be on a Team or Enterprise plan to use the read-only role.
+           * @description Role name to assign. Must be on an Enterprise plan to use the read-only or no-access roles. no-access grants no project visibility until project-scoped roles are assigned separately.
            * @example developer
            * @enum {string}
            */
-          role: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
         }
         /**
          * @description Resource type.
@@ -1242,7 +1580,48 @@ export interface components {
         type: 'organization_invitation'
       }[]
       error?: {
-        code: string
+        /** @enum {string} */
+        code:
+          | 'bad_request'
+          | 'forbidden'
+          | 'internal_server_error'
+          | 'not_found'
+          | 'payment_required'
+          | 'rate_limit_exceeded'
+          | 'request_timeout'
+          | 'request_too_large'
+          | 'unauthorized'
+          | 'validation_failed'
+          | 'agentic_credential_not_found'
+          | 'branch_admin_required'
+          | 'compute_build_context_too_large'
+          | 'compute_build_in_progress'
+          | 'compute_deploy_rate_limit_exceeded'
+          | 'compute_instance_limit_exceeded'
+          | 'compute_instance_not_found'
+          | 'compute_not_enabled'
+          | 'compute_request_rejected'
+          | 'compute_unavailable'
+          | 'notebook_cell_duplicate'
+          | 'notebook_cell_unknown'
+          | 'notebook_disabled'
+          | 'notebook_not_found'
+          | 'notebook_sort_invalid'
+          | 'organization_invitation_email_delivery_failed'
+          | 'organization_invitations_partially_failed'
+          | 'organization_role_name_invalid'
+          | 'organization_role_not_entitled'
+          | 'pagination_cursor_invalid'
+          | 'project_branch_resync_unsupported'
+          | 'project_not_found'
+          | 'project_privatelink_disabled'
+          | 'project_transfer_disabled'
+          | 'delivery_not_found'
+          | 'endpoint_disabled'
+          | 'endpoint_event_type_not_subscribed'
+          | 'endpoint_not_found'
+          | 'endpoint_url_unresolvable'
+          | 'webhooks_access_disabled'
         description?: string
         id?: string
         issues?: {
@@ -1287,6 +1666,118 @@ export interface components {
         meta?: {
           [key: string]: unknown
         }
+      }
+    }
+    V2CreateNotebookRequest: {
+      data: {
+        attributes: {
+          content: {
+            cells: (
+              | ({
+                  id?: string
+                  text: string
+                  /** @enum {string} */
+                  type: 'markdown'
+                } & {
+                  [key: string]: unknown
+                })
+              | ({
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: ({
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    } & {
+                      [key: string]: unknown
+                    })[]
+                  } & {
+                    [key: string]: unknown
+                  }
+                  /** @description Read replica to run against. Omit to use the primary database. */
+                  database_identifier?: string
+                  id?: string
+                  /** @default 100 */
+                  row_limit?: number
+                  /** @description SQL run against the project database. */
+                  sql: string
+                  title?: string
+                  /** @enum {string} */
+                  type: 'database'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                } & {
+                  [key: string]: unknown
+                })
+              | ({
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: ({
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    } & {
+                      [key: string]: unknown
+                    })[]
+                  } & {
+                    [key: string]: unknown
+                  }
+                  id?: string
+                  /** @description SQL run against the project logs. */
+                  sql: string
+                  time_range:
+                    | ({
+                        /** @description ISO 8601 end of the range. */
+                        end: string
+                        /** @description ISO 8601 start of the range. */
+                        start: string
+                        /** @enum {string} */
+                        type: 'absolute'
+                      } & {
+                        [key: string]: unknown
+                      })
+                    | ({
+                        amount: number
+                        /** @enum {string} */
+                        type: 'relative'
+                        /** @enum {string} */
+                        unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+                      } & {
+                        [key: string]: unknown
+                      })
+                  title?: string
+                  /** @enum {string} */
+                  type: 'log'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                } & {
+                  [key: string]: unknown
+                })
+            )[]
+          }
+          description?: string
+          favorite?: boolean
+          name: string
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'notebook'
       }
     }
     V2CreatePrivateLinkAssociationRequest: {
@@ -1340,7 +1831,7 @@ export interface components {
         type: 'organization_invitation'
       }[]
     }
-    V2DeployWorkerRequest: {
+    V2DeployComputeInstanceRequest: {
       data: {
         attributes: {
           /** @description Id of a build context staged through the uploads endpoint. Required unless `runtime` is set. */
@@ -1360,8 +1851,47 @@ export interface components {
          * @description Resource type.
          * @enum {string}
          */
-        type: 'project_worker'
+        type: 'project_compute_instance'
       }
+    }
+    V2ListComputeInstancesResponse_Output: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          build_state: 'building' | 'active' | 'failed'
+          deleting?: boolean
+          image_version?: string
+          instances?: {
+            declared: number
+            live: number
+            ready: number
+            stale: number
+          }
+          instances_error?: string
+          secret_generation: string
+          spec: {
+            /** @example public */
+            exposure: string
+            /** @example 1 */
+            instances: number
+            /** @example node */
+            runtime?: string
+            /** @example 2gb-1vcpu */
+            size: string
+          }
+          state_reason?: string
+        }
+        /**
+         * @description Compute instance name.
+         * @example hello-world
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_compute_instance'
+      }[]
     }
     V2ListGitHubConnectionsResponse_Output: {
       data: {
@@ -1499,6 +2029,55 @@ export interface components {
         prev: string | null
       }
     }
+    V2ListNotebooksResponse_Output: {
+      data: {
+        attributes: {
+          description: string | null
+          favorite: boolean
+          inserted_at: string
+          name: string
+          /** @description User who created the notebook. */
+          owner: {
+            id: number
+            username: string
+          } | null
+          updated_at: string
+          /** @description User who last wrote to the notebook. */
+          updated_by: {
+            id: number
+            username: string
+          } | null
+        }
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'notebook'
+      }[]
+      links: {
+        /**
+         * @description URL path to the first page if available.
+         * @example /v2/projects/{ref}/notebooks?page[size]=10
+         */
+        first?: string | null
+        /**
+         * @description URL path to the last page if available.
+         * @example /v2/projects/{ref}/notebooks?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+         */
+        last?: string | null
+        /**
+         * @description URL path to the next page.
+         * @example /v2/projects/{ref}/notebooks?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+         */
+        next: string | null
+        /**
+         * @description URL path to the previous page.
+         * @example /v2/projects/{ref}/notebooks?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+         */
+        prev: string | null
+      }
+    }
     V2ListPrivateLinkAssociationsResponse_Output: {
       data: {
         attributes: {
@@ -1506,6 +2085,8 @@ export interface components {
           account_name?: string
           /** @description The AWS account ID this PrivateLink share is associated with. */
           aws_account_id: string
+          /** @description The custom DNS name configured on the AWS VPC Lattice resource configuration. */
+          custom_dns_name: string
           /** @description Identifier of the database this PrivateLink share targets - the project ref for the primary, or the read replica identifier. */
           database_identifier: string
           /**
@@ -1682,44 +2263,113 @@ export interface components {
         type: 'organization_role'
       }[]
     }
-    V2ListWorkersResponse_Output: {
+    V2NotebookResponse_Output: {
       data: {
         attributes: {
-          /** @enum {string} */
-          build_state: 'building' | 'active' | 'failed'
-          deleting?: boolean
-          image_version?: string
-          instances?: {
-            declared: number
-            live: number
-            ready: number
-            stale: number
+          content: {
+            cells: (
+              | {
+                  id: string
+                  text: string
+                  /** @enum {string} */
+                  type: 'markdown'
+                }
+              | {
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: {
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    }[]
+                  }
+                  /** @description Read replica to run against. Omit to use the primary database. */
+                  database_identifier?: string
+                  id: string
+                  /** @default 100 */
+                  row_limit: number
+                  /** @description SQL run against the project database. */
+                  sql: string
+                  title?: string
+                  /** @enum {string} */
+                  type: 'database'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                }
+              | {
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: {
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    }[]
+                  }
+                  id: string
+                  /** @description SQL run against the project logs. */
+                  sql: string
+                  time_range:
+                    | {
+                        /** @description ISO 8601 end of the range. */
+                        end: string
+                        /** @description ISO 8601 start of the range. */
+                        start: string
+                        /** @enum {string} */
+                        type: 'absolute'
+                      }
+                    | {
+                        amount: number
+                        /** @enum {string} */
+                        type: 'relative'
+                        /** @enum {string} */
+                        unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+                      }
+                  title?: string
+                  /** @enum {string} */
+                  type: 'log'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                }
+            )[]
+            schema_version: number
           }
-          instances_error?: string
-          secret_generation: string
-          spec: {
-            /** @example public */
-            exposure: string
-            /** @example 1 */
-            instances: number
-            /** @example node */
-            runtime?: string
-            /** @example 2gb-1vcpu */
-            size: string
-          }
-          state_reason?: string
+          description: string | null
+          favorite: boolean
+          inserted_at: string
+          name: string
+          /** @description User who created the notebook. */
+          owner: {
+            id: number
+            username: string
+          } | null
+          updated_at: string
+          /** @description User who last wrote to the notebook. */
+          updated_by: {
+            id: number
+            username: string
+          } | null
         }
-        /**
-         * @description Worker name.
-         * @example hello-world
-         */
         id: string
         /**
          * @description Resource type.
          * @enum {string}
          */
-        type: 'project_worker'
-      }[]
+        type: 'notebook'
+      }
     }
     V2PreviewProjectTransferResponse_Output: {
       data: {
@@ -1752,6 +2402,8 @@ export interface components {
           account_name?: string
           /** @description The AWS account ID this PrivateLink share is associated with. */
           aws_account_id: string
+          /** @description The custom DNS name configured on the AWS VPC Lattice resource configuration. */
+          custom_dns_name: string
           /** @description Identifier of the database this PrivateLink share targets - the project ref for the primary, or the read replica identifier. */
           database_identifier: string
           /**
@@ -1865,7 +2517,10 @@ export interface components {
               | 'instance_telemetry_lost'
               | 'instance_db_down'
               | 'instance_alert_firing'
-              | 'log_service_error_rate_high'
+              | 'log_data_api_error_rate_high'
+              | 'log_auth_error_rate_high'
+              | 'log_storage_error_rate_high'
+              | 'log_edge_function_error_rate_high'
               | 'project_not_active'
               | 'advisor_check_unavailable'
             /** Format: date-time */
@@ -1918,6 +2573,8 @@ export interface components {
             }
             /** @description Postgres parameter overrides. Empty when the project runs entirely on defaults. */
             postgres_settings: {
+              autovacuum_max_workers?: number
+              autovacuum_work_mem?: string
               /** @description Default unit: s */
               checkpoint_timeout?: string
               cron_log_statement?: boolean
@@ -1951,6 +2608,8 @@ export interface components {
               max_wal_senders?: number
               max_wal_size?: string
               max_worker_processes?: number
+              pg_net_batch_size?: number
+              pg_stat_statements_max?: number
               /** @enum {string} */
               session_replication_role?: 'origin' | 'replica' | 'local'
               shared_buffers?: string
@@ -2000,8 +2659,8 @@ export interface components {
             capabilities: {
               iceberg_catalog: boolean
               list_v2: boolean
+              object_versioning: boolean
             }
-            database_pool_mode: string
             features: {
               iceberg_catalog: {
                 enabled: boolean
@@ -2026,7 +2685,7 @@ export interface components {
             }
             /** Format: int64 */
             file_size_limit: number
-            migration_version: string
+            migration_version: string | null
             /** @enum {string} */
             upstream_target: 'main' | 'canary'
           }
@@ -2082,7 +2741,10 @@ export interface components {
               | 'instance_telemetry_lost'
               | 'instance_db_down'
               | 'instance_alert_firing'
-              | 'log_service_error_rate_high'
+              | 'log_data_api_error_rate_high'
+              | 'log_auth_error_rate_high'
+              | 'log_storage_error_rate_high'
+              | 'log_edge_function_error_rate_high'
           }[]
         }
         /**
@@ -2106,65 +2768,117 @@ export interface components {
         type: 'project_transfer_input'
       }
     }
-    V2WorkerResponse_Output: {
+    V2UpdateNotebookRequest: {
       data: {
         attributes: {
-          /** @enum {string} */
-          build_state: 'building' | 'active' | 'failed'
-          deleting?: boolean
-          image_version?: string
-          instances?: {
-            declared: number
-            live: number
-            ready: number
-            stale: number
+          /** @description Replaces the notebook body. A cell keeps its identity by echoing back its `id`; a cell sent without an `id` is added as a new one. */
+          content?: {
+            cells: (
+              | ({
+                  id?: string
+                  text: string
+                  /** @enum {string} */
+                  type: 'markdown'
+                } & {
+                  [key: string]: unknown
+                })
+              | ({
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: ({
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    } & {
+                      [key: string]: unknown
+                    })[]
+                  } & {
+                    [key: string]: unknown
+                  }
+                  /** @description Read replica to run against. Omit to use the primary database. */
+                  database_identifier?: string
+                  id?: string
+                  /** @default 100 */
+                  row_limit?: number
+                  /** @description SQL run against the project database. */
+                  sql: string
+                  title?: string
+                  /** @enum {string} */
+                  type: 'database'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                } & {
+                  [key: string]: unknown
+                })
+              | ({
+                  /** @description Chart configuration, retained even while `view` is `table`. */
+                  chart?: {
+                    cumulative: boolean
+                    /** @enum {string} */
+                    scale: 'linear' | 'log'
+                    show_labels: boolean
+                    /** @enum {string} */
+                    type: 'bar' | 'line'
+                    /** @description Result column used for the x axis. */
+                    x_column: string
+                    y_series: ({
+                      /** @description Result column plotted as a series. */
+                      column: string
+                    } & {
+                      [key: string]: unknown
+                    })[]
+                  } & {
+                    [key: string]: unknown
+                  }
+                  id?: string
+                  /** @description SQL run against the project logs. */
+                  sql: string
+                  time_range:
+                    | ({
+                        /** @description ISO 8601 end of the range. */
+                        end: string
+                        /** @description ISO 8601 start of the range. */
+                        start: string
+                        /** @enum {string} */
+                        type: 'absolute'
+                      } & {
+                        [key: string]: unknown
+                      })
+                    | ({
+                        amount: number
+                        /** @enum {string} */
+                        type: 'relative'
+                        /** @enum {string} */
+                        unit: 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+                      } & {
+                        [key: string]: unknown
+                      })
+                  title?: string
+                  /** @enum {string} */
+                  type: 'log'
+                  /** @enum {string} */
+                  view?: 'table' | 'chart'
+                } & {
+                  [key: string]: unknown
+                })
+            )[]
           }
-          instances_error?: string
-          secret_generation: string
-          spec: {
-            /** @example public */
-            exposure: string
-            /** @example 1 */
-            instances: number
-            /** @example node */
-            runtime?: string
-            /** @example 2gb-1vcpu */
-            size: string
-          }
-          state_reason?: string
+          description?: string
+          favorite?: boolean
+          name?: string
         }
-        /**
-         * @description Worker name.
-         * @example hello-world
-         */
-        id: string
         /**
          * @description Resource type.
          * @enum {string}
          */
-        type: 'project_worker'
-      }
-    }
-    V2WorkerUploadResponse_Output: {
-      data: {
-        attributes: {
-          /** @description When the slot stops accepting the upload. */
-          expires_at: string
-          /** @example PUT */
-          method: string
-          /** @description Presigned destination for the `.tar.gz` build context. */
-          url: string
-        }
-        /**
-         * @description Upload id to pass to the deploy endpoint as `context_upload_id`.
-         * @example cafe0000000000000000000000000000
-         */
-        id: string
-        /**
-         * @description Resource type.
-         * @enum {string}
-         */
-        type: 'project_worker_upload'
+        type: 'notebook'
       }
     }
   }
@@ -2176,325 +2890,6 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  'v1-webhooks-events-post': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': {
-          data: {
-            attributes: {
-              /**
-               * @description Organization slug
-               * @example tsrqponmlkjihgfedcba
-               */
-              organization_slug: string
-              /** @description Extra data to pass to consumers. `organization_slug` and `project_ref` (if applicable) are always provided by default. */
-              payload?: {
-                [key: string]: unknown
-              }
-              /** @description Project's ref. If left unspecified or `null`, the event will published as organization-wide, only to organization-wide endpoints. */
-              project_ref?: string | null
-              /**
-               * Format: date-time
-               * @description Optional timestamp of event publication.
-               */
-              timestamp?: string
-              /**
-               * @description Webhook event type.
-               * @enum {string}
-               */
-              type:
-                | 'v1.project.paused'
-                | 'v1.project.created'
-                | 'v1.project.restored'
-                | 'v1.project.transferred'
-                | 'v1.project.removed'
-                | 'v1.project.restarted'
-                | 'v1.project.status.changed'
-                | 'v1.project.backup.started'
-                | 'v1.project.branch.created'
-                | 'v1.project.branch.updated'
-                | 'v1.project.branch.removed'
-                | 'v1.organization.member.invitation.created'
-                | 'v1.organization.member.invitation.canceled'
-                | 'v1.organization.member.added'
-                | 'v1.organization.member.removed'
-                | 'v1.organization.member.role.assigned'
-                | 'v1.organization.member.role.removed'
-                | 'v1.organization.member.role.updated'
-                | 'v1.organization.billing.plan.upgraded'
-                | 'v1.organization.billing.plan.downgraded'
-                | 'project.v1.paused'
-                | 'project.v1.created'
-                | 'project.v1.restored'
-                | 'project.v1.transferred'
-                | 'project.v1.removed'
-                | 'project.v1.restarted'
-                | 'project.v1.status.changed'
-                | 'project.v1.backup.started'
-                | 'project.v1.branch.created'
-                | 'project.v1.branch.updated'
-                | 'project.v1.branch.removed'
-                | 'organization.v1.member.invitation.created'
-                | 'organization.v1.member.invitation.canceled'
-                | 'organization.v1.member.added'
-                | 'organization.v1.member.removed'
-                | 'organization.v1.member.role.assigned'
-                | 'organization.v1.member.role.removed'
-                | 'organization.v1.member.role.updated'
-                | 'organization.v1.billing.plan.upgraded'
-                | 'organization.v1.billing.plan.downgraded'
-                | 'project.v1.branch.deleted'
-            }
-            /**
-             * @description Resource type.
-             * @constant
-             */
-            type: 'event'
-          }
-          meta: {
-            /** @description Idempotency key. */
-            idempotency_key: string
-          }
-        }
-      }
-    }
-    responses: {
-      /** @description Events published */
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            data: {
-              id: string
-              /**
-               * @description Resource type.
-               * @constant
-               */
-              type: 'ingress'
-            }
-          }
-        }
-      }
-      /** @description PermissionDenied */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error: {
-              /** @constant */
-              code: 'forbidden.permission_denied'
-              description?: string
-              id?: string
-              issues?: components['schemas']['APIErrorObject'][]
-              links?: {
-                [key: string]: {
-                  describedby?: string
-                  href: string
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                  rel?: string
-                  title?: string
-                  type?: string
-                }
-              }
-              /** @constant */
-              message: 'Forbidden: Permission denied'
-              meta?: {
-                [key: string]: unknown
-              }
-            }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-      /** @description GenericRequestTimeout */
-      408: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error: {
-              /** @constant */
-              code: 'request_timeout'
-              description?: string
-              id?: string
-              issues?: components['schemas']['APIErrorObject'][]
-              links?: {
-                [key: string]: {
-                  describedby?: string
-                  href: string
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                  rel?: string
-                  title?: string
-                  type?: string
-                }
-              }
-              /** @constant */
-              message: 'Request Timeout'
-              meta?: {
-                [key: string]: unknown
-              }
-            }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-      /** @description GenericTooManyRequests */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error: {
-              /** @constant */
-              code: 'too_many_requests'
-              description?: string
-              id?: string
-              issues?: components['schemas']['APIErrorObject'][]
-              links?: {
-                [key: string]: {
-                  describedby?: string
-                  href: string
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                  rel?: string
-                  title?: string
-                  type?: string
-                }
-              }
-              /** @constant */
-              message: 'Too Many Requests'
-              meta?: {
-                [key: string]: unknown
-              }
-            }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'internal_server_error'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Internal Server Error'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'internal_server_error.event.ingress_failed'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Internal Server Error: Failed to ingress the event'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-      /** @description TemporarilyDisabled */
-      503: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error: {
-              /** @constant */
-              code: 'service_unavailable.temporarily_disabled'
-              description?: string
-              id?: string
-              issues?: components['schemas']['APIErrorObject'][]
-              links?: {
-                [key: string]: {
-                  describedby?: string
-                  href: string
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                  rel?: string
-                  title?: string
-                  type?: string
-                }
-              }
-              /** @constant */
-              message: 'Service Unavailable: Temporarily disabled'
-              meta?: {
-                [key: string]: unknown
-              }
-            }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
-    }
-  }
   'v2-list-organization-github-connections': {
     parameters: {
       query?: {
@@ -2661,7 +3056,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponseBody']
         }
       }
-      /** @description This feature requires the Enterprise organization plan. */
+      /** @description This feature requires the Team, or Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -2732,7 +3127,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponseBody']
         }
       }
-      /** @description This feature requires the Enterprise organization plan. */
+      /** @description This feature requires the Team, or Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -2794,7 +3189,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponseBody']
         }
       }
-      /** @description This feature requires the Enterprise organization plan. */
+      /** @description This feature requires the Team, or Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -2959,6 +3354,8 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
                 event: {
                   /** @description Final data sent to the consumer. */
                   payload: {
@@ -2999,27 +3396,6 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
-                    | 'project.v1.paused'
-                    | 'project.v1.created'
-                    | 'project.v1.restored'
-                    | 'project.v1.transferred'
-                    | 'project.v1.removed'
-                    | 'project.v1.restarted'
-                    | 'project.v1.status.changed'
-                    | 'project.v1.backup.started'
-                    | 'project.v1.branch.created'
-                    | 'project.v1.branch.updated'
-                    | 'project.v1.branch.removed'
-                    | 'organization.v1.member.invitation.created'
-                    | 'organization.v1.member.invitation.canceled'
-                    | 'organization.v1.member.added'
-                    | 'organization.v1.member.removed'
-                    | 'organization.v1.member.role.assigned'
-                    | 'organization.v1.member.role.removed'
-                    | 'organization.v1.member.role.updated'
-                    | 'organization.v1.billing.plan.upgraded'
-                    | 'organization.v1.billing.plan.downgraded'
-                    | 'project.v1.branch.deleted'
                 }
                 /**
                  * Format: uuid
@@ -3044,7 +3420,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -3061,68 +3437,6 @@ export interface operations {
                * @constant
                */
               type: 'delivery'
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -3174,7 +3488,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -3191,14 +3505,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -3215,7 +3529,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -3235,7 +3549,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.delivery'
+              code: 'delivery_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -3252,7 +3566,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Delivery not found'
+              message: 'Webhook delivery not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -3289,7 +3603,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -3309,7 +3623,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -3326,7 +3640,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -3408,68 +3722,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -3517,7 +3769,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -3534,14 +3786,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -3558,7 +3810,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -3578,7 +3830,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.delivery'
+              code: 'delivery_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -3595,7 +3847,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Delivery not found'
+              message: 'Webhook delivery not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -3632,7 +3884,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -3652,7 +3904,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -3669,7 +3921,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -3765,7 +4017,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -3854,68 +4106,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -3963,7 +4153,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -3980,14 +4170,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4004,7 +4194,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -4041,7 +4231,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -4061,7 +4251,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -4078,7 +4268,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -4151,7 +4341,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /**
@@ -4241,7 +4431,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -4308,68 +4498,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -4417,7 +4545,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4434,14 +4562,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4458,7 +4586,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -4495,7 +4623,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -4515,7 +4643,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -4532,7 +4660,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -4621,7 +4749,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -4688,68 +4816,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -4797,7 +4863,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4814,14 +4880,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -4838,7 +4904,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -4875,7 +4941,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -4895,7 +4961,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -4912,7 +4978,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -5003,7 +5069,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5070,68 +5136,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -5179,7 +5183,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5196,14 +5200,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5220,7 +5224,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -5240,7 +5244,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5257,7 +5261,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -5294,7 +5298,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -5314,7 +5318,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5331,7 +5335,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -5422,7 +5426,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5489,68 +5493,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -5598,7 +5540,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5615,14 +5557,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -5639,7 +5581,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -5659,7 +5601,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5676,7 +5618,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -5713,7 +5655,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -5733,7 +5675,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -5750,7 +5692,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -5825,7 +5767,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5912,7 +5854,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5979,68 +5921,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -6088,7 +5968,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6105,14 +5985,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6129,7 +6009,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -6149,7 +6029,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -6166,7 +6046,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -6203,7 +6083,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -6223,7 +6103,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -6240,7 +6120,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -6325,6 +6205,49 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
+                event: {
+                  /** @description Final data sent to the consumer. */
+                  payload: {
+                    /**
+                     * @description Organization slug
+                     * @example tsrqponmlkjihgfedcba
+                     */
+                    organization_slug: string
+                    project_ref: string | null
+                  }
+                  /**
+                   * Format: date-time
+                   * @description Timestamp of event publication.
+                   */
+                  timestamp: string
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                }
                 /**
                  * Format: uuid
                  * @description Identifier of the event, which triggered the delivery (UUID v7).
@@ -6348,7 +6271,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -6387,68 +6310,6 @@ export interface operations {
                * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
                */
               prev: string | null
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -6500,7 +6361,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6517,14 +6378,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6541,7 +6402,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -6561,7 +6422,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -6578,7 +6439,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -6615,7 +6476,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -6635,7 +6496,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -6652,7 +6513,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -6744,27 +6605,6 @@ export interface operations {
                 | 'v1.organization.member.role.updated'
                 | 'v1.organization.billing.plan.upgraded'
                 | 'v1.organization.billing.plan.downgraded'
-                | 'project.v1.paused'
-                | 'project.v1.created'
-                | 'project.v1.restored'
-                | 'project.v1.transferred'
-                | 'project.v1.removed'
-                | 'project.v1.restarted'
-                | 'project.v1.status.changed'
-                | 'project.v1.backup.started'
-                | 'project.v1.branch.created'
-                | 'project.v1.branch.updated'
-                | 'project.v1.branch.removed'
-                | 'organization.v1.member.invitation.created'
-                | 'organization.v1.member.invitation.canceled'
-                | 'organization.v1.member.added'
-                | 'organization.v1.member.removed'
-                | 'organization.v1.member.role.assigned'
-                | 'organization.v1.member.role.removed'
-                | 'organization.v1.member.role.updated'
-                | 'organization.v1.billing.plan.upgraded'
-                | 'organization.v1.billing.plan.downgraded'
-                | 'project.v1.branch.deleted'
             }
             /**
              * @description Resource type.
@@ -6804,7 +6644,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'bad_request.endpoint.test.disabled'
+                  code: 'endpoint_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6821,14 +6661,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Bad Request: Endpoint is disabled'
+                  message: 'Webhook endpoint is disabled'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'bad_request.endpoint.test.wrong_event_type'
+                  code: 'endpoint_event_type_not_subscribed'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6845,55 +6685,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Bad Request: Provided event type is not subscribed to by the endpoint'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
+                  message: 'Webhook endpoint is not subscribed to this event type'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -6951,7 +6743,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6968,14 +6760,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -6992,7 +6784,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -7012,7 +6804,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -7029,7 +6821,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -7066,7 +6858,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -7086,7 +6878,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -7103,7 +6895,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -7457,6 +7249,337 @@ export interface operations {
       }
     }
   }
+  'v2-create-a-branch': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2CreateBranchRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2BranchResponse_Output']
+        }
+      }
+      /** @description Invalid branch configuration for this project */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Organization plan does not cover the requested branch */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to create database branch */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-list-all-compute-instances': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ListComputeInstancesResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-a-compute-instance': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ComputeInstanceResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-delete-a-compute-instance': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-deploy-a-compute-instance': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2DeployComputeInstanceRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ComputeInstanceResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-create-compute-instance-upload': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ComputeInstanceUploadResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
   'v2-get-project-config': {
     parameters: {
       query?: never
@@ -7497,6 +7620,360 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-list-notebooks': {
+    parameters: {
+      query?: {
+        filter?: {
+          name?: string
+        }
+        page?: {
+          after?: string
+          before?: string
+          size?: number
+        }
+        sort?: 'name' | '-name' | 'inserted_at' | '-inserted_at'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ListNotebooksResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to retrieve project's notebooks */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-create-notebook': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2CreateNotebookRequest']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2NotebookResponse_Output']
+        }
+      }
+      /** @description The request repeats a cell id */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to create notebook */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-notebook': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2NotebookResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Notebook not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to retrieve notebook */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-delete-notebook': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Notebook not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to delete notebook */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-update-notebook': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2UpdateNotebookRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2NotebookResponse_Output']
+        }
+      }
+      /** @description The request references a cell that does not exist on this notebook, or repeats a cell id */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Notebook not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to update notebook */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -7885,6 +8362,8 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
                 event: {
                   /** @description Final data sent to the consumer. */
                   payload: {
@@ -7925,27 +8404,6 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
-                    | 'project.v1.paused'
-                    | 'project.v1.created'
-                    | 'project.v1.restored'
-                    | 'project.v1.transferred'
-                    | 'project.v1.removed'
-                    | 'project.v1.restarted'
-                    | 'project.v1.status.changed'
-                    | 'project.v1.backup.started'
-                    | 'project.v1.branch.created'
-                    | 'project.v1.branch.updated'
-                    | 'project.v1.branch.removed'
-                    | 'organization.v1.member.invitation.created'
-                    | 'organization.v1.member.invitation.canceled'
-                    | 'organization.v1.member.added'
-                    | 'organization.v1.member.removed'
-                    | 'organization.v1.member.role.assigned'
-                    | 'organization.v1.member.role.removed'
-                    | 'organization.v1.member.role.updated'
-                    | 'organization.v1.billing.plan.upgraded'
-                    | 'organization.v1.billing.plan.downgraded'
-                    | 'project.v1.branch.deleted'
                 }
                 /**
                  * Format: uuid
@@ -7970,7 +8428,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -7987,68 +8445,6 @@ export interface operations {
                * @constant
                */
               type: 'delivery'
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -8100,7 +8496,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8117,14 +8513,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8141,7 +8537,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -8161,7 +8557,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.delivery'
+              code: 'delivery_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -8178,7 +8574,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Delivery not found'
+              message: 'Webhook delivery not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -8215,7 +8611,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -8235,7 +8631,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -8252,7 +8648,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -8334,68 +8730,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -8443,7 +8777,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8460,14 +8794,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8484,7 +8818,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -8504,7 +8838,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.delivery'
+              code: 'delivery_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -8521,7 +8855,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Delivery not found'
+              message: 'Webhook delivery not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -8558,7 +8892,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -8578,7 +8912,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -8595,7 +8929,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -8691,7 +9025,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -8780,68 +9114,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -8889,7 +9161,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8906,14 +9178,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -8930,7 +9202,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -8967,7 +9239,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -8987,7 +9259,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -9004,7 +9276,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -9077,7 +9349,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /**
@@ -9167,7 +9439,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -9234,68 +9506,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -9343,7 +9553,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9360,14 +9570,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9384,7 +9594,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -9421,7 +9631,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -9441,7 +9651,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -9458,7 +9668,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -9547,7 +9757,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -9614,68 +9824,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -9723,7 +9871,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9740,14 +9888,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -9764,7 +9912,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -9801,7 +9949,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -9821,7 +9969,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -9838,7 +9986,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -9929,7 +10077,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -9996,68 +10144,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -10105,7 +10191,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10122,14 +10208,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10146,7 +10232,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -10166,7 +10252,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10183,7 +10269,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -10220,7 +10306,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -10240,7 +10326,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10257,7 +10343,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -10348,7 +10434,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10415,68 +10501,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -10524,7 +10548,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10541,14 +10565,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -10565,7 +10589,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -10585,7 +10609,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10602,7 +10626,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -10639,7 +10663,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -10659,7 +10683,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -10676,7 +10700,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -10751,7 +10775,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10838,7 +10862,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10905,68 +10929,6 @@ export interface operations {
           }
         }
       }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
-            }
-          }
-        }
-      }
       /** @description GenericUnauthorized */
       401: {
         headers: {
@@ -11014,7 +10976,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11031,14 +10993,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11055,7 +11017,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -11075,7 +11037,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -11092,7 +11054,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -11129,7 +11091,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -11149,7 +11111,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -11166,7 +11128,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -11251,6 +11213,49 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
+                event: {
+                  /** @description Final data sent to the consumer. */
+                  payload: {
+                    /**
+                     * @description Organization slug
+                     * @example tsrqponmlkjihgfedcba
+                     */
+                    organization_slug: string
+                    project_ref: string | null
+                  }
+                  /**
+                   * Format: date-time
+                   * @description Timestamp of event publication.
+                   */
+                  timestamp: string
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                }
                 /**
                  * Format: uuid
                  * @description Identifier of the event, which triggered the delivery (UUID v7).
@@ -11274,7 +11279,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -11313,68 +11318,6 @@ export interface operations {
                * @example /v2/organizations/slug/webhooks/endpoints/{id}/deliveries?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
                */
               prev: string | null
-            }
-          }
-        }
-      }
-      /** @description Multiple error responses */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': {
-            error:
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-            $defs: {
-              APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
         }
@@ -11426,7 +11369,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11443,14 +11386,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11467,7 +11410,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -11487,7 +11430,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -11504,7 +11447,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -11541,7 +11484,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -11561,7 +11504,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -11578,7 +11521,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -11670,27 +11613,6 @@ export interface operations {
                 | 'v1.organization.member.role.updated'
                 | 'v1.organization.billing.plan.upgraded'
                 | 'v1.organization.billing.plan.downgraded'
-                | 'project.v1.paused'
-                | 'project.v1.created'
-                | 'project.v1.restored'
-                | 'project.v1.transferred'
-                | 'project.v1.removed'
-                | 'project.v1.restarted'
-                | 'project.v1.status.changed'
-                | 'project.v1.backup.started'
-                | 'project.v1.branch.created'
-                | 'project.v1.branch.updated'
-                | 'project.v1.branch.removed'
-                | 'organization.v1.member.invitation.created'
-                | 'organization.v1.member.invitation.canceled'
-                | 'organization.v1.member.added'
-                | 'organization.v1.member.removed'
-                | 'organization.v1.member.role.assigned'
-                | 'organization.v1.member.role.removed'
-                | 'organization.v1.member.role.updated'
-                | 'organization.v1.billing.plan.upgraded'
-                | 'organization.v1.billing.plan.downgraded'
-                | 'project.v1.branch.deleted'
             }
             /**
              * @description Resource type.
@@ -11730,7 +11652,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'bad_request.endpoint.test.disabled'
+                  code: 'endpoint_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11747,14 +11669,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Bad Request: Endpoint is disabled'
+                  message: 'Webhook endpoint is disabled'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'bad_request.endpoint.test.wrong_event_type'
+                  code: 'endpoint_event_type_not_subscribed'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11771,55 +11693,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Bad Request: Provided event type is not subscribed to by the endpoint'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_slug'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid organization slug'
-                  meta?: {
-                    [key: string]: unknown
-                  }
-                }
-              | {
-                  /** @constant */
-                  code: 'bad_request.invalid_ref'
-                  description?: string
-                  id?: string
-                  issues?: components['schemas']['APIErrorObject'][]
-                  links?: {
-                    [key: string]: {
-                      describedby?: string
-                      href: string
-                      meta?: {
-                        [key: string]: unknown
-                      }
-                      rel?: string
-                      title?: string
-                      type?: string
-                    }
-                  }
-                  /** @constant */
-                  message: 'Bad Request: Invalid project ref'
+                  message: 'Webhook endpoint is not subscribed to this event type'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -11877,7 +11751,7 @@ export interface operations {
             error:
               | {
                   /** @constant */
-                  code: 'forbidden.permission_denied'
+                  code: 'forbidden'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11894,14 +11768,14 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Permission denied'
+                  message: 'Forbidden'
                   meta?: {
                     [key: string]: unknown
                   }
                 }
               | {
                   /** @constant */
-                  code: 'forbidden.access_disabled'
+                  code: 'webhooks_access_disabled'
                   description?: string
                   id?: string
                   issues?: components['schemas']['APIErrorObject'][]
@@ -11918,7 +11792,7 @@ export interface operations {
                     }
                   }
                   /** @constant */
-                  message: 'Forbidden: Access disabled'
+                  message: 'Webhooks access is disabled for this organization or project'
                   meta?: {
                     [key: string]: unknown
                   }
@@ -11938,7 +11812,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'not_found.endpoint'
+              code: 'endpoint_not_found'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -11955,7 +11829,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Not Found: Endpoint not found'
+              message: 'Webhook endpoint not found'
               meta?: {
                 [key: string]: unknown
               }
@@ -11992,7 +11866,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Request Timeout'
+              message: 'Request timed out'
               meta?: {
                 [key: string]: unknown
               }
@@ -12012,7 +11886,7 @@ export interface operations {
           'application/json': {
             error: {
               /** @constant */
-              code: 'too_many_requests'
+              code: 'rate_limit_exceeded'
               description?: string
               id?: string
               issues?: components['schemas']['APIErrorObject'][]
@@ -12029,7 +11903,7 @@ export interface operations {
                 }
               }
               /** @constant */
-              message: 'Too Many Requests'
+              message: 'Rate limit exceeded'
               meta?: {
                 [key: string]: unknown
               }
@@ -12075,257 +11949,6 @@ export interface operations {
               APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
-        }
-      }
-    }
-  }
-  'v2-list-all-workers': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2ListWorkersResponse_Output']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-get-a-worker': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2WorkerResponse_Output']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-delete-a-worker': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      204: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-deploy-a-worker': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['V2DeployWorkerRequest']
-      }
-    }
-    responses: {
-      202: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2WorkerResponse_Output']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-    }
-  }
-  'v2-create-worker-upload': {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        name: string
-        /** @description Project ref */
-        ref: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['V2WorkerUploadResponse_Output']
-        }
-      }
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Forbidden action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
-        }
-      }
-      /** @description Rate limit exceeded */
-      429: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponseBody']
         }
       }
     }

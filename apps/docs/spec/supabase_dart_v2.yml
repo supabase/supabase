@@ -121,7 +121,7 @@ functions:
     description: |
       Creates a new user.
     notes: |
-      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - By default, the user needs to verify their email address before signing in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
@@ -363,7 +363,7 @@ functions:
   - id: sign-in-with-password
     title: 'signInWithPassword()'
     description: |
-      Log in an existing user using email or phone number with password.
+      Sign in an existing user using email or phone number with password.
     notes: |
       - Requires either an email and password or a phone number and password.
     params:
@@ -948,7 +948,7 @@ functions:
       - Drives the full WebAuthn ceremony end to end: starts the challenge with the Supabase server, calls the `authenticator` you supply to prompt the user for biometrics or a security key, and verifies the credential with the server.
       - Does not require an existing session. On success the session is persisted and an `AuthChangeEvent.signedIn` event is fired.
       - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` (since `passkeys` `2.21.0`).
-      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey-api) namespace instead.
+      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey) namespace instead.
       - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
       - Platform setup the library cannot perform (Associated Domains on iOS/macOS, Digital Asset Links on Android, the `passkeys` web SDK on web) is documented in the `supabase_flutter` package README.
     params:
@@ -977,12 +977,12 @@ functions:
   - id: register-passkey
     title: 'registerPasskey()'
     notes: |
-      Registers a new passkey (WebAuthn credential) for the signed in user.
+      Registers a new passkey (WebAuthn credential) for the signed-in user.
       - Available on `supabase_flutter` 2.15.0 and later as an extension on `GoTrueClient`.
       - Drives the full WebAuthn ceremony end to end: starts the registration with the Supabase server, calls the `authenticator` you supply to create a credential on the device, and verifies it with the server.
       - Requires a signed in (non-anonymous) user. If the user has verified MFA factors, the session has to be at `aal2` to manage passkeys.
       - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` (since `passkeys` `2.21.0`).
-      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey-api) namespace instead.
+      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey) namespace instead.
       - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
     params:
       - name: authenticator
@@ -1011,7 +1011,7 @@ functions:
   - id: sign-out
     title: 'signOut()'
     description: |
-      Signs out the current user, if there is a logged in user.
+      Signs out the current user, if there is a signed-in user.
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
     params:
@@ -1233,9 +1233,9 @@ functions:
   - id: get-user
     title: 'currentUser'
     description: |
-      Returns the user data, if there is a logged in user.
+      Returns the user data, if there is a signed-in user.
     examples:
-      - name: Get the logged in user
+      - name: Get the signed-in user
         isSpotlight: true
         code: |
           ```dart
@@ -1280,7 +1280,7 @@ functions:
   - id: update-user
     title: 'updateUser()'
     description: |
-      Updates user data for a logged in user.
+      Updates user data for a signed-in user.
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
@@ -2298,7 +2298,7 @@ functions:
   - id: passkey-list
     title: 'passkey.list()'
     notes: |
-      Returns the list of passkeys registered to the signed in user.
+      Returns the list of passkeys registered to the signed-in user.
     examples:
       - id: list-passkeys
         name: List the current user's passkeys
@@ -2334,7 +2334,7 @@ functions:
   - id: passkey-delete
     title: 'passkey.delete()'
     notes: |
-      Deletes a passkey from the signed in user.
+      Deletes a passkey from the signed-in user.
       - If the user has verified MFA factors, the session has to be at `aal2` to manage passkeys.
     params:
       - name: passkeyId
@@ -2354,7 +2354,7 @@ functions:
   - id: passkey-start-registration
     title: 'passkey.startRegistration()'
     notes: |
-      Starts the registration of a new passkey for the signed in user.
+      Starts the registration of a new passkey for the signed-in user.
       - Requires a signed in (non-anonymous) user.
       - Pass the returned `options` to the platform's passkey API to create the credential, then call [`passkey.verifyRegistration()`](/docs/reference/dart/auth-passkey-verifyregistration) with the result.
       - When the server omits `user.name`/`displayName` in the registration options, they are backfilled with `friendlyName` (or a generic `Passkey` default) before the platform ceremony.
@@ -2379,7 +2379,7 @@ functions:
   - id: passkey-verify-registration
     title: 'passkey.verifyRegistration()'
     notes: |
-      Completes the registration of a new passkey and returns the stored [`Passkey`](/docs/reference/dart/auth-passkey-api).
+      Completes the registration of a new passkey and returns the stored [`Passkey`](/docs/reference/dart/auth-passkey).
     params:
       - name: challengeId
         isOptional: false
@@ -3269,7 +3269,7 @@ functions:
       - id: parsing-custom-headers
         name: Parsing custom headers.
         description: |
-          Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
+          Any `headers` will be passed through to the function. A common pattern is to pass a signed-in user's JWT token as an Authorization header.
         isSpotlight: true
         code: |
           ```dart
@@ -5329,7 +5329,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/dart/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/dart/file-buckets-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none
@@ -5537,7 +5537,7 @@ functions:
     title: 'from.downloadStream()'
     notes: |
       - The request is sent when the stream is listened to. A non-success response surfaces as a `StorageException` on the stream before any bytes are emitted.
-      - Prefer this over [`download()`](/docs/reference/dart/storage-from-download) for large files to keep memory usage low.
+      - Prefer this over [`download()`](/docs/reference/dart/file-buckets-download) for large files to keep memory usage low.
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `select`

@@ -1,16 +1,21 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { compact, get, sum, uniqBy } from 'lodash'
-import { Upload } from 'lucide-react'
+import { UploadIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { DragEventHandler, useCallback, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Checkbox, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
+import {
+  STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
+  STORAGE_SORT_BY,
+  STORAGE_SORT_BY_ORDER,
+  STORAGE_VIEWS,
+} from '../Storage.constants'
 import type { StorageItem } from '../Storage.types'
 import { formatFolderItems } from '../StorageExplorer/StorageExplorer.utils'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
@@ -19,9 +24,9 @@ import { BucketFilePickerRow } from './BucketFilePickerRow'
 import { useBucketFilePickerStateSnapshot } from './BucketFilePickerState'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useBucketObjectsInfiniteQuery } from '@/data/storage/bucket-objects-infinite-query'
+import { bucketObjectsInfiniteQueryOptions } from '@/data/storage/bucket-objects-infinite-query'
 import { storageKeys } from '@/data/storage/keys'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatBytes } from '@/lib/helpers'
 import { noop } from '@/lib/void'
 
@@ -74,7 +79,7 @@ const DragOverOverlay = ({
                 className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
                 style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
               >
-                <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
+                <UploadIcon className="text-white pointer-events-none" size={20} strokeWidth={2} />
                 <p className="text-center text-sm text-white mt-2 pointer-events-none">
                   Drop your files to upload to this folder
                 </p>
@@ -103,7 +108,9 @@ export const BucketFilePickerColumn = ({
   const columnRef = useRef<HTMLDivElement | null>(null)
 
   const { hostEndpoint } = useProjectApiUrl({ projectRef: projectRef! })
-  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_WRITE
+  )
 
   const {
     columns,
@@ -136,28 +143,57 @@ export const BucketFilePickerColumn = ({
   const isLastFolder = index === columns.length
 
   const { view, sortBy, sortByOrder } = useStoragePreference(projectRef!)
+  // v2's sortBy.column doesn't support 'last_accessed_at'; the picker's own sort dropdown no
+  // longer offers it, but the preference is shared with the (still v1) main file explorer.
+  const sortColumn = sortBy === STORAGE_SORT_BY.LAST_ACCESSED_AT ? STORAGE_SORT_BY.NAME : sortBy
 
   const debouncedSearchString = useDebounce(itemSearchString, 500)
-  const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useBucketObjectsInfiniteQuery(
-    {
+  const { data, isLoading, isFetching, fetchNextPage, hasNextPage } = useInfiniteQuery({
+    ...bucketObjectsInfiniteQueryOptions({
       projectRef,
       bucketId: bucket.id,
       path,
       options: {
         sortBy: {
-          column: sortBy,
+          column: sortColumn,
           order: sortByOrder,
         },
         // When a user tries to search, only search in the last opened folder (rightmost column)
         ...(isLastFolder && debouncedSearchString ? { search: debouncedSearchString } : {}),
       },
-    }
-  )
+    }),
+  })
 
   const items = useMemo(() => {
-    const objs = data?.pages.flatMap((page) => page) || []
-    return formatFolderItems(objs)
-  }, [data])
+    const pages = data?.pages ?? []
+    // v2's `name` is the full key/prefix from the bucket root (folders end with a trailing
+    // slash), not the bare file/folder name — take the last path segment for display.
+    const objs = pages
+      .flatMap((page) => page.objects)
+      .map((object) => ({ ...object, name: object.name.split('/').pop() ?? object.name }))
+    // v2 returns folders and objects separately; re-combine them into the single sorted list
+    // formatFolderItems expects, tagging folders with `id: null` per its existing convention.
+    const folders = pages
+      .flatMap((page) => page.folders)
+      .map((folder) => {
+        const folderPath = folder.name.replace(/\/$/, '')
+        return {
+          id: null,
+          name: folderPath.split('/').pop() ?? folderPath,
+          created_at: null,
+          updated_at: null,
+          last_accessed_at: null,
+          metadata: null,
+        }
+      })
+    const direction = sortByOrder === STORAGE_SORT_BY_ORDER.DESC ? -1 : 1
+    const merged = [...folders, ...objs].sort((a, b) => {
+      const aValue = (sortColumn === STORAGE_SORT_BY.NAME ? a.name : a[sortColumn]) ?? ''
+      const bValue = (sortColumn === STORAGE_SORT_BY.NAME ? b.name : b[sortColumn]) ?? ''
+      return direction * String(aValue).localeCompare(String(bValue))
+    })
+    return formatFolderItems(merged)
+  }, [data, sortColumn, sortByOrder])
 
   const haveSelectedItems = selectedItems.length > 0
   const columnItemsId = items.map((item) => item.id)

@@ -1,4 +1,4 @@
-import { Table2 } from 'lucide-react'
+import { Table2Icon } from 'lucide-react'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
@@ -31,7 +31,7 @@ export function NewTab() {
     ? []
     : [
         {
-          icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+          icon: <Table2Icon className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
           title: 'Create a table',
           description: 'Design and create a new database table',
           bgColor: 'bg-blue-500',
@@ -49,11 +49,7 @@ export function NewTab() {
           <Card>
             <CardHeader className="py-2 px-3 flex-row items-center justify-between w-full space-y-0">
               <CardTitle className="text-foreground-light">Currently impersonating as</CardTitle>
-              <Button
-                variant="default"
-                className="font-sans"
-                onClick={() => roleState.setRole(undefined)}
-              >
+              <Button className="font-sans" onClick={() => roleState.setRole(undefined)}>
                 Stop
               </Button>
             </CardHeader>
@@ -69,7 +65,7 @@ export function NewTab() {
               {impersonatingAnon && <p className="text-foreground-lighter">Not logged-in</p>}
               {!!impersonatedUser && (
                 <p>
-                  ID: <code className="text-code-inline">{impersonatedUser.id}</code>
+                  ID: <code>{impersonatedUser.id}</code>
                 </p>
               )}
             </CardContent>

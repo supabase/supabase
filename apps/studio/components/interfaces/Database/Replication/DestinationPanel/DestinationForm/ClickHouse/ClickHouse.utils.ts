@@ -64,26 +64,26 @@ export const getClickHouseValidationIssues = (
   const issues: ClickHouseValidationIssue[] = []
 
   if (!data.clickhouseUrl?.length) {
-    issues.push({ path: 'clickhouseUrl', message: 'URL is required' })
+    issues.push({ path: 'clickhouseUrl', message: 'URL is required.' })
   } else {
     let parsed: URL | undefined
 
     try {
       parsed = new URL(data.clickhouseUrl)
     } catch {
-      issues.push({ path: 'clickhouseUrl', message: 'ClickHouse URL must be a valid URL' })
+      issues.push({ path: 'clickhouseUrl', message: 'ClickHouse URL must be a valid URL.' })
     }
 
     if (parsed) {
       if (parsed.protocol !== 'https:') {
-        issues.push({ path: 'clickhouseUrl', message: 'ClickHouse URL must use https://' })
+        issues.push({ path: 'clickhouseUrl', message: 'ClickHouse URL must use HTTPS.' })
       } else {
         const host = parsed.hostname.replace(/^\[|\]$/g, '')
 
         if (isClickHouseHostInternal(host)) {
           issues.push({
             path: 'clickhouseUrl',
-            message: 'ClickHouse URL must not target an internal address',
+            message: 'ClickHouse URL must not target an internal address.',
           })
         }
       }
@@ -91,11 +91,11 @@ export const getClickHouseValidationIssues = (
   }
 
   if (!data.clickhouseUser?.length) {
-    issues.push({ path: 'clickhouseUser', message: 'User is required' })
+    issues.push({ path: 'clickhouseUser', message: 'User is required.' })
   }
 
   if (!data.clickhouseDatabase?.length) {
-    issues.push({ path: 'clickhouseDatabase', message: 'Database is required' })
+    issues.push({ path: 'clickhouseDatabase', message: 'Database is required.' })
   }
 
   return issues

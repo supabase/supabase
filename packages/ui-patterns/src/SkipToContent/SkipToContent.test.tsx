@@ -24,17 +24,18 @@ describe('SkipToContent', () => {
     const { container } = render(<SkipToContent href="#main" />)
 
     const wrapper = container.firstElementChild as HTMLElement
-    expect(wrapper.className).toContain('-translate-y-full')
+    expect(wrapper.className).toContain('-translate-y-[calc(100%+8px)]')
     expect(wrapper.className).toContain('focus-within:translate-y-[10px]')
     expect(wrapper.className).toContain('w-fit')
     expect(wrapper.className).toContain('left-[10px]')
   })
 
-  it('uses an unmodified default Button for hover and fill styles', () => {
+  it('uses the default Button surface without custom overrides', () => {
     render(<SkipToContent href="#main" />)
 
     const link = screen.getByRole('link', { name: 'Skip to content' })
-    expect(link.className).toContain('hover:bg-popover')
+    expect(link.className).toContain('raised-control-surface')
+    expect(link.className).toContain('control-surface-shadows')
     expect(link.className).not.toContain('bg-surface-300')
     expect(link.className).not.toContain('hover:bg-secondary')
   })

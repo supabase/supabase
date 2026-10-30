@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { Lock } from 'lucide-react'
+import { LockIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
@@ -12,10 +12,14 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
+import { resolveCaptchaToken } from './SignIn.utils'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { BASE_PATH } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
 import { auth, buildPathWithParams } from '@/lib/gotrue'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -28,6 +32,8 @@ export const SignInSSOForm = () => {
   const captchaRef = useRef<HCaptcha>(null)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [_, setLastSignInUsed] = useLastSignIn()
+  const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { email: '' },
@@ -39,8 +45,13 @@ export const SignInSSOForm = () => {
 
     let token = captchaToken
     if (!token) {
-      const captchaResponse = await captchaRef.current?.execute({ async: true })
-      token = captchaResponse?.response ?? null
+      const captcha = await resolveCaptchaToken(captchaRef, trackFunnelError, toastId)
+      if (!captcha.ok) {
+        setCaptchaToken(null)
+        captchaRef.current?.resetCaptcha()
+        return
+      }
+      token = captcha.token
     }
 
     // redirects to /sign-in to check if the user has MFA setup (handled in SignInLayout.tsx)
@@ -71,6 +82,7 @@ export const SignInSSOForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign in: ${error.message}`, { id: toastId })
+      trackFunnelError('signin', classifyApiError('signin', error), 'toast', toastId)
       captureCriticalError(error, 'sign in via SSO')
     }
   }
@@ -81,22 +93,21 @@ export const SignInSSOForm = () => {
         id={formId}
         method="POST"
         className="flex flex-col gap-4"
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          track('sign_in_submitted', { category: 'account', method: 'sso' })
+          return form.handleSubmit(onSubmit, (errors) =>
+            trackFunnelError('signin', classifyValidationError('signin', errors), 'form')
+          )(e)
+        }}
       >
         <FormField
           key="email"
           name="email"
           control={form.control}
           render={({ field }) => (
-            <FormItemLayout name="email" label="Email">
+            <FormItemLayout label="Email">
               <FormControl>
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  {...field}
-                  placeholder="gavin@hooli.com"
-                />
+                <Input type="email" autoComplete="email" {...field} placeholder="gavin@hooli.com" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -116,7 +127,14 @@ export const SignInSSOForm = () => {
           />
         </div>
 
-        <Button block form={formId} type="submit" size="large" loading={isSubmitting}>
+        <Button
+          variant="primary"
+          block
+          form={formId}
+          type="submit"
+          size="large"
+          loading={isSubmitting}
+        >
           Sign in
         </Button>
       </form>
@@ -129,7 +147,7 @@ export const SignInWithSSOButton = () => {
 
   return (
     <LastSignInWrapper type="sso">
-      <Button asChild block size="large" variant="outline" icon={<Lock />}>
+      <Button asChild block size="large" variant="outline" icon={<LockIcon />}>
         <Link href={{ pathname: '/sign-in-sso', query: router.query }}>Continue with SSO</Link>
       </Button>
     </LastSignInWrapper>

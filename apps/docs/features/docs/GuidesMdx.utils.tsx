@@ -34,7 +34,7 @@ const PUBLISHED_SECTIONS = [
   'graphql',
   'integrations',
   'local-development',
-  'monitoring-and-debugging',
+  'observability',
   'platform',
   'queues',
   'realtime',
@@ -90,7 +90,12 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       editLink,
     }
   } catch (error: unknown) {
-    if (error instanceof Error && error.cause instanceof FileNotFoundError) {
+    // `fromFs` rethrows FileNotFoundError directly, so check the error itself
+    // as well as its cause.
+    if (
+      error instanceof FileNotFoundError ||
+      (error instanceof Error && error.cause instanceof FileNotFoundError)
+    ) {
       // Not using console.error because this includes pages that are genuine
       // 404s and clutters up the logs
       console.log('Could not read Markdown at path: %s', fullPath)

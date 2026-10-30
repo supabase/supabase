@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -39,12 +39,11 @@ export function SecretEnvRow({ secret }: SecretEnvRowProps) {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant="default"
             size="tiny"
             className={cn('px-1.5', isDisabled && 'opacity-50')}
             aria-label={secret.isRevealed ? 'Hide secret key' : 'Reveal secret key'}
             loading={secret.isRevealed && secret.isRevealing}
-            icon={secret.isRevealed ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
+            icon={secret.isRevealed ? <EyeOffIcon strokeWidth={2} /> : <EyeIcon strokeWidth={2} />}
             onClick={onToggle}
             disabled={isDisabled}
           />

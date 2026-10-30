@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { configKeys } from './keys'
-import { handleError, put } from '@/data/fetchers'
+import { handleError, put, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type PostgresConfigurationUpdateVariables = {
@@ -20,6 +20,7 @@ export async function updatePostgresConfiguration({
   const { data, error } = await put('/v1/projects/{ref}/config/database/postgres', {
     params: { path: { ref: projectRef } },
     body: payload,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -50,9 +51,10 @@ export const usePostgresConfigurationUpdateMutation = ({
     mutationFn: (vars) => updatePostgresConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries({
-        queryKey: configKeys.postgresConfig(projectRef),
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: configKeys.postgresConfig(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

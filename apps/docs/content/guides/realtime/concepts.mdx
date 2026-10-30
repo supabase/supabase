@@ -40,7 +40,7 @@ The connections include:
 - **Migrations**: Two temporary connections to run database migrations when needed
 - **Authorization**: Configurable connection pool to check authorization policies on join that are always started.
 - **Broadcast from database**: One connection to receive data from replication slot used to broadcast the changes to the clients that is always started.
-- **Postgres Changes**: Multiple connection pools required. These pools are only started if you use Postgres Changes.
+- **[Postgres Changes](/docs/guides/realtime/postgres-changes)**: Multiple connection pools required. These pools are only started if you use Postgres Changes.
   - **Subscription management**: To manage the subscribers to Postgres Changes
   - **Subscription cleanup**: To cleanup the subscribers to Postgres Changes
   - **WAL pull**: To pull the changes from the database

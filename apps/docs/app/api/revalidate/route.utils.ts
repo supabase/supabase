@@ -91,7 +91,8 @@ export async function _handleRevalidateRequest(request: NextRequest) {
   }
 
   result.tags.forEach((tag) => {
-    revalidateTag(tag)
+    // Expire immediately so the next request never gets stale content.
+    revalidateTag(tag, { expire: 0 })
   })
 
   return new Response(null, {

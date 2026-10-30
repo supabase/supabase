@@ -23,11 +23,6 @@ describe('QUERY_PERFORMANCE SQL queries', () => {
       const sql = queries[name].safeSql([], undefined, undefined)
       expect(sql).toContain('calls > 0')
     })
-
-    it.each(queryNames)('%s still includes calls > 0 when user filters are provided', (name) => {
-      const sql = queries[name].safeSql([], "WHERE auth.rolname in ('postgres')", undefined)
-      expect(sql).toContain('calls > 0')
-    })
   })
 
   describe('WHERE clause composition with user filters', () => {

@@ -22,8 +22,10 @@ export const contentListingIconSchema = z.union([z.string().min(1), contentListi
 
 export const contentListingItemSchema = z.object({
   title: z.string().min(1),
-  href: z.string().min(1),
-  description: z.string().min(1),
+  href: z.string().min(1).optional(),
+  description: z.string().min(1).optional(),
+  /** Shown under the title on grid cards, before the description. */
+  subtitle: z.string().min(1).optional(),
   icon: contentListingIconSchema.optional(),
   hasLightIcon: z.boolean().optional(),
   badge: z.string().min(1).optional(),
@@ -36,7 +38,7 @@ export const contentListingItemSchema = z.object({
   feature: z.string().min(1).optional(),
 })
 
-export const contentListingGroupTypeSchema = z.enum(['list', 'grid'])
+export const contentListingGroupTypeSchema = z.enum(['list', 'grid', 'progression'])
 
 export const contentListingGridColumnsSchema = z.union([z.literal(2), z.literal(3), z.literal(4)])
 
@@ -45,6 +47,8 @@ export const contentListingHeadingLevelSchema = z.enum(['h2', 'h3', 'h4'])
 export const contentListingGroupSchema = z.object({
   id: z.string().min(1),
   heading: z.string().min(1).optional(),
+  /** Id of an existing heading that names this group. Used as aria-labelledby. */
+  labelledBy: z.string().min(1).optional(),
   headingLevel: contentListingHeadingLevelSchema.optional(),
   description: z.string().optional(),
   type: contentListingGroupTypeSchema.optional(),

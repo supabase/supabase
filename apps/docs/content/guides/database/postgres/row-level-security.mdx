@@ -51,26 +51,26 @@ You write RLS rules in SQL, so a rule can express whatever access logic your app
 
 Postgres runs two checks before a client touches a table. Grants decide whether a role can run an operation on the table at all. Policies decide which rows that operation applies to. Set both for every table you expose.
 
-On existing projects, a new table in `public` starts with every privilege already granted to all three roles:
+On existing projects, a new table in `public` starts with every privilege already granted to all three roles. The default grants include `select`, `insert`, `update`, `delete`, `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`:
 
-| Role            | Granted automatically                  | What it should keep                                     |
-| --------------- | -------------------------------------- | ------------------------------------------------------- |
-| `anon`          | `select`, `insert`, `update`, `delete` | Only what signed-out visitors are meant to read         |
-| `authenticated` | `select`, `insert`, `update`, `delete` | Only the operations your app exposes to signed-in users |
-| `service_role`  | `select`, `insert`, `update`, `delete` | Full access. It bypasses RLS, so keep it server-side    |
+| Role            | Granted automatically | What it should keep                                     |
+| --------------- | --------------------- | ------------------------------------------------------- |
+| `anon`          | Every privilege       | Only what signed-out visitors are meant to read         |
+| `authenticated` | Every privilege       | Only the operations your app exposes to signed-in users |
+| `service_role`  | Every privilege       | Full access. It bypasses RLS, so keep it server-side    |
 
 Adding policies doesn't take those grants back. A table protected only by policies still hands `anon` an insert path if you never revoke the grant.
 
 Not every project grants these automatically. See [Default privileges](/docs/guides/api/securing-your-api#default-privileges). Grant each role only the operations it needs.
 
-A missing grant raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy. To set them, see [Enable RLS and set the grants](#enable-rls-and-set-the-grants).
+A [missing grant](/kb/troubleshooting/database-api-42501-errors) raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy. To set them, see [Enable RLS and set the grants](#enable-rls-and-set-the-grants).
 
 ### Authenticated and unauthenticated roles
 
 Supabase maps every request to one of the roles:
 
-- `anon`: an unauthenticated request (the user is not logged in)
-- `authenticated`: an authenticated request (the user is logged in)
+- `anon`: an unauthenticated request (the user is not signed in)
+- `authenticated`: an authenticated request (the user is signed in)
 
 These are [Postgres Roles](/docs/guides/database/postgres/roles). You can use these roles within your Policies using the `TO` clause:
 
@@ -113,7 +113,7 @@ Until the suite passes, you don't know whether the policies do what you intended
 
 ### Enable RLS and set the grants
 
-Run these statements in the [SQL Editor](/dashboard/project/_/sql/new) for a one-off change, or in a [migration](/docs/guides/deployment/database-migrations) to keep the change reproducible across environments. Grants and RLS belong in the same migration.
+Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection). To keep the change reproducible across environments, put the statements in a [migration](/docs/guides/deployment/database-migrations) instead. Grants and RLS belong in the same migration.
 
 Enable RLS, then set the grants to match what each role does in your app:
 
@@ -141,7 +141,7 @@ Enable RLS, then set the grants to match what each role does in your app:
 4. Write the test file for the table, and run the suite.
 
    ```bash
-   supabase test new reports_rls.test
+   supabase test new reports_rls
    supabase test db
    ```
 
@@ -160,9 +160,9 @@ to anon, authenticated
 using ( true );
 ```
 
-```sql supabase/tests/announcements_rls.test.sql
--- File: supabase/tests/announcements_rls.test.sql
--- Create: supabase test new announcements_rls.test
+```sql supabase/tests/announcements_rls_test.sql
+-- File: supabase/tests/announcements_rls_test.sql
+-- Create: supabase test new announcements_rls
 -- Run:    supabase test db
 -- Repeat for every public-read table you secured.
 begin;
@@ -313,11 +313,11 @@ using ( (select auth.uid()) = user_id );
 
 #### Policy tests
 
-When you adapt those four policies to a table, add this file for that table. The path is `supabase/tests/<table>_rls.test.sql`. For a table users share, also assert that a member who is not the owner can perform the operations its policies allow, and that a non-member cannot.
+When you adapt those four policies to a table, add this file for that table. The path is `supabase/tests/<table>_rls_test.sql`. For a table users share, also assert that a member who is not the owner can perform the operations its policies allow, and that a non-member cannot.
 
-```sql supabase/tests/profiles_rls.test.sql
--- File: supabase/tests/profiles_rls.test.sql
--- Create: supabase test new profiles_rls.test
+```sql supabase/tests/profiles_rls_test.sql
+-- File: supabase/tests/profiles_rls_test.sql
+-- Create: supabase test new profiles_rls
 -- Run:    supabase test db
 -- One file per table you enabled RLS on. Name that table in the assertions.
 -- Do not create a table only the tests use.
@@ -479,7 +479,9 @@ This prevents the policy `( (select auth.uid()) = user_id )` from running for an
 
 ### Run the test suite
 
-The files above live under `supabase/tests/` and run through [pgTAP](/docs/guides/database/extensions/pgtap). Create them with `supabase test new <table>_rls.test`, and run them with `supabase test db`.
+The files above live under `supabase/tests/` and run through [pgTAP](/docs/guides/database/extensions/pgtap). Create them with `supabase test new <table>_rls`, and run them with `supabase test db`.
+
+For more information about writing a policy test and running it against your local database, see [Test Row Level Security policies with pgTAP](/docs/guides/database/postgres/testing-row-level-security).
 
 [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main) adds `tests.create_supabase_user()`, `tests.authenticate_as()`, and `tests.rls_enabled()`. See [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended) and [Testing your database](/docs/guides/database/testing).
 
@@ -755,7 +757,7 @@ The JWT-based `service_role` key is a legacy alternative. Prefer a secret key wh
 
 <Admonition type="note">
 
-A secret key bypasses RLS only when the request carries no user access token. If the request carries one, it runs under the RLS policies of that signed-in user, even when the client library was initialized with a secret key.
+A secret key bypasses RLS only when the request carries no user access token. If the request carries one, it runs under the RLS policies of that signed-in user, even when the client library was [initialized with a secret key](/kb/troubleshooting/why-is-my-service-role-key-client-getting-rls-errors-or-not-returning-data-7_1K9z).
 
 </Admonition>
 
@@ -775,3 +777,4 @@ This can be useful for system-level access. **Never** share login credentials fo
 - [Securing your API](/docs/guides/api/securing-your-api): grants, dedicated schemas, and pre-request checks around the Data API.
 - [Column Level Security](/docs/guides/database/postgres/column-level-security): restrict access to individual columns.
 - [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main): a community extension that adds user creation and role impersonation helpers to pgTAP.
+- [Troubleshooting Row Level Security](/kb/troubleshooting/rls-performance-and-best-practices-Z5Jjwv)

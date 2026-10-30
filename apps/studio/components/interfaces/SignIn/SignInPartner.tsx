@@ -1,15 +1,21 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { InlineLink } from '@/components/ui/InlineLink'
+import { getIdentityProviderConfig } from '@/lib/external-identity-providers'
 import { auth } from '@/lib/gotrue'
+import { classifyApiError } from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 export const SignInPartner = () => {
   const router = useRouter()
+  const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
 
   useEffect(() => {
-    let isMounted = true // ✅ Flag added
+    let isMounted = true
 
     ;(async () => {
       const params = new URLSearchParams(window.location.hash.substring(1))
@@ -18,35 +24,38 @@ export const SignInPartner = () => {
       const token = params.get('id_token')
 
       const { data } = await auth.getSession()
-
-      if (!isMounted) return 
+      if (!isMounted) return
 
       if (!data.session && partner && token) {
+        // partner comes from the URL hash unauthenticated; only registry-known values may
+        // enter the method vocabulary, anything else would let a crafted link poison it
+        const knownPartner = getIdentityProviderConfig(partner)
+        const method = knownPartner?.id ?? 'unregistered_partner'
+        track('sign_in_submitted', {
+          category: 'account',
+          method,
+        })
         try {
-          await auth.signInWithIdToken({ provider: partner, token })
-        } finally {
-          if (isMounted) { 
-            router.replace({ pathname: '/sign-in-mfa' })
+          const { error } = await auth.signInWithIdToken({ provider: partner, token })
+          if (error) {
+            trackFunnelError('signin', classifyApiError('signin', error), 'form')
           }
+        } finally {
+          if (isMounted) router.replace({ pathname: '/sign-in-mfa', query: { method } })
         }
       } else {
-        if (isMounted) { 
-          router.replace({ pathname: '/sign-in' })
-        }
+        router.replace({ pathname: '/sign-in' })
       }
     })()
 
-    return () => { 
+    return () => {
       isMounted = false
     }
-  // Intentionally omitting 'router' to prevent Next.js router reference mutations
-  // from triggering duplicate re-renders and spamming the auth endpoints.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) 
+  }, [])
 
   return (
     <div className="relative mx-auto w-full flex flex-col items-center justify-center gap-y-6">
-      <Loader2 className="animate-spin" />
+      <Loader2Icon className="animate-spin" />
       <h2 className="text-lg text-center">Signing in to Supabase Dashboard</h2>
       <p className="text-xs text-foreground-lighter text-center max-w-[220px] sm:max-w-full">
         By continuing, you agree to Supabase’s{' '}

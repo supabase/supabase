@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { type AdmonitionProps } from 'ui-patterns/Admonition/Admonition.types'
