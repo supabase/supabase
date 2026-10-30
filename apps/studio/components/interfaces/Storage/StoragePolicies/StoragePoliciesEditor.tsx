@@ -137,7 +137,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 }
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
-  <div className="flex w-full items-center justify-end gap-x-2 border-t px-6 py-3 border-default">
+  <div className="sticky bottom-0 z-10 flex w-full items-center justify-end gap-x-2 border-t px-6 py-3 border-default bg-dash-sidebar">
     <Button onClick={onViewTemplates}>View templates</Button>
     <Button variant="primary" onClick={onReviewPolicy}>
       Review
