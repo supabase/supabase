@@ -200,6 +200,7 @@ export const migrationSolutions = {
     {
       id: Solutions.firebase,
       text: 'Switch from Firebase',
+      name: 'Firebase',
       description: '',
       url: '/solutions/switch-from-firebase',
       icon: (props: any) => (
@@ -226,6 +227,7 @@ export const migrationSolutions = {
     {
       id: Solutions.neon,
       text: 'Switch from Neon',
+      name: 'Neon',
       description: '',
       url: '/solutions/switch-from-neon',
       icon: (props: any) => (
@@ -305,6 +307,7 @@ export const navData = {
       links: [
         ...migrationSolutions.solutions.map((solution) => ({
           text: solution.text,
+          name: solution.name,
           url: solution.url,
           icon: solution.icon,
         })),
