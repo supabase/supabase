@@ -2,6 +2,7 @@ import { getExposedFunctionsSql } from '@supabase/pg-meta'
 import { infiniteQueryOptions } from '@tanstack/react-query'
 
 import { privilegeKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import type { ResponseError } from '@/types'
@@ -48,6 +49,7 @@ export async function getExposedFunctions(
       connectionString,
       sql,
       queryKey: ['exposed-functions', page],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -63,7 +65,6 @@ export const exposedFunctionsInfiniteQueryOptions = (
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   return infiniteQueryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: privilegeKeys.exposedFunctionsInfinite(projectRef, search),
     queryFn: ({ signal, pageParam }) =>
       getExposedFunctions(

@@ -6,7 +6,8 @@ import {
   parseLogsFilterUrlParams,
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
-import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { unifiedLogsScopeSchema } from './UnifiedLogs.schema'
+import { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
   joinSqlFragments,
@@ -14,7 +15,7 @@ import {
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
-import { WORKER_LOG_SOURCES } from '@/lib/constants/compute'
+import { COMPUTE_LOG_SUBSERVICES } from '@/lib/constants/compute'
 
 // Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
 // pre-brand the keywords we want to switch between.
@@ -66,9 +67,13 @@ const HTTP_PATH_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', l
  * logs from postgREST / storage-api and are intentionally not part of unified
  * logs; the UI surfaces gateway HTTP traffic for those buckets.
  */
-const WORKER_LOG_SOURCE_VALUES = Object.values(WORKER_LOG_SOURCES)
-const WORKER_LOG_SOURCE_CONDITION = safeSql`log_attributes['source'] IN (${joinSqlFragments(
-  WORKER_LOG_SOURCE_VALUES.map((source) => lit(source)),
+// Compute rows are matched on their stream names rather than a source: the mapping does
+// not classify them, so `source` is empty and the backend's top-level `subservice` lands
+// in `log_attributes`. The stream names are product-prefixed, which is what makes this
+// list a product filter as well as a stream one.
+const COMPUTE_SUBSERVICE_VALUES = Object.values(COMPUTE_LOG_SUBSERVICES)
+const COMPUTE_SUBSERVICE_CONDITION = safeSql`log_attributes['subservice'] IN (${joinSqlFragments(
+  COMPUTE_SUBSERVICE_VALUES.map((subservice) => lit(subservice)),
   ','
 )})`
 
@@ -79,7 +84,7 @@ const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
       safeSql`source = ${lit(source)}`,
     ])
   ),
-  compute: WORKER_LOG_SOURCE_CONDITION,
+  compute: COMPUTE_SUBSERVICE_CONDITION,
 }
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
@@ -91,12 +96,13 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'edge_logs' THEN 'edge'
       WHEN source = 'postgres_logs' THEN 'postgres'
       WHEN source = 'function_edge_logs' THEN 'edge function'
+      WHEN source = 'function_logs' THEN 'edge function runtime'
       WHEN source = 'auth_logs' THEN 'auth'
       WHEN source = 'realtime_logs' THEN 'realtime'
       WHEN source = 'supavisor_logs' THEN 'supavisor'
       WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'
       WHEN source = 'multigres_logs' THEN 'multigres'
-      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN 'compute'
+      WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN 'compute'
       ELSE source
     END`
 
@@ -104,29 +110,23 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
 // auth-service `status` attribute for auth rows, and the Postgres
 // `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
 const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
-      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null
+      WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN null
       WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
       ELSE toString((${HTTP_STATUS_EXPR}))
     END`
 
-const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_METHOD_EXPR})`
-const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_PATH_EXPR})`
-const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, log_attributes, map())`
+const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_METHOD_EXPR})`
+const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_PATH_EXPR})`
+const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source = 'function_logs', log_attributes, map())`
 
-// SQL expression for derived `level`. Used inline (not as alias reference)
-// because the OTEL endpoint can't resolve aliases inside countIf when the
-// alias is not in GROUP BY.
-//
-// HTTP status is checked first so gateway and auth rows (which carry a
-// `severity_text` of `INFO` regardless of response code) bucket as
-// success/warning/error by status. Postgres-style severity is the
-// fallback for rows without a status code.
 const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
-      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null
+      WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN null
+      WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('error','fatal') THEN 'error'
+      WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('warn','warning') THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 400 AND 499 THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 200 AND 299 THEN 'success'
-      WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'
+      WHEN severity_text IN ('ERROR','FATAL','PANIC','CRITICAL','ALERT','EMERGENCY') THEN 'error'
       WHEN severity_text IN ('WARN','WARNING') THEN 'warning'
       WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'
       ELSE 'success'
@@ -240,6 +240,43 @@ const translateFilter = (
   }
 }
 
+const NO_ROWS: SafeLogSqlFragment = safeSql`0`
+
+export const getUnifiedLogsScopeCondition = (
+  scope?: UnifiedLogsScope
+): SafeLogSqlFragment | null => {
+  if (!scope) return null
+  const result = unifiedLogsScopeSchema.safeParse(scope)
+  if (!result.success || result.data.filters.length === 0) return NO_ROWS
+
+  const groups = new Map<
+    string,
+    { column: string; operator: LogsFilterOperator; values: string[] }
+  >()
+  for (const { column, operator, value } of result.data.filters) {
+    const isPatternOperator = operator === '~~*' || operator === '!~~*'
+    const supportsPatternOperator = column === 'event_message' || column === 'pathname'
+    if (isPatternOperator && !supportsPatternOperator) return NO_ROWS
+
+    const key = `${column}:${operator}`
+    const group = groups.get(key) ?? { column, operator, values: [] }
+    group.values.push(value)
+    groups.set(key, group)
+  }
+
+  const conditions: SafeLogSqlFragment[] = []
+  for (const { column, operator, values } of groups.values()) {
+    try {
+      const condition = translateFilter(column, values, operator)
+      if (!condition) return NO_ROWS
+      conditions.push(condition)
+    } catch {
+      return NO_ROWS
+    }
+  }
+  return safeSql`(${joinSqlFragments(conditions, ' AND ')})`
+}
+
 const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
   conditions.length > 0 ? safeSql`WHERE ${joinSqlFragments(conditions, ' AND ')}` : safeSql``
 
@@ -325,13 +362,19 @@ const buildBaseWhere = (
     if (logTypeFilter) {
       const condition = translateFilter('log_type', logTypeFilter.values, logTypeFilter.operator)
       if (condition) parts.push(condition)
-    } else if (!userFilterValue(search)) {
+      if (!search.scope && logTypeFilter.operator === '<>') {
+        parts.push(safeSql`NOT (${LOG_TYPE_CONDITION['edge function runtime']})`)
+      }
+    } else if (!search.scope && !userFilterValue(search)) {
       // Skip the default (postgres|edge) source restriction while the user filter is
       // active — the user clause governs which sources are eligible (auth + postgres),
       // and the default would otherwise exclude auth_logs, the primary attributable source.
       parts.push(logTypeWhereCondition([...DEFAULT_LOG_TYPES]))
     }
   }
+
+  const scope = getUnifiedLogsScopeCondition(search.scope)
+  if (scope) parts.push(scope)
 
   for (const [key, { operator, values }] of Object.entries(grouped)) {
     if (key === excludeField) continue
@@ -589,5 +632,103 @@ FROM logs
 ${whereClause(conditions)}
 GROUP BY time_bucket
 ORDER BY time_bucket ASC
+`
+}
+
+export const REQUEST_CORRELATION_KEYS = {
+  requestId: {
+    edge_logs: ['request.headers.cf_ray', 'response.headers.cf_ray'],
+    auth_logs: ['request_id'],
+    storage_logs: ['req.headers.cf_ray'],
+    function_edge_logs: ['request.headers.cf_ray'],
+  },
+  executionId: {
+    function_edge_logs: ['execution_id'],
+    function_logs: ['execution_id'],
+  },
+} as const satisfies Record<'requestId' | 'executionId', Record<string, readonly string[]>>
+
+export type RequestCorrelationIds = { requestIds: string[]; executionIds: string[] }
+
+export const REQUEST_TIMELINE_LIMIT = 200
+
+const CORRELATION_ID_PATTERN = /^[0-9A-Za-z-]{1,64}$/
+
+export const getRequestCorrelationIds = (
+  logs: { source: string; attributes: Record<string, unknown> | null | undefined }[]
+): RequestCorrelationIds => {
+  const collect = (keysBySource: Record<string, readonly string[]>) => {
+    const ids = new Set<string>()
+    for (const { source, attributes } of logs) {
+      for (const key of keysBySource[source] ?? []) {
+        const value = attributes?.[key]
+        if (typeof value === 'string' && CORRELATION_ID_PATTERN.test(value)) ids.add(value)
+      }
+    }
+    return [...ids].sort()
+  }
+  return {
+    requestIds: collect(REQUEST_CORRELATION_KEYS.requestId),
+    executionIds: collect(REQUEST_CORRELATION_KEYS.executionId),
+  }
+}
+
+const correlationConditions = (
+  keysBySource: Record<string, readonly string[]>,
+  ids: string[]
+): SafeLogSqlFragment[] => {
+  if (ids.length === 0) return []
+  const idList = joinSqlFragments(
+    ids.map((id) => lit(id)),
+    ','
+  )
+  return Object.entries(keysBySource).map(([source, keys]) => {
+    const matches = keys.map((key) => safeSql`log_attributes[${lit(key)}] IN (${idList})`)
+    return safeSql`(source = ${lit(source)} AND (${joinSqlFragments(matches, ' OR ')}))`
+  })
+}
+
+export const getLogAttributesQuery = ({
+  logId,
+  source,
+}: {
+  logId: string
+  source: string
+}): SafeLogSqlFragment => safeSql`
+SELECT source, log_attributes
+FROM logs
+WHERE id = ${lit(logId)} AND source = ${lit(source)}
+LIMIT 1
+`
+
+export const getRequestTimelineQuery = ({
+  requestIds,
+  executionIds,
+}: RequestCorrelationIds): SafeLogSqlFragment => {
+  const conditions = [
+    ...correlationConditions(REQUEST_CORRELATION_KEYS.requestId, requestIds),
+    ...correlationConditions(REQUEST_CORRELATION_KEYS.executionId, executionIds),
+  ]
+  if (conditions.length === 0) throw new Error('A request or execution ID is required')
+
+  return safeSql`
+SELECT
+    id,
+    timestamp,
+    source,
+    ${LOG_TYPE_EXPR} AS log_type,
+    ${STATUS_EXPR} AS status,
+    ${LEVEL_EXPR} AS level,
+    ${PATHNAME_EXPR} AS pathname,
+    event_message,
+    ${METHOD_EXPR} AS method,
+    ${AUTH_USER_EXPR} AS auth_user,
+    log_attributes AS metadata,
+    null AS log_count,
+    null AS logs
+FROM logs
+WHERE ${joinSqlFragments(conditions, ' OR ')}
+ORDER BY timestamp ASC, id ASC
+LIMIT ${lit(REQUEST_TIMELINE_LIMIT)}
 `
 }

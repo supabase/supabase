@@ -330,6 +330,16 @@ https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
   'monitoring-agent-security': createMonitoringPrompt('Security monitor', ['security']),
   'monitoring-agent-performance': createMonitoringPrompt('Performance monitor', ['performance']),
   'monitoring-agent-usage': createMonitoringPrompt('Resource monitor', ['usage']),
+  'testing-row-level-security': `Help me write pgTAP tests for my Row Level Security policies.
+1. Read all of
+   https://supabase.com/docs/guides/database/postgres/testing-row-level-security.md,
+   not only its first lines. Follow the rules in "Write quality tests with agents".
+2. Before you write any tests, list the access rules to prove and confirm them
+   with me.
+3. Write one test at a time. Run \`supabase test db\` and show that each test
+   fails when the policy it covers is broken.
+4. Don't change a policy to make a test pass. Tell me which assertion and
+   policy disagree.`,
 } as const
 
 export type AiPromptId = keyof typeof aiPrompts

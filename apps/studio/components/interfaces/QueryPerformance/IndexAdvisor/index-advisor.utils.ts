@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { GetIndexAdvisorResultResponse } from '@/data/database/retrieve-index-advisor-result-query'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 
@@ -80,6 +81,7 @@ export async function createIndexes({
       projectRef,
       connectionString,
       sql: safeSql`${joinSqlFragments(indexStatements, ';\n')};`,
+      grant: unguarded.migrating,
     })
 
     toast.success('Successfully created index')

@@ -98,7 +98,7 @@ export type FilterBarRootProps = {
   actions?: FilterBarAction[]
   isLoading?: boolean
   supportsOperators?: boolean
-  /** Logical operator for groups created via "New Group". Defaults to 'AND'. */
+  /** Logical operator for groups created via "New filter group". Defaults to 'AND'. */
   defaultGroupOperator?: FilterGroup['logicalOperator']
   variant?: FilterBarVariant
   icon?: React.ReactNode
@@ -415,7 +415,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
 
   return (
     <FilterBarContext.Provider value={contextValue}>
-      <div ref={rootRef} data-filterbar-root className="h-full min-h-[32px] flex items-stretch">
+      <div ref={rootRef} data-filterbar-root className="h-full min-h-[26px] flex items-stretch">
         {children}
       </div>
     </FilterBarContext.Provider>

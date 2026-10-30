@@ -2,6 +2,7 @@ import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseQueuesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -26,6 +27,8 @@ export async function getDatabaseQueues({ projectRef, connectionString }: Databa
     projectRef,
     connectionString,
     sql: queueSqlQuery,
+    queryKey: ['list-queues'],
+    grant: unguarded.migrating,
   })
   return result
 }

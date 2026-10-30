@@ -165,7 +165,7 @@ export const buildUpdateDestinationApiConfig = (
 
 export type UpdateDestinationPipelineParams = {
   destinationId: number
-  pipelineId: number
+  pipelineId: string
   projectRef: string
   destinationName: string
   destinationConfig: DestinationConfig

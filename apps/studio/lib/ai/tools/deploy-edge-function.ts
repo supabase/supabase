@@ -14,6 +14,9 @@ export const contract = {
   inputSchema,
   outputSchema: z.object({ success: z.boolean() }),
   minOptInLevel: null,
+  availability: {
+    environments: new Set(['platform']),
+  },
   needsApproval: true,
   toModelOutput: ({ success }) => ({ success }),
 } as const satisfies ToolContract

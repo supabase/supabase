@@ -5,7 +5,7 @@ description: 'Enable temporary access for short-lived database connections tied 
 
 Your Supabase project supports connecting to the Postgres database using either your Supabase API token (Personal Access Token) or your current dashboard session token (JWT). This is called temporary access, as the authentication tokens can be short-lived and tied directly to a specific Supabase user. Temporary access is disabled by default.
 
-Enabling temporary access only applies to connections to Postgres and Supavisor ("Connection Pooler"); all HTTP APIs offered by Supabase (e.g., PostgREST, Storage, Auth) require authentication tokens specific to the service and are independent of the Supabase platform user(s).
+Enabling temporary access only applies to connections to Postgres and the shared pooler (Supavisor); all HTTP APIs offered by Supabase (e.g., PostgREST, Storage, Auth) require authentication tokens specific to the service and are independent of the Supabase platform user(s).
 
 <Admonition type="note">
 
@@ -55,7 +55,7 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
 
 ## Configure user access
 
-Once temporary access has been enabled, project users must be authorized and mapped to Postgres roles they are allowed to access. Each user can be authorized to "assume" one or more Postgres roles using temporary access.
+Once temporary access has been enabled, project users must be authorized and mapped to [Postgres roles](/docs/guides/database/postgres/roles) they are allowed to access. Each user can be authorized to "assume" one or more Postgres roles using temporary access.
 
 When a user is authorized to assume a Postgres role, the user's Personal Access Token (PAT) will be used as the password for the Postgres role.
 
@@ -105,7 +105,7 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit" \
 
 <Admonition type="note">
 
-This feature does not work with IPv6 Transaction pooler (PgBouncer). Direct connections and connections through the IPv4 connection pooler are fully supported.
+This feature does not work with the dedicated pooler. Direct connections and connections through the shared pooler are fully supported.
 
 </Admonition>
 

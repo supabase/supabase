@@ -19,18 +19,27 @@ export const usePipelineDataValidation = ({
 }) => {
   const values = useWatch({ control: form.control, name: dataFieldNames })
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
+
   const snapshot = JSON.stringify([type, ...values])
   const currentSnapshot = useRef(snapshot)
   currentSnapshot.current = snapshot
+
   const [verifiedSnapshot, setVerifiedSnapshot] = useState<string>()
   const [isValidatingData, setIsValidatingData] = useState(false)
   const isValidatingRef = useRef(false)
+
   const [dataErrorState, setDataErrorState] = useState<{ snapshot: string; message: string }>()
   const setDataError = (message?: string) =>
     setDataErrorState(message ? { snapshot, message } : undefined)
   const dataError = dataErrorState?.snapshot === snapshot ? dataErrorState.message : undefined
+
   const names = useReplicationPublicationNamesQuery({ projectRef, sourceId })
   const publication = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
+  const isSelectedPublicationMissing =
+    names.isSuccess && !names.data.some(({ name }) => name === publicationName)
+  const hasPublicationLoadError =
+    !!publicationName && (names.isError || (publication.isError && !isSelectedPublicationMissing))
+
   const isDataVerified =
     verifiedSnapshot === JSON.stringify([snapshot, publication.data]) &&
     names.isSuccess &&
@@ -45,20 +54,28 @@ export const usePipelineDataValidation = ({
     setVerifiedSnapshot(undefined)
     isValidatingRef.current = true
     setIsValidatingData(true)
+
     try {
       if (!projectRef || sourceId === undefined || !publicationName) {
         form.setError('publicationName', { message: 'Select an available publication.' })
         return false
       }
+
       const [freshNames, freshPublication] = await Promise.all([
         names.refetch(),
         publication.refetch(),
       ])
       if (currentSnapshot.current !== snapshot) return false
+      if (freshNames.isSuccess && !freshNames.data.some(({ name }) => name === publicationName)) {
+        form.setError('publicationName', { message: 'Select an available publication.' })
+        form.setFocus('publicationName')
+        return false
+      }
       if (freshNames.isError || freshPublication.isError) {
         setDataError('Publication tables could not be loaded. Click Continue to try again.')
         return false
       }
+
       const selected = freshNames.data?.some(({ name }) => name === publicationName)
         ? freshPublication.data
         : undefined
@@ -76,11 +93,13 @@ export const usePipelineDataValidation = ({
       setIsValidatingData(false)
     }
   }
+
   return {
     validateData,
     isValidatingData,
     isDataVerified,
     dataError,
+    hasPublicationLoadError,
     publication: publication.data,
   }
 }

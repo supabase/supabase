@@ -22,6 +22,7 @@ import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 
 interface TableCopySelectionProps {
+  showLoadError?: boolean
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
 }
@@ -31,7 +32,11 @@ const isSelectiveMode = (mode: DestinationPanelSchemaType['tableSyncCopyMode']) 
 
 const tableLabel = ({ schema, name }: { schema: string; name: string }) => `${schema}.${name}`
 
-export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) => {
+export const TableCopySelection = ({
+  form,
+  editMode,
+  showLoadError = true,
+}: TableCopySelectionProps) => {
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
 
@@ -126,7 +131,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
         )}
       />
 
-      {isErrorPublications && (
+      {isErrorPublications && showLoadError && (
         <Admonition type="warning" title="Publication tables could not be loaded">
           <p className="leading-normal!">
             Refresh the page before changing or saving the initial sync settings.

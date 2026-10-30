@@ -1,4 +1,8 @@
 import {
+  createFeedbackOperations,
+  type FeedbackOperationsOptions,
+} from '@supabase/mcp-server-supabase'
+import {
   ApiKey,
   ApiKeyType,
   ApplyMigrationOptions,
@@ -6,6 +10,7 @@ import {
   DebuggingOperations,
   DevelopmentOperations,
   ExecuteSqlOptions,
+  FeedbackOperations,
   QueryLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
 import { isFeatureEnabled, type Feature } from 'common/enabled-features'
@@ -186,5 +191,19 @@ export function getDebuggingOperations({
 
       return data.filter((lint) => lint.categories.includes('PERFORMANCE'))
     },
+  }
+}
+
+export type GetFeedbackOperationsOptions = Pick<FeedbackOperationsOptions, 'fetch'>
+
+export function getFeedbackOperations({
+  fetch,
+}: GetFeedbackOperationsOptions = {}): FeedbackOperations {
+  const feedback = createFeedbackOperations({ fetch })
+
+  // Self-hosted project refs aren't Supabase projects, so feedback is sent without one.
+  return {
+    submit: ({ projectId: _projectId, ...input }) => feedback.submit(input),
+    delete: ({ projectId: _projectId, ...input }) => feedback.delete(input),
   }
 }

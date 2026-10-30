@@ -216,6 +216,20 @@ The first step establishes the operating context for both readers and agents. Do
 a redundant orientation step to a genuinely atomic instruction. Write `Click **Save**.`
 rather than adding `Locate the **Save** button` as a separate step.
 
+#### Pair Dashboard steps with a terminal option
+
+Agents can't use the Dashboard. For any change a reader makes there, also give a terminal
+path, such as `psql`, the Supabase CLI, or the Management API. Put paths with separate
+steps in [tabs](#tabs).
+
+#### For every "run the following SQL" step
+
+Paste this standard snippet before the SQL block:
+
+```mdx
+Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+```
+
 ### Code blocks
 
 #### Keep code lines short so the reader doesn't scroll

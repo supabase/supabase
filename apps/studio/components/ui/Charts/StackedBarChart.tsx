@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bar, BarChart, Cell, Legend, Tooltip, XAxis } from 'recharts'
+import { Bar, BarChart, Cell, ComposedChart, Legend, Line, Tooltip, XAxis } from 'recharts'
 
 import { ChartHeader } from './ChartHeader'
 import {
@@ -26,6 +26,7 @@ interface Props extends CommonChartProps<any> {
   hideLegend?: boolean
   hideHeader?: boolean
   stackColors?: ValidStackColor[]
+  chartStyle?: 'bar' | 'line'
   syncId?: string
 }
 const StackedBarChart: React.FC<Props> = ({
@@ -49,7 +50,9 @@ const StackedBarChart: React.FC<Props> = ({
   hideHeader = false,
   stackColors = DEFAULT_STACK_COLORS,
   syncId,
+  chartStyle = 'bar',
 }) => {
+  const Chart = chartStyle === 'line' ? ComposedChart : BarChart
   const { Container } = useChartSize(size)
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
@@ -118,7 +121,7 @@ const StackedBarChart: React.FC<Props> = ({
         />
       )}
       <Container>
-        <BarChart
+        <Chart
           data={variant === 'percentages' ? percentagesStackedData : stackedData}
           margin={{
             top: 20,
@@ -157,27 +160,40 @@ const StackedBarChart: React.FC<Props> = ({
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
           />
-          {dataKeys.map((datum, stackIndex) => (
-            <Bar
-              key={stackIndex}
-              dataKey={datum}
-              type="monotone"
-              legendType="circle"
-              fill={stackColorScales[stackIndex].base}
-              stackId={1}
-              animationDuration={300}
-              maxBarSize={48}
-              className={onBarClick ? 'cursor-pointer' : ''}
-            >
-              {stackedData?.map((_entry: unknown, index: any) => (
-                <Cell
-                  key={`cell-${index}`}
-                  className={`transition-all duration-300`}
-                  opacity={focusDataIndex === index ? 0.85 : 1}
-                />
-              ))}
-            </Bar>
-          ))}
+          {chartStyle === 'line' &&
+            dataKeys.map((datum, stackIndex) => (
+              <Line
+                key={datum}
+                dataKey={datum}
+                type="linear"
+                legendType="circle"
+                stroke={stackColorScales[stackIndex].base}
+                dot={false}
+                animationDuration={300}
+              />
+            ))}
+          {chartStyle === 'bar' &&
+            dataKeys.map((datum, stackIndex) => (
+              <Bar
+                key={stackIndex}
+                dataKey={datum}
+                type="monotone"
+                legendType="circle"
+                fill={stackColorScales[stackIndex].base}
+                stackId={1}
+                animationDuration={300}
+                maxBarSize={48}
+                className={onBarClick ? 'cursor-pointer' : ''}
+              >
+                {stackedData?.map((_entry: unknown, index: any) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    className={`transition-all duration-300`}
+                    opacity={focusDataIndex === index ? 0.85 : 1}
+                  />
+                ))}
+              </Bar>
+            ))}
           <Tooltip
             labelFormatter={
               xAxisFormatAsDate ? (label) => formatChartDate(label as number | string) : undefined
@@ -204,7 +220,7 @@ const StackedBarChart: React.FC<Props> = ({
             wrapperClassName="bg-gray-600 rounded-sm min-w-md"
             active={!!syncId && syncTooltip && hoveredIndex !== null}
           />
-        </BarChart>
+        </Chart>
       </Container>
       {stackedData && stackedData[0] && (
         <div className="text-foreground-lighter -mt-5 flex items-center justify-between text-xs">

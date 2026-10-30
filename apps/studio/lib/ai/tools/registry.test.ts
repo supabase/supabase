@@ -1,8 +1,18 @@
 import type { ToolUIPart } from 'ai'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
+import { LEGACY_TOOL_CONTRACTS } from './legacy-tools'
 import { INVALID_NOTEBOOK_RUN_OUTPUT_MESSAGE } from './notebook-run-output'
-import { sanitizeContractPart, type StudioUIMessage } from './registry'
+import {
+  isToolAvailable,
+  REMOTE_TOOL_CONTRACTS,
+  sanitizeContractPart,
+  TOOL_CONTRACTS,
+  type StudioUIMessage,
+} from './registry'
+import { TOOL_FACTORIES } from './registry.server'
+import type { RemoteToolContract, ToolAvailability, ToolContract } from './types'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 describe('TOOL_CONTRACTS', () => {
   it('types contract tool parts on StudioUIMessage', () => {
@@ -12,6 +22,95 @@ describe('TOOL_CONTRACTS', () => {
     >
     expectTypeOf<Part['input']>().toHaveProperty('expected_updated_at')
     expectTypeOf<Part['output']>().toHaveProperty('name')
+  })
+})
+
+describe('contract invariants', () => {
+  const contracts: Record<string, { name: string }> = {
+    ...TOOL_CONTRACTS,
+    ...REMOTE_TOOL_CONTRACTS,
+  }
+
+  it.each(Object.entries(contracts))('%s is keyed by its own name', (key, contract) => {
+    expect(contract.name).toBe(key)
+  })
+
+  it('has a server factory for exactly the local contracts', () => {
+    expect(Object.keys(TOOL_FACTORIES).sort()).toEqual(Object.keys(TOOL_CONTRACTS).sort())
+  })
+
+  it.each([...Object.values(TOOL_CONTRACTS), ...Object.values(REMOTE_TOOL_CONTRACTS)])(
+    '$name is available in at least one environment',
+    (contract) => {
+      expect(contract.availability.environments.size).toBeGreaterThan(0)
+    }
+  )
+
+  it('keeps a name shared by a local and a remote contract in disjoint environments with the same access rules', () => {
+    const local: Record<string, ToolContract> = TOOL_CONTRACTS
+    const remotes: RemoteToolContract[] = Object.values(REMOTE_TOOL_CONTRACTS)
+    for (const remote of remotes) {
+      const counterpart = local[remote.name]
+      if (!counterpart) continue
+
+      const overlap = [...counterpart.availability.environments].filter((environment) =>
+        remote.availability.environments.has(environment)
+      )
+      expect(overlap, `${remote.name} environments overlap`).toEqual([])
+      expect(counterpart.minOptInLevel).toBe(remote.minOptInLevel)
+      expect(counterpart.needsApproval).toBe(remote.needsApproval)
+    }
+  })
+})
+
+describe('LEGACY_TOOL_CONTRACTS', () => {
+  it('does not overlap live contracts', () => {
+    const live = new Set([...Object.keys(TOOL_CONTRACTS), ...Object.keys(REMOTE_TOOL_CONTRACTS)])
+    expect(Object.keys(LEGACY_TOOL_CONTRACTS).filter((name) => live.has(name))).toEqual([])
+  })
+
+  it.each(Object.entries(LEGACY_TOOL_CONTRACTS))(
+    'keys %s by its contract name',
+    (key, contract) => {
+      expect(contract.name).toBe(key)
+    }
+  )
+})
+
+describe('isToolAvailable', () => {
+  const availability: ToolAvailability = {
+    environments: new Set(['platform']),
+    requires: new Set(['explorer', 'baseUrl']),
+  }
+
+  it('requires the environment', () => {
+    expect(
+      isToolAvailable(availability, {
+        environment: 'self-hosted',
+        satisfied: new Set(['explorer', 'baseUrl']),
+      })
+    ).toBe(false)
+  })
+
+  it('requires every requirement to be satisfied', () => {
+    expect(
+      isToolAvailable(availability, { environment: 'platform', satisfied: new Set(['explorer']) })
+    ).toBe(false)
+    expect(
+      isToolAvailable(availability, {
+        environment: 'platform',
+        satisfied: new Set(['explorer', 'baseUrl']),
+      })
+    ).toBe(true)
+  })
+
+  it('needs nothing beyond the environment when there are no requirements', () => {
+    expect(
+      isToolAvailable(
+        { environments: new Set(['platform']) },
+        { environment: 'platform', satisfied: new Set() }
+      )
+    ).toBe(true)
   })
 })
 
@@ -102,4 +201,158 @@ describe('notebook mutation contracts', () => {
       })
     }
   )
+})
+
+describe('read-only contracts', () => {
+  const cells = [
+    { _tag: 'markdown_cell', _id: 'cell-1', text: '# Signup funnel' },
+    {
+      _tag: 'database_cell',
+      _id: 'cell-2',
+      sql: 'select 1',
+      row_limit: 100,
+      view: 'table',
+    },
+  ]
+  const outputs = {
+    list_databases: {
+      databases: [
+        { identifier: 'ref', is_primary: true, region: 'us-east-1', status: 'ACTIVE_HEALTHY' },
+      ],
+    },
+    list_notebooks: {
+      notebooks: [
+        {
+          id: 'notebook-1',
+          name: 'Signup funnel',
+          description: null,
+          visibility: 'project',
+          updated_at: '2026-01-01T00:00:00.000Z',
+          cell_count: 2,
+        },
+      ],
+      cursor: 'next',
+    },
+    list_policies: 'Policy Name: "Users can read own rows"',
+    list_reports: [
+      {
+        id: 'report-1',
+        name: 'Home',
+        description: null,
+        visibility: 'project',
+        updated_at: '2026-01-01T00:00:00.000Z',
+        chart_count: 1,
+      },
+    ],
+    get_report: {
+      id: 'report-1',
+      name: 'Home',
+      visibility: 'project',
+      period_start: { time_period: '7d' },
+      period_end: { time_period: 'today' },
+      interval: '1d',
+      layout: [
+        {
+          id: 'chart-1',
+          x: 0,
+          y: 0,
+          w: 6,
+          h: 4,
+          label: 'Signups',
+          attribute: 'snippet_chart-1',
+          provider: 'daily-stats',
+          chart_type: 'bar',
+          sql: 'select 1',
+          chartConfig: { type: 'bar', cumulative: false, xKey: 'day', yKey: 'count' },
+        },
+      ],
+    },
+    get_active_incidents: {
+      incidents: [
+        {
+          kind: 'incident',
+          name: 'Elevated errors',
+          status: 'investigating',
+          impact: 'partial_outage',
+          affected_components: ['Database / API'],
+          last_update_message: null,
+          url: 'https://status.supabase.com/incidents/1',
+        },
+      ],
+      message: 'There is 1 active incident on Supabase infrastructure.',
+    },
+    get_notebook: {
+      id: 'notebook-1',
+      name: 'Signup funnel',
+      description: 'About signups',
+      visibility: 'project',
+      updated_at: '2026-01-01T00:00:00.000Z',
+      cells,
+    },
+  }
+
+  const levels = [
+    'disabled',
+    'schema',
+    'schema_and_log',
+    'schema_and_log_and_data',
+  ] as const satisfies AiOptInLevel[]
+
+  describe.each(Object.entries(outputs))('%s', (name, output) => {
+    const part = {
+      type: `tool-${name}`,
+      toolCallId: 'call-4',
+      state: 'output-available',
+      input: {},
+      output,
+    } as ToolUIPart
+
+    it.each(levels)('shows the output unchanged, live and on replay, at %s', (level) => {
+      const contract: ToolContract = TOOL_CONTRACTS[name as keyof typeof outputs]
+      expect(contract.toModelOutput(output, level)).toEqual(output)
+      expect(sanitizeContractPart(part, level)?.output).toEqual(output)
+    })
+
+    it('drops an output that does not match the schema', () => {
+      expect(sanitizeContractPart({ ...part, output: 12345 } as ToolUIPart, 'schema')?.output).toBe(
+        undefined
+      )
+    })
+  })
+
+  it.each(['escalate_to_human', 'resolve_support_conversation'] as const)(
+    '%s output is limited to status on replay',
+    (name) => {
+      const part = {
+        type: `tool-${name}`,
+        toolCallId: 'call-6',
+        state: 'output-available',
+        input: {},
+        output: { status: 'sent', extra: 'ignored' },
+      } as ToolUIPart
+      expect(sanitizeContractPart(part, 'disabled')?.output).toEqual({ status: 'sent' })
+    }
+  )
+
+  it('accepts a notebook list without a cursor or description', () => {
+    const output = {
+      notebooks: [
+        {
+          id: 'notebook-1',
+          name: 'Notebook',
+          visibility: 'project',
+          updated_at: '2026-01-01T00:00:00.000Z',
+          cell_count: 0,
+        },
+      ],
+    }
+    const part = {
+      type: 'tool-list_notebooks',
+      toolCallId: 'call-5',
+      state: 'output-available',
+      input: {},
+      output,
+    } as ToolUIPart
+    expect(sanitizeContractPart(part, 'schema')?.output).toEqual(output)
+  })
 })

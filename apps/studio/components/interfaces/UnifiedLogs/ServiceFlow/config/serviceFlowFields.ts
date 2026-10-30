@@ -657,8 +657,7 @@ export const storageDetailsFields: BlockFieldConfig[] = [
 // POSTGRES FIELDS
 // =============================================================================
 
-// Primary Postgres Fields (Always Visible)
-export const postgresPrimaryFields: BlockFieldConfig[] = [
+export const postgresStatementFields: BlockFieldConfig[] = [
   {
     id: 'event_message',
     label: 'Message',
@@ -666,26 +665,20 @@ export const postgresPrimaryFields: BlockFieldConfig[] = [
     wrap: true,
   },
   {
+    id: 'error_severity',
+    label: 'Severity',
+    getValue: (data, enrichedData) => enrichedData?.error_severity || data?.error_severity,
+    requiresEnrichedData: true,
+  },
+  {
     id: 'status',
-    label: 'Status',
+    label: 'SQLSTATE',
     getValue: (data, enrichedData) => enrichedData?.status || data?.status,
   },
   {
     id: 'command_tag',
     label: 'Command',
     getValue: (data, enrichedData) => enrichedData?.command_tag || data?.command_tag,
-    requiresEnrichedData: true,
-  },
-  {
-    id: 'database_name',
-    label: 'Database',
-    getValue: (data, enrichedData) => enrichedData?.database_name || data?.database_name,
-    requiresEnrichedData: true,
-  },
-  {
-    id: 'database_user',
-    label: 'User',
-    getValue: (data, enrichedData) => enrichedData?.database_user || data?.database_user,
     requiresEnrichedData: true,
   },
   {
@@ -697,19 +690,32 @@ export const postgresPrimaryFields: BlockFieldConfig[] = [
   },
   {
     id: 'detail',
-    label: 'Details',
+    label: 'Detail',
     getValue: (data, enrichedData) => enrichedData?.detail || data?.detail,
+    requiresEnrichedData: true,
+    wrap: true,
+  },
+  {
+    id: 'hint',
+    label: 'Hint',
+    getValue: (data, enrichedData) =>
+      enrichedData?.hint || enrichedData?.['parsed.hint'] || data?.hint,
     requiresEnrichedData: true,
     wrap: true,
   },
 ]
 
-// Postgres Details (Collapsible)
-export const postgresDetailsFields: BlockFieldConfig[] = [
+export const postgresSessionFields: BlockFieldConfig[] = [
   {
-    id: 'backend_type',
-    label: 'Backend Type',
-    getValue: (data, enrichedData) => enrichedData?.backend_type || data?.backend_type,
+    id: 'database_user',
+    label: 'User',
+    getValue: (data, enrichedData) => enrichedData?.database_user || data?.database_user,
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'database_name',
+    label: 'Database',
+    getValue: (data, enrichedData) => enrichedData?.database_name || data?.database_name,
     requiresEnrichedData: true,
   },
   {
@@ -719,40 +725,15 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
     requiresEnrichedData: true,
   },
   {
+    id: 'backend_type',
+    label: 'Backend Type',
+    getValue: (data, enrichedData) => enrichedData?.backend_type || data?.backend_type,
+    requiresEnrichedData: true,
+  },
+  {
     id: 'session_id',
     label: 'Session ID',
     getValue: (data, enrichedData) => enrichedData?.session_id || data?.session_id,
-    requiresEnrichedData: true,
-  },
-  {
-    id: 'process_id',
-    label: 'Process ID',
-    getValue: (data, enrichedData) => enrichedData?.process_id || data?.process_id,
-    requiresEnrichedData: true,
-  },
-  {
-    id: 'query_id',
-    label: 'Query ID',
-    getValue: (data, enrichedData) => {
-      const queryId = enrichedData?.query_id || data?.query_id
-      return queryId ? String(queryId) : null
-    },
-    requiresEnrichedData: true,
-  },
-  {
-    id: 'transaction_id',
-    label: 'Transaction ID',
-    getValue: (data, enrichedData) => {
-      const txId = enrichedData?.transaction_id || data?.transaction_id
-      return txId ? String(txId) : null
-    },
-    requiresEnrichedData: true,
-  },
-  {
-    id: 'virtual_transaction_id',
-    label: 'Virtual TX ID',
-    getValue: (data, enrichedData) =>
-      enrichedData?.virtual_transaction_id || data?.virtual_transaction_id,
     requiresEnrichedData: true,
   },
   {
@@ -764,4 +745,87 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
     },
     requiresEnrichedData: true,
   },
+  {
+    id: 'process_id',
+    label: 'Process ID',
+    getValue: (data, enrichedData) => enrichedData?.process_id || data?.process_id,
+    requiresEnrichedData: true,
+  },
+]
+
+export const postgresTransactionFields: BlockFieldConfig[] = [
+  {
+    id: 'transaction_id',
+    label: 'Transaction ID',
+    getValue: (data, enrichedData) => {
+      const txId = enrichedData?.transaction_id || data?.transaction_id
+      return txId ? String(txId) : null
+    },
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'virtual_transaction_id',
+    label: 'Virtual Transaction ID',
+    getValue: (data, enrichedData) =>
+      enrichedData?.virtual_transaction_id || data?.virtual_transaction_id,
+    requiresEnrichedData: true,
+  },
+  {
+    id: 'query_id',
+    label: 'Query ID',
+    getValue: (data, enrichedData) => {
+      const queryId = enrichedData?.query_id || data?.query_id
+      return queryId ? String(queryId) : null
+    },
+    requiresEnrichedData: true,
+  },
+]
+
+// =============================================================================
+// SUPAVISOR FIELDS
+// =============================================================================
+
+// Supavisor rows carry everything under `metadata` (the OTEL `log_attributes` map).
+const supavisorField = (
+  key: string,
+  label: string,
+  options?: Pick<BlockFieldConfig, 'wrap'>
+): BlockFieldConfig => ({
+  id: key,
+  label,
+  getValue: (_data, enrichedData) => enrichedData?.metadata?.[key],
+  requiresEnrichedData: true,
+  ...options,
+})
+
+export const supavisorPrimaryFields: BlockFieldConfig[] = [
+  {
+    id: 'event_message',
+    label: 'Message',
+    getValue: (data, enrichedData) => enrichedData?.event_message || data?.event_message,
+    wrap: true,
+  },
+  supavisorField('user', 'User'),
+  supavisorField('db_name', 'Database'),
+  supavisorField('mode', 'Pool mode'),
+  supavisorField('type', 'Pool type'),
+  supavisorField('state', 'State'),
+  supavisorField('app_name', 'Application'),
+  supavisorField('peer_ip', 'Peer IP'),
+  supavisorField('local', 'Local'),
+]
+
+export const supavisorNodeFields: BlockFieldConfig[] = [
+  supavisorField('region', 'Region'),
+  supavisorField('location', 'Location'),
+  supavisorField('nodehost', 'Node host', { wrap: true }),
+  supavisorField('instance_id', 'Instance ID'),
+]
+
+export const supavisorSourceFields: BlockFieldConfig[] = [
+  supavisorField('context.module', 'Module', { wrap: true }),
+  supavisorField('context.function', 'Function'),
+  supavisorField('context.file', 'File', { wrap: true }),
+  supavisorField('context.line', 'Line'),
+  supavisorField('context.pid', 'Process ID'),
 ]

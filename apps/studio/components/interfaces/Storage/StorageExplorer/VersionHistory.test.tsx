@@ -86,7 +86,10 @@ describe('VersionHistory', () => {
 
     renderHistory()
 
-    await userEvent.click(await screen.findByRole('button', { name: /Actions for version/ }))
+    const versionActions = await screen.findByRole('button', { name: /Actions for version/ })
+    // No suspended notice on an enabled bucket
+    expect(screen.queryByText(/Versioning is suspended/)).not.toBeInTheDocument()
+    await userEvent.click(versionActions)
     await userEvent.click(await screen.findByText('Restore as current'))
 
     // A restore changes the object's size, type and modified date, and the row
@@ -146,18 +149,6 @@ describe('VersionHistory', () => {
       // The versions already listed are still restorable, so the notice has to say so.
       expect(await screen.findByText(/overwrites it in place/)).toBeInTheDocument()
       expect(screen.getByText(/stay retained/)).toBeInTheDocument()
-    })
-
-    it('stays out of the way on an enabled bucket', async () => {
-      addAPIMock({
-        method: 'post',
-        path: '/platform/storage/:ref/buckets/:id/objects/list',
-        response: () => Response.json(VERSIONS),
-      })
-      renderHistory({ versioningState: 'enabled' })
-
-      await screen.findByRole('button', { name: /Actions for version/ })
-      expect(screen.queryByText(/Versioning is suspended/)).not.toBeInTheDocument()
     })
   })
 })
