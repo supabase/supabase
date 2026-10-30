@@ -80,6 +80,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Products',
       menuItems: [
         [
+          { label: 'Features' },
           {
             label: 'Database',
             icon: 'database',
@@ -1199,6 +1200,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Postgres log configuration',
           url: '/guides/database/postgres/postgres-log-config' as `/${string}`,
+        },
+        {
+          name: 'Log slow and failing queries',
+          url: '/guides/observability/log-slow-queries' as `/${string}`,
         },
       ],
     },
@@ -2578,7 +2583,7 @@ export const local_development: NavMenuConstant = {
         { name: 'Database testing', url: '/guides/database/testing' },
         {
           name: 'RLS policies testing',
-          url: '/guides/database/extensions/pgtap#testing-rls-policies' as `/${string}`,
+          url: '/guides/database/postgres/testing-row-level-security',
         },
       ],
     },
@@ -2636,6 +2641,10 @@ export const security: NavMenuConstant = {
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
+        {
+          name: 'Rotate a leaked API key',
+          url: '/guides/security/rotate-leaked-api-keys',
+        },
       ],
     },
   ],
@@ -3045,6 +3054,7 @@ export const telemetry: NavMenuConstant = {
       name: 'Configure and export',
       items: [
         { name: 'Configure logging', url: '/guides/observability/configure-logging' },
+        { name: 'Log slow and failing queries', url: '/guides/observability/log-slow-queries' },
         { name: 'Log drains', url: '/guides/observability/log-drains' },
         { name: 'Client-side tracing', url: '/guides/observability/client-side-tracing' },
         { name: 'Sentry integration', url: '/guides/observability/sentry-monitoring' },

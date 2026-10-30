@@ -1,0 +1,292 @@
+---
+id: 'testing-row-level-security'
+title: 'Test Row Level Security policies with pgTAP'
+description: 'Write pgTAP tests that check which rows each role can read and change.'
+subtitle: 'Catch policy mistakes before they reach production.'
+---
+
+Prove each Row Level Security (RLS) policy allows and blocks what you meant by running [pgTAP](https://pgtap.org) tests against your local database.
+
+For more information about how policies work, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
+
+Copy the following prompt to write RLS policy tests for your application:
+
+<AiPrompt id="testing-row-level-security" includeInMarkdown />
+
+## Write and run a policy test
+
+The example tests a `todos` table whose policy lets each user access only their own rows.
+
+1. Open a terminal in your project and start the local stack:
+
+   ```bash
+   supabase start
+   ```
+
+2. Create a migration for the table and its policy:
+
+   ```bash
+   supabase migration new create_todos
+   ```
+
+   In the new `supabase/migrations/<timestamp>_create_todos.sql` file, add the following SQL:
+
+   ```sql
+   create table todos (
+     id uuid primary key default gen_random_uuid(),
+     task text not null,
+     user_id uuid references auth.users not null,
+     completed boolean default false
+   );
+
+   alter table todos enable row level security;
+
+   create policy "Users can only access their own todos"
+   on todos for all
+   to authenticated
+   using ((select auth.uid()) = user_id);
+
+   -- index the column the policy filters on
+   create index todos_user_id_idx on todos using btree (user_id);
+   ```
+
+   Apply the migration to your local database:
+
+   ```bash
+   supabase db reset
+   ```
+
+   `supabase db reset` recreates the local database from your migrations and seed file, so it deletes any data they don't create. To apply only the new migration, run `supabase migration up` instead.
+
+3. Create the test file:
+
+   ```bash
+   supabase test new todos_rls
+   ```
+
+4. In `supabase/tests/todos_rls_test.sql`, write the tests:
+
+   ```sql supabase/tests/todos_rls_test.sql
+   begin;
+   create extension if not exists pgtap with schema extensions;
+   select plan(4);
+
+   insert into auth.users (id, email)
+   values
+     ('123e4567-e89b-12d3-a456-426614174000', 'user1@test.com'),
+     ('987fcdeb-51a2-43d7-9012-345678901234', 'user2@test.com');
+
+   insert into public.todos (task, user_id)
+   values
+     ('User 1 Task 1', '123e4567-e89b-12d3-a456-426614174000'),
+     ('User 1 Task 2', '123e4567-e89b-12d3-a456-426614174000'),
+     ('User 2 Task 1', '987fcdeb-51a2-43d7-9012-345678901234');
+
+   -- as user 1
+   set local role authenticated;
+   set local request.jwt.claim.sub = '123e4567-e89b-12d3-a456-426614174000';
+
+   select results_eq(
+     'select count(*) from todos',
+     array[2::bigint],
+     'User 1 sees only their 2 todos'
+   );
+
+   -- returning proves the row was written, not only that nothing failed
+   select results_eq(
+     $$insert into todos (task, user_id)
+       values ('New Task', '123e4567-e89b-12d3-a456-426614174000'::uuid)
+       returning task$$,
+     array['New Task'],
+     'User 1 can create their own todo'
+   );
+
+   -- as user 2
+   set local request.jwt.claim.sub = '987fcdeb-51a2-43d7-9012-345678901234';
+
+   select results_eq(
+     'select count(*) from todos',
+     array[1::bigint],
+     'User 2 sees only their 1 todo'
+   );
+
+   select is_empty(
+     $$update todos set task = 'Hacked!'
+       where user_id = '123e4567-e89b-12d3-a456-426614174000'::uuid
+       returning 1$$,
+     'User 2 cannot modify User 1 todos'
+   );
+
+   select * from finish();
+   rollback;
+   ```
+
+   The file runs in one transaction that rolls back at the end, so the test data never persists. `set local role` and `request.jwt.claim.sub` set the role and user each assertion runs as, the way a signed-in user's request does.
+
+5. Run the tests:
+
+   ```bash
+   supabase test db
+   ```
+
+   ```text
+   psql:todos_rls_test.sql:2: NOTICE:  extension "pgtap" already exists, skipping
+   ./todos_rls_test.sql .. ok
+   All tests successful.
+   Files=1, Tests=4,  0 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
+   Result: PASS
+   ```
+
+   If any assertion fails, fix the policy or the test, then rerun `supabase test db` until the output ends with `Result: PASS`.
+
+The policy now has a test that fails if a change lets one user read or edit another user's todos.
+
+## Test the policy from your application
+
+Test the same policy through the Supabase client your app uses. Unlike pgTAP tests, application-level tests can't use a transaction to keep their data from persisting.
+
+<Admonition type="caution">
+
+Don't rely on a clean database state. Resetting the database before each test is slow and keeps tests from running in parallel. Give each test suite its own user IDs instead.
+
+</Admonition>
+
+The following Vitest suite mirrors the pgTAP tests above. It needs `@supabase/supabase-js` and `vitest` installed. Set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` to the `API_URL`, `PUBLISHABLE_KEY`, and `SECRET_KEY` values that `supabase status -o env` prints.
+
+```typescript
+import crypto from 'crypto'
+import { createClient } from '@supabase/supabase-js'
+import { beforeAll, describe, expect, it } from 'vitest'
+
+describe('Todos RLS', () => {
+  // Generate unique IDs for this test suite to avoid conflicts with other tests
+  const USER_1_ID = crypto.randomUUID()
+  const USER_2_ID = crypto.randomUUID()
+
+  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!)
+
+  beforeAll(async () => {
+    // Setup test data specific to this test suite
+    const adminSupabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY!)
+
+    // Create test users with unique IDs
+    await adminSupabase.auth.admin.createUser({
+      id: USER_1_ID,
+      email: `user1-${USER_1_ID}@test.com`,
+      password: 'password123',
+      // We want the user to be usable right away without email confirmation
+      email_confirm: true,
+    })
+    await adminSupabase.auth.admin.createUser({
+      id: USER_2_ID,
+      email: `user2-${USER_2_ID}@test.com`,
+      password: 'password123',
+      email_confirm: true,
+    })
+
+    // Create initial todos
+    await adminSupabase.from('todos').insert([
+      { task: 'User 1 Task 1', user_id: USER_1_ID },
+      { task: 'User 1 Task 2', user_id: USER_1_ID },
+      { task: 'User 2 Task 1', user_id: USER_2_ID },
+    ])
+  })
+
+  it('should allow User 1 to only see their own todos', async () => {
+    // Sign in as User 1
+    await supabase.auth.signInWithPassword({
+      email: `user1-${USER_1_ID}@test.com`,
+      password: 'password123',
+    })
+
+    const { data: todos } = await supabase.from('todos').select('*')
+
+    expect(todos).toHaveLength(2)
+    todos?.forEach((todo) => {
+      expect(todo.user_id).toBe(USER_1_ID)
+    })
+  })
+
+  it('should allow User 1 to create their own todo', async () => {
+    await supabase.auth.signInWithPassword({
+      email: `user1-${USER_1_ID}@test.com`,
+      password: 'password123',
+    })
+
+    const { error } = await supabase.from('todos').insert({ task: 'New Task', user_id: USER_1_ID })
+
+    expect(error).toBeNull()
+  })
+
+  it('should allow User 2 to only see their own todos', async () => {
+    // Sign in as User 2
+    await supabase.auth.signInWithPassword({
+      email: `user2-${USER_2_ID}@test.com`,
+      password: 'password123',
+    })
+
+    const { data: todos } = await supabase.from('todos').select('*')
+    expect(todos).toHaveLength(1)
+    todos?.forEach((todo) => {
+      expect(todo.user_id).toBe(USER_2_ID)
+    })
+  })
+
+  it('should prevent User 2 from modifying User 1 todos', async () => {
+    await supabase.auth.signInWithPassword({
+      email: `user2-${USER_2_ID}@test.com`,
+      password: 'password123',
+    })
+
+    // Attempt to update the todos we shouldn't have access to
+    // RLS filters out the rows, so the update succeeds but changes nothing
+    const { error: updateError } = await supabase
+      .from('todos')
+      .update({ task: 'Hacked!' })
+      .eq('user_id', USER_1_ID)
+    expect(updateError).toBeNull()
+
+    // Log back in as User 1 to verify their todos weren't changed
+    await supabase.auth.signInWithPassword({
+      email: `user1-${USER_1_ID}@test.com`,
+      password: 'password123',
+    })
+
+    // Fetch the todos seeded in beforeAll, so other tests' rows don't matter
+    const { data: todos, error } = await supabase
+      .from('todos')
+      .select('task')
+      .eq('user_id', USER_1_ID)
+      .in('task', ['User 1 Task 1', 'User 1 Task 2'])
+
+    // Verify that User 1 still sees both seeded todos, unchanged
+    expect(error).toBeNull()
+    expect(todos?.map((todo) => todo.task).sort()).toEqual(['User 1 Task 1', 'User 1 Task 2'])
+  })
+})
+```
+
+### Keep application tests independent
+
+Use the following approaches so tests don't collide over shared data:
+
+- **Unique identifiers:** generate unique IDs for each test suite.
+- **Cleanup:** delete the data a suite creates in an `afterAll` or `afterEach` hook.
+- **Isolated data sets:** use prefixes or namespaces in data to separate test cases.
+
+## Write quality tests with agents
+
+Give the following rules to the agent that writes your tests. Each rule keeps the suite focused on the mistakes a policy test exists to catch.
+
+- **Agree on the rules first.** List each role and operation the policy must allow or block, such as "a signed-in user can't read another user's todo." Write one test per rule. A rule with no test is a gap, however many assertions the file has.
+- **Test the cross-user case.** RLS exists to stop one user from reaching another user's rows. For each table that holds user data, assert that a second user can't read, update, or delete the first user's rows.
+- **Break each policy and watch the suite fail.** For a policy that already exists, add a temporary policy on the same table that uses `using (true)`, run `supabase test db`, and check that a test fails. Then drop the temporary policy. Dropping the real policy instead proves nothing, because with no policy every read is denied and denial tests still pass.
+- **Don't change a policy to make a test pass.** When a test and a policy disagree, report which assertion failed and which policy it covers, and let the owner decide which one is wrong.
+- **Test through roles.** Run each assertion as `anon` or `authenticated` with `request.jwt.claim.sub` set, and check the rows returned or the error raised. A check on `pg_policies` passes while the policy is still wrong.
+- **Filter reads on tables everyone can read.** Select only the rows your test inserted, by ID. An exact match on the whole table fails once other data exists.
+
+## Related content
+
+- [Policy tests](/docs/guides/database/postgres/row-level-security#policy-tests) in Row Level Security cover all four operations
+- [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended)
+- [pgTAP extension](/docs/guides/database/extensions/pgtap)
