@@ -80,6 +80,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Products',
       menuItems: [
         [
+          { label: 'Features' },
           {
             label: 'Database',
             icon: 'database',
