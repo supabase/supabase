@@ -52,6 +52,16 @@ describe('getIntegrationType', () => {
     expect(getIntegrationType(buildIntegration('https://login.example.com'))).toBe('custom')
     expect(getIntegrationType(undefined)).toBe('custom')
   })
+
+  it('labels a Scalekit environment host as Scalekit', () => {
+    expect(getIntegrationType(buildIntegration('https://yourorg.scalekit.com'))).toBe('scalekit')
+    expect(getIntegrationType(buildIntegration('https://yourorg.scalekit.cloud'))).toBe('scalekit')
+    expect(getIntegrationTypeLabel('scalekit')).toBe('Scalekit')
+  })
+
+  it('leaves a Scalekit custom domain as Custom OIDC', () => {
+    expect(getIntegrationType(buildIntegration('https://auth.yourapp.ai'))).toBe('custom')
+  })
 })
 
 describe('getIntegrationTypeLabel', () => {

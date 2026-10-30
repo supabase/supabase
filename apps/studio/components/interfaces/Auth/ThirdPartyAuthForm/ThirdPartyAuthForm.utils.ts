@@ -7,8 +7,23 @@ export const INTEGRATION_TYPES = [
   'awsCognito',
   'clerk',
   'workos',
+  'scalekit',
   'custom',
 ] as const
+
+const SCALEKIT_ENVIRONMENT_HOSTS = ['scalekit.com', 'scalekit.cloud']
+
+export const isScalekitEnvironmentHost = (issuerUrl?: string | null) => {
+  if (!issuerUrl) return false
+  try {
+    const host = new URL(issuerUrl).hostname.toLowerCase()
+    return SCALEKIT_ENVIRONMENT_HOSTS.some(
+      (suffix) => host === suffix || host.endsWith(`.${suffix}`)
+    )
+  } catch {
+    return false
+  }
+}
 export type INTEGRATION_TYPES = (typeof INTEGRATION_TYPES)[number]
 
 export const getIntegrationType = (integration?: ThirdPartyAuthIntegration): INTEGRATION_TYPES => {
@@ -36,6 +51,10 @@ export const getIntegrationType = (integration?: ThirdPartyAuthIntegration): INT
     return 'clerk'
   }
 
+  if (isScalekitEnvironmentHost(integration?.oidc_issuer_url)) {
+    return 'scalekit'
+  }
+
   return 'custom'
 }
 
@@ -51,6 +70,8 @@ export const getIntegrationTypeLabel = (type: INTEGRATION_TYPES) => {
       return 'Clerk'
     case 'workos':
       return 'WorkOS'
+    case 'scalekit':
+      return 'Scalekit'
     case 'custom':
     default:
       return 'Custom OIDC'
@@ -69,6 +90,8 @@ export const getIntegrationTypeIcon = (type: INTEGRATION_TYPES) => {
       return `${BASE_PATH}/img/icons/clerk-icon.svg`
     case 'workos':
       return `${BASE_PATH}/img/icons/workos-icon.svg`
+    case 'scalekit':
+      return `${BASE_PATH}/img/icons/scalekit-icon.svg`
     case 'custom':
     default:
       return `${BASE_PATH}/img/icons/badge-check-icon.svg`
