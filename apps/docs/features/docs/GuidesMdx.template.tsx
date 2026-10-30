@@ -10,10 +10,9 @@ import { type GuideFrontmatter } from '~/lib/docs'
 import { breadcrumbListSchema, serializeJsonLd, techArticleSchema } from '~/lib/json-ld'
 import { mdToPlainText } from '~/lib/md-to-plain-text'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-import { ExternalLink } from 'lucide-react'
 import { type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { cn } from 'ui'
+import { cn, IconGitHubSolid } from 'ui'
 
 const EDIT_LINK_SYMBOL = Symbol('edit link')
 interface EditLink {
@@ -68,7 +67,7 @@ type GuideTemplateProps =
 const formatLastUpdated = (iso: string) =>
   new Date(iso).toLocaleDateString('en-US', {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     timeZone: 'UTC',
   })
@@ -120,14 +119,24 @@ const GuideTemplate = ({
               dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
             />
           )}
-          <Breadcrumbs className="mb-6" />
+          <div className="mb-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+            <Breadcrumbs />
+            {lastUpdated ? (
+              <p className="text-foreground-lighter">
+                Updated{' '}
+                <time dateTime={new Date(lastUpdated).toISOString()} className="whitespace-nowrap">
+                  {formatLastUpdated(lastUpdated)}
+                </time>
+              </p>
+            ) : null}
+          </div>
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
             data-testid="sb-docs-guide-main-article"
             className="prose max-w-none"
           >
-            <header className="mb-8">
+            <header className="mb-12">
               <h1 className="mt-0 mb-0 [&>p]:m-0">
                 <PageTitleObserver title={mdToPlainText(meta?.title || 'Supabase Docs')} />
                 <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
@@ -136,11 +145,6 @@ const GuideTemplate = ({
                 <div className="mt-3 not-prose [&_p]:text-xl [&_p]:leading-7 text-foreground-light [&>p]:m-0">
                   <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
                 </div>
-              )}
-              {lastUpdated && (
-                <p className="mt-4 mb-0 text-sm text-foreground-lighter">
-                  Last updated {formatLastUpdated(lastUpdated)}
-                </p>
               )}
             </header>
             {hideToc ? null : <GuideTocMenu />}
@@ -156,15 +160,17 @@ const GuideTemplate = ({
                   editLink.includesProtocol ? editLink.link : `https://github.com/${editLink.link}`
                 }
                 className={cn(
-                  'w-fit',
-                  'flex items-center gap-1',
+                  'relative w-fit',
+                  'flex items-center gap-1.5',
                   'text-sm text-tertiary-foreground hover:text-foreground',
-                  'transition-colors'
+                  'transition-colors',
+                  'after:absolute after:-inset-y-3 after:inset-x-0'
                 )}
                 target="_blank"
                 rel="noreferrer noopener edit"
               >
-                Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+                <IconGitHubSolid size={14} aria-hidden />
+                Edit this page
               </a>
             </footer>
           </article>
