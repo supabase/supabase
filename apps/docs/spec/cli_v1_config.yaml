@@ -888,7 +888,7 @@ parameters:
     type: 'bool'
     default: false
     description: |
-      If enabled, requires the user's current password to be provided when changing to a new password.
+      If enabled, users must reauthenticate before changing their password, unless they signed in within the last 24 hours.
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
