@@ -14,6 +14,8 @@ apps/www/public/images/*
 apps/www/public/changelog.md
 apps/www/public/changelog/*.md
 apps/www/.generated/*
+# Published by the supabase/cli release workflow
+apps/www/public/schemas
 # Written by apps/www/scripts/syncPartnerIntakeForm.mjs
 apps/www/components/Partners/__generated__
 apps/docs/**/generated/*
