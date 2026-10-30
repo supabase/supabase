@@ -1,6 +1,7 @@
 ---
 title: How do I move an app from SQLite to Postgres?
 topics: ['Database', 'Migration']
+lastEdited: 2026-10-30
 ---
 
 Create the schema in Postgres, [import the data](/docs/guides/database/import-data) into Supabase, and only then switch the app to the new connection string. A SQLite file lives on one machine's disk, so once your app runs on more than one server or on serverless functions, it needs a database server it can reach over the network.
