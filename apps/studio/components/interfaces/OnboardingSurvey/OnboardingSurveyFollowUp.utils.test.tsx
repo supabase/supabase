@@ -5,6 +5,7 @@ import { ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS } from './OnboardingSurvey.consta
 import {
   getFollowUpRemainingMs,
   getFollowUpStorageKey,
+  isProjectCreationPath,
   markFollowUpPending,
   parseFollowUpState,
 } from './OnboardingSurveyFollowUp.utils'
@@ -62,4 +63,20 @@ describe('markFollowUpPending', () => {
     const stored = safeLocalStorage.getItem(getFollowUpStorageKey('user-1', 'new-org'))
     expect(JSON.parse(stored!)).toEqual({ status: 'pending', orgCreatedAt: now.toISOString() })
   })
+})
+
+describe('isProjectCreationPath', () => {
+  it.each(['/new', '/new/my-org', '/integrations/vercel/my-org/deploy-button/new-project'])(
+    'treats %s as project creation',
+    (pathname) => {
+      expect(isProjectCreationPath(pathname)).toBe(true)
+    }
+  )
+
+  it.each(['/project/abc', '/org/my-org', '/newsletter', null, undefined])(
+    'does not treat %s as project creation',
+    (pathname) => {
+      expect(isProjectCreationPath(pathname)).toBe(false)
+    }
+  )
 })

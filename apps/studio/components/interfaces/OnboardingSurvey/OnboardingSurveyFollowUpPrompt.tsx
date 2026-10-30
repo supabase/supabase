@@ -1,7 +1,9 @@
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 
+import { isProjectCreationPath } from './OnboardingSurveyFollowUp.utils'
 import {
   OnboardingSurveyFollowUpDialog,
   type OnboardingSurveyFollowUpValues,
@@ -24,7 +26,8 @@ export function OnboardingSurveyFollowUpPrompt() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { mutate: submitOnboardingSurvey, isPending: isSubmitting } = useOnboardingSurveyMutation()
 
-  const shouldShowCard = isEligible && !isDialogOpen
+  const pathname = usePathname()
+  const shouldShowCard = isEligible && !isDialogOpen && !isProjectCreationPath(pathname)
 
   useEffect(() => {
     if (!shouldShowCard) {

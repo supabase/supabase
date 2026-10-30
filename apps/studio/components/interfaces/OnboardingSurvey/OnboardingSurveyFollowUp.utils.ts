@@ -47,3 +47,13 @@ export function getFollowUpRemainingMs(orgCreatedAt: string, now: number) {
   if (Number.isNaN(createdAt)) return 0
   return Math.max(0, createdAt + ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS - now)
 }
+
+/**
+ * Project creation pages (/new/[slug] and the Vercel deploy-button flow) are
+ * where the creator is likely to land right after making the org; keep the
+ * follow-up out of their way there.
+ */
+export function isProjectCreationPath(pathname: string | null | undefined) {
+  if (!pathname) return false
+  return pathname === '/new' || pathname.startsWith('/new/') || pathname.endsWith('/new-project')
+}
