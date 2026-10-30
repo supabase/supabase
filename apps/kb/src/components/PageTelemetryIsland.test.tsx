@@ -3,14 +3,18 @@ import { consentState } from 'common/consent-state'
 import {
   buildFirstReferrerData,
   FIRST_REFERRER_COOKIE_NAME,
+  MW_DIAG_COOKIE_NAME,
   serializeFirstReferrerCookie,
 } from 'common/first-referrer-cookie'
 import { posthogClient } from 'common/posthog-client'
+import { getFirstTouchData } from 'common/telemetry-first-touch-store'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PageTelemetryIsland } from './PageTelemetryIsland'
+
+const platform = vi.hoisted(() => ({ isPlatform: true }))
 
 vi.hoisted(() => {
   window.matchMedia = (() => ({
@@ -22,7 +26,9 @@ vi.hoisted(() => {
 
 vi.mock('common/constants', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common/constants')>()),
-  IS_PLATFORM: true,
+  get IS_PLATFORM() {
+    return platform.isPlatform
+  },
 }))
 
 describe('PageTelemetryIsland', () => {
@@ -43,8 +49,24 @@ describe('PageTelemetryIsland', () => {
     root = undefined
     consentState.hasConsented = false
     document.cookie = `${FIRST_REFERRER_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+    document.cookie = `${MW_DIAG_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+    platform.isPlatform = true
+    setReferrer('')
+    window.history.replaceState(null, '', '/')
     vi.restoreAllMocks()
   })
+
+  function setReferrer(referrer: string) {
+    Object.defineProperty(document, 'referrer', { value: referrer, configurable: true })
+  }
+
+  function setFirstReferrerCookie() {
+    const data = buildFirstReferrerData({
+      referrer: 'https://www.google.com/',
+      landingUrl: 'https://supabase.com/kb?utm_source=google&gclid=abc',
+    })
+    document.cookie = `${FIRST_REFERRER_COOKIE_NAME}=${encodeURIComponent(serializeFirstReferrerCookie(data))}; path=/`
+  }
 
   function render() {
     const container = document.createElement('div')
@@ -55,6 +77,15 @@ describe('PageTelemetryIsland', () => {
 
   it('sends nothing before consent', () => {
     consentState.hasConsented = false
+    render()
+
+    expect(posthogClient.init).not.toHaveBeenCalled()
+    expect(posthogClient.capturePageView).not.toHaveBeenCalled()
+  })
+
+  it('sends nothing off platform, even after consent', () => {
+    platform.isPlatform = false
+    consentState.hasConsented = true
     render()
 
     expect(posthogClient.init).not.toHaveBeenCalled()
@@ -95,11 +126,7 @@ describe('PageTelemetryIsland', () => {
   })
 
   it('attributes the first pageview to the first-referrer cookie', () => {
-    const data = buildFirstReferrerData({
-      referrer: 'https://www.google.com/',
-      landingUrl: 'https://supabase.com/kb?utm_source=google&gclid=abc',
-    })
-    document.cookie = `${FIRST_REFERRER_COOKIE_NAME}=${encodeURIComponent(serializeFirstReferrerCookie(data))}; path=/`
+    setFirstReferrerCookie()
     consentState.hasConsented = true
     render()
 
@@ -112,6 +139,56 @@ describe('PageTelemetryIsland', () => {
         first_referrer_cookie_consumed: true,
       })
     )
+  })
+
+  it('does not reattribute later KB pages to the first referrer', () => {
+    setFirstReferrerCookie()
+    setReferrer(`${window.location.origin}/kb/guides/a`)
+    consentState.hasConsented = true
+    render()
+
+    const props = vi.mocked(posthogClient.capturePageView).mock.calls[0][0]
+    expect(props.$referrer).toBe(`${window.location.origin}/kb/guides/a`)
+    expect(props).not.toHaveProperty('$utm_source')
+    expect(props).not.toHaveProperty('first_referrer_cookie_present')
+  })
+
+  it('sends landing-page UTMs captured before consent', async () => {
+    window.history.replaceState(null, '', '/kb?utm_source=google&gclid=abc')
+    setReferrer('https://www.google.com/')
+    render()
+
+    await act(async () => {
+      consentState.hasConsented = true
+    })
+
+    expect(posthogClient.capturePageView).toHaveBeenCalledWith(
+      expect.objectContaining({
+        $utm_source: 'google',
+        gclid: 'abc',
+        first_touch_pathname: '/kb',
+      })
+    )
+    expect(getFirstTouchData()).toBeNull()
+  })
+
+  it('sends the middleware diagnostic cookie', () => {
+    document.cookie = `${MW_DIAG_COOKIE_NAME}=${encodeURIComponent('hit=1&would_stamp=1')}; path=/`
+    consentState.hasConsented = true
+    render()
+
+    expect(posthogClient.capturePageView).toHaveBeenCalledWith(
+      expect.objectContaining({ mw_diag_hit: true, mw_diag_would_stamp: true })
+    )
+  })
+
+  it('sends a pageview when the page is restored from the back-forward cache', () => {
+    consentState.hasConsented = true
+    render()
+
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }))
+
+    expect(posthogClient.capturePageView).toHaveBeenCalledTimes(2)
   })
 
   it('sends a pageleave on unload after consent', () => {
