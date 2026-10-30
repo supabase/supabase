@@ -1135,5 +1135,12 @@
     "position": "Engineering",
     "author_url": "https://github.com/za-arthur",
     "author_image_url": "https://github.com/za-arthur.png"
+  },
+  {
+    "author_id": "charislam",
+    "author": "Charis Lam",
+    "username": "charislam",
+    "author_url": "https://github.com/charislam",
+    "author_image_url": "https://github.com/charislam.png"
   }
 ]
