@@ -55,39 +55,47 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 	}
 	<div class="section-container lg:grid lg:grid-cols-3 lg:gap-6">
 		<article class="prose prose-img:rounded-lg max-w-none min-w-0 py-16 lg:col-span-2">
-			<Breadcrumb className="not-prose mb-6">
-				<BreadcrumbList>
-					<BreadcrumbItem>
-						<BreadcrumbLink href={import.meta.env.BASE_URL}>Knowledge base</BreadcrumbLink>
-					</BreadcrumbItem>
-					{
-						topics.length > 0 && (
-							<>
-								<BreadcrumbSeparator />
-								{/* a guide can sit in several topics, so they share one level instead of nesting */}
-								<BreadcrumbItem>
-									{topics.map((topic, index) => (
-										<span>
-											{isKnownTopic(topic) ? (
-												<BreadcrumbLink
-													href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
-													title={getTopicDescription(topic)}
-												>
-													{topic}
-												</BreadcrumbLink>
-											) : (
-												topic
-											)}
-											{index < topics.length - 1 && ','}
-										</span>
-									))}
-								</BreadcrumbItem>
-							</>
-						)
-					}
-				</BreadcrumbList>
-			</Breadcrumb>
-			<header class="mb-8">
+			<div class="not-prose mb-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem>
+							<BreadcrumbLink href={import.meta.env.BASE_URL}>Knowledge base</BreadcrumbLink>
+						</BreadcrumbItem>
+						{
+							topics.length > 0 && (
+								<>
+									<BreadcrumbSeparator />
+									<BreadcrumbItem>
+										{topics.map((topic, index) => (
+											<span>
+												{isKnownTopic(topic) ? (
+													<BreadcrumbLink
+														href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
+														title={getTopicDescription(topic)}
+													>
+														{topic}
+													</BreadcrumbLink>
+												) : (
+													topic
+												)}
+												{index < topics.length - 1 && ','}
+											</span>
+										))}
+									</BreadcrumbItem>
+								</>
+							)
+						}
+					</BreadcrumbList>
+				</Breadcrumb>
+				{
+					lastEdited && (
+						<p class="text-foreground-lighter">
+							Updated <time datetime={toIsoDay(lastEdited)} class="whitespace-nowrap">{formatDisplayDate(lastEdited)}</time>
+						</p>
+					)
+				}
+			</div>
+			<header class="mb-12">
 				<h1 data-page-title={title} class="mt-0 mb-0 text-balance">{title}</h1>
 				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
 			</header>
@@ -112,25 +120,17 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 				)
 			}
 			{
-				(lastEdited || viewGitHubLink) && (
-					<footer class="mt-16 not-prose flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-						{lastEdited && (
-							<p class="text-foreground-lighter">
-								Edited <time datetime={toIsoDay(lastEdited)} class="whitespace-nowrap">{formatDisplayDate(lastEdited)}</time>
-							</p>
-						)}
-						{lastEdited && viewGitHubLink && <span aria-hidden="true" class="size-1 shrink-0 bg-foreground-muted" />}
-						{viewGitHubLink && (
-							<a
-								href={viewGitHubLink}
-								target="_blank"
-								rel="noreferrer noopener edit"
-								class="relative w-fit inline-flex items-center gap-1.5 text-foreground-light transition-colors hover:text-foreground after:absolute after:-inset-y-3 after:inset-x-0"
-							>
-								<IconGitHubSolid size={14} aria-hidden="true" />
-								Edit this page
-							</a>
-						)}
+				viewGitHubLink && (
+					<footer class="mt-16 not-prose flex items-center justify-between gap-4">
+						<a
+							href={viewGitHubLink}
+							target="_blank"
+							rel="noreferrer noopener edit"
+							class="relative w-fit inline-flex items-center gap-1.5 text-sm text-foreground-light transition-colors hover:text-foreground after:absolute after:-inset-y-3 after:inset-x-0"
+						>
+							<IconGitHubSolid size={14} aria-hidden="true" />
+							Edit this page
+						</a>
 					</footer>
 				)
 			}
