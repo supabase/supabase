@@ -1,0 +1,70 @@
+---
+title: Magic Link Authentication
+description: Passwordless authentication with magic links for Next.js
+preview: |-
+  <BlockOverview name="magic-auth-nextjs" showFiles>
+    <BlockPreview name="magic-auth/auth/magic-link" />
+  </BlockOverview>
+---
+
+Magic link authentication provides a passwordless sign-in experience by sending users a unique link via email that they can click to sign in.
+
+## Installation
+
+### Set up the Supabase client
+
+This block requires a Supabase client for Next.js. If your project already has one, skip to the block installation. Otherwise, install the client:
+
+<BlockItem name="supabase-client-nextjs" />
+
+### Install the block
+
+<BlockItem name="magic-auth-nextjs" showOpenInV0={false} />
+
+## Usage
+
+Once you install the block in your Next.js project, you'll have all the necessary pages and components to set up magic link authentication.
+
+### Getting started
+
+After installing the block, add the following environment variables to your `.env.local` file:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+- If you're using supabase.com, you can find these values in the [Connect modal](https://supabase.com/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=nextjs&using=create-next-app&with=supabasejs) under App Frameworks or in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api).
+
+- If you're using a local instance of Supabase, you can find these values by running `supabase start` or `supabase status` (if you already have it running).
+
+### Understanding the flow
+
+The magic link authentication flow works as follows:
+
+1. **Request magic link** — User enters their email on the `/auth/magic-link` page
+2. **Email verification** — Supabase sends a magic link to the user's email
+3. **Verify & create session** — User clicks the link, which redirects to `/auth/verify` where the session is created
+4. **Access protected content** — User is redirected to `/protected` (protected by middleware)
+
+### Email configuration
+
+Make sure you have email enabled in your Supabase project:
+
+1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
+2. Navigate to **Authentication** > **Email Templates**
+3. Ensure the magic link template is configured with your domain
+
+You can customize the email template to match your branding.
+
+### Customizing redirects
+
+After users verify their magic link, they're redirected to `/protected`. To change this, update the `emailRedirectTo` in `components/magic-link-form.tsx` and the redirect destination in `app/auth/verify/page.tsx`.
+
+### Testing in development
+
+To test locally with magic links:
+
+1. Run your Next.js app: `npm run dev`
+2. Run Supabase locally: `supabase start`
+3. Use the [Supabase Dashboard](http://localhost:54323) to view sent emails or use a test email
