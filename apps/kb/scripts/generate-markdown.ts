@@ -142,17 +142,19 @@ const renderLinkList = (entries: Entry[]) =>
 
 /**
  * Renders the root sitemap: the site title as an h1 with its description
- * beneath, then one section per kind of page (topics, troubleshooting
- * articles, guides), each a bullet list of links to the `.md` exports.
+ * beneath, then one section per kind of page (topics, guides, FAQs,
+ * troubleshooting articles), each a bullet list of links to the `.md` exports.
  */
 export function renderSitemapMarkdown({
   topics,
-  troubleshooting,
   guides,
+  faqs,
+  troubleshooting,
 }: {
   topics: Entry[]
-  troubleshooting: Entry[]
   guides: Entry[]
+  faqs: Entry[]
+  troubleshooting: Entry[]
 }): string {
   return (
     [
@@ -160,10 +162,12 @@ export function renderSitemapMarkdown({
       SITE_DESCRIPTION,
       '## Topics',
       renderLinkList(topics),
-      '## Troubleshooting',
-      renderLinkList(troubleshooting),
       '## Guides',
       renderLinkList(guides),
+      '## FAQs',
+      renderLinkList(faqs),
+      '## Troubleshooting',
+      renderLinkList(troubleshooting),
     ].join('\n\n') + '\n'
   )
 }
@@ -206,7 +210,11 @@ async function main() {
   const files = await findContentFiles(CONTENT_DIR)
 
   const guidesByTopic = new Map<Topic, Entry[]>(TOPICS.map((topic) => [topic.name, []]))
-  const entriesByCollection: Record<string, Entry[]> = { guides: [], troubleshooting: [] }
+  const entriesByCollection: Record<'guides' | 'faqs' | 'troubleshooting', Entry[]> = {
+    guides: [],
+    faqs: [],
+    troubleshooting: [],
+  }
 
   await Promise.all(
     files.map(async (file) => {
@@ -218,8 +226,8 @@ async function main() {
       const outputPath = path.join(OUTPUT_DIR, toMdExtension(relativePath))
       await writeFileEnsuringDir(outputPath, markdown)
 
-      // the first folder under src/content is the collection, e.g. guides or troubleshooting
-      const collection = relativePath.split(path.sep)[0] as 'guides' | 'troubleshooting'
+      // the first folder under src/content is the collection, e.g. guides, faqs or troubleshooting
+      const collection = relativePath.split(path.sep)[0] as keyof typeof entriesByCollection
       const topics: string[] = Array.isArray(data.topics) ? data.topics : []
       const entry: Entry = { title: data.title ?? relativePath, url: toMdUrl(relativePath) }
       entriesByCollection[collection]?.push(entry)
@@ -244,8 +252,9 @@ async function main() {
       path.join(OUTPUT_DIR, 'sitemap.md'),
       renderSitemapMarkdown({
         topics: topicEntries,
-        troubleshooting: entriesByCollection.troubleshooting.sort(byTitle),
         guides: entriesByCollection.guides.sort(byTitle),
+        faqs: entriesByCollection.faqs.sort(byTitle),
+        troubleshooting: entriesByCollection.troubleshooting.sort(byTitle),
       })
     ),
   ])
