@@ -53,7 +53,10 @@ vi.mock('@/components/layouts/APIKeys/APIKeysLayout', () => ({
 
 vi.mock('@/components/interfaces/APIKeys/ApiKeysIllustrations', () => ({
   ApiKeysCreateCallout: () => <div>ApiKeysCreateCallout</div>,
-  ApiKeysFeedbackBanner: () => <div>ApiKeysFeedbackBanner</div>,
+}))
+
+vi.mock('@/components/interfaces/APIKeys/LegacyAPIKeysRetirementNotice', () => ({
+  LegacyAPIKeysRetirementNotice: () => <div>LegacyAPIKeysRetirementNotice</div>,
 }))
 
 vi.mock('@/components/interfaces/APIKeys/PublishableAPIKeys', () => ({
@@ -82,12 +85,12 @@ describe('/project/[ref]/settings/api-keys', () => {
     })
   })
 
-  it('renders publishable and secret keys with the feedback banner on platform when keys exist', () => {
+  it('renders publishable and secret keys with the retirement notice on platform when keys exist', () => {
     render(<ApiKeysPage dehydratedState={{}} />)
 
     expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
     expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
-    expect(screen.getByText('ApiKeysFeedbackBanner')).toBeInTheDocument()
+    expect(screen.getByText('LegacyAPIKeysRetirementNotice')).toBeInTheDocument()
     expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
     expect(screen.queryByText(/Local development with the Supabase CLI/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Self-hosted Supabase/i)).not.toBeInTheDocument()
@@ -99,7 +102,7 @@ describe('/project/[ref]/settings/api-keys', () => {
     render(<ApiKeysPage dehydratedState={{}} />)
 
     expect(screen.getByText('ApiKeysCreateCallout')).toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
+    expect(screen.getByText('LegacyAPIKeysRetirementNotice')).toBeInTheDocument()
   })
 
   it.each([
@@ -130,7 +133,7 @@ describe('/project/[ref]/settings/api-keys', () => {
       expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
       expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
       expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
-      expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
+      expect(screen.queryByText('LegacyAPIKeysRetirementNotice')).not.toBeInTheDocument()
     }
   )
 })
