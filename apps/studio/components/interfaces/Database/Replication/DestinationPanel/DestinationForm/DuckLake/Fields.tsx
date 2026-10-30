@@ -36,6 +36,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SelectionListState } from 'ui-patterns/SelectionListState'
@@ -59,6 +60,7 @@ import {
 } from './DuckLake.constants'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
 import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
+import { useIsOrioleDb } from '@/hooks/misc/useSelectedProject'
 
 const DUCKLAKE_MODE_OPTIONS = [
   {
@@ -77,9 +79,11 @@ const DUCKLAKE_MODE_OPTIONS = [
 const DuckLakeModeSelector = ({
   value,
   onChange,
+  isOrioleDb,
 }: {
   value: DucklakeMode
   onChange: (value: DucklakeMode) => void
+  isOrioleDb: boolean
 }) => {
   return (
     <RadioGroupStacked
@@ -93,6 +97,7 @@ const DuckLakeModeSelector = ({
           value={option.value}
           label={option.label}
           description={option.description}
+          disabled={isOrioleDb && option.value === DUCKLAKE_MODE_SUPABASE}
         />
       ))}
     </RadioGroupStacked>
@@ -520,6 +525,7 @@ export const DuckLakeFields = ({
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
 }) => {
+  const isOrioleDb = !!useIsOrioleDb()
   const ducklakeMode = (useWatch({ control: form.control, name: 'ducklakeMode' }) ??
     DUCKLAKE_MODE_SUPABASE) as DucklakeMode
   // The platform API resolves the managed config into a flat catalog URL + provisioned S3
@@ -536,6 +542,7 @@ export const DuckLakeFields = ({
           <FormControl>
             <DuckLakeModeSelector
               value={effectiveMode}
+              isOrioleDb={isOrioleDb}
               onChange={(value) =>
                 form.setValue('ducklakeMode', value, { shouldValidate: true, shouldDirty: true })
               }
@@ -544,9 +551,17 @@ export const DuckLakeFields = ({
         </FormItemLayout>
       )}
 
-      {effectiveMode === DUCKLAKE_MODE_SUPABASE ? (
+      {!editMode && isOrioleDb && (
+        <Admonition
+          type="warning"
+          title="This project cannot host a DuckLake catalog"
+          description="OrioleDB is not supported for the metadata catalog. Select Enter connection details to use a catalog on standard Postgres."
+        />
+      )}
+      {effectiveMode === DUCKLAKE_MODE_SUPABASE && !isOrioleDb && (
         <DuckLakeSupabaseFields form={form} />
-      ) : (
+      )}
+      {effectiveMode === DUCKLAKE_MODE_CUSTOM && (
         <DuckLakeCustomFields form={form} editMode={editMode} />
       )}
     </div>

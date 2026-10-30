@@ -1634,32 +1634,6 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
- * denominator for the dismiss rate. Migration outcome itself is measured via decay in
- * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerExposedEvent {
-  action: 'logs_all_deprecation_banner_exposed'
-  groups: TelemetryGroups
-}
-
-/**
- * User dismissed the logs.all deprecation banner.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
-  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
  * User clicked the enable button for Index Advisor, either from the banner or the confirmation dialog.
  *
  * @group Events
@@ -2253,6 +2227,58 @@ export interface StorageUrlSigningKeyUpdatedEvent {
   properties: {
     /** What happened to the key. */
     change: 'rotated' | 'revoked' | 'moved_to_standby'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a lifecycle rule is added to a bucket from its card on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleCreatedEvent {
+  action: 'storage_bucket_lifecycle_rule_created'
+  properties: {
+    /** The new rule's status, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is edited, enabled, or disabled on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleUpdatedEvent {
+  action: 'storage_bucket_lifecycle_rule_updated'
+  properties: {
+    /** The rule's status after the save, Enabled or Disabled. */
+    ruleStatus: 'Enabled' | 'Disabled'
+    /** How many rules the bucket's lifecycle configuration holds after the save. */
+    ruleCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when a bucket lifecycle rule is deleted on the Storage policies page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/policies
+ */
+export interface StorageBucketLifecycleRuleRemovedEvent {
+  action: 'storage_bucket_lifecycle_rule_removed'
+  properties: {
+    /** How many rules remain; 0 means the configuration was removed. */
+    ruleCount: number
   }
   groups: TelemetryGroups
 }
@@ -4373,8 +4399,6 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | LogsAllDeprecationBannerExposedEvent
-  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
@@ -4410,6 +4434,9 @@ export type TelemetryEvent =
   | StorageBucketVersioningEnabledEvent
   | StorageUrlSigningKeyCreatedEvent
   | StorageUrlSigningKeyUpdatedEvent
+  | StorageBucketLifecycleRuleCreatedEvent
+  | StorageBucketLifecycleRuleUpdatedEvent
+  | StorageBucketLifecycleRuleRemovedEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent

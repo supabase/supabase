@@ -284,6 +284,8 @@ When using WebSockets, keep in mind that the HTTP request is considered complete
 while the socket is still open, keep an unresolved `EdgeRuntime.waitUntil()` promise
 that resolves in `socket.onclose`.
 
+If WebSocket connections drop unexpectedly, see [Edge Functions worker timeouts and WebSocket drops](/kb/troubleshooting/edge-functions-worker-timeouts-and-websocket-drops).
+
 ---
 
 ## Testing WebSockets locally

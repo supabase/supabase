@@ -3,7 +3,7 @@
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { isFeatureEnabled } from 'common/enabled-features'
 import { DevToolbarTrigger } from 'dev-tools'
-import { Command, Menu, Search, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,14 +12,13 @@ import type { FC, Ref } from 'react'
 import { memo, useState } from 'react'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
-import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
 import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
-import { SearchV2Trigger, useSearchV2Variant } from '@/features/SearchV2'
+import { SearchV2Trigger } from '@/features/SearchV2'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
@@ -46,7 +45,6 @@ const TopNavBar: FC<TopNavBarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const user = useUser()
   const menu = useDropdownMenu(user)
-  const searchVariant = useSearchV2Variant()
   const { theme, setTheme } = useTheme()
 
   const isOpen = onMenuToggle ? isMenuOpen : mobileMenuOpen
@@ -72,18 +70,8 @@ const TopNavBar: FC<TopNavBarProps> = ({
               <DevToolbarTrigger />
               {onMenuToggle && isOpen ? (
                 <MobileNavThemeButton value={theme} onValueChange={setTheme} />
-              ) : searchVariant === 'search-v2-active' ? (
-                <SearchV2Trigger
-                  placeholder={
-                    <>
-                      Search
-                      <span className="hidden xl:inline ml-1"> docs...</span>
-                    </>
-                  }
-                />
               ) : (
-                <CommandMenuTriggerInput
-                  className="[&>div>p]:text-foreground-lighter"
+                <SearchV2Trigger
                   placeholder={
                     <>
                       Search

@@ -74,8 +74,7 @@ const LIFECYCLE_BY_STATUS: Partial<
 }
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
-  const { ref: projectRef, pipelineId: pipelineIdParam } = useParams()
-  const pipelineId = Number(pipelineIdParam)
+  const { ref: projectRef, pipelineId } = useParams()
   const router = useRouter()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
@@ -92,10 +91,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     data: pipeline,
     error: pipelineError,
     isPending: isPipelineLoading,
-  } = useReplicationPipelineByIdQuery(
-    { projectRef, pipelineId },
-    { enabled: Number.isSafeInteger(pipelineId) }
-  )
+  } = useReplicationPipelineByIdQuery({ projectRef, pipelineId }, { enabled: !!pipelineId })
   const {
     data: pipelineStatusData,
     error: pipelineStatusError,

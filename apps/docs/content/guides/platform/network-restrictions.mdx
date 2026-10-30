@@ -103,3 +103,4 @@ To remove all network restrictions:
 
 - Network restrictions apply to Postgres and the database pooler. They don't apply to HTTPS APIs such as PostgREST, Storage, and Auth, or to Supabase client libraries like [supabase-js](/docs/reference/javascript/introduction).
 - With network restrictions applied, Edge functions lose direct access to the database. Use [supabase-js](/docs/reference/javascript/introduction) to connect to the database from Edge Functions instead.
+- If you see `no pg_hba.conf entry` errors from an IP address you don't recognize, see [Seeing no pg_hba.conf entry for host errors](/kb/troubleshooting/seeing-no-pghbaconf-entry-for-host-errors-in-postgres-and-they-come-from-an-ip-address-that-i-dont-recognize-4gds9f).

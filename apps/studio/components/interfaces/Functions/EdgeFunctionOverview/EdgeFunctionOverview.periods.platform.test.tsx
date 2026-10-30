@@ -1,24 +1,24 @@
-import { QueryClient } from '@tanstack/react-query'
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
 import { afterEach, expect, it, vi } from 'vitest'
 
-import { EdgeFunctionOverview } from './EdgeFunctionOverview'
 import { configKeys } from '@/data/config/keys'
 import { customDomainKeys } from '@/data/custom-domains/keys'
 import type { EdgeFunction } from '@/data/edge-functions/edge-function-query'
 import { edgeFunctionsKeys } from '@/data/edge-functions/keys'
 import { projectKeys } from '@/data/projects/keys'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
+import OverviewPage from '@/pages/project/[ref]/functions/[functionSlug]/index'
 import { createMockProject } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 afterEach(() => vi.useRealTimers())
 
-it('shows sparse execution averages without adding old zeroes and updates the selected chart period', async () => {
+it('loads the overview before feature flags and updates metrics with the selected period', async () => {
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(new Date('2026-03-20T10:37:21Z'))
   const user = userEvent.setup()
@@ -64,8 +64,8 @@ it('shows sparse execution averages without adding old zeroes and updates the se
   })
 
   customRender(
-    <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: true }}>
-      <EdgeFunctionOverview />
+    <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: false }}>
+      <OverviewPage dehydratedState={dehydrate(queryClient)} />
     </FeatureFlagContext.Provider>,
     { queryClient }
   )

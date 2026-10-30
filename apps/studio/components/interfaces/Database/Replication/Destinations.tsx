@@ -77,7 +77,7 @@ const STATUS_SORT_ORDER: PipelineStatusName[] = [
 // Keyed by pipeline id from the responses themselves, so this never closes over component state.
 const combinePipelineStatuses = (
   results: { data?: ReplicationPipelineStatusData }[]
-): Map<number, PipelineStatusName | undefined> =>
+): Map<string, PipelineStatusName | undefined> =>
   new Map(
     results
       .map((result) => result.data)

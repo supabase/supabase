@@ -9,6 +9,7 @@ import {
   getMenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import { useNavItems } from '~/features/IaNav'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 import { MobileHeaderSlotsContext } from '~/layouts/MobileHeaderSlots'
@@ -192,7 +193,8 @@ function SidebarSkeleton({
   const [tocSlot, setTocSlot] = useState<HTMLDivElement | null>(null)
   const [scrolledTitle, setScrolledTitle] = useState<string | null>(null)
   const [pickedGroupLabel, setPickedGroupLabel] = useState<string>()
-  const currentGroupLabel = getMenuGroupLabel(menuId)
+  const { GLOBAL_MENU_ITEMS } = useNavItems()
+  const currentGroupLabel = getMenuGroupLabel(menuId, GLOBAL_MENU_ITEMS)
   const selectedGroupLabel = pickedGroupLabel ?? currentGroupLabel
   // a page outside every group keeps its own nav, whichever group is picked
   const isSideNavShown = !currentGroupLabel || selectedGroupLabel === currentGroupLabel
