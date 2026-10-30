@@ -44,7 +44,13 @@ For every Postgres connection mode, the string comes from the same place:
 1. Open your project in the [Supabase Dashboard](/dashboard/project/_).
 2. Click **Connect** at the top of the page.
 3. Choose the connection method you picked above.
-4. Copy the string and replace `[YOUR-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
+4. Copy the string and replace `[YOUR-PASSWORD]` with your database password. [Percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `@`, `:`, `/`, `%`, `&`, `#`, `?`, or a space.
+
+<Admonition type="caution">
+
+Unencoded special characters in your password are a common cause of `password authentication failed` errors, including `P1000` errors from ORMs such as Prisma. An unencoded `@` can move the host boundary, so clients parse the wrong host and send credentials you did not type. An unencoded `:` is allowed within the user information by RFC 3986, but some clients split credentials on it and fail anyway. If you have reset your password and still cannot connect, percent-encode every reserved character before putting it in the connection string.
+
+</Admonition>
 
 The sections below show what each string looks like and when to use it. Take the host, port, and username from the string you copied rather than typing the bracketed placeholders literally. The pooler host in particular can't be composed from your region, and pooled connections use a different username from direct connections. Both are covered under [Endpoints and IP versions](#endpoints-and-ip-versions).
 
