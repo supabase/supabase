@@ -32,17 +32,14 @@ import { deleteDatabaseColumn } from '@/data/database-columns/database-column-de
 import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
 import type { Constraint } from '@/data/database/constraints-query'
 import { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
-import { databaseKeys } from '@/data/database/keys'
-import { entityTypeKeys } from '@/data/entity-types/keys'
-import { lintKeys } from '@/data/lint/keys'
+import { unguarded } from '@/data/fetchers'
 import { prefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from '@/data/query-client'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { tableEditorKeys } from '@/data/table-editor/keys'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
-import { tableRowKeys } from '@/data/table-rows/keys'
 import { executeWithRetry } from '@/data/table-rows/table-rows-query'
 import { tableKeys } from '@/data/tables/keys'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { getTable, getTableQuery, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import {
   UpdateTableBody,
@@ -51,8 +48,10 @@ import {
 import { getTables } from '@/data/tables/tables-query'
 import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import type { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly } from '@/lib/type-helpers'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import type { SidePanel } from '@/state/table-editor'
 
 const BATCH_SIZE = 1000
@@ -100,6 +99,7 @@ const addPrimaryKey = async (
     connectionString: connectionString,
     sql: query,
     queryKey: ['primary-keys'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -116,6 +116,7 @@ const dropConstraint = async (
     connectionString: connectionString,
     sql: query,
     queryKey: ['drop-constraint'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -136,6 +137,7 @@ const addForeignKey = async ({
     connectionString: connectionString,
     sql: query,
     queryKey: ['foreign-keys'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -156,6 +158,7 @@ const removeForeignKey = async ({
     connectionString: connectionString,
     sql: query,
     queryKey: ['foreign-keys'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -176,6 +179,7 @@ const updateForeignKey = async ({
     connectionString: connectionString,
     sql: query,
     queryKey: ['foreign-keys'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -368,6 +372,7 @@ export const duplicateTable = async (
       duplicatedTableName,
       comment: payload.comment,
     }),
+    grant: unguarded.migrating,
   })
   await queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, sourceTableSchema) })
 
@@ -391,6 +396,7 @@ export const duplicateTable = async (
         sourceTableSchema,
         duplicatedTableName,
       }),
+      grant: unguarded.migrating,
     })
 
     // Insert into does not copy over auto increment sequences, so we manually do it next if any
@@ -406,6 +412,7 @@ export const duplicateTable = async (
           duplicatedTableName,
           columnName: column.name,
         }),
+        grant: unguarded.migrating,
       })
     })
   }
@@ -442,7 +449,6 @@ export const createTable = async ({
   isRLSEnabled,
   importContent,
   track,
-  scoped,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -457,7 +463,6 @@ export const createTable = async ({
   isRLSEnabled: boolean
   importContent?: ImportContent
   track: Track
-  scoped?: boolean
 }) => {
   const queryClient = getQueryClient()
 
@@ -537,6 +542,7 @@ export const createTable = async ({
         connectionString,
         sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\n')}; COMMIT;`,
         queryKey: ['table', 'create-with-columns'],
+        grant: unguarded.migrating,
       })
     }
   )
@@ -594,7 +600,7 @@ export const createTable = async ({
                     value={progress}
                     max={100}
                     type="horizontal"
-                    barClass="bg-brand"
+                    barClass="bg-primary-bright"
                     labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
                     labelBottomClass=""
                     labelTop={`${progress.toFixed(2)}%`}
@@ -631,7 +637,7 @@ export const createTable = async ({
                     value={progress}
                     max={100}
                     type="horizontal"
-                    barClass="bg-brand"
+                    barClass="bg-primary-bright"
                     labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
                     labelTop={`${progress.toFixed(2)}%`}
                     labelTopClass="tabular-nums"
@@ -662,6 +668,7 @@ export const createTable = async ({
             connectionString,
             sql: updateSequenceSQL,
             queryKey: ['sequences', 'update-batch'],
+            grant: unguarded.migrating,
           })
         }
       }
@@ -676,7 +683,6 @@ export const createTable = async ({
         projectRef,
         connectionString,
         id: table.id,
-        scoped,
       })
     }
   )
@@ -697,7 +703,6 @@ export const updateTable = async ({
   existingForeignKeyRelations,
   primaryKey,
   track,
-  scoped,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -709,7 +714,6 @@ export const updateTable = async ({
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
   track: Track
-  scoped?: boolean
 }) => {
   const queryClient = getQueryClient()
 
@@ -859,23 +863,15 @@ export const updateTable = async ({
     existingForeignKeyRelations,
   })
 
-  await Promise.all([
-    queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, table.id) }),
-    queryClient.invalidateQueries({
-      queryKey: databaseKeys.foreignKeyConstraints(projectRef, table.schema),
-    }),
-    queryClient.invalidateQueries({ queryKey: databaseKeys.tableDefinition(projectRef, table.id) }),
-    queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
-    queryClient.invalidateQueries({
-      queryKey: tableKeys.list(projectRef, table.schema, { includeColumns: true }),
-    }),
-    queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
-  ])
-
-  // We need to invalidate tableRowsAndCount after tableEditor
-  // to ensure the query sent is correct
-  await queryClient.invalidateQueries({
-    queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+  await invalidateTableMetadata(queryClient, {
+    projectRef,
+    schema: table.schema,
+    tableId: table.id,
+    tableName: table.name,
+    newSchema: updatedTable.schema,
+    newTableName: updatedTable.name,
+    includeRows: true,
+    includeLint: true,
   })
 
   return {
@@ -883,7 +879,6 @@ export const updateTable = async ({
       projectRef,
       connectionString,
       id: table.id,
-      scoped,
     }),
     hasError,
   }
@@ -945,6 +940,7 @@ export async function insertRowsViaSpreadsheet({
   table,
   selectedHeaders,
   emptyStringAsNullHeaders = selectedHeaders,
+  roleImpersonationState,
   onProgressUpdate,
 }: {
   projectRef: string
@@ -953,6 +949,7 @@ export async function insertRowsViaSpreadsheet({
   table: RetrieveTableResult
   selectedHeaders: string[]
   emptyStringAsNullHeaders?: string[]
+  roleImpersonationState?: RoleImpersonationState
   onProgressUpdate: (progress: number) => void
 }): Promise<{ error: unknown }> {
   let chunkNumber = 0
@@ -976,10 +973,19 @@ export async function insertRowsViaSpreadsheet({
           emptyStringAsNullHeaders,
         })
 
-        const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
+        const insertQuery = wrapWithRoleImpersonation(
+          new Query().from(table.name, table.schema).insert(formattedData).toSql(),
+          roleImpersonationState
+        )
         try {
           await executeWithRetry(() =>
-            executeSql({ projectRef, connectionString, sql: insertQuery })
+            executeSql({
+              projectRef,
+              connectionString,
+              sql: insertQuery,
+              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+              grant: unguarded.migrating,
+            })
           )
         } catch (error) {
           console.warn(error)
@@ -1027,6 +1033,7 @@ export async function insertRowsViaSpreadsheet({
             connectionString,
             sql: updateSequenceSQL,
             queryKey: ['sequences', 'update-batch'],
+            grant: unguarded.migrating,
           })
             .then(() => resolve({ error: insertError }))
             .catch((error) => resolve({ error }))
@@ -1046,6 +1053,7 @@ export async function insertTableRows({
   rows,
   selectedHeaders,
   emptyStringAsNullHeaders = selectedHeaders,
+  roleImpersonationState,
   onProgressUpdate,
 }: {
   projectRef: string
@@ -1054,6 +1062,7 @@ export async function insertTableRows({
   rows: unknown[]
   selectedHeaders: string[]
   emptyStringAsNullHeaders?: string[]
+  roleImpersonationState?: RoleImpersonationState
   onProgressUpdate: (progress: number) => void
 }): Promise<{ error: unknown }> {
   let insertError: unknown = undefined
@@ -1071,9 +1080,18 @@ export async function insertTableRows({
     return () => {
       return Promise.race([
         new Promise(async (resolve, reject) => {
-          const insertQuery = new Query().from(table.name, table.schema).insert(batch).toSql()
+          const insertQuery = wrapWithRoleImpersonation(
+            new Query().from(table.name, table.schema).insert(batch).toSql(),
+            roleImpersonationState
+          )
           try {
-            await executeSql({ projectRef, connectionString, sql: insertQuery })
+            await executeSql({
+              projectRef,
+              connectionString,
+              sql: insertQuery,
+              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+              grant: unguarded.migrating,
+            })
           } catch (error) {
             insertError = error
             reject(error)
@@ -1129,6 +1147,7 @@ export async function insertTableRows({
       connectionString,
       sql: updateSequenceSQL,
       queryKey: ['sequences', 'update-batch'],
+      grant: unguarded.migrating,
     })
     return { error: insertError }
   } catch (error) {

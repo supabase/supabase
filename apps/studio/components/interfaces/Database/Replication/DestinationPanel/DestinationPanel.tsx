@@ -1,11 +1,11 @@
-import { ArrowUpRight } from 'lucide-react'
+import { useFeatureFlags, useParams } from 'common'
+import { ArrowUpRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   DialogSectionSeparator,
   Sheet,
   SheetContent,
@@ -14,35 +14,42 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { DestinationForm } from './DestinationForm'
+import { DESTINATION_DOCS_PATHS } from './DestinationPanel.constants'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
-import { ReadReplicaForm } from './ReadReplicaForm'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { DOCS_URL } from '@/lib/constants'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
-interface DestinationPanelProps {
-  onSuccessCreateReadReplica?: () => void
-}
-
-export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPanelProps) => {
+export const DestinationPanel = () => {
+  const { ref: projectRef } = useParams()
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
   const enablePgReplicate = useIsETLPrivateAlpha()
-  const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
+  const isAccessLoading = IS_PLATFORM && (!flagsLoaded || isOrganizationPending)
+  const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
-      'Read Replica',
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
       'Snowflake',
+      'ClickHouse',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -70,6 +77,9 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
   } = useDestinationInformation({ id: edit })
   const destinationType = existingDestinationType ?? urlDestinationType
   const invalidExistingDestination = destinationFetcher.error?.code === 404
+  const showAccessRequest = !isAccessLoading && !enablePgReplicate
+  const showEnablement = !isAccessLoading && enablePgReplicate && replicationNotEnabled
+  const showDestinationForm = !isAccessLoading && enablePgReplicate && !replicationNotEnabled
 
   const existingDestination = editMode
     ? {
@@ -82,15 +92,26 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
       }
     : undefined
 
+  const checkIsDirtyRef = useRef<() => boolean>(() => false)
+
   const onClose = () => {
+    checkIsDirtyRef.current = () => false
     setDestinationType(null)
     setEdit(null)
   }
 
-  const docsUrl =
-    urlDestinationType === 'BigQuery'
-      ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
-      : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => checkIsDirtyRef.current(),
+    onClose,
+  })
+
+  const destinationDocsPath =
+    destinationType && destinationType !== 'Analytics Bucket'
+      ? DESTINATION_DOCS_PATHS[destinationType]
+      : undefined
+  const docsUrl = `${DOCS_URL}${
+    destinationDocsPath ?? '/guides/database/replication/pipelines#step-3-configure-a-destination'
+  }`
 
   useEffect(() => {
     if (edit !== null && invalidExistingDestination) {
@@ -99,77 +120,104 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
     }
   }, [edit, invalidExistingDestination, setEdit])
 
+  const typeSelection = (
+    <>
+      <DestinationTypeSelection />
+      <DialogSectionSeparator />
+    </>
+  )
+
+  const pipelinesTypeSelection = (
+    <>
+      {typeSelection}
+      {destinationType != null && isLocalETLNotSetUp && (
+        <SheetSection className="pb-0!">
+          <Admonition
+            type="warning"
+            title="Replication unavailable locally"
+            description="Configure the replication API to manage pipelines in local development."
+          />
+        </SheetSection>
+      )}
+    </>
+  )
+
   return (
     <>
-      <Sheet open={visible} onOpenChange={onClose}>
-        <SheetContent size="lg" showClose={false}>
-          <div className="flex flex-col h-full" tabIndex={-1}>
+      <Sheet open={visible} onOpenChange={handleOpenChange}>
+        <SheetContent size="lg" showClose={false} className="max-w-3xl">
+          <div className="flex flex-col h-full min-h-0" tabIndex={-1}>
             <SheetHeader className="flex items-center justify-between">
               <div>
-                <SheetTitle>{editMode ? 'Edit destination' : 'Add new destination'}</SheetTitle>
+                <SheetTitle>{editMode ? 'Edit pipeline' : 'Add pipeline'}</SheetTitle>
                 <SheetDescription>
                   {editMode
-                    ? 'Update the configuration for this destination.'
-                    : 'Set up a read replica or Supabase Pipelines destination for near real-time replication'}
+                    ? 'Update how this pipeline sends data to its destination.'
+                    : 'Send tables to an external destination for analytics workloads.'}
                 </SheetDescription>
               </div>
-              <DocsButton href={docsUrl} topic={`${urlDestinationType} pipeline settings`} />
+              <DocsButton
+                href={docsUrl}
+                topic={`${destinationType ?? 'destination'} pipeline settings`}
+              />
             </SheetHeader>
 
-            <DestinationTypeSelection />
-
-            <DialogSectionSeparator />
-
-            {destinationType === 'Read Replica' ? (
-              <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
-            ) : !enablePgReplicate ? (
+            {isAccessLoading && (
               <SheetSection>
-                <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
-                  <div className="flex flex-col gap-y-1">
-                    <h4>Request Pipelines access</h4>
-                    <p className="text-sm text-foreground-light">
-                      Pipelines is in <span className="text-foreground">public alpha</span> and
-                      being rolled out gradually. Request access below to join the waitlist. Read
-                      replicas are available now.
-                    </p>
-                  </div>
-                  <div className="flex gap-x-2">
-                    <Button
-                      asChild
-                      variant="secondary"
-                      iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
-                    >
-                      <Link
-                        target="_blank"
-                        rel="noreferrer"
-                        href="https://forms.supabase.com/pg_replicate"
+                <GenericSkeletonLoader />
+              </SheetSection>
+            )}
+            {showAccessRequest && (
+              <div className="grow overflow-auto min-h-0">
+                {pipelinesTypeSelection}
+                <SheetSection>
+                  <Admonition
+                    type="note"
+                    layout="responsive"
+                    title="Request Pipelines access"
+                    description="Pipelines is in public alpha and available to approved organizations."
+                    actions={
+                      <Button
+                        asChild
+                        variant="primary"
+                        iconRight={<ArrowUpRightIcon size={16} strokeWidth={1.5} />}
                       >
-                        Request Pipelines access
-                      </Link>
-                    </Button>
-                    <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
-                  </div>
-                </div>
-              </SheetSection>
-            ) : replicationNotEnabled ? (
-              <SheetSection>
-                <EnablePipelinesCallout
-                  className="p-6!"
-                  type={destinationType}
-                  hasAccess={hasETLReplicationAccess}
-                />
-              </SheetSection>
-            ) : (
+                        <Link
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://forms.supabase.com/pg_replicate"
+                        >
+                          Request access
+                        </Link>
+                      </Button>
+                    }
+                  />
+                </SheetSection>
+              </div>
+            )}
+            {showEnablement && (
+              <div className="grow overflow-auto min-h-0">
+                {pipelinesTypeSelection}
+                <SheetSection>
+                  <EnablePipelinesCallout type={destinationType} />
+                </SheetSection>
+              </div>
+            )}
+            {showDestinationForm && (
               <DestinationForm
                 visible={visible}
-                selectedType={destinationType ?? 'Read Replica'}
+                selectedType={destinationType ?? 'BigQuery'}
                 existingDestination={existingDestination}
+                typeSelection={pipelinesTypeSelection}
+                checkIsDirtyRef={checkIsDirtyRef}
                 onClose={onClose}
+                onCancel={confirmOnClose}
               />
             )}
           </div>
         </SheetContent>
       </Sheet>
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }

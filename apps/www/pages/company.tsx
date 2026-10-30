@@ -91,7 +91,9 @@ const Team = () => {
           </div>
           <div className=" col-span-4 pt-8 md:mt-0 md:text-right">
             <a href="https://supabase.com/careers">
-              <Button size="medium">Join the team</Button>
+              <Button variant="primary" size="medium">
+                Join the team
+              </Button>
             </a>
           </div>
         </div>
@@ -132,7 +134,7 @@ const Community = () => {
                 />
               </div>
               <div>
-                <h1 className="text-foreground mb-0 text-3xl">{x.stat}</h1>
+                <p className="text-foreground mb-0 text-3xl">{x.stat}</p>
                 <p className="text-foreground-light text-sm">{x.statLabel}</p>
               </div>
             </div>
@@ -197,7 +199,7 @@ const Investors = () => {
 
               <div className="flex flex-col justify-center space-y-2">
                 <div>
-                  <h1 className="text-foreground mb-0 text-base">{x.name}</h1>
+                  <p className="text-foreground mb-0 text-base">{x.name}</p>
                   <p className="text-foreground-lighter mb-0 text-xs">{x.title}</p>
                 </div>
               </div>
@@ -220,7 +222,7 @@ const Press = () => {
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover
@@ -247,7 +249,7 @@ const Press = () => {
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover

@@ -6,8 +6,8 @@ import { CH } from '@code-hike/mdx/components'
 import DefaultLayout from '~/components/Layouts/Default'
 import { type ListingDetail, type Partner } from '~/types/partners'
 import { useBreakpoint } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUpRight, ChevronLeft, ExternalLink } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client'
 import { MDXClient } from 'next-mdx-remote-client/csr'
 import Image from 'next/image'
@@ -16,7 +16,7 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
@@ -142,7 +142,12 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                 <h1 className="h1 mb-0!">{partner.title}</h1>
               </div>
               {installHref && (
-                <Button asChild size="medium" iconRight={<ArrowUpRight strokeWidth={1.5} />}>
+                <Button
+                  variant="primary"
+                  asChild
+                  size="medium"
+                  iconRight={<ArrowUpRight strokeWidth={1.5} />}
+                >
                   <a href={installHref} target="_blank" rel="noreferrer">
                     {activeListing.publishedInMarketplace
                       ? 'Install integration'
@@ -161,10 +166,11 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
               {/* Listings tabs */}
               <div className="flex">
                 {allListings.map((listing, i) => (
-                  <button
+                  <Link
                     key={listing.slug}
-                    type="button"
-                    onClick={() => {
+                    href={`?tab=${encodeURIComponent(listing.slug)}`}
+                    onNavigate={(event) => {
+                      event.preventDefault()
                       setActiveSlug(listing.slug)
                       setFocusedImage(null)
                     }}
@@ -176,7 +182,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                     )}
                   >
                     {listing.label}
-                  </button>
+                  </Link>
                 ))}
               </div>
             </SectionContainerWithCn>
@@ -294,7 +300,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                   </div>
                 </div>
                 {installHref && (
-                  <Button asChild>
+                  <Button variant="primary" asChild>
                     <a href={installHref} target="_blank" rel="noreferrer">
                       {activeListing.publishedInMarketplace
                         ? 'Install integration'
@@ -310,7 +316,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
         <div className="border-t bg-background">
           <SectionContainerWithCn className="mx-auto max-w-2xl flex flex-col items-center gap-6 py-24 px-6 text-center">
             <h2 className="h2 text-balance">Interested in partnering with Supabase?</h2>
-            <Button asChild size="medium">
+            <Button variant="primary" asChild size="medium">
               <Link href="/partners#become-a-partner">Become a partner</Link>
             </Button>
           </SectionContainerWithCn>
@@ -337,6 +343,7 @@ function PartnerDetails({
             videoId={activeListing.youtubeId}
             imgUrl={`https://img.youtube.com/vi/${activeListing.youtubeId}/0.jpg`}
             imgOverlayText="Watch an introductory video"
+            videoTitle={`Introduction to ${partner.title}`}
             triggerContainerClassName="w-full"
           />
         )}
@@ -354,7 +361,7 @@ function PartnerDetails({
               <span className="text-lighter">Category</span>
               <Link
                 href={`/partners/catalog?cat=${encodeURIComponent(category.slug)}`}
-                className="text-brand-link hover:underline transition-colors"
+                className="text-primary hover:underline transition-colors"
               >
                 {category.name}
               </Link>
@@ -372,7 +379,7 @@ function PartnerDetails({
                 }
                 target="_blank"
                 rel="noreferrer"
-                className="text-brand-link hover:underline transition-colors"
+                className="text-primary hover:underline transition-colors"
               >
                 {(() => {
                   try {
@@ -395,7 +402,7 @@ function PartnerDetails({
                 href={activeListing.docsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="text-brand-link hover:underline transition-colors"
+                className="text-primary hover:underline transition-colors"
               >
                 <span className="flex items-center space-x-1">
                   <span>Learn</span>

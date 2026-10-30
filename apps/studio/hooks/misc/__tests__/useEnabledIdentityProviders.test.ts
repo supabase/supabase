@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -8,74 +9,29 @@ import {
 } from '@/lib/external-identity-providers'
 
 const mockIsFeatureEnabled = vi.hoisted(() => vi.fn())
-const mockUseLocalStorageQuery = vi.hoisted(() => vi.fn())
 
 vi.mock('../useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockIsFeatureEnabled,
 }))
 
-vi.mock('../useLocalStorage', () => ({
-  useLocalStorageQuery: mockUseLocalStorageQuery,
-}))
+function mockFeatures({ github = false, chatgpt = true }: { github?: boolean; chatgpt?: boolean }) {
+  mockIsFeatureEnabled.mockReturnValue({
+    dashboardAuthSignInWithGithub: github,
+    dashboardAuthSignInWithChatgpt: chatgpt,
+  })
+}
 
 describe('useEnabledIdentityProviders', () => {
-  it('returns every provider when all flags are enabled', () => {
-    mockIsFeatureEnabled.mockReturnValue({
-      dashboardAuthSignInWithGithub: true,
-      dashboardAuthSignInWithChatgpt: true,
-    })
-    mockUseLocalStorageQuery.mockReturnValue([true])
+  it.each([
+    [{ github: true, chatgpt: true }, [GITHUB_IDENTITY_PROVIDER, CHATGPT_IDENTITY_PROVIDER]],
+    [{ github: true, chatgpt: false }, [GITHUB_IDENTITY_PROVIDER]],
+    [{ github: false, chatgpt: true }, [CHATGPT_IDENTITY_PROVIDER]],
+    [{ github: false, chatgpt: false }, []],
+  ])('returns only the providers whose flags are enabled: %o', (flags, expected) => {
+    mockFeatures(flags)
 
     const { result } = renderHook(() => useEnabledIdentityProviders())
 
-    expect(result.current).toEqual([GITHUB_IDENTITY_PROVIDER, CHATGPT_IDENTITY_PROVIDER])
-  })
-
-  it('returns no providers when all flags are disabled', () => {
-    mockIsFeatureEnabled.mockReturnValue({
-      dashboardAuthSignInWithGithub: false,
-      dashboardAuthSignInWithChatgpt: false,
-    })
-    mockUseLocalStorageQuery.mockReturnValue([false])
-
-    const { result } = renderHook(() => useEnabledIdentityProviders())
-
-    expect(result.current).toEqual([])
-  })
-
-  it('includes ChatGPT when its flag is enabled and the local storage switch is truthy', () => {
-    mockIsFeatureEnabled.mockReturnValue({
-      dashboardAuthSignInWithGithub: false,
-      dashboardAuthSignInWithChatgpt: true,
-    })
-    mockUseLocalStorageQuery.mockReturnValue([true])
-
-    const { result } = renderHook(() => useEnabledIdentityProviders())
-
-    expect(result.current).toEqual([CHATGPT_IDENTITY_PROVIDER])
-  })
-
-  it('excludes ChatGPT when its flag is enabled but the local storage switch is unset', () => {
-    mockIsFeatureEnabled.mockReturnValue({
-      dashboardAuthSignInWithGithub: false,
-      dashboardAuthSignInWithChatgpt: true,
-    })
-    mockUseLocalStorageQuery.mockReturnValue([false])
-
-    const { result } = renderHook(() => useEnabledIdentityProviders())
-
-    expect(result.current).toEqual([])
-  })
-
-  it('excludes ChatGPT when the local storage switch is truthy but its flag is disabled', () => {
-    mockIsFeatureEnabled.mockReturnValue({
-      dashboardAuthSignInWithGithub: false,
-      dashboardAuthSignInWithChatgpt: false,
-    })
-    mockUseLocalStorageQuery.mockReturnValue([true])
-
-    const { result } = renderHook(() => useEnabledIdentityProviders())
-
-    expect(result.current).toEqual([])
+    expect(result.current).toEqual(expected)
   })
 })

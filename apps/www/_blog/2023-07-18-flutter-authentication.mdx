@@ -97,7 +97,7 @@ We also need some iOS specific settings. Open `ios/Runner/Info.plist` file and a
 </array>
 ```
 
-That is it for setting up our [Supabase auth to prepare for Google sign-in](https://supabase.com/docs/guides/auth/social-login/auth-google?platform=flutter).
+That is it for setting up our [Supabase auth to prepare for Google sign-in](https://supabase.com/docs/guides/auth/social-sign-in/auth-google?platform=flutter).
 
 Finally, we can initialize Supabase in our Flutter application with the credentials of our Supabase instance. Update your `main.dart` file and add `Supabase.initialize()` in the `main` function like the following. Note that you will see some errors since the home screen is set to the `LoginScreen`, which we will create later.
 
@@ -135,7 +135,7 @@ class MyApp extends StatelessWidget {
 }
 ```
 
-You can find your Supabase URL and Anon key in `Settings -> API` from your [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/api).
+You can find your Supabase URL and Anon key in `Settings -> API` from your [Supabase dashboard](https://supabase.com/dashboard/project/_/integrations/data_api/overview).
 
 ![Supabase credentials](/images/blog/flutter-authentication/supabase-credentials.png)
 

@@ -1,10 +1,13 @@
 import { screen } from '@testing-library/react'
+import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { BillingCustomerData } from './BillingCustomerData'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { createMockOrganization, render } from '@/tests/helpers'
+
+mockIntersectionObserver()
 
 const mockSelectedOrganization = vi.hoisted(() => vi.fn())
 
@@ -40,8 +43,9 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: mockSelectedOrganization() }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: () => ({ can: true, isSuccess: true }),
 }))
 
 vi.mock('@/data/organizations/organization-customer-profile-query', () => ({
@@ -103,7 +107,6 @@ vi.mock('@/components/ui/PartnerManagedResource', () => ({
 
 describe('BillingCustomerData', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',

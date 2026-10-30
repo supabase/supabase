@@ -57,6 +57,7 @@ function list({
   if (filter) {
     sql = safeSql`${sql} and n.nspname ${filter}`
   }
+  sql = safeSql`${sql} order by t.oid`
   if (limit) {
     sql = safeSql`${sql} limit ${literal(limit)}`
   }

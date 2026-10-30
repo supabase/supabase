@@ -1,0 +1,129 @@
+import type { Page } from '@playwright/test'
+
+export const GUIDE_ARTICLE_SELECTOR = '[data-testid="sb-docs-guide-main-article"]'
+const DOCS_PATH_PREFIX = '/docs'
+
+export type LinkTarget = {
+  url: string
+  anchor?: string
+}
+
+function decodeAnchor(hash: string): string {
+  try {
+    return decodeURIComponent(hash)
+  } catch {
+    return hash
+  }
+}
+
+export function docsOwnedLinkTargets(
+  hrefs: string[],
+  pageUrl: string,
+  baseURL: string
+): LinkTarget[] {
+  const origin = new URL(baseURL).origin
+  const links = new Map<string, LinkTarget>()
+
+  for (const href of hrefs) {
+    if (!href || href === '#') continue
+
+    let url: URL
+    try {
+      url = new URL(href, pageUrl)
+    } catch {
+      continue
+    }
+
+    if (!['http:', 'https:'].includes(url.protocol)) continue
+    if (url.origin !== origin) continue
+    if (url.pathname !== DOCS_PATH_PREFIX && !url.pathname.startsWith(`${DOCS_PATH_PREFIX}/`)) {
+      continue
+    }
+
+    const anchor = decodeAnchor(url.hash.slice(1))
+    url.hash = ''
+    const target: LinkTarget = anchor ? { url: url.toString(), anchor } : { url: url.toString() }
+    links.set(`${target.url}#${anchor}`, target)
+  }
+
+  return [...links.keys()].sort().map((key) => links.get(key)!)
+}
+
+export async function collectDocsOwnedLinks(
+  page: Page,
+  baseURL: string,
+  articleSelector: string = GUIDE_ARTICLE_SELECTOR
+): Promise<LinkTarget[]> {
+  const hrefs = await page
+    .locator(`${articleSelector} a[href]`)
+    .evaluateAll((anchors) =>
+      anchors.map((anchor) => (anchor as HTMLAnchorElement).getAttribute('href') ?? '')
+    )
+
+  return docsOwnedLinkTargets(hrefs, page.url(), baseURL)
+}
+
+export type LinkCheckResult = {
+  ok: boolean
+  status: number
+  error?: string
+  anchors: string[]
+}
+
+const linkChecks = new Map<string, Promise<LinkCheckResult>>()
+
+// The docs middleware rewrites /reference/* requests whose user agent looks like a bot
+// (isbot, which matches HeadlessChrome) to /api/crawlers. Fetching from inside the page
+// keeps the browser's own user agent and network stack, so a link resolves the same way
+// page.goto resolves it in this suite.
+// Reading the body is slow for large reference pages, so only do it when an anchor needs it.
+export function checkLinkFromBrowser(
+  page: Page,
+  url: string,
+  withAnchors: boolean
+): Promise<LinkCheckResult> {
+  const key = `${withAnchors}:${url}`
+  let check = linkChecks.get(key) ?? (withAnchors ? undefined : linkChecks.get(`true:${url}`))
+  if (!check) {
+    check = page.evaluate(
+      async ({ linkUrl, readAnchors, articleSelector }) => {
+        try {
+          const response = await fetch(linkUrl)
+          if (!response.ok || !readAnchors) {
+            return { ok: response.ok, status: response.status, anchors: [] }
+          }
+
+          const doc = new DOMParser().parseFromString(await response.text(), 'text/html')
+          const root = doc.querySelector(articleSelector) ?? doc
+          const anchors = [
+            ...[...root.querySelectorAll('[id]')].map((element) => element.id),
+            ...[...root.querySelectorAll('a[name]')].map(
+              (element) => element.getAttribute('name')!
+            ),
+          ]
+          return { ok: true, status: response.status, anchors }
+        } catch (error) {
+          return {
+            ok: false,
+            status: 0,
+            error: error instanceof Error ? error.message : String(error),
+            anchors: [],
+          }
+        }
+      },
+      {
+        linkUrl: url,
+        readAnchors: withAnchors,
+        articleSelector: GUIDE_ARTICLE_SELECTOR,
+      }
+    )
+    check.then(
+      (result) => {
+        if (!result.ok) linkChecks.delete(key)
+      },
+      () => linkChecks.delete(key)
+    )
+    linkChecks.set(key, check)
+  }
+  return check
+}

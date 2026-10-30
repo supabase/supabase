@@ -1,18 +1,19 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback, useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
 
 import { AddWrapperButton } from './AddWrapperButton'
+import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import { WrapperTable } from './WrapperTable'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -21,15 +22,15 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const WrappersTab = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const [isCreating, setIsCreating] = useQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
   )
 
-  const { can: canCreateWrapper } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'wrappers'
+  const { can: canCreateWrapper } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setIsCreating(true), {
@@ -44,7 +45,6 @@ export const WrappersTab = () => {
 
   const wrappers = data ?? []
   const wrapperMeta = WRAPPERS.find((w) => w.name === id)
-
   const createdWrappers = wrapperMeta
     ? wrappers.filter((w) => wrapperMetaComparator(wrapperMeta, w))
     : []
@@ -58,6 +58,14 @@ export const WrappersTab = () => {
     }, [setIsCreating]),
   })
 
+  const CreateWrapperSheetComponent = !wrapperMeta
+    ? null
+    : wrapperMeta.customComponent
+      ? wrapperMeta.name === 'iceberg_wrapper'
+        ? CreateIcebergWrapperSheet
+        : null
+      : CreateWrapperSheet
+
   if (!wrapperMeta) {
     return <div>Missing integration.</div>
   }
@@ -70,23 +78,25 @@ export const WrappersTab = () => {
             <p className="text-sm text-foreground-light">
               No {wrapperMeta.label} wrappers have been installed
             </p>
-            <AddWrapperButton onClick={() => setIsCreating(true)} />
+            <AddWrapperButton />
           </div>
         </div>
       ) : (
         <>
-          <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
-            <DocsButton href={wrapperMeta.docsUrl} />
-            <AddWrapperButton variant="primary" onClick={() => setIsCreating(true)} />
-          </div>
+          {!isMarketplaceEnabled && (
+            <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
+              <DocsButton href={wrapperMeta.docsUrl} />
+              <AddWrapperButton variant="primary" />
+            </div>
+          )}
           <WrapperTable />
         </>
       )}
 
-      <Sheet open={!!isCreating} onOpenChange={handleOpenChange}>
-        <SheetContent size="lg" tabIndex={undefined}>
-          {wrapperMeta && (
-            <CreateWrapperSheet
+      <Sheet open={!!isCreating && canCreateWrapper} onOpenChange={handleOpenChange}>
+        <SheetContent size="lg">
+          {wrapperMeta && CreateWrapperSheetComponent && (
+            <CreateWrapperSheetComponent
               wrapperMeta={wrapperMeta}
               onDirty={setIsDirty}
               onClose={() => {

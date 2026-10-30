@@ -1,11 +1,11 @@
 import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { RefreshCw, RotateCcw, X } from 'lucide-react'
+import { RefreshCwIcon, RotateCcwIcon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, LoadingLine } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { Markdown } from '../../Markdown'
@@ -18,6 +18,7 @@ import { transformStatementDataToRows } from './WithStatements.utils'
 import { PresetHookResult } from '@/components/interfaces/Reports/Reports.utils'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { unguarded } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -211,9 +212,8 @@ export const WithStatements = ({
             >
               <Button
                 aria-label="Refresh"
-                variant="default"
                 size="tiny"
-                icon={<RefreshCw />}
+                icon={<RefreshCwIcon />}
                 onClick={handleRefresh}
                 className="w-[26px]"
               />
@@ -225,9 +225,8 @@ export const WithStatements = ({
             >
               <Button
                 aria-label="Reset report"
-                variant="default"
                 size="tiny"
-                icon={<RotateCcw />}
+                icon={<RotateCcwIcon />}
                 onClick={() => setShowResetgPgStatStatements(true)}
                 className="w-[26px]"
               />
@@ -241,7 +240,11 @@ export const WithStatements = ({
           </>
         }
       />
-      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+
+      <div>
+        <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+      </div>
+
       <QueryPerformanceGrid
         aggregatedData={processedData}
         isLoading={isLoading}
@@ -264,18 +267,14 @@ export const WithStatements = ({
           size="tiny"
           onClick={() => setShowBottomSection(false)}
         >
-          <X size="14" />
+          <XIcon size="14" />
         </Button>
         <div className="w-[33%] flex flex-col gap-y-1 text-sm">
           <p>Reset report</p>
           <p className="text-xs text-foreground-light">
             Consider resetting the analysis after optimizing any queries
           </p>
-          <Button
-            variant="default"
-            className="mt-3! w-min"
-            onClick={() => setShowResetgPgStatStatements(true)}
-          >
+          <Button className="mt-3! w-min" onClick={() => setShowResetgPgStatStatements(true)}>
             Reset report
           </Button>
         </div>
@@ -293,7 +292,7 @@ export const WithStatements = ({
           <Markdown
             className="text-xs"
             content={`The Supabase CLI comes with a range of tools to help inspect your Postgres instances for
-            potential issues. [Learn more here](${DOCS_URL}/guides/database/inspect).`}
+            potential issues. [Learn more here](${DOCS_URL}/guides/observability/inspect).`}
           />
         </div>
       </div>
@@ -320,6 +319,7 @@ export const WithStatements = ({
               projectRef: project?.ref,
               connectionString,
               sql: safeSql`SELECT pg_stat_statements_reset();`,
+              grant: unguarded.migrating,
             })
             handleRefresh()
             setShowResetgPgStatStatements(false)

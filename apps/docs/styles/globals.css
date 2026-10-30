@@ -1,5 +1,11 @@
 @import 'config/tailwind.config.css';
-@import './../../../packages/ui/build/css/themes/faux-classic-dark.css';
+@import 'config/inline-code.css';
+@import 'ui-patterns/CodeBlock/code-block.css';
+@import 'ui-patterns/Toc/toc-menu.css';
+@import 'ui-patterns/Notch/notch.css';
+@import './code-block.css';
+@import './reference.css';
+@import 'docs-search/styles.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';
@@ -10,6 +16,7 @@
 @source '../pages/**/*.{tsx,mdx}';
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../packages/docs-search/src/**/*.{tsx,ts}';
 
 @theme inline {
   --font-sans:
@@ -145,7 +152,7 @@ h6:not(.font-mono),
   white-space: pre-line;
 }
 
-.prose :where(p, a, code, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
+.prose :where(p, a, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
 .prose :where(ol > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
   font-weight: inherit;
 }
@@ -160,11 +167,16 @@ h6:not(.font-mono),
   @apply font-heading font-semibold;
 }
 
+/* Alert set its own type scale to prevent drift in docs */
 .prose
   :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
     :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) *
-  ) {
+  ):not(:where([data-slot='alert'] *)) {
   @apply text-base leading-7;
+}
+
+.prose :where([data-slot='alert'] ol > li)::before {
+  top: 0;
 }
 
 .prose :where(h1, .h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -209,13 +221,6 @@ pre[class*='language-'] {
   font-family: var(--font-mono);
   & h5 {
     font-weight: 200;
-  }
-}
-
-.method-list-item-validation {
-  code {
-    @apply text-xs bg-control rounded-sm;
-    padding: 1px 6px;
   }
 }
 
@@ -276,29 +281,9 @@ pre[class*='language-'] {
   }
 }
 
-.admonition-content > p {
-  @apply m-0;
-}
-
-/* format <code> inside <p> */
 h2 code,
 h3 code,
 h4 code {
-  word-break: keep-all !important;
-  white-space: nowrap !important;
-  padding: 0.1rem 0.35rem !important;
-
-  &:before {
-    display: none;
-  }
-  &::after {
-    display: none;
-  }
-}
-
-/* code inside admonitions */
-.admonition-content p code {
-  @apply bg-control;
   word-break: keep-all !important;
   white-space: nowrap !important;
 }
@@ -310,15 +295,6 @@ article p strong {
 /* fix box shadow when <code> is inside <a> */
 a:has(code) {
   box-shadow: none !important;
-}
-
-/* fix code line wrapping */
-/* need to set this to happen from medium onwards, otherwise the would cause horizontal scroll */
-article p code {
-  &::before,
-  &::after {
-    display: none !important;
-  }
 }
 
 .short-inline-codeblock {
@@ -372,27 +348,6 @@ th code {
   @apply text-nowrap;
 }
 
-/*
- * First column (e.g. variable names): wrap at word boundaries, not mid-token.
- */
-.prose :where(td:first-child) code {
-  @apply break-words whitespace-normal;
-}
-
-/*
- * Other columns: prevents very long code lines (checksums, URLs, etc.) from
- * breaking table widths.
- */
-.prose :where(td:not(:first-child)) code {
-  @apply break-all;
-}
-
-.prose table td:first-child,
-.prose table th:first-child {
-  min-width: 12rem;
-  width: 30%;
-}
-
 /* Zoomable image */
 
 [data-rmiz-modal]:focus,
@@ -410,53 +365,4 @@ th code {
 }
 [data-rmiz-modal-img] {
   image-rendering: high-quality;
-}
-
-/* Code blocks need margin applied when in content container */
-.prose :where(.shiki:not(.shiki-wrapper *), .shiki-wrapper) {
-  margin-block: 2rem;
-}
-
-/* Code block theme colors for use with Supabase Theme */
-[data-theme='dark'],
-.dark {
-  --code-token-keyword: #bda4ff;
-  --code-foreground: #ffffff;
-  --code-token-constant: #3ecf8e;
-  --code-token-string: #ffcda1;
-  --code-token-comment: #949494;
-  --code-token-parameter: #ffffff;
-  --code-token-function: #3ecf8e;
-  --code-token-string-expression: #ffcda1;
-  --code-token-punctuation: #ffffff;
-  --code-token-link: #ffffff;
-  --code-token-number: #ffffff;
-  --code-token-property: #3ecf8e;
-  --code-highlight-color: #232323;
-}
-[data-theme='light'],
-.light {
-  --code-token-keyword: #5f2fc4;
-  --code-foreground: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-constant: #15593b;
-  --code-token-string: #9a5200;
-  --code-token-comment: #6a6a6a;
-  --code-token-parameter: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-function: #15593b;
-  --code-token-string-expression: #9a5200;
-  --code-token-punctuation: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-link: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-number: oklch(from var(--foreground-light) l c h / 1);
-  --code-token-property: #15593b;
-  --code-highlight-color: #1c1c1c;
-}
-
-/* Word wrap styles for code blocks */
-.shiki[data-wrapped='true'] {
-  overflow-x: hidden !important;
-}
-
-.shiki[data-wrapped='true'] .code-content {
-  white-space: pre-wrap !important;
-  word-break: break-word !important;
 }

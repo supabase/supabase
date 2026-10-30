@@ -1,6 +1,7 @@
 /packages/ui/  @supabase/design
 /packages/shared-data/pricing.ts @supabase/billing
 /packages/shared-data/plans.ts @supabase/billing
+/packages/shared-data/scoped-access-token-permissions.ts @supabase/Dashboard @supabase/docs
 /packages/common/telemetry-constants.ts @supabase/growth-eng
 /packages/dev-tools/ @supabase/growth-eng
 # /packages/pg-meta @supabase/postgres @avallete
@@ -10,8 +11,11 @@
 
 /apps/docs/ @supabase/docs
 
+/apps/kb/ @supabase/knowledgebase
+
 /apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
+/apps/www/public/schemas/ @supabase/cli
 /apps/www/lib/redirects.js
 
 /docker/ @supabase/cli @supabase/self-hosted
@@ -20,5 +24,8 @@
 /apps/studio/components/interfaces/Billing/Payment                  @supabase/security
 /apps/studio/components/interfaces/Organization/Documents/          @supabase/security
 /apps/studio/pages/new/index.tsx                                    @supabase/security
+
+/apps/studio/lib/ai/                                                @supabase/ai
+/apps/studio/pages/api/ai/                                          @supabase/ai
 
 /packages/shared-data/compute-disk-limits.ts @supabase/platform

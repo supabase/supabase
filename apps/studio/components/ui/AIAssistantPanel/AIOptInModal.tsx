@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
 import {
   Button,
@@ -12,21 +11,32 @@ import {
   DialogTitle,
   Form,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { AIOptInLevelSelector } from '@/components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
 import { useAIOptInForm } from '@/hooks/forms/useAIOptInForm'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
 
 interface AIOptInModalProps {
   visible: boolean
   onCancel: () => void
+  /** The level the Assistant asked for. Shows it as proposed. */
+  requiredLevel?: AiOptInLevel
+  /** Called after the level is saved. */
+  onSaved?: (level: AiOptInLevel) => void
 }
 
-export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
-  const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
-  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+export const AIOptInModal = ({ visible, onCancel, requiredLevel, onSaved }: AIOptInModalProps) => {
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm((level) => {
+    onSaved?.(level)
+    onCancel()
+  })
+  const { can: canUpdateOrganization } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE
   )
 
   const onOpenChange = (open: boolean) => {
@@ -34,6 +44,11 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
       onCancel()
     }
   }
+
+  const proposedLevel =
+    requiredLevel && !isOptInLevelAtLeast(currentOptInLevel, requiredLevel)
+      ? requiredLevel
+      : undefined
 
   useEffect(() => {
     if (visible) {
@@ -53,9 +68,18 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
             <DialogSectionSeparator />
 
             <DialogSection className="space-y-4 pb-0" padding="small">
+              <Admonition
+                type="warning"
+                title={`This changes the opt-in level for every project in ${organization?.name ?? 'this organization'}`}
+                description={
+                  proposedLevel && 'The Assistant needs more access to answer your question.'
+                }
+              />
               <AIOptInLevelSelector
                 control={form.control}
                 disabled={!canUpdateOrganization || isUpdating}
+                currentLevel={proposedLevel && currentOptInLevel}
+                proposedLevel={proposedLevel}
               />
             </DialogSection>
 
@@ -69,7 +93,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
                 </p>
               )}
               <div className="flex items-center gap-x-2">
-                <Button variant="default" disabled={isUpdating} onClick={onCancel}>
+                <Button disabled={isUpdating} onClick={onCancel}>
                   Cancel
                 </Button>
                 <Button

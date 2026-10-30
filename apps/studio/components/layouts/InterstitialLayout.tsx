@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { ArrowRightLeft } from 'lucide-react'
+import { ArrowRightLeftIcon } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { Card, CardContent, CardHeader, cn } from 'ui'
 
@@ -16,6 +16,8 @@ interface InterstitialLayoutProps {
   footer?: ReactNode
   containerClassName?: string
   cardClassName?: string
+  /** Shared max-width for the card and footer column. Defaults to `max-w-[400px]`. */
+  widthClassName?: string
   titleClassName?: string
   descriptionClassName?: string
 }
@@ -34,10 +36,12 @@ export const InterstitialLayout = ({
   footer,
   containerClassName,
   cardClassName,
+  widthClassName = 'max-w-[400px]',
   titleClassName,
   descriptionClassName,
   children,
 }: PropsWithChildren<InterstitialLayoutProps>) => {
+  const shouldReduceMotion = useReducedMotion()
   const TitleElement = typeof title === 'string' ? 'h1' : 'div'
   const DescriptionElement = typeof description === 'string' ? 'p' : 'div'
 
@@ -55,7 +59,7 @@ export const InterstitialLayout = ({
   const descriptionElement = description ? (
     <DescriptionElement
       className={cn(
-        '!m-0 px-3 !text-balance text-sm text-foreground-lighter leading-tight',
+        'm-0! px-3 text-balance! text-sm text-foreground-lighter',
         descriptionClassName
       )}
     >
@@ -65,9 +69,9 @@ export const InterstitialLayout = ({
 
   const card = (
     <MotionCard
-      layout="size"
+      layout={shouldReduceMotion ? false : 'size'}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className={cn('overflow-hidden max-w-[400px] w-full mx-auto', cardClassName)}
+      className={cn('overflow-hidden w-full mx-auto', widthClassName, cardClassName)}
     >
       {(logo || title || description) && (
         <CardHeader className="font-normal items-center gap-0 space-y-0 px-6 py-6 text-center [--card-padding-x:1.5rem] border-0">
@@ -92,7 +96,7 @@ export const InterstitialLayout = ({
       )}
     >
       {footer ? (
-        <div className="flex w-full max-w-[400px] flex-col items-center gap-4">
+        <div className={cn('flex w-full flex-col items-center gap-4', widthClassName)}>
           {card}
           <div className="px-2 text-center text-balance">{footer}</div>
         </div>
@@ -111,7 +115,7 @@ export const InterstitialLayout = ({
 export const LogoBox = ({ children, className }: { children: ReactNode; className?: string }) => (
   <div
     className={cn(
-      'flex size-12 items-center justify-center overflow-hidden rounded-xl border bg-muted',
+      'flex size-12 items-center justify-center overflow-hidden rounded-lg border bg-muted',
       className
     )}
   >
@@ -123,7 +127,7 @@ export const LogoBox = ({ children, className }: { children: ReactNode; classNam
 export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode }) => (
   <div className="flex items-center justify-center gap-2.5">
     {left}
-    <ArrowRightLeft className="size-4 text-foreground-muted" />
+    <ArrowRightLeftIcon className="size-4 text-foreground-muted" />
     {right}
   </div>
 )
@@ -155,9 +159,12 @@ export const DestinationLogo = ({ icon, name }: { icon?: ReactNode; name: string
   </LogoBox>
 )
 
+/** Fixed light tile chrome for Connect pairs with unclassified (uploaded) marks. */
+export const CONNECT_LOGO_LIGHT_TILE_CLASSNAME = 'border-black/10 bg-white'
+
 /** Supabase symbol (not the wordmark) rendered inset inside a LogoBox. */
-export const SupabaseLogo = () => (
-  <LogoBox className="bg-surface-75">
+export const SupabaseLogo = ({ forceLight = false }: { forceLight?: boolean } = {}) => (
+  <LogoBox className={forceLight ? CONNECT_LOGO_LIGHT_TILE_CLASSNAME : 'bg-surface-75'}>
     <img alt="Supabase" src={`${BASE_PATH}/img/supabase-logo.svg`} className="size-7" />
   </LogoBox>
 )
@@ -184,7 +191,7 @@ export const InterstitialAccountRow = ({
     >
       <ProfileImage
         src={avatarUrl}
-        alt={displayName}
+        alt=""
         className="size-8 flex-shrink-0 rounded-full border border-muted"
       />
       <div className="min-w-0 flex-1">
@@ -198,3 +205,15 @@ export const InterstitialAccountRow = ({
     </CardContent>
   </Card>
 )
+
+export const InterstitialActionError = ({ error }: { error?: ReactNode }) => {
+  if (!error) return null
+
+  return (
+    <div className="mt-3 border-t border-muted pt-5">
+      <p role="alert" className="text-center text-xs text-destructive text-balance">
+        {error}
+      </p>
+    </div>
+  )
+}

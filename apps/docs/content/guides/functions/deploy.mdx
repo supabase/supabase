@@ -3,7 +3,7 @@ id: 'functions-deploy'
 title: 'Deploy to Production'
 description: 'Deploy your Edge Functions to your remote Supabase Project.'
 subtitle: 'Deploy your Edge Functions to your remote Supabase Project.'
-tocVideo: '5OWH9c4u68M'
+tocVideo: 'EQ5h3NSWMbk'
 ---
 
 Once you have developed your Edge Functions locally, you can deploy them to your Supabase project.
@@ -18,7 +18,7 @@ Before getting started, make sure you have the Supabase CLI installed. Check out
 
 ## Step 1: Authenticate
 
-Log in to the Supabase CLI if you haven't already:
+Sign in to the Supabase CLI if you haven't already:
 
 ```bash
 supabase login
@@ -34,7 +34,7 @@ Get the project ID associated with your function:
 supabase projects list
 ```
 
-<Admonition type="tip" title="Need a new project?">
+<Admonition type="note" title="Need a new project?">
 
 If you haven't yet created a Supabase project, you can do so by visiting [database.new](https://database.new).
 
@@ -63,6 +63,8 @@ Or deploy individual Edge Functions by specifying the function name:
 ```bash
 supabase functions deploy hello-world
 ```
+
+If a deployment fails, see [Edge Function fails to deploy](/kb/troubleshooting/edge-function-fails-deploy).
 
 ## Step 4: Verify successful deployment
 
@@ -224,7 +226,7 @@ pipelines:
 
 ### Function configuration
 
-Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+Individual function configuration like [JWT verification](/docs/guides/local-development/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/local-development/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
 
 ```toml
 [functions.hello-world]

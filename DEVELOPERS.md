@@ -97,7 +97,7 @@ You can run any of the sites individually by using the scope name. For example:
 pnpm dev:www
 ```
 
-Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`
+Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`. For `docs`, see [`apps/docs/DEVELOPERS.md`](./apps/docs/DEVELOPERS.md).
 
 #### Shared components
 
@@ -175,7 +175,10 @@ We review PRs in the order of their submission. We try to accept the earliest on
 
 ### Add a redirect
 
-Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) file in our main site.
+Where the redirect goes depends on the URL:
+
+- **`/docs` URLs:** add the entry to [`apps/docs/lib/redirects/`](https://github.com/supabase/supabase/blob/master/apps/docs/lib/redirects/README.md). Static one-to-one entries go in `static-redirects.json`, and entries with params, splats, or conditions go in `dynamic-redirects.js`.
+- **All other URLs:** add the entry to [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) in the main site.
 
 ---
 

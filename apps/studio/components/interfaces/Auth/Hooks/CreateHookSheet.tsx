@@ -8,7 +8,7 @@ import {
 import { useParams } from 'common'
 import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -27,7 +27,7 @@ import {
   SheetTitle,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import * as z from 'zod'
@@ -43,6 +43,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -167,7 +168,10 @@ export const CreateHookSheet = ({
   })
 
   const isDirty = form.formState.isDirty
-  const { postgresValues, hookType, selectedType, enabled } = form.watch()
+  const [postgresValues, hookType, selectedType, enabled] = useWatch({
+    control: form.control,
+    name: ['postgresValues', 'hookType', 'selectedType', 'enabled'],
+  })
   const {
     confirmOnClose,
     handleOpenChange,
@@ -216,6 +220,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
           projectRef,
           connectionString: project!.connectionString,
           sql: joinSqlFragments(statements, '\n'),
+          grant: unguarded.migrating,
         })
       }
       onClose()
@@ -407,7 +412,6 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                           <SchemaSelector
                             size="small"
                             showError={false}
-                            stopScrollPropagation
                             selectedSchemaName={field.value}
                             onSelectSchema={(name) => field.onChange(name)}
                             disabled={field.disabled}
@@ -432,7 +436,6 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                             size="small"
                             schema={postgresValues.schema}
                             value={field.value}
-                            stopScrollPropagation
                             onChange={field.onChange}
                             disabled={field.disabled}
                             filterFunction={(func) => {
@@ -509,13 +512,12 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                         description={
                           <div className="flex items-center gap-x-2">
                             <p>
-                              Should be a base64 encoded secret with a prefix{' '}
-                              <code className="text-code-inline">v1,whsec_</code>.
+                              Should be a base64 encoded secret with a prefix <code>v1,whsec_</code>
+                              .
                             </p>
                             <InfoTooltip side="bottom" className="w-60 text-center">
-                              <code className="text-code-inline">v1</code> denotes the signature
-                              version and <code className="text-code-inline">whsec_</code> signifies
-                              a symmetric secret.
+                              <code>v1</code> denotes the signature version and <code>whsec_</code>{' '}
+                              signifies a symmetric secret.
                             </InfoTooltip>
                           </div>
                         }
@@ -524,7 +526,6 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                           <div className="flex flex-row">
                             <Input {...field} className="rounded-r-none border-r-0" />
                             <Button
-                              variant="default"
                               className="rounded-l-none text-xs h-auto"
                               onClick={() => {
                                 const authHookSecret = generateAuthHookSecret()
@@ -554,10 +555,11 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
             </div>
           )}
 
-          <Button disabled={isUpdatingAuthHooks} variant="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdatingAuthHooks} onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button
+            variant="primary"
             form={FORM_ID}
             type="submit"
             disabled={isUpdatingAuthHooks}

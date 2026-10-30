@@ -125,7 +125,7 @@ You can access PITR in the [Point in Time](/dashboard/project/_/database/backups
 
 The latest restore point of the project could be significantly behind the current time. This occurs when the database has had no recent activity, and therefore we have not made any recent WAL file backups. However, the state of the database at the latest recovery point still reflects the current state of the database, given that no transactions have occurred in between.
 
-### Restoration process
+### Restoration process [#pitr-restoration-process]
 
 ![PITR: Calendar view](/docs/img/backups-pitr-calendar-view.png)
 
@@ -141,7 +141,9 @@ After selecting your desired recovery point, the Dashboard prompts you to review
 
 ### Downloading backups after disabling PITR
 
-When you disable PITR, we still take all new backups as physical backups only. You can still use physical backups for restoration, but they are not available for direct download. If you need to download a backup after disabling PITR, you need to take a manual [legacy logical backup using the Supabase CLI or pg_dump](/docs/guides/platform/migrating-within-supabase/backup-restore#backup-database-using-the-cli).
+When you disable PITR, we still take all new backups as physical backups only. You can still use physical backups for restoration, but they are not available for direct download. If you need to download a backup after disabling PITR, you need to take a manual [legacy logical backup using the Supabase CLI or pg_dump](/docs/guides/platform/migrating-within-supabase/backup-restore#back-up-database-using-the-cli).
+
+To download a logical backup, see [Download logical backups](/kb/troubleshooting/download-logical-backups).
 
 ## Restore to a new project
 

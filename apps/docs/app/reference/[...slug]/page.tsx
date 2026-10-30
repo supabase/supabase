@@ -46,7 +46,7 @@ export default async function ReferencePage(props: { params: Promise<{ slug: Arr
   } else if (isCliReference) {
     return <CliReferencePage />
   } else if (isApiReference) {
-    return <ApiReferencePage />
+    return <ApiReferencePage path={parsedPath.path} />
   } else if (isSelfHostingReference) {
     return (
       <SelfHostingReferencePage service={parsedPath.service} servicePath={parsedPath.servicePath} />

@@ -25,6 +25,7 @@ function DraftModeBanner({ onDismiss }: DraftModeBannerProps) {
           {onDismiss && (
             <div className="order-2 shrink-0 sm:order-3 sm:ml-3">
               <button
+                tabIndex={0}
                 type="button"
                 className="-mr-1 flex p-2 rounded-md sm:-mr-2"
                 onClick={onDismiss}

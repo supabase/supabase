@@ -9,7 +9,7 @@ import {
   SelectValue,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -89,7 +89,7 @@ export function JitDbAccessRoleGrantFields({
           className="mt-0.5"
         />
         <div className="min-w-0 flex-1">
-          <code className="text-code-inline dark:bg-surface-300! dark:border-control! tracking-normal!">
+          <code className="dark:bg-surface-300! dark:border-control! tracking-normal!">
             {role.label}
           </code>
         </div>

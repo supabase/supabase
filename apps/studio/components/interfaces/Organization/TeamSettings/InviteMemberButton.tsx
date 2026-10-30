@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { UserPlus } from 'lucide-react'
+import { UserPlusIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -30,7 +29,8 @@ import {
   SheetTrigger,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -43,21 +43,21 @@ import {
   parseEmails,
 } from './InviteMemberButton.utils'
 import { ROLE_DESCRIPTIONS } from './Roles.constants'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { getAssignableRoleIds, getOrgRole } from './TeamSettings.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { OrganizationProjectsMultiSelect } from '@/components/ui/OrganizationProjectsMultiSelect'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { doPermissionsCheck, useGetPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -70,14 +70,14 @@ export const InviteMemberButton = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { permissions: permissions } = useGetPermissions()
+  const { data: permissionsV2 } = usePermissionsQueryV2()
 
   const { organizationMembersCreate: organizationMembersCreationEnabled } = useIsFeatureEnabled([
     'organization_members:create',
   ])
 
   const [isOpen, setIsOpen] = useState(false)
-  const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
+  const [pendingInvite, setPendingInvite] = useState<z.infer<typeof FormSchema>>()
 
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
@@ -90,7 +90,7 @@ export const InviteMemberButton = () => {
     email: '',
     role: orgScopedRoles.find((role) => role.name === 'Developer')?.id.toString() ?? '',
     applyToOrg: true,
-    projectRef: '',
+    projectRefs: [] as string[],
     requireSso: 'auto' as const,
   }
 
@@ -104,24 +104,17 @@ export const InviteMemberButton = () => {
 
   const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
-  const { rolesAddable } = useGetRolesManagementPermissions(
-    organization?.slug,
-    orgScopedRoles,
-    permissions ?? []
-  )
+  const orgRole = getOrgRole(permissionsV2, organization?.slug)
+  const rolesAddable = getAssignableRoleIds(orgRole, orgScopedRoles)
 
-  const canInviteMembers =
-    hasOrgRole &&
-    rolesAddable.length > 0 &&
-    orgScopedRoles.some(({ id: role_id }) =>
-      doPermissionsCheck(
-        permissions,
-        PermissionAction.CREATE,
-        'user_invites',
-        { resource: { role_id } },
-        organization?.slug
-      )
-    )
+  const canInviteMembers = hasOrgRole && rolesAddable.length > 0
+
+  const inviteDisabledReason = !organizationMembersCreationEnabled
+    ? 'Inviting members is currently disabled'
+    : !canInviteMembers
+      ? 'You need additional permissions to invite members to this organization'
+      : undefined
+  const isInviteDisabled = inviteDisabledReason !== undefined
 
   const { mutateAsync: inviteMemberAsync, isPending: isInviting } =
     useOrganizationCreateInvitationMutation()
@@ -131,15 +124,15 @@ export const InviteMemberButton = () => {
       email: emailSchema,
       role: z.string().min(1, 'Role is required'),
       applyToOrg: z.boolean(),
-      projectRef: z.string(),
+      projectRefs: z.array(z.string()),
       requireSso: z.enum(['auto', 'sso', 'non-sso']),
     })
     .superRefine((data, ctx) => {
-      if (!data.applyToOrg && !data.projectRef) {
+      if (!data.applyToOrg && data.projectRefs.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'A project must be selected',
-          path: ['projectRef'],
+          message: 'Select at least one project',
+          path: ['projectRefs'],
         })
       }
     })
@@ -151,9 +144,15 @@ export const InviteMemberButton = () => {
     defaultValues,
   })
 
-  const { applyToOrg, projectRef, email } = form.watch()
+  const [applyToOrg, email] = useWatch({
+    control: form.control,
+    name: ['applyToOrg', 'email'],
+  })
 
   const emailCount = parseEmails(email ?? '').length
+  const getRoleName = (roleId?: string) =>
+    orgScopedRoles.find((role) => role.id.toString() === roleId)?.name
+  const pendingRoleName = getRoleName(pendingInvite?.role)
 
   const onInviteMember = async (values: z.infer<typeof FormSchema>) => {
     if (!slug) return console.error('Slug is required')
@@ -183,7 +182,7 @@ export const InviteMemberButton = () => {
       if (toInvite.length === 0) return
     }
 
-    const projectPayload = buildProjectPayload(values.applyToOrg, values.projectRef)
+    const projectPayload = buildProjectPayload(values.applyToOrg, values.projectRefs)
     const ssoPayload = buildSsoPayload(values.requireSso)
 
     let result: BatchInvitationResult
@@ -218,6 +217,18 @@ export const InviteMemberButton = () => {
     }
   }
 
+  const handleInviteSubmit = (values: z.infer<typeof FormSchema>) => {
+    const roleName = getRoleName(values.role)
+    const needsConfirmation = roleName === 'Owner' || roleName === 'Administrator'
+    if (needsConfirmation) setPendingInvite(values)
+    else onInviteMember(values)
+  }
+
+  const handleConfirmInvite = async () => {
+    if (pendingInvite) await onInviteMember(pendingInvite)
+    setPendingInvite(undefined)
+  }
+
   useEffect(() => {
     if (isSuccess && isOpen) {
       const developerRoleId = orgScopedRoles
@@ -234,7 +245,6 @@ export const InviteMemberButton = () => {
   const hasUnsavedChanges = form.formState.isDirty
 
   const closeInviteSheet = () => {
-    setProjectDropdownOpen(false)
     setIsOpen(false)
     form.reset(defaultValues)
   }
@@ -253,26 +263,21 @@ export const InviteMemberButton = () => {
       <SheetTrigger asChild>
         <Shortcut
           id={SHORTCUT_IDS.ORG_TEAM_INVITE}
-          onTrigger={() => {
-            if (canInviteMembers) setIsOpen(true)
-          }}
+          onTrigger={() => setIsOpen(true)}
+          options={{ enabled: !isInviteDisabled }}
           side="bottom"
-          tooltipOpen={isOpen ? false : undefined}
+          tooltipOpen={isOpen || isInviteDisabled ? false : undefined}
         >
           <ButtonTooltip
             variant="primary"
-            disabled={!canInviteMembers}
-            icon={<UserPlus size={14} />}
+            disabled={isInviteDisabled}
+            icon={<UserPlusIcon size={14} />}
             className="pointer-events-auto grow md:grow-0"
             onClick={() => setIsOpen(true)}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: !organizationMembersCreationEnabled
-                  ? 'Inviting members is currently disabled'
-                  : !canInviteMembers
-                    ? 'You need additional permissions to invite members to this organization'
-                    : undefined,
+                text: inviteDisabledReason,
               },
             }}
           >
@@ -312,7 +317,7 @@ export const InviteMemberButton = () => {
             <form
               id="organization-invitation"
               className="flex flex-col gap-y-4"
-              onSubmit={form.handleSubmit(onInviteMember)}
+              onSubmit={form.handleSubmit(handleInviteSubmit)}
             >
               <FormField
                 name="role"
@@ -336,12 +341,20 @@ export const InviteMemberButton = () => {
                           const canAssignRole = rolesAddable.includes(role.id)
                           const isOwnerRole = role.name === 'Owner'
                           const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                          const disabled = !canAssignRole || disabledForStripe
+
+                          const isNoAccessRole = role.name === 'No-access'
+                          const isApplyingProjectRole = !applyToOrg
+                          const disabledForProjectRole = isApplyingProjectRole && isNoAccessRole
+
+                          const disabled =
+                            !canAssignRole || disabledForStripe || disabledForProjectRole
                           const disabledReason = disabledForStripe
                             ? 'Cannot be assigned in Stripe Projects organizations'
-                            : !canAssignRole
-                              ? 'Additional permissions required to assign role'
-                              : undefined
+                            : disabledForProjectRole
+                              ? 'Cannot assign No-access role to project-scoped members'
+                              : !canAssignRole
+                                ? 'Additional permissions required to assign role'
+                                : undefined
 
                           return (
                             <FormItem asChild key={role.id}>
@@ -350,13 +363,13 @@ export const InviteMemberButton = () => {
                                   value={role.id.toString()}
                                   disabled={disabled}
                                   label={role.name}
-                                  description={[
-                                    ROLE_DESCRIPTIONS[role.name] ??
-                                      'Permissions are based on the configured organization role.',
-                                    disabledReason,
-                                  ]
-                                    .filter(Boolean)
-                                    .join(' ')}
+                                  description={
+                                    <>
+                                      {ROLE_DESCRIPTIONS[role.name] ??
+                                        'Permissions are based on the configured organization role.'}
+                                      {disabledReason && ` ${disabledReason}`}
+                                    </>
+                                  }
                                 />
                               </FormControl>
                             </FormItem>
@@ -416,25 +429,19 @@ export const InviteMemberButton = () => {
               )}
               {!applyToOrg && (
                 <FormField
-                  name="projectRef"
+                  name="projectRefs"
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
                       layout="horizontal"
-                      label="Select a project"
+                      label="Select projects"
                       description="Project access can be adjusted after the user joins"
                     >
                       <FormControl className="col-span-6">
-                        <OrganizationProjectSelector
-                          fetchOnMount
-                          sameWidthAsTrigger
-                          checkPosition="left"
-                          selectedRef={projectRef}
-                          open={projectDropdownOpen}
-                          setOpen={setProjectDropdownOpen}
-                          searchPlaceholder="Search project..."
-                          onSelect={(project) => field.onChange(project.ref)}
-                          onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
+                        <OrganizationProjectsMultiSelect
+                          selectedRefs={field.value}
+                          onChange={(refs) => field.onChange(refs)}
+                          triggerLabel="Select projects..."
                         />
                       </FormControl>
                     </FormItemLayout>
@@ -467,12 +474,10 @@ export const InviteMemberButton = () => {
           </Form>
         </SheetSection>
         <SheetFooter>
-          <Button variant="default" onClick={confirmOnClose}>
-            Cancel
-          </Button>
+          <Button onClick={confirmOnClose}>Cancel</Button>
           <Shortcut
             id={SHORTCUT_IDS.ORG_TEAM_INVITE_SUBMIT}
-            onTrigger={() => form.handleSubmit(onInviteMember)()}
+            onTrigger={() => form.handleSubmit(handleInviteSubmit)()}
             options={{ enabled: isOpen && !isInviting }}
             side="top"
           >
@@ -490,6 +495,17 @@ export const InviteMemberButton = () => {
       <DiscardChangesConfirmationDialog
         {...discardChangesModalProps}
         description="Are you sure you want to discard your changes? Your invitation will not be sent."
+      />
+      <ConfirmationModal
+        variant="warning"
+        visible={pendingInvite !== undefined}
+        loading={isInviting}
+        title={`Invite as ${pendingRoleName}?`}
+        description={pendingRoleName && ROLE_DESCRIPTIONS[pendingRoleName]}
+        confirmLabel="Send invitation"
+        confirmLabelLoading="Sending invitation..."
+        onCancel={() => setPendingInvite(undefined)}
+        onConfirm={handleConfirmInvite}
       />
     </Sheet>
   )

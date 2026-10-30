@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
@@ -77,13 +77,22 @@ export const ConnectSection = () => {
               <button
                 key={action.id}
                 type="button"
+                tabIndex={
+                  (action.requiresActiveProject ?? true)
+                    ? !isActiveHealthy
+                      ? -1
+                      : 0
+                    : !selectedProject?.ref
+                      ? -1
+                      : 0
+                }
                 disabled={
                   (action.requiresActiveProject ?? true) ? !isActiveHealthy : !selectedProject?.ref
                 }
                 onClick={() => handleActionClick(action)}
                 className={cn(
                   'group flex items-center gap-3 p-4 text-left transition-colors min-h-[72px] w-full',
-                  'hover:bg-surface-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand',
+                  'hover:bg-surface-100 focus-ring',
                   'xl:min-h-32 xl:flex-col xl:justify-center xl:p-6 xl:text-center',
                   ((action.requiresActiveProject ?? true)
                     ? !isActiveHealthy
@@ -97,7 +106,7 @@ export const ConnectSection = () => {
                   <p className="text-sm">{action.heading}</p>
                   <p className="text-sm text-foreground-lighter">{action.subheading}</p>
                 </div>
-                <ChevronRight
+                <ChevronRightIcon
                   size={16}
                   className="shrink-0 text-foreground-lighter group-hover:text-foreground xl:hidden"
                 />

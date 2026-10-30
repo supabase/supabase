@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useParams } from 'common'
-import { ChevronRight, Plus } from 'lucide-react'
+import { ChevronRightIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
@@ -38,7 +38,7 @@ export function SidebarCollapsible({
   return (
     <Collapsible defaultOpen={defaultOpen}>
       <CollapsibleTrigger className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:rotate-90! pb-2">
-        <ChevronRight
+        <ChevronRightIcon
           size={16}
           className={'text-foreground-light transition-transform duration-200'}
         />
@@ -233,8 +233,7 @@ export function LogsSidebarMenuV2() {
 
         <ButtonTooltip
           asChild
-          variant="default"
-          icon={<Plus className="text-foreground" />}
+          icon={<PlusIcon className="text-foreground" />}
           className="w-[26px]"
           tooltip={{ content: { text: 'New query', side: 'bottom' } }}
         >
@@ -301,7 +300,7 @@ export function LogsSidebarMenuV2() {
               IS_PLATFORM ? 'Create and save your queries to use them in the explorer' : undefined
             }
             actions={
-              <Button asChild variant="default">
+              <Button asChild>
                 <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
               </Button>
             }
@@ -328,7 +327,7 @@ export function LogsSidebarMenuV2() {
           </div>
         }
         actions={
-          <Button asChild variant="default">
+          <Button asChild>
             <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
           </Button>
         }

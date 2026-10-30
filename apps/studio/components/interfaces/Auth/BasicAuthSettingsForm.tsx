@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert,
@@ -37,7 +36,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -62,13 +61,11 @@ export const BasicAuthSettingsForm = () => {
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
-  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const form = useForm({
@@ -82,6 +79,10 @@ export const BasicAuthSettingsForm = () => {
     },
   })
   const { isDirty } = form.formState
+  const externalAnonymousUsersEnabled = useWatch({
+    control: form.control,
+    name: 'EXTERNAL_ANONYMOUS_USERS_ENABLED',
+  })
 
   useEffect(() => {
     if (authConfig) {
@@ -250,7 +251,7 @@ export const BasicAuthSettingsForm = () => {
                     )}
                   />
 
-                  {form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
+                  {externalAnonymousUsersEnabled && (
                     <Alert
                       className="flex w-full items-center justify-between mt-4"
                       variant="warning"
@@ -258,16 +259,14 @@ export const BasicAuthSettingsForm = () => {
                       <WarningIcon />
                       <div>
                         <AlertTitle>
-                          Anonymous users will use the{' '}
-                          <code className="text-code-inline">authenticated</code> role when signing
+                          Anonymous users will use the <code>authenticated</code> role when signing
                           in
                         </AlertTitle>
                         <AlertDescription className="flex flex-col gap-y-3">
                           <p>
                             As a result, anonymous users will be subjected to RLS policies that
-                            apply to the <code className="text-code-inline">public</code> and{' '}
-                            <code className="text-code-inline">authenticated</code> roles. We
-                            strongly advise{' '}
+                            apply to the <code>public</code> and <code>authenticated</code> roles.
+                            We strongly advise{' '}
                             <Link
                               href={`/project/${projectRef}/database/policies`}
                               className="text-foreground underline"
@@ -276,12 +275,7 @@ export const BasicAuthSettingsForm = () => {
                             </Link>{' '}
                             to ensure that access to your data is restricted where required.
                           </p>
-                          <Button
-                            asChild
-                            variant="default"
-                            className="w-min"
-                            icon={<ExternalLink />}
-                          >
+                          <Button asChild className="w-min" icon={<ExternalLinkIcon />}>
                             <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
                               View access control docs
                             </Link>
@@ -291,23 +285,22 @@ export const BasicAuthSettingsForm = () => {
                     </Alert>
                   )}
 
-                  {!authConfig?.SECURITY_CAPTCHA_ENABLED &&
-                    form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
-                      <Alert className="mt-4">
-                        <WarningIcon />
-                        <AlertTitle>
-                          We highly recommend{' '}
-                          <InlineLink href={`/project/${projectRef}/auth/protection`}>
-                            enabling captcha
-                          </InlineLink>{' '}
-                          for anonymous sign-ins
-                        </AlertTitle>
-                        <AlertDescription>
-                          This will prevent potential abuse on sign-ins which may bloat your
-                          database and incur costs for monthly active users (MAU)
-                        </AlertDescription>
-                      </Alert>
-                    )}
+                  {!authConfig?.SECURITY_CAPTCHA_ENABLED && externalAnonymousUsersEnabled && (
+                    <Alert className="mt-4">
+                      <WarningIcon />
+                      <AlertTitle>
+                        We highly recommend{' '}
+                        <InlineLink href={`/project/${projectRef}/auth/protection`}>
+                          enabling captcha
+                        </InlineLink>{' '}
+                        for anonymous sign-ins
+                      </AlertTitle>
+                      <AlertDescription>
+                        This will prevent potential abuse on sign-ins which may bloat your database
+                        and incur costs for monthly active users (MAU)
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </CardContent>
                 <CardContent>
                   <FormField
@@ -331,11 +324,7 @@ export const BasicAuthSettingsForm = () => {
                   />
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
-                  {isDirty && (
-                    <Button variant="default" onClick={() => form.reset()}>
-                      Cancel
-                    </Button>
-                  )}
+                  {isDirty && <Button onClick={() => form.reset()}>Cancel</Button>}
                   <Button
                     variant="primary"
                     type="submit"

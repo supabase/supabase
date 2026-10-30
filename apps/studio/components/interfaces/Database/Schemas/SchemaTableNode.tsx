@@ -1,16 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Handle, Node, NodeProps } from '@xyflow/react'
 import { TableEditor } from 'icons'
 import {
-  Copy,
+  CopyIcon,
   DiamondIcon,
-  Edit,
-  Fingerprint,
-  Hash,
+  EditIcon,
+  FingerprintIcon,
+  HashIcon,
   InfoIcon,
-  Key,
-  MoreVertical,
-  Table2,
+  KeyIcon,
+  MoreVerticalIcon,
+  Table2Icon,
 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { memo } from 'react'
@@ -34,7 +33,7 @@ import { TableNodeData } from './Schemas.constants'
 import { getTableDefinitionAsMarkdown } from './Schemas.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { getTableDefinition } from '@/data/database/table-definition-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
 
@@ -56,9 +55,8 @@ const TableNodeComponent = ({
   const hiddenNodeConnector = 'h-px! w-px! min-w-0! min-h-0! cursor-grab! border-0! opacity-0!'
   const schemaGraphContext = useSchemaGraphContext()
   const { data: project } = useSelectedProjectQuery()
-  const { can: canUpdateColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
+  const { can: canUpdateColumns } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
   const router = useRouter()
   const itemHeight = 'h-[22px]'
@@ -72,7 +70,7 @@ const TableNodeComponent = ({
         <header
           className={cn(
             'text-[0.55rem] px-2 py-1 border-[0.5px] rounded-[4px] bg-alternative flex gap-1 items-center',
-            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+            hasEdgesSelected ? 'outline outline-1 outline-primary-bright' : undefined
           )}
         >
           {data.name}
@@ -89,7 +87,7 @@ const TableNodeComponent = ({
         <div
           className={cn(
             'border-[0.5px] overflow-hidden rounded-[4px] shadow-xs',
-            hasEdgesSelected ? 'outline outline-1 outline-brand' : undefined
+            hasEdgesSelected ? 'outline outline-1 outline-primary-bright' : undefined
           )}
           style={{ width: TABLE_NODE_WIDTH / 2 }}
         >
@@ -100,7 +98,7 @@ const TableNodeComponent = ({
             )}
           >
             <div className="min-w-0 flex shrink gap-x-1 items-center">
-              <Table2 strokeWidth={1} size={12} className="text-light" />
+              <Table2Icon strokeWidth={1} size={12} className="text-light" />
               <span className="whitespace-nowrap overflow-hidden text-ellipsis" title={data.name}>
                 {data.name}
               </span>
@@ -125,7 +123,7 @@ const TableNodeComponent = ({
                           variant="text"
                           className="px-0 w-[16px] h-[16px] rounded-sm nodrag nopan"
                         >
-                          <MoreVertical size={10} />
+                          <MoreVerticalIcon size={10} />
                           <span className="sr-only">{data.name} actions</span>
                         </Button>
                       </DropdownMenuTrigger>
@@ -134,7 +132,7 @@ const TableNodeComponent = ({
                           className="flex items-center space-x-2 whitespace-nowrap"
                           onClick={() => schemaGraphContext.onEditTable(data.id)}
                         >
-                          <Edit size={12} />
+                          <EditIcon size={12} />
                           <p>Edit table</p>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -160,7 +158,7 @@ const TableNodeComponent = ({
                             copyToClipboard(data.name)
                           }}
                         >
-                          <Copy size={12} />
+                          <CopyIcon size={12} />
                           <span>Copy name</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -195,7 +193,7 @@ const TableNodeComponent = ({
                             }
                           }}
                         >
-                          <Copy size={12} />
+                          <CopyIcon size={12} />
                           <span>Copy as SQL</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -216,7 +214,7 @@ const TableNodeComponent = ({
                             }
                           }}
                         >
-                          <Copy size={12} />
+                          <CopyIcon size={12} />
                           <span>Copy as Markdown</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -249,7 +247,7 @@ const TableNodeComponent = ({
                 )}
               >
                 {column.isPrimary && (
-                  <Key size={8} strokeWidth={1} className={cn('shrink-0', 'text-light')} />
+                  <KeyIcon size={8} strokeWidth={1} className={cn('shrink-0', 'text-light')} />
                 )}
                 {column.isNullable && (
                   <DiamondIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
@@ -263,10 +261,10 @@ const TableNodeComponent = ({
                   />
                 )}
                 {column.isUnique && (
-                  <Fingerprint size={8} strokeWidth={1} className="shrink-0 text-light" />
+                  <FingerprintIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
                 {column.isIdentity && (
-                  <Hash size={8} strokeWidth={1} className="shrink-0 text-light" />
+                  <HashIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
                 )}
               </div>
               <div className="flex w-full justify-between min-w-0">
@@ -275,7 +273,7 @@ const TableNodeComponent = ({
                     'text-ellipsis overflow-hidden whitespace-nowrap min-w-0 max-w-[80%]',
                     schemaGraphContext.selectedEdge?.sourceHandle === column.id ||
                       schemaGraphContext.selectedEdge?.targetHandle === column.id
-                      ? 'text-brand'
+                      ? 'text-primary'
                       : undefined
                   )}
                   title={column.name}
@@ -309,7 +307,7 @@ const TableNodeComponent = ({
                     // Use opacity to hide the button so that it remains accessible (users can tab to it)
                     className="opacity-0 focus:opacity-100 group-hover:opacity-100 data-open:opacity-100 absolute right-0 top-1/2 -translate-y-1/2 px-0 mr-1 w-[16px] h-[16px] rounded-sm"
                   >
-                    <MoreVertical size={10} />
+                    <MoreVerticalIcon size={10} />
                     <span className="sr-only">
                       {data.name} {column.name} actions
                     </span>
@@ -323,7 +321,7 @@ const TableNodeComponent = ({
                         onClick={() => schemaGraphContext.onEditColumn(data.id, column.id)}
                         className="space-x-2"
                       >
-                        <Edit size={12} />
+                        <EditIcon size={12} />
                         <p>Edit column</p>
                       </DropdownMenuItem>
                     </TooltipTrigger>
@@ -341,7 +339,7 @@ const TableNodeComponent = ({
                       copyToClipboard(column.name)
                     }}
                   >
-                    <Copy size={12} />
+                    <CopyIcon size={12} />
                     <span>Copy name</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

@@ -87,6 +87,49 @@ withTestDatabase(
   }
 )
 
+const OPTION_MATRIX = [
+  { label: 'default', options: {} },
+  { label: 'includeArrayTypes', options: { includeArrayTypes: true } },
+  { label: 'includedSchemas=public', options: { includedSchemas: ['public'] } },
+  { label: 'excludedSchemas=public', options: { excludedSchemas: ['public'] } },
+  {
+    label: 'excludedSchemas=public + includeSystemSchemas',
+    options: { excludedSchemas: ['public'], includeSystemSchemas: true },
+  },
+  {
+    label: 'includedSchemas=public + includeArrayTypes',
+    options: { includedSchemas: ['public'], includeArrayTypes: true },
+  },
+]
+
+withTestDatabase(
+  'types.list is oid-ordered and handles enums, composites, and dropped attrs',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create type color as enum ('red', 'green', 'blue', 'yellow');
+      create type shipment as (id int8, note text, tossme int, color color);
+      alter type shipment drop attribute tossme;
+      create type point3 as (x float8, y float8, z float8);
+    `)
+
+    for (const { label, options } of OPTION_MATRIX) {
+      const { sql, zod } = await pgMeta.types.list(options)
+      const res = zod.parse(await executeQuery(sql))
+      const ids = res.map((t) => t.id)
+      expect(ids, `${label} oid-ordered`).toEqual([...ids].sort((a, b) => a - b))
+    }
+
+    const { sql, zod } = await pgMeta.types.list({ includedSchemas: ['public'] })
+    const res = zod.parse(await executeQuery(sql))
+    expect(res.find((t) => t.name === 'color')?.enums).toEqual(['red', 'green', 'blue', 'yellow'])
+    expect(res.find((t) => t.name === 'shipment')?.attributes.map((a) => a.name)).toEqual([
+      'id',
+      'note',
+      'color',
+    ])
+  }
+)
+
 withTestDatabase('composite type attributes', async ({ executeQuery }) => {
   await executeQuery(`create type test_composite as (id int8, data text);`)
 

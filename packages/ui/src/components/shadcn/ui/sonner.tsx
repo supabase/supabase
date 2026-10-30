@@ -31,20 +31,21 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'toast',
             'w-full',
             'rounded-md',
-            'py-3',
-            'px-5',
+            'py-3!',
+            'px-5!',
             'flex',
             'gap-2',
-            'items-start',
-            'font-normal',
-            'text-sm',
+            'items-center',
+            'font-normal!',
+            'text-sm!',
             'data-[expanded=false]:overflow-hidden',
             'group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay group-[.toaster]:shadow-lg'
           ),
-          icon: 'mt-0.5',
+          icon: 'self-start',
+          loader: 'relative! data-[visible="false"]:hidden!',
           title: 'font-normal!',
           description:
-            'text-xs group-[.toast]:text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:opacity-100!',
+            'text-xs! group-[.toast]:!text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:opacity-100!',
           actionButton: cn('block', buttonVariants({ variant: 'primary', size: 'tiny' })),
           cancelButton: cn('block', buttonVariants({ variant: 'default', size: 'tiny' })),
           // success: 'group toast group-[.toaster]:!bg-brand-200 group-[.toaster]:border-brand-500',
@@ -54,20 +55,20 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:!border-destructive-500',
           closeButton: cn(
             // unset all styles set from sonner
-            'absolute right-2 top-2 size-6 flex items-center justify-center rounded-md text-foreground-light opacity-0 transition',
-            'hover:text-foreground hover:bg-surface-200 focus:opacity-100 focus:outline-hidden focus:ring-2 group-hover:opacity-100',
-            'group-[.destructive]:text-destructive-300 group-[.destructive]:hover:text-destructive-50',
-            'group-[.destructive]:focus:ring-destructive-400 group-[.destructive]:focus:ring-offset-destructive-600',
-            'left-auto transform-none border-0 border-transparent'
+            'absolute -left-2 -top-2 size-6 flex items-center justify-center rounded-full text-foreground bg-overlay! opacity-0 transition-opacity',
+            'border transform-none',
+            'focus-visible:opacity-100 focus-ring group-hover:opacity-100',
+            'group-data-[type="error"]:text-destructive! group-data-[type="error"]:border-destructive-500!',
+            'group-data-[type="error"]:focus-visible:ring-destructive-400! group-data-[type="error"]:focus-visible:ring-offset-destructive-600!',
+            'group-data-[type="warning"]:text-warning! group-data-[type="warning"]:border-warning-500!',
+            'group-data-[type="warning"]:focus-visible:ring-warning-400! group-data-[type="warning"]:focus-visible:ring-offset-warning-600!'
           ),
           content: 'grow',
-          //group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay
         },
         duration: SONNER_DEFAULT_DURATION,
         closeButton: true,
         ...toastOptions,
       }}
-      cn={cn}
       {...props}
     />
   )

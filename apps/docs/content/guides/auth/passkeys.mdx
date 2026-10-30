@@ -35,7 +35,6 @@ Registering a passkey requires an existing, confirmed, non-anonymous user. Sign-
 ### Dashboard
 
 Open the [Passkeys settings](/dashboard/project/_/auth/passkeys) from the **Authentication → Passkeys** section of the Dashboard, turn on **Enable Passkey authentication**, and fill in the WebAuthn [relying party](https://www.w3.org/TR/webauthn-3/#relying-party) details:
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
 - **Relying Party Display Name**: a human-readable name for your application shown during the passkey prompt (for example, "My App").
 - **Relying Party ID**: the bare domain name for your application (for example, "example.com"). Do not include a scheme, port, or path. This determines which passkeys can be used.
@@ -403,7 +402,7 @@ let response = try await supabase.auth.verifyPasskeyAuthentication(
 
 The `options` field returned from the start methods matches the [WebAuthn `PublicKeyCredentialCreationOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialcreationoptions) and [`PublicKeyCredentialRequestOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialrequestoptions) shapes (with `ArrayBuffer` fields encoded as base64url).
 
-See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-list) · [Dart](/docs/reference/dart/auth-passkey-list) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
 
 ## Manage passkeys
 
@@ -474,7 +473,7 @@ try await supabase.auth.deletePasskey(id: passkeys.first!.id)
 
 `friendlyName` is limited to 120 characters. `lastUsedAt` is updated each time the passkey is used to sign in.
 
-See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-list) · [Dart](/docs/reference/dart/auth-passkey-list) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
 
 ## Admin API
 
@@ -520,7 +519,7 @@ await supabase.auth.admin.passkey.deletePasskey(
 </TabPanel>
 </Tabs>
 
-See the `auth.admin.passkey` reference ([JavaScript](/docs/reference/javascript/auth-admin-passkey-api) · [Dart](/docs/reference/dart/auth-admin-passkey-api)) for the full API. The Swift SDK does not expose admin passkey methods.
+The Swift SDK does not expose admin passkey methods.
 
 ## Error codes
 

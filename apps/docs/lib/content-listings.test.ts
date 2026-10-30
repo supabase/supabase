@@ -4,6 +4,7 @@ import {
   ContentListings as ContentListingsMarkdownHandler,
   serializeContentListingGroupToMarkdown,
 } from '~/internals/markdown-schema/ContentListings'
+import { contentListingItemSchema } from '~/lib/content-listings.schema'
 import { isExternalContentListingHref } from '~/lib/content-listings.utils'
 import { describe, expect, it } from 'vitest'
 
@@ -58,6 +59,27 @@ describe('serializeContentListingGroupToMarkdown', () => {
     expect(markdown).toContain('Read these first.')
     expect(markdown).toContain(
       '**[Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres):** Connection strings and pooler modes.'
+    )
+  })
+
+  it('includes a subtitle before the description', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'hire-agent',
+        items: [
+          {
+            title: 'Health monitor',
+            href: '/guides/observability/automate-with-agents/health',
+            subtitle: 'Every 15 minutes',
+            description: 'Watch logs for 5xx spikes and Auth failures.',
+          },
+        ],
+      },
+      'https://supabase.com'
+    )
+
+    expect(markdown).toContain(
+      '**[Health monitor](https://supabase.com/docs/guides/observability/automate-with-agents/health):** Every 15 minutes. Watch logs for 5xx spikes and Auth failures.'
     )
   })
 
@@ -125,6 +147,27 @@ describe('serializeContentListingGroupToMarkdown', () => {
     )
   })
 
+  it('renders items without href as unlinked list entries', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'what-you-get',
+        heading: 'What you get',
+        items: [
+          {
+            title: 'Automatic failover',
+            description: 'Another node is promoted if a node goes down.',
+          },
+        ],
+      },
+      'https://supabase.com'
+    )
+
+    expect(markdown).toContain(
+      '- **Automatic failover:** Another node is promoted if a node goes down.'
+    )
+    expect(markdown).not.toContain('](')
+  })
+
   it('omits heading line when heading is not set', () => {
     const markdown = serializeContentListingGroupToMarkdown(
       {
@@ -143,9 +186,88 @@ describe('serializeContentListingGroupToMarkdown', () => {
     expect(markdown).not.toMatch(/^#+\s/m)
     expect(markdown).toContain('**[Connect]')
   })
+
+  it('omits feature-gated items when those features are disabled', () => {
+    const previous = process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+    process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = 'true'
+
+    try {
+      const markdown = serializeContentListingGroupToMarkdown(
+        {
+          id: 'frameworks',
+          heading: 'Frameworks',
+          items: [
+            {
+              title: 'React',
+              href: '/guides/getting-started/quickstarts/reactjs',
+              description: 'Web framework.',
+            },
+            {
+              title: 'Flutter',
+              href: '/guides/getting-started/quickstarts/flutter',
+              description: 'Mobile framework.',
+              feature: 'sdk:dart',
+            },
+          ],
+        },
+        ''
+      )
+
+      expect(markdown).toContain('**[React]')
+      expect(markdown).not.toContain('Flutter')
+    } finally {
+      if (previous === undefined) {
+        delete process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+      } else {
+        process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = previous
+      }
+    }
+  })
+
+  it('returns empty string when every item is feature-gated off', () => {
+    const previous = process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+    process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = 'true'
+
+    try {
+      const markdown = serializeContentListingGroupToMarkdown(
+        {
+          id: 'sdk-only',
+          heading: 'SDKs',
+          items: [
+            {
+              title: 'Flutter',
+              href: '/guides/getting-started/quickstarts/flutter',
+              description: 'Mobile framework.',
+              feature: 'sdk:dart',
+            },
+          ],
+        },
+        ''
+      )
+
+      expect(markdown).toBe('')
+    } finally {
+      if (previous === undefined) {
+        delete process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+      } else {
+        process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = previous
+      }
+    }
+  })
 })
 
 describe('ContentListings markdown handler', () => {
+  it.each([
+    'getting-started-use-cases',
+    'getting-started-framework-quickstarts',
+    'getting-started-web-app-demos',
+    'getting-started-mobile-tutorials',
+  ])('renders %s as a second-level section under the page title', (id) => {
+    const markdown = ContentListingsMarkdownHandler({ props: { id } })
+
+    expect(markdown).toMatch(/^## [^\n]+\n/)
+  })
+
   it('serializes the group looked up by id', () => {
     const markdown = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
 
@@ -170,9 +292,11 @@ describe('dashboard content listing hrefs', () => {
   // Root-relative /dashboard hrefs get the docs basePath and 404; use absolute URLs.
   it('uses absolute https://supabase.com dashboard URLs', () => {
     const dashboardLinks = Object.values(CONTENT_LISTINGS).flatMap((group) =>
-      group.items
-        .filter((item) => isDashboardHref(item.href))
-        .map((item) => ({ listingId: group.id, title: item.title, href: item.href }))
+      group.items.flatMap((item) =>
+        item.href && isDashboardHref(item.href)
+          ? [{ listingId: group.id, title: item.title, href: item.href }]
+          : []
+      )
     )
 
     expect(dashboardLinks.length).toBeGreaterThan(0)
@@ -185,17 +309,60 @@ describe('dashboard content listing hrefs', () => {
   })
 })
 
-describe('TelemetryEvent union', () => {
-  it('includes docs_content_listing_clicked', () => {
-    const event = {
-      action: 'docs_content_listing_clicked' as const,
-      properties: {
-        targetPath: '/guides/storage',
-        linkTitle: 'Storage',
-      },
-    }
+describe('contentListingItemSchema href', () => {
+  it('accepts an item without href', () => {
+    const result = contentListingItemSchema.safeParse({
+      title: 'Automatic failover',
+      description: 'Another node is promoted if a node goes down.',
+    })
+    expect(result.success).toBe(true)
+  })
+})
 
-    const _typeCheck: import('common/telemetry-constants').TelemetryEvent = event
-    expect(_typeCheck.action).toBe('docs_content_listing_clicked')
+describe('contentListingItemSchema icon', () => {
+  const baseItem = {
+    title: 'Datadog',
+    href: '/guides/observability/log-drains#datadog',
+    description: 'Stream logs directly into Datadog for monitoring and analysis.',
+  }
+
+  it('accepts an optional subtitle', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      subtitle: 'Every 15 minutes',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts a plain string icon path', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: '/docs/img/icons/github-icon',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts a well-formed icon chip object', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: { kind: 'datadog', color: '#632CA6', bg: 'rgba(99,44,166,0.1)' },
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects an icon chip object missing bg', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: { kind: 'datadog', color: '#632CA6' },
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects an icon chip object with an unknown kind', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: { kind: 'not-a-real-kind', color: '#632CA6', bg: 'rgba(99,44,166,0.1)' },
+    })
+    expect(result.success).toBe(false)
   })
 })

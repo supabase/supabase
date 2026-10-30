@@ -1,18 +1,14 @@
 import { useParams } from 'common'
-import { ExternalLink, Loader2 } from 'lucide-react'
+import { ExternalLinkIcon, Loader2Icon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { Results } from './Results'
-import { getSqlErrorLines } from './UtilityTabResults.utils'
-import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
+import { DataGridResults } from '@/components/ui/DataGridResults'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { getSqlErrorLines } from '@/data/sql/utils'
 import { DOCS_URL } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
@@ -30,16 +26,10 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
   ({ id, isExecuting, isDisabled, isDebugging, onDebug, buildDebugPrompt }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
-    const { data: organization } = useSelectedOrganizationQuery()
     const sessionSnap = useSqlEditorSessionSnapshot()
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
     const result = sessionSnap.results[id]?.[0]
-    const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-
-    // Customers on HIPAA plans should not have access to Supabase AI
-    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
-    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
 
     const isTimeout =
       result?.error?.message?.includes('canceling statement due to statement timeout') ||
@@ -51,7 +41,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
     if (isExecuting) {
       return (
         <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark">
-          <Loader2 size={14} className="animate-spin" />
+          <Loader2Icon size={14} className="animate-spin" />
           <p className="m-0 border-0 font-mono text-sm">Running...</p>
         </div>
       )
@@ -124,7 +114,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
                       className={cn(InlineLinkClassName, 'flex items-center gap-x-1')}
                     >
                       connecting to your database directly
-                      <ExternalLink size={12} />
+                      <ExternalLinkIcon size={12} />
                     </span>
                     .
                   </p>
@@ -136,7 +126,6 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
               {readReplicaError && (
                 <Button
                   className="py-2"
-                  variant="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
                     sessionSnap.resetResult(id)
@@ -155,16 +144,14 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
                   </TooltipContent>
                 </Tooltip>
               )}
-              {!hasHipaaAddon && (
-                <AiAssistantDropdown
-                  label="Debug with Assistant"
-                  buildPrompt={buildDebugPrompt}
-                  onOpenAssistant={onDebug}
-                  telemetrySource="sql_debug"
-                  disabled={!!isDisabled || isDebugging}
-                  loading={isDebugging}
-                />
-              )}
+              <AiAssistantDropdown
+                label="Debug with Assistant"
+                buildPrompt={buildDebugPrompt}
+                onOpenAssistant={onDebug}
+                telemetrySource="sql_debug"
+                disabled={!!isDisabled || isDebugging}
+                loading={isDebugging}
+              />
             </div>
           </div>
         </div>
@@ -173,7 +160,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       return (
         <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
           <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
-            Click <code className="text-code-inline">Run</code> to execute your query
+            Click <code>Run</code> to execute your query
           </p>
         </div>
       )
@@ -185,7 +172,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       )
     }
 
-    return <Results rows={result.rows} />
+    return <DataGridResults rows={result.rows} />
   }
 )
 

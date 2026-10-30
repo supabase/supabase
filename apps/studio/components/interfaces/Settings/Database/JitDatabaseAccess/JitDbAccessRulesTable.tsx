@@ -1,4 +1,4 @@
-import { EllipsisVertical, Pencil, Plus, Trash2 } from 'lucide-react'
+import { EllipsisVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -83,12 +83,7 @@ export function JitDbAccessRulesTable({
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="inline-flex">
-                <Button
-                  variant="default"
-                  icon={<Plus />}
-                  onClick={onAddRule}
-                  disabled={addDisabled}
-                >
+                <Button icon={<PlusIcon />} onClick={onAddRule} disabled={addDisabled}>
                   Add rule
                 </Button>
               </span>
@@ -127,7 +122,7 @@ export function JitDbAccessRulesTable({
                 return (
                   <TableRow
                     key={user.id}
-                    className={rowIsInteractive ? 'relative inset-focus cursor-pointer' : undefined}
+                    className={rowIsInteractive ? 'relative focus-inset cursor-pointer' : undefined}
                     onClick={
                       rowIsInteractive
                         ? (event) => {
@@ -171,9 +166,8 @@ export function JitDbAccessRulesTable({
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            icon={<EllipsisVertical />}
+                            icon={<EllipsisVerticalIcon />}
                             aria-label="More actions"
-                            variant="default"
                             size="tiny"
                             className="w-7 hit-area-2"
                             disabled={!canUpdate || disableActions}
@@ -188,7 +182,7 @@ export function JitDbAccessRulesTable({
                             }}
                             disabled={!canUpdate || disableActions}
                           >
-                            <Pencil size={14} className="text-foreground-lighter" />
+                            <PencilIcon size={14} className="text-foreground-lighter" />
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -200,7 +194,7 @@ export function JitDbAccessRulesTable({
                             }}
                             disabled={!canUpdate || disableActions}
                           >
-                            <Trash2 size={14} className="text-foreground-lighter" />
+                            <Trash2Icon size={14} className="text-foreground-lighter" />
                             Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>

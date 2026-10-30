@@ -14,7 +14,7 @@ Today `pgvector` supports two types of indexes:
 - [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes)
 - [IVFFlat](/docs/guides/ai/vector-indexes/ivf-indexes)
 
-In general we recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes).
+In general we recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes). If queries are slow on an existing table, see [Increase vector lookup speeds with HNSW](/kb/troubleshooting/increase-vector-lookup-speeds-by-applying-an-hsnw-index-ohLHUM).
 
 ## Distance operators
 
@@ -34,7 +34,7 @@ For pgvector versions 0.7.0 and above, it's possible to create indexes on vector
 
 You can check your current pgvector version by running: `SELECT * FROM pg_extension WHERE extname = 'vector';` or by navigating to the [Extensions](/dashboard/project/_/database/extensions) tab in your Supabase project dashboard.
 
-If you are on an earlier version of pgvector, you should [upgrade your project here](/dashboard/project/_/settings/infrastructure).
+If you are on an earlier version of pgvector, you should [upgrade your project here](/dashboard/project/_/settings/general).
 
 ## Resources
 

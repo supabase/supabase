@@ -1,4 +1,4 @@
-import { Lightbulb } from 'lucide-react'
+import { LightbulbIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -51,7 +51,11 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         id="advisor-center-trigger"
         className={cn(
           'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
-          hasCriticalIssues && 'bg-destructive-200 border-destructive-500',
+          // Critical fill/border only when idle — selected matches the other
+          // header circles (foreground fill, no destructive outline).
+          hasCriticalIssues &&
+            !isOpen &&
+            'bg-destructive-200 border-destructive-500 hover:border-destructive',
           isOpen && 'bg-foreground text-background'
         )}
         onClick={handleClick}
@@ -61,7 +65,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
           },
         }}
       >
-        <Lightbulb
+        <LightbulbIcon
           size={16}
           strokeWidth={1.5}
           className={cn(
@@ -72,11 +76,17 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         <span className="sr-only">Advisor Center</span>
       </ButtonTooltip>
       {hasCriticalIssues ? (
-        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-destructive" />
+        <span
+          className={cn(
+            'absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full',
+            // Slightly lighter on the inverted selected fill in light mode only.
+            isOpen ? 'bg-destructive-500 dark:bg-destructive' : 'bg-destructive'
+          )}
+        />
       ) : hasWarningIssues ? (
         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-warning" />
       ) : hasUnreadNotifications ? (
-        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand" />
+        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary-bright" />
       ) : null}
     </div>
   )

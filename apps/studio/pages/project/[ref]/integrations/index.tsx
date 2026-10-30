@@ -1,6 +1,6 @@
 import { IS_PLATFORM, useFeatureFlags } from 'common'
 import { Database } from 'common/marketplace.types'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, type ReactNode } from 'react'
@@ -246,7 +246,7 @@ const LegacyIntegrationsPage = () => {
               size="tiny"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search integrations..."
-              icon={<Search size={14} />}
+              icon={<SearchIcon size={14} />}
               className="w-52"
             />
           </PageSectionMeta>

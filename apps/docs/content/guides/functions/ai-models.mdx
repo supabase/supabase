@@ -6,7 +6,7 @@ subtitle: 'Run AI models in Edge Functions using the built-in Supabase AI API.'
 tocVideo: 'w4Rr_1whU-U'
 ---
 
-Edge Functions have a built-in API for running AI models. You can use this API to generate embeddings, build conversational workflows, and do other AI related tasks in your Edge Functions.
+Edge Functions have a built-in API for running AI models. You can use this API to [generate embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings), build conversational workflows, and do other AI related tasks in your Edge Functions.
 
 This allows you to:
 
@@ -26,7 +26,7 @@ Create a new inference session:
 const model = new Supabase.ai.Session('model-name')
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 To get type hints and checks for the API, import types from `functions-js`:
 
@@ -358,7 +358,7 @@ Since Llamafile provides an OpenAI API compatible server, you can either use it 
 
       ```ts
       import { withSupabase } from 'npm:@supabase/server@^1'
-      import OpenAI from 'jsr:@openai/openai@^6'
+      import OpenAI from 'npm:openai@^6'
 
       export default {
         fetch: withSupabase({ auth: 'publishable' }, async (req, ctx) => {

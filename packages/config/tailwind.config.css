@@ -26,6 +26,7 @@
  * consumes them from @theme inline so Tailwind generates the utilities. */
 @import './css/colors.css';
 @import './css/theme.css';
+@import './css/charts.css';
 @import './css/animations.css';
 @import './css/utilities.css';
 @import './tailwind-plugins/hit-area.css';

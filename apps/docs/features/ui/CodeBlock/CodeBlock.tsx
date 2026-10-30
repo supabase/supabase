@@ -1,23 +1,26 @@
-import { Fragment, type PropsWithChildren } from 'react'
-import { bundledLanguages, createHighlighter, type BundledLanguage, type ThemedToken } from 'shiki'
+import { type PropsWithChildren } from 'react'
+import { bundledLanguages, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
-import { cn } from 'ui'
-
-import { AnnotatedSpan, CodeBlockControls } from './CodeBlock.client'
-import { getFontStyle } from './CodeBlock.utils'
-import theme from './supabase-2.json' with { type: 'json' }
+import { highlightCode } from 'ui-patterns/CodeBlock/CodeBlock.highlight'
+import { getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
+import { CodeBlockControls } from 'ui-patterns/CodeBlock/CodeBlockControls'
+import {
+  CodeBlockFrame,
+  CodeBlockTokens,
+  type CodeToken,
+} from 'ui-patterns/CodeBlock/CodeBlockFrame'
 import denoTypes from './types/lib.deno.d.ts.include'
 
 const extraFiles: ExtraFiles = { 'deno.d.ts': denoTypes }
 
-const twoslasher = createTwoslasher({ extraFiles })
+const twoslasher = createTwoslasher({
+  extraFiles,
+  // todo: remove once Twoslash stops using deprecated baseUrl and node10 resolution
+  compilerOptions: { ignoreDeprecations: '6.0' },
+})
 const TWOSLASHABLE_LANGS: ReadonlyArray<string> = ['js', 'ts', 'javascript', 'typescript']
 
 const BUNDLED_LANGUAGES = Object.keys(bundledLanguages)
-const highlighter = await createHighlighter({
-  themes: [theme],
-  langs: BUNDLED_LANGUAGES,
-})
 
 export async function CodeBlock({
   className,
@@ -26,12 +29,16 @@ export async function CodeBlock({
   contents,
   children,
   skipTypeGeneration,
+  hideControls = false,
+  compact = false,
 }: PropsWithChildren<{
   className?: string
   lang?: string
   lineNumbers?: boolean
   contents?: string
   skipTypeGeneration?: boolean
+  hideControls?: boolean
+  compact?: boolean
 }>) {
   let code = (contents || extractCode(children)).trim()
   const lang = tryToBundledLanguage(langSetting || '') || extractLang(children)
@@ -44,109 +51,37 @@ export async function CodeBlock({
       twoslashed = annotationsByLine(hoverNodes)
       code = editedCode
     } catch (_err) {
-      // Silently ignore, if imports aren't defined type compilation fails
-      // Uncomment lines below to debug in dev
-      // console.log('\n==========CODE==========\n')
-      // console.log(code)
-      // console.error(_err.recommendation)
+      // Type compilation fails when imports aren't defined
     }
   }
 
-  const { tokens } = highlighter.codeToTokens(code, {
-    lang: lang || undefined,
-    theme: 'Supabase Theme',
-  })
+  const { tokens } = await highlightCode(code, lang)
 
   return (
-    <div
-      className={cn(
-        'shiki',
-        'group',
-        'relative',
-        'not-prose',
-        'w-full overflow-x-auto',
-        'border border-default rounded-lg',
-        'bg-200',
-        'text-sm',
-        className
-      )}
-      role="group"
-      aria-roledescription="code block"
+    <CodeBlockFrame
+      className={className}
+      lang={lang}
+      lineCount={tokens.length}
+      compact={compact}
+      controls={hideControls ? null : <CodeBlockControls content={code.trim()} />}
     >
-      <CodeBlockControls content={code.trim()} />
-      <pre>
-        <code className={lineNumbers ? 'grid grid-cols-[auto_1fr]' : ''}>
-          {lineNumbers ? (
-            <>
-              {tokens.map((line, idx) => (
-                <Fragment key={idx}>
-                  <div
-                    className={cn(
-                      'select-none text-right text-muted bg-control px-2 min-h-5 leading-5',
-                      idx === 0 && 'pt-6',
-                      idx === tokens.length - 1 && 'pb-6'
-                    )}
-                  >
-                    {idx + 1}
-                  </div>
-                  <div
-                    className={cn(
-                      'code-content min-h-5 leading-5 pl-6 pr-6',
-                      idx === 0 && 'pt-6',
-                      idx === tokens.length - 1 && 'pb-6'
-                    )}
-                  >
-                    <CodeLine tokens={line} twoslash={twoslashed?.get(idx)} />
-                  </div>
-                </Fragment>
-              ))}
-            </>
-          ) : (
-            <div className="code-content p-6">
-              {tokens.map((line, idx) => (
-                <CodeLine key={idx} tokens={line} twoslash={twoslashed?.get(idx)} />
-              ))}
-            </div>
-          )}
-        </code>
-      </pre>
-    </div>
-  )
-}
+      <CodeBlockTokens
+        lineNumbers={lineNumbers}
+        lines={tokens.map((line, lineIndex) => {
+          let offset = 0
+          return line.map(({ content, color, fontStyle }): CodeToken => {
+            const annotations = twoslashed
+              ?.get(lineIndex)
+              ?.get(offset)
+              ?.map(({ text, docs, tags }) => ({ text, docs, tags }))
+            offset += content.length
+            const className = getTokenClassName(color, fontStyle)
 
-function CodeLine({
-  tokens: rawTokens,
-  twoslash,
-}: {
-  tokens: Array<ThemedToken>
-  twoslash?: Map<number, Array<NodeHover>>
-}) {
-  let offset = 0
-  const tokens = rawTokens.map((token) => {
-    const newToken = { ...token, offset }
-    offset += token.content.length
-    return newToken
-  })
-
-  return (
-    <span className="block min-h-5 leading-5">
-      {tokens.map((token) =>
-        twoslash?.has(token.offset) ? (
-          <AnnotatedSpan
-            key={token.offset}
-            token={token}
-            annotations={twoslash.get(token.offset)!}
-          />
-        ) : (
-          <span
-            key={token.offset}
-            style={{ color: token.color, ...getFontStyle(token.fontStyle || 0) }}
-          >
-            {token.content}
-          </span>
-        )
-      )}
-    </span>
+            return annotations ? [content, className, annotations] : [content, className]
+          })
+        })}
+      />
+    </CodeBlockFrame>
   )
 }
 

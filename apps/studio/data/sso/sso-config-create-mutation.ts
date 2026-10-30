@@ -1,14 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { operations } from 'api-types'
 import { toast } from 'sonner'
 
 import { orgSSOKeys } from './keys'
-import type { components } from '@/data/api'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
+type CreateSSOProviderBody =
+  operations['SSOProvidersController_createSSOProvider']['requestBody']['content']['application/json']
+
 export type SSOConfigCreateVariables = {
   slug: string
-  config: components['schemas']['CreateSSOProviderBody']
+  config: CreateSSOProviderBody
 }
 
 export async function createSSOConfig({ slug, config }: SSOConfigCreateVariables) {

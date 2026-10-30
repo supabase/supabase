@@ -13,7 +13,20 @@
 
     "dashboard_auth:custom_provider": {
       "type": ["string", "null"],
-      "description": "Show a custom provider on the sign in page (Continue with X)"
+      "description": "Show a custom provider on the sign in page (Continue with X). Will be deprecated by dashboard_auth:custom_providers."
+    },
+
+    "dashboard_auth:custom_providers": {
+      "type": ["array", "null"],
+      "description": "Show a custom provider on the sign in page (Continue with X)",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "dashboard_auth:logo_link_url": {
+      "type": ["string", "null"],
+      "description": "The URL for the logo on the auth pages (sign in, forgot password, etc.) links to. Defaults to https://supabase.com"
     },
 
     "docs:row_level_security_guide_path": {
@@ -92,6 +105,14 @@
     "ssl:certificate_url": {
       "type": "string",
       "description": "The URL of the SSL certificate"
+    },
+
+    "status_page:visibility_field_ids": {
+      "type": "array",
+      "description": "Deployment-mode visibility field IDs on incident.io response incidents. Element 0 is this build's own custom-field ID (empty string = default Supabase build); the rest are other modes' field IDs.",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

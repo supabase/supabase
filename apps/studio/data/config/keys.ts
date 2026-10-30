@@ -19,9 +19,17 @@ export const configKeys = {
   projectCreationPostgresVersions: (
     organizationSlug: string | undefined,
     cloudProvider: string,
-    dbRegion: string
+    dbRegion: string,
+    highAvailability?: boolean
   ) =>
-    ['projects', organizationSlug, cloudProvider, dbRegion, 'available-creation-versions'] as const,
+    [
+      'projects',
+      organizationSlug,
+      cloudProvider,
+      dbRegion,
+      'available-creation-versions',
+      highAvailability,
+    ] as const,
   projectUnpausePostgresVersions: (projectRef: string | undefined) =>
     ['projects', projectRef, 'available-unpause-versions'] as const,
   diskAutoscaleConfig: (projectRef: string | undefined) =>
@@ -29,4 +37,6 @@ export const configKeys = {
   deploymentMode: () => ['deployment-mode'] as const,
   postgresConfig: (projectRef: string | undefined) =>
     ['projects', projectRef, 'postgres-config'] as const,
+  // used for entire project state, includes all configs, matches `config.toml` schema
+  projectConfig: (projectRef: string | undefined) => ['projects', projectRef, 'config'] as const,
 }

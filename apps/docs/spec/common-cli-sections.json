@@ -160,6 +160,30 @@
         "title": "Start only the local database",
         "slug": "supabase-db-start",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-schema",
+        "title": "Manage database schema",
+        "slug": "supabase-db-schema",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-schema-declarative",
+        "title": "Manage declarative database schemas",
+        "slug": "supabase-db-schema-declarative",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-schema-declarative-sync",
+        "title": "Generate a new migration from declarative schema",
+        "slug": "supabase-db-schema-declarative-sync",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-db-schema-declarative-generate",
+        "title": "Generate declarative schema from a database",
+        "slug": "supabase-db-schema-declarative-generate",
+        "type": "cli-command"
       }
     ]
   },

@@ -1,9 +1,8 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { Database, HardDrive, Shield, Webhook, Zap } from 'lucide-react'
-import Link from 'next/link'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -118,6 +117,7 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
             const Icon = ICONS[useCase.icon]
             return (
               <button
+                tabIndex={0}
                 key={useCase.label}
                 role="tab"
                 aria-selected={isActive}
@@ -196,7 +196,7 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
                 <p className="text-sm text-foreground-lighter">{active.paragraph}</p>
               </motion.div>
             </AnimatePresence>
-            <Link
+            <a
               href="/docs/guides/functions"
               className="flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap shrink-0"
             >
@@ -218,7 +218,7 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
                   strokeLinejoin="round"
                 />
               </svg>
-            </Link>
+            </a>
           </div>
         </div>
       </div>

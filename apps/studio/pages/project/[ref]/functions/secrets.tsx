@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -34,10 +34,8 @@ const SecretsPage: NextPageWithLayout = () => {
                 title="Local development with the Supabase CLI"
                 description={
                   <p>
-                    Add custom secrets to{' '}
-                    <code className="text-code-inline">supabase/functions/.env</code>, or pass{' '}
-                    <code className="text-code-inline">--env-file</code> to{' '}
-                    <code className="text-code-inline">supabase functions serve</code>.
+                    Add custom secrets to <code>supabase/functions/.env</code>, or pass{' '}
+                    <code>--env-file</code> to <code>supabase functions serve</code>.
                   </p>
                 }
                 actions={<DocsButton href={`${DOCS_URL}/guides/functions/secrets#using-the-cli`} />}

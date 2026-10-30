@@ -180,7 +180,7 @@ You can check the `Proxy-Status` and `Content-Length` headers in the Supabase Lo
 
 PostgREST now validates the JWT `kid` claim. If your JWT contains a Key ID (`kid`), it will try to match this with one of the `kid`'s in the configured JSON Web Key Set. Check the [official docs](https://docs.postgrest.org/en/v13/references/auth.html#jwk-kid-validation) for more details.
 
-If you use Supabase Auth or the CLI to create JSON Web Keys, you shouldn’t worry about this change as both systems will ensure `kid`'s are present in the JSON Web Key Set.
+If you use [Supabase Auth](/auth) or the CLI to create JSON Web Keys, you shouldn’t worry about this change as both systems will ensure `kid`'s are present in the JSON Web Key Set.
 
 For users that integrate with other Auth systems, make sure that both your JWT and JWKS follow the above rules.
 

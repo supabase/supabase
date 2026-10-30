@@ -1,25 +1,23 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { PublicationsTables } from '@/components/interfaces/Database/Publications/PublicationsTables'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from '@/types'
 
-const DatabasePublications: NextPageWithLayout = () => {
+const DatabasePublicationsContent = () => {
   const { ref, id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { can: canViewPublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_READ,
-    'publications'
+  const { can: canViewPublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_READ
   )
 
   const { data: publications = [], isPending } = useDatabasePublicationsQuery({
@@ -53,6 +51,8 @@ const DatabasePublications: NextPageWithLayout = () => {
     </PageLayout>
   )
 }
+
+const DatabasePublications: NextPageWithLayout = () => <DatabasePublicationsContent />
 
 DatabasePublications.getLayout = (page) => (
   <DefaultLayout>

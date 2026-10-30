@@ -10,7 +10,7 @@ import {
   safeSql,
   type SafeSqlFragment,
 } from './pg-format'
-import { TABLE_PRIVILEGES_SQL } from './sql/table-privileges'
+import { getScopedTablePrivilegesSql } from './sql/table-privileges'
 
 const pgTablePrivilegesZod = z.object({
   relation_id: z.number(),
@@ -60,19 +60,18 @@ function list({
   sql: SafeSqlFragment
   zod: typeof pgTablePrivilegesArrayZod
 } {
-  let sql = safeSql`
-with table_privileges as (${TABLE_PRIVILEGES_SQL})
-select *
-from table_privileges
-`
   const filter = filterByList(
     includedSchemas,
     excludedSchemas,
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
-  if (filter) {
-    sql = safeSql`${sql} where schema ${filter}`
-  }
+  // Push the schema filter into the base WHERE (before aclexplode / GROUP BY).
+  const base = getScopedTablePrivilegesSql(filter ? safeSql`and nc.nspname ${filter}` : undefined)
+  let sql = safeSql`
+with table_privileges as (${base})
+select *
+from table_privileges
+`
   if (limit) {
     sql = safeSql`${sql} limit ${literal(limit)}`
   }
@@ -105,28 +104,17 @@ function retrieve({
   sql: SafeSqlFragment
   zod: typeof pgTablePrivilegesOptionalZod
 } {
-  if (id) {
-    const sql = /* SQL */ safeSql`
-with table_privileges as (${TABLE_PRIVILEGES_SQL})
+  const scopeFilter = id
+    ? safeSql`and c.oid = ${literal(id)}`
+    : safeSql`and nc.nspname = ${literal(schema)} and c.relname = ${literal(name)}`
+  const sql = /* SQL */ safeSql`
+with table_privileges as (${getScopedTablePrivilegesSql(scopeFilter)})
 select *
 from table_privileges
-where table_privileges.relation_id = ${literal(id)};`
-    return {
-      sql,
-      zod: pgTablePrivilegesOptionalZod,
-    }
-  } else {
-    const sql = /* SQL */ safeSql`
-with table_privileges as (${TABLE_PRIVILEGES_SQL})
-select *
-from table_privileges
-where table_privileges.schema = ${literal(schema)}
-  and table_privileges.name = ${literal(name)}
 `
-    return {
-      sql,
-      zod: pgTablePrivilegesOptionalZod,
-    }
+  return {
+    sql,
+    zod: pgTablePrivilegesOptionalZod,
   }
 }
 
@@ -145,6 +133,25 @@ type TablePrivilegesGrant = {
     | 'MAINTAIN'
   isGrantable?: boolean
 }
+/**
+ * The `%I.%I` arguments of a `format()` call that name a relation: the schema
+ * and name of the relation with the given oid.
+ *
+ * The statements below deliberately avoid `format('… %s …', <oid>::regclass)`:
+ * `%s` substitutes raw text, so a PL/pgSQL body using it can't be proven to
+ * build a fixed statement. Servers that statically check `DO` blocks (such as
+ * Multigres) reject those. A format string made only of `%I`/`%L` conversions
+ * can be checked, and builds the same statement.
+ */
+function relationIdentArgs(relationId: number): SafeSqlFragment {
+  const id = literal(relationId)
+  return safeSql`(select n.nspname from pg_class c join pg_namespace n on n.oid = c.relnamespace where c.oid = ${id}), (select relname from pg_class where oid = ${id})`
+}
+
+function granteeSql(grantee: string): SafeSqlFragment {
+  return grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
+}
+
 function grant(grants: TablePrivilegesGrant[]): { sql: SafeSqlFragment } {
   const sql = safeSql`
 do $$
@@ -152,9 +159,11 @@ begin
 ${joinSqlFragments(
   grants.map(
     ({ privilegeType, relationId, grantee, isGrantable }) =>
-      safeSql`execute format('grant ${keyword(privilegeType)} on table %s to ${
-        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-      } ${isGrantable ? safeSql`with grant option` : safeSql``}', ${literal(relationId)}::regclass);`
+      safeSql`execute format(${literal(
+        `grant ${keyword(privilegeType)} on table %I.%I to ${granteeSql(grantee)}${
+          isGrantable ? ' with grant option' : ''
+        }`
+      )}, ${relationIdentArgs(relationId)});`
   ),
   '\n'
 )}
@@ -184,9 +193,9 @@ begin
 ${joinSqlFragments(
   revokes.map(
     ({ privilegeType, relationId, grantee }) =>
-      safeSql`execute format('revoke ${keyword(privilegeType)} on table %s from ${
-        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-      }', ${literal(relationId)}::regclass);`
+      safeSql`execute format(${literal(
+        `revoke ${keyword(privilegeType)} on table %I.%I from ${granteeSql(grantee)}`
+      )}, ${relationIdentArgs(relationId)});`
   ),
   '\n'
 )}

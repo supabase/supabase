@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseCronJobsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -23,6 +24,7 @@ export async function deleteDatabaseCronJob({
     connectionString,
     sql: safeSql`SELECT cron.unschedule(${literal(jobId)});`,
     queryKey: databaseCronJobsKeys.delete(),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -48,9 +50,12 @@ export const useDatabaseCronJobDeleteMutation = ({
     mutationFn: (vars) => deleteDatabaseCronJob(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, searchTerm } = variables
-      await queryClient.invalidateQueries({
-        queryKey: databaseCronJobsKeys.listInfinite(projectRef, searchTerm),
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseCronJobsKeys.jobs(projectRef) }),
+        queryClient.invalidateQueries({
+          queryKey: databaseCronJobsKeys.listInfiniteMinimal(projectRef, searchTerm),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

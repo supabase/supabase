@@ -27,7 +27,6 @@ const LW_MATERIALIZED_VIEW = 'tickets_view'
 export async function GET(req: Request) {
   const url = new URL(req.url)
 
-  // Just here to silence snyk false positives
   // Verify that req.url is from an allowed domain
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
   const userAgent = req.headers.get('user-agent')

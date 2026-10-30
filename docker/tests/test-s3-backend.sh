@@ -4,7 +4,7 @@
 #
 # Validates that the S3-compatible backend (MinIO, RustFS, etc.) handles
 # all S3 operations that Storage relies on. Uses the aws cli so the test
-# is backend-agnostic — no vendor-specific tools required.
+# is backend-agnostic - no vendor-specific tools required.
 #
 # Usage:
 #   sh test-s3-backend.sh                   # Uses localhost:9100
@@ -67,11 +67,24 @@ check() {
     fi
 }
 
-# Wrapper for aws commands against the backend directly
+# Wrapper for aws commands against the backend directly.
+#
+# Always exits 0: under `set -e` a failing aws call would kill the suite on the
+# spot, so the check never records a FAIL and no summary is printed. The aws
+# error is echoed to stderr so a FAIL stays explainable even where the caller
+# discards stdout.
 s3() {
-    AWS_ACCESS_KEY_ID="$BACKEND_ACCESS_KEY" \
-    AWS_SECRET_ACCESS_KEY="$BACKEND_SECRET_KEY" \
-    aws "$@" --endpoint-url "$BACKEND_URL" --region "$REGION" 2>&1
+    s3_out=$(AWS_ACCESS_KEY_ID="$BACKEND_ACCESS_KEY" \
+        AWS_SECRET_ACCESS_KEY="$BACKEND_SECRET_KEY" \
+        aws "$@" --endpoint-url "$BACKEND_URL" --region "$REGION" 2>&1) ||
+        echo "  aws $1 $2 failed: $(printf '%s' "$s3_out" | tail -n 1)" >&2
+    printf '%s\n' "$s3_out"
+}
+
+# Wrapper for jq that yields empty output instead of aborting the suite when
+# the payload is not JSON (e.g. an S3 error document) and jq exits non-zero.
+jq_r() {
+    jq -r "$@" 2>/dev/null || true
 }
 
 bucket_name="backend-test-$$"
@@ -86,7 +99,7 @@ echo ""
 
 echo "--- Connectivity ---"
 list_output=$(s3 s3api list-buckets --output json)
-list_ok=$(echo "$list_output" | jq -r 'if .Buckets then "true" else "false" end' 2>/dev/null)
+list_ok=$(echo "$list_output" | jq_r 'if .Buckets then "true" else "false" end')
 check "Backend reachable (ListBuckets)" "true" "$list_ok"
 
 if [ "$list_ok" != "true" ]; then
@@ -105,7 +118,7 @@ echo ""
 echo "--- Storage bucket ---"
 if [ -n "$GLOBAL_S3_BUCKET" ]; then
     storage_bucket_exists=$(s3 s3api list-buckets --output json | \
-        jq -r --arg name "$GLOBAL_S3_BUCKET" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end' 2>/dev/null)
+        jq_r --arg name "$GLOBAL_S3_BUCKET" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end')
     check "GLOBAL_S3_BUCKET ($GLOBAL_S3_BUCKET) exists" "true" "$storage_bucket_exists"
 else
     echo "  SKIP: GLOBAL_S3_BUCKET not set"
@@ -117,11 +130,11 @@ fi
 
 echo ""
 echo "--- CreateBucket ---"
-s3 s3api create-bucket --bucket "$bucket_name" --output json >/dev/null 2>&1
+s3 s3api create-bucket --bucket "$bucket_name" --output json >/dev/null
 
 # Verify create succeeded
 create_found=$(s3 s3api list-buckets --output json | \
-    jq -r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end' 2>/dev/null)
+    jq_r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end')
 check "CreateBucket" "true" "$create_found"
 
 if [ "$create_found" != "true" ]; then
@@ -133,7 +146,7 @@ fi
 
 # Verify in ListBuckets (separate call)
 bucket_found=$(s3 s3api list-buckets --output json | \
-    jq -r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end' 2>/dev/null)
+    jq_r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end')
 check "Bucket visible in ListBuckets" "true" "$bucket_found"
 
 # ---------------------------------------------
@@ -156,7 +169,7 @@ echo ""
 echo "--- ListObjectsV2 ---"
 list_objects=$(s3 s3api list-objects-v2 --bucket "$bucket_name" --output json)
 object_found=$(echo "$list_objects" | \
-    jq -r '[.Contents[]? | .Key] | if any(. == "test-file.txt") then "true" else "false" end' 2>/dev/null)
+    jq_r '[.Contents[]? | .Key] | if any(. == "test-file.txt") then "true" else "false" end')
 check "Object found in ListObjectsV2" "true" "$object_found"
 
 # ---------------------------------------------
@@ -166,7 +179,7 @@ check "Object found in ListObjectsV2" "true" "$object_found"
 echo ""
 echo "--- HeadObject ---"
 head_output=$(s3 s3api head-object --bucket "$bucket_name" --key "test-file.txt" --output json)
-head_size=$(echo "$head_output" | jq -r '.ContentLength // 0' 2>/dev/null)
+head_size=$(echo "$head_output" | jq_r '.ContentLength // 0')
 original_size=$(wc -c < "$tmpfile" | tr -d ' ')
 check "HeadObject returns correct size" "$original_size" "$head_size"
 rm -f "$tmpfile"
@@ -207,7 +220,7 @@ echo "--- DeleteObject ---"
 s3 s3 rm "s3://$bucket_name/test-copy.txt" >/dev/null
 list_after_delete=$(s3 s3api list-objects-v2 --bucket "$bucket_name" --output json)
 copy_gone=$(echo "$list_after_delete" | \
-    jq -r '[.Contents[]? | .Key] | if any(. == "test-copy.txt") then "false" else "true" end' 2>/dev/null)
+    jq_r '[.Contents[]? | .Key] | if any(. == "test-copy.txt") then "false" else "true" end')
 check "Deleted object no longer listed" "true" "$copy_gone"
 
 # ---------------------------------------------
@@ -224,7 +237,7 @@ large_ok=$(echo "$large_put" | grep -q "upload:" && echo "true" || echo "false")
 check "Multipart upload (7MB)" "true" "$large_ok"
 
 large_head=$(s3 s3api head-object --bucket "$bucket_name" --key "large-file.bin" --output json)
-remote_size=$(echo "$large_head" | jq -r '.ContentLength // 0' 2>/dev/null)
+remote_size=$(echo "$large_head" | jq_r '.ContentLength // 0')
 check "Multipart size matches ($large_size bytes)" "$large_size" "$remote_size"
 
 large_download=$(mktemp); cleanup_files="$cleanup_files $large_download"
@@ -250,12 +263,12 @@ rm -f "$batch_file"
 delete_objects_output=$(s3 s3api delete-objects --bucket "$bucket_name" \
     --delete '{"Objects":[{"Key":"batch-a.txt"},{"Key":"batch-b.txt"},{"Key":"batch-c.txt"}]}' \
     --output json)
-deleted_count=$(echo "$delete_objects_output" | jq -r '.Deleted | length' 2>/dev/null)
+deleted_count=$(echo "$delete_objects_output" | jq_r '.Deleted | length')
 check "DeleteObjects removed 3 objects" "3" "$deleted_count"
 
 # Verify all gone
 batch_list=$(s3 s3api list-objects-v2 --bucket "$bucket_name" --prefix "batch-" --output json)
-batch_remaining=$(echo "$batch_list" | jq -r '[.Contents[]?] | length' 2>/dev/null)
+batch_remaining=$(echo "$batch_list" | jq_r '[.Contents[]?] | length')
 check "Batch-deleted objects gone" "0" "$batch_remaining"
 
 # ---------------------------------------------
@@ -270,7 +283,7 @@ s3 s3 cp "$presign_file" "s3://$bucket_name/presign-test.txt" >/dev/null
 rm -f "$presign_file"
 
 presigned_url=$(s3 s3 presign "s3://$bucket_name/presign-test.txt")
-presign_body=$(curl -s "$presigned_url")
+presign_body=$(curl -s "$presigned_url" || true)
 check "Presigned URL returns correct content" "presigned content test" "$presign_body"
 
 # ---------------------------------------------
@@ -342,7 +355,7 @@ echo "--- Cleanup ---"
 s3 s3 rm "s3://$bucket_name/" --recursive >/dev/null
 s3 s3api delete-bucket --bucket "$bucket_name" >/dev/null
 bucket_gone=$(s3 s3api list-buckets --output json | \
-    jq -r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "false" else "true" end' 2>/dev/null)
+    jq_r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "false" else "true" end')
 check "Test bucket deleted" "true" "$bucket_gone"
 
 # ---------------------------------------------

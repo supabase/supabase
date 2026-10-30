@@ -1,4 +1,4 @@
-import { Maximize2, Minimize2 } from 'lucide-react'
+import { Maximize2Icon, Minimize2Icon } from 'lucide-react'
 import { Button, cn, FormControl, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -43,7 +43,10 @@ export const FunctionEditor = ({
                 'transition z-50'
               )}
               onClick={() => setFocused(!focused)}
-              icon={focused ? <Minimize2 /> : <Maximize2 />}
+              icon={focused ? <Minimize2Icon /> : <Maximize2Icon />}
+              aria-label={focused ? 'Minimize editor' : 'Maximize editor'}
+              // Tooltip repeats the label; screen readers would read it twice
+              aria-describedby={undefined}
             />
           </TooltipTrigger>
           <TooltipContent side="bottom">

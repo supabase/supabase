@@ -2,6 +2,7 @@ import pgMeta from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { tableKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { SafePostgresTable } from '@/lib/postgres-types'
@@ -26,6 +27,7 @@ export async function getTable(
       connectionString,
       sql,
       queryKey: tableKeys.retrieve(projectRef, name, schema),
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -48,6 +50,9 @@ export const useTableQuery = <TData = RetrieveTableResult>(
     queryKey: tableKeys.retrieve(projectRef, name, schema),
     queryFn: ({ signal }) => getTable({ projectRef, connectionString, name, schema }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
+    refetchOnWindowFocus: false,
+    retryOnMount: false,
+    staleTime: 5 * 60 * 1000,
     ...options,
   })
 }
@@ -68,7 +73,6 @@ export const getTableQuery = async ({
 }) => {
   const queryClient = getQueryClient()
   const table = await queryClient.fetchQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: tableKeys.retrieve(projectRef, name, schema),
     queryFn: ({ signal }) => getTable({ projectRef, connectionString, name, schema }, signal),
   })

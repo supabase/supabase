@@ -7,7 +7,7 @@ SSR frameworks move rendering and data fetches to the server, to reduce client b
 
 Supabase Auth is fully compatible with SSR. You need to make a few changes to the configuration of your Supabase client, to store the user session in cookies instead of local storage. After setting up your Supabase client, follow the instructions for any flow in the How-To guides.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Make sure to use the PKCE flow instructions where those differ from the implicit flow instructions. If no difference is mentioned, don't worry about this.
 
@@ -20,14 +20,20 @@ We have developed an [`@supabase/ssr`](https://www.npmjs.com/package/@supabase/s
 ## Framework quickstarts
 
 <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6 mb-6 not-prose">
-  <Link href="/guides/auth/server-side/nextjs" passHref>
-    <GlassPanel title="Next.js" background={false} icon="/docs/img/icons/nextjs-icon">
+  <Link
+    href="/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nextjs"
+    passHref
+  >
+    <GlassPanel title="Next.js" icon="/docs/img/icons/nextjs-icon">
       Automatically configure Supabase in Next.js to use cookies, making your user and their session
       available on the client and server.
     </GlassPanel>
   </Link>
-  <Link href="/guides/auth/server-side/sveltekit" passHref>
-    <GlassPanel title="SvelteKit" background={false} icon="/docs/img/icons/svelte-icon">
+  <Link
+    href="/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=sveltekit"
+    passHref
+  >
+    <GlassPanel title="SvelteKit" icon="/docs/img/icons/svelte-icon">
       Automatically configure Supabase in SvelteKit to use cookies, making your user and their
       session available on the client and server.
     </GlassPanel>

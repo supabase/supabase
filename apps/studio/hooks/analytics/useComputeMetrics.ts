@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
+import { COMPUTE_METRICS_ATTRIBUTES, getComputeMetricAvailability } from './useComputeMetrics.utils'
 import {
   parseConnectionsData,
   parseInfrastructureMetrics,
@@ -10,10 +11,10 @@ import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export type ComputeMetrics = {
-  cpu: number
-  disk: number
-  memory: number
-  connections: { peak: number; max: number }
+  cpu: number | null
+  disk: number | null
+  memory: number | null
+  connections: { peak: number; max: number } | null
   isLoading: boolean
   isError: boolean
 }
@@ -23,7 +24,6 @@ export function useComputeMetrics({ projectRef }: { projectRef?: string }): Comp
 
   // Intentionally anchored to mount time so the query key stays stable across re-renders.
   // React Query's staleTime handles background refresh without shifting the window.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { startDate, endDate } = useMemo(() => {
     const now = dayjs()
     return {
@@ -38,21 +38,17 @@ export function useComputeMetrics({ projectRef }: { projectRef?: string }): Comp
     isError,
   } = useInfraMonitoringAttributesQuery({
     projectRef,
-    attributes: [
-      'avg_cpu_usage',
-      'ram_usage',
-      'disk_fs_used_system',
-      'disk_fs_used_wal',
-      'pg_database_size',
-      'disk_fs_size',
-      'pg_stat_database_num_backends',
-    ],
+    attributes: COMPUTE_METRICS_ATTRIBUTES,
     startDate,
     endDate,
     interval: '1h',
   })
 
-  const { data: maxConnectionsData, isLoading: connectionsLoading } = useMaxConnectionsQuery({
+  const {
+    data: maxConnectionsData,
+    isLoading: connectionsLoading,
+    isError: isConnectionsError,
+  } = useMaxConnectionsQuery({
     projectRef,
     connectionString: project?.connectionString,
   })
@@ -62,12 +58,13 @@ export function useComputeMetrics({ projectRef }: { projectRef?: string }): Comp
     () => parseConnectionsData(infraData, maxConnectionsData),
     [infraData, maxConnectionsData]
   )
+  const availability = getComputeMetricAvailability(infraData)
 
   return {
-    cpu: metrics?.cpu.current ?? 0,
-    disk: metrics?.disk.current ?? 0,
-    memory: metrics?.ram.current ?? 0,
-    connections,
+    cpu: availability.cpu ? (metrics?.cpu.current ?? null) : null,
+    disk: availability.disk ? (metrics?.disk.current ?? null) : null,
+    memory: availability.memory ? (metrics?.ram.current ?? null) : null,
+    connections: availability.connections && !isConnectionsError ? connections : null,
     isLoading: infraLoading || connectionsLoading,
     isError,
   }

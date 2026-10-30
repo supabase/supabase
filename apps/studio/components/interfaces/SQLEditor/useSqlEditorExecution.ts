@@ -14,7 +14,7 @@ import {
 } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { isValidConnString } from '@/data/fetchers'
+import { isValidConnString, unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
@@ -40,13 +40,7 @@ export function useSqlEditorExecution({
   setAiTitle,
 }: UseSqlEditorExecutionArgs) {
   const { ref } = useParams()
-  const {
-    editorRef,
-    clearPendingRunRefocus,
-    refocusEditorAfterRunIfNeeded,
-    clearHighlights,
-    applyErrorHighlight,
-  } = useSQLEditorContext()
+  const { editor, clearPendingRunRefocus, refocusEditorAfterRunIfNeeded } = useSQLEditorContext()
 
   const { data: project } = useSelectedProjectQuery()
   const queryClient = useQueryClient()
@@ -78,9 +72,9 @@ export function useSqlEditorExecution({
       queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
       refocusEditorAfterRunIfNeeded()
     },
-    onError(error: any, vars) {
+    onError(error, vars) {
       if (id) {
-        applyErrorHighlight(error, hasSelection)
+        editor.highlightErrorLine(error, hasSelection)
         sessionSnap.addResultError(id, error, vars.autoLimit)
       }
 
@@ -95,7 +89,7 @@ export function useSqlEditorExecution({
         return
       }
 
-      if (editorRef.current === null || isExecuting || project === undefined) {
+      if (!editor.isReady() || isExecuting || project === undefined) {
         clearPendingRunRefocus()
         return
       }
@@ -120,7 +114,7 @@ export function useSqlEditorExecution({
         setAiTitle(id, sql)
       }
 
-      clearHighlights()
+      editor.clearHighlights()
 
       const impersonatedRoleState = getImpersonatedRoleState()
       const connectionString = resolveConnectionString(
@@ -143,13 +137,13 @@ export function useSqlEditorExecution({
         handleError: (error) => {
           throw error
         },
+        grant: unguarded.migrating,
       })
 
-      track('sql_editor_query_run_button_clicked')
+      track('sql_editor_query_run_button_clicked', { source: 'database' })
     },
     [
-      editorRef,
-      clearHighlights,
+      editor,
       clearPendingRunRefocus,
       isDiffOpen,
       id,

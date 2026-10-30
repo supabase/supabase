@@ -1,9 +1,11 @@
-import { screen, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { describe, expect, test, vi } from 'vitest'
+import { HttpResponse } from 'msw'
+import { useState } from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { render } from '../../helpers'
 import { PREVIEWER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
@@ -11,13 +13,120 @@ import {
   generateDynamicHelper,
   generateDynamicHelpers,
   generateHelpersFromInput,
-  LogsDatePicker,
   parseCustomInput,
+} from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
+import {
+  LogsDatePicker,
+  type DatePickerValue,
 } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
+
+beforeEach(() => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: () =>
+      HttpResponse.json<APIErrorBody>({ message: 'Project not found' }, { status: 404 }),
+  })
+})
+
+describe('inline and popover date-picker state', () => {
+  const initialRange = {
+    from: '2026-08-01T01:02:03.000Z',
+    to: '2026-08-02T04:05:06.000Z',
+  }
+  const selectedRange = {
+    from: '2026-09-10T07:08:09.000Z',
+    to: '2026-09-11T10:11:12.000Z',
+  }
+
+  test.each(['inline', 'popover'] as const)(
+    '%s applies the newly selected helper dates and times',
+    async (variant) => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+      function Picker() {
+        const [value, setValue] = useState<DatePickerValue>(initialRange)
+        return (
+          <LogsDatePicker
+            variant={variant}
+            value={value}
+            helpers={[
+              {
+                text: 'Selected range',
+                calcFrom: () => selectedRange.from,
+                calcTo: () => selectedRange.to,
+              },
+            ]}
+            onSubmit={(next) => {
+              setValue(next)
+              onSubmit(next)
+            }}
+          />
+        )
+      }
+      customRender(<Picker />)
+      if (variant === 'popover') await user.click(screen.getByRole('button'))
+      await user.click(screen.getByText('Selected range'))
+      expect(onSubmit).toHaveBeenLastCalledWith({
+        ...selectedRange,
+        isHelper: true,
+        text: 'Selected range',
+      })
+      if (variant === 'popover') {
+        await user.click(screen.getByRole('button', { name: 'Selected range' }))
+      }
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
+      expect(onSubmit).toHaveBeenLastCalledWith({ ...selectedRange, isHelper: false })
+    }
+  )
+
+  test.each(['inline', 'popover'] as const)(
+    '%s only handles document clipboard events when it is a popover',
+    async (variant) => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+      customRender(
+        <LogsDatePicker
+          variant={variant}
+          open
+          value={initialRange}
+          helpers={[]}
+          onSubmit={onSubmit}
+        />
+      )
+      await navigator.clipboard.writeText('Unrelated text')
+      fireEvent.copy(document)
+      if (variant === 'popover') {
+        await waitFor(async () => {
+          expect(await navigator.clipboard.readText()).toBe(JSON.stringify(initialRange))
+        })
+      } else {
+        expect(await navigator.clipboard.readText()).toBe('Unrelated text')
+      }
+
+      await navigator.clipboard.writeText(JSON.stringify(selectedRange))
+      fireEvent.paste(document)
+      if (variant === 'popover') {
+        await waitFor(() => {
+          expect(screen.getAllByLabelText('Hours')[0]).toHaveValue(
+            new Date(selectedRange.from).getHours().toString()
+          )
+        })
+      }
+      await user.click(screen.getByRole('button', { name: 'Apply' }))
+      expect(onSubmit).toHaveBeenLastCalledWith({
+        ...(variant === 'popover' ? selectedRange : initialRange),
+        isHelper: false,
+      })
+    }
+  )
+})
 
 describe('parseCustomInput', () => {
   test('returns invalid for empty input', () => {
@@ -67,14 +176,15 @@ describe('parseCustomInput', () => {
     expect(parseCustomInput('0')).toEqual({ type: 'invalid' })
     expect(parseCustomInput('-5')).toEqual({ type: 'invalid' })
   })
+
+  test('returns invalid for amounts that fall outside the representable date range', () => {
+    expect(parseCustomInput('999999999')).toEqual({ type: 'invalid' })
+    expect(parseCustomInput('999999999d')).toEqual({ type: 'invalid' })
+    expect(parseCustomInput('99999999')).toEqual({ type: 'number', value: 99999999 })
+  })
 })
 
 describe('generateDynamicHelper', () => {
-  test('generates helper with correct text', () => {
-    const helper = generateDynamicHelper(5, 'hour')
-    expect(helper.text).toBe('Last 5 hours')
-  })
-
   test('uses singular form when value is 1', () => {
     expect(generateDynamicHelper(1, 'minute').text).toBe('Last 1 minute')
     expect(generateDynamicHelper(1, 'hour').text).toBe('Last 1 hour')
@@ -96,7 +206,7 @@ describe('generateDynamicHelper', () => {
 })
 
 describe('generateDynamicHelpers', () => {
-  test('generates 3 helpers for minutes, hours, days', () => {
+  test('generates helpers for every supported relative unit', () => {
     const helpers = generateDynamicHelpers(5)
     expect(helpers).toHaveLength(3)
     expect(helpers[0].text).toBe('Last 5 minutes')
@@ -112,7 +222,7 @@ describe('generateHelpersFromInput', () => {
     expect(generateHelpersFromInput('2yoie')).toBeNull()
   })
 
-  test('returns 3 helpers for number only input', () => {
+  test('returns a helper for every unit for number only input', () => {
     const helpers = generateHelpersFromInput('25')
     expect(helpers).toHaveLength(3)
     expect(helpers![0].text).toBe('Last 25 minutes')
@@ -124,6 +234,16 @@ describe('generateHelpersFromInput', () => {
     const helpers = generateHelpersFromInput('2h')
     expect(helpers).toHaveLength(1)
     expect(helpers![0].text).toBe('Last 2 hours')
+  })
+
+  test('never returns a helper whose calcFrom throws', () => {
+    expect(generateHelpersFromInput('999999999')).toBeNull()
+
+    const helpers = generateHelpersFromInput('99999999')
+    expect(helpers).not.toBeNull()
+    for (const helper of helpers!) {
+      expect(() => helper.calcFrom()).not.toThrow()
+    }
   })
 })
 
@@ -145,24 +265,6 @@ test('renders warning', async () => {
   )
   await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
   await screen.findByText(/memory errors/)
-  await screen.findByText(RegExp(from.format('DD MMM')))
-})
-
-test('renders dates in local time', async () => {
-  const from = dayjs().subtract(1, 'days')
-  const to = dayjs()
-  render(
-    <LogsDatePicker
-      helpers={PREVIEWER_DATEPICKER_HELPERS}
-      onSubmit={mockFn}
-      value={{
-        from: from.toISOString(),
-        to: to.toISOString(),
-      }}
-    />
-  )
-  // renders time locally
-  await userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
   await screen.findByText(RegExp(from.format('DD MMM')))
 })
 
@@ -207,28 +309,26 @@ test('datepicker onSubmit will return ISO string of selected dates', async () =>
   )
 
   // open the datepicker
-  userEvent.click(screen.getByText(/13:00/i))
+  await userEvent.click(screen.getByText(/13:00/i))
 
   const day15 = dayjs().date(15)
   const day16 = day15.add(1, 'day')
 
   // Find and click on first date
   const day15Element = await screen.findByText(day15.format('D'))
-  userEvent.dblClick(day15Element)
+  await userEvent.dblClick(day15Element)
 
   // Find and click on second date
   const day16Element = await screen.findByText(day16.format('D'))
-  userEvent.click(day16Element)
+  await userEvent.click(day16Element)
 
   await userEvent.click(await screen.findByText('Apply'))
-  expect(mockFn).toBeCalled()
-
-  const call = mockFn.mock.calls[0][0]
-
-  expect(call).toMatchObject({
-    from: dayjs().date(day15.date()).hour(13).minute(0).second(0).millisecond(0).toISOString(),
-    to: dayjs().date(day16.date()).hour(23).minute(59).second(59).millisecond(0).toISOString(),
-  })
+  expect(mockFn).toHaveBeenCalledWith(
+    expect.objectContaining({
+      from: dayjs().date(day15.date()).hour(13).minute(0).second(0).millisecond(0).toISOString(),
+      to: dayjs().date(day16.date()).hour(23).minute(59).second(59).millisecond(0).toISOString(),
+    })
+  )
 })
 
 test('disabled helpers are disabled', async () => {
@@ -260,7 +360,7 @@ test('disabled helpers are disabled', async () => {
   )
 
   // click the datepicker
-  userEvent.click(screen.getByText('Last 7 days'))
+  await userEvent.click(screen.getByText('Last 7 days'))
 
   const disabledHelperContainer = await screen.findByText(/last 30 days/i)
 
@@ -269,31 +369,6 @@ test('disabled helpers are disabled', async () => {
   })
 
   expect(disabledButton.getAttribute('aria-disabled')).toBe('true')
-})
-
-test('passing a value prop shows the correct dates in the label', async () => {
-  const from = dayjs().subtract(10, 'days')
-  const to = dayjs()
-
-  render(
-    <LogsDatePicker
-      helpers={[]}
-      value={{ from: from.toISOString(), to: to.toISOString() }}
-      onSubmit={mockFn}
-    />
-  )
-
-  await screen.findByText(
-    `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
-  )
-
-  // change the date
-  userEvent.click(await screen.findByText(RegExp(from.format('DD MMM'))))
-  userEvent.click(await screen.findByText(RegExp(to.format('DD MMM'))))
-
-  await screen.findByText(
-    `${from.format('DD MMM')}, ${from.format('HH:mm')} - ${to.format('DD MMM')}, ${to.format('HH:mm')}`
-  )
 })
 
 test('opening with an unparseable date value (legacy epoch-ms its/ite) does not crash', async () => {

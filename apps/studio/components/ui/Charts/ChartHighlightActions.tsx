@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ArrowRight, SearchIcon } from 'lucide-react'
+import { ArrowRightIcon, SearchIcon } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
 import {
   cn,
@@ -112,7 +112,7 @@ export const ChartHighlightActions = ({
       >
         <DropdownMenuLabel className="flex items-center justify-center text-foreground-light font-mono gap-x-2 text-xs">
           <span>{formatChartDate(toFormattableDate(selectedRangeStart!), 'MMM D, H:mm')}</span>
-          <ArrowRight size={10} />
+          <ArrowRightIcon size={10} />
           <span>{formatChartDate(toFormattableDate(selectedRangeEnd!), 'MMM D, H:mm')}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="my-0" />
@@ -134,6 +134,7 @@ export const ChartHighlightActions = ({
             <DropdownMenuItem asChild key={action.id} disabled={disabled} className={cn('group')}>
               <button
                 disabled={disabled}
+                tabIndex={-1}
                 onClick={() => ctx && action.onSelect({ ...ctx })}
                 className="w-full flex items-center gap-1.5"
               >

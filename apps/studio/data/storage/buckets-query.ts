@@ -22,7 +22,7 @@ import {
 
 export type BucketsVariables = { projectRef?: string }
 
-export type Bucket = components['schemas']['StorageBucketResponse']
+export type Bucket = components['schemas']['StorageBucketResponse_Output']
 
 export type BucketType = Bucket['type']
 
@@ -142,7 +142,6 @@ export const useBucketNumberEstimateQuery = (
 
   return useQuery<number | undefined, ResponseError>({
     // Query remains functionally the same even if connectionString changes
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: getBucketNumberEstimateKey(projectRef),
     queryFn: () =>
       getBucketNumberEstimate({

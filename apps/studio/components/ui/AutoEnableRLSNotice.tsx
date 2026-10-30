@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { ShieldCheck, X } from 'lucide-react'
+import { ShieldCheckIcon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -15,14 +14,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseEventTriggerCreateMutation } from '@/data/database-event-triggers/database-event-trigger-create-mutation'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
@@ -68,7 +67,7 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
         <>
           <CreateEnsureRLSTriggerDialog />
           <ButtonTooltip
-            icon={<X />}
+            icon={<XIcon />}
             variant="text"
             className="w-6"
             tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
@@ -87,9 +86,8 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
   const [open, setOpen] = useState(false)
 
-  const { can: canCreateTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  const { can: canCreateTriggers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { mutate: createEventTrigger, isPending: isCreating } =
@@ -117,13 +115,12 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
       <DialogTrigger asChild>
         {iconOnly ? (
           <ButtonTooltip
-            variant="default"
-            icon={<ShieldCheck />}
+            icon={<ShieldCheckIcon />}
             className="w-7"
             tooltip={{ content: { side: 'bottom', text: 'Auto-enable RLS for new tables' } }}
           />
         ) : (
-          <Button variant="default">Set up trigger</Button>
+          <Button>Set up trigger</Button>
         )}
       </DialogTrigger>
       <DialogContent size="large">
@@ -138,9 +135,9 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
         <DialogSection className="text-sm flex flex-col gap-y-2">
           <p>
-            Tables in exposed schemas such as <code className="text-code-inline">public</code> are
-            reachable through your project’s API. Enable Row Level Security (RLS) on these tables so
-            access is governed by the policies you define, not just the project API key.
+            Tables in exposed schemas such as <code>public</code> are reachable through your
+            project’s API. Enable Row Level Security (RLS) on these tables so access is governed by
+            the policies you define, not just the project API key.
           </p>
           <p>
             This trigger automatically enables RLS whenever a new table is created. Review the SQL
@@ -156,10 +153,11 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
         </CodeBlock>
 
         <DialogFooter>
-          <Button variant="default" disabled={isCreating} onClick={() => setOpen(false)}>
+          <Button disabled={isCreating} onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <ButtonTooltip
+            variant="primary"
             disabled={!canCreateTriggers}
             loading={isCreating}
             onClick={handleCreateTrigger}

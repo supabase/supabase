@@ -34,7 +34,7 @@ export default function MasterPartnerProgramAgreementPage() {
         subheader="The governing agreement for participants in the Supabase partner program."
       />
       <MDXProvider components={mdxComponents()}>
-        <SectionContainer className="prose">
+        <SectionContainer className="prose legal-prose">
           <LegalDocVersions versions={versions} />
         </SectionContainer>
       </MDXProvider>

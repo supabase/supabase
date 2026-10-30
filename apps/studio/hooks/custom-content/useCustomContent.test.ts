@@ -1,8 +1,8 @@
+// @vitest-environment jsdom
 import { cleanup, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 beforeEach(() => {
-  vi.clearAllMocks()
   vi.resetModules()
   cleanup()
 })

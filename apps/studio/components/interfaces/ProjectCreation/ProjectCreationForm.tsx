@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { acceptUntrustedSql, joinSqlFragments, untrustedSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -8,8 +7,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Form, useWatch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Button, cn, Form, useWatch } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
@@ -19,20 +18,33 @@ import { DatabasePasswordInput } from './DatabasePasswordInput'
 import { DataSeeding } from './DataSeeding'
 import { DisabledWarningDueToIncident } from './DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from './FreeProjectLimitWarning'
+import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
-import { extractPostgresVersionDetails } from './PostgresVersionSelector'
-import { sizes } from './ProjectCreation.constants'
+import {
+  HIGH_AVAILABILITY_POSTGRES_ENGINE,
+  HIGH_AVAILABILITY_RELEASE_CHANNEL,
+  sizes,
+} from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  AUTO_REGION_VALUE,
+  getAvailableRegions,
+  getFreeTierGeneralRegionExperimentVariant,
+  getHighAvailabilityRegionCode,
+  getRegionSelectionType,
   instanceLabel,
   monthlyInstancePrice,
+  resolveDefaultDbRegion,
+  resolvePostgresVersion,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
 import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
+import { getRegionRestrictionMessage } from './RegionSelector.utils'
 import { SecurityOptions } from './SecurityOptions'
+import { useRegionRestriction } from './useRegionRestriction'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import {
   GitHubRepositoryField,
@@ -55,8 +67,9 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from '@/data/projects/project-create-mutation'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import {
   isInDataApiRevokeTreatment,
   useDataApiRevokeOnCreateDefaultEnabled,
@@ -64,6 +77,7 @@ import {
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
@@ -89,9 +103,11 @@ interface ProjectCreationFormProps {
  *  - "Internal configuration" section
  *  - "GitHub repository" field
  *  - "Free project info" at the bottom
- *  - "Cancel" button
+ * - Cancel closes the popup window instead of navigating into Studio
  * - Shows the following:
  *  - "Data seeding" section
+ * - When embedded in the Vercel interstitial, flattens Panel chrome so the shared
+ *   form fields sit inside InterstitialLayout without a nested card
  * Eventually we could looking into reducing the differences more, e.g having data seeding
  * for both ways, and showing GitHub repository field for Vercel integration
  */
@@ -104,29 +120,39 @@ export const ProjectCreationForm = ({
   const { profile } = useProfile()
   const { slug, projectName, externalId } = useParams()
   const trackFunnelError = useTrackFunnelError()
-  const defaultProvider = useDefaultProvider()
+  const defaultProviderFromHook = useDefaultProvider()
+  const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+  // On staging, ~50% of new projects default to v3 (AWS_K8S). Rolled once per mount; the
+  // internal-only "Cloud provider" selector can still override it.
+  const [defaultProvider] = useState<CloudProvider>(() => {
+    const canDefaultToV3 =
+      process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' &&
+      (validCloudProviders?.includes('AWS_K8S') ?? true)
+    return canDefaultToV3 && Math.random() < 0.5 ? 'AWS_K8S' : PROVIDERS[defaultProviderFromHook].id
+  })
 
   const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
+  const hasSelectedOrganization = currentOrg !== undefined
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
-  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
-  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'integrations.github_connections'
+  const { can: isAdmin } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE)
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
   const { hasAccess: hasAccessToGitHubIntegration } = useCheckEntitlements(
     'integrations.github_connections'
   )
 
-  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const { hasLoaded: flagsLoaded, isConfigCatStale } = useFeatureFlags()
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration =
     useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
+  const { getRegionRestriction } = useRegionRestriction()
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -142,6 +168,7 @@ export const ProjectCreationForm = ({
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
+  const [projectCreationError, setProjectCreationError] = useState<string>()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -152,11 +179,13 @@ export const ProjectCreationForm = ({
       highAvailability: false,
       postgresVersion: '',
       instanceType: '',
-      cloudProvider: PROVIDERS[defaultProvider].id,
+      kubernetesClusterId: '',
+      kubernetesClusterForce: false,
+      cloudProvider: defaultProvider,
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
-      dbRegion: undefined,
+      dbRegion: '',
       githubRepositoryId: '',
       githubInstallationId: undefined,
       githubRepositoryName: '',
@@ -169,7 +198,7 @@ export const ProjectCreationForm = ({
       shouldRunMigrations: true,
     },
   })
-  const { getFieldState, resetField, setValue } = form
+  const { getFieldState, resetField, setError, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -178,10 +207,27 @@ export const ProjectCreationForm = ({
     organization,
     projectName: watchedProjectName,
     highAvailability,
+    kubernetesClusterId: watchedKubernetesClusterId,
+    kubernetesClusterForce: watchedKubernetesClusterForce,
   } = useWatch({ control: form.control })
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+  const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
+
+  const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
+  const isResolvingFreeTierGeneralRegionExperiment =
+    isFreePlan &&
+    smartRegionEnabled &&
+    (!flagsLoaded || isPendingOrganizationCreatedAt || isConfigCatStale === true)
+  const freeTierGeneralRegionEnrollment = useFlag('freeTierGeneralRegionEnrollment')
+  const freeTierGeneralRegionSelection = useFlag('freeTierGeneralRegionSelection')
+  const freeTierGeneralRegionExperimentVariant = getFreeTierGeneralRegionExperimentVariant({
+    isFreePlan,
+    smartRegionEnabled,
+    enrollmentFlag: freeTierGeneralRegionEnrollment,
+    selectionFlag: freeTierGeneralRegionSelection,
+  })
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -197,10 +243,8 @@ export const ProjectCreationForm = ({
   // form state carried over from the free plan. To avoid this, we set a
   // default instance size in this case.
   const instanceSize = canChooseInstanceSize ? (watchedInstanceSize ?? sizes[0]) : undefined
-  const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
-    { slug },
-    { enabled: isFreePlan }
-  )
+  const { data: membersExceededLimit = [], isLoading: isLoadingFreeProjectLimit } =
+    useFreeProjectLimitCheckQuery({ slug }, { enabled: isFreePlan })
   const hasMembersExceedingFreeTierLimit = membersExceededLimit.length > 0
   const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
 
@@ -246,33 +290,61 @@ export const ProjectCreationForm = ({
     }
   )
 
-  const { data: availableRegionsData, error: availableRegionsError } =
-    useOrganizationAvailableRegionsQuery(
-      {
-        slug: slug,
-        cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
-        desiredInstanceSize: instanceSize as DesiredInstanceSize,
-      },
-      {
-        enabled: flagsLoaded && smartRegionEnabled,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchInterval: false,
-        refetchOnReconnect: false,
-      }
-    )
+  const {
+    data: availableRegionsData,
+    error: availableRegionsError,
+    isFetching: isFetchingAvailableRegions,
+  } = useOrganizationAvailableRegionsQuery(
+    {
+      slug: slug,
+      cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
+      desiredInstanceSize: instanceSize as DesiredInstanceSize,
+      highAvailability,
+    },
+    {
+      enabled: flagsLoaded && smartRegionEnabled && hasSelectedOrganization,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+      refetchOnReconnect: false,
+    }
+  )
 
+  const highAvailabilityRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? availableRegionsData?.all.specific.find(
+          (region) => region.code === highAvailabilityRegionCode
+        )
+      : undefined
   const recommendedSmartRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
+    ? availableRegionsData?.recommendations.smartGroup?.name
     : ''
+
+  const firstAvailableSmartRegion = highAvailability
+    ? undefined
+    : availableRegionsData?.all.smartGroup[0]?.name
+  const isAutoRegionAvailable =
+    smartRegionEnabled && !highAvailability && availableRegionsData?.all.auto !== undefined
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
-    : (autoDefaultRegion ?? fixedDefaultRegion)
+  const defaultRegion = resolveDefaultDbRegion({
+    cloudProvider: selectedCloudProvider,
+    isHighAvailabilityRestricted:
+      highAvailability === true && highAvailabilityRegionCode !== undefined,
+    highAvailabilityRegionName: highAvailabilityRegion?.name,
+    isSmartRegionEnabled: smartRegionEnabled,
+    isAutoRegionAvailable,
+    recommendedSmartRegion,
+    firstAvailableSmartRegion,
+    autoDefaultRegion,
+    fixedDefaultRegion,
+  })
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
+  const hasAvailableRegions =
+    !smartRegionEnabled || (availableRegionsData !== undefined && !availableRegionsError)
+  const canSubmitProject = canCreateProject && hasAvailableRegions
   const canConfigureGitHubOnCreate =
     canCreateProject && hasAccessToGitHubIntegration && canCreateGitHubConnection
 
@@ -283,6 +355,7 @@ export const ProjectCreationForm = ({
       cloudProvider: cloudProvider as CloudProvider,
       dbRegion: smartRegionEnabled ? dbRegionExact : (dbRegion ?? ''),
       organizationSlug: organization,
+      highAvailability,
     },
     { enabled: currentOrg !== null }
   )
@@ -309,6 +382,14 @@ export const ProjectCreationForm = ({
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      setProjectCreationError(undefined)
+      const regionSelectionType = smartRegionEnabled
+        ? getRegionSelectionType({
+            dbRegion: form.getValues('dbRegion'),
+            availableRegions: availableRegionsData?.all,
+            isDbRegionDirty,
+          })
+        : undefined
       track(
         'project_creation_simple_version_submitted',
         {
@@ -321,6 +402,11 @@ export const ProjectCreationForm = ({
           ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
             dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
           }),
+          ...(freeTierGeneralRegionExperimentVariant !== undefined && {
+            freeTierGeneralRegionExperiment: freeTierGeneralRegionExperimentVariant,
+          }),
+          ...(regionSelectionType !== undefined && { regionSelectionType }),
+          regionCode: res.region,
         },
         {
           project: res.ref,
@@ -331,6 +417,11 @@ export const ProjectCreationForm = ({
       if (surface === 'main') router.push(`/project/${res.ref}`)
     },
     onError: (error) => {
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(`Failed to create new project: ${error.message}`)
+        trackFunnelError('project_creation', classifyApiError('project_creation', error), 'form')
+        return
+      }
       const toastId = toast.error(`Failed to create new project: ${error.message}`)
       trackFunnelError(
         'project_creation',
@@ -346,7 +437,14 @@ export const ProjectCreationForm = ({
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
-    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
+    // High availability projects are free during Alpha, so the forced large compute
+    // doesn't incur the usual compute costs.
+    const requiresCostConfirmation =
+      !values.highAvailability &&
+      additionalMonthlySpend > 0 &&
+      (hasOAuthApps || launchingLargerInstance)
+
+    if (requiresCostConfirmation) {
       track('project_creation_simple_version_confirm_modal_opened', {
         instanceSize: values.instanceSize,
       })
@@ -358,6 +456,7 @@ export const ProjectCreationForm = ({
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
+    setProjectCreationError(undefined)
 
     const {
       cloudProvider,
@@ -367,6 +466,8 @@ export const ProjectCreationForm = ({
       dbRegion,
       postgresVersion,
       instanceType,
+      kubernetesClusterId,
+      kubernetesClusterForce,
       instanceSize,
       dataApi,
       dataApiDefaultPrivileges,
@@ -378,14 +479,32 @@ export const ProjectCreationForm = ({
       shouldRunMigrations,
     } = values
 
-    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
-      return toast.error(
-        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
-      )
+    // HA projects never take a custom version — the API resolves the image from
+    // postgresEngine + releaseChannel.
+    const customPostgresVersion = highAvailability ? undefined : postgresVersion
+
+    if (customPostgresVersion && !customPostgresVersion.match(/1[2-9]\..*/)) {
+      const message =
+        'Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        return
+      }
+      return toast.error(message)
     }
 
     if (useOrioleDb && !availableOrioleVersion) {
-      const toastId = toast.error('No available OrioleDB image found, only Postgres is available')
+      const message = 'No available OrioleDB image found, only Postgres is available'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        trackFunnelError(
+          'project_creation',
+          { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+          'form'
+        )
+        return
+      }
+      const toastId = toast.error(message)
       trackFunnelError(
         'project_creation',
         { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
@@ -395,13 +514,58 @@ export const ProjectCreationForm = ({
       return
     }
 
-    const { postgresEngine, releaseChannel } =
-      extractPostgresVersionDetails(postgresVersionSelection)
+    const { postgresEngine, releaseChannel } = resolvePostgresVersion({
+      postgresVersionSelection,
+      useOrioleDb,
+      availableOrioleVersion,
+    })
 
-    const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion = smartRegionEnabled
-      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
-      : undefined
+    const { auto, smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+    const selectedExplicitRegion =
+      smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
+    const selectedSmartRegion = dbRegion === AUTO_REGION_VALUE ? auto : selectedExplicitRegion
+    const selectedRegion = smartRegionEnabled ? selectedSmartRegion : undefined
+
+    if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
+      return toast.error(
+        `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
+      )
+    }
+
+    const isRegionSelectionUnavailable =
+      smartRegionEnabled &&
+      (!selectedRegion || !!availableRegionsError || isFetchingAvailableRegions)
+    if (isRegionSelectionUnavailable) {
+      setError(
+        'dbRegion',
+        { type: 'manual', message: 'Please select an available region.' },
+        { shouldFocus: true }
+      )
+      return
+    }
+
+    const selectedSpecificRegion = specific.find((x) => x.name === dbRegion)
+    const selectedStaticRegion = smartRegionEnabled
+      ? undefined
+      : Object.values(getAvailableRegions(cloudProvider as CloudProvider)).find(
+          (region) => region.displayName === dbRegion
+        )
+    const selectedRegionRestriction = getRegionRestriction(
+      selectedSpecificRegion ?? selectedStaticRegion
+    )
+    if (selectedRegionRestriction !== undefined) {
+      setError(
+        'dbRegion',
+        { type: 'manual', message: getRegionRestrictionMessage(selectedRegionRestriction) },
+        { shouldFocus: true }
+      )
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'region_unavailable' },
+        'form'
+      )
+      return
+    }
     const parsedGitHubRepositoryId =
       githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
     const shouldIncludeGitHubFields =
@@ -446,8 +610,8 @@ export const ProjectCreationForm = ({
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
       dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
-      postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
-      releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      postgresEngine: highAvailability ? HIGH_AVAILABILITY_POSTGRES_ENGINE : postgresEngine,
+      releaseChannel: highAvailability ? HIGH_AVAILABILITY_RELEASE_CHANNEL : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
       ...(shouldIncludeGitHubFields
         ? {
@@ -457,14 +621,19 @@ export const ProjectCreationForm = ({
         : {}),
     }
 
-    if (postgresVersion || instanceType) {
+    if (customPostgresVersion || instanceType || kubernetesClusterId) {
       data['customSupabaseRequest'] = {
-        ami: {
-          ...(postgresVersion && {
-            search_tags: { 'tag:postgresVersion': postgresVersion },
-          }),
-          ...(instanceType && { instance_type: instanceType }),
-        },
+        ...((customPostgresVersion || instanceType) && {
+          ami: {
+            ...(customPostgresVersion && {
+              search_tags: { 'tag:postgresVersion': customPostgresVersion },
+            }),
+            ...(instanceType && { instance_type: instanceType }),
+          },
+        }),
+        ...(kubernetesClusterId && { kubernetes_cluster_id: kubernetesClusterId }),
+        ...(kubernetesClusterId &&
+          kubernetesClusterForce && { kubernetes_cluster_force: kubernetesClusterForce }),
       }
     }
 
@@ -479,6 +648,32 @@ export const ProjectCreationForm = ({
     hasTrackedFormExposed.current = true
     track('project_creation_form_exposed', { surface })
   }, [isOrganizationsSuccess, canCreateProject, currentOrg, track, surface])
+
+  const freeTierGeneralRegionExposedSlug = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (!slug || freeTierGeneralRegionExposedSlug.current === slug) return
+    if (isResolvingFreeTierGeneralRegionExperiment) return
+    if (freeTierGeneralRegionExperimentVariant === undefined) return
+    if (!canCreateProject || projectCreationDisabled || isLoadingFreeProjectLimit) return
+    freeTierGeneralRegionExposedSlug.current = slug
+    track(
+      'free_tier_general_region_experiment_exposed',
+      {
+        variant: freeTierGeneralRegionExperimentVariant,
+      },
+      {
+        organization: slug,
+      }
+    )
+  }, [
+    slug,
+    isResolvingFreeTierGeneralRegionExperiment,
+    freeTierGeneralRegionExperimentVariant,
+    canCreateProject,
+    projectCreationDisabled,
+    isLoadingFreeProjectLimit,
+    track,
+  ])
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
@@ -508,22 +703,10 @@ export const ProjectCreationForm = ({
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (!isDbRegionDirty && recommendedSmartRegion) {
-      setValue('dbRegion', recommendedSmartRegion)
-    }
-  }, [recommendedSmartRegion, isDbRegionDirty, setValue])
-
-  useEffect(() => {
-    if (regionError && fixedDefaultRegion) {
+    if (!smartRegionEnabled && regionError && fixedDefaultRegion) {
       resetField('dbRegion', { defaultValue: fixedDefaultRegion })
     }
-  }, [regionError, resetField, fixedDefaultRegion])
-
-  useEffect(() => {
-    if (highAvailability && cloudProvider !== 'AWS_K8S') {
-      setValue('cloudProvider', 'AWS_K8S')
-    }
-  }, [highAvailability, cloudProvider, setValue])
+  }, [smartRegionEnabled, regionError, resetField, fixedDefaultRegion])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
@@ -534,6 +717,16 @@ export const ProjectCreationForm = ({
       })
     }
   }, [instanceSize, watchedInstanceSize, setValue])
+
+  useEffect(() => {
+    const isK8sProvider = cloudProvider === 'AWS_K8S' || cloudProvider === 'AWS_NIMBUS'
+    if (!isK8sProvider && watchedKubernetesClusterId) {
+      setValue('kubernetesClusterId', '', { shouldDirty: false, shouldValidate: false })
+    }
+    if ((!isK8sProvider || !watchedKubernetesClusterId) && watchedKubernetesClusterForce) {
+      setValue('kubernetesClusterForce', false, { shouldDirty: false, shouldValidate: false })
+    }
+  }, [cloudProvider, watchedKubernetesClusterId, watchedKubernetesClusterForce, setValue])
 
   useEffect(() => {
     if (!githubRepositoryName) return
@@ -581,24 +774,32 @@ export const ProjectCreationForm = ({
       >
         <Panel
           loading={!isOrganizationsSuccess}
+          noMargin={isVercelIntegrationFlow}
+          className={cn(
+            isVercelIntegrationFlow && 'border-0 shadow-none rounded-none bg-transparent'
+          )}
           title={
-            <div key="panel-title">
-              <h3>Create a new project</h3>
-              <p className="text-sm text-foreground-lighter text-balance">
-                Your project will have its own dedicated instance and full Postgres database. An API
-                will be set up so you can easily interact with your new database.
-              </p>
-            </div>
+            !isVercelIntegrationFlow && (
+              <div key="panel-title">
+                <h3>Create a new project</h3>
+                <p className="text-sm text-foreground-lighter text-balance">
+                  Your project will have its own dedicated instance and full Postgres database. An
+                  API will be set up so you can easily interact with your new database.
+                </p>
+              </div>
+            )
           }
           footer={
             <ProjectCreationFooter
               form={form}
-              canCreateProject={canCreateProject}
+              canCreateProject={canSubmitProject}
               instanceSize={instanceSize}
+              highAvailability={highAvailability}
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
-              hideCancelButton={isVercelIntegrationFlow}
+              isLoadingAvailableRegions={isFetchingAvailableRegions}
+              cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
         >
@@ -624,8 +825,8 @@ export const ProjectCreationForm = ({
                           label="GitHub (optional)"
                           description={
                             <>
-                              Ideal for agent-first workflows: update your schema in code, push it
-                              to GitHub, and Supabase deploys the changes automatically.{' '}
+                              Ideal for agent-first workflows. Update your schema in code and push
+                              it to GitHub. Supabase deploys the changes.{' '}
                               <a
                                 href="https://supabase.com/docs/guides/deployment/branching/github-integration"
                                 target="_blank"
@@ -648,24 +849,33 @@ export const ProjectCreationForm = ({
                     )}
                     <ProjectNameInput form={form} />
 
+                    <HighAvailabilityInput
+                      form={form}
+                      highAvailabilityRegionName={highAvailabilityRegion?.name}
+                    />
+
                     {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
                     <DatabasePasswordInput form={form} />
 
                     <RegionSelector
                       form={form}
+                      hasSelectedOrganization={hasSelectedOrganization}
                       instanceSize={instanceSize as DesiredInstanceSize}
+                      showGeneralRegionsOnly={freeTierGeneralRegionExperimentVariant === 'test'}
+                      isLoading={isResolvingFreeTierGeneralRegionExperiment}
+                      isFreePlan={isFreePlan}
                     />
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}
 
                     <SecurityOptions form={form} surface={surface} />
 
-                    {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
+                    {showAdvancedConfig &&
+                      !!availableOrioleVersion &&
+                      highAvailability !== true && <AdvancedConfiguration form={form} />}
 
-                    {showAdvancedConfig && !!availableOrioleVersion && (
-                      <AdvancedConfiguration form={form} />
-                    )}
+                    {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
@@ -704,7 +914,7 @@ export const ProjectCreationForm = ({
                           </p>
 
                           <div>
-                            <Button asChild variant="default">
+                            <Button asChild>
                               <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
                             </Button>
                           </div>
@@ -714,6 +924,13 @@ export const ProjectCreationForm = ({
                   </Panel.Content>
                 ) : null}
               </div>
+            )}
+            {projectCreationError && (
+              <Panel.Content>
+                <p role="alert" className="text-sm text-destructive">
+                  {projectCreationError}
+                </p>
+              </Panel.Content>
             )}
           </>
         </Panel>

@@ -2,7 +2,7 @@ import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
@@ -61,6 +61,30 @@ export interface TableEditorProps {
   saveChanges: (params: SaveTableParams) => void
   updateEditorDirty: () => void
   apiAccessToggleHandler: TableApiAccessHandlerWithHistoryReturn
+}
+
+interface TableRealtimeToggleProps {
+  checked: boolean
+  onCheckedChange: () => void
+}
+
+export const TableRealtimeToggle = ({ checked, onCheckedChange }: TableRealtimeToggleProps) => {
+  return (
+    <div className="items-start flex space-x-2">
+      <Checkbox id="enable-realtime" checked={checked} onCheckedChange={onCheckedChange} />
+      <div className="grid gap-1.5 leading-none">
+        <label
+          htmlFor="enable-realtime"
+          className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Enable Realtime
+        </label>
+        <p className="text-sm text-foreground-muted">
+          Broadcast changes on this table to authorized subscribers.
+        </p>
+      </div>
+    </div>
+  )
 }
 
 export const TableEditor = ({
@@ -433,7 +457,7 @@ export const TableEditor = ({
       <SidePanel.Separator />
 
       <SidePanel.Content className="space-y-10 py-6">
-        <div className="items-top flex space-x-2">
+        <div className="items-start flex space-x-2">
           <Checkbox
             id="enable-rls"
             checked={tableFields.isRLSEnabled}
@@ -500,32 +524,18 @@ export const TableEditor = ({
         )}
 
         {realtimeEnabled && (
-          <div className="items-top flex space-x-2">
-            <Checkbox
-              id="enable-realtime"
-              checked={tableFields.isRealtimeEnabled}
-              onCheckedChange={() => {
-                track('realtime_toggle_table_clicked', {
-                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                  origin: 'tableSidePanel',
-                })
-                onUpdateField({
-                  isRealtimeEnabled: !tableFields.isRealtimeEnabled,
-                })
-              }}
-            />
-            <div className="grid gap-1.5 leading-none">
-              <label
-                htmlFor="enable-realtime"
-                className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Enable Realtime
-              </label>
-              <p className="text-sm text-foreground-muted">
-                Broadcast changes on this table to authorized subscribers.
-              </p>
-            </div>
-          </div>
+          <TableRealtimeToggle
+            checked={tableFields.isRealtimeEnabled}
+            onCheckedChange={() => {
+              track('realtime_toggle_table_clicked', {
+                newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                origin: 'tableSidePanel',
+              })
+              onUpdateField({
+                isRealtimeEnabled: !tableFields.isRealtimeEnabled,
+              })
+            }}
+          />
         )}
       </SidePanel.Content>
 
@@ -551,7 +561,7 @@ export const TableEditor = ({
         )}
         {isDuplicating && (
           <>
-            <div className="items-top flex space-x-2">
+            <div className="items-start flex space-x-2">
               <Checkbox
                 id="duplicate-rows"
                 checked={isDuplicateRows}
