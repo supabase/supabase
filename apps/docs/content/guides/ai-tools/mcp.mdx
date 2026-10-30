@@ -103,15 +103,14 @@ Requires a paid plan.
 
 ### Feedback
 
-- `submit_feedback` - Send feedback about Supabase tools to the Supabase team, and return a delete token
-- `delete_feedback` - Delete feedback you sent, using its delete token
+<Admonition type="note">
 
-The `features` value for this group is `feedback`. The server hides both tools in [read-only mode](#configuration-options).
+Disabled in read-only mode (`read_only` parameter).
 
-Feedback includes the text your agent sends, the name and version of your MCP client, and the MCP server version. The tool instructs your agent to ask before sending feedback you didn't request and to leave out secrets, personal data, and database contents. Review what your agent sends, and keep the delete token to remove the feedback later.
+</Admonition>
 
-- **Hosted connections:** Feedback also records your Supabase user and, if your agent provides one, a project. Project-scoped connections always attach the scoped project. To delete feedback, use the same account and project you sent it with. If the hosted server doesn't offer these tools, it ignores `feedback` in the `features` parameter and loads the other requested groups.
-- **Local connections:** Feedback is sent without a Supabase user or project. The configuration panel doesn't select this group for local connections. Add `feedback` to the `features` parameter to enable it. Local versions without these tools reject the `feedback` value.
+- `submit_feedback` - Send feedback about Supabase tools to the Supabase team
+- `delete_feedback` - Delete feedback using the token returned by `submit_feedback`
 
 ### Storage (disabled by default)
 
