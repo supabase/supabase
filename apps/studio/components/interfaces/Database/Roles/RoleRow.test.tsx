@@ -99,8 +99,8 @@ describe('RoleRow', () => {
 
     await user.click(getLoginSwitch())
     expect(await screen.findByLabelText('Password')).toBeInTheDocument()
-    // The role may already have a password, so an empty field must not claim it has none
-    expect(screen.getByText(/leave empty to keep the role's current password/i)).toBeInTheDocument()
+    // The role may already have a password, so the text must not claim it has none
+    expect(screen.getByText(/setting a password replaces any existing one/i)).toBeInTheDocument()
 
     await user.click(getLoginSwitch())
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()

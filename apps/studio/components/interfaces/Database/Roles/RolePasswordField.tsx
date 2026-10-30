@@ -27,9 +27,9 @@ export const RolePasswordField = ({
   const { control, setValue } = useFormContext<{ password: string }>()
   const [isPasswordGenerated, setIsPasswordGenerated] = useState(false)
 
-  // A role without login can still hold a password, and leaving the field empty keeps it
+  // A role without login can still hold a password, which a new one replaces
   const hint = isExistingRole
-    ? "Optional. Leave empty to keep the role's current password, if it has one."
+    ? 'Optional. Setting a password replaces any existing one.'
     : "Optional. Without a password, the role can't log in using password authentication."
 
   return (
