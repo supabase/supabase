@@ -12,6 +12,7 @@ Apply this document when you add a page or move content around on an existing on
 | If you're deciding                                     | Read                                                          |
 | ------------------------------------------------------ | ------------------------------------------------------------- |
 | Which document type to write, and how big it should be | [Document types](#document-types)                             |
+| What to put in a guide's frontmatter                   | [Write good frontmatter](#write-good-frontmatter)             |
 | Which reader question a chunk answers                  | [Information types](#information-types)                       |
 | How to order sections on the page                      | [Grouping sections](#grouping-sections)                       |
 | How many items belong in one group                     | [Chunking](#chunking)                                         |
@@ -47,19 +48,6 @@ separate section or an explainer and cross-reference the authoritative explanati
 rather than repeating it. This keeps the action path scannable and maintains one source
 of truth.
 
-### Give the description, subtitle, and first sentence separate jobs
-
-Each one does a different job:
-
-| Place          | Job                                                                                      | When to set it               |
-| -------------- | ---------------------------------------------------------------------------------------- | ---------------------------- |
-| `description`  | What the page helps the reader do, for search and link previews, in 150–160 characters   | Always                       |
-| `subtitle`     | An imperative that defines a title too short to say what the page covers, with no period | Only when the title needs it |
-| First sentence | The [value statement](#open-a-guide-with-a-value-statement)                              | Always                       |
-
-- **Recommended**: `Vault` with `Manage secrets in Postgres`, and `Branching` with `Use Supabase Branches to test and preview changes`.
-- **Not recommended**: The same line in the description, subtitle, and first sentence.
-
 ### Topic size
 
 Each type above is one unit of work for the reader. An explainer covers one topic. A
@@ -88,6 +76,24 @@ those items are about. A procedure can have six steps and still cover two tasks.
 
 - **Recommended**: A passwordless email login guide with `Send a one-time password` and `Verify the code`.
 - **Not recommended**: An `Authentication` page that also covers passwords, OAuth, and session storage.
+
+## Write good frontmatter
+
+Every guide sets `title` and `description` in its frontmatter. `subtitle` is optional.
+
+### Subtitle
+
+The subtitle is a short line under the title. Add one only when the title doesn't say what
+the page covers. Write it as an imperative with no period. It can match the description.
+As a rule of thumb, if it matches the first sentence of the page, leave it out.
+
+- **Recommended**: `Vault` with `Manage secrets in Postgres`, and `Branching` with `Use Supabase Branches to test and preview changes`.
+- **Not recommended**: `Configure your Supabase client to use cookies`, above a first sentence of `Learn how to configure your Supabase client to use cookies.`
+
+### Description
+
+The description is the page's meta description in search results and link previews. Say
+what the page helps the reader do, in 150–160 characters.
 
 ## Information types
 
