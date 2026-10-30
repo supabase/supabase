@@ -15,6 +15,7 @@ Alaister Young
 Aleksi Immonen
 Alex Hall
 Alex Hsu
+Alex Ives
 Alexander Alexandrov
 Alexander Korotkov
 Alexis Aguilar
@@ -38,6 +39,7 @@ Ariuna K
 Arshdeep Singh
 Artur Zakirov
 Artyom Borissov
+Avinash Sajjanshetty
 Aziz Quadri
 Barco Fourie
 Barry Roodt
@@ -184,6 +186,7 @@ Joey Freeland
 Joey Lei
 John Fitzgerald
 John Jarvis
+John Murret
 Joel Martin
 Johan Bergström
 John Pena
@@ -250,7 +253,9 @@ Matt Rossman
 Matt Smiley
 Matthias Luft
 Mats Kindahl
+Meg Corren
 Mert Yerekapan
+Michael Zalimeni
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
@@ -299,6 +304,7 @@ Ricardo Tavares
 Riccardo Busetti
 Richard Kasprzak
 Rob Shields
+Robert Vojta
 Rodrigo Esteves
 Rodrigo Mansueli
 Román Cuellar
@@ -317,9 +323,11 @@ Sam Rome
 Sam Rose
 Samir Ketema
 Sana Cordeaux
+Santos Flores de Leon
 Sasi Kanumuri
 Sara Read
 Satya Rohith Gannamanedi
+Satyanarayana Uppada
 Sean Geoghegan
 Sean Oliver
 Sean Romberg

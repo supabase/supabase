@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
 import { GitBranchIcon, GitMergeIcon, MoreVerticalIcon, ShieldIcon } from 'lucide-react'
@@ -19,11 +20,12 @@ import { ReviewWithAI } from '../BranchManagement/ReviewWithAI'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const MergeTitle = () => {
@@ -33,14 +35,15 @@ export const MergeTitle = () => {
 
   const parentProjectRef = project?.parent_project_ref
 
-  const { data: branches } = useBranchesQuery(
-    { projectRef: parentProjectRef },
-    {
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
-      staleTime: 0,
-    }
-  )
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+  })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
 
@@ -76,14 +79,15 @@ export const MergeSubtitle = () => {
   const { data: project } = useSelectedProjectQuery()
   const parentProjectRef = project?.parent_project_ref
 
-  const { data: branches } = useBranchesQuery(
-    { projectRef: parentProjectRef },
-    {
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
-      staleTime: 0,
-    }
-  )
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+  })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
 
   const subtitle = useMemo(() => {
@@ -137,14 +141,15 @@ export const MergeActions = ({
     ref: parentProjectRef,
   })
 
-  const { data: branches } = useBranchesQuery(
-    { projectRef: parentProjectRef },
-    {
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
-      staleTime: 0,
-    }
-  )
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+  })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
 

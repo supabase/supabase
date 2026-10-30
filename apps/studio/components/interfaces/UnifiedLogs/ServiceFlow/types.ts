@@ -15,6 +15,7 @@ export interface ServiceFlowBlockProps {
   isLoading?: boolean // Whether enriched data is still loading
   error?: string // Error message if enriched data failed to load
   isLast?: boolean // Whether this is the last block in the flow
+  defaultOpen?: boolean
   filterFields: DataTableFilterField<any>[] // Available filter fields for clickable values
   table: Table<any> // Table instance for filtering actions
 }

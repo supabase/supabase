@@ -3,7 +3,7 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -29,6 +29,7 @@ export async function createOrganizationInvitation({
   const { data, error } = await post('/platform/organizations/{slug}/members/invitations', {
     params: { path: { slug } },
     body: payload,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

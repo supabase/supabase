@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { GitMergeIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -5,8 +6,9 @@ import { toast } from 'sonner'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const MergeRequestButton = () => {
@@ -17,7 +19,11 @@ export const MergeRequestButton = () => {
 
   const projectRef = projectDetails?.parent_project_ref || ref
 
-  const { data: branches } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef, grant: branchesGrant.grant }),
+    enabled: Boolean(projectDetails),
+  })
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {

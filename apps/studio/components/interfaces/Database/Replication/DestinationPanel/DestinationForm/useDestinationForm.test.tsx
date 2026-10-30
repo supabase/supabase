@@ -45,7 +45,7 @@ const renderDestinationForm = async () => {
   const view = customRenderHook(
     () => ({
       ...useDestinationForm({ selectedType: 'BigQuery' }),
-      requestStatus: usePipelineRequestStatus().getRequestStatus(8),
+      requestStatus: usePipelineRequestStatus().getRequestStatus('8'),
     }),
     {
       wrapper: ({ children }) => (
@@ -346,7 +346,7 @@ describe('useDestinationForm', () => {
           data: formData,
           existingDestination: {
             destinationId: 7,
-            pipelineId: 8,
+            pipelineId: '8',
             enabled,
             statusName: enabled ? 'started' : 'stopped',
           },
@@ -377,7 +377,7 @@ describe('useDestinationForm', () => {
         data: formData,
         existingDestination: {
           destinationId: 7,
-          pipelineId: 8,
+          pipelineId: '8',
           enabled: true,
           statusName: 'started',
         },
@@ -407,7 +407,7 @@ describe('useDestinationForm', () => {
         data: formData,
         existingDestination: {
           destinationId: 7,
-          pipelineId: 8,
+          pipelineId: '8',
           enabled: true,
           statusName: 'started',
         },

@@ -192,7 +192,7 @@ If resumable (TUS) uploads fail with HTTP 500 and a message about `x-amz-tagging
 
 ### Permission denied on uploads
 
-Setting a bucket to "Public" only allows unauthenticated **downloads**. Uploads are always blocked unless you create an RLS policy on the `storage.objects` table. Go to **Storage** > **Files** > **Policies** in Studio and create a policy that allows `INSERT` for the appropriate roles.
+Setting a bucket to "Public" only allows unauthenticated **downloads**. [Uploads are always blocked](/kb/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload) unless you create an RLS policy on the `storage.objects` table. Go to **Storage** > **Files** > **Policies** in Studio and create a policy that allows `INSERT` for the appropriate roles.
 
 ### Upload URLs point to localhost
 
