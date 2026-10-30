@@ -113,7 +113,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
             isTransparent && 'border-transparent backdrop-blur-none'
           )}
         >
-          <div className="section-container relative flex justify-between h-16">
+          <div className="section-container relative flex justify-between h-(--header-height)">
             <div className="flex items-center flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center shrink-0">
@@ -124,7 +124,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   value={activeDropdown}
                   onValueChange={handleDropdownChange}
                   renderViewport={false}
-                  className="static hidden pl-8 lg:flex h-16 items-stretch"
+                  className="static hidden pl-8 lg:flex h-full items-stretch"
                 >
                   <NavigationMenuList className="h-full space-x-0 items-stretch">
                     {menu.primaryNav.map((menuItem) =>
@@ -284,7 +284,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         menu={menu}
         toggleRef={menuButtonRef}
         onLinkClick={handleMenuClose}
-        className="lg:hidden [--header-height:--spacing(16)]"
+        className="lg:hidden"
       />
     </>
   )
