@@ -65,9 +65,10 @@ export const TopNavMenu = ({ children, className }: TopNavMenuProps) => {
         containerProps={{ className: 'inset-x-0' }}
         className={cn(
           'mt-0 w-full rounded-none border-0 border-b border-default bg-background shadow-none md:w-full',
-          'h-[calc(var(--radix-navigation-menu-viewport-height)+1px)] data-[state=closed]:h-0',
+          'h-[calc(var(--radix-navigation-menu-viewport-height,0px)+1px)] data-[state=closed]:h-0',
           'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
-          'motion-safe:transition-[height] motion-safe:duration-250 motion-safe:ease-in-out'
+          'motion-safe:transition-[height] motion-safe:duration-200 motion-safe:ease-[cubic-bezier(0.23,1,0.32,1)]',
+          'data-[state=closed]:duration-300 data-[state=closed]:ease-[cubic-bezier(0.32,0.72,0,1)]'
         )}
       />
     </NavigationMenu>
@@ -89,7 +90,7 @@ export const TopNavMenuItem = ({ label, children, className, ...props }: TopNavM
     </NavigationMenuTrigger>
     <NavigationMenuContent
       className={cn(
-        'md:w-full duration-250 motion-reduce:animate-none!',
+        'md:w-full duration-150 ease-out data-[state=closed]:duration-250 motion-reduce:animate-none!',
         'data-[state=open]:animate-in data-[state=open]:fade-in',
         'data-[state=closed]:animate-out data-[state=closed]:fade-out',
         'data-[motion^=from-]:animate-in',
