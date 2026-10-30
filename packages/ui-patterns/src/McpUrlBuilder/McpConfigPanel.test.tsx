@@ -20,6 +20,21 @@ function selectOptOut(tool: string) {
   })
 }
 
+describe('McpConfigPanel default feature groups', () => {
+  it('enables feedback by default only for hosted connections', () => {
+    const { container, rerender } = render(<McpConfigPanel {...props} />, {
+      wrapper: TooltipProvider,
+    })
+    expect(container.textContent).toMatch(/features=[^&\s"]*feedback/)
+    expect(container.textContent).not.toMatch(/features=[^&\s"]*storage/)
+
+    // Older local Studio versions reject unknown groups with a 400.
+    rerender(<McpConfigPanel {...props} isPlatform={false} />)
+    expect(container.textContent).toContain('features=docs')
+    expect(container.textContent).not.toMatch(/features=[^&\s"]*feedback/)
+  })
+})
+
 describe('McpConfigPanel opt-out transitions', () => {
   it('permanently clears cost opt-outs when a connection becomes project scoped', () => {
     const { container, rerender } = render(<McpConfigPanel {...props} />, {

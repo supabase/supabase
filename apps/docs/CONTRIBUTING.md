@@ -84,11 +84,12 @@ Adding a new guide requires:
 - YAML frontmatter
 - A navigation entry in a separate file
 
-Frontmatter looks like this. `title` is mandatory. There are also optional properties that you can use to control the page display, including `subtitle`, `tocVideo`, and `hideToc`.
+Frontmatter looks like this. `title` and `description` are required. Optional properties control the page display, including `subtitle`, `tocVideo`, and `hideToc`. For what goes in `description` and `subtitle`, see [Write good frontmatter](./style-guide/03-page-structure.md#write-good-frontmatter).
 
 ```yaml
 ---
 title: How to connect to Supabase
+description: Connect to your Supabase Postgres database from a frontend app, a backend server, or a database tool, using a direct connection or the connection pooler.
 hideToc: true
 ---
 ```
@@ -96,6 +97,17 @@ hideToc: true
 The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/supabase/supabase/blob/master/apps/docs/components/Navigation/NavigationMenu/NavigationMenu.constants.ts).
 
 Add an entry with the `name`, `url`, and optional `icon` for your page.
+
+### Skip anchor link CI check
+
+When you remove a header that is linked to elsewhere, CI fails.
+You may want to merge your change anyway. For example, you may want to correct the links in a separate PR to avoid PR bloat.
+
+To merge anyway:
+
+1. Confirm the removal is deliberate.
+2. Add the `skip-anchor-check` label to the PR.
+3. Wait for the check to rerun. It passes and lists the broken links as warnings.
 
 ## Reference structure
 

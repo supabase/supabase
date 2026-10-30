@@ -57,7 +57,6 @@ Eval('Assistant', {
       )
       return generateAssistantResponse({
         ...modelResponse.modelParams,
-        isExplorerEnabled: true,
         ...(level && { aiOptInLevel: level }),
         messages,
         tools: level ? filterToolsByOptInLevel(mockTools, level) : mockTools,
