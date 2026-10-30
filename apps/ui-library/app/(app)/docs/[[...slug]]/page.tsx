@@ -17,6 +17,7 @@ import { OpenInV0Button } from '@/components/open-in-v0-button'
 import { SourcePanel } from '@/components/source-panel'
 import { libraryBlocks } from '@/config/library'
 import { canonicalAlternates, libraryUrl } from '@/lib/canonical'
+import { breadcrumbListSchema, serializeJsonLd, techArticleSchema } from '@/lib/json-ld'
 import { cn } from '@/lib/utils'
 
 interface DocPageProps {
@@ -86,8 +87,26 @@ export default async function DocPage(props: DocPageProps) {
   const libraryBlock = libraryBlocks.find((block) => block.href === `/docs/${doc.slugAsParams}`)
   const markdownPath = `${process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'}/docs/${doc.slugAsParams}.md`
 
+  const url = libraryUrl(`/docs/${doc.slugAsParams}`)
+  const techArticleJsonLd = serializeJsonLd(
+    techArticleSchema({
+      url,
+      headline: doc.title,
+      description: doc.description || undefined,
+    })
+  )
+  // The library has no section index pages, so the trail is the home page and this doc.
+  const breadcrumbJsonLd = serializeJsonLd(
+    breadcrumbListSchema([
+      { name: 'Supabase Library', url: libraryUrl('') },
+      { name: doc.title, url },
+    ])
+  )
+
   return (
     <main className="isolate px-4 pb-10 pt-4 md:px-8 md:pb-16 md:pt-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: techArticleJsonLd }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
       <header
         className={cn(
           'relative z-20 flex flex-col gap-5 py-8 md:py-12',
