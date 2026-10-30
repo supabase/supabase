@@ -99,6 +99,8 @@ describe('RoleRow', () => {
 
     await user.click(getLoginSwitch())
     expect(await screen.findByLabelText('Password')).toBeInTheDocument()
+    // The role may already have a password, so an empty field must not claim it has none
+    expect(screen.getByText(/leave empty to keep the role's current password/i)).toBeInTheDocument()
 
     await user.click(getLoginSwitch())
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
@@ -114,7 +116,7 @@ describe('RoleRow', () => {
     submit(role)
 
     await waitFor(() => expect(getUpdateQuery()).toBeDefined())
-    expect(getUpdateQuery()).toContain('login')
+    expect(getUpdateQuery()).toMatch(/\blogin\b/)
     expect(getUpdateQuery()).toContain(`'s3cret'`)
   })
 
@@ -126,7 +128,7 @@ describe('RoleRow', () => {
     submit(role)
 
     await waitFor(() => expect(getUpdateQuery()).toBeDefined())
-    expect(getUpdateQuery()).toContain('login')
+    expect(getUpdateQuery()).toMatch(/\blogin\b/)
     expect(getUpdateQuery()).not.toContain('password')
   })
 

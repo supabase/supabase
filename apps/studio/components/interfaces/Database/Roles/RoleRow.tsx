@@ -266,7 +266,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             </div>
             {canSetPassword && (
               <div className="py-4">
-                <RolePasswordField />
+                <RolePasswordField isExistingRole />
               </div>
             )}
             {!disabled && (

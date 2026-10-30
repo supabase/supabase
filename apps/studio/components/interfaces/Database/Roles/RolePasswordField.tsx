@@ -10,6 +10,8 @@ import { generateStrongPassword } from '@/lib/project'
 interface RolePasswordFieldProps {
   /** Whether leaving the field empty is allowed. Defaults to true. */
   isOptional?: boolean
+  /** Whether the role already exists, so it may already have a password. Defaults to false. */
+  isExistingRole?: boolean
   layout?: 'horizontal' | 'vertical'
 }
 
@@ -19,10 +21,16 @@ interface RolePasswordFieldProps {
  */
 export const RolePasswordField = ({
   isOptional = true,
+  isExistingRole = false,
   layout = 'horizontal',
 }: RolePasswordFieldProps) => {
   const { control, setValue } = useFormContext<{ password: string }>()
   const [isPasswordGenerated, setIsPasswordGenerated] = useState(false)
+
+  // A role without login can still hold a password, and leaving the field empty keeps it
+  const hint = isExistingRole
+    ? "Optional. Leave empty to keep the role's current password, if it has one."
+    : "Optional. Without a password, the role can't log in using password authentication."
 
   return (
     <FormField
@@ -34,8 +42,7 @@ export const RolePasswordField = ({
           label="Password"
           description={
             <>
-              {isOptional &&
-                `Optional. Without a password, the role can't log in using password authentication. `}
+              {isOptional && `${hint} `}
               <button
                 type="button"
                 tabIndex={0}
