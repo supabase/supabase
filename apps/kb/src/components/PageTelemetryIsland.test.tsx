@@ -51,6 +51,7 @@ describe('PageTelemetryIsland', () => {
     document.cookie = `${FIRST_REFERRER_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
     document.cookie = `${MW_DIAG_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
     platform.isPlatform = true
+    sessionStorage.clear()
     setReferrer('')
     window.history.replaceState(null, '', '/')
     vi.restoreAllMocks()
@@ -143,14 +144,36 @@ describe('PageTelemetryIsland', () => {
 
   it('does not reattribute later KB pages to the first referrer', () => {
     setFirstReferrerCookie()
-    setReferrer(`${window.location.origin}/kb/guides/a`)
+    setReferrer('https://supabase.com/kb/guides/a')
     consentState.hasConsented = true
+    render()
+    act(() => root?.unmount())
+    vi.mocked(posthogClient.capturePageView).mockClear()
+
     render()
 
     const props = vi.mocked(posthogClient.capturePageView).mock.calls[0][0]
-    expect(props.$referrer).toBe(`${window.location.origin}/kb/guides/a`)
+    expect(props.$referrer).toBe('https://supabase.com/kb/guides/a')
     expect(props).not.toHaveProperty('$utm_source')
     expect(props).not.toHaveProperty('first_referrer_cookie_present')
+  })
+
+  it('attributes the first pageview after consent even on a later KB page', async () => {
+    setFirstReferrerCookie()
+    setReferrer('https://supabase.com/kb/guides/a')
+    render()
+
+    await act(async () => {
+      consentState.hasConsented = true
+    })
+
+    expect(posthogClient.capturePageView).toHaveBeenCalledWith(
+      expect.objectContaining({
+        $referrer: 'https://www.google.com/',
+        $utm_source: 'google',
+        first_referrer_cookie_consumed: true,
+      })
+    )
   })
 
   it('sends landing-page UTMs captured before consent', async () => {
@@ -180,15 +203,6 @@ describe('PageTelemetryIsland', () => {
     expect(posthogClient.capturePageView).toHaveBeenCalledWith(
       expect.objectContaining({ mw_diag_hit: true, mw_diag_would_stamp: true })
     )
-  })
-
-  it('sends a pageview when the page is restored from the back-forward cache', () => {
-    consentState.hasConsented = true
-    render()
-
-    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }))
-
-    expect(posthogClient.capturePageView).toHaveBeenCalledTimes(2)
   })
 
   it('sends a pageleave on unload after consent', () => {

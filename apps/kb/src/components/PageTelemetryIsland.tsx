@@ -7,9 +7,22 @@ import { posthogClient } from 'common/posthog-client'
 import { clearFirstTouchData, getFirstTouchData } from 'common/telemetry-first-touch-store'
 import { useEffect, useRef } from 'react'
 
-import { BASE_PATH } from '../lib/constants'
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
+const FIRST_PAGEVIEW_SENT_KEY = 'kb_first_pageview_sent'
+
+function hasSentFirstPageview() {
+  try {
+    return sessionStorage.getItem(FIRST_PAGEVIEW_SENT_KEY) !== null
+  } catch {
+    return false
+  }
+}
+
+function markFirstPageviewSent() {
+  try {
+    sessionStorage.setItem(FIRST_PAGEVIEW_SENT_KEY, '1')
+  } catch {}
+}
 
 export function PageTelemetryIsland() {
   const { hasAccepted } = useConsentState()
@@ -24,19 +37,20 @@ export function PageTelemetryIsland() {
 
     posthogClient.init()
 
-    const isEntryPage = !document.referrer.startsWith(`${window.location.origin}${BASE_PATH}`)
+    const isFirstPageview = !hasSentFirstPageview()
     const cookieHeader = document.cookie
-    const firstTouchData = isEntryPage ? getFirstTouchData() : null
+    const firstTouchData = isFirstPageview ? getFirstTouchData() : null
     try {
       handlePageTelemetry({
         apiUrl: API_URL,
         pathname: window.location.pathname,
         ...(firstTouchData && { telemetryDataOverride: firstTouchData }),
-        ...(isEntryPage && {
+        ...(isFirstPageview && {
           firstReferrerData: parseFirstReferrerCookie(cookieHeader),
           mwDiagData: parseMwDiagCookie(cookieHeader),
         }),
       })
+      markFirstPageviewSent()
     } finally {
       clearFirstTouchData()
     }
@@ -46,16 +60,8 @@ export function PageTelemetryIsland() {
     if (!enabled) return
 
     const handleBeforeUnload = () => handlePageLeaveTelemetry(API_URL, window.location.pathname)
-    const handlePageShow = (event: PageTransitionEvent) => {
-      if (event.persisted)
-        handlePageTelemetry({ apiUrl: API_URL, pathname: window.location.pathname })
-    }
     window.addEventListener('beforeunload', handleBeforeUnload)
-    window.addEventListener('pageshow', handlePageShow)
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      window.removeEventListener('pageshow', handlePageShow)
-    }
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [enabled])
 
   return null
