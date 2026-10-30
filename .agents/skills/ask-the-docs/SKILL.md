@@ -57,7 +57,7 @@ than with prose. Default to including a **Mermaid diagram** in answers
 about:
 
 - The MDX runtime vs markdown-export pipeline split.
-- Build flow (Turbo → pnpm `prebuild` / `build` / `postbuild` → Vercel).
+- Build flow (Turbo task graph → `build` → R2 upload in `vercel.json` → Vercel).
 - LLM/agent consumption surface (`llms.txt`, negotiation, bulk exports).
 - Federated docs fetch flow.
 - CI / PR flow.
@@ -82,7 +82,7 @@ at hand — they cite each other where context matters.
 | [`reference/docs-app-direction.md`](./reference/docs-app-direction.md)             | Refactoring vision and working norms — what new work should align with.                                                                                                  |
 | [`reference/known-issues.md`](./reference/known-issues.md)                         | Living list of broken, fragile, or in-flux systems. Check before depending on anything (federated docs, search, Sentry, reference-page architecture).                    |
 | [`reference/app-map.md`](./reference/app-map.md)                                   | Architecture cheat sheet — directories, the two-pipeline (MDX runtime + markdown export) model, heading/typography contract, telemetry, lint entries.                    |
-| [`reference/build-pipeline.md`](./reference/build-pipeline.md)                     | Turborepo + pnpm lifecycle steps for building `apps/docs` — codegen, prebuild, postbuild, Vercel deploy. Mermaid diagram included.                                       |
+| [`reference/build-pipeline.md`](./reference/build-pipeline.md)                     | Turborepo task graph for building `apps/docs` — codegen, markdown generation, sitemap, R2 upload, Vercel deploy. Mermaid diagram included.                                       |
 | [`reference/llm-agent-surface.md`](./reference/llm-agent-surface.md)               | Audience routing, `llms.txt`, content negotiation, bulk exports.                                                                                                         |
 | [`reference/llm-agent-parity.md`](./reference/llm-agent-parity.md)                 | HTML↔markdown fidelity (e.g. AI prompts), search caveat, agent onboarding guides, in-flux wiring.                                                                        |
 | [`reference/federated-docs.md`](./reference/federated-docs.md)                     | How docs pulls markdown from external repos at build time. Routes, `pageMap`, remark/rehype plugins, link transforms, known failure modes.                               |

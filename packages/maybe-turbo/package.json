@@ -1,0 +1,10 @@
+{
+  "name": "maybe-turbo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Runs a package script through turbo unless it's already running inside turbo.",
+  "type": "module",
+  "bin": {
+    "maybe-turbo": "bin/maybe-turbo.mjs"
+  }
+}

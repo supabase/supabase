@@ -6,7 +6,7 @@
  * (`/docs/reference/csharp/auth-signup`).
  *
  * To remove: delete this file, its test, its call in ./ingest.ts and the `codegen:references` step
- * of `preingest:search_v2`, then run `delete from docs_search_v2 where slug like 'reference/%'` once.
+ * of the `ingest:search_v2` task's `dependsOn` in `turbo.jsonc`, then run `delete from docs_search_v2 where slug like 'reference/%'` once.
  */
 import { readFile } from 'node:fs/promises'
 import type { SupabaseClient } from '@supabase/supabase-js'

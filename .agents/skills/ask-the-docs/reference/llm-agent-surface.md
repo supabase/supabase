@@ -37,7 +37,7 @@ builds it on each request.
 
 ```mermaid
 flowchart TB
-  subgraph docsApp ["apps/docs prebuild"]
+  subgraph docsApp ["apps/docs build"]
     GM["build:guides-markdown"]
     RM["build:reference-markdown"]
     GZ["build:gz-archive"]
@@ -173,7 +173,7 @@ and `llms-full.txt`, not from middleware negotiation.
 - [`llm-agent-parity.md`](./llm-agent-parity.md) — two-pipeline fidelity,
   search caveat, agent onboarding pages, in-flux wiring.
 - [`app-map.md`](./app-map.md) — two-pipeline model, directory layout.
-- [`build-pipeline.md`](./build-pipeline.md) — prebuild steps that
+- [`build-pipeline.md`](./build-pipeline.md) — turbo tasks that
   produce markdown exports and the tarball.
 - [`docs-app-direction.md`](./docs-app-direction.md) — one-to-one
   markdown fidelity goal.
