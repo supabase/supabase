@@ -1,5 +1,5 @@
 import { createHash, createHmac, pbkdf2Sync } from 'node:crypto'
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import { buildScramSha256Verifier, getRolePasswordForSql } from './scram-sha-256'
 
@@ -40,6 +40,10 @@ describe('buildScramSha256Verifier', () => {
 })
 
 describe('getRolePasswordForSql', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   test.each(['pencil', `it's a "secret"`, 'with space & symbols !@#$%^*()'])(
     'sends a verifier instead of the ASCII password %j',
     async (password) => {
@@ -58,4 +62,10 @@ describe('getRolePasswordForSql', () => {
       expect(await getRolePasswordForSql(password)).toBe(password)
     }
   )
+  // Browsers don't expose crypto.subtle outside secure contexts, such as self-hosted Studio over HTTP
+  test('leaves an ASCII password as is when crypto.subtle is unavailable', async () => {
+    vi.stubGlobal('crypto', { getRandomValues: crypto.getRandomValues.bind(crypto) })
+
+    expect(await getRolePasswordForSql('pencil')).toBe('pencil')
+  })
 })

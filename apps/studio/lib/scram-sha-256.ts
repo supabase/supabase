@@ -57,8 +57,13 @@ export const buildScramSha256Verifier = async (
  * precomputed SCRAM-SHA-256 verifier so the plaintext stays out of the SQL, and with it the
  * server logs. Anything else is returned as is for Postgres to normalize and hash, because
  * SASLprep is not applied here.
+ *
+ * Browsers only expose `crypto.subtle` in secure contexts, so Studio served over plain HTTP
+ * (for example self-hosted at `http://<ip>:8000`) also falls back to the plaintext password
+ * rather than failing to set it.
  */
 export const getRolePasswordForSql = async (password: string) => {
   const isAscii = /^\p{ASCII}*$/u.test(password)
-  return isAscii ? buildScramSha256Verifier(password) : password
+  const canHash = globalThis.crypto?.subtle !== undefined
+  return isAscii && canHash ? buildScramSha256Verifier(password) : password
 }
