@@ -108,12 +108,8 @@
 
 :root {
   --sidebar-width: 300px;
-  --header-height: 50px;
-  --docs-side-column-width: clamp(15rem, 20vw, 17.5rem);
-}
-
-:root[data-ia-nav='option-1'] {
   --header-height: 56px;
+  --docs-side-column-width: clamp(15rem, 20vw, 17.5rem);
 }
 
 html {
