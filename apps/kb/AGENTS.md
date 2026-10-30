@@ -55,7 +55,7 @@ Each content collection renders through a matching catch-all page — e.g. `src/
 content files, and read from every collection.
 
 Separately, `scripts/generate-markdown.ts` runs as a `prebuild` step and exports every content file — plus
-one page per topic, listing its guides, and a root `sitemap.md` linking every topic, troubleshooting article, and guide — as a plain `.md` file under the gitignored `public/markdown/`,
+one page per topic, listing its guides, and a root `sitemap.md` linking every topic, guide, FAQ, and troubleshooting article — as a plain `.md` file under the gitignored `public/markdown/`,
 mirroring the page's URL with a `.md` extension. `vercel.json` permanently redirects `<page>.md` requests to
 these generated files, one redirect entry per route section (`guides`, `topics`, `troubleshooting`). It also
 rewrites guide, topic, and troubleshooting page requests that send `Accept: text/markdown` to the same files
