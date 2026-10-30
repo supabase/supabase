@@ -5,6 +5,7 @@ import { ConsentIsland } from '../components/ConsentIsland'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
 import { KbSearch } from '../components/KbSearch'
+import { PageTelemetryIsland } from '../components/PageTelemetryIsland'
 import { toSummary, toTroubleshootingSummary } from '../lib/guides'
 import { getListedTopics } from '../lib/topics'
 import '../styles/globals.css'
@@ -92,6 +93,7 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 		<Footer />
 		<KbSearch client:load />
 		<ConsentIsland client:only="react" />
+		<PageTelemetryIsland client:only="react" />
 	</body>
 </html>
 

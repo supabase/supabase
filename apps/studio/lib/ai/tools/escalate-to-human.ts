@@ -22,5 +22,6 @@ export const contract = {
     requires: new Set(['supportMode']),
   },
   needsApproval: false,
+  promptGuidance: `- If the user asks for a human, or if the issue cannot be safely resolved, call \`escalate_to_human\` with a short reason.`,
   toModelOutput: ({ status }) => ({ status }),
 } as const satisfies ToolContract
