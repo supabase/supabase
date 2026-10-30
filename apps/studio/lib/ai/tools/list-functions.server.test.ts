@@ -51,7 +51,9 @@ describe('ai/tools/list-functions', () => {
 
     const [variables, , , fetcher] = vi.mocked(executeSql).mock.calls[0]
     expect(variables.sql).toContain(`IN ('public')`)
-    expect(fetcher).toBe(executeQuery)
+    vi.mocked(executeQuery).mockResolvedValue({ data: [], error: undefined })
+    await expect(fetcher?.({ query: 'select 1' })).resolves.toEqual({ data: [] })
+    expect(executeQuery).toHaveBeenCalledWith({ query: 'select 1' })
     expect(result).toEqual([
       {
         schema: 'public',
@@ -62,5 +64,20 @@ describe('ai/tools/list-functions', () => {
         definition: 'select a + b',
       },
     ])
+  })
+  it('returns procedures, whose return_type is null', async () => {
+    vi.mocked(executeSql).mockResolvedValue({
+      result: [{ ...FUNCTION_ROW, name: 'do_work', type: 'procedure', return_type: null }],
+    })
+    const tool = createListFunctionsTool({
+      projectRef: 'default',
+      connectionString: 'encrypted',
+      aiOptInLevel: 'schema',
+    })
+    if (!tool.execute) throw new Error('execute is undefined')
+
+    const result = await tool.execute({ schemas: ['public'] }, TOOL_CONTEXT)
+
+    expect(result).toEqual([expect.objectContaining({ name: 'do_work', return_type: null })])
   })
 })

@@ -8,11 +8,13 @@ import type { ToolFactory } from './types'
 
 export const createTool: ToolFactory<typeof contract> = (ctx) => {
   return toolFromContract(contract, ctx, async ({ schemas, verbose }, { abortSignal }) => {
-    const rows = await runPgMetaQuery(
-      ctx,
-      pgMeta.tables.list({ includedSchemas: schemas, includeColumns: verbose }),
-      abortSignal
-    )
-    return toListTablesOutput(rows, verbose)
+    const options = { includedSchemas: schemas, includeColumns: verbose }
+    const [tables, views, materializedViews, foreignTables] = await Promise.all([
+      runPgMetaQuery(ctx, pgMeta.tables.list(options), abortSignal),
+      runPgMetaQuery(ctx, pgMeta.views.list(options), abortSignal),
+      runPgMetaQuery(ctx, pgMeta.materializedViews.list(options), abortSignal),
+      runPgMetaQuery(ctx, pgMeta.foreignTables.list(options), abortSignal),
+    ])
+    return toListTablesOutput({ tables, views, materializedViews, foreignTables }, verbose)
   })
 }

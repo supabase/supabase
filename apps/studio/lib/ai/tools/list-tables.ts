@@ -21,7 +21,7 @@ const inputSchema = z.object({
 export const contract = {
   name: 'list_tables',
   description:
-    'Lists all tables in one or more schemas. By default returns a compact summary. Set verbose to true to include column details, primary keys, and foreign key constraints.',
+    'Lists all tables, views, materialized views, and foreign tables in one or more schemas. By default returns a compact summary. Set verbose to true to include column details, primary keys, and foreign key constraints.',
   inputSchema,
   outputSchema: listTablesOutputSchema,
   minOptInLevel: 'schema',

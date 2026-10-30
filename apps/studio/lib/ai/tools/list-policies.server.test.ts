@@ -90,6 +90,8 @@ describe('ai/tools/list-policies', () => {
 
     const [variables, , , fetcher] = vi.mocked(executeSql).mock.calls[0]
     expect(variables.sql).toContain(`IN ('public','app')`)
-    expect(fetcher).toBe(executeQuery)
+    vi.mocked(executeQuery).mockResolvedValue({ data: [], error: undefined })
+    await expect(fetcher?.({ query: 'select 1' })).resolves.toEqual({ data: [] })
+    expect(executeQuery).toHaveBeenCalledWith({ query: 'select 1' })
   })
 })

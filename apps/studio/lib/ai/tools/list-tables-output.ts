@@ -1,4 +1,4 @@
-import type { PGTable } from '@supabase/pg-meta'
+import type { PGForeignTable, PGMaterializedView, PGTable, PGView } from '@supabase/pg-meta'
 import { z } from 'zod'
 
 // The shape of the remote MCP `list_tables` output, so the model sees the same thing in every
@@ -28,6 +28,8 @@ export const listTablesOutputSchema = z.object({
     z.object({
       /** `schema.table` */
       name: z.string(),
+      /** Omitted for regular tables, as in MCP. */
+      type: z.enum(['view', 'materialized_view', 'foreign_table']).optional(),
       rls_enabled: z.boolean(),
       rows: z.number().nullable(),
       comment: z.string().nullable().optional(),
@@ -90,28 +92,69 @@ function toForeignKeyConstraints(relationships: PGTable['relationships']) {
   return [...constraints.values()]
 }
 
-/**
- * Maps pg-meta table rows to the MCP `list_tables` shape. Columns, primary keys and foreign
- * keys are included only when `verbose`, as in MCP.
- */
-export function toListTablesOutput(rows: readonly PGTable[], verbose: boolean): ListTablesOutput {
-  return {
-    tables: rows.map((table) => {
-      const summary = {
-        name: `${table.schema}.${table.name}`,
-        rls_enabled: table.rls_enabled,
-        rows: table.live_rows_estimate,
-        ...(table.comment !== null && { comment: table.comment }),
-      }
-      if (!verbose) return summary
+type Relations = {
+  tables: readonly PGTable[]
+  views: readonly PGView[]
+  materializedViews: readonly PGMaterializedView[]
+  foreignTables: readonly PGForeignTable[]
+}
 
-      const foreignKeyConstraints = toForeignKeyConstraints(table.relationships)
-      return {
-        ...summary,
-        columns: table.columns ? table.columns.map(toColumn) : null,
-        primary_keys: table.primary_keys.map((key) => key.name),
-        ...(foreignKeyConstraints.length > 0 && { foreign_key_constraints: foreignKeyConstraints }),
-      }
-    }),
+type NonTableRelation = Pick<PGView, 'schema' | 'name' | 'comment' | 'columns'>
+
+function toNonTableEntry(
+  relation: NonTableRelation,
+  type: NonNullable<ListTablesOutput['tables'][number]['type']>,
+  verbose: boolean
+): ListTablesOutput['tables'][number] {
+  const summary = {
+    name: `${relation.schema}.${relation.name}`,
+    type,
+    // Postgres has no row security or row estimate for these relations here.
+    rls_enabled: false,
+    rows: null,
+    ...(relation.comment !== null && { comment: relation.comment }),
+  }
+  if (!verbose) return summary
+  return {
+    ...summary,
+    columns: relation.columns ? relation.columns.map(toColumn) : null,
+    primary_keys: [],
+  }
+}
+
+/**
+ * Maps pg-meta relation rows to the MCP `list_tables` shape. Columns, primary keys and foreign
+ * keys are included only when `verbose`, as in MCP. Views, materialized views and foreign tables
+ * are tagged with a `type`; regular tables omit it.
+ */
+export function toListTablesOutput(
+  { tables, views, materializedViews, foreignTables }: Relations,
+  verbose: boolean
+): ListTablesOutput {
+  return {
+    tables: [
+      ...tables.map((table) => {
+        const summary = {
+          name: `${table.schema}.${table.name}`,
+          rls_enabled: table.rls_enabled,
+          rows: table.live_rows_estimate,
+          ...(table.comment !== null && { comment: table.comment }),
+        }
+        if (!verbose) return summary
+
+        const foreignKeyConstraints = toForeignKeyConstraints(table.relationships)
+        return {
+          ...summary,
+          columns: table.columns ? table.columns.map(toColumn) : null,
+          primary_keys: table.primary_keys.map((key) => key.name),
+          ...(foreignKeyConstraints.length > 0 && {
+            foreign_key_constraints: foreignKeyConstraints,
+          }),
+        }
+      }),
+      ...views.map((view) => toNonTableEntry(view, 'view', verbose)),
+      ...materializedViews.map((view) => toNonTableEntry(view, 'materialized_view', verbose)),
+      ...foreignTables.map((table) => toNonTableEntry(table, 'foreign_table', verbose)),
+    ],
   }
 }

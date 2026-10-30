@@ -11,7 +11,8 @@ const outputSchema = z.array(
     schema: z.string(),
     name: z.string(),
     argument_types: z.string(),
-    return_type: z.string(),
+    // Null for procedures, which have no result type.
+    return_type: z.string().nullable(),
     language: z.string(),
     definition: z.string(),
   })

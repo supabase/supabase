@@ -52,7 +52,27 @@ describe('ai/tools/tool-sql runPgMetaQuery', () => {
 
     await runPgMetaQuery(CTX, pgMeta.schemas.list())
 
-    expect(vi.mocked(executeSql).mock.calls[0][3]).toBe(executeQuery)
+    const fetcher = vi.mocked(executeSql).mock.calls[0][3]
+    vi.mocked(executeQuery).mockResolvedValue({ data: [{ ok: true }], error: undefined })
+
+    await expect(fetcher?.({ query: 'select 1' })).resolves.toEqual({ data: [{ ok: true }] })
+    expect(executeQuery).toHaveBeenCalledWith({ query: 'select 1' })
+  })
+
+  it('surfaces the database error instead of an empty result off platform', async () => {
+    state.isPlatform = false
+    // Mirror executeSql's handling: a result with a `data` key counts as success.
+    vi.mocked(executeSql).mockImplementation(async (_variables, _signal, _headers, fetcher) => {
+      const result = await fetcher!({ query: 'select 1' })
+      if ('data' in result) return { result: result.data }
+      throw result.error
+    })
+    vi.mocked(executeQuery).mockResolvedValue({
+      data: undefined,
+      error: new Error('connection refused'),
+    })
+
+    await expect(runPgMetaQuery(CTX, pgMeta.schemas.list())).rejects.toThrow('connection refused')
   })
 
   it('parses rows with the builder schema', async () => {

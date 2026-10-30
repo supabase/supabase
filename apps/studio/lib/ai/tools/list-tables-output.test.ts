@@ -1,4 +1,4 @@
-import type { PGTable } from '@supabase/pg-meta'
+import type { PGForeignTable, PGMaterializedView, PGTable, PGView } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
 import { listTablesOutputSchema, toListTablesOutput } from './list-tables-output'
@@ -42,12 +42,12 @@ const table = (overrides: Partial<PGTable> = {}): PGTable => ({
   ...overrides,
 })
 
+const tablesOnly = (tables: PGTable[], verbose: boolean) =>
+  toListTablesOutput({ tables, views: [], materializedViews: [], foreignTables: [] }, verbose)
+
 describe('toListTablesOutput', () => {
   it('returns a compact summary without details', () => {
-    const output = toListTablesOutput(
-      [table({ columns: [column()], comment: 'Things to do' })],
-      false
-    )
+    const output = tablesOnly([table({ columns: [column()], comment: 'Things to do' })], false)
 
     expect(output).toEqual({
       tables: [{ name: 'public.todos', rls_enabled: true, rows: 3, comment: 'Things to do' }],
@@ -55,12 +55,12 @@ describe('toListTablesOutput', () => {
   })
 
   it('omits a null comment', () => {
-    const [summary] = toListTablesOutput([table()], false).tables
+    const [summary] = tablesOnly([table()], false).tables
     expect(summary).not.toHaveProperty('comment')
   })
 
   it('includes columns, primary keys and foreign keys when verbose', () => {
-    const output = toListTablesOutput(
+    const output = tablesOnly(
       [
         table({
           columns: [
@@ -143,7 +143,7 @@ describe('toListTablesOutput', () => {
       target_table_schema: 'public',
       target_table_name: 'lists',
     }
-    const [verbose] = toListTablesOutput(
+    const [verbose] = tablesOnly(
       [
         table({
           columns: [column({ is_generated: true })],
@@ -169,13 +169,87 @@ describe('toListTablesOutput', () => {
   })
 
   it('returns null columns and no foreign keys when a verbose row has none', () => {
-    const [verbose] = toListTablesOutput([table()], true).tables
+    const [verbose] = tablesOnly([table()], true).tables
     expect(verbose.columns).toBeNull()
     expect(verbose).not.toHaveProperty('foreign_key_constraints')
   })
 
   it('produces output the output schema accepts', () => {
-    const output = toListTablesOutput([table({ columns: [column()] })], true)
+    const output = tablesOnly([table({ columns: [column()] })], true)
     expect(listTablesOutputSchema.safeParse(output).success).toBe(true)
+  })
+  describe('non-table relations', () => {
+    const view: PGView = {
+      id: 2,
+      schema: 'public',
+      name: 'active_todos',
+      is_updatable: false,
+      comment: 'Open items',
+      columns: [column({ is_nullable: true })],
+    }
+    const materializedView: PGMaterializedView = {
+      id: 3,
+      schema: 'analytics',
+      name: 'daily',
+      is_populated: true,
+      comment: null,
+    }
+    const foreignTable: PGForeignTable = {
+      id: 4,
+      schema: 'public',
+      name: 'remote',
+      comment: null,
+      foreign_server_name: 's',
+      foreign_data_wrapper_name: 'w',
+      foreign_data_wrapper_handler: 'h',
+    }
+    const relations = {
+      tables: [],
+      views: [view],
+      materializedViews: [materializedView],
+      foreignTables: [foreignTable],
+    }
+
+    it('tags each relation with its type in the compact summary', () => {
+      expect(toListTablesOutput(relations, false)).toEqual({
+        tables: [
+          {
+            name: 'public.active_todos',
+            type: 'view',
+            rls_enabled: false,
+            rows: null,
+            comment: 'Open items',
+          },
+          {
+            name: 'analytics.daily',
+            type: 'materialized_view',
+            rls_enabled: false,
+            rows: null,
+          },
+          { name: 'public.remote', type: 'foreign_table', rls_enabled: false, rows: null },
+        ],
+      })
+    })
+
+    it('adds columns and empty primary keys when verbose', () => {
+      const [verboseView, verboseMaterialized] = toListTablesOutput(relations, true).tables
+
+      expect(verboseView.columns).toEqual([
+        {
+          name: 'id',
+          data_type: 'bigint',
+          format: 'int8',
+          options: ['nullable', 'updatable'],
+        },
+      ])
+      expect(verboseView.primary_keys).toEqual([])
+      expect(verboseMaterialized.columns).toBeNull()
+    })
+
+    it('produces output the output schema accepts', () => {
+      expect(listTablesOutputSchema.safeParse(toListTablesOutput(relations, true)).success).toBe(
+        true
+      )
+    })
   })
 })
