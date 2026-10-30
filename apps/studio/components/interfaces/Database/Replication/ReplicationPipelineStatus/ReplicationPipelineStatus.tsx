@@ -33,7 +33,7 @@ import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoad
 
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
-import { getStatusName } from '../Pipeline.utils'
+import { getPipelineLogsUrl, getStatusName } from '../Pipeline.utils'
 import { PipelineStatusName } from '../Replication.constants'
 import { RestartTableDialog } from '../RestartTableDialog'
 import { PipelineHealthSection } from './PipelineHealthSection'
@@ -218,9 +218,7 @@ export const ReplicationPipelineStatus = () => {
   const stateNotice = getPipelineStateNotice({ requestStatus, statusName, tableStatuses })
   const isSlotDisconnected =
     !isStatusError && statusName === PipelineStatusName.STARTED && applyLagMetrics?.active === false
-  const logsUrl = `/project/${projectRef}/logs/replication-logs?f=${encodeURIComponent(
-    JSON.stringify({ pipeline_id: pipelineId })
-  )}`
+  const logsUrl = getPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
   const emptyState = getTableStatusEmptyState({
     isDisabled: showDisabledState,
     disabledStateConfig: config,

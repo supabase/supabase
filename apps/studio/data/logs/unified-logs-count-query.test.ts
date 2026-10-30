@@ -26,3 +26,27 @@ describe('unified log counts', () => {
     ).rejects.toThrow('Count query failed')
   })
 })
+
+it.each([true, false])('reads Pipelines counts from the expected backend %s', async (useOtel) => {
+  addAPIMock({
+    method: 'post',
+    path: useOtel
+      ? '/platform/projects/:ref/analytics/endpoints/logs.all.otel'
+      : '/platform/projects/:ref/analytics/endpoints/logs.all',
+    response: () =>
+      HttpResponse.json<AnalyticsResponse>({
+        result: [
+          { facet: 'total', value: 'all', count: 2 },
+          { facet: 'log_type', value: 'pipelines', count: 2 },
+          { facet: 'level', value: 'error', count: 1 },
+        ],
+      }),
+  })
+  const counts = await getUnifiedLogsCount({
+    projectRef: 'default',
+    search: createUnifiedLogsSearch({ filter: ['log_type:eq:pipelines'] }),
+    useOtel,
+  })
+  expect(counts.totalRowCount).toBe(2)
+  expect(counts.facets.log_type.rows).toEqual([{ value: 'pipelines', total: 2 }])
+})

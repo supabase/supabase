@@ -362,3 +362,36 @@ describe('parseUnifiedLogsQueryRows', () => {
     expect(() => parseUnifiedLogsQueryRows([{ ...computeRow, level: 'info' }])).toThrow()
   })
 })
+
+describe('Pipelines logs mapping', () => {
+  it.each(['150', '03dg2o5teb2eucxr9ggh3uie6'])(
+    'preserves string identity %s and process fields for both backends',
+    (pipeline_id) => {
+      const metadata = { pipeline_id_v2: pipeline_id, level: 'error', table_id: '123' }
+      const row = {
+        id: 'pipeline-log',
+        timestamp: '2026-10-30T10:00:00Z',
+        log_type: 'pipelines',
+        status: null,
+        method: null,
+        pathname: null,
+        level: 'error',
+        event_message: 'Table copy failed',
+        log_count: null,
+        logs: null,
+        pipeline_id,
+      }
+      for (const details of [{ metadata }, { pipeline_metadata: JSON.stringify(metadata) }]) {
+        const mapped = mapUnifiedLogRow(parseUnifiedLogsQueryRows([{ ...row, ...details }])[0])
+        expect(mapped).toMatchObject({
+          pipeline_id,
+          metadata,
+          level: 'error',
+          status: null,
+          method: null,
+          pathname: null,
+        })
+      }
+    }
+  )
+})

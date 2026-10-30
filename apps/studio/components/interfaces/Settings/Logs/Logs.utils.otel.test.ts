@@ -632,21 +632,26 @@ describe('OTEL filter translation', () => {
   it('translates the etl pipeline_id filter', () => {
     expect(fmt(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: '42' })))
       .toMatchInlineSnapshot(`
-      "-- Logs Preview Query (otel) ['etl_replication_logs']
-      select
-        id,
-        timestamp,
-        event_message
-      from
-        logs
-      where
-        source = 'etl_replication_logs'
-        and (log_attributes['pipeline_id'] = '42')
-      order by
-        timestamp desc
-      limit
-        100"
-    `)
+        "-- Logs Preview Query (otel) ['etl_replication_logs']
+        select
+          id,
+          timestamp,
+          event_message
+        from
+          logs
+        where
+          source = 'etl_replication_logs'
+          and (
+            coalesce(
+              nullIf(log_attributes['pipeline_id_v2'], ''),
+              log_attributes['pipeline_id']
+            ) = '42'
+          )
+        order by
+          timestamp desc
+        limit
+          100"
+      `)
   })
 
   it('quotes a numeric etl pipeline_id so it compares as a string', () => {
@@ -663,7 +668,12 @@ describe('OTEL filter translation', () => {
         logs
       where
         source = 'etl_replication_logs'
-        and (log_attributes['pipeline_id'] = '42')
+        and (
+          coalesce(
+            nullIf(log_attributes['pipeline_id_v2'], ''),
+            log_attributes['pipeline_id']
+          ) = '42'
+        )
       order by
         timestamp desc
       limit

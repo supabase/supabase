@@ -4,7 +4,7 @@ import ReplicationLogsPage from '@/pages/project/[ref]/logs/replication-logs'
 
 export const Route = createFileRoute('/project/$ref/logs/replication-logs')({
   component: ReplicationLogsRoute,
-  staticData: { logsLayoutTitle: 'Replication Logs' },
+  staticData: { logsLayoutTitle: 'Pipelines logs' },
 })
 
 function ReplicationLogsRoute() {

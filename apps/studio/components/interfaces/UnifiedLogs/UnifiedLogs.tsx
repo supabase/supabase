@@ -34,7 +34,7 @@ import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
-import { LOG_TYPES, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { LOG_TYPES, PIPELINE_LOG_LEVEL_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
   buildDefaultColumnFilters,
@@ -193,6 +193,14 @@ export const UnifiedLogs = ({
     return parameters
   }, [search, scope, queryLogTypeVisibility])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
+  const parsedFilters = parseLogsFilterUrlParams(searchParameters.filter)
+  const selectedLogTypes = [...parsedFilters, ...(scope?.filters ?? [])].filter(
+    (filter) => filter.column === 'log_type' && filter.operator === '='
+  )
+  const isPipelinesLogsView =
+    (selectedLogTypes.length === 1 && selectedLogTypes[0].value === 'pipelines') ||
+    (selectedLogTypes.length === 0 &&
+      parsedFilters.some((filter) => filter.column === 'pipeline_id'))
 
   useEffect(() => setLocalFilterOrigin(null), [urlFilterScope])
 
@@ -295,9 +303,15 @@ export const UnifiedLogs = ({
     const baseLevels: readonly string[] = included.length > 0 ? included : LEVELS
     const activeLevels = baseLevels.filter((l) => !excluded.has(l))
     return Object.fromEntries(
-      Object.entries(CHART_CONFIG).filter(([key]) => activeLevels.includes(key))
+      LEVELS.filter((level) => activeLevels.includes(level)).map((level) => [
+        level,
+        {
+          ...CHART_CONFIG[level],
+          label: <TooltipLabel level={level} isProcessLog={isPipelinesLogsView} />,
+        },
+      ])
     ) as ChartConfig
-  }, [search.filter])
+  }, [search.filter, isPipelinesLogsView])
 
   const getRowClassName = (row: Row<ColumnSchema>) =>
     getLogRowClassName(row.original, liveMode.timestamp)
@@ -362,6 +376,17 @@ export const UnifiedLogs = ({
     )
 
     return gatedFields.map((field) => {
+      if (field.value === 'level' && isPipelinesLogsView) {
+        return {
+          ...field,
+          options: LEVELS.map((level) => ({
+            value: level,
+            label: PIPELINE_LOG_LEVEL_LABELS[level],
+            count: facets?.level?.rows.find((row) => row.value === level)?.total ?? 0,
+          })),
+          component: (option: Option) => <span className="text-xs">{option.label}</span>,
+        }
+      }
       const facetsField = facets?.[field.value]
 
       // If no facets data available, use the predefined field
@@ -387,7 +412,7 @@ export const UnifiedLogs = ({
 
       return { ...field, options }
     })
-  }, [facets, offeredFilters, queryLogTypeVisibility])
+  }, [facets, offeredFilters, queryLogTypeVisibility, isPipelinesLogsView])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)

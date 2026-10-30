@@ -26,6 +26,7 @@ mockAnimationsApi()
 
 describe('UnifiedLogs', () => {
   afterEach(() => {
+    vi.useRealTimers()
     localStorage.removeItem(LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK)
     localStorage.removeItem(`${LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK}-edge-function`)
   })
@@ -102,6 +103,83 @@ describe('UnifiedLogs', () => {
       timeout: 5_000,
     })
   }, 15_000)
+
+  it.each([true, false])(
+    'displays application logs and pipeline details with the OTEL backend %s',
+    async (useOtel) => {
+      vi.useFakeTimers({ shouldAdvanceTime: true })
+      const queries: string[] = []
+      const pipelineId = '03dg2o5teb2eucxr9ggh3uie6'
+      const metadata = { pipeline_id_v2: pipelineId, level: 'error', table_id: '123' }
+      addAPIMock({
+        method: 'post',
+        path: useOtel
+          ? '/platform/projects/:ref/analytics/endpoints/logs.all.otel'
+          : '/platform/projects/:ref/analytics/endpoints/logs.all',
+        response: async ({ request }) => {
+          const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+          queries.push(sql)
+          const isList = useOtel
+            ? sql.includes('row list')
+            : sql.includes('ORDER BY timestamp DESC')
+          return HttpResponse.json<AnalyticsResponse>({
+            result: isList
+              ? [
+                  {
+                    id: 'application-log',
+                    log_type: 'pipelines',
+                    pipeline_id: pipelineId,
+                    timestamp: Date.now() * 1000,
+                    event_message: 'Table copy failed',
+                    level: 'error',
+                    method: null,
+                    pathname: null,
+                    status: null,
+                    log_count: null,
+                    logs: null,
+                    ...(useOtel ? { metadata } : { pipeline_metadata: JSON.stringify(metadata) }),
+                  },
+                ]
+              : [],
+          })
+        },
+      })
+      mswServer.use(
+        http.get('/api/enabled-features-overrides', () =>
+          HttpResponse.json<{ disabled_features: string[] }>({ disabled_features: [] })
+        )
+      )
+      customRender(
+        <FeatureFlagContext.Provider
+          value={{ configcat: { otelUnifiedLogs: useOtel }, posthog: {}, hasLoaded: true }}
+        >
+          <UnifiedLogs hasFilterSideBar={false} />
+        </FeatureFlagContext.Provider>,
+        {
+          nuqs: {
+            hasMemory: true,
+            searchParams: `?filter=log_type:eq:pipelines,pipeline_id:eq:${pipelineId}&id=application-log`,
+          },
+        }
+      )
+      expect((await screen.findAllByText('Table copy failed'))[0]).toBeVisible()
+      expect(screen.getAllByText(pipelineId).length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Pipelines logs').length).toBeGreaterThan(0)
+      expect(await screen.findByRole('tab', { name: 'Overview' })).toBeVisible()
+      expect(screen.queryByRole('tab', { name: /Timeline|User/ })).not.toBeInTheDocument()
+      expect(screen.getAllByText('Pipeline ID').length).toBeGreaterThan(0)
+      await waitFor(() => expect(queries.length).toBeGreaterThanOrEqual(3))
+      for (const sql of queries) {
+        expect(sql).toContain('etl_replication_logs')
+        expect(sql).toContain('pipeline_id_v2')
+        expect(sql).toContain(pipelineId)
+      }
+      const rawTab = screen.getByRole('tab', { name: 'Raw JSON' })
+      fireEvent.keyDown(rawTab, { key: 'Enter' })
+      expect(rawTab).toHaveAttribute('aria-selected', 'true')
+      expect((await screen.findAllByText(/table_id/)).length).toBeGreaterThan(0)
+    }
+  )
 
   it('limits function logs to the supported filters and scopes rows, counts, and chart requests', async () => {
     const user = userEvent.setup()

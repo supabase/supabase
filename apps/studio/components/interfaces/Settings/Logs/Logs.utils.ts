@@ -914,7 +914,7 @@ const QUERY_TYPE_LABELS: Record<QueryType, string> = {
   pg_upgrade: 'Postgres upgrade',
   pg_cron: 'pg_cron',
   pgbouncer: 'PgBouncer',
-  etl: 'ETL',
+  etl: 'Pipelines logs',
   multigres: 'Multigres',
 }
 
@@ -932,7 +932,7 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
   pgbouncer_logs: 'PgBouncer',
   pg_upgrade_logs: 'Postgres upgrade',
   pg_cron_logs: 'pg_cron',
-  etl_replication_logs: 'ETL',
+  etl_replication_logs: 'Pipelines logs',
   multigres_logs: 'Multigres',
 }
 

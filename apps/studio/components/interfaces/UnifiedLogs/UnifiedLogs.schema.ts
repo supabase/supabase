@@ -21,6 +21,7 @@ export const columnSchema = z.object({
   logs: z.array(z.any()).optional(), // array of function logs
   auth_user: z.string().nullable().optional(),
   metadata: z.record(z.string(), z.unknown()).nullable().optional(),
+  pipeline_id: z.string().nullish(),
 })
 
 export type ColumnSchema = z.infer<typeof columnSchema>
