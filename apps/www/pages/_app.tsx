@@ -101,7 +101,7 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       />
 
-      <div className={`${manrope.variable} ${inter.variable} ${sourceCodePro.variable}`}>
+      <div className={`${manrope.variable} ${inter.variable} ${sourceCodePro.variable} font-sans`}>
         <AuthProvider>
           {/* [TODO] I think we need to deconflict with the providers in layout.tsx? */}
           <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
