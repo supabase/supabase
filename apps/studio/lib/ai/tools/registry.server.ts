@@ -13,11 +13,16 @@ import { createTool as createListNotebooks } from './list-notebooks.server'
 import { createTool as createListPolicies } from './list-policies.server'
 import { createTool as createListReports } from './list-reports.server'
 import { createTool as createLoadKnowledge } from './load-knowledge.server'
-import { isToolAvailable, TOOL_CONTRACTS, type ContractToolName } from './registry'
+import {
+  isToolAvailable,
+  TOOL_CONTRACTS,
+  type ContractToolName,
+  type ToolRequest,
+} from './registry'
 import { createTool as createRenameChat } from './rename-chat.server'
 import { createTool as createResolveSupportConversation } from './resolve-support-conversation.server'
 import { createTool as createRunNotebook } from './run-notebook.server'
-import type { ToolContext, ToolEnvironment, ToolFactory, ToolRequirement } from './types'
+import type { ToolContext, ToolFactory } from './types'
 import { createTool as createUpdateNotebook } from './update-notebook.server'
 import { createTool as createUpdateOptInLevel } from './update-opt-in-level.server'
 
@@ -47,10 +52,7 @@ export const TOOL_FACTORIES = {
 } as const satisfies { [K in ContractToolName]: ToolFactory<(typeof TOOL_CONTRACTS)[K]> }
 
 /** Builds the contract tools that exist in the request's environment and whose requirements it meets. */
-export function buildLocalTools(
-  ctx: ToolContext,
-  request: { environment: ToolEnvironment; satisfied: ReadonlySet<ToolRequirement> }
-): ToolSet {
+export function buildLocalTools(ctx: ToolContext, request: ToolRequest): ToolSet {
   const tools: ToolSet = {}
   for (const name of Object.keys(TOOL_FACTORIES) as ContractToolName[]) {
     if (!isToolAvailable(TOOL_CONTRACTS[name].availability, request)) continue
