@@ -33,6 +33,8 @@ import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getComputeSizeLabel } from '@/lib/compute-labels'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const MAP_WIDTH = 800
@@ -44,6 +46,8 @@ const MapView = () => {
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
+  const { data: project } = useSelectedProjectQuery()
+  const computeSize = getComputeSizeLabel(project?.infra_compute_size)
 
   const [mount, setMount] = useState(false)
   const [isPanning, setIsPanning] = useState(false)
@@ -286,7 +290,10 @@ const MapView = () => {
                         </p>
                         <div>
                           <p className="text-xs text-foreground-light">
-                            AWS{projectHomepageShowInstanceSize ? ` • ${database.size}` : ''}
+                            AWS
+                            {projectHomepageShowInstanceSize && !!computeSize
+                              ? ` • ${computeSize}`
+                              : ''}
                           </p>
                           {database.identifier !== ref && (
                             <p className="text-xs text-foreground-light">

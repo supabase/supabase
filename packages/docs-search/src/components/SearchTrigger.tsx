@@ -27,9 +27,10 @@ export function SearchTrigger({
       onClick={onClick}
       className={cn(
         'cursor-pointer',
-        'grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
+        'grow xl:min-w-56 h-[30px] rounded-md',
         'pl-2 pr-1',
         'flex items-center justify-between',
+        'max-xl:w-7.5 max-xl:grow-0 max-xl:justify-center max-xl:px-0',
         'border border-default bg-surface-75 text-foreground-lighter shadow-(--shadow-codeblock)',
         'hover:border-strong hover:text-foreground-light',
         'focus-ring',
@@ -39,9 +40,9 @@ export function SearchTrigger({
     >
       <div className="flex items-center gap-2">
         <Search aria-hidden className="size-4 shrink-0" strokeWidth={2.25} />
-        <p className="flex pr-2 text-sm">{placeholder}</p>
+        <p className="flex pr-2 text-sm max-xl:sr-only">{placeholder}</p>
       </div>
-      <KeyboardShortcut keys={['Meta', 'k']} aria-hidden className="hidden md:inline-flex" />
+      <KeyboardShortcut keys={['Meta', 'k']} aria-hidden className="hidden xl:inline-flex" />
     </button>
   )
 }

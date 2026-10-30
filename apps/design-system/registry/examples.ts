@@ -1574,6 +1574,11 @@ export const examples: Registry = [
     files: ['example/ai-tools-minimal.tsx'],
   },
   {
+    name: 'ai-tools-horizontal',
+    type: 'components:example',
+    files: ['example/ai-tools-horizontal.tsx'],
+  },
+  {
     name: 'toc-demo',
     type: 'components:example',
     files: ['example/toc-demo.tsx'],

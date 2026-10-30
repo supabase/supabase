@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import type {
   BigQueryDestinationConfig,
   BigQueryTableOption,
@@ -190,7 +191,7 @@ async function createDestinationPipeline(
   })
 
   if (error) handleError(error)
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 type CreateDestinationPipelineData = Awaited<ReturnType<typeof createDestinationPipeline>>

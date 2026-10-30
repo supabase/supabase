@@ -435,6 +435,10 @@
       "import": "./src/GlassPanel/index.tsx",
       "types": "./src/GlassPanel/index.tsx"
     },
+    "./GlyphLines": {
+      "import": "./src/GlyphLines/index.tsx",
+      "types": "./src/GlyphLines/index.tsx"
+    },
     "./Image/Image": {
       "import": "./src/Image/Image.tsx",
       "types": "./src/Image/Image.tsx"
@@ -547,6 +551,22 @@
       "import": "./src/MetricCard/index.tsx",
       "types": "./src/MetricCard/index.tsx"
     },
+    "./MobileNav/MobileNavDrawer": {
+      "import": "./src/MobileNav/MobileNavDrawer.tsx",
+      "types": "./src/MobileNav/MobileNavDrawer.tsx"
+    },
+    "./MobileNav/MobileNavLock": {
+      "import": "./src/MobileNav/MobileNavLock.tsx",
+      "types": "./src/MobileNav/MobileNavLock.tsx"
+    },
+    "./MobileNav/MobileNavTabs": {
+      "import": "./src/MobileNav/MobileNavTabs.tsx",
+      "types": "./src/MobileNav/MobileNavTabs.tsx"
+    },
+    "./MobileNav/MobileNavThemeButton": {
+      "import": "./src/MobileNav/MobileNavThemeButton.tsx",
+      "types": "./src/MobileNav/MobileNavThemeButton.tsx"
+    },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
       "types": "./src/MobileSheetNav/MobileSheetNav.tsx"
@@ -559,9 +579,18 @@
       "import": "./src/MultipleCodeBlock/index.tsx",
       "types": "./src/MultipleCodeBlock/index.tsx"
     },
+    "./Notch/NotchOutline": {
+      "import": "./src/Notch/NotchOutline.tsx",
+      "types": "./src/Notch/NotchOutline.tsx"
+    },
     "./Notch": {
       "import": "./src/Notch/index.ts",
       "types": "./src/Notch/index.ts"
+    },
+    "./Notch/notch.css": {
+      "style": "./src/Notch/notch.css",
+      "import": "./src/Notch/notch.css",
+      "types": "./src/Notch/notch.css"
     },
     "./PageBreadcrumbs": {
       "import": "./src/PageBreadcrumbs/index.tsx",
@@ -758,6 +787,18 @@
       "import": "./src/Toc/types.ts",
       "types": "./src/Toc/types.ts"
     },
+    "./TopNav/TopNavDropdown": {
+      "import": "./src/TopNav/TopNavDropdown.tsx",
+      "types": "./src/TopNav/TopNavDropdown.tsx"
+    },
+    "./TopNav/TopNavMenu": {
+      "import": "./src/TopNav/TopNavMenu.tsx",
+      "types": "./src/TopNav/TopNavMenu.tsx"
+    },
+    "./TopNav/TopNavMenuToggle": {
+      "import": "./src/TopNav/TopNavMenuToggle.tsx",
+      "types": "./src/TopNav/TopNavMenuToggle.tsx"
+    },
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
@@ -853,7 +894,7 @@
     "scroll-into-view-if-needed": "^3.1.0",
     "shiki": "catalog:",
     "smol-toml": "^1.6.1",
-    "sonner": "^1.5.0",
+    "sonner": "^2.0.8",
     "sql-formatter": "^15.0.0",
     "sse.js": "^2.2.0",
     "tsconfig": "workspace:*",

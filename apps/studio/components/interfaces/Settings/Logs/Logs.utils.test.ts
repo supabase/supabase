@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { LogsTableName } from './Logs.constants'
 import type { Filters, LogData } from './Logs.types'
@@ -139,12 +139,34 @@ describe('Logs.utils', () => {
   })
 
   describe('buildLogsPrompt', () => {
+    test.each([
+      '2026-10-27T10:15:00.000000',
+      '2026-10-27 10:15:00.000000',
+      '2026-10-27T10:15:00Z',
+      '2026-10-27T11:15:00+01:00',
+    ])(
+      'preserves the UTC log time in Assistant prompts regardless of the local timezone: %s',
+      (timestamp) => {
+        vi.stubEnv('TZ', 'Europe/Madrid')
+        try {
+          expect(new Date('2026-10-27T10:15:00').getTimezoneOffset()).toBe(-60)
+          const prompt = buildLogsPrompt([
+            { id: 'log', timestamp, event_message: 'Function failed' },
+          ])
+          expect(prompt).toContain('**Timestamp:** 2026-10-27T10:15:00.000Z')
+        } finally {
+          vi.unstubAllEnvs()
+        }
+      }
+    )
+
     test('builds prompt with single log', () => {
       const rows: LogData[] = [createLog({ id: '1', event_message: 'error occurred' })]
       const result = buildLogsPrompt(rows)
       expect(result).toContain('1 Supabase log entry')
       expect(result).toContain('error occurred')
       expect(result).toContain('What do these logs indicate')
+      expect(result).not.toContain('more matching log')
     })
 
     test('builds prompt with multiple logs', () => {
@@ -154,6 +176,26 @@ describe('Logs.utils', () => {
       ]
       const result = buildLogsPrompt(rows)
       expect(result).toContain('2 Supabase log entries')
+    })
+
+    test.each([
+      [1, '+1 more matching log entry not included.'],
+      [45, '+45 more matching log entries not included.'],
+      [1234, '+1,234 more matching log entries not included.'],
+    ])('tells the assistant that %i matching preview logs were omitted', (omittedCount, note) => {
+      const rows: LogData[] = [createLog({ id: '1', event_message: 'latest error' })]
+      const result = buildLogsPrompt(rows, {
+        queryType: 'functions',
+        sqlQuery: 'select event_message from function_logs limit 1',
+        omittedCount,
+      })
+      expect(result).toContain('from the **Edge Functions** service')
+      expect(result).toContain('latest error')
+      expect(result.indexOf('latest error')).toBeLessThan(result.indexOf(note))
+      expect(result).toContain(note)
+      expect(result).toContain(
+        '**Query used:**\n```sql\nselect event_message from function_logs limit 1\n```'
+      )
     })
   })
 

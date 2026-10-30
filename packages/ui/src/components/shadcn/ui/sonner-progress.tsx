@@ -27,7 +27,7 @@ export const SonnerProgress = ({
   description?: string
 }) => (
   <div className="flex gap-3 w-full">
-    <Loader2 className="animate-spin text-foreground-muted mt-0.5" size={16} />
+    <Loader2 className="motion-safe:animate-spin text-foreground-muted mt-0.5" size={16} />
     <div className="flex flex-col gap-2 w-full">
       <div className="flex w-full justify-between">
         <p className="text-foreground text-sm">{message}</p>

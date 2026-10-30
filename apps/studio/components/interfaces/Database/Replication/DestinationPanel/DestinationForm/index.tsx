@@ -42,6 +42,7 @@ import {
   pruneStaleTableOptions,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
+import { DUCKLAKE_MODE_SUPABASE } from './DuckLake/DuckLake.constants'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
@@ -60,6 +61,7 @@ import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
+import { AlertError } from '@/components/ui/AlertError'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -68,6 +70,7 @@ import { useReplicationPublicationNamesQuery } from '@/data/replication/publicat
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'destination-editor'
 
@@ -91,6 +94,17 @@ export const DestinationForm = ({
   onCancel = onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
+  const isOrioleDb = useIsOrioleDb({ enabled: selectedType === 'DuckLake' })
+  const {
+    isPending: isProjectPending,
+    isSuccess: isProjectSuccess,
+    isFetched: isProjectFetched,
+    isFetching: isProjectFetching,
+    error: projectError,
+    refetch: refetchProject,
+  } = useSelectedProjectQuery({ enabled: selectedType === 'DuckLake' })
+  const isDuckLakeProjectBlocked =
+    selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb !== false)
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
@@ -231,7 +245,7 @@ export const DestinationForm = ({
             addRequiredFieldError(path, message)
           })
         } else if (selectedType === 'DuckLake') {
-          getDucklakeValidationIssues(data, { secretsOptional: editMode }).forEach(
+          getDucklakeValidationIssues(data, { secretsOptional: editMode, isOrioleDb }).forEach(
             ({ path, message }) => {
               addRequiredFieldError(path, message)
             }
@@ -257,6 +271,8 @@ export const DestinationForm = ({
   // See https://react-hook-form.com/docs/useform/formstate
   const { isDirty } = form.formState
 
+  const ducklakeMode = useWatch({ control: form.control, name: 'ducklakeMode' })
+  const isManagedDuckLake = selectedType === 'DuckLake' && ducklakeMode === DUCKLAKE_MODE_SUPABASE
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
   const { data: selectedPublication, isSuccess: isSuccessPublication } =
     useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
@@ -287,6 +303,7 @@ export const DestinationForm = ({
 
   const isSubmitDisabled =
     isSaving ||
+    (isManagedDuckLake && isDuckLakeProjectBlocked) ||
     !isExistingConfigReady ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
@@ -320,6 +337,8 @@ export const DestinationForm = ({
   }
 
   const onSubmit = async (rawData: z.infer<typeof FormSchema>) => {
+    if (rawData.ducklakeMode === DUCKLAKE_MODE_SUPABASE && isDuckLakeProjectBlocked) return
+
     if (!isSuccessPublication || !selectedPublication) {
       toast.error('Publication tables are unavailable. Refresh and try again.')
       return
@@ -436,6 +455,9 @@ export const DestinationForm = ({
     const values = pendingFormValues
     setShowCostDialog(false)
 
+    // Project details may have failed to refresh while validation or confirmation was open.
+    if (values.ducklakeMode === DUCKLAKE_MODE_SUPABASE && isDuckLakeProjectBlocked) return
+
     await submitPipeline({
       data: values,
       existingDestination,
@@ -476,7 +498,34 @@ export const DestinationForm = ({
         />
       )}
       {selectedType === 'DuckLake' && etlEnableDucklake && (
-        <DuckLakeFields form={form} editMode={editMode} />
+        <>
+          <p role="status" className="px-5 pt-5 text-sm text-foreground-light empty:sr-only">
+            {isManagedDuckLake && isProjectPending && !isProjectFetched
+              ? 'Checking project compatibility...'
+              : ''}
+          </p>
+          {/* Keep this mounted during retries: AlertError's telemetry also observes the project. */}
+          {isManagedDuckLake &&
+            isProjectFetched &&
+            (!isProjectSuccess || isOrioleDb === undefined) && (
+              <AlertError
+                className="mx-5 mt-5"
+                subject="Failed to load project"
+                error={projectError ?? { message: 'The project database version is unavailable.' }}
+                projectRef={projectRef}
+                additionalActions={
+                  <Button
+                    type="button"
+                    loading={isProjectFetching}
+                    onClick={() => refetchProject()}
+                  >
+                    Retry
+                  </Button>
+                }
+              />
+            )}
+          <DuckLakeFields form={form} editMode={editMode} />
+        </>
       )}
       {selectedType === 'Snowflake' && etlEnableSnowflake && (
         <SnowflakeFields form={form} editMode={editMode} />

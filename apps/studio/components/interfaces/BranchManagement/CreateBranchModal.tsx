@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
 import { CheckIcon, DatabaseZapIcon, DollarSignIcon, GitMergeIcon, Loader2Icon } from 'lucide-react'
@@ -47,7 +47,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from '@/data/branches/branch-create-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { DiskAttributesData, useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
@@ -56,10 +56,10 @@ import { projectKeys } from '@/data/projects/keys'
 import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -75,10 +75,6 @@ export const CreateBranchModal = () => {
 
   const [isGitBranchValid, setIsGitBranchValid] = useState(false)
 
-  const { can: canCreateBranch } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_CREATE
-  )
-
   const { hasAccess: hasAccessToBranching, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('branching_limit')
   const promptPlanUpgrade = IS_PLATFORM && !hasAccessToBranching
@@ -86,6 +82,15 @@ export const CreateBranchModal = () => {
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
+
+  const createBranchGrant = useGrant('POST /v1/projects/{ref}/branches', { projectRef })
+  const createDataBranchGrant = useGrant(
+    'POST /v1/projects/{ref}/branches',
+    { projectRef },
+    { variant: 'production' }
+  )
+  const canCreateDataBranch = createDataBranchGrant.status === 'granted'
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
 
   const formId = 'create-branch-form'
   const FormSchema = z.object({
@@ -141,7 +146,9 @@ export const CreateBranchModal = () => {
   const isError = isErrorAuthorization || isErrorConnections
   const error = authorizationError || connectionsError
 
-  const { data: branches } = useBranchesQuery({ projectRef })
+  const { data: branches } = useQuery(
+    branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
+  )
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery(
     { projectRef },
     { enabled: showCreateBranchModal }
@@ -206,7 +213,8 @@ export const CreateBranchModal = () => {
 
   const isDisabled =
     !isFormValid ||
-    !canCreateBranch ||
+    createBranchGrant.status !== 'granted' ||
+    (!!withData && !canCreateDataBranch) ||
     !isSuccessAddons ||
     (!!gitBranchName && !isSuccessConnections) ||
     isLoadingEntitlement ||
@@ -214,7 +222,14 @@ export const CreateBranchModal = () => {
     isCreatingBranch ||
     isCheckingGHBranchValidity
 
-  const tooltipText = promptPlanUpgrade ? 'Upgrade to unlock branching' : undefined
+  const getTooltipText = () => {
+    if (promptPlanUpgrade) return 'Upgrade to unlock branching'
+    if (createBranchGrant.status === 'denied') {
+      return 'You need additional permissions to create branches'
+    }
+    return undefined
+  }
+  const tooltipText = getTooltipText()
 
   const validateGitBranchName = useCallback(
     (branchName: string) => {
@@ -262,7 +277,11 @@ export const CreateBranchModal = () => {
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
+    const isDataBranch = allowDataBranching && !!data.withData
+    const grantResult = isDataBranch ? createDataBranchGrant : createBranchGrant
+    if (grantResult.status !== 'granted') return
     createBranch({
+      grant: grantResult.grant,
       projectRef,
       branchName: data.branchName,
       is_default: false,
@@ -344,6 +363,10 @@ export const CreateBranchModal = () => {
                 />
               )}
 
+              {createBranchGrant.status === 'error' && (
+                <AlertError subject="Failed to check your permissions to create branches" />
+              )}
+
               {isSuccess &&
                 (!githubAuthorization || !githubConnection ? (
                   <ConnectToGitHub />
@@ -423,12 +446,16 @@ export const CreateBranchModal = () => {
                       }
                       layout="flex-row-reverse"
                       className="[&>div>label]:mb-1"
-                      description="Clone production data into this branch"
+                      description={
+                        createDataBranchGrant.status === 'denied'
+                          ? 'You need additional permissions to include data'
+                          : 'Clone production data into this branch'
+                      }
                     >
                       <FormControl>
                         <Switch
                           aria-label="Include data"
-                          disabled={!hasPitrEnabled}
+                          disabled={!hasPitrEnabled || !canCreateDataBranch}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
