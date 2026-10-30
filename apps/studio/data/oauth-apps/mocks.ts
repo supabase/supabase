@@ -13,6 +13,7 @@ import type {
   OAuthOrganizationRole,
   OAuthOrgAppDetails,
   OAuthScope,
+  OAuthValidationRole,
 } from './types'
 import { isPreflightValidationFailure, isWriteScope } from './types'
 import type { OrganizationRole } from '@/data/organization-members/organization-roles-query'
@@ -543,6 +544,17 @@ const ROLE_VALIDATED_SCENARIOS = new Set<string>([
   OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide,
 ])
 
+const VALIDATION_ROLE_NAMES: Record<string, OAuthValidationRole['name']> = {
+  [OWNER_ROLE.name]: 'owner',
+  [ADMINISTRATOR_ROLE.name]: 'administrator',
+  [DEVELOPER_ROLE.name]: 'developer',
+  [READ_ONLY_ROLE.name]: 'read-only',
+}
+
+function toValidationRole(role: OrganizationRole): OAuthValidationRole {
+  return { name: VALIDATION_ROLE_NAMES[role.name] ?? 'no-access' }
+}
+
 function isReadOnlyRole(role: OrganizationRole) {
   return role.id === READ_ONLY_ROLE.id
 }
@@ -563,7 +575,10 @@ function evaluateGrantEligibility(
       status: 'error',
       error_code: 'role_validation_failed',
       message: `Your ${organization.default_role.name} role cannot install this app for the organization.`,
-      validation: { scope_target: 'organization', role: organization.default_role },
+      validation: {
+        scope_target: 'organization',
+        role: toValidationRole(organization.default_role),
+      },
     }
   }
 
@@ -577,7 +592,7 @@ function evaluateGrantEligibility(
     message: `Your ${organization.default_role.name} role cannot satisfy this app's scopes for all projects.`,
     validation: {
       scope_target: 'all_projects',
-      role: organization.default_role,
+      role: toValidationRole(organization.default_role),
       failed_scopes: failedScopes,
     },
   }
@@ -624,10 +639,9 @@ export function getMockOAuthAppsAuthorizeApproveResult(
     message: `Your role is read-only on ${blocked.length} of the selected projects.`,
     validation: {
       scope_target: 'projects',
-      failures: blocked.map(({ name, ref, role }) => ({
+      failures: blocked.map(({ ref, role }) => ({
         ref,
-        name,
-        role,
+        role: toValidationRole(role),
         failed_scopes: failedScopes,
       })),
     },
