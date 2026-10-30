@@ -66,7 +66,10 @@ const LogsFilterPopover = ({
           <span>{options.label}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align={align} className="p-0 w-60">
+      <PopoverContent
+        align={align}
+        className="p-0 w-60 max-h-(--radix-popover-content-available-height) overflow-y-auto overflow-x-hidden"
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault()

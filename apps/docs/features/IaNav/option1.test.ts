@@ -44,7 +44,7 @@ function navUrls(navItems: Record<string, unknown>): string[] {
 describe('Option 1 navigation', () => {
   // These topics link to a section of their source page. When a topic gets its own page,
   // fix its link in the sidebar and remove it from this test.
-  it('links each of the seven new topics to the section it comes from', () => {
+  it('links each topic without its own page to the section it comes from', () => {
     const links = Object.values(option1 as Record<string, unknown>)
       .filter((value): value is NavNode => typeof value === 'object' && value !== null)
       .flatMap((sidebar) => nodes(sidebar))
@@ -52,21 +52,12 @@ describe('Option 1 navigation', () => {
 
     expect(links).toEqual(
       expect.arrayContaining([
-        ['Rotate a leaked API key', '/guides/getting-started/api-keys#leaked-key'],
         ['Production security checklist', '/guides/deployment/going-into-prod#security'],
-        [
-          'Log slow and failing queries',
-          '/guides/database/postgres/postgres-log-config#logmindurationstatement',
-        ],
         ['Query plans with explain()', '/guides/database/debugging-performance#using-explain'],
         ['Preview branches on Vercel', '/guides/deployment/branching/integrations#vercel'],
         [
           'Map team members to Postgres roles',
           '/guides/platform/temporary-access#configure-user-access',
-        ],
-        [
-          'Test RLS policies with pgTAP',
-          '/guides/local-development/testing/overview#database-unit-testing-with-pgtap',
         ],
       ])
     )
