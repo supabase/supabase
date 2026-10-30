@@ -85,9 +85,14 @@ const TopNavBar: FC<TopNavBarProps> = ({
             </div>
           </div>
           <div className="hidden lg:flex items-center justify-end gap-3">
-            {!isUserLoading && !isLoggedIn ? (
+            {!isLoggedIn ? (
               <Button variant="primary" asChild>
-                <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
+                <a
+                  href="/dashboard"
+                  className={cn('h-[30px]', isUserLoading && 'invisible')}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
                   Sign up
                 </a>
               </Button>
