@@ -21,6 +21,7 @@ import {
 } from '@/components/interfaces/Compute/Compute.utils'
 import { ComputeEmptyState } from '@/components/interfaces/Compute/ComputeEmptyState'
 import { ComputeList } from '@/components/interfaces/Compute/ComputeList'
+import { ComputePlanUsage } from '@/components/interfaces/Compute/ComputePlanUsage'
 import { DeployComputeInstanceDialog } from '@/components/interfaces/Compute/DeployComputeInstanceDialog'
 import { ComputeLayout } from '@/components/layouts/ComputeLayout/ComputeLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -115,6 +116,9 @@ const ComputePage: NextPageWithLayout = () => {
             )}
             {isSuccess && instances.length === 0 && (
               <ComputeEmptyState onDeploy={() => setIsDeployInstructionsOpen(true)} />
+            )}
+            {isSuccess && instances.length > 0 && ref && (
+              <ComputePlanUsage projectRef={ref} instances={instances} />
             )}
             {isSuccess && instances.length > 0 && ref && (
               <ComputeList

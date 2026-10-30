@@ -7,6 +7,11 @@ export const computeKeys = {
     name: string | undefined,
     params: { size: string; instances: number; days: number }
   ) => ['projects', projectRef, 'instance', name, 'usage', params] as const,
+  projectUsage: (
+    projectRef: string | undefined,
+    instances: { name: string; size: string; declaredInstances: number }[],
+    days: number
+  ) => ['projects', projectRef, 'compute-usage', instances, days] as const,
   orgUsage: (orgSlug: string | undefined, projectRef: string | null | undefined, days: number) =>
     ['organizations', orgSlug, 'compute-usage', projectRef ?? 'all', days] as const,
   logs: (

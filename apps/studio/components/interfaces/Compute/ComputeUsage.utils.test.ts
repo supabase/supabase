@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   COMPUTE_ALLOWANCE_WARNING_THRESHOLD,
   getComputeActiveHoursAllowance,
+  getComputeInstanceAllowance,
   getComputeUnitWeight,
 } from './ComputeUsage.constants'
 import {
@@ -51,6 +52,23 @@ describe('plan allowances', () => {
   it('falls back to the free allowance for an unknown or missing plan', () => {
     expect(getComputeActiveHoursAllowance(undefined)).toBe(50)
     expect(getComputeActiveHoursAllowance('some-future-plan')).toBe(50)
+  })
+})
+
+describe('plan instance allowances', () => {
+  it('returns the configured instance limit per plan', () => {
+    expect(getComputeInstanceAllowance('free')).toBe(1)
+    expect(getComputeInstanceAllowance('pro')).toBe(10)
+    expect(getComputeInstanceAllowance('team')).toBe(25)
+  })
+
+  it('returns null for enterprise, which has no fixed limit', () => {
+    expect(getComputeInstanceAllowance('enterprise')).toBeNull()
+  })
+
+  it('falls back to the free limit for an unknown or missing plan', () => {
+    expect(getComputeInstanceAllowance(undefined)).toBe(1)
+    expect(getComputeInstanceAllowance('some-future-plan')).toBe(1)
   })
 })
 

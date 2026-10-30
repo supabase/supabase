@@ -134,6 +134,66 @@ export const computeInstanceUsageQueryOptions = ({
   })
 
 /* ------------------------------------------------------------------ *
+ * Project-wide usage                                                  *
+ * ------------------------------------------------------------------ */
+
+export interface ComputeProjectUsageVariables {
+  projectRef?: string
+  /** The project's instances, so usage reflects what is actually deployed. */
+  instances?: { name: string; size: string; declaredInstances: number }[]
+  days?: number
+}
+
+export interface ComputeProjectUsage {
+  points: ComputeUsagePoint[]
+  activeHours: number
+  computeUnits: number
+  requests: number
+}
+
+/** Sums each instance's generated series into one project-level total. */
+export const computeProjectUsageQueryOptions = ({
+  projectRef,
+  instances = [],
+  days = 30,
+}: ComputeProjectUsageVariables) =>
+  queryOptions({
+    queryKey: computeKeys.projectUsage(projectRef, instances, days),
+    queryFn: async (): Promise<ComputeProjectUsage> => {
+      const perInstance = instances.map((instance) =>
+        generateUsagePoints({
+          seed: `${projectRef}:${instance.name}`,
+          days,
+          size: instance.size,
+          instances: instance.declaredInstances,
+          dutyCycle: 0.55,
+          requestsPerActiveHour: 820,
+        })
+      )
+
+      const points: ComputeUsagePoint[] = Array.from({ length: days }, (_, index) => {
+        const bucket = perInstance.map((series) => series[index]).filter(Boolean)
+        return {
+          timestamp: bucket[0]?.timestamp ?? dayjs().utc().toISOString(),
+          activeHours: Number(bucket.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
+          computeUnits: Number(bucket.reduce((sum, p) => sum + p.computeUnits, 0).toFixed(2)),
+          instances: Number(bucket.reduce((sum, p) => sum + p.instances, 0).toFixed(2)),
+          requests: bucket.reduce((sum, p) => sum + p.requests, 0),
+        }
+      })
+
+      return {
+        points,
+        activeHours: Number(points.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
+        computeUnits: Number(points.reduce((sum, p) => sum + p.computeUnits, 0).toFixed(2)),
+        requests: points.reduce((sum, p) => sum + p.requests, 0),
+      }
+    },
+    enabled: IS_PLATFORM && projectRef !== undefined && instances.length > 0,
+    staleTime: Infinity,
+  })
+
+/* ------------------------------------------------------------------ *
  * Org-wide usage                                                      *
  * ------------------------------------------------------------------ */
 

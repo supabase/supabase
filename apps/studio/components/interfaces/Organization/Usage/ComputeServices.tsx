@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 import {
   Chart,
   ChartCard,
@@ -45,12 +45,11 @@ import type { OrgSubscription } from '@/data/subscriptions/types'
 const USAGE_WINDOW_DAYS = 30
 
 const burndownConfig = {
-  usedHours: { label: 'Active hours used', color: 'var(--chart-1)' },
+  usedHours: { label: 'Active hours used' },
 } satisfies ChartConfig
 
 const bySizeConfig = {
-  activeHours: { label: 'Active hours', color: 'var(--chart-1)' },
-  computeUnits: { label: 'Compute units', color: 'var(--chart-2)' },
+  activeHours: { label: 'Active hours' },
 } satisfies ChartConfig
 
 export interface ComputeServicesProps {
@@ -81,6 +80,13 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
       : burndown.status === 'warning'
         ? ('warning' as const)
         : ('default' as const)
+
+  // The series is neutral until usage actually crosses the warning threshold, so colour
+  // only ever appears when it means something.
+  const isOverThreshold = burndown.status === 'warning' || burndown.status === 'exhausted'
+  const burndownInkClassName = isOverThreshold
+    ? 'fill-warning stroke-warning'
+    : 'fill-foreground stroke-foreground'
 
   return (
     <div id="compute-services" className="scroll-my-12">
@@ -141,7 +147,11 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
                     data={burndown.points}
                     margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
                   >
-                    <CartesianGrid vertical={false} stroke="var(--chart-muted)" />
+                    <CartesianGrid
+                      vertical={false}
+                      strokeDasharray="3 3"
+                      className="stroke-border-stronger"
+                    />
                     <XAxis
                       dataKey="timestamp"
                       tickLine={false}
@@ -194,9 +204,8 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
                     <Area
                       dataKey="usedHours"
                       type="monotone"
-                      stroke="var(--chart-1)"
-                      fill="var(--chart-1-fill)"
-                      fillOpacity={0.2}
+                      className={burndownInkClassName}
+                      fillOpacity={0.15}
                       strokeWidth={2}
                     />
                   </AreaChart>
@@ -242,7 +251,11 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
                     layout="vertical"
                     margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
                   >
-                    <CartesianGrid horizontal={false} stroke="var(--chart-muted)" />
+                    <CartesianGrid
+                      horizontal={false}
+                      strokeDasharray="3 3"
+                      className="stroke-border-stronger"
+                    />
                     <XAxis type="number" tickLine={false} axisLine={false} className="text-xs" />
                     <YAxis
                       type="category"
@@ -253,8 +266,7 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
                       className="text-xs"
                     />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="activeHours" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
-                    <Bar dataKey="computeUnits" fill="var(--chart-2)" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="activeHours" className="fill-foreground" radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ChartContainer>
               </ChartContent>
@@ -348,7 +360,7 @@ const ComputeProjectTable = ({
               className="hidden h-1.5 w-12 overflow-hidden rounded-full bg-surface-300 sm:block"
             >
               <span
-                className={cn('block h-full rounded-full bg-brand-default')}
+                className="block h-full rounded-full bg-foreground"
                 style={{ width: `${Math.round(share * 100)}%` }}
               />
             </span>

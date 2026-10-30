@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { BarChart2Icon } from 'lucide-react'
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 import {
   Chart,
@@ -12,6 +12,7 @@ import {
   ChartHeader,
   ChartLoadingState,
   ChartMetric,
+  ChartTitle,
   type ChartConfig,
 } from 'ui-patterns/Chart'
 import {
@@ -34,9 +35,12 @@ import { computeInstanceUsageQueryOptions } from '@/data/compute/compute-usage-q
 
 const USAGE_WINDOW_DAYS = 30
 
-const chartConfig = {
-  computeUnits: { label: 'Compute units', color: 'var(--chart-1)' },
-  instances: { label: 'Instances', color: 'var(--chart-2)' },
+const computeUnitsConfig = {
+  computeUnits: { label: 'Compute units' },
+} satisfies ChartConfig
+
+const instancesConfig = {
+  instances: { label: 'Instances' },
 } satisfies ChartConfig
 
 interface ComputeInstanceUsageSectionProps {
@@ -116,73 +120,126 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
             </div>
           </Chart>
 
-          <Chart isLoading={isPending} isErrored={isError}>
-            <ChartCard>
-              <ChartHeader align="start">
-                <ChartMetric
-                  label="Compute units"
-                  value={formatComputeUnits(totalComputeUnits)}
-                  tooltip="Daily compute units, with live instances plotted alongside."
-                />
-              </ChartHeader>
-              <ChartContent
-                isEmpty={isEmpty}
-                loadingState={<ChartLoadingState />}
-                errorState={
-                  <ChartEmptyState
-                    icon={<BarChart2Icon size={16} />}
-                    title="Usage unavailable"
-                    description="Unable to load usage for this instance"
-                  />
-                }
-                emptyState={
-                  <ChartEmptyState
-                    icon={<BarChart2Icon size={16} />}
-                    title="No usage yet"
-                    description="Usage appears once the instance starts serving requests"
-                  />
-                }
-              >
-                <ChartContainer config={chartConfig} className="h-52 w-full">
-                  <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid vertical={false} stroke="var(--chart-muted)" />
-                    <XAxis
-                      dataKey="timestamp"
-                      tickLine={false}
-                      axisLine={false}
-                      minTickGap={32}
-                      tickFormatter={(value) => dayjs(value).format('DD MMM')}
-                      className="text-xs"
+          {/* Compute units and instances are different measures, so they get a chart each
+              rather than sharing one y-axis. Both use the neutral ink the other usage
+              charts use — nothing here is a status, so nothing is coloured. */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Chart isLoading={isPending} isErrored={isError}>
+              <ChartCard>
+                <ChartHeader align="start">
+                  <ChartTitle tooltip="Active hours weighted by instance size, per day.">
+                    Compute units
+                  </ChartTitle>
+                </ChartHeader>
+                <ChartContent
+                  isEmpty={isEmpty}
+                  loadingState={<ChartLoadingState />}
+                  errorState={
+                    <ChartEmptyState
+                      icon={<BarChart2Icon size={16} />}
+                      title="Usage unavailable"
+                      description="Unable to load usage for this instance"
                     />
-                    <YAxis tickLine={false} axisLine={false} width={40} className="text-xs" />
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          labelFormatter={(value) => dayjs(value).format('DD MMM YYYY')}
-                        />
-                      }
+                  }
+                  emptyState={
+                    <ChartEmptyState
+                      icon={<BarChart2Icon size={16} />}
+                      title="No usage yet"
+                      description="Usage appears once the instance starts serving requests"
                     />
-                    <Area
-                      dataKey="computeUnits"
-                      type="monotone"
-                      stroke="var(--chart-1)"
-                      fill="var(--chart-1-fill)"
-                      fillOpacity={0.2}
-                      strokeWidth={2}
+                  }
+                >
+                  <ChartContainer config={computeUnitsConfig} className="h-44 w-full">
+                    <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                      <CartesianGrid
+                        vertical={false}
+                        strokeDasharray="3 3"
+                        className="stroke-border-stronger"
+                      />
+                      <XAxis
+                        dataKey="timestamp"
+                        tickLine={false}
+                        axisLine={false}
+                        minTickGap={32}
+                        tickFormatter={(value) => dayjs(value).format('DD MMM')}
+                        className="text-xs"
+                      />
+                      <YAxis tickLine={false} axisLine={false} width={40} className="text-xs" />
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            labelFormatter={(value) => dayjs(value).format('DD MMM YYYY')}
+                          />
+                        }
+                      />
+                      <Bar dataKey="computeUnits" className="fill-foreground" />
+                    </BarChart>
+                  </ChartContainer>
+                </ChartContent>
+              </ChartCard>
+            </Chart>
+
+            <Chart isLoading={isPending} isErrored={isError}>
+              <ChartCard>
+                <ChartHeader align="start">
+                  <ChartTitle tooltip="Mean number of instances live each day.">
+                    Instances
+                  </ChartTitle>
+                </ChartHeader>
+                <ChartContent
+                  isEmpty={isEmpty}
+                  loadingState={<ChartLoadingState />}
+                  errorState={
+                    <ChartEmptyState
+                      icon={<BarChart2Icon size={16} />}
+                      title="Usage unavailable"
+                      description="Unable to load instance counts"
                     />
-                    <Area
-                      dataKey="instances"
-                      type="monotone"
-                      stroke="var(--chart-2)"
-                      fill="var(--chart-2-fill)"
-                      fillOpacity={0.12}
-                      strokeWidth={2}
+                  }
+                  emptyState={
+                    <ChartEmptyState
+                      icon={<BarChart2Icon size={16} />}
+                      title="No instances yet"
+                      description="Instance counts appear once the deployment is live"
                     />
-                  </AreaChart>
-                </ChartContainer>
-              </ChartContent>
-            </ChartCard>
-          </Chart>
+                  }
+                >
+                  <ChartContainer config={instancesConfig} className="h-44 w-full">
+                    <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                      <CartesianGrid
+                        vertical={false}
+                        strokeDasharray="3 3"
+                        className="stroke-border-stronger"
+                      />
+                      <XAxis
+                        dataKey="timestamp"
+                        tickLine={false}
+                        axisLine={false}
+                        minTickGap={32}
+                        tickFormatter={(value) => dayjs(value).format('DD MMM')}
+                        className="text-xs"
+                      />
+                      <YAxis
+                        tickLine={false}
+                        axisLine={false}
+                        width={40}
+                        className="text-xs"
+                        allowDecimals={false}
+                      />
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            labelFormatter={(value) => dayjs(value).format('DD MMM YYYY')}
+                          />
+                        }
+                      />
+                      <Bar dataKey="instances" className="fill-foreground" />
+                    </BarChart>
+                  </ChartContainer>
+                </ChartContent>
+              </ChartCard>
+            </Chart>
+          </div>
         </div>
       </PageSectionContent>
     </PageSection>

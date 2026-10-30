@@ -27,6 +27,16 @@ export const COMPUTE_ACTIVE_HOURS_ALLOWANCE: Record<string, number | null> = {
 
 export const DEFAULT_COMPUTE_ACTIVE_HOURS_ALLOWANCE = 50
 
+/** Instances included per plan. `null` means no fixed limit. */
+export const COMPUTE_INSTANCE_ALLOWANCE: Record<string, number | null> = {
+  free: 1,
+  pro: 10,
+  team: 25,
+  enterprise: null,
+}
+
+export const DEFAULT_COMPUTE_INSTANCE_ALLOWANCE = 1
+
 /** The point at which the burn-down starts warning, as a fraction of the allowance. */
 export const COMPUTE_ALLOWANCE_WARNING_THRESHOLD = 0.8
 
@@ -36,6 +46,12 @@ export const getComputeActiveHoursAllowance = (
   if (planId === undefined) return DEFAULT_COMPUTE_ACTIVE_HOURS_ALLOWANCE
   if (!(planId in COMPUTE_ACTIVE_HOURS_ALLOWANCE)) return DEFAULT_COMPUTE_ACTIVE_HOURS_ALLOWANCE
   return COMPUTE_ACTIVE_HOURS_ALLOWANCE[planId]
+}
+
+export const getComputeInstanceAllowance = (planId: OrgPlan['id'] | undefined): number | null => {
+  if (planId === undefined) return DEFAULT_COMPUTE_INSTANCE_ALLOWANCE
+  if (!(planId in COMPUTE_INSTANCE_ALLOWANCE)) return DEFAULT_COMPUTE_INSTANCE_ALLOWANCE
+  return COMPUTE_INSTANCE_ALLOWANCE[planId]
 }
 
 export const getComputeUnitWeight = (size: string): number =>
