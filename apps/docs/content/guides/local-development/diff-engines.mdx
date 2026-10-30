@@ -2,7 +2,6 @@
 id: 'diff-engines'
 title: 'Diff engines: pg-delta and migra'
 description: 'How the Supabase CLI generates migrations, which engine your project uses, and how to switch.'
-subtitle: 'How the Supabase CLI generates migrations, which engine your project uses, and how to switch.'
 ---
 
 A diff engine compares two database states and generates the SQL that turns one into the other. It powers `supabase db diff`, `supabase db pull`, and the `supabase db schema declarative` commands. The CLI ships two engines, and the same command can behave differently depending on which one your project uses. This page explains how to tell which engine you're on, what differs between them, and how to move an existing project from one to the other.

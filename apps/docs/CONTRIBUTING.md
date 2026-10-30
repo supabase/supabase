@@ -84,7 +84,7 @@ Adding a new guide requires:
 - YAML frontmatter
 - A navigation entry in a separate file
 
-Frontmatter looks like this. `title` is mandatory. There are also optional properties that you can use to control the page display, including `subtitle`, `tocVideo`, and `hideToc`.
+Frontmatter looks like this. `title` is mandatory. There are also optional properties that you can use to control the page display, including `description`, `subtitle`, `tocVideo`, and `hideToc`. For what goes in `description` and `subtitle`, see [Give the description, subtitle, and first sentence separate jobs](./style-guide/03-page-structure.md#give-the-description-subtitle-and-first-sentence-separate-jobs).
 
 ```yaml
 ---

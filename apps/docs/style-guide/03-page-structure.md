@@ -47,6 +47,19 @@ separate section or an explainer and cross-reference the authoritative explanati
 rather than repeating it. This keeps the action path scannable and maintains one source
 of truth.
 
+### Give the description, subtitle, and first sentence separate jobs
+
+Each one does a different job:
+
+| Place          | Job                                                                                      | When to set it               |
+| -------------- | ---------------------------------------------------------------------------------------- | ---------------------------- |
+| `description`  | What the page helps the reader do, for search and link previews, in 150–160 characters   | Always                       |
+| `subtitle`     | An imperative that defines a title too short to say what the page covers, with no period | Only when the title needs it |
+| First sentence | The [value statement](#open-a-guide-with-a-value-statement)                              | Always                       |
+
+- **Recommended**: `Vault` with `Manage secrets in Postgres`, and `Branching` with `Use Supabase Branches to test and preview changes`.
+- **Not recommended**: The same line in the description, subtitle, and first sentence.
+
 ### Topic size
 
 Each type above is one unit of work for the reader. An explainer covers one topic. A

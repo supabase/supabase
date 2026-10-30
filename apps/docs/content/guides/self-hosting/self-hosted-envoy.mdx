@@ -1,7 +1,6 @@
 ---
 title: 'Envoy API Gateway'
 description: 'Architecture and configuration of the Envoy API gateway for self-hosted Supabase.'
-subtitle: 'Architecture and configuration of the Envoy API gateway for self-hosted Supabase.'
 ---
 
 Self-hosted Supabase uses an [Envoy](https://www.envoyproxy.io/)-based API gateway by default. It accepts incoming client requests, routes them to internal services (Auth, PostgREST, Realtime, Storage, Edge Functions, postgres-meta, Studio), and enforces API key authentication by translating opaque `sb_` keys into the internal credentials used by those services.
