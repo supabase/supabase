@@ -164,10 +164,6 @@ export const database: NavMenuConstant = {
           name: 'Query performance',
           items: [
             { name: 'Query optimization', url: '/guides/database/query-optimization' },
-            {
-              name: 'Debugging performance issues',
-              url: '/guides/database/debugging-performance',
-            },
             { name: 'Partitioning your tables', url: '/guides/database/partitions' },
             { name: 'Migrating to pg_partman', url: '/guides/database/migrating-to-pg-partman' },
           ],
