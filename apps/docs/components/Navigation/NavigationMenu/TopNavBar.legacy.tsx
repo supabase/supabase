@@ -108,7 +108,7 @@ export const LegacyTopNavBar: FC<TopNavBarProps> = ({
 }
 
 const HeaderLogo = memo(() => (
-  <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit">
+  <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit lg:w-(--nav-logo-width)">
     <HeaderLogoContent />
   </Link>
 ))

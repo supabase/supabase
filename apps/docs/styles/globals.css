@@ -110,6 +110,8 @@
   --sidebar-width: 300px;
   --header-height: 56px;
   --docs-side-column-width: clamp(15rem, 20vw, 17.5rem);
+  --nav-logo-width: 8.5rem;
+  --nav-menu-inset: calc(var(--nav-logo-width) + 4.75rem);
 }
 
 html {
