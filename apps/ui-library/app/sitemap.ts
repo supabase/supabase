@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next'
 
 import { allDocs } from '@/.velite'
+import { CANONICAL_ORIGIN, LIBRARY_PATH } from '@/lib/canonical'
 
-// Matches `metadataBase` in app/layout.tsx. The library is served under /library
-// on the main site, so every URL needs the base path, which crawlers don't add.
-const SITE_URL = 'https://supabase.com'
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '/library'
+// The library is served under /library on the main site, so every URL needs the
+// base path, which crawlers don't add.
+const SITE_URL = CANONICAL_ORIGIN
+const BASE_PATH = LIBRARY_PATH
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const docUrls = allDocs
