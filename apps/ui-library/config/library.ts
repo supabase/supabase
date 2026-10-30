@@ -64,6 +64,11 @@ const blockMetadata: Record<string, Pick<LibraryBlock, 'description' | 'category
     category: 'Authentication',
     preview: 'auth',
   },
+  'magic-auth': {
+    description: 'Passwordless sign-in with magic links.',
+    category: 'Authentication',
+    preview: 'auth',
+  },
   'social-auth': {
     description: 'OAuth sign-in flows for popular providers.',
     category: 'Authentication',
