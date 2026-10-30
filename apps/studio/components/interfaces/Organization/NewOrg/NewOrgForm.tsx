@@ -43,14 +43,12 @@ import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
 import {
   BUILDING_MAX_LENGTH,
   BUILDING_PLACEHOLDER,
-  formatHeardFromAnswer,
-  HEARD_FROM_FOLLOW_UP_BY_VALUE,
-  HEARD_FROM_OPTIONS,
   isOrgFormVariant,
   ORG_KIND_DEFAULT,
   ORG_KIND_TYPES,
   ORG_SIZE_DEFAULT,
   ORG_SIZE_TYPES,
+  SURVEY_ORG_KIND_TYPES,
 } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
 import { useOnboardingSurveyPrompt } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyPrompt'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -90,8 +88,6 @@ const formSchema = organizationDetailsSchema.extend({
     .transform((val) => val.toUpperCase())
     .pipe(z.enum(plans)),
   spend_cap: z.boolean(),
-  heard_from: z.string().optional(),
-  heard_from_detail: z.string().optional(),
   building: z.string().max(BUILDING_MAX_LENGTH).optional(),
 })
 
@@ -165,8 +161,6 @@ export const NewOrgForm = ({
       kind: defaultValues.kind as OrgKind,
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
-      heard_from: '',
-      heard_from_detail: '',
       building: '',
     },
   })
@@ -199,8 +193,6 @@ export const NewOrgForm = ({
       kind: defaultValues.kind as OrgKind,
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
-      heard_from: form.getValues('heard_from'),
-      heard_from_detail: form.getValues('heard_from_detail'),
       building: form.getValues('building'),
     })
   }, [defaultValues, form])
@@ -245,11 +237,6 @@ export const NewOrgForm = ({
   const selectedPlan = useWatch({ control: form.control, name: 'plan' })
   const selectedSpendCap = useWatch({ control: form.control, name: 'spend_cap' })
   const selectedOrgKind = useWatch({ control: form.control, name: 'kind' })
-  const selectedHeardFrom = useWatch({ control: form.control, name: 'heard_from' })
-  const selectedHeardFromDetail = useWatch({ control: form.control, name: 'heard_from_detail' })
-  const heardFromFollowUp = selectedHeardFrom
-    ? HEARD_FROM_FOLLOW_UP_BY_VALUE[selectedHeardFrom]
-    : undefined
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -311,19 +298,14 @@ export const NewOrgForm = ({
     async (slug: string) => {
       if (!showOnboardingSurveyInOrgForm) return
 
-      const heardFrom = formatHeardFromAnswer(
-        form.getValues('heard_from'),
-        form.getValues('heard_from_detail')
-      )
       const building = form.getValues('building')?.trim()
       const kind = form.getValues('kind')
       const size = kind === 'COMPANY' ? form.getValues('size') : undefined
-      const hasHeardFrom = !!heardFrom
       const hasBuilding = !!building
 
       const groupOverrides = { organization: slug }
 
-      if (!hasHeardFrom && !hasBuilding) {
+      if (!hasBuilding) {
         track(
           'onboarding_survey_dismissed',
           { surface: 'org_form', reason: 'org_form_blank' },
@@ -332,7 +314,7 @@ export const NewOrgForm = ({
       } else {
         track(
           'onboarding_survey_submit_button_clicked',
-          { surface: 'org_form', hasHeardFrom, hasBuilding },
+          { surface: 'org_form', hasHeardFrom: false, hasBuilding },
           groupOverrides
         )
       }
@@ -344,13 +326,12 @@ export const NewOrgForm = ({
           slug,
           kind,
           size,
-          heard_from: heardFrom || undefined,
           building: building || undefined,
         })
       } catch {
         track(
           'onboarding_survey_submit_failed',
-          { surface: 'org_form', hasHeardFrom, hasBuilding },
+          { surface: 'org_form', hasHeardFrom: false, hasBuilding },
           groupOverrides
         )
       }
@@ -505,6 +486,8 @@ export const NewOrgForm = ({
 
   const buildingPlaceholder = BUILDING_PLACEHOLDER
 
+  const orgKindLabels = showOnboardingSurveyInOrgForm ? SURVEY_ORG_KIND_TYPES : ORG_KIND_TYPES
+
   const orgKindField = (
     <FormField
       control={form.control}
@@ -524,7 +507,7 @@ export const NewOrgForm = ({
               </SelectTrigger>
 
               <SelectContent>
-                {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
+                {Object.entries(orgKindLabels).map(([k, v]) => (
                   <SelectItem key={k} value={k}>
                     {v}
                   </SelectItem>
@@ -563,57 +546,6 @@ export const NewOrgForm = ({
     />
   )
 
-  const heardFromField = (
-    <FormField
-      control={form.control}
-      name="heard_from"
-      render={({ field }) => (
-        <FormItemLayout label="Where did you hear about us?" layout="horizontal">
-          <FormControl>
-            <div className="flex flex-col gap-y-2">
-              <Select
-                value={field.value}
-                onValueChange={(value) => {
-                  field.onChange(value)
-                  if (!HEARD_FROM_FOLLOW_UP_BY_VALUE[value]) {
-                    form.setValue('heard_from_detail', '', {
-                      shouldDirty: true,
-                    })
-                  }
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select an option" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  {HEARD_FROM_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {heardFromFollowUp && (
-                <Input
-                  aria-label={heardFromFollowUp.label}
-                  value={selectedHeardFromDetail ?? ''}
-                  placeholder={heardFromFollowUp.placeholder}
-                  onChange={(event) =>
-                    form.setValue('heard_from_detail', event.target.value, {
-                      shouldDirty: true,
-                    })
-                  }
-                />
-              )}
-            </div>
-          </FormControl>
-        </FormItemLayout>
-      )}
-    />
-  )
-
   const buildingField = (
     <FormField
       control={form.control}
@@ -644,7 +576,6 @@ export const NewOrgForm = ({
     <div className="flex flex-col gap-y-5">
       {orgKindField}
       {orgSizeField}
-      {heardFromField}
       {buildingField}
     </div>
   )

@@ -1,3 +1,5 @@
+import { ORG_KIND_TYPES, type OrgKind } from '../Organization/NewOrg/OrganizationDetailsFields'
+
 export const HEARD_FROM_OPTIONS = [
   { value: 'search_engine', label: 'Search engine' },
   { value: 'social_media', label: 'Social media' },
@@ -70,6 +72,12 @@ export {
   ORG_SIZE_DEFAULT,
   ORG_SIZE_TYPES,
 } from '../Organization/NewOrg/OrganizationDetailsFields'
+
+// Same values as ORG_KIND_TYPES, worded as answers to "Who is this org for?"
+export const SURVEY_ORG_KIND_TYPES: Record<OrgKind, string> = {
+  ...ORG_KIND_TYPES,
+  UNDISCLOSED: 'Prefer not to say',
+}
 
 export const ONBOARDING_SURVEY_EXPERIMENT_ID = 'onboardingSurveyPlacement'
 
