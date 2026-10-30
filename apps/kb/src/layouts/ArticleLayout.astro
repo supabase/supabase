@@ -1,12 +1,11 @@
 ---
-import { ExternalLink } from 'lucide-react'
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, GithubIcon } from 'ui'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, GithubIcon, IconGitHubSolid } from 'ui'
 import type { TOCItemType } from 'ui-patterns/Toc/types'
 
 import { CodeBlockControlsIsland } from '../components/CodeBlockControlsIsland'
 import { FeaturedSection } from '../components/FeaturedSection'
 import { GuideSidebar } from '../components/GuideSidebar'
-import { formatDisplayDate } from '../lib/format-date'
+import { formatDisplayDate, toIsoDay } from '../lib/format-date'
 import { TocHeaderMenu } from '../components/TocHeaderMenu'
 import type { RelatedGuides } from '../lib/guides'
 import Layout from './Layout.astro'
@@ -90,7 +89,6 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 			</Breadcrumb>
 			<header class="mb-8">
 				<h1 data-page-title={title} class="mt-0 mb-0 text-balance">{title}</h1>
-				{lastEdited && <p class="not-prose mt-3 text-sm text-foreground-lighter">Last edited: {formatDisplayDate(lastEdited)}</p>}
 				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
 			</header>
 			<slot />
@@ -114,16 +112,25 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 				)
 			}
 			{
-				viewGitHubLink && (
-					<footer class="mt-16 not-prose flex items-center justify-between gap-4">
-						<a
-							href={viewGitHubLink}
-							target="_blank"
-							rel="noreferrer noopener edit"
-							class="w-fit inline-flex items-center gap-1 text-sm text-foreground-light hover:text-foreground"
-						>
-							View this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
-						</a>
+				(lastEdited || viewGitHubLink) && (
+					<footer class="mt-16 not-prose flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+						{lastEdited && (
+							<p class="text-foreground-lighter">
+								Edited <time datetime={toIsoDay(lastEdited)} class="whitespace-nowrap">{formatDisplayDate(lastEdited)}</time>
+							</p>
+						)}
+						{lastEdited && viewGitHubLink && <span aria-hidden="true" class="size-1 shrink-0 bg-foreground-muted" />}
+						{viewGitHubLink && (
+							<a
+								href={viewGitHubLink}
+								target="_blank"
+								rel="noreferrer noopener edit"
+								class="relative w-fit inline-flex items-center gap-1.5 text-foreground-light transition-colors hover:text-foreground after:absolute after:-inset-y-3 after:inset-x-0"
+							>
+								<IconGitHubSolid size={14} aria-hidden="true" />
+								Edit this page
+							</a>
+						)}
 					</footer>
 				)
 			}
