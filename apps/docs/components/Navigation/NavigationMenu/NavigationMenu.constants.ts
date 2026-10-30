@@ -1011,6 +1011,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'Beekeeper Studio',
       url: '/guides/database/beekeeper-studio',
     },
+    {
+      name: 'VisuaLeaf',
+      url: '/guides/database/visualeaf',
+    },
   ],
 }
 
