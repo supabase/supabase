@@ -79,7 +79,7 @@ those items are about. A procedure can have six steps and still cover two tasks.
 
 ## Write good frontmatter
 
-Every guide sets `title` and `description` in its frontmatter. `subtitle` is optional.
+Every guide sets `title` and `description` in its frontmatter.
 
 ### Title
 
@@ -90,19 +90,17 @@ Keep the title to 35 characters or fewer, in sentence case.
 
 **Not recommended:** Avoid gerunds. For example, `Creating a table`.
 
-### Subtitle
+### (Optional) Subtitle
 
-The subtitle is a short line under the title. Add one only when the title doesn't say what
-the page covers. Write it as an imperative with no period. It can match the description.
-As a rule of thumb, if it matches the first sentence of the page, leave it out.
+Subtitles are decorative to add more depth to a title. If it matches the first sentence of the page,
+leave it out.
 
-For example, a page titled `Vault` has the subtitle `Manage secrets in Postgres`, and a
-page titled `Branching` has `Use Supabase Branches to test and preview changes`.
+- **Recommended**: A page called `Vault` has the subtitle `Manage secrets in Postgres`.
 
 ### Description
 
-The description is the page's meta description in search results and link previews. Say
-what the page helps the reader do, in 150–160 characters.
+The description is the page's 150–160 character meta description. Say what the page helps
+the reader do with relevant keywords.
 
 ## Information types
 
