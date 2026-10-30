@@ -22,6 +22,7 @@ import {
   ComputeInstanceSnippetTabs,
 } from '../ComputeInstanceSnippetTabs'
 import { RuntimeBadge } from '../RuntimeBadge'
+import { ComputeInstanceUsageSection } from './ComputeInstanceUsageSection'
 import { CLI_NAME } from '@/lib/constants/compute'
 
 interface ComputeInstanceOverviewTabProps {
@@ -143,6 +144,8 @@ export const ComputeInstanceOverviewTab = ({ instance }: ComputeInstanceOverview
           )}
         </PageSectionContent>
       </PageSection>
+
+      <ComputeInstanceUsageSection instance={instance} />
 
       <PageSection>
         <PageSectionMeta>

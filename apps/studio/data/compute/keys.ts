@@ -2,6 +2,13 @@ export const computeKeys = {
   list: (projectRef: string | undefined) => ['projects', projectRef, 'compute'] as const,
   detail: (projectRef: string | undefined, name: string | undefined) =>
     ['projects', projectRef, 'instance', name, 'detail'] as const,
+  usage: (
+    projectRef: string | undefined,
+    name: string | undefined,
+    params: { size: string; instances: number; days: number }
+  ) => ['projects', projectRef, 'instance', name, 'usage', params] as const,
+  orgUsage: (orgSlug: string | undefined, projectRef: string | null | undefined, days: number) =>
+    ['organizations', orgSlug, 'compute-usage', projectRef ?? 'all', days] as const,
   logs: (
     projectRef: string | undefined,
     name: string | undefined,

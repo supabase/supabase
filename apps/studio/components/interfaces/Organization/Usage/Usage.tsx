@@ -12,6 +12,7 @@ import { Restriction } from '../BillingSettings/Restriction'
 import ActiveCompute from './ActiveCompute'
 import Activity from './Activity'
 import Compute from './Compute'
+import { ComputeServices } from './ComputeServices'
 import Egress from './Egress'
 import OrgLogUsage from './OrgLogUsage'
 import { Pipelines } from './Pipelines'
@@ -438,6 +439,12 @@ export const Usage = () => {
               isLoadingOrgDailyStats={isLoadingOrgDailyStats}
             />
           )}
+
+          <ComputeServices
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+          />
 
           <Egress
             orgSlug={slug as string}
