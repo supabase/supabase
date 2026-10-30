@@ -513,7 +513,7 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
-type OnboardingSurveySurface = 'org_form'
+type OnboardingSurveySurface = 'org_form' | 'follow_up'
 
 /**
  * Onboarding survey prompt UI became visible.
@@ -523,6 +523,18 @@ type OnboardingSurveySurface = 'org_form'
  */
 export interface OnboardingSurveyPromptOpenedEvent {
   action: 'onboarding_survey_prompt_opened'
+  properties: { surface: OnboardingSurveySurface }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked Answer on the onboarding survey follow-up card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyAnswerButtonClickedEvent {
+  action: 'onboarding_survey_answer_button_clicked'
   properties: { surface: OnboardingSurveySurface }
   groups: Partial<TelemetryGroups>
 }
@@ -539,6 +551,7 @@ export interface OnboardingSurveySubmitButtonClickedEvent {
   action: 'onboarding_survey_submit_button_clicked'
   properties: {
     surface: OnboardingSurveySurface
+    hasKind: boolean
     hasBuilding: boolean
   }
   groups: Partial<TelemetryGroups>
@@ -554,7 +567,7 @@ export interface OnboardingSurveyDismissedEvent {
   action: 'onboarding_survey_dismissed'
   properties: {
     surface: OnboardingSurveySurface
-    reason: 'org_form_blank'
+    reason: 'org_form_blank' | 'follow_up_skip' | 'follow_up_closed'
   }
   groups: Partial<TelemetryGroups>
 }
@@ -569,6 +582,7 @@ export interface OnboardingSurveySubmitFailedEvent {
   action: 'onboarding_survey_submit_failed'
   properties: {
     surface: OnboardingSurveySurface
+    hasKind: boolean
     hasBuilding: boolean
   }
   groups: Partial<TelemetryGroups>
@@ -4397,6 +4411,7 @@ export type TelemetryEvent =
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | OnboardingSurveyPromptOpenedEvent
+  | OnboardingSurveyAnswerButtonClickedEvent
   | OnboardingSurveySubmitButtonClickedEvent
   | OnboardingSurveyDismissedEvent
   | OnboardingSurveySubmitFailedEvent

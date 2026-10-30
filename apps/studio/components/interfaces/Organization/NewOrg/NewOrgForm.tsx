@@ -50,6 +50,7 @@ import {
   ORG_SIZE_TYPES,
   SURVEY_ORG_KIND_TYPES,
 } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
+import { markFollowUpPending } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
 import { useOnboardingSurveyVariant } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyVariant'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
@@ -298,23 +299,30 @@ export const NewOrgForm = ({
       const building = form.getValues('building')?.trim()
       const kind = form.getValues('kind')
       const size = kind === 'COMPANY' ? form.getValues('size') : undefined
+      // Kind always holds a value, so only count it as answered when changed
+      const hasKind = kind.toUpperCase() !== defaultValues.kind.toUpperCase()
       const hasBuilding = !!building
+      const profileId = user.profile?.gotrue_id
 
       const groupOverrides = { organization: slug }
 
-      if (!hasBuilding) {
+      // Nothing answered: send nothing yet so the creator's follow-up answers
+      // aren't dropped (the survey endpoint keeps one response per user and org)
+      if (!hasKind && !hasBuilding) {
         track(
           'onboarding_survey_dismissed',
           { surface: 'org_form', reason: 'org_form_blank' },
           groupOverrides
         )
-      } else {
-        track(
-          'onboarding_survey_submit_button_clicked',
-          { surface: 'org_form', hasBuilding },
-          groupOverrides
-        )
+        if (profileId) markFollowUpPending({ profileId, orgSlug: slug })
+        return
       }
+
+      track(
+        'onboarding_survey_submit_button_clicked',
+        { surface: 'org_form', hasKind, hasBuilding },
+        groupOverrides
+      )
 
       // Always persist kind/size: omitKindFromOrgCreation removes them from the
       // org creation payload for survey variants, so this is the only save path.
@@ -328,12 +336,19 @@ export const NewOrgForm = ({
       } catch {
         track(
           'onboarding_survey_submit_failed',
-          { surface: 'org_form', hasBuilding },
+          { surface: 'org_form', hasKind, hasBuilding },
           groupOverrides
         )
       }
     },
-    [form, showOnboardingSurveyInOrgForm, submitOnboardingSurvey, track]
+    [
+      defaultValues.kind,
+      form,
+      showOnboardingSurveyInOrgForm,
+      submitOnboardingSurvey,
+      track,
+      user.profile?.gotrue_id,
+    ]
   )
 
   const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({

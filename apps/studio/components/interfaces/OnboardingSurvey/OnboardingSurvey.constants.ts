@@ -2,6 +2,9 @@ import { ORG_KIND_TYPES, type OrgKind } from '../Organization/NewOrg/Organizatio
 
 export const BUILDING_MAX_LENGTH = 500
 
+// How long after creating an org its creator can be asked the survey again
+export const ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS = 5 * 60 * 1000
+
 export const BUILDING_PLACEHOLDER =
   'e.g. realtime collaboration, an AI support workflow, or an operations dashboard'
 
