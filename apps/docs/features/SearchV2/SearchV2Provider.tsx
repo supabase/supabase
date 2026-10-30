@@ -1,6 +1,9 @@
 'use client'
 
-import type { DocsSearchV2AskAiOpenedEvent } from 'common/telemetry-constants'
+import type {
+  DocsSearchV2AskAiClosedEvent,
+  DocsSearchV2AskAiOpenedEvent,
+} from 'common/telemetry-constants'
 import { SearchDialog, useSearchShortcut } from 'docs-search/components'
 import { useRouter } from 'next/navigation'
 import { createContext, use, useState, type ReactNode } from 'react'
@@ -8,7 +11,8 @@ import { flushSync } from 'react-dom'
 
 import { ASK_AI_DIALOG_LABELS, AskAiPanel } from './AskAiPanel'
 import { SearchV2Panel } from './SearchV2Dialog'
-import { useSearchV2Dialog } from './useSearchV2Dialog'
+import { ASK_AI_QUESTION_TELEMETRY_LENGTH } from './constants'
+import { useSearchV2Dialog, type SearchV2CloseReason } from './useSearchV2Dialog'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 type SearchTriggerType = Parameters<ReturnType<typeof useSearchV2Dialog>['openDialog']>[0]
@@ -66,17 +70,17 @@ export function SearchV2Provider({ children }: SearchV2ProviderProps) {
       .finished.finally(() => delete root.dataset.searchDialogMorph)
   }
 
-  const closeAskAi = () => {
+  const closeAskAi = (closeReason: DocsSearchV2AskAiClosedEvent['properties']['closeReason']) => {
     if (!isAskAiOpen) return
     setIsAskAiOpen(false)
-    sendTelemetryEvent({ action: 'docs_search_v2_ask_ai_closed' })
+    sendTelemetryEvent({ action: 'docs_search_v2_ask_ai_closed', properties: { closeReason } })
   }
 
   const showSearch = (triggerType: SearchTriggerType) =>
     showPanel({
       next: 'search',
       update: () => {
-        closeAskAi()
+        closeAskAi('switched_to_search')
         setPanel('search')
         openSearch(triggerType)
       },
@@ -89,13 +93,17 @@ export function SearchV2Provider({ children }: SearchV2ProviderProps) {
     if (question) {
       sendTelemetryEvent({
         action: 'docs_search_v2_ask_ai_question_submitted',
-        properties: { question, questionSource: 'search' },
+        properties: {
+          question: question.slice(0, ASK_AI_QUESTION_TELEMETRY_LENGTH),
+          questionLength: question.length,
+          questionSource: 'search',
+        },
       })
     }
     showPanel({
       next: 'ask-ai',
       update: () => {
-        if (isSearchOpen) handleSearchOpenChange(false)
+        if (isSearchOpen) handleSearchOpenChange(false, 'switched_to_ask_ai')
         setAskAiQuestion(question)
         setPanel('ask-ai')
         setIsAskAiOpen(true)
@@ -103,18 +111,20 @@ export function SearchV2Provider({ children }: SearchV2ProviderProps) {
     })
   }
 
-  const closeDialog = () => {
-    closeAskAi()
-    if (isSearchOpen) handleSearchOpenChange(false)
+  const closeDialog = (
+    closeReason: Extract<SearchV2CloseReason, 'dismissed' | 'result_navigated'>
+  ) => {
+    closeAskAi('dismissed')
+    if (isSearchOpen) handleSearchOpenChange(false, closeReason)
   }
 
   const handleDialogOpenChange = (next: boolean) => {
-    if (!next) closeDialog()
+    if (!next) closeDialog('dismissed')
   }
 
   const handleResultNavigate = (path: string) => {
     router.push(path)
-    closeDialog()
+    closeDialog('result_navigated')
   }
 
   useSearchShortcut(() => showSearch('keyboard_shortcut'))
@@ -133,7 +143,7 @@ export function SearchV2Provider({ children }: SearchV2ProviderProps) {
         ) : (
           <SearchV2Panel
             onResultNavigate={handleResultNavigate}
-            onResultLinkNavigate={closeDialog}
+            onResultLinkNavigate={() => closeDialog('result_navigated')}
             onAskAi={showAskAi}
           />
         )}

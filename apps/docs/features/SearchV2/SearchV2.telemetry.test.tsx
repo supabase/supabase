@@ -13,6 +13,16 @@ const resetSearch = vi.fn()
 let searchState: DocsSearchV2State
 
 vi.mock('@/lib/telemetry', () => ({ useSendTelemetryEvent: () => sendTelemetryEvent }))
+vi.mock('ui-patterns/CommandMenu/prepackaged/ai', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('ui-patterns/CommandMenu/prepackaged/ai')>()),
+  useAiChat: () => ({
+    submit: vi.fn(),
+    reset: () => {},
+    messages: [],
+    isResponding: false,
+    hasError: false,
+  }),
+}))
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }))
 vi.mock('next/link', () => ({
   default: ({
@@ -171,7 +181,10 @@ describe('SearchV2 telemetry', () => {
 
     expect(screen.queryByRole('combobox')).toBeNull()
     expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
-    expect(sendTelemetryEvent).toHaveBeenCalledWith({ action: 'docs_search_v2_closed' })
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_closed',
+      properties: { closeReason: 'dismissed' },
+    })
   })
 
   it('runs the debounced search while typing and resets when the input is cleared', () => {
@@ -381,6 +394,40 @@ describe('SearchV2 telemetry', () => {
         action: 'docs_search_v2_result_clicked',
         properties: { resultPath: '/guides/auth', query: 'auth' },
       })
+    })
+  })
+})
+
+describe('Ask AI telemetry', () => {
+  it('reports a switch between search and Ask AI as its own close reason, not a dismissal', () => {
+    openDialog()
+    sendTelemetryEvent.mockClear()
+
+    fireEvent.keyDown(window, { key: 'i', metaKey: true })
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_closed',
+      properties: { closeReason: 'switched_to_ask_ai' },
+    })
+
+    fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_ask_ai_closed',
+      properties: { closeReason: 'switched_to_search' },
+    })
+  })
+
+  // questions can hold pasted logs or connection strings
+  it('sends only the start of a long question, with its full length', () => {
+    render(<TriggerWithProvider />)
+    fireEvent.keyDown(window, { key: 'i', metaKey: true })
+    const input = screen.getByRole('textbox', { name: 'Ask Supabase AI a question' })
+
+    fireEvent.change(input, { target: { value: 'a'.repeat(400) } })
+    fireEvent.submit(input.closest('form')!)
+
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_ask_ai_question_submitted',
+      properties: { question: 'a'.repeat(300), questionLength: 400, questionSource: 'typed' },
     })
   })
 })

@@ -1,11 +1,13 @@
 'use client'
 
-import type { DocsSearchV2OpenedEvent } from 'common/telemetry-constants'
+import type { DocsSearchV2ClosedEvent, DocsSearchV2OpenedEvent } from 'common/telemetry-constants'
 import { useCallback, useState } from 'react'
 
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 type SearchV2TriggerType = DocsSearchV2OpenedEvent['properties']['triggerType']
+
+export type SearchV2CloseReason = DocsSearchV2ClosedEvent['properties']['closeReason']
 
 /**
  * Open state for the Search V2 dialog, with its opened/closed telemetry.
@@ -23,11 +25,12 @@ export function useSearchV2Dialog() {
     [sendTelemetryEvent]
   )
 
+  // the dialog reports a plain close, which is a dismissal
   const handleOpenChange = useCallback(
-    (next: boolean) => {
+    (next: boolean, closeReason: SearchV2CloseReason = 'dismissed') => {
       setOpen(next)
       if (!next) {
-        sendTelemetryEvent({ action: 'docs_search_v2_closed' })
+        sendTelemetryEvent({ action: 'docs_search_v2_closed', properties: { closeReason } })
       }
     },
     [sendTelemetryEvent]

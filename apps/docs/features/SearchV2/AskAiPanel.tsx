@@ -1,5 +1,6 @@
 'use client'
 
+import type { DocsSearchV2AskAiQuestionSubmittedEvent } from 'common/telemetry-constants'
 import { SearchInputRow, type SearchDialogProps } from 'docs-search/components'
 import { FileText } from 'lucide-react'
 import Link from 'next/link'
@@ -22,8 +23,11 @@ import {
 import { Markdown } from 'ui-patterns/Markdown'
 
 import { AskAiIcon } from './AskAiIcon'
+import { ASK_AI_QUESTION_TELEMETRY_LENGTH } from './constants'
 import { CurvedScrollArea } from '@/features/ui/CurvedScrollArea'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
+
+type QuestionSource = DocsSearchV2AskAiQuestionSubmittedEvent['properties']['questionSource']
 
 interface AskAiPanelProps {
   initialQuestion: string
@@ -47,8 +51,22 @@ export const ASK_AI_DIALOG_LABELS: SearchDialogProps['labels'] = {
 export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
   const [question, setQuestion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { submit, reset, messages, isResponding, hasError } = useAiChat({ setIsLoading })
   const sendTelemetryEvent = useSendTelemetryEvent()
+  // the question that search sent is the first one, and every later question is typed
+  const questionSourceRef = useRef<QuestionSource>(initialQuestion ? 'search' : 'typed')
+  const { submit, reset, messages, isResponding, hasError } = useAiChat({
+    setIsLoading,
+    onAnswerComplete: ({ durationMs, sourceCount }) =>
+      sendTelemetryEvent({
+        action: 'docs_search_v2_ask_ai_answer_completed',
+        properties: { questionSource: questionSourceRef.current, durationMs, sourceCount },
+      }),
+    onAnswerError: ({ durationMs }) =>
+      sendTelemetryEvent({
+        action: 'docs_search_v2_ask_ai_answer_failed',
+        properties: { questionSource: questionSourceRef.current, durationMs },
+      }),
+  })
   const inputRef = useRef<HTMLInputElement>(null)
   const isPinnedRef = useRef(true)
   const lastScrollTopRef = useRef(0)
@@ -71,10 +89,15 @@ export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
     event.preventDefault()
     const trimmedQuestion = question.trim()
     if (!trimmedQuestion || isBusy) return
+    questionSourceRef.current = 'typed'
     submit(trimmedQuestion)
     sendTelemetryEvent({
       action: 'docs_search_v2_ask_ai_question_submitted',
-      properties: { question: trimmedQuestion, questionSource: 'typed' },
+      properties: {
+        question: trimmedQuestion.slice(0, ASK_AI_QUESTION_TELEMETRY_LENGTH),
+        questionLength: trimmedQuestion.length,
+        questionSource: 'typed',
+      },
     })
     setQuestion('')
     isPinnedRef.current = true
@@ -87,7 +110,6 @@ export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
     lastScrollTopRef.current = list.scrollTop
   }
 
-  // follows the question and the streamed answer while the reader stays at the bottom.
   // a stable callback ref, so react does not create the observer again on each render
   const followConversation = useCallback((content: HTMLDivElement | null) => {
     if (!content) return
@@ -155,7 +177,8 @@ export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
         <SearchInputRow
           icon={<AskAiIcon isThinking={isBusy} className="size-full" />}
           onClear={hasConversation ? handleClear : undefined}
-          // under a conversation the input is far from the search input, so a morph moves it across the dialog
+          // under a conversation the input is far from the search input,
+          // so a morph would move it across the dialog
           hasMorph={!hasConversation}
           className={hasConversation ? 'border-t' : undefined}
         >
@@ -197,17 +220,17 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
   const isFailedAnswer = (message: Message, index: number) =>
     message.status !== MessageStatus.Complete && (hasError || index < messages.length - 1)
 
-  // an answer always follows the question it answers
-  const handleSourceClick = ({
-    sourcePath,
-    answerIndex,
-  }: {
-    sourcePath: string
-    answerIndex: number
-  }) => {
+  const handleSourceClick = (sourcePath: string) => {
     sendTelemetryEvent({
       action: 'docs_search_v2_ask_ai_source_clicked',
-      properties: { sourcePath, question: messages[answerIndex - 1]?.content ?? '' },
+      properties: { sourcePath },
+    })
+  }
+
+  const handleAnswerLinkClick = (href: string) => {
+    sendTelemetryEvent({
+      action: 'docs_search_v2_ask_ai_answer_link_clicked',
+      properties: { href },
     })
   }
 
@@ -232,7 +255,14 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
                 codeBlock
                 className="ask-ai-answer prose-sm wrap-break-word"
                 components={{
-                  a: (props) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                  a: (props) => (
+                    <a
+                      {...props}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => handleAnswerLinkClick(props.href ?? '')}
+                    />
+                  ),
                 }}
               >
                 {message.content}
@@ -244,12 +274,7 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
               </p>
             ) : null}
             {message.sources?.length ? (
-              <AiSources
-                sources={message.sources}
-                onSourceClick={(sourcePath) =>
-                  handleSourceClick({ sourcePath, answerIndex: index })
-                }
-              />
+              <AiSources sources={message.sources} onSourceClick={handleSourceClick} />
             ) : null}
           </li>
         )

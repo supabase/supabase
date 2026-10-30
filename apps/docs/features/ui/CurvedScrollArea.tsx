@@ -13,7 +13,7 @@ import {
 } from 'react'
 import { cn } from 'ui'
 
-export interface CurvedScrollAreaProps {
+interface CurvedScrollAreaProps {
   children: ReactNode
   viewportRef?: Ref<HTMLDivElement>
   onScroll?: (event: UIEvent<HTMLDivElement>) => void
@@ -41,7 +41,6 @@ const DISPLACEMENT_MAP =
   <rect width='100' height='100' fill='url(#y)'/>
 </svg>`)
 
-// opaque at the top edge and clear at the bottom of the band, so the blur fades out downward
 const BLUR_MASK =
   svgDataUrl(`<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100' preserveAspectRatio='none'>
   <defs>
@@ -76,8 +75,6 @@ export function CurvedScrollArea({
     return () => observer.disconnect()
   }, [])
 
-  // the filter is on the content, and the scrollbar is outside the viewport, so the scrollbar stays
-  // straight
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     const { scrollTop } = event.currentTarget
     const progress = Math.min(scrollTop / bandHeight, 1)

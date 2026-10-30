@@ -15,9 +15,12 @@ import { useEffect } from 'react'
 
 import { AskAiIcon } from './AskAiIcon'
 import { SEARCH_V2_ENDPOINT, SEARCH_V2_MIN_CHARACTERS } from './constants'
+import type { SearchV2CloseReason } from './useSearchV2Dialog'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
-type SearchV2DialogProps = Pick<SearchDialogProps, 'open' | 'onOpenChange'>
+interface SearchV2DialogProps extends Pick<SearchDialogProps, 'open'> {
+  onOpenChange: (open: boolean, closeReason?: SearchV2CloseReason) => void
+}
 
 interface SearchV2PanelProps extends Pick<
   SearchPanelProps,
@@ -37,9 +40,9 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
       <SearchV2Panel
         onResultNavigate={(path) => {
           router.push(path)
-          onOpenChange(false)
+          onOpenChange(false, 'result_navigated')
         }}
-        onResultLinkNavigate={() => onOpenChange(false)}
+        onResultLinkNavigate={() => onOpenChange(false, 'result_navigated')}
       />
     </SearchDialog>
   )

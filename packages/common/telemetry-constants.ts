@@ -1200,6 +1200,12 @@ export interface DocsSearchV2ResultClickedEvent {
  */
 export interface DocsSearchV2ClosedEvent {
   action: 'docs_search_v2_closed'
+  properties: {
+    /**
+     * Why the dialog closed: the user dismissed it, opened a result, or switched to Ask AI.
+     */
+    closeReason: 'dismissed' | 'result_navigated' | 'switched_to_ask_ai'
+  }
 }
 
 /**
@@ -1229,9 +1235,13 @@ export interface DocsSearchV2AskAiQuestionSubmittedEvent {
   action: 'docs_search_v2_ask_ai_question_submitted'
   properties: {
     /**
-     * The question sent to Ask AI.
+     * The question sent to Ask AI, cut to its first 300 characters.
      */
     question: string
+    /**
+     * The length of the full question, in characters.
+     */
+    questionLength: number
     /**
      * Where the question came from: typed in Ask AI, or carried over from a search.
      */
@@ -1252,10 +1262,6 @@ export interface DocsSearchV2AskAiSourceClickedEvent {
      * The path of the source that was clicked.
      */
     sourcePath: string
-    /**
-     * The question whose answer listed the source.
-     */
-    question: string
   }
 }
 
@@ -1267,6 +1273,72 @@ export interface DocsSearchV2AskAiSourceClickedEvent {
  */
 export interface DocsSearchV2AskAiClosedEvent {
   action: 'docs_search_v2_ask_ai_closed'
+  properties: {
+    /**
+     * Why Ask AI closed: the user dismissed the dialog, or switched to search.
+     */
+    closeReason: 'dismissed' | 'switched_to_search'
+  }
+}
+
+/**
+ * Ask AI finished streaming an answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerCompletedEvent {
+  action: 'docs_search_v2_ask_ai_answer_completed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the end of the answer, in milliseconds.
+     */
+    durationMs: number
+    /**
+     * The number of source pages listed under the answer.
+     */
+    sourceCount: number
+  }
+}
+
+/**
+ * Ask AI failed to answer a question in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerFailedEvent {
+  action: 'docs_search_v2_ask_ai_answer_failed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the failure, in milliseconds.
+     */
+    durationMs: number
+  }
+}
+
+/**
+ * User clicked a link inside an Ask AI answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerLinkClickedEvent {
+  action: 'docs_search_v2_ask_ai_answer_link_clicked'
+  properties: {
+    /**
+     * The link's destination, as written in the answer.
+     */
+    href: string
+  }
 }
 
 /**
@@ -4436,6 +4508,9 @@ export type TelemetryEvent =
   | DocsSearchV2AskAiQuestionSubmittedEvent
   | DocsSearchV2AskAiSourceClickedEvent
   | DocsSearchV2AskAiClosedEvent
+  | DocsSearchV2AskAiAnswerCompletedEvent
+  | DocsSearchV2AskAiAnswerFailedEvent
+  | DocsSearchV2AskAiAnswerLinkClickedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent

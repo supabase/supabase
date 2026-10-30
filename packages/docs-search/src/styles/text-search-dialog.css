@@ -1,4 +1,3 @@
-/* one text size for the search and ask ai panels, between text-sm and text-base */
 @utility text-search-dialog {
   font-size: 0.875rem;
   line-height: 1.25rem;

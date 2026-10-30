@@ -33,12 +33,7 @@ export interface SearchPanelProps {
   onResultNavigate: (path: string) => void
   /** Fires when a result link is about to navigate in this tab (not a new-tab click). */
   onResultLinkNavigate?: () => void
-  /**
-   * Replaces the "no results" message once a search finds nothing, for example with a message and
-   * a `SearchActionItem`. `query` is the search that found nothing.
-   */
   renderNoResults?: (context: { query: string }) => ReactNode
-  /** Fills the start of the footer that shows under results. `query` is trimmed. */
   renderFooterStart?: (context: { query: string }) => ReactNode
   renderLink?: SearchRenderLink
   labels?: Partial<SearchLabels>
