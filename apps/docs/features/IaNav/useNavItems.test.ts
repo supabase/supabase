@@ -18,6 +18,7 @@ vi.mock('common', () => ({
 function renderNavItems(flagValue: string | boolean) {
   vi.mocked(useFeatureFlags).mockReturnValue({
     posthog: { [IA_NAV_FLAG]: flagValue },
+    hasLoaded: true,
   } as unknown as ReturnType<typeof useFeatureFlags>)
   vi.mocked(useSearchParamsShallow).mockReturnValue(
     new URLSearchParams() as unknown as ReturnType<typeof useSearchParamsShallow>

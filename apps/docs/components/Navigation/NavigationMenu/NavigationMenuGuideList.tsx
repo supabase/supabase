@@ -8,7 +8,7 @@ import { cn } from 'ui'
 import { type NavMenuSection } from '../Navigation.types'
 import { MenuId } from './NavigationMenu'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
-import { useIaNavReady, useNavItems } from '@/features/IaNav'
+import { IA_NAV_PENDING_CLASS, useIaNavReady, useNavItems } from '@/features/IaNav'
 
 const NavigationMenuGuideList = ({
   id,
@@ -79,7 +79,7 @@ const NavigationMenuGuideList = ({
     <NavigationMenuGuideListWrapper
       id={id}
       firstLevelRoute={firstLevelRoute}
-      className={cn(!isNavReady && 'invisible noscript:visible')}
+      className={cn(!isNavReady && IA_NAV_PENDING_CLASS)}
     >
       <NavigationMenuGuideListItems menu={menu} id={id} />
     </NavigationMenuGuideListWrapper>
