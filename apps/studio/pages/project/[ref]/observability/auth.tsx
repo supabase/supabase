@@ -1,6 +1,6 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
+import { ArrowRightIcon, LogsIcon, RefreshCwIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsJson, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -64,7 +64,9 @@ const REPORT_TITLE = 'Auth'
 
 const AuthUsage = () => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelReports')
   const chartSyncId = `auth-report`
+  const queryGroup = useOtel ? 'auth-otel' : 'auth-bigquery'
 
   const {
     selectedDateRange,
@@ -143,6 +145,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: { provider: usageProviderFilter },
+    useOtel,
   })
 
   const errorsReportConfig = createErrorsReportConfig({
@@ -151,6 +154,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: { status_code: monitoringStatusCodeFilter },
+    useOtel,
   })
 
   const latencyReportConfig = createLatencyReportConfig({
@@ -159,6 +163,7 @@ const AuthUsage = () => {
     endDate: selectedDateRange?.period_end?.date,
     interval: selectedDateRange?.interval,
     filters: {},
+    useOtel,
   })
 
   const onRefreshReport = useRefreshHandler(
@@ -225,9 +230,8 @@ const AuthUsage = () => {
                 side="bottom"
               >
                 <Button
-                  variant="default"
                   disabled={isRefreshing}
-                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                  icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
@@ -254,7 +258,7 @@ const AuthUsage = () => {
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
-                    <ArrowRight size={12} />
+                    <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
@@ -293,6 +297,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{ provider: usageProviderFilter }}
                   highlightActions={highlightActions}
                 />
@@ -327,6 +332,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{ status_code: monitoringStatusCodeFilter }}
                   highlightActions={highlightActions}
                 />
@@ -351,6 +357,7 @@ const AuthUsage = () => {
                   endDate={selectedDateRange?.period_end?.date}
                   updateDateRange={updateDateRange}
                   syncId={chartSyncId}
+                  queryGroup={queryGroup}
                   filters={{}}
                   highlightActions={highlightActions}
                 />

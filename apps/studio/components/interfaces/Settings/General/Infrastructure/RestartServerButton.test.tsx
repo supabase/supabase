@@ -26,8 +26,9 @@ vi.mock('next/router', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
 }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
@@ -42,7 +43,6 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
 
 describe('RestartServerButton', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseFlag.mockReturnValue(false)
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
     mockUseIsFeatureEnabled.mockReturnValue({ projectSettingsRestartProject: true })

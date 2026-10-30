@@ -87,7 +87,6 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
 
 describe('ProjectDropdown', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'supabase-org',

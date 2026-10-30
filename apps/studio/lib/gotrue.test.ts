@@ -1,9 +1,11 @@
+// @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
 
 import {
   buildSignUpReturnPath,
   DEFAULT_FALLBACK_PATH,
   DEFAULT_SIGNUP_RETURN_PATH,
+  getReturnToPath,
   getSignUpReturnTo,
   validateReturnTo,
 } from './gotrue'
@@ -101,6 +103,26 @@ describe('buildSignUpReturnPath', () => {
     window.location = { search: '' }
 
     expect(buildSignUpReturnPath(['/join?token=abc', '/other'])).toBe('/join?token=abc')
+  })
+})
+
+describe('getReturnToPath', () => {
+  it('rebuilds a nested returnTo path with the params that rode alongside it', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '?ref=abc&name=OPENAI_API_KEY&returnTo=%2Fmcp%2Fsecrets' }
+
+    expect(getReturnToPath()).toBe('/mcp/secrets?ref=abc&name=OPENAI_API_KEY')
+  })
+
+  it('accepts a multi-segment returnTo rather than falling back', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '?returnTo=%2Fmcp%2Fsecrets' }
+
+    expect(getReturnToPath()).toBe('/mcp/secrets')
   })
 })
 

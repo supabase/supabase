@@ -44,7 +44,7 @@ If you use special symbols in your Postgres password, you must remember to [perc
 
 When you created your project you were also asked to enter a password. This is the password for the `postgres` role in your database. You can update this from the Dashboard under the [Database Settings](/dashboard/project/_/database/settings) page. You should _never_ give this to third-party service unless you absolutely trust them. Instead, we recommend that you create a new user for every service that you want to give access too. This will also help you with debugging - you can see every query that each role is executing in your database within `pg_stat_statements`.
 
-Changing the password does not result in any downtime. All connected services, such as PostgREST, PgBouncer, and other Supabase managed services, are automatically updated to use the latest password to ensure availability. However, if you have any external services connecting to the Supabase database using hardcoded username/password credentials, a manual update will be required.
+Changing the password does not result in any downtime. All connected services, such as PostgREST, the dedicated pooler, and other Supabase managed services, are automatically updated to use the latest password to ensure availability. However, if you have any external services connecting to the Supabase database using hardcoded username/password credentials, a manual update will be required.
 
 ## Granting permissions
 
@@ -78,6 +78,8 @@ In some cases, you might want to prevent a role from having a child relationship
 alter role "child_role_name" noinherit;
 ```
 
+If a custom role still inherits privileges you didn't grant explicitly, see [Custom role inherits privileges that were not explicitly granted](/kb/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted).
+
 ## Supabase roles
 
 Postgres comes with a set of [predefined roles](https://www.postgresql.org/docs/current/predefined-roles.html). Supabase extends this with a default set of roles which are configured on your database when you start a new project:
@@ -109,7 +111,7 @@ Used by the Auth middleware to connect to the database and run migration. Access
 
 ### `supabase_storage_admin`
 
-Used by the Auth middleware to connect to the database and run migration. Access is scoped to the `storage` schema.
+Used by the Storage middleware to connect to the database and run migration. Access is scoped to the `storage` schema.
 
 ### `supabase_etl_admin`
 
@@ -125,7 +127,7 @@ This role:
 
 ### `dashboard_user`
 
-For running commands via the Supabase UI.
+The Supabase Dashboard doesn't connect as this role. Queries you run in the Dashboard execute as `postgres` and include a `-- source: dashboard` comment, which you can use to [find them in the Postgres logs](/kb/troubleshooting/how-to-interpret-and-explore-the-postgres-logs-OuCIOj).
 
 ### `supabase_admin`
 

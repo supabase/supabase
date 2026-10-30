@@ -26,15 +26,9 @@ export function DashboardToggle<T extends FieldValues>({
         control={form.control}
         name={name}
         render={({ field }) => (
-          <FormItemLayout
-            layout="flex-row-reverse"
-            label={label}
-            description={description}
-            id={name}
-          >
+          <FormItemLayout layout="flex-row-reverse" label={label} description={description}>
             <FormControl>
               <Switch
-                id={name}
                 checked={field.value}
                 onCheckedChange={(value) => {
                   field.onChange(value)

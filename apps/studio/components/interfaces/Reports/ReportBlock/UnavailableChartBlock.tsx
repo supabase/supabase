@@ -23,9 +23,8 @@ export const UnavailableChartBlock = ({ label, actions }: UnavailableChartBlockP
           This chart isn't available on your current compute size
         </p>
         <p className="text-xs text-foreground-lighter">
-          Disk IO burst balance only applies to compute sizes below 4XL. Larger instances have
-          sustained disk IO at their baseline, so there's no burst credit pool to track. You can
-          remove this chart from your report.
+          Your compute's disk IO runs at a sustained rate. There's no burst credit pool to track.
+          You can remove this chart from your report.
         </p>
       </div>
     </ReportBlockContainer>

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, RefreshCw } from 'lucide-react'
+import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react'
 import { parseAsJson, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
@@ -162,9 +162,8 @@ const EdgeFunctionsUsage = () => {
                 side="bottom"
               >
                 <Button
-                  variant="default"
                   disabled={isRefreshing}
-                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                  icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
@@ -173,7 +172,6 @@ const EdgeFunctionsUsage = () => {
               <ReportSettings chartId="edge-functions-charts" />
 
               <LogsDatePicker
-                align="start"
                 value={datePickerValue}
                 helpers={datePickerHelpers}
                 onSubmit={handleDatePickerChange}
@@ -195,7 +193,7 @@ const EdgeFunctionsUsage = () => {
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
-                    <ArrowRight size={12} />
+                    <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}

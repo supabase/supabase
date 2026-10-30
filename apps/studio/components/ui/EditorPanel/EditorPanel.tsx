@@ -4,14 +4,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import {
-  AlertCircle,
-  Book,
-  CheckCircle2,
-  FolderOpen,
-  Loader2,
-  Maximize2,
+  AlertCircleIcon,
+  BookIcon,
+  CheckCircle2Icon,
+  FolderOpenIcon,
+  Loader2Icon,
+  MaximizeIcon,
   PlusIcon,
-  X,
+  XIcon,
 } from 'lucide-react'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { useRouter } from 'next/router'
@@ -47,6 +47,7 @@ import { SaveSnippetDialog } from './SaveSnippetDialog'
 import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { useCreateQuery } from '@/components/interfaces/Explorer/hooks'
+import { SaveQueryDropdown } from '@/components/interfaces/Explorer/SaveQueryDropdown'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
@@ -56,6 +57,8 @@ import { useContentIdQuery } from '@/data/content/content-id-query'
 import { useContentQuery, type Content } from '@/data/content/content-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
+import type { Snippet } from '@/data/content/sql-folders-query'
+import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -66,6 +69,7 @@ import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-pa
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const EditorPanel = () => {
@@ -86,6 +90,7 @@ export const EditorPanel = () => {
   const { profile } = useProfile()
   const { closeSidebar } = useSidebarManagerSnapshot()
   const sqlEditorSnap = useSqlEditorV2StateSnapshot()
+  const { requestSave } = useSqlEditorSaveCoordinator()
   const isExplorerEnabled = useIsExplorerEnabled()
   const { createQuery } = useCreateQuery()
   const queryClient = useQueryClient()
@@ -194,6 +199,14 @@ export const EditorPanel = () => {
       if (vars.payload.id && ref) {
         queryClient.invalidateQueries({ queryKey: contentKeys.resource(ref, vars.payload.id) })
       }
+      if (activeSnippet) {
+        const updatedSnippet = { ...activeSnippet, content: vars.payload.content }
+        sqlEditorSnap.updateSnippet({
+          id: activeSnippet.id,
+          snippet: updatedSnippet as unknown as Snippet,
+          skipSave: true,
+        })
+      }
       originalSnippetRef.current = { sql: currentValue, name: vars.payload.name }
       showSaveSuccess()
     },
@@ -241,6 +254,7 @@ export const EditorPanel = () => {
         throw executeError
       },
       contextualInvalidation: true,
+      grant: unguarded.migrating,
     })
   }
 
@@ -301,7 +315,7 @@ export const EditorPanel = () => {
     })
 
     sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
-    sqlEditorSnap.addNeedsSaving(snippet.id)
+    requestSave(snippet.id)
 
     router.push(`/project/${ref}/sql/${snippet.id}`)
     handleClosePanel()
@@ -313,6 +327,7 @@ export const EditorPanel = () => {
         {isEditingTitle ? (
           <input
             ref={titleInputRef}
+            aria-label="Query title"
             value={titleInput}
             onChange={(e) => setTitleInput(e.target.value)}
             onBlur={commitRename}
@@ -354,14 +369,14 @@ export const EditorPanel = () => {
                 role="combobox"
                 aria-expanded={isSnippetsOpen}
                 className="w-7 h-7 p-0"
-                icon={<FolderOpen size={14} />}
+                icon={<FolderOpenIcon size={14} />}
                 tooltip={{
                   content: {
                     side: 'bottom',
                     text: 'Open snippet',
                   },
                 }}
-              ></ButtonTooltip>
+              />
             </PopoverTrigger>
             <PopoverContent align="end" className="w-[300px] p-0">
               <Command shouldFilter={false}>
@@ -403,11 +418,10 @@ export const EditorPanel = () => {
               <PopoverTrigger asChild>
                 <Button
                   size="tiny"
-                  variant="default"
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
-                  icon={<Book size={14} />}
+                  icon={<BookIcon size={14} />}
                 >
                   Templates
                 </Button>
@@ -461,12 +475,12 @@ export const EditorPanel = () => {
           <ButtonTooltip
             variant="text"
             className="w-7 h-7 p-0"
-            icon={<Maximize2 strokeWidth={1.5} />}
-            aria-label={isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor'}
+            icon={<MaximizeIcon strokeWidth={1.5} />}
+            aria-label={isExplorerEnabled ? 'Open in Explorer' : 'Open in SQL editor'}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: isExplorerEnabled ? 'Open in Explorer' : 'Expand to SQL editor',
+                text: isExplorerEnabled ? 'Open in Explorer' : 'Open in SQL editor',
               },
             }}
             onClick={handleExpand}
@@ -476,7 +490,7 @@ export const EditorPanel = () => {
             variant="text"
             className="w-7 h-7 p-0"
             onClick={handleClosePanel}
-            icon={<X strokeWidth={1.5} />}
+            icon={<XIcon strokeWidth={1.5} />}
             tooltip={{
               content: {
                 side: 'bottom',
@@ -583,12 +597,7 @@ export const EditorPanel = () => {
               <span className="font-mono">
                 {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
               </span>
-              <Button
-                size="tiny"
-                variant="default"
-                className="ml-2"
-                onClick={() => setShowResults((prev) => !prev)}
-              >
+              <Button size="tiny" className="ml-2" onClick={() => setShowResults((prev) => !prev)}>
                 {showResults ? 'Hide Results' : 'Show Results'}
               </Button>
             </div>
@@ -611,9 +620,9 @@ export const EditorPanel = () => {
                 saveStatus === 'idle' && 'text-foreground-light'
               )}
             >
-              {isUpserting && <Loader2 size={13} className="animate-spin" />}
-              {saveStatus === 'success' && <CheckCircle2 size={13} />}
-              {saveStatus === 'error' && <AlertCircle size={13} />}
+              {isUpserting && <Loader2Icon size={13} className="animate-spin" />}
+              {saveStatus === 'success' && <CheckCircle2Icon size={13} />}
+              {saveStatus === 'error' && <AlertCircleIcon size={13} />}
               <span>
                 {isUpserting
                   ? 'Saving...'
@@ -623,45 +632,53 @@ export const EditorPanel = () => {
               </span>
             </div>
           )}
-          <Button
-            variant="default"
-            size="tiny"
-            disabled={
-              !currentValue ||
-              isExecuting ||
-              isUpserting ||
-              (!!activeSnippet &&
-                currentValue === originalSnippetRef.current?.sql &&
-                activeSnippet.name === originalSnippetRef.current?.name)
-            }
-            onClick={() => {
-              if (!ref || !profile || !project) return
 
-              if (activeSnippet) {
-                setSaveStatus('idle')
-                upsertContent({
-                  projectRef: ref,
-                  payload: {
-                    id: activeSnippet.id,
-                    type: 'sql',
-                    name: activeSnippet.name,
-                    description: activeSnippet.description ?? '',
-                    visibility: activeSnippet.visibility ?? 'user',
-                    project_id: project.id,
-                    owner_id: profile.id,
-                    content: {
-                      ...activeSnippet.content,
-                      unchecked_sql: untrustedSql(currentValue),
-                    },
-                  },
-                })
-              } else {
-                setIsSaveDialogOpen(true)
+          {isExplorerEnabled ? (
+            <SaveQueryDropdown
+              query={{ title: activeSnippet?.name ?? 'Run SQL', sql: currentValue }}
+            >
+              <Button size="tiny">Save</Button>
+            </SaveQueryDropdown>
+          ) : (
+            <Button
+              size="tiny"
+              disabled={
+                !currentValue ||
+                isExecuting ||
+                isUpserting ||
+                (!!activeSnippet &&
+                  currentValue === originalSnippetRef.current?.sql &&
+                  activeSnippet.name === originalSnippetRef.current?.name)
               }
-            }}
-          >
-            {activeSnippet ? 'Update snippet' : 'Save as snippet'}
-          </Button>
+              onClick={() => {
+                if (!ref || !profile || !project) return
+                if (activeSnippet) {
+                  setSaveStatus('idle')
+                  upsertContent({
+                    projectRef: ref,
+                    payload: {
+                      id: activeSnippet.id,
+                      type: 'sql',
+                      name: activeSnippet.name,
+                      description: activeSnippet.description ?? '',
+                      visibility: activeSnippet.visibility ?? 'user',
+                      project_id: project.id,
+                      owner_id: profile.id,
+                      content: {
+                        ...activeSnippet.content,
+                        unchecked_sql: untrustedSql(currentValue),
+                      },
+                    },
+                  })
+                } else {
+                  setIsSaveDialogOpen(true)
+                }
+              }}
+            >
+              {activeSnippet ? 'Update snippet' : 'Save as snippet'}
+            </Button>
+          )}
+
           <SqlRunButton
             isDisabled={isExecuting}
             isExecuting={isExecuting}
@@ -682,7 +699,7 @@ export const EditorPanel = () => {
             project_id: project.id,
           })
           sqlEditorSnap.addSnippet({ projectRef: ref, snippet })
-          sqlEditorSnap.addNeedsSaving(snippet.id)
+          requestSave(snippet.id)
           setActiveSnippet(snippet as unknown as Extract<Content, { type: 'sql' }>)
           originalSnippetRef.current = { sql: currentValue, name }
           showSaveSuccess()

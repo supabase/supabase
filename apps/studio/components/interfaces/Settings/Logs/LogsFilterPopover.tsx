@@ -66,7 +66,10 @@ const LogsFilterPopover = ({
           <span>{options.label}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align={align} className="p-0 w-60">
+      <PopoverContent
+        align={align}
+        className="p-0 w-60 max-h-(--radix-popover-content-available-height) overflow-y-auto overflow-x-hidden"
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -107,7 +110,7 @@ const LogsFilterPopover = ({
           ))}
 
           <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-            <Button size="tiny" variant="default" onClick={handleReset} type="button">
+            <Button size="tiny" onClick={handleReset} type="button">
               Clear
             </Button>
             <Button loading={isLoading} variant="primary" type="submit">

@@ -2,7 +2,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { Loader, Plus } from 'lucide-react'
+import { LoaderIcon, PlusIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
   forwardRef,
@@ -19,6 +19,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
+import { CardBrandIcon } from '@/components/interfaces/Billing/Payment/PaymentMethods/CreditCard'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
@@ -31,7 +32,7 @@ import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { BASE_PATH, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -234,7 +235,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
           <div>
             <p>{errorMessage} Update your billing address or tax ID before upgrading your plan.</p>
             <Button
-              variant="default"
               className="mt-2"
               onClick={() => {
                 if (onClose) {
@@ -314,7 +314,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
       <div>
         {isLoading || isCustomerProfileLoading ? (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-strong bg-surface-200">
-            <Loader className="animate-spin" size={14} />
+            <LoaderIcon className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
         ) : paymentMethods?.data && paymentMethods?.data.length > 0 && !setupNewPaymentMethod ? (
@@ -345,13 +345,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                   return (
                     <SelectItem key={method.id} value={method.id}>
                       <div className="flex gap-2">
-                        <img
-                          alt="Credit Card Brand"
-                          src={`${BASE_PATH}/img/payment-methods/${method.card?.brand
-                            .replace(' ', '-')
-                            .toLowerCase()}.png`}
-                          width="32"
-                        />
+                        <CardBrandIcon brand={method.card?.brand} />
                         {label}
                       </div>
                     </SelectItem>
@@ -359,7 +353,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 })}
                 <SelectItem value="new">
                   <div className="flex gap-2">
-                    <Plus size={16} />
+                    <PlusIcon size={16} />
                     <p className="transition text-foreground-light group-hover:text-foreground">
                       Add new payment method
                     </p>

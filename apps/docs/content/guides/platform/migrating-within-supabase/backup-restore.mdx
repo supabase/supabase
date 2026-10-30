@@ -27,7 +27,7 @@ breadcrumb: 'Migrations'
 
       <Admonition type="note">
 
-        Use the [Session pooler](/dashboard/project/_?showConnect=true&method=session) connection string by default. If your network supports [IPv6](https://test-ipv6.com/) or you have the [IPv4 add-on](/docs/guides/platform/ipv4-address) enabled, use the direct connection string.
+        Use the direct connection string. If your network doesn't support [IPv6](https://test-ipv6.com/) and you don't have the [IPv4 add-on](/docs/guides/platform/ipv4-address) enabled, use the [Session pooler](/dashboard/project/_?showConnect=true&method=session) connection string instead.
 
       </Admonition>
 
@@ -38,7 +38,7 @@ breadcrumb: 'Migrations'
 
       Direct connection string:
       ```bash
-        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.com:5432/postgres
+        postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
       ```
     </StepHikeCompact.Details>
 
@@ -107,7 +107,7 @@ These steps cover a manual logical restore (`pg_dump` / `psql`) into a project y
       <StepHikeCompact.Details title="Configure newly created project" fullWidth>
         In the new project:
 
-        - If Webhooks were used in the old database, enable [Database Webhooks](/dashboard/project/_/database/hooks).
+        - If Webhooks were used in the old database, enable [Database Webhooks](/dashboard/project/_/integrations/webhooks/overview).
         - If any non-default extensions were used in the old database, enable the [Extensions](/dashboard/project/_/database/extensions).
       </StepHikeCompact.Details>
 
@@ -119,7 +119,7 @@ These steps cover a manual logical restore (`pg_dump` / `psql`) into a project y
 
       <Admonition type="note">
 
-        Use the Session pooler connection string by default. If your ISP [supports IPv6](https://test-ipv6.com/), use the direct connection string.
+        Use the direct connection string. If your ISP doesn't [support IPv6](https://test-ipv6.com/) and you don't have the [IPv4 add-on](/docs/guides/platform/ipv4-address) enabled, use the Session pooler connection string instead.
 
       </Admonition>
 
@@ -130,7 +130,7 @@ These steps cover a manual logical restore (`pg_dump` / `psql`) into a project y
 
         Direct connection string:
         ```bash
-          postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.com:5432/postgres
+          postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
         ```
       </StepHikeCompact.Details>
 
@@ -230,12 +230,27 @@ psql \
 
 #### Schema changes to `auth` and `storage`
 
-If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or Row Level Security(RLS) policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
+If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or Row Level Security (RLS) policies, you have to restore them separately. The Supabase CLI can help you diff the old project against your local migrations. The command depends on your project's diff engine.
+
+<$Partial path="diff_engine_check.mdx" />
+
+On `pg-delta`, a plain diff includes your customizations in the managed schemas:
+
+```bash
+supabase link --project-ref "$OLD_PROJECT_REF"
+supabase db diff --linked > changes.sql
+```
+
+<$Partial path="managed_schemas_diff_capture.mdx" />
+
+On the legacy `migra` engine, name the schemas explicitly:
 
 ```bash
 supabase link --project-ref "$OLD_PROJECT_REF"
 supabase db diff --linked --schema auth,storage > changes.sql
 ```
+
+Recreate those objects on the new project from your own migration files or through the Dashboard.
 
 ### Troubleshooting notes
 

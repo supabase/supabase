@@ -93,8 +93,6 @@ The following charts are available for Free and Pro plans:
 | Disk usage                   | Free, Pro       | Disk space consumption breakdown             | Storage capacity planning                                      |
 | Database size                | Free, Pro       | Total database size and growth trends        | Space consumption monitoring, including list of largest tables |
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ### Advanced Telemetry
 
 {/* TODO: This is confusing and feels contradictory */}
@@ -121,7 +119,7 @@ height={650}
 | **Free**            | Available unallocated memory                           |
 | **Swap**            | Disk overflow used when physical RAM is exhausted      |
 
-The **Swap** series only appears when the system is swapping. Swap is disk space the operating system uses as an overflow when physical RAM is full. Because disk is much slower than RAM, sustained swap activity indicates memory pressure and can significantly degrade database performance.
+The **Swap** series only appears when the system is swapping. Swap is disk space the operating system uses as an overflow when physical RAM is full. Because disk is much slower than RAM, [sustained swap activity](/kb/troubleshooting/memory-and-swap-usage-explained-aPNgm0) indicates memory pressure and can significantly degrade database performance.
 
 How it helps debug issues:
 
@@ -169,12 +167,12 @@ Why this matters for Postgres:
 
 Actions you can take:
 
-| Action                                                                                              | Description                                                                             |
-| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [Use connection pooling](/docs/guides/database/connecting-to-postgres#how-connection-pooling-works) | Route clients through Supavisor or PgBouncer to cap fork-driven commit pressure.        |
-| Lower `max_connections` or per-pool sizes                                                           | Reduce the upper bound on concurrent backends so spikes cannot exceed the Commit limit. |
-| [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                     | Reduce per-operation memory allocations on workloads with many concurrent queries.      |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                         | Raise both physical RAM and the Commit limit so the workload fits with headroom.        |
+| Action                                                                                                                 | Description                                                                                         |
+| ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [Use connection pooling](/docs/guides/database/connecting-to-postgres/pooling-and-limits#how-connection-pooling-works) | Route clients through the shared pooler or the dedicated pooler to cap fork-driven commit pressure. |
+| Lower `max_connections` or per-pool sizes                                                                              | Reduce the upper bound on concurrent backends so spikes cannot exceed the Commit limit.             |
+| [Tune `work_mem`](https://pgtune.leopard.in.ua)                                                                        | Reduce per-operation memory allocations on workloads with many concurrent queries.                  |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                                            | Raise both physical RAM and the Commit limit so the workload fits with headroom.                    |
 
 ### CPU usage
 
@@ -310,7 +308,7 @@ Actions you can take:
 
 ### Query Performance
 
-Links to the [Query Performance Advisory page](/docs/guides/platform/performance#examine-query-performance) in the dashboard, which provides a detailed analysis of slow database queries
+Links to the [Query Performance Advisory page](/docs/guides/platform/performance#examining-query-performance) in the dashboard, which provides a detailed analysis of slow database queries
 
 ### Database connections
 
@@ -345,19 +343,17 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                                                     | Description                                                     |
-| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
-| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
-| Review application code                                                                    | Ensure proper connection handling and cleanup                   |
+| Action                                                                                                  | Description                                                     |
+| ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                             | Increase maximum connection limits                              |
+| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#choose-a-connection-method) | Optimize connection management for high direct connection usage |
+| Review application code                                                                                 | Ensure proper connection handling and cleanup                   |
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
-### Dedicated Pooler (PgBouncer) Client Connections
+### Dedicated Pooler Client Connections
 
 Available on Team and Enterprise plans.
 
-This chart displays the number of PgBouncer connections over time.
+This chart displays the number of dedicated pooler connections over time.
 
 How it helps debug issues:
 
@@ -369,19 +365,17 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                                                     | Description                                                     |
-| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
-| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
-| Review application code                                                                    | Ensure proper connection handling and cleanup                   |
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+| Action                                                                                                  | Description                                                     |
+| ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                             | Increase maximum connection limits                              |
+| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#choose-a-connection-method) | Optimize connection management for high direct connection usage |
+| Review application code                                                                                 | Ensure proper connection handling and cleanup                   |
 
 ### Shared Pooler (Supavisor) Client Connections
 
 Available on Team and Enterprise plans.
 
-This chart displays the number of Supavisor connections over time.
+This chart displays the number of shared pooler connections over time.
 
 How it helps debug issues:
 
@@ -393,11 +387,11 @@ How it helps debug issues:
 
 Actions you can take:
 
-| Action                                                                                     | Description                                                     |
-| ------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                | Increase maximum connection limits                              |
-| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#shared-pooler) | Optimize connection management for high direct connection usage |
-| Review application code                                                                    | Ensure proper connection handling and cleanup                   |
+| Action                                                                                                  | Description                                                     |
+| ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [Upgrade compute size](/docs/guides/platform/compute-and-disk#compute-size)                             | Increase maximum connection limits                              |
+| Implement [connection pooling](/docs/guides/database/connecting-to-postgres#choose-a-connection-method) | Optimize connection management for high direct connection usage |
+| Review application code                                                                                 | Ensure proper connection handling and cleanup                   |
 
 ### Disk Usage
 

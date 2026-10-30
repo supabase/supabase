@@ -333,7 +333,6 @@ export const FormLayout = React.forwardRef<
         <FormDescription
           className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
-          id={`${id}-description`}
         >
           {description}
         </FormDescription>

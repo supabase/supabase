@@ -38,8 +38,8 @@ export const ValidationWarningsDialog = ({
           </AlertDialogTitle>
           <AlertDialogDescription>
             {hasWarnings
-              ? 'Replication can start, but the warnings listed above may affect how some changes are applied downstream. Review them before proceeding.'
-              : 'No validation issues were found. Confirm to create the pipeline and start replication to the destination.'}
+              ? 'Replication can start, but the warnings listed above may affect how some changes are applied downstream.'
+              : 'No validation issues were found. Create the pipeline and start replication to the destination.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

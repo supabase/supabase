@@ -14,7 +14,7 @@ const ORG_SAMEAS = [
   'https://www.instagram.com/supabasecom',
 ]
 
-const ORG_LOGO_URL = `${CANONICAL_ORIGIN}/images/og/supabase-og.png`
+const ORG_LOGO_URL = `${CANONICAL_ORIGIN}/brand-assets/supabase-logo-green-black-transparent.png`
 
 type JsonLdSchema = Record<string, unknown> | Record<string, unknown>[]
 
@@ -152,6 +152,7 @@ interface BlogPostingSchemaInput {
   description?: string
   image: string
   datePublished: string
+  dateModified: string
   authors: Array<{ name: string; url?: string }>
 }
 
@@ -167,6 +168,7 @@ export function blogPostingSchema(input: BlogPostingSchemaInput) {
     description: input.description,
     image: input.image,
     datePublished: input.datePublished,
+    dateModified: input.dateModified,
     author: input.authors.map((a) => ({
       '@type': 'Person',
       name: a.name,
@@ -180,6 +182,68 @@ export function blogPostingSchema(input: BlogPostingSchemaInput) {
         '@type': 'ImageObject',
         url: ORG_LOGO_URL,
       },
+    },
+  }
+}
+
+interface TechArticleSchemaInput {
+  url: string
+  headline: string
+  description?: string
+  datePublished: string
+}
+
+export function techArticleSchema(input: TechArticleSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    '@id': `${input.url}#page`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': input.url,
+    },
+    url: input.url,
+    headline: input.headline,
+    description: input.description,
+    inLanguage: 'en',
+    datePublished: input.datePublished,
+    publisher: {
+      '@type': 'Organization',
+      '@id': ORG_ID,
+      name: SITE_NAME,
+      logo: {
+        '@type': 'ImageObject',
+        url: ORG_LOGO_URL,
+      },
+    },
+    isPartOf: { '@id': SITE_ID },
+  }
+}
+
+interface CollectionPageSchemaInput {
+  url: string
+  name: string
+  description?: string
+  items: Array<{ url: string; name: string }>
+}
+
+export function collectionPageSchema(input: CollectionPageSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${input.url}#page`,
+    url: input.url,
+    name: input.name,
+    description: input.description,
+    isPartOf: { '@id': SITE_ID },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: input.items.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: item.url,
+        name: item.name,
+      })),
     },
   }
 }

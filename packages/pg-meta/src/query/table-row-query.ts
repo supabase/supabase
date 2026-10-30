@@ -87,6 +87,25 @@ const LARGE_COLUMNS_TYPES_SET = new Set(LARGE_COLUMNS_TYPES)
 // Threshold count for applying default sort
 export const THRESHOLD_COUNT = 100000
 
+// Operators that perform SQL pattern matching, where a bare value with no `%`/`_`
+// wildcard should be treated as a "contains" search rather than an exact match
+const PATTERN_MATCH_OPERATORS: Filter['operator'][] = ['~~', '~~*', '!~~', '!~~*']
+
+export function formatPatternMatchFilterValue(
+  value: Filter['value'],
+  operator: Filter['operator']
+) {
+  if (
+    PATTERN_MATCH_OPERATORS.includes(operator) &&
+    typeof value === 'string' &&
+    !value.includes('%') &&
+    !value.includes('_')
+  ) {
+    return `%${value}%`
+  }
+  return value
+}
+
 // Return the primary key columns if exists, otherwise return the first column to use as a default sort
 export const getDefaultOrderByColumns = (
   table: Pick<PGTable, 'primary_keys' | 'columns'>,
@@ -149,11 +168,11 @@ export const getTableRowsSql = ({
   filters.forEach((x) => {
     const col = table.columns?.find((y) => y.name === x.column)
     const isStringTypeColumn = !!col ? (TEXT_TYPES as string[]).includes(col.format) : true
-    queryChains = queryChains.filter(
-      x.column,
-      x.operator,
-      !isStringTypeColumn && x.value === '' ? null : x.value
-    )
+    const value =
+      !isStringTypeColumn && x.value === ''
+        ? null
+        : formatPatternMatchFilterValue(x.value, x.operator)
+    queryChains = queryChains.filter(x.column, x.operator, value)
   })
 
   // If sorts is empty and table row count is within threshold, use the primary key as the default sort.
@@ -222,18 +241,18 @@ export const getTableRowsSql = ({
     const isJson = (JSON_SET as Set<string>).has(format)
     // format comes from pg_attribute (e.g. 'text', 'json') — ident() ensures safe quoting
     const arrayTypeCast = isJson ? safeSql`::${keyword(format)}[]` : safeSql`::text[]`
-    const lastElement: SafeSqlFragment = isJson
-      ? safeSql`array['{"truncated": true}'::json]`
-      : safeSql`array['...']`
+    const marker: SafeSqlFragment = isJson
+      ? safeSql`'{"truncated": true}'::json`
+      : safeSql`'...'::text`
+    const lastElement: SafeSqlFragment = safeSql`array[${marker}]`
     const col = ident(columnName)
     if (index >= 0) {
       // We cast to text[] but limit the array size if the total size of the array is too large (same logic than for text fields)
       // This returns the first MAX_ARRAY_SIZE elements of the array (adjustable) and adds '...' if truncated
       // NOTE: this is not optimal, as the first element in the array could still be very large (more than 10Kb) and in such case
       // the trimming might fail.
-      // Also handle multi-dimentionals array truncation, but won't happen the extra `...` element to it as we can't determine what's
-      // the right number of items to generate within the array. Studio side, we'll consider any multi-dimentional array as possibly
-      // truncated.
+      // Multi-dimensional arrays are sliced the same way, but the marker has to be a whole extra entry of the first
+      // dimension (so that the array stays rectangular). It's filled with the marker, using the lengths of the other dimensions.
       selectExpressions[index] = safeSql`
         case 
           when octet_length(${col}::text) > ${literal(maxCharacters)} 
@@ -243,7 +262,13 @@ export const getTableRowsSql = ({
               then
                 (select array_cat(${col}[1:${literal(maxArraySize)}]${arrayTypeCast}, ${lastElement}${arrayTypeCast}))${arrayTypeCast}
               else
-                ${col}[1:${literal(maxArraySize)}]${arrayTypeCast}
+                array_cat(
+                  ${col}[1:${literal(maxArraySize)}]${arrayTypeCast},
+                  array_fill(
+                    ${marker},
+                    array(select array_length(${col}, d) from generate_series(2, array_ndims(${col})) as d order by d)
+                  )${arrayTypeCast}
+                )${arrayTypeCast}
             end
           else ${col}${arrayTypeCast}
         end

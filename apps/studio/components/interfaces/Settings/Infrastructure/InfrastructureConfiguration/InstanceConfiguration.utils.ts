@@ -21,10 +21,13 @@ export const generateNodes = ({
   primary,
   replicas,
   loadBalancers,
+  computeSize,
 }: {
   primary: Database
   replicas: Database[]
   loadBalancers: LoadBalancer[]
+  /** Abstract size label (e.g. "Small") — replicas always match the primary's compute size */
+  computeSize?: string
 }): Node[] => {
   const position = { x: 0, y: 0 }
   const regions = groupBy(replicas, (d) => {
@@ -77,7 +80,7 @@ export const generateNodes = ({
       region: primaryRegion ?? { name: primary.region },
       provider: primary.cloud_provider,
       inserted_at: primary.inserted_at,
-      computeSize: primary.size,
+      computeSize,
       status: primary.status,
       numReplicas: replicas.length,
       numRegions: Object.keys(regions).length,
@@ -101,7 +104,7 @@ export const generateNodes = ({
           region,
           provider: database.cloud_provider,
           inserted_at: database.inserted_at,
-          computeSize: database.size,
+          computeSize,
           status: database.status,
         },
       }

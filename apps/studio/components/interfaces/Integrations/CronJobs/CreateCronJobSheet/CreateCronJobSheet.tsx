@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
@@ -53,7 +52,7 @@ import { getDatabaseCronJob } from '@/data/database-cron-jobs/database-cron-job-
 import { useDatabaseCronJobCreateMutation } from '@/data/database-cron-jobs/database-cron-jobs-create-mutation'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { isGreaterThanOrEqual } from '@/lib/semver'
@@ -118,9 +117,8 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
   const { mutate: upsertCronJob, isPending: isUpserting } = useDatabaseCronJobCreateMutation()
   const isLoading = isLoadingGetCronJob || isUpserting
 
-  const { can: canToggleExtensions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'extensions'
+  const { can: canToggleExtensions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const cronJobValues = parseCronJobCommand(
@@ -394,8 +392,8 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                         // @ts-ignore
                         title={
                           <span>
-                            Enable <code className="text-code-inline w-min">pg_net</code> for HTTP
-                            requests or Edge Functions
+                            Enable <code className="w-min">pg_net</code> for HTTP requests or Edge
+                            Functions
                           </span>
                         }
                         description={
@@ -405,7 +403,6 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                               within your cron jobs
                             </span>
                             <ButtonTooltip
-                              variant="default"
                               className="w-min"
                               disabled={!canToggleExtensions}
                               onClick={() => setShowEnableExtensionModal(true)}
@@ -450,13 +447,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
               </Form>
             </div>
             <SheetFooter>
-              <Button
-                size="tiny"
-                variant="default"
-                type="button"
-                onClick={confirmOnClose}
-                disabled={isLoading}
-              >
+              <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isLoading}>
                 Cancel
               </Button>
               <Button

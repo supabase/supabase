@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import ApiKeysLayout from './APIKeysLayout'
 import { customRender } from '@/tests/lib/custom-render'
@@ -16,10 +16,6 @@ const LEGACY_TAB = 'Legacy anon, service_role API keys'
 const NEW_TAB = 'Publishable and secret API keys'
 
 describe('ApiKeysLayout', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('hides the legacy keys tab on High Availability projects', () => {
     mockUseHighAvailability.mockReturnValue({ isHighAvailability: true, isPending: false })
 

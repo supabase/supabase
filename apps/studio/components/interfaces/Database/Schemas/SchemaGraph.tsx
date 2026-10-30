@@ -1,5 +1,4 @@
 import type { PGSchema } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Background,
   BackgroundVariant,
@@ -12,7 +11,14 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
-import { Check, ChevronDown, Copy, Download, Loader2, Plus } from 'lucide-react'
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  DownloadIcon,
+  Loader2Icon,
+  PlusIcon,
+} from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -63,7 +69,7 @@ import { useDatabasePoliciesQuery } from '@/data/database-policies/database-poli
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -161,9 +167,8 @@ export const SchemaGraph = () => {
     {}
   )
 
-  const { can: canUpdateTables } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canUpdateTables } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -298,9 +303,6 @@ export const SchemaGraph = () => {
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_SVG, () => downloadImage('svg'), {
     enabled: shortcutsEnabled,
   })
-  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_FIND_TABLE, () => setFindTableOpen(true), {
-    enabled: shortcutsEnabled,
-  })
 
   const isFirstLoad = useRef(true)
   const fitViewOnNextLayout = useRef(false)
@@ -432,9 +434,8 @@ export const SchemaGraph = () => {
               <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-0">
                   <ButtonTooltip
-                    variant="default"
                     className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
-                    icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
+                    icon={copied ? <CheckIcon data-testid="copy-sql-ready" /> : <CopyIcon />}
                     onClick={copyAsSQL}
                     tooltip={{
                       content: {
@@ -456,11 +457,10 @@ export const SchemaGraph = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        variant="default"
                         size="tiny"
                         aria-label="Export options"
                         className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-                        icon={<ChevronDown size={12} />}
+                        icon={<ChevronDownIcon size={12} />}
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
@@ -473,9 +473,9 @@ export const SchemaGraph = () => {
                         }}
                       >
                         {isMarkdownDataLoading ? (
-                          <Loader2 size={12} className="animate-spin" />
+                          <Loader2Icon size={12} className="animate-spin" />
                         ) : (
-                          <Copy size={12} />
+                          <CopyIcon size={12} />
                         )}
                         <span>Copy as Markdown</span>
                       </DropdownMenuItem>
@@ -486,7 +486,7 @@ export const SchemaGraph = () => {
                           downloadImage('png')
                         }}
                       >
-                        <Download size={12} />
+                        <DownloadIcon size={12} />
                         <span>Download as PNG</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -496,7 +496,7 @@ export const SchemaGraph = () => {
                           downloadImage('svg')
                         }}
                       >
-                        <Download size={12} />
+                        <DownloadIcon size={12} />
                         <span>Download as SVG</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -511,7 +511,7 @@ export const SchemaGraph = () => {
                     tooltipOpen={autoLayoutDialogOpen ? false : undefined}
                   >
                     <AlertDialogTrigger asChild>
-                      <Button variant="default">Auto layout</Button>
+                      <Button>Auto layout</Button>
                     </AlertDialogTrigger>
                   </Shortcut>
                   <AlertDialogContent>
@@ -534,7 +534,7 @@ export const SchemaGraph = () => {
       </div>
       {isLoadingTables && (
         <div className="w-full h-full flex items-center justify-center gap-x-2">
-          <Loader2 className="animate-spin text-foreground-light" size={16} />
+          <Loader2Icon className="animate-spin text-foreground-light" size={16} />
           <p className="text-sm text-foreground-light">Loading tables</p>
         </div>
       )}
@@ -561,7 +561,7 @@ export const SchemaGraph = () => {
                 }
               >
                 {canAddTables && (
-                  <Button asChild className="mt-2 w-min" variant="default" icon={<Plus />}>
+                  <Button asChild className="mt-2 w-min" icon={<PlusIcon />}>
                     <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
                   </Button>
                 )}
@@ -607,7 +607,6 @@ export const SchemaGraph = () => {
                   {hasNextPage && (
                     <Panel position="bottom-center" className="mb-11!">
                       <Button
-                        variant="default"
                         size="tiny"
                         loading={isFetchingNextPage}
                         onClick={() => {

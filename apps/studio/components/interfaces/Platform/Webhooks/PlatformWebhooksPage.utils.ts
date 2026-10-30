@@ -1,4 +1,5 @@
-import type { WebhookScope } from './PlatformWebhooks.types'
+import { DELIVERIES_POLL_INTERVAL_MS } from './PlatformWebhooks.constants'
+import type { WebhookDelivery, WebhookScope } from './PlatformWebhooks.types'
 
 export const shouldHandleEndpointNotFound = ({
   endpointId,
@@ -13,6 +14,37 @@ export const shouldHandleEndpointNotFound = ({
   if (hasSelectedEndpoint) return false
   return endpointId !== pendingCreatedEndpointId
 }
+
+/**
+ * The table's rows refresh every few seconds, but the sheet's delivery is loaded once, so its status
+ * can be out of date. Prefer the table's row, and only fall back to the sheet's delivery when it is
+ * not on the current page.
+ */
+export const findDeliveryToRetry = ({
+  deliveryId,
+  selectedDelivery,
+  pageDeliveries,
+}: {
+  deliveryId: string
+  selectedDelivery: WebhookDelivery | null
+  pageDeliveries: WebhookDelivery[]
+}) =>
+  pageDeliveries.find((delivery) => delivery.id === deliveryId) ??
+  (selectedDelivery?.id === deliveryId ? selectedDelivery : undefined)
+
+/**
+ * Only redirect away once the flags have loaded and the route params are populated; before
+ * that, the flag reads `false` and `slug`/`ref` are undefined even for enabled users.
+ */
+export const shouldRedirectFromWebhooks = ({
+  areFlagsReady,
+  isScopeReady,
+  isEnabled,
+}: {
+  areFlagsReady: boolean
+  isScopeReady: boolean
+  isEnabled: boolean
+}) => areFlagsReady && isScopeReady && !isEnabled
 
 interface PendingSigningSecretReveal {
   endpointId: string
@@ -44,4 +76,23 @@ export const resetPendingSigningSecretRevealForTests = () => {
   for (const key of Object.keys(pendingSigningSecretRevealByScope) as WebhookScope[]) {
     delete pendingSigningSecretRevealByScope[key]
   }
+}
+
+/**
+ * Deliveries are not polled by default. Polling is on while the user chose "Live", while a delivery
+ * is still pending, and for a short wait after a test event or retry was sent. That wait cannot end
+ * when the new row shows up, because the API returns an ingress ID, not the ID of the delivery.
+ */
+export const getDeliveriesRefetchInterval = ({
+  isLive,
+  isAwaitingDelivery,
+  deliveries,
+}: {
+  isLive: boolean
+  isAwaitingDelivery: boolean
+  deliveries: WebhookDelivery[]
+}) => {
+  const hasPendingDelivery = deliveries.some((delivery) => delivery.status === 'pending')
+
+  return isLive || isAwaitingDelivery || hasPendingDelivery ? DELIVERIES_POLL_INTERVAL_MS : false
 }

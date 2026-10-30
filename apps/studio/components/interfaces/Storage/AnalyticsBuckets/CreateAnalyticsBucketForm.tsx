@@ -225,8 +225,7 @@ export const CreateAnalyticsBucketForm = ({
                 title="Wrappers extension must be updated for Iceberg Wrapper support"
               >
                 <p className="prose max-w-full text-sm leading-normal!">
-                  Update the <code className="text-code-inline">wrappers</code> extension by
-                  upgrading your project from your{' '}
+                  Update the <code>wrappers</code> extension by upgrading your project from your{' '}
                   <InlineLink href={getServiceVersionsPath(ref)}>project settings</InlineLink>{' '}
                   before creating an Analytics bucket.{' '}
                   <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
@@ -256,10 +255,11 @@ export const CreateAnalyticsBucketForm = ({
       </Section>
 
       <Footer>
-        <Button variant="default" disabled={isCreating} onClick={() => onOpenChange(false)}>
+        <Button disabled={isCreating} onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button
+          variant="primary"
           form={formId}
           type="submit"
           loading={isCreating}

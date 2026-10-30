@@ -1,5 +1,7 @@
 @import 'config/tailwind.config.css';
-@import './../../../packages/ui/build/css/themes/faux-classic-dark.css';
+@import 'config/inline-code.css';
+@import 'ui-patterns/CodeBlock/code-block.css';
+@import 'ui-patterns/Notch/notch.css';
 
 @source '../_blog/*.mdx';
 @source '../components/**/*.tsx';
@@ -17,10 +19,19 @@
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-manrope, var(--font-sans));
   --font-mono: var(--font-source-code-pro), 'Source Code Pro', ui-monospace, Menlo, monospace;
+
+  --color-pane-dark: hsl(var(--colors-gray-dark-300));
 }
 
 @utility section-container {
   @apply w-full mx-auto max-w-7xl px-6 lg:px-12 xl:px-24;
+}
+
+@utility construction-mask {
+  mask:
+    linear-gradient(to right, transparent, #000 35%, #000 65%, transparent),
+    linear-gradient(to bottom, #000 60%, transparent);
+  mask-composite: intersect;
 }
 
 /**
@@ -47,6 +58,17 @@
 }
 
 @theme {
+  /* Scale Tailwind's default radius tokens by 4/3 to match the shared Studio curve. */
+  --radius: 0.333333rem;
+  --radius-xs: 0.166667rem;
+  --radius-sm: 0.333333rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.666667rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.333333rem;
+  --radius-3xl: 2rem;
+  --radius-4xl: 2.666667rem;
+
   --color-purple-sos-100: hsl(293 80% 97%);
   --color-purple-sos-200: hsl(293 85% 91%);
   --color-purple-sos-300: hsl(293 90% 80%);
@@ -64,6 +86,8 @@
   --animate-marquee-vertical: marquee-vertical 180s linear infinite both;
   --animate-pulse-radar: pulse-radar 3s linear infinite;
   --animate-slide-in: slideIn 250ms ease-in both;
+  --animate-draw-line: draw-line 1.8s linear both;
+  --animate-reveal-hatch: reveal-hatch 2.4s cubic-bezier(0.4, 0, 1, 1) 1.8s both;
 
   --delay-1200: 1200ms;
   --delay-1500: 1500ms;
@@ -81,6 +105,22 @@
   --text-8xl: 5.875rem;
   --text-9xl: 7.875rem;
   --font-weight-normal: 450;
+  --ease-crossfade: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes reveal-hatch {
+  from {
+    scale: 0;
+  }
+  to {
+    scale: 1;
+  }
 }
 
 @keyframes flash-code {
@@ -261,11 +301,11 @@ h6:not(.overwrite) {
 }
 
 .heading-gradient-brand {
-  @apply text-[#3ECF8E00] bg-clip-text bg-linear-to-b from-brand to-brand/80;
+  @apply text-[#3ECF8E00] bg-clip-text bg-linear-to-b from-brand-default to-brand-default/80;
 }
 
 .toc-animate {
-  @apply translate-x-1! text-brand!;
+  @apply translate-x-1! text-primary!;
 }
 
 .prose-toc a {

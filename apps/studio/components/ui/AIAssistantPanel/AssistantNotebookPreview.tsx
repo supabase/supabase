@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { NotebookText } from 'lucide-react'
+import { NotebookTextIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button, cn } from 'ui'
 
@@ -83,10 +83,10 @@ export const AssistantNotebookPreview = ({
     expandedOverrides[getEntryKey(entry)] === true
 
   return (
-    <div className={cn('flex w-full min-w-0 max-w-6xl mx-auto flex-col', className)}>
+    <div className={cn('flex w-full min-w-0 max-w-3xl mx-auto flex-col', className)}>
       <ExplorerToolbar aria-label="Notebook toolbar">
         <ExplorerToolbarIcon>
-          <NotebookText size={16} strokeWidth={2} />
+          <NotebookTextIcon size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle>{title ?? FALLBACK_TITLE[mode]}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>

@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Trash } from 'lucide-react'
+import { GripVerticalIcon, TrashIcon } from 'lucide-react'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
 import {
   Button,
@@ -66,20 +66,19 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
                 tabIndex={isDisabled ? -1 : 0}
                 disabled={isDisabled}
               >
-                <GripVertical size={16} strokeWidth={1.5} />
+                <GripVerticalIcon size={16} strokeWidth={1.5} />
               </button>
               <Input {...inputField} className="w-full" />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    variant="default"
                     size="small"
                     disabled={isDisabled}
-                    icon={<Trash strokeWidth={1.5} size={16} />}
+                    icon={<TrashIcon strokeWidth={1.5} size={16} />}
                     className="px-2"
                     onClick={() => onRemoveValue()}
                     aria-label="Remove value"
-                    // Tooltip repeats the label; the description would read the name twice
+                    // Tooltip repeats the label; screen readers would read it twice
                     aria-describedby={undefined}
                   />
                 </TooltipTrigger>

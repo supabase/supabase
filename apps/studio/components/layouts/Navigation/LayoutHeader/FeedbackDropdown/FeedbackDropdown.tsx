@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'common'
-import { Lightbulb, TriangleAlert } from 'lucide-react'
+import { LightbulbIcon, TriangleAlertIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
@@ -65,18 +65,18 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
           <div className="flex flex-col gap-4 p-4">
             <div className="font-medium text-sm">What would you like to share?</div>
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="default" className="h-32" onClick={() => setStage('issue-options')}>
+              <Button className="h-32" onClick={() => setStage('issue-options')}>
                 <div className="grid gap-1.5 text-center">
-                  <TriangleAlert size="28" className="mx-auto text-destructive-600" />
+                  <TriangleAlertIcon size="28" className="mx-auto text-destructive-600" />
                   <div className="flex flex-col items-center">
                     <span className="text-base">Issue</span>
                     <span className="text-xs text-foreground-lighter">with my project</span>
                   </div>
                 </div>
               </Button>
-              <Button variant="default" className="h-32" onClick={() => setStage('widget')}>
+              <Button className="h-32" onClick={() => setStage('widget')}>
                 <div className="grid gap-1.5 text-center">
-                  <Lightbulb size="28" className="mx-auto text-warning" />
+                  <LightbulbIcon size="28" className="mx-auto text-warning" />
                   <div className="flex flex-col items-center">
                     <span className="text-base">Idea</span>
                     <span className="text-xs text-foreground-lighter">to improve Supabase</span>
@@ -109,7 +109,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             </div>
             <PopoverSeparator />
             <div className="px-4 pt-4 pb-4">
-              <Button variant="default" size="tiny" onClick={() => setStage('widget')}>
+              <Button size="tiny" onClick={() => setStage('widget')}>
                 Leave feedback instead
               </Button>
             </div>

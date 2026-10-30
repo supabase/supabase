@@ -5,7 +5,6 @@ import ScrollProgress from 'components/ScrollProgress'
 import { getMenu } from 'data/nav'
 import { DevToolbarTrigger } from 'dev-tools'
 import { useSendTelemetryEvent } from 'lib/telemetry'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
@@ -13,15 +12,16 @@ import {
   Button,
   buttonVariants,
   cn,
+  FloatingPlate,
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
+  NavigationMenuViewport,
 } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
-import { AnnouncementBanner } from 'ui-patterns/Banners/AnnouncementBanner'
 
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -39,10 +39,29 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const pathname = usePathname()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState('')
+  const [visibleDropdown, setVisibleDropdown] = useState('')
+  const [isSwitchingDropdown, setIsSwitchingDropdown] = useState(false)
+  const [openedDropdowns, setOpenedDropdowns] = useState<string[]>([])
+  const handleDropdownChange = (value: string) => {
+    // animate card height between two open menus only
+    setIsSwitchingDropdown(value !== '' && activeDropdown !== '')
+    setActiveDropdown(value)
+    if (value === '') return
+    setVisibleDropdown(value)
+    if (!openedDropdowns.includes(value)) setOpenedDropdowns([...openedDropdowns, value])
+  }
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const user = useUser()
   const menu = getMenu()
+  const dropdownTitles: string[] = menu.primaryNav
+    .filter((menuItem) => menuItem.hasDropdown)
+    .map((menuItem) => menuItem.title)
+  const getDropdownSide = (title: string) => {
+    if (title === visibleDropdown) return 'active'
+    return dropdownTitles.indexOf(title) < dropdownTitles.indexOf(visibleDropdown) ? 'start' : 'end'
+  }
   const sendTelemetryEvent = useSendTelemetryEvent()
   const userMenu = useDropdownMenu(user)
 
@@ -81,7 +100,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
-      {!isStateOfStartupsPage && <AnnouncementBanner />}
       <div
         className={cn(
           'sticky top-0 z-40 transform',
@@ -91,7 +109,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         style={{ transform: 'translate3d(0,0,999px)' }}
         data-nav-transparent={isTransparent ? '' : undefined}
       >
-        {isStateOfStartupsPage && <AnnouncementBanner />}
         <div
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95 transition-all duration-300',
@@ -116,22 +133,43 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 </div>
                 <NavigationMenu
                   delayDuration={0}
-                  className="hidden pl-8 sm:space-x-4 lg:flex h-16"
-                  viewportClassName="rounded-xl bg-background"
+                  value={activeDropdown}
+                  onValueChange={handleDropdownChange}
+                  renderViewport={false}
+                  className="static hidden pl-8 lg:flex h-16 items-stretch"
                 >
-                  <NavigationMenuList>
+                  <NavigationMenuList className="h-full space-x-0 items-stretch">
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
-                        <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
+                        <NavigationMenuItem
+                          className="text-sm font-medium"
+                          key={menuItem.title}
+                          value={menuItem.title}
+                        >
                           <NavigationMenuTrigger
                             className={cn(
                               buttonVariants({ variant: 'text', size: 'small' }),
-                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! focus-ring focus-visible:text-foreground px-2 h-auto'
+                              'bg-transparent! hover:text-primary data-open:text-primary! focus-ring focus-visible:text-foreground px-2.5 h-full'
                             )}
                           >
                             {menuItem.title}
                           </NavigationMenuTrigger>
-                          <NavigationMenuContent>{menuItem.dropdown}</NavigationMenuContent>
+                          <NavigationMenuContent
+                            forceMount
+                            inert={visibleDropdown !== menuItem.title}
+                            data-active={visibleDropdown === menuItem.title}
+                            data-side={getDropdownSide(menuItem.title)}
+                            className={cn(
+                              'md:w-full data-[motion^=from-]:animate-none! data-[motion^=to-]:animate-none!',
+                              'data-[active=false]:pointer-events-none data-[active=false]:opacity-0',
+                              'data-[side=start]:-translate-x-4 data-[side=end]:translate-x-4',
+                              'motion-safe:group-data-[switching=true]/viewport:transition-[opacity,translate]',
+                              'motion-safe:group-data-[switching=true]/viewport:duration-250',
+                              'motion-safe:group-data-[switching=true]/viewport:ease-in-out'
+                            )}
+                          >
+                            {openedDropdowns.includes(menuItem.title) ? menuItem.dropdown : null}
+                          </NavigationMenuContent>
                         </NavigationMenuItem>
                       ) : (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
@@ -139,7 +177,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                             <MenuItem
                               href={menuItem.url}
                               title={menuItem.title}
-                              className="group-hover:bg-transparent text-foreground focus-visible:text-brand-link"
+                              className="group-hover:bg-transparent text-foreground focus-visible:text-primary px-2.5 h-full"
                               hoverColor="brand"
                             />
                           </NavigationMenuLink>
@@ -147,6 +185,24 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                       )
                     )}
                   </NavigationMenuList>
+                  <NavigationMenuViewport
+                    forceMount
+                    data-open={activeDropdown !== ''}
+                    data-switching={isSwitchingDropdown}
+                    // The wrapper keeps the last menu's height while closed, so it must
+                    // not capture pointer events over the page below the nav.
+                    containerProps={{ className: 'inset-x-0 pointer-events-none' }}
+                    className={cn(
+                      'group/viewport pointer-events-auto origin-top scale-100 rounded-xl bg-surface-75 md:w-[960px]',
+                      'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
+                      'data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200',
+                      'data-[open=false]:invisible data-[open=false]:scale-[0.97] data-[open=false]:opacity-0',
+                      'data-[open=false]:pointer-events-none',
+                      'motion-safe:transition-[opacity,scale,visibility]',
+                      'motion-safe:data-[switching=true]:transition-[height,opacity,scale,visibility]',
+                      'motion-reduce:transition-none'
+                    )}
+                  />
                 </NavigationMenu>
               </div>
               <div className="flex items-center gap-2 opacity-0 animate-fade-in scale-100! delay-300">
@@ -160,28 +216,54 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   <GitHubButton />
                   {isLoggedIn ? (
                     <>
-                      <Button className="hidden lg:block" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
-                      </Button>
+                      {isStateOfStartupsPage ? (
+                        <FloatingPlate rounded="md" className="hidden lg:inline-flex">
+                          <Button asChild>
+                            <a href="/dashboard/projects">Dashboard</a>
+                          </Button>
+                        </FloatingPlate>
+                      ) : (
+                        <Button className="hidden lg:inline-flex" asChild>
+                          <a href="/dashboard/projects">Dashboard</a>
+                        </Button>
+                      )}
                       <AuthenticatedDropdownMenu menu={userMenu} user={user} site="www" />
                     </>
                   ) : (
                     <>
-                      <Button variant="default" className="hidden lg:block" asChild>
-                        <Link
-                          href="https://supabase.com/dashboard"
-                          onClick={() =>
-                            sendTelemetryEvent({
-                              action: 'sign_in_button_clicked',
-                              properties: { buttonLocation: 'Header Nav' },
-                            })
-                          }
-                        >
-                          Sign in
-                        </Link>
-                      </Button>
-                      <Button className="hidden lg:block" asChild>
-                        <Link
+                      {isStateOfStartupsPage ? (
+                        <FloatingPlate rounded="md" className="hidden lg:inline-flex">
+                          <Button asChild>
+                            <a
+                              href="https://supabase.com/dashboard"
+                              onClick={() =>
+                                sendTelemetryEvent({
+                                  action: 'sign_in_button_clicked',
+                                  properties: { buttonLocation: 'Header Nav' },
+                                })
+                              }
+                            >
+                              Sign in
+                            </a>
+                          </Button>
+                        </FloatingPlate>
+                      ) : (
+                        <Button className="hidden lg:inline-flex" asChild>
+                          <a
+                            href="https://supabase.com/dashboard"
+                            onClick={() =>
+                              sendTelemetryEvent({
+                                action: 'sign_in_button_clicked',
+                                properties: { buttonLocation: 'Header Nav' },
+                              })
+                            }
+                          >
+                            Sign in
+                          </a>
+                        </Button>
+                      )}
+                      <Button variant="primary" className="hidden lg:inline-flex" asChild>
+                        <a
                           href="https://supabase.com/dashboard/sign-up"
                           onClick={() =>
                             sendTelemetryEvent({
@@ -191,7 +273,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           }
                         >
                           Start your project
-                        </Link>
+                        </a>
                       </Button>
                     </>
                   )}

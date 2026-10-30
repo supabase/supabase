@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
 
@@ -36,6 +36,18 @@ const METRICS: MetricConfig[] = [
     label: 'File storage',
     unit: 'gigabytes',
     anchor: 'storageSize',
+  },
+  {
+    key: PricingMetric.LOG_INGESTION,
+    label: 'Log Ingestion',
+    unit: 'gigabytes',
+    anchor: 'logIngestion',
+  },
+  {
+    key: PricingMetric.LOG_QUERYING,
+    label: 'Log Query',
+    unit: 'gigabytes',
+    anchor: 'logQuery',
   },
 ]
 
@@ -94,7 +106,7 @@ const ProgressRing = ({
         transform="rotate(-90 9 9)"
         className={cn(
           'transition-[stroke-dashoffset] duration-500',
-          isOver ? 'text-warning-600' : isApproaching ? 'text-warning' : 'text-brand'
+          isOver ? 'text-warning-600' : isApproaching ? 'text-warning' : 'text-primary'
         )}
       />
     </svg>
@@ -137,7 +149,7 @@ const CompactMetricRow = ({
             <span className="text-muted"> / </span>
             <span className="text-foreground-lighter">{formatted.limit}</span>
           </span>
-          <ChevronRight
+          <ChevronRightIcon
             size={12}
             strokeWidth={1.5}
             className="text-foreground w-0 ml-0 opacity-0 overflow-hidden group-hover/row:w-3 group-hover/row:ml-1 group-hover/row:opacity-100 transition-all"

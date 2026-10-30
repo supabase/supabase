@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { proxy, snapshot, useSnapshot, type Snapshot } from 'valtio'
 import { proxyMap } from 'valtio/utils'
 
+import { persistNotebookDraft, readNotebookDraft, removeNotebookDraft } from './notebook-drafts'
 import type { Notebook, StateNotebook } from './types'
 import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import type { SnippetStatus } from '@/data/content/snippet-status'
@@ -39,6 +40,16 @@ export const notebooksState = proxy({
   addNotebook: ({ projectRef, notebook }: { projectRef: string; notebook: Notebook }) => {
     if (notebooksState.notebooks[notebook.id]) return
     notebooksState.notebooks[notebook.id] = { projectRef, notebook, status: 'new' }
+
+    if (notebook.content) {
+      persistNotebookDraft({
+        projectRef,
+        id: notebook.id,
+        name: notebook.name,
+        content: notebook.content,
+        baseUpdatedAt: null,
+      })
+    }
   },
 
   /**
@@ -67,10 +78,18 @@ export const notebooksState = proxy({
    * 'unsaved' -> ...), but the one-time 'new' -> 'saved' transition has no
    * other trigger — the resource query that would otherwise pick it up is
    * disabled while the notebook is still 'new'.
+   *
+   * `updatedAt` is the server's confirmed timestamp for this save, so the
+   * next locally-persisted draft (if any) branches from an accurate base
+   * rather than the notebook's stale initial-load timestamp.
    */
-  markSaved: ({ id }: { id: string }) => {
+  markSaved: ({ id, updatedAt }: { id: string; updatedAt?: string }) => {
     const stateNotebook = notebooksState.notebooks[id]
-    if (stateNotebook) stateNotebook.status = 'saved'
+    if (stateNotebook) {
+      stateNotebook.status = 'saved'
+      if (updatedAt) stateNotebook.notebook.updated_at = updatedAt
+      removeNotebookDraft({ projectRef: stateNotebook.projectRef, id })
+    }
     notebooksState.clearServerDivergence({ id })
   },
 
@@ -81,13 +100,25 @@ export const notebooksState = proxy({
     notebooksState.serverDivergedWhileDirty.delete(id),
 
   /**
-   * Rename follows its own async save directly at the call site rather than going
-   * through needsSaving/the debounced scheduler.
+   * Rename is bundled into the same "Save changes" action as cell edits, rather than its
+   * own immediate save — so it needs the same dirty-tracking and draft persistence as
+   * `updateCells`, or a rename with no cell changes would look clean and never get saved.
    */
   renameNotebook: ({ id, name }: { id: string; name: string }) => {
     const stateNotebook = notebooksState.notebooks[id]
-    if (stateNotebook) {
-      stateNotebook.notebook.name = name
+    if (!stateNotebook) return
+
+    stateNotebook.notebook.name = name
+    stateNotebook.status = statusOnEdit(stateNotebook.status)
+
+    if (stateNotebook.notebook.content) {
+      persistNotebookDraft({
+        projectRef: stateNotebook.projectRef,
+        id,
+        name,
+        content: stateNotebook.notebook.content,
+        baseUpdatedAt: stateNotebook.notebook.updated_at ?? null,
+      })
     }
   },
 
@@ -103,6 +134,7 @@ export const notebooksState = proxy({
     notebooksState.notebooks = otherNotebooks
     if (!skipSave) notebooksState.needsSaving.delete(id)
     notebooksState.clearServerDivergence({ id })
+    if (notebook) removeNotebookDraft({ projectRef: notebook.projectRef, id })
   },
 
   /**
@@ -126,6 +158,47 @@ export const notebooksState = proxy({
     stateNotebook.notebook.content.cells = cells as Notebooks.Cell[]
     stateNotebook.status = statusOnEdit(stateNotebook.status)
     if (!skipSave) notebooksState.needsSaving.set(id, false)
+
+    persistNotebookDraft({
+      projectRef: stateNotebook.projectRef,
+      id,
+      name: stateNotebook.notebook.name,
+      content: stateNotebook.notebook.content,
+      baseUpdatedAt: stateNotebook.notebook.updated_at ?? null,
+    })
+  },
+
+  /**
+   * Applies a locally-persisted draft on top of a freshly-loaded notebook — restoring
+   * edits that were never saved before the browser refreshed. `baseUpdatedAt` is the
+   * server's current `updated_at` for this notebook; if the draft branched from a
+   * different value, the server moved on while the draft was pending (e.g. an assistant
+   * edit), so the existing "assistant changes detected" conflict is raised rather than
+   * silently restoring over it — the user still sees their draft, but saving it requires
+   * the same confirmation an in-session conflict would.
+   */
+  restoreDraft: ({
+    projectRef,
+    id,
+    baseUpdatedAt,
+  }: {
+    projectRef: string
+    id: string
+    baseUpdatedAt: string
+  }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (!stateNotebook) return
+
+    const draft = readNotebookDraft({ projectRef, id })
+    if (!draft) return
+
+    stateNotebook.notebook.name = draft.name
+    stateNotebook.notebook.content = draft.content
+    stateNotebook.status = statusOnEdit('saved')
+
+    if (draft.baseUpdatedAt !== null && draft.baseUpdatedAt !== baseUpdatedAt) {
+      notebooksState.markServerDivergence({ id, type: 'updated' })
+    }
   },
 
   /**

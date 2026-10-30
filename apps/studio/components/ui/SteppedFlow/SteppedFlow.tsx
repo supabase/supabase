@@ -106,16 +106,20 @@ export const SteppedFlow = ({
         </p>
         <Card
           key={currentStep}
-          className="animate-in fade-in-0 duration-200 motion-reduce:animate-none"
+          className={cn(
+            currentIndex > 0 && 'animate-in fade-in-0 duration-200 motion-reduce:animate-none'
+          )}
         >
           {children}
           <CardFooter
-            className={cn(currentIndex > 0 || showCancel ? 'justify-between' : 'justify-end')}
+            className={cn(
+              'border-t',
+              currentIndex > 0 || showCancel ? 'justify-between' : 'justify-end'
+            )}
           >
             {currentIndex > 0 ? (
               <Button
                 type="button"
-                variant="default"
                 disabled={navigationDisabled}
                 onClick={() => onStepChange(steps[currentIndex - 1].id)}
               >
@@ -123,12 +127,7 @@ export const SteppedFlow = ({
               </Button>
             ) : null}
             {currentIndex === 0 && showCancel ? (
-              <Button
-                type="button"
-                variant="default"
-                disabled={navigationDisabled}
-                onClick={onCancel}
-              >
+              <Button type="button" disabled={navigationDisabled} onClick={onCancel}>
                 {cancelLabel}
               </Button>
             ) : null}

@@ -1,6 +1,12 @@
 # build output
 dist/
 
+# generated markdown export (scripts/generate-markdown.ts)
+public/markdown/
+
+# federated troubleshooting content (scripts/federated-content), regenerated on every prebuild
+src/content/troubleshooting/
+
 # generated types
 .astro/
 
@@ -22,3 +28,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# jetbrains setting folder
+src/content/troubleshooting

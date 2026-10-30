@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -9,10 +8,11 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import BillingEmail from './BillingEmail'
 import { organizationKeys } from '@/data/organizations/keys'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type CustomerResponse = components['schemas']['CustomerResponse']
+type CustomerResponse = components['schemas']['CustomerResponse_Output']
 
 // The additional-emails control renders a Radix Popover when adding a recipient.
 mockAnimationsApi()
@@ -31,8 +31,9 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: (action: string) => mockCheckPermissions(action),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: (permission: string) => mockCheckPermissions(permission),
 }))
 
 vi.mock('react-intersection-observer', () => ({
@@ -94,7 +95,6 @@ const removeRecipient = (email: string) => {
 
 describe('BillingEmail', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockCheckPermissions.mockImplementation(() => ({ can: true, isSuccess: true }))
   })
 
@@ -111,8 +111,8 @@ describe('BillingEmail', () => {
   })
 
   test('shows a permission notice when the user cannot read billing data', async () => {
-    mockCheckPermissions.mockImplementation((action: string) => ({
-      can: action !== PermissionAction.BILLING_READ,
+    mockCheckPermissions.mockImplementation((permission) => ({
+      can: permission !== FGA_PERMISSIONS.ORGANIZATION.BILLING_READ,
       isSuccess: true,
     }))
 
@@ -123,8 +123,8 @@ describe('BillingEmail', () => {
   })
 
   test('disables the email controls when the user cannot update billing data', async () => {
-    mockCheckPermissions.mockImplementation((action: string) => ({
-      can: action !== PermissionAction.BILLING_WRITE,
+    mockCheckPermissions.mockImplementation((permission) => ({
+      can: permission !== FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE,
       isSuccess: true,
     }))
     mockCustomerProfile({ email: 'billing@example.com', additional_emails: [] })
@@ -149,7 +149,7 @@ describe('BillingEmail', () => {
 
     const emailInput = await screen.findByPlaceholderText('Email')
     await userEvent.clear(emailInput)
-    await userEvent.type(emailInput, 'new-billing@example.com')
+    await userEvent.paste('new-billing@example.com')
 
     fireEvent.click(await screen.findByRole('button', { name: 'Save' }))
 
@@ -239,7 +239,7 @@ describe('BillingEmail', () => {
     await waitFor(() => expect(emailInput).toHaveValue('initial@example.com'))
 
     await userEvent.clear(emailInput)
-    await userEvent.type(emailInput, 'edited@example.com')
+    await userEvent.paste('edited@example.com')
 
     // Simulate an unrelated refetch of the same shared customer-profile query (e.g. triggered
     // by another section, or a background refetch) returning newer server data.

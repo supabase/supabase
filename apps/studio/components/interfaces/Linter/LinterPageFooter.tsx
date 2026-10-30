@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { Button, cn } from 'ui'
 
 import { Markdown } from '../Markdown'
@@ -38,7 +38,7 @@ export const LinterPageFooter = ({
         size="tiny"
         onClick={() => setShowBottomSection(false)}
       >
-        <X size="14" />
+        <XIcon size="14" />
       </Button>
       <div
         className={cn(hideDbInspectCTA ? 'w-[35%]' : 'w-[33%]', 'flex flex-col gap-y-1 text-sm')}
@@ -55,7 +55,6 @@ export const LinterPageFooter = ({
           align="start"
         >
           <Button
-            variant="default"
             className="mt-3! w-min"
             disabled={isLoading || isRefetching}
             loading={isLoading || isRefetching}
