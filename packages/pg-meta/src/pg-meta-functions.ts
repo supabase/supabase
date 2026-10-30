@@ -322,6 +322,18 @@ function splitArgumentTypes(argumentTypes: SafeSqlFragment): Array<SafeSqlFragme
   return argumentTypes.split(', ') as Array<SafeSqlFragment>
 }
 
+// Parameters flagged with GUC_LIST_QUOTE in PostgreSQL ruleutils.c are stored in
+// proconfig as ready-to-emit comma-separated identifier lists. All other GUCs
+// store scalar strings and must be wrapped with literal() when re-emitted in SQL.
+const GUC_LIST_QUOTE = new Set([
+  'search_path',
+  'temp_tablespaces',
+  'shared_preload_libraries',
+  'session_preload_libraries',
+  'local_preload_libraries',
+  'datestyle',
+])
+
 export function update(
   currentFunc: PGSavedFunction,
   { name, schema, definition }: PGFunctionUpdate
@@ -330,6 +342,20 @@ export function update(
   const identityArgs = currentFunc.identity_argument_types
   const routineKeyword = currentFunc.type === 'procedure' ? safeSql`PROCEDURE` : safeSql`FUNCTION`
 
+  const requotedConfigParams = currentFunc.config_params
+    ? Object.fromEntries(
+        Object.entries(currentFunc.config_params).map(([param, value]) => {
+          if (value === 'FROM CURRENT' || value === '""') {
+            return [param, value]
+          }
+          if (GUC_LIST_QUOTE.has(param.toLowerCase())) {
+            return [param, value]
+          }
+          return [param, literal(value)]
+        })
+      )
+    : {}
+
   const updateDefinitionSql =
     typeof definition === 'string'
       ? _generateCreateFunctionSql(
@@ -337,7 +363,7 @@ export function update(
             ...currentFunc,
             definition,
             args,
-            config_params: currentFunc.config_params ?? {},
+            config_params: requotedConfigParams,
             type: currentFunc.type,
           },
           { replace: true }

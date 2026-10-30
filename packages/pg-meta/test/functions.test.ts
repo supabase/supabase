@@ -412,3 +412,56 @@ withTestDatabase(
     await executeQuery(removeSql)
   }
 )
+
+
+withTestDatabase(
+  'update function with complex config_params roundtrip (hyphens, spaces, quoted scalars, search_path)',
+  async ({ executeQuery }) => {
+    // 1. Create function with complex configuration parameters
+    // Includes:
+    // - ADV1: search_path multi-schema list
+    // - ADV2: search_path with quoted identifier
+    // - ADV3: scalar value containing literal quotes: application_name = '''x'''
+    // - Namespaced GUC with hyphens: app.jwt_secret = 'top-secret'
+    await executeQuery(safeSql`
+      create function public.test_config_roundtrip()
+      returns integer
+      language sql
+      set "app.jwt_secret" to 'top-secret'
+      set application_name to '''x'''
+      set search_path to "my-schema", public
+      as 'select 1';
+    `)
+
+    // 2. Retrieve function via pgMeta
+    const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+      name: 'test_config_roundtrip',
+      schema: 'public',
+      args: [],
+    })
+    const retrievedFunc = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    expect(retrievedFunc).toBeDefined()
+    expect(retrievedFunc!.config_params).toEqual({
+      'app.jwt_secret': 'top-secret',
+      application_name: "'x'",
+      search_path: '"my-schema", public',
+    })
+
+    // 3. Update function definition (triggers update() and re-quoting)
+    const { sql: updateSql } = pgMeta.functions.update(asSavedFunction(retrievedFunc!), {
+      definition: 'select 2',
+    })
+
+    await executeQuery(updateSql)
+
+    // 4. Verify updated function retained its definition and all config parameters
+    const updatedFunc = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(updatedFunc!.definition).toBe('select 2')
+    expect(updatedFunc!.config_params).toEqual(retrievedFunc!.config_params)
+
+    // 5. Cleanup
+    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(updatedFunc!))
+    await executeQuery(removeSql)
+  }
+)
