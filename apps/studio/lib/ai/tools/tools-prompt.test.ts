@@ -21,13 +21,18 @@ vi.mock('common', async (importOriginal) => {
 
 vi.mock('./mcp-tools', () => ({ getMcpTools: vi.fn() }))
 
-// The legacy names are the self-hosted fallback tools, which exist only there.
-const FALLBACK_TOOL_NAMES: string[] = Object.keys(LEGACY_TOOL_CONTRACTS)
+// Removed tools that saved chats still mention. No prompt may name them.
+const LEGACY_TOOL_NAMES: string[] = Object.keys(LEGACY_TOOL_CONTRACTS)
+// A local contract wins over a remote one of the same name, as in `buildToolsPrompt`.
 const CONTRACTS: RemoteToolContract[] = [
-  ...Object.values(TOOL_CONTRACTS),
-  ...Object.values(REMOTE_TOOL_CONTRACTS),
+  ...new Map<string, RemoteToolContract>(
+    [...Object.values(REMOTE_TOOL_CONTRACTS), ...Object.values(TOOL_CONTRACTS)].map((contract) => [
+      contract.name,
+      contract,
+    ])
+  ).values(),
 ]
-const ALL_TOOL_NAMES = [...CONTRACTS.map(({ name }) => name), ...FALLBACK_TOOL_NAMES]
+const ALL_TOOL_NAMES = [...CONTRACTS.map(({ name }) => name), ...LEGACY_TOOL_NAMES]
 
 const ENVIRONMENTS: ToolEnvironment[] = ['platform', 'self-hosted']
 const BOOLEANS = [false, true]
@@ -139,8 +144,7 @@ describe('buildToolsPrompt', () => {
         schemasString: NO_SCHEMA_ACCESS_MESSAGE,
         includesLogsSnippets: true,
       })
-      const [ownText] = messages[0].content.split('\n\n')
-      const unavailable = namedTools(ownText).filter((name) => !available.has(name))
+      const unavailable = namedTools(messages[0].content).filter((name) => !available.has(name))
       expect(unavailable).toEqual([])
     })
 

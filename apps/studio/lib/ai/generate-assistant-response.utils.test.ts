@@ -169,13 +169,13 @@ describe('prepareMessagesForModel', () => {
       { type: 'json', value: rows },
       { type: 'text', value: 'Function: add' },
       { type: 'text', value: expect.stringContaining('could not be read') },
-      { type: 'text', value: 'Guidance' },
+      { type: 'text', value: expect.stringContaining('load_knowledge') },
     ])
 
     const hidden = await outputs('disabled')
     expect(hidden[0]).toEqual({ type: 'text', value: expect.stringContaining('`schema`') })
     expect(hidden[1]).toEqual(hidden[0])
-    expect(hidden[3]).toEqual({ type: 'text', value: 'Guidance' })
+    expect(hidden[3]).toEqual({ type: 'text', value: expect.stringContaining('load_knowledge') })
   })
 
   it('keeps non-tool parts untouched', () => {

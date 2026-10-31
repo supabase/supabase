@@ -1,6 +1,5 @@
 import type { InferUITools, Tool, ToolUIPart, UIDataTypes, UIMessage } from 'ai'
 
-import type { ToolName } from '../tool-filter'
 import { contract as createNotebook } from './create-notebook'
 import { contract as deleteNotebook } from './delete-notebook'
 import { contract as deployEdgeFunction } from './deploy-edge-function'
@@ -15,10 +14,12 @@ import { contract as listBranches } from './list-branches'
 import { contract as listDatabases } from './list-databases'
 import { contract as listEdgeFunctions } from './list-edge-functions'
 import { contract as listExtensions } from './list-extensions'
+import { contract as listFunctions } from './list-functions'
 import { contract as listNotebooks } from './list-notebooks'
 import { contract as listPolicies } from './list-policies'
 import { contract as listReports } from './list-reports'
 import { contract as listTables } from './list-tables'
+import { contract as listTablesRemote } from './list-tables.remote'
 import { contract as loadKnowledge } from './load-knowledge'
 import { contract as queryLogs } from './query-logs'
 import { contract as renameChat } from './rename-chat'
@@ -52,16 +53,18 @@ export const TOOL_CONTRACTS = {
   get_notebook: getNotebook,
   get_report: getReport,
   list_databases: listDatabases,
+  list_functions: listFunctions,
   list_notebooks: listNotebooks,
   list_policies: listPolicies,
   list_reports: listReports,
+  list_tables: listTables,
   load_knowledge: loadKnowledge,
   rename_chat: renameChat,
   resolve_support_conversation: resolveSupportConversation,
   run_notebook: runNotebook,
   update_notebook: updateNotebook,
   update_opt_in_level: updateOptInLevel,
-} as const satisfies Partial<Record<ToolName, ToolContract>>
+} as const satisfies Record<string, ToolContract>
 
 export type ContractToolName = keyof typeof TOOL_CONTRACTS
 
@@ -97,12 +100,15 @@ export const REMOTE_TOOL_CONTRACTS = {
   list_branches: listBranches,
   list_edge_functions: listEdgeFunctions,
   list_extensions: listExtensions,
-  list_tables: listTables,
+  list_tables: listTablesRemote,
   query_logs: queryLogs,
   search_docs: searchDocs,
-} as const satisfies Partial<Record<ToolName, RemoteToolContract>>
+} as const satisfies Record<string, RemoteToolContract>
 
 export type RemoteContractToolName = keyof typeof REMOTE_TOOL_CONTRACTS
+
+/** Every tool Studio allows: the names are the keys of the two registries. */
+export type ToolName = ContractToolName | RemoteContractToolName
 
 /** The contract for a migrated remote tool, or `undefined` if the tool hasn't been migrated. */
 export function getRemoteToolContract(toolName: string): RemoteToolContract | undefined {
