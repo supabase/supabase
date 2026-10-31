@@ -76,5 +76,12 @@ export const useAccountRecovery = ({ enabled = true }: { enabled?: boolean } = {
       (shouldReadFactors && factors.isFetching) ||
       (shouldReadCodes && codes.isFetching))
 
-  return { findings, isPending, isFetching, isError, verifiedFactorCount }
+  return {
+    findings,
+    isPending,
+    isFetching,
+    isError,
+    verifiedFactorCount,
+    isFactorsSuccess: shouldReadFactors && factors.isSuccess,
+  }
 }
