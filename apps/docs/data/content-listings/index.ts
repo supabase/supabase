@@ -2,6 +2,7 @@ import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
+import { contributingDetails } from './contributing.data'
 import { databaseGetStarted, databaseMultigresWhatYouGet, databaseNextSteps } from './database.data'
 import {
   functionsExamplesAiMedia,
@@ -60,6 +61,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   supabaseWayStorageBuild,
   supabaseWayFunctionsBuild,
   supabaseWayProductionBuild,
+  contributingDetails,
   authGetStarted,
   authPricing,
   authNextSteps,
