@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import {
   convertByteaToHex,
+  generateDuplicateRowObject,
+  generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
   getDuplicatePrimaryKeyMatch,
@@ -1011,6 +1013,62 @@ describe('prepareRowForDuplication', () => {
         table
       )
     ).toEqual({ id: 2, name: 'Paris' })
+  })
+})
+
+describe('generateDuplicateRowObject', () => {
+  const makeColumn = (name: string, format: string, default_value: string | null = null) =>
+    ({
+      name,
+      format,
+      data_type: format,
+      default_value,
+      is_nullable: true,
+      is_identity: false,
+      is_generated: false,
+    }) as any
+  const makeTable = (columns: any[]) => ({ columns, primary_keys: [{ name: 'id' }] }) as any
+  const duplicate = (row: Record<string, any>, table: any) => {
+    const fields = generateRowFields(prepareRowForDuplication(row, table), table, [])
+    return { fields, payload: generateDuplicateRowObject(row, fields) }
+  }
+
+  it.each(['timestamp', 'timestamptz', 'date', 'time', 'timetz'])(
+    'keeps a NULL %s through the duplicate pipeline',
+    (format) => {
+      const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', format)])
+      expect(duplicate({ id: 1, at: null }, table).payload).toEqual({ at: null })
+    }
+  )
+
+  it('keeps a NULL instead of applying the column default', () => {
+    const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', 'timestamptz', 'now()')])
+    expect(duplicate({ id: 1, at: null }, table).payload).toEqual({ at: null })
+  })
+
+  it('copies a set datetime value', () => {
+    const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', 'timestamp')])
+    expect(duplicate({ id: 1, at: '2024-01-02T03:04:05' }, table).payload).toEqual({
+      at: '2024-01-02T03:04:05',
+    })
+  })
+
+  it('uses a value typed over a copied NULL', () => {
+    const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', 'timestamp')])
+    const { fields } = duplicate({ id: 1, at: null }, table)
+    const edited = fields.map((field) =>
+      field.name === 'at' ? { ...field, value: '2024-01-02T03:04:05' } : field
+    )
+    expect(generateDuplicateRowObject({ id: 1, at: null }, edited)).toEqual({
+      at: '2024-01-02T03:04:05',
+    })
+  })
+
+  it('leaves an empty value alone when the source was not NULL', () => {
+    const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', 'timestamp', 'now()')])
+    const { fields } = duplicate({ id: 1, at: '2024-01-02T03:04:05' }, table)
+    const cleared = fields.map((field) => (field.name === 'at' ? { ...field, value: '' } : field))
+    expect(generateDuplicateRowObject({ id: 1, at: '2024-01-02T03:04:05' }, cleared)).toEqual({})
   })
 })
 

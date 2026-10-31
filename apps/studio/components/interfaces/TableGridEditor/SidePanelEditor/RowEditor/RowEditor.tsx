@@ -12,6 +12,7 @@ import { JsonEditor } from './JsonEditor'
 import type { EditValue, RowEditorMode, RowField } from './RowEditor.types'
 import {
   convertByteaToHex,
+  generateDuplicateRowObject,
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
@@ -207,9 +208,12 @@ export const RowEditor = ({
     if (isEmpty(errors)) {
       updateEditorDirty()
 
-      const payload = isNewRecord
-        ? generateRowObjectFromFields({ fields: rowFields, useDefaultForEmptyValues: true })
-        : generateUpdateRowPayload(row, rowFields)
+      const payload =
+        resolvedMode === 'duplicate' && row
+          ? generateDuplicateRowObject(row, rowFields)
+          : isNewRecord
+            ? generateRowObjectFromFields({ fields: rowFields, useDefaultForEmptyValues: true })
+            : generateUpdateRowPayload(row, rowFields)
 
       const configuration = { identifiers: {}, rowIdx: -1 }
       if (!isNewRecord) {

@@ -311,6 +311,30 @@ export const generateRowObjectFromFields = ({
   return results
 }
 
+/**
+ * Insert payload for a duplicated row. The datetime inputs show NULL as an empty string, which
+ * Postgres would reject or replace with the column default, so a copied NULL is restored here.
+ */
+export const generateDuplicateRowObject = (sourceRow: Dictionary<any>, fields: RowField[]) => {
+  const rowObject = generateRowObjectFromFields({
+    fields,
+    useDefaultForEmptyValues: true,
+  }) as Dictionary<any>
+
+  fields.forEach((field) => {
+    if (
+      DATETIME_TYPES.includes(field.format) &&
+      !field.isGenerated &&
+      field.value === '' &&
+      sourceRow[field.name] === null
+    ) {
+      rowObject[field.name] = null
+    }
+  })
+
+  return rowObject
+}
+
 export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) => {
   const rowObject = generateRowObjectFromFields({ fields, includeUndefinedValues: true }) as any
 
