@@ -1001,7 +1001,9 @@ export interface CustomReportAssistantSqlBlockAddedEvent {
 }
 
 /**
- * User voted on the feedback button on a docs page. The feedback button is located at the sidebar of every docs page.
+ * User voted on the docs feedback control in the sidebar. In the docs-feedback-dock
+ * variant, the vote opens the feedback dock, and the event also fires when the user
+ * switches their vote inside an open dock.
  *
  * @group Events
  * @source docs
@@ -1010,10 +1012,82 @@ export interface DocsFeedbackClickedEvent {
   action: 'docs_feedback_clicked'
   properties: {
     /**
-     * 'yes' means clicking on the tick button, 'no' means clicking on the cross button.
+     * 'yes' means clicking on the tick or thumbs-up button, 'no' means clicking on the cross or thumbs-down button.
      */
     response: 'yes' | 'no'
   }
+}
+
+/**
+ * User submitted docs feedback from the feedback dock and the request succeeded.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackSubmittedEvent {
+  action: 'docs_feedback_submitted'
+  properties: {
+    /**
+     * Vote attached to the submission: 'yes' is thumbs-up, 'no' is thumbs-down.
+     */
+    response: 'yes' | 'no'
+    /**
+     * Character length of the comment. The comment text itself is never sent.
+     */
+    commentLength: number
+    /**
+     * Whether the user was signed in when submitting.
+     */
+    isSignedIn: boolean
+  }
+}
+
+/**
+ * User tried to submit docs feedback from the feedback dock and the request failed.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackSubmissionFailedEvent {
+  action: 'docs_feedback_submission_failed'
+  properties: {
+    /**
+     * Vote attached to the failed submission: 'yes' is thumbs-up, 'no' is thumbs-down.
+     */
+    response: 'yes' | 'no'
+    /**
+     * Whether the browser reported being offline when the submission failed.
+     */
+    isOffline: boolean
+  }
+}
+
+/**
+ * User closed the docs feedback dock.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackDockClosedEvent {
+  action: 'docs_feedback_dock_closed'
+  properties: {
+    /**
+     * How the dock closed: 'dismissed' closed it with an empty draft,
+     * 'discarded' confirmed throwing away a non-empty draft, 'after_submit'
+     * closed it after a successful submission.
+     */
+    reason: 'dismissed' | 'discarded' | 'after_submit'
+  }
+}
+
+/**
+ * User clicked the bug report link next to the docs feedback vote buttons.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsFeedbackBugReportClickedEvent {
+  action: 'docs_feedback_bug_report_clicked'
 }
 
 export type MarkdownAffordancePageType =
@@ -4355,6 +4429,10 @@ export type TelemetryEvent =
   | AssistantEditInSqlEditorClickedEvent
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
+  | DocsFeedbackSubmittedEvent
+  | DocsFeedbackSubmissionFailedEvent
+  | DocsFeedbackDockClosedEvent
+  | DocsFeedbackBugReportClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | PreferredSourceClickedEvent
