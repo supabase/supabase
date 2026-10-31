@@ -2,7 +2,7 @@
 
 Our docs help developers to get started and keep succeeding with Supabase. We welcome contributions from everyone.
 
-If you'd like to contribute, see our list of [recommended issues](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22). We also welcome you to open a PR or a new issue with your question.
+If you'd like to contribute, see our list of [recommended issues](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22). If you have a question or a new idea, [open an issue](https://github.com/supabase/supabase/issues/new/choose) first. Link the issue in your pull request.
 
 How to write a docs page is covered by the [style guide](./style-guide/README.md). This file covers repo mechanics. If you write with an AI coding agent, these skills apply the style guide for you:
 
