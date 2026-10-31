@@ -787,6 +787,18 @@
       "import": "./src/Toc/types.ts",
       "types": "./src/Toc/types.ts"
     },
+    "./TopNav/TopNavDropdown": {
+      "import": "./src/TopNav/TopNavDropdown.tsx",
+      "types": "./src/TopNav/TopNavDropdown.tsx"
+    },
+    "./TopNav/TopNavMenu": {
+      "import": "./src/TopNav/TopNavMenu.tsx",
+      "types": "./src/TopNav/TopNavMenu.tsx"
+    },
+    "./TopNav/TopNavMenuToggle": {
+      "import": "./src/TopNav/TopNavMenuToggle.tsx",
+      "types": "./src/TopNav/TopNavMenuToggle.tsx"
+    },
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"

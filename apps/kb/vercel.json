@@ -46,6 +46,11 @@
       "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
       "destination": "/markdown/faqs/:path+.md"
     },
+    {
+      "source": "/kb",
+      "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
+      "destination": "/markdown/sitemap.md"
+    },
     { "source": "/kb", "destination": "/index.html" },
     { "source": "/kb/:path*", "destination": "/:path*" }
   ],
@@ -64,6 +69,10 @@
     },
     {
       "source": "/kb/faqs/:path+",
+      "headers": [{ "key": "Vary", "value": "Accept" }]
+    },
+    {
+      "source": "/kb",
       "headers": [{ "key": "Vary", "value": "Accept" }]
     }
   ]

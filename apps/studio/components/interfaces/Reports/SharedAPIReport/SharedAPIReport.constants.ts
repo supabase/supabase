@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { FeatureFlagContext, useFlag, useParams } from 'common'
+import dayjs from 'dayjs'
 import { isEqual } from 'lodash'
 import { useContext, useState } from 'react'
 
@@ -203,6 +204,17 @@ type SharedAPIReportParams = {
   projectRef: string
   enabled?: boolean
 }
+export const getSharedAPIReportSql = (
+  queryName: SharedAPIReportKey,
+  filters: ReportFilterItem[],
+  { start, end, useOtel }: { start: string; end: string; useOtel: boolean }
+): SafeLogSqlFragment => {
+  const granularity = dayjs(end).diff(dayjs(start), 'minute') <= 60 ? 'minute' : 'hour'
+  return useOtel
+    ? getLogsSql(PRESET_CONFIG.api.queries[queryName], filters, true, granularity)
+    : SHARED_API_REPORT_SQL[queryName].safeSql(filters)
+}
+
 export const useSharedAPIReport = ({
   filterBy,
   start,
@@ -232,9 +244,7 @@ export const useSharedAPIReport = ({
   const isQueryModeReady = !IS_PLATFORM || hasLoadedFlags === true
   const keys = Object.keys(SHARED_API_REPORT_SQL) as SharedAPIReportKey[]
   const getQuerySql = (queryName: SharedAPIReportKey) =>
-    useOtel
-      ? getLogsSql(PRESET_CONFIG.api.queries[queryName], allFilters, true)
-      : SHARED_API_REPORT_SQL[queryName].safeSql(allFilters)
+    getSharedAPIReportSql(queryName, allFilters, { start, end, useOtel })
   const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
     totalRequests: getQuerySql('totalRequests'),
     topRoutes: getQuerySql('topRoutes'),

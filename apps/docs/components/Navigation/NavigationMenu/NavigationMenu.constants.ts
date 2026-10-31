@@ -80,6 +80,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Products',
       menuItems: [
         [
+          { label: 'Features' },
           {
             label: 'Database',
             icon: 'database',
@@ -2814,6 +2815,10 @@ export const platform: NavMenuConstant = {
           name: 'Temporary Access',
           url: '/guides/platform/temporary-access' as `/${string}`,
         },
+        {
+          name: 'Map team members to Postgres roles',
+          url: '/guides/platform/team-database-access' as `/${string}`,
+        },
         { name: 'Performance Tuning', url: '/guides/platform/performance' as `/${string}` },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' as `/${string}` },
         {
@@ -3206,6 +3211,10 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Configuration', url: '/guides/deployment/branching/configuration' },
         { name: 'Integrations', url: '/guides/deployment/branching/integrations' },
+        {
+          name: 'Preview branches on Vercel',
+          url: '/guides/integrations/vercel-preview-branches' as `/${string}`,
+        },
         { name: 'Troubleshooting', url: '/guides/deployment/branching/troubleshooting' },
         { name: 'Billing', url: '/guides/platform/manage-your-usage/branching' },
       ],
@@ -3269,6 +3278,10 @@ export const integrations: NavMenuConstant = {
     {
       name: 'Vercel Marketplace',
       url: '/guides/integrations/vercel-marketplace',
+    },
+    {
+      name: 'Preview branches on Vercel',
+      url: '/guides/integrations/vercel-preview-branches',
     },
     {
       name: 'Stripe Projects',

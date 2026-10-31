@@ -436,10 +436,19 @@ Name the thing instead.
 - **Recommended**: `[HTTP/1.1 RFC](https://www.rfc-editor.org/rfc/rfc2616)`
 - **Not recommended**: `[https://www.rfc-editor.org/rfc/rfc2616](https://www.rfc-editor.org/rfc/rfc2616)`
 
-#### Introduce a link with `see`, and say what the reader will find
+#### Introduce a link
 
-Write `For more information about X, see Y` rather than `For more information on X, see
-Y`. The `about` clause is what tells a reader whether the link is worth following.
+Introduce a link so the reader always knows where the link goes and why it's relevant.
+
+| Write                                        | When                                                           |
+| -------------------------------------------- | -------------------------------------------------------------- |
+| `See [Title].`                               | The sentence before already says why the link matters          |
+| `For more information, see [Title].`         | The title says what the reader gets, and `See` reads as abrupt |
+| `For more information about X, see [Title].` | The title alone doesn't say why the link matters here          |
+
+- **Recommended**: ``The `anon` role handles requests from users who aren't signed in. See [Postgres roles](/docs/guides/database/postgres/roles).``
+- **Recommended**: `For more information about policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security).`
+- **Not recommended**: `For more information about Row Level Security, see [Row Level Security](/docs/guides/database/postgres/row-level-security).`
 
 #### Keep sentence punctuation outside the link
 
