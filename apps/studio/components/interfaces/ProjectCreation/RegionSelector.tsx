@@ -1,10 +1,11 @@
 import { useFeatureFlags, useParams } from 'common'
-import { EarthIcon, Loader2Icon } from 'lucide-react'
+import { EarthIcon, Loader2Icon, LockIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
+  Button,
   cn,
   FormControl,
   FormField,
@@ -32,15 +33,21 @@ import {
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
 import { ProjectCreationStatusAdmonition } from './ProjectCreationStatusAdmonition'
-import { getRegionRestrictionCopy, SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
+import {
+  getRegionRestrictionCopy,
+  getShowLockedSpecificRegions,
+  SELECT_DIFFERENT_REGION,
+} from './RegionSelector.utils'
 import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { RegionFlag } from '@/components/ui/RegionFlag'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
+import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -96,6 +103,7 @@ export const RegionSelector = ({
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
   const isSpecificRegionsLinkEnabled = isFreePlan && !hideSpecificRegions
+  const regionLockedOverlayVariant = usePHFlag<boolean>('regionLockedOverlay')
 
   const { getRegionRestriction } = useRegionRestriction()
 
@@ -171,18 +179,40 @@ export const RegionSelector = ({
   const isSpecificRegionSelected = regionOptions.some((region) => region.name === dbRegion)
   const [isOpen, setIsOpen] = useState(false)
   const [hasRevealedSpecificRegions, setHasRevealedSpecificRegions] = useState(false)
+  const [hoveredLockedRegionCode, setHoveredLockedRegionCode] = useState<string | undefined>(
+    undefined
+  )
+  const showLockedSpecificRegions = getShowLockedSpecificRegions({
+    isFreePlan,
+    regionLockedOverlayVariant,
+    hasGeneralRegions,
+  })
+  // The region is selectable (so the user can see exactly what they picked), but a
+  // locked selection blocks submission — see ProjectCreationForm's canSubmitProject.
+  const isSelectedRegionLocked = showLockedSpecificRegions && isSpecificRegionSelected
   const isSpecificRegionsCollapsedBehindLink =
     isSpecificRegionsLinkEnabled &&
     hasGeneralRegions &&
     !hasRevealedSpecificRegions &&
-    !isSpecificRegionSelected
-  const showSpecificRegions = !isSpecificRegionsCollapsedBehindLink && !hideSpecificRegions
+    !isSpecificRegionSelected &&
+    !showLockedSpecificRegions
+  // The locked treatment supersedes both the collapsed-behind-link state and the
+  // freeTierGeneralRegionExperiment's hideSpecificRegions footer link.
+  const showSpecificRegions =
+    showLockedSpecificRegions || (!isSpecificRegionsCollapsedBehindLink && !hideSpecificRegions)
 
   const handleRevealSpecificRegions = () => {
     track('project_creation_specific_region_link_clicked')
     setHasRevealedSpecificRegions(true)
     setIsOpen(true)
   }
+
+  const hasTrackedRegionLockVariantExposed = useRef(false)
+  useEffect(() => {
+    if (!showLockedSpecificRegions || hasTrackedRegionLockVariantExposed.current) return
+    hasTrackedRegionLockVariantExposed.current = true
+    track('region_lock_variant_exposed')
+  }, [showLockedSpecificRegions, track])
 
   const lastValidRegionRef = useRef<string | undefined>(undefined)
   useEffect(() => {
@@ -363,6 +393,40 @@ export const RegionSelector = ({
                               {highAvailability ? 'High Availability Regions' : 'Specific regions'}
                             </SelectLabel>
                             {regionOptionsWithRestriction.map((value) => {
+                              if (showLockedSpecificRegions) {
+                                return (
+                                  <SelectItem
+                                    key={value.code}
+                                    value={value.name}
+                                    className="w-full [&>:nth-child(2)]:w-full"
+                                    onMouseEnter={() => setHoveredLockedRegionCode(value.code)}
+                                    onMouseLeave={() => setHoveredLockedRegionCode(undefined)}
+                                    onClick={() =>
+                                      track('locked_region_clicked', { region: value.code })
+                                    }
+                                  >
+                                    <div className="flex flex-row items-center justify-between w-full gap-x-2">
+                                      <div className="flex items-center gap-x-3">
+                                        <RegionFlag className="w-5" region={value.code} />
+                                        <div className="flex items-center gap-x-2">
+                                          <LockIcon size={12} className="text-foreground-lighter" />
+                                          <span className="text-foreground">{value.name}</span>
+                                          <span className="text-xs text-foreground-lighter font-mono">
+                                            {value.code}
+                                          </span>
+                                        </div>
+                                      </div>
+
+                                      {hoveredLockedRegionCode === value.code && (
+                                        <Badge variant="success" className="mr-1">
+                                          Pro
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </SelectItem>
+                                )
+                              }
+
                               const restrictionCopy =
                                 value.restriction !== undefined
                                   ? getRegionRestrictionCopy(value.restriction)
@@ -410,7 +474,7 @@ export const RegionSelector = ({
                           </SelectGroup>
                         )}
 
-                        {hideSpecificRegions && (
+                        {hideSpecificRegions && !showLockedSpecificRegions && (
                           <>
                             <SelectSeparator />
                             <div
@@ -461,6 +525,37 @@ export const RegionSelector = ({
                     type="warning"
                     title={selectedRestrictionCopy.title}
                     description={`${selectedRestrictionCopy.notice} ${SELECT_DIFFERENT_REGION}`}
+                    className="mt-3"
+                  />
+                </FormItemLayout>
+              )}
+
+              {isSelectedRegionLocked && (
+                <FormItemLayout layout="horizontal" isReactForm={false}>
+                  <Admonition
+                    type="default"
+                    title="This region is only available on paid plans"
+                    description="Upgrade to choose a specific region for lower latency and data residency. On the Free Plan, Supabase picks the best available region within your selected geography."
+                    actions={
+                      <>
+                        <UpgradePlanButton
+                          source="projectCreationRegionLock"
+                          onClick={() => track('region_lock_upgrade_clicked')}
+                        />
+                        {hasAutoOption && (
+                          <Button
+                            type="button"
+                            variant="default"
+                            onClick={() => {
+                              track('region_lock_use_auto_clicked')
+                              field.onChange(AUTO_REGION_VALUE)
+                            }}
+                          >
+                            Use Auto instead
+                          </Button>
+                        )}
+                      </>
+                    }
                     className="mt-3"
                   />
                 </FormItemLayout>

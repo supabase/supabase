@@ -581,6 +581,63 @@ export interface ProjectCreationSpecificRegionLinkClickedEvent {
 }
 
 /**
+ * Org was shown the locked-specific-regions variant: a free-plan org with the
+ * regionLockedOverlay PostHog flag enabled sees the full specific regions list, greyed
+ * out and non-selectable, instead of the collapsed-behind-link baseline.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface RegionLockVariantExposedEvent {
+  action: 'region_lock_variant_exposed'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked a locked (greyed-out, paid-plan-only) region in the project creation
+ * region selector, opening the upgrade admonition.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface LockedRegionClickedEvent {
+  action: 'locked_region_clicked'
+  properties: {
+    /** The region code the user clicked, e.g. 'us-east-1' */
+    region: string
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Upgrade to Pro" button inside the locked-region upgrade admonition
+ * in the project creation region selector.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface RegionLockUpgradeClickedEvent {
+  action: 'region_lock_upgrade_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked "Use Auto instead" inside the locked-region upgrade admonition in the
+ * project creation region selector.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface RegionLockUseAutoClickedEvent {
+  action: 'region_lock_use_auto_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * New-organization form was rendered and shown to the user. Passive impression that
  * anchors the organization-creation funnel (exposed -> completed). Fires once per form
  * view, after the user's profile has resolved (i.e. an authenticated session), so it
@@ -4329,6 +4386,10 @@ export type TelemetryEvent =
   | FreeTierGeneralRegionUpgradeClickedEvent
   | FreeTierGeneralRegionDocsLinkClickedEvent
   | ProjectCreationSpecificRegionLinkClickedEvent
+  | RegionLockVariantExposedEvent
+  | LockedRegionClickedEvent
+  | RegionLockUpgradeClickedEvent
+  | RegionLockUseAutoClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
