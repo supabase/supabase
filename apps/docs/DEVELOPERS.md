@@ -33,7 +33,7 @@ To test locally, within the `apps/docs` directory:
 
 This creates Markdown files for all routes under the `public/markdown/guides` directory, ignored by Git.
 
-For production this setup runs as a `prebuild` task to allow Vercel to bundle these files with middleware and functions.
+For production this setup runs as a turbo dependency of `build` (see `turbo.jsonc`) to allow Vercel to bundle these files with middleware and functions.
 
 ## Accessibility checks
 

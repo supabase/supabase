@@ -148,7 +148,7 @@ When adding a new component that has a markdown representation:
    omit the handler — `generate-guides-markdown.ts` unwraps unknown JSX to its
    children automatically.
 
-For the full build flow (Turbo + pnpm lifecycle), see
+For the full build flow (Turbo task graph), see
 [`build-pipeline.md`](./build-pipeline.md).
 
 For how agents and LLMs consume exported markdown (negotiation, bulk
