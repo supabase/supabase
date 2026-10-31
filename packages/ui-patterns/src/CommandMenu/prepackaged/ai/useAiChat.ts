@@ -107,9 +107,16 @@ const messageReducer = (state: Message[], messageAction: MessageAction) => {
 interface UseAiChatOptions {
   messageTemplate?: (message: string) => string
   setIsLoading?: Dispatch<SetStateAction<boolean>>
+  onAnswerComplete?: (answer: { durationMs: number; sourceCount: number }) => void
+  onAnswerError?: (failure: { durationMs: number }) => void
 }
 
-const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: UseAiChatOptions) => {
+const useAiChat = ({
+  messageTemplate = (message) => message,
+  setIsLoading,
+  onAnswerComplete,
+  onAnswerError,
+}: UseAiChatOptions) => {
   const eventSourceRef = useRef<SSE | undefined>(undefined)
   const messageIdempotencyKey = useRef(0)
 
@@ -155,18 +162,33 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
         }),
       })
 
+      const startTime = performance.now()
+      let answer = ''
+      // a finished or failed stream stops here, so a late chunk, [DONE] or error cannot advance
+      // the index again
+      let isFinished = false
+
       function handleError<T>(err: T) {
+        if (isFinished) return
+        isFinished = true
+        eventSource.close()
         setIsLoading?.(false)
         setIsResponding(false)
         setHasError(true)
+        // the next question starts a new pair, so its answer does not stream into this failed one
+        setCurrentMessageIndex((index) => index + 2)
+        onAnswerError?.({ durationMs: Math.round(performance.now() - startTime) })
         console.error(err)
       }
 
       function handleMessage(e: MessageEvent) {
+        if (isFinished) return
         try {
           setIsLoading?.(false)
 
           if (e.data === '[DONE]') {
+            isFinished = true
+            eventSource.close()
             setIsResponding(false)
             // Parse sources from the content and clean the message
             dispatchMessage({
@@ -174,6 +196,10 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
               index: currentMessageIndex,
             })
             setCurrentMessageIndex((x) => x + 2)
+            onAnswerComplete?.({
+              durationMs: Math.round(performance.now() - startTime),
+              sourceCount: parseSourcesFromContent(answer).sources.length,
+            })
             return
           }
 
@@ -196,6 +222,7 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
           ] = completionChunk.choices
 
           if (content) {
+            answer += content
             dispatchMessage({
               type: 'append-content',
               index: currentMessageIndex,
@@ -217,7 +244,7 @@ const useAiChat = ({ messageTemplate = (message) => message, setIsLoading }: Use
 
       setIsLoading?.(true)
     },
-    [currentMessageIndex, messages, messageTemplate]
+    [currentMessageIndex, messages, messageTemplate, onAnswerComplete, onAnswerError]
   )
 
   function reset() {

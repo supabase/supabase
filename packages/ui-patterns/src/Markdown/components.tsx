@@ -58,7 +58,8 @@ export const DefaultPre = ({ children, ...props }: HTMLAttributes<HTMLPreElement
 export const CodeBlockPre = ({ children, ...props }: HTMLAttributes<HTMLPreElement>) => {
   // Find the code element inside pre
   const codeElement = React.Children.toArray(children).find(
-    (child) => isValidElement(child) && child.type === 'code'
+    // react-markdown passes the mapped Code component, not a plain code element
+    (child) => isValidElement(child) && (child.type === 'code' || child.type === Code)
   )
 
   if (!isValidElement(codeElement)) {

@@ -1,11 +1,13 @@
 'use client'
 
-import { useRef, useState, type KeyboardEvent } from 'react'
+import { Search } from 'lucide-react'
+import { useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from 'ui'
 
 import { resolveSearchLabels } from './labels'
 import { LoadingBeam } from './LoadingBeam'
 import { SearchFooter } from './SearchFooter'
+import { SearchInputRow } from './SearchInputRow'
 import { SearchResultItem } from './SearchResultItem'
 import type { SearchLabels, SearchRenderLink, SearchResult, SearchState } from './types'
 import { canSubmitQuery, getHighlightQuery, getIsSearching, getVisibleResults } from './utils'
@@ -31,6 +33,8 @@ export interface SearchPanelProps {
   onResultNavigate: (path: string) => void
   /** Fires when a result link is about to navigate in this tab (not a new-tab click). */
   onResultLinkNavigate?: () => void
+  renderNoResults?: (context: { query: string }) => ReactNode
+  renderFooterStart?: (context: { query: string }) => ReactNode
   renderLink?: SearchRenderLink
   labels?: Partial<SearchLabels>
 }
@@ -42,6 +46,8 @@ export function SearchPanel({
   onResultActivate,
   onResultNavigate,
   onResultLinkNavigate,
+  renderNoResults,
+  renderFooterStart,
   renderLink,
   labels,
 }: SearchPanelProps) {
@@ -74,9 +80,9 @@ export function SearchPanel({
     inputRef.current?.focus()
   }
 
-  // cmdk's root turns enter into "open highlighted result", so keep it on the button.
+  // cmdk's root turns enter into "open highlighted result", so footer actions keep it.
   // other keys must bubble, or tab never reaches the dialog's focus trap
-  function handleClearKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+  function handleFooterKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key === 'Enter') event.stopPropagation()
   }
 
@@ -102,33 +108,35 @@ export function SearchPanel({
 
   return (
     <Command shouldFilter={false} className="bg-transparent">
-      <div className="relative flex items-center gap-3 pr-4">
+      <SearchInputRow
+        icon={<Search aria-hidden className="size-full" strokeWidth={2} />}
+        onClear={query ? handleClear : undefined}
+        clearLabel={copy.clear}
+        beam={
+          <LoadingBeam
+            isActive={isSearching}
+            direction={isDeleting ? 'backward' : 'forward'}
+            className={isListVisible ? '-bottom-px' : undefined}
+          />
+        }
+      >
         <CommandInput
+          autoFocus
           ref={inputRef}
+          autoComplete="off"
+          data-1p-ignore // 1Password
+          data-lpignore="true" // LastPass
+          data-form-type="other" // Dashlane
+          data-bwignore // Bitwarden
           value={query}
           placeholder={copy.inputPlaceholder}
           aria-label={copy.inputLabel}
           onValueChange={handleValueChange}
-          wrapperClassName="flex-1 border-0 pl-3 pr-0 text-foreground-lighter [&_svg]:size-4.5 [&_svg]:stroke-2 [&_svg]:opacity-100"
-          className="h-12 pl-2.5 text-base text-foreground placeholder:text-foreground-lighter"
+          showSearchIcon={false}
+          wrapperClassName="size-full border-0 p-0"
+          className="h-full p-0 text-search-dialog! placeholder:text-foreground-lighter"
         />
-        {query ? (
-          <button
-            type="button"
-            tabIndex={0}
-            onClick={handleClear}
-            onKeyDown={handleClearKeyDown}
-            className="relative -mx-2 shrink-0 cursor-pointer rounded-md px-2 py-1 text-xs text-foreground-lighter transition-colors duration-150 after:absolute after:inset-x-0 after:-inset-y-2 after:content-[''] hover:bg-overlay-hover hover:text-foreground focus-ring"
-          >
-            {copy.clear}
-          </button>
-        ) : null}
-        <LoadingBeam
-          isActive={isSearching}
-          direction={isDeleting ? 'backward' : 'forward'}
-          className={isListVisible ? '-bottom-px' : undefined}
-        />
-      </div>
+      </SearchInputRow>
       {/*
         Screen-reader-only status announcement. Focus stays in the input as results come in
         (that's what lets people keep typing), so nothing else here gets read aloud on its
@@ -139,10 +147,20 @@ export function SearchPanel({
       </div>
       <CommandList
         label={copy.resultsLabel}
-        className="h-(--cmdk-list-height) max-h-[min(477px,70dvh)] inset-shadow-2xs inset-shadow-border mx-px transition-all duration-150 ease-enter motion-reduce:transition-none scroll-fade-bottom"
+        className="h-(--cmdk-list-height) max-h-[min(477px,70dvh)] outline-hidden inset-shadow-2xs inset-shadow-border mx-px transition-all duration-150 ease-enter motion-reduce:transition-none scroll-fade-bottom"
       >
-        {searchState.status === 'noResults' && <CommandEmpty>{copy.noResults}</CommandEmpty>}
-        {searchState.status === 'error' && <CommandEmpty>{copy.error}</CommandEmpty>}
+        {searchState.status === 'noResults' ? (
+          renderNoResults ? (
+            <div className="py-6 text-center text-sm">
+              {renderNoResults({ query: highlightQuery })}
+            </div>
+          ) : (
+            <CommandEmpty className="text-sm">{copy.noResults}</CommandEmpty>
+          )
+        ) : null}
+        {searchState.status === 'error' && (
+          <CommandEmpty className="text-sm">{copy.error}</CommandEmpty>
+        )}
         {results.length > 0 && (
           <CommandGroup className="pt-1.25">
             {results.map((result) => (
@@ -159,7 +177,15 @@ export function SearchPanel({
           </CommandGroup>
         )}
       </CommandList>
-      {results.length > 0 ? <SearchFooter labels={copy} /> : null}
+      {results.length > 0 ? (
+        <SearchFooter labels={copy}>
+          {renderFooterStart ? (
+            <span onKeyDown={handleFooterKeyDown} className="contents">
+              {renderFooterStart({ query: query.trim() })}
+            </span>
+          ) : null}
+        </SearchFooter>
+      ) : null}
     </Command>
   )
 }

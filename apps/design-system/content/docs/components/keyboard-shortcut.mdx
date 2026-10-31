@@ -59,6 +59,14 @@ Use the inline variant when the shortcut needs to sit on the same line as surrou
 <Button iconRight={<KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />}>Apply</Button>
 ```
 
+### Keycaps
+
+Use the keycaps variant when each key needs its own cap, such as a search input that opens with a shortcut.
+
+```tsx
+<KeyboardShortcut keys={['Meta', 'K']} variant="keycaps" />
+```
+
 ## Examples
 
 ### Pill
@@ -68,3 +76,7 @@ Use the inline variant when the shortcut needs to sit on the same line as surrou
 ### Inline
 
 <ComponentPreview name="keyboard-shortcut-inline" align="start" />
+
+### Keycaps
+
+<ComponentPreview name="keyboard-shortcut-keycaps" align="start" />

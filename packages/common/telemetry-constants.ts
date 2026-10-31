@@ -1024,9 +1024,11 @@ export type MarkdownAffordancePageType =
   | 'changelog'
   | 'guide'
   | 'troubleshooting'
+  | 'ask_ai_answer'
 
 /**
- * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
+ * User clicked 'Copy as Markdown' on a page or under a Supabase AI answer, and the markdown was copied
+ * successfully.
  * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events
@@ -1200,6 +1202,145 @@ export interface DocsSearchV2ResultClickedEvent {
  */
 export interface DocsSearchV2ClosedEvent {
   action: 'docs_search_v2_closed'
+  properties: {
+    /**
+     * Why the dialog closed: the user dismissed it, opened a result, or switched to Ask AI.
+     */
+    closeReason: 'dismissed' | 'result_navigated' | 'switched_to_ask_ai'
+  }
+}
+
+/**
+ * User opened Ask AI in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiOpenedEvent {
+  action: 'docs_search_v2_ask_ai_opened'
+  properties: {
+    /**
+     * The trigger that opened Ask AI: the top bar button, Cmd+I or Ctrl+I, the item shown when a
+     * search has no results, or the button in the search results footer.
+     */
+    triggerType: 'ask_ai_button' | 'keyboard_shortcut' | 'no_results_item' | 'results_footer_button'
+  }
+}
+
+/**
+ * User's question was sent to Ask AI in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiQuestionSubmittedEvent {
+  action: 'docs_search_v2_ask_ai_question_submitted'
+  properties: {
+    /**
+     * The question sent to Ask AI, cut to its first 300 characters.
+     */
+    question: string
+    /**
+     * The length of the full question, in characters.
+     */
+    questionLength: number
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+  }
+}
+
+/**
+ * User clicked a source link under an Ask AI answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiSourceClickedEvent {
+  action: 'docs_search_v2_ask_ai_source_clicked'
+  properties: {
+    /**
+     * The path of the source that was clicked.
+     */
+    sourcePath: string
+  }
+}
+
+/**
+ * User closed Ask AI in the Search V2 dialog, by closing the dialog or by switching to search.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiClosedEvent {
+  action: 'docs_search_v2_ask_ai_closed'
+  properties: {
+    /**
+     * Why Ask AI closed: the user dismissed the dialog, or switched to search.
+     */
+    closeReason: 'dismissed' | 'switched_to_search'
+  }
+}
+
+/**
+ * Ask AI finished streaming an answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerCompletedEvent {
+  action: 'docs_search_v2_ask_ai_answer_completed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the end of the answer, in milliseconds.
+     */
+    durationMs: number
+    /**
+     * The number of source pages listed under the answer.
+     */
+    sourceCount: number
+  }
+}
+
+/**
+ * Ask AI failed to answer a question in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerFailedEvent {
+  action: 'docs_search_v2_ask_ai_answer_failed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the failure, in milliseconds.
+     */
+    durationMs: number
+  }
+}
+
+/**
+ * User clicked a link inside an Ask AI answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerLinkClickedEvent {
+  action: 'docs_search_v2_ask_ai_answer_link_clicked'
+  properties: {
+    /**
+     * The link's destination, as written in the answer.
+     */
+    href: string
+  }
 }
 
 /**
@@ -4365,6 +4506,13 @@ export type TelemetryEvent =
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
   | DocsSearchV2ClosedEvent
+  | DocsSearchV2AskAiOpenedEvent
+  | DocsSearchV2AskAiQuestionSubmittedEvent
+  | DocsSearchV2AskAiSourceClickedEvent
+  | DocsSearchV2AskAiClosedEvent
+  | DocsSearchV2AskAiAnswerCompletedEvent
+  | DocsSearchV2AskAiAnswerFailedEvent
+  | DocsSearchV2AskAiAnswerLinkClickedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
