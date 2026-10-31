@@ -1,16 +1,16 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { ResponseError } from 'types'
 import { replicationKeys } from './keys'
-import { handleError, post } from 'data/fetchers'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type StartPipelineParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
 }
 
-async function startPipeline(
+export async function startPipeline(
   { projectRef, pipelineId }: StartPipelineParams,
   signal?: AbortSignal
 ) {
@@ -34,27 +34,39 @@ export const useStartPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<StartPipelineData, ResponseError, StartPipelineParams>,
+  UseCustomMutationOptions<StartPipelineData, ResponseError, StartPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<StartPipelineData, ResponseError, StartPipelineParams>(
-    (vars) => startPipeline(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef, pipelineId } = variables
-        await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to start pipeline: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<StartPipelineData, ResponseError, StartPipelineParams>({
+    mutationFn: (vars) => startPipeline(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef, pipelineId } = variables
+
+      await queryClient.invalidateQueries(
+        {
+          queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
+        },
+        { cancelRefetch: false }
+      )
+
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      await queryClient.invalidateQueries(
+        {
+          queryKey: replicationKeys.pipelinesStatus(variables.projectRef, variables.pipelineId),
+        },
+        { cancelRefetch: false }
+      )
+
+      if (onError === undefined) {
+        toast.error(`Failed to start pipeline: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

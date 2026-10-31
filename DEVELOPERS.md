@@ -1,7 +1,6 @@
 # Developing Supabase
 
 - [Developing Supabase](#developing-supabase)
-
   - [Getting started](#getting-started)
     - [Install dependencies](#install-dependencies)
   - [Local development](#local-development)
@@ -34,11 +33,11 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
-- [Git](https://git-scm.com/)
-- [Node.js v22.x or higher](https://nodejs.org)
-- [pnpm](https://pnpm.io/) version 9.x.x or higher
-- [make](https://www.gnu.org/software/make/) or the equivalent to `build-essentials` for your OS
-- [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
+- [**Git**](https://git-scm.com/)
+- [**Node.js**](https://nodejs.org) (version as documented in [`.nvmrc`](./.nvmrc))
+- [**pnpm**](https://pnpm.io/) (version as documented in the `packageManager` field in [`package.json`](./package.json))
+- [**make**](https://www.gnu.org/software/make/) (or the equivalent to `build-essentials` for your OS)
+- [**Docker**](https://docs.docker.com/get-docker/) (to run studio locally)
 
 ## Local development
 
@@ -98,7 +97,7 @@ You can run any of the sites individually by using the scope name. For example:
 pnpm dev:www
 ```
 
-Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`
+Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`. For `docs`, see [`apps/docs/DEVELOPERS.md`](./apps/docs/DEVELOPERS.md).
 
 #### Shared components
 
@@ -119,7 +118,6 @@ For example:
 
 1. `cd apps/studio`: move to the `studio` workspace.
 2. `pnpm add react`: installs `react` into `studio` workspace.
-
 
 ---
 
@@ -177,7 +175,10 @@ We review PRs in the order of their submission. We try to accept the earliest on
 
 ### Add a redirect
 
-Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) file in our main site.
+Where the redirect goes depends on the URL:
+
+- **`/docs` URLs:** add the entry to [`apps/docs/lib/redirects/`](https://github.com/supabase/supabase/blob/master/apps/docs/lib/redirects/README.md). Static one-to-one entries go in `static-redirects.json`, and entries with params, splats, or conditions go in `dynamic-redirects.js`.
+- **All other URLs:** add the entry to [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) in the main site.
 
 ---
 
@@ -192,7 +193,7 @@ We support "federating" docs, meaning doc content can come directly from externa
 
 Federated docs work using Next.js's build pipeline. We use `getStaticProps()` to fetch remote documentation (ie. markdown) at build time which is processed and passed to the respective page within the docs.
 
-See the [Vecs Python source code](https://github.com/supabase/supabase/blob/master/apps/docs/pages/guides/ai/python/%5Bslug%5D.tsx) to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
+See the [Vecs Python source code](https://github.com/supabase/supabase/tree/master/apps/docs/app/guides/ai/python/%5Bslug%5D) to see how we do this for [`supabase/vecs`](https://github.com/supabase/vecs). Use this as a starting point for federating other docs.
 
 Some things to consider:
 
@@ -203,7 +204,7 @@ Some things to consider:
 
 ## Community channels
 
-If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [Github Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
+If you get stuck somewhere or have any questions, join our [Discord Community Server](https://discord.supabase.com/) or the [GitHub Discussions](https://github.com/supabase/supabase/discussions). We are here to help!
 
 ## Contributors
 

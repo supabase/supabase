@@ -1,6 +1,116 @@
-import { FDW, FDWTable } from 'data/fdw/fdws-query'
-import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
-import type { WrapperMeta } from './Wrappers.types'
+import * as z from 'zod'
+
+import { WRAPPER_HANDLERS, WRAPPERS } from './Wrappers.constants'
+import type { Table, WrapperMeta } from './Wrappers.types'
+import { FDW, FDWTable } from '@/data/fdw/fdws-query'
+
+const tableSchema = z
+  .object({
+    index: z.number(),
+    columns: z.array(z.object({ name: z.string(), type: z.string() })),
+    is_new_schema: z.boolean(),
+    schema: z.string(),
+    schema_name: z.string(),
+    table_name: z.string(),
+    object: z.any().optional(),
+  })
+  .passthrough() // passthrough is needed for table options
+
+export const getWrapperCreationFormSchema = (wrapperMeta: WrapperMeta) => {
+  let wrapperSchema = {
+    // Common validation for all wrappers
+    server_name: z.string().min(1, 'Please provide a name for your server'),
+  } as Record<string, z.ZodTypeAny>
+
+  // Add wrapper specific options
+  wrapperMeta.server.options.forEach((option) => {
+    if (option.required) {
+      wrapperSchema[option.name] = z.string().min(1, 'Required')
+      return
+    }
+    wrapperSchema[option.name] = z.string().optional()
+  })
+
+  return z.discriminatedUnion('mode', [
+    z
+      .object({
+        mode: z.literal('tables'),
+        tables: z
+          .array(tableSchema, { required_error: 'Please provide at least one table' })
+          .min(1, 'Please provide at least one table'),
+      })
+      .merge(z.object(wrapperSchema)),
+    z
+      .object({
+        mode: z.literal('schema'),
+        source_schema: z.string().min(1, 'Please provide a source schema'),
+        target_schema: z.string().min(1, 'Please provide an unique target schema'),
+      })
+      .merge(z.object(wrapperSchema)),
+  ])
+}
+
+export const getEditionFormSchema = (wrapperMeta: WrapperMeta) => {
+  let wrapperSchema = {
+    // Common validation for all wrappers
+    server_name: z.string().min(1, 'Please provide a name for your server'),
+    tables: z
+      .array(tableSchema, { required_error: 'Please provide at least one table' })
+      .min(1, 'Please provide at least one table'),
+  } as Record<string, z.ZodTypeAny>
+
+  // Add wrapper specific options
+  wrapperMeta.server.options.forEach((option) => {
+    if (option.required) {
+      wrapperSchema[option.name] = z.string().min(1, 'Required')
+      return
+    }
+    wrapperSchema[option.name] = z.string().optional()
+  })
+  return z.object(wrapperSchema)
+}
+
+export const getTableFormSchema = (table: Table) => {
+  let tableSchema = {
+    table_name: z.string().min(1, 'Required'),
+    schema: z.string().min(1, 'Required'),
+    schema_name: z.string().optional(),
+    columns: z.array(
+      z.object({
+        name: z.string().min(1, 'Required'),
+        type: z.string().min(1, 'Required'),
+      })
+    ),
+  } as Record<string, z.ZodTypeAny>
+
+  table.options.forEach((option) => {
+    if (option.required) {
+      tableSchema[option.name] = z.string().min(1, 'Required')
+      return
+    }
+    tableSchema[option.name] = z.string().optional()
+  })
+
+  return (
+    z
+      .object(tableSchema)
+      // passthrough is needed for table options
+      .passthrough()
+      .superRefine((values, ctx) => {
+        if (values.schema === 'custom' && !values.schema_name) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['schema_name'],
+            message: 'Required',
+          })
+        }
+      })
+  )
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
 
 export const makeValidateRequired = (options: { name: string; required: boolean }[]) => {
   const requiredOptionsSet = new Set(
@@ -12,12 +122,12 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
   )
   const requiredArrayOptions = Array.from(requiredArrayOptionsSet)
 
-  return (values: Record<string, any>) => {
+  return (values: Record<string, unknown>) => {
     const errors = Object.fromEntries(
       Object.entries(values)
-        .flatMap(([key, value]) =>
+        .flatMap(([key, value]): [string, unknown][] =>
           Array.isArray(value)
-            ? [[key, value], ...value.map((v, i) => [`${key}.${i}`, v])]
+            ? [[key, value], ...value.map((v, i): [string, unknown] => [`${key}.${i}`, v])]
             : [[key, value]]
         )
         .filter(([_key, value]) => {
@@ -26,6 +136,7 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
           if (
             idx !== undefined &&
             requiredOptionsSet.has(key) &&
+            isRecord(value) &&
             Object.keys(value).some((subKey) => requiredArrayOptionsSet.has(`${key}.${subKey}`))
           ) {
             const arrayOption = requiredArrayOptions.find((option) => option.startsWith(`${key}.`))
@@ -50,6 +161,8 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
   }
 }
 
+export const NewTable = {} as FormattedWrapperTable
+
 export interface FormattedWrapperTable {
   index: number
   columns: { name: string }[]
@@ -58,7 +171,7 @@ export interface FormattedWrapperTable {
   schema_name: string
   table_name: string
   object?: string // From options object for Firebase/Stripe
-  [key: string]: any // For other dynamic options from table.options
+  [key: string]: unknown // For other dynamic options from table.options
 }
 
 export const formatWrapperTables = (
@@ -100,7 +213,7 @@ export const formatWrapperTables = (
       ...options,
       index,
       id: table.id,
-      columns: table.columns,
+      columns: table.columns ?? [],
       is_new_schema: false,
       schema: table.schema,
       schema_name: table.schema,
@@ -130,4 +243,31 @@ export function wrapperMetaComparator(
 
 export function getWrapperMetaForWrapper(wrapper: FDW | undefined) {
   return WRAPPERS.find((w) => wrapperMetaComparator(w, wrapper))
+}
+
+/**
+ * Returns the subset of extensions that are required but not yet installed.
+ * Returns `null` when the extensions list is still loading (undefined),
+ * so callers can distinguish "loading" from "nothing to install".
+ * Generic so the full extension type (including `default_version`) is preserved.
+ */
+export function getRequiredExtensionsToInstall<
+  T extends { name: string; installed_version: string | null },
+>(extensions: T[] | undefined, requiredExtensionNames: string[]): T[] | null {
+  if (extensions === undefined) return null
+  return extensions.filter(
+    (ext) => requiredExtensionNames.includes(ext.name) && !ext.installed_version
+  )
+}
+
+/**
+ * Returns true when the wrappers extension is installed at >= 0.5.0,
+ * which is the minimum version required for IMPORT FOREIGN SCHEMA support.
+ */
+export function hasForeignSchemaSupport(
+  wrappersExtension: { installed_version: string | null } | undefined
+): boolean {
+  return wrappersExtension?.installed_version
+    ? wrappersExtension.installed_version >= '0.5.0'
+    : false
 }

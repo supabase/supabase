@@ -105,13 +105,13 @@ const LWMeetups = ({ meetups, className }: { meetups?: Meetup[]; className?: str
                   title={liveNow ? 'Live now' : undefined}
                   className={cn(
                     'h-10 group inline-flex items-center flex-wrap text-3xl md:text-4xl',
-                    'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                    meetup.id === activeMeetup?.id && '!text-foreground',
+                    'text-foreground-muted hover:text-foreground! leading-none! transition-colors',
+                    meetup.id === activeMeetup?.id && 'text-foreground!',
                     liveNow && 'text-foreground-light'
                   )}
                 >
                   {liveNow && (
-                    <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
+                    <div className="w-2 h-2 rounded-full bg-brand-default mr-2 mb-4 animate-pulse" />
                   )}
                   <span>{meetup.title}</span>
                 </Link>

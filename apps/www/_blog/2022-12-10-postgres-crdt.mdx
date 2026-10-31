@@ -2,8 +2,8 @@
 title: 'pg_crdt - an experimental CRDT extension for Postgres'
 description: 'Embedding Yjs and Automerge into Postgres for collaborative applications.'
 author: paul_copplestone
-image: launch-week-6/crdt/og-pg-crdt.png
-thumb: launch-week-6/crdt/og-pg-crdt.png
+imgSocial: launch-week-6/crdt/og-pg-crdt.png
+imgThumb: launch-week-6/crdt/og-pg-crdt.png
 categories:
   - postgres
 tags:
@@ -16,7 +16,7 @@ toc_depth: 2
 
 Today we're open-sourcing an EXPERIMENTAL extension for CRDTs, `pg_crdt`. The GitHub repo is [here](https://github.com/supabase/pg_crdt). There are [instructions](https://github.com/supabase/pg_crdt#installation) for running it locally in the README.
 
-When we released the new [multiplayer features](/blog/supabase-realtime-multiplayer-general-availability) for our Realtime engine,
+When we released the new [multiplayer features](/blog/supabase-realtime-multiplayer-general-availability) for our [Realtime](/realtime) engine,
 it took 30 minutes for someone to ask if we'd add CRDT support.
 
 > _Anyone from Supabase here, do you have any plans to build in support for CRDT toolkits such as Yjs or AutoMerge for these features? It would make working with them so much easier if there was a plug and play backend._
@@ -140,7 +140,7 @@ The Realtime engine seems like a great _compliment_ for `pg_crdt`, but before we
 
 These are a few of the _known_ limitations:
 
-- Realtime broadcasts database changes from the Postgres write ahead log (WAL). The WAL includes a complete copy of the the underlying data so small updates cause the entire document to broadcast to all collaborators
+- Realtime broadcasts database changes from the Postgres write ahead log (WAL). The WAL includes a complete copy of the underlying data so small updates cause the entire document to broadcast to all collaborators
 - Frequently updated CRDTs produce a lot of WAL and dead tuples
 - Large CRDT types in Postgres generate significant serialization/deserialization overhead on-update.
 

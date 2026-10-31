@@ -1,26 +1,45 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { z } from 'zod'
 
-import {
-  getFacetCountCTE,
-  getUnifiedLogsCTE,
-} from 'components/interfaces/UnifiedLogs/UnifiedLogs.queries'
-import { Option } from 'components/ui/DataTable/DataTable.types'
-import { handleError, post } from 'data/fetchers'
-import { ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
+import { logsAllEndpointUrl } from './logs-endpoint'
+import { quotedIdent, safeSql } from './safe-analytics-sql'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
+import {
+  logsFiltersToUrlParams,
+  parseLogsFilterUrlParams,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
+import { getFacetCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
+import {
+  getEffectiveLogTypes,
+  getFacetCountCTE,
+  getUnifiedLogsCTE,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type UnifiedLogsFacetCountVariables = UnifiedLogsVariables & {
   facet: string
   facetSearch?: string
+  useOtel?: boolean
 }
 
+const facetRowsSchema = z.array(
+  z.object({
+    value: z.union([z.string(), z.number()]).transform(String),
+    count: z
+      .union([z.number(), z.string().regex(/^\d+$/).transform(Number)])
+      .refine((count) => Number.isSafeInteger(count) && count >= 0),
+  })
+)
+
 export async function getUnifiedLogsFacetCount(
-  { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,
+  { projectRef, search, facet, facetSearch, useOtel = false }: UnifiedLogsFacetCountVariables,
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') {
@@ -28,37 +47,84 @@ export async function getUnifiedLogsFacetCount(
   }
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
-  const sql = `
-${getUnifiedLogsCTE()},
-${getFacetCountCTE({ search, facet, facetSearch })}
-SELECT dimension, value, count from ${facet}_count;
-`.trim()
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: { path: { ref: projectRef } },
-    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
+  const cteName = quotedIdent(facet.replaceAll('.', '_') + '_count')
+
+  const sql = useOtel
+    ? getFacetCountQuery({ search, facet, facetSearch })
+    : safeSql`
+${getUnifiedLogsCTE(getEffectiveLogTypes(search))},
+${getFacetCountCTE({ search, facet, facetSearch, cteName })}
+SELECT dimension, value, count from ${cteName};
+`
+
+  const endpoint = logsAllEndpointUrl(useOtel)
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: isoTimestampEnd,
     signal,
   })
-
-  if (error) handleError(error)
-  return (data.result ?? []) as Option[]
+  if (data.error !== undefined) {
+    throw new Error(typeof data.error === 'string' ? data.error : data.error.message)
+  }
+  return facetRowsSchema
+    .parse(data.result)
+    .sort((a, b) => b.count - a.count)
+    .map((row) => ({
+      label: row.value,
+      value: row.value,
+      count: row.count,
+    }))
 }
 
 export type UnifiedLogsFacetCountData = Awaited<ReturnType<typeof getUnifiedLogsFacetCount>>
-export type UnifiedLogsFacetCountError = ExecuteSqlError
+export type UnifiedLogsFacetCountError = ResponseError | z.ZodError
 
 export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>(
   { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
-) =>
-  useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>(
-    logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, search),
-    ({ signal }) => getUnifiedLogsFacetCount({ projectRef, search, facet, facetSearch }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...UNIFIED_LOGS_QUERY_OPTIONS,
-      ...options,
-    }
-  )
+  }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
+) => {
+  const useOtel = useUnifiedLogsBackend(search)
+  const scopedSearch =
+    facet === 'pathname'
+      ? {
+          ...search,
+          filter: logsFiltersToUrlParams(
+            parseLogsFilterUrlParams(search.filter).filter(({ column }) => column !== facet)
+          ),
+        }
+      : search
+  const facetScope = {
+    ...scopedSearch,
+    latency: undefined,
+    'timing.dns': undefined,
+    'timing.connection': undefined,
+    'timing.tls': undefined,
+    'timing.ttfb': undefined,
+    'timing.transfer': undefined,
+    sort: undefined,
+    size: 40,
+    start: 0,
+    direction: 'next' as const,
+    cursor: new Date(0),
+  }
+  return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
+    queryKey: [
+      ...logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, facetScope),
+      { otel: useOtel },
+    ],
+    queryFn: ({ signal }) =>
+      getUnifiedLogsFacetCount(
+        { projectRef, search: facetScope, facet, facetSearch, useOtel },
+        signal
+      ),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...UNIFIED_LOGS_QUERY_OPTIONS,
+    ...options,
+  })
+}

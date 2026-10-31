@@ -1,10 +1,11 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-type ReplicationPipelineByIdParams = { projectRef?: string; pipelineId?: number }
+type ReplicationPipelineByIdParams = { projectRef?: string; pipelineId?: string }
 
 async function fetchReplicationPipelineById(
   { projectRef, pipelineId }: ReplicationPipelineByIdParams,
@@ -20,7 +21,7 @@ async function fetchReplicationPipelineById(
     handleError(error)
   }
 
-  return data
+  return { ...data, id: pipelineIdSchema.parse(data.id) }
 }
 
 export type ReplicationPipelineByIdData = Awaited<ReturnType<typeof fetchReplicationPipelineById>>
@@ -30,13 +31,11 @@ export const useReplicationPipelineByIdQuery = <TData = ReplicationPipelineByIdD
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ReplicationPipelineByIdData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationPipelineByIdData, ResponseError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelineByIdData, ResponseError, TData>(
-    replicationKeys.pipelineById(projectRef, pipelineId),
-    ({ signal }) => fetchReplicationPipelineById({ projectRef, pipelineId }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ReplicationPipelineByIdData, ResponseError, TData>({
+    queryKey: replicationKeys.pipelineById(projectRef, pipelineId),
+    queryFn: ({ signal }) => fetchReplicationPipelineById({ projectRef, pipelineId }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
+    ...options,
+  })

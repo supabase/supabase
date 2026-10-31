@@ -9,15 +9,15 @@ tags:
   - launch-week
   - edge-functions
   - storage
-date: '2025-07-18:00:00'
+date: '2025-07-18T00:00'
 toc_depth: 3
 author: laktek,nyannyacha
-image: launch-week-15/day-5-persistent-storage-for-functions/og.jpg
-thumb: launch-week-15/day-5-persistent-storage-for-functions/thumb.png
+imgSocial: launch-week-15/day-5-persistent-storage-for-functions/og.png
+imgThumb: launch-week-15/day-5-persistent-storage-for-functions/thumb.png
 launchweek: '15'
 ---
 
-Today, we are introducing Persistent Storage and up to 97% faster cold start times for Edge Functions. Previously, Edge Functions only supported ephemeral file storage by writing to `/tmp` directory. Many common libraries for performing tasks, such as zipping/unzipping files and image transformations, are built to work with persistent file storage, so making them work with Edge Functions required extra steps.
+Today, we are introducing Persistent Storage and up to 97% faster cold start times for [Edge Functions](/edge-functions). Previously, Edge Functions only supported ephemeral file storage by writing to `/tmp` directory. Many common libraries for performing tasks, such as zipping/unzipping files and image transformations, are built to work with persistent file storage, so making them work with Edge Functions required extra steps.
 
 The persistent storage option is built on top of the S3 protocol. It allows you to mount any [S3-compatible bucket](https://supabase.com/docs/guides/storage/s3/compatibility), including [Supabase Storage Buckets](https://supabase.com/docs/guides/storage), as a directory for your Edge Functions. You can perform operations such as reading and writing files to the mounted buckets as you would in a POSIX file system.
 
@@ -35,7 +35,7 @@ await Deno.writeTextFile('/s3/my-bucket/demo.txt', 'hello world')
 <div className="video-container mb-8">
   <iframe
     className="w-full"
-    src="https://www.youtube-nocookie.com/embed/h3mQrDC4g14"
+    src="https://www.youtube-nocookie.com/embed/z8EPAE658iI"
     title="Persistent Storage and Faster Boot Times for Edge Functions"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
     allowfullscreen
@@ -148,6 +148,6 @@ Deno.serve(() => {
 })
 ```
 
-## Try it on Preview Today
+## How to try
 
-These changes will be rolled out along with the Deno 2 upgrade to all clusters within the next 2 weeks. Meanwhile, you can use the Preview cluster if you'd like to try them out today. Please see [this guide](https://github.com/orgs/supabase/discussions/36814) on how to test your functions in Preview cluster.
+These changes are already deployed and available to use on all regions.

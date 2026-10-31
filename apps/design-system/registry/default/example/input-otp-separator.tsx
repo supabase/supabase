@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from 'ui'
 
 export default function InputOTPWithSeparator() {

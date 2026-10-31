@@ -44,7 +44,7 @@ create table instruments (
   name text
 );
 
-insert into books
+insert into instruments
   (id, name)
 values
   (1, 'violin'),
@@ -87,6 +87,8 @@ end; $$ language plpgsql;
 alter role authenticator set pgrst.db_pre_request to 'filter_plan_requests';
 notify pgrst, 'reload config';
 ```
+
+<$Partial path="db_pre_request_warning.mdx" />
 
 Replace `'123.123.123.123'` with your actual IP address.
 

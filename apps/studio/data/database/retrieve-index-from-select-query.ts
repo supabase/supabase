@@ -1,8 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { joinSqlFragments, literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GetInvolvedIndexesFromSelectQueryVariables = {
   projectRef?: string
@@ -31,7 +33,7 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-explain-query'],
-      sql: /* sql */ `
+      sql: safeSql`
         create or replace function pg_temp.explain_query(query text) returns jsonb
         language plpgsql
         as $$
@@ -101,8 +103,9 @@ export async function getInvolvedIndexesInSelectQuery({
         end;
         $$;
 
-        select pg_temp.explain_query('${query}') as plans;
+        select pg_temp.explain_query(${literal(query)}) as plans;
       `,
+      grant: unguarded.migrating,
     })
 
     const involvedIndexes = findIndexNames(result)
@@ -113,7 +116,8 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-names'],
-      sql: `select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${involvedIndexes.map((name) => `'${name}'`).join(', ')});`,
+      sql: safeSql`select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${joinSqlFragments(involvedIndexes.map(literal), ', ')});`,
+      grant: unguarded.migrating,
     })
 
     return indexResult as GetInvolvedIndexesFromSelectQueryResponse[]
@@ -132,7 +136,7 @@ export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelec
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<
+  }: UseCustomQueryOptions<
     GetInvolvedIndexesFromSelectQueryData,
     GetInvolvedIndexesFromSelectQueryError,
     TData
@@ -149,19 +153,17 @@ export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelec
     GetInvolvedIndexesFromSelectQueryData,
     GetInvolvedIndexesFromSelectQueryError,
     TData
-  >(
-    databaseKeys.indexesFromQuery(projectRef, query),
-    () => getInvolvedIndexesInSelectQuery({ projectRef, connectionString, query }),
-    {
-      retry: false,
-      enabled:
-        enabled &&
-        typeof projectRef !== 'undefined' &&
-        typeof query !== 'undefined' &&
-        isValidQueryForIndexing,
-      ...options,
-    }
-  )
+  >({
+    queryKey: databaseKeys.indexesFromQuery(projectRef, query),
+    queryFn: () => getInvolvedIndexesInSelectQuery({ projectRef, connectionString, query }),
+    retry: false,
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof query !== 'undefined' &&
+      isValidQueryForIndexing,
+    ...options,
+  })
 }
 
 // Helper functions

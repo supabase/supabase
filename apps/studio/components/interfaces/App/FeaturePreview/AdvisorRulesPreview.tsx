@@ -1,13 +1,13 @@
+import { useParams } from 'common'
 import Image from 'next/image'
 
-import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { BASE_PATH } from 'lib/constants'
-import { useIsRealtimeSettingsEnabled } from './FeaturePreviewContext'
+import { useIsAdvisorRulesEnabled } from './FeaturePreviewContext'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { BASE_PATH } from '@/lib/constants'
 
 export const AdvisorRulesPreview = () => {
   const { ref } = useParams()
-  const isRealtimeSettingsEnabled = useIsRealtimeSettingsEnabled()
+  const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
 
   return (
     <div>
@@ -21,18 +21,18 @@ export const AdvisorRulesPreview = () => {
         width={1296}
         height={900}
         alt="api-docs-side-panel-preview"
-        className="rounded border mb-4"
+        className="rounded-sm border mb-4"
       />
-      <div className="space-y-2 !mt-4">
+      <div className="space-y-2 mt-4!">
         <p className="text-sm">Enabling this preview will:</p>
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
             Allow you to disable advisor rules for your project from the{' '}
             <InlineLink
               href={
-                isRealtimeSettingsEnabled
-                  ? `/project/${ref}/advisors/security`
-                  : `/project/${ref}/advisors/rules/security`
+                isAdvisorRulesEnabled
+                  ? `/project/${ref}/advisors/rules/security`
+                  : `/project/${ref}/advisors/security`
               }
             >
               Advisors section.

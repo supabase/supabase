@@ -4,32 +4,37 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useCallback } from 'react'
 
 import {
-  QueryPerformanceSort,
-  useQueryPerformanceQuery,
-} from 'components/interfaces/Reports/Reports.queries'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { databaseIndexesKeys } from 'data/database-indexes/keys'
-import { databaseKeys } from 'data/database/keys'
-import {
   QUERY_PERFORMANCE_PRESET_MAP,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from '../QueryPerformance.constants'
+import { type QueryPerformanceSort } from '../QueryPerformance.types'
+import { useQueryPerformanceQuery } from '../useQueryPerformanceQuery'
 import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
+import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import { databaseIndexesKeys } from '@/data/database-indexes/keys'
+import { databaseKeys } from '@/data/database/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function useIndexInvalidation() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { project } = useProjectContext()
+  const { data: project } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
   const [{ preset: urlPreset, search: searchQuery, order, sort }] = useQueryStates({
     sort: parseAsString,
     search: parseAsString.withDefault(''),
     order: parseAsString,
-    preset: parseAsString.withDefault(QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING),
+    preset: parseAsString.withDefault('unified'),
   })
 
-  const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
+  const { invalidate: invalidateTableIndexAdvisor } = useTableIndexAdvisor()
+
+  // Falls back to UNIFIED so an unrecognized preset param doesn't resolve to
+  // undefined and crash generateQueryPerformanceSql.
+  const preset =
+    QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES] ??
+    QUERY_PERFORMANCE_PRESET_MAP[QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED]
   const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
   const roles = router?.query?.roles ?? []
 
@@ -43,7 +48,11 @@ export function useIndexInvalidation() {
 
   return useCallback(() => {
     queryPerformanceQuery.runQuery()
-    queryClient.invalidateQueries(databaseKeys.indexAdvisorFromQuery(project?.ref, ''))
-    queryClient.invalidateQueries(databaseIndexesKeys.list(project?.ref))
-  }, [queryPerformanceQuery, queryClient, project?.ref])
+    queryClient.invalidateQueries({
+      queryKey: databaseKeys.indexAdvisorFromQuery(project?.ref, ''),
+    })
+    queryClient.invalidateQueries({ queryKey: databaseIndexesKeys.list(project?.ref) })
+
+    invalidateTableIndexAdvisor()
+  }, [queryPerformanceQuery, queryClient, project?.ref, invalidateTableIndexAdvisor])
 }

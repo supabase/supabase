@@ -1,270 +1,334 @@
-import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
-import type { PostgresTrigger } from '@supabase/postgres-meta'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { toast } from 'sonner'
-
+import { zodResolver } from '@hookform/resolvers/zod'
+import { keyword } from '@supabase/pg-meta'
+import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
-import { getTableEditor } from 'data/table-editor/table-editor-query'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useRef, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { Button, Form, SidePanel } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { FormContents } from './FormContents'
+import { Admonition } from 'ui-patterns/Admonition'
 
-export interface EditHookPanelProps {
-  visible: boolean
-  selectedHook?: PostgresTrigger
-  onClose: () => void
-}
+import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
+import { FormContents } from './FormContents'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
+import { useInstallRequiredExtensions } from '@/components/interfaces/Integrations/Integration/useInstallRequiredExtensions'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
+import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
+import { uuidv4 } from '@/lib/helpers'
 
 export type HTTPArgument = { id: string; name: string; value: string }
 
-export const isEdgeFunction = ({
-  ref,
-  restUrlTld,
-  url,
-}: {
-  ref?: string
-  restUrlTld?: string
-  url: string
-}) =>
-  url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
-  url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
+const FORM_ID = 'edit-hook-panel-form'
 
-export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
+const parseHeaders = (selectedHook?: PGTrigger): HTTPArgument[] => {
+  if (typeof selectedHook === 'undefined') {
+    return [{ id: uuidv4(), name: 'Content-type', value: 'application/json' }]
+  }
+  const [, , headers] = selectedHook.function_args
+  let parsedHeaders: Record<string, string> = {}
+
+  try {
+    parsedHeaders = JSON.parse(headers.replace(/\\"/g, '"'))
+  } catch (e) {
+    parsedHeaders = {}
+  }
+
+  return Object.entries(parsedHeaders).map(([name, value]) => ({
+    id: uuidv4(),
+    name,
+    value,
+  }))
+}
+
+const parseParameters = (selectedHook?: PGTrigger): HTTPArgument[] => {
+  if (typeof selectedHook === 'undefined') {
+    return [{ id: uuidv4(), name: '', value: '' }]
+  }
+  const [, , , parameters] = selectedHook.function_args
+  let parsedParameters: Record<string, string> = {}
+
+  try {
+    parsedParameters = JSON.parse(parameters.replace(/\\"/g, '"'))
+  } catch (e) {
+    parsedParameters = {}
+  }
+
+  return Object.entries(parsedParameters).map(([name, value]) => ({
+    id: uuidv4(),
+    name,
+    value,
+  }))
+}
+
+export const EditHookPanel = () => {
   const { ref } = useParams()
-  const submitRef = useRef<any>(null)
-  const [isEdited, setIsEdited] = useState(false)
-  const [isClosingPanel, setIsClosingPanel] = useState(false)
+  const { data: project } = useSelectedProjectQuery()
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
-  // [Joshen] There seems to be some bug between Checkbox.Group within the Form component
-  // hence why this external state as a temporary workaround
-  const [events, setEvents] = useState<string[]>([])
-  const [eventsError, setEventsError] = useState<string>()
+  const [isLoadingTable, setIsLoadingTable] = useState(false)
 
-  // For HTTP request
-  const [httpHeaders, setHttpHeaders] = useState<HTTPArgument[]>([])
-  const [httpParameters, setHttpParameters] = useState<HTTPArgument[]>([])
+  const {
+    requiredExtensionsToInstall,
+    needsExtensions,
+    isExtensionDataLoading: isExtensionsLoading,
+    installRequiredExtensions,
+  } = useInstallRequiredExtensions()
 
-  const { project } = useProjectContext()
-  const { data } = useTablesQuery({
+  const { data: schemas, isSuccess: isSchemasLoaded } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { mutate: createDatabaseTrigger } = useDatabaseTriggerCreateMutation({
-    onSuccess: (res) => {
-      toast.success(`Successfully created new webhook "${res.name}"`)
-      setIsSubmitting(false)
-      onClose()
-    },
-    onError: (error) => {
-      setIsSubmitting(false)
-      toast.error(`Failed to create webhook: ${error.message}`)
-    },
-  })
-  const { mutate: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation({
-    onSuccess: (res) => {
-      setIsSubmitting(false)
-      toast.success(`Successfully updated webhook "${res.name}"`)
-      onClose()
-    },
-    onError: (error) => {
-      setIsSubmitting(false)
-      toast.error(`Failed to update webhook: ${error.message}`)
-    },
+  const { mutateAsync: enableHooks } = useHooksEnableMutation({ onError: () => {} })
+
+  const needsWebhooksEnabled =
+    isMarketplaceEnabled &&
+    isSchemasLoaded &&
+    !schemas.some((schema) => schema.name === 'supabase_functions')
+  const isExtensionDataLoading = isExtensionsLoading || (isMarketplaceEnabled && !isSchemasLoaded)
+
+  const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
   })
 
-  const tables = useMemo(
-    () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
-    [data]
+  const [showCreateHookForm, setShowCreateHookForm] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false)
   )
-  const restUrl = project?.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
-  const initialValues = {
-    name: selectedHook?.name ?? '',
-    table_id: selectedHook?.table_id ?? '',
-    http_url: selectedHook?.function_args?.[0] ?? '',
-    http_method: selectedHook?.function_args?.[1] ?? 'POST',
-    function_type: isEdgeFunction({ ref, restUrlTld, url: selectedHook?.function_args?.[0] ?? '' })
-      ? 'supabase_function'
-      : 'http_request',
-    timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
+  const [selectedHookIdToEdit, setSelectedHookIdToEdit] = useQueryState(
+    'edit',
+    parseAsString.withDefault('')
+  )
+  const selectedHook = hooks.find((hook) => hook.id.toString() === selectedHookIdToEdit)
+
+  // Webhook IDs aren't stable across edits because the update mutation drops and recreates the
+  // trigger, assigning a new ID. This causes a brief window where the old selectedHookIdToEdit
+  // no longer matches any hook, incorrectly triggering the "Webhook not found" toast. Since this
+  // is an edge case, we use an ad-hoc ref to suppress the toast when the panel is closing rather
+  // than a more involved solution
+  const isClosingRef = useRef(false)
+
+  const visible = showCreateHookForm || !!selectedHook
+
+  const onClose = () => {
+    isClosingRef.current = true
+    setShowCreateHookForm(false)
+    setSelectedHookIdToEdit(null)
   }
+
+  const { mutate: createDatabaseTrigger, isPending: isCreating } = useDatabaseTriggerCreateMutation(
+    {
+      onSuccess: (_, variables) => {
+        toast.success(`Successfully created new webhook "${variables.payload.name}"`)
+        onClose()
+      },
+      onError: (error) => {
+        toast.error(`Failed to create webhook: ${error.message}`)
+      },
+    }
+  )
+
+  const { mutate: updateDatabaseTrigger, isPending: isUpdating } = useDatabaseTriggerUpdateMutation(
+    {
+      onSuccess: (res) => {
+        toast.success(`Successfully updated webhook "${res.name}"`)
+        onClose()
+      },
+      onError: (error) => {
+        toast.error(`Failed to update webhook: ${error.message}`)
+      },
+    }
+  )
+
+  const isSubmitting = isCreating || isUpdating || isLoadingTable
+
+  const restUrl = project?.restUrl
+
+  const form = useForm<WebhookFormValues>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: selectedHook?.name ?? '',
+      table_id: selectedHook?.table_id?.toString() ?? '',
+      http_url: selectedHook?.function_args?.[0] ?? '',
+      http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
+      function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
+        ? 'supabase_function'
+        : 'http_request',
+      timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
+      events: selectedHook?.events ?? [],
+      httpHeaders: parseHeaders(selectedHook),
+      httpParameters: parseParameters(selectedHook),
+    },
+  })
 
   useEffect(() => {
+    if (isSuccess && !!selectedHookIdToEdit && !selectedHook && !isClosingRef.current) {
+      toast('Webhook not found')
+      setSelectedHookIdToEdit(null)
+    }
+  }, [isSuccess, selectedHook, selectedHookIdToEdit, setSelectedHookIdToEdit])
+
+  // Reset the closing ref when the panel fully closes
+  useEffect(() => {
+    if (!visible) {
+      isClosingRef.current = false
+    }
+  }, [visible])
+
+  // Reset form when panel opens with new selectedHook
+  useEffect(() => {
     if (visible) {
-      setIsEdited(false)
-      setIsClosingPanel(false)
-
-      if (selectedHook !== undefined) {
-        setEvents(selectedHook.events)
-
-        const [_, __, headers, parameters] = selectedHook.function_args
-
-        let parsedParameters: Record<string, string> = {}
-
-        // Try to parse the parameters with escaped quotes
-        try {
-          parsedParameters = JSON.parse(parameters.replace(/\\"/g, '"'))
-        } catch (e) {
-          // If parsing still fails, fallback to an empty object
-          parsedParameters = {}
-        }
-
-        let parsedHeaders: Record<string, string> = {}
-        try {
-          parsedHeaders = JSON.parse(headers.replace(/\\"/g, '"'))
-        } catch (e) {
-          // If parsing still fails, fallback to an empty object
-          parsedHeaders = {}
-        }
-
-        setHttpHeaders(
-          Object.keys(parsedHeaders).map((key) => {
-            return { id: uuidv4(), name: key, value: parsedHeaders[key] }
-          })
-        )
-
-        setHttpParameters(
-          Object.keys(parsedParameters).map((key) => {
-            return { id: uuidv4(), name: key, value: parsedParameters[key] }
-          })
-        )
-      } else {
-        setEvents([])
-        setHttpHeaders([{ id: uuidv4(), name: 'Content-type', value: 'application/json' }])
-        setHttpParameters([{ id: uuidv4(), name: '', value: '' }])
-      }
+      form.reset({
+        name: selectedHook?.name ?? '',
+        table_id: selectedHook?.table_id?.toString() ?? '',
+        http_url: selectedHook?.function_args?.[0] ?? '',
+        http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
+        function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
+          ? 'supabase_function'
+          : 'http_request',
+        timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
+        events: selectedHook?.events ?? [],
+        httpHeaders: parseHeaders(selectedHook),
+        httpParameters: parseParameters(selectedHook),
+      })
     }
-  }, [visible, selectedHook])
+  }, [visible, selectedHook, ref, restUrl, form])
 
-  const onClosePanel = () => {
-    if (isEdited) setIsClosingPanel(true)
-    else onClose()
-  }
-
-  const onUpdateSelectedEvents = (event: string) => {
-    if (events.includes(event)) {
-      setEvents(events.filter((e) => e !== event))
-    } else {
-      setEvents(events.concat(event))
-    }
-    setEventsError(undefined)
-  }
-
-  const validate = (values: any) => {
-    const errors: any = {}
-
-    if (!values.name) {
-      errors['name'] = 'Please provide a name for your webhook'
-    }
-    if (!values.table_id) {
-      errors['table_id'] = 'Please select a table for which your webhook will trigger from'
-    }
-
-    if (values.function_type === 'http_request') {
-      // For HTTP requests
-      if (!values.http_url) {
-        errors['http_url'] = 'Please provide a URL'
-      } else if (!values.http_url.startsWith('http')) {
-        errors['http_url'] = 'Please include HTTP/HTTPs to your URL'
-      } else if (!isValidHttpUrl(values.http_url)) {
-        errors['http_url'] = 'Please provide a valid URL'
-      }
-    } else if (values.function_type === 'supabase_function') {
-      // For Supabase Edge Functions
-      if (values.http_url.includes('undefined')) {
-        errors['http_url'] = 'No edge functions available for selection'
-      }
-    }
-
-    if (values.timeout_ms < 1000 || values.timeout_ms > 10_000) {
-      errors['timeout_ms'] = 'Timeout should be between 1000ms and 10,000ms'
-    }
-
-    if (JSON.stringify(values) !== JSON.stringify(initialValues)) setIsEdited(true)
-    return errors
-  }
-
-  const onSubmit = async (values: any) => {
-    setIsSubmitting(true)
+  const queryClient = useQueryClient()
+  const onSubmit: SubmitHandler<WebhookFormValues> = async (values) => {
     if (!project?.ref) {
       return console.error('Project ref is required')
     }
-    if (events.length === 0) {
-      return setEventsError('Please select at least one event')
-    }
 
-    const selectedTable = await getTableEditor({
-      id: values.table_id,
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    })
-    if (!selectedTable) {
-      setIsSubmitting(false)
-      return toast.error('Unable to find selected table')
-    }
+    if (isExtensionDataLoading) return
 
-    const headers = httpHeaders
-      .filter((header) => header.name && header.value)
-      .reduce((a: any, b: any) => {
-        a[b.name] = b.value
-        return a
-      }, {})
-    const parameters = httpParameters
-      .filter((param) => param.name && param.value)
-      .reduce((a: any, b: any) => {
-        a[b.name] = b.value
-        return a
-      }, {})
+    try {
+      setIsLoadingTable(true)
 
-    // replacer function with JSON.stringify to handle quotes properly
-    const stringifiedParameters = JSON.stringify(parameters, (key, value) => {
-      if (typeof value === 'string') {
-        // Return the raw string without any additional escaping
-        return value
+      if (needsExtensions || needsWebhooksEnabled) {
+        const toastId = toast.loading('Setting up database webhooks…')
+        try {
+          if (needsExtensions) {
+            const extensionNames = (requiredExtensionsToInstall ?? [])
+              .map((ext) => ext.name)
+              .join(', ')
+            toast.loading(`Installing extensions ${extensionNames}…`, { id: toastId })
+            await installRequiredExtensions()
+          }
+          if (needsWebhooksEnabled) {
+            toast.loading('Enabling database webhooks…', { id: toastId })
+            await enableHooks({ ref: project.ref })
+          }
+          toast.dismiss(toastId)
+        } catch (error) {
+          toast.error(`Failed to set up database webhooks: ${(error as Error).message}`, {
+            id: toastId,
+          })
+          return
+        }
       }
-      return value
-    })
 
-    const payload: PGTriggerCreate = {
-      events,
-      activation: 'AFTER',
-      orientation: 'ROW',
-      name: values.name,
-      table: selectedTable.name,
-      schema: selectedTable.schema,
-      function_name: 'http_request',
-      function_schema: 'supabase_functions',
-      function_args: [
-        values.http_url,
-        values.http_method,
-        JSON.stringify(headers),
-        stringifiedParameters,
-        values.timeout_ms.toString(),
-      ],
-    }
+      const selectedTable = await queryClient.fetchQuery(
+        tableEditorQueryOptions({
+          id: Number(values.table_id),
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+        })
+      )
+      if (!selectedTable) {
+        return toast.error('Unable to find selected table')
+      }
 
-    if (selectedHook === undefined) {
-      createDatabaseTrigger({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        payload,
+      const headers = values.httpHeaders
+        .filter((header) => header.name && header.value)
+        .reduce(
+          (a, b) => {
+            a[b.name] = b.value
+            return a
+          },
+          {} as Record<string, string>
+        )
+      const parameters = values.httpParameters
+        .filter((param) => param.name && param.value)
+        .reduce(
+          (a, b) => {
+            a[b.name] = b.value
+            return a
+          },
+          {} as Record<string, string>
+        )
+
+      // replacer function with JSON.stringify to handle quotes properly
+      const stringifiedParameters = JSON.stringify(parameters, (_key, value) => {
+        if (typeof value === 'string') {
+          // Return the raw string without any additional escaping
+          return value
+        }
+        return value
       })
-    } else {
-      updateDatabaseTrigger({
-        projectRef: project?.ref,
-        connectionString: project?.connectionString,
-        originalTrigger: selectedHook,
-        updatedTrigger: { ...payload, enabled_mode: 'ORIGIN' },
-      })
+
+      const payload: PGTriggerCreate = {
+        events: values.events,
+        activation: 'AFTER',
+        orientation: 'ROW',
+        name: values.name,
+        table: selectedTable.name,
+        schema: selectedTable.schema,
+        function_name: 'http_request',
+        function_schema: 'supabase_functions',
+        function_args: [
+          values.http_url,
+          values.http_method,
+          JSON.stringify(headers),
+          stringifiedParameters,
+          values.timeout_ms.toString(),
+        ],
+      }
+
+      if (selectedHook === undefined) {
+        createDatabaseTrigger({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          payload,
+        })
+      } else {
+        updateDatabaseTrigger({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          originalTrigger: selectedHook,
+          updatedTrigger: {
+            ...payload,
+            enabled_mode: 'ORIGIN',
+            events: payload.events.map(keyword),
+          },
+        })
+      }
+    } catch (error) {
+      console.error('Failed to get table editor:', error)
+      toast.error('Failed to get table editor')
+    } finally {
+      setIsLoadingTable(false)
     }
   }
+
+  // This is intentionally kept outside of the useConfirmOnClose hook to force RHF to update the isDirty state.
+  const isDirty = form.formState.isDirty
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
+    checkIsDirty: () => isDirty,
+    onClose: () => onClose(),
+  })
 
   return (
     <>
@@ -275,76 +339,51 @@ export const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelP
           selectedHook === undefined ? (
             'Create a new database webhook'
           ) : (
-            <>
+            <span>
               Update webhook <code className="text-sm">{selectedHook.name}</code>
-            </>
+            </span>
           )
         }
-        className="hooks-sidepanel mr-0 transform transition-all duration-300 ease-in-out"
+        className="mr-0 transform transition-all duration-300 ease-in-out"
         onConfirm={() => {}}
-        onCancel={() => onClosePanel()}
+        onCancel={confirmOnClose}
         customFooter={
           <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
-            <Button
-              size="tiny"
-              type="default"
-              htmlType="button"
-              onClick={onClosePanel}
-              disabled={isSubmitting}
-            >
+            <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button
               size="tiny"
-              type="primary"
-              htmlType="button"
-              disabled={isSubmitting}
+              variant="primary"
+              type="submit"
+              form={FORM_ID}
+              disabled={isSubmitting || isExtensionDataLoading}
               loading={isSubmitting}
-              onClick={() => submitRef?.current?.click()}
             >
               {selectedHook === undefined ? 'Create webhook' : 'Update webhook'}
             </Button>
           </div>
         }
       >
-        <Form validateOnBlur initialValues={initialValues} onSubmit={onSubmit} validate={validate}>
-          {({ values, resetForm, errors }: any) => {
-            return (
-              <FormContents
-                values={values}
-                resetForm={resetForm}
-                errors={errors}
-                tables={tables}
-                events={events}
-                eventsError={eventsError}
-                onUpdateSelectedEvents={onUpdateSelectedEvents}
-                httpHeaders={httpHeaders}
-                httpParameters={httpParameters}
-                setHttpHeaders={setHttpHeaders}
-                setHttpParameters={setHttpParameters}
-                submitRef={submitRef}
-                selectedHook={selectedHook}
-              />
-            )
-          }}
+        <Form {...form}>
+          <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
+            {isMarketplaceEnabled && (
+              <div className="flex flex-col gap-y-4 border-b px-5 py-5">
+                {(needsExtensions || needsWebhooksEnabled) && (
+                  <Admonition
+                    type="warning"
+                    title="Database webhooks will be set up"
+                    description="Proceeding will also install the required extensions and enable database webhooks on your project."
+                  />
+                )}
+                <RequiredExtensionsSection hideSeparator />
+              </div>
+            )}
+            <FormContents form={form} selectedHook={selectedHook} />
+          </form>
         </Form>
       </SidePanel>
-      <ConfirmationModal
-        visible={isClosingPanel}
-        title="Discard changes"
-        confirmLabel="Discard"
-        onCancel={() => setIsClosingPanel(false)}
-        onConfirm={() => {
-          setIsClosingPanel(false)
-          setIsEdited(false)
-          onClose()
-        }}
-      >
-        <p className="text-sm text-foreground-light">
-          There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-          lost.
-        </p>
-      </ConfirmationModal>
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }

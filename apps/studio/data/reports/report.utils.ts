@@ -1,10 +1,41 @@
-import { AnalyticsInterval } from 'data/analytics/constants'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { type ComparisonOperator } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
+import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 
 export type Granularity = 'minute' | 'hour' | 'day'
+
+/**
+ * Pre-branded SQL fragments for the closed set of granularity tokens that
+ * `analyticsIntervalToGranularity` may return. Use to splice a granularity into
+ * a `safeSql` template without re-validating at the call site.
+ */
+export const SAFE_GRANULARITY_SQL: Record<Granularity, SafeLogSqlFragment> = {
+  minute: safeSql`minute`,
+  hour: safeSql`hour`,
+  day: safeSql`day`,
+}
+
+/**
+ * Pre-branded SQL fragments for the closed set of numeric comparison operators
+ * accepted by `ReportsNumericFilter`. Use to splice an operator into a
+ * `safeSql` template without re-validating at the call site.
+ */
+export const SAFE_COMPARISON_OPERATOR_SQL: Record<ComparisonOperator, SafeLogSqlFragment> = {
+  '=': safeSql`=`,
+  '>=': safeSql`>=`,
+  '<=': safeSql`<=`,
+  '>': safeSql`>`,
+  '<': safeSql`<`,
+  '!=': safeSql`!=`,
+}
+
 export function analyticsIntervalToGranularity(interval: AnalyticsInterval): Granularity {
   switch (interval) {
     case '1m':
+      return 'minute'
+    case '2m':
       return 'minute'
     case '5m':
       return 'minute'
@@ -37,17 +68,19 @@ export const REPORT_STATUS_CODE_COLORS: { [key: string]: { light: string; dark: 
   default: { light: '#757575', dark: '#9E9E9E' },
 }
 
-export const useEdgeFnIdToName = ({ projectRef }: { projectRef: string }) => {
-  const { data: edgeFunctions, isLoading } = useEdgeFunctionsQuery({
+export async function fetchLogs(
+  projectRef: string,
+  sql: SafeLogSqlFragment,
+  startDate: string,
+  endDate: string,
+  useOtel = false
+) {
+  return await executeAnalyticsSql({
     projectRef,
+    endpoint: logsAllEndpointUrl(useOtel),
+    sql,
+    iso_timestamp_start: startDate,
+    iso_timestamp_end: endDate,
+    method: 'get',
   })
-
-  function edgeFnIdToName(id: string) {
-    return edgeFunctions?.find((fn) => fn.id === id)?.name
-  }
-
-  return {
-    edgeFnIdToName,
-    isLoading,
-  }
 }

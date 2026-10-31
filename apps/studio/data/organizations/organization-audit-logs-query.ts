@@ -1,46 +1,23 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { components } from 'api-types'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type AuditLog = {
-  action: {
-    metadata: {
-      method?: string
-      status?: number
-    }[]
-    name: string
-  }
-  actor: {
-    id: string
-    type: 'user' | string
-    metadata: {
-      email?: string
-    }[]
-  }
-  target: {
-    description: string
-    metadata: {
-      org_slug?: string
-      project_ref?: string
-    }
-  }
-  occurred_at: string
-}
+// Audit log timestamps are returned in microseconds, not milliseconds.
+// Divide by this constant before passing to dayjs/Date to get a valid date.
+export const TIMESTAMP_MICROS_PER_MS = 1000
 
-export type OrganizationAuditLogsResponse = {
-  result: AuditLog[]
-  retention_period: number
-}
+export type AuditLog = components['schemas']['AuditLogsResponse_Output']['result'][number]
 
-export type OrganizationAuditLogsVariables = {
+type OrganizationAuditLogsVariables = {
   slug?: string
   iso_timestamp_start: string
   iso_timestamp_end: string
 }
 
-export async function getOrganizationAuditLogs(
+async function getOrganizationAuditLogs(
   { slug, iso_timestamp_start, iso_timestamp_end }: OrganizationAuditLogsVariables,
   signal?: AbortSignal
 ) {
@@ -52,31 +29,28 @@ export async function getOrganizationAuditLogs(
   })
 
   if (error) handleError(error)
-  // [Joshen] API doesn't generate types for each audit log properly
-  return data as unknown as OrganizationAuditLogsResponse
+  return data
 }
 
-export type OrganizationAuditLogsData = Awaited<ReturnType<typeof getOrganizationAuditLogs>>
-export type OrganizationAuditLogsError = ResponseError
+type OrganizationAuditLogsData = Awaited<ReturnType<typeof getOrganizationAuditLogs>>
+type OrganizationAuditLogsError = ResponseError
 
 export const useOrganizationAuditLogsQuery = <TData = OrganizationAuditLogsData>(
   vars: OrganizationAuditLogsVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
+  }: UseCustomQueryOptions<OrganizationAuditLogsData, OrganizationAuditLogsError, TData> = {}
 ) => {
   const { slug, iso_timestamp_start, iso_timestamp_end } = vars
 
-  return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>(
-    organizationKeys.auditLogs(slug, {
+  return useQuery<OrganizationAuditLogsData, OrganizationAuditLogsError, TData>({
+    queryKey: organizationKeys.auditLogs(slug, {
       date_start: iso_timestamp_start,
       date_end: iso_timestamp_end,
     }),
-    ({ signal }) => getOrganizationAuditLogs(vars, signal),
-    {
-      enabled: enabled && typeof slug !== 'undefined',
-      ...options,
-    }
-  )
+    queryFn: ({ signal }) => getOrganizationAuditLogs(vars, signal),
+    enabled: enabled && typeof slug !== 'undefined',
+    ...options,
+  })
 }

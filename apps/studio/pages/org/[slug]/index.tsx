@@ -1,66 +1,73 @@
-import { useState } from 'react'
-
 import { useIsMFAEnabled } from 'common'
-import { ProjectList } from 'components/interfaces/Home/ProjectList'
-import HomePageActions from 'components/interfaces/HomePageActions'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PROJECT_STATUS } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
-import { Admonition } from 'ui-patterns'
+import Link from 'next/link'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+
+import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
+import { HomePageActions } from '@/components/interfaces/HomePageActions'
+import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useShowUpgradeCta } from '@/hooks/misc/useShowUpgradeCta'
+import type { NextPageWithLayout } from '@/types'
 
 const ProjectsPage: NextPageWithLayout = () => {
-  const org = useSelectedOrganization()
   const isUserMFAEnabled = useIsMFAEnabled()
+  const { data: org } = useSelectedOrganizationQuery()
+  const { showUpgradeCta: showOrgProjectsListUsageCard } = useShowUpgradeCta()
+
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
 
-  const [search, setSearch] = useState('')
-  const [filterStatus, setFilterStatus] = useState<string[]>([
-    PROJECT_STATUS.ACTIVE_HEALTHY,
-    PROJECT_STATUS.INACTIVE,
-  ])
-
-  useAutoProjectsPrefetch()
-
   return (
-    <ScaffoldContainerLegacy>
-      {disableAccessMfa ? (
-        <Admonition type="note" title={`The organization "${org?.name}" has MFA enforced`}>
-          <p className="!m-0">
-            Set up MFA on your account through your{' '}
-            <InlineLink href="/account/security">account preferences</InlineLink> to access this
-            organization
-          </p>
-        </Admonition>
-      ) : (
-        <div>
-          <HomePageActions
-            search={search}
-            setSearch={setSearch}
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
+    <ScaffoldContainer className="grow flex">
+      <ScaffoldSection isFullWidth className="pb-12">
+        {disableAccessMfa ? (
+          <Admonition
+            type="note"
+            layout="horizontal"
+            title={`${org?.name} requires MFA`}
+            description={
+              <>
+                Set up multi-factor authentication (MFA) on your account to access this
+                organization’s projects.
+              </>
+            }
+            actions={
+              <Button asChild>
+                <Link href="/account/security">Set up MFA</Link>
+              </Button>
+            }
           />
-
-          <div className="my-6 space-y-8">
-            <ProjectList
-              search={search}
-              filterStatus={filterStatus}
-              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
-            />
+        ) : (
+          <div className="space-y-5">
+            <div className="flex flex-col gap-y-4 xl:flex-row xl:gap-x-6">
+              <div className="flex flex-col gap-y-4 flex-1 min-w-0">
+                <HomePageActions />
+                <ProjectList />
+              </div>
+              {showOrgProjectsListUsageCard && (
+                <aside className="xl:w-80 xl:shrink-0">
+                  <ul className="list-none p-0 m-0">
+                    <PlanUsageCard />
+                  </ul>
+                </aside>
+              )}
+            </div>
           </div>
-        </div>
-      )}
-    </ScaffoldContainerLegacy>
+        )}
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
 
 ProjectsPage.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>{page}</OrganizationLayout>
+    <OrganizationLayout title="Projects">
+      <PageLayout title="Projects">{page}</PageLayout>
+    </OrganizationLayout>
   </DefaultLayout>
 )
 

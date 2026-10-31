@@ -1,22 +1,26 @@
-import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
+import { IS_PLATFORM } from 'common'
+import { CircleIcon, CodeIcon, MinusIcon, PlusIcon, WindIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-
-import DiffViewer from 'components/ui/DiffViewer'
-import type { EdgeFunctionBodyData } from 'data/edge-functions/edge-function-body-query'
-import type {
-  EdgeFunctionsDiffResult,
-  FileInfo,
-  FileStatus,
-} from 'hooks/branches/useEdgeFunctionsDiff'
-import { EMPTY_ARR } from 'lib/void'
-import { basename } from 'path'
 import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
+
+import { DiffEditor } from '@/components/ui/DiffEditor'
+import type { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
+import {
+  fileKey,
+  type EdgeFunctionsDiffResult,
+  type FileInfo,
+  type FileStatus,
+} from '@/hooks/branches/useEdgeFunctionsDiff'
+import { EMPTY_ARR } from '@/lib/void'
+
+const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
+  files: EMPTY_ARR,
+}
 
 interface EdgeFunctionsDiffPanelProps {
   diffResults: EdgeFunctionsDiffResult
   currentBranchRef?: string
-  mainBranchRef?: string
 }
 
 interface FunctionDiffProps {
@@ -27,14 +31,11 @@ interface FunctionDiffProps {
   fileInfos: FileInfo[]
 }
 
-// Helper to canonicalize file identifiers to prevent mismatch due to differing root paths
-const fileKey = (fullPath: string) => basename(fullPath)
-
 // Helper to get the status color for file indicators
 const getStatusColor = (status: FileStatus): string => {
   switch (status) {
     case 'added':
-      return 'text-brand'
+      return 'text-primary'
     case 'removed':
       return 'text-destructive'
     case 'modified':
@@ -50,15 +51,15 @@ const getStatusColor = (status: FileStatus): string => {
 const getStatusIcon = (status: FileStatus) => {
   switch (status) {
     case 'added':
-      return Plus
+      return PlusIcon
     case 'removed':
-      return Minus
+      return MinusIcon
     case 'modified':
-      return Circle
+      return CircleIcon
     case 'unchanged':
-      return Circle
+      return CircleIcon
     default:
-      return Circle
+      return CircleIcon
   }
 }
 
@@ -81,17 +82,21 @@ const FunctionDiff = ({
     }
   }, [allFileKeys, activeFileKey])
 
-  const currentFile = currentBody.find(
-    (f: EdgeFunctionBodyData[number]) => fileKey(f.name) === activeFileKey
+  const currentFile = currentBody.files.find(
+    (f: EdgeFunctionBodyData['files'][number]) => fileKey(f.name) === activeFileKey
   )
-  const mainFile = mainBody.find(
-    (f: EdgeFunctionBodyData[number]) => fileKey(f.name) === activeFileKey
+  const mainFile = mainBody.files.find(
+    (f: EdgeFunctionBodyData['files'][number]) => fileKey(f.name) === activeFileKey
   )
 
   const language = useMemo(() => {
     if (!activeFileKey) return 'plaintext'
-    if (activeFileKey.endsWith('.ts') || activeFileKey.endsWith('.tsx')) return 'typescript'
-    if (activeFileKey.endsWith('.js') || activeFileKey.endsWith('.jsx')) return 'javascript'
+    if (activeFileKey.endsWith('.ts') || activeFileKey.endsWith('.tsx')) {
+      return 'typescript'
+    }
+    if (activeFileKey.endsWith('.js') || activeFileKey.endsWith('.jsx')) {
+      return 'javascript'
+    }
     if (activeFileKey.endsWith('.json')) return 'json'
     if (activeFileKey.endsWith('.sql')) return 'sql'
     return 'plaintext'
@@ -104,10 +109,10 @@ const FunctionDiff = ({
       <CardHeader>
         <CardTitle>
           <Link
-            href={`/project/${currentBranchRef}/functions/${functionSlug}`}
+            href={`/project/${currentBranchRef}/functions/${functionSlug}${IS_PLATFORM ? '' : '/details'}`}
             className="flex items-center gap-2"
           >
-            <Code strokeWidth={1.5} size={16} className="text-foreground-muted" />
+            <CodeIcon strokeWidth={1.5} size={16} className="text-foreground-muted" />
             {functionSlug}
           </Link>
         </CardTitle>
@@ -123,6 +128,7 @@ const FunctionDiff = ({
                   <li key={fileInfo.key} className="flex">
                     <button
                       type="button"
+                      tabIndex={0}
                       onClick={() => setActiveFileKey(fileInfo.key)}
                       className={cn(
                         'flex-1 text-left text-xs px-4 py-2 flex items-center gap-2',
@@ -132,7 +138,7 @@ const FunctionDiff = ({
                       )}
                     >
                       <Icon
-                        className={cn('flex-shrink-0', getStatusColor(fileInfo.status))}
+                        className={cn('shrink-0', getStatusColor(fileInfo.status))}
                         size={12}
                         strokeWidth={1}
                       />
@@ -144,10 +150,11 @@ const FunctionDiff = ({
             </ul>
           </div>
           <div className="flex-1 min-h-0">
-            <DiffViewer
+            <DiffEditor
               language={language}
               original={mainFile?.content || ''}
               modified={currentFile?.content || ''}
+              options={{ readOnly: true }}
             />
           </div>
         </div>
@@ -156,10 +163,9 @@ const FunctionDiff = ({
   )
 }
 
-const EdgeFunctionsDiffPanel = ({
+export const EdgeFunctionsDiffPanel = ({
   diffResults,
   currentBranchRef,
-  mainBranchRef,
 }: EdgeFunctionsDiffPanelProps) => {
   if (diffResults.isLoading) {
     return <Skeleton className="h-64" />
@@ -170,7 +176,7 @@ const EdgeFunctionsDiffPanel = ({
   if (noChanges) {
     return (
       <div className="p-6 text-center">
-        <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
+        <WindIcon size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
         <h3 className="mb-1">No changes detected between branches</h3>
         <p className="text-sm text-foreground-light">
           Any changes to your edge functions will be shown here for review
@@ -189,7 +195,7 @@ const EdgeFunctionsDiffPanel = ({
                 key={slug}
                 functionSlug={slug}
                 currentBody={diffResults.addedBodiesMap[slug]!}
-                mainBody={EMPTY_ARR}
+                mainBody={EMPTY_FUNCTION_BODY}
                 currentBranchRef={currentBranchRef}
                 fileInfos={diffResults.functionFileInfo[slug] || EMPTY_ARR}
               />
@@ -232,5 +238,3 @@ const EdgeFunctionsDiffPanel = ({
     </div>
   )
 }
-
-export default EdgeFunctionsDiffPanel

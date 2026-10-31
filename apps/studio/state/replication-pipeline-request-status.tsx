@@ -1,65 +1,82 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { createContext, useContext, useState, type ReactNode } from 'react'
+
+import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeline-status-query'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
-  EnableRequested = 'EnableRequested',
-  DisableRequested = 'DisableRequested',
+  StartRequested = 'StartRequested',
+  StopRequested = 'StopRequested',
+}
+
+type PipelineRequest = {
+  id: symbol
+  status: PipelineStatusRequestStatus
 }
 
 interface PipelineRequestStatusContextType {
-  requestStatus: Record<number, PipelineStatusRequestStatus>
-  setRequestStatus: (pipelineId: number, status: PipelineStatusRequestStatus) => void
-  getRequestStatus: (pipelineId: number) => PipelineStatusRequestStatus
-  updatePipelineStatus: (pipelineId: number, backendStatus: string | undefined) => void
-}
-
-interface PipelineRequestStatusProviderProps {
-  children: ReactNode
+  getRequestStatus: (pipelineId: string | undefined) => PipelineStatusRequestStatus
+  isRequestPending: (pipelineId: string | undefined) => boolean
+  runWithRequestStatus: <T>(
+    pipelineId: string,
+    status: PipelineStatusRequestStatus,
+    action: () => Promise<T>
+  ) => Promise<T>
 }
 
 const PipelineRequestStatusContext = createContext<PipelineRequestStatusContextType | undefined>(
   undefined
 )
 
-export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatusProviderProps) => {
-  const [requestStatus, setRequestStatusState] = useState<
-    Record<number, PipelineStatusRequestStatus>
-  >({})
+export const PipelineRequestStatusProvider = ({ children }: { children: ReactNode }) => {
+  const { ref: projectRef } = useParams()
+  const queryClient = useQueryClient()
+  const [requests, setRequests] = useState<Record<string, PipelineRequest>>({})
 
-  const setRequestStatus = (pipelineId: number, status: PipelineStatusRequestStatus) => {
-    setRequestStatusState((prev) => ({
-      ...prev,
-      [pipelineId]: status,
-    }))
-  }
-
-  const getRequestStatus = (pipelineId: number): PipelineStatusRequestStatus => {
-    return requestStatus[pipelineId] || PipelineStatusRequestStatus.None
-  }
-
-  const updatePipelineStatus = useCallback(
-    (pipelineId: number, backendStatus: string | undefined) => {
-      const currentRequestStatus = requestStatus[pipelineId] || PipelineStatusRequestStatus.None
-
-      if (
-        (currentRequestStatus === PipelineStatusRequestStatus.EnableRequested &&
-          (backendStatus === 'started' || backendStatus === 'failed')) ||
-        (currentRequestStatus === PipelineStatusRequestStatus.DisableRequested &&
-          (backendStatus === 'stopped' || backendStatus === 'failed'))
-      ) {
-        setRequestStatus(pipelineId, PipelineStatusRequestStatus.None)
+  const runWithRequestStatus: PipelineRequestStatusContextType['runWithRequestStatus'] = async (
+    pipelineId,
+    status,
+    action
+  ) => {
+    const id = Symbol('pipeline request')
+    setRequests((previous) => ({ ...previous, [pipelineId]: { id, status } }))
+    try {
+      return await action()
+    } finally {
+      const options = {
+        ...replicationPipelineStatusQueryOptions({ projectRef, pipelineId }),
+        staleTime: 0,
       }
-    },
-    [requestStatus, setRequestStatus]
-  )
+      // A status fetch that was already in flight started before this mutation resolved, so it
+      // may resolve with pre-mutation data. `fetchQuery` dedupes against it instead of starting
+      // a new request, so first wait for it to drain.
+      const hasFetchInFlight =
+        queryClient.getQueryState(options.queryKey)?.fetchStatus === 'fetching'
+      if (hasFetchInFlight) await queryClient.fetchQuery(options).catch(() => {})
+
+      // Nothing is in flight now, so this always starts a fresh request reflecting the
+      // post-mutation state. Errors are swallowed: query consumers already display fetch
+      // failures, and we don't want that to override the mutation's own result/error.
+      await queryClient.fetchQuery(options).catch(() => {})
+
+      setRequests((previous) => {
+        if (previous[pipelineId]?.id !== id) return previous
+        const { [pipelineId]: _removed, ...rest } = previous
+        return rest
+      })
+    }
+  }
 
   return (
     <PipelineRequestStatusContext.Provider
       value={{
-        requestStatus,
-        setRequestStatus,
-        getRequestStatus,
-        updatePipelineStatus,
+        getRequestStatus: (pipelineId) =>
+          (pipelineId === undefined ? undefined : requests[pipelineId]?.status) ??
+          PipelineStatusRequestStatus.None,
+        isRequestPending: (pipelineId) =>
+          pipelineId !== undefined && requests[pipelineId] !== undefined,
+        runWithRequestStatus,
       }}
     >
       {children}
@@ -69,8 +86,7 @@ export const PipelineRequestStatusProvider = ({ children }: PipelineRequestStatu
 
 export const usePipelineRequestStatus = () => {
   const context = useContext(PipelineRequestStatusContext)
-  if (context === undefined) {
+  if (context === undefined)
     throw new Error('usePipelineRequestStatus must be used within a PipelineRequestStatusProvider')
-  }
   return context
 }

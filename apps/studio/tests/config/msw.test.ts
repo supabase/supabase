@@ -1,5 +1,6 @@
-import { API_URL } from 'lib/constants'
-import { test, expect } from 'vitest'
+import { expect, test } from 'vitest'
+
+import { API_URL } from '@/lib/constants'
 
 test('MSW works as expected', async () => {
   const res = await fetch(`${API_URL}/msw/test`)
@@ -10,9 +11,5 @@ test('MSW works as expected', async () => {
 })
 
 test('MSW errors on missing endpoints', async () => {
-  expect(async () => {
-    const res = await fetch(`${API_URL}/endpoint-that-doesnt-exist`)
-    const json = await res.json()
-    expect(json).toEqual({ message: '🚫 MSW missed' })
-  })
+  await expect(fetch(`${API_URL}/endpoint-that-doesnt-exist`)).rejects.toThrow()
 })

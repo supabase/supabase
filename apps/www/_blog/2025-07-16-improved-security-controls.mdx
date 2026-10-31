@@ -8,11 +8,11 @@ tags:
   - launch-week
   - security
   - realtime
-date: '2025-07-16:15:00'
+date: '2025-07-16T15:00'
 toc_depth: 3
 author: staaldraad,hieu,filipe
-image: launch-week-15/day-3-security-controls/og.jpg
-thumb: launch-week-15/day-3-security-controls/thumb.png
+imgSocial: launch-week-15/day-3-security-controls/og.png
+imgThumb: launch-week-15/day-3-security-controls/thumb.png
 launchweek: '15'
 ---
 
@@ -47,7 +47,7 @@ The first setting we are launching in the organization‑wide security settings 
   alt="Project view when MFA enforced and access denied"
 />
 
-With MFA enforcement enabled, all members of your organization must use multi-factor authentication to access any project or resource. If a member hasn’t enabled MFA, they will immediately lose access until they do. New organization members will be able to accept invitations to an MFA enforced organization, but will not be able to interact with the organization until they have enabled MFA.
+With MFA enforcement enabled, all members of your organization must use [multi-factor authentication](/features/multi-factor-authentication) to access any project or resource. If a member hasn’t enabled MFA, they will immediately lose access until they do. New organization members will be able to accept invitations to an MFA enforced organization, but will not be able to interact with the organization until they have enabled MFA.
 
 This setting is only available to **Organization Owners**, and the owner must have MFA enabled on their own account. We recommend setting up **two separate MFA apps** as a backup.
 
@@ -76,7 +76,7 @@ You can toggle on this setting in the new [**Security tab**](/dashboard/org/_/se
   alt="Realtime configuration for private channels"
 />
 
-You can now set Realtime to use only private channels using [Realtime Authorization](/docs/guides/realtime/authorization?queryGroups=language&language=dart). If you toggle off the `Allow public access` setting, no public channels can be created. Only clients authorized via [Realtime Authorization](/docs/guides/realtime/authorization?queryGroups=language&language=dart), can listen to and send messages.
+You can now set [Realtime](/realtime) to use only private channels using [Realtime Authorization](/docs/guides/realtime/authorization?queryGroups=language&language=dart). If you toggle off the `Allow public access` setting, no public channels can be created. Only clients authorized via [Realtime Authorization](/docs/guides/realtime/authorization?queryGroups=language&language=dart), can listen to and send messages.
 
 This settings page is under a feature preview and you can enable it [here](/dashboard/project/_?featurePreviewModal=supabase-ui-realtime-settings). Once the feature preview is enabled, you can configure this setting in the new [Realtime Settings page](/dashboard/project/_/realtime/settings). While you are there, you can also tune the connection pool size that Realtime uses and the maximum **concurrent clients.**
 

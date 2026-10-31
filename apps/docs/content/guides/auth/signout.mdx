@@ -18,7 +18,8 @@ Call the sign out method from the client library. It removes the active session 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signOut() {
@@ -27,6 +28,7 @@ async function signOut() {
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -36,6 +38,8 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
 ```swift
@@ -43,6 +47,8 @@ try await supabase.auth.signOut()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -52,6 +58,8 @@ suspend fun logout() {
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
 ```python
@@ -59,6 +67,16 @@ supabase.auth.sign_out()
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Auth.SignOut();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Sign out and scopes
@@ -71,6 +89,16 @@ Supabase Auth allows you to specify three different scopes for when a user invok
 
 You can invoke these by providing the `scope` option:
 
+<Admonition type="caution">
+
+JavaScript, Swift, Python, and C# default to the `global` scope. Dart and Kotlin default to `local`.
+
+With the `global` scope, calling `signOut()` on one device revokes the refresh tokens for every session that user has, including other devices and browsers. Those other sessions fail with `AuthApiError: Invalid Refresh Token: Refresh Token Not Found` the next time they try to refresh, even though no one signed out on that device.
+
+If your app expects independent sessions per device, pass the `local` scope explicitly, as shown in the examples below.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
@@ -82,7 +110,8 @@ You can invoke these by providing the `scope` option:
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project-id.supabase.co', 'your-anon-key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 // defaults to the global scope
@@ -93,6 +122,7 @@ await supabase.auth.signOut({ scope: 'local' })
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
 ```dart
@@ -104,6 +134,8 @@ await supabase.auth.signOut(scope: SignOutScope.global);
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -115,6 +147,20 @@ supabase.auth.signOut(SignOutScope.GLOBAL)
 ```
 
 </TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// defaults to the global scope
+await supabase.Auth.SignOut();
+
+// sign out from the current session only
+await supabase.Auth.SignOut(SignOutScope.Local);
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 Upon sign out, all refresh tokens and potentially other database objects related to the affected sessions are destroyed and the client library removes the session stored in the local storage medium.

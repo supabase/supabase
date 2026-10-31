@@ -1,58 +1,73 @@
-import JWTSettings from 'components/interfaces/JwtSecrets/jwt-settings'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import JWTKeysLayout from 'components/layouts/JWTKeys/JWTKeysLayout'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import type { NextPageWithLayout } from 'types'
+import { IS_PLATFORM } from 'common'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from 'components/interfaces/JwtSecrets/jwt.constants'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { configKeys } from 'data/config/keys'
-import { useEffect, useRef } from 'react'
-import { toast } from 'sonner'
+import { JWTSecretKeysTable } from '@/components/interfaces/JwtSecrets/jwt-secret-keys-table'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import JWTKeysLayout from '@/components/layouts/JWTKeys/JWTKeysLayout'
+import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { LocalSetupGuide } from '@/components/ui/LocalSetupGuide'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
-const JWTKeysLegacyPage: NextPageWithLayout = () => {
-  const { ref: projectRef, source } = useParams()
-  const client = useQueryClient()
+const JWTSigningKeysPage: NextPageWithLayout = () => {
+  const { isCli, isSelfHosted } = useDeploymentMode()
+  const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
+  )
 
-  const { data } = useJwtSecretUpdatingStatusQuery({ projectRef })
-  const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
-  const jwtSecretUpdateError = data?.jwtSecretUpdateError
+  if (!IS_PLATFORM) {
+    return (
+      <div className="space-y-4">
+        {isCli && (
+          <LocalSetupGuide
+            variant="cli"
+            body={
+              <p>
+                The asymmetric key pair used to sign user session JWTs is configured by the Supabase
+                CLI.
+              </p>
+            }
+            docsHref={`${DOCS_URL}/guides/local-development`}
+          />
+        )}
+        {isSelfHosted && (
+          <LocalSetupGuide
+            variant="selfHosted"
+            body={
+              <p>
+                The asymmetric key pair used to sign user session JWTs is configured via environment
+                variables.
+              </p>
+            }
+            docsHref={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`}
+          />
+        )}
+      </div>
+    )
+  }
 
-  const previousJwtSecretUpdateStatus = useRef<JwtSecretUpdateStatus>()
-  const { Failed, Updated, Updating } = JwtSecretUpdateStatus
-  const jwtSecretUpdateErrorMessage =
-    JWT_SECRET_UPDATE_ERROR_MESSAGES[jwtSecretUpdateError as JwtSecretUpdateError]
-
-  useEffect(() => {
-    if (previousJwtSecretUpdateStatus.current === Updating) {
-      switch (jwtSecretUpdateStatus) {
-        case Updated:
-          client.invalidateQueries(configKeys.api(projectRef))
-          client.invalidateQueries(configKeys.settings(projectRef))
-          client.invalidateQueries(configKeys.postgrest(projectRef))
-          toast.success('Successfully updated JWT secret')
-          break
-        case Failed:
-          toast.error(`JWT secret update failed: ${jwtSecretUpdateErrorMessage}`)
-          break
-      }
-    }
-
-    previousJwtSecretUpdateStatus.current = jwtSecretUpdateStatus
-  }, [jwtSecretUpdateStatus])
-
-  return <JWTSettings />
+  return (
+    <>
+      {!isPermissionsLoaded ? (
+        <GenericSkeletonLoader />
+      ) : !canReadAPIKeys ? (
+        <NoPermission isFullPage resourceText="access your project's API keys" />
+      ) : (
+        <JWTSecretKeysTable />
+      )}
+    </>
+  )
 }
 
-JWTKeysLegacyPage.getLayout = (page) => (
+JWTSigningKeysPage.getLayout = (page) => (
   <DefaultLayout>
-    <SettingsLayout>
+    <SettingsLayout title="JWT Keys">
       <JWTKeysLayout>{page}</JWTKeysLayout>
     </SettingsLayout>
   </DefaultLayout>
 )
 
-export default JWTKeysLegacyPage
+export default JWTSigningKeysPage

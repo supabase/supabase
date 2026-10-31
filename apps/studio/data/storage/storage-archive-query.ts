@@ -1,8 +1,8 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
 import { storageKeys } from './keys'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type StorageArchiveVariables = { projectRef?: string }
 
@@ -12,6 +12,7 @@ async function fetchStorageArchive({ projectRef }: StorageArchiveVariables, sign
   const { data, error } = await get('/platform/storage/{ref}/archive', {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
   if (error) {
     if ((error as ResponseError)?.message?.includes('Storage archive not found')) {
@@ -27,10 +28,14 @@ export type StorageArchiveData = Awaited<ReturnType<typeof fetchStorageArchive>>
 
 export const useStorageArchiveQuery = <TData = StorageArchiveData>(
   { projectRef }: StorageArchiveVariables,
-  { enabled = true, ...options }: UseQueryOptions<StorageArchiveData, ResponseError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<StorageArchiveData, ResponseError, TData> = {}
 ) =>
-  useQuery<StorageArchiveData, ResponseError, TData>(
-    storageKeys.archive(projectRef),
-    ({ signal }) => fetchStorageArchive({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<StorageArchiveData, ResponseError, TData>({
+    queryKey: storageKeys.archive(projectRef),
+    queryFn: ({ signal }) => fetchStorageArchive({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

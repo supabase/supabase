@@ -3,6 +3,7 @@ id: 'postgres-triggers'
 title: 'Postgres Triggers'
 description: 'Automatically execute SQL on table events.'
 subtitle: 'Automatically execute SQL on table events.'
+tocVideo: 'C9kJwxhdw9A'
 ---
 
 In Postgres, a trigger executes a set of actions automatically on table events such as INSERTs, UPDATEs, DELETEs, or TRUNCATE operations.
@@ -108,6 +109,14 @@ You can delete a trigger using the `drop trigger` command:
 ```sql
 drop trigger "trigger_name" on "table_name";
 ```
+
+If your trigger is inside a restricted schema, you won't be able to drop it due to permission restrictions. In those cases, you can drop the function it depends on instead using the CASCADE clause to automatically remove all triggers that call it:
+
+```sql
+drop function if exists restricted_schema.function_name() cascade;
+```
+
+Make sure you take a backup of the function before removing it in case you're planning to recreate it later.
 
 ## Resources
 

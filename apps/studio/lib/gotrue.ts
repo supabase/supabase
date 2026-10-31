@@ -1,10 +1,53 @@
-import { getAccessToken, type User } from 'common/auth'
+import type { JwtPayload } from '@supabase/supabase-js'
+import { type User } from 'common/auth'
 import { gotrueClient } from 'common/gotrue'
 
 export const auth = gotrueClient
-export { getAccessToken }
 
 export const DEFAULT_FALLBACK_PATH = '/organizations'
+export const DEFAULT_SIGNUP_RETURN_PATH = '/new'
+
+/**
+ * When unauthenticated users hit protected dashboard routes, withAuth sets
+ * returnTo to the current path. Marketing entry via /dashboard often ends up
+ * as returnTo=/org (or /organizations). New users who switch to sign-up should
+ * start org creation instead.
+ */
+export function getSignUpReturnTo(returnTo: string | string[] | undefined): string {
+  const value = Array.isArray(returnTo) ? returnTo[0] : returnTo
+
+  if (!value) {
+    return DEFAULT_SIGNUP_RETURN_PATH
+  }
+
+  const [pathname, query] = value.split('?', 2)
+  if (pathname === DEFAULT_FALLBACK_PATH || pathname === '/org') {
+    return query ? `${DEFAULT_SIGNUP_RETURN_PATH}?${query}` : DEFAULT_SIGNUP_RETURN_PATH
+  }
+
+  return value
+}
+
+/** Post-signup redirect path, normalising returnTo and excluding it from merged query params. */
+export function buildSignUpReturnPath(returnTo: string | string[] | undefined): string {
+  const basePath = validateReturnTo(getSignUpReturnTo(returnTo), DEFAULT_SIGNUP_RETURN_PATH)
+  const [pathOnly, pathQuery] = basePath.split('?', 2)
+  const pathnameSearchParams = new URLSearchParams(pathQuery || '')
+
+  if (typeof location === 'undefined') {
+    const queryString = pathnameSearchParams.toString()
+    return queryString ? `${pathOnly}?${queryString}` : pathOnly
+  }
+
+  const mergedParams = new URLSearchParams(location.search)
+  mergedParams.delete('returnTo')
+  for (const [key, val] of pathnameSearchParams.entries()) {
+    mergedParams.set(key, val)
+  }
+
+  const queryString = mergedParams.toString()
+  return queryString ? `${pathOnly}?${queryString}` : pathOnly
+}
 
 export const validateReturnTo = (
   returnTo: string,
@@ -23,18 +66,17 @@ export const validateReturnTo = (
   return safePathPattern.test(returnTo) ? returnTo : fallback
 }
 
-export const getAuthUser = async (token: String): Promise<any> => {
+export const getUserClaims = async (
+  token: String
+): Promise<{ error: any | null; claims: JwtPayload | null }> => {
   try {
-    const {
-      data: { user },
-      error,
-    } = await auth.getUser(token.replace('Bearer ', ''))
+    const { data, error } = await auth.getClaims(token.replace(/bearer /i, ''))
     if (error) throw error
 
-    return { user, error: null }
+    return { claims: data?.claims ?? null, error: null }
   } catch (err) {
     console.error(err)
-    return { user: null, error: err }
+    return { claims: null, error: err }
   }
 }
 

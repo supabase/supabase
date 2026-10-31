@@ -6,7 +6,7 @@ export function useHideSidebar() {
   const shouldHide =
     pathname.startsWith('/account') ||
     pathname.startsWith('/new') ||
-    pathname === '/support/new' ||
+    pathname.startsWith('/support') ||
     pathname === '/organizations' ||
     pathname === '/sign-in'
 

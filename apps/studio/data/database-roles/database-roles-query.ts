@@ -1,9 +1,11 @@
 import pgMeta from '@supabase/pg-meta'
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { databaseRoleKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseRolesVariables = {
   projectRef?: string
@@ -19,7 +21,13 @@ export async function getDatabaseRoles(
   signal?: AbortSignal
 ) {
   const { result } = await executeSql(
-    { projectRef, connectionString, sql: pgMetaRolesList.sql, queryKey: ['database-roles'] },
+    {
+      projectRef,
+      connectionString,
+      sql: pgMetaRolesList.sql,
+      queryKey: ['database-roles'],
+      grant: unguarded.migrating,
+    },
     signal
   )
 
@@ -27,21 +35,22 @@ export async function getDatabaseRoles(
 }
 
 export type DatabaseRolesData = z.infer<typeof pgMetaRolesList.zod>
-export type DatabaseRolesError = ExecuteSqlError
+export type DatabaseRolesError = ResponseError
 
 export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
   { projectRef, connectionString }: DatabaseRolesVariables,
-  { enabled = true, ...options }: UseQueryOptions<DatabaseRolesData, DatabaseRolesError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<DatabaseRolesData, DatabaseRolesError, TData> = {}
 ) =>
-  useQuery<DatabaseRolesData, DatabaseRolesError, TData>(
-    databaseRoleKeys.databaseRoles(projectRef),
-    ({ signal }) => getDatabaseRoles({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseRolesData, DatabaseRolesError, TData>({
+    queryKey: databaseRoleKeys.databaseRoles(projectRef),
+    queryFn: ({ signal }) => getDatabaseRoles({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })
 
 export function invalidateRolesQuery(client: QueryClient, projectRef: string | undefined) {
-  return client.invalidateQueries(databaseRoleKeys.databaseRoles(projectRef))
+  return client.invalidateQueries({ queryKey: databaseRoleKeys.databaseRoles(projectRef) })
 }

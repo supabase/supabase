@@ -1,10 +1,11 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { databasePublicationsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabasePublicationCreateVariables = {
   projectRef: string
@@ -41,6 +42,7 @@ export async function createDatabasePublication({
     connectionString,
     sql,
     queryKey: ['publication', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -53,7 +55,7 @@ export const useDatabasePublicationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     DatabasePublicationCreateData,
     ResponseError,
     DatabasePublicationCreateVariables
@@ -66,10 +68,11 @@ export const useDatabasePublicationCreateMutation = ({
     DatabasePublicationCreateData,
     ResponseError,
     DatabasePublicationCreateVariables
-  >((vars) => createDatabasePublication(vars), {
+  >({
+    mutationFn: (vars) => createDatabasePublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(databasePublicationsKeys.list(projectRef))
+      await queryClient.invalidateQueries({ queryKey: databasePublicationsKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

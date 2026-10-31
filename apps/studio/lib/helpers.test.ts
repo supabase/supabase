@@ -1,9 +1,15 @@
+import { toast } from 'sonner'
+import { copyToClipboard } from 'ui'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import {
   detectBrowser,
   detectOS,
+  extractUrls,
   formatBytes,
   formatCurrency,
+  formatRestoreWindow,
+  getBasePathURL,
   getDatabaseMajorVersion,
   getDistanceLatLonKM,
   getSemanticVersion,
@@ -18,13 +24,16 @@ import {
   removeCommentsFromSql,
   removeJSONTrailingComma,
   snakeToCamel,
+  stripMarkdownCodeBlocks,
   tablesToSQL,
   timeout,
   tryParseInt,
   tryParseJson,
 } from './helpers'
 
-import { copyToClipboard } from 'ui'
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn(), success: vi.fn() },
+}))
 
 describe('tryParseJson', () => {
   it('should return the parsed JSON', () => {
@@ -85,6 +94,33 @@ describe('getURL', () => {
   })
 })
 
+describe('getBasePathURL', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('appends the base path to the site URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://supabase.com')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('does not double the base path on the fallback URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', '')
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_BRANCH_URL', '')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('strips a trailing slash before appending the base path', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://supabase.com/')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('returns the site URL when there is no base path', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'http://localhost:8082')
+    expect(getBasePathURL('')).toEqual('http://localhost:8082')
+  })
+})
+
 describe('makeRandomString', () => {
   it('should return a random string of the given length', () => {
     const result = makeRandomString(10)
@@ -123,7 +159,7 @@ describe('propsAreEqual', () => {
   })
 
   it('should return false if the props are not equal', () => {
-    const result = propsAreEqual({ a: 1, b: 2 }, { a: 1, b: 3 })
+    expect(propsAreEqual({ a: 1, b: 2 }, { a: 1, b: 3 })).toBe(false)
   })
 })
 
@@ -190,8 +226,9 @@ describe('copyToClipboard', () => {
   })
 
   it('uses clipboard.write if available', async () => {
-    await copyToClipboard('hello')
+    const promise = copyToClipboard('hello')
     vi.runAllTimers()
+    await promise
     expect(writeMock).toHaveBeenCalled()
   })
 
@@ -200,18 +237,61 @@ describe('copyToClipboard', () => {
     await copyToClipboard('hello')
     expect(writeTextMock).toHaveBeenCalledWith('hello')
   })
+
+  it('falls back to writeText when clipboard.write is denied', async () => {
+    writeMock.mockRejectedValue(
+      new DOMException("Failed to execute 'write' on 'Clipboard': Write permission denied.")
+    )
+    const callback = vi.fn()
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(writeTextMock).toHaveBeenCalledWith('hello')
+    expect(callback).toHaveBeenCalled()
+    expect(toast.error).not.toHaveBeenCalled()
+  })
+
+  it('does not retry after a successful rich write when the callback throws', async () => {
+    const callback = vi.fn(() => {
+      throw new Error('Callback failed')
+    })
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(writeMock).toHaveBeenCalledOnce()
+    expect(writeTextMock).not.toHaveBeenCalled()
+    expect(callback).toHaveBeenCalledOnce()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
+  })
+
+  it('reports when both clipboard methods are denied', async () => {
+    writeMock.mockRejectedValue(new DOMException('Write permission denied.'))
+    writeTextMock.mockRejectedValue(new DOMException('Write permission denied.'))
+    const callback = vi.fn()
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(callback).not.toHaveBeenCalled()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
+  })
+
+  it('resolves and reports when writeText is denied', async () => {
+    writeTextMock.mockRejectedValue(new DOMException('Write permission denied.'))
+    vi.stubGlobal('navigator', { clipboard: { writeText: writeTextMock } })
+    const callback = vi.fn()
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(callback).not.toHaveBeenCalled()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
+  })
 })
 
 describe('detectBrowser', () => {
-  const originalNavigator = global.navigator
-
   const setUserAgent = (ua: string) => {
     vi.stubGlobal('navigator', { userAgent: ua })
   }
 
   afterEach(() => {
+    // `global.navigator` can't be assigned directly (jsdom defines it as a getter),
+    // so restore it by unstubbing.
     vi.unstubAllGlobals()
-    global.navigator = originalNavigator
   })
 
   it('detects Chrome', () => {
@@ -293,6 +373,138 @@ describe('isValidHttpUrl', () => {
     const result = isValidHttpUrl('not a url')
 
     expect(result).toBe(false)
+  })
+})
+
+describe('extractUrls', () => {
+  it.each([
+    ['http URLs', 'Visit http://example.com for more info', ['http://example.com']],
+    ['URLs with ports', 'Connect to http://localhost:3000', ['http://localhost:3000']],
+    [
+      'URLs with paths, query params, and fragments',
+      'Check https://example.com/api/v1/users?id=123&name=test#details',
+      ['https://example.com/api/v1/users?id=123&name=test#details'],
+    ],
+    [
+      'URLs with special and encoded characters',
+      'Visit https://example.com/path_with_underscores/file-name.txt?q=hello%20world',
+      ['https://example.com/path_with_underscores/file-name.txt?q=hello%20world'],
+    ],
+    [
+      'multiple URLs with subdomains',
+      'Visit http://www.example.com and https://api.supabase.com for more info',
+      ['http://www.example.com', 'https://api.supabase.com'],
+    ],
+    ['URLs without trailing punctuation', 'Check https://example.com!!!', ['https://example.com']],
+    [
+      'URLs with trailing commas and periods',
+      'Visit https://example.com, and https://supabase.com.',
+      ['https://example.com', 'https://supabase.com'],
+    ],
+    ['URLs in parentheses', 'Check out (https://example.com) for details', ['https://example.com']],
+    [
+      'URLs wrapped in markdown bold',
+      'Check out **https://example.com/subpath** for details',
+      ['https://example.com/subpath'],
+    ],
+    [
+      'URLs with an uppercase protocol',
+      'Visit HTTP://EXAMPLE.COM and HTTPS://SUPABASE.COM',
+      ['HTTP://EXAMPLE.COM', 'HTTPS://SUPABASE.COM'],
+    ],
+    ['nothing from plain text', 'This is just plain text with no URLs', []],
+    ['nothing from an empty string', '', []],
+  ])('should extract %s', (_, text, expected) => {
+    expect(extractUrls(text)).toEqual(expected)
+  })
+
+  describe('with excludeCodeBlocks option', () => {
+    it('should exclude URLs in fenced code blocks', () => {
+      const text = 'Visit https://real.com\n```\nhttps://code.com\n```'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual(['https://real.com'])
+    })
+
+    it('should exclude URLs in fenced code blocks with language specifier', () => {
+      const text = 'Visit https://real.com\n```sql\nSELECT * FROM https://code.com\n```'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual(['https://real.com'])
+    })
+
+    it('should exclude URLs in inline code', () => {
+      const text = 'Use `https://code.com` for the endpoint, or visit https://real.com'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual(['https://real.com'])
+    })
+
+    it('should handle multiple code blocks', () => {
+      const text =
+        'https://first.com\n```\nhttps://code1.com\n```\nhttps://second.com\n```\nhttps://code2.com\n```'
+      expect(extractUrls(text, { excludeCodeBlocks: true })).toEqual([
+        'https://first.com',
+        'https://second.com',
+      ])
+    })
+
+    it('should not exclude code blocks by default', () => {
+      const text = 'Visit https://real.com\n```\nhttps://code.com\n```'
+      expect(extractUrls(text)).toEqual(['https://real.com', 'https://code.com'])
+    })
+  })
+
+  describe('with excludeTemplates option', () => {
+    it('should not extract URLs with angle brackets in subdomain', () => {
+      // Angle brackets in subdomain prevent the URL from being extracted at all
+      const text = 'Visit https://real.com or https://<project-ref>.supabase.co'
+      expect(extractUrls(text, { excludeTemplates: true })).toEqual(['https://real.com'])
+    })
+
+    it('should exclude URLs truncated at angle brackets in path', () => {
+      // The regex stops at angle brackets - exclude the whole truncated URL
+      const text = 'Visit https://real.com or https://example.com/api/<project-id>/data'
+      expect(extractUrls(text, { excludeTemplates: true })).toEqual(['https://real.com'])
+    })
+
+    it('should keep URLs without angle brackets', () => {
+      const text = 'Visit https://example.com/path_with_underscores'
+      expect(extractUrls(text, { excludeTemplates: true })).toEqual([
+        'https://example.com/path_with_underscores',
+      ])
+    })
+  })
+
+  describe('with both options', () => {
+    it('should exclude both code blocks and template URLs', () => {
+      const text =
+        'Visit https://real.com\n```\nhttps://code.com\n```\nOr https://<project-ref>.supabase.co'
+      expect(extractUrls(text, { excludeCodeBlocks: true, excludeTemplates: true })).toEqual([
+        'https://real.com',
+      ])
+    })
+  })
+})
+
+describe('stripMarkdownCodeBlocks', () => {
+  it('should remove fenced code blocks', () => {
+    const text = 'Before\n```\ncode here\n```\nAfter'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Before\n\nAfter')
+  })
+
+  it('should remove fenced code blocks with language specifier', () => {
+    const text = 'Before\n```typescript\nconst x = 1;\n```\nAfter'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Before\n\nAfter')
+  })
+
+  it('should remove inline code', () => {
+    const text = 'Use `inline code` here'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Use  here')
+  })
+
+  it('should handle multiple code blocks', () => {
+    const text = '```js\ncode1\n```\ntext\n```ts\ncode2\n```'
+    expect(stripMarkdownCodeBlocks(text)).toBe('\ntext\n')
+  })
+
+  it('should preserve text without code blocks', () => {
+    const text = 'Just regular text here'
+    expect(stripMarkdownCodeBlocks(text)).toBe('Just regular text here')
   })
 })
 
@@ -492,5 +704,17 @@ describe('tablesToSQL', () => {
 
     expect(result).toContain('-- WARNING: This schema is for context only')
     expect(result).not.toContain('CREATE TABLE')
+  })
+})
+
+describe('formatRestoreWindow', () => {
+  it('renders windows under a year in days', () => {
+    expect(formatRestoreWindow(90)).toBe('90 days')
+    expect(formatRestoreWindow(364)).toBe('364 days')
+  })
+
+  it('renders windows of a year or more as 1 year', () => {
+    expect(formatRestoreWindow(365)).toBe('1 year')
+    expect(formatRestoreWindow(400)).toBe('1 year')
   })
 })

@@ -1,10 +1,11 @@
 'use client'
 
+import { CheckCircle, File, Loader2, Upload, X } from 'lucide-react'
+import { createContext, useCallback, useContext, type PropsWithChildren } from 'react'
+
 import { cn } from '@/lib/utils'
 import { type UseSupabaseUploadReturn } from '@/registry/default/blocks/dropzone/hooks/use-supabase-upload'
 import { Button } from '@/registry/default/components/ui/button'
-import { CheckCircle, File, Loader2, Upload, X } from 'lucide-react'
-import { createContext, type PropsWithChildren, useCallback, useContext } from 'react'
 
 export const formatBytes = (
   bytes: number,
@@ -106,11 +107,11 @@ const DropzoneContent = ({ className }: { className?: string }) => {
             className="flex items-center gap-x-4 border-b py-2 first:mt-4 last:mb-4 "
           >
             {file.type.startsWith('image/') ? (
-              <div className="h-10 w-10 rounded border overflow-hidden shrink-0 bg-muted flex items-center justify-center">
+              <div className="h-10 w-10 rounded-sm border overflow-hidden shrink-0 bg-muted flex items-center justify-center">
                 <img src={file.preview} alt={file.name} className="object-cover" />
               </div>
             ) : (
-              <div className="h-10 w-10 rounded border bg-muted flex items-center justify-center">
+              <div className="h-10 w-10 rounded-sm border bg-muted flex items-center justify-center">
                 <File size={18} />
               </div>
             )}

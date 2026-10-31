@@ -2,14 +2,14 @@
 title: Storage is now available in Supabase
 description: Launching Supabase Storage and how you can use it in your apps
 author: inian
-image: storage/ph-1.png
-thumb: storage/ph-1.png
+imgSocial: storage/ph-1.png
+imgThumb: storage/ph-1.png
 categories:
   - product
 tags:
   - supabase
   - storage
-date: '03-30-2021'
+date: '2021-03-30'
 ---
 
 <div className="bg-gray-300 rounded-lg px-6 py-2 italic">
@@ -97,7 +97,7 @@ For Authorization, we wanted to avoid creating a new DSL like Firebase. Instead,
 
 ![One True Language](/images/blog/storage/true-language.png)
 
-To do this, we leverage Postgres' Row Level Security. We create a table for `buckets` and `objects` inside each Supabase project. These tables are namespaced in a separate schema called `storage`.
+To do this, we leverage Postgres' [Row Level Security](/docs/guides/database/postgres/row-level-security). We create a table for `buckets` and `objects` inside each Supabase project. These tables are namespaced in a separate schema called `storage`.
 
 The idea is simple - if a user is able to `select` from the `objects` table, they can retrieve the object too. Using Postgres' Row Level Security, you can define fine-grained Policies to determine access levels for different users.
 
@@ -157,7 +157,7 @@ We have intentionally kept the API surface for the storage backend very small, i
 
 ### Client libraries
 
-You may be itching to get started tinkering around with our new Supabase storage - we have an example app prepared for you which simulates a simple context of setting an avatar image for a user. This will help you to get a high level overview of how to use your project's storage with our client library. For greater detail, refer to our storage API documentation [here](/docs/reference/javascript/storage-createbucket).
+You may be itching to get started tinkering around with our new Supabase storage - we have an example app prepared for you which simulates a simple context of setting an avatar image for a user. This will help you to get a high level overview of how to use your project's storage with our client library. For greater detail, refer to our storage API documentation [here](/docs/reference/javascript/file-buckets-createbucket).
 
 ![Example app 1](/images/blog/storage/ph-7.png)
 

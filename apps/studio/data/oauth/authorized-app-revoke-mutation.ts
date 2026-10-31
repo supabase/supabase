@@ -1,16 +1,16 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type AuthorizedAppRevokeVariables = {
   id: string
-  slug: string
+  orgSlug: string
 }
 
-export async function revokeAuthorizedApp({ id, slug }: AuthorizedAppRevokeVariables) {
+export async function revokeAuthorizedApp({ id, orgSlug: slug }: AuthorizedAppRevokeVariables) {
   if (!id) throw new Error('App ID is required')
   if (!slug) throw new Error('Organization slug is required')
 
@@ -29,27 +29,25 @@ export const useAuthorizedAppRevokeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>,
+  UseCustomMutationOptions<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>(
-    (vars) => revokeAuthorizedApp(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { slug } = variables
-        await queryClient.invalidateQueries(oauthAppKeys.authorizedApps(slug))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to revoke application: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>({
+    mutationFn: (vars) => revokeAuthorizedApp(vars),
+    async onSuccess(data, variables, context) {
+      const { orgSlug: slug } = variables
+      await queryClient.invalidateQueries({ queryKey: oauthAppKeys.authorizedApps(slug) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to revoke application: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

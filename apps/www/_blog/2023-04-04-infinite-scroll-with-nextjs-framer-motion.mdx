@@ -2,8 +2,8 @@
 title: Infinite scroll with Next.js, Framer Motion, and Supabase
 description: Lazy load and paginate data on scroll with Next.js and a sprinkle of Framer Motion magic ✨
 author: fsansalvadore
-image: infinite-scroll-thumb.jpg
-thumb: infinite-scroll-thumb.jpg
+imgSocial: infinite-scroll-thumb.jpg
+imgThumb: infinite-scroll-thumb.jpg
 launchweek: '7'
 categories:
   - engineering
@@ -15,7 +15,7 @@ date: '2023-04-04'
 toc_depth: 6
 ---
 
-Imagine you generated a bunch of tickets for the Supabase [Launch Week](https://www.supabase.com/launch-week/7) and you wanted to display them all on [one page](https://supabase.com/launch-week/7/tickets). It might take a while to load them all in one go, so a great solution to this would be to lazy load smaller subsets while the user scrolls, with a technique called infinite scrolling.
+Imagine you generated a bunch of tickets for the Supabase [Launch Week](https://www.supabase.com/launch-week/7) and you wanted to display them all on [one page](https://supabase.com/launch-week/7). It might take a while to load them all in one go, so a great solution to this would be to lazy load smaller subsets while the user scrolls, with a technique called infinite scrolling.
 
 An infinite scroll allows you to scroll through your content endlessly while only loading the data you need as you need it. This improves performance while also creating a smooth and delightful user experience.
 
@@ -135,7 +135,7 @@ return <div ref={containerRef}>{/* List of loaded tickets */}</div>
 
 ## Step 3. Load tickets based on the offset
 
-Now we can load more tickets based on the current offset. We'll use the [range](https://supabase.com/docs/reference/javascript/range) method from the supabase-js library to easily work with the pagination logic.
+Now we can load more tickets based on the current offset. We'll use the [range](https://supabase.com/docs/reference/javascript/using-modifiers-range) method from the supabase-js library to easily work with the pagination logic.
 
 ```jsx
 export default function TicketsPage() {

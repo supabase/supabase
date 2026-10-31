@@ -1,5 +1,6 @@
 import { proxy } from 'valtio'
-import { type IViewState, type DialogSize, type ITouchHandlers } from './viewState.types'
+
+import { type DialogSize, type ITouchHandlers, type IViewState } from './viewState.types'
 
 const initViewState = () => {
   const state: IViewState = proxy({
@@ -13,7 +14,11 @@ const initViewState = () => {
       handleTouchEnd: () => {},
     },
     setOpen: (open) => {
-      state.init()
+      // init mounts the lazy menu, so only an open should do it
+      if (open) {
+        state.init()
+      }
+
       state.open = open
     },
     toggleOpen: () => {

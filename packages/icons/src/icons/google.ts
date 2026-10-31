@@ -1,0 +1,52 @@
+import createSupabaseIcon from '../createSupabaseIcon';
+
+/**
+ * @component @name Google
+ * @description Supabase SVG icon component, renders SVG Element with children.
+ *
+ * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0yMS43NjE3IDEyLjE4NzFjMC0uODE5NC0uMDY2NS0xLjQxNzMtLjIxMDQtMi4wMzc0aC05LjM1NjZ2My42OTgzaDUuNDkyYy0uMTEwNi45MTkxLS43MDg1IDIuMzAzMi0yLjAzNzMgMy4yMzMzbC0uMDE4Ni4xMjM4IDIuOTU4NCAyLjI5MTkuMjA1LjAyMDRjMS44ODIzLTEuNzM4NSAyLjk2NzUtNC4yOTYzIDIuOTY3NS03LjMzMDMiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8cGF0aCBkPSJNMTIuMTk0NyAyMS45MzEzYzIuNjkwNiAwIDQuOTQ5NS0uODg1OSA2LjU5OTQtMi40MTM5bC0zLjE0NDctMi40MzYxYy0uODQxNS41ODY5LTEuOTcxLjk5NjYtMy40NTQ3Ljk5NjYtMi42MzU0IDAtNC44NzIxLTEuNzM4NC01LjY2OTQtNC4xNDEzbC0uMTE3LjAxLTMuMDc2IDIuMzgwNy0uMDQwMy4xMTE4YzEuNjM4OCAzLjI1NTQgNS4wMDUgNS40OTIyIDguOTAyNyA1LjQ5MjIiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8cGF0aCBkPSJNNi41MjUzIDEzLjkzNjZjLS4yMTA0LS42Mi0uMzMyMi0xLjI4NDUtLjMzMjItMS45NzFzLjEyMTgtMS4zNTA5LjMyMS0xLjk3MWwtLjAwNTUtLjEzMi0zLjExNDctMi40MTktLjEwMi4wNDg1Yy0uNjc1MyAxLjM1MS0xLjA2MjkgMi44NjgtMS4wNjI5IDQuNDczNnMuMzg3NiAzLjEyMjUgMS4wNjMgNC40NzM0eiIgZmlsbD0iY3VycmVudENvbG9yIi8+CjxwYXRoIGQ9Ik0xMi4xOTQ3IDUuODUzNGMxLjg3MTIgMCAzLjEzMzUuODA4MyAzLjg1MzMgMS40ODM4bDIuODEyNS0yLjc0NjFDMTcuMTMzMiAyLjk4NTUgMTQuODg1MyAyIDEyLjE5NDcgMiA4LjI5NjkgMiA0LjkzMDcgNC4yMzY3IDMuMjkyIDcuNDkyMWwzLjIyMjIgMi41MDI2Yy44MDg0LTIuNDAyOSAzLjA0NTEtNC4xNDEzIDUuNjgwNS00LjE0MTMiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8L3N2Zz4K)
+ *
+ * @param {Object} props - Supabase icons props and any valid SVG attribute
+ * @returns {JSX.Element} JSX Element
+ *
+ */
+const Google = createSupabaseIcon(
+  'Google',
+  [
+    [
+      'path',
+      {
+        d: 'M21.7617 12.1871c0-.8194-.0665-1.4173-.2104-2.0374h-9.3566v3.6983h5.492c-.1106.9191-.7085 2.3032-2.0373 3.2333l-.0186.1238 2.9584 2.2919.205.0204c1.8823-1.7385 2.9675-4.2963 2.9675-7.3303',
+        fill: 'currentColor',
+        key: 'ikn7nc',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M12.1947 21.9313c2.6906 0 4.9495-.8859 6.5994-2.4139l-3.1447-2.4361c-.8415.5869-1.971.9966-3.4547.9966-2.6354 0-4.8721-1.7384-5.6694-4.1413l-.117.01-3.076 2.3807-.0403.1118c1.6388 3.2554 5.005 5.4922 8.9027 5.4922',
+        fill: 'currentColor',
+        key: '1f6k5y',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M6.5253 13.9366c-.2104-.62-.3322-1.2845-.3322-1.971s.1218-1.3509.321-1.971l-.0055-.132-3.1147-2.419-.102.0485c-.6753 1.351-1.0629 2.868-1.0629 4.4736s.3876 3.1225 1.063 4.4734z',
+        fill: 'currentColor',
+        key: '1ij2v0',
+      },
+    ],
+    [
+      'path',
+      {
+        d: 'M12.1947 5.8534c1.8712 0 3.1335.8083 3.8533 1.4838l2.8125-2.7461C17.1332 2.9855 14.8853 2 12.1947 2 8.2969 2 4.9307 4.2367 3.292 7.4921l3.2222 2.5026c.8084-2.4029 3.0451-4.1413 5.6805-4.1413',
+        fill: 'currentColor',
+        key: '1wkoif',
+      },
+    ],
+  ],
+  { fill: 'none', stroke: 'none' },
+);
+
+export default Google;

@@ -1,7 +1,7 @@
-import { expect, test } from 'vitest'
-import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
-import { afterAll } from 'vitest'
+import { afterAll, expect, test } from 'vitest'
+
+import pgMeta, { safeSql } from '../src/index'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 afterAll(async () => {
   await cleanupRoot()
@@ -97,8 +97,8 @@ withTestDatabase('retrieve, create, update, delete policies', async ({ executeQu
   // Update policy
   const { sql: updateSql } = pgMeta.policies.update(createdPolicy!, {
     name: 'updated_policy',
-    definition: "current_setting('my.username') IN (name)",
-    check: "current_setting('my.username') IN (name)",
+    definition: safeSql`current_setting('my.username') IN (name)`,
+    check: safeSql`current_setting('my.username') IN (name)`,
     roles: ['postgres'],
   })
   await executeQuery(updateSql)

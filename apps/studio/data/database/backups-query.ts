@@ -1,16 +1,18 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import { useIsOrioleDbInAws } from 'hooks/misc/useSelectedProject'
-import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import { useIsOrioleDbInAws, useOrioleDbReleaseStage } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type BackupsVariables = {
   projectRef?: string
+  projectStatus?: string
 }
 
-export type DatabaseBackup = components['schemas']['BackupsResponse']['backups'][number]
+export type DatabaseBackup = components['schemas']['BackupsResponse_Output']['backups'][number]
 
 export async function getBackups({ projectRef }: BackupsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -18,6 +20,7 @@ export async function getBackups({ projectRef }: BackupsVariables, signal?: Abor
   const { data, error } = await get(`/platform/database/{ref}/backups`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -28,18 +31,22 @@ export type BackupsData = Awaited<ReturnType<typeof getBackups>>
 export type BackupsError = ResponseError
 
 export const useBackupsQuery = <TData = BackupsData>(
-  { projectRef }: BackupsVariables,
-  { enabled = true, ...options }: UseQueryOptions<BackupsData, BackupsError, TData> = {}
+  { projectRef, projectStatus }: BackupsVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<BackupsData, BackupsError, TData> = {}
 ) => {
   // [Joshen] Check for specifically false to account for project not loaded yet
   const isOrioleDbInAws = useIsOrioleDbInAws()
+  const orioleDbReleaseStage = useOrioleDbReleaseStage()
 
-  return useQuery<BackupsData, BackupsError, TData>(
-    databaseKeys.backups(projectRef),
-    ({ signal }) => getBackups({ projectRef }, signal),
-    {
-      enabled: enabled && !isOrioleDbInAws && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  return useQuery<BackupsData, BackupsError, TData>({
+    queryKey: databaseKeys.backups(projectRef),
+    queryFn: ({ signal }) => getBackups({ projectRef }, signal),
+    enabled:
+      enabled &&
+      !(isOrioleDbInAws && orioleDbReleaseStage === 'alpha') &&
+      typeof projectRef !== 'undefined' &&
+      projectStatus !== PROJECT_STATUS.COMING_UP &&
+      projectStatus !== PROJECT_STATUS.UNKNOWN,
+    ...options,
+  })
 }

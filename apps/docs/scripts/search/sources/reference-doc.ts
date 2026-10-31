@@ -2,17 +2,18 @@ import { createHash } from 'crypto'
 import { readFile } from 'fs/promises'
 import yaml from 'js-yaml'
 import type { OpenAPIV3 } from 'openapi-types'
+
 import type {
   ICommonItem,
   ICommonSection,
   IFunctionDefinition,
+  IFunctionExample,
   ISpec,
 } from '../../../components/reference/Reference.types.js'
 import { getApiEndpointById } from '../../../features/docs/Reference.generated.singleton.js'
 import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec.js'
 import { flattenSections } from '../../../lib/helpers.js'
 import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers.js'
-import type { Json } from '../../helpers.mdx.js'
 import { BaseLoader, BaseSource } from './base.js'
 
 export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
@@ -24,7 +25,7 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
   constructor(
     source: string,
     path: string,
-    public meta: Json,
+    public meta: Record<string, unknown>,
     public specFilePath: string,
     public sectionsFilePath: string
   ) {
@@ -68,7 +69,7 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
     specSections: SpecSection[],
     id: string
   ): SpecSection | undefined | Promise<SpecSection | undefined>
-  enhanceMeta(_section: SpecSection): Json {
+  enhanceMeta(_section: SpecSection): Record<string, unknown> {
     return this.meta
   }
 }
@@ -81,12 +82,12 @@ export abstract class ReferenceSource<SpecSection> extends BaseSource {
     path: string,
     public refSection: ICommonSection,
     public specSection: SpecSection,
-    public meta: Json
+    public meta: Record<string, unknown>
   ) {
     super(source, path)
   }
 
-  process() {
+  async process() {
     const checksum = createHash('sha256')
       .update(JSON.stringify(this.refSection) + JSON.stringify(this.specSection))
       .digest('base64')
@@ -125,7 +126,7 @@ export class OpenApiReferenceLoader extends ReferenceLoader<Partial<enrichedOper
   constructor(
     source: string,
     path: string,
-    meta: Json,
+    meta: Record<string, unknown>,
     specFilePath: string,
     sectionsFilePath: string
   ) {
@@ -251,7 +252,7 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
   constructor(
     source: string,
     path: string,
-    meta: Json,
+    meta: Record<string, unknown>,
     specFilePath: string,
     sectionsFilePath: string
   ) {
@@ -272,9 +273,79 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
     return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
   }
 
-  enhanceMeta(section: IFunctionDefinition): Json {
+  enhanceMeta(section: IFunctionDefinition): Record<string, unknown> {
     return { ...this.meta, slug: section.id, methodName: section.title }
   }
+}
+
+/**
+ * Build search sources for a client lib from the new reference pipeline
+ * (`content/reference/<lib>/<ver>/{sections,functions,typeSpec}.json`) instead
+ * of the legacy YAML.
+ *
+ * Each function entry in `functions.json` either has rich content inline
+ * (partial-authored entries like subcategory overviews) or just an `id` +
+ * `$ref` pointing into `typeSpec.json`'s `methods` map for the TSDoc-extracted
+ * description and examples. We merge those into the `IFunctionDefinition`
+ * shape `ClientLibReferenceSource` already knows how to render, so no
+ * downstream changes are needed.
+ */
+export async function loadClientLibReferenceFromNewPipeline({
+  source,
+  path,
+  meta,
+  contentDir,
+}: {
+  source: string
+  path: string
+  meta: Record<string, unknown>
+  contentDir: string
+}): Promise<BaseSource[]> {
+  const [sectionsRaw, functionsRaw, typeSpecRaw] = await Promise.all([
+    readFile(`${contentDir}/sections.json`, 'utf8'),
+    readFile(`${contentDir}/functions.json`, 'utf8'),
+    readFile(`${contentDir}/typeSpec.json`, 'utf8'),
+  ])
+
+  const refSections = JSON.parse(sectionsRaw) as ICommonItem[]
+  const functions = JSON.parse(functionsRaw) as Array<{
+    id: string
+    $ref?: string
+    title?: string
+    description?: string
+    examples?: IFunctionExample[]
+  }>
+  const typeSpec = JSON.parse(typeSpecRaw) as {
+    methods: Record<string, { comment?: { shortText?: string; examples?: IFunctionExample[] } }>
+  }
+
+  const enriched: IFunctionDefinition[] = functions.map((fn) => {
+    const typeSpecEntry = fn.$ref ? typeSpec.methods[fn.$ref] : undefined
+    return {
+      id: fn.id,
+      $ref: fn.$ref ?? '',
+      title: fn.title ?? '',
+      description: fn.description ?? typeSpecEntry?.comment?.shortText ?? '',
+      examples: fn.examples ?? typeSpecEntry?.comment?.examples,
+    }
+  })
+
+  const flattened = flattenSections(refSections)
+
+  return flattened
+    .map((refSection) => {
+      const specSection = enriched.find((e) => e.id === refSection.id)
+      if (!specSection) return undefined
+      const titleForMeta = specSection.title || refSection.title
+      return new ClientLibReferenceSource(
+        source,
+        `${path}/${refSection.slug}`,
+        refSection,
+        specSection,
+        { ...meta, slug: specSection.id, methodName: titleForMeta }
+      )
+    })
+    .filter((s): s is ClientLibReferenceSource => s !== undefined)
 }
 
 export class ClientLibReferenceSource extends ReferenceSource<IFunctionDefinition> {
@@ -311,7 +382,7 @@ export class CliReferenceLoader extends ReferenceLoader<CliCommand> {
   constructor(
     source: string,
     path: string,
-    meta: Json,
+    meta: Record<string, unknown>,
     specFilePath: string,
     sectionsFilePath: string
   ) {

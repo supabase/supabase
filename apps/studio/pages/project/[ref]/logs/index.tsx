@@ -1,76 +1,55 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useUnifiedLogsPreview } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { UnifiedLogs } from 'components/interfaces/UnifiedLogs/UnifiedLogs'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { UnifiedLogs } from '@/components/interfaces/UnifiedLogs/UnifiedLogs'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ProjectLayout } from '@/components/layouts/ProjectLayout'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { withAuth } from '@/hooks/misc/withAuth'
+import type { NextPageWithLayout } from '@/types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { hasLoaded } = useContext(FeatureFlagContext)
 
-  const org = useSelectedOrganization()
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
-
-  const [lastVisitedLogsPage] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_LOGS_PAGE,
-    'explorer'
-  )
+  const logsEnabled = useIsFeatureEnabled('logs:all')
+  const { isEnabled: isUnifiedLogsEnabled, isLoading } = useUnifiedLogsPreview()
 
   useEffect(() => {
-    if (hasLoaded && !!org && !isUnifiedLogsEnabled) {
-      router.replace(`/project/${ref}/logs/${lastVisitedLogsPage}`)
+    if (logsEnabled && !isLoading && !isUnifiedLogsEnabled && ref) {
+      router.replace(`/project/${ref}/logs/explorer`)
     }
-  }, [router, hasLoaded, org, lastVisitedLogsPage, ref, isUnifiedLogsEnabled])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logsEnabled, isLoading, isUnifiedLogsEnabled, ref])
 
-  // Handle redirects when unified logs preview flag changes
-  useEffect(() => {
-    // Only handle redirects if we're currently on a logs page
-    if (!router.asPath.includes('/logs') || (IS_PLATFORM && !hasLoaded)) return
-
-    if (IS_PLATFORM && isUnifiedLogsEnabled) {
-      // If unified logs preview is enabled and we're not already on the main logs page
-      if (router.asPath !== `/project/${ref}/logs` && router.asPath.includes('/logs/')) {
-        router.push(`/project/${ref}/logs`)
-      }
-    } else {
-      // If unified logs preview is disabled and admin flag is also off
-      // and we're on the main logs page, redirect to explorer
-      if (router.asPath === `/project/${ref}/logs`) {
-        router.push(`/project/${ref}/logs/explorer`)
-      }
-    }
-  }, [isUnifiedLogsEnabled, router, ref, hasLoaded])
-
-  if (isUnifiedLogsEnabled) {
+  if (!logsEnabled) {
     return (
-      <DefaultLayout>
-        <ProjectLayout>
-          <UnifiedLogs />
-        </ProjectLayout>
-      </DefaultLayout>
+      <ProjectLayout browserTitle={{ section: 'Logs' }}>
+        <UnknownInterface urlBack={`/project/${ref}`} />
+      </ProjectLayout>
     )
   }
 
-  return (
-    <DefaultLayout>
-      <LogsLayout>
-        {/* Empty placeholder - the useEffect will handle redirect */}
-        <div></div>
-      </LogsLayout>
-    </DefaultLayout>
-  )
+  if (isUnifiedLogsEnabled) {
+    return (
+      // Omit the generic product segment here; project/org context already makes the route clear.
+      <ProjectLayout browserTitle={{ section: 'Unified Logs' }}>
+        <UnifiedLogs />
+      </ProjectLayout>
+    )
+  }
+
+  return null
 }
 
-// Don't use getLayout since we're handling layouts conditionally within the component
-LogPage.getLayout = (page) => page
+// DefaultLayout lives at the framework wrapper level, not in the page
+// body — both runtimes provide it externally (Next via `getLayout`,
+// TanStack via the parent `routes/project/$ref.tsx` shell). Wrapping it
+// inline would double-mount its SidebarProvider/ProjectContextProvider
+// chain under TanStack since the shell already supplies one.
+LogPage.getLayout = (page) => <DefaultLayout>{page}</DefaultLayout>
 
-export default LogPage
+export default withAuth(LogPage)

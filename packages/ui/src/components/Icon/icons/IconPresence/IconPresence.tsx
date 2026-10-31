@@ -1,6 +1,7 @@
 // DO NOT EDIT
 // @ts-ignore
 import IconBase from './../../IconBase'
+
 const SvgComponent = () => (
   <>
     <path

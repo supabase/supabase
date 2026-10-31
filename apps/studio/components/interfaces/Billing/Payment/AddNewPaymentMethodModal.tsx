@@ -4,13 +4,13 @@ import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Modal } from 'ui'
+import { Dialog, DialogContent, DialogHeader, DialogSectionSeparator, DialogTitle } from 'ui'
 
-import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
 import { getStripeElementsAppearanceOptions } from './Payment.utils'
+import { useOrganizationPaymentMethodSetupIntent } from '@/data/organizations/organization-payment-method-setup-intent-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
 interface AddNewPaymentMethodModalProps {
   visible: boolean
@@ -29,7 +29,7 @@ const AddNewPaymentMethodModal = ({
 }: AddNewPaymentMethodModalProps) => {
   const { resolvedTheme } = useTheme()
   const [intent, setIntent] = useState<any>()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
@@ -108,37 +108,36 @@ const AddNewPaymentMethodModal = ({
         size="invisible"
         onOpen={() => {
           // [Joshen] This is to ensure that hCaptcha popup remains clickable
-          if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.add('pointer-events-auto!')
         }}
         onClose={() => {
           onLocalCancel()
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onVerify={(token) => {
           setCaptchaToken(token)
-          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+          if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
         }}
         onExpire={() => {
           setCaptchaToken(null)
         }}
       />
 
-      <Modal
-        hideFooter
-        size="medium"
-        visible={visible && intent !== undefined}
-        header="Add new payment method"
-        onCancel={onLocalCancel}
-        className="PAYMENT"
-      >
-        <Elements stripe={stripePromise} options={options}>
-          <AddPaymentMethodForm
-            returnUrl={returnUrl}
-            onCancel={onLocalCancel}
-            onConfirm={onLocalConfirm}
-          />
-        </Elements>
-      </Modal>
+      <Dialog open={visible && intent !== undefined} onOpenChange={onLocalCancel}>
+        <DialogContent size="medium" className="PAYMENT">
+          <DialogHeader>
+            <DialogTitle>Add new payment method</DialogTitle>
+          </DialogHeader>
+          <DialogSectionSeparator />
+          <Elements stripe={stripePromise} options={options}>
+            <AddPaymentMethodForm
+              returnUrl={returnUrl}
+              onCancel={onLocalCancel}
+              onConfirm={onLocalConfirm}
+            />
+          </Elements>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

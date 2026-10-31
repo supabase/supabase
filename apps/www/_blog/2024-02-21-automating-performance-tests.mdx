@@ -2,8 +2,8 @@
 title: 'Automating performance tests'
 description: Learn about our story to get to the automated performance testing.
 author: egor_romanov
-image: 2024-02-21-automating-performance-tests/automating-performance-tests-OG.png
-thumb: 2024-02-21-automating-performance-tests/automating-performance-tests-OG.png
+imgSocial: 2024-02-21-automating-performance-tests/automating-performance-tests-OG.png
+imgThumb: 2024-02-21-automating-performance-tests/automating-performance-tests-OG.png
 categories:
   - engineering
 tags:
@@ -18,7 +18,7 @@ At the end of this post you will have a practical approach for doing performance
 
 ## How this started?
 
-When I joined Supabase we had a challenging task of rewriting Realtime service so that users would be able to stream database updates with respect to RLS policies. Such a huge design change could not happen without having an impact on throughput.
+When I joined Supabase we had a challenging task of rewriting [Realtime](/realtime) service so that users would be able to stream database updates with respect to RLS policies. Such a huge design change could not happen without having an impact on throughput.
 
 We decided to extensively test how the new Realtime would perform prior to launch to:
 
@@ -288,7 +288,7 @@ Let’s bring the list of what was left:
 
 ## Our experience
 
-We have run tests for up to 1,000,000 concurrent virtual users for Supavisor and up to 200,000 for the Realtime service.
+We have run tests for up to 1,000,000 concurrent virtual users for [Supavisor](https://supabase.com/docs/guides/database/supavisor) and up to 200,000 for the Realtime service.
 
 <div>
   <Img

@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import { cn } from '@/lib/utils'
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
@@ -10,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/registry/default/components/ui/card'
-import { useState } from 'react'
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [error, setError] = useState<string | null>(null)
@@ -39,7 +40,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Welcome!</CardTitle>
+          <CardTitle className="font-medium text-lg tracking-normal">Welcome!</CardTitle>
           <CardDescription>Sign in to your account to continue</CardDescription>
         </CardHeader>
         <CardContent>
@@ -47,7 +48,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             <div className="flex flex-col gap-6">
               {error && <p className="text-sm text-destructive-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Continue with Github'}
+                {isLoading ? 'Signing in...' : 'Continue with GitHub'}
               </Button>
             </div>
           </form>

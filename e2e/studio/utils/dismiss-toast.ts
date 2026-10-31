@@ -9,3 +9,11 @@ export const dismissToast = async (page: Page) => {
 }
 
 export const toKebabCase = (str: string) => str.replace(/([A-Z])/g, '-$1').toLowerCase()
+
+export const dismissToastsIfAny = async (page: Page) => {
+  const closeButtons = page.getByRole('button', { name: 'Close toast' })
+  const count = await closeButtons.count()
+  for (let i = 0; i < count; i++) {
+    await closeButtons.nth(i).click()
+  }
+}

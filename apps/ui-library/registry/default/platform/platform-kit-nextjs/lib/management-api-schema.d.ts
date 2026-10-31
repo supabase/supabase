@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  '/v1/branches/{branch_id}': {
+  '/v1/branches/{branch_id_or_ref}': {
     parameters: {
       query?: never
       header?: never
@@ -32,7 +32,7 @@ export interface paths {
     patch: operations['v1-update-a-branch-config']
     trace?: never
   }
-  '/v1/branches/{branch_id}/push': {
+  '/v1/branches/{branch_id_or_ref}/push': {
     parameters: {
       query?: never
       header?: never
@@ -52,7 +52,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/merge': {
+  '/v1/branches/{branch_id_or_ref}/merge': {
     parameters: {
       query?: never
       header?: never
@@ -72,7 +72,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/reset': {
+  '/v1/branches/{branch_id_or_ref}/reset': {
     parameters: {
       query?: never
       header?: never
@@ -92,7 +92,7 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/v1/branches/{branch_id}/diff': {
+  '/v1/branches/{branch_id_or_ref}/diff': {
     parameters: {
       query?: never
       header?: never
@@ -2493,6 +2493,7 @@ export interface components {
       security_manual_linking_enabled: boolean | null
       security_refresh_token_reuse_interval: number | null
       security_update_password_require_reauthentication: boolean | null
+      security_update_password_require_current_password: boolean | null
       sessions_inactivity_timeout: number | null
       sessions_single_per_user: boolean | null
       sessions_tags: string | null
@@ -2591,6 +2592,7 @@ export interface components {
         | null
       security_manual_linking_enabled?: boolean | null
       security_update_password_require_reauthentication?: boolean | null
+      security_update_password_require_current_password?: boolean | null
       security_refresh_token_reuse_interval?: number | null
       mailer_otp_exp?: number
       mailer_otp_length?: number | null

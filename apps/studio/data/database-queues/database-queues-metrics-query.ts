@@ -1,7 +1,14 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import { ident, literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useQuery } from '@tanstack/react-query'
+
 import { databaseQueuesKeys } from './keys'
+import {
+  isQueueNameValid,
+  pgmqQueueTable,
+} from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesMetricsVariables = {
   projectRef?: string
@@ -15,21 +22,23 @@ export type PostgresQueueMetric = {
   method: 'estimated' | 'precise'
 }
 
-const preciseMetricsSqlQuery = (queueName: string) => `
+const preciseMetricsSqlQuery = (queueName: string) =>
+  safeSql`
   set local statement_timeout = '1s';
   SELECT
     COUNT(*) AS row_count
   FROM
-    "pgmq"."q_${queueName}";
+    ${ident('pgmq')}.${ident(pgmqQueueTable(queueName))};
 `
 
-const estimateMetricsSqlQuery = (queueName: string) => `
+const estimateMetricsSqlQuery = (queueName: string) =>
+  safeSql`
   select
   reltuples::bigint as estimated_rows
     from
   pg_class
     where
-  relname = 'q_${queueName}'
+  relname = ${literal(pgmqQueueTable(queueName))}
   and relnamespace = 'pgmq'::regnamespace;
 `
 
@@ -39,12 +48,18 @@ export async function getDatabaseQueuesMetrics({
   queueName,
 }: DatabaseQueuesMetricsVariables) {
   if (!projectRef) throw new Error('Project ref is required')
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
 
   try {
     const { result } = await executeSql({
       projectRef,
       connectionString,
       sql: preciseMetricsSqlQuery(queueName),
+      grant: unguarded.migrating,
     })
     return {
       queue_name: queueName,
@@ -58,6 +73,7 @@ export async function getDatabaseQueuesMetrics({
         projectRef,
         connectionString,
         sql: estimateMetricsSqlQuery(queueName),
+        grant: unguarded.migrating,
       })
       return {
         queue_name: queueName,
@@ -77,13 +93,11 @@ export const useQueuesMetricsQuery = <TData = DatabaseQueuesMetricsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseQueuesMetricsData, DatabaseQueuesMetricsError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseQueuesMetricsData, DatabaseQueuesMetricsError, TData> = {}
 ) =>
-  useQuery<DatabaseQueuesMetricsData, DatabaseQueuesMetricsError, TData>(
-    databaseQueuesKeys.metrics(projectRef, queueName),
-    () => getDatabaseQueuesMetrics({ projectRef, connectionString, queueName }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseQueuesMetricsData, DatabaseQueuesMetricsError, TData>({
+    queryKey: databaseQueuesKeys.metrics(projectRef, queueName),
+    queryFn: () => getDatabaseQueuesMetrics({ projectRef, connectionString, queueName }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

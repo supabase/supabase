@@ -1,4 +1,5 @@
-import { cn } from 'ui/src/lib/utils'
+import { cn } from 'ui'
+
 import CountdownStep from './CountdownStep'
 
 interface CountdownWidgetProps {

@@ -12,23 +12,32 @@ You can control client access to Realtime [Broadcast](/docs/guides/realtime/broa
 - Control which clients can publish their presence to a Channel
 - Control which clients can receive messages about the presence of other clients
 
-<Admonition type="caution">
-
-Realtime Authorization is in Public Beta. To use Authorization for your Realtime Channels, use `supabase-js` version `v2.44.0` or later.
-
-</Admonition>
-
 <Admonition type="note">
 
-To enforce private channels you need to disable the 'Allow public access' setting in [Realtime Settings](https://supabase.com/dashboard/project/_?featurePreviewModal=supabase-ui-realtime-settings)
+To enforce private channels you need to disable the 'Allow public access' setting in [Realtime Settings](/dashboard/project/_/realtime/settings)
 
 </Admonition>
-
 ## How it works
 
 Realtime uses the `messages` table in your database's `realtime` schema to generate access policies for your clients when they connect to a Channel topic.
 
-By creating RLS polices on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic.
+By creating RLS policies on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic.
+
+<Admonition type="caution">
+
+Realtime locks down the `realtime` schema to protect it against unexpected changes to guarantee the healthy operation of the Realtime service and avoid conflicts that could be caused by future migrations. Creating a table or function in `realtime` is expected to fail with `permission denied for schema realtime`, whether you run the SQL yourself or through the dashboard. Managing RLS policies on `realtime.messages` is allowed: [`supautils`](https://github.com/supabase/supautils) lets the `postgres` role run policy statements on that table without owning it.
+
+Row Level Security is already enabled on `realtime.messages`, so don't add `ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY` to a migration. Postgres checks table ownership before it checks whether the setting would change, so the statement fails with `42501 must be owner of table messages`. That aborts the transaction, and every statement after it is skipped, including any `create policy` statements that follow.
+
+Remove the `ALTER TABLE` line and the rest of the migration passes. If a migration needs to check that RLS is on, read the catalog:
+
+```sql
+select relrowsecurity from pg_class where oid = 'realtime.messages'::regclass;
+```
+
+If you hit that error, see [must be owner of table messages](/kb/troubleshooting/realtime-must-be-owner-of-table-messages).
+
+</Admonition>
 
 The validation is done when the user connects. When their WebSocket connection is established and a Channel topic is joined, their permissions are calculated based on:
 
@@ -50,13 +59,11 @@ Increased RLS complexity can impact database performance and connection time, le
 
 </Admonition>
 
-## Helper functions
-
-You can use the following helper functions when writing RLS policies:
+## Accessing request information
 
 ### `realtime.topic`
 
-Returns the Channel topic the user is attempting to connect to.
+You can use the `realtime.topic` helper function when writing RLS policies. It returns the Channel topic the user is attempting to connect to.
 
 ```sql
 create policy "authenticated can read all messages on topic"
@@ -65,6 +72,21 @@ for select
 to authenticated
 using (
   (select realtime.topic()) = 'room-1'
+);
+```
+
+### JWT claims
+
+The user claims can be accessed using the `current_setting` function. The claims are available as a JSON object in the `request.jwt.claims` setting.
+
+```sql
+create policy "authenticated with supabase.io email can read all"
+on "realtime"."messages"
+for select
+to authenticated
+using (
+  -- Only users with the email claim ending with @supabase.io
+  (((current_setting('request.jwt.claims'))::json ->> 'email') ~~ '%@supabase.io')
 );
 ```
 
@@ -78,6 +100,8 @@ create table public.rooms (
     topic text not null unique
 );
 
+GRANT SELECT ON public.rooms TO anon;
+
 alter table public.rooms enable row level security;
 
 create table public.profiles (
@@ -87,6 +111,9 @@ create table public.profiles (
   primary key (id)
 );
 
+GRANT SELECT ON public.profiles TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+
 alter table public.profiles enable row level security;
 
 create table public.rooms_users (
@@ -95,7 +122,15 @@ create table public.rooms_users (
   created_at timestamptz default current_timestamp
 );
 
+GRANT SELECT ON public.rooms_users TO authenticated;
+
 alter table public.rooms_users enable row level security;
+
+create policy "authenticated can read own room memberships"
+on public.rooms_users
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
 ```
 
 ### Broadcast
@@ -121,7 +156,7 @@ exists (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast')
   )
 );
@@ -158,6 +193,7 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  <$Show if="sdk:dart">
   <TabPanel id="dart" label="Dart">
     ```dart
     final channel = supabase.channel(
@@ -177,6 +213,8 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
     ```swift
     let channel = supabase.channel("room-1") {
@@ -194,6 +232,8 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:kotlin">
   <TabPanel id="kotlin" label="Kotlin">
     ```kotlin
     val channel = supabase.channel("room-1") {
@@ -207,6 +247,8 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  </$Show>
+  <$Show if="sdk:python">
   <TabPanel id="python" label="Python">
     ```py
     channel = realtime.channel(
@@ -225,6 +267,7 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```
 
   </TabPanel>
+  </$Show>
 </Tabs>
 
 #### Allow a user to send a Broadcast message
@@ -246,7 +289,7 @@ with check (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast')
   )
 );
@@ -273,7 +316,7 @@ using (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('presence')
   )
 );
@@ -296,7 +339,7 @@ with check (
       rooms_users
     where
       user_id = (select auth.uid())
-      and name = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('presence')
   )
 );
@@ -323,7 +366,7 @@ using (
       rooms_users
     where
       user_id = (select auth.uid())
-      and topic = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast', 'presence')
   )
 );
@@ -346,7 +389,7 @@ with check (
       rooms_users
     where
       user_id = (select auth.uid())
-      and name = (select realtime.topic())
+      and room_topic = (select realtime.topic())
       and realtime.messages.extension in ('broadcast', 'presence')
   )
 );
@@ -354,18 +397,20 @@ with check (
 
 ## Interaction with Postgres Changes
 
-Realtime Postgres Changes are separate from Channel authorization. The `private` Channel option does not apply to Postgres Changes.
+When using Postgres Changes on tables with RLS, database records are sent only to clients who are allowed to read them based on your RLS policies.
 
-When using Postgres Changes with RLS, database records are sent only to clients who are allowed to read them based on your RLS policies.
+Private and public channels can subscribe to Postgres Changes.
 
 ## Updating RLS policies
 
-Client access polices are cached for the duration of the connection. Your database is not queried for every Channel message.
+Client access policies are cached for the duration of the connection. Your database is not queried for every Channel message.
 
-Realtime updates the access policy cache for a client based on your RLS polices when:
+Realtime updates the access policy cache for a client based on your RLS policies when:
 
 - A client connects to Realtime and subscribes to a Channel
 - A new JWT is sent to Realtime from a client via the [`access_token` message](/docs/guides/realtime/protocol#access-token)
+
+This means that if you revoke a user's access (for example, by removing a row an RLS policy uses to grant it) while they're still connected, they'll keep receiving messages until their JWT expires or a new one is sent.
 
 If a new JWT is never received on the Channel, the client will be disconnected when the JWT expires.
 

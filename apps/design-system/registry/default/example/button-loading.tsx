@@ -2,7 +2,7 @@ import { Button } from 'ui'
 
 export default function ButtonLoading() {
   return (
-    <Button disabled loading>
+    <Button variant="primary" disabled loading>
       Please wait
     </Button>
   )

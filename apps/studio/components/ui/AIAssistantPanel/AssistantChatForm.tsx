@@ -1,16 +1,19 @@
-'use client'
-
 import { useBreakpoint } from 'common'
-import { ArrowUp, Loader2 } from 'lucide-react'
-import React, { ChangeEvent, memo, useRef } from 'react'
-import { Button, ExpandingTextArea } from 'ui'
-import { cn } from 'ui/src/lib/utils'
-import { SnippetRow, getSnippetContent } from './SnippetRow'
-import { type SqlSnippet } from './AIAssistant.types'
+import { ArrowUpIcon, Loader2Icon, SquareIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, ReactNode, useRef } from 'react'
+import { Button, cn, ExpandingTextArea } from 'ui'
+
+import { ButtonTooltip } from '../ButtonTooltip'
+import { formatAttachedSnippets } from './AIAssistant.utils'
+import { ModelSelector } from './ModelSelector'
+import { SnippetRow } from './SnippetRow'
+import type { AssistantModelId } from '@/lib/ai/model.utils'
+import { type SqlSnippet } from '@/state/ai-assistant-state'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
-  textAreaRef?: React.RefObject<HTMLTextAreaElement>
+  textAreaRef?: React.RefObject<HTMLTextAreaElement | null>
   /* The loading state of the form */
   loading: boolean
   /* The disabled state of the form */
@@ -27,6 +30,10 @@ export interface FormProps {
    * The function to handle the form submission
    */
   onSubmit: (message: string) => void
+  /**
+   * The function to handle stopping the stream
+   */
+  onStop?: () => void
   /* The placeholder of the textarea */
   placeholder?: string
   /* SQL snippets to display above the form - can be strings or objects with label and content */
@@ -37,9 +44,27 @@ export interface FormProps {
   snippetsClassName?: string
   /* Additional class name for the form wrapper */
   className?: string
+  /* If currently editing an existing message */
+  isEditing?: boolean
+  /* The currently selected AI model */
+  selectedModel?: AssistantModelId
+  /* Callback when a model is chosen */
+  onSelectModel?: (model: AssistantModelId) => void
+  /* Icon for the submit button when not loading, defaults to an up arrow */
+  submitIcon?: ReactNode
+  /* Label for the submit button when not loading, used for both aria-label and tooltip text, defaults to "Send message" */
+  submitLabel?: string
+  /**
+   * An additional action shown beside the main submit button, transitioned in/out with
+   * Motion. Pass undefined to hide it (e.g. when the input doesn't match its condition).
+   */
+  secondaryAction?: {
+    label: string
+    onClick: () => void
+  }
 }
 
-const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
+const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
   (
     {
       loading = false,
@@ -48,42 +73,49 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
       textAreaRef,
       onValueChange,
       onSubmit,
+      onStop,
       placeholder,
       sqlSnippets,
       onRemoveSnippet,
       snippetsClassName,
       includeSnippetsInMessage = false,
       className,
+      isEditing = false,
+      selectedModel,
+      onSelectModel,
+      submitIcon = <ArrowUpIcon />,
+      submitLabel = 'Send message',
+      secondaryAction,
       ...props
     },
-    ref
+    _ref
   ) => {
     const formRef = useRef<HTMLFormElement>(null)
     const isMobile = useBreakpoint('md')
 
-    const handleSubmit = (event?: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
       if (event) event.preventDefault()
-      if (!value || loading) return
+      if (disabled || !value || (loading && !isEditing)) return
 
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
-        const sqlSnippetsString = sqlSnippets
-          .map((snippet: SqlSnippet) => '```sql\n' + getSnippetContent(snippet) + '\n```')
-          .join('\n')
-        finalMessage = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
+        finalMessage = [value, formatAttachedSnippets(sqlSnippets)].filter(Boolean).join('\n\n')
       }
 
       onSubmit(finalMessage)
     }
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault()
         handleSubmit()
+      } else if (event.key === 'Escape') {
+        event.currentTarget.blur()
       }
     }
 
-    const canSubmit = !loading && !!value
+    const canSubmit = !disabled && !loading && !!value
+    const showModelSelector = selectedModel !== undefined && onSelectModel !== undefined
 
     return (
       <div className="w-full">
@@ -92,7 +124,7 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
           ref={formRef}
           {...props}
           onSubmit={handleSubmit}
-          className={cn('relative overflow-hidden', className)}
+          className={cn('relative rounded-lg', className)}
         >
           {sqlSnippets && sqlSnippets.length > 0 && (
             <SnippetRow
@@ -102,11 +134,11 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
             />
           )}
           <ExpandingTextArea
+            autoFocus={!isMobile}
             ref={textAreaRef}
-            autoFocus={isMobile}
             disabled={disabled}
             className={cn(
-              'text-sm pr-10 max-h-64',
+              'text-base md:text-sm pr-10 pb-9 max-h-64 rounded-lg',
               sqlSnippets && sqlSnippets.length > 0 && 'pt-10'
             )}
             placeholder={placeholder}
@@ -116,21 +148,72 @@ const AssistantChatFormComponent = React.forwardRef<HTMLFormElement, FormProps>(
             onChange={(event) => onValueChange(event)}
             onKeyDown={handleKeyDown}
           />
-          <div className="absolute right-1.5 bottom-1.5 flex gap-3 items-center">
-            {loading && (
-              <Loader2 size={22} className="animate-spin w-7 h-7 text-muted" strokeWidth={1} />
+          <div
+            className={cn(
+              'absolute inset-x-2 bottom-2 flex items-center pointer-events-none',
+              showModelSelector ? 'justify-between' : 'justify-end'
             )}
-            <Button
-              htmlType="submit"
-              aria-label="Send message"
-              icon={<ArrowUp />}
-              disabled={!canSubmit}
-              className={cn(
-                'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
-                !canSubmit ? 'text-muted opacity-50' : 'text-default opacity-100',
-                loading && 'hidden'
+          >
+            {showModelSelector && (
+              <div className="pointer-events-auto">
+                <ModelSelector selectedModel={selectedModel} onSelectModel={onSelectModel} />
+              </div>
+            )}
+
+            <div className="flex gap-x-1.5 items-center pointer-events-auto">
+              <AnimatePresence>
+                {!loading && secondaryAction && (
+                  <motion.div
+                    key="secondary-action"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <Button
+                      type="button"
+                      variant="outline"
+                      aria-label={secondaryAction.label}
+                      onClick={secondaryAction.onClick}
+                      className="h-7 rounded-full"
+                    >
+                      {secondaryAction.label}
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {loading ? (
+                onStop ? (
+                  <ButtonTooltip
+                    variant="outline"
+                    aria-label="Stop response"
+                    icon={<SquareIcon fill="currentColor" className="scale-75" />}
+                    onClick={onStop}
+                    className="w-7 h-7 rounded-full p-0 text-center flex items-center justify-center"
+                    tooltip={{ content: { side: 'top', text: 'Stop response' } }}
+                  />
+                ) : (
+                  <Loader2Icon
+                    size={22}
+                    className="animate-spin size-7 text-muted"
+                    strokeWidth={1}
+                  />
+                )
+              ) : (
+                <ButtonTooltip
+                  type="submit"
+                  variant={canSubmit ? 'primary' : 'default'}
+                  aria-label={submitLabel}
+                  icon={submitIcon}
+                  disabled={!canSubmit}
+                  className={cn(
+                    'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
+                    !canSubmit ? 'opacity-50' : 'opacity-100'
+                  )}
+                  tooltip={{ content: { side: 'top', text: submitLabel } }}
+                />
               )}
-            />
+            </div>
           </div>
         </form>
       </div>

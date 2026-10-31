@@ -4,19 +4,19 @@ import { Button } from 'ui'
 export default function ButtonDemo() {
   return (
     <div className="flex gap-3">
-      <Button type="default" size="tiny">
+      <Button variant="default" size="tiny">
         Tiny Button
       </Button>
-      <Button type="default" size="small">
+      <Button variant="default" size="small">
         Small button
       </Button>
-      <Button type="default" size="medium">
+      <Button variant="default" size="medium">
         Medium button
       </Button>
-      <Button type="default" size="large">
+      <Button variant="default" size="large">
         Large button
       </Button>
-      <Button type="default" size="xlarge">
+      <Button variant="default" size="xlarge">
         Huge button
       </Button>
     </div>

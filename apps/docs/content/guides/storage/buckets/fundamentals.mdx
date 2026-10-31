@@ -3,6 +3,7 @@ id: 'storage-bucket-public-and-private'
 title: 'Storage Buckets'
 description: 'Learn how Supabase Storage Buckets works.'
 sidebar_label: 'Buckets'
+tocVideo: ch2UGHMreB0
 ---
 
 Buckets allow you to keep your files organized and determines the [Access Model](#access-model) for your assets. [Upload restrictions](/docs/guides/storage/buckets/creating-buckets#restricting-uploads) like max file size and allowed content types are also defined at the bucket level.
@@ -17,8 +18,8 @@ When a bucket is set to **Private** all operations are subject to access control
 
 The only ways to download assets within a private bucket is to:
 
-- Use the [download method](/docs/reference/javascript/storage-from-download) by providing a authorization header containing your user's JWT. The RLS policy you create on the `storage.objects` table will use this user to determine if they have access.
-- Create a signed URL with the [`createSignedUrl` method](/docs/reference/javascript/storage-from-createsignedurl) that can be accessed for a limited time.
+- Use the [download method](/docs/reference/javascript/file-buckets-download) by providing an authorization header containing your user's JWT. The RLS policy you create on the `storage.objects` table will use this user to determine if they have access.
+- Create a signed URL with the [`createSignedUrl` method](/docs/reference/javascript/file-buckets-createsignedurl) that can be accessed for a limited time.
 
 #### Example use cases:
 
@@ -29,7 +30,7 @@ The only ways to download assets within a private bucket is to:
 
 When a bucket is designated as 'Public,' it effectively bypasses access controls for both retrieving and serving files within the bucket. This means that anyone who possesses the asset URL can readily access the file.
 
-Access control is still enforced for other types of operations including uploading, deleting, moving, and copying.
+[Access control is still enforced](/kb/troubleshooting/why-cant-i-uploadlistetc-my-public-bucket-Z6CmGt) for other types of operations including uploading, deleting, moving, and copying.
 
 #### Example use cases:
 

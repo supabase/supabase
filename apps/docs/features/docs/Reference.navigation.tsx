@@ -1,4 +1,5 @@
-import { Fragment, type PropsWithChildren } from 'react'
+import { isFeatureEnabled } from 'common'
+import { type PropsWithChildren } from 'react'
 
 import { cn } from 'ui'
 
@@ -18,6 +19,10 @@ interface ReferenceNavigationProps {
   libPath: string
   version: string
   isLatestVersion: boolean
+  // Spike (DOCS-1268): API reference sidebar links navigate to real pages
+  // instead of scrolling within one giant page. SDK/CLI/self-hosting callers
+  // never pass this, so their behavior is unchanged.
+  realNavigation?: boolean
 }
 
 export async function ReferenceNavigation({
@@ -27,8 +32,11 @@ export async function ReferenceNavigation({
   libPath,
   version,
   isLatestVersion,
+  realNavigation,
 }: ReferenceNavigationProps) {
   const navSections = await getReferenceSections(libraryId, version)
+  const filteredNavSections = navSections?.filter((section) => section.title !== 'Auth')
+  const displayedNavSections = isFeatureEnabled('sdk:auth') ? navSections : filteredNavSections
 
   const basePath = `/reference/${libPath}${isLatestVersion ? '' : `/${version}`}`
 
@@ -40,19 +48,17 @@ export async function ReferenceNavigation({
         <RefVersionDropdown library={libPath} currentVersion={version} />
       </div>
       <ul className="flex flex-col gap-2">
-        {navSections?.map((section) => (
-          <Fragment key={section.id}>
-            {section.type === 'category' ? (
-              <li>
-                <RefCategory basePath={basePath} section={section} />
-              </li>
-            ) : (
-              <li className={topLvlRefNavItemStyles}>
-                <RefLink basePath={basePath} section={section} />
-              </li>
-            )}
-          </Fragment>
-        ))}
+        {displayedNavSections?.map((section, index) =>
+          section.type === 'category' ? (
+            <li key={section.id ?? String(index)}>
+              <RefCategory basePath={basePath} section={section} realNavigation={realNavigation} />
+            </li>
+          ) : (
+            <li key={section.id ?? String(index)} className={topLvlRefNavItemStyles}>
+              <RefLink basePath={basePath} section={section} realNavigation={realNavigation} />
+            </li>
+          )
+        )}
       </ul>
     </ReferenceNavigationScrollHandler>
   )
@@ -63,9 +69,11 @@ const topLvlRefNavItemStyles = 'leading-5'
 function RefCategory({
   basePath,
   section,
+  realNavigation,
 }: {
   basePath: string
   section: AbbrevApiReferenceSection
+  realNavigation?: boolean
 }) {
   if (!('items' in section && section.items && section.items.length > 0)) return null
 
@@ -76,7 +84,7 @@ function RefCategory({
       <ul className="space-y-2">
         {section.items?.map((item) => (
           <li key={item.id} className={topLvlRefNavItemStyles}>
-            <RefLink basePath={basePath} section={item} />
+            <RefLink basePath={basePath} section={item} realNavigation={realNavigation} />
           </li>
         ))}
       </ul>

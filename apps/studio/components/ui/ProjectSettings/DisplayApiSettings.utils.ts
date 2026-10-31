@@ -1,34 +1,13 @@
 import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRef } from 'react'
 
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-
-dayjs.extend(duration)
-dayjs.extend(relativeTime)
-
-export function useLastUsedAPIKeysLogQuery(projectRef: string) {
-  const now = useRef(new Date()).current
-  return useLogsQuery(projectRef, {
-    iso_timestamp_start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-    iso_timestamp_end: now.toISOString(),
-    sql: "-- last-used-anon--service_role-api-keys\nSELECT unix_millis(max(timestamp)) as timestamp, payload.role, payload.signature_prefix FROM edge_logs cross join unnest(metadata) as m cross join unnest(m.request) as request cross join unnest(request.sb) as sb cross join unnest(sb.jwt) as jwt cross join unnest(jwt.apikey) as apikey cross join unnest(apikey.payload) as payload WHERE apikey.invalid is null and payload.issuer = 'supabase' and payload.algorithm = 'HS256' and payload.role in ('anon', 'service_role') GROUP BY payload.role, payload.signature_prefix",
-  })
-}
+import type { ApiKeyLastUsed } from '@/data/analytics/api-keys-last-used-query'
 
 export function getLastUsedAPIKeys(
   apiKeys: {
     tags: string
     api_key: string
   }[],
-  logData:
-    | {
-        timestamp: number
-        role?: 'anon' | 'service_role' | string
-        signature_prefix?: string
-      }[]
-    | null
+  logData: ApiKeyLastUsed[] | null | undefined
 ) {
   if (apiKeys.length < 1 || !logData || logData.length < 1) {
     return {}
@@ -39,11 +18,11 @@ export function getLastUsedAPIKeys(
   return apiKeys.reduce(
     (a, i) => {
       const entry = logData?.find(
-        ({ role, signature_prefix }) =>
+        ({ role, signaturePrefix }) =>
           role &&
-          signature_prefix &&
+          signaturePrefix &&
           i.tags.indexOf(role) >= 0 &&
-          i.api_key.split('.')[2]?.startsWith(signature_prefix)
+          i.api_key.split('.')[2]?.startsWith(signaturePrefix)
       )?.timestamp
 
       if (entry) {

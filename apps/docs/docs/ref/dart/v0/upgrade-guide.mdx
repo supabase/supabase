@@ -353,7 +353,7 @@ await supabase.auth.signInWithOtp(
   phone: phone,
 );
 
-// After receiving a SMS with a OTP.
+// After receiving an SMS with an OTP.
 await supabase.auth.verifyOTP(
   type: OtpType.sms,
   token: token,

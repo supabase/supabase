@@ -1,19 +1,21 @@
-import { AlertCircle, ArrowUpRight, CheckCircle2 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { AlertCircleIcon, ArrowUpRightIcon, CheckCircle2Icon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-
-import { useParams } from 'common'
-import { useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
+
+import { branchesQueryOptions } from '@/data/branches/branches-query'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const GitHubStatus = () => {
   const { ref: projectRef } = useParams()
-  const selectedProject = useSelectedProject()
-  const selectedOrganization = useSelectedOrganization()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const parentProjectRef = selectedProject?.parent_project_ref || projectRef
 
   const { data: connections } = useGitHubConnectionsQuery(
@@ -21,10 +23,13 @@ export const GitHubStatus = () => {
     { enabled: !!selectedOrganization?.id }
   )
 
-  const { data: branches } = useBranchesQuery(
-    { projectRef: parentProjectRef },
-    { enabled: !!parentProjectRef }
-  )
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    enabled: !!parentProjectRef,
+  })
 
   const githubConnection = connections?.find(
     (connection) => connection.project.ref === parentProjectRef
@@ -44,10 +49,10 @@ export const GitHubStatus = () => {
           className="block w-full transition truncate text-sm text-foreground-light hover:text-foreground"
         >
           <div className="w-full flex items-center justify-between">
-            <h3 className="">GitHub Integration</h3>
-            <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
+            <h3 className="text-sm">GitHub connection</h3>
+            <ArrowUpRightIcon strokeWidth={1} className="h-4 w-4" />
           </div>
-          <p className="mt-1 text-xs text-foreground-lighter flex items-center gap-2">
+          <p className="mt-0.5 text-xs text-foreground-lighter flex items-center gap-2">
             {isConnected ? (
               <>
                 <Image
@@ -84,9 +89,9 @@ export const GitHubStatus = () => {
           <div className="flex flex-col gap-2 text-xs text-foreground-light">
             <div className="flex items-center gap-2">
               {hasGitBranchSync ? (
-                <CheckCircle2 size={12} className="text-brand-600" />
+                <CheckCircle2Icon size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning-600" />
+                <AlertCircleIcon size={12} className="text-warning" />
               )}
               <span>
                 {hasGitBranchSync
@@ -96,9 +101,9 @@ export const GitHubStatus = () => {
             </div>
             <div className="flex items-center gap-2">
               {hasAutomaticBranching ? (
-                <CheckCircle2 size={12} className="text-brand-600" />
+                <CheckCircle2Icon size={12} className="text-brand-600" />
               ) : (
-                <AlertCircle size={12} className="text-warning-600" />
+                <AlertCircleIcon size={12} className="text-warning" />
               )}
               <span>
                 {hasAutomaticBranching

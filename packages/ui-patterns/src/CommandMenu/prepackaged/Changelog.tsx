@@ -1,6 +1,6 @@
+import { useRegisterCommands } from '..'
 import { Inbox } from 'lucide-react'
 
-import { useRegisterCommands } from '..'
 import { BASE_PATH } from './shared/constants'
 
 const useChangelogCommand = ({ enabled = true }: { enabled?: boolean } = {}) => {
@@ -9,7 +9,7 @@ const useChangelogCommand = ({ enabled = true }: { enabled?: boolean } = {}) => 
     [
       {
         id: 'changelog',
-        name: 'Changelog',
+        name: 'View changelog',
         route: BASE_PATH ? 'https://supabase.com/changelog' : '/changelog',
         icon: () => <Inbox />,
       },

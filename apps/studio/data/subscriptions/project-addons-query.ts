@@ -1,9 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import { EMPTY_ARR } from '@/lib/void'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectAddonsVariables = {
   projectRef?: string
@@ -24,7 +25,11 @@ export async function getProjectAddons(
   })
 
   if (error) handleError(error)
-  return data
+  return {
+    ...data,
+    selected_addons: Array.isArray(data?.selected_addons) ? data.selected_addons : EMPTY_ARR,
+    available_addons: Array.isArray(data?.available_addons) ? data.available_addons : EMPTY_ARR,
+  }
 }
 
 export type ProjectAddonsData = Awaited<ReturnType<typeof getProjectAddons>>
@@ -32,14 +37,15 @@ export type ProjectAddonsError = ResponseError
 
 export const useProjectAddonsQuery = <TData = ProjectAddonsData>(
   { projectRef }: ProjectAddonsVariables,
-  { enabled = true, ...options }: UseQueryOptions<ProjectAddonsData, ProjectAddonsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<ProjectAddonsData, ProjectAddonsError, TData> = {}
 ) =>
-  useQuery<ProjectAddonsData, ProjectAddonsError, TData>(
-    subscriptionKeys.addons(projectRef),
-    ({ signal }) => getProjectAddons({ projectRef }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
-      staleTime: 60 * 60 * 1000, // 60 minutes
-      ...options,
-    }
-  )
+  useQuery<ProjectAddonsData, ProjectAddonsError, TData>({
+    queryKey: subscriptionKeys.addons(projectRef),
+    queryFn: ({ signal }) => getProjectAddons({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    staleTime: 60 * 60 * 1000,
+    ...options,
+  })

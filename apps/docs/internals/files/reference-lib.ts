@@ -5,6 +5,7 @@ export async function generateReferencePages() {
   return (
     await Promise.all(
       Object.keys(REFERENCES)
+        .filter((key) => REFERENCES[key].enabled !== false)
         .flatMap((key) => {
           if (REFERENCES[key].versions.length === 0) {
             return [
@@ -28,11 +29,14 @@ export async function generateReferencePages() {
         .map(async ({ sdkId, version, libPath, isLatestVersion }) => {
           const flattenedSections = await getFlattenedSections(sdkId, version)
           return (
-            flattenedSections?.map((section) => ({
-              link: isLatestVersion
-                ? `reference/${libPath}/${section.slug}`
-                : `reference/${libPath}/${version}/${section.slug}`,
-            })) ?? []
+            flattenedSections
+              ?.filter((section) => section.type !== 'category' && !!section.slug)
+              .map((section) => ({
+                link: isLatestVersion
+                  ? `reference/${libPath}/${section.slug}`
+                  : `reference/${libPath}/${version}/${section.slug}`,
+                priority: 0.8,
+              })) ?? []
           )
         })
     )

@@ -14,7 +14,7 @@ Today `pgvector` supports two types of indexes:
 - [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes)
 - [IVFFlat](/docs/guides/ai/vector-indexes/ivf-indexes)
 
-In general we recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](https://supabase.com/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes). If you have a special use case that requires IVFFlat instead, keep reading.
+In general we recommend using [HNSW](/docs/guides/ai/vector-indexes/hnsw-indexes) because of its [performance](/blog/increase-performance-pgvector-hnsw#hnsw-performance-1536-dimensions) and [robustness against changing data](/docs/guides/ai/vector-indexes/hnsw-indexes#when-should-you-create-hnsw-indexes). If you have a special use case that requires IVFFlat instead, keep reading.
 
 ## Usage
 
@@ -62,7 +62,7 @@ For example, to create an index with 100 lists on a column that uses the cosine 
 create index on items using ivfflat (column_name vector_cosine_ops) with (lists = 100);
 ```
 
-For more info on the different operators, see [Distance operations](#distance-operators).
+For more info on the different operators, see [Distance operators](/docs/guides/ai/vector-indexes#distance-operators).
 
 For every query, you can set the number of probes (1 by default). The number of probes corresponds to the number of nearby cells to probe for a match. Increase this for better recall at the expense of speed.
 

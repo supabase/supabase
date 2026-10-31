@@ -1,9 +1,9 @@
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import { ResponseError } from 'types'
 import { storageKeys } from './keys'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type StorageArchiveCreateVariables = {
   projectRef?: string
@@ -14,6 +14,7 @@ const createStorageArchive = async ({ projectRef }: StorageArchiveCreateVariable
 
   const { data, error } = await post('/platform/storage/{ref}/archive', {
     params: { path: { ref: projectRef } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -27,27 +28,25 @@ export function useStorageArchiveCreateMutation({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>,
+  UseCustomMutationOptions<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>,
   'mutationFn'
 > = {}) {
   const queryClient = useQueryClient()
 
-  return useMutation<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>(
-    (vars) => createStorageArchive(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.archive(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create storage archive: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<StorageArchiveCreateData, ResponseError, StorageArchiveCreateVariables>({
+    mutationFn: (vars) => createStorageArchive(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: storageKeys.archive(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create storage archive: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

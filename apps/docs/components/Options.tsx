@@ -1,5 +1,6 @@
 import { XCircle } from 'lucide-react'
 import { FC, PropsWithChildren, useState } from 'react'
+import { Badge } from 'ui'
 
 interface IOptions {
   name?: string
@@ -16,6 +17,7 @@ const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) 
   return (
     <div className="mt-0">
       <button
+        tabIndex={0}
         className={[
           'px-5 py-1',
           'border-t border-l border-r border-default',
@@ -56,17 +58,11 @@ const Option: FC<IOption> = (props) => {
         </span>
         {!props.isEnum && (
           <>
-            <span>
-              {props.isOptional ? (
-                <div className="text-[10px] px-3 tracking-wide font-mono text-foreground-lighter">
-                  Optional
-                </div>
-              ) : (
-                <div className="text-[10px] border border-amber-700 bg-amber-300 text-amber-900 px-2 tracking-wide font-mono py-0.25 rounded-full">
-                  REQUIRED
-                </div>
-              )}
-            </span>
+            {props.isOptional ? (
+              <Badge variant="default">Optional</Badge>
+            ) : (
+              <Badge variant="warning">Required</Badge>
+            )}
             <span className="text-foreground-muted text-xs">{props.type ?? 'no type'}</span>
           </>
         )}

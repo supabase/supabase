@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 
 import useLw15ConfData from 'components/LaunchWeek/15/hooks/use-conf-data'
 import { useRegistration } from 'components/LaunchWeek/15/hooks/use-registration'
@@ -13,7 +13,7 @@ const LW15TicketRedirect = () => {
 
   useEffect(() => {
     if (confState.sessionLoaded && confState.session === null) {
-      router.replace('/launch-week')
+      router?.replace('/launch-week')
     }
   }, [confState.sessionLoaded, confState.session, router, user.username])
 

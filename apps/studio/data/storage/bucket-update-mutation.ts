@@ -1,17 +1,19 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
+import { patch } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export type BucketUpdateVariables = {
+type BucketUpdateVariables = {
   projectRef: string
   id: string
   isPublic: boolean
   file_size_limit: number | null
   allowed_mime_types: string[] | null
+  /** Omitted when versioning isn't changing. There is no going back to DISABLED. */
+  versioning_status?: components['schemas']['UpdateStorageBucketBody']['versioning_status']
 }
 
 // [Alaister]: API accept null values for allowed_mime_types and file_size_limit to reset
@@ -23,29 +25,36 @@ type UpdateStorageBucketBody = Omit<
   file_size_limit: number | null
 }
 
-export async function updateBucket({
+async function updateBucket({
   projectRef,
   id,
   isPublic,
   file_size_limit,
   allowed_mime_types,
-}: BucketUpdateVariables) {
+  versioning_status,
+}: BucketUpdateVariables): Promise<BucketUpdateResult> {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
   const payload: Partial<UpdateStorageBucketBody> = { public: isPublic }
   if (file_size_limit !== undefined) payload.file_size_limit = file_size_limit
   if (allowed_mime_types !== undefined) payload.allowed_mime_types = allowed_mime_types
+  if (versioning_status !== undefined) payload.versioning_status = versioning_status
 
   const { data, error } = await patch('/platform/storage/{ref}/buckets/{id}', {
     params: { path: { id, ref: projectRef } },
     body: payload as any,
   })
 
-  if (error) handleError(error)
-  return data
+  if (error) {
+    // Return the error instead of throwing it, so we can handle it gracefully
+    return { data: null, error }
+  }
+
+  return { data, error: null }
 }
 
+type BucketUpdateResult = { data: any; error: null } | { data: null; error: any }
 type BucketUpdateData = Awaited<ReturnType<typeof updateBucket>>
 
 export const useBucketUpdateMutation = ({
@@ -53,27 +62,35 @@ export const useBucketUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BucketUpdateData, ResponseError, BucketUpdateVariables>,
+  UseCustomMutationOptions<BucketUpdateData, ResponseError, BucketUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketUpdateData, ResponseError, BucketUpdateVariables>(
-    (vars) => updateBucket(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(storageKeys.buckets(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update bucket: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BucketUpdateData, ResponseError, BucketUpdateVariables>({
+    mutationFn: async (vars) => {
+      const result = await updateBucket(vars)
+      if (result.error) {
+        throw result.error
+      }
+      return result.data
+    },
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      // `refetchType: 'all'` because the list query is inactive on the bucket page.
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.buckets(projectRef),
+        refetchType: 'all',
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update bucket: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

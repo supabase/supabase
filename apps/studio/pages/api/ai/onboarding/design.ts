@@ -1,10 +1,11 @@
-import { streamText, tool } from 'ai'
+import { pipeUIMessageStreamToResponse, streamText, tool, toUIMessageStream } from 'ai'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import { getModel } from 'lib/ai/model'
-import apiWrapper from 'lib/api/apiWrapper'
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 
 export const maxDuration = 60
 
@@ -17,20 +18,20 @@ const getTools = () => {
   return {
     executeSql: tool({
       description: 'Save the generated database schema definition',
-      parameters: z.object({
+      inputSchema: z.object({
         sql: z.string().describe('The SQL schema definition'),
       }),
     }),
 
     reset: tool({
       description: 'Reset the database, services and start over',
-      parameters: z.object({}),
+      inputSchema: z.object({}),
     }),
 
     setServices: tool({
       description:
         'Set the entire list of Supabase services needed for the project. Always include the full list',
-      parameters: z.object({
+      inputSchema: z.object({
         services: z
           .array(ServiceSchema)
           .describe('Array of services with reasons why they are needed'),
@@ -39,7 +40,7 @@ const getTools = () => {
 
     setTitle: tool({
       description: "Set the project title based on the user's description",
-      parameters: z.object({
+      inputSchema: z.object({
         title: z.string().describe('The project title'),
       }),
     }),
@@ -64,7 +65,10 @@ const wrapper = (req: NextApiRequest, res: NextApiResponse) =>
 export default wrapper
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { model, error: modelError } = await getModel()
+  const { modelParams, error: modelError } = await getModel({
+    provider: 'openai',
+    modelEntry: DEFAULT_COMPLETION_MODEL,
+  })
 
   if (modelError) {
     return res.status(500).json({ error: modelError.message })
@@ -72,10 +76,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const { messages } = req.body
 
-  const result = await streamText({
-    model,
-    maxSteps: 7,
-    system: source`
+  const result = streamText({
+    ...modelParams,
+    instructions: source`
       You are a Supabase expert who helps people set up their Supabase project. You specializes in database schema design. You are to help the user design a database schema for their application but also suggest Supabase services they should use. 
       
       When designing database schemas, follow these rules:
@@ -100,5 +103,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     tools: getTools(),
   })
 
-  result.pipeDataStreamToResponse(res)
+  const stream = toUIMessageStream({ stream: result.stream })
+  pipeUIMessageStreamToResponse({
+    response: res,
+    stream,
+    headers: { 'Content-Encoding': 'none' },
+  })
 }

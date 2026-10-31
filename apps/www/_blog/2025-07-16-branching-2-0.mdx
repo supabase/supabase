@@ -7,20 +7,20 @@ categories:
 tags:
   - launch-week
   - studio
-date: '2025-07-16:00:00'
+date: '2025-07-16T00:00'
 toc_depth: 3
 author: saxon_fletcher
-image: launch-week-15/day-3-branching-2-0/og.jpg
-thumb: launch-week-15/day-3-branching-2-0/thumb.png
+imgSocial: launch-week-15/day-3-branching-2-0/og.png
+imgThumb: launch-week-15/day-3-branching-2-0/thumb.png
 launchweek: '15'
 ---
 
-Branching has been a part of Supabase for some time now, a way for you to experiment or build out new features without affecting your production environment. It requires you to connect your Supabase project to a GitHub repository which automates many parts of the workflow, but this also alienates those who prefer not to use Git. Today, we are announcing Branching 2.0 which removes the Git requirement and makes it super simple to spin up new branches.
+[Branching](/features/branching) has been a part of Supabase for some time now, a way for you to experiment or build out new features without affecting your production environment. It requires you to connect your Supabase project to a GitHub repository which automates many parts of the workflow, but this also alienates those who prefer not to use Git. Today, we are announcing Branching 2.0 which removes the Git requirement and makes it super simple to spin up new branches.
 
 <div className="video-container mb-8">
   <iframe
     className="w-full"
-    src="https://www.youtube-nocookie.com/embed/CRARnyYqrOU"
+    src="https://www.youtube-nocookie.com/embed/AMQqhHxz5UI"
     title="Introducing Branching 2.0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
     allowfullscreen
@@ -37,7 +37,7 @@ The current implementation of branching requires a connection to a GitHub repo. 
 
 ## New behavior
 
-With these new updates you can now create branches with Git, without Git, or a combination of both. This can be done directly through the dashboard, Supabase CLI, or the [Management API](https://supabase.com/docs/reference/api/introduction). Every branch is a direct copy of production, including schema, functions and configurations. You can then connect your app, make changes, and when ready to launch, you have the option to pull those changes down to your codebase or review and merge without leaving the dashboard. For those using separate Supabase projects for this, you no longer need to do so.
+With these new updates you can now create branches with Git, without Git, or a combination of both. This can be done directly through the dashboard, [Supabase CLI](/features/cli), or the [Management API](https://supabase.com/docs/reference/api/introduction). Every branch is a direct copy of production, including schema, functions and configurations. You can then connect your app, make changes, and when ready to launch, you have the option to pull those changes down to your codebase or review and merge without leaving the dashboard. For those using separate Supabase projects for this, you no longer need to do so.
 
 ### How it works
 
@@ -108,8 +108,6 @@ When ready, click the merge button and watch your changes be deployed to product
 There are a few limitations you should be aware of before deciding to use branching without git.
 
 - Custom roles created through the dashboard are not captured on branch creation.
-- Only public schema changes are supported right now.
-- Extensions are not included in the diff process
 - Branches can only be merged to main; merging between preview branches is not supported.
 - If your branch is out of date, you can pull in latest changes from main, but keep in mind that all functions will be overwritten.
 - Deleting functions must be done manually on main branch.

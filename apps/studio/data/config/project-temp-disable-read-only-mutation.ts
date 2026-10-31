@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import { usageKeys } from 'data/usage/keys'
-import type { ResponseError } from 'types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import { usageKeys } from '@/data/usage/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TempDisableReadOnlyModeVariables = {
   projectRef: string
@@ -12,6 +12,7 @@ export type TempDisableReadOnlyModeVariables = {
 export async function tempDisableReadOnlyMode({ projectRef }: TempDisableReadOnlyModeVariables) {
   const { data, error } = await post('/v1/projects/{ref}/readonly/temporary-disable', {
     params: { path: { ref: projectRef } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -25,25 +26,30 @@ export const useDisableReadOnlyModeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DisableReadOnlyModeData, ResponseError, TempDisableReadOnlyModeVariables>,
+  UseCustomMutationOptions<
+    DisableReadOnlyModeData,
+    ResponseError,
+    TempDisableReadOnlyModeVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<DisableReadOnlyModeData, ResponseError, TempDisableReadOnlyModeVariables>(
-    (vars) => tempDisableReadOnlyMode(vars),
-    {
-      async onSuccess(data, variables, context) {
-        setTimeout(() => queryClient.invalidateQueries(usageKeys.resourceWarnings()), 2000)
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to disable read only mode: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DisableReadOnlyModeData, ResponseError, TempDisableReadOnlyModeVariables>({
+    mutationFn: (vars) => tempDisableReadOnlyMode(vars),
+    async onSuccess(data, variables, context) {
+      setTimeout(
+        () => queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings() }),
+        2000
+      )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to disable read only mode: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

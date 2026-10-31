@@ -1,0 +1,220 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useFlag, useParams } from 'common'
+import { useEffect } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
+import { safeSql } from '@/data/logs/safe-analytics-sql'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+const schema = z.object({
+  AUDIT_LOG_DISABLE_POSTGRES: z.boolean(),
+})
+
+const AUDIT_LOG_ENTRIES_TABLE = 'audit_log_entries'
+
+const AUTH_AUDIT_LOGS_QUERY = safeSql`
+  select
+    cast(timestamp as datetime) as timestamp,
+    event_message,
+    metadata
+  from auth_audit_logs
+  limit 10
+`
+
+const AUTH_AUDIT_LOGS_QUERY_OTEL = safeSql`
+  select
+    timestamp,
+    event_message,
+    log_attributes
+  from logs
+  where source = 'auth_audit_logs'
+  order by timestamp desc
+  limit 10
+`
+
+export const AuditLogsForm = () => {
+  const { ref: projectRef } = useParams()
+  const useOtel = useFlag('otelLegacyLogs')
+  const { data: project } = useSelectedProjectQuery()
+  const authAuditLogsQuery = pickLogsQueryBuilder(
+    useOtel,
+    AUTH_AUDIT_LOGS_QUERY_OTEL,
+    AUTH_AUDIT_LOGS_QUERY
+  )
+  const authAuditLogsUrl = `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(authAuditLogsQuery)}`
+
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+  )
+
+  const { data: tables = [] } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    includeColumns: false,
+    schema: 'auth',
+  })
+  const auditLogTable = tables.find((x) => x.name === AUDIT_LOG_ENTRIES_TABLE)
+
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isPending: isLoading,
+  } = useAuthConfigQuery({ projectRef })
+
+  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      toast.error(`Failed to update audit logs: ${error?.message}`)
+    },
+    onSuccess: () => {
+      toast.success('Successfully updated audit logs settings')
+    },
+  })
+
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { AUDIT_LOG_DISABLE_POSTGRES: false },
+  })
+  const { isDirty } = form.formState
+  const { AUDIT_LOG_DISABLE_POSTGRES: formValueDisablePostgres } = useWatch({
+    control: form.control,
+  })
+  const currentlyDisabled = authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false
+  const isDisabling = !currentlyDisabled && formValueDisablePostgres
+
+  const onSubmitAuditLogs = (values: any) => {
+    if (!projectRef) return console.error('Project ref is required')
+    updateAuthConfig({ projectRef: projectRef, config: values })
+  }
+
+  useEffect(() => {
+    if (authConfig) {
+      form.reset({ AUDIT_LOG_DISABLE_POSTGRES: authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false })
+    }
+  }, [authConfig])
+
+  if (isError) {
+    return (
+      <PageSection>
+        <PageSectionContent>
+          <AlertError
+            error={authConfigError}
+            subject="Failed to retrieve auth configuration for hooks"
+          />
+        </PageSectionContent>
+      </PageSection>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <PageSection>
+        <PageSectionContent>
+          <GenericSkeletonLoader />
+        </PageSectionContent>
+      </PageSection>
+    )
+  }
+
+  return (
+    <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Settings</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmitAuditLogs)} className="space-y-4">
+            <Card>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="AUDIT_LOG_DISABLE_POSTGRES"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Write audit logs to the database"
+                      description={
+                        <p className="text-sm prose text-foreground-lighter max-w-full">
+                          When enabled, audit logs are written to the{' '}
+                          <InlineLink
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`/project/${projectRef}/editor/${auditLogTable?.id}`}
+                          >
+                            <code>{AUDIT_LOG_ENTRIES_TABLE}</code>
+                          </InlineLink>{' '}
+                          table.
+                          <br />
+                          You can disable this to reduce disk usage while still accessing logs
+                          through the <InlineLink href={authAuditLogsUrl}>Auth logs</InlineLink>.
+                        </p>
+                      }
+                    >
+                      <FormControl>
+                        <Switch
+                          checked={!field.value}
+                          onCheckedChange={(value) => field.onChange(!value)}
+                          disabled={!canUpdateConfig}
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+                {isDisabling && (
+                  <Admonition
+                    type="warning"
+                    className="mt-4"
+                    title="Disabling PostgreSQL storage will not automatically migrate or transfer existing audit log data"
+                    description={
+                      <p>
+                        Future audit logs will only appear in the project’s{' '}
+                        <InlineLink href={authAuditLogsUrl}>auth logs</InlineLink>. You are
+                        responsible for backing up, copying, or migrating existing data from the{' '}
+                        <code className="break-keep!">{AUDIT_LOG_ENTRIES_TABLE}</code> table if
+                        needed.
+                      </p>
+                    }
+                  />
+                )}
+              </CardContent>
+
+              <CardFooter className="justify-end space-x-2">
+                {isDirty && <Button onClick={() => form.reset()}>Cancel</Button>}
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
+                  loading={isUpdatingConfig}
+                >
+                  Save changes
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form>
+      </PageSectionContent>
+    </PageSection>
+  )
+}

@@ -1,41 +1,35 @@
-import { ExternalLink, Loader2 } from 'lucide-react'
+import { useParams } from 'common'
+import { ExternalLinkIcon, Loader2Icon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
+import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { useParams } from 'common'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import CopyButton from 'components/ui/CopyButton'
-import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { AiIconAnimation, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import Results from './Results'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import CopyButton from '@/components/ui/CopyButton'
+import { DataGridResults } from '@/components/ui/DataGridResults'
+import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
+import { getSqlErrorLines } from '@/data/sql/utils'
+import { DOCS_URL } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 
 export type UtilityTabResultsProps = {
   id: string
   isExecuting?: boolean
   isDisabled?: boolean
   onDebug: () => void
+  buildDebugPrompt: () => string
   isDebugging?: boolean
 }
 
-const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
-  ({ id, isExecuting, isDisabled, isDebugging, onDebug }) => {
+export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
+  ({ id, isExecuting, isDisabled, isDebugging, onDebug, buildDebugPrompt }) => {
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
-    const organization = useSelectedOrganization()
-    const snapV2 = useSqlEditorV2StateSnapshot()
+    const sessionSnap = useSqlEditorSessionSnapshot()
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-    const result = snapV2.results[id]?.[0]
-    const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-
-    // Customers on HIPAA plans should not have access to Supabase AI
-    const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
-    const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
+    const result = sessionSnap.results[id]?.[0]
 
     const isTimeout =
       result?.error?.message?.includes('canceling statement due to statement timeout') ||
@@ -46,15 +40,13 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
 
     if (isExecuting) {
       return (
-        <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-          <Loader2 size={14} className="animate-spin" />
+        <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark">
+          <Loader2Icon size={14} className="animate-spin" />
           <p className="m-0 border-0 font-mono text-sm">Running...</p>
         </div>
       )
     } else if (result?.error) {
-      const formattedError = (result.error?.formattedError?.split('\n') ?? []).filter(
-        (x: string) => x.length > 0
-      )
+      const errorLines = getSqlErrorLines(result.error)
       const readReplicaError =
         state.selectedDatabaseId !== ref &&
         result.error.message.includes('in a read-only transaction')
@@ -63,7 +55,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
       )
 
       return (
-        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
           <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
             {isTimeout ? (
               <div className="flex flex-col gap-y-1">
@@ -72,11 +64,13 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                 </p>
                 <p className="text-sm text-foreground-light">
                   You can either{' '}
-                  <InlineLink href="https://supabase.com/docs/guides/platform/performance#examining-query-performance">
+                  <InlineLink
+                    href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
+                  >
                     optimize your query
                   </InlineLink>
                   , or{' '}
-                  <InlineLink href="https://supabase.com/docs/guides/database/timeouts">
+                  <InlineLink href={`${DOCS_URL}/guides/database/timeouts`}>
                     increase the statement timeout
                   </InlineLink>
                   {' or '}
@@ -91,8 +85,8 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
               </div>
             ) : (
               <div className="flex flex-col gap-y-1">
-                {formattedError.length > 0 ? (
-                  formattedError.map((x: string, i: number) => (
+                {errorLines.length > 0 ? (
+                  errorLines.map((x: string, i: number) => (
                     <pre key={`error-${i}`} className="font-mono text-sm text-wrap">
                       {x}
                     </pre>
@@ -120,7 +114,7 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
                       className={cn(InlineLinkClassName, 'flex items-center gap-x-1')}
                     >
                       connecting to your database directly
-                      <ExternalLink size={12} />
+                      <ExternalLinkIcon size={12} />
                     </span>
                     .
                   </p>
@@ -132,57 +126,54 @@ const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsProps>(
               {readReplicaError && (
                 <Button
                   className="py-2"
-                  type="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
-                    snapV2.resetResult(id)
+                    sessionSnap.resetResult(id)
                   }}
                 >
                   Switch to primary database
                 </Button>
               )}
-              {formattedError.length > 0 && (
+              {errorLines.length > 0 && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <CopyButton iconOnly type="default" text={formattedError.join('\n')} />
+                    <CopyButton iconOnly variant="default" text={errorLines.join('\n')} />
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
                     <span>Copy error</span>
                   </TooltipContent>
                 </Tooltip>
               )}
-              {!hasHipaaAddon && (
-                <Button
-                  icon={<AiIconAnimation size={16} loading={isDebugging} />}
-                  disabled={!!isDisabled || isDebugging}
-                  onClick={onDebug}
-                >
-                  Debug with Assistant
-                </Button>
-              )}
+              <AiAssistantDropdown
+                label="Debug with Assistant"
+                buildPrompt={buildDebugPrompt}
+                onOpenAssistant={onDebug}
+                telemetrySource="sql_debug"
+                disabled={!!isDisabled || isDebugging}
+                loading={isDebugging}
+              />
             </div>
           </div>
         </div>
       )
     } else if (!result) {
       return (
-        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
           <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
-            Click <code>Run</code> to execute your query.
+            Click <code>Run</code> to execute your query
           </p>
         </div>
       )
     } else if (result.rows.length <= 0) {
       return (
-        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
           <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
         </div>
       )
     }
 
-    return <Results rows={result.rows} />
+    return <DataGridResults rows={result.rows} />
   }
 )
 
 UtilityTabResults.displayName = 'UtilityTabResults'
-export default UtilityTabResults

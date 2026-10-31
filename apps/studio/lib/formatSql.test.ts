@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { formatSql } from './formatSql'
 
 describe('formatSql', () => {
@@ -16,7 +17,7 @@ from
     expect(result).toBe('123')
   })
 
-  it('should return the original argument if it is not valid, not throw', () => {
+  it('should return templated SQL unchanged rather than throw', () => {
     const result = formatSql('select {col1}, {col2} from {tableName};')
     expect(result).toBe('select {col1}, {col2} from {tableName};')
   })

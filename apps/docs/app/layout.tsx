@@ -1,25 +1,34 @@
-import '@code-hike/mdx/styles'
-import 'config/code-hike.scss'
-import '../styles/main.scss'
-import '../styles/new-docs.scss'
-import '../styles/prism-okaidia.scss'
-
-import { type Metadata, type Viewport } from 'next'
-
-import { genFaviconData } from 'common/MetaFavicons/app-router'
+import 'ui-patterns/ShimmeringLoader/index.css'
+import '../styles/globals.css'
+import '../styles/prism-okaidia.css'
 
 import { GlobalProviders } from '~/features/app.providers'
+import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { TelemetryTagManager } from 'common'
+import { genFaviconData } from 'common/MetaFavicons/app-router'
+import type { Metadata, Viewport } from 'next'
+import { SkipToContent } from 'ui-patterns/SkipToContent'
+
+import { inter, manrope } from '@/fonts'
+
+const { metadataApplicationName, metadataTitle } = getCustomContent([
+  'metadata:application_name',
+  'metadata:title',
+])
+
+const FAVICON_ROUTE = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
 
 const metadata: Metadata = {
-  applicationName: 'Supabase Docs',
-  title: 'Supabase Docs',
+  applicationName: metadataApplicationName,
+  title: metadataTitle,
   description:
     'Supabase is the Postgres development platform providing all the backend features you need to build a product.',
   metadataBase: new URL('https://supabase.com'),
-  icons: genFaviconData(BASE_PATH),
+  icons: genFaviconData(BASE_PATH, FAVICON_ROUTE),
+  manifest: `${BASE_PATH}${FAVICON_ROUTE}/manifest.json`,
   robots: {
     index: IS_PRODUCTION,
     follow: IS_PRODUCTION,
@@ -46,8 +55,14 @@ const viewport: Viewport = {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${manrope.variable} ${inter.variable}`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <body>
+        <SkipToContent href={`#${DOCS_CONTENT_CONTAINER_ID}`} />
         <TelemetryTagManager />
         <GlobalProviders>
           <TopNavSkeleton>{children}</TopNavSkeleton>

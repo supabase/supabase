@@ -1,22 +1,22 @@
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 
 const JWTKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
 
   const navigationItems = [
     {
-      label: 'Legacy JWT Secret',
+      label: 'JWT Signing Keys',
       href: `/project/${projectRef}/settings/jwt`,
-      id: 'legacy-jwt-keys',
+      id: 'signing-keys',
     },
     {
-      label: 'JWT Signing Keys',
-      href: `/project/${projectRef}/settings/jwt/signing-keys`,
-      id: 'signing-keys',
+      label: 'Legacy JWT Secret',
+      href: `/project/${projectRef}/settings/jwt/legacy`,
+      id: 'legacy-jwt-keys',
     },
   ]
 

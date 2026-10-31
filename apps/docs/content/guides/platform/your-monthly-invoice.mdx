@@ -37,7 +37,9 @@ The following invoice was issued on January 6, 2025 with the previous billing cy
     light: '/docs/img/guides/platform/example-invoice.png',
     dark: '/docs/img/guides/platform/example-invoice.png',
   }}
-  zoomable
+
+width={1690}
+height={2192}
 />
 
 1. The final amount due
@@ -46,8 +48,6 @@ The following invoice was issued on January 6, 2025 with the previous billing cy
 4. Usage based fee for Custom Domain for the previous billing cycle. There is no free usage quota for Custom Domain. You get charged for the 744 hours (24 hours \* 31 days) a Custom Domain was active. The final Custom Domain fees are <Price price="10.19" />.
 5. Usage based fee for Egress for the previous billing cycle. There is a free usage quota of 250 GB for Egress. You get charged for usage beyond 250 GB only, meaning for 2,119.47 GB. The final Egress fees are <Price price="190.75" />.
 6. Usage based fee for Monthly Active Users for the previous billing cycle. There is a free usage quota of 100,000 users. With 141 users there is no charge for this line item.
-
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 
 ### Why is my invoice more than <Price price="25" />?
 
@@ -66,8 +66,8 @@ Monthly invoices are auto-collected by charging the payment method marked as "ac
 If your payment fails, Supabase retries the charge several times. We send you a Payment Failure email with the reason for the failure. Follow the steps outlined in this email. You can manually trigger a charge at any time via
 
 - the link in the Payment Failure email
-- the "Pay Now" button on the [organization's invoices page](https://supabase.com/dashboard/org/_/billing#invoices)
+- the "Pay now" button on the [organization's invoices page](/dashboard/org/_/billing#invoices)
 
 ## Where to find your invoices
 
-Your invoice is sent to you via email. You can also find your invoices on the [organization's invoices page](https://supabase.com/dashboard/org/_/billing#invoices).
+Your invoice is sent to you via email. You can also find your invoices on the [organization's invoices page](/dashboard/org/_/billing#invoices).

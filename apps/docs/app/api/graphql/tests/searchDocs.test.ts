@@ -4,7 +4,9 @@ import { type OpenAIClientInterface } from '~/lib/openAi'
 import { ApiError } from '../../utils'
 import { POST } from '../route'
 
-const contentEmbeddingMock = vi.fn().mockImplementation(async () => Result.ok([0.1, 0.2, 0.3]))
+const contentEmbeddingMock = vi
+  .fn()
+  .mockImplementation(async () => Result.ok({ embedding: [0.1, 0.2, 0.3], tokenCount: 10 }))
 const openAIMock: OpenAIClientInterface = {
   createContentEmbedding: contentEmbeddingMock,
 }
@@ -57,10 +59,13 @@ vi.mock('~/lib/supabase', () => ({
 describe('/api/graphql searchDocs', () => {
   beforeAll(() => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
+    // KB search is a network call; return no KB results
+    vi.stubGlobal('fetch', () => Promise.resolve(Response.json([])))
   })
 
   afterAll(() => {
     vi.restoreAllMocks()
+    vi.unstubAllGlobals()
     vi.doUnmock('~/lib/openAi')
     vi.doUnmock('~/lib/supabase')
   })

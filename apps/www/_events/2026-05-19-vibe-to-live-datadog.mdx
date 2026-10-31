@@ -1,0 +1,54 @@
+---
+title: 'Vibe to Live: Go Deeper into Your Supabase App with Datadog'
+meta_title: 'Vibe to Live: Go Deeper into Your Supabase App with Datadog'
+subtitle: >-
+  Full-stack observability for the Supabase apps your team is shipping to
+  production
+meta_description: >-
+  See how to add full-stack observability to any Supabase app in minutes with
+  Datadog Database Monitoring. Query metrics, logs, and traces in one place.
+type: webinar
+onDemand: true
+date: '2026-05-19T10:00:00.000-07:00'
+timezone: America/Los_Angeles
+duration: 45 mins
+categories:
+  - webinar
+main_cta:
+  url: '#recording'
+  target: _self
+  label: Watch the recording
+speakers: 'nick_littman,ethan_perez'
+hosts:
+  - name: Supabase
+    avatar_url: 'https://github.com/supabase.png'
+description: >-
+  Learn how to add full-stack observability to any Supabase app in minutes with
+  Datadog.
+---
+
+Your team shipped it in a weekend. Now get full observability from day one.
+
+Product managers are shipping internal tools. Operations teams are building dashboards. Non-technical employees are creating apps for real business workflows using AI. Apps built on Supabase land in production fast, and with Datadog, your monitoring keeps pace.
+
+Slow queries don't always throw errors. Edge Functions fail silently. Auth bottlenecks look fine, until they don't. Without visibility into your Supabase stack, you are guessing.
+
+In this session, Nick Littman from Supabase and Ethan Perez, a Senior Engineer on Datadog's Database Monitoring team, show you how to add full-stack observability to any Supabase app in minutes.
+
+<div className="video-container mb-8" id="recording">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/pnXBtJV2lnk"
+    title="Vibe to Live: Go Deeper into Your Supabase App with Datadog"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
+## Key takeaways
+
+- How Supabase's built-in monitoring tooling and Datadog Database Monitoring work together, so you can go deeper without needing database expertise
+- One-click setup and what you can see immediately: query metrics, logs, and traces in one place
+- How to catch and diagnose a real performance problem using Datadog's AI-powered Database Investigator
+
+We hope you enjoy the recording!

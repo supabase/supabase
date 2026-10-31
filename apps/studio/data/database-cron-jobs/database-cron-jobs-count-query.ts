@@ -1,14 +1,17 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useQuery } from '@tanstack/react-query'
+
 import { databaseCronJobsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type DatabaseCronJobsCountVariables = {
   projectRef?: string
   connectionString?: string | null
 }
 
-const cronJobCountSql = `select count(jobid) from cron.job;`.trim()
+const cronJobCountSql = safeSql`select count(jobid) from cron.job;`
 
 export async function getDatabaseCronJobsCount({
   projectRef,
@@ -21,6 +24,7 @@ export async function getDatabaseCronJobsCount({
     connectionString,
     sql: cronJobCountSql,
     queryKey: ['cron-jobs-count'],
+    grant: unguarded.migrating,
   })
   return result[0].count
 }
@@ -33,13 +37,11 @@ export const useCronJobsCountQuery = <TData = DatabaseCronJobData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
+  }: UseCustomQueryOptions<DatabaseCronJobData, DatabaseCronJobError, TData> = {}
 ) =>
-  useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>(
-    databaseCronJobsKeys.count(projectRef),
-    () => getDatabaseCronJobsCount({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<DatabaseCronJobData, DatabaseCronJobError, TData>({
+    queryKey: databaseCronJobsKeys.count(projectRef),
+    queryFn: () => getDatabaseCronJobsCount({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

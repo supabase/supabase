@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type Region =
   | 'us-east-1'
@@ -24,7 +24,6 @@ export type Region =
 export type ReadReplicaSetUpVariables = {
   projectRef: string
   region: Region
-  size: string // Not used in API yet, purely for UI atm
 }
 
 export async function setUpReadReplica({ projectRef, region }: ReadReplicaSetUpVariables) {
@@ -35,6 +34,7 @@ export async function setUpReadReplica({ projectRef, region }: ReadReplicaSetUpV
     body: {
       read_replica_region: region,
     },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data
@@ -47,26 +47,24 @@ export const useReadReplicaSetUpMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ReadReplicaSetUpData, ResponseError, ReadReplicaSetUpVariables>,
+  UseCustomMutationOptions<ReadReplicaSetUpData, ResponseError, ReadReplicaSetUpVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<ReadReplicaSetUpData, ResponseError, ReadReplicaSetUpVariables>(
-    (vars) => setUpReadReplica(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(replicaKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to set up read replica: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ReadReplicaSetUpData, ResponseError, ReadReplicaSetUpVariables>({
+    mutationFn: (vars) => setUpReadReplica(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: replicaKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to set up read replica: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

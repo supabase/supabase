@@ -1,10 +1,12 @@
-import authors from 'lib/authors.json'
+import dayjs from 'dayjs'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
-import type Author from '~/types/author'
-import type PostTypes from '~/types/post'
-import dayjs from 'dayjs'
+
+import AuthorAvatars from './AuthorAvatars'
+import authors from '@/lib/authors.json'
+import { BLOG_PLACEHOLDER_IMAGE, getBlogThumbnailImage } from '@/lib/blog-images'
+import type Author from '@/types/author'
+import type PostTypes from '@/types/post'
 
 interface Props {
   post: PostTypes
@@ -24,43 +26,36 @@ const BlogGridItem = ({ post }: Props) => {
     }
   }
 
-  return (
-    <Link
-      href={post.path}
-      className="group inline-block min-w-full p-2 sm:p-4 h-full border border-transparent transition-all hover:bg-surface-200 dark:hover:bg-surface-75 rounded-xl"
-    >
-      <div className="flex flex-col space-y-2">
-        <div className="flex flex-col space-y-1">
-          <div className="border-default relative mb-3 w-full aspect-[2/1] lg:aspect-[5/3] overflow-hidden rounded-lg border shadow-sm">
-            <Image
-              fill
-              sizes="100%"
-              quality={100}
-              src={
-                !post.thumb
-                  ? `/images/blog/blog-placeholder.png`
-                  : post.type === 'casestudy'
-                    ? post.thumb
-                    : `/images/blog/${post.thumb}`
-              }
-              className="scale-100 object-cover overflow-hidden"
-              alt={`${post.title} thumbnail`}
-            />
-          </div>
+  const imageUrl = getBlogThumbnailImage(post) ?? BLOG_PLACEHOLDER_IMAGE
 
-          {post.date && (
-            <div className="text-foreground-lighter flex items-center space-x-1.5 text-sm">
-              <p>{dayjs(post.date).format('D MMM YYYY')}</p>
-              {post.readingTime && (
-                <>
-                  <p>•</p>
-                  <p>{post.readingTime}</p>
-                </>
-              )}
-            </div>
-          )}
-          <h3 className="text-foreground max-w-sm text-xl">{post.title}</h3>
-          <p className="text-foreground-light max-w-sm text-base !mb-0">{post.description}</p>
+  return (
+    <Link href={post.path} prefetch={false} className="group flex flex-col h-full">
+      <div
+        className="relative w-full aspect-[1.91/1] overflow-hidden rounded-md border border-foreground/10"
+        aria-hidden="true"
+      >
+        <Image fill sizes="100%" quality={100} src={imageUrl} className="object-cover" alt="" />
+      </div>
+      <div className="flex flex-col gap-1 pt-4">
+        <h3 className="text-foreground text-lg group-hover:underline">{post.title}</h3>
+        <p className="text-foreground-lighter text-sm mt-1 line-clamp-2">{post.description}</p>
+        {post.date && (
+          <div className="text-foreground-lighter flex items-center space-x-1.5 text-[11px] mt-3">
+            <p>
+              <span className="sr-only">Published </span>
+              {dayjs(post.date).format('D MMM YYYY')}
+            </p>
+            {post.readingTime && (
+              <>
+                <p aria-hidden="true">•</p>
+                <p>{post.readingTime}</p>
+              </>
+            )}
+          </div>
+        )}
+        <div className="mt-1.5">
+          <span className="sr-only">Author: </span>
+          <AuthorAvatars authors={author} />
         </div>
       </div>
     </Link>

@@ -1,13 +1,19 @@
 import * as Sentry from '@sentry/nextjs'
+import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
-import { IS_PLATFORM } from 'common'
-import { API_URL } from 'lib/constants'
-import { getAccessToken } from 'lib/gotrue'
-import { uuidv4 } from 'lib/helpers'
-import { ResponseError } from 'types'
-import type { paths } from './api' // generated from openapi-typescript
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import type { paths } from './api'
+import { reportEmptyBodyResponse } from './empty-body-diagnostics'
+import { ERROR_PATTERNS } from './error-patterns'
+import { guardMethod, type GuardedClientMethod } from './guarded-fetch'
+import { API_URL } from '@/lib/constants'
+import { uuidv4 } from '@/lib/helpers'
+import { ResponseError } from '@/types'
+import { UnknownAPIResponseError } from '@/types/api-errors'
+import { ErrorMetadata } from '@/types/base'
+
+// generated from openapi-typescript
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
@@ -23,7 +29,7 @@ export const fetchHandler: typeof fetch = async (input, init) => {
   }
 }
 
-const client = createClient<paths>({
+export const client = createClient<paths>({
   fetch: fetchHandler,
   // [Joshen] Just FYI, the replace is temporary until we update env vars API_URL to remove /platform or /v1 - should just be the base URL
   baseUrl: API_URL?.replace('/platform', ''),
@@ -59,6 +65,47 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
   return headers
 }
 
+/**
+ * openapi-fetch only treats a response body as empty when `status === 204` or the
+ * response carries a `Content-Length: 0` header; otherwise it calls `response.json()`,
+ * which throws "Unexpected end of JSON input" on an empty body. HTTP/3 (and HEAD
+ * requests) may omit `Content-Length: 0` on empty-body responses — e.g. a `201` with
+ * no body — so a request that succeeds over HTTP/2 can fail over HTTP/3.
+ *
+ * Normalize empty-body success responses by setting `Content-Length: 0` so the parser
+ * short-circuits regardless of transport. Non-empty responses are returned untouched.
+ */
+export async function normalizeEmptyBodyResponse(
+  response: Response,
+  source?: { request: Request; schemaPath: string }
+): Promise<Response> {
+  if (response.status === 204) {
+    return response
+  }
+
+  if (response.headers.has('Content-Length')) {
+    if (source && response.headers.get('Content-Length') === '0') {
+      void reportEmptyBodyResponse({ ...source, response })
+    }
+    return response
+  }
+
+  const body = await response.clone().text()
+  if (body.length > 0) {
+    return response
+  }
+
+  if (source) void reportEmptyBodyResponse({ ...source, response })
+
+  const headers = new Headers(response.headers)
+  headers.set('Content-Length', '0')
+  return new Response(null, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
 function pgMetaGuard(request: Request) {
   // Only check for /platform/pg-meta/ endpoints
   if (request.url.includes('/platform/pg-meta/')) {
@@ -92,9 +139,9 @@ client.use(
   },
   {
     // Middleware to format errors
-    async onResponse({ request, response }) {
+    async onResponse({ request, response, schemaPath }) {
       if (response.ok) {
-        return response
+        return normalizeEmptyBodyResponse(response, { request, schemaPath })
       }
 
       // handle errors
@@ -104,9 +151,15 @@ client.use(
 
         // add code field to body
         body.code = response.status
+
         body.requestId = request.headers.get('X-Request-Id')
-        const retryAfterHeader = response.headers.get('Retry-After')
+
+        const retryAfterHeader =
+          response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset')
         body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
+
+        const requestUrl = new URL(request.url)
+        body.requestPathname = requestUrl.pathname
 
         return new Response(JSON.stringify(body), {
           headers: response.headers,
@@ -122,28 +175,24 @@ client.use(
   }
 )
 
-export const {
-  GET: get,
-  POST: post,
-  PUT: put,
-  PATCH: patch,
-  DELETE: del,
-  HEAD: head,
-  TRACE: trace,
-  OPTIONS: options,
-} = client
+export const get = guardMethod('get', client.GET) as GuardedClientMethod<paths, 'get'>
+export const post = guardMethod('post', client.POST) as GuardedClientMethod<paths, 'post'>
+export const put = guardMethod('put', client.PUT) as GuardedClientMethod<paths, 'put'>
+export const patch = guardMethod('patch', client.PATCH) as GuardedClientMethod<paths, 'patch'>
+export const del = guardMethod('delete', client.DELETE) as GuardedClientMethod<paths, 'delete'>
+export const { HEAD: head, TRACE: trace, OPTIONS: options } = client
+
+export { unguarded, type Unguarded } from './guarded-fetch'
 
 type HandleErrorOptions = {
   alwaysCapture?: boolean
+  sentryContext?: Parameters<typeof Sentry.captureException>[1]
 }
 
-export const handleError = (
-  error: unknown,
-  options: HandleErrorOptions = { alwaysCapture: false }
-): never => {
+export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   if (error && typeof error === 'object') {
     if (options.alwaysCapture) {
-      Sentry.captureException(error)
+      Sentry.captureException(error, options.sentryContext)
     }
     const errorMessage =
       'msg' in error && typeof error.msg === 'string'
@@ -157,9 +206,40 @@ export const handleError = (
       'requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined
     const retryAfter =
       'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
+    const requestPathname =
+      'requestPathname' in error && typeof error.requestPathname === 'string'
+        ? error.requestPathname
+        : undefined
+    const metadata =
+      'metadata' in error && typeof error.metadata === 'object' && !!error.metadata
+        ? (error.metadata as ErrorMetadata)
+        : undefined
+    const formattedError =
+      'formattedError' in error && typeof error.formattedError === 'string'
+        ? error.formattedError
+        : undefined
 
     if (errorMessage) {
-      throw new ResponseError(errorMessage, errorCode, requestId, retryAfter)
+      const matched = ERROR_PATTERNS.find(({ pattern }) => pattern.test(errorMessage))
+      throw matched
+        ? new matched.ErrorClass(
+            errorMessage,
+            errorCode,
+            requestId,
+            retryAfter,
+            requestPathname,
+            metadata,
+            formattedError
+          )
+        : new UnknownAPIResponseError(
+            errorMessage,
+            errorCode,
+            requestId,
+            retryAfter,
+            requestPathname,
+            metadata,
+            formattedError
+          )
     }
   }
 
@@ -169,11 +249,11 @@ export const handleError = (
 
   // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
   // add handling for it.
-  Sentry.captureException(error)
+  Sentry.captureException(error, options.sentryContext)
 
   // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
   // up in the UI.
-  throw new ResponseError(undefined)
+  throw new UnknownAPIResponseError(undefined)
 }
 
 // [Joshen] The methods below are brought over from lib/common/fetch because we still need them
@@ -229,10 +309,11 @@ async function handleFetchError(response: unknown): Promise<ResponseError> {
     resJson.msg ??
     resJson.error ??
     `An error has occurred: ${status ?? 'Unknown error'}`
-  const retryAfter =
-    response instanceof Response && response.headers.get('Retry-After')
-      ? parseInt(response.headers.get('Retry-After')!)
-      : undefined
+  const retryAfterHeader =
+    response instanceof Response
+      ? (response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset'))
+      : null
+  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
 
   let error = new ResponseError(message, status, undefined, retryAfter)
 

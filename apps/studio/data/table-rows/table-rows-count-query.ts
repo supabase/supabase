@@ -1,96 +1,28 @@
-import { Query } from '@supabase/pg-meta/src/query'
-import { QueryClient, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
-import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import type { Filter, SupaTable } from 'components/grid/types'
-import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { tableRowKeys } from './keys'
-import { formatFilterValue } from './utils'
+import { getTableRowsCountSql } from '@supabase/pg-meta'
+import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 
-type GetTableRowsCountArgs = {
+import { tableRowKeys } from './keys'
+import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
+import type { Filter, SupaTable } from '@/components/grid/types'
+import { unguarded } from '@/data/fetchers'
+import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
+
+export type GetTableRowsCountArgs = {
   table?: SupaTable
   filters?: Filter[]
   enforceExactCount?: boolean
 }
 
-export const THRESHOLD_COUNT = 50000
-const COUNT_ESTIMATE_SQL = /* SQL */ `
-CREATE OR REPLACE FUNCTION pg_temp.count_estimate(
-    query text
-) RETURNS integer LANGUAGE plpgsql AS $$
-DECLARE
-    plan jsonb;
-BEGIN
-    EXECUTE 'EXPLAIN (FORMAT JSON)' || query INTO plan;
-    RETURN plan->0->'Plan'->'Plan Rows';
-END;
-$$;
-`.trim()
-
-export const getTableRowsCountSql = ({
-  table,
-  filters = [],
-  enforceExactCount = false,
-}: GetTableRowsCountArgs) => {
-  if (!table) return ``
-
-  if (enforceExactCount) {
-    const query = new Query()
-    let queryChains = query.from(table.name, table.schema ?? undefined).count()
-    filters
-      .filter((x) => x.value && x.value !== '')
-      .forEach((x) => {
-        const value = formatFilterValue(table, x)
-        queryChains = queryChains.filter(x.column, x.operator, value)
-      })
-    return `select (${queryChains.toSql().slice(0, -1)}), false as is_estimate;`
-  } else {
-    const selectQuery = new Query()
-    let selectQueryChains = selectQuery.from(table.name, table.schema ?? undefined).select('*')
-    filters
-      .filter((x) => x.value && x.value != '')
-      .forEach((x) => {
-        const value = formatFilterValue(table, x)
-        selectQueryChains = selectQueryChains.filter(x.column, x.operator, value)
-      })
-    const selectBaseSql = selectQueryChains.toSql()
-
-    const countQuery = new Query()
-    let countQueryChains = countQuery.from(table.name, table.schema ?? undefined).count()
-    filters
-      .filter((x) => x.value && x.value != '')
-      .forEach((x) => {
-        const value = formatFilterValue(table, x)
-        countQueryChains = countQueryChains.filter(x.column, x.operator, value)
-      })
-    const countBaseSql = countQueryChains.toSql().slice(0, -1)
-
-    const sql = `
-${COUNT_ESTIMATE_SQL}
-
-with approximation as (
-    select reltuples as estimate
-    from pg_class
-    where oid = ${table.id}
-)
-select 
-  case 
-    when estimate = -1 then (select pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}'))
-    when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}')` : 'estimate'}
-    else (${countBaseSql})
-  end as count,
-  estimate = -1 or estimate > ${THRESHOLD_COUNT} as is_estimate
-from approximation;
-`.trim()
-
-    return sql
-  }
-}
-
 export type TableRowsCount = {
-  count: number
+  count?: number
   is_estimate?: boolean
 }
 
@@ -103,7 +35,7 @@ export type TableRowsCountVariables = Omit<GetTableRowsCountArgs, 'table'> & {
 }
 
 export type TableRowsCountData = TableRowsCount
-export type TableRowsCountError = ExecuteSqlError
+export type TableRowsCountError = ResponseError
 
 export async function getTableRowsCount(
   {
@@ -114,7 +46,8 @@ export async function getTableRowsCount(
     filters,
     roleImpersonationState,
     enforceExactCount,
-  }: TableRowsCountVariables,
+    isReadOnlyContext = false,
+  }: TableRowsCountVariables & { isReadOnlyContext?: boolean },
   signal?: AbortSignal
 ) {
   const entity = await prefetchTableEditor(queryClient, {
@@ -128,8 +61,17 @@ export async function getTableRowsCount(
 
   const table = parseSupaTable(entity)
 
+  const formattedFilters = filters?.map((x) => ({
+    ...x,
+    value: formatPatternMatchFilterValue(x.value, x.operator),
+  }))
   const sql = wrapWithRoleImpersonation(
-    getTableRowsCountSql({ table, filters, enforceExactCount }),
+    getTableRowsCountSql({
+      table,
+      filters: formattedFilters,
+      enforceExactCount,
+      isReadOnlyContext,
+    }),
     roleImpersonationState
   )
   const { result } = await executeSql(
@@ -139,31 +81,69 @@ export async function getTableRowsCount(
       sql,
       queryKey: ['table-rows-count', table.id],
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      grant: unguarded.migrating,
     },
     signal
   )
 
   return {
-    count: result[0].count,
-    is_estimate: result[0].is_estimate ?? false,
+    count: result?.[0]?.count,
+    is_estimate: result?.[0]?.is_estimate ?? false,
   } as TableRowsCount
 }
 
 export const useTableRowsCountQuery = <TData = TableRowsCountData>(
-  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsCountVariables, 'queryClient'>,
+  {
+    projectRef,
+    tableId,
+    ...args
+  }: Omit<TableRowsCountVariables, 'queryClient' | 'connectionString'>,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
+  }: UseCustomQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
 ) => {
   const queryClient = useQueryClient()
-  return useQuery<TableRowsCountData, TableRowsCountError, TData>(
-    tableRowKeys.tableRowsCount(projectRef, { table: { id: tableId }, ...args }),
-    ({ signal }) =>
-      getTableRowsCount({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
-      ...options,
-    }
+  const {
+    connectionString,
+    identifier: readReplicaIdentifier,
+    type,
+  } = useConnectionStringForReadOps()
+  const { can: canSQLAdminWrite, isLoading: isPermissionsLoading } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
+
+  return useQuery<TableRowsCountData, TableRowsCountError, TData>({
+    queryKey: tableRowKeys.tableRowsCount(projectRef, {
+      table: { id: tableId },
+      readReplicaIdentifier,
+      ...args,
+    }),
+    queryFn: ({ signal }) =>
+      getTableRowsCount(
+        {
+          queryClient,
+          projectRef,
+          connectionString,
+          tableId,
+          isReadOnlyContext: type === 'replica' || !canSQLAdminWrite,
+          ...args,
+        },
+        signal
+      ),
+    enabled:
+      enabled &&
+      typeof projectRef !== 'undefined' &&
+      typeof tableId !== 'undefined' &&
+      (!IS_PLATFORM || typeof connectionString !== 'undefined') &&
+      // isReadOnlyContext resolves to `type === 'replica' || !canSQLAdminWrite`: for
+      // read replicas it's already known synchronously, but otherwise it depends on
+      // canSQLAdminWrite, which starts out `false` while permissions are loading.
+      // Firing while that's still in flight would cache a transient
+      // isReadOnlyContext:true (and, on a never-analyzed table,
+      // count:-1/is_estimate:true) for what may actually be a writable user. Wait
+      // for the permission check to settle before firing in that case.
+      (type === 'replica' || !isPermissionsLoading),
+    ...options,
+  })
 }

@@ -1,7 +1,7 @@
 import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
+import { companyStats } from 'data/company-stats'
 import { Activity } from 'lucide-react'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
-import { companyStats } from 'data/company-stats'
 
 export const data = (isDark: boolean) => ({
   hero: {
@@ -20,11 +20,11 @@ export const data = (isDark: boolean) => ({
   highlightsSection: {
     highlights: [
       {
-        number: companyStats.databasesManaged,
+        number: companyStats.databasesManaged.text,
         text: 'databases managed',
       },
       {
-        number: companyStats.databasesLaunchedDaily,
+        number: companyStats.databasesLaunchedDaily.text,
         text: 'databases launched daily',
       },
       {
@@ -88,7 +88,7 @@ We're committed to our Free Plan - we know the importance of this for testing ho
       {
         number: '25,000',
         text: 'Discord members',
-        url: 'https://discord.com/invite/R7bSpeBSJE',
+        url: 'https://discord.supabase.com',
         icon: <IconDiscord />,
       },
       {
@@ -152,7 +152,7 @@ We're committed to our Free Plan - we know the importance of this for testing ho
                   strokeLinecap: 'butt',
                   strokeLinejoin: 'miter',
                   strokeMiterlimit: 10,
-                  fill: 'hsl(var(--background-default) / 1)',
+                  fill: 'oklch(from var(--background-default) l c h / 1)',
                   fillRule: 'nonzero',
                   opacity: 1,
                 }}
@@ -176,7 +176,7 @@ In the past year, we've had 12 companies start on Supabase and grow from zero to
 
 ![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg?v=3)
 
-Most of these were AI companies, like Udio, Krea, Humata, Chatbase, Pika, Quivr, Mendable, Markprompt and [MDN search](https://developer.mozilla.org/en-US/blog/introducing-ai-help/) by Mozilla.
+Most of these were AI companies, like Udio, Krea, Humata, Chatbase, Pika, Quivr, Firecrawl, Markprompt and [MDN search](https://developer.mozilla.org/en-US/blog/introducing-ai-help/) by Mozilla.
 
 Postgres has been instrumental in our scalability and adoption. It's versatility is best demonstrated by pgvector: we were the first cloud provider to offer it, and today 15% of all new Supabase projects use pgvector for AI and ML workloads. Look out for a few related announcements this week.
 `,

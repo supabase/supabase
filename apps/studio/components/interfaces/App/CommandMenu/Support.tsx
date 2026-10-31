@@ -1,35 +1,35 @@
-import { LifeBuoy } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { IS_PLATFORM } from 'common'
+import { ActivityIcon, LifeBuoyIcon } from 'lucide-react'
+import { useMemo } from 'react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 
-const useSupportCommands = () => {
+export const useSupportCommands = () => {
   const commands = useMemo(
     () =>
       [
         {
-          id: 'support',
-          name: 'Support',
-          route: 'https://www.supabase.com/support',
-          icon: () => <LifeBuoy />,
-        },
-        {
           id: 'system-status',
-          name: 'System Status',
-          value: 'Support: System Status',
+          name: 'View system status',
+          value: 'Support: View system status',
           route: 'https://status.supabase.com',
-          icon: () => <LifeBuoy />,
+          icon: () => <ActivityIcon />,
         },
         {
-          id: 'github-discussions',
-          name: 'GitHub Discussions',
-          value: 'Support: GitHub Discussions',
-          route: 'https://github.com/orgs/supabase/discussions',
-          icon: () => <LifeBuoy />,
-          defaultHidden: true,
+          id: 'discord-community',
+          name: 'Ask Discord community',
+          value: 'Support: Ask Discord community',
+          route: 'https://discord.supabase.com',
+          icon: () => <LifeBuoyIcon />,
+        },
+        {
+          id: 'support-team',
+          name: 'Contact support',
+          value: 'Support: Contact support',
+          route: 'https://www.supabase.com/support',
+          icon: () => <LifeBuoyIcon />,
         },
       ] as Array<ICommand>,
     []
@@ -37,5 +37,3 @@ const useSupportCommands = () => {
 
   useRegisterCommands(COMMAND_MENU_SECTIONS.SUPPORT, commands, { enabled: IS_PLATFORM })
 }
-
-export { useSupportCommands }

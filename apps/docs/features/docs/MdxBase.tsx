@@ -1,16 +1,15 @@
-import { MDXRemote } from 'next-mdx-remote/rsc'
+import { preprocessMdxWithDefaults } from '~/features/directives/utils'
+import { components } from '~/features/docs/MdxBase.shared'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { isFeatureEnabled } from 'common'
+import { MDXRemote } from 'next-mdx-remote-client/rsc'
 import { type ComponentProps } from 'react'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 
-import { preprocessMdxWithDefaults } from '~/features/directives/utils'
-import { components } from '~/features/docs/MdxBase.shared'
-import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-
 const mdxOptions: SerializeOptions = {
   mdxOptions: {
-    useDynamicImport: true,
     remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
     rehypePlugins: [rehypeKatex as any],
   },
@@ -39,6 +38,7 @@ const MDXRemoteBase = async ({
   } = mdxOptions
 
   const finalOptions = {
+    scope: { isFeatureEnabled },
     ...mdxOptions,
     ...otherOptions,
     mdxOptions: {

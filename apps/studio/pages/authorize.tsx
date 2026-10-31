@@ -1,278 +1,105 @@
-import dayjs from 'dayjs'
-import { AlertCircle } from 'lucide-react'
-import Link from 'next/link'
+import { useFlag, useParams } from 'common'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { AuthorizeRequesterDetails } from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
-import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
-import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
-import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { withAuth } from 'hooks/misc/withAuth'
-import type { NextPageWithLayout } from 'types'
-import {
-  Alert,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  Listbox,
-} from 'ui'
+import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
+import { ApiAuthorizationLoadingScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Loading'
+import { OAuthAppsAuthorizeScreen } from '@/components/interfaces/Organization/OAuthApps/Consent'
+import { OAUTH_APPS_MOCK_SCENARIOS, USE_MOCKS } from '@/data/oauth-apps/mocks'
+import { useOAuthAppsAuthorizeRequestQuery } from '@/data/oauth-apps/oauth-apps-authorize-request-query'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import type { NextPageWithLayout } from '@/types'
 
-// Need to handle if no organizations in account
-// Need to handle if not logged in yet state
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize API Access', brand: 'Supabase' })
+
+const MOCK_SCENARIOS: Record<string, { authId: string; organizationSlug?: string }> = {
+  default: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper },
+  reconsent: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent },
+  reconsent_all_projects: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects },
+  role_validation: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation },
+  empty_org: {
+    authId: OAUTH_APPS_MOCK_SCENARIOS.vercelDeveloper,
+    organizationSlug: 'contoso-labs',
+  },
+  dynamic_client: { authId: OAUTH_APPS_MOCK_SCENARIOS.dynamicMcpClient },
+  org_bound: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot },
+  org_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide },
+  user_bound_all: { authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects },
+}
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { auth_id, organization_slug } = useParams()
-  const [isApproving, setIsApproving] = useState(false)
-  const [isDeclining, setIsDeclining] = useState(false)
-  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
+  const routerReady = router.isReady
+  const { auth_id, organization_slug, mock_scenario } = useParams()
+  const oauthAppScopedGrants = useFlag('OauthAppScopedGrants')
+  const isScopedOAuthFlowEnabled = oauthAppScopedGrants && USE_MOCKS
 
-  const {
-    data: organizations,
-    isSuccess: isSuccessOrganizations,
-    isLoading: isLoadingOrganizations,
-  } = useOrganizationsQuery()
-  const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
-  const isApproved = (requester?.approved_at ?? null) !== null
-  const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
+  const mockScenario = USE_MOCKS
+    ? (MOCK_SCENARIOS[mock_scenario ?? 'default'] ?? MOCK_SCENARIOS.default)
+    : undefined
+  const authId = mockScenario?.authId ?? auth_id
+  const organizationSlug = organization_slug ?? mockScenario?.organizationSlug
 
-  const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
-    onSuccess: (res) => {
-      window.location.href = res.url
-    },
-  })
-  const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
-    onSuccess: () => {
-      toast.success('Declined API authorization request')
-      router.push('/organizations')
-    },
-  })
+  const projectRefParam = router.query.project_ref
+  const projectRef = (Array.isArray(projectRefParam) ? projectRefParam[0] : projectRefParam) ?? null
 
-  useEffect(() => {
-    if (isSuccessOrganizations && organizations.length > 0) {
-      if (organization_slug) {
-        setSelectedOrgSlug(organizations.find(({ slug }) => slug === organization_slug)?.slug)
-      } else {
-        setSelectedOrgSlug(organizations[0].slug)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccessOrganizations])
+  const { data: request } = useOAuthAppsAuthorizeRequestQuery(
+    { id: authId },
+    { enabled: isScopedOAuthFlowEnabled }
+  )
 
-  const onApproveRequest = async () => {
-    if (!auth_id) {
-      return toast.error('Unable to approve request: auth_id is missing ')
-    }
-    if (!selectedOrgSlug) {
-      return toast.error('Unable to approve request: No organization selected')
-    }
-
-    setIsApproving(true)
-    approveRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsApproving(false) })
-  }
-
-  const onDeclineRequest = async () => {
-    if (!auth_id) {
-      return toast.error('Unable to decline request: auth_id is missing ')
-    }
-    if (!selectedOrgSlug) {
-      return toast.error('Unable to decline request: No organization selected')
-    }
-
-    setIsDeclining(true)
-    declineRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsDeclining(false) })
-  }
-
-  if (isLoading) {
+  if (!routerReady) {
     return (
-      <FormPanel header={<p>Authorize API access</p>}>
-        <div className="px-8 py-6 space-y-2">
-          <ShimmeringLoader />
-          <ShimmeringLoader className="w-3/4" />
-          <ShimmeringLoader className="w-1/2" />
-        </div>
-      </FormPanel>
+      <>
+        <Head>
+          <title>{PAGE_TITLE}</title>
+        </Head>
+        <ApiAuthorizationLoadingScreen />
+      </>
     )
   }
 
-  if (auth_id === undefined) {
-    return (
-      <FormPanel header={<p>Authorization for API access</p>}>
-        <div className="px-8 py-6">
-          <Alert withIcon variant="warning" title="Missing authorization ID">
-            Please provide a valid authorization ID in the URL
-          </Alert>
-        </div>
-      </FormPanel>
-    )
-  }
-
-  if (isError) {
-    return (
-      <FormPanel header={<p>Authorize API access</p>}>
-        <div className="px-8 py-6">
-          <Alert
-            withIcon
-            variant="warning"
-            title="Failed to fetch details for API authorization request"
-          >
-            <p>Please retry your authorization request from the requesting app</p>
-            {error !== undefined && <p className="mt-2">Error: {error?.message}</p>}
-          </Alert>
-        </div>
-      </FormPanel>
-    )
-  }
-
-  if (isApproved) {
-    const approvedOrganization = organizations?.find(
-      (org) => org?.slug === requester.approved_organization_slug
-    )
+  if (isScopedOAuthFlowEnabled) {
+    if (!authId || !request) {
+      return (
+        <>
+          <Head>
+            <title>{PAGE_TITLE}</title>
+          </Head>
+          <ApiAuthorizationLoadingScreen />
+        </>
+      )
+    }
 
     return (
-      <FormPanel header={<p>Authorize API access for {requester?.name}</p>}>
-        <div className="w-full px-8 py-6 space-y-8">
-          <Alert withIcon variant="success" title="This authorization request has been approved">
-            <p>
-              {requester.name} has read and write access to the organization "
-              {approvedOrganization?.name ?? 'Unknown'}" and all of its projects
-            </p>
-            <p className="mt-2">
-              Approved on: {dayjs(requester.approved_at).format('DD MMM YYYY HH:mm:ss (ZZ)')}
-            </p>
-          </Alert>
-        </div>
-      </FormPanel>
+      <>
+        <Head>
+          <title>{PAGE_TITLE}</title>
+        </Head>
+        <OAuthAppsAuthorizeScreen
+          authId={authId}
+          request={request}
+          organizationSlug={organizationSlug}
+          projectRef={projectRef}
+          navigate={(destination) => router.push(destination)}
+        />
+      </>
     )
   }
-
-  const searchParams = new URLSearchParams(location.search)
-  let pathname = location.pathname
-  const basePath = process.env.NEXT_PUBLIC_BASE_PATH
-  if (basePath) {
-    pathname = pathname.replace(basePath, '')
-  }
-
-  searchParams.set('returnTo', pathname)
 
   return (
-    <FormPanel
-      header={<p>Authorize API access for {requester?.name}</p>}
-      footer={
-        <div className="flex items-center justify-end py-4 px-8">
-          <div className="flex items-center space-x-2">
-            <Button
-              type="default"
-              loading={isDeclining}
-              disabled={
-                isApproving || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)
-              }
-              onClick={onDeclineRequest}
-            >
-              Decline
-            </Button>
-            {isLoadingOrganizations ? (
-              <Button loading={isLoadingOrganizations}>Authorize {requester?.name}</Button>
-            ) : isSuccessOrganizations && organizations.length === 0 ? (
-              <Link href={`/new?${searchParams.toString()}`}>
-                <Button loading={isLoadingOrganizations}>Create an organization</Button>
-              </Link>
-            ) : (
-              <Button
-                loading={isApproving}
-                disabled={
-                  isDeclining || isExpired || (Boolean(organization_slug) && !selectedOrgSlug)
-                }
-                onClick={onApproveRequest}
-              >
-                Authorize {requester?.name}
-              </Button>
-            )}
-          </div>
-        </div>
-      }
-    >
-      <div className="w-full px-8 py-6 space-y-8">
-        {/* API Authorization requester details */}
-        <AuthorizeRequesterDetails
-          icon={requester.icon}
-          name={requester.name}
-          domain={requester.domain}
-          scopes={requester.scopes}
-        />
-
-        {/* Expiry warning */}
-        {isExpired && (
-          <Alert withIcon variant="warning" title="This authorization request is expired">
-            Please retry your authorization request from the requesting app
-          </Alert>
-        )}
-
-        {/* Organization selection */}
-        {isLoadingOrganizations ? (
-          <div className="py-4 space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-          </div>
-        ) : organizations?.length === 0 ? (
-          <Alert_Shadcn_ variant="warning">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle_Shadcn_>
-              Organization is needed for installing an integration
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="">
-              Your account isn't associated with any organizations. To use this integration, it must
-              be installed within an organization. You'll be redirected to create an organization
-              first.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        ) : organization_slug && !selectedOrgSlug ? (
-          <Alert_Shadcn_ variant="warning">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle_Shadcn_>
-              Organization is needed for installing an integration
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="">
-              Your account is not a member of the pre-selected organization. To use this
-              integration, it must be installed within an organization your account is associated
-              with.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        ) : (
-          <Listbox
-            label={
-              organization_slug
-                ? 'API access will be granted to pre-selected organization:'
-                : 'Select an organization to grant API access to:'
-            }
-            value={selectedOrgSlug}
-            disabled={isExpired || Boolean(organization_slug)}
-            onChange={setSelectedOrgSlug}
-          >
-            {(organizations ?? []).map((organization) => (
-              <Listbox.Option
-                key={organization?.slug}
-                label={organization?.name}
-                value={organization?.slug}
-              >
-                {organization.name}
-              </Listbox.Option>
-            ))}
-          </Listbox>
-        )}
-      </div>
-    </FormPanel>
+    <>
+      <Head>
+        <title>{PAGE_TITLE}</title>
+      </Head>
+      <ApiAuthorizationScreen
+        auth_id={auth_id}
+        organization_slug={organization_slug}
+        navigate={(destination) => router.push(destination)}
+      />
+    </>
   )
 }
-
-APIAuthorizationPage.getLayout = (page) => <APIAuthorizationLayout>{page}</APIAuthorizationLayout>
 
 export default withAuth(APIAuthorizationPage)

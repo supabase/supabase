@@ -1,7 +1,7 @@
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Label } from 'ui'
 
-import { Label_Shadcn_ as Label } from 'ui'
 import type { DataTableInputFilterField } from '../DataTable.types'
 import { useDebounce } from '../hooks/useDebounce'
 import { InputWithAddons } from '../primitives/InputWithAddons'
@@ -40,8 +40,8 @@ export function DataTableFilterInput<TData>({ value: _value }: DataTableInputFil
       </Label>
       <InputWithAddons
         placeholder="Search"
-        leading={<Search className="h-4 w-4" />}
-        containerClassName="h-9 rounded"
+        leading={<SearchIcon className="h-4 w-4" />}
+        containerClassName="h-9 rounded-sm"
         name={value}
         id={value}
         value={input || ''}

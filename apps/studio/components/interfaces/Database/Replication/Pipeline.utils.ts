@@ -1,96 +1,122 @@
-import { ReplicationPipelineStatusData } from 'data/replication/pipeline-status-query'
-import { PipelineStatusRequestStatus } from 'state/replication-pipeline-request-status'
-
-export const PIPELINE_ERROR_MESSAGES = {
-  RETRIEVE_PIPELINE: 'Failed to retrieve pipeline information',
-  RETRIEVE_PIPELINE_STATUS: 'Failed to retrieve pipeline status',
-  RETRIEVE_REPLICATION_STATUS: 'Failed to retrieve table replication status',
-  RETRIEVE_DESTINATIONS: 'Failed to retrieve destinations',
-  ENABLE_DESTINATION: 'Failed to enable destination',
-  DISABLE_DESTINATION: 'Failed to disable destination',
-  DELETE_DESTINATION: 'Failed to delete destination',
-  NO_PIPELINE_FOUND: 'No pipeline found',
-  COPY_TABLE_STATUS: 'Failed to copy table status',
-} as const
+import { PipelineStatusName } from './Replication.constants'
+import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
+import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
 export const getStatusName = (
   status: ReplicationPipelineStatusData['status'] | undefined
-): ReplicationPipelineStatusData['status']['name'] | undefined => {
-  if (status && typeof status === 'object' && 'name' in status) {
-    return status.name
-  }
-  return undefined
+): PipelineStatusName | undefined => {
+  if (!status || typeof status !== 'object' || !('name' in status)) return undefined
+  return normalizePipelineStatusName(status.name)
 }
 
-export const PIPELINE_STATE_MESSAGES = {
-  enabling: {
-    title: 'Pipeline Enabling',
-    message: 'Starting the pipeline. Table replication will resume once enabled.',
-    badge: 'Enabling',
+export const normalizePipelineStatusName = (statusName?: string): PipelineStatusName | undefined =>
+  typeof statusName === 'string' &&
+  (Object.values(PipelineStatusName) as string[]).includes(statusName)
+    ? (statusName as PipelineStatusName)
+    : undefined
+
+export type PipelineDisplayStateKey =
+  | 'starting'
+  | 'stopping'
+  | 'failed'
+  | 'stopped'
+  | 'running'
+  | 'unknown'
+
+export type PipelineDisplayType = 'failure' | 'loading' | 'success' | 'idle'
+
+export interface PipelineDisplayState {
+  key: PipelineDisplayStateKey
+  label: string
+  title: string
+  message: string
+  badge: string
+  type: PipelineDisplayType
+}
+
+const PIPELINE_DISPLAY_STATES: Record<PipelineDisplayStateKey, PipelineDisplayState> = {
+  starting: {
+    key: 'starting',
+    label: 'Starting',
+    title: 'Starting pipeline',
+    message: 'Starting the pipeline. Replication will resume once running.',
+    badge: 'Starting',
+    type: 'loading',
   },
-  disabling: {
-    title: 'Pipeline Disabling',
-    message: 'Stopping the pipeline. Table replication will be paused once disabled.',
-    badge: 'Disabling',
+  stopping: {
+    key: 'stopping',
+    label: 'Stopping',
+    title: 'Stopping pipeline',
+    message: 'Stopping replication. Data transfer will stop after in-flight work finishes.',
+    badge: 'Stopping',
+    type: 'loading',
   },
   failed: {
-    title: 'Pipeline Failed',
-    message: 'Replication has encountered an error. Check the logs for details.',
+    key: 'failed',
+    label: 'Failed',
+    title: 'Pipeline failed',
+    message: 'Replication has encountered an error',
     badge: 'Failed',
+    type: 'failure',
   },
   stopped: {
-    title: 'Pipeline Stopped',
-    message: 'Replication is paused. Enable the pipeline to resume data synchronization.',
+    key: 'stopped',
+    label: 'Stopped',
+    title: 'Pipeline stopped',
+    message: 'Replication is stopped. Start the pipeline to resume data synchronization.',
     badge: 'Stopped',
-  },
-  starting: {
-    title: 'Pipeline Starting',
-    message: 'Initializing replication. Table status will be available once running.',
-    badge: 'Starting',
+    type: 'idle',
   },
   running: {
-    title: 'Pipeline Running',
-    message: 'Replication is active and processing data',
+    key: 'running',
+    label: 'Running',
+    title: 'Pipeline running',
+    message: 'Replication is active and processing changes',
     badge: 'Running',
+    type: 'success',
   },
   unknown: {
-    title: 'Pipeline Status Unknown',
-    message: 'Unable to determine replication status. Check the logs for more information.',
+    key: 'unknown',
+    label: 'Unknown',
+    title: 'Pipeline status unknown',
+    message: 'Unable to determine pipeline status',
     badge: 'Unknown',
+    type: 'idle',
   },
-  notRunning: {
-    title: 'Pipeline Not Running',
-    message: 'Replication is not active. Enable the pipeline to start data synchronization.',
-    badge: 'Disabled',
-  },
-} as const
+}
 
-export const getPipelineStateMessages = (
-  requestStatus: PipelineStatusRequestStatus | undefined,
-  statusName: string | undefined
-) => {
-  // Always prioritize request status (enabling/disabling) over pipeline status
-  if (requestStatus === PipelineStatusRequestStatus.EnableRequested) {
-    return PIPELINE_STATE_MESSAGES.enabling
+export const getPipelineDisplayState = (
+  requestStatus?: PipelineStatusRequestStatus,
+  statusName?: PipelineStatusName
+): PipelineDisplayState => {
+  if (requestStatus === PipelineStatusRequestStatus.StartRequested) {
+    return PIPELINE_DISPLAY_STATES.starting
+  }
+  if (requestStatus === PipelineStatusRequestStatus.StopRequested) {
+    return PIPELINE_DISPLAY_STATES.stopping
   }
 
-  if (requestStatus === PipelineStatusRequestStatus.DisableRequested) {
-    return PIPELINE_STATE_MESSAGES.disabling
-  }
-
-  // Only check pipeline status if no request is in progress
   switch (statusName) {
-    case 'failed':
-      return PIPELINE_STATE_MESSAGES.failed
-    case 'stopped':
-      return PIPELINE_STATE_MESSAGES.stopped
-    case 'starting':
-      return PIPELINE_STATE_MESSAGES.starting
-    case 'started':
-      return PIPELINE_STATE_MESSAGES.running
-    case 'unknown':
-      return PIPELINE_STATE_MESSAGES.unknown
+    case PipelineStatusName.STARTING:
+      return PIPELINE_DISPLAY_STATES.starting
+    case PipelineStatusName.FAILED:
+      return PIPELINE_DISPLAY_STATES.failed
+    case PipelineStatusName.STOPPED:
+      return PIPELINE_DISPLAY_STATES.stopped
+    case PipelineStatusName.STARTED:
+      return PIPELINE_DISPLAY_STATES.running
+    case PipelineStatusName.STOPPING:
+      return PIPELINE_DISPLAY_STATES.stopping
+    case PipelineStatusName.UNKNOWN:
     default:
-      return PIPELINE_STATE_MESSAGES.notRunning
+      return PIPELINE_DISPLAY_STATES.unknown
   }
+}
+
+/** Resetting tables or applying settings must not imply starting an inactive pipeline. */
+export const getRestartRequestStatus = (statusName?: PipelineStatusName) => {
+  if (statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED) {
+    return PipelineStatusRequestStatus.StopRequested
+  }
+  return PipelineStatusRequestStatus.None
 }

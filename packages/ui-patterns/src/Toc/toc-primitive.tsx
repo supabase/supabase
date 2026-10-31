@@ -1,11 +1,13 @@
 'use client'
 
+import { mergeRefs } from 'common/helpers'
+import { useAnchorObserver } from 'common/hooks/useAnchorObserver'
+import { useOnChange } from 'common/hooks/useOnChange'
 import { createContext, forwardRef, useContext, useMemo, useRef } from 'react'
-import scrollIntoView from 'scroll-into-view-if-needed'
 import type { AnchorHTMLAttributes, ReactNode, RefObject } from 'react'
-import type { TableOfContents } from './server/get-toc'
+import scrollIntoView from 'scroll-into-view-if-needed'
 
-import { mergeRefs, useAnchorObserver, useOnChange } from 'common'
+import type { TableOfContents } from './server/get-toc'
 
 export const ActiveAnchorContext = createContext<string[]>([])
 

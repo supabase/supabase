@@ -1,9 +1,12 @@
 import pgMeta from '@supabase/pg-meta'
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { getQueryClient } from '@/data/query-client'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { SafePostgresTable } from '@/lib/postgres-types'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type TablesVariables = {
   projectRef?: string
@@ -15,7 +18,7 @@ export type TablesVariables = {
 export async function getTable(
   { projectRef, connectionString, name, schema }: TablesVariables,
   signal?: AbortSignal
-) {
+): Promise<SafePostgresTable> {
   const { sql, zod } = pgMeta.tables.retrieve({ name, schema })
 
   const { result } = await executeSql(
@@ -24,26 +27,54 @@ export async function getTable(
       connectionString,
       sql,
       queryKey: tableKeys.retrieve(projectRef, name, schema),
+      grant: unguarded.migrating,
     },
     signal
   )
-  return zod.parse(result[0])
+  // pg-meta sources `check` from pg_catalog; treat it as SafeSqlFragment for DDL composition.
+  return zod.parse(result[0]) as unknown as SafePostgresTable
 }
 
 export type RetrieveTableResult = Awaited<ReturnType<typeof getTable>>
 export type RetrieveTableError = ResponseError
 export type RetrievedTableColumn = NonNullable<RetrieveTableResult['columns']>[number]
 
-export const useTablesQuery = <TData = RetrieveTableResult>(
+export const useTableQuery = <TData = RetrieveTableResult>(
   { projectRef, connectionString, name, schema }: TablesVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<RetrieveTableResult, RetrieveTableError, TData> = {}
+  }: UseCustomQueryOptions<RetrieveTableResult, RetrieveTableError, TData> = {}
 ) => {
-  return useQuery<RetrieveTableResult, RetrieveTableError, TData>(
-    tableKeys.retrieve(projectRef, name, schema),
-    ({ signal }) => getTable({ projectRef, connectionString, name, schema }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  return useQuery<RetrieveTableResult, RetrieveTableError, TData>({
+    queryKey: tableKeys.retrieve(projectRef, name, schema),
+    queryFn: ({ signal }) => getTable({ projectRef, connectionString, name, schema }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    refetchOnWindowFocus: false,
+    retryOnMount: false,
+    staleTime: 5 * 60 * 1000,
+    ...options,
+  })
+}
+
+/**
+ * Non-hook usage to fetch data + caching it into the store
+ */
+export const getTableQuery = async ({
+  projectRef,
+  name,
+  schema,
+  connectionString,
+}: {
+  projectRef: string
+  name: string
+  schema: string
+  connectionString?: string | null
+}) => {
+  const queryClient = getQueryClient()
+  const table = await queryClient.fetchQuery({
+    queryKey: tableKeys.retrieve(projectRef, name, schema),
+    queryFn: ({ signal }) => getTable({ projectRef, connectionString, name, schema }, signal),
+  })
+  return table
 }

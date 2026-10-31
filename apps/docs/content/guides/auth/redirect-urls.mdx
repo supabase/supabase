@@ -7,17 +7,29 @@ subtitle: 'Set up redirect urls with Supabase Auth.'
 
 ## Overview
 
-Supabase Auth allows your application to receive a [user session](/docs/guides/auth/sessions) on web pages or in mobile apps that only you allow.
+Supabase Auth allows you to control how the [user sessions](/docs/guides/auth/sessions) are handled by your application.
 
-When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library methods provide a `redirectTo` parameter to specify where to redirect the user to after authentication. By default, the user will be redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls) but you can modify the `SITE_URL` or add additional redirect URLs to the allow list. Once you've added necessary URLs to the allow list, you can specify the URL you want the user to be redirected to in the `redirectTo` parameter.
+<Admonition type="note">
 
-When using [Sign in with Web3](/docs/guides/auth/auth-web3) the message signed by the user in the Web3 wallet application will indicate the URL on which the signature took place. Supabase Auth will reject messages that are signed for URLs that have not been allowed.
+**Looking for OAuth client redirect URIs?**
 
-To edit the allow list, go to the [URL Configuration](/dashboard/project/_/auth/url-configuration) page. In local development or self-hosted projects, use the [configuration file](/docs/guides/cli/config#auth.additional_redirect_urls).
+This guide covers redirect URLs for users signing **into** your application (using social providers like Google, GitHub, etc.). If you're setting up your Supabase project as an **OAuth 2.1 provider** for third-party applications, see the [OAuth Server Redirect URI configuration](/docs/guides/auth/oauth-server/getting-started#redirect-uri-configuration) instead.
+
+</Admonition>
+
+When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth), the Supabase client library provides a `redirectTo` parameter to specify where to redirect the user after authentication. The URL in `redirectTo` should match the [Redirect URLs](/dashboard/project/_/auth/url-configuration) list configuration.
+
+To configure allowed redirect URLs, go to the [URL Configuration](/dashboard/project/_/auth/url-configuration) page. Once you've added necessary URLs, you can use the URL you want the user to be redirected to in the `redirectTo` parameter.
+
+The Site URL in [URL Configuration](/dashboard/project/_/auth/url-configuration) defines the **[default redirect URL](/kb/troubleshooting/why-am-i-being-redirected-to-the-wrong-url-when-using-auth-redirectto-option-_vqIeO)** when no `redirectTo` is specified in the code. Change this from `http://localhost:3000` to your production URL (e.g., https://example.com). This setting is critical for email confirmations and password resets.
+
+When using [Sign in with Web3](/docs/guides/auth/auth-web3), the message signed by the user in the Web3 wallet application will indicate the URL on which the signature took place. Supabase Auth will reject messages that are signed for URLs that are not on the allowed list.
+
+In local development or self-hosted projects, use the [configuration file](/docs/guides/local-development/cli/config#auth.additional_redirect_urls). See below for more information on configuring `SITE_URL` when deploying to Vercel or Netlify.
 
 ## Use wildcards in redirect URLs
 
-Supabase allows you to specify wildcards when adding redirect URLs to the [allow list](https://supabase.com/dashboard/project/_/auth/url-configuration). You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel.
+Supabase allows you to specify wildcards when adding redirect URLs to the [allow list](/dashboard/project/_/auth/url-configuration). You can use wildcard match patterns to support preview URLs from providers like Netlify and Vercel.
 
 | Wildcard                 | Description                                                                                                                                |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -30,7 +42,7 @@ Supabase allows you to specify wildcards when adding redirect URLs to the [allow
 
 The separator characters in a URL are defined as `.` and `/`. Use [this tool](https://www.digitalocean.com/community/tools/glob?comments=true&glob=http%3A%2F%2Flocalhost%3A3000%2F%2A%2A&matches=false&tests=http%3A%2F%2Flocalhost%3A3000&tests=http%3A%2F%2Flocalhost%3A3000%2F&tests=http%3A%2F%2Flocalhost%3A3000%2F%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest-test%3Ftest%3Dtest&tests=http%3A%2F%2Flocalhost%3A3000%2Ftest%2Ftest%3Ftest%3Dtest) to test your patterns.
 
-<Admonition type="note" label="Recommendation">
+<Admonition type="note" title="Recommendation">
 
 While the "globstar" (`**`) is useful for local development and preview URLs, we recommend setting the exact redirect URL path for your site URL in production.
 
@@ -82,6 +94,8 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 ```
 
+To point each preview deployment at its own Supabase preview branch, see [Preview branches on Vercel](/docs/guides/integrations/vercel-preview-branches).
+
 ## Email templates when using `redirectTo`
 
 When using a `redirectTo` option, you may need to replace the `{{ .SiteURL }}` with `{{ .RedirectTo }}` in your email templates. See the [Email Templates guide](/docs/guides/auth/auth-email-templates) for more information.
@@ -90,11 +104,13 @@ For example, change the following:
 
 ```html
 <!-- Old -->
-<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm your mail</a>
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+  >Confirm email address</a
+>
 
 <!-- New -->
 <a href="{{ .RedirectTo }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
-  >Confirm your mail</a
+  >Confirm email address</a
 >
 ```
 

@@ -1,13 +1,14 @@
 'use client'
 
-import * as Accordion from '@radix-ui/react-accordion'
+import { usePathname } from 'next/navigation'
+import { Accordion } from 'radix-ui'
+import { PropsWithChildren } from 'react'
+import { cn } from 'ui'
 
 import { type NavMenuSection } from '../Navigation.types'
-import * as NavItems from './NavigationMenu.constants'
-import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
-import { usePathname } from 'next/navigation'
-import { PropsWithChildren } from 'react'
 import { MenuId } from './NavigationMenu'
+import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
+import { useIaNavReady, useNavItems } from '@/features/IaNav'
 
 const NavigationMenuGuideList = ({
   id,
@@ -18,8 +19,9 @@ const NavigationMenuGuideList = ({
 }) => {
   const pathname = usePathname()
   const firstLevelRoute = pathname?.split('/')?.slice(0, 4)?.join('/')
+  const NavItems = useNavItems()
+  const isNavReady = useIaNavReady()
 
-  // eslint-disable-next-line import/namespace -- dynamic access, can't lint properly
   let menu = NavItems[id]
 
   if (id === MenuId.Integrations && additionalNavItems?.integrations) {
@@ -74,7 +76,11 @@ const NavigationMenuGuideList = ({
   }
 
   return (
-    <NavigationMenuGuideListWrapper id={id} firstLevelRoute={firstLevelRoute}>
+    <NavigationMenuGuideListWrapper
+      id={id}
+      firstLevelRoute={firstLevelRoute}
+      className={cn(!isNavReady && 'invisible noscript:visible')}
+    >
       <NavigationMenuGuideListItems menu={menu} id={id} />
     </NavigationMenuGuideListWrapper>
   )
@@ -83,10 +89,12 @@ const NavigationMenuGuideList = ({
 export function NavigationMenuGuideListWrapper({
   id,
   firstLevelRoute,
+  className,
   children,
 }: PropsWithChildren<{
   id: string
   firstLevelRoute?: string
+  className?: string
 }>) {
   return (
     <Accordion.Root
@@ -94,7 +102,10 @@ export function NavigationMenuGuideListWrapper({
       key={id}
       type="single"
       value={firstLevelRoute}
-      className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150"
+      className={cn(
+        'transition-all duration-150 ease-out opacity-100 ml-0 delay-150 w-full',
+        className
+      )}
     >
       {children}
     </Accordion.Root>

@@ -2,8 +2,8 @@
 title: Getting started with Ruby on Rails and Postgres on Supabase
 description: 'Learn how to create a new Rails app and connect it to a Supabase Postgres database.'
 author: thor_schaeff
-image: getting-started/rails/rails.jpg
-thumb: getting-started/rails/rails.jpg
+imgSocial: getting-started/rails/rails.jpg
+imgThumb: getting-started/rails/rails.jpg
 categories:
   - engineering
 tags:
@@ -20,9 +20,9 @@ Postgres is an ideal choice for your Ruby on Rails applications as Rails ships w
 
 In this post we'll start from scratch, creating a new Rails project, connecting it to our Supabase Postgres database, and interacting with the database using the Rails Console.
 
-<Admonition type="note" label="Need help migrating?">
+<Admonition type="note" title="Need help migrating?">
 
-Supabase is one of the best [free alternatives to Heroku Postgres](/alternatives/supabase-vs-heroku-postgres). See [this guide](/docs/guides/resources/migrating-to-supabase/heroku) to learn how to migrate from Heroku to Supabase.
+Supabase is one of the best [free alternatives to Heroku Postgres](/alternatives/supabase-vs-heroku-postgres). See [this guide](/kb/guides/migrate-from-heroku) to learn how to migrate from Heroku to Supabase.
 
 There's also a [Heroku to Supabase migration tool](https://migrate.supabase.com/) available to migrate in just a few clicks.
 
@@ -56,7 +56,7 @@ Go to [database.new](https://database.new) and create a new Supabase project. Sa
 
 When your project is up and running, navigate to the [project connect page](https://supabase.com/dashboard/project/_?showConnect=true) to find the URI connection string.
 
-Rails ships with a Postgres adapter included, you can simply configure it via the environment variables. You can find the database URL in your [Supabase Dashboard](/dashboard/project/_/settings/database).
+Rails ships with a Postgres adapter included, you can simply configure it via the environment variables. You can find the database URL in your [Supabase Dashboard](/dashboard/project/_/database/settings).
 
 ```bash Terminal
 export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
@@ -145,7 +145,7 @@ That's it! You're Rails app is up and running with Supabase Postgres and Fly.io!
 
 ## Conclusion
 
-Supabase is the ideal platform for powering your Postgres database for your Ruby on Rails applications! Every Supabase project comes with a full Postgres database and a good number of [useful extensions](/docs/guides/database/extensions)!
+Supabase is the ideal platform for powering your [Postgres database](/solutions/hosted-postgres) for your Ruby on Rails applications! Every Supabase project comes with a full Postgres database and a good number of [useful extensions](/docs/guides/database/extensions)!
 
 Try it out now at [database.new](https://database.new)!
 

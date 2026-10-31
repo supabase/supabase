@@ -1,7 +1,7 @@
+import { paths } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { paths } from 'api-types'
-import apiWrapper from 'lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -20,6 +20,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type ResponseData =
   paths['/platform/integrations/{slug}']['get']['responses']['200']['content']['application/json']
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   return res.status(200).json([])
 }

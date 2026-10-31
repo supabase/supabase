@@ -1,17 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { InvoicesSettings } from './InvoicesSettings'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckProjectPermissions } from 'hooks/misc/useCheckPermissions'
-import InvoicesSettings from './InvoicesSettings'
+} from '@/components/layouts/Scaffold'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
-const InvoicesSection = () => {
-  const { isSuccess: isPermissionsLoaded, can: canReadInvoices } = useAsyncCheckProjectPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+export const InvoicesSection = () => {
+  const { isSuccess: isPermissionsLoaded, can: canReadInvoices } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
   return (
@@ -36,5 +34,3 @@ const InvoicesSection = () => {
     </ScaffoldSection>
   )
 }
-
-export default InvoicesSection

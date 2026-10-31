@@ -1,11 +1,12 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Globe, Trash } from 'lucide-react'
+import { GlobeIcon, TrashIcon } from 'lucide-react'
+import { Button, Checkbox } from 'ui'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { EmptyListState } from 'components/ui/States'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button, Checkbox_Shadcn_ } from 'ui'
 import { ValueContainer } from './ValueContainer'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { EmptyListState } from '@/components/ui/EmptyListState'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RedirectUrlListProps {
   allowList: string[]
@@ -24,7 +25,9 @@ export const RedirectUrlList = ({
   onSelectRemoveURLs,
   onSelectClearSelection,
 }: RedirectUrlListProps) => {
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+  )
 
   // [Joshen] One for next time: maybe shift this into a reusable logic since it
   // seems like we can use this in multiple places for future
@@ -63,11 +66,8 @@ export const RedirectUrlList = ({
       <ValueContainer className="py-3 flex items-center justify-end">
         {selectedUrls.length > 0 ? (
           <div className="flex items-center gap-x-2">
-            <Button type="default" onClick={() => onSelectClearSelection()}>
-              Clear selection
-            </Button>
+            <Button onClick={() => onSelectClearSelection()}>Clear selection</Button>
             <ButtonTooltip
-              type="default"
               disabled={!canUpdateConfig}
               tooltip={{
                 content: {
@@ -77,27 +77,36 @@ export const RedirectUrlList = ({
                     : undefined,
                 },
               }}
-              icon={<Trash />}
+              icon={<TrashIcon />}
               onClick={() => (selectedUrls.length > 0 ? onSelectRemoveURLs() : null)}
             >
               Remove ({selectedUrls.length})
             </ButtonTooltip>
           </div>
         ) : (
-          <ButtonTooltip
-            disabled={!canUpdateConfig}
-            onClick={() => onSelectAddURL()}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text: !canUpdateConfig
-                  ? 'You need additional permissions to update redirect URLs'
-                  : undefined,
-              },
-            }}
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+            label="Add redirect URL"
+            onTrigger={() => onSelectAddURL()}
+            options={{ enabled: canUpdateConfig }}
+            side="bottom"
           >
-            Add URL
-          </ButtonTooltip>
+            <ButtonTooltip
+              variant="primary"
+              disabled={!canUpdateConfig}
+              onClick={() => onSelectAddURL()}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canUpdateConfig
+                    ? 'You need additional permissions to update redirect URLs'
+                    : undefined,
+                },
+              }}
+            >
+              Add URL
+            </ButtonTooltip>
+          </Shortcut>
         )}
       </ValueContainer>
       {allowList.length > 0 ? (
@@ -108,10 +117,10 @@ export const RedirectUrlList = ({
               <ValueContainer key={url} isSelected={isSelected} onClick={(e) => onClickUrl(e, url)}>
                 <div className={`flex items-center gap-4 font-mono group w-full`}>
                   <div className="w-5 h-5 flex items-center justify-center">
-                    <Checkbox_Shadcn_ checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
+                    <Checkbox checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
                   </div>
-                  <Globe strokeWidth={2} size={14} className="text-foreground-lighter" />
-                  <span className="text-sm flex-grow">{url}</span>
+                  <GlobeIcon strokeWidth={2} size={14} className="text-foreground-lighter" />
+                  <span className="text-sm grow">{url}</span>
                 </div>
               </ValueContainer>
             )
@@ -121,7 +130,7 @@ export const RedirectUrlList = ({
         <div
           className={[
             'flex items-center border-overlay bg-studio text-foreground',
-            'justify-center gap-2 rounded border px-6 py-8 text-sm',
+            'justify-center gap-2 rounded-b border px-6 py-8 text-sm',
           ].join(' ')}
         >
           <EmptyListState

@@ -1,7 +1,18 @@
-import { BASE_PATH } from 'lib/constants'
-import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { type OptimizedSearchColumns } from '@supabase/pg-meta'
 
-export const PANEL_PADDING = 'px-5 py-5'
+import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
+import { BASE_PATH } from '@/lib/constants'
+
+export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
+
+export type SpecificFilterColumn = OptimizedSearchColumns | 'name' | 'freeform'
+
+export const UUIDV4_LEFT_PREFIX_REGEX =
+  /^(?:[0-9a-f]{1,8}|[0-9a-f]{8}-|[0-9a-f]{8}-[0-9a-f]{1,4}|[0-9a-f]{8}-[0-9a-f]{4}-|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{0,3}|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{0,3}|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-|[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{0,12})$/i
+
+export const PHONE_NUMBER_LEFT_PREFIX_REGEX = /^[+]?[0-9]{0,15}$/
+
+export const PANEL_PADDING = 'px-4 py-5'
 
 // [Joshen] Temporary fix as bulk delete will fire n requests since Auth + API do not have a bulk delete endpoint yet
 export const MAX_BULK_DELETE = 20

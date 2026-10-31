@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { products } from 'shared-data'
 import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
 
@@ -5,7 +6,7 @@ export type ProductType = {
   [key: string]: {
     name: string
     icon: string
-    description: string | JSX.Element
+    description: ReactNode
     description_short: string
     label: string
     url: string
@@ -61,6 +62,19 @@ const MainProducts: ProductType = {
     description_short: 'Deploy code globally on the edge',
     label: '',
     url: '/edge-functions',
+  },
+  [PRODUCT_SHORTNAMES.COMPUTE]: {
+    name: PRODUCT_NAMES.COMPUTE,
+    icon: products.compute.icon[24],
+    description: (
+      <>
+        Run <strong>AI-agent sandboxes and backend services</strong> on one runtime, next to your
+        database.
+      </>
+    ),
+    description_short: 'Sandboxes and backend services',
+    label: 'Private Alpha',
+    url: '/compute',
   },
   [PRODUCT_SHORTNAMES.REALTIME]: {
     name: PRODUCT_NAMES.REALTIME,

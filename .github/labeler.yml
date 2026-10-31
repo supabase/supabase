@@ -1,0 +1,10 @@
+# Add 'documentation' to any change in apps/docs
+# https://github.com/marketplace/actions/labeler
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: 'apps/docs/**/*'
+
+# Add 'self-hosted' to any change in the self-hosting docs
+self-hosted:
+  - changed-files:
+      - any-glob-to-any-file: 'apps/docs/content/guides/self-hosting/**/*'

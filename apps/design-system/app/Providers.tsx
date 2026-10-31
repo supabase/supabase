@@ -1,17 +1,19 @@
 'use client'
 
+import { ThemeProvider } from 'common'
 import { Provider as JotaiProvider } from 'jotai'
-import { ThemeProvider as NextThemesProvider } from 'next-themes'
-import { ThemeProviderProps } from 'next-themes/dist/types'
-
 import { TooltipProvider } from 'ui'
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+import { MobileSidebarProvider } from '@/context/mobile-sidebar-context'
+
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <JotaiProvider>
-      <NextThemesProvider {...props}>
-        <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
-      </NextThemesProvider>
+      <ThemeProvider>
+        <TooltipProvider delayDuration={0}>
+          <MobileSidebarProvider>{children}</MobileSidebarProvider>
+        </TooltipProvider>
+      </ThemeProvider>
     </JotaiProvider>
   )
 }

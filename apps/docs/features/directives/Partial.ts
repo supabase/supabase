@@ -7,6 +7,10 @@
  * Simple string replacement is supported. The replacement strings are
  * specified using the `variables` field.
  *
+ * Variable substitution is optional. Any variable referenced in the partial
+ * content but not provided is rendered as an empty string, and any variable
+ * provided but not referenced in the content is ignored.
+ *
  * ## Examples
  *
  * ### Simple partial
@@ -33,14 +37,15 @@
  * ```
  */
 
-import { type Root } from 'mdast'
-import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { PARTIALS_DIRECTORY } from '~/lib/docs'
+import { parsePartialVariables, substitutePartialVars } from '~/lib/partials.utils'
+import { type Root } from 'mdast'
+import type { MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
 
-import { PARTIALS_DIRECTORY } from '~/lib/docs'
 import { fromDocsMarkdown, getAttributeValue, getAttributeValueExpression } from './utils.server'
 
 export function partialsRemark() {
@@ -65,6 +70,7 @@ function toFilePath(node: MdxJsxFlowElement) {
   if (typeof path !== 'string' || !isMdFile(path)) {
     throw new Error('Invalid $Partial path: path must end with .mdx or .md')
   }
+
   const filePath = join(PARTIALS_DIRECTORY, path)
   if (!filePath.startsWith(PARTIALS_DIRECTORY)) {
     throw new Error(`Invalid $Partial path: Path must be inside ${PARTIALS_DIRECTORY}`)
@@ -72,34 +78,8 @@ function toFilePath(node: MdxJsxFlowElement) {
   return filePath
 }
 
-function substituteVars(content: string, vars: Record<string, string> | undefined) {
-  if (vars === undefined) {
-    return content
-  }
-
-  for (const [key, value] of Object.entries(vars)) {
-    content = content.replace(new RegExp(`(?<!\\\\)\\{\\{\\s*\\.${key}\\s*\\}\\}`, 'g'), value)
-  }
-  return content
-}
-
 function getVariables(node: MdxJsxFlowElement): undefined | Record<string, string> {
-  const variables = getAttributeValueExpression(getAttributeValue(node, 'variables'))
-  if (variables === undefined) {
-    return
-  }
-
-  try {
-    const parsed = JSON.parse(variables)
-    for (const value of Object.values(parsed)) {
-      if (typeof value !== 'string') {
-        throw new Error('Only string values are allowed')
-      }
-    }
-    return parsed
-  } catch {
-    throw new Error('Invalid $Partial variables: must be valid JSON containing only string values')
-  }
+  return parsePartialVariables(getAttributeValueExpression(getAttributeValue(node, 'variables')))
 }
 
 async function fetchPartialsContent(tree: Root) {
@@ -135,7 +115,7 @@ function rewriteNodes(
   contentMap: Map<MdxJsxFlowElement, [Parent, string, undefined | Record<string, string>]>
 ) {
   for (const [node, [parent, rawContent, vars]] of contentMap) {
-    let content = substituteVars(rawContent.trim(), vars)
+    const content = substitutePartialVars(rawContent.trim(), vars)
     const replacementContent = fromDocsMarkdown(content)
     parent.children.splice(parent.children.indexOf(node), 1, replacementContent)
   }

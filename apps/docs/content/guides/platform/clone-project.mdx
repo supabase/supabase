@@ -1,9 +1,32 @@
 ---
-title: Duplicate project
+title: Restore to a new project
 subtitle: How to clone your existing Supabase project
 ---
 
-You can clone your Supabase project by restoring your data from an existing project into a completely new one. Note that this only duplicates your database, not your project configuration.
+<Admonition type="note" title="Beta Version">
+
+You can clone your Supabase project by restoring your data from an existing project into a completely new one. This process creates a database-only copy and requires manual reconfiguration to fully replicate your original project.
+
+</Admonition>
+
+**What will be transferred?**
+
+- Database schema (tables, views, procedures)
+- All data and indexes
+- Database roles, permissions and users
+- Auth user data (user accounts, hashed passwords, and authentication records from the auth schema)
+- Encryption root key (so [Vault](/docs/guides/database/vault) secrets and encrypted columns remain readable in the new project)
+
+**What needs manual reconfiguration?**
+
+- Storage objects & settings (Your S3/storage files and bucket configurations are **NOT** copied)
+- Edge Functions
+- Auth settings & API keys
+- Realtime settings
+- Database extensions and settings
+- [Read replicas](/docs/guides/platform/read-replicas)
+
+To move Edge Functions to another project, see [Transfer Edge Function from one project to another](/kb/troubleshooting/transfer-edge-function-from-one-project-to-another).
 
 Whether you're using physical backups or Point-in-Time recovery (PITR), this feature allows you to duplicate project data with ease, perform testing safely, or recover data for analysis. Access to this feature is exclusive to users on paid plans and requires that physical backups are enabled for the source project.
 
@@ -13,7 +36,7 @@ PITR is an additional add-on available for organizations on a paid plan with phy
 
 </Admonition>
 
-To begin, switch to the source project—the project containing the data you wish to restore—and go to the [database backups](https://supabase.com/dashboard/project/_/database/backups/restore-to-new-project) page. Select the **Restore to a New Project** tab.
+To begin, switch to the source project—the project containing the data you wish to restore—and go to the [database backups](/dashboard/project/_/database/backups/restore-to-new-project) page. Select the **Restore to a New Project** tab.
 
 A list of available backups is displayed. Select the backup you want to use and click the "Restore" button. For projects with PITR enabled, use the date and time selector to specify the exact point in time from which you wish to restore data.
 
@@ -36,10 +59,20 @@ Once the restoration is complete, the new project will be available in your dash
 
 New projects are completely independent of their source, and as such can be modified and used as desired.
 
-<Admonition type="note">
+<Admonition type="caution">
 
-As the entire database is copied to the new project, this will include all extensions that were enabled at the source. If the source project included extensions that are configured to carry out external operations—for example pg_net, pg_cron, wrappers—these should be disabled once the copy process has completed to avoid any unwanted actions from taking place.
+Restore to a new project is a binary restore: it copies the entire database, including any enabled extensions that carry out external operations (for example `pg_net`, `pg_cron`, wrappers). These jobs start running as soon as the restore completes. There's no way to exclude or pause them going into the restore.
+
+If you need to inspect or remove cron jobs, webhook triggers, or wrapper definitions before any external extension runs, use a [logical restore with the Supabase CLI](/docs/guides/platform/migrating-within-supabase/backup-restore) instead. This process is manual, and doesn't carry over the encryption root key, so Vault secrets and encrypted columns aren't readable unless you migrate the key separately.
 
 </Admonition>
 
 Restoring to a new project is an excellent way to manage environments more effectively. You can use this feature to create staging environments for testing, experiment with changes without risk to production data, or swiftly recover from unexpected data loss scenarios.
+
+<Admonition type="danger">
+
+Recovering deleted rows by manually inspecting dead tuples (for example with `pageinspect` and `pg_surgery`) isn't supported on Supabase. It bypasses your table's constraint checks and can corrupt your data by restoring rows that violate a `CHECK`, `FOREIGN KEY`, or `UNIQUE` constraint.
+
+</Admonition>
+
+Restoring to a new project is the safe way to get deleted rows back. Restore from a physical backup that predates the deletion, or, if the deletion happened too recently for your last backup to have captured it, enable PITR and restore to the exact point in time before the deletion. Then copy the rows you need into your live project.

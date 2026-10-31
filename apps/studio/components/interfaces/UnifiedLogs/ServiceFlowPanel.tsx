@@ -1,233 +1,160 @@
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { useDataTable } from 'components/ui/DataTable/providers/DataTableProvider'
-import { ServiceFlowType, useUnifiedLogInspectionQuery } from 'data/logs'
 import {
-  CodeBlock,
   ResizableHandle,
   ResizablePanel,
-  Skeleton,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-  cn,
+  Tabs,
+  TabsContent,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
+
+import { LogDetail } from './components/LogDetail'
+import { LogStepSummary } from './components/LogTimeline'
+import { LogUser } from './components/LogUser'
+import { LogTimestampHeader, RequestTimeline } from './components/RequestTimeline'
+import { LogSelectionActions } from './LogSelectionActions'
 import {
-  MemoizedEdgeFunctionBlock,
-  MemoizedGoTrueBlock,
-  MemoizedNetworkBlock,
-  MemoizedPostgRESTBlock,
-  MemoizedPostgresBlock,
-  MemoizedStorageBlock,
-} from './ServiceFlow/components/ServiceBlocks'
-import { ServiceFlowHeader } from './ServiceFlow/components/ServiceFlowHeader'
-import { MemoizedRequestStartedBlock } from './ServiceFlow/components/blocks/RequestStartedBlock'
-import { MemoizedResponseCompletedBlock } from './ServiceFlow/components/blocks/ResponseCompletedBlock'
+  LogPanelCloseButton,
+  LogPanelNavigation,
+} from './ServiceFlow/components/ServiceFlowPanelControls'
+import { getLogDataForMetadataVisibility } from './ServiceFlowPanel.utils'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
+import { getEventMessageDisplay, getRawLogData } from './UnifiedLogs.utils'
+import { JsonCodeBlock } from '@/components/ui/JsonCodeBlock'
+import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
+import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface ServiceFlowPanelProps {
-  selectedRow: ColumnSchema
-  selectedRowKey: string
+  dock: 'bottom' | 'right'
+  setDock: (value: 'bottom' | 'right') => void
+  selectedRows: ColumnSchema[]
   searchParameters: QuerySearchParamsType
 }
 
 export function ServiceFlowPanel({
-  selectedRow,
-  selectedRowKey,
+  dock,
+  setDock,
+  selectedRows,
   searchParameters,
 }: ServiceFlowPanelProps) {
-  const { table, filterFields } = useDataTable()
-  const { ref: projectRef } = useParams()
-  const [activeTab, setActiveTab] = useState('service-flow')
+  const [activeTab, setActiveTab] = useState('overview')
 
-  const logType = selectedRow?.log_type
-  const serviceFlowType: ServiceFlowType | undefined =
-    logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
-  const shouldShowServiceFlow = !!serviceFlowType
+  const [openedLog, setOpenedLog] = useState<{ fromId: string; log: ColumnSchema } | null>(null)
+  const isRequestTimelineEnabled = useUnifiedLogsBackend(searchParameters)
+  const hasMultiple = selectedRows.length > 1
+  const selectedRow = selectedRows[0]
+  const activeLog =
+    (openedLog && openedLog.fromId === selectedRow?.id ? openedLog.log : undefined) ?? selectedRow
+  const showTimeline = isRequestTimelineEnabled && selectedRow?.log_type !== 'compute'
+  const showUser = selectedRow?.log_type !== 'compute'
+  const tabs = [
+    'overview',
+    'raw-json',
+    ...(showTimeline ? ['timeline'] : []),
+    ...(showUser ? ['user'] : []),
+  ]
+  const currentTab = tabs.includes(activeTab) ? activeTab : 'overview'
+  const title = hasMultiple
+    ? `${selectedRows.length} logs selected`
+    : getEventMessageDisplay(activeLog?.log_type ?? '', activeLog?.event_message).message ||
+      activeLog?.id
 
-  // Query the logs API directly
-  const {
-    data: serviceFlowData,
-    isLoading,
-    error,
-  } = useUnifiedLogInspectionQuery(
-    {
-      projectRef: projectRef,
-      logId: selectedRow?.id,
-      type: serviceFlowType,
-      search: searchParameters,
-    },
-    {
-      enabled: Boolean(projectRef) && Boolean(selectedRow?.id) && Boolean(serviceFlowType),
-    }
+  const handleSelectTimelineLog = (log: ColumnSchema) => {
+    if (!selectedRow) return
+    setOpenedLog(log.id === selectedRow.id ? null : { fromId: selectedRow.id, log })
+    setActiveTab('overview')
+  }
+  const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
+  const selectedJson = selectedRows.map((row) =>
+    getLogDataForMetadataVisibility(getRawLogData(row), logsMetadata)
   )
 
-  // Prepare JSON data for Raw JSON tab
-  const jsonData =
-    shouldShowServiceFlow && serviceFlowData?.result?.[0] ? serviceFlowData.result[0] : selectedRow
-
-  if (selectedRowKey) {
-    return (
-      <>
-        <ResizableHandle withHandle className="z-10" />
-        <ResizablePanel
-          id="log-sidepanel"
-          order={2}
-          defaultSize={1}
-          maxSize={40}
-          className={cn(
-            'bg-dash-sidebar',
-            'z-40',
-            'border-l fixed right-0 top-0 bottom-0',
-            'md:absolute md:h-auto',
-            // ' md:w-3/4',
-            'xl:z-[1]',
-            'min-w-[28rem] max-w-[45rem]',
-            'xl:relative xl:border-l-0'
-          )}
-        >
-          <div className="h-full overflow-auto">
-            {/* Service Flow Header with navigation */}
-            <ServiceFlowHeader
-              selectedRow={selectedRow}
-              enrichedData={serviceFlowData?.result?.[0]}
-            />
-
-            <div className="relative">
-              <Tabs
-                defaultValue="service-flow"
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="w-full h-full flex flex-col pt-2"
-              >
-                <TabsList className="flex gap-3 px-5">
-                  {shouldShowServiceFlow && (
-                    <TabsTrigger value="service-flow">Overview</TabsTrigger>
-                  )}
-                  <TabsTrigger value="raw-json">Raw JSON</TabsTrigger>
-                </TabsList>
-
-                {shouldShowServiceFlow && (
-                  <TabsContent value="service-flow">
-                    <div className="p-4">
-                      {error ? (
-                        <div className="text-center py-8 text-destructive">
-                          Error: {error.toString()}
-                        </div>
-                      ) : (
-                        <>
-                          {serviceFlowType === 'postgres' ? (
-                            // Postgres flows: Connection Started -> Postgres -> Response
-                            <>
-                              <MemoizedRequestStartedBlock data={selectedRow} />
-
-                              <MemoizedPostgresBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                                isLoading={isLoading}
-                                isLast={false}
-                                filterFields={filterFields}
-                                table={table}
-                              />
-
-                              <MemoizedResponseCompletedBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                              />
-                            </>
-                          ) : (
-                            // HTTP-based flows: Request Started -> Network -> Service -> Response
-                            <>
-                              <MemoizedRequestStartedBlock data={selectedRow} />
-
-                              <MemoizedNetworkBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                                isLoading={isLoading}
-                                filterFields={filterFields}
-                                table={table}
-                              />
-
-                              {serviceFlowType === 'auth' ? (
-                                <MemoizedGoTrueBlock
-                                  data={selectedRow}
-                                  enrichedData={serviceFlowData?.result?.[0]}
-                                  isLoading={isLoading}
-                                  filterFields={filterFields}
-                                  table={table}
-                                />
-                              ) : serviceFlowType === 'edge-function' ? (
-                                <MemoizedEdgeFunctionBlock
-                                  data={selectedRow}
-                                  enrichedData={serviceFlowData?.result?.[0]}
-                                  isLoading={isLoading}
-                                  filterFields={filterFields}
-                                  table={table}
-                                />
-                              ) : serviceFlowType === 'storage' ? (
-                                <MemoizedStorageBlock
-                                  data={selectedRow}
-                                  enrichedData={serviceFlowData?.result?.[0]}
-                                  isLoading={isLoading}
-                                  filterFields={filterFields}
-                                  table={table}
-                                />
-                              ) : (
-                                <>
-                                  <MemoizedPostgRESTBlock
-                                    data={selectedRow}
-                                    enrichedData={serviceFlowData?.result?.[0]}
-                                    isLoading={isLoading}
-                                    filterFields={filterFields}
-                                    table={table}
-                                  />
-
-                                  <MemoizedPostgresBlock
-                                    data={selectedRow}
-                                    enrichedData={serviceFlowData?.result?.[0]}
-                                    isLoading={isLoading}
-                                    filterFields={filterFields}
-                                    table={table}
-                                  />
-                                </>
-                              )}
-
-                              <MemoizedResponseCompletedBlock
-                                data={selectedRow}
-                                enrichedData={serviceFlowData?.result?.[0]}
-                              />
-                            </>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </TabsContent>
-                )}
-
-                <TabsContent value="raw-json" className="flex-grow overflow-auto">
-                  {isLoading && shouldShowServiceFlow && (
-                    <div className="flex items-center gap-3 text-foreground-light p-3 bg-surface-100 border-b border-border">
-                      <Skeleton className="h-4 w-4 rounded-full animate-pulse" />
-                      <span className="text-sm">Enriching log...</span>
-                    </div>
-                  )}
-                  <CodeBlock
-                    language="json"
-                    className="max-h-[800px] overflow-auto border-none rounded-none [&_pre]:!leading-tight [&_code]:!leading-tight"
-                  >
-                    {JSON.stringify(jsonData, null, 2)}
-                  </CodeBlock>
-                </TabsContent>
-              </Tabs>
+  return (
+    <>
+      <ResizableHandle withHandle />
+      <ResizablePanel
+        id="log-sidepanel"
+        defaultSize={400}
+        minSize={dock === 'bottom' ? 300 : 400}
+        className="bg-dash-sidebar"
+      >
+        <div className="flex h-full flex-col overflow-hidden">
+          <div className="flex min-w-0 items-start gap-3 px-4 pb-2 pt-3">
+            <div className="flex min-w-0 flex-1" role="status" title={title}>
+              {!hasMultiple && activeLog ? (
+                <LogStepSummary log={activeLog} />
+              ) : (
+                <span className="truncate text-sm leading-5 text-foreground">{title}</span>
+              )}
+            </div>
+            <div className="flex h-5 shrink-0 items-center gap-1">
+              <LogSelectionActions rows={hasMultiple || !activeLog ? selectedRows : [activeLog]} />
+              <LogPanelCloseButton />
             </div>
           </div>
-        </ResizablePanel>
-      </>
-    )
-  }
-
-  return null
+          {hasMultiple ? (
+            <div
+              className="min-h-0 flex-1 overflow-auto"
+              role="region"
+              aria-label="Selected logs JSON"
+            >
+              <JsonCodeBlock>{JSON.stringify(selectedJson, null, 2)}</JsonCodeBlock>
+            </div>
+          ) : (
+            <Tabs
+              value={currentTab}
+              onValueChange={setActiveTab}
+              className="flex min-h-0 flex-1 flex-col"
+            >
+              <TabsList className="shrink-0 gap-x-4 px-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="raw-json">Raw JSON</TabsTrigger>
+                {showTimeline && <TabsTrigger value="timeline">Timeline</TabsTrigger>}
+                {showUser && <TabsTrigger value="user">User</TabsTrigger>}
+                <TabsIndicator />
+              </TabsList>
+              {tabs.map((tab) => (
+                <TabsContent
+                  key={`${tab}-${selectedRow?.id}`}
+                  value={tab}
+                  className="mt-0 min-h-0 flex-1 overflow-auto"
+                >
+                  {tab === 'timeline' && selectedRow && activeLog && (
+                    <RequestTimeline
+                      row={selectedRow}
+                      activeLog={activeLog}
+                      onSelectLog={handleSelectTimelineLog}
+                    />
+                  )}
+                  {tab === 'user' && activeLog && (
+                    <LogUser row={activeLog} searchParameters={searchParameters} />
+                  )}
+                  {(tab === 'overview' || tab === 'raw-json') && activeLog && (
+                    <LogDetail
+                      row={activeLog}
+                      tab={tab}
+                      searchParameters={searchParameters}
+                      overviewHeader={<LogTimestampHeader log={activeLog} />}
+                    />
+                  )}
+                </TabsContent>
+              ))}
+            </Tabs>
+          )}
+          <div className="flex shrink-0 items-center gap-2 border-t px-4 py-1.5 text-xs text-foreground-lighter">
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+              <ShortcutBadge shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW} />
+              <ShortcutBadge shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_NEXT_ROW} />
+              <span>Extend selection</span>
+            </div>
+            <LogPanelNavigation dock={dock} setDock={setDock} />
+          </div>
+        </div>
+      </ResizablePanel>
+    </>
+  )
 }

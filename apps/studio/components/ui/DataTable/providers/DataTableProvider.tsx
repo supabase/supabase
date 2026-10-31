@@ -9,14 +9,14 @@ import type {
 } from '@tanstack/react-table'
 import { createContext, ReactNode, useContext, useMemo } from 'react'
 
-import { QuerySearchParamsType } from 'components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { DataTableFilterField } from '../DataTable.types'
-import { ControlsProvider } from './ControlsProvider'
+import { RowSelectionModifiers } from '../rowSelection.utils'
+import { ResponseError } from '@/types'
 
 // REMINDER: read about how to move controlled state out of the useReactTable hook
 // https://github.com/TanStack/table/discussions/4005#discussioncomment-7303569
 
-interface DataTableStateContextType {
+interface DataTableStateContextType<TSearchParams = unknown> {
   columnFilters: ColumnFiltersState
   sorting: SortingState
   rowSelection: RowSelectionState
@@ -24,30 +24,35 @@ interface DataTableStateContextType {
   columnVisibility: VisibilityState
   pagination: PaginationState
   enableColumnOrdering: boolean
-  searchParameters: QuerySearchParamsType
+  searchParameters: TSearchParams
+  hasPendingFilterChange?: boolean
+  openRowId: string | undefined
+  setOpenRowId: (id: string | undefined) => void
+  onSelectRow?: (id: string, modifiers?: RowSelectionModifiers) => void
 }
 
 interface DataTableBaseContextType<TData = unknown, TValue = unknown> {
   table: Table<TData>
+  error: ResponseError | null
   filterFields: DataTableFilterField<TData>[]
   columns: ColumnDef<TData, TValue>[]
-  isFetching?: boolean
-  isLoading?: boolean
-  isLoadingCounts?: boolean
+  isFetching: boolean
+  isError: boolean
+  isLoading: boolean
+  isLoadingCounts: boolean
   getFacetedUniqueValues?: (table: Table<TData>, columnId: string) => Map<string, number>
   getFacetedMinMaxValues?: (table: Table<TData>, columnId: string) => undefined | [number, number]
 }
 
-interface DataTableContextType<TData = unknown, TValue = unknown>
-  extends DataTableStateContextType,
-    DataTableBaseContextType<TData, TValue> {}
+interface DataTableContextType<TData = unknown, TValue = unknown, TSearchParams = unknown>
+  extends DataTableStateContextType<TSearchParams>, DataTableBaseContextType<TData, TValue> {}
 
-export const DataTableContext = createContext<DataTableContextType<any, any> | null>(null)
+export const DataTableContext = createContext<DataTableContextType<any, any, any> | null>(null)
 
-export function DataTableProvider<TData, TValue>({
+export function DataTableProvider<TData, TValue, TSearchParams = unknown>({
   children,
   ...props
-}: Partial<DataTableStateContextType> &
+}: Partial<DataTableStateContextType<TSearchParams>> &
   DataTableBaseContextType<TData, TValue> & {
     children: ReactNode
   }) {
@@ -62,23 +67,21 @@ export function DataTableProvider<TData, TValue>({
       pagination: props.pagination ?? { pageIndex: 0, pageSize: 10 },
       enableColumnOrdering: props.enableColumnOrdering ?? false,
       searchParameters: props.searchParameters ?? ({} as any),
+      openRowId: props.openRowId,
+      setOpenRowId: props.setOpenRowId ?? (() => {}),
     }),
     [props]
   )
 
-  return (
-    <DataTableContext.Provider value={value}>
-      <ControlsProvider>{children}</ControlsProvider>
-    </DataTableContext.Provider>
-  )
+  return <DataTableContext.Provider value={value}>{children}</DataTableContext.Provider>
 }
 
-export function useDataTable<TData, TValue>() {
+export function useDataTable<TData, TValue, TSearchParams = unknown>() {
   const context = useContext(DataTableContext)
 
   if (!context) {
     throw new Error('useDataTable must be used within a DataTableProvider')
   }
 
-  return context as DataTableContextType<TData, TValue>
+  return context as DataTableContextType<TData, TValue, TSearchParams>
 }

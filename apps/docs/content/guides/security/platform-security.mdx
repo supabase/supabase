@@ -6,14 +6,14 @@ description: 'Supabase provides a secure yet flexible platform. Here is how to a
 
 The Supabase hosted platform provides a secure by default configuration. Some organizations may however require further security controls to meet their own security policies or compliance requirements.
 
-Access to additional security controls can be found under the [security tab](https://supabase.com/dashboard/org/_/security) for organizations.
+Access to additional security controls can be found under the [security tab](/dashboard/org/_/security) for organizations.
 
 ## Available controls
 
 <Admonition type="note">
 
 Additional security controls are under active development. Any changes will be published here and
-in our [changelog](https://supabase.com/changelog).
+in our [changelog](/changelog).
 
 </Admonition>
 
@@ -25,7 +25,7 @@ For configuration information, see [Enforce MFA on Organization](/docs/guides/pl
 
 ### SSO for organizations
 
-Supabase offers single sign-on (SSO) as a login option to provide additional account security for your team. This allows company administrators to enforce the use of an identity provider when logging into Supabase.
+Supabase offers single sign-on (SSO) as a sign-in option to provide additional account security for your team. This allows company administrators to enforce the use of an identity provider when signing in to Supabase.
 
 For configuration information, see [Enable SSO for Your Organization](/docs/guides/platform/sso).
 
@@ -40,6 +40,12 @@ For configuration information, see [Postgres SSL Enforcement](/docs/guides/platf
     Controlling this at the organization level is on our roadmap.
 
 </Admonition>
+
+### TLS for project APIs
+
+All HTTP APIs of your project, including Auth, the Data API, Storage, Realtime, and Edge Functions, accept only HTTPS connections using TLS 1.2 or TLS 1.3.
+
+For supported cipher suites, see [TLS for project APIs](/docs/guides/security/tls).
 
 ### Network restrictions
 
@@ -61,6 +67,6 @@ For configuration information, see [PrivateLink](/docs/guides/platform/privateli
 
 <Admonition type="note">
 
-PrivateLink is currently in alpha and available exclusively to Enterprise customers.
+To establish PrivateLink with a Read Replica, reach out to your account rep.
 
 </Admonition>

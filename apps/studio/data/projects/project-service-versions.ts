@@ -1,8 +1,8 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectServiceVersionsVariables = {
   projectRef?: string
@@ -30,13 +30,11 @@ export const useProjectServiceVersionsQuery = <TData = ProjectServiceVersionsDat
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectServiceVersionsData, ProjectServiceVersionsError, TData> = {}
+  }: UseCustomQueryOptions<ProjectServiceVersionsData, ProjectServiceVersionsError, TData> = {}
 ) =>
-  useQuery<ProjectServiceVersionsData, ProjectServiceVersionsError, TData>(
-    projectKeys.serviceVersions(projectRef),
-    ({ signal }) => getProjectServiceVersions({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectServiceVersionsData, ProjectServiceVersionsError, TData>({
+    queryKey: projectKeys.serviceVersions(projectRef),
+    queryFn: ({ signal }) => getProjectServiceVersions({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

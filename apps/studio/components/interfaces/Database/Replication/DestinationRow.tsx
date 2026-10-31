@@ -1,170 +1,284 @@
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { useDeleteDestinationMutation } from 'data/replication/delete-destination-mutation'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { Pipeline } from 'data/replication/pipelines-query'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
+import { ChevronRightIcon, MinusIcon } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { cn, TableCell, TableRow } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { DeleteDestination } from './DeleteDestination'
+import { DestinationLogo } from './DestinationLogo'
+import { DetailSubtext } from './DetailSubtext'
+import { PipelineStatePill } from './PipelineStatePill'
+import { PipelineStatusName } from './Replication.constants'
+import {
+  getFormattedLagValue,
+  getInitialSyncProgress,
+} from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
+import { RowMenu } from './RowMenu'
+import { UpdateVersionModal } from './UpdateVersionModal'
+import { useDestinationInformation } from './useDestinationInformation'
+import { AlertError } from '@/components/ui/AlertError'
+import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
+import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
+import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import { createNavigationHandler } from '@/lib/navigation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
-} from 'state/replication-pipeline-request-status'
-import { ResponseError } from 'types'
-import { Button } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import DeleteDestination from './DeleteDestination'
-import DestinationPanel from './DestinationPanel'
-import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
-import { PipelineStatus, PipelineStatusName } from './PipelineStatus'
-import { STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
-import { RowMenu } from './RowMenu'
+} from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 interface DestinationRowProps {
-  sourceId: number | undefined
   destinationId: number
-  destinationName: string
-  type: string
-  pipeline: Pipeline | undefined
-  error: ResponseError | null
-  isLoading: boolean
-  isError: boolean
-  isSuccess: boolean
 }
 
-export const DestinationRow = ({
-  sourceId,
-  destinationId,
-  destinationName,
-  type,
-  pipeline,
-  error: pipelineError,
-  isLoading: isPipelineLoading,
-  isError: isPipelineError,
-  isSuccess: isPipelineSuccess,
-}: DestinationRowProps) => {
+export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
-  const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
+
+  const { type, statusName, destination, pipeline, pipelineStatus, pipelineFetcher } =
+    useDestinationInformation({
+      id: destinationId,
+    })
+  const {
+    error: pipelineError,
+    isPending: isPipelineLoading,
+    isError: isPipelineError,
+  } = pipelineFetcher
+  const destinationName = destination?.name ?? pipeline?.destination_name ?? ''
 
   const {
-    data: pipelineStatusData,
     error: pipelineStatusError,
-    isLoading: isPipelineStatusLoading,
+    isPending: isPipelineStatusLoading,
     isError: isPipelineStatusError,
     isSuccess: isPipelineStatusSuccess,
-  } = useReplicationPipelineStatusQuery(
-    {
-      projectRef,
-      pipelineId: pipeline?.id,
-    },
-    { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
-  )
-  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
+  } = useReplicationPipelineStatusQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
+  const { getRequestStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
 
-  const { mutateAsync: stopPipeline } = useStopPipelineMutation()
-  const { mutateAsync: deleteDestination } = useDeleteDestinationMutation({})
+  const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
+  const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({
+    onError: () => {},
+  })
 
-  const pipelineStatus = pipelineStatusData?.status
-  const statusName = getStatusName(pipelineStatus)
+  // Fetch table-level replication status to surface errors in list view
+  const {
+    data: replicationStatusData,
+    isPending: isReplicationStatusLoading,
+    isError: isReplicationStatusError,
+  } = useReplicationPipelineReplicationStatusQuery({ projectRef, pipelineId: pipeline?.id }, {})
+  const tableStatuses = replicationStatusData?.table_statuses ?? []
+  const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
+  const applyLag = replicationStatusData?.apply_lag
+  // Slot acknowledgment can trail local worker progress; missing lag is not a caught-up signal.
+  const lagBytes = applyLag?.confirmed_flush_lsn_bytes
+  const lag = getFormattedLagValue('bytes', lagBytes)
+  // The lag figure only covers ongoing changes, so it reads as "Caught up" while an initial copy
+  // is still running. Say what's actually happening instead.
+  const { syncingCount } = getInitialSyncProgress(tableStatuses)
+  const isInitialSyncRunning = syncingCount > 0
+  const isCaughtUp = lagBytes === 0
+  // Hide old table errors while an optimistic lifecycle action is displayed.
+  const isPipelineStopped = statusName === PipelineStatusName.STOPPED
+  const isTransitioning = requestStatus !== PipelineStatusRequestStatus.None
+  const hasTableErrors = errorCount > 0 && !isPipelineStopped && !isTransitioning
+
+  // Check if a newer pipeline version is available (one-time check cached for session)
+  const { data: versionData } = useReplicationPipelineVersionQuery({
+    projectRef,
+    pipelineId: pipeline?.id,
+  })
+  const hasUpdate = Boolean(versionData?.new_version)
+
+  const handleNavigation = pipeline
+    ? createNavigationHandler(`/project/${projectRef}/database/pipelines/${pipeline.id}`, router)
+    : undefined
 
   const onDeleteClick = async () => {
     if (!projectRef) {
       return console.error('Project ref is required')
     }
     if (!pipeline) {
-      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+      return toast.error('No pipeline found')
     }
 
     try {
-      await stopPipeline({ projectRef, pipelineId: pipeline.id })
-      // deleting the destination also deletes the pipeline because of cascade delete
-      // so we don't need to call deletePipeline explicitly
-      await deleteDestination({ projectRef, destinationId: destinationId })
+      setIsDeleting(true)
+      await stopPipeline({ projectRef, pipelineId: pipeline.id, waitUntilStopped: true })
+      await deleteDestinationPipeline({
+        projectRef,
+        destinationId: destinationId,
+        pipelineId: pipeline.id,
+      })
+      // Close dialog after successful deletion
+      setShowDeleteDestinationForm(false)
+      toast.success(`Deleted pipeline "${destinationName}"`)
     } catch (error) {
-      toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
+      toast.error(`Failed to delete pipeline: ${(error as ResponseError).message}`)
+    } finally {
+      setIsDeleting(false)
     }
   }
 
-  useEffect(() => {
-    if (pipeline?.id) {
-      updatePipelineStatus(pipeline.id, statusName)
-    }
-  }, [pipeline?.id, statusName, updatePipelineStatus])
+  // Five distinct states, so early returns rather than a ternary chain.
+  const renderLag = () => {
+    if (isReplicationStatusLoading) return <ShimmeringLoader />
+    if (isInitialSyncRunning)
+      return <span className="text-foreground-light whitespace-nowrap">Initial sync</span>
+    if (isReplicationStatusError || !applyLag)
+      return (
+        <>
+          <MinusIcon size={18} className="text-foreground-lighter" aria-hidden />
+          <span className="sr-only">Lag unavailable</span>
+        </>
+      )
+    if (isCaughtUp)
+      return <span className="text-foreground-light whitespace-nowrap">Caught up</span>
+    return <span className="text-foreground-light whitespace-nowrap">{lag.display}</span>
+  }
 
   return (
     <>
       {isPipelineError && (
-        <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
+        <TableRow>
+          <TableCell colSpan={6}>
+            <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
+          </TableCell>
+        </TableRow>
       )}
-      {isPipelineSuccess && (
-        <Table.tr>
-          <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : destinationName}</Table.td>
-          <Table.td>{isPipelineLoading ? <ShimmeringLoader /> : type}</Table.td>
-          <Table.td>
+      {(isPipelineLoading || pipeline) && (
+        <TableRow
+          className={cn('relative', pipeline && 'cursor-pointer focus-inset')}
+          onClick={handleNavigation}
+          onAuxClick={handleNavigation}
+          onKeyDown={handleNavigation}
+          tabIndex={pipeline ? 0 : undefined}
+        >
+          <TableCell className="!pr-1">
+            {type ? <DestinationLogo type={type} hasErrors={hasTableErrors} /> : null}
+          </TableCell>
+
+          <TableCell className="max-w-[180px]">
+            {isPipelineLoading && !destinationName ? (
+              <ShimmeringLoader />
+            ) : (
+              <div className="flex flex-col gap-y-0.5">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {destinationName || type}
+                </p>
+                {pipeline && (
+                  <DetailSubtext className="flex items-center gap-x-1.5">
+                    <span>#{pipeline.id}</span>
+                    <span aria-hidden>&middot;</span>
+                    <span>{type}</span>
+                    {hasTableErrors && (
+                      <>
+                        <span aria-hidden>&middot;</span>
+                        <span className="text-destructive">
+                          {errorCount} table error{errorCount === 1 ? '' : 's'}
+                        </span>
+                      </>
+                    )}
+                  </DetailSubtext>
+                )}
+              </div>
+            )}
+          </TableCell>
+
+          <TableCell>
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader />
             ) : (
-              <PipelineStatus
-                pipelineStatus={pipelineStatusData?.status}
+              <PipelineStatePill
+                pipelineStatus={pipelineStatus?.status}
                 error={pipelineStatusError}
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
                 isSuccess={isPipelineStatusSuccess}
                 requestStatus={requestStatus}
+                projectRef={projectRef}
+                pipelineId={pipeline?.id}
               />
             )}
-          </Table.td>
-          <Table.td>
+          </TableCell>
+
+          <TableCell>
+            <div aria-live="polite" aria-atomic="true">
+              {isReplicationStatusLoading && <span className="sr-only">Loading lag</span>}
+              {renderLag()}
+            </div>
+          </TableCell>
+
+          <TableCell>
             {isPipelineLoading || !pipeline ? (
               <ShimmeringLoader />
             ) : (
               pipeline.config.publication_name
             )}
-          </Table.td>
-          <Table.td>
+          </TableCell>
+
+          <TableCell>
             <div className="flex items-center justify-end gap-x-2">
-              <Button asChild type="default">
-                <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
-                  View status
-                </Link>
-              </Button>
-              <RowMenu
-                pipeline={pipeline}
-                pipelineStatus={pipelineStatusData?.status}
-                error={pipelineStatusError}
-                isLoading={isPipelineStatusLoading}
-                isError={isPipelineStatusError}
-                onDeleteClick={() => setShowDeleteDestinationForm(true)}
-                onEditClick={() => setShowEditDestinationPanel(true)}
-              />
+              {pipeline ? (
+                <>
+                  <div
+                    onClick={(event) => event.stopPropagation()}
+                    onAuxClick={(event) => event.stopPropagation()}
+                    onKeyDown={(event) => event.stopPropagation()}
+                  >
+                    <RowMenu
+                      destinationId={destinationId}
+                      pipeline={pipeline}
+                      pipelineStatus={pipelineStatus?.status}
+                      error={pipelineStatusError}
+                      isLoading={isPipelineStatusLoading}
+                      isError={isPipelineStatusError}
+                      onDeleteClick={() => setShowDeleteDestinationForm(true)}
+                      hasUpdate={hasUpdate}
+                      onUpdateClick={() => setShowUpdateVersionModal(true)}
+                    />
+                  </div>
+                  <ChevronRightIcon
+                    size={16}
+                    strokeWidth={1.5}
+                    className="text-foreground-lighter"
+                    aria-hidden
+                  />
+                  <button tabIndex={-1} className="sr-only">
+                    Go to pipeline details
+                  </button>
+                </>
+              ) : (
+                <ShimmeringLoader className="h-6 w-6 py-0" />
+              )}
             </div>
-          </Table.td>
-        </Table.tr>
+          </TableCell>
+        </TableRow>
       )}
+
       <DeleteDestination
         visible={showDeleteDestinationForm}
         setVisible={setShowDeleteDestinationForm}
         onDelete={onDeleteClick}
-        isLoading={isPipelineStatusLoading}
+        isLoading={isDeleting}
         name={destinationName}
       />
-      <DestinationPanel
-        visible={showEditDestinationPanel}
-        onClose={() => setShowEditDestinationPanel(false)}
-        sourceId={sourceId}
-        existingDestination={{
-          sourceId,
-          destinationId: destinationId,
-          pipelineId: pipeline?.id,
-          enabled: statusName === PipelineStatusName.STARTED,
-        }}
+
+      <UpdateVersionModal
+        visible={showUpdateVersionModal}
+        pipeline={pipeline}
+        onClose={() => setShowUpdateVersionModal(false)}
       />
     </>
   )

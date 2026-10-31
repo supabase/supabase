@@ -1,19 +1,26 @@
-import matter from 'gray-matter'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { gfmFromMarkdown } from 'mdast-util-gfm'
-import { gfm } from 'micromark-extension-gfm'
-import { type Metadata, type ResolvingMetadata } from 'next'
-import { notFound } from 'next/navigation'
-import { readFile, readdir } from 'node:fs/promises'
-import { extname, join, sep } from 'node:path'
-
+import { readdir } from 'node:fs/promises'
+import { extname, join, relative, sep } from 'node:path'
+import * as Sentry from '@sentry/nextjs'
+import { extractMessageFromAnyError, FileNotFoundError } from '~/app/api/utils'
 import { pluckPromise } from '~/features/helpers.fn'
 import { cache_fullProcess_withDevCacheBust, existsFile } from '~/features/helpers.fs'
 import type { OrPromise } from '~/features/helpers.types'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
+import { mdAlternate } from '~/lib/md-alternates'
+import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { gfmFromMarkdown } from 'mdast-util-gfm'
+import { gfm } from 'micromark-extension-gfm'
+import { type Metadata, type ResolvingMetadata } from 'next'
+import { notFound } from 'next/navigation'
+
 import { newEditLink } from './GuidesMdx.template'
+import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
+
+const { metadataTitle } = getCustomContent(['metadata:title'])
 
 const PUBLISHED_SECTIONS = [
   'ai',
@@ -24,9 +31,10 @@ const PUBLISHED_SECTIONS = [
   'deployment',
   'functions',
   'getting-started',
-  // 'graphql', -- technically published, but completely federated
+  'graphql',
   'integrations',
   'local-development',
+  'observability',
   'platform',
   'queues',
   'realtime',
@@ -34,12 +42,13 @@ const PUBLISHED_SECTIONS = [
   'security',
   'self-hosting',
   'storage',
-  'telemetry',
 ] as const
 
 const getGuidesMarkdownInternal = async (slug: string[]) => {
   const relPath = slug.join(sep).replace(/\/$/, '')
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
+  const guidesPath = `/guides/${slug.join('/')}`
+
   /**
    * SAFETY CHECK:
    * Prevent accessing anything outside of published sections and GUIDES_DIRECTORY
@@ -51,30 +60,54 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
     notFound()
   }
 
-  let mdx: string
-  try {
-    mdx = await readFile(fullPath, 'utf-8')
-  } catch {
-    // Not using console.error because this includes pages that are genuine
-    // 404s and clutters up the logs
-    console.log('Error reading Markdown at path: %s', fullPath)
+  /**
+   * DISABLED PAGE CHECK:
+   * Check if this page is disabled in the navigation configuration
+   */
+  if (!checkGuidePageEnabled(guidesPath)) {
+    console.log('Page is disabled: %s', guidesPath)
     notFound()
   }
 
-  const editLink = newEditLink(
-    `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
-  )
+  try {
+    const guide = (await GuideModelLoader.fromFs(relative(GUIDES_DIRECTORY, fullPath))).unwrap()
+    const content = guide.content ?? ''
+    const meta = guide.metadata ?? {}
 
-  const { data: meta, content } = matter(mdx)
-  if (!isValidGuideFrontmatter(meta)) {
-    throw Error('Type of frontmatter is not valid')
-  }
+    if (!isValidGuideFrontmatter(meta)) {
+      throw Error(`Type of frontmatter is not valid for path: ${fullPath}`)
+    }
 
-  return {
-    pathname: `/guides/${slug.join('/')}` satisfies `/${string}`,
-    meta,
-    content,
-    editLink,
+    const { editLink: editLinkOverride, ...restMeta } = meta
+    const editLink = newEditLink(
+      editLinkOverride ?? `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
+    )
+
+    return {
+      pathname: `/guides/${slug.join('/')}` satisfies `/${string}`,
+      meta: restMeta,
+      content,
+      editLink,
+    }
+  } catch (error: unknown) {
+    // `fromFs` rethrows FileNotFoundError directly, so check the error itself
+    // as well as its cause.
+    if (
+      error instanceof FileNotFoundError ||
+      (error instanceof Error && error.cause instanceof FileNotFoundError)
+    ) {
+      // Not using console.error because this includes pages that are genuine
+      // 404s and clutters up the logs
+      console.log('Could not read Markdown at path: %s', fullPath)
+    } else {
+      console.error(
+        'Error processing Markdown file at path: %s:\n\t%s',
+        fullPath,
+        extractMessageFromAnyError(error)
+      )
+      Sentry.captureException(error)
+    }
+    notFound()
   }
 }
 
@@ -110,12 +143,25 @@ const genGuidesStaticParams = (directory?: string) => async () => {
           )
       )
 
+  // Flattening earlier will not work because there is nothing to flatten
+  // until the promises resolve.
+  const allParams = (await Promise.all(promises)).flat()
+
   /**
-   * Flattening earlier will not work because there is nothing to flatten
-   * until the promises resolve.
+   * Filter out disabled pages from static generation
    */
-  const result = (await Promise.all(promises)).flat()
-  return result
+  const enabledParams = allParams.filter((param) => {
+    const guidesPath = `/guides/${directory ? `${directory}/` : ''}${param.slug.join('/')}`
+    const isEnabled = checkGuidePageEnabled(guidesPath)
+
+    if (!isEnabled) {
+      console.log('Excluding disabled page from static generation: %s', guidesPath)
+    }
+
+    return isEnabled
+  })
+
+  return enabledParams
 }
 
 const genGuideMeta =
@@ -134,12 +180,16 @@ const genGuideMeta =
     const ogType = pathname.split('/')[2]
 
     return {
-      title: `${meta.title} | Supabase Docs`,
+      title: `${meta.title} | ${metadataTitle || 'Supabase'}`,
       description: meta.description || meta.subtitle,
       // @ts-ignore
       alternates: {
         ...parentAlternates,
         canonical: meta.canonical || `${BASE_PATH}${pathname}`,
+        types: {
+          ...(parentAlternates?.types ?? {}),
+          ...mdAlternate(pathname.replace(/^\/guides\//, '')),
+        },
       },
       openGraph: {
         ...parentOg,

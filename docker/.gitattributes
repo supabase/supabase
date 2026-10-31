@@ -1,0 +1,17 @@
+* text=auto
+
+*.md eol=lf
+
+*.env eol=lf
+.env.example eol=lf
+
+*.sh eol=lf
+*.sql eol=lf
+*.yml eol=lf
+*.yaml eol=lf
+*.ts eol=lf
+*.exs eol=lf
+*.conf eol=lf
+*.tpl eol=lf
+Caddyfile eol=lf
+Dockerfile* eol=lf

@@ -1,74 +1,132 @@
-import { Clipboard, Edit, Trash } from 'lucide-react'
+import { CopyIcon, EditIcon, ListFilterIcon, TrashIcon } from 'lucide-react'
 import { useCallback } from 'react'
-import { Item, ItemParams, Menu } from 'react-contexify'
+import { toast } from 'sonner'
+import { copyToClipboard, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from 'ui'
 
-import type { SupaRow } from 'components/grid/types'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { copyToClipboard } from 'ui'
-import { ROW_CONTEXT_MENU_ID } from '.'
+import { useTableRowOperations } from '../../hooks/useTableRowOperations'
 import { formatClipboardValue } from '../../utils/common'
+import { buildFilterFromCellValue, isComplexValue } from '../header/filter/FilterPopoverNew.utils'
+import type { SupaRow } from '@/components/grid/types'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
-export type RowContextMenuProps = {
-  rows: SupaRow[]
+type RowContextMenuContentProps = {
+  row: SupaRow
+  selectedCellPosition?: { idx: number; rowIdx: number } | null
 }
 
-const RowContextMenu = ({ rows }: RowContextMenuProps) => {
+export const RowContextMenuContent = ({
+  row,
+  selectedCellPosition,
+}: RowContextMenuContentProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const { deleteRows } = useTableRowOperations()
+  const activeCellPosition = selectedCellPosition ?? snap.selectedCellPosition
 
-  function onDeleteRow(p: ItemParams) {
-    const { props } = p
-    const { rowIdx } = props
-    const row = rows[rowIdx]
-    if (row) tableEditorSnap.onDeleteRows([row])
-  }
+  const onDeleteRow = useCallback(() => {
+    if (!row) {
+      toast.error('Row not found')
+      return
+    }
+    deleteRows({ rows: [row], table: snap.originalTable })
+  }, [row, snap.originalTable, deleteRows])
 
-  function onEditRowClick(p: ItemParams) {
-    const { props } = p
-    const { rowIdx } = props
-    const row = rows[rowIdx]
+  const onEditRowClick = useCallback(() => {
     tableEditorSnap.onEditRow(row)
-  }
+  }, [row, tableEditorSnap])
 
-  const onCopyCellContent = useCallback(
-    (p: ItemParams) => {
-      const { props } = p
+  const onCopyCellContent = useCallback(() => {
+    if (!activeCellPosition) return
 
-      if (!snap.selectedCellPosition || !props) {
-        return
+    const column = snap.gridColumns[activeCellPosition.idx]
+    if (!column) return
+
+    const value = row[column.key]
+    const text = formatClipboardValue(value)
+    const isSensitive = snap.sensitiveDataColumns.has(column.key as string)
+
+    void copyToClipboard(text, () => {
+      if (isSensitive) {
+        toast.warning('Copied sensitive data to clipboard')
+      } else {
+        toast.success('Copied cell value to clipboard')
       }
+    })
+  }, [activeCellPosition, row, snap.gridColumns, snap.sensitiveDataColumns])
 
-      const { rowIdx } = props
-      const row = rows[rowIdx]
+  const onCopyRowContent = useCallback(() => {
+    const hasSensitiveColumns = snap.gridColumns.some((col) =>
+      snap.sensitiveDataColumns.has(col.key as string)
+    )
 
-      const columnKey = snap.gridColumns[snap.selectedCellPosition.idx as number].key
+    void copyToClipboard(JSON.stringify(row), () => {
+      if (hasSensitiveColumns) {
+        toast.warning('Copied row containing sensitive data to clipboard')
+      } else {
+        toast.success('Copied row to clipboard')
+      }
+    })
+  }, [row, snap.gridColumns, snap.sensitiveDataColumns])
 
-      const value = row[columnKey]
-      const text = formatClipboardValue(value)
+  const getRowAndColumn = useCallback(() => {
+    if (!activeCellPosition) return null
 
-      copyToClipboard(text)
-    },
-    [rows, snap.gridColumns, snap.selectedCellPosition]
-  )
+    const column = snap.gridColumns[activeCellPosition.idx as number]
+    if (!row || !column) return null
+
+    return { row, column }
+  }, [activeCellPosition, row, snap.gridColumns])
+
+  const onFilterByValue = useCallback(() => {
+    const result = getRowAndColumn()
+    if (!result) return
+
+    const { row, column } = result
+    const newFilter = buildFilterFromCellValue(column.key, row[column.key])
+    snap.setFilters([...snap.filters, newFilter])
+
+    const displayValue = newFilter.value === 'null' ? 'NULL' : newFilter.value
+    toast.success(`Filtering ${column.name} by ${displayValue}`)
+  }, [getRowAndColumn, snap])
+
+  const isFilterByValueVisible = useCallback(() => {
+    const result = getRowAndColumn()
+    if (!result) return false
+
+    return !isComplexValue(result.row[result.column.key])
+  }, [getRowAndColumn])
 
   return (
-    <>
-      <Menu id={ROW_CONTEXT_MENU_ID} animation={false}>
-        <Item onClick={onCopyCellContent}>
-          <Clipboard size={14} />
-          <span className="ml-2 text-xs">Copy cell content</span>
-        </Item>
-        <Item onClick={onEditRowClick} hidden={!snap.editable} data="edit">
-          <Edit size={14} />
-          <span className="ml-2 text-xs">Edit row</span>
-        </Item>
-        <Item onClick={onDeleteRow} hidden={!snap.editable} data="delete">
-          <Trash size={14} stroke="red" />
-          <span className="ml-2 text-xs">Delete row</span>
-        </Item>
-      </Menu>
-    </>
+    <DropdownMenuContent align="start" side="right" sideOffset={0} className="w-36 min-w-36!">
+      <DropdownMenuItem className="gap-x-2" onSelect={onCopyCellContent}>
+        <CopyIcon size={12} />
+        <span className="text-xs">Copy cell</span>
+      </DropdownMenuItem>
+      <DropdownMenuItem className="gap-x-2" onSelect={onCopyRowContent}>
+        <CopyIcon size={12} />
+        <span className="text-xs">Copy row</span>
+      </DropdownMenuItem>
+      {isFilterByValueVisible() && (
+        <DropdownMenuItem className="gap-x-2" onSelect={onFilterByValue}>
+          <ListFilterIcon size={12} />
+          <span className="text-xs">Filter by value</span>
+        </DropdownMenuItem>
+      )}
+      {snap.editable && (
+        <>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="gap-x-2" onSelect={onEditRowClick}>
+            <EditIcon size={12} />
+            <span className="text-xs">Edit row</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="gap-x-2" onSelect={onDeleteRow}>
+            <TrashIcon size={12} />
+            <span className="text-xs">Delete row</span>
+          </DropdownMenuItem>
+        </>
+      )}
+    </DropdownMenuContent>
   )
 }
-export default RowContextMenu

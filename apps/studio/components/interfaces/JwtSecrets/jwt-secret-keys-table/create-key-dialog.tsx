@@ -1,37 +1,32 @@
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/jwt-signing-key-create-mutation'
-import { JWTAlgorithm } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { stringToBase64URL } from 'lib/base64url'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   DialogFooter,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Label_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Textarea,
 } from 'ui'
 
-dayjs.extend(relativeTime)
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-create-mutation'
+import { JWTAlgorithm } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
+import { stringToBase64URL } from '@/lib/base64url'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
 const EC_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'y', 'd']
-const ALLOWED_JWK_PROPERTIES = new Set([
-  ...RSA_JWK_REQUIRED_PROPERTIES,
-  ...EC_JWK_REQUIRED_PROPERTIES,
-])
 
 export const CreateKeyDialog = ({
   projectRef,
@@ -108,7 +103,7 @@ export const CreateKeyDialog = ({
     return null
   }, [privateKey, newKeyAlgorithm])
 
-  const { mutate, isLoading: isLoadingMutation } = useJWTSigningKeyCreateMutation({
+  const { mutate, isPending: isPendingMutation } = useJWTSigningKeyCreateMutation({
     onSuccess: () => {
       toast.success('Standby key created successfully')
       onClose()
@@ -148,11 +143,7 @@ export const CreateKeyDialog = ({
                     .replace(/=/g, '')
                 : stringToBase64URL(privateKey),
             }
-          : Object.fromEntries(
-              Object.entries(JSON.parse(privateKey)).filter(([prop]) =>
-                ALLOWED_JWK_PROPERTIES.has(prop)
-              )
-            )
+          : JSON.parse(privateKey)
         : null,
     })
   }
@@ -175,38 +166,34 @@ export const CreateKeyDialog = ({
       <DialogSectionSeparator />
       <DialogSection className="flex flex-col gap-4">
         <div className="flex flex-col gap-4">
-          <Label_Shadcn_ htmlFor="algorithm">Choose signing algorithm:</Label_Shadcn_>
-          <Select_Shadcn_
+          <Label htmlFor="algorithm">Choose signing algorithm:</Label>
+          <Select
             name="algorithm"
             value={newKeyAlgorithm}
             onValueChange={(value: JWTAlgorithm) => setNewKeyAlgorithm(value)}
           >
-            <SelectTrigger_Shadcn_ id="algorithm">
-              <SelectValue_Shadcn_ placeholder="Select algorithm" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectItem_Shadcn_ value="ES256">
+            <SelectTrigger id="algorithm">
+              <SelectValue placeholder="Select algorithm" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ES256">
                 <span>ES256 (ECC)</span>
-                <Badge variant="brand" className="ml-2">
+                <Badge variant="success" className="ml-2">
                   Recommended
                 </Badge>
-              </SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="RS256">RS256 (RSA)</SelectItem_Shadcn_>
-              <SelectItem_Shadcn_ value="HS256">HS256 (Shared Secret)</SelectItem_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectItem>
+              <SelectItem value="RS256">RS256 (RSA)</SelectItem>
+              <SelectItem value="HS256">HS256 (Shared Secret)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex flex-col gap-4">
-          <Label_Shadcn_ htmlFor="byok" className="flex items-center gap-x-2">
-            <Checkbox_Shadcn_
-              id="byok"
-              checked={isBYOK}
-              onCheckedChange={(value) => setBYOK(!!value)}
-            />
+          <Label htmlFor="byok" className="flex items-center gap-x-2">
+            <Checkbox id="byok" checked={isBYOK} onCheckedChange={(value) => setBYOK(!!value)} />
             {newKeyAlgorithm === 'HS256'
               ? 'Import an existing secret'
               : 'Import an existing private key'}
-          </Label_Shadcn_>
+          </Label>
           {isBYOK && (
             <div className="flex flex-col gap-2">
               <Textarea
@@ -230,26 +217,39 @@ export const CreateKeyDialog = ({
           )}
           {isBYOK && newKeyAlgorithm === 'HS256' && (
             <>
-              <Label_Shadcn_ htmlFor="base64" className="flex items-center gap-x-2">
-                <Checkbox_Shadcn_
+              <Label htmlFor="base64" className="flex items-center gap-x-2">
+                <Checkbox
                   id="base64"
                   checked={isBase64}
                   onCheckedChange={(value) => setBase64(!!value)}
                 />
                 Secret is already Base64 encoded
-              </Label_Shadcn_>
+              </Label>
             </>
           )}
         </div>
       </DialogSection>
       <DialogFooter>
-        <Button
-          onClick={() => handleAddNewStandbyKey()}
-          disabled={isLoadingMutation || !!privateKeyMessage}
-          loading={isLoadingMutation}
+        <Shortcut
+          id={SHORTCUT_IDS.JWT_KEYS_SUBMIT_STANDBY}
+          onTrigger={handleAddNewStandbyKey}
+          options={{
+            enabled:
+              !isPendingMutation && !privateKeyMessage && (!isBYOK || privateKey.trim().length > 0),
+          }}
+          side="top"
         >
-          Create standby key
-        </Button>
+          <Button
+            variant="primary"
+            onClick={() => handleAddNewStandbyKey()}
+            disabled={
+              isPendingMutation || !!privateKeyMessage || (isBYOK && privateKey.trim().length === 0)
+            }
+            loading={isPendingMutation}
+          >
+            Create standby key
+          </Button>
+        </Shortcut>
       </DialogFooter>
     </>
   )

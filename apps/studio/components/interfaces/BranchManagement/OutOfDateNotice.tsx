@@ -1,5 +1,5 @@
+import { GitBranchIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from 'ui'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,12 +10,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
+  Button,
 } from 'ui'
-import { GitBranchIcon } from 'lucide-react'
-import { Admonition } from 'ui-patterns'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { Admonition } from 'ui-patterns/Admonition'
+
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface OutOfDateNoticeProps {
   isBranchOutOfDateMigrations: boolean
@@ -34,9 +34,7 @@ export const OutOfDateNotice = ({
   isBranchOutOfDateMigrations,
   missingMigrationsCount,
   hasMissingFunctions,
-  missingFunctionsCount,
   hasOutOfDateFunctions,
-  outOfDateFunctionsCount,
   hasEdgeFunctionModifications,
   modifiedFunctionsCount,
   isPushing,
@@ -44,9 +42,8 @@ export const OutOfDateNotice = ({
 }: OutOfDateNoticeProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const hasOutdatedMigrations = isBranchOutOfDateMigrations && missingMigrationsCount > 0
-  const selectedOrg = useSelectedOrganization()
-  const project = useSelectedProject()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const { data: project } = useSelectedProjectQuery()
+  const track = useTrack()
 
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = isBranch ? project?.parent_project_ref : project?.ref
@@ -71,18 +68,14 @@ export const OutOfDateNotice = ({
       setIsDialogOpen(false)
     }
 
-    // Track branch update
-    sendEvent({
-      action: 'branch_updated',
-      properties: {
+    track(
+      'branch_updated',
+      {
         modifiedEdgeFunctions: hasEdgeFunctionModifications,
         source: 'out_of_date_notice',
       },
-      groups: {
-        project: parentProjectRef ?? 'Unknown',
-        organization: selectedOrg?.slug ?? 'Unknown',
-      },
-    })
+      { project: parentProjectRef }
+    )
 
     onPush()
   }
@@ -99,7 +92,6 @@ export const OutOfDateNotice = ({
           <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
               <Button
-                type="default"
                 loading={isPushing}
                 icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
                 className="shrink-0"
@@ -109,7 +101,7 @@ export const OutOfDateNotice = ({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Update branch with modified functions?</AlertDialogTitle>
+                <AlertDialogTitle>Update branch with modified functions</AlertDialogTitle>
                 <AlertDialogDescription>
                   This branch has {modifiedFunctionsCount} modified edge function
                   {modifiedFunctionsCount !== 1 ? 's' : ''} that will be overwritten when updating
@@ -119,7 +111,7 @@ export const OutOfDateNotice = ({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleUpdate(true)}>
+                <AlertDialogAction variant="warning" onClick={() => handleUpdate(true)}>
                   Update anyway
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -127,7 +119,6 @@ export const OutOfDateNotice = ({
           </AlertDialog>
         ) : (
           <Button
-            type="default"
             loading={isPushing}
             onClick={() => handleUpdate()}
             icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
