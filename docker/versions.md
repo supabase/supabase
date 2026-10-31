@@ -1,5 +1,9 @@
 # Docker image version updates in docker-compose.yml
 
+## 2026-10-27
+- supabase/studio:2026.10.26-sha-478bd88 (prev supabase/studio:2026.10.12-sha-3699278)
+- supabase/storage-api:v1.84.30 (prev supabase/storage-api:v1.81.0)
+
 ## 2026-10-16
 - supabase/studio:2026.10.12-sha-3699278 (prev supabase/studio:2026.09.07-sha-7996410)
 - supabase/gotrue:v2.197.0 (prev supabase/gotrue:v2.196.0)
