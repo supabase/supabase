@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 
 import { apiKeysKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
+import { EMPTY_ARR } from '@/lib/void'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type LegacyKeys = {
@@ -63,7 +64,7 @@ async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: Abo
   if (error) handleError(error)
 
   // [Jonny]: Overriding the types here since some stuff is not actually nullable or optional
-  return data as unknown as APIKey[]
+  return (Array.isArray(data) ? data : EMPTY_ARR) as unknown as APIKey[]
 }
 
 export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
