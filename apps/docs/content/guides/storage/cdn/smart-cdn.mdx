@@ -37,6 +37,30 @@ If you need to ensure assets refresh directly from the origin server and bypass 
 
 For instance, you can use a URL like `/storage/v1/object/sign/profile-pictures/cat.jpg?cacheNonce=1` with a long browser cache (e.g., 1 year). To update the picture, increment the `cacheNonce` query parameter in the URL, like `/storage/v1/object/sign/profile-pictures/cat.jpg?cacheNonce=2`. The CDN will recognize it as a new object and fetch the updated version from the origin.
 
+## Checking cache status
+
+To check whether an asset is cached, read the [`cf-cache-status`](/docs/guides/storage/cdn/fundamentals) header on a `GET` response.
+
+<Admonition type="caution">
+
+A `HEAD` response doesn't show whether an asset is cached. `HEAD` requests aren't eligible for Smart CDN caching and return `cache-control: private, no-cache`.
+
+</Admonition>
+
+The following command downloads the file, discards the body, and prints the response headers:
+
+```bash
+curl -sD - -o /dev/null \
+  https://<project-ref>.supabase.co/storage/v1/object/public/<bucket>/<file>
+```
+
+To avoid downloading the whole file, request only the first byte. The server responds with `206 Partial Content` and a 1-byte body:
+
+```bash
+curl -sD - -r 0-0 -o /dev/null \
+  https://<project-ref>.supabase.co/storage/v1/object/public/<bucket>/<file>
+```
+
 ## Signed URLs and CDN caching
 
 Signed URLs are the primary way to serve assets from private buckets to end users. With Smart CDN enabled, signed URL responses are cached at the CDN edge, like any other storage request.
