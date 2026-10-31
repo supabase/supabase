@@ -43,6 +43,8 @@ import { ICON_STROKE_WIDTH, StorageRowIcon } from '../StorageRowIcon'
 import { isVersioningActive } from '../StorageVersioning.constants'
 import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
+import { useFileExplorerKeyboardNavigation } from './FileExplorerKeyboardNavigation'
+import { getExplorerRowId } from './FileExplorerKeyboardNavigation.utils'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { pickFile } from './pickFile'
@@ -143,6 +145,8 @@ interface FileExplorerRowProps {
   view: STORAGE_VIEWS
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
+  /** Row the keyboard cursor is on, while the column has focus */
+  activeItemIndex?: number
   style?: CSSProperties
 }
 
@@ -154,10 +158,12 @@ type RowOption = {
 }
 
 export const FileExplorerRow = ({
+  index: itemIndex,
   item,
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
   selectedItems = [],
+  activeItemIndex,
   style,
 }: FileExplorerRowProps) => {
   const {
@@ -177,8 +183,8 @@ export const FileExplorerRow = ({
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
-  const { openFolderAtIndex, setPreviewedFile, clearPreviewedFile, truncateToColumn } =
-    useStorageExplorerNavigation()
+  const { setPreviewedFile, clearPreviewedFile, truncateToColumn } = useStorageExplorerNavigation()
+  const { activateRow } = useFileExplorerKeyboardNavigation()
   const { onCopyUrl } = useCopyUrl()
   const ctx = useFileExplorerContextMenu()
 
@@ -197,6 +203,7 @@ export const FileExplorerRow = ({
   const isPreviewed =
     (!isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)) ||
     (isArchivedFile && selectedArchivedObject?.id === archivedObjectId)
+  const isCursorRow = activeItemIndex === itemIndex
   const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
   // Names the action being taken, not the retention behind it: a suspended bucket reads
@@ -469,7 +476,13 @@ export const FileExplorerRow = ({
 
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
     return (
-      <FileExplorerRowEditing style={style} view={view} item={item} columnIndex={columnIndex} />
+      <FileExplorerRowEditing
+        style={style}
+        view={view}
+        item={item}
+        columnIndex={columnIndex}
+        itemIndex={itemIndex}
+      />
     )
   }
 
@@ -483,13 +496,27 @@ export const FileExplorerRow = ({
       }}
     >
       <div
+        id={getExplorerRowId(columnIndex, itemIndex)}
+        role="option"
+        aria-selected={isFile ? isSelected : undefined}
         style={isArchived ? ARCHIVED_STRIPES_STYLE : undefined}
         className={cn(
-          'storage-row group flex h-full items-center px-2.5 rounded-sm',
-          'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
-          isOpened && 'bg-selection',
-          isSelected && 'bg-selection',
-          isPreviewed && 'bg-selection hover:bg-selection',
+          'storage-row group flex h-full items-center px-2.5',
+          // Every background fills the row edge to edge — no rounding on the cursor, on a
+          // parent folder held open, on a selection, or under the mouse.
+          //
+          // The row the keyboard is on keeps its background through a hover: the hover
+          // colours are left off entirely rather than overridden, since a hover rule with
+          // an extra condition on it outweighs one without, whatever the order. A ~10%
+          // foreground overlay also keeps it legible on a row that is already opened,
+          // selected or previewed, which sit at ~4.5% on the surface scale.
+          isCursorRow && 'bg-foreground/10',
+          !isCursorRow && [
+            'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
+            isOpened && 'bg-selection',
+            isSelected && 'bg-selection',
+            isPreviewed && 'bg-selection hover:bg-selection',
+          ],
           item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
           isArchived && 'text-foreground-lighter [&_p]:text-foreground-lighter',
           // Keyboard focus on the checkbox: ring the whole row
@@ -498,14 +525,10 @@ export const FileExplorerRow = ({
         onClick={(event) => {
           event.stopPropagation()
           event.preventDefault()
-          if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-            if (item.type === STORAGE_ROW_TYPES.FOLDER) {
-              clearArchivedSelection()
-              openFolderAtIndex(columnIndex, item)
-            } else {
-              onSelectFile(columnIndex)
-            }
-          }
+          if (item.status === STORAGE_ROW_STATUS.LOADING) return
+          // Clicking a row is the same as putting the cursor on it: a folder opens into the
+          // next column, a file opens its preview, and the arrow keys carry on from here
+          activateRow({ columnIndex, itemIndex })
         }}
       >
         <div
