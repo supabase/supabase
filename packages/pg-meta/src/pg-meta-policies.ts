@@ -134,8 +134,8 @@ create policy ${ident(name)} on ${ident(schema)}.${ident(table)}
 
 type PolicyUpdateParams = {
   name?: string
-  definition?: SafeSqlFragment
-  check?: SafeSqlFragment
+  definition?: SafeSqlFragment | null
+  check?: SafeSqlFragment | null
   roles?: string[]
 }
 
@@ -149,9 +149,17 @@ function update(
   const nameSql: SafeSqlFragment =
     name === undefined ? safeSql`` : safeSql`${alter} RENAME TO ${ident(name)};`
   const definitionSql: SafeSqlFragment =
-    definition === undefined ? safeSql`` : safeSql`${alter} USING (${definition});`
+    definition === undefined
+      ? safeSql``
+      : definition === null
+        ? safeSql`${alter} USING (NULL);`
+        : safeSql`${alter} USING (${definition});`
   const checkSql: SafeSqlFragment =
-    check === undefined ? safeSql`` : safeSql`${alter} WITH CHECK (${check});`
+    check === undefined
+      ? safeSql``
+      : check === null
+        ? safeSql`${alter} WITH CHECK (NULL);`
+        : safeSql`${alter} WITH CHECK (${check});`
   const rolesSql: SafeSqlFragment =
     roles === undefined
       ? safeSql``
