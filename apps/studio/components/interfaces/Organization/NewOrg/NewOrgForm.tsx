@@ -27,6 +27,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import { deriveTier, type OrgTier } from './NewOrgForm.utils'
 import {
   ORG_KIND_DEFAULT,
   ORG_SIZE_DEFAULT,
@@ -213,8 +214,7 @@ export const NewOrgForm = ({
 
   const previewTier = useMemo(() => {
     if (selectedPlan === 'FREE') return undefined
-    const dbTier = selectedPlan === 'PRO' && !selectedSpendCap ? 'PAYG' : selectedPlan
-    return ('tier_' + dbTier.toLowerCase()) as 'tier_pro' | 'tier_payg' | 'tier_team'
+    return deriveTier(selectedPlan, selectedSpendCap)
   }, [selectedPlan, selectedSpendCap])
 
   const {
@@ -249,7 +249,10 @@ export const NewOrgForm = ({
       if ('pending_payment_intent_secret' in org && org.pending_payment_intent_secret) {
         setPaymentIntentSecret(org.pending_payment_intent_secret)
       } else {
-        onOrganizationCreated(org as { slug: string })
+        onOrganizationCreated(
+          org as { slug: string },
+          deriveTier(form.getValues('plan'), form.getValues('spend_cap'))
+        )
       }
     },
     onError: (data) => {
@@ -262,7 +265,10 @@ export const NewOrgForm = ({
   const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({
     onSuccess: (data) => {
       if (data && 'slug' in data) {
-        onOrganizationCreated({ slug: data.slug })
+        onOrganizationCreated(
+          { slug: data.slug },
+          deriveTier(form.getValues('plan'), form.getValues('spend_cap'))
+        )
       }
     },
     onError: (error) => {
@@ -299,14 +305,8 @@ export const NewOrgForm = ({
     }
   }
 
-  const onOrganizationCreated = (org: { slug: string }) => {
-    if (submittedTier.current) {
-      track(
-        'organization_creation_completed',
-        { tier: submittedTier.current },
-        { organization: org.slug }
-      )
-    }
+  const onOrganizationCreated = (org: { slug: string }, tier: OrgTier) => {
+    track('organization_creation_completed', { tier }, { organization: org.slug })
 
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
@@ -334,8 +334,6 @@ export const NewOrgForm = ({
     } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
-  const submittedTier = useRef<'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | null>(null)
-
   async function createOrg(
     formValues: z.infer<typeof formSchema>,
     paymentMethodId?: string,
@@ -345,13 +343,8 @@ export const NewOrgForm = ({
       tax_id: CustomerTaxId | null
     }
   ) {
-    const dbTier = formValues.plan === 'PRO' && !formValues.spend_cap ? 'PAYG' : formValues.plan
-    const tier = ('tier_' + dbTier.toLowerCase()) as
-      | 'tier_payg'
-      | 'tier_pro'
-      | 'tier_free'
-      | 'tier_team'
-    submittedTier.current = tier
+    const isFreeTier = formValues.plan === 'FREE'
+    const tier = deriveTier(formValues.plan, formValues.spend_cap)
 
     createOrganization({
       name: formValues.name,
@@ -359,9 +352,9 @@ export const NewOrgForm = ({
       tier,
       ...(formValues.kind == 'COMPANY' ? { size: formValues.size } : {}),
       payment_method: paymentMethodId,
-      billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
-      address: dbTier === 'FREE' ? null : customerData?.address,
-      tax_id: dbTier === 'FREE' ? undefined : (customerData?.tax_id ?? undefined),
+      billing_name: isFreeTier ? undefined : customerData?.billing_name,
+      address: isFreeTier ? null : customerData?.address,
+      tax_id: isFreeTier ? undefined : (customerData?.tax_id ?? undefined),
     })
   }
 
