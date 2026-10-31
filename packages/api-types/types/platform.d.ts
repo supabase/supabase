@@ -4384,23 +4384,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/status': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get infrastructure status */
-    get: operations['StatusController_getStatus']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/storage/{ref}/analytics-buckets': {
     parameters: {
       query?: never
@@ -5277,7 +5260,7 @@ export interface paths {
     post?: never
     /**
      * Disable Warehouse
-     * @description Asynchronously stop and delete Warehouse replication, remove its publication and FDW, and revoke external catalog access. Optionally delete the DuckLake catalog schema and managed Storage bucket with delete_data=true, requiring SQL and Storage admin write permissions on the configured destination. Poll setup-status for completion. Source tables are preserved.
+     * @description Asynchronously stop and delete Warehouse replication, remove its publication, FDW, and reader group, and revoke external catalog access. Optionally delete the DuckLake catalog schema and managed Storage bucket with delete_data=true, requiring SQL and Storage admin write permissions on the configured destination. Poll setup-status for completion. Source tables are preserved.
      */
     delete: operations['WarehouseController_deleteWarehouse']
     options?: never
@@ -5294,7 +5277,7 @@ export interface paths {
     }
     /**
      * Get Warehouse catalog access
-     * @description Return whether external Warehouse catalog access is enabled and credentials when enabled.
+     * @description Return whether external Warehouse catalog access is enabled and a connection template with secret placeholders when enabled.
      */
     get: operations['WarehouseController_getCatalog']
     put?: never
@@ -5340,7 +5323,7 @@ export interface paths {
     put?: never
     /**
      * Set up Warehouse
-     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. For backward compatibility, an empty targets array asynchronously stops and deletes the Warehouse pipeline and publication, disables external catalog access, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection. Prefer DELETE to disable Warehouse and optionally delete its data; poll setup-status for completion.
+     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. For backward compatibility, an empty targets array asynchronously stops and deletes the Warehouse pipeline and publication, disables external catalog access, removes the Warehouse reader group, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection. Prefer DELETE to disable Warehouse and optionally delete its data; poll setup-status for completion.
      */
     post: operations['WarehouseController_setup']
     delete?: never
@@ -6964,13 +6947,48 @@ export interface components {
             | 'm7a.16xlarge'
             | 'm8a.16xlarge'
             | 'm8g.24xlarge'
+            | 'm6a.24xlarge'
+            | 'm6i.24xlarge'
+            | 'm7i.24xlarge'
+            | 'm8i.24xlarge'
+            | 'm7a.24xlarge'
+            | 'm8a.24xlarge'
             | 'c8g.24xlarge'
+            | 'c6a.24xlarge'
+            | 'c6i.24xlarge'
+            | 'c7i.24xlarge'
+            | 'c8i.24xlarge'
+            | 'c7a.24xlarge'
+            | 'c8a.24xlarge'
             | 'r8g.24xlarge'
+            | 'r6a.24xlarge'
+            | 'r6i.24xlarge'
+            | 'r7i.24xlarge'
+            | 'r8i.24xlarge'
+            | 'r7a.24xlarge'
+            | 'r8a.24xlarge'
             | 'x8g.24xlarge'
+            | 'x8i.24xlarge'
             | 'm8g.48xlarge'
+            | 'm6a.48xlarge'
+            | 'm7i.48xlarge'
+            | 'm8i.48xlarge'
+            | 'm7a.48xlarge'
+            | 'm8a.48xlarge'
             | 'c8g.48xlarge'
+            | 'c6a.48xlarge'
+            | 'c7i.48xlarge'
+            | 'c8i.48xlarge'
+            | 'c7a.48xlarge'
+            | 'c8a.48xlarge'
             | 'r8g.48xlarge'
+            | 'r6a.48xlarge'
+            | 'r7i.48xlarge'
+            | 'r8i.48xlarge'
+            | 'r7a.48xlarge'
+            | 'r8a.48xlarge'
             | 'x8g.48xlarge'
+            | 'x8i.48xlarge'
           /**
            * @description Preferred architecture for WPP projects. Soft hint — the worker selects the cheapest region-available type for this arch and may cross to the other arch if no ODCR capacity is available. Cannot be set together with instance_type. Only for internal use.
            * @enum {string}
@@ -9204,6 +9222,9 @@ export interface components {
         | 'log_auth_error_rate_high'
         | 'log_storage_error_rate_high'
         | 'log_edge_function_error_rate_high'
+        | 'realtime_authorization_timeouts'
+        | 'realtime_postgres_changes_spike'
+        | 'realtime_concurrent_users_near_limit'
         | 'project_not_active'
         | 'advisor_check_unavailable'
       /** Format: date-time */
@@ -13282,6 +13303,679 @@ export interface components {
       } | null
       /** @enum {string} */
       tax_status: 'calculated' | 'not_applicable' | 'failed'
+      upcomingInvoice: {
+        appliedCustomerBalance: number
+        billing_cycle_end: string
+        billing_cycle_start: string
+        currency: string
+        currentCosts: {
+          actualInElapsedCycle: number
+          fixedFees: {
+            lineItems: {
+              /** @enum {string} */
+              category: 'fixed_fee'
+              description: string
+              name: string
+              period: {
+                end: string
+                start: string
+              }
+              pre_tax_amount: number
+              pre_tax_amount_before_discount: number
+            }[]
+          }
+          usage: {
+            lineItems: (
+              | {
+                  breakdown: {
+                    /** @enum {string} */
+                    project_db_instance_size?:
+                      | 'pico'
+                      | 'nano'
+                      | 'micro'
+                      | 'small'
+                      | 'medium'
+                      | 'large'
+                      | 'xlarge'
+                      | '2xlarge'
+                      | '4xlarge'
+                      | '8xlarge'
+                      | '12xlarge'
+                      | '16xlarge'
+                      | '24xlarge'
+                      | '24xlarge_optimized_memory'
+                      | '24xlarge_optimized_cpu'
+                      | '24xlarge_high_memory'
+                      | '48xlarge'
+                      | '48xlarge_optimized_memory'
+                      | '48xlarge_optimized_cpu'
+                      | '48xlarge_high_memory'
+                    project_name: string
+                    project_ref: string
+                    /** @enum {string} */
+                    project_status?:
+                      | 'INACTIVE'
+                      | 'ACTIVE_HEALTHY'
+                      | 'ACTIVE_UNHEALTHY'
+                      | 'COMING_UP'
+                      | 'UNKNOWN'
+                      | 'GOING_DOWN'
+                      | 'INIT_FAILED'
+                      | 'REMOVED'
+                      | 'RESTORING'
+                      | 'UPGRADING'
+                      | 'PAUSING'
+                      | 'RESTORE_FAILED'
+                      | 'RESTARTING'
+                      | 'PAUSE_FAILED'
+                      | 'RESIZING'
+                    total_pre_tax_amount?: number
+                    total_usage: number
+                    variants: {
+                      is_active_variant: boolean
+                      name: string
+                      pre_tax_amount: number
+                      pre_tax_amount_before_discount: number
+                      unit_price_desc: string | null
+                      usage: number
+                      /** @enum {string} */
+                      usage_metric:
+                        | 'EGRESS'
+                        | 'CACHED_EGRESS'
+                        | 'DATABASE_SIZE'
+                        | 'STORAGE_SIZE'
+                        | 'MONTHLY_ACTIVE_USERS'
+                        | 'MONTHLY_ACTIVE_SSO_USERS'
+                        | 'FUNCTION_INVOCATIONS'
+                        | 'FUNCTION_CPU_MILLISECONDS'
+                        | 'STORAGE_IMAGES_TRANSFORMED'
+                        | 'REALTIME_MESSAGE_COUNT'
+                        | 'REALTIME_PEAK_CONNECTIONS'
+                        | 'DISK_SIZE_GB_HOURS_GP3'
+                        | 'DISK_SIZE_GB_HOURS_IO2'
+                        | 'AUTH_MFA_PHONE'
+                        | 'AUTH_MFA_WEB_AUTHN'
+                        | 'LOG_DRAIN_EVENTS'
+                        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                        | 'DISK_THROUGHPUT_GP3'
+                        | 'DISK_IOPS_GP3'
+                        | 'DISK_IOPS_IO2'
+                        | 'COMPUTE_HOURS_BRANCH'
+                        | 'COMPUTE_HOURS_XS'
+                        | 'COMPUTE_HOURS_SM'
+                        | 'COMPUTE_HOURS_MD'
+                        | 'COMPUTE_HOURS_L'
+                        | 'COMPUTE_HOURS_XL'
+                        | 'COMPUTE_HOURS_2XL'
+                        | 'COMPUTE_HOURS_4XL'
+                        | 'COMPUTE_HOURS_8XL'
+                        | 'COMPUTE_HOURS_12XL'
+                        | 'COMPUTE_HOURS_16XL'
+                        | 'COMPUTE_HOURS_24XL'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                        | 'COMPUTE_HOURS_48XL'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                        | 'CUSTOM_DOMAIN'
+                        | 'PITR_7'
+                        | 'PITR_14'
+                        | 'PITR_28'
+                        | 'IPV4'
+                        | 'LOG_DRAIN'
+                        | 'ETL_PIPELINE'
+                        | 'ETL_REPLICATED_DATA'
+                        | 'ETL_COPY_BACKFILL_DATA'
+                        | 'LOG_INGESTION'
+                        | 'LOG_QUERYING'
+                        | 'LOG_STORAGE'
+                        | 'ACTIVE_COMPUTE_HOURS'
+                    }[]
+                  }[]
+                  compute_credits_used: number | null
+                  name: string
+                  period: {
+                    end: string
+                    start: string
+                  }
+                  pre_tax_amount: number
+                  pre_tax_amount_before_discount: number
+                  /** @enum {string} */
+                  schema: 'compute'
+                  /** @enum {string} */
+                  type: 'compute' | 'branch' | 'replica'
+                  /** @enum {string} */
+                  usage_unit: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
+                }
+              | {
+                  breakdown: {
+                    /** @enum {string} */
+                    project_db_instance_size?:
+                      | 'pico'
+                      | 'nano'
+                      | 'micro'
+                      | 'small'
+                      | 'medium'
+                      | 'large'
+                      | 'xlarge'
+                      | '2xlarge'
+                      | '4xlarge'
+                      | '8xlarge'
+                      | '12xlarge'
+                      | '16xlarge'
+                      | '24xlarge'
+                      | '24xlarge_optimized_memory'
+                      | '24xlarge_optimized_cpu'
+                      | '24xlarge_high_memory'
+                      | '48xlarge'
+                      | '48xlarge_optimized_memory'
+                      | '48xlarge_optimized_cpu'
+                      | '48xlarge_high_memory'
+                    project_name: string
+                    project_ref: string
+                    /** @enum {string} */
+                    project_status?:
+                      | 'INACTIVE'
+                      | 'ACTIVE_HEALTHY'
+                      | 'ACTIVE_UNHEALTHY'
+                      | 'COMING_UP'
+                      | 'UNKNOWN'
+                      | 'GOING_DOWN'
+                      | 'INIT_FAILED'
+                      | 'REMOVED'
+                      | 'RESTORING'
+                      | 'UPGRADING'
+                      | 'PAUSING'
+                      | 'RESTORE_FAILED'
+                      | 'RESTARTING'
+                      | 'PAUSE_FAILED'
+                      | 'RESIZING'
+                    total_pre_tax_amount?: number
+                    total_usage: number
+                    variants: {
+                      is_active_variant: boolean
+                      name: string
+                      pre_tax_amount: number
+                      pre_tax_amount_before_discount: number
+                      unit_price_desc: string | null
+                      usage: number
+                      /** @enum {string} */
+                      usage_metric:
+                        | 'EGRESS'
+                        | 'CACHED_EGRESS'
+                        | 'DATABASE_SIZE'
+                        | 'STORAGE_SIZE'
+                        | 'MONTHLY_ACTIVE_USERS'
+                        | 'MONTHLY_ACTIVE_SSO_USERS'
+                        | 'FUNCTION_INVOCATIONS'
+                        | 'FUNCTION_CPU_MILLISECONDS'
+                        | 'STORAGE_IMAGES_TRANSFORMED'
+                        | 'REALTIME_MESSAGE_COUNT'
+                        | 'REALTIME_PEAK_CONNECTIONS'
+                        | 'DISK_SIZE_GB_HOURS_GP3'
+                        | 'DISK_SIZE_GB_HOURS_IO2'
+                        | 'AUTH_MFA_PHONE'
+                        | 'AUTH_MFA_WEB_AUTHN'
+                        | 'LOG_DRAIN_EVENTS'
+                        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                        | 'DISK_THROUGHPUT_GP3'
+                        | 'DISK_IOPS_GP3'
+                        | 'DISK_IOPS_IO2'
+                        | 'COMPUTE_HOURS_BRANCH'
+                        | 'COMPUTE_HOURS_XS'
+                        | 'COMPUTE_HOURS_SM'
+                        | 'COMPUTE_HOURS_MD'
+                        | 'COMPUTE_HOURS_L'
+                        | 'COMPUTE_HOURS_XL'
+                        | 'COMPUTE_HOURS_2XL'
+                        | 'COMPUTE_HOURS_4XL'
+                        | 'COMPUTE_HOURS_8XL'
+                        | 'COMPUTE_HOURS_12XL'
+                        | 'COMPUTE_HOURS_16XL'
+                        | 'COMPUTE_HOURS_24XL'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                        | 'COMPUTE_HOURS_48XL'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                        | 'CUSTOM_DOMAIN'
+                        | 'PITR_7'
+                        | 'PITR_14'
+                        | 'PITR_28'
+                        | 'IPV4'
+                        | 'LOG_DRAIN'
+                        | 'ETL_PIPELINE'
+                        | 'ETL_REPLICATED_DATA'
+                        | 'ETL_COPY_BACKFILL_DATA'
+                        | 'LOG_INGESTION'
+                        | 'LOG_QUERYING'
+                        | 'LOG_STORAGE'
+                        | 'ACTIVE_COMPUTE_HOURS'
+                    }[]
+                  }[]
+                  description: string
+                  name: string
+                  period: {
+                    end: string
+                    start: string
+                  }
+                  pre_tax_amount: number
+                  pre_tax_amount_before_discount: number
+                  quantity: number | null
+                  /** @enum {string} */
+                  schema: 'generic'
+                  unit_price: number | null
+                  unit_price_desc: string | null
+                  /** @enum {string} */
+                  usage_metric?:
+                    | 'EGRESS'
+                    | 'CACHED_EGRESS'
+                    | 'DATABASE_SIZE'
+                    | 'STORAGE_SIZE'
+                    | 'MONTHLY_ACTIVE_USERS'
+                    | 'MONTHLY_ACTIVE_SSO_USERS'
+                    | 'FUNCTION_INVOCATIONS'
+                    | 'FUNCTION_CPU_MILLISECONDS'
+                    | 'STORAGE_IMAGES_TRANSFORMED'
+                    | 'REALTIME_MESSAGE_COUNT'
+                    | 'REALTIME_PEAK_CONNECTIONS'
+                    | 'DISK_SIZE_GB_HOURS_GP3'
+                    | 'DISK_SIZE_GB_HOURS_IO2'
+                    | 'AUTH_MFA_PHONE'
+                    | 'AUTH_MFA_WEB_AUTHN'
+                    | 'LOG_DRAIN_EVENTS'
+                    | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                    | 'DISK_THROUGHPUT_GP3'
+                    | 'DISK_IOPS_GP3'
+                    | 'DISK_IOPS_IO2'
+                    | 'COMPUTE_HOURS_BRANCH'
+                    | 'COMPUTE_HOURS_XS'
+                    | 'COMPUTE_HOURS_SM'
+                    | 'COMPUTE_HOURS_MD'
+                    | 'COMPUTE_HOURS_L'
+                    | 'COMPUTE_HOURS_XL'
+                    | 'COMPUTE_HOURS_2XL'
+                    | 'COMPUTE_HOURS_4XL'
+                    | 'COMPUTE_HOURS_8XL'
+                    | 'COMPUTE_HOURS_12XL'
+                    | 'COMPUTE_HOURS_16XL'
+                    | 'COMPUTE_HOURS_24XL'
+                    | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                    | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                    | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                    | 'COMPUTE_HOURS_48XL'
+                    | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                    | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                    | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                    | 'CUSTOM_DOMAIN'
+                    | 'PITR_7'
+                    | 'PITR_14'
+                    | 'PITR_28'
+                    | 'IPV4'
+                    | 'LOG_DRAIN'
+                    | 'ETL_PIPELINE'
+                    | 'ETL_REPLICATED_DATA'
+                    | 'ETL_COPY_BACKFILL_DATA'
+                    | 'LOG_INGESTION'
+                    | 'LOG_QUERYING'
+                    | 'LOG_STORAGE'
+                    | 'ACTIVE_COMPUTE_HOURS'
+                  /** @enum {string} */
+                  usage_unit?: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
+                }
+            )[]
+          }
+        }
+        /** @enum {string} */
+        fixed_fees_billing_mode: 'in_advance' | 'in_arrears'
+        minimum_fee: {
+          expectedAtEndOfCycle: number
+          floorPrice: number | null
+          prorated: boolean
+        }
+        prepaidCredits:
+          | {
+              actualWithdrawnInElapsedCycle: number
+              currentBalance: number
+              expectedBalanceAtEndOfCycle: number
+              expectedWithdrawnAtEndOfCycle: number
+              /** @enum {string} */
+              kind: 'with_forecast'
+              projectedWithdrawnInRemainingCycle: number
+            }
+          | {
+              actualWithdrawnInElapsedCycle: number
+              /** @enum {string} */
+              kind: 'without_forecast'
+            }
+        projectedCosts: {
+          projectedInRemainingCycle: number
+          usage: {
+            lineItems: (
+              | {
+                  breakdown: {
+                    /** @enum {string} */
+                    project_db_instance_size?:
+                      | 'pico'
+                      | 'nano'
+                      | 'micro'
+                      | 'small'
+                      | 'medium'
+                      | 'large'
+                      | 'xlarge'
+                      | '2xlarge'
+                      | '4xlarge'
+                      | '8xlarge'
+                      | '12xlarge'
+                      | '16xlarge'
+                      | '24xlarge'
+                      | '24xlarge_optimized_memory'
+                      | '24xlarge_optimized_cpu'
+                      | '24xlarge_high_memory'
+                      | '48xlarge'
+                      | '48xlarge_optimized_memory'
+                      | '48xlarge_optimized_cpu'
+                      | '48xlarge_high_memory'
+                    project_name: string
+                    project_ref: string
+                    /** @enum {string} */
+                    project_status?:
+                      | 'INACTIVE'
+                      | 'ACTIVE_HEALTHY'
+                      | 'ACTIVE_UNHEALTHY'
+                      | 'COMING_UP'
+                      | 'UNKNOWN'
+                      | 'GOING_DOWN'
+                      | 'INIT_FAILED'
+                      | 'REMOVED'
+                      | 'RESTORING'
+                      | 'UPGRADING'
+                      | 'PAUSING'
+                      | 'RESTORE_FAILED'
+                      | 'RESTARTING'
+                      | 'PAUSE_FAILED'
+                      | 'RESIZING'
+                    total_pre_tax_amount?: number
+                    total_usage: number
+                    variants: {
+                      is_active_variant: boolean
+                      name: string
+                      pre_tax_amount: number
+                      pre_tax_amount_before_discount: number
+                      unit_price_desc: string | null
+                      usage: number
+                      /** @enum {string} */
+                      usage_metric:
+                        | 'EGRESS'
+                        | 'CACHED_EGRESS'
+                        | 'DATABASE_SIZE'
+                        | 'STORAGE_SIZE'
+                        | 'MONTHLY_ACTIVE_USERS'
+                        | 'MONTHLY_ACTIVE_SSO_USERS'
+                        | 'FUNCTION_INVOCATIONS'
+                        | 'FUNCTION_CPU_MILLISECONDS'
+                        | 'STORAGE_IMAGES_TRANSFORMED'
+                        | 'REALTIME_MESSAGE_COUNT'
+                        | 'REALTIME_PEAK_CONNECTIONS'
+                        | 'DISK_SIZE_GB_HOURS_GP3'
+                        | 'DISK_SIZE_GB_HOURS_IO2'
+                        | 'AUTH_MFA_PHONE'
+                        | 'AUTH_MFA_WEB_AUTHN'
+                        | 'LOG_DRAIN_EVENTS'
+                        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                        | 'DISK_THROUGHPUT_GP3'
+                        | 'DISK_IOPS_GP3'
+                        | 'DISK_IOPS_IO2'
+                        | 'COMPUTE_HOURS_BRANCH'
+                        | 'COMPUTE_HOURS_XS'
+                        | 'COMPUTE_HOURS_SM'
+                        | 'COMPUTE_HOURS_MD'
+                        | 'COMPUTE_HOURS_L'
+                        | 'COMPUTE_HOURS_XL'
+                        | 'COMPUTE_HOURS_2XL'
+                        | 'COMPUTE_HOURS_4XL'
+                        | 'COMPUTE_HOURS_8XL'
+                        | 'COMPUTE_HOURS_12XL'
+                        | 'COMPUTE_HOURS_16XL'
+                        | 'COMPUTE_HOURS_24XL'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                        | 'COMPUTE_HOURS_48XL'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                        | 'CUSTOM_DOMAIN'
+                        | 'PITR_7'
+                        | 'PITR_14'
+                        | 'PITR_28'
+                        | 'IPV4'
+                        | 'LOG_DRAIN'
+                        | 'ETL_PIPELINE'
+                        | 'ETL_REPLICATED_DATA'
+                        | 'ETL_COPY_BACKFILL_DATA'
+                        | 'LOG_INGESTION'
+                        | 'LOG_QUERYING'
+                        | 'LOG_STORAGE'
+                        | 'ACTIVE_COMPUTE_HOURS'
+                    }[]
+                  }[]
+                  compute_credits_used: number | null
+                  name: string
+                  period: {
+                    end: string
+                    start: string
+                  }
+                  pre_tax_amount: number
+                  pre_tax_amount_before_discount: number
+                  /** @enum {string} */
+                  schema: 'compute'
+                  /** @enum {string} */
+                  type: 'compute' | 'branch' | 'replica'
+                  /** @enum {string} */
+                  usage_unit: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
+                }
+              | {
+                  breakdown: {
+                    /** @enum {string} */
+                    project_db_instance_size?:
+                      | 'pico'
+                      | 'nano'
+                      | 'micro'
+                      | 'small'
+                      | 'medium'
+                      | 'large'
+                      | 'xlarge'
+                      | '2xlarge'
+                      | '4xlarge'
+                      | '8xlarge'
+                      | '12xlarge'
+                      | '16xlarge'
+                      | '24xlarge'
+                      | '24xlarge_optimized_memory'
+                      | '24xlarge_optimized_cpu'
+                      | '24xlarge_high_memory'
+                      | '48xlarge'
+                      | '48xlarge_optimized_memory'
+                      | '48xlarge_optimized_cpu'
+                      | '48xlarge_high_memory'
+                    project_name: string
+                    project_ref: string
+                    /** @enum {string} */
+                    project_status?:
+                      | 'INACTIVE'
+                      | 'ACTIVE_HEALTHY'
+                      | 'ACTIVE_UNHEALTHY'
+                      | 'COMING_UP'
+                      | 'UNKNOWN'
+                      | 'GOING_DOWN'
+                      | 'INIT_FAILED'
+                      | 'REMOVED'
+                      | 'RESTORING'
+                      | 'UPGRADING'
+                      | 'PAUSING'
+                      | 'RESTORE_FAILED'
+                      | 'RESTARTING'
+                      | 'PAUSE_FAILED'
+                      | 'RESIZING'
+                    total_pre_tax_amount?: number
+                    total_usage: number
+                    variants: {
+                      is_active_variant: boolean
+                      name: string
+                      pre_tax_amount: number
+                      pre_tax_amount_before_discount: number
+                      unit_price_desc: string | null
+                      usage: number
+                      /** @enum {string} */
+                      usage_metric:
+                        | 'EGRESS'
+                        | 'CACHED_EGRESS'
+                        | 'DATABASE_SIZE'
+                        | 'STORAGE_SIZE'
+                        | 'MONTHLY_ACTIVE_USERS'
+                        | 'MONTHLY_ACTIVE_SSO_USERS'
+                        | 'FUNCTION_INVOCATIONS'
+                        | 'FUNCTION_CPU_MILLISECONDS'
+                        | 'STORAGE_IMAGES_TRANSFORMED'
+                        | 'REALTIME_MESSAGE_COUNT'
+                        | 'REALTIME_PEAK_CONNECTIONS'
+                        | 'DISK_SIZE_GB_HOURS_GP3'
+                        | 'DISK_SIZE_GB_HOURS_IO2'
+                        | 'AUTH_MFA_PHONE'
+                        | 'AUTH_MFA_WEB_AUTHN'
+                        | 'LOG_DRAIN_EVENTS'
+                        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                        | 'DISK_THROUGHPUT_GP3'
+                        | 'DISK_IOPS_GP3'
+                        | 'DISK_IOPS_IO2'
+                        | 'COMPUTE_HOURS_BRANCH'
+                        | 'COMPUTE_HOURS_XS'
+                        | 'COMPUTE_HOURS_SM'
+                        | 'COMPUTE_HOURS_MD'
+                        | 'COMPUTE_HOURS_L'
+                        | 'COMPUTE_HOURS_XL'
+                        | 'COMPUTE_HOURS_2XL'
+                        | 'COMPUTE_HOURS_4XL'
+                        | 'COMPUTE_HOURS_8XL'
+                        | 'COMPUTE_HOURS_12XL'
+                        | 'COMPUTE_HOURS_16XL'
+                        | 'COMPUTE_HOURS_24XL'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                        | 'COMPUTE_HOURS_48XL'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                        | 'CUSTOM_DOMAIN'
+                        | 'PITR_7'
+                        | 'PITR_14'
+                        | 'PITR_28'
+                        | 'IPV4'
+                        | 'LOG_DRAIN'
+                        | 'ETL_PIPELINE'
+                        | 'ETL_REPLICATED_DATA'
+                        | 'ETL_COPY_BACKFILL_DATA'
+                        | 'LOG_INGESTION'
+                        | 'LOG_QUERYING'
+                        | 'LOG_STORAGE'
+                        | 'ACTIVE_COMPUTE_HOURS'
+                    }[]
+                  }[]
+                  description: string
+                  name: string
+                  period: {
+                    end: string
+                    start: string
+                  }
+                  pre_tax_amount: number
+                  pre_tax_amount_before_discount: number
+                  quantity: number | null
+                  /** @enum {string} */
+                  schema: 'generic'
+                  unit_price: number | null
+                  unit_price_desc: string | null
+                  /** @enum {string} */
+                  usage_metric?:
+                    | 'EGRESS'
+                    | 'CACHED_EGRESS'
+                    | 'DATABASE_SIZE'
+                    | 'STORAGE_SIZE'
+                    | 'MONTHLY_ACTIVE_USERS'
+                    | 'MONTHLY_ACTIVE_SSO_USERS'
+                    | 'FUNCTION_INVOCATIONS'
+                    | 'FUNCTION_CPU_MILLISECONDS'
+                    | 'STORAGE_IMAGES_TRANSFORMED'
+                    | 'REALTIME_MESSAGE_COUNT'
+                    | 'REALTIME_PEAK_CONNECTIONS'
+                    | 'DISK_SIZE_GB_HOURS_GP3'
+                    | 'DISK_SIZE_GB_HOURS_IO2'
+                    | 'AUTH_MFA_PHONE'
+                    | 'AUTH_MFA_WEB_AUTHN'
+                    | 'LOG_DRAIN_EVENTS'
+                    | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                    | 'DISK_THROUGHPUT_GP3'
+                    | 'DISK_IOPS_GP3'
+                    | 'DISK_IOPS_IO2'
+                    | 'COMPUTE_HOURS_BRANCH'
+                    | 'COMPUTE_HOURS_XS'
+                    | 'COMPUTE_HOURS_SM'
+                    | 'COMPUTE_HOURS_MD'
+                    | 'COMPUTE_HOURS_L'
+                    | 'COMPUTE_HOURS_XL'
+                    | 'COMPUTE_HOURS_2XL'
+                    | 'COMPUTE_HOURS_4XL'
+                    | 'COMPUTE_HOURS_8XL'
+                    | 'COMPUTE_HOURS_12XL'
+                    | 'COMPUTE_HOURS_16XL'
+                    | 'COMPUTE_HOURS_24XL'
+                    | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                    | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                    | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                    | 'COMPUTE_HOURS_48XL'
+                    | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                    | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                    | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                    | 'CUSTOM_DOMAIN'
+                    | 'PITR_7'
+                    | 'PITR_14'
+                    | 'PITR_28'
+                    | 'IPV4'
+                    | 'LOG_DRAIN'
+                    | 'ETL_PIPELINE'
+                    | 'ETL_REPLICATED_DATA'
+                    | 'ETL_COPY_BACKFILL_DATA'
+                    | 'LOG_INGESTION'
+                    | 'LOG_QUERYING'
+                    | 'LOG_STORAGE'
+                    | 'ACTIVE_COMPUTE_HOURS'
+                  /** @enum {string} */
+                  usage_unit?: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
+                }
+            )[]
+          }
+        }
+        subscription_id: string
+        taxes: {
+          expectedAtEndOfCycle: number
+          percentage: number
+          /** @enum {string} */
+          status: 'calculated' | 'not_applicable' | 'failed'
+        }
+        total: {
+          gross: {
+            expectedAtEndOfCycle: number
+          }
+          net: {
+            expectedAtEndOfCycle: number
+          }
+        }
+      } | null
     }
     UpdateAddonBody: {
       /** @enum {string} */
@@ -16235,11 +16929,11 @@ export interface components {
       result: 'success'
     }
     WarehouseCatalogResponse_Output: {
-      /** @description External catalog credentials. Present only when enabled. */
+      /** @description External catalog connection template with secret placeholders. Present only when enabled. */
       credentials?: {
         /**
-         * @description DuckLake catalog Postgres URL
-         * @example postgres://postgres:<pwd>@db.example.supabase.co:5432/postgres
+         * @description DuckLake catalog Postgres URL with a database password placeholder
+         * @example postgres://postgres:[YOUR_DATABASE_PASSWORD]@db.example.supabase.co:5432/postgres
          */
         catalog_url: string
         /**
@@ -16252,7 +16946,10 @@ export interface components {
          * @example ducklake
          */
         metadata_schema: string
-        /** @description S3 access key id */
+        /**
+         * @description S3 access key ID placeholder; supply your own authorized storage credentials
+         * @example [YOUR_S3_ACCESS_KEY_ID]
+         */
         s3_access_key_id: string
         /**
          * @description S3-compatible storage endpoint without protocol
@@ -16264,7 +16961,10 @@ export interface components {
          * @example us-east-1
          */
         s3_region: string
-        /** @description S3 secret access key */
+        /**
+         * @description S3 secret access key placeholder; no secret is returned
+         * @example [YOUR_S3_SECRET_ACCESS_KEY]
+         */
         s3_secret_access_key: string
       }
       /** @description Whether external catalog access is enabled */
@@ -21290,7 +21990,9 @@ export interface operations {
   }
   OrgInvoicesController_getUpcomingInvoice: {
     parameters: {
-      query?: never
+      query?: {
+        enable_v2?: string
+      }
       header?: never
       path: {
         /** @description Organization slug */
@@ -32634,30 +33336,6 @@ export interface operations {
     }
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StatusController_getStatus: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to retrieve infrastructure status */
-      500: {
         headers: {
           [name: string]: unknown
         }

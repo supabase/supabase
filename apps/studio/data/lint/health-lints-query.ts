@@ -16,7 +16,7 @@ type AdvisorLintName =
 /**
  * Health lints are on-demand only on the API side — each one opens a live database
  * connection or queries the metrics/logs store — so the endpoint runs only the lints it
- * is asked for. We request the checks that mean the project is actually broken, and leave
+ * is asked for. We request the checks that report a problem with the project, and leave
  * out the diagnostic ones (`db_connection_failing`, `instance_telemetry_lost`), which
  * describe the state of our own probes more than the state of the project.
  */
@@ -29,6 +29,9 @@ export const HEALTH_LINT_NAMES = [
   'log_storage_error_rate_high',
   'log_edge_function_error_rate_high',
   'instance_alert_firing',
+  'realtime_authorization_timeouts',
+  'realtime_postgres_changes_spike',
+  'realtime_concurrent_users_near_limit',
 ] as const satisfies readonly AdvisorLintName[]
 
 /**

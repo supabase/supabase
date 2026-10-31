@@ -151,6 +151,7 @@ export const fgaRequirements = {
   'GET /v1/snippets': [['snippets_read']],
   'GET /v1/snippets/{id}': [['snippets_read']],
   'GET /v2/organizations/{slug}/integrations/github/connections': [['organization_projects_read']],
+  'GET /v2/organizations/{slug}/maintenance/windows': [['organization_admin_read']],
   'GET /v2/organizations/{slug}/members': [['members_read']],
   'GET /v2/organizations/{slug}/projects': [['organization_projects_read']],
   'GET /v2/organizations/{slug}/roles': [['members_read']],
@@ -279,6 +280,7 @@ export const fgaRequirements = {
   'POST /v2/organizations/{slug}/members/invitations': [['members_write']],
   'POST /v2/projects/{ref}/advisors/run': [['advisors_read']],
   'POST /v2/projects/{ref}/analytics/log-drains': [['analytics_config_write']],
+  'POST /v2/projects/{ref}/backups/download': [['backups_write']],
   'POST /v2/projects/{ref}/branches': [
     ['branching_development_create'],
     ['branching_production_create'],
