@@ -159,6 +159,7 @@ export type Database = {
           metadata: Json | null
           page: string
           title: string | null
+          user_agent: string | null
           user_id: string | null
           vote: Database['public']['Enums']['feedback_vote'] | null
         }
@@ -169,6 +170,7 @@ export type Database = {
           metadata?: Json | null
           page: string
           title?: string | null
+          user_agent?: string | null
           user_id?: string | null
           vote?: Database['public']['Enums']['feedback_vote'] | null
         }
@@ -179,6 +181,7 @@ export type Database = {
           metadata?: Json | null
           page?: string
           title?: string | null
+          user_agent?: string | null
           user_id?: string | null
           vote?: Database['public']['Enums']['feedback_vote'] | null
         }
