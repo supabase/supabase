@@ -1,4 +1,4 @@
-import type { IsoPoint } from '../iso-shapes'
+import type { IsoPoint } from 'ui-patterns/IsoShape/IsoShape.geometry'
 import { BEAM_ALPHA, hash, isBeamAt, rampGlyph } from './field'
 import { tracePolygon } from './layer'
 

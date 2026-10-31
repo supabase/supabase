@@ -18,7 +18,7 @@ import {
   type IsoPoint,
   type IsoRing,
   type IsoView,
-} from '../lib/iso-shapes'
+} from 'ui-patterns/IsoShape/IsoShape.geometry'
 import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
 
 export interface CoverCanvasProps {
