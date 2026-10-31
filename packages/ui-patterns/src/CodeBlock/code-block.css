@@ -72,6 +72,6 @@
   overflow-wrap: anywhere !important;
 }
 
-.shadow-codeblock {
+@utility shadow-codeblock {
   box-shadow: var(--shadow-codeblock, none);
 }

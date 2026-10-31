@@ -156,9 +156,12 @@ export type Database = {
           comment: string
           created_at: string
           id: number
+          images: string[] | null
           metadata: Json | null
           page: string
+          pins: Json | null
           title: string | null
+          user_agent: string | null
           user_id: string | null
           vote: Database['public']['Enums']['feedback_vote'] | null
         }
@@ -166,9 +169,12 @@ export type Database = {
           comment: string
           created_at?: string
           id?: never
+          images?: string[] | null
           metadata?: Json | null
           page: string
+          pins?: Json | null
           title?: string | null
+          user_agent?: string | null
           user_id?: string | null
           vote?: Database['public']['Enums']['feedback_vote'] | null
         }
@@ -176,9 +182,12 @@ export type Database = {
           comment?: string
           created_at?: string
           id?: never
+          images?: string[] | null
           metadata?: Json | null
           page?: string
+          pins?: Json | null
           title?: string | null
+          user_agent?: string | null
           user_id?: string | null
           vote?: Database['public']['Enums']['feedback_vote'] | null
         }
