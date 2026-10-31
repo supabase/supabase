@@ -7,7 +7,11 @@
 import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
-import { groupLogsFiltersByColumn, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
+import {
+  getLogAttributeKey,
+  groupLogsFiltersByColumn,
+  parseLogsFilterUrlParams,
+} from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
@@ -59,6 +63,9 @@ const buildConditions = (
 ): SafeLogSqlFragment[] => {
   const conditions: SafeLogSqlFragment[] = []
   const grouped = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
+  if (Object.keys(grouped).some((key) => getLogAttributeKey(key) !== undefined)) {
+    throw new Error('Log attribute filters are only supported on ClickHouse')
+  }
 
   for (const [key, { operator, values }] of Object.entries(grouped)) {
     if (key === excludeKey) continue

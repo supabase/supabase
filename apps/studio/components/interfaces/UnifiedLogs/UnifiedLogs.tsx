@@ -15,7 +15,7 @@ import {
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import {
   Button,
   ChartConfig,
@@ -194,7 +194,11 @@ export const UnifiedLogs = ({
   }, [search, scope, queryLogTypeVisibility])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
 
-  useEffect(() => setLocalFilterOrigin(null), [urlFilterScope])
+  const syncUrlFilters = useEffectEvent(() => {
+    setLocalFilterOrigin(null)
+    setColumnFilters(buildDefaultColumnFilters({ ...search, filter: visibleSearchFilters }))
+  })
+  useEffect(() => syncUrlFilters(), [urlFilterScope])
 
   const { selection, selectRow, clearSelection } = useTableRowSelection({
     scope: JSON.stringify([projectRef, searchParameters]),
@@ -390,7 +394,12 @@ export const UnifiedLogs = ({
   }, [facets, offeredFilters, queryLogTypeVisibility])
 
   const applyFilterSearch = () => {
-    const update = buildFilterSearchUpdate(columnFilters, filterFields)
+    const offeredColumnFilters = columnFilters.filter(
+      ({ id }) =>
+        !defaultFilterFields.some((field) => field.value === id) ||
+        isOfferedFilter(id, offeredFilters)
+    )
+    const update = buildFilterSearchUpdate(offeredColumnFilters, filterFields)
     if (Array.isArray(update.filter)) {
       update.filter = gateLogTypeFilters(update.filter.map(String), queryLogTypeVisibility)
     }

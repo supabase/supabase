@@ -9,13 +9,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { UnifiedLogs } from './UnifiedLogs'
+import { createUnifiedLogsSearch, serializeUnifiedLogsSearchParams } from './UnifiedLogs.utils'
 import {
   EDGE_FUNCTION_LOGS_VIEW,
   getEdgeFunctionLogsScope,
 } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview.utils'
+import { retrieveUnifiedLogs } from '@/data/logs/get-unified-logs'
+import { getUnifiedLogs } from '@/data/logs/unified-logs-infinite-query'
 import type { UnifiedLogsQueryRow } from '@/data/logs/unified-logs.utils'
-import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, mswServer } from '@/tests/lib/msw'
+import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
 type AnalyticsResponse = components['schemas']['AnalyticsResponse_Output']
 type ProjectResponse = components['schemas']['ProjectDetailResponse_Output']
@@ -134,10 +137,337 @@ describe('UnifiedLogs', () => {
       expect(queries.some((sql) => sql.includes('sidebar facet counts'))).toBe(true)
       expect(queries.some((sql) => sql.includes('severity chart'))).toBe(true)
     })
-    for (const sql of queries) {
+    for (const sql of queries.filter((sql) => !sql.includes('arrayJoin(mapKeys'))) {
       expect(sql).toContain("log_attributes['function_id'] IN ('fn-123')")
       expect(sql).toContain("source = 'function_logs'")
     }
+  })
+
+  it('removes unavailable builtins from function URLs while preserving attributes and resource scope', async () => {
+    const queries: string[] = []
+    const onUrlUpdate = vi.fn()
+    const filters = [
+      'status:eq:500',
+      'level:eq:error',
+      'attribute.status:eq:runtime-status',
+      'request_id:eq:req-123',
+      'function_id:eq:fn-123',
+      'log_type:eq:edge function runtime',
+    ]
+    const date = [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')]
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        queries.push(z.object({ sql: z.string() }).parse(await request.json()).sql)
+        return HttpResponse.json<AnalyticsResponse>({ result: [] })
+      },
+    })
+    customRender(
+      <UnifiedLogs scope={FUNCTION_SCOPE} hasFilterSideBar={false} {...EDGE_FUNCTION_LOGS_VIEW} />,
+      {
+        nuqs: {
+          hasMemory: true,
+          onUrlUpdate,
+          searchParams: serializeUnifiedLogsSearchParams('', { filter: filters, date }),
+        },
+      }
+    )
+    await waitFor(() => {
+      const update = onUrlUpdate.mock.lastCall?.[0]
+      expect(update?.searchParams.get('filter')).toBe(filters.slice(1).join(','))
+      expect(update?.searchParams.get('date')).toBe(`${date[0].getTime()}-${date[1].getTime()}`)
+    })
+    await waitFor(() => {
+      const rowQuery = queries.filter((sql) => sql.includes('row list')).at(-1)
+      expect(rowQuery).toContain("log_attributes['status'] IN ('runtime-status')")
+      expect(rowQuery).toContain("log_attributes['request_id'] IN ('req-123')")
+      expect(rowQuery).toContain("log_attributes['function_id'] IN ('fn-123')")
+      expect(rowQuery).toContain("source = 'function_logs'")
+      expect(rowQuery).not.toContain("IN ('500')")
+    })
+  })
+
+  it('discovers attributes after opening the picker and applies manual keys across requests', async () => {
+    const user = userEvent.setup()
+    const queries: string[] = []
+    const onUrlUpdate = vi.fn()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        queries.push(sql)
+        return HttpResponse.json<AnalyticsResponse>({
+          result: sql.includes('arrayJoin(mapKeys') ? [{ key: 'request_id', n: 1 }] : [],
+        })
+      },
+    })
+    customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      queryClient,
+      nuqs: { hasMemory: true, onUrlUpdate },
+    })
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    expect(queries.some((sql) => sql.includes('arrayJoin(mapKeys'))).toBe(false)
+    const input = screen.getByTestId('filter-bar-freeform-input')
+    await user.click(input)
+    expect(await screen.findByRole('option', { name: 'Attributes: request_id' })).toHaveTextContent(
+      /^request_id$/
+    )
+    expect(screen.getByText('Attributes')).toBeVisible()
+    fireEvent.change(input, { target: { value: 'manual:key' } })
+    await user.click(await screen.findByRole('option', { name: 'Attributes: manual:key' }))
+    const valueInput = screen.getByTestId('filter-value-attribute.manual:key')
+    expect(
+      screen.getByRole('button', { name: 'Change property from manual:key' })
+    ).toHaveTextContent('manual:key')
+    fireEvent.change(valueInput, { target: { value: "value'with:colon" } })
+    await user.keyboard('{Enter}')
+    await waitFor(() => {
+      const filtered = queries.filter((sql) =>
+        sql.includes("log_attributes['manual:key'] IN ('value''with:colon')")
+      )
+      expect(filtered.some((sql) => sql.includes('row list'))).toBe(true)
+      expect(filtered.some((sql) => sql.includes('sidebar facet counts'))).toBe(true)
+      expect(filtered.some((sql) => sql.includes('severity chart'))).toBe(true)
+    })
+    expect(onUrlUpdate).toHaveBeenCalled()
+    expect(
+      queries
+        .filter((sql) => sql.includes('arrayJoin(mapKeys'))
+        .some((sql) => sql.includes("source = 'postgres_logs'"))
+    ).toBe(true)
+    expect(
+      queries
+        .filter((sql) => sql.includes('arrayJoin(mapKeys'))
+        .some((sql) => sql.includes("source = 'edge_logs'"))
+    ).toBe(true)
+  })
+
+  it.each([
+    { scenario: 'successful discovery', hasError: false, completion: 'Log attributes loaded.' },
+    {
+      scenario: 'partially failed discovery',
+      hasError: true,
+      completion: 'Some log attributes could not be loaded.',
+    },
+  ])('announces $scenario only after every source settles', async ({ hasError, completion }) => {
+    const user = userEvent.setup()
+    const postgresResponse = Promise.withResolvers<void>()
+    const edgeResponse = Promise.withResolvers<void>()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        if (!sql.includes('arrayJoin(mapKeys'))
+          return HttpResponse.json<AnalyticsResponse>({ result: [] })
+        if (sql.includes("source = 'postgres_logs'")) {
+          await postgresResponse.promise
+          return HttpResponse.json<AnalyticsResponse>({ result: [{ key: 'postgres_key', n: 1 }] })
+        }
+        await edgeResponse.promise
+        if (hasError)
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Discovery unavailable' },
+            { status: 500 }
+          )
+        return HttpResponse.json<AnalyticsResponse>({ result: [{ key: 'edge_key', n: 1 }] })
+      },
+    })
+    customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      queryClient,
+      nuqs: { hasMemory: true },
+    })
+    try {
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      const status = screen.getByRole('status')
+      expect(status).toBeEmptyDOMElement()
+      expect(status).toHaveAttribute('aria-live', 'polite')
+      expect(status).toHaveAttribute('aria-atomic', 'true')
+      await user.click(screen.getByTestId('filter-bar-freeform-input'))
+      expect(status).toHaveTextContent('Loading log attributes.')
+      postgresResponse.resolve()
+      expect(await screen.findByRole('option', { name: 'Attributes: postgres_key' })).toBeVisible()
+      expect(status).toHaveTextContent('Loading log attributes.')
+      edgeResponse.resolve()
+      await waitFor(() => expect(status).toHaveTextContent(completion))
+      expect(screen.getByRole('status')).toBe(status)
+    } finally {
+      postgresResponse.resolve()
+      edgeResponse.resolve()
+      await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    }
+  })
+
+  it('keeps restored attribute exclusions when changing builtin filters', async () => {
+    const queries: string[] = []
+    const onUrlUpdate = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        queries.push(sql)
+        return HttpResponse.json<AnalyticsResponse>({ result: [] })
+      },
+    })
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const view = customRender(<UnifiedLogs />, {
+      queryClient,
+      nuqs: {
+        hasMemory: true,
+        onUrlUpdate,
+        searchParams: '?filter=attribute.status:neq:failure,request_id:eq:req-1',
+      },
+    })
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
+    expect(screen.getByTestId('filter-value-attribute.status')).toHaveValue('failure')
+    expect(screen.getByTestId('filter-value-request_id')).toHaveValue('req-1')
+    fireEvent.click(screen.getByRole('button', { name: 'Method' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /POST/ }))
+    await waitFor(() =>
+      expect(
+        queries.some(
+          (sql) =>
+            sql.includes("log_attributes['status'] NOT IN ('failure')") &&
+            sql.includes("log_attributes['request_id'] IN ('req-1')") &&
+            sql.includes("IN ('POST')")
+        )
+      ).toBe(true)
+    )
+    const lastUpdate = onUrlUpdate.mock.lastCall?.[0]
+    expect(lastUpdate.searchParams.get('filter')).toContain('attribute.status:neq:failure')
+    expect(lastUpdate.searchParams.get('filter')).toContain('request_id:eq:req-1')
+    view.unmount()
+  })
+
+  it('keeps attribute filters in paginated and exported network requests', async () => {
+    const queries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        queries.push(z.object({ sql: z.string() }).parse(await request.json()).sql)
+        return HttpResponse.json<AnalyticsResponse>({ result: [] })
+      },
+    })
+    const search = createUnifiedLogsSearch({ filter: ['attribute.trace_id:neq:trace-1'] })
+    await getUnifiedLogs({
+      projectRef: 'default',
+      search,
+      useOtel: true,
+      pageParam: {
+        direction: 'next',
+        cursor: 1,
+        row: { id: 'cursor-row', timestamp: '2026-01-01T10:00:00Z' },
+      },
+    })
+    await retrieveUnifiedLogs({ projectRef: 'default', search, useOtel: true, limit: 100 })
+    expect(queries).toHaveLength(2)
+    expect(queries[0]).toContain("'cursor-row'")
+    expect(queries[1]).toContain('LIMIT 100')
+    for (const sql of queries)
+      expect(sql).toContain("log_attributes['trace_id'] NOT IN ('trace-1')")
+  })
+
+  it.each([
+    ['an excluded log type', '?filter=log_type:neq:postgres', 'storage_logs', 'req.storage_key'],
+    ['a user filter', '?user=user-1', 'auth_logs', 'auth_event.custom_key'],
+  ])('discovers matching source attributes with %s', async (_, searchParams, source, key) => {
+    const user = userEvent.setup()
+    const discoveryQueries: string[] = []
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+        if (sql.includes('arrayJoin(mapKeys')) discoveryQueries.push(sql)
+        const hasKey = sql.includes('arrayJoin(mapKeys') && sql.includes(`source = '${source}'`)
+        return HttpResponse.json<AnalyticsResponse>({ result: hasKey ? [{ key, n: 1 }] : [] })
+      },
+    })
+    customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      queryClient,
+      nuqs: { hasMemory: true, searchParams },
+    })
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    expect(discoveryQueries).toHaveLength(0)
+    await user.click(screen.getByTestId('filter-bar-freeform-input'))
+    expect(await screen.findByRole('option', { name: `Attributes: ${key}` })).toBeVisible()
+    expect(discoveryQueries.some((sql) => sql.includes("source = 'postgres_logs'"))).toBe(false)
+  })
+
+  it('restores attribute and date filters when navigating between URLs without remounting', async () => {
+    const requests: { sql: string; iso_timestamp_start: string; iso_timestamp_end: string }[] = []
+    const onUrlUpdate = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        requests.push(
+          z
+            .object({
+              sql: z.string(),
+              iso_timestamp_start: z.string(),
+              iso_timestamp_end: z.string(),
+            })
+            .parse(await request.json())
+        )
+        return HttpResponse.json<AnalyticsResponse>({ result: [] })
+      },
+    })
+    const firstUrl = '?filter=attribute.trace_id:eq:first&date=1778230800000-1778234400000'
+    const secondUrl = '?filter=attribute.trace_id:neq:second&date=1778317200000-1778320800000'
+    let location = firstUrl
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const view = customRender(<UnifiedLogs hasFilterSideBar={false} />, {
+      wrapper: ({ children }) => (
+        <CustomWrapper
+          queryClient={queryClient}
+          nuqs={{ hasMemory: true, searchParams: location, onUrlUpdate }}
+        >
+          {children}
+        </CustomWrapper>
+      ),
+    })
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
+    expect(screen.getByTestId('filter-value-attribute.trace_id')).toHaveValue('first')
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    onUrlUpdate.mockClear()
+    location = secondUrl
+    view.rerender(<UnifiedLogs hasFilterSideBar={false} />)
+    await waitFor(() =>
+      expect(screen.getByTestId('filter-value-attribute.trace_id')).toHaveValue('second')
+    )
+    expect(screen.getByTestId<HTMLInputElement>('filter-value-date').value).toContain('09 May')
+    await waitFor(() =>
+      expect(
+        requests.some(
+          ({ sql, iso_timestamp_start }) =>
+            sql.includes("log_attributes['trace_id'] NOT IN ('second')") &&
+            iso_timestamp_start === new Date(1778317200000).toISOString()
+        )
+      ).toBe(true)
+    )
+    location = firstUrl
+    view.rerender(<UnifiedLogs hasFilterSideBar={false} />)
+    await waitFor(() =>
+      expect(screen.getByTestId('filter-value-attribute.trace_id')).toHaveValue('first')
+    )
+    expect(screen.getByTestId<HTMLInputElement>('filter-value-date').value).toContain('08 May')
+    expect(
+      onUrlUpdate.mock.calls.every(
+        ([event]) =>
+          !event.searchParams.get('filter')?.includes('second') ||
+          event.searchParams.get('date') === '1778317200000-1778320800000'
+      )
+    ).toBe(true)
   })
 
   it('keeps loaded logs readable without claiming zero matches when counts fail', async () => {

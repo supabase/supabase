@@ -30,6 +30,11 @@ const ABBREV_TO_OPERATOR: Record<string, LogsFilterOperator> = {
   notilike: '!~~*',
 }
 
+export const logAttributeFilterId = (key: string) => `attribute.${key}`
+
+export const getLogAttributeKey = (id: string): string | undefined =>
+  id.startsWith('attribute.') ? id.slice('attribute.'.length) : undefined
+
 export const isLogsFilterColumnValue = (value: unknown): value is LogsColumnFilterValue => {
   return (
     typeof value === 'object' &&
@@ -42,24 +47,33 @@ export const isLogsFilterColumnValue = (value: unknown): value is LogsColumnFilt
 
 export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[] => {
   if (!Array.isArray(filter)) return []
-  const parsed: LogsFilter[] = []
-  for (const raw of filter) {
+  return filter.flatMap((raw): LogsFilter[] => {
     const [column, abbrev, ...rest] = raw.split(':')
     const operator = ABBREV_TO_OPERATOR[abbrev]
-    if (!column || !operator) continue
-    parsed.push({ column, operator, value: rest.join(':') })
-  }
-  return parsed
+    if (!column || !operator) return []
+    const value = rest.join(':')
+    if (!column.startsWith('attribute.')) return [{ column, operator, value }]
+    try {
+      return [{ column: decodeURIComponent(column), operator, value: decodeURIComponent(value) }]
+    } catch {
+      return []
+    }
+  })
 }
 
 export const logsFiltersToUrlParams = (filters: LogsFilter[]): string[] => {
-  return filters.map((f) => `${f.column}:${OPERATOR_TO_ABBREV[f.operator]}:${f.value}`)
+  return filters.map((filter) => {
+    const isAttributeFilter = filter.column.startsWith('attribute.')
+    const column = isAttributeFilter ? encodeURIComponent(filter.column) : filter.column
+    const value = isAttributeFilter ? encodeURIComponent(filter.value) : filter.value
+    return `${column}:${OPERATOR_TO_ABBREV[filter.operator]}:${value}`
+  })
 }
 
 export const groupLogsFiltersByColumn = (
   filters: LogsFilter[]
 ): Record<string, LogsColumnFilterValue> => {
-  const grouped: Record<string, LogsColumnFilterValue> = {}
+  const grouped: Record<string, LogsColumnFilterValue> = Object.create(null)
   for (const { column, operator, value } of filters) {
     const existing = grouped[column]
     if (!existing) {
@@ -120,11 +134,11 @@ export const buildFilterSearchUpdate = (
   columnFilters: { id: string; value: unknown }[],
   filterFields: { value: string; type: string }[]
 ): Record<string, unknown> => {
-  const filterableNames = new Set(
-    filterFields.filter((field) => field.type !== 'timerange').map((field) => field.value)
+  const timerangeNames = new Set(
+    filterFields.filter((field) => field.type === 'timerange').map((field) => field.value)
   )
   const filterEntries = logsFiltersToUrlParams(
-    columnFiltersToLogsFilters(columnFilters, filterableNames)
+    columnFiltersToLogsFilters(columnFilters.filter(({ id }) => !timerangeNames.has(id)))
   )
   const update: Record<string, unknown> = {
     filter: filterEntries.length > 0 ? filterEntries : null,

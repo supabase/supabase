@@ -263,6 +263,28 @@ describe('buildValueItems', () => {
 })
 
 describe('buildPropertyItems', () => {
+  it('preserves property groups and distinct IDs in add and change menus after searching', () => {
+    const params = {
+      filterProperties: [
+        { label: 'status', name: 'status', type: 'string' as const },
+        {
+          label: 'status',
+          name: 'attribute.status',
+          type: 'string' as const,
+          propertyGroupLabel: 'Attributes',
+        },
+      ],
+      inputValue: 'stat',
+    }
+    const expected = [
+      { value: 'status', label: 'status' },
+      { value: 'attribute.status', label: 'status', propertyGroupLabel: 'Attributes' },
+    ]
+
+    expect(buildPropertyItems(params)).toEqual(expected)
+    expect(buildPropertyChangeItems({ ...params, currentPropertyName: 'user' })).toEqual(expected)
+  })
+
   const properties: FilterProperty[] = [
     { label: 'Name', name: 'name', type: 'string', operators: ['='] },
     { label: 'Status', name: 'status', type: 'string', operators: ['='] },

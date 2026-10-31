@@ -75,6 +75,13 @@ export function DefaultCommandList({
           )}
           {groupData.items.map(({ item, index }, itemIndex) => (
             <Fragment key={`${item.value}-${item.label}`}>
+              {item.propertyGroupLabel &&
+                item.propertyGroupLabel !== items[index - 1]?.propertyGroupLabel && (
+                  <>
+                    {index > 0 && <GroupSeparator />}
+                    <GroupHeader label={item.propertyGroupLabel} />
+                  </>
+                )}
               {item.value === '__new_group__' && itemIndex > 0 && <GroupSeparator />}
               <CommandListItem
                 showSelection={showSelection}
