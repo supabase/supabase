@@ -70,8 +70,7 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
       <div className="flex flex-col gap-1 p-4 text-sm">
         <p className="text-foreground-light">No related logs</p>
         <p className="text-foreground-lighter">
-          Only API Gateway, Auth, Storage, and Edge Function logs carry a request ID that links
-          them.
+          Related logs need a shared request, trace, or function execution ID.
         </p>
       </div>
     )

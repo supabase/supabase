@@ -619,7 +619,12 @@ describe('request timeline', () => {
 
         { source: 'postgres_logs', attributes: { request_id: 'ignored' } },
       ])
-    ).toEqual({ requestIds: ['8f00aa-IAD', '8f00bb-IAD'], executionIds: ['exec-1'] })
+    ).toEqual({
+      requestIds: ['8f00aa-IAD', '8f00bb-IAD'],
+      executionIds: ['exec-1'],
+      nativeRequestIds: [],
+      traceIds: [],
+    })
   })
 
   it('ignores IDs that are not plain identifiers', () => {
@@ -629,7 +634,57 @@ describe('request timeline', () => {
         { source: 'auth_logs', attributes: { request_id: 42 } },
         { source: 'storage_logs', attributes: null },
       ])
-    ).toEqual({ requestIds: [], executionIds: [] })
+    ).toEqual({ requestIds: [], executionIds: [], nativeRequestIds: [], traceIds: [] })
+  })
+
+  it('keeps native request IDs, traces, and legacy IDs in separate namespaces', () => {
+    expect(
+      getRequestCorrelationIds([
+        {
+          source: 'edge_logs',
+          attributes: {
+            request_id: '01a1880e-a158-7005-9fdf-e9ee66e4b6ad',
+            'request.headers.cf_ray': '01a1880e-a158-7005-9fdf-e9ee66e4b6ad',
+            trace_id: '69110a42ebc24cb5a63d00fc2e8017a4',
+            span_id: '467867d205824e7d',
+          },
+        },
+        {
+          source: 'auth_logs',
+          attributes: { request_id: '01a1880e-a158-7005-9fdf-e9ee66e4b6ad' },
+        },
+        { source: 'unknown_logs', attributes: { trace_id: 'a'.repeat(32) } },
+      ])
+    ).toEqual({
+      requestIds: [],
+      executionIds: [],
+      nativeRequestIds: ['01a1880e-a158-7005-9fdf-e9ee66e4b6ad'],
+      traceIds: ['69110a42ebc24cb5a63d00fc2e8017a4'],
+    })
+  })
+
+  it('ignores malformed traces, standalone spans, and zero placeholders', () => {
+    expect(
+      getRequestCorrelationIds([
+        {
+          source: 'edge_logs',
+          attributes: {
+            request_id: '00000000-0000-0000-0000-000000000000',
+            trace_id: '0'.repeat(32),
+            'request.headers.cf_ray': '0000',
+          },
+        },
+        {
+          source: 'function_logs',
+          attributes: {
+            execution_id: '00000000-0000-0000-0000-000000000000',
+            trace_id: 'bad-trace',
+            span_id: '467867d205824e7d',
+            parent_span_id: 'f3addadfe21d5055',
+          },
+        },
+      ])
+    ).toEqual({ requestIds: [], executionIds: [], nativeRequestIds: [], traceIds: [] })
   })
 
   it('matches each source on its own key and orders oldest first', () => {
@@ -654,6 +709,13 @@ describe('request timeline', () => {
   })
 
   it('refuses to build an unbounded query', () => {
-    expect(() => getRequestTimelineQuery({ requestIds: [], executionIds: [] })).toThrow()
+    expect(() =>
+      getRequestTimelineQuery({
+        requestIds: [],
+        executionIds: [],
+        nativeRequestIds: [],
+        traceIds: [],
+      })
+    ).toThrow()
   })
 })

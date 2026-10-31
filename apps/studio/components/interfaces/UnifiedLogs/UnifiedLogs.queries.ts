@@ -646,30 +646,54 @@ export const REQUEST_CORRELATION_KEYS = {
     function_edge_logs: ['execution_id'],
     function_logs: ['execution_id'],
   },
-} as const satisfies Record<'requestId' | 'executionId', Record<string, readonly string[]>>
+  nativeRequestId: Object.fromEntries(
+    Object.values(LOG_TYPE_TO_SOURCE).map((source) => [source, ['request_id']])
+  ),
+  traceId: Object.fromEntries(
+    Object.values(LOG_TYPE_TO_SOURCE).map((source) => [source, ['trace_id']])
+  ),
+} as const satisfies Record<string, Record<string, readonly string[]>>
 
-export type RequestCorrelationIds = { requestIds: string[]; executionIds: string[] }
+export type RequestCorrelationIds = {
+  requestIds: string[]
+  executionIds: string[]
+  nativeRequestIds: string[]
+  traceIds: string[]
+}
 
 export const REQUEST_TIMELINE_LIMIT = 200
 
 const CORRELATION_ID_PATTERN = /^[0-9A-Za-z-]{1,64}$/
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const TRACE_ID_PATTERN = /^[0-9a-f]{32}$/i
+const ZERO_ID_PATTERN = /^0+(?:-0+)*$/
 
 export const getRequestCorrelationIds = (
   logs: { source: string; attributes: Record<string, unknown> | null | undefined }[]
 ): RequestCorrelationIds => {
-  const collect = (keysBySource: Record<string, readonly string[]>) => {
+  const collect = (
+    keysBySource: Record<string, readonly string[]>,
+    pattern = CORRELATION_ID_PATTERN,
+    isLegacyRequest = false
+  ) => {
     const ids = new Set<string>()
     for (const { source, attributes } of logs) {
       for (const key of keysBySource[source] ?? []) {
         const value = attributes?.[key]
-        if (typeof value === 'string' && CORRELATION_ID_PATTERN.test(value)) ids.add(value)
+        if (typeof value !== 'string' || !pattern.test(value) || ZERO_ID_PATTERN.test(value)) {
+          continue
+        }
+        if (isLegacyRequest && UUID_PATTERN.test(value)) continue
+        ids.add(value)
       }
     }
     return [...ids].sort()
   }
   return {
-    requestIds: collect(REQUEST_CORRELATION_KEYS.requestId),
+    requestIds: collect(REQUEST_CORRELATION_KEYS.requestId, CORRELATION_ID_PATTERN, true),
     executionIds: collect(REQUEST_CORRELATION_KEYS.executionId),
+    nativeRequestIds: collect(REQUEST_CORRELATION_KEYS.nativeRequestId, UUID_PATTERN),
+    traceIds: collect(REQUEST_CORRELATION_KEYS.traceId, TRACE_ID_PATTERN),
   }
 }
 
@@ -704,10 +728,15 @@ LIMIT 1
 export const getRequestTimelineQuery = ({
   requestIds,
   executionIds,
-}: RequestCorrelationIds): SafeLogSqlFragment => {
+  nativeRequestIds = [],
+  traceIds = [],
+}: Pick<RequestCorrelationIds, 'requestIds' | 'executionIds'> &
+  Partial<Pick<RequestCorrelationIds, 'nativeRequestIds' | 'traceIds'>>): SafeLogSqlFragment => {
   const conditions = [
     ...correlationConditions(REQUEST_CORRELATION_KEYS.requestId, requestIds),
     ...correlationConditions(REQUEST_CORRELATION_KEYS.executionId, executionIds),
+    ...correlationConditions(REQUEST_CORRELATION_KEYS.nativeRequestId, nativeRequestIds),
+    ...correlationConditions(REQUEST_CORRELATION_KEYS.traceId, traceIds),
   ]
   if (conditions.length === 0) throw new Error('A request or execution ID is required')
 
