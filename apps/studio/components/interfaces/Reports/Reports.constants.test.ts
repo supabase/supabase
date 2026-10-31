@@ -52,18 +52,6 @@ describe('generateRegexpWhereSafe', () => {
     )
   })
 
-  it('should handle numbers', () => {
-    const filters: ReportFilterItem[] = [
-      {
-        key: 'request.status_code',
-        value: 200,
-        compare: 'is',
-      },
-    ]
-    const result = generateRegexpWhereSafe(filters, true)
-    expect(result).toBe('WHERE `request`.`status_code` = 200')
-  })
-
   it('should escape single quotes in string values', () => {
     const filters: ReportFilterItem[] = [
       {

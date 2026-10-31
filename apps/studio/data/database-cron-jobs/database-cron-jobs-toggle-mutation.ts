@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseCronJobsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -25,6 +26,7 @@ export async function toggleDatabaseCronJob({
     connectionString,
     sql: safeSql`select cron.alter_job(job_id := ${literal(jobId)}, active := ${literal(active)});`,
     queryKey: databaseCronJobsKeys.alter(),
+    grant: unguarded.migrating,
   })
 
   return result

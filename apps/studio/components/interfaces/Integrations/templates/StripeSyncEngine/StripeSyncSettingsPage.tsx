@@ -33,7 +33,7 @@ export const StripeSyncSettingsPage = () => {
   if (!installed || uninstalling) {
     return (
       <ConstrainedIntegrationTabScaffold>
-        <PageSection>
+        <PageSection className="py-0">
           <Admonition type="default" description="Stripe Sync Engine is not installed." />
         </PageSection>
       </ConstrainedIntegrationTabScaffold>

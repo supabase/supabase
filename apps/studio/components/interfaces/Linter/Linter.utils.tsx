@@ -304,7 +304,7 @@ export const lintInfoMap: LintInfo[] = [
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/settings/api-keys`,
     linkText: 'View settings',
-    docsLink: `${DOCS_URL}/guides/api/api-keys#the-servicerole-key`,
+    docsLink: `${DOCS_URL}/guides/security/rotate-leaked-api-keys`,
     category: 'security',
   },
   {

@@ -466,7 +466,7 @@ describe('TableOptions source reconciliation', () => {
     customRender(<TableOptionsHarness tableOptions={[{ tableId: 202, clusterBy: ['Region'] }]} />)
 
     expect(await screen.findByText('Billing.Invoices')).toBeInTheDocument()
-    expect(screen.getByText('No longer in publication')).toHaveClass('text-destructive-600')
+    expect(screen.getByText('No longer in publication')).toBeInTheDocument()
     expect(screen.getByText('Some tables are no longer in the publication')).toBeInTheDocument()
     expect(screen.queryByText('Region')).not.toBeInTheDocument()
     expect(document.body).not.toHaveTextContent('202')

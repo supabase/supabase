@@ -3,9 +3,12 @@
 This guide explains how to run Playwright end-to-end checks against docs pages
 this repo owns.
 
-Use this suite when you change guides, troubleshooting entries, or shared
+Use this suite when you change guides or shared
 partials under `apps/docs/content`. It loads each in-scope page, checks that the
-article renders, and verifies that docs-owned links in the article resolve.
+article renders, and verifies that docs-owned links in the article resolve. For
+links with an anchor, it also checks that the target page's article has an element
+with that `id` or an `a[name]` with that value, including same-page `#anchor`
+links.
 
 This page covers:
 
@@ -108,7 +111,7 @@ paths.
 
 ### Run every in-scope page
 
-To test every guide and troubleshooting entry instead of a changed-files scope
+To test every guide instead of a changed-files scope
 — for example, a periodic full-site check — run:
 
 ```bash
@@ -117,8 +120,8 @@ PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:all
 
 This ignores `DOCS_E2E_PAGE_PATHS` and the 20-page cap described in
 [Limits](#limits), and tests every page listed by
-`pnpm -C e2e/docs resolve-docs-scope` across the whole `guides` and
-`troubleshooting` trees — several hundred pages as of this writing. `--all`
+`pnpm -C e2e/docs resolve-docs-scope` across the whole `guides`
+tree — several hundred pages as of this writing. `--all`
 runs also default to `--max-failures=0`, so a full run isn't cut short by
 `playwright.config.ts`'s global `maxFailures: 3`. Expect a long run: the suite
 runs one worker by default, so pass `--workers` to parallelize it, for
@@ -136,11 +139,10 @@ pages linking into reference docs or server-side auth guides.
 
 ### In scope
 
-| Changed path                                 | Behavior                                                 |
-| -------------------------------------------- | -------------------------------------------------------- |
-| `apps/docs/content/guides/**/*.mdx`          | Test `/docs/guides/<slug>`, excluding federated sections |
-| `apps/docs/content/troubleshooting/**/*.mdx` | Test `/docs/guides/troubleshooting/<slug>`               |
-| `apps/docs/content/_partials/**`             | Test owned pages that include that partial               |
+| Changed path                        | Behavior                                                 |
+| ----------------------------------- | -------------------------------------------------------- |
+| `apps/docs/content/guides/**/*.mdx` | Test `/docs/guides/<slug>`, excluding federated sections |
+| `apps/docs/content/_partials/**`    | Test owned pages that include that partial               |
 
 ### Out of scope
 

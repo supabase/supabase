@@ -212,7 +212,7 @@ For more details, see:
 
 ### 404 `NOT_FOUND`
 
-The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello`. Check that the corresponding directory exists at `volumes/functions/hello/`.
+The [request URL must include the function name](/kb/troubleshooting/edge-function-404-error-response) after `/functions/v1/`. For example, `/functions/v1/hello`. Check that the corresponding directory exists at `volumes/functions/hello/`.
 
 ### Function invocation errors
 
@@ -224,9 +224,11 @@ Check the functions service logs:
 docker compose logs functions
 ```
 
-For 503 `BOOT_ERROR`, check for syntax errors, invalid imports, or missing dependencies that prevent the function from starting.
+For 503 `BOOT_ERROR`, check for syntax errors, invalid imports, or missing dependencies that [prevent the function from starting](/kb/troubleshooting/edge-function-503-response).
 
 ### 401 "invalid JWT"
+
+For more on 401 responses from functions, see [Edge Function 401 errors](/kb/troubleshooting/edge-function-401-error-response).
 
 - Check that `FUNCTIONS_VERIFY_JWT` matches your intent (`true` or `false`) in `.env`
 - If verification is enabled, pass either a valid JWT in `Authorization: Bearer <token>` (a user session token or a legacy API key), or an `sb_publishable_*` or `sb_secret_*` key in the `apikey` header. The API gateway translates `sb_` keys to an internal JWT, which the functions service then verifies.

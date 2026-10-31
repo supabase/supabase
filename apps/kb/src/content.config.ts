@@ -4,17 +4,6 @@ import { z } from 'astro/zod'
 
 import { TOPIC_NAMES } from './lib/topics'
 
-// Format date as "September 26, 2026"
-const formatDate = (date: Date): string => {
-  // Adjust for timezone offset to preserve the intended date
-  const adjusted = new Date(date.getTime() + date.getTimezoneOffset() * 60000)
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(adjusted)
-}
-
 // Astro's default id is a lowercased slug of the file path, but the markdown
 // export (scripts/generate-markdown.ts) keeps the filename's case and Vercel
 // serves static files case-sensitively. Keeping the case here makes the page
@@ -31,6 +20,10 @@ const articleFields = {
   // Surfaces the guide in the homepage's "Featured Guides" section.
   pinned: z.boolean().default(false),
   github_url: z.string().optional(),
+  lastEdited: z
+    .date()
+    .nullish()
+    .transform((value) => value ?? undefined),
 }
 
 // Every entry here is rendered through ArticleLayout by
@@ -47,10 +40,6 @@ const guides = defineCollection({
     // Surfaces the guide in the homepage's "Featured Guides" section.
     pinned: z.boolean().default(false),
     github_url: z.string().optional(),
-    date: z
-      .date()
-      .optional()
-      .transform((date) => (date ? formatDate(date) : undefined)),
   }),
 })
 
@@ -74,8 +63,7 @@ const troubleshooting = defineCollection({
 })
 
 // Question-and-answer entries in src/content/faqs. `title` holds the question,
-// and the body holds the answer. Entries are not rendered by a page yet — this
-// collection only defines the schema so content can be authored against it.
+// and the body holds the answer. Rendered by src/pages/faqs/[...slug].astro.
 const faqs = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/faqs', generateId }),
   // Every entry is tagged with the FAQs topic in addition to any topics its
@@ -84,6 +72,10 @@ const faqs = defineCollection({
     .object({
       title: z.string(),
       topics: z.array(z.string()).default([]),
+      lastEdited: z
+        .date()
+        .nullish()
+        .transform((value) => value ?? undefined),
     })
     .transform((data) => ({ ...data, topics: [...new Set(['FAQs', ...data.topics])] })),
 })

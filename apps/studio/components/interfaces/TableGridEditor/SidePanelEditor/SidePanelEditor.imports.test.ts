@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import { safeSql } from '@supabase/pg-meta'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -65,7 +67,7 @@ describe('CSV imports with role impersonation', () => {
   })
 
   test.each(['uploaded', 'pasted'])(
-    '%s CSV wraps every large-row batch in the selected role',
+    '%s CSV wraps large-row batches in the selected role before updating sequences',
     async (source) => {
       const queries: string[] = []
       addAPIMock({
@@ -86,7 +88,31 @@ describe('CSV imports with role impersonation', () => {
       const options = {
         projectRef: 'default',
         connectionString: undefined,
-        table,
+        table: {
+          ...table,
+          columns: [
+            {
+              id: '1.1',
+              table_id: table.id,
+              schema: table.schema,
+              table: table.name,
+              name: 'id',
+              ordinal_position: 1,
+              data_type: 'bigint',
+              format: 'int8',
+              is_identity: true,
+              identity_generation: 'BY DEFAULT',
+              is_generated: false,
+              is_nullable: false,
+              is_updatable: true,
+              is_unique: true,
+              check: null,
+              default_value: null,
+              enums: [],
+              comment: null,
+            },
+          ],
+        },
         selectedHeaders: ['id', 'name'],
         roleImpersonationState,
         onProgressUpdate,
@@ -106,13 +132,16 @@ describe('CSV imports with role impersonation', () => {
           : await insertTableRows({ ...options, rows })
 
       expect(result.error).toBeUndefined()
-      expect(queries.length).toBeGreaterThan(1)
-      for (const query of queries) {
+      const insertQueries = queries.slice(0, -1)
+      expect(insertQueries.length).toBeGreaterThan(1)
+      for (const query of insertQueries) {
         expect(query).toContain("set_config('role', 'anon', true)")
         expect(query).toContain('request.jwt.claims')
         expect(query.includes('insert into public.import_test')).toBe(true)
         expect(new Blob([query]).size).toBeLessThanOrEqual(IMPORT_SQL_SIZE_LIMIT)
       }
+      expect(queries.at(-1)).toContain('SELECT setval(')
+      expect(queries.at(-1)).toContain("pg_get_serial_sequence('public.import_test', 'id')")
       expect(onProgressUpdate).toHaveBeenLastCalledWith(100)
     }
   )

@@ -48,44 +48,43 @@ The state module owns the AI SDK chat instances, request transport, chat persist
 
 ### Model requests and context
 
-| Change                                              | Start here                                                                                                                                                                              |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Chat endpoint and request validation                | [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts)                                                                                                                                 |
-| Model streaming and response orchestration          | [generate-assistant-response.ts](./generate-assistant-response.ts)                                                                                                                      |
-| System instructions and topic knowledge             | [prompts.ts](./prompts.ts); `load_knowledge` topics in [knowledge-topics.ts](./tools/knowledge-topics.ts)                                                                               |
-| Project, chat, clock, and logs context              | [assistant-context.ts](./assistant-context.ts), [assistant-message-metadata.ts](./assistant-message-metadata.ts)                                                                        |
-| History preparation and output sanitization         | [generate-assistant-response.utils.ts](./generate-assistant-response.utils.ts), [tool-sanitizer.ts](./tools/tool-sanitizer.ts), [registry.ts](./tools/registry.ts)                      |
-| Model catalog, defaults, and provider configuration | [model.utils.ts](./model.utils.ts), [model.ts](./model.ts), [bedrock.ts](./bedrock.ts); entitlement and throttling decisions in [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts) |
-| Tracing and feedback                                | [braintrust-logger.ts](./braintrust-logger.ts), [feedback API](../../pages/api/ai/feedback/), [rate-message-mutation.ts](../../data/ai/rate-message-mutation.ts)                        |
+| Change                                              | Start here                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chat endpoint and request validation                | [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts)                                                                                                                                                                                                                                                                                                                       |
+| Model streaming and response orchestration          | [generate-assistant-response.ts](./generate-assistant-response.ts)                                                                                                                                                                                                                                                                                                            |
+| System instructions and topic knowledge             | [prompts.ts](./prompts.ts) for tool-agnostic rules; tool rules in each contract's `promptGuidance`, assembled by [tools-prompt.ts](./tools/tools-prompt.ts); the full prompt is built by `buildSystemPrompt` in [generate-assistant-response.utils.ts](./generate-assistant-response.utils.ts); `load_knowledge` topics in [knowledge-topics.ts](./tools/knowledge-topics.ts) |
+| Project, chat, clock, and logs context              | [assistant-context.ts](./assistant-context.ts), [assistant-message-metadata.ts](./assistant-message-metadata.ts)                                                                                                                                                                                                                                                              |
+| History preparation and output sanitization         | [generate-assistant-response.utils.ts](./generate-assistant-response.utils.ts), [tool-sanitizer.ts](./tools/tool-sanitizer.ts), [registry.ts](./tools/registry.ts)                                                                                                                                                                                                            |
+| Model catalog, defaults, and provider configuration | [model.utils.ts](./model.utils.ts), [model.ts](./model.ts), [bedrock.ts](./bedrock.ts); entitlement and throttling decisions in [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts)                                                                                                                                                                                       |
+| Tracing and feedback                                | [braintrust-logger.ts](./braintrust-logger.ts), [feedback API](../../pages/api/ai/feedback/), [rate-message-mutation.ts](../../data/ai/rate-message-mutation.ts)                                                                                                                                                                                                              |
 
-Keep per-request context in `assistant-context.ts`. The shared system prompt is deliberately static for provider caching.
+Keep per-request context in `assistant-context.ts`. The shared system prompt is deliberately static for provider caching: it varies only with the tool set, through its generated `## Tools` section. That costs no extra cache misses, because providers cache tool definitions before the system prompt, so a change to the tool set already invalidates the cached system prompt ([Anthropic](https://platform.claude.com/docs/en/build-with-claude/prompt-caching#what-invalidates-the-cache), [Bedrock](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html#prompt-caching-converse), [OpenAI](https://developers.openai.com/api/docs/guides/prompt-caching)).
 
 ### Tools
 
-| Change                                                       | Start here                                                                                                                                                                                                |
-| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tool assembly and platform/self-hosted selection             | [tools/index.ts](./tools/index.ts)                                                                                                                                                                        |
-| Allowlist, minimum opt-in levels, and blocked-tool responses | [tool-filter.ts](./tool-filter.ts)                                                                                                                                                                        |
-| Studio tool assembly and opt-in requests                     | [studio-tools.ts](./tools/studio-tools.ts)                                                                                                                                                                |
-| Remote MCP connection and tool selection                     | [supabase-mcp.ts](./supabase-mcp.ts), [mcp-tools.ts](./tools/mcp-tools.ts)                                                                                                                                |
-| Schema and policy tools                                      | [schema-tools.ts](./tools/schema-tools.ts)                                                                                                                                                                |
-| Reports, notebooks, incidents, and support                   | [report-tools.ts](./tools/report-tools.ts), [notebook-tools.ts](./tools/notebook-tools.ts), [incident-tools.ts](./tools/incident-tools.ts), [support-tools.ts](./tools/support-tools.ts)                  |
-| Self-hosted tools                                            | [fallback-tools.ts](./tools/fallback-tools.ts)                                                                                                                                                            |
-| Contract-based tools (see [Tool contracts](#tool-contracts)) | [registry.ts](./tools/registry.ts) lists them in `TOOL_CONTRACTS` (and remote MCP tools in `REMOTE_TOOL_CONTRACTS`); [types.ts](./tools/types.ts), [tool-from-contract.ts](./tools/tool-from-contract.ts) |
+| Change                                                       | Start here                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Tool assembly and platform/self-hosted selection             | [tools/index.ts](./tools/index.ts)                                                                                                                                                                                                                                                                           |
+| Allowlist, minimum opt-in levels, and blocked-tool responses | [tool-filter.ts](./tool-filter.ts)                                                                                                                                                                                                                                                                           |
+| Remote MCP connection and tool selection                     | [supabase-mcp.ts](./supabase-mcp.ts), [mcp-tools.ts](./tools/mcp-tools.ts)                                                                                                                                                                                                                                   |
+| Self-hosted tools                                            | [fallback-tools.ts](./tools/fallback-tools.ts)                                                                                                                                                                                                                                                               |
+| Contract-based tools (see [Tool contracts](#tool-contracts)) | [registry.ts](./tools/registry.ts) lists them in `TOOL_CONTRACTS` (and remote MCP tools in `REMOTE_TOOL_CONTRACTS`), and [registry.server.ts](./tools/registry.server.ts) maps each to its factory in `TOOL_FACTORIES`; [types.ts](./tools/types.ts), [tool-from-contract.ts](./tools/tool-from-contract.ts) |
 
 Tools are moving to [contracts](#tool-contracts); the rest declare their schemas and output handling directly. [registry.ts](./tools/registry.ts) is the source of truth for which are which: a tool in `TOOL_CONTRACTS` or `REMOTE_TOOL_CONTRACTS` is a contract tool.
 
 For a new or changed tool:
 
 1. Prefer a [contract](#tool-contracts) for a new tool. Otherwise implement it in the appropriate tool module.
-2. Include it in `getTools` through the module's tool getter, and add its name to the allowlist in `tool-filter.ts`. A contract, local or remote, declares minimum access as `minOptInLevel`; other tools use `TOOL_CATEGORY_MAP`.
+2. Register it in the registry, which `getTools` builds tools from (add the factory to `TOOL_FACTORIES` for a local contract), and add its name to the allowlist in `tool-filter.ts`. A contract, local or remote, declares minimum access as `minOptInLevel`; other tools use `TOOL_CATEGORY_MAP`.
 3. Decide whether execution needs user approval and what output may reach the model, including on history replay. Read the [SQL safety skill](../../../../.agents/skills/safe-sql-execution/SKILL.md) before changing SQL execution.
 4. Update `Message.Parts.tsx` and its helpers if the tool needs a UI renderer.
 5. Update relevant tests, mock tools, and evaluation cases. See [local development and validation](#local-development-and-validation).
 
 ### Tool contracts
 
-A contract declares a tool once: name, description, input and output schemas, `minOptInLevel`, `needsApproval`, and `toModelOutput`, which decides what the model may see of the output. The registry also applies `toModelOutput` to persisted outputs when it replays history, so it must be safe to run on its own result.
+A contract declares a tool once: name, description, input and output schemas, `availability`, `minOptInLevel`, `needsApproval`, optional `promptGuidance`, and `toModelOutput`, which decides what the model may see of the output. `availability` says which environments (`platform`, `self-hosted`) the tool exists in and which request conditions it also needs (`requires`, such as the Explorer flag or support mode). [registry.server.ts](./tools/registry.server.ts) builds only the available tools for a request, so `getTools` has no per-tool branches.
+
+`promptGuidance` holds the rules for using the tool that its description doesn't cover; omit it when the description is enough. [buildToolsPrompt](./tools/tools-prompt.ts) generates the system prompt's `## Tools` section from the tools the model is given: it lists each one that has a contract, then adds a section with the guidance of each tool that has any. Because it reads the tool set itself, the prompt never mentions a tool the model doesn't have, including remote tools that failed to load. Keep rules that name a tool in its `promptGuidance`, not in `prompts.ts`, and name only tools that are available whenever that tool is; a test checks the tool set `getTools` builds for every combination of environment and requirements. The prompt is cached, so the section may depend only on the tool set, never on per-request data. The registry also applies `toModelOutput` to persisted outputs when it replays history, so it must be safe to run on its own result.
 
 Each contract tool is a pair of files named after the tool, plus an optional output helper:
 
@@ -99,7 +98,7 @@ To migrate a tool to a contract:
 
 1. Create `<tool-name>.ts` and `<tool-name>.server.ts`, moving the schemas, description, and `execute` out of the old definition.
 2. Make `outputSchema` accept every shape already saved in chat history, normalizing older ones with a union and transform. Set `outputOnInvalid` if the model should see something other than nothing when a saved output doesn't parse.
-3. Register the contract in `TOOL_CONTRACTS`, and compose `createTool` into the module's tool getter.
+3. Register the contract in `TOOL_CONTRACTS`, and declare its `availability`, and add `createTool` to `TOOL_FACTORIES` in [registry.server.ts](./tools/registry.server.ts).
 4. Remove the tool from `TOOL_CATEGORY_MAP`. Keep it in the allowlist in `tool-filter.ts`.
 5. Delete any per-tool sanitizer. [tool-sanitizer.ts](./tools/tool-sanitizer.ts) only delegates to `sanitizeContractPart`.
 6. Replace imports of the old inline schemas in the UI, evals, and `generate-assistant-response.ts` with `contract.inputSchema`, `contract.outputSchema`, or `ToolContractInput`/`ToolContractOutput`.
@@ -108,7 +107,15 @@ To migrate a tool to a contract:
 
 #### Remote contracts
 
-A tool the remote MCP server implements has a `RemoteToolContract`: only `name`, `minOptInLevel`, and `needsApproval`. The server owns the description, input schema, execution, and output, so there is no `.server.ts` file and its parts stay `dynamic-tool`, outside `StudioUIMessage`. Register it in `REMOTE_TOOL_CONTRACTS` and remove it from `TOOL_CATEGORY_MAP`; [mcp-tools.ts](./tools/mcp-tools.ts) applies `needsApproval`, since MCP tool definitions can't declare it. [list-extensions.ts](./tools/list-extensions.ts) is an example.
+A tool the remote MCP server implements has a `RemoteToolContract`: only `name`, `availability`, `minOptInLevel`, `needsApproval`, and `promptGuidance`. The server owns the description, input schema, execution, and output, so there is no `.server.ts` file and its parts stay `dynamic-tool`, outside `StudioUIMessage`. Register it in `REMOTE_TOOL_CONTRACTS` and remove it from `TOOL_CATEGORY_MAP`; [mcp-tools.ts](./tools/mcp-tools.ts) applies `needsApproval`, since MCP tool definitions can't declare it. [list-extensions.ts](./tools/list-extensions.ts) is an example.
+
+#### Legacy contracts
+
+A tool that no longer exists can still have outputs in saved chats, such as the self-hosted fallback tools that contracts replace. A `LegacyToolContract` keeps those outputs safe: only `name`, `outputSchema`, `toModelOutput`, and `outputOnInvalid`, so replayed output is validated and gated by opt-in level like any contract tool's. [legacy-tools.ts](./tools/legacy-tools.ts) lists them in `LEGACY_TOOL_CONTRACTS`. Only history replay reads them, through `sanitizeContractPart`, and nothing registers them as tools. When you remove or rename a tool whose outputs exist in saved chats, add a legacy contract for the old name.
+
+#### Legacy contracts
+
+A tool that no longer exists can still have outputs in saved chats, such as the self-hosted fallback tools that contracts replace. A `LegacyToolContract` keeps those outputs safe: only `name`, `outputSchema`, `toModelOutput`, and `outputOnInvalid`, so replayed output is validated and gated by opt-in level like any contract tool's. [legacy-tools.ts](./tools/legacy-tools.ts) lists them in `LEGACY_TOOL_CONTRACTS`. Only history replay reads them, through `sanitizeContractPart`, and nothing registers them as tools. When you remove or rename a tool whose outputs exist in saved chats, add a legacy contract for the old name.
 
 ## Access and data sharing
 
@@ -147,7 +154,7 @@ Use the [Studio setup instructions](../../README.md#developer-quickstart) for th
 Tests are colocated with the implementation under `lib/ai/`, `components/ui/AIAssistantPanel/`, and `state/`. For example, from `apps/studio`:
 
 ```bash
-pnpm exec vitest run lib/ai/tool-filter.test.ts lib/ai/tools/studio-tools.test.ts
+pnpm exec vitest run lib/ai/tool-filter.test.ts lib/ai/tools/index.availability.test.ts lib/ai/tools/registry.test.ts
 ```
 
 Use the [Assistant evaluation guide](../../evals/README.md) for behavioral datasets, local evaluation commands, CI labels, and scoring. [dataset.ts](../../evals/dataset.ts) contains scenarios and [mock-tools.ts](./tools/mock-tools.ts) supplies tool behavior for evaluations. The browser test is [assistant.spec.ts](../../../../e2e/studio/features/assistant.spec.ts); read the [E2E setup guide](../../../../e2e/studio/README.md) before running it.

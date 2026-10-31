@@ -45,7 +45,7 @@ Additionally, you can install Supabase agent skills alongside the MCP server, us
 
 ## Available tools
 
-The Supabase MCP server provides tools organized into feature groups. All groups except Storage are enabled by default. You can enable or disable specific groups using the [configuration panel above](#configure-your-ai-tool).
+The Supabase MCP server provides tools organized into feature groups. Groups that your connection supports are enabled by default, except Storage. You can enable or disable specific groups using the [configuration panel above](#configure-your-ai-tool).
 
 ### Database
 
@@ -100,6 +100,13 @@ Requires a paid plan.
 
 - `create_branch` / `list_branches` / `delete_branch` - Branch management
 - `merge_branch` / `reset_branch` / `rebase_branch` - Branch operations
+
+### Feedback
+
+Disabled in read-only mode (`read_only` parameter).
+
+- `submit_feedback` - Send feedback about Supabase tools to the Supabase team
+- `delete_feedback` - Delete feedback using the token returned by `submit_feedback`
 
 ### Storage (disabled by default)
 
@@ -213,7 +220,7 @@ There are some situations where you might want to manually authenticate the MCP 
 
 ### CI environment
 
-To authenticate the MCP server in a CI environment, create a scoped personal access token (PAT) and pass it as a header to the MCP server.
+To authenticate the MCP server in a CI environment, create a personal access token (PAT) and pass it as a header to the MCP server.
 
 1. Production projects can contain sensitive data. Before connecting one, scope the server to that project, enable [read-only mode](#configuration-options), restrict the available feature groups, and review the [security risks](#security-risks).
 

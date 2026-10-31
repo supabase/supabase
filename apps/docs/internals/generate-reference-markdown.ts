@@ -124,6 +124,13 @@ const REFERENCES: Ref[] = [
     contentDir: path.join(process.cwd(), 'content/reference/middleware/v1'),
   },
   {
+    kind: 'sdk-new',
+    title: 'TanStack DB Reference',
+    outFile: 'tanstack_db.md',
+    mdxDir: path.join(MDX_ROOT, 'tanstack_db'),
+    contentDir: path.join(process.cwd(), 'content/reference/tanstack_db/v1'),
+  },
+  {
     kind: 'sdk-legacy',
     title: 'Kotlin Client Library Reference',
     outFile: 'kotlin.md',
@@ -247,7 +254,15 @@ async function renderMarkdownSection(mdxDir: string, section: Section): Promise<
     return null
   }
   const { content, data } = matter(raw)
-  const body = stripMdxJsx(content)
+  const links: Array<{ title: string; href: string }> = Array.isArray(data.links) ? data.links : []
+  const body = [
+    stripMdxJsx(content),
+    links.length
+      ? `## Additional links\n\n${links.map((l) => `- [${l.title}](${l.href})`).join('\n')}`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('\n\n')
   if (!body) return null
   const heading = data.hideTitle
     ? null

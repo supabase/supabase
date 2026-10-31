@@ -189,35 +189,31 @@ describe('server source maps', () => {
     await expect(plugin.load.call({} as never, codeFile)).rejects.toMatchObject({ code: 'EISDIR' })
   })
 
+  // Vercel output paths are covered by the build cases below; here only token/skip change the config.
   it.each([
-    [false, false, true],
-    [false, true, true],
-    [true, false, false],
-    [true, true, false],
-    [false, false, false],
-    [true, false, true],
-  ])(
-    'enables both server stages with token=%s, Vercel=%s, skip=%s',
-    async (hasToken, isVercel, shouldSkipUpload) => {
-      const config = await resolveStudioConfig(hasToken, isVercel, shouldSkipUpload)
-      expect(config.environments.ssr.build.sourcemap).toBe(true)
-      expect(config.environments.nitro.build.sourcemap).toBe(true)
-      expect(config.environments.client.build.sourcemap).toBe(
-        hasToken && !shouldSkipUpload ? 'hidden' : false
-      )
-      expect(captured.nitro?.experimental?.sourcemapMinify).toBe(false)
-      expect(captured.sentry?.sourcemaps?.filesToDeleteAfterUpload).toEqual([
-        path.join(studioRoot, '.output/public/**/*.map'),
-        path.join(studioRoot, '.vercel/output/static/**/*.map'),
-        ...(hasToken && !shouldSkipUpload
-          ? [
-              path.join(studioRoot, '.output/server/**/*.map'),
-              path.join(studioRoot, '.vercel/output/functions/**/*.map'),
-            ]
-          : []),
-      ])
-    }
-  )
+    [false, true],
+    [true, false],
+    [false, false],
+    [true, true],
+  ])('enables both server stages with token=%s, skip=%s', async (hasToken, shouldSkipUpload) => {
+    const config = await resolveStudioConfig(hasToken, false, shouldSkipUpload)
+    expect(config.environments.ssr.build.sourcemap).toBe(true)
+    expect(config.environments.nitro.build.sourcemap).toBe(true)
+    expect(config.environments.client.build.sourcemap).toBe(
+      hasToken && !shouldSkipUpload ? 'hidden' : false
+    )
+    expect(captured.nitro?.experimental?.sourcemapMinify).toBe(false)
+    expect(captured.sentry?.sourcemaps?.filesToDeleteAfterUpload).toEqual([
+      path.join(studioRoot, '.output/public/**/*.map'),
+      path.join(studioRoot, '.vercel/output/static/**/*.map'),
+      ...(hasToken && !shouldSkipUpload
+        ? [
+            path.join(studioRoot, '.output/server/**/*.map'),
+            path.join(studioRoot, '.vercel/output/functions/**/*.map'),
+          ]
+        : []),
+    ])
+  })
 
   it.each([
     [false, false, false],

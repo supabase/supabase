@@ -49,23 +49,22 @@ describe('extractServiceRows', () => {
     expect(extractServiceRows([], 'db')).toEqual([])
   })
 
-  it('preserves the timestamp from each row', () => {
+  it('maps each row independently, preserving its timestamp', () => {
     const rows = [
-      makeRow({ timestamp: '2026-05-20T09:00:00' }),
-      makeRow({ timestamp: '2026-05-20T10:00:00' }),
+      makeRow({
+        timestamp: '2026-05-20T09:00:00',
+        postgres_logs: { ok: 100, warning: 0, error: 0, total: 100 },
+      }),
+      makeRow({
+        timestamp: '2026-05-20T10:00:00',
+        postgres_logs: { ok: 50, warning: 5, error: 10, total: 65 },
+      }),
     ]
     const result = extractServiceRows(rows, 'db')
-    expect(result.map((r) => r.timestamp)).toEqual(['2026-05-20T09:00:00', '2026-05-20T10:00:00'])
-  })
-
-  it('handles multiple rows and maps each independently', () => {
-    const rows = [
-      makeRow({ postgres_logs: { ok: 100, warning: 0, error: 0, total: 100 } }),
-      makeRow({ postgres_logs: { ok: 50, warning: 5, error: 10, total: 65 } }),
-    ]
-    const result = extractServiceRows(rows, 'db')
-    expect(result[0]).toMatchObject({ ok_count: 100, warning_count: 0, error_count: 0 })
-    expect(result[1]).toMatchObject({ ok_count: 50, warning_count: 5, error_count: 10 })
+    expect(result).toEqual([
+      { timestamp: '2026-05-20T09:00:00', ok_count: 100, warning_count: 0, error_count: 0 },
+      { timestamp: '2026-05-20T10:00:00', ok_count: 50, warning_count: 5, error_count: 10 },
+    ])
   })
 
   it('defaults to 0 when the service field is missing from the row', () => {

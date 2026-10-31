@@ -45,7 +45,7 @@ const renderDestinationForm = async () => {
   const view = customRenderHook(
     () => ({
       ...useDestinationForm({ selectedType: 'BigQuery' }),
-      requestStatus: usePipelineRequestStatus().getRequestStatus(8),
+      requestStatus: usePipelineRequestStatus().getRequestStatus('8'),
     }),
     {
       wrapper: ({ children }) => (
@@ -166,28 +166,7 @@ describe('useDestinationForm', () => {
     expect(result.current.requestStatus).toBe(PipelineStatusRequestStatus.None)
   })
 
-  it('validates destination and pipeline configuration before creating', async () => {
-    const { result } = await renderDestinationForm()
-    await act(async () => {
-      expect(
-        await result.current.validateConfiguration({
-          data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
-          onValidationFail: vi.fn(),
-        })
-      ).toEqual({ canContinue: true, warnings: [] })
-    })
-    expect(validationRequests).toEqual([
-      expect.objectContaining({
-        source_id: 42,
-        config: expect.objectContaining({
-          publication_name: 'analytics',
-          table_sync_copy: { type: 'include_tables', table_ids: [101] },
-        }),
-      }),
-    ])
-  })
-
-  it('sends the same pipeline settings to both validation endpoints', async () => {
+  it('validates with the same pipeline settings sent to both validation endpoints', async () => {
     const expectedPipelineConfig = {
       publication_name: 'analytics',
       table_sync_copy: { type: 'include_tables', table_ids: [101] },
@@ -197,10 +176,12 @@ describe('useDestinationForm', () => {
     }
     const { result } = await renderDestinationForm()
     await act(async () => {
-      await result.current.validateConfiguration({
-        data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
-        onValidationFail: vi.fn(),
-      })
+      expect(
+        await result.current.validateConfiguration({
+          data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+          onValidationFail: vi.fn(),
+        })
+      ).toEqual({ canContinue: true, warnings: [] })
     })
     expect(destinationRequests).toEqual([
       {
@@ -365,7 +346,7 @@ describe('useDestinationForm', () => {
           data: formData,
           existingDestination: {
             destinationId: 7,
-            pipelineId: 8,
+            pipelineId: '8',
             enabled,
             statusName: enabled ? 'started' : 'stopped',
           },
@@ -396,7 +377,7 @@ describe('useDestinationForm', () => {
         data: formData,
         existingDestination: {
           destinationId: 7,
-          pipelineId: 8,
+          pipelineId: '8',
           enabled: true,
           statusName: 'started',
         },
@@ -426,7 +407,7 @@ describe('useDestinationForm', () => {
         data: formData,
         existingDestination: {
           destinationId: 7,
-          pipelineId: 8,
+          pipelineId: '8',
           enabled: true,
           statusName: 'started',
         },

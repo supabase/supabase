@@ -10,20 +10,16 @@ import {
   type UIMessage,
 } from 'ai'
 import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
-import { source } from 'common-tags'
 
 import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
-import { prepareMessagesForModel } from '@/lib/ai/generate-assistant-response.utils'
 import {
-  CHAT_PROMPT,
-  GENERAL_PROMPT,
-  LIMITATIONS_PROMPT,
-  NOTEBOOKS_PROMPT,
-  SECURITY_PROMPT,
-} from '@/lib/ai/prompts'
+  buildSystemPrompt,
+  hideToolErrorsFromModel,
+  prepareMessagesForModel,
+} from '@/lib/ai/generate-assistant-response.utils'
 import type { contract as renameChatContract } from '@/lib/ai/tools/rename-chat'
 import type { ToolContractInput } from '@/lib/ai/tools/types'
 
@@ -46,7 +42,6 @@ export async function generateAssistantResponse({
   planId,
   isHighComplianceProject,
   includesLogsSnippets,
-  isExplorerEnabled,
   systemProviderOptions,
   providerOptions,
   requestedModel,
@@ -72,7 +67,6 @@ export async function generateAssistantResponse({
   isHighComplianceProject?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
-  isExplorerEnabled?: boolean
   requestedModel?: string
   /** The model actually used after entitlement/throttle fallback. */
   effectiveModel?: string
@@ -95,25 +89,10 @@ export async function generateAssistantResponse({
         : NO_SCHEMA_ACCESS_MESSAGE
 
     // Important: do not use per-request dynamic content in the system prompt or Bedrock will
-    // not cache it. isExplorerEnabled is a per-user flag, not per-request, so it only produces
-    // two prompt variants (on/off) rather than defeating caching.
-    const system = source`
-      ${GENERAL_PROMPT}
-      ${CHAT_PROMPT}
-      ${isExplorerEnabled ? NOTEBOOKS_PROMPT : ''}
-      ${SECURITY_PROMPT}
-      ${LIMITATIONS_PROMPT}
-
-      ## Available Knowledge
-
-      Before writing SQL or answering questions about the following topics, call \`load_knowledge\` to load detailed knowledge:
-      - \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
-      - \`logs\` — ClickHouse SQL against the project's logs table. Always load before calling \`query_logs\`.
-      - \`rls\` — Row Level Security policies for database tables.
-      - \`storage\` — Supabase Storage buckets, public/private bucket access, and \`storage.objects\` policies. Always load before creating Storage buckets or \`storage.objects\` policies.
-      - \`edge_functions\` — Supabase Edge Functions
-      - \`realtime\` — Supabase Realtime
-    `
+    // not cache it. The tools section varies with the tool set. That costs no extra cache
+    // misses: providers cache tools before the system prompt, so a change to the tool set
+    // already invalidates the cached system prompt.
+    const system = buildSystemPrompt(Object.keys(tools))
 
     const systemMessage: SystemModelMessage = {
       role: 'system',
@@ -149,6 +128,9 @@ export async function generateAssistantResponse({
       instructions: systemMessage,
       stopWhen: isStepCount(20),
       messages: coreMessages,
+      prepareStep: ({ messages }) => ({
+        messages: hideToolErrorsFromModel(messages, aiOptInLevel),
+      }),
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),

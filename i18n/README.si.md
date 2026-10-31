@@ -50,7 +50,7 @@ Supabase යනු විවෘත පරිශීලක උපාංග කි�
 Supabase යනු [hosted platform](https://supabase.com/dashboard). ඔබට කිසිවක් ස්ථාපනය නොකර ලියාපදිංචි වී Supabase භාවිතා කිරීම ආරම්භ කළ හැකිය.
 ඔබට [self-host](https://supabase.com/docs/guides/hosting/overview) සහ [develop locally](https://supabase.com/docs/guides/local-development) කළ හැකිය.
 
-![Architecture](apps/docs/public/img/supabase-architecture.svg)
+![Architecture](https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) යනු අවුරුදු 30 වඩා කාලයක් ක්‍රියාත්මක වෙමින් පවතින object-relational database system එකක් වන අතර එය විශ්වාසනීයත්වයට,ක්‍රියාකාරීත්වයට හා feature robustness බවට කීර්තියක් අත්පත්කරගෙන සිටියි
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
@@ -205,7 +205,7 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
 
 ## Badges
 
-![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
+![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
@@ -222,7 +222,7 @@ Client libraries සඳහා අපගේ ප්‍රවේශය modular ව�
 </a>
 ```
 
-![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![Made with Supabase (dark)](https://supabase.com/badge-made-with-supabase-dark.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)

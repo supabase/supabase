@@ -33,6 +33,8 @@ You also need to set up an SMS provider. Each provider has its own configuration
 
 By default, a user can only request an OTP once every <SharedData data="config">auth.rate_limits.otp.period</SharedData> and they expire after <SharedData data="config">auth.rate_limits.otp.validity</SharedData>.
 
+To test phone sign-in without sending SMS, [add test phone numbers with fixed codes](/docs/guides/auth/testing-auth-flows#test-phone-sign-in-with-test-numbers).
+
 ## Signing in with phone OTP
 
 With OTP, a user can sign in without setting a password on their account. They need to verify their phone number each time they sign in.
@@ -240,7 +242,7 @@ If successful, the user will now be signed in and you should receive a valid ses
 }
 ```
 
-The access token can be sent in the Authorization header as a Bearer token for any CRUD operations on supabase-js. See our guide on [Row Level Security](/docs/guides/auth#row-level-security) for more info on restricting access on a user basis.
+The access token can be sent in the Authorization header as a Bearer token for any CRUD operations on supabase-js. See our guide on [Row Level Security](/docs/guides/database/postgres/row-level-security) for more info on restricting access on a user basis.
 
 ## Updating a phone number
 

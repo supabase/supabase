@@ -11,7 +11,7 @@ import {
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
-import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
+import { REPORT_STATUS_CODE_COLORS, type Granularity } from '@/data/reports/report.utils'
 import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
 import { useLogsQuery, type LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
 import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
@@ -70,7 +70,8 @@ export const queriesFactory = <T extends string>(
 export function getLogsSql(
   query: ReportQuery,
   filters: ReportFilterItem[],
-  useOtel = false
+  useOtel = false,
+  granularity?: Granularity
 ): SafeLogSqlFragment {
   if (query.queryType !== 'logs') {
     throw new Error(`Expected logs query, got ${query.queryType}`)
@@ -79,7 +80,7 @@ export function getLogsSql(
     if (query.safeSqlOtel === undefined) {
       throw new Error('Expected an OTEL logs query')
     }
-    return query.safeSqlOtel(filters)
+    return query.safeSqlOtel(filters, granularity)
   }
   return query.safeSql(filters)
 }
