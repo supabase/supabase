@@ -185,6 +185,9 @@ export const TOTPFactors = () => {
         lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
         hasRecoveryCodes={status === 'available'}
+        canUseRecoveryCodes={
+          enableAuthRecoveryCodes && status === 'available' && !!codes && codes.remaining > 0
+        }
       />
     </>
   )
