@@ -352,6 +352,7 @@
   "auth/third-party/firebase-auth",
   "auth/third-party/overview",
   "auth/third-party/workos",
+  "auth/third-party/scalekit",
   "database/extensions/http",
   "database/extensions/hypopg",
   "database/extensions/index_advisor",
