@@ -113,7 +113,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
   </TabPanel>
   <TabPanel id="flutter" label="Flutter">
-    // Currently supabase_flutter supports deep links on Android, iOS, Web, macOS and Windows.
+    `supabase_flutter` handles deep links on Android, iOS, the web, macOS, Windows and Linux, and completes the sign-in when the app opens through the redirect link.
 
     ### Deep link config
 
@@ -303,6 +303,27 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
       </TabPanel>
     </Tabs>
+
+    ### Sign in through a web authentication session
+
+    By default, `signInWithOAuth()` opens the sign-in page with [url_launcher](https://pub.dev/packages/url_launcher), and the browser stays open after the redirect brings the user back to the app. To run the flow in a system web authentication session that closes on its own, add [`supabase_flutter_web_auth`](https://pub.dev/packages/supabase_flutter_web_auth) and pass its launcher to `Supabase.initialize`:
+
+    ```dart
+    import 'package:supabase_flutter/supabase_flutter.dart';
+    import 'package:supabase_flutter_web_auth/supabase_flutter_web_auth.dart';
+
+    Future<void> initializeSupabase() async {
+      await Supabase.initialize(
+        url: 'https://your-project.supabase.co',
+        publishableKey: 'your-publishable-key',
+        authOptions: const FlutterAuthClientOptions(
+          oauthLauncher: FlutterWebAuth2OAuthLauncher(),
+        ),
+      );
+    }
+    ```
+
+    `signInWithOAuth()`, `signInWithSSO()` and `linkIdentity()` then return `false` when the user closes the session without signing in. The package README covers the callback activity Android needs.
 
   </TabPanel>
 

@@ -175,11 +175,11 @@ Requires `supabase-swift` `2.51.0` or later and `swift-tools-version: 6.1` or la
 
 <TabPanel id="dart" label="Dart">
 
-Requires `supabase` `2.x` or later (Flutter or Dart-only).
+Requires `supabase` `3.x` or later (Flutter or Dart-only).
 
 1. **Implement a `traceContextProvider`** that returns the current `TraceContext` from your tracing library. Return `null` when there is no active span.
 
-2. **Pass `TracePropagationOptions`** when creating the client:
+2. **Pass `TracePropagationOptions`** when creating the client. Passing them turns propagation on:
 
    ```dart
    import 'package:supabase/supabase.dart';
@@ -188,7 +188,6 @@ Requires `supabase` `2.x` or later (Flutter or Dart-only).
      'https://xyzcompany.supabase.co',
      'your-publishable-key',
      tracePropagationOptions: TracePropagationOptions(
-       enabled: true,
        traceContextProvider: () {
          final span = YourTracer.activeSpan;
          if (span == null) return null;
@@ -206,21 +205,19 @@ Requires `supabase` `2.x` or later (Flutter or Dart-only).
    ```dart
    await Supabase.initialize(
      url: 'https://xyzcompany.supabase.co',
-     anonKey: 'your-publishable-key',
+     publishableKey: 'your-publishable-key',
      tracePropagationOptions: TracePropagationOptions(
-       enabled: true,
-       traceContextProvider: () => yourTraceContextProvider(),
+       traceContextProvider: yourTraceContextProvider,
      ),
    );
    ```
 
 ## Options
 
-| Option                    | Type                    | Default | Description                                                                                                                                                                       |
-| ------------------------- | ----------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `enabled`                 | `bool`                  | `false` | Enable trace propagation.                                                                                                                                                         |
-| `respectSamplingDecision` | `bool`                  | `true`  | When `true`, skips propagation if the upstream trace is not sampled. Set to `false` to always attach a `trace_id` — useful for log correlation even when traces are not exported. |
-| `traceContextProvider`    | `TraceContextProvider?` | `null`  | Callback returning the current `TraceContext`. Return `null` when there is no active span.                                                                                        |
+| Option                    | Type                   | Default  | Description                                                                                                                                                                               |
+| ------------------------- | ---------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `respectSamplingDecision` | `bool`                 | `true`   | When `true`, skips propagation if the upstream trace is not sampled. Set to `false` to always attach a `trace_id`, which is useful for log correlation even when traces are not exported. |
+| `traceContextProvider`    | `TraceContextProvider` | required | Callback returning the current `TraceContext`. Return `null` when there is no active span.                                                                                                |
 
 Headers are only injected on requests targeting Supabase hosts (`*.supabase.co`, `*.supabase.in`, your project host, and loopback addresses for local development). Third-party hosts never receive trace headers.
 

@@ -86,14 +86,14 @@ export async function fetchTanstackDbLibReferenceSource() {
 }
 
 export async function fetchDartLibReferenceSource() {
-  // Dart v2 is driven by the new reference pipeline. Ingest search sources from
-  // the generated `content/reference/dart/v2/` outputs so embeddings never
+  // Dart v3 is driven by the new reference pipeline. Ingest search sources from
+  // the generated `content/reference/dart/v3/` outputs so embeddings never
   // drift from what the renderer shows.
   return loadClientLibReferenceFromNewPipeline({
     source: 'dart-lib',
     path: '/reference/dart',
     meta: { title: 'Dart Reference', language: 'Dart' },
-    contentDir: 'content/reference/dart/v2',
+    contentDir: 'content/reference/dart/v3',
   })
 }
 

@@ -54,7 +54,7 @@ export async function GET(request: Request) {
 
       if (replacement) {
         section = contentSections.find((section) => section.slug?.toLowerCase() === replacement)
-      } else if (legacySlug && version === 'v2' && (lib === 'javascript' || lib === 'dart')) {
+      } else if (legacySlug && hasLegacySlugAliases(lib, version)) {
         const matches = contentSections.filter((section) =>
           section.slug?.toLowerCase().endsWith(`-${legacySlug}`)
         )
@@ -80,10 +80,16 @@ export async function GET(request: Request) {
   return response
 }
 
+function hasLegacySlugAliases(lib: string, version: string) {
+  if (lib === 'javascript') return version === 'v2'
+  if (lib === 'dart') return version === 'v2' || version === 'v3'
+  return false
+}
+
 function legacyReferenceSlug(lib: string, version: string, slug?: string) {
   if (!slug || slug === 'start') return 'introduction'
   if (lib === 'swift' && version === 'v2' && slug === 'get-user') return 'auth-getuser'
-  if (version !== 'v2' || (lib !== 'javascript' && lib !== 'dart')) return undefined
+  if (!hasLegacySlugAliases(lib, version)) return undefined
   if (slug === 'admin-api') return 'auth-admin'
   if (slug === 'get-user') return lib === 'dart' ? 'auth-currentuser' : 'auth-getuser'
   if (slug.startsWith('storage-from-')) return `file-buckets-${slug.slice('storage-from-'.length)}`

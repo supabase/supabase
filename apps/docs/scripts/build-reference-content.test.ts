@@ -64,7 +64,7 @@ describe.skip('build-reference-content: javascript/v2', () => {
  */
 describe.skip('build-reference-content: dart/v2', () => {
   beforeAll(async () => {
-    await generateDartReferenceDump()
+    await generateDartReferenceDump('v2')
   })
 
   it('matches snapshot', async () => {

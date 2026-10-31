@@ -131,21 +131,23 @@ const { error } = await supabase.from('restaurants').insert([
 <TabPanel id="dart" label="Dart">
 
 ```dart
-await supabase.from('restaurants').insert([
-  {
-    'name': 'Supa Burger',
-    'location': 'POINT(-73.946823 40.807416)',
-  },
-  {
-    'name': 'Supa Pizza',
-    'location': 'POINT(-73.94581 40.807475)',
-  },
-  {
-    'name': 'Supa Taco',
-    'location': 'POINT(-73.945826 40.80629)',
-  },
+await supabase.table(Restaurants.table).insertAll([
+  RestaurantsInsert(
+    name: 'Supa Burger',
+    location: 'POINT(-73.946823 40.807416)',
+  ),
+  RestaurantsInsert(
+    name: 'Supa Pizza',
+    location: 'POINT(-73.94581 40.807475)',
+  ),
+  RestaurantsInsert(
+    name: 'Supa Taco',
+    location: 'POINT(-73.945826 40.80629)',
+  ),
 ]);
 ```
+
+`Restaurants` and `RestaurantsInsert` come from the [generated Dart types](/docs/guides/api/rest/generating-types#generating-dart-types).
 
 </TabPanel>
 </$Show>
@@ -275,10 +277,10 @@ const { data, error } = await supabase.rpc('nearby_restaurants', {
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.rpc('nearby_restaurants',params: {
-  'lat': 40.807313,
-  'long': -73.946713,
-});
+final restaurants = await supabase.rpc.nearbyRestaurants(
+  lat: 40.807313,
+  long: -73.946713,
+);
 ```
 
 </TabPanel>
@@ -420,12 +422,12 @@ const { data, error } = await supabase.rpc('restaurants_in_view', {
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.rpc('restaurants_in_view', params: {
-  'min_lat': 40.807,
-  'min_long': -73.946,
-  'max_lat': 40.808,
-  'max_long': -73.945,
-});
+final restaurants = await supabase.rpc.restaurantsInView(
+  minLat: 40.807,
+  minLong: -73.946,
+  maxLat: 40.808,
+  maxLong: -73.945,
+);
 ```
 
 </TabPanel>

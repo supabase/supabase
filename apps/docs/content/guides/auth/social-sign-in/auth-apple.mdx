@@ -417,12 +417,14 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     Once the setup is complete on the Flutter app, add the bundle ID of your app to your Supabase dashboard in `Authentication -> Providers -> Apple` in order to register your app with Supabase.
 
     ```dart
+    import 'dart:convert';
+
     import 'package:sign_in_with_apple/sign_in_with_apple.dart';
     import 'package:supabase_flutter/supabase_flutter.dart';
     import 'package:crypto/crypto.dart';
 
     /// Performs Apple sign in on iOS or macOS
-    Future<AuthResponse> signInWithApple() async {
+    Future<Session> signInWithApple() async {
       final rawNonce = supabase.auth.generateRawNonce();
       final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
 
@@ -440,7 +442,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
             'Could not find ID Token from generated credential.');
       }
 
-      final authResponse = await supabase.auth.signInWithIdToken(
+      final session = await supabase.auth.signInWithIdToken(
         provider: OAuthProvider.apple,
         idToken: idToken,
         nonce: rawNonce,
@@ -466,7 +468,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
         );
       }
 
-      return authResponse;
+      return session;
     }
     ```
 
@@ -490,9 +492,11 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     ```dart
     await supabase.auth.signInWithOAuth(
       OAuthProvider.apple,
-      redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+      // Brings the user back to the app through a deep link.
+      redirectTo: kIsWeb ? null : 'my.scheme://my-host',
+      // Opens the sign-in page in the browser app on mobile.
       authScreenLaunchMode:
-          kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+          kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication,
     );
     ```
 

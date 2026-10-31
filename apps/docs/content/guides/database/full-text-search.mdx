@@ -127,11 +127,13 @@ const { data, error } = await supabase.from('books').select().eq('title', 'Harry
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .eq('title', 'Harry');
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.title.eq('Harry'));
 ```
+
+`Books` comes from the [generated Dart types](/docs/guides/api/rest/generating-types#generating-dart-types).
 
 </TabPanel>
 </$Show>
@@ -213,10 +215,10 @@ const { data, error } = await supabase.from('books').select().textSearch('title'
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .textSearch('title', "'Harry'");
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.title.textSearch("'Harry'"));
 ```
 
 </TabPanel>
@@ -296,10 +298,10 @@ const { data, error } = await supabase.from('books').select().textSearch('descri
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .textSearch('description', "'big'");
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.description.textSearch("'big'"));
 ```
 
 </TabPanel>
@@ -413,10 +415,10 @@ $$ language sql immutable;
 ```
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .textSearch('title_description', "little")
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.titleDescription.textSearch('little'));
 ```
 
 </TabPanel>
@@ -540,10 +542,10 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .textSearch('description', "'little' & 'big'");
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.description.textSearch("'little' & 'big'"));
 ```
 
 </TabPanel>
@@ -642,10 +644,10 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .textSearch('description', "'little' | 'big'");
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.description.textSearch("'little' | 'big'"));
 ```
 
 </TabPanel>
@@ -758,7 +760,7 @@ const { data, error } = await supabase.rpc('search_books_by_title_prefix', { pre
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.rpc('search_books_by_title_prefix', params: { 'prefix': 'Lit' });
+final books = await supabase.rpc.searchBooksByTitlePrefix(prefix: 'Lit');
 ```
 
 </TabPanel>
@@ -987,10 +989,10 @@ const { data, error } = await supabase.from('books').select().textSearch('fts', 
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .textSearch('fts', "'little' & 'big'");
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.fts.textSearch("'little' & 'big'"));
 ```
 
 </TabPanel>
@@ -1094,10 +1096,10 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .textSearch('description', "'big' <-> 'dreams'");
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.description.textSearch("'big' <-> 'dreams'"));
 ```
 
 </TabPanel>
@@ -1186,10 +1188,10 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .textSearch('description', "'year' <2> 'school'");
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.description.textSearch("'year' <2> 'school'"));
 ```
 
 </TabPanel>
@@ -1281,10 +1283,10 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .from('books')
-  .select()
-  .textSearch('description', "'big' & !'little'");
+final books = await supabase
+    .table(Books.table)
+    .select()
+    .where(Books.description.textSearch("'big' & !'little'"));
 ```
 
 </TabPanel>
@@ -1383,8 +1385,7 @@ const { data, error } = await supabase.rpc('search_books', { search_query: 'big'
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .rpc('search_books', params: { 'search_query': 'big' });
+final results = await supabase.rpc.searchBooks(searchQuery: 'big');
 ```
 
 </TabPanel>
@@ -1606,8 +1607,9 @@ const { data, error } = await supabase.rpc('search_books_fts', { search_query: '
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final result = await client
-  .rpc('search_books_fts', params: { 'search_query': 'little & big' });
+final results = await supabase.rpc.searchBooksFts(
+  searchQuery: 'little & big',
+);
 ```
 
 </TabPanel>

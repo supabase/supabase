@@ -578,9 +578,11 @@ This method of signing in is web based, and will open a browser window to perfor
 ```dart
 await supabase.auth.signInWithOAuth(
   OAuthProvider.google,
-  redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+  // Brings the user back to the app through a deep link.
+  redirectTo: kIsWeb ? null : 'my.scheme://my-host',
+  // Opens the sign-in page in the browser app on mobile.
   authScreenLaunchMode:
-      kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+      kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication,
 );
 ```
 

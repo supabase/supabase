@@ -77,7 +77,7 @@ export const REFERENCES: Reference[] = [
   newPipelineLib('javascript', 'v2', 'JavaScript Reference'),
   newPipelineLib('server', 'v1', 'Server Reference'),
   newPipelineLib('middleware', 'v1', 'Middleware Reference'),
-  newPipelineLib('dart', 'v2', 'Flutter Reference'),
+  newPipelineLib('dart', 'v3', 'Flutter Reference'),
   legacyLib('python', 'v2', 'Python Reference', 'supabase_py_v2.yml'),
   legacyLib('csharp', 'v8', 'C# Reference', 'supabase_csharp_v8.yml'),
   legacyLib('swift', 'v2', 'Swift Reference', 'supabase_swift_v2.yml'),

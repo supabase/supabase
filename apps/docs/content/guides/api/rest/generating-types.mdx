@@ -301,6 +301,38 @@ if (error) throw error
 const countriesWithCities: CountriesWithCities = data
 ```
 
+## Generating Dart types
+
+The Dart and Flutter client libraries read and write rows through types generated from your database. Generating them needs the Supabase CLI 2.122.0 or newer.
+
+Add the generator as a dev dependency of your project:
+
+```bash
+dart pub add dev:supabase_typegen
+```
+
+In a Flutter project, run `flutter pub add dev:supabase_typegen` instead. Then generate the types from the directory of your `pubspec.yaml`:
+
+```bash
+# The local database started with `supabase start`
+supabase gen types --lang dart --local > lib/supabase_schema.g.dart
+
+# The project linked with `supabase link`, or any project by its reference
+supabase gen types --lang dart --linked > lib/supabase_schema.g.dart
+supabase gen types --lang dart --project-id "$PROJECT_REF" > lib/supabase_schema.g.dart
+```
+
+For the `movies` table above, the file has a `MoviesRow` type for its rows, `MoviesInsert` and `MoviesUpdate` for writes, and a `Movies` class with the table and its columns. Pass them to `table()`:
+
+```dart
+final List<MoviesRow> movies = await supabase
+    .table(Movies.table)
+    .select()
+    .where(Movies.name.eq('The Empire Strikes Back'));
+```
+
+Never edit the generated file. Regenerate it after every database migration and commit it.
+
 ## Update types automatically with GitHub Actions
 
 One way to keep your type definitions in sync with your database is to set up a GitHub action that runs on a schedule.

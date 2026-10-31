@@ -34,6 +34,7 @@ enum MenuId {
   RefJavaScriptV2 = 'reference_javascript_v2',
   RefDartV1 = 'reference_dart_v1',
   RefDartV2 = 'reference_dart_v2',
+  RefDartV3 = 'reference_dart_v3',
   RefCSharpV0 = 'reference_csharp_v0',
   RefCSharpV1 = 'reference_csharp_v1',
   RefCSharpV8 = 'reference_csharp_v8',
@@ -178,6 +179,11 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.RefDartV2,
+    type: 'reference',
+    path: '/reference/dart/v2',
+  },
+  {
+    id: MenuId.RefDartV3,
     type: 'reference',
     path: '/reference/dart',
   },

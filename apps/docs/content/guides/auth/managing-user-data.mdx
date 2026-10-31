@@ -95,7 +95,7 @@ const { data, error } = await supabase.auth.signUp({
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final res = await supabase.auth.signUp(
+final response = await supabase.auth.signUp(
   email: 'valid.email@supabase.io',
   password: 'example-password',
   data: {

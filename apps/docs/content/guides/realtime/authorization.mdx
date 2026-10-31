@@ -198,18 +198,18 @@ Then, to join a topic with RLS enabled, instantiate the Channel with the `privat
     ```dart
     final channel = supabase.channel(
       'room-1',
-      opts: const RealtimeChannelConfig(private: true),
+      options: const RealtimeChannelConfig(private: true),
     );
 
-    channel
-        .onBroadcast(event: 'test', callback: (payload) => print(payload))
-        .subscribe((status, err) {
-      if (status == RealtimeSubscribeStatus.subscribed) {
+    channel.onBroadcast(event: 'test').listen(print);
+    channel.onStatusChange.listen((change) {
+      if (change.status == RealtimeSubscribeStatus.subscribed) {
         print('Connected!');
       } else {
-        print(err);
+        print(change.error);
       }
     });
+    channel.subscribe();
     ```
 
   </TabPanel>

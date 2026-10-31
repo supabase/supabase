@@ -123,14 +123,14 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 </TabPanel>
 <TabPanel id="dart" label="Dart">
 
-The Dart SDK does not require an opt-in flag — the methods are annotated `@experimental` so the analyzer surfaces them as preview API. The server independently rejects calls with `passkey_disabled` when the dashboard toggle is off.
+The Dart SDK does not require an opt-in flag. The methods are annotated `@experimental` so the analyzer surfaces them as preview API. The server independently rejects calls with `passkey_disabled` when the dashboard toggle is off.
 
 ```dart
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 await Supabase.initialize(
   url: supabaseUrl,
-  anonKey: supabaseAnonKey,
+  publishableKey: supabasePublishableKey,
 );
 final supabase = Supabase.instance.client;
 ```
@@ -194,12 +194,12 @@ if (error) {
 try {
   final Passkey passkey = await supabase.auth.registerPasskey(authenticator);
   print('Registered passkey ${passkey.id}');
-} on AuthException catch (e) {
+} on AuthException catch (error) {
   // The Supabase server rejected the credential.
-  print(e);
-} catch (e) {
+  print(error);
+} catch (error) {
   // User cancelled or the platform ceremony failed.
-  print(e);
+  print(error);
 }
 ```
 
@@ -268,11 +268,11 @@ if (error) {
 
 ```dart
 try {
-  final AuthResponse res = await supabase.auth.signInWithPasskey(authenticator);
-  // res.session and res.user are set; the client also fires AuthChangeEvent.signedIn
-  print('Signed in as ${res.user?.email}');
-} on AuthException catch (e) {
-  print(e);
+  final session = await supabase.auth.signInWithPasskey(authenticator);
+  // The client also emits AuthSignedIn on onAuthStateChange.
+  print('Signed in as ${session.user.email}');
+} on AuthException catch (error) {
+  print(error);
 }
 ```
 
@@ -362,7 +362,7 @@ final authentication = await supabase.auth.passkey.startAuthentication();
 final Map<String, dynamic> credential = await runAuthenticationCeremony(
   authentication.options,
 );
-final AuthResponse res = await supabase.auth.passkey.verifyAuthentication(
+final session = await supabase.auth.passkey.verifyAuthentication(
   challengeId: authentication.challengeId,
   credential: credential,
 );

@@ -1,0 +1,493 @@
+---
+title: 'Upgrade guide'
+---
+
+`supabase_flutter` v3 adds a typed table API, turns realtime callbacks into streams and returns more precise types from auth and storage. This page covers the changes most apps run into. The [full migration guide](https://github.com/supabase/supabase-flutter/blob/main/MIGRATION.md#migrating-from-v2-to-v3) lists every breaking change.
+
+## Upgrade the client library
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Depend on v3 of the client library in your `pubspec.yaml` file.
+
+    If you depend on a service package directly, note that four of them are renamed: `gotrue` is now `supabase_auth`, `storage_client` is `supabase_storage`, `realtime_client` is `supabase_realtime` and `functions_client` is `supabase_functions`. `GoTrueClient` is now `AuthClient`.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```yaml
+    supabase_flutter: ^3.0.0
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Let an AI agent do the migration
+
+    The v3 packages ship [package skills](https://dart.dev/ai/package-skills) for AI coding agents such as Claude Code, Cursor, Gemini and Copilot. They include skills for migrating from v2 to v3, so an agent can carry out most of this guide for you. Install them once `pubspec.yaml` depends on v3.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```sh Terminal
+    dart run skills@ get --all
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Initialization
+
+    `anonKey` is replaced by the required `publishableKey`. A legacy anon key is still a valid value. `realtimeClientOptions` is renamed to `realtimeOptions`.
+
+    The `debug` flag is gone and the SDK never prints logs. Listen to the `supabase` loggers of [package:logging](https://pub.dev/packages/logging) instead, see [Initializing](/docs/reference/dart/initializing).
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="v2"
+      queryGroup="version"
+    >
+      <TabPanel id="v2" label="Before">
+
+        ```dart
+        await Supabase.initialize(
+          url: 'https://your-project.supabase.co',
+          anonKey: 'your-anon-key',
+          debug: true,
+          realtimeClientOptions: const RealtimeClientOptions(
+            logLevel: RealtimeLogLevel.info,
+          ),
+        );
+        ```
+
+      </TabPanel>
+      <TabPanel id="v3" label="After">
+
+        ```dart
+        await Supabase.initialize(
+          url: 'https://your-project.supabase.co',
+          publishableKey: 'your-publishable-key',
+          realtimeOptions: const RealtimeClientOptions(
+            logLevel: RealtimeLogLevel.info,
+          ),
+        );
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Database
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Move to the typed table API
+
+    v3 adds `table()`, a typed counterpart of `from()` built on types generated from your database schema. We recommend generating the types and using `table()` for every table: rows come back as generated types instead of maps, filters and writes are checked at compile time, and interceptors such as offline support only apply to typed requests.
+
+    Generate the types with the Supabase CLI 2.122.0 or newer, see [Generating types](/docs/guides/api/rest/generating-types). `from()` keeps working as the untyped fallback, so you can move over one table at a time.
+
+    Filters are methods on the generated columns, passed to `where()` and combined with `&`, `|` and `not()`. The direction of an ordering is set on the column. Writes take the generated `Insert` and `Update` types, and an `update()` or `delete()` sends nothing until you call `where()` or `all()` on it.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```sh Terminal
+    dart pub add dev:supabase_typegen
+    supabase gen types --lang dart --local > lib/supabase_schema.g.dart
+    ```
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="v2"
+      queryGroup="version"
+    >
+      <TabPanel id="v2" label="Before">
+
+        ```dart
+        final List<Map<String, dynamic>> books = await supabase
+            .from('books')
+            .select()
+            .eq('in_print', true)
+            .lt('price', 10)
+            .order('created_at', ascending: false);
+        final title = books.first['title'] as String;
+
+        await supabase
+            .from('books')
+            .insert({'author_id': 2, 'title': 'Dune'});
+        await supabase
+            .from('books')
+            .update({'in_print': false})
+            .eq('id', 1);
+        ```
+
+      </TabPanel>
+      <TabPanel id="v3" label="After">
+
+        ```dart
+        final List<BooksRow> books = await supabase
+            .table(Books.table)
+            .select()
+            .where(Books.inPrint.isTrue() & Books.price.lt(10))
+            .order(Books.createdAt.desc());
+        final String title = books.first.title;
+
+        await supabase
+            .table(Books.table)
+            .insert(BooksInsert(authorId: 2, title: 'Dune'));
+        await supabase
+            .table(Books.table)
+            .update(BooksUpdate(inPrint: false))
+            .where(Books.id.eq(1));
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### `order()` sorts ascending by default
+
+    `order()` on `from()` and on `stream()` now defaults to ascending. The compiler does not catch this, so check every `order()` call that does not pass `ascending`. Passing `ascending: false` means descending on both versions, so you can make the change before upgrading.
+
+    Writes without a trailing `select()` now resolve to `void`, and `rpc` is a getter. Calling it works as before.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="v2"
+      queryGroup="version"
+    >
+      <TabPanel id="v2" label="Before">
+
+        ```dart
+        // Newest first
+        await supabase.from('books').select().order('created_at');
+        ```
+
+      </TabPanel>
+      <TabPanel id="v3" label="After">
+
+        ```dart
+        // Newest first
+        await supabase
+            .from('books')
+            .select()
+            .order('created_at', ascending: false);
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Auth
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Sign-in methods return the `Session`
+
+    Methods that always issue a session return it directly instead of an `AuthResponse`: `signInWithPassword()`, `signInAnonymously()`, `signInWithIdToken()`, `refreshSession()`, `setSession()` and others. They throw an `AuthSessionMissingException` when no session comes back. `signUp()` and `verifyOTP()` still return an `AuthResponse`. MFA verification also returns the `Session`.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="v2"
+      queryGroup="version"
+    >
+      <TabPanel id="v2" label="Before">
+
+        ```dart
+        final response = await supabase.auth.signInWithPassword(
+          email: 'user@example.com',
+          password: 'password',
+        );
+        final session = response.session!;
+        final user = response.user!;
+        ```
+
+      </TabPanel>
+      <TabPanel id="v3" label="After">
+
+        ```dart
+        final session = await supabase.auth.signInWithPassword(
+          email: 'user@example.com',
+          password: 'password',
+        );
+        final user = session.user;
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### `AuthState` is a sealed class
+
+    Each auth event has its own `AuthState` subtype, such as `AuthSignedIn`, `AuthSignedOut` and `AuthInitialSession`, so you can switch over them. `session` is non-nullable on the subtypes that always have one. `signOutReason` moved to `AuthSignedOut.reason`. Comparing `state.event` still works.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="v2"
+      queryGroup="version"
+    >
+      <TabPanel id="v2" label="Before">
+
+        ```dart
+        supabase.auth.onAuthStateChange.listen((state) {
+          if (state.event == AuthChangeEvent.signedIn) {
+            print('Signed in as ${state.session!.user.email}');
+          } else if (state.event == AuthChangeEvent.signedOut) {
+            print('Signed out: ${state.signOutReason}');
+          }
+        });
+        ```
+
+      </TabPanel>
+      <TabPanel id="v3" label="After">
+
+        ```dart
+        supabase.auth.onAuthStateChange.listen((state) {
+          switch (state) {
+            case AuthSignedIn(:final session):
+              print('Signed in as ${session.user.email}');
+            case AuthSignedOut(:final reason):
+              print('Signed out: $reason');
+            default:
+          }
+        });
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Realtime
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Callbacks are streams
+
+    `onPostgresChanges()` and `onBroadcast()` no longer take a `callback` and return a stream instead of the channel, so they no longer chain. The presence listeners are stream getters, such as `onPresenceSync`. `subscribe()` takes no callback; listen to `onStatusChange` instead.
+
+    Broadcast data now arrives under the `payload` key of the message. v2 and v3 clients cannot read each other's broadcasts, so move every app that shares a channel to v3 together.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="v2"
+      queryGroup="version"
+    >
+      <TabPanel id="v2" label="Before">
+
+        ```dart
+        supabase
+            .channel('room')
+            .onPostgresChanges(
+              event: PostgresChangeEvent.insert,
+              schema: 'public',
+              table: 'messages',
+              callback: (payload) => print(payload.newRecord),
+            )
+            .onBroadcast(
+              event: 'cursor',
+              callback: (message) => print(message['x']),
+            )
+            .subscribe((status, [error]) {
+              if (status == RealtimeSubscribeStatus.subscribed) {
+                print('Connected');
+              }
+            });
+        ```
+
+      </TabPanel>
+      <TabPanel id="v3" label="After">
+
+        ```dart
+        final channel = supabase.channel('room');
+        channel
+            .onPostgresChanges(
+              event: PostgresChangeEvent.insert,
+              schema: 'public',
+              table: 'messages',
+            )
+            .listen((payload) => print(payload.newRecord));
+        channel
+            .onBroadcast(event: 'cursor')
+            .listen((message) => print(message['payload']['x']));
+        channel.onStatusChange.listen((change) {
+          if (change.status == RealtimeSubscribeStatus.subscribed) {
+            print('Connected');
+          }
+        });
+        channel.subscribe();
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Storage
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Uploads return an `UploadResponse`
+
+    `upload()`, `uploadBinary()`, `update()`, `updateBinary()` and the signed URL uploads return an `UploadResponse` instead of a `String`. The key the uploads used to return is now `fullPath`. Code that keeps the result in a `var` or interpolates it into a string still compiles, so check those places.
+
+    `info()` is now `getMetadata()`, and `retryAttempts` is replaced by `retryOptions: SupabaseRetryOptions(count: ...)`.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="v2"
+      queryGroup="version"
+    >
+      <TabPanel id="v2" label="Before">
+
+        ```dart
+        final String path = await supabase.storage
+            .from('avatars')
+            .upload('avatar.png', file);
+        ```
+
+      </TabPanel>
+      <TabPanel id="v3" label="After">
+
+        ```dart
+        final response = await supabase.storage
+            .from('avatars')
+            .upload('avatar.png', file);
+        final String path = response.fullPath;
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Errors
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### One exception hierarchy
+
+    Every service exception extends `SupabaseException`. Exceptions for an error response from a service also mix in `SupabaseApiException`, which has an `int` `statusCode`, so the per-service bases no longer have a status. Catch the API type, such as `AuthApiException` or `PostgrestApiException`, to read it. `PostgrestApiException.errorCode` holds the PostgREST or Postgres error code.
+
+    A request that gets no response throws a transport exception from the same hierarchy, so a catch of `ClientException` or `TimeoutException` no longer matches.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="v2"
+      queryGroup="version"
+    >
+      <TabPanel id="v2" label="Before">
+
+        ```dart
+        try {
+          await supabase.auth.signInWithOtp(email: 'user@example.com');
+        } on AuthException catch (error) {
+          if (error.statusCode == '429') {
+            print('Too many requests');
+          }
+        }
+        ```
+
+      </TabPanel>
+      <TabPanel id="v3" label="After">
+
+        ```dart
+        try {
+          await supabase.auth.signInWithOtp(email: 'user@example.com');
+        } on AuthApiException catch (error) {
+          if (error.statusCode == 429) {
+            print('Too many requests');
+          }
+        } on SupabaseException catch (error) {
+          print(error.message);
+        }
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+## Changes the compiler will not catch
+
+Most changes produce compile errors until you act on them. These do not, so check them explicitly:
+
+- `order()` sorts ascending by default and no longer sends a null placement unless you pass `nullsFirst`.
+- `DateTime` filter values are sent with their offset from UTC.
+- Broadcast data arrives under `payload`, and v2 and v3 clients cannot read each other's broadcasts.
+- Creating a channel with a name already in use returns the existing channel instead of replacing it.
+- Storage uploads return an `UploadResponse`, which breaks code that stores the result in a `var` or interpolates it.
+- A request without a response throws a `SupabaseTransportException`, and realtime throws exceptions instead of strings.
+- `Supabase.initialize` throws a `StateError` when called again with another URL or key.
+- Confirming an email or phone change emits `userUpdated`, and switching to another user's session emits `signedIn`.
+- An expired session is kept when `autoRefreshToken` is off, so a non-null `currentSession` is not guaranteed to be valid.
+
+The [full migration guide](https://github.com/supabase/supabase-flutter/blob/main/MIGRATION.md#changes-the-compiler-will-not-catch) lists every such change, along with all other breaking changes.
