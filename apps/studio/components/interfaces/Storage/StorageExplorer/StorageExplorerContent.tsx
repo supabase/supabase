@@ -14,6 +14,7 @@ import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
+import { StorageSearchResults } from './StorageSearchResults'
 import { UploadConflictModal } from './UploadConflictModal'
 import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
 import { useUploadConflictPrompt } from './useUploadConflictPrompt'
@@ -22,12 +23,14 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface StorageExplorerContentProps {
   itemSearchString: string
+  debouncedSearchString: string
   setItemSearchString: (value: string) => void
   isLoading: boolean
 }
 
 export const StorageExplorerContent = ({
   itemSearchString,
+  debouncedSearchString,
   setItemSearchString,
   isLoading,
 }: StorageExplorerContentProps) => {
@@ -43,7 +46,6 @@ export const StorageExplorerContent = ({
     moveFiles,
     setSelectedItems,
     setSelectedItemsToMove,
-    setIsSearching,
   } = useStorageExplorerStateSnapshot()
   const { truncateToColumn } = useStorageExplorerNavigation()
   const { isOverlayEnabled, isListingTruncated, selectedArchivedObject } = useArchivedFilesContext()
@@ -51,11 +53,15 @@ export const StorageExplorerContent = ({
   const { conflicts, promptForConflicts, resolveConflicts } = useUploadConflictPrompt()
 
   const handleClearSearch = useCallback(() => {
-    setIsSearching(false)
     setItemSearchString('')
-  }, [setIsSearching, setItemSearchString])
+  }, [setItemSearchString])
 
-  useStorageExplorerShortcuts({ onClearSearch: handleClearSearch })
+  useStorageExplorerShortcuts({
+    isSearching: itemSearchString.length > 0,
+    onClearSearch: handleClearSearch,
+  })
+
+  const isShowingSearchResults = itemSearchString.trim().length > 0
 
   /** Checkbox selection methods */
   /** [Joshen] We'll only support checkbox selection for files ONLY */
@@ -126,18 +132,22 @@ export const StorageExplorerContent = ({
         />
       )}
       <div className="flex flex-1 min-h-0">
-        <FileExplorer
-          columns={columns}
-          selectedItems={selectedItems}
-          itemSearchString={itemSearchString}
-          isLoading={isLoading}
-          onFilesUpload={onFilesUpload}
-          onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-          onSelectColumnEmptySpace={truncateToColumn}
-          onColumnLoadMore={(index, column) =>
-            fetchMoreFolderContents({ index, column, searchString: itemSearchString })
-          }
-        />
+        {isShowingSearchResults ? (
+          <StorageSearchResults
+            searchString={debouncedSearchString}
+            onClearSearch={handleClearSearch}
+          />
+        ) : (
+          <FileExplorer
+            columns={columns}
+            selectedItems={selectedItems}
+            isLoading={isLoading}
+            onFilesUpload={onFilesUpload}
+            onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+            onSelectColumnEmptySpace={truncateToColumn}
+            onColumnLoadMore={(index, column) => fetchMoreFolderContents({ index, column })}
+          />
+        )}
         {selectedArchivedObject !== undefined ? <ArchivedFilePreviewPane /> : <PreviewPane />}
       </div>
 
