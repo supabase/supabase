@@ -40,6 +40,8 @@ import contestRules from './legal/contest-rules'
 import byocEarlyAccess from './pre-release/byoc-early-access'
 import multigresEarlyAccess from './pre-release/multigres-early-access'
 import multigresEarlyAccessThankYou from './pre-release/multigres-early-access-thank-you'
+import warehouseEarlyAccess from './pre-release/warehouse-early-access'
+import warehouseEarlyAccessThankYou from './pre-release/warehouse-early-access-thank-you'
 import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 
 const pages: GoPageInput[] = [
@@ -49,6 +51,8 @@ const pages: GoPageInput[] = [
   byocEarlyAccess, // maintain until PM says to remove
   multigresEarlyAccess, // maintain while the Multigres private alpha is active
   multigresEarlyAccessThankYou, // maintain while the Multigres private alpha is active
+  warehouseEarlyAccess, // maintain while the Warehouse private alpha is active
+  warehouseEarlyAccessThankYou, // maintain while the Warehouse private alpha is active
   amoe, // maintain forever
   amoeThankYou, // maintain forever
   contestRules, // maintain forever
