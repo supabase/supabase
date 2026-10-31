@@ -432,6 +432,11 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/flutter',
         },
         {
+          name: 'Unity',
+          url: '/guides/getting-started/quickstarts/unity',
+          enabled: sdkCsharpEnabled,
+        },
+        {
           name: 'Flask (Python)',
           url: '/guides/getting-started/quickstarts/flask' as `/${string}`,
           enabled: !jsOnly,
