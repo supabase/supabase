@@ -58,6 +58,8 @@
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
         "PG_META_CRYPTO_KEY",
+        // Bearer token checked on each /api/mcp request. Not inlined at build time.
+        "MCP_ACCESS_TOKEN",
         "PGRST_DB_SCHEMAS",
         "PGRST_DB_MAX_ROWS",
         "PGRST_DB_EXTRA_SEARCH_PATH",

@@ -1,5 +1,6 @@
+import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { createMocks } from 'node-mocks-http'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import handler from '../../../../pages/api/mcp/index'
 import { mswServer } from '@/tests/lib/msw'
@@ -26,24 +27,33 @@ vi.mock('@supabase/mcp-server-supabase', () => ({
   createFeedbackOperations: vi.fn().mockReturnValue({}),
 }))
 
+const accessToken = 'a'.repeat(32)
+
 describe('/api/mcp', () => {
   beforeEach(() => {
     // Disable MSW for these tests
     mswServer.close()
+    vi.clearAllMocks()
+    vi.stubEnv('MCP_ACCESS_TOKEN', accessToken)
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
   })
 
   describe('Method handling', async () => {
     it('should handle POST requests without a features parameter', async () => {
       const { req, res } = createMocks({
         method: 'POST',
+        headers: { authorization: `Bearer ${accessToken}` },
         query: {},
         body: {},
       })
 
       await handler(req, res)
 
-      expect(res._getStatusCode()).not.toBe(405)
-      expect(res._getStatusCode()).not.toBe(400)
+      expect(res._getStatusCode()).toBe(200)
+      expect(createSupabaseMcpServer).toHaveBeenCalledOnce()
     })
 
     it('should return 405 for non-POST methods', async () => {
@@ -61,17 +71,56 @@ describe('/api/mcp', () => {
     })
   })
 
+  describe('Access token', () => {
+    it('rejects POST when MCP_ACCESS_TOKEN is not configured', async () => {
+      vi.stubEnv('MCP_ACCESS_TOKEN', '')
+
+      const { req, res } = createMocks({
+        method: 'POST',
+        headers: { authorization: `Bearer ${accessToken}` },
+        body: {},
+      })
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(503)
+      expect(JSON.parse(res._getData())).toMatchObject({
+        error: { message: expect.stringContaining('not configured') },
+      })
+      expect(createSupabaseMcpServer).not.toHaveBeenCalled()
+    })
+
+    it('rejects POST when the bearer token does not match', async () => {
+      const { req, res } = createMocks({
+        method: 'POST',
+        headers: { authorization: `Bearer ${'b'.repeat(32)}` },
+        body: {},
+      })
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(401)
+      expect(res._getHeaders()['www-authenticate']).toBe('Bearer')
+      expect(JSON.parse(res._getData())).toMatchObject({
+        error: { message: expect.stringContaining('MCP access token') },
+      })
+      expect(createSupabaseMcpServer).not.toHaveBeenCalled()
+    })
+  })
+
   describe('Query validation', async () => {
     it('should accept valid feature groups', async () => {
       const { req, res } = createMocks({
         method: 'POST',
+        headers: { authorization: `Bearer ${accessToken}` },
         query: { features: 'docs,database' },
         body: {},
       })
 
       await handler(req, res)
 
-      expect(res._getStatusCode()).not.toBe(400)
+      expect(res._getStatusCode()).toBe(200)
+      expect(createSupabaseMcpServer).toHaveBeenCalledOnce()
     })
 
     it('should accept the feedback feature group', async () => {
@@ -101,6 +150,7 @@ describe('/api/mcp', () => {
     it('should reject invalid feature groups', async () => {
       const { req, res } = createMocks({
         method: 'POST',
+        headers: { authorization: `Bearer ${accessToken}` },
         query: { features: 'invalid,unknown' },
         body: {},
       })
@@ -109,6 +159,7 @@ describe('/api/mcp', () => {
 
       expect(res._getStatusCode()).toBe(400)
       expect(JSON.parse(res._getData())).toHaveProperty('error')
+      expect(createSupabaseMcpServer).not.toHaveBeenCalled()
     })
   })
 })

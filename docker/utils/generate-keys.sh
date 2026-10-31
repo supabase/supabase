@@ -94,9 +94,11 @@ echo ""
 
 postgres_password=$(gen_hex 16)
 dashboard_password=$(gen_hex 16)
+mcp_access_token=$(gen_base64 24)
 
 echo "POSTGRES_PASSWORD=${postgres_password}"
 echo "DASHBOARD_PASSWORD=${dashboard_password}"
+echo "MCP_ACCESS_TOKEN=${mcp_access_token}"
 echo ""
 
 if [ "$1" = "--update-env" ]; then
@@ -135,4 +137,10 @@ sed \
     -e "s|^MINIO_ROOT_PASSWORD=.*$|MINIO_ROOT_PASSWORD=${minio_root_password}|" \
     -e "s|^POSTGRES_PASSWORD=.*$|POSTGRES_PASSWORD=${postgres_password}|" \
     -e "s|^DASHBOARD_PASSWORD=.*$|DASHBOARD_PASSWORD=${dashboard_password}|" \
+    -e "s|^MCP_ACCESS_TOKEN=.*$|MCP_ACCESS_TOKEN=${mcp_access_token}|" \
     .env
+
+# Older .env files have no MCP_ACCESS_TOKEN line for sed to replace.
+if ! grep -q '^MCP_ACCESS_TOKEN=' .env; then
+    printf '\nMCP_ACCESS_TOKEN=%s\n' "$mcp_access_token" >> .env
+fi

@@ -11,6 +11,8 @@ import {
   getDevelopmentOperations,
   getFeedbackOperations,
 } from '@/lib/api/self-hosted/mcp'
+import { authorizeMcpRequest } from '@/lib/api/self-hosted/mcp-auth'
+import { IS_PLATFORM } from '@/lib/constants'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
 // Twin of `pages/api/mcp/index.ts`. Web-fetch rewrite — the
@@ -50,6 +52,22 @@ const mcpQuerySchema = z.object({
 })
 
 const POST = async ({ request }: { request: Request }) => {
+  const authorization = authorizeMcpRequest({
+    isPlatform: IS_PLATFORM,
+    authorizationHeader: request.headers.get('authorization'),
+    configuredToken: process.env.MCP_ACCESS_TOKEN,
+  })
+
+  if (!authorization.isAuthorized) {
+    return new Response(JSON.stringify({ error: { message: authorization.message } }), {
+      status: authorization.status,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authorization.status === 401 ? { 'WWW-Authenticate': 'Bearer' } : {}),
+      },
+    })
+  }
+
   const url = new URL(request.url)
   const query = Object.fromEntries(url.searchParams.entries())
   const { error, data } = mcpQuerySchema.safeParse(query)
@@ -62,7 +80,9 @@ const POST = async ({ request }: { request: Request }) => {
   }
 
   const { features, read_only } = data
-  const headers = request.headers
+  const headers = new Headers(request.headers)
+  // The bearer token authorizes this route. Do not forward it to pg-meta.
+  headers.delete('authorization')
 
   const platform: SupabasePlatform = {
     database: getDatabaseOperations({ headers }),
