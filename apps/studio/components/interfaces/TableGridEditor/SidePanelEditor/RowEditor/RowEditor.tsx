@@ -18,6 +18,7 @@ import {
   getDuplicatePrimaryKeyMatch,
   getTruncatedFieldErrors,
   getTruncatedFieldNames,
+  isValueTruncated,
   prepareRowForDuplication,
   validateFields,
 } from './RowEditor.utils'
@@ -148,9 +149,10 @@ export const RowEditor = ({
           selectedTable,
           foreignKeys
         )
+        // A field the user replaced while loading keeps the replacement.
         setRowFields((fields) =>
           fields.map((field) =>
-            field.name in fullValues
+            field.name in fullValues && isValueTruncated(field.value, field.format)
               ? { ...field, value: fullFields.find((full) => full.name === field.name)?.value }
               : field
           )
