@@ -5,6 +5,7 @@ volumes/functions/**
 !volumes/functions/deno.json*
 !volumes/functions/main/
 volumes/functions/main/**
+!volumes/functions/main/memory-pressure.ts
 !volumes/functions/main/index.ts
 !volumes/functions/hello/
 volumes/functions/hello/**
