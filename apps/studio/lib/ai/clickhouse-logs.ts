@@ -41,7 +41,7 @@ Sources and their common log_attributes keys:
 - function_logs: event_type, function_id, execution_id, level
 - storage_logs, realtime_logs, postgrest_logs, supavisor_logs, pgbouncer_logs: mostly id, timestamp, event_message, with extra fields in log_attributes
 
-The editor or query_logs tool applies the user's selected time range as a request parameter, so do not add a timestamp filter in SQL.`
+The user's selected time range is applied as a request parameter, so do not add a timestamp filter in SQL.`
 
 function renderAvailableKeys(availableKeys?: string[]): string {
   if (!availableKeys || availableKeys.length === 0) return ''

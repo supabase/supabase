@@ -5,8 +5,9 @@ import { isOptInLevelAtLeast } from './opt-in-level'
 import {
   getRemoteToolContract,
   getToolContract,
-  type ContractToolName,
-  type RemoteContractToolName,
+  REMOTE_TOOL_CONTRACTS,
+  TOOL_CONTRACTS,
+  type ToolName,
 } from './tools/registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
@@ -21,114 +22,27 @@ export type DatabaseExtension = {
 
 const basicToolSchema = z.custom<Tool>((value) => typeof value === 'object')
 
+const TOOL_NAMES: ReadonlySet<string> = new Set([
+  ...Object.keys(TOOL_CONTRACTS),
+  ...Object.keys(REMOTE_TOOL_CONTRACTS),
+])
+
 /**
- * Schema for validating that a tool set only contains known tools.
+ * Schema for validating that a tool set only contains known tools. The allowlist is the
+ * registry: a tool is known when it has a local or remote contract.
  */
 export const toolSetValidationSchema = z.record(
-  z.enum([
-    // MCP tools
-    'list_tables',
-    'list_extensions',
-    'list_edge_functions',
-    'list_branches',
-    'search_docs',
-    'get_advisors',
-    'query_logs',
-    'get_active_incidents',
-
-    // Local tools
-    'execute_sql',
-    'deploy_edge_function',
-    'rename_chat',
-    'update_opt_in_level',
-    'escalate_to_human',
-    'resolve_support_conversation',
-    'list_policies',
-    'list_reports',
-    'get_report',
-    'list_databases',
-    'list_notebooks',
-    'get_notebook',
-    'run_notebook',
-    'create_notebook',
-    'update_notebook',
-    'delete_notebook',
-
-    // Fallback tools for self-hosted
-    'getSchemaTables',
-    'getRlsKnowledge',
-    'getFunctions',
-    'getEdgeFunctionKnowledge',
-
-    'load_knowledge',
-  ]),
+  z.custom<ToolName>((name) => typeof name === 'string' && TOOL_NAMES.has(name), 'Unknown tool'),
   basicToolSchema
 )
-export type ToolName = keyof z.infer<typeof toolSetValidationSchema>
-
-/**
- * Tool categories based on the data they access
- */
-export const TOOL_CATEGORIES = {
-  // UI tools that are always available regardless of opt-in level
-  UI: 'ui',
-  // Schema-level tools that require schema opt-in
-  SCHEMA: 'schema',
-  // Log-level tools that require schema_and_log opt-in
-  LOG: 'log',
-  // Data-level tools that require schema_and_log_and_data opt-in
-  DATA: 'data',
-} as const
-
-type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
-
-/**
- * Mapping of tool names to their categories. Tools that have migrated to a contract
- * (`TOOL_CONTRACTS` or `REMOTE_TOOL_CONTRACTS`) declare their own `minOptInLevel` instead and
- * aren't listed here.
- */
-export const TOOL_CATEGORY_MAP: Record<
-  Exclude<ToolName, ContractToolName | RemoteContractToolName>,
-  ToolCategory
-> = {
-  // Schema tools
-  getSchemaTables: TOOL_CATEGORIES.SCHEMA,
-  getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
-  getFunctions: TOOL_CATEGORIES.SCHEMA,
-  getEdgeFunctionKnowledge: TOOL_CATEGORIES.SCHEMA,
-}
-
-/**
- * Get the minimum opt-in level required for a tool category
- */
-function getMinimumOptInLevel(category: ToolCategory): AiOptInLevel | null {
-  switch (category) {
-    case TOOL_CATEGORIES.UI:
-      return null // Always available
-    case TOOL_CATEGORIES.SCHEMA:
-      return 'schema'
-    case TOOL_CATEGORIES.LOG:
-      return 'schema_and_log'
-    case TOOL_CATEGORIES.DATA:
-      return 'schema_and_log_and_data'
-    default:
-      return null
-  }
-}
-
-function isCategorizedTool(name: string): name is keyof typeof TOOL_CATEGORY_MAP {
-  return Object.hasOwn(TOOL_CATEGORY_MAP, name)
-}
 
 /**
  * The lowest opt-in level a tool needs, `null` if it's always available, or `undefined` if the
- * tool isn't on the allowlist. A contract's `minOptInLevel` wins over the category map.
+ * tool isn't on the allowlist. A name with both a local and a remote contract has the same
+ * level in each (a registry test enforces it).
  */
 function getToolMinimumLevel(toolName: string): AiOptInLevel | null | undefined {
-  const contract = getToolContract(toolName) ?? getRemoteToolContract(toolName)
-  if (contract) return contract.minOptInLevel
-  if (isCategorizedTool(toolName)) return getMinimumOptInLevel(TOOL_CATEGORY_MAP[toolName])
-  return undefined
+  return (getToolContract(toolName) ?? getRemoteToolContract(toolName))?.minOptInLevel
 }
 
 /**
