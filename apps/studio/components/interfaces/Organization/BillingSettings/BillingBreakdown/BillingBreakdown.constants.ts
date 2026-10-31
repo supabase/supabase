@@ -147,12 +147,6 @@ export const BILLING_BREAKDOWN_METRICS = (subscription?: OrgSubscription): Metri
       category: 'Database',
     },
     {
-      key: PricingMetric.LOG_DRAIN_EVENTS,
-      name: 'Log Drain Events',
-      units: 'absolute',
-      category: 'Database',
-    },
-    {
       key: PricingMetric.LOG_INGESTION,
       name: 'Log Ingestion',
       units: 'bytes',
@@ -169,6 +163,12 @@ export const BILLING_BREAKDOWN_METRICS = (subscription?: OrgSubscription): Metri
         subscription?.plan.id !== 'platform'
           ? 'Your organization gets a log query allowance that scales with how much log data you ingest. Once exceeded, your logs will be degraded.'
           : undefined,
+    },
+    {
+      key: PricingMetric.LOG_DRAIN_EVENTS,
+      name: 'Log Drain Events',
+      units: 'absolute',
+      category: 'Database',
     },
     {
       key: PricingMetric.LOG_STORAGE,

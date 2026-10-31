@@ -394,7 +394,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           description:
             subscription?.plan.id === 'platform'
               ? "Total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle."
-              : "Total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle.\nBilling starts after the grace period ends at the start of 2027.",
+              : "Total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle.\nBilling starts after the grace period ends in early 2027.",
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
@@ -412,13 +412,21 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           description:
             subscription?.plan.id === 'platform'
               ? 'Total amount of logs queried across all projects.\nBilling is based on the total amount of logs queried in Gigabyte.'
-              : "Total amount of logs queried across all projects.\nLogs Query usage isn't billed directly. Instead, your organization gets a log query allowance that scales with how much log data you ingest. The allowance covers the volume of log data scanned when you read logs through the Studio UI, the Management API, the CLI, or any other interface.\nEnforcement starts after the grace period ends at the start of 2027.",
+              : "Total amount of logs queried across all projects.\nLogs Query usage isn't billed directly. Instead, your organization gets a log query allowance that scales with how much log data you ingest. The allowance covers the volume of log data scanned when you read logs through the Studio UI, the Management API, the CLI, or any other interface.\nAn enforcement timeline will be announced at a future date before it will take effect.",
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Log Query',
               url: `${DOCS_URL}/guides/platform/manage-your-usage/logs-query`,
             },
+            ...(subscription?.plan.id !== 'platform'
+              ? [
+                  {
+                    name: 'Share feedback on GitHub',
+                    url: 'https://github.com/orgs/supabase/discussions/50925',
+                  },
+                ]
+              : []),
           ],
         },
         ...logStorageAttributes,

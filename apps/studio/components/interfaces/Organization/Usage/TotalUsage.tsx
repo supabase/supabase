@@ -101,25 +101,37 @@ export const TotalUsage = ({
         return metricUsage && metricUsage.usage > 0
       })
 
-    const PINNED_METRICS = [PricingMetric.LOG_INGESTION, PricingMetric.LOG_QUERYING]
+    // Log metrics: sort after all ratio-based available metrics, together, in array order
+    const METRICS_SORT_LAST = [
+      PricingMetric.LOG_INGESTION,
+      PricingMetric.LOG_QUERYING,
+      PricingMetric.LOG_DRAIN_EVENTS,
+    ]
 
     return breakdownMetrics.slice().sort((a, b) => {
-      const pinnedIndexA = PINNED_METRICS.indexOf(a.key as PricingMetric)
-      const pinnedIndexB = PINNED_METRICS.indexOf(b.key as PricingMetric)
+      const sortLastA = METRICS_SORT_LAST.includes(a.key as PricingMetric)
+      const sortLastB = METRICS_SORT_LAST.includes(b.key as PricingMetric)
+      const usageMetaA = usage.usages.find((x) => x.metric === a.key)
+      const usageMetaB = usage.usages.find((x) => x.metric === b.key)
 
-      if (pinnedIndexA !== -1 || pinnedIndexB !== -1) {
-        if (pinnedIndexA === -1) return 1
-        if (pinnedIndexB === -1) return -1
-        return pinnedIndexA - pinnedIndexB
+      if (sortLastA !== sortLastB) {
+        if (!usageMetaA?.available_in_plan || !usageMetaB?.available_in_plan) {
+          return Number(usageMetaB?.available_in_plan) - Number(usageMetaA?.available_in_plan)
+        }
+        return sortLastA ? 1 : -1
       }
 
-      const usageMetaA = usage.usages.find((x) => x.metric === a.key)
+      if (sortLastA && sortLastB) {
+        return (
+          Number(usageMetaB?.available_in_plan) - Number(usageMetaA?.available_in_plan) ||
+          breakdownMetrics.indexOf(a) - breakdownMetrics.indexOf(b)
+        )
+      }
+
       const usageRatioA =
         typeof usageMetaA !== 'number'
           ? (usageMetaA?.usage ?? 0) / (usageMetaA?.pricing_free_units ?? 0)
           : 0
-
-      const usageMetaB = usage.usages.find((x) => x.metric === b.key)
       const usageRatioB =
         typeof usageMetaB !== 'number'
           ? (usageMetaB?.usage ?? 0) / (usageMetaB?.pricing_free_units ?? 0)
