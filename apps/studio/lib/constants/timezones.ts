@@ -322,6 +322,7 @@ const ALL_TIMEZONES: Timezone[] = [
       'America/Argentina/Tucuman',
       'America/Argentina/Ushuaia',
       'America/Buenos_Aires',
+      'America/Argentina/Buenos_Aires',
       'America/Catamarca',
       'America/Cordoba',
       'America/Jujuy',
@@ -407,6 +408,7 @@ const ALL_TIMEZONES: Timezone[] = [
     utc: [
       'Atlantic/Canary',
       'Atlantic/Faeroe',
+      'Atlantic/Faroe',
       'Atlantic/Madeira',
       'Europe/Dublin',
       'Europe/Lisbon',
@@ -546,6 +548,7 @@ const ALL_TIMEZONES: Timezone[] = [
       'Europe/Chisinau',
       'Europe/Helsinki',
       'Europe/Kiev',
+      'Europe/Kyiv',
       'Europe/Mariehamn',
       'Europe/Nicosia',
       'Europe/Riga',
@@ -584,6 +587,7 @@ const ALL_TIMEZONES: Timezone[] = [
     utc: [
       'Europe/Helsinki',
       'Europe/Kiev',
+      'Europe/Kyiv',
       'Europe/Mariehamn',
       'Europe/Riga',
       'Europe/Sofia',
@@ -775,7 +779,7 @@ const ALL_TIMEZONES: Timezone[] = [
     value: 'Myanmar Standard Time',
     isdst: false,
     text: '(UTC+06:30) Yangon (Rangoon)',
-    utc: ['Asia/Rangoon', 'Indian/Cocos'],
+    utc: ['Asia/Rangoon', 'Asia/Yangon', 'Indian/Cocos'],
   },
   {
     value: 'SE Asia Standard Time',
@@ -789,6 +793,7 @@ const ALL_TIMEZONES: Timezone[] = [
       'Asia/Phnom_Penh',
       'Asia/Pontianak',
       'Asia/Saigon',
+      'Asia/Ho_Chi_Minh',
       'Asia/Vientiane',
       'Etc/GMT-7',
       'Indian/Christmas',
@@ -974,7 +979,7 @@ const ALL_TIMEZONES: Timezone[] = [
     value: 'Tonga Standard Time',
     isdst: false,
     text: "(UTC+13:00) Nuku'alofa",
-    utc: ['Etc/GMT-13', 'Pacific/Enderbury', 'Pacific/Fakaofo', 'Pacific/Tongatapu'],
+    utc: ['Etc/GMT-13', 'Pacific/Enderbury', 'Pacific/Kanton', 'Pacific/Fakaofo', 'Pacific/Tongatapu'],
   },
   {
     value: 'Samoa Standard Time',
