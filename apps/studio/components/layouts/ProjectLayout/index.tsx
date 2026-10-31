@@ -220,6 +220,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     const ignorePausedState =
       router.pathname === '/project/[ref]' ||
+      router.pathname.includes('/project/[ref]/branches') ||
       router.pathname.includes('/project/[ref]/settings') ||
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
