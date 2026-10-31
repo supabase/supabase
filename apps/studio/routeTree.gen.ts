@@ -174,6 +174,7 @@ import { Route as ProjectRefLogsEdgeLogsRouteImport } from './routes/project/$re
 import { Route as ProjectRefLogsMultigresLogsRouteImport } from './routes/project/$ref/logs/multigres-logs'
 import { Route as ProjectRefLogsPgUpgradeLogsRouteImport } from './routes/project/$ref/logs/pg-upgrade-logs'
 import { Route as ProjectRefLogsPgcronLogsRouteImport } from './routes/project/$ref/logs/pgcron-logs'
+import { Route as ProjectRefLogsPipelinesLogsRouteImport } from './routes/project/$ref/logs/pipelines-logs'
 import { Route as ProjectRefLogsPoolerLogsRouteImport } from './routes/project/$ref/logs/pooler-logs'
 import { Route as ProjectRefLogsPostgresLogsRouteImport } from './routes/project/$ref/logs/postgres-logs'
 import { Route as ProjectRefLogsPostgrestLogsRouteImport } from './routes/project/$ref/logs/postgrest-logs'
@@ -1200,6 +1201,12 @@ const ProjectRefLogsPgcronLogsRoute =
   ProjectRefLogsPgcronLogsRouteImport.update({
     id: '/pgcron-logs',
     path: '/pgcron-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
+const ProjectRefLogsPipelinesLogsRoute =
+  ProjectRefLogsPipelinesLogsRouteImport.update({
+    id: '/pipelines-logs',
+    path: '/pipelines-logs',
     getParentRoute: () => ProjectRefLogsRoute,
   } as any)
 const ProjectRefLogsPoolerLogsRoute =
@@ -2304,6 +2311,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/logs/multigres-logs': typeof ProjectRefLogsMultigresLogsRoute
   '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
   '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
+  '/project/$ref/logs/pipelines-logs': typeof ProjectRefLogsPipelinesLogsRoute
   '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
   '/project/$ref/logs/postgres-logs': typeof ProjectRefLogsPostgresLogsRoute
   '/project/$ref/logs/postgrest-logs': typeof ProjectRefLogsPostgrestLogsRoute
@@ -2615,6 +2623,7 @@ export interface FileRoutesByTo {
   '/project/$ref/logs/multigres-logs': typeof ProjectRefLogsMultigresLogsRoute
   '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
   '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
+  '/project/$ref/logs/pipelines-logs': typeof ProjectRefLogsPipelinesLogsRoute
   '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
   '/project/$ref/logs/postgres-logs': typeof ProjectRefLogsPostgresLogsRoute
   '/project/$ref/logs/postgrest-logs': typeof ProjectRefLogsPostgrestLogsRoute
@@ -2942,6 +2951,7 @@ export interface FileRoutesById {
   '/project/$ref/logs/multigres-logs': typeof ProjectRefLogsMultigresLogsRoute
   '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
   '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
+  '/project/$ref/logs/pipelines-logs': typeof ProjectRefLogsPipelinesLogsRoute
   '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
   '/project/$ref/logs/postgres-logs': typeof ProjectRefLogsPostgresLogsRoute
   '/project/$ref/logs/postgrest-logs': typeof ProjectRefLogsPostgrestLogsRoute
@@ -3269,6 +3279,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/multigres-logs'
     | '/project/$ref/logs/pg-upgrade-logs'
     | '/project/$ref/logs/pgcron-logs'
+    | '/project/$ref/logs/pipelines-logs'
     | '/project/$ref/logs/pooler-logs'
     | '/project/$ref/logs/postgres-logs'
     | '/project/$ref/logs/postgrest-logs'
@@ -3580,6 +3591,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/multigres-logs'
     | '/project/$ref/logs/pg-upgrade-logs'
     | '/project/$ref/logs/pgcron-logs'
+    | '/project/$ref/logs/pipelines-logs'
     | '/project/$ref/logs/pooler-logs'
     | '/project/$ref/logs/postgres-logs'
     | '/project/$ref/logs/postgrest-logs'
@@ -3906,6 +3918,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/multigres-logs'
     | '/project/$ref/logs/pg-upgrade-logs'
     | '/project/$ref/logs/pgcron-logs'
+    | '/project/$ref/logs/pipelines-logs'
     | '/project/$ref/logs/pooler-logs'
     | '/project/$ref/logs/postgres-logs'
     | '/project/$ref/logs/postgrest-logs'
@@ -5361,6 +5374,13 @@ declare module '@tanstack/react-router' {
       path: '/pgcron-logs'
       fullPath: '/project/$ref/logs/pgcron-logs'
       preLoaderRoute: typeof ProjectRefLogsPgcronLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
+    '/project/$ref/logs/pipelines-logs': {
+      id: '/project/$ref/logs/pipelines-logs'
+      path: '/pipelines-logs'
+      fullPath: '/project/$ref/logs/pipelines-logs'
+      preLoaderRoute: typeof ProjectRefLogsPipelinesLogsRouteImport
       parentRoute: typeof ProjectRefLogsRoute
     }
     '/project/$ref/logs/pooler-logs': {
@@ -6934,6 +6954,7 @@ interface ProjectRefLogsRouteChildren {
   ProjectRefLogsMultigresLogsRoute: typeof ProjectRefLogsMultigresLogsRoute
   ProjectRefLogsPgUpgradeLogsRoute: typeof ProjectRefLogsPgUpgradeLogsRoute
   ProjectRefLogsPgcronLogsRoute: typeof ProjectRefLogsPgcronLogsRoute
+  ProjectRefLogsPipelinesLogsRoute: typeof ProjectRefLogsPipelinesLogsRoute
   ProjectRefLogsPoolerLogsRoute: typeof ProjectRefLogsPoolerLogsRoute
   ProjectRefLogsPostgresLogsRoute: typeof ProjectRefLogsPostgresLogsRoute
   ProjectRefLogsPostgrestLogsRoute: typeof ProjectRefLogsPostgrestLogsRoute
@@ -6957,6 +6978,7 @@ const ProjectRefLogsRouteChildren: ProjectRefLogsRouteChildren = {
   ProjectRefLogsMultigresLogsRoute: ProjectRefLogsMultigresLogsRoute,
   ProjectRefLogsPgUpgradeLogsRoute: ProjectRefLogsPgUpgradeLogsRoute,
   ProjectRefLogsPgcronLogsRoute: ProjectRefLogsPgcronLogsRoute,
+  ProjectRefLogsPipelinesLogsRoute: ProjectRefLogsPipelinesLogsRoute,
   ProjectRefLogsPoolerLogsRoute: ProjectRefLogsPoolerLogsRoute,
   ProjectRefLogsPostgresLogsRoute: ProjectRefLogsPostgresLogsRoute,
   ProjectRefLogsPostgrestLogsRoute: ProjectRefLogsPostgrestLogsRoute,

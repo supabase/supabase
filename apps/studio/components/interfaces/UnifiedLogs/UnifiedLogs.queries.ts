@@ -9,6 +9,7 @@ import {
 import { unifiedLogsScopeSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
+import { PIPELINE_ID_OTEL_SQL } from '@/data/logs/pipeline-logs'
 import {
   joinSqlFragments,
   analyticsLiteral as lit,
@@ -29,7 +30,7 @@ const NOT_ILIKE_OP = safeSql`NOT ILIKE`
 // Facets the count query is allowed to be invoked for. Reject anything else
 // at the entry point rather than letting an unsupported value reach
 // `log_attributes[…]` lookups.
-const FACET_FIELDS = ['log_type', 'level', 'method', 'status', 'pathname'] as const
+const FACET_FIELDS = ['log_type', 'level', 'method', 'status', 'pathname', 'pipeline_id'] as const
 
 // OTEL log_attributes keys for HTTP-style fields. Centralized so they can be
 // adjusted in one place if the backend conventions change.
@@ -102,6 +103,7 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'supavisor_logs' THEN 'supavisor'
       WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'
       WHEN source = 'multigres_logs' THEN 'multigres'
+      WHEN source = 'etl_replication_logs' THEN 'pipelines'
       WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN 'compute'
       ELSE source
     END`
@@ -111,16 +113,22 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
 // `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
 const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN null
+      WHEN source = 'etl_replication_logs' THEN null
       WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
       ELSE toString((${HTTP_STATUS_EXPR}))
     END`
 
-const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_METHOD_EXPR})`
-const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_PATH_EXPR})`
-const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source = 'function_logs', log_attributes, map())`
+const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(source = 'etl_replication_logs', null, if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_METHOD_EXPR}))`
+const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(source = 'etl_replication_logs', null, if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_PATH_EXPR}))`
+const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source IN ('function_logs', 'etl_replication_logs'), log_attributes, map())`
 
 const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN null
+      WHEN source = 'etl_replication_logs' THEN multiIf(
+        upper(coalesce(nullIf(log_attributes['level'], ''), severity_text)) IN ('ERROR','FATAL','PANIC','CRITICAL','ALERT','EMERGENCY'), 'error',
+        upper(coalesce(nullIf(log_attributes['level'], ''), severity_text)) IN ('WARN','WARNING'), 'warning',
+        'success'
+      )
       WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('error','fatal') THEN 'error'
       WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('warn','warning') THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
@@ -173,6 +181,8 @@ const translateFilter = (
     )})`
 
   switch (key) {
+    case 'pipeline_id':
+      return safeSql`(source = 'etl_replication_logs' AND ${PIPELINE_ID_OTEL_SQL} ${inOp} ${inList(values)})`
     case 'log_type': {
       const branches = values.map((t) => {
         const condition = LOG_TYPE_CONDITION[t] ?? safeSql`source = ${lit(t)}`
@@ -345,6 +355,7 @@ const ROW_PROJECTION: SafeLogSqlFragment = safeSql`
     event_message,
     ${METHOD_EXPR} AS method,
     ${AUTH_USER_EXPR} AS auth_user,
+    if(source = 'etl_replication_logs', ${PIPELINE_ID_OTEL_SQL}, null) AS pipeline_id,
     ${METADATA_EXPR} AS metadata,
     null AS log_count,
     null AS logs
@@ -365,6 +376,8 @@ const buildBaseWhere = (
       if (!search.scope && logTypeFilter.operator === '<>') {
         parts.push(safeSql`NOT (${LOG_TYPE_CONDITION['edge function runtime']})`)
       }
+    } else if (grouped.pipeline_id) {
+      parts.push(safeSql`source = 'etl_replication_logs'`)
     } else if (!search.scope && !userFilterValue(search)) {
       // Skip the default (postgres|edge) source restriction while the user filter is
       // active — the user clause governs which sources are eligible (auth + postgres),
@@ -533,7 +546,9 @@ export const getFacetCountQuery = ({
             ? STATUS_EXPR
             : facet === 'pathname'
               ? PATHNAME_EXPR
-              : safeSql`log_attributes[${lit(facet)}]`
+              : facet === 'pipeline_id'
+                ? PIPELINE_ID_OTEL_SQL
+                : safeSql`log_attributes[${lit(facet)}]`
 
   const conditions: SafeLogSqlFragment[] = [
     ...buildBaseWhere(search, facet),

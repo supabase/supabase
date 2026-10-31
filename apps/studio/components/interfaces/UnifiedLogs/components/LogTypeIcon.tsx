@@ -6,8 +6,11 @@ import {
   DatabaseIcon,
   NetworkIcon,
   TerminalIcon,
+  WorkflowIcon,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { LOG_TYPES_LABELS } from '../UnifiedLogs.constants'
 
 interface LogTypeIconProps {
   type: string
@@ -31,6 +34,7 @@ const ICON_MAP = new Map<string, IconComponent>([
   ['supavisor', CableIcon],
   ['pgbouncer', CableIcon],
   ['multigres', NetworkIcon],
+  ['pipelines', WorkflowIcon],
   ['compute', Compute],
 ])
 
@@ -41,16 +45,17 @@ export const LogTypeIcon = ({
   className,
 }: LogTypeIconProps) => {
   const Icon = ICON_MAP.get(type) ?? BoxIcon
+  const label = type === 'pipelines' ? LOG_TYPES_LABELS.pipelines : type
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="inline-flex" role="img" aria-label={type}>
+        <span className="inline-flex" role="img" aria-label={label}>
           <Icon size={size} strokeWidth={strokeWidth} className={className} />
         </span>
       </TooltipTrigger>
       <TooltipContent side="left">
-        <div className="text-xs">{type}</div>
+        <div className="text-xs">{label}</div>
       </TooltipContent>
     </Tooltip>
   )

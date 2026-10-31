@@ -42,7 +42,12 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
-import { getPipelineDisplayState, getRestartRequestStatus, getStatusName } from './Pipeline.utils'
+import {
+  getPipelineDisplayState,
+  getPipelineLogsUrl,
+  getRestartRequestStatus,
+  getStatusName,
+} from './Pipeline.utils'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
@@ -200,9 +205,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     }
   }
 
-  const logsUrl = `/project/${projectRef}/logs/replication-logs?f=${encodeURIComponent(
-    JSON.stringify({ pipeline_id: pipelineId })
-  )}`
+  const logsUrl = getPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
 
   return (
     <div className="flex min-h-full w-full flex-col items-stretch">

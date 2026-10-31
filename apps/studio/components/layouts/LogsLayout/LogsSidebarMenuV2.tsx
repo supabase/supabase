@@ -13,6 +13,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
+import { getPipelineLogsUrl } from '@/components/interfaces/Database/Replication/Pipeline.utils'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
@@ -83,8 +84,9 @@ export function LogsSidebarMenuV2() {
     }
   )
 
-  // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
-  const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
+  // Show Pipelines logs for projects with Pipelines enabled and an existing source.
+  const showPipelinesLogs =
+    enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const showMultigresLogs = useShowMultigresLogs()
@@ -174,11 +176,11 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
-    showETLLogs
+    showPipelinesLogs
       ? {
-          name: 'Replication',
+          name: 'Pipelines logs',
           key: 'replication_logs',
-          url: `/project/${ref}/logs/replication-logs`,
+          url: getPipelineLogsUrl({ projectRef: ref }),
           items: [],
         }
       : null,
@@ -257,7 +259,9 @@ export function LogsSidebarMenuV2() {
         <>
           <SidebarCollapsible title="Collections" defaultOpen={true}>
             {filteredLogs.map((collection) => {
-              const isItemActive = isActive(collection?.url ?? '')
+              const isItemActive =
+                isActive(collection?.url ?? '') ||
+                (collection.key === 'replication_logs' && isActive('/logs/replication-logs'))
               return (
                 <LogsSidebarItem
                   key={collection?.key ?? ''}

@@ -40,7 +40,15 @@ export function DataTableFilterCheckboxAsync<TData>({
       />
 
       {isError && (
-        <AlertError error={error} subject="Failed to retrieve pathnames" projectRef={projectRef} />
+        <AlertError
+          error={error}
+          subject={
+            value === 'pipeline_id'
+              ? 'Failed to retrieve pipeline IDs'
+              : 'Failed to retrieve pathnames'
+          }
+          projectRef={projectRef}
+        />
       )}
 
       <div className="max-h-[215px] overflow-y-auto rounded-sm border border-border empty:border-none">

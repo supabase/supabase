@@ -10,6 +10,7 @@ import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { groupLogsFiltersByColumn, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
+import { getPipelineIdBigQuerySql } from '@/data/logs/pipeline-logs'
 import {
   joinSqlFragments,
   analyticsLiteral as lit,
@@ -25,7 +26,15 @@ const NOT_IN_OP = safeSql`NOT IN`
 const LIKE_OP = safeSql`LIKE`
 const NOT_LIKE_OP = safeSql`NOT LIKE`
 
-const ALL_LOG_TYPES = ['edge', 'postgrest', 'storage', 'postgres', 'edge function', 'auth']
+const ALL_LOG_TYPES = [
+  'edge',
+  'postgrest',
+  'storage',
+  'postgres',
+  'edge function',
+  'auth',
+  'pipelines',
+]
 
 /**
  * Computes the log_type set that the CTE should union. With no filter, defaults
@@ -35,7 +44,12 @@ const ALL_LOG_TYPES = ['edge', 'postgrest', 'storage', 'postgres', 'edge functio
 export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
   if (search.scope) throw new Error('Scoped unified logs queries are only supported on ClickHouse')
   const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
-  if (filters.length === 0) return [...DEFAULT_LOG_TYPES]
+  if (filters.length === 0) {
+    const hasPipelineFilter = parseLogsFilterUrlParams(search.filter).some(
+      (filter) => filter.column === 'pipeline_id'
+    )
+    return hasPipelineFilter ? ['pipelines'] : [...DEFAULT_LOG_TYPES]
+  }
   const included = filters.filter((f) => f.operator === '=').map((f) => f.value)
   const excluded = new Set(filters.filter((f) => f.operator === '<>').map((f) => f.value))
   const base = included.length > 0 ? included : ALL_LOG_TYPES
@@ -189,7 +203,9 @@ const getEdgeLogsQuery = (): SafeLogSqlFragment => safeSql`
       null as event_message,
       edge_logs_request.method as method,
       null as log_count,
-      null as logs
+      null as logs,
+      cast(null as string) as pipeline_id,
+      cast(null as string) as pipeline_metadata
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
@@ -218,7 +234,9 @@ const getPostgrestLogsQuery = (): SafeLogSqlFragment => safeSql`
       null as event_message,
       edge_logs_request.method as method,
       null as log_count,
-      null as logs
+      null as logs,
+      cast(null as string) as pipeline_id,
+      cast(null as string) as pipeline_metadata
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
@@ -250,7 +268,9 @@ const getPostgresLogsQuery = (): SafeLogSqlFragment => safeSql`
       event_message as event_message,
       null as method,
       null as log_count,
-      null as logs
+      null as logs,
+      cast(null as string) as pipeline_id,
+      cast(null as string) as pipeline_metadata
     from postgres_logs as pgl
     cross join unnest(pgl.metadata) as pgl_metadata
     cross join unnest(pgl_metadata.parsed) as pgl_parsed
@@ -276,7 +296,9 @@ const getEdgeFunctionLogsQuery = (): SafeLogSqlFragment => safeSql`
       COALESCE(function_logs_agg.last_event_message, '') as event_message,
       fel_request.method as method,
       function_logs_agg.function_log_count as log_count,
-      null as logs
+      null as logs,
+      cast(null as string) as pipeline_id,
+      cast(null as string) as pipeline_metadata
     from function_edge_logs as fel
     cross join unnest(metadata) as fel_metadata
     cross join unnest(fel_metadata.response) as fel_response
@@ -313,7 +335,9 @@ const getAuthLogsQuery = (): SafeLogSqlFragment => safeSql`
       null as event_message,
       el_in_al_request.method as method,
       null as log_count,
-      null as logs
+      null as logs,
+      cast(null as string) as pipeline_id,
+      cast(null as string) as pipeline_metadata
     from auth_logs as al
     cross join unnest(metadata) as al_metadata
     left join (
@@ -347,13 +371,38 @@ const getSupabaseStorageLogsQuery = (): SafeLogSqlFragment => safeSql`
       null as event_message,
       edge_logs_request.method as method,
       null as log_count,
-      null as logs
+      null as logs,
+      cast(null as string) as pipeline_id,
+      cast(null as string) as pipeline_metadata
     from edge_logs as el
     cross join unnest(metadata) as edge_logs_metadata
     cross join unnest(edge_logs_metadata.request) as edge_logs_request
     cross join unnest(edge_logs_metadata.response) as edge_logs_response
     -- ONLY include logs where the path includes /storage/
     WHERE edge_logs_request.path LIKE '%/storage/%'
+  `
+
+/** Pipeline process logs, including metadata for the detail panel. */
+const getPipelinesLogsQuery = (): SafeLogSqlFragment => safeSql`
+    select
+      pl.id,
+      null as source_id,
+      pl.timestamp,
+      'pipelines' as log_type,
+      cast(null as string) as status,
+      case
+        when lower(coalesce(json_value(to_json_string(pl), '$.level'), json_value(to_json_string(pl), '$.metadata[0].level'))) in ('error', 'fatal', 'panic', 'critical', 'alert', 'emergency') then 'error'
+        when lower(coalesce(json_value(to_json_string(pl), '$.level'), json_value(to_json_string(pl), '$.metadata[0].level'))) in ('warn', 'warning') then 'warning'
+        else 'success'
+      end as level,
+      cast(null as string) as pathname,
+      pl.event_message,
+      cast(null as string) as method,
+      null as log_count,
+      null as logs,
+      ${getPipelineIdBigQuerySql(safeSql`pl`)} as pipeline_id,
+      to_json_string(pl) as pipeline_metadata
+    from etl_replication_logs as pl
   `
 
 const LOG_TYPE_QUERIES: Record<string, () => SafeLogSqlFragment> = {
@@ -363,6 +412,7 @@ const LOG_TYPE_QUERIES: Record<string, () => SafeLogSqlFragment> = {
   'edge function': getEdgeFunctionLogsQuery,
   auth: getAuthLogsQuery,
   storage: getSupabaseStorageLogsQuery,
+  pipelines: getPipelinesLogsQuery,
 }
 
 /**
@@ -410,7 +460,9 @@ SELECT
     event_message,
     method,
     log_count,
-    logs
+    logs,
+    pipeline_id,
+    pipeline_metadata
 FROM unified_logs
 ${whereClause(conditions)}
 `
@@ -481,7 +533,8 @@ log_type_counts AS (
     COUNTIF(log_type = 'storage') AS storage_count,
     COUNTIF(log_type = 'postgres') AS postgres_count,
     COUNTIF(log_type = 'edge function') AS edge_function_count,
-    COUNTIF(log_type = 'auth') AS auth_count
+    COUNTIF(log_type = 'auth') AS auth_count,
+    COUNTIF(log_type = 'pipelines') AS pipelines_count
   FROM unified_logs
   ${logTypeWhere}
 ),
@@ -500,13 +553,14 @@ level_counts AS (
 ${getFacetCountCTE({ search, facet: 'method', cteName: safeSql`method_count` })},
 ${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })}
 
-SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
+SELECT 'total' AS facet, 'all' AS value, total AS count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'postgrest', postgrest_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'storage', storage_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'postgres', postgres_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'edge function', edge_function_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'auth', auth_count FROM log_type_counts
+UNION ALL SELECT 'log_type', 'pipelines', pipelines_count FROM log_type_counts
 UNION ALL SELECT 'level', 'success', success_count FROM level_counts
 UNION ALL SELECT 'level', 'warning', warning_count FROM level_counts
 UNION ALL SELECT 'level', 'error', error_count FROM level_counts
