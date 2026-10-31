@@ -665,7 +665,7 @@ async function retrieveContextForLLM(userQuery) {
     .join('\n\n')
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4',
+    model: 'gpt-5.6-sol',
     messages: [
       {
         role: 'system',
@@ -717,7 +717,7 @@ async def retrieve_context_for_llm(user_query):
     )
 
     response = openai.chat.completions.create(
-        model='gpt-4',
+        model='gpt-5.6-sol',
         messages=[
             {
                 'role': 'system',
