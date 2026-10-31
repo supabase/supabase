@@ -139,7 +139,7 @@ export const runAndManage: NavMenuConstant = {
         },
         {
           name: 'Production security checklist',
-          url: '/guides/deployment/going-into-prod#security',
+          url: '/guides/security/production-checklist',
         },
       ],
     },
