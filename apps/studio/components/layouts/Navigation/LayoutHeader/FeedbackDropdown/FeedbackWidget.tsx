@@ -93,9 +93,17 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
 
     // Give time for dropdown to close
     await timeout(100)
-    toPng(document.body, { filter })
+    toPng(document.body, {
+      filter,
+      // the csp blocks fetches to avatar hosts, so a transparent pixel replaces images it cannot read
+      imagePlaceholder:
+        'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+    })
       .then((dataUrl: any) => setScreenshot(dataUrl))
-      .catch(() => toast.error('Failed to capture screenshot'))
+      .catch((error) => {
+        console.error('Failed to capture screenshot:', error)
+        toast.error('Failed to capture screenshot')
+      })
       .finally(() => setIsSavingScreenshot(false))
   }
 
