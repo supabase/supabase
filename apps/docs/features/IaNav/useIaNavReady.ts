@@ -1,26 +1,12 @@
 'use client'
 
-import { useFeatureFlags, useSearchParamsShallow } from 'common'
-import { useEffect, useState } from 'react'
-
-import { IA_NAV_FLAG, isIaNavVariant } from './constants'
-
-const READY_TIMEOUT_MS = 1000
+import { useCachedIaNavFlag } from './useIaNavVariant'
 
 /**
- * True once the visitor's nav variant is known, so the nav can stay hidden instead of
- * flashing today's nav. Falls back to true after a timeout in case flags never load.
- * Hide with `invisible noscript:visible` so the nav still shows without JavaScript.
+ * True once the client has read the variant cached on the last visit. Until then, put
+ * `IA_NAV_PENDING_CLASS` on the nav: it hides the nav only for a visitor cached on option-1,
+ * since the server html always holds the control nav.
  */
 export function useIaNavReady(): boolean {
-  const { hasLoaded } = useFeatureFlags()
-  const override = useSearchParamsShallow().get(IA_NAV_FLAG)
-  const [hasTimedOut, setHasTimedOut] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setHasTimedOut(true), READY_TIMEOUT_MS)
-    return () => clearTimeout(timer)
-  }, [])
-
-  return isIaNavVariant(override) || Boolean(hasLoaded) || hasTimedOut
+  return useCachedIaNavFlag() !== null
 }
