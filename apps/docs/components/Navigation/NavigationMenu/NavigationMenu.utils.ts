@@ -1,5 +1,6 @@
 'use client'
 
+import type { GlobalMenuItems } from '~/components/Navigation/Navigation.types'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import type { ICommonItem } from '~/components/reference/Reference.types'
 import type { Json } from '~/features/helpers.types'
@@ -7,7 +8,6 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { menuState } from '../../../hooks/useMenuState'
-import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
 
 export function getPathWithoutHash(relativePath: string) {
   return new URL(relativePath, 'http://placeholder').pathname
@@ -172,8 +172,8 @@ export const isMenuLevel = (menuId: string, level: string | undefined): boolean 
   !!level && menuId.replace(/_v\d+$/, '') === level
 
 // the top-level group that holds a section: start itself, or the group that links to it
-export const getMenuGroupLabel = (menuId: string): string | undefined =>
-  GLOBAL_MENU_ITEMS.find(
+export const getMenuGroupLabel = (menuId: string, menuItems: GlobalMenuItems): string | undefined =>
+  menuItems.find(
     ([section]) =>
       section.enabled !== false &&
       (isMenuLevel(menuId, section.level) ||

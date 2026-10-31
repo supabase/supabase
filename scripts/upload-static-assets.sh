@@ -35,6 +35,15 @@ if [[ "$FORCE_ASSET_CDN" != "1" ]] && [[ "$VERCEL_ENV" != "production" ]]; then
     exit 0
 fi
 
+# The build already points at the CDN at this point, so a missing credential
+# must fail the build rather than skip the upload.
+for var in ASSET_CDN_S3_ENDPOINT AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY; do
+    if [[ -z "${!var}" ]]; then
+        echo "Asset CDN upload is enabled but $var is not set. Set the R2 credentials for this environment, or FORCE_ASSET_CDN=-1 to disable the asset CDN."
+        exit 1
+    fi
+done
+
 # Set the cdnBucket variable based on NEXT_PUBLIC_ENVIRONMENT
 if [[ "$NEXT_PUBLIC_ENVIRONMENT" == "staging" ]]; then
   BUCKET_NAME="frontend-assets-staging"
@@ -57,6 +66,36 @@ if ! command -v aws &> /dev/null; then
     unzip -q awscliv2.zip
     export PATH=$PWD/aws/dist:$PATH
     rm awscliv2.zip
+fi
+
+# TanStack Start builds (Studio): upload Nitro's Vercel immutable store, whose
+# files are content-hashed, to a folder shared by every deployment (see
+# apps/studio/asset-cdn.ts). Shared rather than per-commit so unchanged chunks
+# dedupe and older tabs keep resolving their lazy chunks. The files also stay in
+# the Vercel output: web workers must be served same-origin.
+if [[ "$1" == "tanstack" ]]; then
+    IMMUTABLE_DIR=".vercel/output/static/_vercel/immutable"
+    if [ ! -d "$IMMUTABLE_DIR" ]; then
+        echo -e "${YELLOW}Directory $IMMUTABLE_DIR not found!${NC}"
+        echo "Make sure the TanStack build ran for Vercel with immutable static files enabled."
+        exit 1
+    fi
+
+    # Names are content hashes, so an existing object never needs replacing:
+    # --size-only skips files a previous deployment already uploaded (the
+    # default mtime check would re-upload every freshly built file). Source
+    # maps are uploaded to Sentry, never published.
+    echo -e "${YELLOW}Uploading immutable static files to R2...${NC}"
+    aws s3 sync "$IMMUTABLE_DIR" "s3://$BUCKET_NAME/${SITE_NAME:-studio}/tanstack/_vercel/immutable" \
+        --size-only \
+        --exclude "*.map" \
+        --endpoint-url "$ASSET_CDN_S3_ENDPOINT" \
+        --cache-control "public,max-age=31536000,immutable" \
+        --region auto \
+        --only-show-errors
+
+    echo -e "${GREEN}Upload completed successfully!${NC}"
+    exit 0
 fi
 
 # Check if directory exists

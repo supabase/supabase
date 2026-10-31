@@ -1,4 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { Loader2Icon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
@@ -31,17 +33,18 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from '@/data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
 import { useGitHubConnectionCreateMutation } from '@/data/integrations/github-connection-create-mutation'
 import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionUpdateMutation } from '@/data/integrations/github-connection-update-mutation'
 import type { GitHubConnection } from '@/data/integrations/integrations.types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 interface GitHubIntegrationConnectionFormProps {
   connection?: GitHubConnection
@@ -61,11 +64,13 @@ export const GitHubIntegrationConnectionForm = ({
 
   const { hasAccess: hasAccessToBranching } = useCheckEntitlements('branching_limit')
 
-  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
+    PermissionAction.UPDATE,
+    'integrations.github_connections'
   )
-  const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'integrations.github_connections'
   )
 
   const canManageGitHubConnection = canCreateGitHubConnection && canUpdateGitHubConnection
@@ -92,10 +97,18 @@ export const GitHubIntegrationConnectionForm = ({
     },
   })
 
-  const { data: existingBranches } = useBranchesQuery(
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: selectedProject?.ref,
+  })
+  const createBranchGrant = useGrant(
+    'POST /v1/projects/{ref}/branches',
     { projectRef: selectedProject?.ref },
-    { enabled: !!selectedProject?.ref }
+    { variant: 'production' }
   )
+  const { data: existingBranches } = useQuery({
+    ...branchesQueryOptions({ projectRef: selectedProject?.ref, grant: branchesGrant.grant }),
+    enabled: !!selectedProject?.ref,
+  })
 
   const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
     useCheckGithubBranchValidity({ onError: () => {} })
@@ -253,12 +266,17 @@ export const GitHubIntegrationConnectionForm = ({
           projectRef: selectedProject.ref,
           gitBranch: data.branchName,
         })
-      : createBranch({
-          projectRef: selectedProject.ref,
-          branchName: 'main',
-          gitBranch: data.branchName,
-          is_default: true,
-        })
+      : createBranchGrant.status === 'granted'
+        ? createBranch({
+            grant: createBranchGrant.grant,
+            projectRef: selectedProject.ref,
+            branchName: 'main',
+            gitBranch: data.branchName,
+            is_default: true,
+          })
+        : Promise.reject(
+            new Error('You need additional permissions to update the production branch')
+          )
 
     // Only re-baseline the form once both requests succeed, so a failure keeps the edits unsaved
     const results = await Promise.allSettled([connectionRequest, branchRequest])
@@ -311,12 +329,17 @@ export const GitHubIntegrationConnectionForm = ({
           gitBranch: data.enableProductionSync ? data.branchName : '',
           branchName: data.branchName || 'main',
         })
-      : createBranch({
-          projectRef: selectedProject.ref,
-          gitBranch: data.enableProductionSync ? data.branchName : '',
-          branchName: data.branchName || 'main',
-          is_default: true,
-        })
+      : createBranchGrant.status === 'granted'
+        ? createBranch({
+            grant: createBranchGrant.grant,
+            projectRef: selectedProject.ref,
+            gitBranch: data.enableProductionSync ? data.branchName : '',
+            branchName: data.branchName || 'main',
+            is_default: true,
+          })
+        : Promise.reject(
+            new Error('You need additional permissions to update the production branch')
+          )
 
     setIsConfirmingBranchChange(false)
 

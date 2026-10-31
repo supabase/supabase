@@ -378,6 +378,7 @@ export const getPostgresServiceFlowQuery = (logId: string): SafeLogSqlFragment =
       pgl_parsed.query_id as query_id,
       pgl_parsed.query as query,
       pgl_parsed.detail as detail,
+      pgl_parsed.hint as hint,
 
       -- Session details
       pgl_parsed.session_id as session_id,

@@ -47,6 +47,8 @@ docker compose down
 docker compose up -d
 ```
 
+If queue functions still return a schema error after you expose `pgmq_public`, see [PGRST106 schema must be one of the following](/kb/troubleshooting/pgrst106-the-schema-must-be-one-of-the-following-error-when-querying-an-exposed-schema).
+
 ## Stop exposing queues
 
 If you no longer want to expose the `pgmq_public` schema, you can remove it from your configuration.
