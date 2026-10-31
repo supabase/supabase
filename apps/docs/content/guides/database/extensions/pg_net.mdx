@@ -4,12 +4,6 @@ title: 'pg_net: Async Networking'
 description: 'pg_net: an async networking extension for Postgres.'
 ---
 
-<Admonition type="caution">
-
-The pg_net API is in beta. Functions signatures may change.
-
-</Admonition>
-
 [pg_net](https://github.com/supabase/pg_net/) enables Postgres to make asynchronous HTTP/HTTPS requests in SQL. It differs from the [`http`](/docs/guides/database/extensions/http) extension in that it is asynchronous by default. This makes it useful in blocking functions (like triggers).
 
 It eliminates the need for servers to continuously poll for database changes and instead allows the database to proactively notify external resources about significant events.
