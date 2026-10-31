@@ -2,9 +2,10 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invalidateRolesQuery } from './database-roles-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]
 
@@ -27,6 +28,7 @@ export async function updateDatabaseRole({
     connectionString,
     sql,
     queryKey: ['roles', 'update'],
+    grant: unguarded.migrating,
   })
   return result
 }

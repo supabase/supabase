@@ -62,6 +62,33 @@ export type Database = {
         }
         Relationships: []
       }
+      contribute_similar_thread_feedback: {
+        Row: {
+          id: string
+          parent_thread_id: string
+          similar_thread_key: string | null
+          reaction: string
+          feedback: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          parent_thread_id: string
+          similar_thread_key?: string | null
+          reaction: string
+          feedback?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          parent_thread_id?: string
+          similar_thread_key?: string | null
+          reaction?: string
+          feedback?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       contribute_threads: {
         Row: {
           author: string
@@ -92,6 +119,8 @@ export type Database = {
           title: string
           topic: string | null
           topic_embedding: string | null
+          similar_solved_threads: Json | null
+          ai_suggested_reply: string | null
           topic_id: string | null
           updated_at: string | null
         }

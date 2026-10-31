@@ -1,13 +1,13 @@
-import { ExternalLink, Eye, EyeOff, Loader } from 'lucide-react'
+import { useParams } from 'common'
+import { ExternalLinkIcon, EyeIcon, EyeOffIcon, LoaderIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Button, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const DecryptedReadOnlyInput = ({
   value,
@@ -58,7 +58,7 @@ export const DecryptedReadOnlyInput = ({
                     rel="noreferrer noopener"
                     href={`/project/${ref}/integrations/vault/secrets?search=${value}`}
                   >
-                    <ExternalLink
+                    <ExternalLinkIcon
                       size={14}
                       className="text-foreground-lighter hover:text-foreground transition"
                     />
@@ -82,20 +82,14 @@ export const DecryptedReadOnlyInput = ({
             secureEntry ? (
               isLoading ? (
                 <div className="flex items-center justify-center">
-                  <Button
-                    disabled
-                    type="default"
-                    className="w-7"
-                    icon={<Loader className="animate-spin" />}
-                  />
+                  <Button disabled className="w-7" icon={<LoaderIcon className="animate-spin" />} />
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
                   <Button
-                    type="default"
                     className="w-7"
                     loading={showHidden && isDecryptedValueLoading}
-                    icon={showHidden ? <Eye /> : <EyeOff />}
+                    icon={showHidden ? <EyeIcon /> : <EyeOffIcon />}
                     onClick={() => setShowHidden(!showHidden)}
                   />
                 </div>

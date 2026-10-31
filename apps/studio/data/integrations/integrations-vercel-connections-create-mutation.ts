@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import type { IntegrationConnectionsCreateVariables } from './integrations.types'
 import { integrationKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export async function createIntegrationVercelConnections({
   organizationIntegrationId,
@@ -67,11 +66,7 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
     },
     async onError(data, variables, context) {
       snapshot.setLoading(false)
-      if (onError === undefined) {
-        toast.error(`Failed to create connection: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
+      await onError?.(data, variables, context)
     },
     ...options,
   })

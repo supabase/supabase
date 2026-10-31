@@ -1,7 +1,27 @@
-import { useParams } from 'common'
-import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
+import { useFlag } from 'common'
+import { geoCentroid } from 'd3-geo'
+import sumBy from 'lodash/sumBy'
+import { ChevronRightIcon } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { Fragment, useRef, useState, type ReactNode } from 'react'
+import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
 import {
-  MAP_CHART_THEME,
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  WarningIcon,
+} from 'ui'
+import * as z from 'zod'
+
+import { queryParamsToObject, safeDecodeURIComponent } from '../Reports.utils'
+import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
+import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
+import {
   buildCountsByIso2,
   computeMarkerRadius,
   extractIso2FromFeatureProps,
@@ -10,57 +30,39 @@ import {
   isKnownCountryCode,
   isMicroCountry,
   iso2ToCountryName,
-} from 'components/interfaces/Reports/utils/geo'
+  MAP_CHART_THEME,
+} from '@/components/interfaces/Reports/utils/geo'
 import {
-  TextFormatter,
   jsonSyntaxHighlight,
-} from 'components/interfaces/Settings/Logs/LogsFormatters'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import BarChart from 'components/ui/Charts/BarChart'
-import { geoCentroid } from 'd3-geo'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { BASE_PATH } from 'lib/constants'
-import sumBy from 'lodash/sumBy'
-import { ChevronRight } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { Fragment, useRef, useState } from 'react'
-import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
-import type { ResponseError } from 'types'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Collapsible,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  WarningIcon,
-} from 'ui'
-import * as z from 'zod'
-
-import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import { queryParamsToObject } from '../Reports.utils'
+  TextFormatter,
+} from '@/components/interfaces/Settings/Logs/LogsFormatters'
+import Table from '@/components/to-be-cleaned/Table'
+import { AlertError } from '@/components/ui/AlertError'
+import BarChart from '@/components/ui/Charts/BarChart'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import type { ResponseError } from '@/types'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
     timestamp: string
     ingress: number
-    egress: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
+  const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
   const { data, error, isError } = useFillTimeseriesSorted({
     data: props.data,
     timestampKey: 'timestamp',
-    valueKey: ['ingress_mb', 'egress_mb'],
+    valueKey: 'ingress_mb',
     defaultValue: 0,
     startDate: props.params?.iso_timestamp_start,
     endDate: props.params?.iso_timestamp_end,
   })
 
   const totalIngress = sumBy(props.data, 'ingress_mb')
-  const totalEgress = sumBy(props.data, 'egress_mb')
 
   function determinePrecision(valueInMb: number) {
     return valueInMb < 0.001 ? 7 : totalIngress > 1 ? 2 : 4
@@ -73,17 +75,18 @@ export const NetworkTrafficRenderer = (
     return <AlertError subject="Failed to retrieve network traffic" error={error} />
   } else if (isError) {
     return (
-      <Alert_Shadcn_ variant="warning">
+      <Alert variant="warning">
         <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve network traffic</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        <AlertTitle>Failed to retrieve network traffic</AlertTitle>
+        <AlertDescription>{error?.message ?? 'Unknown error'}</AlertDescription>
+      </Alert>
     )
   }
 
   return (
     <div className="flex flex-col gap-12 w-full">
       <BarChart
+        chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
         size="small"
         title="Ingress"
         highlightedValue={sumBy(props.data, 'ingress_mb')}
@@ -96,18 +99,19 @@ export const NetworkTrafficRenderer = (
         displayDateInUtc
       />
 
-      <BarChart
-        size="small"
-        title="Egress"
-        highlightedValue={totalEgress}
-        format="MB"
-        valuePrecision={determinePrecision(totalEgress)}
-        className="w-full"
-        data={data}
-        yAxisKey="egress_mb"
-        xAxisKey="timestamp"
-        displayDateInUtc
-      />
+      {organization && (
+        <div className="flex items-center justify-between gap-4 rounded border border-default bg-surface-200 px-4 py-3">
+          <div>
+            <p className="text-sm text-foreground">Billable egress</p>
+            <p className="text-sm text-foreground-light">
+              View your organization&apos;s Usage page for billable egress.
+            </p>
+          </div>
+          <Button asChild variant="default" size="tiny">
+            <Link href={`/org/${organization.slug}/usage#egress`}>View Usage</Link>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
@@ -118,6 +122,7 @@ export const TotalRequestsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -137,16 +142,17 @@ export const TotalRequestsChartRenderer = (
     return <AlertError subject="Failed to retrieve total requests" error={error} />
   } else if (isError) {
     return (
-      <Alert_Shadcn_ variant="warning">
+      <Alert variant="warning">
         <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve total requests</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        <AlertTitle>Failed to retrieve total requests</AlertTitle>
+        <AlertDescription>{error?.message ?? 'Unknown error'}</AlertDescription>
+      </Alert>
     )
   }
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       highlightedValue={total}
@@ -171,18 +177,18 @@ export const TopApiRoutesRenderer = (
     avg?: number
   }>
 ) => {
-  const { ref: projectRef } = useParams()
   const [showMore, setShowMore] = useState(false)
 
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200 !border-x-0 !rounded-none'
-  const cellClasses = '!text-xs !py-2 !border-x-0 !rounded-none align-middle'
+  const headerClasses = 'text-xs! py-2! p-0 font-bold bg-surface-200! border-x-0! rounded-none!'
+  const cellClasses = 'text-xs! py-2! border-x-0! rounded-none! align-middle'
 
   if (props.data.length === 0) return null
 
   return (
-    <Collapsible>
+    <>
       <Table
         className="rounded-t-none"
+        containerClassName="overflow-x-auto"
         head={
           <>
             <Table.th className={headerClasses}>Request</Table.th>
@@ -208,11 +214,11 @@ export const TopApiRoutesRenderer = (
                       <Table.td className={[cellClasses].join(' ')}>
                         <RouteTdContent {...datum} />
                       </Table.td>
-                      <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                      <Table.td className={[cellClasses, 'text-right'].join(' ')}>
                         {datum.count}
                       </Table.td>
                       {props.data[0].avg !== undefined && (
-                        <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                        <Table.td className={[cellClasses, 'text-right'].join(' ')}>
                           {Number(datum.avg).toFixed(2)}ms
                         </Table.td>
                       )}
@@ -224,22 +230,20 @@ export const TopApiRoutesRenderer = (
           </>
         }
       />
-      <Collapsible.Trigger asChild>
-        <div className="flex flex-row justify-end w-full gap-2 p-1">
-          <Button
-            type="text"
-            onClick={() => setShowMore(!showMore)}
-            className={[
-              'transition',
-              showMore ? 'text-foreground' : 'text-foreground-lighter',
-              props.data.length <= 3 ? 'hidden' : '',
-            ].join(' ')}
-          >
-            {!showMore ? 'Show more' : 'Show less'}
-          </Button>
-        </div>
-      </Collapsible.Trigger>
-    </Collapsible>
+      <div className="flex flex-row justify-end w-full gap-2 p-1">
+        <Button
+          variant="text"
+          onClick={() => setShowMore(!showMore)}
+          className={[
+            'transition',
+            showMore ? 'text-foreground' : 'text-foreground-lighter',
+            props.data.length <= 3 ? 'hidden' : '',
+          ].join(' ')}
+        >
+          {!showMore ? 'Show more' : 'Show less'}
+        </Button>
+      </div>
+    </>
   )
 }
 
@@ -249,6 +253,7 @@ export const ErrorCountsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -269,16 +274,17 @@ export const ErrorCountsChartRenderer = (
     return <AlertError subject="Failed to retrieve request errors" error={error} />
   } else if (isError) {
     return (
-      <Alert_Shadcn_ variant="warning">
+      <Alert variant="warning">
         <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve request errors</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        <AlertTitle>Failed to retrieve request errors</AlertTitle>
+        <AlertDescription>{error?.message ?? 'Unknown error'}</AlertDescription>
+      </Alert>
     )
   }
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       className="w-full"
@@ -297,6 +303,7 @@ export const ResponseSpeedChartRenderer = (
     avg: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const transformedData = props.data.map((datum) => ({
     timestamp: datum.timestamp,
     avg: datum.avg,
@@ -320,16 +327,17 @@ export const ResponseSpeedChartRenderer = (
     return <AlertError subject="Failed to retrieve response speeds" error={error} />
   } else if (isError) {
     return (
-      <Alert_Shadcn_ variant="warning">
+      <Alert variant="warning">
         <WarningIcon />
-        <AlertTitle_Shadcn_>Failed to retrieve response speeds</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>{error?.message ?? 'Unknown error'}</AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        <AlertTitle>Failed to retrieve response speeds</AlertTitle>
+        <AlertDescription>{error?.message ?? 'Unknown error'}</AlertDescription>
+      </Alert>
     )
   }
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       highlightedValue={lastAvg}
       format="ms"
@@ -350,45 +358,39 @@ interface RouteTdContentProps {
   search: string
 }
 const RouteTdContent = (datum: RouteTdContentProps) => (
-  <Collapsible_Shadcn_>
-    <CollapsibleTrigger_Shadcn_ asChild>
+  <Collapsible>
+    <CollapsibleTrigger asChild>
       <div className="flex gap-2 items-center">
-        <Button asChild type="text" className=" !py-0 !p-1" title="Show more route details">
+        <Button asChild variant="text" className=" py-0! p-1!" title="Show more route details">
           <span>
-            <ChevronRight
+            <ChevronRightIcon
               size={14}
               className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
             />
           </span>
         </Button>
         <TextFormatter
-          className="w-10 h-4 text-center rounded bg-surface-300"
+          className="w-10 h-4 text-center rounded-sm bg-surface-300"
           value={datum.method}
         />
         {datum.status_code && (
-          <TextFormatter
-            className={`w-10 h-4 text-center rounded ${
-              datum.status_code >= 400
-                ? 'bg-orange-500'
-                : datum.status_code >= 300
-                  ? 'bg-yellow-500'
-                  : 'bg-green-500'
-            }`}
-            value={String(datum.status_code)}
+          <DataTableColumnStatusCode
+            value={datum.status_code}
+            level={String(Math.floor(datum.status_code / 100))}
           />
         )}
         <div className=" truncate max-w-sm lg:max-w-lg">
           <TextFormatter className="text-foreground-light" value={datum.path} />
           <TextFormatter
             className="max-w-sm text-foreground-lighter truncate "
-            value={decodeURIComponent(datum.search || '')}
+            value={safeDecodeURIComponent(datum.search || '')}
           />
         </div>
       </div>
-    </CollapsibleTrigger_Shadcn_>
-    <CollapsibleContent_Shadcn_ className="pt-2">
+    </CollapsibleTrigger>
+    <CollapsibleContent className="pt-2">
       {datum.search ? (
-        <pre className={`syntax-highlight overflow-auto rounded bg-surface-100 p-2 !text-xs`}>
+        <pre className="syntax-highlight overflow-auto whitespace-pre-wrap wrap-break-word rounded-sm bg-surface-100 p-2 text-xs! [&_span]:whitespace-pre-wrap!">
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{
@@ -399,8 +401,8 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
       ) : (
         <p className="text-xs text-foreground-lighter">No query parameters in this request</p>
       )}
-    </CollapsibleContent_Shadcn_>
-  </Collapsible_Shadcn_>
+    </CollapsibleContent>
+  </Collapsible>
 )
 export const RequestsByCountryMapRenderer = (
   props: ReportWidgetProps<{
@@ -453,10 +455,6 @@ export const RequestsByCountryMapRenderer = (
                   const iso2 = extractIso2FromFeatureProps(
                     (geo.properties || undefined) as Record<string, unknown> | undefined
                   )
-                  // Skip Antarctica entirely (causes hover issues)
-                  if ((title || '').toLowerCase() === 'antarctica') {
-                    return null
-                  }
                   const value = iso2 ? countsByIso2[iso2] || 0 : 0
                   const baseOpacity = getFillOpacity(value, max, theme)
                   const tooltipTitle = title
@@ -580,7 +578,7 @@ export const RequestsByCountryMapRenderer = (
                     if (code) present.add(code)
                   }
 
-                  const markers: JSX.Element[] = []
+                  const markers: ReactNode[] = []
                   for (const iso2 in countsByIso2) {
                     const count = countsByIso2[iso2]
                     if (count <= 0) continue
@@ -636,7 +634,7 @@ export const RequestsByCountryMapRenderer = (
       </ComposableMap>
       {hoverInfo.visible && (
         <div
-          className="pointer-events-none absolute z-10 rounded bg-surface-100 p-1.5 border border-surface-200 text-sm"
+          className="pointer-events-none absolute z-10 rounded-sm bg-surface-100 p-1.5 border border-surface-200 text-sm"
           style={{ left: hoverInfo.x, top: hoverInfo.y }}
         >
           <h3 className="text-foreground-lighter text-sm">{hoverInfo.title}</h3>

@@ -1,20 +1,22 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { awsAccountKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
 
 export type AWSAccountCreateVariables = {
   projectRef: string
   awsAccountId: string
   accountName?: string
+  databaseIdentifier?: string
 }
 
 export async function createAWSAccount({
   projectRef,
   awsAccountId,
   accountName,
+  databaseIdentifier,
 }: AWSAccountCreateVariables) {
   const { data, error } = await post(
     '/platform/projects/{ref}/privatelink/associations/aws-account',
@@ -25,6 +27,7 @@ export async function createAWSAccount({
       body: {
         aws_account_id: awsAccountId,
         account_name: accountName,
+        database_identifier: databaseIdentifier,
       },
     }
   )
@@ -46,16 +49,16 @@ export const useAWSAccountCreateMutation = ({
   const queryClient = useQueryClient()
   return useMutation<AWSAccountCreateData, ResponseError, AWSAccountCreateVariables>({
     mutationFn: (vars) => createAWSAccount(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: awsAccountKeys.list(projectRef) })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
-        toast.error(`Failed to create AWS account: ${data.message}`)
+        toast.error(`Failed to create connection: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

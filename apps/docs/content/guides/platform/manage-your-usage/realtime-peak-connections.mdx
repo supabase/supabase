@@ -7,6 +7,8 @@ title: 'Manage Realtime Peak Connections usage'
 
 Realtime Peak Connections are measured by tracking the highest number of concurrent connections for each project during the billing cycle. Regardless of fluctuations, only the peak count per project is used for billing, and the totals from all projects are summed. Only successful connections are counted, connection attempts are not included.
 
+Every WebSocket connection to Realtime counts, including connections from your own servers. In Edge Functions and other serverless runtimes, each worker that subscribes to a channel opens its own connection, so peak connections can far exceed your number of users. To send messages from a server without opening a connection, use the [Broadcast REST API](/docs/guides/realtime/broadcast#broadcast-using-the-rest-api).
+
 ### Example
 
 For simplicity, this example assumes a billing cycle of only three days.
@@ -24,7 +26,7 @@ Realtime Peak Connections are billed using Package pricing, with each package re
 
 ### Example
 
-For simplicity, let's assume a package size of 1,000 and a charge of <Price price="10" /> per package with no quota.
+For simplicity, assume a package size of 1,000 and a charge of <Price price="10" /> per package with no quota.
 
 | Peak Connections | Packages Billed | Costs                |
 | ---------------- | --------------- | -------------------- |
@@ -50,11 +52,11 @@ The organization's connections are within the quota, so no charges apply.
 | Line Item                 | Units           | Costs                    |
 | ------------------------- | --------------- | ------------------------ |
 | Pro Plan                  | 1               | <Price price="25" />     |
-| Compute Hours Micro       | 744 hours       | <Price price="10" />     |
+| Compute Hours Small       | 730 hours       | <Price price="15" />     |
 | Realtime Peak Connections | 350 connections | <Price price="0" />      |
-| **Subtotal**              |                 | **<Price price="35" />** |
+| **Subtotal**              |                 | **<Price price="40" />** |
 | Compute Credits           |                 | -<Price price="10" />    |
-| **Total**                 |                 | **<Price price="25" />** |
+| **Total**                 |                 | **<Price price="30" />** |
 
 ### Exceeding quota
 
@@ -63,11 +65,11 @@ The organization's connections exceed the quota by 1,200, incurring charges for 
 | Line Item                 | Units             | Costs                    |
 | ------------------------- | ----------------- | ------------------------ |
 | Pro Plan                  | 1                 | <Price price="25" />     |
-| Compute Hours Micro       | 744 hours         | <Price price="10" />     |
+| Compute Hours Small       | 730 hours         | <Price price="15" />     |
 | Realtime Peak Connections | 1,700 connections | <Price price="20" />     |
-| **Subtotal**              |                   | **<Price price="45" />** |
+| **Subtotal**              |                   | **<Price price="60" />** |
 | Compute Credits           |                   | -<Price price="10" />    |
-| **Total**                 |                   | **<Price price="35" />** |
+| **Total**                 |                   | **<Price price="50" />** |
 
 ## View usage
 
@@ -79,7 +81,9 @@ You can view Realtime Peak Connections usage on the [organization's usage page](
     light: '/docs/img/guides/platform/usage-navbar--light.png',
     dark: '/docs/img/guides/platform/usage-navbar--dark.png',
   }}
-  zoomable
+
+width={1546}
+height={208}
 />
 
 In the Realtime Peak Connections section, you can see the usage for the selected time period.
@@ -90,9 +94,13 @@ In the Realtime Peak Connections section, you can see the usage for the selected
     light: '/docs/img/guides/platform/usage-realtime-peak-connections--light.png',
     dark: '/docs/img/guides/platform/usage-realtime-peak-connections--dark.png',
   }}
-  zoomable
+
+width={2046}
+height={752}
 />
 
 ## Exceeding Quotas
 
 <$Partial path="billing/exceeding_usage_quotas.mdx" />
+
+If you hit the concurrent peak connections quota, see [Realtime concurrent peak connections quota](/kb/troubleshooting/realtime-concurrent-peak-connections-quota-jdDqcp).

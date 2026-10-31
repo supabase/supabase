@@ -1,24 +1,25 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { MouseEventHandler } from 'react'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const CreateBucketButton = ({
   onClick,
 }: {
-  onClick?: MouseEventHandler<HTMLButtonElement>
+  onClick: MouseEventHandler<HTMLButtonElement>
 }) => {
-  const { can: canCreateBuckets } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canCreateBuckets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_WRITE
+  )
 
   return (
     <ButtonTooltip
       block
       size="tiny"
-      type="primary"
+      variant="primary"
       className="w-fit"
-      icon={<Plus size={14} />}
+      icon={<PlusIcon size={14} />}
       disabled={!canCreateBuckets}
       onClick={onClick}
       tooltip={{

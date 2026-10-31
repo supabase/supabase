@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react'
-import Link from 'next/link'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 
@@ -28,7 +27,7 @@ describe('NavMenu Component', () => {
     render(
       <NavMenu>
         <NavMenuItem active={false}>
-          <Link href="/">Home</Link>
+          <span>Home</span>
         </NavMenuItem>
       </NavMenu>
     )

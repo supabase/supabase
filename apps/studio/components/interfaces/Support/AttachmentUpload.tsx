@@ -1,5 +1,7 @@
+// End of third-party imports
+
 import { compact } from 'lodash'
-import { Plus, X } from 'lucide-react'
+import { FileCodeIcon, PlusIcon, XIcon } from 'lucide-react'
 import {
   useCallback,
   useEffect,
@@ -10,15 +12,39 @@ import {
   type RefObject,
 } from 'react'
 import { toast } from 'sonner'
-// End of third-party imports
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { useGenerateAttachmentURLsMutation } from 'data/support/generate-attachment-urls-mutation'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { cn } from 'ui'
 import { createSupportStorageClient } from './support-storage-client'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useGenerateAttachmentURLsMutation } from '@/data/support/generate-attachment-urls-mutation'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
 
 const MAX_ATTACHMENTS = 5
+const ALLOWED_FILE_EXTENSIONS = ['.txt', '.log', '.png', '.jpg', '.jpeg', '.pdf', '.json', '.har']
+const IMAGE_FILE_EXTENSIONS = ['.png', '.jpg', '.jpeg']
+
+const getFileExtension = (filename: string) => {
+  const extension = filename.split('.').pop()
+  return extension ? `.${extension.toLowerCase()}` : ''
+}
+
+const isAllowedFile = (file: File) => ALLOWED_FILE_EXTENSIONS.includes(getFileExtension(file.name))
+
+const isImageFile = (file: File) => IMAGE_FILE_EXTENSIONS.includes(getFileExtension(file.name))
+
+const removeAttachmentButtonClassName = cn(
+  'absolute -top-1 -right-1 size-4 shrink-0 rounded-full bg-red-900 p-0 cursor-pointer',
+  'focus-ring'
+)
+
+const RemoveAttachmentIcon = () => (
+  <XIcon
+    aria-hidden="true"
+    strokeWidth={3}
+    className="pointer-events-none absolute left-1/2 top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 text-contrast"
+  />
+)
 
 const uploadAttachments = async ({ userId, files }: { userId: string; files: File[] }) => {
   const supportSupabaseClient = createSupportStorageClient()
@@ -26,7 +52,7 @@ const uploadAttachments = async ({ userId, files }: { userId: string; files: Fil
   const filesToUpload = Array.from(files)
   const uploadedFiles = await Promise.all(
     filesToUpload.map(async (file) => {
-      const suffix = file.type.split('/')[1]
+      const suffix = file.name.split('.').pop()
       const prefix = `${userId}/${uuidv4()}.${suffix}`
       const options = { cacheControl: '3600' }
 
@@ -61,10 +87,18 @@ export function useAttachmentUpload() {
       event.persist()
       const items = event.target.files || (event as any).dataTransfer.items
       const itemsCopied = Array.prototype.map.call(items, (item: any) => item) as File[]
-      const itemsToBeUploaded = itemsCopied.slice(0, MAX_ATTACHMENTS - uploadedFiles.length)
+
+      const allowedItems = itemsCopied.filter(isAllowedFile)
+      const rejectedItems = itemsCopied.filter((item) => !isAllowedFile(item))
+      const itemsToBeUploaded = allowedItems.slice(0, MAX_ATTACHMENTS - uploadedFiles.length)
 
       setUploadedFiles(uploadedFiles.concat(itemsToBeUploaded))
-      if (items.length + uploadedFiles.length > MAX_ATTACHMENTS) {
+      if (rejectedItems.length > 0) {
+        toast.error(
+          `Unsupported file type: ${rejectedItems.map((item) => item.name).join(', ')}. Supported formats: ${ALLOWED_FILE_EXTENSIONS.join(', ')}`
+        )
+      }
+      if (allowedItems.length + uploadedFiles.length > MAX_ATTACHMENTS) {
         toast(`Only up to ${MAX_ATTACHMENTS} attachments are allowed`)
       }
       event.target.value = ''
@@ -87,7 +121,13 @@ export function useAttachmentUpload() {
 
   useEffect(() => {
     if (!uploadedFiles) return
-    const objectUrls = uploadedFiles.map((file) => URL.createObjectURL(file))
+    const objectUrls = uploadedFiles.map((file) => {
+      if (isImageFile(file)) {
+        return URL.createObjectURL(file)
+      } else {
+        return file.name
+      }
+    })
     setUploadedDataUrls(objectUrls)
 
     return () => {
@@ -104,9 +144,14 @@ export function useAttachmentUpload() {
 
     if (uploadedFiles.length === 0) return
 
-    const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
-    const urls = await generateAttachmentURLs({ bucket: 'support-attachments', filenames })
-    return urls
+    try {
+      const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
+      const urls = await generateAttachmentURLs({ bucket: 'support-attachments', filenames })
+      return urls
+    } catch {
+      // Ignore attachments upload errors, images are additional context and support can ask for more if needed
+      return
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, uploadedFiles])
 
@@ -125,7 +170,7 @@ export function useAttachmentUpload() {
 }
 
 interface AttachmentUploadDisplayProps {
-  uploadButtonRef: RefObject<HTMLInputElement>
+  uploadButtonRef: RefObject<HTMLInputElement | null>
   isFull: boolean
   uploadedDataUrls: string[]
   addFile: () => void
@@ -158,10 +203,15 @@ export function AttachmentUploadDisplay({
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col gap-y-1">
-        <p className="text-sm text-foreground-light">Attachments</p>
+        <p className="text-sm text-foreground">Attachments</p>
         <p className="text-sm text-foreground-lighter">
-          Upload up to {MAX_ATTACHMENTS} screenshots that might be relevant to the issue that you're
-          facing
+          Optionally upload up to {MAX_ATTACHMENTS} relevant images or{' '}
+          <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
+            HAR files
+          </InlineLink>
+        </p>
+        <p className="text-sm text-foreground-lighter">
+          Supported formats: {ALLOWED_FILE_EXTENSIONS.join(', ')}
         </p>
       </div>
       <input
@@ -169,39 +219,76 @@ export function AttachmentUploadDisplay({
         type="file"
         ref={uploadButtonRef}
         className="hidden"
-        accept="image/png, image/jpeg"
+        accept={ALLOWED_FILE_EXTENSIONS.join(',')}
         onChange={handleFileUpload}
       />
       <div className="flex items-center gap-x-2">
-        {uploadedDataUrls.map((url, idx) => (
-          <div
-            key={url}
-            style={{ backgroundImage: `url("${url}")` }}
-            className="relative h-14 w-14 rounded bg-cover bg-center bg-no-repeat"
-          >
-            <button
-              type="button"
-              aria-label="Remove attachment"
-              className={cn(
-                'flex h-4 w-4 items-center justify-center rounded-full bg-red-900',
-                'absolute -top-1 -right-1 cursor-pointer'
-              )}
-              onClick={() => removeFileUpload(idx)}
-            >
-              <X aria-hidden="true" size={12} strokeWidth={2} />
-            </button>
-          </div>
-        ))}
+        {uploadedDataUrls.map((url, idx) => {
+          const isImage = url.startsWith('blob:')
+          if (!isImage) {
+            const filename = url
+            const label = getFileExtension(filename).slice(1).toUpperCase()
+            return (
+              <div
+                key={filename}
+                className="border relative h-14 w-14 rounded-sm flex items-center justify-center"
+              >
+                <Tooltip>
+                  <TooltipTrigger className="cursor-default" onClick={(e) => e.preventDefault()}>
+                    <div className="flex flex-col items-center justify-center gap-y-1">
+                      <FileCodeIcon className="text-foreground-light" size={16} />
+                      <p className="text-[10px] font-mono text-foreground-light tracking-wide leading-none">
+                        {label}
+                      </p>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">{filename}</TooltipContent>
+                </Tooltip>
+
+                <button
+                  type="button"
+                  tabIndex={0}
+                  aria-label="Remove attachment"
+                  className={removeAttachmentButtonClassName}
+                  onClick={() => removeFileUpload(idx)}
+                >
+                  <RemoveAttachmentIcon />
+                </button>
+              </div>
+            )
+          } else {
+            return (
+              <div
+                key={url}
+                style={{ backgroundImage: `url("${url}")` }}
+                className="relative h-14 w-14 rounded-sm bg-cover bg-center bg-no-repeat"
+              >
+                <button
+                  type="button"
+                  tabIndex={0}
+                  aria-label="Remove attachment"
+                  className={removeAttachmentButtonClassName}
+                  onClick={() => removeFileUpload(idx)}
+                >
+                  <RemoveAttachmentIcon />
+                </button>
+              </div>
+            )
+          }
+        })}
         {!isFull && (
           <button
             type="button"
+            tabIndex={0}
+            aria-label="Add attachment"
             className={cn(
-              'border border-stronger opacity-50 transition hover:opacity-100',
-              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded'
+              'border border-stronger opacity-50 hover:opacity-100',
+              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded-sm',
+              'focus-visible:opacity-100 focus-ring'
             )}
             onClick={addFile}
           >
-            <Plus strokeWidth={2} size={20} />
+            <PlusIcon strokeWidth={2} size={20} />
           </button>
         )}
       </div>

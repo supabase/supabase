@@ -1,10 +1,11 @@
 'use client'
 
 import * as Scrollytelling from '@bsmnt/scrollytelling'
-import { useRef, useState, useEffect } from 'react'
-import { motion, AnimatePresence, useInView } from 'framer-motion'
-import { Dots, Stripes } from '../Visuals'
+import { AnimatePresence, motion, useInView } from 'motion/react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
+
+import { Dots, Stripes } from '../Visuals'
 
 const titles = [
   'Thank you to our community.',
@@ -179,7 +180,7 @@ export const Intro = () => {
   return (
     <Scrollytelling.Root>
       <Scrollytelling.Pin childHeight={'100vh'} pinSpacerHeight={`${titles.length * 60}vh`} top={0}>
-        <section className="h-screen border-x border-b max-w-[60rem] mx-auto w-[95%] md:w-full">
+        <section className="h-screen border-x border-b max-w-240 mx-auto w-[95%] md:w-full">
           <div className="h-full grid place-items-center px-4 relative overflow-hidden">
             {/* Floating boxes */}
             <FloatingBoxes />

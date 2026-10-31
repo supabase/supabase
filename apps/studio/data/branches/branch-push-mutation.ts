@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { actionKeys } from '../actions/keys'
 import { branchKeys } from './keys'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BranchPushVariables = {
   branchRef: string
@@ -14,6 +15,7 @@ export async function pushBranch({ branchRef }: Pick<BranchPushVariables, 'branc
   const { data, error } = await post('/v1/branches/{branch_id_or_ref}/push', {
     params: { path: { branch_id_or_ref: branchRef } },
     body: {},
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -36,6 +38,7 @@ export const useBranchPushMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
+      await queryClient.invalidateQueries({ queryKey: actionKeys.list(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

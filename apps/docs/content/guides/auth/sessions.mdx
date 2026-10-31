@@ -69,7 +69,7 @@ Otherwise sessions are progressively deleted from the database 24 hours after th
 
 ### What are recommended values for access token (JWT) expiration?
 
-Most applications should use the default expiration time of 1 hour. This can be customized in your project's [Auth settings](/dashboard/project/_/settings/jwt) in the Advanced Settings section.
+Most applications should use the default expiration time of 1 hour. You can customize this value in the [Auth settings > Sessions](/dashboard/project/_/auth/sessions).
 
 Setting a value over 1 hour is generally discouraged for security reasons, but it may make sense in certain situations.
 
@@ -87,7 +87,7 @@ As your users continue using your app, refresh tokens are being constantly excha
 The general rule is that a refresh token can only be used once. However, strictly enforcing this can cause certain issues to arise. There are two exceptions to this design to prevent the early and unexpected termination of user's sessions:
 
 - A refresh token can be used more than once within a defined reuse interval. By default this is 10 seconds and we do not recommend changing this value. This exception is granted for legitimate situations such as:
-  - Using server-side rendering where the same refresh token needs to be reused on the server and soon after on the client
+  - Using [server-side rendering](/docs/guides/auth/server-side) where the same refresh token needs to be reused on the server and soon after on the client
   - To allow some leeway for bugs or issues with serializing access to the refresh token request
 - If the parent of the currently active refresh token for the user's session is being used, the active token will be returned. This exception solves an important and often common situation:
   - All clients such as browsers, mobile or desktop apps, and even some servers are inherently unreliable due to network issues. A request does not indicate that they received a response or even processed the response they received.
@@ -115,7 +115,7 @@ It's better for cost optimization and scaling as well, as the authentication sys
 
 Most applications rarely need such strong guarantees. Consider adjusting the JWT expiry time to an acceptable value. If this is still necessary, you should try to use this validation logic only for the most sensitive actions within your application.
 
-When a user signs out, the sessions affected by the logout are removed from the database entirely. You can check that the `session_id` claim in the JWT corresponds to a row in the `auth.sessions` table. If such a row does not exist, it means that the user has logged out.
+When a user signs out, the sessions affected by the sign-out are removed from the database entirely. You can check that the `session_id` claim in the JWT corresponds to a row in the `auth.sessions` table. If such a row does not exist, it means that the user has signed out.
 
 Note that sessions are not proactively terminated when their maximum lifetime (time-box) or inactivity timeout are reached. These sessions are cleaned up progressively 24 hours after reaching that status. This allows you to tweak the values or roll back changes without causing unintended user friction.
 

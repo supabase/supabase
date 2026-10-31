@@ -1,8 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Key } from 'lucide-react'
+import { KeyIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { Badge, copyToClipboard } from 'ui'
@@ -18,6 +14,10 @@ import {
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const API_KEYS_PAGE_NAME = 'API Keys'
 
@@ -29,19 +29,25 @@ export function useApiKeysCommands() {
   const { data: project } = useSelectedProjectQuery()
   const ref = project?.ref || '_'
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
-    '*'
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
+  const { isHighAvailability } = useHighAvailability()
 
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef: project?.ref, reveal: true },
     { enabled: canReadAPIKeys }
   )
   const commands = useMemo(() => {
-    const { anonKey, serviceKey, publishableKey, allSecretKeys } = canReadAPIKeys
-      ? getKeys(apiKeys)
-      : {}
+    const {
+      anonKey: legacyAnonKey,
+      serviceKey: legacyServiceKey,
+      publishableKey,
+      allSecretKeys,
+    } = canReadAPIKeys ? (apiKeysData ?? {}) : {}
+
+    const anonKey = isHighAvailability ? undefined : legacyAnonKey
+    const serviceKey = isHighAvailability ? undefined : legacyServiceKey
 
     return [
       project &&
@@ -61,7 +67,7 @@ export function useApiKeysCommands() {
               <Badge>{publishableKey.type}</Badge>
             </span>
           ),
-          icon: () => <Key />,
+          icon: () => <KeyIcon />,
         },
       ...(project && allSecretKeys
         ? allSecretKeys.map((key) => ({
@@ -80,7 +86,7 @@ export function useApiKeysCommands() {
                 <Badge>{key.type}</Badge>
               </span>
             ),
-            icon: () => <Key />,
+            icon: () => <KeyIcon />,
           }))
         : []),
       project &&
@@ -101,7 +107,7 @@ export function useApiKeysCommands() {
               <Badge>{anonKey.type}</Badge>
             </span>
           ),
-          icon: () => <Key />,
+          icon: () => <KeyIcon />,
         },
       project &&
         serviceKey && {
@@ -121,16 +127,16 @@ export function useApiKeysCommands() {
               <Badge>{serviceKey.type}</Badge>
             </span>
           ),
-          icon: () => <Key />,
+          icon: () => <KeyIcon />,
         },
       !(anonKey || serviceKey) && {
         id: 'api-keys-project-settings',
         name: 'See API keys in Project Settings',
         route: `/project/${ref}/settings/api-keys`,
-        icon: () => <Key />,
+        icon: () => <KeyIcon />,
       },
     ].filter(Boolean) as ICommand[]
-  }, [apiKeys, canReadAPIKeys, project, ref, resetCommandMenu, setIsOpen])
+  }, [canReadAPIKeys, apiKeysData, isHighAvailability, project, ref, resetCommandMenu, setIsOpen])
 
   useRegisterPage(
     API_KEYS_PAGE_NAME,
@@ -154,7 +160,7 @@ export function useApiKeysCommands() {
         id: 'api-keys',
         name: 'Get API keys...',
         action: () => setPage(API_KEYS_PAGE_NAME),
-        icon: () => <Key />,
+        icon: () => <KeyIcon />,
       },
     ],
     {
@@ -162,5 +168,18 @@ export function useApiKeysCommands() {
       orderSection: orderCommandSectionsByPriority,
       sectionMeta: { priority: 3 },
     }
+  )
+
+  useRegisterCommands(
+    COMMAND_MENU_SECTIONS.NAVIGATE,
+    [
+      {
+        id: 'nav-api-keys',
+        name: 'Go to API Keys',
+        route: `/project/${ref}/settings/api-keys`,
+        icon: () => <KeyIcon />,
+      },
+    ],
+    { enabled: !!project }
   )
 }

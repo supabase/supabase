@@ -108,7 +108,7 @@ If we can’t find the image in storage, then we kick off the ticket generation 
 
 Each image includes the user’s GitHub details. We use [`supabase-js`](https://supabase.com/docs/reference/javascript/installing) for authentication: users log in with their GitHub account and we store their username in a table in Postgres.
 
-Since this table includes email addresses, we secure it using [RLS](https://supabase.com/docs/guides/auth/row-level-security) to ensure each user can only view their own data. At the same time, we want these tickets to be publicly shareable, and that’s where [Postgres Views](https://supabase.com/blog/postgresql-views) come in handy.
+Since this table includes email addresses, we secure it using [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security) to ensure each user can only view their own data. At the same time, we want these tickets to be publicly shareable, and that’s where [Postgres Views](https://supabase.com/blog/postgresql-views) come in handy.
 
 By creating a view, we can selectively publicize parts of our table and also compute some additional values on the fly:
 
@@ -172,7 +172,7 @@ With our public view in place, we can now easily retrieve the relevant ticket de
 
 The ticket image itself is just a layering of some background images, your GitHub profile picture, and some text elements, et voila you’ve got yourself a unique ticket image!
 
-<div class="grid grid-cols-2 gap-x-5 md:gap-x-8 [&>figure]:!m-0">
+<div class="grid grid-cols-2 gap-x-5 md:gap-x-8 [&>figure]:m-0!">
 <figure>
   ![Main background image](/images/blog/launch-week-7/designing-with-ai-midjourney/ticket-backdrop.png)
   <figcaption>
@@ -264,9 +264,9 @@ Interested to know how this fits within your Next.js application? Find the code 
 
 ## Displaying the images
 
-We have some images, so how can we now display them somewhere? [@Francesco Sansalvadore](https://twitter.com/frnk_snslvdr) saw one of our team members trying to “swipe” on the tickets slider component on the [launch week page](https://supabase.com/launch-week/7/tickets) and he thought, why not feature all the fantastic people who generated tickets on a single page?
+We have some images, so how can we now display them somewhere? [@Francesco Sansalvadore](https://twitter.com/frnk_snslvdr) saw one of our team members trying to “swipe” on the tickets slider component on the [launch week page](https://supabase.com/launch-week/7) and he thought, why not feature all the fantastic people who generated tickets on a single page?
 
-We built a [ticket wall](https://supabase.com/launch-week/7/tickets) that you can scroll endlessly. We approached it with an infinite scroll technique, lazy-loading a few tickets at a time.
+We built a [ticket wall](https://supabase.com/launch-week/7) that you can scroll endlessly. We approached it with an infinite scroll technique, lazy-loading a few tickets at a time.
 
 ![launch week 7 ticket wall](/images/blog/launch-week-7/designing-with-ai-midjourney/launch-week-7-ticket-wall.png)
 

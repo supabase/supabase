@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { BranchesData } from './branches-query'
 import { branchKeys } from './keys'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BranchDeleteVariables = {
   branchRef: string
@@ -14,6 +14,7 @@ export type BranchDeleteVariables = {
 export async function deleteBranch({ branchRef }: Pick<BranchDeleteVariables, 'branchRef'>) {
   const { data, error } = await del('/v1/branches/{branch_id_or_ref}', {
     params: { path: { branch_id_or_ref: branchRef } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

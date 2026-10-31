@@ -1,10 +1,10 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { Blocks, ExternalLink } from 'lucide-react'
+import { BlocksIcon, ExternalLinkIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { detectBrowser } from 'lib/helpers'
 import { Button } from 'ui'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { detectBrowser } from '@/lib/helpers'
 
 interface InsertBeforeRemoveChildErrorHandlerProps {
   message: string
@@ -29,7 +29,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
       <div className="flex flex-col gap-y-4 text-left py-2 w-full">
         <div className="flex items-center gap-x-3">
           <p className="text-lg font-bold">Sorry! A browser extension may have caused an error.</p>
-          <Blocks className="text-foreground-lighter" />
+          <BlocksIcon className="text-foreground-lighter" />
         </div>
 
         <div className="flex flex-col gap-y-2">
@@ -54,7 +54,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
       </div>
 
       <div className="flex gap-x-2 justify-center items-center">
-        <Button asChild type="default" icon={<ExternalLink />}>
+        <Button asChild icon={<ExternalLinkIcon />}>
           <a
             target="_blank"
             rel="noreferrer"
@@ -69,7 +69,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
             More information
           </a>
         </Button>
-        <Button type="outline" onClick={() => router.reload()}>
+        <Button variant="outline" onClick={() => router.reload()}>
           Refresh page
         </Button>
       </div>
@@ -79,7 +79,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
           category: SupportCategories.DASHBOARD_BUG,
           subject: `Client error: Failed to execute '${isRemoveChildError ? 'removeChild' : 'insertBefore'}' on 'Node'`,
           sid: sentryIssueId,
-          error: urlMessage,
+          errorMessage: urlMessage,
         }}
       >
         Still stuck?

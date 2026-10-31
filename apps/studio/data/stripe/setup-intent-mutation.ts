@@ -1,15 +1,15 @@
 import { useMutation } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type SetupIntentVariables = {
   hcaptchaToken: string
 }
 
-export type SetupIntentResponse = components['schemas']['SetupIntentResponse']
+export type SetupIntentResponse = components['schemas']['SetupIntentResponse_Output']
 
 export async function setupIntent({ hcaptchaToken }: SetupIntentVariables) {
   const { data, error } = await post('/platform/stripe/setup-intent', {

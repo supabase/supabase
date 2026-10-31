@@ -1,7 +1,6 @@
-import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
+import { ExternalLinkIcon, Maximize2Icon, Minimize2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { forwardRef, ReactNode, useState } from 'react'
-
 import { Button } from 'ui'
 
 interface InformationBoxProps {
@@ -48,7 +47,7 @@ const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
           <div className="flex items-center justify-between">
             <div className="flex w-full space-x-3 items-center">
               {icon && <span className="text-foreground-lighter">{icon}</span>}
-              <div className="flex-grow">
+              <div className="grow">
                 <h5 className="text-foreground">{title}</h5>
               </div>
             </div>
@@ -58,9 +57,9 @@ const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? (
-                  <Minimize2 size={14} strokeWidth={1.5} />
+                  <Minimize2Icon size={14} strokeWidth={1.5} />
                 ) : (
-                  <Maximize2 size={14} strokeWidth={1.5} />
+                  <Maximize2Icon size={14} strokeWidth={1.5} />
                 )}
               </div>
             ) : null}
@@ -76,7 +75,7 @@ const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
 
               {url && (
                 <div>
-                  <Button asChild type="default" icon={<ExternalLink />}>
+                  <Button asChild icon={<ExternalLinkIcon />}>
                     <Link href={url} target="_blank" rel="noreferrer">
                       {urlLabel}
                     </Link>

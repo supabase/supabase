@@ -1,16 +1,17 @@
 'use client'
 
-import { useMemo } from 'react'
-import { EdgeFunctions } from 'icons'
-import { Loader2 } from 'lucide-react'
 import { useParams } from 'common'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
+import { EdgeFunctions } from 'icons'
+import { Loader2Icon } from 'lucide-react'
+import { useMemo } from 'react'
+
 import {
-  SkeletonResults,
   EmptyState,
   ResultsList,
+  SkeletonResults,
   type SearchResult,
 } from './ContextSearchResults.shared'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 
 interface EdgeFunctionSearchResultsProps {
   query: string
@@ -67,7 +68,7 @@ export function EdgeFunctionSearchResults({ query }: EdgeFunctionSearchResultsPr
       <div className="flex items-center gap-x-2">
         {isLoadingFunctions ? (
           <span className="flex items-center gap-2">
-            <Loader2 size={14} className="animate-spin" /> Loading...
+            <Loader2Icon size={14} className="animate-spin" /> Loading...
           </span>
         ) : (
           <span>

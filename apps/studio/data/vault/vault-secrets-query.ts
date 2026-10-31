@@ -1,14 +1,16 @@
+import { safeSql } from '@supabase/pg-meta'
 import { Query } from '@supabase/pg-meta/src/query'
 import { useQuery } from '@tanstack/react-query'
 
-import type { UseCustomQueryOptions, VaultSecret } from 'types'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomQueryOptions, VaultSecret } from '@/types'
 
 export const getVaultSecretsSql = () => {
   const sql = new Query()
     .from('secrets', 'vault')
-    .select('id,name,description,secret,created_at,updated_at')
+    .select(safeSql`id,key_id,name,description,secret,created_at,updated_at`)
     .toSql()
 
   return sql
@@ -26,7 +28,7 @@ export async function getVaultSecrets(
   const sql = getVaultSecretsSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['vault-secrets'] },
+    { projectRef, connectionString, sql, queryKey: ['vault-secrets'], grant: unguarded.migrating },
     signal
   )
 
@@ -34,7 +36,7 @@ export async function getVaultSecrets(
 }
 
 export type VaultSecretsData = Awaited<ReturnType<typeof getVaultSecrets>>
-export type VaultSecretsError = ExecuteSqlError
+export type VaultSecretsError = ResponseError
 
 export const useVaultSecretsQuery = <TData = VaultSecretsData>(
   { projectRef, connectionString }: VaultSecretsVariables,

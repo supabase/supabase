@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { keys } from './keys'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DeleteThirdPartyAuthIntegrationVariables = {
   projectRef: string
@@ -21,6 +21,7 @@ export async function deleteThirdPartyIntegration({
         tpa_id: tpaId,
       },
     },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data

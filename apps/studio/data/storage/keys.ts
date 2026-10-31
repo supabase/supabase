@@ -32,6 +32,80 @@ export const storageKeys = {
   vectorBucketsIndexes: (projectRef: string | undefined, vectorBucketName: string | undefined) =>
     ['projects', projectRef, 'vector-buckets', vectorBucketName, 'indexes'] as const,
   archive: (projectRef: string | undefined) => ['projects', projectRef, 'archive'] as const,
+  urlSigningKeys: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'storage-url-signing-keys'] as const,
+  publicBucketsWithSelectPolicies: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'public-buckets-with-select-policies', bucketId] as const,
+  objects: (
+    projectRef: string | undefined,
+    bucketId: string | undefined,
+    path: string,
+    params: {
+      limit?: number
+      search?: string
+      sortColumn?: string
+      sortOrder?: string
+    } = {}
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'buckets',
+      bucketId,
+      'objects',
+      ...(path ? [path] : []),
+      ...(params ? [params] : []),
+    ] as const,
+  folders: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'buckets', bucketId, 'folders'] as const,
+  bucketLifecycle: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'buckets', bucketId, 'lifecycle'] as const,
+  /** The policy is part of the key: the API derives each version's expiry from it. */
+  objectVersions: (
+    projectRef: string | undefined,
+    bucketId: string | undefined,
+    objectName: string | undefined,
+    lifecyclePolicy?: { expiryDays: number | null; maxVersions: number | null }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'buckets',
+      bucketId,
+      'object-versions',
+      objectName,
+      ...(lifecyclePolicy ? [lifecyclePolicy] : []),
+    ] as const,
+  /** Omit `versionId` for a prefix that matches every version's URL for one object. */
+  fileUrl: ({
+    projectRef,
+    isBucketPublic,
+    bucketId,
+    path,
+    versionId,
+  }: {
+    projectRef?: string
+    isBucketPublic?: boolean
+    bucketId?: string
+    path: string
+    versionId?: string
+  }) =>
+    [
+      projectRef,
+      'buckets',
+      isBucketPublic,
+      bucketId,
+      'file',
+      path,
+      ...(versionId === undefined ? [] : [versionId]),
+    ] as const,
+  archivedObjects: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'buckets', bucketId, 'archived-objects'] as const,
+  archivedObjectNames: (
+    projectRef: string | undefined,
+    bucketId: string | undefined,
+    path: string
+  ) => ['projects', projectRef, 'buckets', bucketId, 'archived-object-names', path] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({

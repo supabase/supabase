@@ -1,17 +1,17 @@
+import { getUpdateFDWSql } from '@supabase/pg-meta'
+import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { foreignTableKeys } from 'data/foreign-tables/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { wrapWithTransaction } from 'data/sql/utils/transaction'
-import { vaultSecretsKeys } from 'data/vault/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { getCreateFDWSql } from './fdw-create-mutation'
-import { getDeleteFDWSql } from './fdw-delete-mutation'
 import { FDW } from './fdws-query'
 import { fdwKeys } from './keys'
+import type { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
+import { foreignTableKeys } from '@/data/foreign-tables/keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { vaultSecretsKeys } from '@/data/vault/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type FDWUpdateVariables = {
   projectRef?: string
@@ -25,31 +25,6 @@ export type FDWUpdateVariables = {
   skipInvalidation?: boolean
 }
 
-export const getUpdateFDWSql = ({
-  wrapper,
-  wrapperMeta,
-  formState,
-  tables,
-}: Pick<FDWUpdateVariables, 'wrapper' | 'wrapperMeta' | 'formState' | 'tables'>) => {
-  const deleteWrapperSql = getDeleteFDWSql({ wrapper, wrapperMeta })
-  const createWrapperSql = getCreateFDWSql({
-    wrapperMeta,
-    formState,
-    tables,
-    mode: 'tables',
-    sourceSchema: '',
-    targetSchema: '',
-  })
-
-  const sql = /* SQL */ `
-    ${deleteWrapperSql}
-
-    ${createWrapperSql}
-  `
-
-  return sql
-}
-
 export async function updateFDW({
   projectRef,
   connectionString,
@@ -59,7 +34,13 @@ export async function updateFDW({
   tables,
 }: FDWUpdateVariables) {
   const sql = wrapWithTransaction(getUpdateFDWSql({ wrapper, wrapperMeta, formState, tables }))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['update-fdw'],
+    grant: unguarded.migrating,
+  })
   return result
 }
 
@@ -94,7 +75,7 @@ export const useFDWUpdateMutation = ({
     async onError(data, variables, context) {
       if (onError === undefined) {
         toast.error(
-          `Failed to update ${variables.wrapper.name} foreign data wrapper: ${data.message}`
+          `Failed to update ${variables.wrapperMeta.label} foreign data wrapper: ${data.message}`
         )
       } else {
         onError(data, variables, context)

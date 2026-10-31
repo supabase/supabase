@@ -1,7 +1,10 @@
-import { fetchHandler } from 'data/fetchers'
-import type { Integration } from 'data/integrations/integrations.types'
-import { ResponseError, type SupaResponse } from 'types'
+import { getCreateMigrationsTableSQL, getInsertMigrationSQL } from '@supabase/pg-meta'
+
 import { isResponseOk } from './api/apiWrapper'
+import { fetchHandler } from '@/data/fetchers'
+import type { Integration } from '@/data/integrations/integrations.types'
+import { BASE_PATH } from '@/lib/constants'
+import { ResponseError, type SupaResponse } from '@/types'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
   const response = await fetchHandler(url)
@@ -76,13 +79,10 @@ export async function getInitialMigrationSQLFromGitHubRepo(
   const migrations = migrationFileResponses.filter((response) => isResponseOk(response)).join(';')
   const seed = isResponseOk(seedFileResponse) ? seedFileResponse : ''
 
-  const migrationsTableSql = /* SQL */ `
-    create schema if not exists supabase_migrations;
-    create table if not exists supabase_migrations.schema_migrations (
-      version text not null primary key,
-      statements text[],
-      name text
-    );
+  const createMigrationsTableSql = getCreateMigrationsTableSQL()
+
+  const migrationsTableSql = `
+    ${createMigrationsTableSql}
     ${sortedFiles
       .map((file, i) => {
         const migration = migrationFileResponses[i]
@@ -95,12 +95,7 @@ export async function getInitialMigrationSQLFromGitHubRepo(
             .map((statement) => statement.trim())
             .filter(Boolean)
         )
-
-        return /* SQL */ `
-        insert into supabase_migrations.schema_migrations (version, statements, name)
-        select '${version}', array_agg(jsonb_statements)::text[], '${file.name}'
-        from jsonb_array_elements_text($statements$${statements}$statements$::jsonb) as jsonb_statements;
-      `
+        return getInsertMigrationSQL({ name: file.name, version, statements })
       })
       .join('')}
   `
@@ -137,4 +132,54 @@ function getGitHubConfigurationUrl(integration: GitHubIntegration) {
       ? `organizations/${integration.metadata?.account.name}/`
       : ''
   }settings/installations/${integration.metadata?.installation_id}`
+}
+
+export const FRAMEWORK_ICON_SLUGS: ReadonlySet<string> = new Set([
+  'angular',
+  'astro',
+  'blitzjs',
+  'brunch',
+  'create-react-app',
+  'docusaurus',
+  'docusaurus-2',
+  'dojo',
+  'eleventy',
+  'ember',
+  'gatsby',
+  'gridsome',
+  'hexo',
+  'hugo',
+  'hydrogen',
+  'ionic-angular',
+  'ionic-react',
+  'jekyll',
+  'middleman',
+  'nextjs',
+  'nuxtjs',
+  'parcel',
+  'polymer',
+  'preact',
+  'redwoodjs',
+  'remix',
+  'saber',
+  'sanity',
+  'sapper',
+  'scully',
+  'solidstart',
+  'stencil',
+  'storybook',
+  'svelte',
+  'sveltekit',
+  'sveltekit-1',
+  'umijs',
+  'vite',
+  'vitepress',
+  'vue',
+  'vuepress',
+  'zola',
+])
+
+export function getFrameworkIconUrl(framework?: string | null): string | undefined {
+  if (!framework || !FRAMEWORK_ICON_SLUGS.has(framework)) return undefined
+  return `${BASE_PATH}/img/icons/frameworks/${framework}.svg`
 }

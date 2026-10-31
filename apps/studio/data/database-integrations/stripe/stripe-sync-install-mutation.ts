@@ -1,16 +1,17 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { getAccessToken } from 'common'
 import { toast } from 'sonner'
 
-import { getAccessToken } from 'common'
-import { databaseKeys } from 'data/database/keys'
-import { BASE_PATH } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
-import type { ResponseError } from 'types'
 import { stripeSyncKeys } from './keys'
+import { databaseKeys } from '@/data/database/keys'
+import { BASE_PATH } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import type { ResponseError } from '@/types'
 
 export type StripeSyncInstallVariables = {
   projectRef: string
   stripeSecretKey: string
+  startTime: number
 }
 
 export type StripeSyncInstallResponse = {
@@ -21,6 +22,7 @@ export type StripeSyncInstallResponse = {
 export async function installStripeSync({
   projectRef,
   stripeSecretKey,
+  startTime,
 }: StripeSyncInstallVariables): Promise<StripeSyncInstallResponse> {
   const accessToken = await getAccessToken()
 
@@ -33,6 +35,7 @@ export async function installStripeSync({
     body: JSON.stringify({
       projectRef,
       stripeSecretKey,
+      startTime,
     }),
   })
 
@@ -60,11 +63,12 @@ export const useStripeSyncInstallMutation = ({
 
   return useMutation<StripeSyncInstallData, ResponseError, StripeSyncInstallVariables>({
     mutationFn: (vars) => installStripeSync(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
 
       track('integration_install_submitted', {
         integrationName: 'stripe_sync_engine',
+        method: 'template',
       })
 
       // Invalidate schemas query to refresh installation status
@@ -77,13 +81,13 @@ export const useStripeSyncInstallMutation = ({
         queryKey: stripeSyncKeys.all,
       })
 
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to install Stripe Sync: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

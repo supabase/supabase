@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import { Button } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 export default function EmptyStatePresentationalIcon() {
   return (
@@ -8,7 +8,7 @@ export default function EmptyStatePresentationalIcon() {
       title="Create an auth hook"
       description="Use Postgres functions or HTTP endpoints to customize your authentication flow."
     >
-      <Button size="tiny" type="primary" icon={<Plus size={14} />}>
+      <Button size="tiny" variant="primary" icon={<Plus size={14} />}>
         Add hook
       </Button>
     </EmptyStatePresentational>

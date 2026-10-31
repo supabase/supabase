@@ -1,24 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { MoreVertical, Redo2, Trash } from 'lucide-react'
+import { useIsLoggedIn, useParams } from 'common'
+import { MoreVerticalIcon, Redo2Icon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
-import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
-import {
-  useOrganizationMembersQuery,
-  type OrganizationMember,
-} from 'data/organizations/organization-members-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProfile } from 'lib/profile'
 import {
   Button,
   DropdownMenu,
@@ -27,9 +10,18 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { LeaveTeamButton } from './LeaveTeamButton'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
-import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
+import { canManageRole, getOrgRole } from './TeamSettings.utils'
+import { useTeamSettingsData } from './TeamSettingsDataContext'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
+import { useOrganizationDeleteInvitationMutation } from '@/data/organization-members/organization-invitation-delete-mutation'
+import { useOrganizationMemberDeleteMutation } from '@/data/organizations/organization-member-delete-mutation'
+import type { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfile } from '@/lib/profile'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -38,14 +30,16 @@ interface MemberActionsProps {
 export const MemberActions = ({ member }: MemberActionsProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const [showAccessModal, setShowAccessModal] = useState(false)
+  const isLoggedIn = useIsLoggedIn()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
-
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { data: permissions } = usePermissionsQuery()
-  const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const { data: members } = useOrganizationMembersQuery({ slug })
+  const {
+    members,
+    roles: allRoles,
+    selectedOrganization,
+    organizationMembersDeletionEnabled,
+    onManageAccess,
+    permissionsV2,
+  } = useTeamSettingsData()
 
   const memberIsUser = member.gotrue_id == profile?.gotrue_id
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -57,28 +51,30 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     (userMemberData?.role_ids ?? []).length === 1 &&
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
-  const { rolesRemovable } = useGetRolesManagementPermissions(
-    selectedOrganization?.slug,
-    orgScopedRoles.concat(projectScopedRoles),
-    permissions ?? []
-  )
+  // Member management requires an org-level role: project-scoped users have a null
+  // org role in the v2 response and fail every canManageRole check below.
+  const orgRole = getOrgRole(permissionsV2, selectedOrganization?.slug)
+
+  // Name of the role a target member holds; project-scoped roles resolve via their base role.
+  const roleNameFor = (id: number): string | undefined => {
+    const orgScopedRole = orgScopedRoles.find((r) => r.id === id)
+    if (orgScopedRole) return orgScopedRole.name
+    const projectScopedRole = projectScopedRoles.find((r) => r.id === id)
+    return projectScopedRole
+      ? orgScopedRoles.find((r) => r.id === projectScopedRole.base_role_id)?.name
+      : undefined
+  }
 
   const roleId = member.role_ids?.[0] ?? -1
-  const canRemoveMember = member.role_ids.every((id) => rolesRemovable.includes(id))
-
-  const { can: canCreateUserInvites } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_invites',
-    { resource: { role_id: roleId } }
+  const canRemoveMember = (member.role_ids ?? []).every((id) =>
+    canManageRole(orgRole, roleNameFor(id))
   )
-  const canResendInvite = canCreateUserInvites && hasOrgRole
 
-  const { can: canDeleteUserInvites } = useAsyncCheckPermissions(
-    PermissionAction.DELETE,
-    'user_invites',
-    { resource: { role_id: roleId } }
-  )
-  const canRevokeInvite = canDeleteUserInvites && hasOrgRole
+  const canManageTargetRole =
+    !IS_PLATFORM || (isLoggedIn && !!permissionsV2 && canManageRole(orgRole, roleNameFor(roleId)))
+
+  const canResendInvite = canManageTargetRole && hasOrgRole
+  const canRevokeInvite = canManageTargetRole && hasOrgRole
 
   const { mutate: deleteOrganizationMember, isPending: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
@@ -124,16 +120,16 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
           const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
 
-          if (projectScopedRole !== undefined) {
+          if (projectScopedRole !== undefined && projectScopedRole.base_role_id) {
             const projects = projectScopedRole.projects.map(({ ref }) => ref)
             inviteMember({
               slug,
-              email: member.primary_email,
+              emails: [member.primary_email],
               roleId: projectScopedRole.base_role_id,
               projects,
             })
           } else {
-            inviteMember({ slug, email: member.primary_email, roleId })
+            inviteMember({ slug, emails: [member.primary_email], roleId })
           }
         },
       }
@@ -147,7 +143,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
     deleteInvitation(
       { slug, id: invitedId },
-      { onSuccess: () => toast.success('Successfully revoked the invitation.') }
+      { onSuccess: () => toast.success('Successfully canceled the invitation') }
     )
   }
 
@@ -163,14 +159,13 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     <>
       <div className="flex items-center justify-end gap-x-2">
         <ButtonTooltip
-          type="default"
           disabled={isPendingInviteAcceptance || !canRemoveMember}
-          onClick={() => setShowAccessModal(true)}
+          onClick={() => onManageAccess(member)}
           tooltip={{
             content: {
               side: 'bottom',
               text: isPendingInviteAcceptance
-                ? 'Role can only be changed after the user has accepted the invite'
+                ? 'Access can be managed after the invite is accepted'
                 : !canRemoveMember
                   ? 'You need additional permissions to manage this team member'
                   : undefined,
@@ -183,11 +178,12 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              aria-label="More options"
+              variant="text"
               className="px-1.5"
               disabled={isLoading}
               loading={isLoading}
-              icon={<MoreVertical />}
+              icon={<MoreVerticalIcon />}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-40">
@@ -205,7 +201,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                       },
                     }}
                   >
-                    <Redo2 size={14} />
+                    <Redo2Icon size={14} />
                     <p>Resend invitation</p>
                   </DropdownMenuItemTooltip>
 
@@ -222,7 +218,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                       },
                     }}
                   >
-                    <Trash size={14} />
+                    <TrashIcon size={14} />
                     <p>Cancel invitation</p>
                   </DropdownMenuItemTooltip>
                 </>
@@ -239,7 +235,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                       },
                     }}
                   >
-                    <Trash size={12} />
+                    <TrashIcon size={12} />
                     <p>Remove member</p>
                   </DropdownMenuItemTooltip>
                 )
@@ -291,12 +287,6 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
           <span className="text-foreground">{selectedOrganization?.name}</span>?
         </p>
       </ConfirmationModal>
-
-      <UpdateRolesPanel
-        visible={showAccessModal}
-        member={member}
-        onClose={() => setShowAccessModal(false)}
-      />
     </>
   )
 }

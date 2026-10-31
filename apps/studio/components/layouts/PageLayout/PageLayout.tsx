@@ -1,9 +1,9 @@
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
-
-import { useParams } from 'common'
 import { Badge, Button, cn, NavMenu, NavMenuItem } from 'ui'
+
 import { ScaffoldContainer } from '../Scaffold'
 import { PageHeader } from './PageHeader'
 
@@ -81,7 +81,7 @@ export const PageLayout = ({
         className={cn(
           'w-full mx-auto',
           size === 'full' &&
-            (isCompact ? 'max-w-none !px-6 border-b pt-4' : 'max-w-none pt-6 !px-10 border-b'),
+            (isCompact ? 'max-w-none px-6! border-b pt-4' : 'max-w-none pt-6 px-10! border-b'),
           size !== 'full' && (isCompact ? 'pt-4' : 'pt-12'),
           navigationItems.length === 0 && size === 'full' && (isCompact ? 'pb-4' : 'pb-8')
         )}
@@ -126,7 +126,7 @@ export const PageLayout = ({
                     </Link>
                   ) : (
                     <Button
-                      type="link"
+                      variant="link"
                       onClick={item.onClick}
                       className={cn(isActive && 'text-foreground font-medium')}
                     >

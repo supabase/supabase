@@ -4,13 +4,15 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type React from 'react'
 import type { ReactNode } from 'react'
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, FloatingPlate } from 'ui'
 
 import { useMeasuredWidth } from './Row.utils'
 
 interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
-  // columns can be a fixed number or an array [lg, md, sm]
-  columns: number | [number, number, number]
+  // Maximum number of columns visible in the row at once
+  maxColumns: number
+  // Minimum width in pixels for each item before the row reduces the visible count
+  minWidth: number
   children: ReactNode
   className?: string
   /** gap between items in pixels */
@@ -21,8 +23,35 @@ interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
   scrollBehavior?: ScrollBehavior
 }
 
+export const resolveColumnsForWidth = ({
+  width,
+  maxColumns,
+  minWidth,
+  gap,
+}: {
+  width: number
+  maxColumns: number
+  minWidth: number
+  gap: number
+}) => {
+  const denominator = minWidth + gap
+  if (denominator <= 0) return Math.max(1, maxColumns)
+  const fittedColumns = Math.floor((width + gap) / denominator)
+
+  return Math.max(1, Math.min(maxColumns, fittedColumns))
+}
+
 export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
-  { columns, children, className, gap = 16, showArrows = true, scrollBehavior = 'smooth', ...rest },
+  {
+    maxColumns,
+    minWidth,
+    children,
+    className,
+    gap = 16,
+    showArrows = true,
+    scrollBehavior = 'smooth',
+    ...rest
+  },
   ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -32,18 +61,15 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   const [scrollPosition, setScrollPosition] = useState(0)
   const measuredWidth = useMeasuredWidth(containerRef)
 
-  const resolveColumnsForWidth = (width: number): number => {
-    if (!Array.isArray(columns)) return columns
-    // Interpret as [lg, md, sm]
-    const [lgCols, mdCols, smCols] = columns
-    if (width >= 1024) return lgCols
-    if (width >= 768) return mdCols
-    return smCols
-  }
-
   const numberOfColumns = useMemo(
-    () => resolveColumnsForWidth(measuredWidth ?? 0),
-    [measuredWidth, columns]
+    () =>
+      resolveColumnsForWidth({
+        width: measuredWidth ?? 0,
+        maxColumns,
+        minWidth,
+        gap,
+      }),
+    [gap, maxColumns, measuredWidth, minWidth]
   )
 
   const scrollByStep = (direction: -1 | 1) => {
@@ -79,7 +105,9 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   const pendingDeltaRef = useRef(0)
 
   const handleWheel: React.WheelEventHandler<HTMLDivElement> = (e) => {
-    if (e.deltaX === 0) return
+    // Only scroll sideways when horizontal intent wins. Trackpads report a small
+    // deltaX on vertical scrolls, so a deltaX === 0 check would hijack them.
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return
 
     const delta = Math.abs(e.deltaX) * 2 * (e.deltaX > 0 ? 1 : -1)
     pendingDeltaRef.current += delta
@@ -118,30 +146,32 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   return (
     <div ref={ref} className={cn('relative w-full', className)} {...rest}>
       {showArrows && canScrollLeft && (
-        <Button
-          type="default"
-          onClick={scrollLeft}
-          className="absolute w-8 h-8 left-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
-          aria-label="Scroll left"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </Button>
+        <FloatingPlate rounded="full" className="absolute left-0 top-1/2 z-10 -translate-y-1/2">
+          <Button
+            onClick={scrollLeft}
+            className="w-8 h-8 rounded-full p-2"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+        </FloatingPlate>
       )}
 
       {showArrows && canScrollRight && hasContentToScroll && (
-        <Button
-          type="default"
-          onClick={scrollRight}
-          className="absolute w-8 h-8 right-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
-          aria-label="Scroll right"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </Button>
+        <FloatingPlate rounded="full" className="absolute right-0 top-1/2 z-10 -translate-y-1/2">
+          <Button
+            onClick={scrollRight}
+            className="w-8 h-8 rounded-full p-2"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </FloatingPlate>
       )}
 
       <div
         ref={containerRef}
-        className="w-full overflow-visible focus:outline-none"
+        className="w-full overflow-visible focus:outline-hidden"
         tabIndex={0}
         role="region"
         aria-roledescription="carousel"
@@ -162,7 +192,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
           }
         >
           {childrenArray.map((child, index) => (
-            <div key={index} className="flex-shrink-0" style={{ width: 'var(--column-width)' }}>
+            <div key={index} className="shrink-0" style={{ width: 'var(--column-width)' }}>
               {child}
             </div>
           ))}

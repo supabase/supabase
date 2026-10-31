@@ -1,32 +1,30 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useCallback, useEffect, useReducer } from 'react'
+import { useCallback, useEffect, useEffectEvent, useReducer } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Card } from 'ui'
 
-import { DataApiEnableSwitchForm } from './DataApiEnableSwitchForm'
-import { DataApiEnableSwitchError, DataApiEnableSwitchLoading } from './DataApiEnableSwitchStates'
 import { dataApiFormSchema, type DataApiFormValues } from './DataApiEnableSwitch.types'
 import {
   enableCheckReducer,
   getDefaultSchemas,
   queryUnsafeEntitiesInApi,
 } from './DataApiEnableSwitch.utils'
+import { DataApiEnableSwitchForm } from './DataApiEnableSwitchForm'
+import { DataApiEnableSwitchError, DataApiEnableSwitchLoading } from './DataApiEnableSwitchStates'
 import { UnsafeEntitiesConfirmModal } from './UnsafeEntitiesConfirmModal'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 export const DataApiEnableSwitch = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE)
 
   const {
     data: config,
@@ -55,14 +53,14 @@ export const DataApiEnableSwitch = () => {
     },
   })
 
-  const syncForm = useStaticEffectEvent(() => {
+  const syncForm = useEffectEvent(() => {
     if (!isEnabledCheckPending) {
       form.reset({ enableDataApi: isEnabled })
     }
   })
   useEffect(() => {
     syncForm()
-  }, [syncForm, isEnabled])
+  }, [isEnabled])
 
   const doUpdate = useCallback(
     (enableDataApi: boolean) => {

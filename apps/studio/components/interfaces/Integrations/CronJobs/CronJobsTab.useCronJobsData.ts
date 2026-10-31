@@ -1,17 +1,17 @@
 import { keepPreviousData } from '@tanstack/react-query'
-import { useCronJobsCountEstimateQuery } from 'data/database-cron-jobs/database-cron-jobs-count-estimate-query'
-import { useCronJobsCountQuery } from 'data/database-cron-jobs/database-cron-jobs-count-query'
-import {
-  CronJob,
-  useCronJobsInfiniteQuery,
-} from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useMemo } from 'react'
-import type { ResponseError } from 'types'
 
 import { CRON_JOBS_THRESHOLD } from './CronJobsTab.constants'
 import type { ConnectionVars } from '@/data/common.types'
+import { useCronJobsCountEstimateQuery } from '@/data/database-cron-jobs/database-cron-jobs-count-estimate-query'
+import { useCronJobsCountQuery } from '@/data/database-cron-jobs/database-cron-jobs-count-query'
+import {
+  CronJob,
+  useCronJobsInfiniteQuery,
+} from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useCronJobsMinimalInfiniteQuery } from '@/data/database-cron-jobs/database-cron-jobs-minimal-infinite-query'
-import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
+import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError } from '@/types'
 
 // =============================================================================
 // Input types
@@ -19,6 +19,7 @@ import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-query'
 
 type UseCronJobsDataParams = ConnectionVars & {
   searchQuery: string | null
+  enabled?: boolean
 }
 
 // =============================================================================
@@ -27,6 +28,7 @@ type UseCronJobsDataParams = ConnectionVars & {
 
 interface CronJobsGridState {
   rows: Array<CronJob>
+  queryCost?: number
   isSuccess: boolean
   isLoading: boolean
   error: ResponseError | null
@@ -58,6 +60,7 @@ export function useCronJobsData({
   projectRef,
   connectionString,
   searchQuery,
+  enabled = true,
 }: UseCronJobsDataParams): UseCronJobsDataResult {
   const isProjectReady = !!projectRef
 
@@ -74,6 +77,7 @@ export function useCronJobsData({
   } = useCronJobsInfiniteQuery(
     { projectRef, connectionString, searchTerm: searchQuery ?? undefined },
     {
+      enabled,
       placeholderData: Boolean(searchQuery) ? keepPreviousData : undefined,
       staleTime: Infinity,
     }
@@ -95,7 +99,7 @@ export function useCronJobsData({
     {
       placeholderData: Boolean(searchQuery) ? keepPreviousData : undefined,
       staleTime: Infinity,
-      enabled: useMinimalQuery,
+      enabled: enabled && useMinimalQuery,
     }
   )
 
@@ -113,7 +117,10 @@ export function useCronJobsData({
     data: estimatedCount,
     isPending: isLoadingEstimatedCount,
     isError: isEstimatedCountError,
-  } = useCronJobsCountEstimateQuery({ projectRef, connectionString }, { enabled: isProjectReady })
+  } = useCronJobsCountEstimateQuery(
+    { projectRef, connectionString },
+    { enabled: enabled && isProjectReady }
+  )
 
   const hasLargeCronJobsTable =
     typeof estimatedCount === 'number' && estimatedCount > CRON_JOBS_THRESHOLD
@@ -124,12 +131,13 @@ export function useCronJobsData({
 
   const { data: exactCount, isPending: isLoadingExactCount } = useCronJobsCountQuery(
     { projectRef, connectionString },
-    { enabled: isCountQueryEnabled }
+    { enabled: enabled && isCountQueryEnabled }
   )
 
   return {
     grid: {
       rows: cronJobs,
+      queryCost: cronJobsError?.metadata?.cost,
       error: useMinimalQuery ? cronJobsMinimalError : cronJobsError,
       isSuccess: useMinimalQuery ? isCronJobsMinimalSuccess : isCronJobsSuccess,
       isLoading: useMinimalQuery ? isCronJobsMinimalLoading : isCronJobsLoading,

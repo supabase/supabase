@@ -1,21 +1,26 @@
 import { useParams } from 'common'
-import { PageContainer } from 'ui-patterns'
 
+import { ConstrainedIntegrationTabScaffold } from '../ConstrainedIntegrationTabScaffold'
 import { DataApiDisabledState } from '@/components/interfaces/Integrations/DataApi/DataApiDisabledState'
 import { ServiceList } from '@/components/interfaces/Settings/API/ServiceList'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const DataApiSettingsTab = () => {
   const { ref: projectRef } = useParams()
   const { isEnabled, isPending } = useIsDataApiEnabled({ projectRef })
 
-  if (!isPending && !isEnabled) {
-    return <DataApiDisabledState description="configure settings" />
+  if (IS_PLATFORM && !isPending && !isEnabled) {
+    return (
+      <ConstrainedIntegrationTabScaffold className="p-0!">
+        <DataApiDisabledState description="configure settings" />
+      </ConstrainedIntegrationTabScaffold>
+    )
   }
 
   return (
-    <PageContainer size="default" className="ml-0">
+    <ConstrainedIntegrationTabScaffold>
       <ServiceList />
-    </PageContainer>
+    </ConstrainedIntegrationTabScaffold>
   )
 }

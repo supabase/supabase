@@ -1,28 +1,22 @@
-import { AlertCircle, RefreshCw } from 'lucide-react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCustomDomainReverifyQuery } from 'data/custom-domains/custom-domains-reverify-query'
-import { DOCS_URL } from 'lib/constants'
+import { AlertCircleIcon, RefreshCwIcon } from 'lucide-react'
 import { useEffect } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import DNSRecord from './DNSRecord'
-import { DNSTableHeaders } from './DNSTableHeaders'
+import { toast } from 'sonner'
+import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
-const CustomDomainVerify = () => {
+import { DNSRecord } from './DNSRecord'
+import { DNSTableHeaders } from './DNSTableHeaders'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-domains-delete-mutation'
+import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import { useCustomDomainReverifyQuery } from '@/data/custom-domains/custom-domains-reverify-query'
+import { DOCS_URL } from '@/lib/constants'
+
+export const CustomDomainVerify = () => {
   const { ref: projectRef } = useParams()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -83,15 +77,12 @@ const CustomDomainVerify = () => {
       <Panel.Content className="space-y-6">
         <div>
           <h4 className="text-foreground mb-2">
-            Configure TXT verification for your custom domain{' '}
-            <code className="text-code-inline">{customDomain?.hostname}</code>
+            Configure TXT verification for your custom domain <code>{customDomain?.hostname}</code>
           </h4>
           <p className="text-sm text-foreground-light">
             Set the following TXT record(s) in your DNS provider, then click verify to confirm your
-            control over the domain.
-          </p>
-          <p className="text-sm text-foreground-light">
-            Records which have been successfully verified will be removed from this list below.
+            control over the domain. Records which have been successfully verified will be removed
+            from this list below.
           </p>
           {!isValidating && (
             <div className="mt-4 mb-2">
@@ -113,9 +104,8 @@ const CustomDomainVerify = () => {
                 {isNotVerifiedYet && (
                   <p className="mt-1">
                     Some registrars will require you to remove the domain name when creating DNS
-                    records. As an example, to create a record for{' '}
-                    <code className="text-code-inline">foo.app.example.com</code>, you would need to
-                    create an entry for <code className="text-code-inline">foo.app</code>.
+                    records. As an example, to create a record for <code>foo.app.example.com</code>,
+                    you would need to create an entry for <code>foo.app</code>.
                   </p>
                 )}
               </Admonition>
@@ -124,27 +114,25 @@ const CustomDomainVerify = () => {
         </div>
 
         {hasCAAErrors && (
-          <Alert_Shadcn_>
+          <Alert>
             <WarningIcon />
-            <AlertTitle_Shadcn_>
-              Certificate Authority Authentication (CAA) error
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+            <AlertTitle>Certificate Authority Authentication (CAA) error</AlertTitle>
+            <AlertDescription>
               Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
-              <code className="text-code-inline">{customDomain?.hostname}</code>. For example:{' '}
-              <code className="text-code-inline">0 issue "digicert.com"</code>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+              <code>{customDomain?.hostname}</code>. For example:{' '}
+              <code>0 issue "digicert.com"</code>
+            </AlertDescription>
+          </Alert>
         )}
 
         {customDomain?.ssl.status === 'validation_timed_out' ? (
-          <Alert_Shadcn_>
+          <Alert>
             <WarningIcon />
-            <AlertTitle_Shadcn_>Validation timed out</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+            <AlertTitle>Validation timed out</AlertTitle>
+            <AlertDescription>
               Please click "Verify" again to retry the validation of the records
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         ) : (
           <div className="space-y-2">
             <DNSTableHeaders display={customDomain?.ssl.txt_name ?? ''} />
@@ -169,7 +157,7 @@ const CustomDomainVerify = () => {
 
             {customDomain?.ssl.status === 'pending_deployment' && (
               <div className="flex items-center justify-center space-x-2 py-8">
-                <AlertCircle size={16} strokeWidth={1.5} />
+                <AlertCircleIcon size={16} strokeWidth={1.5} />
                 <p className="text-sm text-foreground-light">
                   SSL certificate is being deployed. Please wait a few minutes and try again.
                 </p>
@@ -185,16 +173,12 @@ const CustomDomainVerify = () => {
         <div className="flex items-center justify-between">
           <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <div className="flex items-center space-x-2">
-            <Button
-              type="default"
-              onClick={onCancelCustomDomain}
-              loading={isDeleting}
-              className="self-end"
-            >
+            <Button onClick={onCancelCustomDomain} loading={isDeleting} className="self-end">
               Cancel
             </Button>
             <Button
-              icon={<RefreshCw />}
+              variant="primary"
+              icon={<RefreshCwIcon />}
               onClick={onReverifyCustomDomain}
               loading={!isValidating && isReverifyLoading}
               disabled={isDeleting || isReverifyLoading || isValidating}
@@ -208,5 +192,3 @@ const CustomDomainVerify = () => {
     </>
   )
 }
-
-export default CustomDomainVerify

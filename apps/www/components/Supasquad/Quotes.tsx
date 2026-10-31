@@ -1,19 +1,17 @@
 import 'swiper/css'
 
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import Panel from '~/components/Panel'
+import type { Quote, Quotes } from '~/data/solutions/solutions.utils'
+import Image from 'next/image'
 import Link from 'next/link'
 import { FC } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
-
-import type { Quote, Quotes } from '~/data/solutions/solutions.utils'
-import Image from 'next/image'
-
 const Quotes: FC<Quotes> = (props) => (
   <section id={props.id}>
     <div className="overflow-hidden">
-      <SectionContainer className="!py-4">
+      <SectionContainer className="py-4!">
         <ul className="hidden xl:flex flex-col gap-4 md:flex-row items-stretch w-full h-auto min-h-64">
           {props.items?.map((quote: Quote) => (
             <li key={quote.author} className="w-full">
@@ -31,7 +29,7 @@ const Quotes: FC<Quotes> = (props) => (
             watchOverflow
             threshold={2}
             updateOnWindowResize
-            className="h-[300px] w-full !overflow-visible"
+            className="h-[300px] w-full overflow-visible!"
             breakpoints={{
               320: {
                 slidesPerView: 1.2,
@@ -72,7 +70,7 @@ const QuoteCard: FC<Quote> = ({ quote, author, avatar, authorTitle }) => {
           alt={author}
           width={32}
           height={32}
-          className="bg-surface-200 rounded-full border flex-shrink-0"
+          className="bg-surface-200 rounded-full border shrink-0"
         />
         <div className="flex flex-col gap-0">
           <span className="text-base text-foreground-light leading-snug">{author}</span>

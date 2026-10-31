@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicaKeys } from './keys'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ReadReplicaRemoveVariables = {
   projectRef: string
@@ -19,6 +19,7 @@ export async function removeReadReplica({ projectRef, identifier }: ReadReplicaR
     body: {
       database_identifier: identifier,
     },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data

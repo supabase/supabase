@@ -1,7 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { differenceInDays } from 'date-fns'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { MoreVertical, TrashIcon } from 'lucide-react'
+import { MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -12,6 +10,8 @@ import {
   TableRow,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const StorageCredItem = ({
   description,
@@ -26,9 +26,8 @@ export const StorageCredItem = ({
   access_key: string
   onDeleteClick: (id: string) => void
 }) => {
-  const { can: canRemoveAccessKey } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
+  const { can: canRemoveAccessKey } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
   )
 
   function daysSince(date: string) {
@@ -61,8 +60,8 @@ export const StorageCredItem = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                icon={<MoreVertical size={14} strokeWidth={1} />}
-                type="text"
+                icon={<MoreVerticalIcon size={14} strokeWidth={1} />}
+                variant="text"
                 className="px-1.5 text-foreground-lighter hover:text-foreground"
               />
             </DropdownMenuTrigger>

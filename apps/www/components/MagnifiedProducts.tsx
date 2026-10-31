@@ -1,18 +1,15 @@
-import { useRef } from 'react'
-import Link from 'next/link'
+import { DEFAULT_TRANSITION } from '~/lib/animations'
+import { useBreakpoint } from 'common'
 import {
-  MotionValue,
   motion,
+  MotionValue,
   useInView,
   useMotionValue,
   useSpring,
   useTransform,
-} from 'framer-motion'
-import { useBreakpoint } from 'common'
-import { Products } from './Sections/ProductsCta'
-import { cn } from 'ui'
-
-import { DEFAULT_TRANSITION } from '~/lib/animations'
+} from 'motion/react'
+import Link from 'next/link'
+import { useRef } from 'react'
 import {
   PRODUCT_MODULES,
   PRODUCT_MODULES_NAMES,
@@ -21,6 +18,9 @@ import {
   PRODUCT_SHORTNAMES,
   products as PRODUCTS,
 } from 'shared-data/products'
+import { cn } from 'ui'
+
+import { Products } from './Sections/ProductsCta'
 
 function MagnifiedProducts({ currentProduct }: { currentProduct: Products | string }) {
   let mouseX = useMotionValue(Infinity)
@@ -91,7 +91,7 @@ function Product({
       <Link href={product.url} className="flex w-full flex-col items-center text-center group">
         <motion.div
           style={isMobile ? (undefined as any) : { width, willChange: 'width' }}
-          className="relative w-[30px] !min-w-[30px] md:!min-w-[50px] aspect-square will-change-transform bg-background rounded-xl border p-3 text-foreground-lighter group-hover:text-foreground"
+          className="relative w-[30px] min-w-[30px]! md:min-w-[50px]! aspect-square will-change-transform bg-background rounded-xl border p-3 text-foreground-lighter group-hover:text-foreground"
         >
           <svg
             width="100%"

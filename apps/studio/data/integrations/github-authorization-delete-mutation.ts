@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { integrationKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export async function deleteGitHubAuthorization(signal?: AbortSignal) {
   const { data, error } = await del('/platform/integrations/github/authorization', { signal })
@@ -26,14 +26,8 @@ export const useGitHubAuthorizationDeleteMutation = ({
   return useMutation<GitHubAuthorizationDeleteData, ResponseError, void>({
     mutationFn: () => deleteGitHubAuthorization(),
     async onSuccess(data, variables, context) {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: integrationKeys.githubAuthorization(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: integrationKeys.githubRepositoriesList(),
-        }),
-      ])
+      queryClient.removeQueries({ queryKey: integrationKeys.githubAuthorization() })
+      queryClient.removeQueries({ queryKey: integrationKeys.githubRepositoriesList() })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

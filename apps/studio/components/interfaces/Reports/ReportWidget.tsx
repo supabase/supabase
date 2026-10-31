@@ -1,12 +1,12 @@
-import { ExternalLink, HelpCircle } from 'lucide-react'
+import { useParams } from 'common'
+import { ExternalLinkIcon, HelpCircleIcon } from 'lucide-react'
 import { NextRouter, useRouter } from 'next/router'
 import { ReactNode } from 'react'
+import { Button, cn, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { useParams } from 'common'
-import Panel from 'components/ui/Panel'
-import { Button, Loading, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 import type { LogsEndpointParams } from '../Settings/Logs/Logs.types'
 import type { BaseReportParams, ReportQueryType } from './Reports.types'
+import Panel from '@/components/ui/Panel'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
@@ -48,7 +48,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
               {props?.tooltip && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <HelpCircle className="text-foreground-light" size={14} strokeWidth={1.5} />
+                    <HelpCircleIcon className="text-foreground-light" size={14} strokeWidth={1.5} />
                   </TooltipTrigger>
                   <TooltipContent side="bottom">{props.tooltip}</TooltipContent>
                 </Tooltip>
@@ -60,18 +60,14 @@ const ReportWidget = (props: ReportWidgetProps) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  type="default"
-                  icon={<ExternalLink />}
+                  icon={<ExternalLinkIcon />}
                   className="px-1"
                   onClick={() => {
                     const isDbQueryType = props.queryType === 'db'
-
                     const pathname = isDbQueryType
                       ? `/project/${projectRef}/sql/new`
                       : `/project/${projectRef}/logs/explorer`
-
                     const query: Record<string, string | undefined> = {}
-
                     if (isDbQueryType) {
                       query.content = props.resolvedSql
                     } else {
@@ -79,7 +75,6 @@ const ReportWidget = (props: ReportWidgetProps) => {
                       query.its = props.params?.iso_timestamp_start || ''
                       query.ite = props.params?.iso_timestamp_end || ''
                     }
-
                     router.push({ pathname, query })
                   }}
                 />

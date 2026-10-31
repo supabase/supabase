@@ -1,7 +1,16 @@
-import { Button, Modal } from 'ui'
-
 import { useParams } from 'common/hooks'
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
+
+import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
 
 interface AllowAllModalProps {
   visible: boolean
@@ -10,14 +19,14 @@ interface AllowAllModalProps {
 
 const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   const { ref } = useParams()
-  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
+  const { mutateAsync: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
     })
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
-    applyNetworkRestrictions({
+    await applyNetworkRestrictions({
       projectRef: ref,
       dbAllowedCidrs: ['0.0.0.0/0'],
       dbAllowedCidrsV6: ['::/0'],
@@ -25,28 +34,22 @@ const AllowAllModal = ({ visible, onClose }: AllowAllModalProps) => {
   }
 
   return (
-    <Modal
-      hideFooter
-      size="small"
-      visible={visible}
-      onCancel={onClose}
-      header="Allow access from all IP addresses"
-    >
-      <Modal.Content className="space-y-4">
-        <p className="text-sm text-foreground-light">
-          This will allow any IP address to access your project's database. Are you sure?
-        </p>
-      </Modal.Content>
-      <Modal.Separator />
-      <Modal.Content className="flex items-center justify-end space-x-2">
-        <Button type="default" disabled={isApplying} onClick={() => onClose()}>
-          Cancel
-        </Button>
-        <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
-          Confirm
-        </Button>
-      </Modal.Content>
-    </Modal>
+    <AlertDialog open={visible} onOpenChange={onClose}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Allow access from all IP addresses</AlertDialogTitle>
+          <AlertDialogDescription>
+            This will allow any IP address to access your project's database. Are you sure?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isApplying}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onSubmit} disabled={isApplying} loading={isApplying}>
+            Confirm
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 

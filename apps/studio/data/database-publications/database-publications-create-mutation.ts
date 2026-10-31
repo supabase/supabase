@@ -2,9 +2,10 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databasePublicationsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabasePublicationCreateVariables = {
   projectRef: string
@@ -41,6 +42,7 @@ export async function createDatabasePublication({
     connectionString,
     sql,
     queryKey: ['publication', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result

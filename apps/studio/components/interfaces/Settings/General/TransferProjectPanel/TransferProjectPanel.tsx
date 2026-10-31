@@ -1,16 +1,15 @@
-import { Truck } from 'lucide-react'
-
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { TransferProjectButton } from './TransferProjectButton'
+import { TruckIcon } from 'lucide-react'
 import { Card, CardContent } from 'ui'
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+import { TransferProjectButton } from './TransferProjectButton'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const TransferProjectPanel = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -21,10 +20,7 @@ export const TransferProjectPanel = () => {
     <PageSection id="transfer-project">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Transfer Project</PageSectionTitle>
-          <PageSectionDescription>
-            Transfer your project to a different organization.
-          </PageSectionDescription>
+          <PageSectionTitle>Transfer project</PageSectionTitle>
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
@@ -32,7 +28,7 @@ export const TransferProjectPanel = () => {
           <CardContent>
             <div className="flex flex-col @lg:flex-row @lg:justify-between @lg:items-center gap-4">
               <div className="flex space-x-4">
-                <Truck className="mt-1" />
+                <TruckIcon className="mt-1" />
                 <div className="space-y-1 xl:max-w-lg">
                   <p className="text-sm">Transfer project to another organization</p>
                   <p className="text-sm text-foreground-light">

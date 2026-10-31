@@ -17,7 +17,7 @@ launchweek: '13'
 
 Today we're releasing [Supabase Cron](/modules/cron), a new Postgres Module that makes recurring Jobs simple and intuitive inside your database.
 
-It's designed to work seamlessly with the entire Supabase platform. Create recurring Jobs to run SQL snippets and call database functions, Supabase Edge Functions, and even remote webhooks.
+It's designed to work seamlessly with the entire Supabase platform. Create recurring Jobs to run SQL snippets and call database functions, [Supabase Edge Functions](/edge-functions), and even remote webhooks.
 
 <div className="video-container mb-8">
   <iframe
@@ -31,7 +31,7 @@ It's designed to work seamlessly with the entire Supabase platform. Create recur
 
 <Admonition>
 
-Supabase Cron is built on the powerful [`pg_cron`](https://github.com/citusdata/pg_cron) extension by the team at [Citus Data](https://github.com/citusdata).
+[Supabase Cron](/features/supabase-cron) is built on the powerful [`pg_cron`](https://github.com/citusdata/pg_cron) extension by the team at [Citus Data](https://github.com/citusdata).
 
 It's a Supabase policy to [support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) wherever possible, and the Citus Data team have generously licensed their extension with the OSI-compatible [PostgreSQL license](https://github.com/citusdata/pg_cron?tab=PostgreSQL-1-ov-file).
 
@@ -121,7 +121,8 @@ Wondering why a Job failed? You can view the history of all Jobs and their logs 
   alt="Observe and debug Jobs"
   src="/images/blog/launch-week-13/day-3-supabase-cron/history.jpg"
 />
-For a deeper dive, you can view Jobs in the [Logs Explorer](https://supabase.com/dashboard/project/_zvmkyvanngopzqaabmvx_/logs/pgcron-logs).
+For a deeper dive, you can view Jobs in the [Logs
+Explorer](https://supabase.com/dashboard/project/_zvmkyvanngopzqaabmvx_/logs/pgcron-logs).
 <Img alt="View cron logs" src="/images/blog/launch-week-13/day-3-supabase-cron/logs.jpg" />
 
 ### Try Supabase Cron today

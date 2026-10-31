@@ -1,23 +1,32 @@
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { useQueuesQuery } from 'data/database-queues/database-queues-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { RefreshCw, Search, X } from 'lucide-react'
+import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
-import { Button, cn, LoadingLine } from 'ui'
+import { Button, cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageSection } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ConstrainedIntegrationTabScaffold } from '../ConstrainedIntegrationTabScaffold'
+import { useIntegrationDetail } from '../Landing/useIntegrationDetail'
 import { CreateQueueSheet } from './CreateQueueSheet'
 import { formatQueueColumns, prepareQueuesForDataGrid } from './Queues.utils'
+import { AlertError } from '@/components/ui/AlertError'
+import { useQueuesQuery } from '@/data/database-queues/database-queues-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const QueuesTab = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+
+  const { isInstalled } = useIntegrationDetail()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [search, setSearch] = useState(searchQuery)
@@ -27,6 +36,26 @@ export const QueuesTab = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  const clearSearch = () => {
+    setSearch('')
+    setSearchQuery('')
+  }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search queues' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, clearSearch)
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setCreateQueueSheetShown(true), {
+    label: 'Create queue',
+  })
+
   const {
     data: queues,
     error,
@@ -34,10 +63,13 @@ export const QueuesTab = () => {
     isError,
     isRefetching,
     refetch,
-  } = useQueuesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  } = useQueuesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: isInstalled }
+  )
 
   // Filter queues based on search query
   const filteredQueues = useMemo(() => {
@@ -54,55 +86,71 @@ export const QueuesTab = () => {
   // Get columns configuration
   const columns = useMemo(() => formatQueueColumns(), [])
 
+  if (!isInstalled) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-6 xl:px-10">
+        <ConstrainedIntegrationTabScaffold>
+          <PageSection className="py-0">
+            <Admonition type="default" description="Queues is not installed." />
+          </PageSection>
+        </ConstrainedIntegrationTabScaffold>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="h-full w-full space-y-4">
         <div className="h-full w-full flex flex-col relative">
           <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap">
             <Input
+              ref={searchInputRef}
               size="tiny"
               className="w-52"
               placeholder="Search for a queue"
-              icon={<Search />}
+              icon={<SearchIcon />}
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
+                onSearchInputEscape(search ?? '', clearSearch)(e)
                 if (e.code === 'Enter' || e.code === 'NumpadEnter') setSearchQuery(search.trim())
               }}
               actions={[
                 search && (
-                  <Button
-                    key="clear"
-                    size="tiny"
-                    type="text"
-                    icon={<X />}
-                    onClick={() => {
-                      setSearch('')
-                      setSearchQuery('')
-                    }}
-                    className="p-0 h-5 w-5"
-                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        key="clear"
+                        size="tiny"
+                        variant="text"
+                        icon={<XIcon />}
+                        onClick={clearSearch}
+                        className="p-0 h-5 w-5"
+                        aria-label="Clear search"
+                        // Tooltip repeats the label; screen readers would read it twice
+                        aria-describedby={undefined}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Clear search</TooltipContent>
+                  </Tooltip>
                 ),
               ]}
             />
 
             <div className="flex items-center gap-x-2">
-              <Button
-                type="default"
-                icon={<RefreshCw />}
-                loading={isRefetching}
-                onClick={() => refetch()}
-              >
+              <Button icon={<RefreshCwIcon />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
-              <Button onClick={() => setCreateQueueSheetShown(true)}>Create queue</Button>
+              <Button variant="primary" onClick={() => setCreateQueueSheetShown(true)}>
+                Create queue
+              </Button>
             </div>
           </div>
 
           <LoadingLine loading={isLoading || isRefetching} />
 
           <DataGrid
-            className="flex-grow border-t-0"
+            className="grow border-t-0! border-b-0!"
             rowHeight={44}
             headerRowHeight={36}
             columns={columns}
@@ -111,7 +159,7 @@ export const QueuesTab = () => {
             rowClass={() => {
               return cn(
                 'cursor-pointer',
-                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                 '[&>.rdg-cell:first-child>div]:ml-8'
               )
             }}

@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { serviceStatusKeys } from './keys'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectServiceStatusVariables = {
   projectRef?: string
@@ -11,7 +11,7 @@ export type ProjectServiceStatusVariables = {
 
 // Omit the 'healthy' field as it's equivalent to status = 'ACTIVE_HEALTHY'
 export type ServiceHealthResponse = Omit<
-  components['schemas']['V1ServiceHealthResponse'],
+  components['schemas']['V1ServiceHealthResponse_Output'],
   'healthy'
 >
 export type ProjectServiceStatus = ServiceHealthResponse['status']
@@ -30,6 +30,7 @@ export async function getProjectServiceStatus(
       },
     },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

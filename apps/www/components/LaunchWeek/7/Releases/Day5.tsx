@@ -1,7 +1,11 @@
-import React from 'react'
-import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { opacityVariant4, scaleOpacityVariant2 } from '.'
+import { WeekDayProps } from '~/components/LaunchWeek/7/lw7_days'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
+import { motion } from 'motion/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import React from 'react'
+
 import {
   ArrowTopRightSvg,
   CartTitle,
@@ -10,12 +14,7 @@ import {
   SectionButtons,
   StyledArticleBadge,
 } from './components'
-
-import { WeekDayProps } from '~/components/LaunchWeek/7/lw7_days'
-import { opacityVariant4, scaleOpacityVariant2 } from '.'
-
 import styles from './day5.module.css'
-import Link from 'next/link'
 
 const getDay5Motion = (index: number) => {
   switch (index) {
@@ -121,7 +120,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -170,7 +169,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               <StyledArticleBadge>{day.steps[1].steps[1].badge}</StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -221,7 +220,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -272,7 +271,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -323,7 +322,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -374,7 +373,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -425,7 +424,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -477,7 +476,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -528,7 +527,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -579,7 +578,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -630,7 +629,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
               </StyledArticleBadge>
               <ChipLink
                 uiOnly
-                className="!min-h-[28px] !min-w-[28px] !p-0 !items-center !justify-center"
+                className="min-h-[28px]! min-w-[28px]! p-0! items-center! justify-center!"
               >
                 <ArrowTopRightSvg />
               </ChipLink>
@@ -686,7 +685,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   <motion.div
                     className={[
                       'absolute inset-0 w-full h-full -z-10',
-                      i === 2 && '!mix-blend-overlay blur-2xl',
+                      i === 2 && 'mix-blend-overlay! blur-2xl',
                     ].join(' ')}
                     variants={getDay5omt01Motion(i)}
                   >
@@ -726,7 +725,7 @@ const Day5 = ({ day }: { day: WeekDayProps }) => {
                   <motion.div
                     className={[
                       'absolute inset-0 w-full h-full -z-10',
-                      i === 2 && '!mix-blend-overlay opacity-50 blur-2xl',
+                      i === 2 && 'mix-blend-overlay! opacity-50 blur-2xl',
                     ].join(' ')}
                     variants={getDay5omt02Motion(i)}
                   >

@@ -1,9 +1,9 @@
-import { motion } from 'framer-motion'
-import { CircleDotDashed, GitMerge, X } from 'lucide-react'
+import { CircleDotDashedIcon, GitMergeIcon, XIcon } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useEffect, useRef } from 'react'
+import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 import { ActionRun } from '@/data/actions/action-detail-query'
-import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 interface WorkflowLogsCardProps {
   workflowRun: ActionRun | null | undefined
@@ -58,15 +58,15 @@ export const WorkflowLogsCard = ({
         animate={{ rotate: 360 }}
         transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
       >
-        <CircleDotDashed size={16} strokeWidth={1.5} className="text-warning" />
+        <CircleDotDashedIcon size={16} strokeWidth={1.5} className="text-warning" />
       </motion.div>
     ) : isSuccess ? (
-      <GitMerge size={16} strokeWidth={1.5} className="text-brand" />
+      <GitMergeIcon size={16} strokeWidth={1.5} className="text-primary" />
     ) : null)
 
   return (
     <Card className="bg-background overflow-hidden h-64 flex flex-col">
-      <CardHeader className={isSuccess ? 'text-brand' : isFailed ? 'text-destructive' : ''}>
+      <CardHeader className={isSuccess ? 'text-primary' : isFailed ? 'text-destructive' : ''}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {displayIcon}
@@ -83,9 +83,9 @@ export const WorkflowLogsCard = ({
             {overrideAction}
             {onClose && (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
-                icon={<X size={12} strokeWidth={1.5} />}
+                icon={<XIcon size={12} strokeWidth={1.5} />}
                 onClick={onClose}
                 className="h-5 w-5 p-0"
               />
@@ -98,11 +98,11 @@ export const WorkflowLogsCard = ({
         className="overflow-hidden border-0 overflow-y-auto relative p-0"
       >
         {/* sticky gradient overlay */}
-        <div className="sticky top-0 -mb-8 h-8 bg-gradient-to-b from-background to-transparent pointer-events-none z-10" />
+        <div className="sticky top-0 -mb-8 h-8 bg-linear-to-b from-background to-transparent pointer-events-none z-10" />
         {logs ? (
-          <pre className="p-6 text-xs text-foreground-light p-0 rounded">{logs}</pre>
+          <pre className="p-6 text-xs text-foreground-light p-0 rounded-sm">{logs}</pre>
         ) : (
-          <pre className="p-6 text-sm text-foreground-light rounded">
+          <pre className="p-6 text-sm text-foreground-light rounded-sm">
             {isLoading || isPolling ? 'Initializing workflow...' : 'Waiting for logs...'}
           </pre>
         )}

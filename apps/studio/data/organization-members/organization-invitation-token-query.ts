@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationInviteTokenVariables = { slug?: string; token?: string }
 
-export type OrganizationInviteByToken = components['schemas']['InvitationByTokenResponse']
+export type OrganizationInviteByToken = components['schemas']['InvitationByTokenResponse_Output']
 
 export async function getOrganizationInviteByToken(
   { slug, token }: OrganizationInviteTokenVariables,

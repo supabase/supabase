@@ -5,9 +5,86 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 17 Dec 2025 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 06 Oct 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/flick-games</guid>
+  <title>How a two-person studio keeps two live games in sync on Supabase</title>
+  <link>https://supabase.com/customers/flick-games</link>
+  <description>Flick Games is an indie UK studio running two live products, Art of Solitaire and Goalman, on Supabase. A single backend covers authentication, cross-device cloud saves, and remote content delivery across iOS, Android, and Steam for a team of two.</description>
+  <pubDate>Tue, 06 Oct 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/polymet</guid>
+  <title>How Polymet gives every user a real backend without a backend team</title>
+  <link>https://supabase.com/customers/polymet</link>
+  <description>Polymet is an AI product designer that turns a prompt or an image into working code. A three-person team runs the backend for tens of thousands of user projects a month, on Supabase, without hiring a single backend engineer.</description>
+  <pubDate>Wed, 23 Sep 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/lingodotdev</guid>
+  <title>How Lingo.dev clears enterprise security reviews without a single database question</title>
+  <link>https://supabase.com/customers/lingodotdev</link>
+  <description>Lingo.dev is the localization engineering platform behind retrieval augmented localization, translation APIs with a memory for glossary, brand voice, and quality. It has run on Supabase since day one.</description>
+  <pubDate>Wed, 26 Aug 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/qa-tech</guid>
+  <title>How QA.tech built enterprise-ready AI testing agents on Supabase</title>
+  <link>https://supabase.com/customers/qa-tech</link>
+  <description>QA.tech is an autonomous AI testing platform whose QA agents run end-to-end testing of web and mobile products by goal and intent. Three years on Supabase took QA.tech from three founders to a global customer base, enterprise-scale daily test volume, and SOC 2 compliance.</description>
+  <pubDate>Tue, 04 Aug 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/lovable</guid>
+  <title>How Supabase helps power millions of apps on Lovable</title>
+  <link>https://supabase.com/customers/lovable</link>
+  <description>Lovable lets anyone create software by describing it. Behind many of the one million projects people create on Lovable every week is a Supabase backend, provisioned end to end through the Management API.</description>
+  <pubDate>Thu, 09 Jul 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/delightai</guid>
+  <title>How delight.ai lets every team build production apps on Supabase</title>
+  <link>https://supabase.com/customers/delightai</link>
+  <description>delight.ai builds AI agents for customer experience. With Supabase, Vercel, and Claude Code, every team at the 220-person company ships its own production apps, without pulling engineers off the core product.</description>
+  <pubDate>Wed, 08 Jul 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/drew-crew</guid>
+  <title>Built for everyone: how Drew Clayborn is coding a lifeline for home care</title>
+  <link>https://supabase.com/customers/drew-crew</link>
+  <description>Drew Clayborn is building General Home Health, a HIPAA-compliant home care charting app, by himself. Supabase gives a solo developer the database, auth, realtime, and HIPAA-ready foundation to protect patients, nurses, and agencies.</description>
+  <pubDate>Wed, 08 Jul 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/chatbase</guid>
+  <title>Chatbase goes upmarket on Supabase</title>
+  <link>https://supabase.com/customers/chatbase</link>
+  <description>The consolidation play that took a single founder from zero to 10 million in ARR, and the bet that takes him to 100.</description>
+  <pubDate>Mon, 18 May 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/cofounder</guid>
+  <title>Cofounder builds autonomous companies on Supabase</title>
+  <link>https://supabase.com/customers/cofounder</link>
+  <description>Cofounder gives every customer an entire engineering, sales, marketing, support, and product team made of agents. Supabase for Platforms gives Cofounder the database platform to run an entire software company on every customer&apos;s behalf, from day one.</description>
+  <pubDate>Mon, 04 May 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/hyper</guid>
+  <title>Hyper builds AI marketing agents on Supabase</title>
+  <link>https://supabase.com/customers/hyper</link>
+  <description>Hyper is an AI-native marketing platform with agents that operate across the entire marketing workflow. Supabase gives their three-person team the database platform to do it at enterprise scale.</description>
+  <pubDate>Fri, 19 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/brevo</guid>
+  <title>How Brevo built AI-powered sales workflows on Supabase, without waiting for engineering</title>
+  <link>https://supabase.com/customers/brevo</link>
+  <description>Brevo&apos;s Revenue Operations team built three production AI workflows connecting their CRM to Dust&apos;s AI agents via Supabase MCP—without a single engineering ticket.</description>
+  <pubDate>Thu, 18 Dec 2025 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/exprealty</guid>
   <title>How eXp Realty Unlocked Enterprise Innovation and Cut SaaS Costs with Supabase</title>
   <link>https://supabase.com/customers/exprealty</link>
@@ -181,13 +258,6 @@
   <link>https://supabase.com/customers/pebblely</link>
   <description>Learn how Pebblely, an AI image generation company, used Supabase Auth to handle Single Sign On for their rapidly growing user base.</description>
   <pubDate>Fri, 29 Sep 2023 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/customers/chatbase</guid>
-  <title>Bootstrapped founder builds an AI app with Supabase and scales to $1M in 5 months</title>
-  <link>https://supabase.com/customers/chatbase</link>
-  <description>How Yasser leveraged Supabase to build Chatbase and became one of the most successful single-founder AI products.</description>
-  <pubDate>Wed, 06 Sep 2023 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/quivr</guid>

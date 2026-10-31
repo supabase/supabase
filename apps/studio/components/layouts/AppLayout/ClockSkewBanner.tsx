@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 
-import { HeaderBanner } from 'components/interfaces/Organization/HeaderBanner'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useClockSkewQuery } from 'data/misc/clock-skew-query'
-import { DOCS_URL } from 'lib/constants'
+import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useClockSkewQuery } from '@/data/misc/clock-skew-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ClockSkewBanner = () => {
   const [isClockSkewed, setIsClockSkewed] = useState(false)

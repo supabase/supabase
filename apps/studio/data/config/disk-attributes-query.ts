@@ -2,17 +2,17 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { COOLDOWN_DURATION } from './disk-attributes-update-mutation'
 import { configKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DiskAttributesVariables = {
   projectRef?: string
 }
 
-export type DiskAttribute = components['schemas']['DiskResponse']
+export type DiskAttribute = components['schemas']['DiskResponse_Output']
 
 export async function getDiskAttributes(
   { projectRef }: DiskAttributesVariables,

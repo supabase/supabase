@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { edgeFunctionsKeys } from './keys'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionVariables = {
   projectRef?: string
   slug?: string
 }
 
-export type EdgeFunction = components['schemas']['FunctionSlugResponse']
+export type EdgeFunction = components['schemas']['FunctionSlugResponse_Output']
 
 export async function getEdgeFunction(
   { projectRef, slug }: EdgeFunctionVariables,
@@ -22,6 +22,7 @@ export async function getEdgeFunction(
   const { data, error } = await get(`/v1/projects/{ref}/functions/{function_slug}`, {
     params: { path: { ref: projectRef, function_slug: slug } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

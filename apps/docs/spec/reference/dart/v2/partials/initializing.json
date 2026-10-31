@@ -1,0 +1,117 @@
+{
+  "id": "initializing",
+  "title": "Initializing",
+  "description": "You can initialize Supabase with the static `initialize()` method of the `Supabase` class.\n\nThe Supabase client is your entrypoint to the rest of the Supabase functionality\nand is the easiest way to interact with everything we offer within the Supabase ecosystem.\n",
+  "params": [
+    {
+      "name": "url",
+      "isOptional": false,
+      "type": "string",
+      "description": "The unique Supabase URL which is supplied when you create a new project in your project dashboard."
+    },
+    {
+      "name": "publishableKey",
+      "isOptional": false,
+      "type": "string",
+      "description": "The publishable (anon) key supplied when you create a new project in your project dashboard. Use this for client-side apps. The deprecated `anonKey` parameter is still accepted but `publishableKey` takes precedence when both are supplied."
+    },
+    {
+      "name": "headers",
+      "isOptional": true,
+      "type": "Map<String, String>",
+      "description": "Custom header to be passed to the Supabase client."
+    },
+    {
+      "name": "httpClient",
+      "isOptional": true,
+      "type": "Client",
+      "description": "Custom http client to be used by the Supabase client."
+    },
+    {
+      "name": "authOptions",
+      "isOptional": true,
+      "type": "FlutterAuthClientOptions",
+      "description": "Options to change the Auth behaviors.",
+      "subContent": [
+        {
+          "name": "authFlowType",
+          "isOptional": true,
+          "type": "AuthFlowType",
+          "description": "Whether to use the `pkce` flow or the `implicit` flow. Defaults to `pkce`."
+        },
+        {
+          "name": "localStorage",
+          "isOptional": true,
+          "type": "LocalStorage",
+          "description": "Parameter to override the local storage to store auth tokens."
+        },
+        {
+          "name": "autoRefreshToken",
+          "isOptional": true,
+          "type": "bool",
+          "description": "Whether to automatically refresh the token when it expires. Defaults to `true`."
+        }
+      ]
+    },
+    {
+      "name": "postgrestOptions",
+      "isOptional": true,
+      "type": "PostgrestClientOptions",
+      "description": "Options to change the Postgrest behaviors.",
+      "subContent": [
+        {
+          "name": "schema",
+          "isOptional": true,
+          "type": "String",
+          "description": "Schema to query with the Supabase client. Defaults to `public`."
+        }
+      ]
+    },
+    {
+      "name": "realtimeClientOptions",
+      "isOptional": true,
+      "type": "RealtimeClientOptions",
+      "description": "Options to change the Realtime behaviors.",
+      "subContent": [
+        {
+          "name": "logLevel",
+          "isOptional": true,
+          "type": "RealtimeLogLevel",
+          "description": "Level of realtime server logs to to be logged."
+        }
+      ]
+    },
+    {
+      "name": "storageOptions",
+      "isOptional": true,
+      "type": "StorageClientOptions",
+      "description": "Options to change the Storage behaviors.",
+      "subContent": [
+        {
+          "name": "retryAttempts",
+          "isOptional": true,
+          "type": "int",
+          "description": "The number of times to retry a failed upload request. Defaults to `0`."
+        },
+        {
+          "name": "useNewHostname",
+          "isOptional": true,
+          "type": "bool",
+          "description": "Whether to rewrite legacy storage URLs to use the dedicated storage host (`<ref>.storage.supabase.co`). Set to `true` only if your project has the dedicated storage host enabled. Defaults to `false`."
+        }
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "id": "flutter-initialize",
+      "name": "For Flutter",
+      "code": "```dart\nFuture<void> main() async {\n  await Supabase.initialize(\n    url: 'https://xyzcompany.supabase.co',\n    publishableKey: 'your-publishable-key',\n  );\n\n  runApp(MyApp());\n}\n\n// Get a reference your Supabase client\nfinal supabase = Supabase.instance.client;\n```\n"
+    },
+    {
+      "id": "for-other-dart-projects",
+      "name": "For other Dart projects",
+      "code": "```dart\nfinal supabase = SupabaseClient(\n  'https://xyzcompany.supabase.co',\n  'your-secret-key', // use your secret key for server-side usage\n);\n```\n"
+    }
+  ]
+}

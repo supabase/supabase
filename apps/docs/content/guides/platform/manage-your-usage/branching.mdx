@@ -5,7 +5,7 @@ title: 'Manage Branching usage'
 
 ## What you are charged for
 
-Each [Preview branch](/docs/guides/deployment/branching) is a separate environment with all Supabase services (Database, Auth, Storage, etc.). You're charged for usage within that environment—such as [Compute](/docs/guides/platform/manage-your-usage/compute), [Disk Size](/docs/guides/platform/manage-your-usage/disk-size), [Egress](/docs/guides/platform/manage-your-usage/egress), and [Storage](/docs/guides/platform/manage-your-usage/storage-size)—just like the project you branched from.
+Each [Preview branch](/docs/guides/deployment/branching) is a separate environment with all Supabase services (Database, Auth, Storage, etc.). You're charged for usage within that environment—such as [Compute](/docs/guides/platform/manage-your-usage/compute), [Disk Size](/docs/guides/platform/manage-your-usage/disk-size), [Egress](/docs/guides/platform/manage-your-usage/egress), and [Storage](/docs/guides/platform/manage-your-usage/storage-size)—the same as the project you branched from.
 
 <Admonition type="note">
 
@@ -19,7 +19,7 @@ Refer to individual [usage items](/docs/guides/platform/manage-your-usage) for d
 
 ### Usage on your invoice
 
-Compute incurred by Preview branches is shown as "Branching Compute Hours" on your invoice. Other usage items are not shown separately for branches and are rolled up into the project.
+Compute incurred by Preview branches is shown as "Branching Compute Hours" on your invoice. Other usage items are recorded against the branch itself and count toward your organization total, but are not listed separately per branch on your invoice. To see them, select the parent project on the [usage page](/dashboard/org/_/usage), then select the branch from the branch list.
 
 ## Pricing
 
@@ -55,7 +55,9 @@ You can view Branching usage on the [organization's usage page](/dashboard/org/_
     light: '/docs/img/guides/platform/usage-navbar--light.png',
     dark: '/docs/img/guides/platform/usage-navbar--dark.png',
   }}
-  zoomable
+
+width={1546}
+height={208}
 />
 
 In the Usage Summary section, you can see how many hours your Preview branches existed during the selected time period. Hover over "Branching Compute Hours" for a detailed breakdown.
@@ -66,14 +68,16 @@ In the Usage Summary section, you can see how many hours your Preview branches e
     light: '/docs/img/guides/platform/usage-summary-branch-hours--light.png',
     dark: '/docs/img/guides/platform/usage-summary-branch-hours--dark.png',
   }}
-  zoomable
+
+width={2258}
+height={1360}
 />
 
 ## Optimize usage
 
 - Merge Preview branches as soon as they are ready
 - Delete Preview branches that are no longer in use
-- Check whether your [persistent branches](/docs/guides/deployment/branching#persistent-branches) need to be defined as persistent, or if they can be ephemeral instead. Persistent branches will remain active even after the underlying PR is closed.
+- Check whether your [persistent branches](/docs/guides/deployment/branching#how-branching-works) need to be defined as persistent, or if they can be ephemeral instead. Persistent branches will remain active even after the underlying PR is closed.
 
 ## FAQ
 

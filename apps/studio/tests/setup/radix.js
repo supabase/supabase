@@ -14,38 +14,30 @@
  * Needed to interact with dropdown components, with the `clickDropdown` helper.
  */
 
-class PointerEvent extends Event {
-  constructor(type, props) {
-    super(type, props)
-    if (props.button != null) {
-      this.button = props.button
-    }
-    if (props.ctrlKey != null) {
-      this.ctrlKey = props.ctrlKey
+// Pure-logic tests run in the node environment, which has no `window` to patch.
+if (typeof window !== 'undefined') {
+  class PointerEvent extends Event {
+    constructor(type, props) {
+      super(type, props)
+      if (props.button != null) {
+        this.button = props.button
+      }
+      if (props.ctrlKey != null) {
+        this.ctrlKey = props.ctrlKey
+      }
     }
   }
-}
 
-window.PointerEvent = PointerEvent
-window.HTMLElement.prototype.scrollIntoView = function () {}
+  window.PointerEvent = PointerEvent
+  window.HTMLElement.prototype.scrollIntoView = function () {}
 
-// // https://github.com/radix-ui/primitives/issues/420#issuecomment-771615182
-window.ResizeObserver = class ResizeObserver {
-  constructor(cb) {
-    this.cb = cb
+  // // https://github.com/radix-ui/primitives/issues/420#issuecomment-771615182
+  window.ResizeObserver = class ResizeObserver {
+    constructor(cb) {
+      this.cb = cb
+    }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
   }
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-
-window.DOMRect = {
-  fromRect: () => ({
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
-    width: 0,
-    height: 0,
-  }),
 }

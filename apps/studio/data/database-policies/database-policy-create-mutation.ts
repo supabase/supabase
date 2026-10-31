@@ -1,17 +1,19 @@
 import pgMeta from '@supabase/pg-meta'
+import type { SafeSqlFragment } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databasePoliciesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreatePolicyBody = {
   name: string
   table: string
   schema?: string
-  definition?: string
-  check?: string
+  definition?: SafeSqlFragment
+  check?: SafeSqlFragment
   action?: 'PERMISSIVE' | 'RESTRICTIVE'
   command?: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
   roles?: string[]
@@ -37,6 +39,7 @@ export async function createDatabasePolicy({
     connectionString,
     sql,
     queryKey: ['policy', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result

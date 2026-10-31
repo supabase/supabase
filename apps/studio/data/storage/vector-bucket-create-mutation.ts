@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
 
 type VectorBucketCreateVariables = {
   projectRef: string
@@ -39,16 +39,16 @@ export const useVectorBucketCreateMutation = ({
 
   return useMutation<VectorBucketCreateData, ResponseError, VectorBucketCreateVariables>({
     mutationFn: (vars) => createVectorBucket(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: storageKeys.vectorBuckets(projectRef) })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to create vector bucket: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

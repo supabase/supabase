@@ -1,3 +1,11 @@
+import type { SafeSqlFragment } from '../pg-format'
+
+export type ActionConfig =
+  | { action: 'count' | 'delete' | 'truncate' }
+  | { action: 'select'; actionValue?: SafeSqlFragment }
+  | { action: 'insert'; actionValue: Array<Dictionary<any>> }
+  | { action: 'update'; actionValue: Dictionary<any> }
+
 export interface Sort {
   table: string
   column: string

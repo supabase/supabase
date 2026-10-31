@@ -1,6 +1,7 @@
 import { useIsLoggedIn, useParams } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 
 export function useSelectedOrganizationQuery({ enabled = true } = {}) {
   const isLoggedIn = useIsLoggedIn()

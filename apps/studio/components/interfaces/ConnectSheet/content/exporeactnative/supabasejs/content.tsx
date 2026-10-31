@@ -9,7 +9,7 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       language: 'bash',
       code: `
 EXPO_PUBLIC_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-EXPO_PUBLIC_SUPABASE_KEY=${projectKeys.publishableKey ?? '<prefer publishable key instead of anon key for mobile and desktop apps>'}
+EXPO_PUBLIC_SUPABASE_KEY=${projectKeys.publishableKey ?? 'your-publishable-key'}
         `,
     },
     {

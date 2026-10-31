@@ -1,17 +1,27 @@
 import dayjs from 'dayjs'
-import { TableCell } from 'ui/src/components/shadcn/ui/table'
+import { Badge, TableCell } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 interface TokenNameCellProps {
   name: string
   tokenAlias: string
+  isClassic: boolean
+  scopedTokensEnabled?: boolean
 }
 
-export const TokenNameCell = ({ name, tokenAlias }: TokenNameCellProps) => (
+export const TokenNameCell = ({
+  name,
+  tokenAlias,
+  isClassic,
+  scopedTokensEnabled,
+}: TokenNameCellProps) => (
   <TableCell className="w-auto max-w-96">
-    <p className="truncate" title={name}>
-      {name}
-    </p>
+    <div className="flex items-center gap-x-2">
+      <p className="truncate" title={name}>
+        {name}
+      </p>
+      {isClassic && scopedTokensEnabled && <Badge variant="default">Legacy</Badge>}
+    </div>
     <p
       className="font-mono text-foreground-lighter truncate text-xs mt-1 max-w-32 sm:max-w-48 lg:max-w-full"
       title={tokenAlias}

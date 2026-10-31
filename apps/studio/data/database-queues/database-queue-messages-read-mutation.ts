@@ -1,10 +1,12 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { isQueueNameValid } from 'components/interfaces/Integrations/Queues/Queues.utils'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageReadVariables = {
   projectRef: string
@@ -30,8 +32,9 @@ export async function readDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.set_vt('${queueName}', ${messageId}, ${duration})`,
+    sql: safeSql`select * from pgmq.set_vt(${literal(queueName)}, ${literal(messageId)}, ${literal(duration)})`,
     queryKey: databaseQueuesKeys.create(),
+    grant: unguarded.migrating,
   })
 
   return result

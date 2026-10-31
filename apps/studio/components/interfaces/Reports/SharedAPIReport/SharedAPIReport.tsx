@@ -1,4 +1,3 @@
-import ReportWidget from '../ReportWidget'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
@@ -6,6 +5,7 @@ import {
   TopApiRoutesRenderer,
   TotalRequestsChartRenderer,
 } from '../renderers/ApiRenderers'
+import ReportWidget from '../ReportWidget'
 import { SharedAPIReportKey } from './SharedAPIReport.constants'
 
 type SharedAPIReportWidgetsProps = {
@@ -81,7 +81,7 @@ export function SharedAPIReport({
           isLoading={isLoading.networkTraffic || isRefetching}
           error={error.networkTraffic}
           title="Network Traffic"
-          tooltip="Ingress and egress of requests and responses respectively"
+          tooltip="Ingress is measured from request logs."
           data={data.networkTraffic || []}
           renderer={NetworkTrafficRenderer}
           queryType="logs"

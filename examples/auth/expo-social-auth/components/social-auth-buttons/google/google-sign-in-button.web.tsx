@@ -1,15 +1,14 @@
-import { supabase } from '@/lib/supabase';
-import { CredentialResponse, GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
-import { SignInWithIdTokenCredentials } from '@supabase/supabase-js';
-import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase'
+import { CredentialResponse, GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google'
+import { SignInWithIdTokenCredentials } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
 
-import 'react-native-get-random-values';
+import 'react-native-get-random-values'
 
 export default function GoogleSignInButton() {
-
   // Generate secure, random values for state and nonce
-  const [nonce, setNonce] = useState('');
-  const [sha256Nonce, setSha256Nonce] = useState('');
+  const [nonce, setNonce] = useState('')
+  const [sha256Nonce, setSha256Nonce] = useState('')
 
   async function onGoogleButtonSuccess(authRequestResponse: CredentialResponse) {
     console.debug('Google sign in successful:', { authRequestResponse })
@@ -38,23 +37,24 @@ export default function GoogleSignInButton() {
 
   useEffect(() => {
     function generateNonce(): string {
-      const array = new Uint32Array(1);
-      window.crypto.getRandomValues(array);
-      return array[0].toString();
-    };
-
-    async function generateSha256Nonce(nonce: string): Promise<string> {
-      const buffer = await window.crypto.subtle.digest('sha-256', new TextEncoder().encode(nonce));
-      const array = Array.from(new Uint8Array(buffer));
-      return array.map(b => b.toString(16).padStart(2, '0')).join('');
+      const array = new Uint32Array(1)
+      window.crypto.getRandomValues(array)
+      return array[0].toString()
     }
 
-    let nonce = generateNonce();
-    setNonce(nonce);
+    async function generateSha256Nonce(nonce: string): Promise<string> {
+      const buffer = await window.crypto.subtle.digest('sha-256', new TextEncoder().encode(nonce))
+      const array = Array.from(new Uint8Array(buffer))
+      return array.map((b) => b.toString(16).padStart(2, '0')).join('')
+    }
 
-    generateSha256Nonce(nonce)
-      .then((sha256Nonce) => { setSha256Nonce(sha256Nonce) });
-  }, []);
+    let nonce = generateNonce()
+    setNonce(nonce)
+
+    generateSha256Nonce(nonce).then((sha256Nonce) => {
+      setSha256Nonce(sha256Nonce)
+    })
+  }, [])
 
   return (
     <GoogleOAuthProvider
@@ -69,5 +69,5 @@ export default function GoogleSignInButton() {
         auto_select={true}
       />
     </GoogleOAuthProvider>
-  );
+  )
 }

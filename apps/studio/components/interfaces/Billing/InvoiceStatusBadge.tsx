@@ -1,7 +1,8 @@
-import { InlineLink } from 'components/ui/InlineLink'
-import { DOCS_URL } from 'lib/constants'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { InvoiceStatus } from './Invoices.types'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
 
 interface InvoiceStatusBadgeProps {
   status: InvoiceStatus

@@ -1,37 +1,36 @@
 'use client'
 
-import { IS_PLATFORM, useFlag } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { IS_PLATFORM } from 'common'
 import {
-  Clock5,
-  Code2,
-  KeyRound,
-  Layers,
-  ListChecks,
-  Lock,
-  LockKeyhole,
-  Mail,
-  MessageCircle,
-  Plus,
-  Rows,
-  ShieldPlus,
-  Table2,
-  Telescope,
-  UserCog,
-  UserPlus,
-  Vault,
-  Webhook,
-  Zap,
+  Clock5Icon,
+  Code2Icon,
+  KeyRoundIcon,
+  LayersIcon,
+  ListChecksIcon,
+  LockIcon,
+  LockKeyholeIcon,
+  MailIcon,
+  MessageCircleIcon,
+  PlusIcon,
+  RowsIcon,
+  ShieldPlusIcon,
+  Table2Icon,
+  TelescopeIcon,
+  UserCogIcon,
+  UserPlusIcon,
+  VaultIcon,
+  WebhookIcon,
+  ZapIcon,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useMemo } from 'react'
+import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import {
   PageType,
   useRegisterCommands,
   useRegisterPage,
   useSetCommandMenuOpen,
 } from 'ui-patterns/CommandMenu'
-import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import {
@@ -39,6 +38,7 @@ import {
   getIntegrationRoute,
   useCreateCommandsConfig,
 } from './CreateCommands.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 
 const AiIconAnimation = dynamic(() => import('ui').then((mod) => mod.AiIconAnimation))
 const Badge = dynamic(() => import('ui').then((mod) => mod.Badge))
@@ -46,19 +46,16 @@ const EdgeFunctions = dynamic(() => import('icons').then((mod) => mod.EdgeFuncti
 const AnalyticsBucket = dynamic(() => import('icons').then((mod) => mod.AnalyticsBucket))
 const FilesBucket = dynamic(() => import('icons').then((mod) => mod.FilesBucket))
 const VectorBucket = dynamic(() => import('icons').then((mod) => mod.VectorBucket))
-const Graphql = dynamic(() => import('icons').then((mod) => mod.Graphql))
 
 const CREATE_STUDIO_ENTITY = 'Create Studio Entity'
 
 export function useCreateCommands(options?: CommandOptions) {
-  const enableCreateCommands = useFlag('enablecreatecommands')
   const setIsOpen = useSetCommandMenuOpen()
   const {
     ref,
     setPage,
     openSidebar,
     snap,
-    authenticationOauth21,
     authEnabled,
     edgeFunctionsEnabled,
     storageEnabled,
@@ -84,37 +81,37 @@ export function useCreateCommands(options?: CommandOptions) {
           id: 'create-db-table',
           name: 'Create Table',
           route: `/project/${ref}/editor?create=table`,
-          icon: () => <Table2 />,
+          icon: () => <Table2Icon />,
         },
         {
           id: 'create-db-index',
           name: 'Create Index',
           route: `/project/${ref}/database/indexes?new=true`,
-          icon: () => <Rows />,
+          icon: () => <RowsIcon />,
         },
         {
           id: 'create-db-function',
           name: 'Create Database Function',
           route: `/project/${ref}/database/functions?new=true`,
-          icon: () => <Code2 />,
+          icon: () => <Code2Icon />,
         },
         {
           id: 'create-db-enum',
           name: 'Create Enumerated Type',
           route: `/project/${ref}/database/types?new=true`,
-          icon: () => <ListChecks />,
+          icon: () => <ListChecksIcon />,
         },
         {
           id: 'create-db-trigger',
           name: 'Create Database Trigger',
           route: `/project/${ref}/database/triggers?new=true`,
-          icon: () => <Zap />,
+          icon: () => <ZapIcon />,
         },
         {
           id: 'create-db-role',
           name: 'Create Database Role',
           route: `/project/${ref}/database/roles?new=true`,
-          icon: () => <UserCog />,
+          icon: () => <UserCogIcon />,
         },
       ].filter(Boolean) as ICommand[],
     [ref]
@@ -128,13 +125,13 @@ export function useCreateCommands(options?: CommandOptions) {
               id: 'create-auth-user',
               name: 'Create Auth User',
               route: `/project/${ref}/auth/users?new=true`,
-              icon: () => <UserPlus />,
+              icon: () => <UserPlusIcon />,
             },
             {
               id: 'create-rls-policy',
               name: 'Create RLS Policy',
-              route: `/project/${ref}/auth/policies?new=true`,
-              icon: () => <ShieldPlus />,
+              route: `/project/${ref}/database/policies?new=true`,
+              icon: () => <ShieldPlusIcon />,
             },
             ...(IS_PLATFORM
               ? [
@@ -142,25 +139,25 @@ export function useCreateCommands(options?: CommandOptions) {
                     id: 'create-auth-hook-sms',
                     name: 'Create Auth Hook (SMS)',
                     route: `/project/${ref}/auth/hooks?hook=${sendSmsHook?.id}`,
-                    icon: () => <MessageCircle />,
+                    icon: () => <MessageCircleIcon />,
                   },
                   {
                     id: 'create-auth-hook-email',
                     name: 'Create Auth Hook (Email)',
                     route: `/project/${ref}/auth/hooks?hook=${sendEmailHook?.id}`,
-                    icon: () => <Mail />,
+                    icon: () => <MailIcon />,
                   },
                   {
                     id: 'create-auth-hook-custom-access-token',
                     name: 'Create Auth Hook (Custom Access Token)',
                     route: `/project/${ref}/auth/hooks?hook=${customAccessTokenHook?.id}`,
-                    icon: () => <KeyRound />,
+                    icon: () => <KeyRoundIcon />,
                   },
                   {
                     id: 'create-auth-hook-mfa-verification',
                     name: 'Create Auth Hook (MFA Verification Attempt)',
                     route: `/project/${ref}/auth/hooks?hook=${mfaVerificationHook?.id}`,
-                    icon: () => <ShieldPlus />,
+                    icon: () => <ShieldPlusIcon />,
                     badge: () => (mfaVerificationHookEnabled ? <Badge>Team</Badge> : null),
                     className: mfaVerificationHookEnabled
                       ? 'opacity-50 cursor-not-allowed pointer-events-none'
@@ -170,7 +167,7 @@ export function useCreateCommands(options?: CommandOptions) {
                     id: 'create-auth-hook-password-verification',
                     name: 'Create Auth Hook (Password Verification Attempt)',
                     route: `/project/${ref}/auth/hooks?hook=${passwordVerificationHook?.id}`,
-                    icon: () => <Lock />,
+                    icon: () => <LockIcon />,
                     badge: () => (passwordVerificationHookEnabled ? <Badge>Team</Badge> : null),
                     className: passwordVerificationHookEnabled
                       ? 'opacity-50 cursor-not-allowed pointer-events-none'
@@ -180,17 +177,17 @@ export function useCreateCommands(options?: CommandOptions) {
                     id: 'create-auth-hook-before-user-created',
                     name: 'Create Auth Hook (Before User Created)',
                     route: `/project/${ref}/auth/hooks?hook=${beforeUserCreatedHook?.id}`,
-                    icon: () => <KeyRound />,
+                    icon: () => <KeyRoundIcon />,
                   },
                 ]
               : []),
-            ...(IS_PLATFORM && authenticationOauth21
+            ...(IS_PLATFORM
               ? [
                   {
                     id: 'create-oauth-app',
                     name: 'Create OAuth App',
                     route: `/project/${ref}/auth/oauth-apps?new=true`,
-                    icon: () => <KeyRound />,
+                    icon: () => <KeyRoundIcon />,
                   },
                 ]
               : []),
@@ -207,7 +204,6 @@ export function useCreateCommands(options?: CommandOptions) {
       passwordVerificationHook,
       passwordVerificationHookEnabled,
       beforeUserCreatedHook,
-      authenticationOauth21,
     ]
   )
 
@@ -270,7 +266,7 @@ export function useCreateCommands(options?: CommandOptions) {
               id: 'create-edge-function-secret',
               name: 'Create Edge Function Secret',
               route: `/project/${ref}/functions/secrets`,
-              icon: () => <LockKeyhole />,
+              icon: () => <LockKeyholeIcon />,
             },
           ].filter(Boolean) as ICommand[])
         : [],
@@ -334,7 +330,7 @@ export function useCreateCommands(options?: CommandOptions) {
         const getIcon = () => {
           if (isWrapper) {
             return (
-              <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
+              <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:p-1! [&>svg]:p-1!">
                 {integration.icon()}
               </div>
             )
@@ -343,13 +339,13 @@ export function useCreateCommands(options?: CommandOptions) {
           // Use plain icons for Postgres modules
           switch (integration.id) {
             case 'vault':
-              return <Vault />
+              return <VaultIcon />
             case 'cron':
-              return <Clock5 />
+              return <Clock5Icon />
             case 'webhooks':
-              return <Webhook />
+              return <WebhookIcon />
             case 'queues':
-              return <Layers />
+              return <LayersIcon />
             default:
               // Fallback to integration icon for other Postgres modules
               return integration.icon()
@@ -366,17 +362,20 @@ export function useCreateCommands(options?: CommandOptions) {
       .filter(Boolean) as ICommand[]
   }, [ref, allIntegrations, installedIntegrationIds])
 
+  // Observability commands are only available on the platform, not for self-hosted/CLI
   const observabilityCommands = useMemo(
     () => [
-      ...(IS_PLATFORM && reportsEnabled
-        ? ([
-            {
-              id: 'create-observability-report',
-              name: 'Create Custom Report',
-              route: `/project/${ref}/observability/api-overview?newReport=true`,
-              icon: () => <Telescope />,
-            },
-          ].filter(Boolean) as ICommand[])
+      ...(IS_PLATFORM
+        ? reportsEnabled
+          ? ([
+              {
+                id: 'create-observability-report',
+                name: 'Create Custom Report',
+                route: `/project/${ref}/observability/api-overview?newReport=true`,
+                icon: () => <TelescopeIcon />,
+              },
+            ].filter(Boolean) as ICommand[])
+          : []
         : []),
     ],
     [ref, reportsEnabled]
@@ -453,7 +452,7 @@ export function useCreateCommands(options?: CommandOptions) {
     },
     {
       deps: [sections],
-      enabled: enableCreateCommands,
+      enabled: true,
     }
   )
 
@@ -464,14 +463,14 @@ export function useCreateCommands(options?: CommandOptions) {
         id: 'create-studio-entity',
         name: 'Create...',
         action: () => setPage(CREATE_STUDIO_ENTITY),
-        icon: () => <Plus />,
+        icon: () => <PlusIcon />,
       },
     ],
     {
       ...options,
       orderSection: (sections) => sections,
       sectionMeta: { priority: 3 },
-      enabled: enableCreateCommands,
+      enabled: true,
     }
   )
 }

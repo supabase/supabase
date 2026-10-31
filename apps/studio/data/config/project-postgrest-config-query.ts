@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { configKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 /**
  * Parses the exposed schema string returned from PostgREST config.
@@ -21,7 +21,7 @@ export type ProjectPostgrestConfigVariables = {
   projectRef?: string
 }
 
-type PostgrestConfigResponse = components['schemas']['GetPostgrestConfigResponse'] & {
+type PostgrestConfigResponse = components['schemas']['GetPostgrestConfigResponse_Output'] & {
   db_pool: number | null
 }
 

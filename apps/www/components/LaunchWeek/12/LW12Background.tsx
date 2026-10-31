@@ -21,7 +21,7 @@ const LW12Background = ({ className }: Props) => {
           />
         </div>
       ))}
-      <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute inset-0 w-full h-full bg-linear-to-t from-background to-transparent" />
     </div>
   )
 }

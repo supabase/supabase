@@ -1,37 +1,45 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-
-import { useUserQuery } from 'data/auth/user-query'
-import { User } from 'data/auth/users-infinite-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   cn,
-  Input_Shadcn_,
   ResizableHandle,
   ResizablePanel,
-  SimpleCodeBlock,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { UserCard } from './UserCard'
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
-import { PANEL_PADDING } from './Users.constants'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { UserRecentLogs } from '@/components/interfaces/UnifiedLogs/components/UserRecentLogs'
+import { RawJsonView } from '@/components/ui/RawJsonView'
+import { useUserQuery } from '@/data/auth/user-query'
+import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+type UserPanelView = 'overview' | 'raw' | 'logs'
 
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
+  const showLogs = useIsFeatureEnabled('logs:all')
+  const isOtelUnifiedLogs = useUnifiedLogsBackend()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+  const showRecentLogs = showLogs && isOtelUnifiedLogs && isUnifiedLogsEnabled
 
   const [selectedId, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [view, setView] = useState<'overview' | 'raw' | 'logs'>('overview')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [view, setView] = useState<UserPanelView>('overview')
 
   const { data: selectedUser, isPending } = useUserQuery({
     projectRef: project?.ref,
@@ -39,106 +47,73 @@ export const UserPanel = () => {
     userId: selectedId,
   })
 
-  const filteredProperties = selectedUser
-    ? Object.entries(selectedUser)
-        .filter(
-          ([key, value]) =>
-            key.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (typeof value === 'string' && value.toLowerCase().includes(searchQuery.toLowerCase()))
-        )
-        .reduce((obj, [key, value]) => {
-          if (value !== undefined) {
-            obj[key as keyof User] = value as any
-          }
-          return obj
-        }, {} as Partial<User>)
-    : {}
-
   return (
     <>
       <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={30} maxSize={45} minSize={30} className="bg-studio border-t">
-        <Button
-          type="text"
-          className="absolute top-3 right-3 px-1"
-          icon={<X />}
-          onClick={() => setSelectedId(null)}
-        />
-        <Tabs_Shadcn_
+      <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
+        {!selectedUser && (
+          <Button
+            variant="text"
+            className="absolute top-3 right-3 z-10 px-1"
+            icon={<XIcon />}
+            aria-label="Close panel"
+            onClick={() => setSelectedId(null)}
+          />
+        )}
+        <Tabs
           value={view}
           className="flex flex-col h-full"
-          onValueChange={(value) => setView(value as 'overview' | 'raw' | 'logs')}
+          onValueChange={(value) => {
+            if (value === 'overview' || value === 'raw' || value === 'logs') setView(value)
+          }}
         >
           {isPending ? (
             <div>
               <div className="min-h-[46px] border-b" />
-              <div className="p-5">
+              <div className="p-4">
                 <GenericSkeletonLoader />
               </div>
             </div>
           ) : !!selectedUser ? (
             <>
-              <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
-                <TabsTrigger_Shadcn_
-                  value="overview"
-                  className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
-                >
-                  Overview
-                </TabsTrigger_Shadcn_>
-                <TabsTrigger_Shadcn_
-                  value="logs"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
-                >
-                  Logs
-                </TabsTrigger_Shadcn_>
-                <TabsTrigger_Shadcn_
-                  value="raw"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
-                >
-                  Raw JSON
-                </TabsTrigger_Shadcn_>
-              </TabsList_Shadcn_>
+              <UserCard
+                user={selectedUser}
+                className="pb-3"
+                actions={
+                  <Button
+                    variant="text"
+                    className="px-1"
+                    icon={<XIcon />}
+                    aria-label="Close panel"
+                    onClick={() => setSelectedId(null)}
+                  />
+                }
+              />
+              <TabsList className="shrink-0 gap-x-4 px-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                {showLogs && !showRecentLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}
+                <TabsTrigger value="raw">Raw JSON</TabsTrigger>
+                {showRecentLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}
+                <TabsIndicator />
+              </TabsList>
 
-              <TabsContent_Shadcn_
-                value="overview"
-                className={cn('mt-0 flex-grow min-h-0 overflow-y-auto')}
-              >
+              <TabsContent value="overview" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
                 {selectedUser && (
                   <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
                 )}
-              </TabsContent_Shadcn_>
-              <TabsContent_Shadcn_
-                value="logs"
-                className={cn('mt-0 flex-grow min-h-0 overflow-y-auto')}
-              >
-                {selectedUser && <UserLogs user={selectedUser} />}
-              </TabsContent_Shadcn_>
-              <TabsContent_Shadcn_
-                value="raw"
-                className={cn('mt-0 flex-grow min-h-0 overflow-y-auto', PANEL_PADDING)}
-              >
-                <div className="flex items-center mb-2">
-                  <Input_Shadcn_
-                    autoFocus
-                    type="text"
-                    placeholder="Filter..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="mr-2"
-                  />
-                  <Button
-                    type="text"
-                    disabled={!searchQuery}
-                    onClick={() => setSearchQuery('')}
-                    className="text-xs"
-                  >
-                    Clear
-                  </Button>
-                </div>
-                <SimpleCodeBlock className="javascript" parentClassName="[&>*>span]:text-xs">
-                  {JSON.stringify(filteredProperties, null, 2)}
-                </SimpleCodeBlock>
-              </TabsContent_Shadcn_>
+              </TabsContent>
+              {showLogs && (
+                <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
+                  {showRecentLogs && selectedUser.id ? (
+                    <UserRecentLogs userId={selectedUser.id} />
+                  ) : (
+                    <UserLogs user={selectedUser} />
+                  )}
+                </TabsContent>
+              )}
+              <TabsContent value="raw" className="mt-0 grow min-h-0 overflow-y-auto">
+                <RawJsonView data={selectedUser} copyLabel="Copy user as JSON" />
+              </TabsContent>
             </>
           ) : (
             <div className="flex items-center justify-center w-full h-full flex-col gap-y-2">
@@ -148,7 +123,7 @@ export const UserPanel = () => {
               <p className="text-foreground-lighter text-xs">ID: {selectedId}</p>
             </div>
           )}
-        </Tabs_Shadcn_>
+        </Tabs>
       </ResizablePanel>
     </>
   )

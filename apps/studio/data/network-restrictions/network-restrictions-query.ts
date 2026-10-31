@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
 import { networkRestrictionKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import { UseCustomQueryOptions } from '@/types'
 
 export type NetworkRestrictionsVariables = { projectRef?: string }
 
@@ -23,6 +23,7 @@ export async function getNetworkRestrictions(
   const { data, error } = await get('/v1/projects/{ref}/network-restrictions', {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   // Not allowed error is a valid response to denote if a project

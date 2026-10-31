@@ -1,39 +1,46 @@
-export const TYPES_SQL = /* SQL */ `
+import { safeSql } from '../pg-format'
+
+/**
+ * User-defined types. Enums/attrs are correlated subqueries after schema
+ * filters so the planner does not GROUP BY the whole catalog first.
+ * Ends at a trailing WHERE so pg-meta-types.ts#list can append filters,
+ * `order by t.oid`, and limit.
+ */
+export const TYPES_SQL = /* SQL */ safeSql`
 select
   t.oid::int8 as id,
   t.typname as name,
   n.nspname as schema,
   format_type (t.oid, null) as format,
-  coalesce(t_enums.enums, '[]') as enums,
-  coalesce(t_attributes.attributes, '[]') as attributes,
+  coalesce(
+    (
+      select
+        jsonb_agg(e.enumlabel order by e.enumsortorder)
+      from
+        pg_enum e
+      where
+        e.enumtypid = t.oid
+    ),
+    '[]'
+  ) as enums,
+  coalesce(
+    (
+      select
+        jsonb_agg(
+          jsonb_build_object('name', a.attname, 'type_id', a.atttypid::int8)
+          order by a.attnum asc
+        )
+      from
+        pg_attribute a
+      where
+        a.attrelid = t.typrelid and not a.attisdropped
+    ),
+    '[]'
+  ) as attributes,
   obj_description (t.oid, 'pg_type') as comment
 from
   pg_type t
   left join pg_namespace n on n.oid = t.typnamespace
-  left join (
-    select
-      enumtypid,
-      jsonb_agg(enumlabel order by enumsortorder) as enums
-    from
-      pg_enum
-    group by
-      enumtypid
-  ) as t_enums on t_enums.enumtypid = t.oid
-  left join (
-    select
-      oid,
-      jsonb_agg(
-        jsonb_build_object('name', a.attname, 'type_id', a.atttypid::int8)
-        order by a.attnum asc
-      ) as attributes
-    from
-      pg_class c
-      join pg_attribute a on a.attrelid = c.oid
-    where
-      c.relkind = 'c' and not a.attisdropped
-    group by
-      c.oid
-  ) as t_attributes on t_attributes.oid = t.typrelid
 where
   (
     t.typrelid = 0

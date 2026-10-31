@@ -1,18 +1,17 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Check, Key, Trash } from 'lucide-react'
+import { CheckIcon, KeyIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import { useClientSecretDeleteMutation } from 'data/oauth-secrets/client-secret-delete-mutation'
-import { Secret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import { useClientSecretDeleteMutation } from '@/data/oauth-secrets/client-secret-delete-mutation'
+import { Secret, useClientSecretsQuery } from '@/data/oauth-secrets/client-secrets-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface SecretRowProps {
   secret: Secret
@@ -22,7 +21,9 @@ export interface SecretRowProps {
 export const SecretRow = ({ secret, appId }: SecretRowProps) => {
   const { slug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const { can: canManageSecrets } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  )
 
   const { data } = useClientSecretsQuery({ slug, appId })
   const secrets = data?.client_secrets ?? []
@@ -57,16 +58,16 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
         )}
       >
         <div className="flex flex-row gap-6 items-center">
-          <Key size={16} strokeWidth={2} />
+          <KeyIcon size={16} strokeWidth={2} />
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
-                {isNew && <Check size={14} className="text-brand" strokeWidth={3} />}
+                {isNew && <CheckIcon size={14} className="text-primary" strokeWidth={3} />}
                 <p className="font-mono text-sm">
                   {isNew ? secret.client_secret : `${secret.client_secret_alias}${'*'.repeat(36)}`}
                 </p>
                 {isNew && secret.client_secret && (
-                  <CopyButton text={secret.client_secret} type="default" iconOnly />
+                  <CopyButton text={secret.client_secret} variant="default" iconOnly />
                 )}
               </div>
             </div>
@@ -87,9 +88,8 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
         </div>
         <div className="flex items-center gap-2">
           <ButtonTooltip
-            type="default"
             className="w-7"
-            icon={<Trash />}
+            icon={<TrashIcon />}
             disabled={!appId || !canManageSecrets || isLast}
             onClick={() => setShowDeleteModal(true)}
             tooltip={{

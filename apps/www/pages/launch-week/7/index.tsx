@@ -37,17 +37,17 @@ export default function TicketHome() {
         }}
       />
       <DefaultLayout>
-        <div className="bg-[#1C1C1C] -mt-[65px]">
+        <div className="bg-[#1C1C1C] mt-[-65px]">
           <div className="relative bg-[#9e44ef] pt-16">
             <div className="relative z-10">
-              <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
+              <SectionContainer className="flex flex-col justify-around items-center py-4! md:py-8! gap-2 md:gap-4 px-2! mx-auto!">
                 <LaunchWeekLogoHeader />
               </SectionContainer>
               <LW7BgGraphic />
             </div>
           </div>
 
-          <div className="relative !w-full max-w-[100vw] !px-4 sm:max-w-xl md:max-w-4xl lg:max-w-7xl -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !mx-auto">
+          <div className="relative w-full! max-w-[100vw] px-4! sm:max-w-xl md:max-w-4xl lg:max-w-7xl -mt-48 md:mt-[-460px] z-20 flex flex-col justify-around items-center py-4! md:py-8! gap-2 md:gap-4 mx-auto!">
             <LW7Releases />
             <LaunchWeekPrizeSection className="pt-10" />
           </div>

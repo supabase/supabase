@@ -2,10 +2,11 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { privilegeKeys } from './keys'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TablePrivilegesRevoke = Parameters<
   typeof pgMeta.tablePrivileges.revoke
@@ -30,6 +31,7 @@ export async function revokeTablePrivileges({
     connectionString,
     sql,
     queryKey: ['table-privileges', 'revoke'],
+    grant: unguarded.migrating,
   })
   return result
 }

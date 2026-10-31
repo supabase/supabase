@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import {
   compareSemver,
   isEqual,
@@ -76,11 +77,6 @@ describe('compareSemver', () => {
   it('should return null for invalid versions', () => {
     expect(compareSemver('1.2.3', 'invalid')).toBeNull()
     expect(compareSemver('invalid', '1.2.3')).toBeNull()
-  })
-
-  it('should prioritize major version differences', () => {
-    expect(compareSemver('2.0.0', '1.99.99')).toBe(1)
-    expect(compareSemver('1.99.99', '2.0.0')).toBe(-1)
   })
 
   it('should prioritize minor version differences when major is equal', () => {

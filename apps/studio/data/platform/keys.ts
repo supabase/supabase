@@ -1,3 +1,3 @@
 export const platformKeys = {
-  incidentStatus: () => ['platform', 'incident-status'] as const,
+  statusPage: () => ['platform', 'status-page'] as const,
 }

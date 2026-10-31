@@ -1,29 +1,28 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Lock, Mail } from 'lucide-react'
+import { useParams } from 'common'
+import { LockIcon, MailIcon } from 'lucide-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { useParams } from 'common'
-import { useUserCreateMutation } from 'data/auth/user-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogSectionSeparator,
   DialogTitle,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
 } from 'ui'
+import * as z from 'zod'
+
+import { useUserCreateMutation } from '@/data/auth/user-create-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type CreateUserModalProps = {
   visible: boolean
@@ -38,9 +37,8 @@ const CreateUserFormSchema = z.object({
 
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canCreateUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'create_user'
+  const { can: canCreateUsers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
 
   const { mutate: createUser, isPending: isCreatingUser } = useUserCreateMutation({
@@ -68,26 +66,26 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
           <DialogTitle>Create a new user</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id="create-user"
             className="flex flex-col gap-y-4 p-6"
             onSubmit={form.handleSubmit(onCreateUser)}
           >
-            <FormField_Shadcn_
+            <FormField
               name="email"
               control={form.control}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col gap-1">
-                  <FormLabel_Shadcn_>Email address</FormLabel_Shadcn_>
-                  <FormControl_Shadcn_>
+                <FormItem className="flex flex-col gap-1">
+                  <FormLabel>Email address</FormLabel>
+                  <FormControl>
                     <div className="items-center relative">
-                      <Mail
+                      <MailIcon
                         size={18}
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}
                       />
-                      <Input_Shadcn_
+                      <Input
                         autoFocus
                         {...field}
                         autoComplete="off"
@@ -98,26 +96,26 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                         className="pl-8"
                       />
                     </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               name="password"
               control={form.control}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col gap-1">
-                  <FormLabel_Shadcn_>User Password</FormLabel_Shadcn_>
-                  <FormControl_Shadcn_>
+                <FormItem className="flex flex-col gap-1">
+                  <FormLabel>User Password</FormLabel>
+                  <FormControl>
                     <div className="items-center relative">
-                      <Lock
+                      <LockIcon
                         size={18}
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}
                       />
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         autoComplete="new-password"
                         type="password"
@@ -127,45 +125,46 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                         className="pl-8"
                       />
                     </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               name="autoConfirmUser"
               control={form.control}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex items-center gap-x-2">
-                  <FormControl_Shadcn_>
-                    <Checkbox_Shadcn_
+                <FormItem className="flex items-center gap-x-2">
+                  <FormControl>
+                    <Checkbox
                       checked={field.value}
                       onCheckedChange={(value) => field.onChange(value)}
                     />
-                  </FormControl_Shadcn_>
-                  <FormLabel_Shadcn_>Auto Confirm User?</FormLabel_Shadcn_>
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormLabel>Auto confirm user?</FormLabel>
+                </FormItem>
               )}
             />
 
-            <FormLabel_Shadcn_>
+            <FormLabel>
               <p className="text-sm text-foreground-lighter">
                 A confirmation email will not be sent when creating a user via this form.
               </p>
-            </FormLabel_Shadcn_>
+            </FormLabel>
 
             <Button
+              variant="primary"
               block
               size="small"
-              htmlType="submit"
+              type="submit"
               loading={isCreatingUser}
               disabled={!canCreateUsers || isCreatingUser}
             >
               Create user
             </Button>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

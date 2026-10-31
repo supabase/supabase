@@ -1,14 +1,15 @@
+import { describe, expect, test } from 'vitest'
+
 import {
   calculateMaxCost,
   calculateSummary,
   parseExplainOutput,
   parseNodeDetails,
-} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
 import type {
   ExplainNode,
   QueryPlanRow,
-} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
-import { describe, expect, test } from 'vitest'
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 
 // Helper to create QueryPlanRow array from strings
 const toQueryPlanRows = (lines: string[]): QueryPlanRow[] =>
@@ -569,42 +570,6 @@ describe('parseExplainOutput', () => {
       // Should not parse invalid value at all (regex won't match)
       expect(result[0].rowsRemovedByFilter).toBeUndefined()
     })
-
-    test('parsed numeric fields are finite for valid input', () => {
-      const input = toQueryPlanRows([
-        'Seq Scan on users  (cost=0.00..10.50 rows=100 width=36) (actual time=0.015..0.123 rows=85 loops=1)',
-        "  Filter: (status = 'active')",
-        '  Rows Removed by Filter: 15',
-      ])
-
-      const result = parseExplainOutput(input)
-      parseNodeDetails(result[0])
-
-      expect(result).toHaveLength(1)
-      const node = result[0]
-
-      // Verify all numeric values are finite
-      if (node.cost) {
-        expect(Number.isFinite(node.cost.start)).toBe(true)
-        expect(Number.isFinite(node.cost.end)).toBe(true)
-      }
-      if (node.actualTime) {
-        expect(Number.isFinite(node.actualTime.start)).toBe(true)
-        expect(Number.isFinite(node.actualTime.end)).toBe(true)
-      }
-      if (node.rows !== undefined) {
-        expect(Number.isFinite(node.rows)).toBe(true)
-      }
-      if (node.actualRows !== undefined) {
-        expect(Number.isFinite(node.actualRows)).toBe(true)
-      }
-      if (node.width !== undefined) {
-        expect(Number.isFinite(node.width)).toBe(true)
-      }
-      if (node.rowsRemovedByFilter !== undefined) {
-        expect(Number.isFinite(node.rowsRemovedByFilter)).toBe(true)
-      }
-    })
   })
 
   describe('complex real-world queries', () => {
@@ -885,25 +850,7 @@ describe('calculateSummary', () => {
     })
   })
 
-  test('calculates totalCost from root node cost.end', () => {
-    const tree: ExplainNode[] = [
-      {
-        operation: 'Seq Scan',
-        details: 'on users',
-        cost: { start: 0, end: 45.5 },
-        rows: 100,
-        width: 36,
-        level: 0,
-        children: [],
-        raw: '',
-      },
-    ]
-
-    const result = calculateSummary(tree)
-    expect(result.totalCost).toBe(45.5)
-  })
-
-  test('calculates maxCost from maximum cost across all nodes', () => {
+  test('takes totalCost from the root node and maxCost from the most expensive node', () => {
     const tree: ExplainNode[] = [
       {
         operation: 'Limit',

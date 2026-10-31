@@ -1,20 +1,40 @@
 import pgMeta from '@supabase/pg-meta'
-import { safeValidateUIMessages } from 'ai'
+import type { JwtPayload } from '@supabase/supabase-js'
+import { pipeUIMessageStreamToResponse, safeValidateUIMessages, toUIMessageStream } from 'ai'
+import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { IS_PLATFORM } from 'common'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { getModel } from 'lib/ai/model'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import { generateAssistantResponse } from 'lib/ai/generate-assistant-response'
-import { getTools } from 'lib/ai/tools'
-import { getURL } from 'lib/helpers'
-import apiWrapper from 'lib/api/apiWrapper'
-import { executeQuery } from 'lib/api/self-hosted/query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getAIDetails } from '@/lib/ai/ai-details'
+import { NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
+import {
+  assistantMessageMetadataSchema,
+  messagesIncludeLogsSnippets,
+  type AssistantMessageMetadata,
+} from '@/lib/ai/assistant-message-metadata'
+import { ASSISTANT_TIMEOUT_MS } from '@/lib/ai/assistant-timeout'
+import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
+import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
+import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
+import { getModel } from '@/lib/ai/model'
+import {
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  getAssistantModelEntry,
+  isAssistantBaseModelId,
+  isKnownAssistantModelId,
+  type AssistantModelId,
+} from '@/lib/ai/model.utils'
+import { getTools } from '@/lib/ai/tools'
+import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
+import { apiWrapper } from '@/lib/api/apiWrapper'
+import { executeQuery } from '@/lib/api/self-hosted/query'
+import { getBasePathURL } from '@/lib/helpers'
+import { trustedUserEmail } from '@/lib/server/configcat'
 
-export const maxDuration = 120
+export const maxDuration = 300
 
 export const config = {
   api: {
@@ -24,12 +44,12 @@ export const config = {
   },
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
   const { method } = req
 
   switch (method) {
     case 'POST':
-      return handlePost(req, res)
+      return handlePost(req, res, claims)
     default:
       res.setHeader('Allow', ['POST'])
       res.status(405).json({
@@ -50,18 +70,23 @@ const requestBodySchema = z.object({
   connectionString: z.string(),
   schema: z.string().optional(),
   table: z.string().optional(),
+  chatId: z.string().optional(),
   chatName: z.string().optional(),
+  supportMode: z.boolean().optional(),
   orgSlug: z.string().optional(),
-  model: z.enum(['gpt-5', 'gpt-5-mini']).optional(),
+  model: z.string().optional(),
 })
 
-async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
+  const requestStartedAt = Date.now()
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
   if (IS_PLATFORM && !accessToken) {
     return res.status(401).json({ error: 'Authorization token is required' })
   }
+
+  const userId = claims?.sub
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
   const { data, error: parseError } = requestBodySchema.safeParse(body)
@@ -74,43 +99,54 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     messages: rawMessages,
     projectRef,
     connectionString,
-    orgSlug,
+    orgSlug: rawOrgSlug,
+    chatId,
     chatName,
-    model: requestedModel,
+    model: rawRequestedModel,
+    supportMode,
   } = data
 
-  const messagesValidation = await safeValidateUIMessages({ messages: rawMessages })
+  const requestedModel: AssistantModelId | undefined =
+    rawRequestedModel && isKnownAssistantModelId(rawRequestedModel) ? rawRequestedModel : undefined
+
+  const messagesValidation = await safeValidateUIMessages({
+    messages: rawMessages,
+    metadataSchema: assistantMessageMetadataSchema,
+  })
   if (!messagesValidation.success) {
-    return res
-      .status(400)
-      .json({ error: 'Invalid request body', message: messagesValidation.error.message })
+    return res.status(400).json({
+      error: 'Invalid request body',
+      message: messagesValidation.error.message,
+    })
   }
   const messages = messagesValidation.data
 
+  const includesLogsSnippets = messagesIncludeLogsSnippets(messages)
+
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let isLimited = false
-  let isHipaaEnabled = false
+  let hasAccessToAdvanceModel = false
+  let projectRegion: string | undefined
+  let isHighComplianceProject: boolean | undefined
+  let orgId: number | undefined
+  let orgSlug: string | undefined
+  let planId: string | undefined
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
+    hasAccessToAdvanceModel = true
   }
 
-  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
+  if (IS_PLATFORM && rawOrgSlug && authorization && projectRef) {
     try {
-      // Get organizations and compute opt in level server-side
-      const {
-        aiOptInLevel: orgAIOptInLevel,
-        isLimited: orgAILimited,
-        isHipaaEnabled: orgIsHipaaEnabled,
-      } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-        projectRef,
-      })
+      const aiDetails = await getAIDetails({ orgSlug: rawOrgSlug, projectRef, authorization })
 
-      aiOptInLevel = orgAIOptInLevel
-      isLimited = orgAILimited
-      isHipaaEnabled = orgIsHipaaEnabled
+      aiOptInLevel = aiDetails.aiOptInLevel
+      hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
+      orgId = aiDetails.orgId
+      orgSlug = aiDetails.orgSlug
+      planId = aiDetails.planId
+      projectRegion = aiDetails.region
+      isHighComplianceProject = aiDetails.isHighComplianceProject
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -118,16 +154,22 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
+  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
+
+  const envThrottled = process.env.IS_THROTTLED !== 'false'
+
+  let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
+  if (!isAssistantBaseModelId(effectiveModel) && (!hasAccessToAdvanceModel || envThrottled)) {
+    effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
+  }
+
   const {
-    model,
+    modelParams,
     error: modelError,
-    promptProviderOptions,
-    providerOptions,
+    systemProviderOptions,
   } = await getModel({
     provider: 'openai',
-    model: requestedModel ?? 'gpt-5',
-    routingKey: projectRef,
-    isLimited,
+    modelEntry: getAssistantModelEntry(effectiveModel),
   })
 
   if (modelError) {
@@ -138,6 +180,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     const abortController = new AbortController()
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
+    // Fires when the connection drops. Aborting tears down the remote MCP connection opened
+    // in getTools. The TanStack adapter doesn't emit it, so settling the pipe below also aborts.
+    res.on('close', () => abortController.abort())
 
     const tools = await getTools({
       projectRef,
@@ -145,7 +190,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       authorization,
       aiOptInLevel,
       accessToken,
-      baseUrl: getURL(),
+      baseUrl: getBasePathURL(),
+      supportMode,
+      isExplorerEnabled: explorerEnabled,
+      signal: abortController.signal,
     })
 
     // Get a list of all schemas to add to context
@@ -158,6 +206,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           projectRef,
           connectionString,
           sql: pgMetaSchemasList.sql,
+          grant: unguarded.migrating,
         },
         undefined,
         {
@@ -169,26 +218,45 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       return schemas?.length > 0
         ? `The available database schema names are: ${JSON.stringify(schemas)}`
-        : "You don't have access to any schemas."
+        : NO_SCHEMA_ACCESS_MESSAGE
     }
 
     const result = await generateAssistantResponse({
       messages,
-      model,
+      ...modelParams,
       tools,
       aiOptInLevel,
       getSchemas: aiOptInLevel !== 'disabled' ? getSchemas : undefined,
       projectRef,
+      chatId,
       chatName,
-      isHipaaEnabled,
-      promptProviderOptions,
-      providerOptions,
+      allowTracing: isTracingAllowed({ projectRegion }),
+      supportMode,
+      userId,
+      orgId,
+      orgSlug,
+      planId,
+      isHighComplianceProject,
+      includesLogsSnippets,
+      requestedModel,
+      effectiveModel,
+      systemProviderOptions,
       abortSignal: abortController.signal,
+      timeout: { totalMs: Math.max(0, ASSISTANT_TIMEOUT_MS - (Date.now() - requestStartedAt)) },
+      onSpanCreated: (spanId) => {
+        res.setHeader('x-braintrust-span-id', spanId)
+      },
     })
 
-    result.pipeUIMessageStreamToResponse(res, {
+    const stream = toUIMessageStream({
+      stream: result.stream,
       sendReasoning: true,
       onError: (error) => {
+        console.error('Assistant stream error:', error)
+
+        const encoded = encodeNotebookToolError(error)
+        if (encoded !== null) return encoded
+
         if (error == null) {
           return 'unknown error'
         }
@@ -203,7 +271,24 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
         return JSON.stringify(error)
       },
+      // The browser never receives an abort caused by its own disconnect, so any abort that
+      // reaches it is the deadline. Chat ignores abort chunks, so flag the message instead.
+      messageMetadata: ({ part }): AssistantMessageMetadata =>
+        part.type === 'abort' ? { timedOut: true } : undefined,
     })
+
+    // Keep this asynchronous so the TanStack adapter can return the streaming
+    // Response immediately. Handle piping failures after headers have been sent.
+    // Abort here rather than in toUIMessageStream's onEnd: that callback rebuilds the response
+    // message, which fails on approval continuations without the client's original messages.
+    void pipeUIMessageStreamToResponse({
+      response: res,
+      stream,
+      headers: { 'Content-Encoding': 'none' },
+    })
+      .catch((error) => console.error('Error piping Assistant stream:', error))
+      // Runs when the stream finishes, aborts, or is cancelled.
+      .finally(() => abortController.abort())
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {

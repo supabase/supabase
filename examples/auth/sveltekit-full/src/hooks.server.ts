@@ -18,38 +18,16 @@ const supabase: Handle = async ({ event, resolve }) => {
        * the cookie options. Setting `path` to `/` replicates previous/
        * standard behavior.
        */
-      setAll: (cookiesToSet) => {
+      setAll: (cookiesToSet, headers) => {
         cookiesToSet.forEach(({ name, value, options }) => {
           event.cookies.set(name, value, { ...options, path: '/' })
         })
+        if (Object.keys(headers).length > 0) {
+          event.setHeaders(headers)
+        }
       },
     },
   })
-
-  /**
-   * Unlike `supabase.auth.getSession()`, which returns the session _without_
-   * validating the JWT, this function also calls `getUser()` to validate the
-   * JWT before returning the session.
-   */
-  event.locals.safeGetSession = async () => {
-    const {
-      data: { session },
-    } = await event.locals.supabase.auth.getSession()
-    if (!session) {
-      return { session: null, user: null }
-    }
-
-    const {
-      data: { user },
-      error,
-    } = await event.locals.supabase.auth.getUser()
-    if (error) {
-      // JWT validation has failed
-      return { session: null, user: null }
-    }
-
-    return { session, user }
-  }
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
@@ -63,15 +41,20 @@ const supabase: Handle = async ({ event, resolve }) => {
 }
 
 const authGuard: Handle = async ({ event, resolve }) => {
-  const { session, user } = await event.locals.safeGetSession()
-  event.locals.session = session
-  event.locals.user = user
+  /**
+   * `getClaims` validates the JWT signature locally (against the project's
+   * asymmetric signing keys) without an extra round-trip to the Auth server.
+   * Use this for route protection. Use `getUser()` only when you need the
+   * canonical server-validated user record (e.g., after password changes).
+   */
+  const { data: claimsData } = await event.locals.supabase.auth.getClaims()
+  event.locals.claims = claimsData?.claims ?? null
 
-  if (!event.locals.session && event.url.pathname.startsWith('/private')) {
+  if (!event.locals.claims && event.url.pathname.startsWith('/private')) {
     redirect(303, '/auth')
   }
 
-  if (event.locals.session && event.url.pathname === '/auth') {
+  if (event.locals.claims && event.url.pathname === '/auth') {
     redirect(303, '/private')
   }
 

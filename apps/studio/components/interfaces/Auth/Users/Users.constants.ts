@@ -1,6 +1,7 @@
-import { BASE_PATH } from 'lib/constants'
+import { type OptimizedSearchColumns } from '@supabase/pg-meta'
+
 import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
-import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import { BASE_PATH } from '@/lib/constants'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 
@@ -11,7 +12,7 @@ export const UUIDV4_LEFT_PREFIX_REGEX =
 
 export const PHONE_NUMBER_LEFT_PREFIX_REGEX = /^[+]?[0-9]{0,15}$/
 
-export const PANEL_PADDING = 'px-5 py-5'
+export const PANEL_PADDING = 'px-4 py-5'
 
 // [Joshen] Temporary fix as bulk delete will fire n requests since Auth + API do not have a bulk delete endpoint yet
 export const MAX_BULK_DELETE = 20

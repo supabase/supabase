@@ -1,10 +1,12 @@
 import pgMeta from '@supabase/pg-meta'
 import { PGTriggerUpdate } from '@supabase/pg-meta/src/pg-meta-triggers'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { databaseTriggerKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerUpdateVariables = {
   originalTrigger: {
@@ -31,6 +33,7 @@ export async function updateDatabaseTrigger({
     connectionString,
     sql,
     queryKey: ['trigger', 'update', originalTrigger.id],
+    grant: unguarded.migrating,
   })
 
   return result

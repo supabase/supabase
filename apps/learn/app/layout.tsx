@@ -1,23 +1,28 @@
 import type { Metadata } from 'next'
 
 import '@/styles/globals.css'
-import { API_URL } from '@/lib/constants'
+
 import { FeatureFlagProvider, TelemetryTagManager } from 'common'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import { Inter } from 'next/font/google'
-import { ThemeProvider } from './Providers'
-import { SonnerToaster } from './SonnerToast'
+
+import { Providers } from './Providers'
+import { Toaster } from './toaster'
+import { API_URL } from '@/lib/constants'
 
 const inter = Inter({ subsets: ['latin'] })
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+const FAVICON_ROUTE = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
 
 export const metadata: Metadata = {
   applicationName: 'Learn Supabase',
   title: 'Learn Supabase',
   description: 'Learn Supabase.',
   metadataBase: new URL('https://supabase.com/learn'),
-  icons: genFaviconData(BASE_PATH),
+  icons: genFaviconData(BASE_PATH, FAVICON_ROUTE),
+  manifest: `${BASE_PATH}${FAVICON_ROUTE}/manifest.json`,
   openGraph: {
     type: 'article',
     authors: 'Supabase',
@@ -45,14 +50,10 @@ export default async function Layout({ children }: RootLayoutProps) {
       <body className={`${inter.className} antialiased`}>
         <TelemetryTagManager />
         <FeatureFlagProvider API_URL={API_URL}>
-          <ThemeProvider
-            themes={['dark', 'light', 'classic-dark']}
-            defaultTheme="system"
-            enableSystem
-          >
+          <Providers>
             {children}
-            <SonnerToaster />
-          </ThemeProvider>
+            <Toaster />
+          </Providers>
         </FeatureFlagProvider>
       </body>
     </html>

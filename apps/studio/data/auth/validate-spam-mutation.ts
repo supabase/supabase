@@ -1,15 +1,15 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import type { components } from '@/data/api'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ValidateSpamVariables = {
   projectRef: string
   template: components['schemas']['ValidateSpamBody']
 }
-export type ValidateSpamResponse = components['schemas']['ValidateSpamResponse']
+export type ValidateSpamResponse = components['schemas']['ValidateSpamResponse_Output']
 
 export async function validateSpam({ projectRef, template }: ValidateSpamVariables) {
   const { data, error } = await post('/platform/auth/{ref}/validate/spam', {

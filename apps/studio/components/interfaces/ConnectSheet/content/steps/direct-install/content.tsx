@@ -1,4 +1,4 @@
-import { CodeBlock } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 import examples from '@/components/interfaces/ConnectSheet/DirectConnectionExamples'

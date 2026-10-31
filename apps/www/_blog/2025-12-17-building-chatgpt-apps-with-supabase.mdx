@@ -17,9 +17,9 @@ toc_depth: 2
 
 ChatGPT is no longer just a chat app. OpenAI recently launched the [Apps SDK](https://developers.openai.com/apps-sdk/), which turns ChatGPT into a platform where developers can build interactive applications. These apps run inside ChatGPT and can display custom interfaces, connect to databases, and perform real actions.
 
-In this guide, you will learn how to build a ChatGPT app that connects to your Supabase database. You will use [mcp-use](https://mcp-use.com), an open source SDK that makes it easy to deploy MCP servers on Supabase Edge Functions. By the end, you will have an app that lets ChatGPT users explore your database schema, view table data, and run SQL queries, all through interactive widgets.
+In this guide, you will learn how to build a ChatGPT app that connects to your Supabase database. You will use [mcp-use](https://mcp-use.com), an open source SDK that makes it easy to deploy MCP servers on [Supabase Edge Functions](/docs/guides/functions). By the end, you will have an app that lets ChatGPT users explore your database schema, view table data, and run SQL queries, all through interactive widgets.
 
-<Admonition type="note" label="ChatGPT Apps Marketplace Now Open">
+<Admonition type="note" title="ChatGPT Apps Marketplace Now Open">
 
 OpenAI has launched the [ChatGPT Apps Marketplace](https://chatgpt.com/apps), where users can discover and use apps built by developers. If you build an app following this guide, you can submit it to the marketplace. Check out the [App Submission Guidelines](https://developers.openai.com/apps-sdk/app-submission-guidelines) to learn how to get your app listed.
 
@@ -48,7 +48,7 @@ Here is what mcp-use gives you:
 
 - **Edge runtime support.** Works on Deno, Cloudflare Workers, and Supabase Edge Functions.
 - **OpenAI Apps SDK integration.** Built-in support for ChatGPT app widgets and UI components.
-- **Supabase Auth integration.** Native support for authenticating users with Supabase Auth.
+- **Supabase Auth integration.** Native support for authenticating users with [Supabase Auth](/auth).
 - **Full MCP compliance.** Scores 100/100 on the official MCP conformance tests.
 
 ## Why Supabase Edge Functions?
@@ -105,7 +105,7 @@ Open `index.ts` and set up your MCP server:
 
 ```tsx
 //index.ts
-import { MCPServer, object, text, widget, error } from 'mcp-use/server'
+import { error, MCPServer, object, text, widget } from 'mcp-use/server'
 
 const server = new MCPServer({
   name: 'supabase-explorer',
@@ -194,10 +194,10 @@ const SupabaseStatusWidget: React.FC = () => {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <h2 className="text-3xl font-bold text-[hsl(var(--foreground))] mb-1">
+              <h2 className="text-3xl font-bold text-foreground mb-1">
                 Supabase Status
               </h2>
-              <p className="text-sm text-[hsl(var(--foreground-muted))]">
+              <p className="text-sm text-foreground-muted">
                 Last {props.daysBack} days
               </p>
             </div>

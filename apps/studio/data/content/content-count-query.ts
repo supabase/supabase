@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { operations } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { contentKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetContentCountVariables =
   operations['ContentController_getContentCountV2']['parameters']['query'] & {

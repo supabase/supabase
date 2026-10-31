@@ -2,9 +2,9 @@ import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
-import { get, handleError } from 'data/fetchers'
-import { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type JwtSecretUpdatingStatusVariables = {
   projectRef?: string

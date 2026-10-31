@@ -1,33 +1,39 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { ExternalLinkIcon } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { Restriction } from '../Restriction'
+import { InitiateCancellationFlowButton } from './CancellationFlow'
+import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
-import { Restriction } from '../Restriction'
-import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
+} from '@/components/layouts/Scaffold'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
+
+const COMPARE_PLANS_URL = 'https://supabase.com/pricing#compare-plans'
+const AWS_MARKETPLACE_URL = 'https://supabase.com/aws-marketplace'
 
 const Subscription = () => {
   const { slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
   const {
@@ -43,6 +49,16 @@ const Subscription = () => {
 
   const canChangeTier =
     !projectUpdateDisabled && !['enterprise', 'platform'].includes(currentPlan?.id ?? '')
+  const isDirectlyManaged = selectedOrganization?.managed_by === MANAGED_BY.SUPABASE
+  // Fail closed until subscription succeeds: unresolved plans look like Free and
+  // `billing_via_partner !== true` is true when the field is still undefined.
+  // Also require billing-read: disabled queries can keep a cached isSuccess.
+  const canPurchaseThroughAws =
+    canReadSubscriptions &&
+    isSuccess &&
+    canChangeTier &&
+    isDirectlyManaged &&
+    subscription.billing_via_partner === false
 
   return (
     <>
@@ -58,6 +74,25 @@ const Subscription = () => {
                 Each organization has it's own subscription plan, billing cycle, payment methods and
                 usage quotas.
               </p>
+            </div>
+            <div className="flex flex-col gap-y-2">
+              <p className="text-sm text-foreground-light m-0">More information</p>
+              <div className="flex flex-col gap-y-1">
+                <Link href={COMPARE_PLANS_URL} target="_blank" rel="noreferrer">
+                  <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
+                    <p className="m-0 text-sm">Compare plans</p>
+                    <ExternalLinkIcon size={16} strokeWidth={1.5} />
+                  </div>
+                </Link>
+                {canPurchaseThroughAws && (
+                  <Link href={AWS_MARKETPLACE_URL} target="_blank" rel="noreferrer">
+                    <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
+                      <p className="m-0 text-sm">AWS Marketplace</p>
+                      <ExternalLinkIcon size={16} strokeWidth={1.5} />
+                    </div>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </ScaffoldSectionDetail>
@@ -77,43 +112,47 @@ const Subscription = () => {
               {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
 
               {isSuccess && (
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-2xl text-brand">{currentPlan?.name ?? 'Unknown'} Plan</p>
-                  </div>
+                <div className="space-y-6 w-full">
+                  <div className="flex justify-between items-center">
+                    <p className="text-2xl text-primary leading-none">
+                      {currentPlan?.name ?? 'Unknown'} Plan
+                    </p>
 
-                  <div>
                     {canChangeTier && (
-                      <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                      <div className="flex space-x-2">
                         <Button
-                          type="default"
                           className="pointer-events-auto"
-                          disabled={!canChangeTier}
                           onClick={() => snap.setPanelKey('subscriptionPlan')}
                         >
                           Change subscription plan
                         </Button>
-                      </ProjectUpdateDisabledTooltip>
+                        {currentPlan && currentPlan.id !== 'free' && (
+                          <InitiateCancellationFlowButton variant="danger">
+                            Cancel subscription
+                          </InitiateCancellationFlowButton>
+                        )}
+                      </div>
                     )}
-                    {!canChangeTier &&
-                      (projectUpdateDisabled ? (
-                        <Alert
-                          className="mt-2"
-                          withIcon
-                          variant="info"
+                  </div>
+
+                  {!canChangeTier && (
+                    <div>
+                      {projectUpdateDisabled ? (
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
                           title={`Unable to update plan from ${planName}`}
-                        >
-                          We have temporarily disabled project and subscription changes - our
-                          engineers are working on a fix.
-                        </Alert>
+                          description="We have temporarily disabled project and subscription changes - our
+                          engineers are working on a fix."
+                        />
                       ) : (
-                        <Alert
-                          withIcon
-                          className="mt-2"
-                          variant="info"
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
                           title={`Unable to update plan from ${planName}`}
-                          actions={[
-                            <Button asChild key="contact-support" type="default">
+                          description="Please contact us if you'd like to change your plan."
+                          actions={
+                            <Button asChild key="contact-support">
                               <SupportLink
                                 queryParams={{
                                   category: SupportCategories.SALES_ENQUIRY,
@@ -122,20 +161,19 @@ const Subscription = () => {
                               >
                                 Contact support
                               </SupportLink>
-                            </Button>,
-                          ]}
-                        >
-                          Please contact us if you'd like to change your plan.
-                        </Alert>
-                      ))}
-                  </div>
+                            </Button>
+                          }
+                        />
+                      )}
+                    </div>
+                  )}
 
                   {!subscription?.usage_billing_enabled && (
                     <Admonition
                       type="default"
                       title="This organization is limited by the included usage"
                     >
-                      <div className="[&>p]:!leading-normal prose text-sm">
+                      <div className="[&>p]:leading-normal! prose text-sm">
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
                         seamlessly,{' '}

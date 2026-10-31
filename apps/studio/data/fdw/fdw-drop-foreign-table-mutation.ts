@@ -1,12 +1,14 @@
+import { getDropForeignTableSql } from '@supabase/pg-meta'
+import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { foreignTableKeys } from 'data/foreign-tables/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { wrapWithTransaction } from 'data/sql/utils/transaction'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { fdwKeys } from './keys'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
+import { foreignTableKeys } from '@/data/foreign-tables/keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type FDWDropForeignTableVariables = {
   projectRef?: string
@@ -15,24 +17,20 @@ export type FDWDropForeignTableVariables = {
   tableName: string
 }
 
-export function getDropForeignTableSql({
-  schemaName,
-  tableName,
-}: Omit<FDWDropForeignTableVariables, 'projectRef' | 'connectionString'>) {
-  const sql = /* SQL */ `
-drop foreign table if exists "${schemaName}"."${tableName}";
-`
-
-  return sql
-}
-
 export async function dropForeignTable({
   projectRef,
   connectionString,
   ...rest
 }: FDWDropForeignTableVariables) {
-  const sql = wrapWithTransaction(getDropForeignTableSql(rest))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const sql = wrapWithTransaction(
+    getDropForeignTableSql({ schema: rest.schemaName, table: rest.tableName })
+  )
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    grant: unguarded.migrating,
+  })
   return result
 }
 

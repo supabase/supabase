@@ -1,5 +1,4 @@
-import { InlineLink } from 'components/ui/InlineLink'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -12,57 +11,59 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { CHART_INTERVALS, LOG_RETENTION } from './logs.utils'
-
-type PlanId = keyof typeof LOG_RETENTION
+import { CHART_INTERVALS, getDaysRequired } from './logs.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 interface ChartIntervalDropdownProps {
   value: string
   onChange: (value: string) => void
-  planId?: string
-  planName?: string
   organizationSlug?: string
   dropdownAlign?: 'start' | 'center' | 'end'
   tooltipSide?: 'left' | 'right' | 'top' | 'bottom'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export const ChartIntervalDropdown = ({
   value,
   onChange,
-  planId = 'free',
-  planName,
   organizationSlug,
   dropdownAlign = 'start',
   tooltipSide = 'right',
+  open,
+  onOpenChange,
 }: ChartIntervalDropdownProps) => {
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === value) || CHART_INTERVALS[1]
-  const normalizedPlanId = (planId && planId in LOG_RETENTION ? planId : 'free') as PlanId
+
+  const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
+  const retentionDays = getEntitlementMax()
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button type="default" iconRight={<ChevronDown size={14} />}>
+        <Button iconRight={<ChevronDownIcon size={14} />}>
           <span>{selectedInterval.label}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align={dropdownAlign} className="w-40">
         <DropdownMenuRadioGroup value={value} onValueChange={onChange}>
           {CHART_INTERVALS.map((i) => {
-            const disabled = !i.availableIn?.includes(normalizedPlanId)
+            const daysRequired = getDaysRequired(i.startValue, i.startUnit)
+            const disabled = retentionDays !== undefined && daysRequired > retentionDays
 
             if (disabled) {
-              const retentionDuration = LOG_RETENTION[normalizedPlanId]
               return (
                 <Tooltip key={i.key}>
                   <TooltipTrigger asChild>
-                    <DropdownMenuRadioItem disabled value={i.key} className="!pointer-events-auto">
+                    <DropdownMenuRadioItem disabled value={i.key} className="pointer-events-auto!">
                       {i.label}
                     </DropdownMenuRadioItem>
                   </TooltipTrigger>
                   <TooltipContent side={tooltipSide}>
                     <p>
-                      {planName} plan only includes up to {retentionDuration} day
-                      {retentionDuration > 1 ? 's' : ''} of log retention
+                      Your plan only includes up to {retentionDays} day
+                      {retentionDays !== undefined && retentionDays > 1 ? 's' : ''} of log retention
                     </p>
                     <p className="text-foreground-light">
                       {organizationSlug ? (

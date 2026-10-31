@@ -1,16 +1,15 @@
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/sql/studio/get-count-estimate'
+import { THRESHOLD_COUNT, type OptimizedSearchColumns } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
-import { HelpCircle, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
-import { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
 import { useParams } from 'common'
-import { formatEstimatedCount } from 'components/grid/components/footer/pagination/Pagination.utils'
-import { useUsersCountQuery } from 'data/auth/users-count-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { HelpCircleIcon, Loader2Icon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import type { Filter, SpecificFilterColumn } from './Users.constants'
+import { formatEstimatedCount } from '@/components/grid/components/footer/pagination/Pagination.utils'
+import { useUsersCountQuery } from '@/data/auth/users-count-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface UsersFooterProps {
   filter: Filter
@@ -66,7 +65,7 @@ export const UsersFooter = ({
         <div className="flex items-center gap-x-2">
           {isLoadingCount || isFetchingCount || countData === undefined ? (
             <span className="flex items-center gap-2">
-              <Loader2 size={14} className="animate-spin" /> Loading...
+              <Loader2Icon size={14} className="animate-spin" /> Loading...
             </span>
           ) : (
             <>
@@ -83,9 +82,9 @@ export const UsersFooter = ({
                   <TooltipTrigger asChild>
                     <Button
                       size="tiny"
-                      type="text"
+                      variant="text"
                       className="px-1.5"
-                      icon={<HelpCircle />}
+                      icon={<HelpCircleIcon />}
                       onClick={() => {
                         if (specificFilterColumn === 'freeform') {
                           setShowFetchExactCountModal(true)
@@ -99,7 +98,9 @@ export const UsersFooter = ({
                         This is an estimated value as your project has more than{' '}
                         {THRESHOLD_COUNT.toLocaleString()} users.
                         <br />
-                        <span className="text-brand">Click to retrieve the exact count.</span>{' '}
+                        <span className="text-primary">
+                          Click to retrieve the exact count.
+                        </span>{' '}
                       </>
                     ) : (
                       <>

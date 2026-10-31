@@ -1,15 +1,9 @@
-import { ChevronRight, Search } from 'lucide-react'
+import { useParams } from 'common'
+import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
+import { ChevronRightIcon, SearchIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { AlphaNotice } from 'components/ui/AlphaNotice'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
-import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
-import { createNavigationHandler } from 'lib/navigation'
 import {
   Card,
   Table,
@@ -22,14 +16,21 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
+import { AlertError } from '@/components/ui/AlertError'
+import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
+import { createNavigationHandler } from '@/lib/navigation'
 
 export const AnalyticsBuckets = () => {
   const { ref } = useParams()
@@ -103,14 +104,14 @@ export const AnalyticsBuckets = () => {
                         </Tooltip>
                       )}
                     </div>
-                    <div className="flex flex-grow justify-between gap-x-2 items-center">
+                    <div className="flex grow justify-between gap-x-2 items-center">
                       <Input
                         size="tiny"
-                        className="flex-grow lg:flex-grow-0 w-52"
+                        className="grow lg:grow-0 w-52"
                         placeholder="Search for a bucket"
                         value={filterString}
                         onChange={(e) => setFilterString(e.target.value)}
-                        icon={<Search />}
+                        icon={<SearchIcon />}
                       />
                       <CreateBucketButton onClick={() => setVisible(true)} />
                     </div>
@@ -136,14 +137,11 @@ export const AnalyticsBuckets = () => {
                           </TableHeader>
                           <TableBody>
                             {analyticsBuckets.length === 0 && filterString.length > 0 && (
-                              <TableRow className="[&>td]:hover:bg-inherit">
-                                <TableCell colSpan={3}>
-                                  <p className="text-sm text-foreground">No results found</p>
-                                  <p className="text-sm text-foreground-light">
-                                    Your search for "{filterString}" did not return any results
-                                  </p>
-                                </TableCell>
-                              </TableRow>
+                              <TableRowNoResults
+                                className="[&>td]:hover:bg-inherit"
+                                colSpan={3}
+                                search={filterString}
+                              />
                             )}
                             {analyticsBuckets.map((bucket) => {
                               const handleBucketNavigation = createNavigationHandler(
@@ -154,7 +152,7 @@ export const AnalyticsBuckets = () => {
                               return (
                                 <TableRow
                                   key={bucket.name}
-                                  className="relative cursor-pointer h-16 inset-focus"
+                                  className="relative cursor-pointer h-16 focus-inset"
                                   onClick={handleBucketNavigation}
                                   onAuxClick={handleBucketNavigation}
                                   onKeyDown={handleBucketNavigation}
@@ -183,7 +181,7 @@ export const AnalyticsBuckets = () => {
 
                                   <TableCell>
                                     <div className="flex justify-end items-center h-full">
-                                      <ChevronRight
+                                      <ChevronRightIcon
                                         size={14}
                                         className="text-foreground-muted/60"
                                       />

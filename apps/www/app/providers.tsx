@@ -1,6 +1,5 @@
 'use client'
 
-import { Suspense } from 'react'
 import {
   AuthProvider,
   FeatureFlagProvider,
@@ -13,10 +12,12 @@ import {
 import { WwwCommandMenu } from 'components/CommandMenu'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
 import { API_URL } from 'lib/constants'
-import { themes, TooltipProvider, SonnerToaster } from 'ui'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsentToast } from 'ui-patterns/consent'
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
+
+import { Toaster } from './toaster'
 
 function Providers({ children }: { children: React.ReactNode }) {
   useThemeSandbox()
@@ -25,18 +26,14 @@ function Providers({ children }: { children: React.ReactNode }) {
   return (
     <NuqsAdapter>
       <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
           <DevToolbarProvider apiUrl={API_URL}>
-            <ThemeProvider
-              themes={themes.map((t) => t.value)}
-              enableSystem
-              disableTransitionOnChange
-            >
+            <ThemeProvider>
               <TooltipProvider delayDuration={0}>
                 <CommandProvider>
                   <TelemetryTagManager />
-                  <SonnerToaster position="top-right" />
-                  <Suspense fallback={null}>{children}</Suspense>
+                  <Toaster />
+                  {children}
                   <WwwCommandMenu />
                   <PageTelemetry
                     API_URL={API_URL}

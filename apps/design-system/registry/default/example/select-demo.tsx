@@ -1,30 +1,30 @@
 import * as React from 'react'
 import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectLabel_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 
 export default function SelectDemo() {
   return (
-    <Select_Shadcn_>
-      <SelectTrigger_Shadcn_ className="w-[180px]">
-        <SelectValue_Shadcn_ placeholder="Select a fruit" />
-      </SelectTrigger_Shadcn_>
-      <SelectContent_Shadcn_>
-        <SelectGroup_Shadcn_>
-          <SelectLabel_Shadcn_>Fruits</SelectLabel_Shadcn_>
-          <SelectItem_Shadcn_ value="apple">Apple</SelectItem_Shadcn_>
-          <SelectItem_Shadcn_ value="banana">Banana</SelectItem_Shadcn_>
-          <SelectItem_Shadcn_ value="blueberry">Blueberry</SelectItem_Shadcn_>
-          <SelectItem_Shadcn_ value="grapes">Grapes</SelectItem_Shadcn_>
-          <SelectItem_Shadcn_ value="pineapple">Pineapple</SelectItem_Shadcn_>
-        </SelectGroup_Shadcn_>
-      </SelectContent_Shadcn_>
-    </Select_Shadcn_>
+    <Select>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select a fruit" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Fruits</SelectLabel>
+          <SelectItem value="apple">Apple</SelectItem>
+          <SelectItem value="banana">Banana</SelectItem>
+          <SelectItem value="blueberry">Blueberry</SelectItem>
+          <SelectItem value="grapes">Grapes</SelectItem>
+          <SelectItem value="pineapple">Pineapple</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   )
 }

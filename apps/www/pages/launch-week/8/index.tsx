@@ -121,10 +121,10 @@ export default function TicketHome() {
         }}
       >
         <DefaultLayout>
-          <div className="-mt-[65px]">
+          <div className="mt-[-65px]">
             <div className="relative">
               <div className="relative z-10">
-                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[200px] !py-4 md:!py-8 lg:!pb-0 gap-2 md:gap-4 !px-0 !mx-auto">
+                <SectionContainer className="relative flex flex-col justify-around items-center min-h-[200px] py-4! md:py-8! lg:pb-0! gap-2 md:gap-4 px-0! mx-auto!">
                   <div className="absolute bottom-0 z-10 w-full flex flex-col items-center justify-end gap-4 px-6">
                     <LaunchWeekLogoHeader />
                   </div>
@@ -140,7 +140,7 @@ export default function TicketHome() {
                   </div>
                 </SectionContainer>
               </div>
-              <div className="absolute w-full aspect-[1/1] md:aspect-[1.5/1] lg:aspect-[2.5/1] inset-0 z-0">
+              <div className="absolute w-full aspect-square md:aspect-1.5/1 lg:aspect-2.5/1 inset-0 z-0">
                 <Image
                   src="/images/launchweek/8/LW8-gradient.png"
                   fill
@@ -153,12 +153,12 @@ export default function TicketHome() {
             </div>
 
             <div id="twitter-spaces">
-              <SectionContainer className="!pt-10 lg:!pt-14 !pb-0" id="hackathon">
+              <SectionContainer className="pt-10! lg:pt-14! pb-0!" id="hackathon">
                 <LW8CalloutsSection />
               </SectionContainer>
             </div>
 
-            <SectionContainer className="!pt-0">
+            <SectionContainer className="pt-0!">
               <LW8Releases />
             </SectionContainer>
 
@@ -166,11 +166,11 @@ export default function TicketHome() {
               <LWArchive />
             </SectionContainer>
 
-            <SectionContainer className="!px-4 w-full">
+            <SectionContainer className="px-4! w-full">
               <LaunchWeekPrizeSection />
             </SectionContainer>
           </div>
-          <CTABanner className="!bg-[#020405] border-t-0" />
+          <CTABanner className="bg-[#020405]! border-t-0" />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>

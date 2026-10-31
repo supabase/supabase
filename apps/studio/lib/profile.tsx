@@ -1,18 +1,23 @@
 import * as Sentry from '@sentry/nextjs'
+import { useQueryClient } from '@tanstack/react-query'
+import { useIsLoggedIn, useUser } from 'common'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, createContext, useContext, useEffect, useMemo } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 
-import { useIsLoggedIn, useUser } from 'common'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
-import { useProfileIdentitiesQuery } from 'data/profile/profile-identities-query'
-import { useProfileQuery } from 'data/profile/profile-query'
-import type { Profile } from 'data/profile/types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import type { ResponseError } from 'types'
 import { useSignOut } from './auth'
 import { getGitHubProfileImgUrl } from './github'
+import { organizationKeys } from '@/data/organizations/keys'
+import { permissionKeys } from '@/data/permissions/keys'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
+import { profileKeys } from '@/data/profile/keys'
+import { useProfileCreateMutation } from '@/data/profile/profile-create-mutation'
+import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
+import { useProfileQuery } from '@/data/profile/profile-query'
+import type { Profile } from '@/data/profile/types'
+import { useTrack } from '@/lib/telemetry/track'
+import type { ResponseError } from '@/types'
 
 export type ProfileContextType = {
   profile: Profile | undefined
@@ -32,14 +37,15 @@ export const ProfileContext = createContext<ProfileContextType>({
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const user = useUser()
+  const queryClient = useQueryClient()
   const isLoggedIn = useIsLoggedIn()
   const router = useRouter()
   const signOut = useSignOut()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: createProfile, isPending: isCreatingProfile } = useProfileCreateMutation({
     onSuccess: () => {
-      sendEvent({ action: 'sign_up', properties: { category: 'conversion' } })
+      track('sign_up', { category: 'conversion' })
 
       if (user) {
         // Send an event to GTM, will do nothing if GTM is not enabled
@@ -53,14 +59,13 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     },
     onError: (error) => {
       if (error.code === 409) {
-        // [Joshen] There's currently an assumption that createProfile is getting triggered
-        // multiple times unnecessarily, although the tracing the code i can't see why this might
-        // be happening unless GET profile is somehow returning `User's profile not found` incorrectly
-        // Adding a Sentry capture + toast in hopes to catch this while developing on local / staging
+        // The profile already exists (e.g. GET hit a lagging replica, or it was created
+        // elsewhere), so the earlier "not found" is stale. Refetch rather than leaving the
+        // user stuck on the cached error. Sentry capture is kept to monitor how often this occurs.
         Sentry.captureMessage('Profile already exists: ' + error.message)
-        if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') {
-          toast.error('[DEV] createProfile called despite profile already exists: ' + error.message)
-        }
+        queryClient.invalidateQueries({ queryKey: profileKeys.profile() })
+        queryClient.invalidateQueries({ queryKey: organizationKeys.list() })
+        queryClient.invalidateQueries({ queryKey: permissionKeys.list() })
       } else {
         Sentry.captureMessage('Failed to create users profile: ' + error.message)
         toast.error('Failed to create your profile. Please refresh to try again.')
@@ -79,26 +84,30 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     enabled: isLoggedIn,
   })
 
+  const isProfileNotFound = isError && error?.message === "User's profile not found"
   useEffect(() => {
-    if (!isError) return
-    // if the user does not yet exist, create a profile for them
-    if (error?.message === "User's profile not found") {
-      createProfile()
-    }
+    if (!isProfileNotFound || !user?.id) return
+    createProfile()
+  }, [isProfileNotFound, user?.id, createProfile])
 
-    // [Alaister] If the user has a bad auth token, auth-js won't know about it
-    // and will think the user is authenticated. Since fetching the profile happens
-    // on every page load, we can check for a 401 here and sign the user out if
-    // they have a bad token.
-    if (error?.code === 401) {
-      signOut().then(() => router.push('/sign-in'))
-    }
-  }, [error, signOut, router, createProfile, isError])
+  // [Alaister] If the user has a bad auth token, auth-js won't know about it
+  // and will think the user is authenticated. Since fetching the profile happens
+  // on every page load, we can check for a 401 here and sign the user out if
+  // they have a bad token.
+  const isUnauthorized = isError && error?.code === 401
+  useEffect(() => {
+    if (!isUnauthorized) return
+    signOut().then(() => router.push('/sign-in'))
+  }, [isUnauthorized, signOut, router])
 
   const { isInitialLoading: isLoadingPermissions } = usePermissionsQuery({ enabled: isLoggedIn })
+  const { isInitialLoading: isLoadingPermissionsV2 } = usePermissionsQueryV2({
+    enabled: isLoggedIn,
+  })
 
   const value = useMemo(() => {
-    const isLoading = isLoadingProfile || isCreatingProfile || isLoadingPermissions
+    const isLoading =
+      isLoadingProfile || isCreatingProfile || isLoadingPermissions || isLoadingPermissionsV2
 
     return {
       error,
@@ -111,6 +120,7 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     isLoadingProfile,
     isCreatingProfile,
     isLoadingPermissions,
+    isLoadingPermissionsV2,
     profile,
     error,
     isError,
@@ -131,7 +141,6 @@ export function useProfileNameAndPicture(): {
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { data: identitiesData, isPending: isLoadingIdentities } = useProfileIdentitiesQuery()
 
-  const username = profile?.username
   const isGitHubProfile = profile?.auth0_id?.startsWith('github')
 
   const gitHubUsername = isGitHubProfile

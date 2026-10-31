@@ -3,8 +3,8 @@ import { groupBy, isEqual } from 'lodash'
 import {
   OrganizationRole,
   OrganizationRolesResponse,
-} from 'data/organization-members/organization-roles-query'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
+} from '@/data/organization-members/organization-roles-query'
+import { OrganizationMember } from '@/data/organizations/organization-members-query'
 
 export interface ProjectRoleConfiguration {
   ref?: string
@@ -94,6 +94,15 @@ export const deriveChanges = (
   return { removed, added, updated }
 }
 
+/** Order-insensitive: the same projects with the same roles count as unchanged */
+export const hasRoleConfigurationChanges = (
+  original: ProjectRoleConfiguration[],
+  final: ProjectRoleConfiguration[]
+) => {
+  const { removed, added, updated } = deriveChanges(original, final)
+  return removed.length > 0 || added.length > 0 || updated.length > 0
+}
+
 // [Joshen] Essentially spit out 3 arrays
 // What to (1) Remove (2) Assign (3) Update
 // And so that we can unit test this
@@ -143,14 +152,15 @@ export const deriveRoleChangeActions = (
       return toRemove.push(role.id)
     }
 
-    const projectsToAddToRole = (groupByAddedRoles[role.base_role_id]?.map((r) => r.ref) ??
+    const projectsToAddToRole = (groupByAddedRoles[role.base_role_id ?? '']?.map((r) => r.ref) ??
       []) as string[]
     const projectsToRemoveFromRole = (groupByRemovedRoles[role.id]?.map((r) => r.ref) ??
       []) as string[]
     const projectsUpdatingFromRole = (groupByUpdatingFromRoles[role.id]?.map((r) => r.ref) ??
       []) as string[]
-    const projectsUpdatingToRole = (groupByUpdatingToRoles[role.base_role_id]?.map((r) => r.ref) ??
-      []) as string[]
+    const projectsUpdatingToRole = (groupByUpdatingToRoles[role.base_role_id ?? '']?.map(
+      (r) => r.ref
+    ) ?? []) as string[]
     const projectRefsAppliedUpdated = projectRefsApplied
       .filter((x) => !projectsToRemoveFromRole.includes(x))
       .filter((x) => !projectsUpdatingFromRole.includes(x))

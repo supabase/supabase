@@ -1,9 +1,9 @@
-import { SimpleCodeBlock } from 'ui'
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
+
 import { Markdown } from '../Markdown'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ResourceContentProps {
   selectedLanguage: 'js' | 'bash'
@@ -18,21 +18,10 @@ interface ResourceContentProps {
 
 const ResourceContent = ({ selectedLanguage, snippet, codeSnippets }: ResourceContentProps) => {
   const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const handleCopy = (title: string) => {
-    sendEvent({
-      action: 'api_docs_code_copy_button_clicked',
-      properties: {
-        title,
-        selectedLanguage,
-      },
-      groups: {
-        project: projectRef ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('api_docs_code_copy_button_clicked', { title, selectedLanguage })
   }
 
   return (
@@ -57,7 +46,7 @@ const ResourceContent = ({ selectedLanguage, snippet, codeSnippets }: ResourceCo
         <div key={codeSnippet.key} className="px-4 space-y-2">
           <p className="text-sm text-foreground-light">{codeSnippet.title}</p>
           <div className="codeblock-container">
-            <div className="bg rounded p-2">
+            <div className="bg rounded-sm p-2">
               <SimpleCodeBlock
                 className={selectedLanguage}
                 onCopy={() => handleCopy(codeSnippet.title)}

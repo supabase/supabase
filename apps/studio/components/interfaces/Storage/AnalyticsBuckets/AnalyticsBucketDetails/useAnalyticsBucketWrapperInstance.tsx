@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 
-import { WRAPPER_HANDLERS } from 'components/interfaces/Integrations/Wrappers/Wrappers.constants'
+import { getAnalyticsBucketFDWServerName } from './AnalyticsBucketDetails.utils'
+import { WRAPPER_HANDLERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
   getWrapperMetaForWrapper,
   wrapperMetaComparator,
-} from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { getAnalyticsBucketFDWName } from './AnalyticsBucketDetails.utils'
+} from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useAnalyticsBucketWrapperInstance = (
   { bucketId }: { bucketId?: string },
@@ -32,7 +32,7 @@ export const useAnalyticsBucketWrapperInstance = (
           wrapper
         )
       )
-      .find((w) => w.name === getAnalyticsBucketFDWName(bucketId ?? ''))
+      .find((w) => w.server_name === getAnalyticsBucketFDWServerName(bucketId ?? ''))
   }, [data, bucketId])
 
   const icebergWrapperMeta = getWrapperMetaForWrapper(icebergWrapper)

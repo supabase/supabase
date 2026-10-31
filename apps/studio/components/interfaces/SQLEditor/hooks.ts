@@ -1,11 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { ContentDiff, DiffType } from './SQLEditor.types'
 import {
   compareAsAddition,
@@ -13,8 +10,13 @@ import {
   compareAsNewSnippet,
   createSqlSnippetSkeletonV2,
 } from './SQLEditor.utils'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const useNewQuery = () => {
   const router = useRouter()
@@ -23,13 +25,9 @@ export const useNewQuery = () => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
-    }
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'sql' }
   )
 
   const newQuery = async (sql: string, name: string, shouldRedirect: boolean = true) => {
@@ -95,17 +93,20 @@ export function useSqlEditorDiff() {
     setSelectedDiffType(undefined)
   }, [])
 
-  return {
-    sourceSqlDiff,
-    setSourceSqlDiff,
-    selectedDiffType,
-    setSelectedDiffType,
-    isAcceptDiffLoading,
-    setIsAcceptDiffLoading,
-    isDiffOpen,
-    defaultSqlDiff,
-    closeDiff,
-  }
+  return useMemo(
+    () => ({
+      sourceSqlDiff,
+      setSourceSqlDiff,
+      selectedDiffType,
+      setSelectedDiffType,
+      isAcceptDiffLoading,
+      setIsAcceptDiffLoading,
+      isDiffOpen,
+      defaultSqlDiff,
+      closeDiff,
+    }),
+    [sourceSqlDiff, selectedDiffType, isAcceptDiffLoading, isDiffOpen, defaultSqlDiff, closeDiff]
+  )
 }
 
 interface PromptState {
@@ -136,18 +137,24 @@ export function useSqlEditorPrompt() {
     }
   }, [promptState.isOpen])
 
-  const resetPrompt = () => {
+  const resetPrompt = useCallback(() => {
     setPromptState(initialPromptState)
     setPromptInput('')
-  }
+  }, [])
 
-  return {
-    promptState,
-    setPromptState,
-    promptInput,
-    setPromptInput,
-    resetPrompt,
-  }
+  const openPrompt = useCallback((context: Omit<PromptState, 'isOpen'>) => {
+    setPromptState((prev) => ({ ...prev, isOpen: true, ...context }))
+  }, [])
+
+  return useMemo(
+    () => ({
+      promptState,
+      setPromptState,
+      promptInput,
+      setPromptInput,
+      resetPrompt,
+      openPrompt,
+    }),
+    [promptState, promptInput, resetPrompt, openPrompt]
+  )
 }
-
-export default useNewQuery

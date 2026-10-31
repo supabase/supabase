@@ -1,9 +1,9 @@
+import pricingAddOn from '~/data/PricingAddOnTable.json'
 import Link from 'next/link'
 import { Fragment, useMemo } from 'react'
-
 import { cn } from 'ui'
-import pricingAddOn from '~/data/PricingAddOnTable.json'
-import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
+
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 const ComputePricingTable = () => {
   const columnNames = useMemo(
@@ -50,20 +50,24 @@ const ComputePricingTable = () => {
                       className="p-3"
                       translate={column.key === 'pricing' ? 'no' : undefined}
                     >
-                      {column.key === 'dedicated' ? (
-                        column.value ? (
-                          <IconPricingIncludedCheck plan="Pro Plan" />
+                      {column.url ? (
+                        isCrossZoneHref(column.url) ? (
+                          <a
+                            href={column.url}
+                            className="underline text-primary hover:text-brand-600"
+                            target="_blank"
+                          >
+                            {column.value}
+                          </a>
                         ) : (
-                          <IconPricingMinus plan="Free Plan" />
+                          <Link
+                            href={column.url}
+                            className="underline text-primary hover:text-brand-600"
+                            target="_blank"
+                          >
+                            {column.value}
+                          </Link>
                         )
-                      ) : column.url ? (
-                        <Link
-                          href={column.url}
-                          className="underline text-brand hover:text-brand-600"
-                          target="_blank"
-                        >
-                          {column.value}
-                        </Link>
                       ) : (
                         column.value
                       )}
@@ -91,18 +95,10 @@ const ComputePricingTable = () => {
                   </th>
                   <td
                     className={`px-4 py-3 ${
-                      column.key === 'plan' ? 'text-brand pt-16 lg:pt-3' : ''
+                      column.key === 'plan' ? 'text-primary pt-16 lg:pt-3' : ''
                     }`}
                   >
-                    {column.key === 'dedicated' ? (
-                      column.value ? (
-                        <IconPricingIncludedCheck plan="Pro Plan" />
-                      ) : (
-                        <IconPricingMinus plan="Free Plan" />
-                      )
-                    ) : (
-                      column.value
-                    )}
+                    {column.value}
                   </td>
                 </tr>
               ))}

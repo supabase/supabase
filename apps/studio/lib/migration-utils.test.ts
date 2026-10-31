@@ -1,6 +1,10 @@
-import { describe, expect, it } from 'vitest'
-import { parseMigrationVersion } from './migration-utils'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import { describe, expect, it } from 'vitest'
+
+import { formatMigrationVersionLabel, parseMigrationVersion } from './migration-utils'
+
+dayjs.extend(utc)
 
 describe('parseMigrationVersion', () => {
   it('should parse valid migration version in YYYYMMDDHHmmss format', () => {
@@ -16,41 +20,12 @@ describe('parseMigrationVersion', () => {
     expect(result?.second()).toBe(0)
   })
 
-  it('should return undefined for invalid version format like "001"', () => {
-    const result = parseMigrationVersion('001')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for invalid version format like "002"', () => {
-    const result = parseMigrationVersion('002')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for invalid version format like "003"', () => {
-    const result = parseMigrationVersion('003')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for empty string', () => {
-    const result = parseMigrationVersion('')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for random string', () => {
-    const result = parseMigrationVersion('not-a-date')
-
-    expect(result).toBeUndefined()
-  })
-
-  it('should return undefined for partial date format', () => {
-    const result = parseMigrationVersion('20231128')
-
-    expect(result).toBeUndefined()
-  })
+  it.each(['001', '002', '', 'not-a-date', '20231128'])(
+    'should return undefined for invalid version %o',
+    (version) => {
+      expect(parseMigrationVersion(version)).toBeUndefined()
+    }
+  )
 
   it('should handle edge case date values that dayjs can parse', () => {
     // dayjs is lenient and will wrap invalid values to valid dates
@@ -62,11 +37,23 @@ describe('parseMigrationVersion', () => {
     expect(result?.isValid()).toBe(true)
   })
 
-  it('should allow chaining dayjs methods when valid', () => {
+  it('should parse version digits as UTC so the UTC time is preserved exactly', () => {
+    // Migration versions are stored as UTC in the DB. Parsing without UTC mode
+    // would shift the time by the viewer's local offset, showing wrong UTC values.
     const result = parseMigrationVersion('20231128095400')
 
-    expect(result?.fromNow()).toBeDefined()
-    expect(result?.toISOString()).toBeDefined()
-    expect(result?.format('DD MMM YYYY')).toBe('28 Nov 2023')
+    expect(result?.toISOString()).toBe('2023-11-28T09:54:00.000Z')
+  })
+})
+
+describe('formatMigrationVersionLabel', () => {
+  it('should format a valid version as a UTC date string', () => {
+    expect(formatMigrationVersionLabel('20231128095400')).toBe('28 Nov 2023, 09:54:00')
+  })
+
+  it('should return Unknown for an invalid version', () => {
+    expect(formatMigrationVersionLabel('001')).toBe('Unknown')
+    expect(formatMigrationVersionLabel(null)).toBe('Unknown')
+    expect(formatMigrationVersionLabel(undefined)).toBe('Unknown')
   })
 })

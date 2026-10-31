@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest'
+
 import { formatRowsForInsert, getRowFromSidePanel } from './SidePanelEditor.utils'
-import type { SidePanel } from 'state/table-editor'
-import type { SupaRow } from 'components/grid/types'
+import type { SupaRow } from '@/components/grid/types'
+import type { SidePanel } from '@/state/table-editor'
 
 describe('SidePanelEditor.utils.test.ts', () => {
   test('formatRowsForInsert should for format rows with basic data types correctly', () => {
@@ -37,6 +38,31 @@ describe('SidePanelEditor.utils.test.ts', () => {
       { id: 1, text: 'A' },
       { id: 2, text: null },
       { id: 3, text: 'C' },
+    ])
+  })
+
+  test('formatRowsForInsert should only convert empty strings to null for selected columns', () => {
+    const rows = [
+      { id: 1, name: '', email: '' },
+      { id: 2, name: 'Bob', email: '' },
+    ]
+    const headers = ['id', 'name', 'email']
+    const columns = [
+      { id: '1', name: 'id', data_type: 'bigint', format: 'int8', is_nullable: false },
+      { id: '2', name: 'name', data_type: 'text', format: 'text', is_nullable: true },
+      { id: '3', name: 'email', data_type: 'text', format: 'text', is_nullable: true },
+    ]
+
+    const formattedRows = formatRowsForInsert({
+      rows,
+      headers,
+      columns: columns as any,
+      emptyStringAsNullHeaders: ['email'],
+    })
+
+    expect(formattedRows).toEqual([
+      { id: 1, name: '', email: null },
+      { id: 2, name: 'Bob', email: null },
     ])
   })
 
@@ -152,40 +178,13 @@ describe('getRowFromSidePanel', () => {
     expect(getRowFromSidePanel(sidePanel)).toEqual(mockRow)
   })
 
-  test('returns undefined for table side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'table',
-      mode: 'new',
-    }
-    expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
-  })
-
-  test('returns undefined for column side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'column',
-    }
-    expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
-  })
-
-  test('returns undefined for schema side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'schema',
-      mode: 'new',
-    }
-    expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
-  })
-
-  test('returns undefined for csv-import side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'csv-import',
-    }
-    expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
-  })
-
-  test('returns undefined for operation-queue side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'operation-queue',
-    }
+  test.each<SidePanel>([
+    { type: 'table', mode: 'new' },
+    { type: 'column' },
+    { type: 'schema', mode: 'new' },
+    { type: 'csv-import' },
+    { type: 'operation-queue' },
+  ])('returns undefined for $type side panel', (sidePanel) => {
     expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
   })
 })

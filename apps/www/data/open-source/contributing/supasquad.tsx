@@ -1,4 +1,4 @@
-import { Image } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
 export const data = {
   metadata: {

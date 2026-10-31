@@ -1,13 +1,13 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
-import { Code, Eye, HelpCircle } from 'lucide-react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { CodeIcon, EyeIcon, HelpCircleIcon } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { buildExplainPrompt } from './ExplainVisualizer.ai'
 import type { QueryPlanRow } from './ExplainVisualizer.types'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export interface ExplainSummary {
   totalTime: number
@@ -33,10 +33,10 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
   const getPromptData = () => {
     if (!id) return null
     const snippet = snapV2.snippets[id]?.snippet
-    if (!snippet?.content?.sql) return null
+    if (!snippet?.content?.unchecked_sql) return null
 
     return buildExplainPrompt({
-      sql: snippet.content.sql,
+      sql: snippet.content.unchecked_sql,
       explainPlanRows: (rows as QueryPlanRow[]) ?? [],
     })
   }
@@ -76,7 +76,7 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
           <h3 className="font-medium text-foreground">Query Execution Plan</h3>
           <Tooltip>
             <TooltipTrigger>
-              <HelpCircle
+              <HelpCircleIcon
                 size="14"
                 strokeWidth={2}
                 className="text-foreground-lighter hover:text-foreground-light transition-colors cursor-help"
@@ -98,7 +98,7 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
                       <span>Seq Scan (slow)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand" />
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary-bright" />
                       <span>Index Scan (fast)</span>
                     </div>
                   </div>
@@ -129,13 +129,12 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
               onOpenAssistant={handleExplainWithAI}
               telemetrySource="explain_visualizer"
               size="tiny"
-              type="default"
+              variant="default"
             />
           )}
           <Button
-            type="default"
             size="tiny"
-            icon={isVisual ? <Code size={14} /> : <Eye size={14} />}
+            icon={isVisual ? <CodeIcon size={14} /> : <EyeIcon size={14} />}
             onClick={onToggleMode}
           >
             {isVisual ? 'Raw' : 'Visual'}

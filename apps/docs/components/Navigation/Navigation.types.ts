@@ -24,6 +24,8 @@ type MenuItem = {
   level?: string
   hasLightIcon?: boolean
   community?: boolean
+  new?: boolean
+  experimental?: boolean
   enabled?: boolean
 }
 

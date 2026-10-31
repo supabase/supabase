@@ -1,8 +1,9 @@
-import { ident, literal } from '@supabase/pg-meta/src/pg-format'
-import type { User } from 'data/auth/users-infinite-query'
-import { RoleImpersonationState as ValtioRoleImpersonationState } from 'state/role-impersonation-state'
+import { getImpersonationSQL, type SafeSqlFragment } from '@supabase/pg-meta'
+import { z } from 'zod'
 
 import { uuidv4 } from './helpers'
+import type { User } from '@/data/auth/users-infinite-query'
+import { RoleImpersonationState as ValtioRoleImpersonationState } from '@/state/role-impersonation-state'
 
 type PostgrestImpersonationRole =
   | {
@@ -33,12 +34,64 @@ type PostgrestImpersonationRole =
 
 export type PostgrestRole = PostgrestImpersonationRole['role']
 
-export type CustomImpersonationRole = {
+type CustomImpersonationRole = {
   type: 'custom'
   role: string
 }
 
 export type ImpersonationRole = PostgrestImpersonationRole | CustomImpersonationRole
+
+/**
+ * The impersonated `user` is the same generated `User` shape already persisted verbatim to
+ * localStorage elsewhere (see `USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES`) — trusted
+ * as-is rather than re-validated field-by-field, since it only ever round-trips our own
+ * writes and its shape tracks a generated API type this schema shouldn't have to mirror.
+ */
+const impersonatedUserSchema = z
+  .record(z.string(), z.unknown())
+  .transform((value) => value as unknown as User)
+
+const aalSchema = z.enum(['aal1', 'aal2'])
+
+const postgrestImpersonationRoleSchema = z.union([
+  z.object({ type: z.literal('postgrest'), role: z.literal('anon') }).strict(),
+  z.object({ type: z.literal('postgrest'), role: z.literal('service_role') }).strict(),
+  z
+    .object({
+      type: z.literal('postgrest'),
+      role: z.literal('authenticated'),
+      userType: z.literal('native'),
+      user: impersonatedUserSchema.optional(),
+      aal: aalSchema.optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('postgrest'),
+      role: z.literal('authenticated'),
+      userType: z.literal('external'),
+      externalAuth: z
+        .object({
+          sub: z.string(),
+          additionalClaims: z.record(z.string(), z.unknown()).optional(),
+        })
+        .optional(),
+      aal: aalSchema.optional(),
+    })
+    .strict(),
+])
+
+const customImpersonationRoleSchema = z
+  .object({ type: z.literal('custom'), role: z.string() })
+  .strict()
+
+/** Parses to `ImpersonationRole` — verified at the `role` field assignment in `toDraft`
+ *  (`state/explorer-query.ts`), since annotating the schema type directly here would also
+ *  constrain its *input* type, which is narrower than `ImpersonationRole` pre-transform. */
+export const impersonationRoleSchema = z.union([
+  postgrestImpersonationRoleSchema,
+  customImpersonationRoleSchema,
+])
 
 export function getExp1HourFromNow() {
   return Math.floor((Date.now() + 60 * 60 * 1000) / 1000)
@@ -94,56 +147,20 @@ export function getPostgrestClaims(projectRef: string, role: PostgrestImpersonat
   }
 }
 
-function getPostgrestRoleImpersonationSql(
-  role: PostgrestImpersonationRole,
-  claims: ReturnType<typeof getPostgrestClaims>
-) {
-  const unexpiredClaims = { ...claims, exp: getExp1HourFromNow() }
-
-  return `
-select set_config('role', ${literal(role.role)}, true),
-set_config('request.jwt.claims', ${literal(JSON.stringify(unexpiredClaims))}, true),
-set_config('request.method', 'POST', true),
-set_config('request.path', '/impersonation-example-request-path', true),
-set_config('request.headers', '{"accept": "*/*"}', true);
-  `.trim()
-}
-
-// Includes getPostgrestRoleImpersonationSql() and wrapWithRoleImpersonation()
-export const ROLE_IMPERSONATION_SQL_LINE_COUNT = 11
-export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
-
-function getCustomRoleImpersonationSql(roleName: string) {
-  return /* SQL */ `
-    set local role ${literal(roleName)};
-  `.trim()
-}
-
 export type RoleImpersonationState = Pick<ValtioRoleImpersonationState, 'role' | 'claims'>
 
-export function wrapWithRoleImpersonation(sql: string, state?: RoleImpersonationState) {
+export function wrapWithRoleImpersonation(
+  sql: SafeSqlFragment,
+  state?: RoleImpersonationState
+): SafeSqlFragment {
   const { role, claims } = state ?? { role: undefined, claims: undefined }
 
-  if (role === undefined) {
-    return sql
-  }
+  if (role === undefined) return sql
 
-  const impersonationSql =
-    role.type === 'postgrest'
-      ? claims !== undefined
-        ? getPostgrestRoleImpersonationSql(role, claims)
-        : ''
-      : getCustomRoleImpersonationSql(role.role)
-
-  return /* SQL */ `
-    ${impersonationSql}
-
-    -- If the users sql returns no rows, pg-meta will
-    -- fallback to returning the result of the impersonation sql.
-    select 1 as "${ROLE_IMPERSONATION_NO_RESULTS}";
-
-    ${sql}
-  `.trim()
+  const unexpiredClaims =
+    claims !== undefined ? { ...claims, exp: getExp1HourFromNow() } : undefined
+  const impersonationSql = getImpersonationSQL({ role: role, unexpiredClaims, sql })
+  return impersonationSql
 }
 
 function encodeText(data: string) {
@@ -162,7 +179,7 @@ function encodeBase64Url(data: ArrayBuffer | Uint8Array | string): string {
 function genKey(rawKey: string) {
   return window.crypto.subtle.importKey(
     'raw',
-    encodeText(rawKey),
+    encodeText(rawKey) as BufferSource,
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign', 'verify']
@@ -180,7 +197,7 @@ async function createToken(jwtPayload: object, key: string) {
       await window.crypto.subtle.sign(
         { name: 'HMAC' },
         await genKey(key),
-        encodeText(headerAndPayload)
+        encodeText(headerAndPayload) as BufferSource
       )
     )
   )

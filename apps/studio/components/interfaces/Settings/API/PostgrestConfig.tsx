@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { safeSql } from '@supabase/pg-meta'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { indexOf } from 'lodash'
-import { Lock } from 'lucide-react'
-import Link from 'next/link'
+import { LockIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -12,16 +11,20 @@ import {
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  Form,
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  FormItem,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Skeleton,
+  Switch,
+  useWatch,
 } from 'ui'
-import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -30,44 +33,77 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import { ExposedSchemaSelector, internalSchemasCannotExpose } from './ExposedSchemaSelector'
 import { HardenAPIModal } from './HardenAPIModal'
+import { ExposedFunctionSelector } from '@/components/interfaces/Settings/API/ExposedFunctionSelector'
+import { ExposedTableSelector } from '@/components/interfaces/Settings/API/ExposedTableSelector'
+import CopyButton from '@/components/ui/CopyButton'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
-import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { authenticatorRoleConfigQueryOptions } from '@/data/database/authenticator-role-config-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { unguarded } from '@/data/fetchers'
+import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
+import { privilegeKeys } from '@/data/privileges/keys'
+import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
+import { useUpdateExposedEntitiesMutation } from '@/data/privileges/update-exposed-entities-mutation'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
+import { noop } from '@/lib/void'
+import type { ResponseError } from '@/types'
+
+const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas`
 
 const formSchema = z.object({
+  // Fields for updatePostgrestConfig
   dbSchema: z.array(z.string()),
   dbExtraSearchPath: z.array(z.string()),
-  maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
-  dbPool: z
+  maxRows: z
+    .union([
+      z.literal(''),
+      z.coerce.number().int().min(1).max(1000000, "Can't be more than 1,000,000"),
+    ])
+    .refine((value) => value !== '', 'Max rows is required')
+    .transform((value) => Number(value)),
+  dbPool: z.coerce
     .number()
     .min(0, 'Must be more than 0')
     .max(1000, "Can't be more than 1000")
     .optional()
     .nullable(),
+
+  // Default privileges toggle
+  defaultPrivilegesGranted: z.boolean(),
+
+  // Fields for expose toggles
+  tableIdsToAdd: z.array(z.number()),
+  tableIdsToRemove: z.array(z.number()),
+  functionNamesToAdd: z.array(z.string()),
+  functionNamesToRemove: z.array(z.string()),
 })
 
 export const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const queryClient = useQueryClient()
 
   const [showModal, setShowModal] = useState(false)
+  const [showResetOverrideConfirm, setShowResetOverrideConfirm] = useState(false)
 
   const {
     data: config,
     isError,
     isPending: isLoadingConfig,
+    isSuccess: isSuccessConfig,
   } = useProjectPostgrestConfigQuery({ projectRef })
-  const { data: extensions } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
   const {
     data: allSchemas = [],
     isPending: isLoadingSchemas,
@@ -77,45 +113,82 @@ export const PostgrestConfig = () => {
     connectionString: project?.connectionString,
   })
 
-  const isLoading = isLoadingConfig || isLoadingSchemas
+  const {
+    data: defaultPrivilegesGranted,
+    isPending: isLoadingDefaultPrivileges,
+    isSuccess: isSuccessDefaultPrivileges,
+  } = useQuery(
+    defaultPrivilegesQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    })
+  )
 
-  const { mutate: updatePostgrestConfig, isPending: isUpdating } =
-    useProjectPostgrestConfigUpdateMutation({
-      onSuccess: () => {
-        toast.success('Successfully saved settings')
+  const { data: authenticatorDbSchemasOverride, refetch: refetchAuthenticatorRoleConfig } =
+    useQuery(
+      authenticatorRoleConfigQueryOptions({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+      })
+    )
+
+  const configDbSchemas = useMemo(
+    () => (config?.db_schema ? config.db_schema.split(',').map((x) => x.trim()) : []),
+    [config?.db_schema]
+  )
+
+  const isLoading = isLoadingConfig || isLoadingSchemas || isLoadingDefaultPrivileges
+
+  const { mutateAsync: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation({
+    onError: noop,
+  })
+  const { mutateAsync: updateExposedEntities } = useUpdateExposedEntitiesMutation({ onError: noop })
+  const { mutateAsync: updateDefaultPrivileges } = useUpdateDefaultPrivilegesMutation({
+    onError: noop,
+  })
+
+  const { mutate: resetAuthenticatorOverride, isPending: isResettingAuthenticatorOverride } =
+    useExecuteSqlMutation({
+      onSuccess: async () => {
+        toast.success('Reset the authenticator role override')
+        setShowResetOverrideConfirm(false)
+        await refetchAuthenticatorRoleConfig()
+      },
+      onError: (error) => {
+        toast.error(`Failed to reset the authenticator role override: ${error.message}`)
       },
     })
 
-  const formId = 'project-postgres-config'
-  const hiddenSchema = [
-    'auth',
-    'pgbouncer',
-    'hooks',
-    'extensions',
-    'vault',
-    'storage',
-    'realtime',
-    'pgsodium',
-    'pgsodium_masks',
-  ]
-  const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+  const [isUpdating, setIsUpdating] = useState(false)
 
-  const isGraphqlExtensionEnabled =
-    (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
+  const formId = 'project-postgres-config'
+
+  const { can: canUpdatePostgrestConfigPermission, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE)
+  // PostgREST config (exposed schemas, extra search path, max rows, pool size) is persisted via
+  // the platform API, which isn't available self-hosted (the values come from env vars there).
+  const canUpdatePostgrestConfig = IS_PLATFORM && canUpdatePostgrestConfigPermission
+  // Entity exposure (tables, functions, default privileges) is applied with SQL GRANT/REVOKE
+  // directly against the database, so it works both on the platform and self-hosted.
+  const canUpdateExposedEntities = canUpdatePostgrestConfigPermission
 
   const defaultValues = useMemo(() => {
-    const dbSchema = config?.db_schema ? config?.db_schema.split(',').map((x) => x.trim()) : []
     return {
-      dbSchema,
+      dbSchema: configDbSchemas,
       maxRows: config?.max_rows,
+      // TODO: only display schemas that exist in the db
       dbExtraSearchPath: (config?.db_extra_search_path ?? '')
         .split(',')
         .map((x) => x.trim())
-        .filter((x) => x.length > 0 && allSchemas.find((y) => y.name === x)),
+        .filter(Boolean),
       dbPool: config?.db_pool,
+      defaultPrivilegesGranted: defaultPrivilegesGranted ?? true,
+      tableIdsToAdd: [] as number[],
+      tableIdsToRemove: [] as number[],
+      functionNamesToAdd: [] as string[],
+      functionNamesToRemove: [] as string[],
     }
-  }, [config, allSchemas])
+  }, [config, configDbSchemas, defaultPrivilegesGranted])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -123,48 +196,138 @@ export const PostgrestConfig = () => {
     defaultValues,
   })
 
-  const schemas =
-    allSchemas
-      .filter((x) => {
-        const find = indexOf(hiddenSchema, x.name)
-        if (find < 0) return x
-      })
-      .map((x) => {
-        return {
-          id: x.id,
-          value: x.name,
-          name: x.name,
-          disabled: false,
-        }
-      }) ?? []
-
   const resetForm = useCallback(() => {
     form.reset({ ...defaultValues })
   }, [form, defaultValues])
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!projectRef) return console.error('Project ref is required') // is this needed ?
+    if (!projectRef) return console.error('Project ref is required')
 
-    updatePostgrestConfig({
-      projectRef,
-      dbSchema: values.dbSchema.join(', '),
-      maxRows: values.maxRows,
-      dbExtraSearchPath: values.dbExtraSearchPath.join(','),
-      dbPool: values.dbPool ? values.dbPool : null,
-    })
+    setIsUpdating(true)
+
+    try {
+      let dbSchema = values.dbSchema.join(',')
+
+      await updateExposedEntities({
+        projectRef,
+        connectionString: project?.connectionString,
+        tableIdsToAdd: values.tableIdsToAdd,
+        tableIdsToRemove: values.tableIdsToRemove,
+        functionNamesToAdd: values.functionNamesToAdd,
+        functionNamesToRemove: values.functionNamesToRemove,
+      })
+
+      if (values.defaultPrivilegesGranted !== defaultPrivilegesGranted) {
+        await updateDefaultPrivileges({
+          projectRef,
+          connectionString: project?.connectionString,
+          granted: values.defaultPrivilegesGranted,
+        })
+      }
+
+      // The PostgREST config endpoint isn't available self-hosted, so only persist these fields on
+      // the platform. Entity exposure above is applied via SQL and works in both environments.
+      if (canUpdatePostgrestConfig) {
+        await updatePostgrestConfig(
+          {
+            projectRef,
+            dbSchema,
+            maxRows: values.maxRows,
+            dbExtraSearchPath: values.dbExtraSearchPath.join(','),
+            dbPool: values.dbPool ? values.dbPool : null,
+          },
+          { onError: noop }
+        )
+      }
+
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.exposedTablesInfinite(projectRef),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.exposedTableCounts(projectRef),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.exposedFunctionsInfinite(projectRef),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.exposedFunctionCounts(projectRef),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: privilegeKeys.defaultPrivileges(projectRef),
+        }),
+      ])
+
+      toast.success('Successfully saved settings')
+      form.reset({
+        dbSchema: dbSchema
+          .split(',')
+          .map((x) => x.trim())
+          .filter(Boolean),
+        maxRows: values.maxRows,
+        dbExtraSearchPath: values.dbExtraSearchPath,
+        dbPool: values.dbPool,
+        defaultPrivilegesGranted: values.defaultPrivilegesGranted,
+        tableIdsToAdd: [],
+        tableIdsToRemove: [],
+        functionNamesToAdd: [],
+        functionNamesToRemove: [],
+      })
+    } catch (error) {
+      toast.error('Failed to save settings: ' + (error as ResponseError).message || 'Unknown error')
+    } finally {
+      setIsUpdating(false)
+    }
   }
 
+  const resetFormRef = useLatest(resetForm)
+  const isReady = isSuccessConfig && isSuccessSchemas && isSuccessDefaultPrivileges
   useEffect(() => {
-    if (config && isSuccessSchemas) {
-      resetForm()
+    if (isReady) {
+      resetFormRef.current()
     }
-  }, [config, isSuccessSchemas, resetForm])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReady])
+
+  const watchedDbSchema = useWatch({ control: form.control, name: 'dbSchema' })
+  const watchedTableIdsToAdd = useWatch({ control: form.control, name: 'tableIdsToAdd' })
+  const watchedTableIdsToRemove = useWatch({
+    control: form.control,
+    name: 'tableIdsToRemove',
+  })
+  const watchedFunctionNamesToAdd = useWatch({
+    control: form.control,
+    name: 'functionNamesToAdd',
+  })
+  const watchedFunctionNamesToRemove = useWatch({
+    control: form.control,
+    name: 'functionNamesToRemove',
+  })
+
+  const missingExposedSchema = useMemo(
+    () => watchedDbSchema.filter((schema) => !allSchemas.some((s) => s.name === schema)),
+    [allSchemas, watchedDbSchema]
+  )
+  const protectedSchemasExposed = useMemo(
+    () => watchedDbSchema.filter((schema) => internalSchemasCannotExpose.has(schema)),
+    [watchedDbSchema]
+  )
+
+  const isAuthenticatorRoleOverridingSchemas = useMemo(() => {
+    if (!authenticatorDbSchemasOverride) return false
+    // Compared against the persisted config, not the live form selection, so the warning stays
+    // visible until the save actually succeeds rather than disappearing the moment the selector
+    // is edited to match.
+    const saved = new Set(configDbSchemas)
+    const overridden = new Set(authenticatorDbSchemasOverride)
+    return saved.size !== overridden.size || [...saved].some((schema) => !overridden.has(schema))
+  }, [authenticatorDbSchemasOverride, configDbSchemas])
 
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
         <Card className="mb-4">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               {isLoading ? (
                 <CardContent>
@@ -172,98 +335,210 @@ export const PostgrestConfig = () => {
                 </CardContent>
               ) : isError ? (
                 <CardContent>
-                  <Admonition type="destructive" title="Failed to retrieve API settings" />
+                  <Admonition type="destructive" description="Failed to retrieve API settings." />
                 </CardContent>
               ) : (
                 <>
-                  <CardContent>
-                    <FormField_Shadcn_
-                      control={form.control}
-                      name="dbSchema"
-                      render={({ field }) => (
-                        <FormItem_Shadcn_>
-                          <FormItemLayout
-                            label="Exposed schemas"
-                            description="The schemas to expose in your API. Tables, views and stored procedures in
-                          these schemas will get API endpoints."
-                            layout="flex-row-reverse"
+                  <CardContent className="space-y-6">
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex-row-reverse"
+                      label="Exposed schemas"
+                      description="Select schemas to include in the Data API. Schemas must be included before tables can be exposed."
+                    >
+                      <ExposedSchemaSelector
+                        selectedSchemas={watchedDbSchema}
+                        readOnly={!canUpdatePostgrestConfig}
+                        onToggleSchema={(schema) => {
+                          const current = form.getValues('dbSchema')
+                          if (current.includes(schema)) {
+                            form.setValue(
+                              'dbSchema',
+                              current.filter((x) => x !== schema),
+                              { shouldDirty: true }
+                            )
+                          } else {
+                            form.setValue('dbSchema', [...current, schema], {
+                              shouldDirty: true,
+                            })
+                          }
+                        }}
+                      />
+                      {protectedSchemasExposed.length > 0 ? (
+                        <p className="mt-1 text-sm text-warning">
+                          {protectedSchemasExposed.length} protected schema
+                          {protectedSchemasExposed.length > 1 ? 's' : ''} is currently exposed and
+                          should be removed
+                        </p>
+                      ) : missingExposedSchema.length > 0 ? (
+                        <p className="mt-1 text-sm text-foreground-lighter">
+                          {missingExposedSchema.length} exposed schema
+                          {missingExposedSchema.length > 1 ? 's' : ''} does not exist — safe to
+                          remove
+                        </p>
+                      ) : null}
+                    </FormItemLayout>
+
+                    {isAuthenticatorRoleOverridingSchemas && (
+                      <Admonition
+                        type="warning"
+                        title="Exposed schemas are being overridden"
+                        description={
+                          <>
+                            The <code>authenticator</code> role has <code>pgrst.db_schemas</code>{' '}
+                            set to{' '}
+                            {authenticatorDbSchemasOverride?.map((schema, i) => (
+                              <span key={schema}>
+                                {i > 0 && ', '}
+                                <code>{schema}</code>
+                              </span>
+                            ))}
+                            , which overrides this setting. See the{' '}
+                            <a
+                              href="https://supabase.com/docs/guides/troubleshooting/pgrst106-the-schema-must-be-one-of-the-following-error-when-querying-an-exposed-schema"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline"
+                            >
+                              PGRST106 troubleshooting guide
+                            </a>{' '}
+                            to check or reset it.
+                          </>
+                        }
+                        actions={
+                          <Button
+                            type="button"
+                            variant="default"
+                            disabled={!canUpdateExposedEntities}
+                            onClick={() => setShowResetOverrideConfirm(true)}
                           >
-                            {isLoadingSchemas ? (
-                              <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
-                                <Skeleton className="w-full h-[38px]" />
-                              </div>
-                            ) : (
-                              <MultiSelector
-                                onValuesChange={field.onChange}
-                                values={field.value}
-                                size="small"
-                                disabled={!canUpdatePostgrestConfig}
-                              >
-                                <MultiSelectorTrigger
-                                  mode="inline-combobox"
-                                  label="Select schemas..."
-                                  badgeLimit="wrap"
-                                  showIcon={false}
-                                  deletableBadge
+                            Reset override
+                          </Button>
+                        }
+                      />
+                    )}
+
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex-row-reverse"
+                      label="Exposed tables"
+                      description="Toggle Data API access for individual tables."
+                    >
+                      <ExposedTableSelector
+                        selectedSchemas={watchedDbSchema}
+                        pendingAddTableIds={watchedTableIdsToAdd}
+                        pendingRemoveTableIds={watchedTableIdsToRemove}
+                        onTogglePendingAdd={(tableId) => {
+                          const current = form.getValues('tableIdsToAdd')
+                          if (current.includes(tableId)) {
+                            form.setValue(
+                              'tableIdsToAdd',
+                              current.filter((x) => x !== tableId),
+                              { shouldDirty: true }
+                            )
+                          } else {
+                            form.setValue('tableIdsToAdd', [...current, tableId], {
+                              shouldDirty: true,
+                            })
+                          }
+                        }}
+                        onTogglePendingRemove={(tableId) => {
+                          const current = form.getValues('tableIdsToRemove')
+                          if (current.includes(tableId)) {
+                            form.setValue(
+                              'tableIdsToRemove',
+                              current.filter((x) => x !== tableId),
+                              { shouldDirty: true }
+                            )
+                          } else {
+                            form.setValue('tableIdsToRemove', [...current, tableId], {
+                              shouldDirty: true,
+                            })
+                          }
+                        }}
+                      />
+                    </FormItemLayout>
+
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex-row-reverse"
+                      label="Exposed functions"
+                      description="Toggle Data API access for individual functions."
+                    >
+                      <ExposedFunctionSelector
+                        selectedSchemas={watchedDbSchema}
+                        pendingAddFunctionNames={watchedFunctionNamesToAdd}
+                        pendingRemoveFunctionNames={watchedFunctionNamesToRemove}
+                        onTogglePendingAdd={(functionName) => {
+                          const current = form.getValues('functionNamesToAdd')
+                          if (current.includes(functionName)) {
+                            form.setValue(
+                              'functionNamesToAdd',
+                              current.filter((x) => x !== functionName),
+                              { shouldDirty: true }
+                            )
+                          } else {
+                            form.setValue('functionNamesToAdd', [...current, functionName], {
+                              shouldDirty: true,
+                            })
+                          }
+                        }}
+                        onTogglePendingRemove={(functionName) => {
+                          const current = form.getValues('functionNamesToRemove')
+                          if (current.includes(functionName)) {
+                            form.setValue(
+                              'functionNamesToRemove',
+                              current.filter((x) => x !== functionName),
+                              { shouldDirty: true }
+                            )
+                          } else {
+                            form.setValue('functionNamesToRemove', [...current, functionName], {
+                              shouldDirty: true,
+                            })
+                          }
+                        }}
+                      />
+                    </FormItemLayout>
+
+                    {watchedDbSchema.includes('public') && (
+                      <FormField
+                        control={form.control}
+                        name="defaultPrivilegesGranted"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Automatically expose new tables"
+                              description="Grants privileges to Data API roles by default, exposing new tables. We recommend disabling this to control access manually."
+                            >
+                              <FormControl>
+                                <Switch
+                                  size="large"
+                                  disabled={!canUpdateExposedEntities}
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
                                 />
-                                <MultiSelectorContent>
-                                  <MultiSelectorList>
-                                    {schemas.length <= 0 ? (
-                                      <MultiSelectorItem key="empty" value="no">
-                                        no
-                                      </MultiSelectorItem>
-                                    ) : (
-                                      schemas.map((x) => (
-                                        <MultiSelectorItem key={x.id + '-' + x.name} value={x.name}>
-                                          {x.name}
-                                        </MultiSelectorItem>
-                                      ))
-                                    )}
-                                  </MultiSelectorList>
-                                </MultiSelectorContent>
-                              </MultiSelector>
-                            )}
-                          </FormItemLayout>
-                          {!field.value.includes('public') && field.value.length > 0 && (
-                            <Admonition
-                              type="default"
-                              title="The public schema for this project is not exposed"
-                              className="mt-2"
-                              description={
-                                <>
-                                  <p className="text-sm">
-                                    You will not be able to query tables and views in the{' '}
-                                    <code className="text-code-inline">public</code> schema via
-                                    supabase-js or HTTP clients.
-                                  </p>
-                                  {isGraphqlExtensionEnabled && (
-                                    <>
-                                      <p className="text-sm">
-                                        Tables in the{' '}
-                                        <code className="text-code-inline">public</code> schema are
-                                        still exposed over our GraphQL endpoints.
-                                      </p>
-                                      <Button asChild type="default" className="mt-2">
-                                        <Link href={`/project/${projectRef}/database/extensions`}>
-                                          Disable the pg_graphql extension
-                                        </Link>
-                                      </Button>
-                                    </>
-                                  )}
-                                </>
-                              }
-                            />
-                          )}
-                        </FormItem_Shadcn_>
-                      )}
-                    />
+                              </FormControl>
+                            </FormItemLayout>
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    {watchedDbSchema.length === 0 && (
+                      <Admonition
+                        type="warning"
+                        title="No schema is currently selected"
+                        description="Saving with no selected schema or table will disable the Data API."
+                      />
+                    )}
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="dbExtraSearchPath"
                       render={({ field }) => (
-                        <FormItem_Shadcn_>
+                        <FormItem>
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Extra search path"
@@ -305,51 +580,53 @@ export const PostgrestConfig = () => {
                               </MultiSelector>
                             )}
                           </FormItemLayout>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="maxRows"
                       render={({ field }) => (
-                        <FormItem_Shadcn_>
+                        <FormItem>
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Max rows"
-                            description="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
+                            description="The maximum number of rows returned from a view, table, or function. Limits payload size for accidental or malicious requests."
                           >
-                            <FormControl_Shadcn_>
-                              <PrePostTab postTab="rows">
-                                <Input_Shadcn_
+                            <FormControl>
+                              <InputGroup>
+                                <FormInputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
                                   type="number"
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
                                 />
-                              </PrePostTab>
-                            </FormControl_Shadcn_>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>rows</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl>
                           </FormItemLayout>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="dbPool"
                       render={({ field }) => (
-                        <FormItem_Shadcn_>
+                        <FormItem>
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Pool size"
                             description="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
                           >
-                            <FormControl_Shadcn_>
-                              <PrePostTab postTab="connections">
-                                <Input_Shadcn_
+                            <FormControl>
+                              <InputGroup>
+                                <FormInputGroupInput
                                   size="small"
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
@@ -362,51 +639,92 @@ export const PostgrestConfig = () => {
                                   }
                                   value={field.value === null ? '' : field.value}
                                 />
-                              </PrePostTab>
-                            </FormControl_Shadcn_>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>connections</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl>
                           </FormItemLayout>
-                        </FormItem_Shadcn_>
+                        </FormItem>
                       )}
                     />
                   </CardContent>
                 </>
               )}
             </form>
-          </Form_Shadcn_>
+          </Form>
           <CardFooter className="border-t">
             <FormActions
               form={formId}
               isSubmitting={isUpdating}
               hasChanges={form.formState.isDirty}
               handleReset={resetForm}
-              disabled={!canUpdatePostgrestConfig}
+              disabled={!canUpdateExposedEntities}
               helper={
-                isPermissionsLoaded && !canUpdatePostgrestConfig
+                isPermissionsLoaded && !canUpdateExposedEntities
                   ? "You need additional permissions to update your project's API settings"
                   : undefined
               }
             />
           </CardFooter>
         </Card>
-        <Card className="mb-4">
-          <CardContent>
-            <FormItemLayout
-              isReactForm={false}
-              layout="flex-row-reverse"
-              label="Harden Data API"
-              description="Expose a custom schema instead of the public schema"
-            >
-              <div className="flex gap-2 items-center justify-end">
-                <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
-                  Harden Data API
-                </Button>
-              </div>
-            </FormItemLayout>
-          </CardContent>
-        </Card>
+        {IS_PLATFORM && (
+          <Card className="mb-4">
+            <CardContent>
+              <FormItemLayout
+                isReactForm={false}
+                layout="flex-row-reverse"
+                label="Harden Data API"
+                description="Expose a custom schema instead of the public schema"
+              >
+                <div className="flex gap-2 items-center justify-end">
+                  <Button icon={<LockIcon />} onClick={() => setShowModal(true)}>
+                    Harden Data API
+                  </Button>
+                </div>
+              </FormItemLayout>
+            </CardContent>
+          </Card>
+        )}
       </PageSectionContent>
 
-      <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />
+      {IS_PLATFORM && <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />}
+
+      <ConfirmationModal
+        visible={showResetOverrideConfirm}
+        title="Reset authenticator role override?"
+        confirmLabel="Reset override"
+        confirmLabelLoading="Resetting..."
+        loading={isResettingAuthenticatorOverride}
+        onCancel={() => setShowResetOverrideConfirm(false)}
+        onConfirm={() => {
+          if (!projectRef) return
+          resetAuthenticatorOverride({
+            projectRef,
+            connectionString: project?.connectionString,
+            sql: resetAuthenticatorDbSchemasSql,
+            grant: unguarded.migrating,
+          })
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          This clears the <code>pgrst.db_schemas</code> setting on the <code>authenticator</code>{' '}
+          role, so the Data API falls back to the schemas selected in the Dashboard above.
+        </p>
+        <p className="text-sm text-foreground-light mt-4">The following statement will be run:</p>
+        <div className="relative mt-2">
+          <pre className="px-3 py-2 pr-10 rounded bg-surface-200 text-xs font-mono whitespace-pre-wrap break-words">
+            {resetAuthenticatorDbSchemasSql}
+          </pre>
+          <CopyButton
+            iconOnly
+            type="button"
+            variant="text"
+            className="absolute top-1 right-1"
+            text={resetAuthenticatorDbSchemasSql}
+          />
+        </div>
+      </ConfirmationModal>
     </PageSection>
   )
 }

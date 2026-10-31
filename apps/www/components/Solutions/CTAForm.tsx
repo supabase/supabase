@@ -1,7 +1,9 @@
 import React, { FC } from 'react'
-import { cn, TextLink } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import TalkToPartnershipTeamForm from '~/components/Forms/TalkToPartnershipTeamForm'
+import { cn } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
+
+import TalkToPartnershipTeamForm from '@/components/Forms/TalkToPartnershipTeamForm'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 interface Props {}
 
@@ -13,10 +15,10 @@ const UseCases: FC<Props> = () => {
     >
       <div className="md:h-full w-full flex flex-col justify-between gap-4 lg:gap-8">
         <div className="flex flex-col gap-2 md:max-w-md">
-          <h1 className="h1 !m-0">
+          <h2 className="h1 m-0!">
             Talk to our
             <br className="hidden md:block" /> Partnerships team
-          </h1>
+          </h2>
           <p className="md:text-lg text-foreground-lighter">
             Explore custom pricing and infrastructure options.
           </p>

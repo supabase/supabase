@@ -1,8 +1,10 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DiskBreakdownVariables = {
   projectRef?: string
@@ -25,7 +27,7 @@ export async function getDiskBreakdown(
     {
       projectRef,
       connectionString,
-      sql: `
+      sql: safeSql`
     SELECT
   (
     SELECT
@@ -38,6 +40,7 @@ export async function getDiskBreakdown(
     FROM
       pg_ls_waldir()
   ) AS wal_size_bytes`,
+      grant: unguarded.migrating,
     },
     signal
   )

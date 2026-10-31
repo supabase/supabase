@@ -1,7 +1,8 @@
+import { Loader2Icon } from 'lucide-react'
 import { ReactNode } from 'react'
 import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Loader2 } from 'lucide-react'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+
+import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 
 export type OverviewTableColumn<T> = {
   key: keyof T | string
@@ -38,7 +39,7 @@ export function OverviewTable<T>({ columns, data, isLoading, emptyMessage }: Ove
           <TableRow className="[&>td]:hover:bg-transparent">
             <TableCell colSpan={columns.length} className="text-center text-foreground-light">
               <div className="flex items-center justify-center gap-2 py-4">
-                <Loader2 className="size-4 animate-spin" />
+                <Loader2Icon className="size-4 animate-spin" />
               </div>
             </TableCell>
           </TableRow>

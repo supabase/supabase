@@ -1,66 +1,57 @@
-import { BookHeart, Box, Cpu, Database, Globe } from 'lucide-react'
-
-import { Auth, EdgeFunctions, Storage } from 'icons'
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { type LOG_TYPES } from '../UnifiedLogs.constants'
+import { Auth, Compute, EdgeFunctions, Realtime, Storage } from 'icons'
+import {
+  BoxIcon,
+  CableIcon,
+  Code2Icon,
+  DatabaseIcon,
+  NetworkIcon,
+  TerminalIcon,
+} from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface LogTypeIconProps {
-  type: (typeof LOG_TYPES)[number]
+  type: string
   size?: number
   strokeWidth?: number
   className?: string
 }
 
+type IconComponent = typeof BoxIcon | typeof Auth
+
+// [Alaister]: commented out types coming in the future
+// edge: Globe,
+const ICON_MAP = new Map<string, IconComponent>([
+  ['postgrest', Code2Icon],
+  ['auth', Auth],
+  ['edge function', EdgeFunctions],
+  ['edge function runtime', TerminalIcon],
+  ['postgres', DatabaseIcon],
+  ['storage', Storage],
+  ['realtime', Realtime],
+  ['supavisor', CableIcon],
+  ['pgbouncer', CableIcon],
+  ['multigres', NetworkIcon],
+  ['compute', Compute],
+])
+
 export const LogTypeIcon = ({
   type,
-  size = 16,
+  size = 14,
   strokeWidth = 1.5,
   className,
 }: LogTypeIconProps) => {
-  // [Alaister]: commented out types coming in the future
-  const iconMap: Record<(typeof LOG_TYPES)[number], () => React.ReactNode> = {
-    // edge: () => <Globe size={size} strokeWidth={strokeWidth} className={className} />,
-    postgrest: () => <BookHeart size={size} strokeWidth={strokeWidth} className={className} />,
-    auth: () => <Auth size={size} strokeWidth={strokeWidth} className={className} />,
-    'edge function': () => (
-      <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
-    ),
-    postgres: () => <Database size={size} strokeWidth={strokeWidth} className={className} />,
-    // function_events: () => (
-    //   <EdgeFunctions size={size} strokeWidth={strokeWidth} className={className} />
-    // ),
-    // supavisor: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
-    // postgres_upgrade: () => <Cpu size={size} strokeWidth={strokeWidth} className={className} />,
-    storage: () => <Storage size={size} strokeWidth={strokeWidth} className={className} />,
-
-    // cron: () => <Clock size={size} strokeWidth={strokeWidth} className={className} />,
-  }
-
-  const IconComponent =
-    iconMap[type] || (() => <Box size={size} strokeWidth={strokeWidth} className={className} />)
+  const Icon = ICON_MAP.get(type) ?? BoxIcon
 
   return (
     <Tooltip>
-      <TooltipTrigger>
-        <IconComponent />
+      <TooltipTrigger asChild>
+        <span className="inline-flex" role="img" aria-label={type}>
+          <Icon size={size} strokeWidth={strokeWidth} className={className} />
+        </span>
       </TooltipTrigger>
       <TooltipContent side="left">
         <div className="text-xs">{type}</div>
       </TooltipContent>
     </Tooltip>
-  )
-}
-
-export const LogTypeIconWithText = ({
-  type,
-  size = 16,
-  strokeWidth = 1.5,
-  className,
-}: LogTypeIconProps) => {
-  return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <LogTypeIcon type={type} size={size} strokeWidth={strokeWidth} />
-      <span>{type}</span>
-    </div>
   )
 }

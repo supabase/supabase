@@ -7,14 +7,14 @@ Since Supabase legacy JWT Secret will be deprecated, users that would like to ve
 > see [Upcoming changes to Supabase API Keys #29260](https://github.com/orgs/supabase/discussions/29260)
 
 To simplify this task, Supabase provides a collection of JWT validation examples
-that can be found at [`_shared/jwt/`](https://github.com/supabase/supabase/blob/main/examples/edge-functions/supabase/functions/_shared/jwt) folder.
+that can be found at [`_shared/jwt/`](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/_shared/jwt) folder.
 
 ## Setup
 
 1. Copy/download the JWT template, then import and use it inside your edge function.
 
 ```bash
-wget https://raw.githubusercontent.com/supabase/supabase/refs/heads/main/examples/edge-functions/supabase/functions/_shared/jwt/<template>.ts
+curl -O https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/examples/edge-functions/supabase/functions/_shared/jwt/<template>.ts
 ```
 
 2. Add any required Environment-Variable to a `.env` file, see inside of the

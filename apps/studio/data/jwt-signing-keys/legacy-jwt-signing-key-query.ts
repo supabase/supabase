@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { jwtSigningKeysKeys } from './keys'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 interface LegacyJWTSigningKeyVariables {
   projectRef?: string
@@ -17,6 +17,7 @@ async function getLegacyJWTSigningKey(
   const { data, error } = await get(`/v1/projects/{ref}/config/auth/signing-keys/legacy`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) {

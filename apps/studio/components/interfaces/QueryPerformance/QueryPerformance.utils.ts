@@ -2,11 +2,11 @@ import * as Sentry from '@sentry/nextjs'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 
-import { getErrorMessage } from 'lib/get-error-message'
+import { getErrorMessage } from '@/lib/get-error-message'
 
 dayjs.extend(duration)
 
-export const formatDuration = (milliseconds: number) => {
+export const formatDuration = (milliseconds: number, precision: number = 2) => {
   const duration = dayjs.duration(milliseconds, 'milliseconds')
 
   const days = Math.floor(duration.asDays())
@@ -16,7 +16,7 @@ export const formatDuration = (milliseconds: number) => {
   const totalSeconds = duration.asSeconds()
 
   if (totalSeconds < 60) {
-    return `${totalSeconds.toFixed(2)}s`
+    return `${totalSeconds.toFixed(precision)}s`
   }
 
   const parts = []

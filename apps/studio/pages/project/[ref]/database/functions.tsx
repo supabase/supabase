@@ -1,13 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -18,10 +8,18 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
+import { FunctionsList } from '@/components/interfaces/Database/Functions/FunctionsList/FunctionsList'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
+
 const DatabaseFunctionsPage: NextPageWithLayout = () => {
-  const { can: canReadFunctions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_READ,
-    'functions'
+  const { can: canReadFunctions, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_READ
   )
 
   if (isPermissionsLoaded && !canReadFunctions) {
@@ -53,7 +51,7 @@ const DatabaseFunctionsPage: NextPageWithLayout = () => {
 
 DatabaseFunctionsPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    <DatabaseLayout title="Functions">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

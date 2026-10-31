@@ -1,19 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence } from 'framer-motion'
-import { AlertCircle, RotateCw, Timer } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { AlertCircleIcon, RotateCwIcon, TimerIcon } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useFlag, useParams } from 'common'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
-import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
-import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
-import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -39,40 +28,89 @@ import {
   TableRow,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { SigningKeysComingSoonBanner } from '../signing-keys-coming-soon'
+
 import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
 import { ActionPanel } from './action-panel'
 import { CreateKeyDialog } from './create-key-dialog'
 import { KeyDetailsDialog } from './key-details-dialog'
 import { RotateKeyDialog } from './rotate-key-dialog'
 import { SigningKeyRow } from './signing-key-row'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import {
+  getJWTSigningKeyLastUsedAt,
+  useApiKeysLastUsedQuery,
+} from '@/data/analytics/api-keys-last-used-query'
+import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { useJWTSigningKeyDeleteMutation } from '@/data/jwt-signing-keys/jwt-signing-key-delete-mutation'
+import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
+import {
+  JWTSigningKey,
+  useJWTSigningKeysQuery,
+} from '@/data/jwt-signing-keys/jwt-signing-keys-query'
+import { useLegacyJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
+import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
+
+const JWTSecretKeysTableHeader = ({
+  showLastRotatedAt = false,
+}: {
+  showLastRotatedAt?: boolean
+}) => {
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
+
+  return (
+    <TableHeader>
+      <TableRow>
+        <TableHead className="w-[315px]">Key</TableHead>
+        <TableHead className="w-[200px]">Type</TableHead>
+        <TableHead className="text-right w-[160px] hidden xl:table-cell">Created at</TableHead>
+        {IS_PLATFORM && showApiKeysLastUsed && (
+          <TableHead className="text-right w-[160px]">Last used</TableHead>
+        )}
+        {showLastRotatedAt && (
+          <TableHead className="text-right hidden xl:table-cell">Last rotated at</TableHead>
+        )}
+        <TableHead />
+      </TableRow>
+    </TableHeader>
+  )
+}
 
 export const JWTSecretKeysTable = () => {
   const { ref: projectRef } = useParams()
   const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
 
-  const newJwtSecrets = useFlag('newJwtSecrets')
-
   const [selectedKey, setSelectedKey] = useState<JWTSigningKey>()
   const [selectedKeyToUpdate, setSelectedKeyToUpdate] = useState<string>()
   const [shownDialog, setShownDialog] = useState<DialogType>()
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
-  const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
-    '*'
+  const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
-  const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
+  const now = useRef(new Date()).current
+  const {
+    data: lastUsedData,
+    isError: isLastUsedError,
+    isLoading: isLoadingLastUsed,
+  } = useApiKeysLastUsedQuery(
     {
       projectRef,
+      isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      isoTimestampEnd: now.toISOString(),
     },
+    { enabled: canReadAPIKeys && showApiKeysLastUsed }
+  )
+  const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
+    { projectRef },
     { enabled: canReadAPIKeys }
   )
   const { data: legacyKey, isPending: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
-    {
-      projectRef,
-    },
+    { projectRef },
     { enabled: canReadAPIKeys }
   )
   const { data: legacyAPIKeysStatus, isPending: isLoadingLegacyAPIKeysStatus } =
@@ -128,6 +166,7 @@ export const JWTSecretKeysTable = () => {
     () => sortedKeys.filter((key) => key.status === 'revoked'),
     [sortedKeys]
   )
+  const getLastUsedAt = (keyId: string) => getJWTSigningKeyLastUsedAt(lastUsedData ?? [], keyId)
 
   const resetDialog = () => {
     setSelectedKey(undefined)
@@ -166,9 +205,9 @@ export const JWTSecretKeysTable = () => {
 
   if (!canReadAPIKeys && !isLoadingCanReadAPIKeys) {
     return (
-      <div className="bg-surface-100 rounded-md border shadow-sm">
+      <div className="bg-surface-100 rounded-md border shadow-xs">
         <div className="flex items-center py-8 px-8 space-x-2">
-          <AlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircleIcon size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             You don't have permission to view JWT signing keys. These keys are restricted to users
             with higher access levels.
@@ -182,36 +221,30 @@ export const JWTSecretKeysTable = () => {
     return <GenericSkeletonLoader />
   }
 
-  if (!newJwtSecrets) {
-    return <SigningKeysComingSoonBanner />
-  }
-
   return (
     <>
       <div className="-space-y-px">
         {!canReadAPIKeys ? null : legacyKey ? (
           <>
-            {standbyKey && (
+            {standbyKey ? (
               <ActionPanel
                 title="Rotate Signing Key"
                 description="Switch the standby key to in use. All new JSON Web Tokens issued by Supabase Auth will be signed with this key."
                 buttonLabel="Rotate keys"
                 onClick={() => setShownDialog('rotate')}
                 loading={isUpdatingJWTSigningKey}
-                icon={<RotateCw className="size-4" />}
-                type="primary"
+                icon={<RotateCwIcon className="size-4" />}
+                variant="primary"
               />
-            )}
-
-            {!standbyKey && (
+            ) : (
               <ActionPanel
                 title="Create standby key"
                 description="Set up a new key which you can switch to once it has been picked up by all components of your application."
                 buttonLabel="Create Standby Key"
                 onClick={() => setShownDialog('create')}
                 loading={isPendingMutation}
-                type="primary"
-                icon={<Timer className="size-4" />}
+                variant="primary"
+                shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
               />
             )}
           </>
@@ -225,95 +258,65 @@ export const JWTSecretKeysTable = () => {
 
       {sortedKeys.length > 0 && (
         <>
-          <div>
-            <Card className="w-full overflow-hidden bg-surface-100 border rounded-md">
-              <CardContent className="p-0">
-                <Table className="p-5">
-                  <TableHeader className="bg-200">
-                    <TableRow>
-                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
-                        Status
-                      </TableHead>
-                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
-                        Key ID
-                      </TableHead>
-                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                        Type
-                      </TableHead>
-                      <TableHead />
-                      <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <AnimatePresence>
-                      {standbyKey && (
-                        <SigningKeyRow
-                          key={standbyKey.id}
-                          signingKey={standbyKey}
-                          legacyKey={legacyKey}
-                          standbyKey={standbyKey}
-                          isLoading={
-                            selectedKeyToUpdate === standbyKey.id && isUpdatingJWTSigningKey
-                          }
-                          setSelectedKey={setSelectedKey}
-                          setShownDialog={setShownDialog}
-                          handleStandbyKey={handleStandbyKey}
-                          handlePreviouslyUsedKey={handlePreviouslyUsedKey}
-                        />
-                      )}
-                      {inUseKey && (
-                        <SigningKeyRow
-                          key={inUseKey.id}
-                          signingKey={inUseKey}
-                          setSelectedKey={setSelectedKey}
-                          setShownDialog={setShownDialog}
-                          handleStandbyKey={handleStandbyKey}
-                          handlePreviouslyUsedKey={handlePreviouslyUsedKey}
-                          legacyKey={legacyKey}
-                          standbyKey={standbyKey}
-                        />
-                      )}
-                    </AnimatePresence>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <JWTSecretKeysTableHeader />
+                <TableBody>
+                  <AnimatePresence>
+                    {inUseKey && (
+                      <SigningKeyRow
+                        key={inUseKey.id}
+                        signingKey={inUseKey}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                        lastUsedAt={getLastUsedAt(inUseKey.id)}
+                        isLoadingLastUsed={isLoadingLastUsed}
+                        isLastUsedError={isLastUsedError}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
+                      />
+                    )}
+                    {standbyKey && (
+                      <SigningKeyRow
+                        key={standbyKey.id}
+                        signingKey={standbyKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                        isLoading={selectedKeyToUpdate === standbyKey.id && isUpdatingJWTSigningKey}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        lastUsedAt={getLastUsedAt(standbyKey.id)}
+                        isLoadingLastUsed={isLoadingLastUsed}
+                        isLastUsedError={isLastUsedError}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
+                      />
+                    )}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <h2>Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
                 These JWT signing keys are still used to{' '}
-                <em className="text-brand not-italic">verify tokens</em> that are yet to expire.
-                Revoke once all tokens have expired.
+                <em className="text-foreground not-italic">verify tokens</em> that are yet to
+                expire. Revoke once all tokens have expired.
               </p>
             </div>
             <Card className="overflow-hidden">
               <CardContent className="p-0">
                 {previouslyUsedKeys.length > 0 ? (
-                  <Table className="p-5">
-                    <TableHeader className="bg-200">
-                      <TableRow>
-                        <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
-                          Status
-                        </TableHead>
-                        <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
-                          Key ID
-                        </TableHead>
-                        <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                          Type
-                        </TableHead>
-                        <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
-                          Last rotated at
-                        </TableHead>
-                        <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                          Actions
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
+                  <Table>
+                    <JWTSecretKeysTableHeader showLastRotatedAt />
                     <TableBody>
                       <AnimatePresence>
                         {previouslyUsedKeys.map((key) => (
@@ -327,6 +330,10 @@ export const JWTSecretKeysTable = () => {
                             setShownDialog={setShownDialog}
                             handleStandbyKey={handleStandbyKey}
                             handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                            lastUsedAt={getLastUsedAt(key.id)}
+                            isLoadingLastUsed={isLoadingLastUsed}
+                            isLastUsedError={isLastUsedError}
+                            isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                           />
                         ))}
                       </AnimatePresence>
@@ -334,7 +341,7 @@ export const JWTSecretKeysTable = () => {
                   </Table>
                 ) : (
                   <div className="flex flex-col items-center justify-center text-center text-foreground-light p-8 gap-2">
-                    <Timer className="size-6 text-foreground-lighter" />
+                    <TimerIcon className="size-6 text-foreground-lighter" />
                     <div className="flex flex-col gap-1">
                       <p className="text-sm font-medium">No previously used keys</p>
                       <p className="text-xs text-foreground-lighter">
@@ -359,26 +366,8 @@ export const JWTSecretKeysTable = () => {
           </div>
           <Card className="overflow-hidden">
             <CardContent className="p-0">
-              <Table className="p-5">
-                <TableHeader className="bg-200">
-                  <TableRow>
-                    <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
-                      Status
-                    </TableHead>
-                    <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
-                      Key ID
-                    </TableHead>
-                    <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                      Type
-                    </TableHead>
-                    <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
-                      Last rotated at
-                    </TableHead>
-                    <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
+              <Table>
+                <JWTSecretKeysTableHeader showLastRotatedAt />
                 <TableBody>
                   <AnimatePresence>
                     {revokedKeys.map((key) => (
@@ -391,6 +380,10 @@ export const JWTSecretKeysTable = () => {
                         handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                         legacyKey={legacyKey}
                         standbyKey={standbyKey}
+                        lastUsedAt={getLastUsedAt(key.id)}
+                        isLoadingLastUsed={isLoadingLastUsed}
+                        isLastUsedError={isLastUsedError}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                       />
                     ))}
                   </AnimatePresence>
@@ -400,48 +393,6 @@ export const JWTSecretKeysTable = () => {
           </Card>
         </div>
       )}
-
-      {/* TODO(hf): For launch <div>
-        <h2 className="text-xl mb-4">Resources</h2>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          <Card className="bg-surface-75 overflow-hidden">
-            <div className="flex">
-              <div className="bg-surface-200 px-0 flex items-center justify-center w-[180px]">
-                <WhyRotateKeysIllustration />
-              </div>
-              <div className="flex-1 pl-8 border-l h-full py-6 px-5">
-                <h4 className="text-sm">Why Rotate keys?</h4>
-                <p className="text-xs text-foreground-light mb-4 max-w-xs">
-                  Create Standby keys ahead of time which can then be promoted to 'In use' at any
-                  time.
-                </p>
-                <Button type="outline" icon={<Book />}>
-                  View guide
-                </Button>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-surface-75 overflow-hidden">
-            <div className="flex">
-              <div className="bg-surface-200 px-0 flex items-center justify-center w-[180px]">
-                <WhyUseStandbyKeysIllustration />
-              </div>
-              <div className="flex-1 pl-8 border-l h-full py-6 px-5">
-                <h4 className="text-sm">Why use a Standby key?</h4>
-                <p className="text-xs text-foreground-light mb-4 max-w-xs">
-                  Create Standby keys ahead of time which can then be promoted to 'In use' at any
-                  time.
-                </p>
-                <Button type="outline" icon={<Book />}>
-                  View guide
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div> */}
 
       <Dialog open={shownDialog === 'legacy'} onOpenChange={resetDialog}>
         <DialogContent className="sm:max-w-[425px]">
@@ -458,6 +409,7 @@ export const JWTSecretKeysTable = () => {
           </DialogSection>
           <DialogFooter>
             <Button
+              variant="primary"
               loading={isMigrating}
               onClick={() => migrateJWTSecret({ projectRef: projectRef! })}
             >

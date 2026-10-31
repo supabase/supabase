@@ -1,16 +1,24 @@
+import dayjs from 'dayjs'
 import { type ReactNode } from 'react'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
-import { InlineLink } from 'components/ui/InlineLink'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 export const RESTRICTION_MESSAGES = {
   GRACE_PERIOD: {
-    title: 'Organization plan has exceeded its quota',
-    description: (date: string, slug: string): ReactNode => (
-      <>
-        You have been given a grace period until {date}.{' '}
-        <InlineLink href={`/org/${slug}/usage`}>Review usage</InlineLink>
-      </>
-    ),
+    title: 'Organization exceeded its quota in the previous billing cycle',
+    description: (date: string, slug: string): ReactNode => {
+      const label = dayjs(date).format('DD MMM, YYYY')
+      return (
+        <>
+          Projects will be restricted from{' '}
+          <TimestampInfo className="text-sm" utcTimestamp={date} label={label} /> if your
+          organization remains over quota.{' '}
+          <InlineLink href={`/org/${slug}/usage`}>Review usage</InlineLink> or{' '}
+          <InlineLink href={`/org/${slug}/billing`}>billing</InlineLink>.
+        </>
+      )
+    },
   },
   GRACE_PERIOD_OVER: {
     title: 'Grace period is over',
@@ -40,21 +48,28 @@ export const RESTRICTION_MESSAGES = {
     ),
   },
   OVERDUE_INVOICES_FROM_OTHER_ORGS: {
-    title: 'Outstanding invoices in other organization',
-    description: (slug: string): ReactNode => (
-      <>
-        Please <InlineLink href={`/org/${slug}/billing#invoices`}>pay invoices</InlineLink> for
-        other organizations to avoid service disruption
-      </>
-    ),
-  },
-  MISSING_BILLING_INFO: {
-    title: 'Missing billing information',
-    description: (slug: string): ReactNode => (
-      <>
-        Please <InlineLink href={`/org/${slug}/billing#address`}>add a billing address</InlineLink>{' '}
-        to avoid restrictions. If you are a registered business, please add a tax ID too
-      </>
-    ),
+    title: 'Outstanding invoices in other organizations',
+    description: (orgs: { name: string; slug: string }[]): ReactNode => {
+      const [firstOrg, ...remainingOrgs] = orgs
+
+      if (!firstOrg) {
+        return (
+          <>
+            <InlineLink href="/organizations">Pay outstanding invoices</InlineLink> to avoid service
+            disruption
+          </>
+        )
+      }
+
+      return (
+        <>
+          Pay invoices for{' '}
+          <InlineLink href={`/org/${firstOrg.slug}/billing#invoices`}>{firstOrg.name}</InlineLink>
+          {remainingOrgs.length > 0 &&
+            ` and ${remainingOrgs.length} other${remainingOrgs.length === 1 ? '' : 's'}`}{' '}
+          to avoid service disruption
+        </>
+      )
+    },
   },
 }

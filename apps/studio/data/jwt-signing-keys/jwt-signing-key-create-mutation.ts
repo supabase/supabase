@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { JWTAlgorithm } from './jwt-signing-keys-query'
 import { jwtSigningKeysKeys } from './keys'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 interface JWTSigningKeyCreateVariables {
   projectRef?: string
@@ -25,6 +25,7 @@ export async function createJWTSigningKey(payload: JWTSigningKeyCreateVariables)
       status: payload.status,
       ...(payload.private_jwk ? { private_jwk: payload.private_jwk } : null),
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

@@ -1,15 +1,15 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
 import { difference } from 'lodash'
 import { useRouter } from 'next/router'
 
-import { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
-import { convertKVStringArrayToJson } from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { FDW } from 'data/fdw/fdws-query'
-import { Bucket } from 'data/storage/buckets-query'
-import { getDecryptedValues } from 'data/vault/vault-secret-decrypted-value-query'
-import { createWrappedSymbol } from 'lib/helpers'
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from './Storage.constants'
 import type { StoragePolicyFormField } from './Storage.types'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { convertKVStringArrayToJson } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { FDW } from '@/data/fdw/fdws-query'
+import { Bucket } from '@/data/storage/buckets-query'
+import { getDecryptedValues } from '@/data/vault/vault-secret-decrypted-value-query'
+import { createWrappedSymbol } from '@/lib/helpers'
 
 const shortHash = (str: string) => {
   let hash = 0
@@ -21,7 +21,7 @@ const shortHash = (str: string) => {
   return new Uint32Array([hash])[0].toString(36)
 }
 
-export type PoliciesByBucket = { name: string | Symbol; policies: PostgresPolicy[] }[]
+export type PoliciesByBucket = { name: string | Symbol; policies: Policy[] }[]
 
 /**
  * Formats the policies from the objects table in the storage schema
@@ -31,7 +31,7 @@ export type PoliciesByBucket = { name: string | Symbol; policies: PostgresPolicy
  */
 export const formatPoliciesForStorage = (
   buckets: Bucket[],
-  policies: PostgresPolicy[]
+  policies: Policy[]
 ): PoliciesByBucket => {
   if (policies.length === 0) return []
 
@@ -58,7 +58,7 @@ export const UNKNOWN_BUCKET_SYMBOL = createWrappedSymbol('unknown-bucket', 'Unkn
  */
 export const UNGROUPED_POLICY_SYMBOL = createWrappedSymbol('ungrouped-policy', 'Ungrouped')
 
-const formatStoragePolicies = (buckets: Bucket[], policies: PostgresPolicy[]) => {
+const formatStoragePolicies = (buckets: Bucket[], policies: Policy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
   const formattedPolicies = policies.map((policy) => {
     const { definition: policyDefinition, check: policyCheck } = policy
@@ -93,8 +93,8 @@ export const extractBucketNameFromDefinition = (definition: string | null) => {
   return bucketDefinition ? bucketDefinition.split("'")[1] : null
 }
 
-const groupPoliciesByBucket = (policies: (PostgresPolicy & { bucket: string | Symbol })[]) => {
-  const policiesByBucket = new Map<string | Symbol, PostgresPolicy[]>()
+const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[]) => {
+  const policiesByBucket = new Map<string | Symbol, Policy[]>()
   policies.forEach((policy) => {
     if (!policiesByBucket.has(policy.bucket)) {
       policiesByBucket.set(policy.bucket, [])
@@ -216,7 +216,13 @@ export const applyBucketIdToTemplateDefinition = (definition: string, bucketId: 
 
 export const useStorageV2Page = () => {
   const router = useRouter()
-  return router.pathname.split('/')[4] as undefined | 'files' | 'analytics' | 'vectors' | 's3'
+  return router.pathname.split('/')[4] as
+    | undefined
+    | 'files'
+    | 'analytics'
+    | 'vectors'
+    | 's3'
+    | 'signing-keys'
 }
 
 export const getDecryptedParameters = async ({
@@ -236,7 +242,7 @@ export const getDecryptedParameters = async ({
 
   const paramsToBeDecrypted = Object.fromEntries(
     new Map(
-      Object.entries(serverOptions).filter(([key, value]) => {
+      Object.entries(serverOptions).filter(([key, _value]) => {
         return wrapperServerOptions.find((option) => option.name === key)?.encrypted
       })
     )
@@ -262,3 +268,19 @@ export const getDecryptedParameters = async ({
     ...paramsWithDecryptedValues,
   }
 }
+
+// [Joshen] These are referenced from the storage API directly here
+// https://github.com/supabase/storage/blob/69e4a40799a9d10be0a63a37cbb46d7d9bea0e17/src/storage/limits.ts#L59
+
+// only allow s3 safe characters and characters which require special handling for now
+// the slash restriction come from bucket naming rules
+// and the rest of the validation rules are based on S3 object key validation.
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+export const validBucketNameRegex = /^(\w|!|-|\.|\*|'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$/
+export const inverseValidBucketNameRegex = /[^A-Za-z0-9_!\-.*'() &$@=;:+,?]/
+
+// only allow s3 safe characters and characters which require special handling for now
+// https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html
+export const validObjectKeyRegex = /^(\w|\/|!|-|\.|\*|'|\(|\)| |&|\$|@|=|;|:|\+|,|\?)*$/
+export const inverseValidObjectKeyRegex = /[^A-Za-z0-9_\/!\-.*'() &$@=;:+,?]/

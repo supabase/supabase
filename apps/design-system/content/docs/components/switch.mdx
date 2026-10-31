@@ -66,13 +66,13 @@ When using Switch in custom flex layouts (especially with height constraints lik
 
 ```tsx
 <div className="relative">
-  <FormField_Shadcn_
+  <FormField
     control={form.control}
     name="enabled"
     render={({ field }) => (
-      <FormControl_Shadcn_>
+      <FormControl>
         <Switch checked={field.value} onCheckedChange={field.onChange} />
-      </FormControl_Shadcn_>
+      </FormControl>
     )}
   />
 </div>

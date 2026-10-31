@@ -1,57 +1,42 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
 import { PropsWithChildren, useEffect, useRef } from 'react'
+import { Admonition } from 'ui-patterns/Admonition'
 
-import { Admonition } from 'ui-patterns/admonition'
-
-import { Button } from 'ui'
-import { useTrack } from 'lib/telemetry/track'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface AlertErrorProps {
   projectRef?: string
+  orgSlug?: string
   subject?: string
+  description?: string
   error?: { message: string } | null
-  layout?: 'vertical' | 'horizontal'
+  layout?: 'vertical' | 'horizontal' | 'responsive'
   className?: string
   showIcon?: boolean
   showInstructions?: boolean
   showErrorPrefix?: boolean
   additionalActions?: React.ReactNode
+  hideContactSupport?: boolean
 }
 
-const ContactSupportButton = ({
-  projectRef,
-  subject,
-  error,
-}: {
-  projectRef?: string
-  subject?: string
-  error?: { message: string } | null
-}) => {
-  return (
-    <Button asChild type="default" className="w-min">
-      <SupportLink
-        queryParams={{
-          category: SupportCategories.DASHBOARD_BUG,
-          projectRef,
-          subject,
-          error: error?.message,
-        }}
-      >
-        Contact support
-      </SupportLink>
-    </Button>
-  )
-}
+const SUPPORT_PHRASE_REGEX = /(contact support)/i
 
 // [Joshen] To standardize the language for all error UIs
 export const AlertError = ({
   projectRef,
+  orgSlug,
   subject,
+  hideContactSupport = false,
+  description = hideContactSupport
+    ? 'Try refreshing your browser.'
+    : 'Try refreshing your browser, but if the issue persists for more than a few minutes, contact support.',
   error,
   className,
   showIcon = true,
-  layout = 'horizontal',
+  layout,
   showInstructions = true,
   showErrorPrefix = true,
   children,
@@ -64,10 +49,40 @@ export const AlertError = ({
     ? '503 Service Temporarily Unavailable'
     : error?.message
 
+  const hasInlineSupportLink =
+    showInstructions && !hideContactSupport && SUPPORT_PHRASE_REGEX.test(description)
+  const canShowSupportFallback = !hideContactSupport && !hasInlineSupportLink
+  // Without instructions there's no sentence to link, so the fallback continues the message
+  const isSupportFallbackInline = canShowSupportFallback && !showInstructions && !!error?.message
+
+  const renderSupportLink = (text: string, key?: number) => (
+    <SupportLink
+      key={key}
+      className={InlineLinkClassName}
+      queryParams={{
+        category: SupportCategories.DASHBOARD_BUG,
+        projectRef,
+        orgSlug,
+        subject,
+        errorMessage: error?.message,
+      }}
+    >
+      {text}
+    </SupportLink>
+  )
+
+  // Splitting with a capture group keeps the matched text, so it can be swapped for a link
+  const renderDescriptionWithSupportLink = (text: string) =>
+    text
+      .split(SUPPORT_PHRASE_REGEX)
+      .map((part, index) =>
+        SUPPORT_PHRASE_REGEX.test(part) ? renderSupportLink(part, index) : part
+      )
+
   useEffect(() => {
     if (!hasTrackedRef.current) {
       hasTrackedRef.current = true
-      if (Math.random() < 0.1) {
+      if (isDashboardErrorSampled()) {
         track('dashboard_error_created', {
           source: 'admonition',
         })
@@ -78,7 +93,7 @@ export const AlertError = ({
   return (
     <Admonition
       type="warning"
-      layout={additionalActions ? 'vertical' : layout}
+      layout={layout ?? (additionalActions ? 'vertical' : 'responsive')}
       showIcon={showIcon}
       title={subject}
       description={
@@ -87,30 +102,27 @@ export const AlertError = ({
             <p>
               {showErrorPrefix && 'Error: '}
               {formattedErrorMessage}
+              {isSupportFallbackInline && (
+                <>
+                  {/[.!?]$/.test(formattedErrorMessage ?? '') ? ' ' : '. '}
+                  If the issue persists, {renderSupportLink('contact support')}.
+                </>
+              )}
             </p>
           )}
           {showInstructions && (
             <p>
-              Try refreshing your browser, but if the issue persists for more than a few minutes,
-              please reach out to us via support.
+              {hasInlineSupportLink ? renderDescriptionWithSupportLink(description) : description}
             </p>
+          )}
+          {canShowSupportFallback && !isSupportFallbackInline && (
+            <p>{renderSupportLink('Contact support')}</p>
           )}
           {children}
         </>
       }
-      actions={
-        additionalActions ? (
-          <>
-            {additionalActions}
-            <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
-          </>
-        ) : (
-          <ContactSupportButton projectRef={projectRef} subject={subject} error={error} />
-        )
-      }
+      actions={additionalActions}
       className={className}
     />
   )
 }
-
-export default AlertError

@@ -1,14 +1,5 @@
-import { Search } from 'lucide-react'
-import { useState } from 'react'
-
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { parseMigrationVersion } from 'lib/migration-utils'
+import { SearchIcon } from 'lucide-react'
+import { useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -24,14 +15,37 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { MigrationsEmptyState } from './MigrationsEmptyState'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
-const Migrations = () => {
+import { MigrationsEmptyState } from './MigrationsEmptyState'
+import { AlertError } from '@/components/ui/AlertError'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
+import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { formatMigrationVersionLabel, parseMigrationVersion } from '@/lib/migration-utils'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+export const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search migrations' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setSearch(''))
 
   const { data: project } = useSelectedProjectQuery()
   const {
@@ -47,9 +61,9 @@ const Migrations = () => {
   const migrations =
     search.length === 0
       ? data
-      : data.filter(
+      : (data.filter(
           (migration) => migration.version.includes(search) || migration.name?.includes(search)
-        ) ?? []
+        ) ?? [])
 
   return (
     <>
@@ -63,31 +77,11 @@ const Migrations = () => {
 
       <div>
         {isError && (
-          <Admonition
-            type="warning"
-            title="Failed to retrieve migration history for database"
-            description={
-              <>
-                <p className="mb-1">
-                  Try refreshing your browser, but if the issue persists for more than a few
-                  minutes, please reach out to us via support.
-                </p>
-                <p className="mb-4">Error: {(error as any)?.message ?? 'Unknown'}</p>
-              </>
-            }
-          >
-            <Button key="contact-support" asChild type="default">
-              <SupportLink
-                queryParams={{
-                  projectRef: project?.ref,
-                  category: SupportCategories.DASHBOARD_BUG,
-                  subject: 'Unable to view database migrations',
-                }}
-              >
-                Contact support
-              </SupportLink>
-            </Button>
-          </Admonition>
+          <AlertError
+            projectRef={project?.ref}
+            subject="Failed to retrieve migration history for database"
+            error={error}
+          />
         )}
         {isSuccess && (
           <div>
@@ -96,12 +90,13 @@ const Migrations = () => {
             {data.length > 0 && (
               <div className="flex flex-col gap-y-4">
                 <Input
+                  ref={searchInputRef}
                   size="tiny"
                   placeholder="Search for a migration"
                   value={search}
                   className="w-full lg:w-52"
-                  onChange={(e: any) => setSearch(e.target.value)}
-                  icon={<Search />}
+                  onChange={(e) => setSearch(e.target.value)}
+                  icon={<SearchIcon />}
                 />
                 <Card>
                   <Table>
@@ -119,23 +114,32 @@ const Migrations = () => {
                       {migrations.length > 0 ? (
                         migrations.map((migration) => {
                           const versionDayjs = parseMigrationVersion(migration.version)
-                          const insertedAt = versionDayjs
-                            ? versionDayjs.format('DD MMM YYYY, HH:mm:ss')
-                            : undefined
+                          const label = formatMigrationVersionLabel(migration.version)
+                          const insertedAt = versionDayjs ? versionDayjs.toISOString() : undefined
 
                           return (
                             <TableRow key={migration.version}>
                               <TableCell>{migration.version}</TableCell>
                               <TableCell
                                 className={cn(
-                                  (migration?.name ?? '').length === 0 && '!text-foreground-lighter'
+                                  (migration?.name ?? '').length === 0 && 'text-foreground-lighter!'
                                 )}
                               >
                                 {migration?.name ?? 'Name not available'}
                               </TableCell>
-                              <TableCell className={cn(!insertedAt && 'text-foreground-lighter')}>
+                              <TableCell>
                                 <Tooltip>
-                                  <TooltipTrigger>{insertedAt ?? 'Unknown'}</TooltipTrigger>
+                                  <TooltipTrigger>
+                                    {!!insertedAt ? (
+                                      <TimestampInfo
+                                        className="text-sm"
+                                        label={label}
+                                        utcTimestamp={insertedAt}
+                                      />
+                                    ) : (
+                                      <p className="text-foreground-lighter">Unknown</p>
+                                    )}
+                                  </TooltipTrigger>
                                   {!insertedAt && (
                                     <TooltipContent side="right" className="w-64 text-center">
                                       This migration was not generated via the{' '}
@@ -151,10 +155,7 @@ const Migrations = () => {
                                 </Tooltip>
                               </TableCell>
                               <TableCell align="right">
-                                <Button
-                                  type="default"
-                                  onClick={() => setSelectedMigration(migration)}
-                                >
+                                <Button onClick={() => setSelectedMigration(migration)}>
                                   View migration SQL
                                 </Button>
                               </TableCell>
@@ -162,14 +163,7 @@ const Migrations = () => {
                           )
                         })
                       ) : (
-                        <TableRow>
-                          <TableCell colSpan={3}>
-                            <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-foreground-light">
-                              Your search for "{search}" did not return any results
-                            </p>
-                          </TableCell>
-                        </TableRow>
+                        <TableRowNoResults colSpan={3} search={search} />
                       )}
                     </TableBody>
                   </Table>
@@ -186,20 +180,25 @@ const Migrations = () => {
         header={`Migration: ${selectedMigration?.version}`}
         onCancel={() => setSelectedMigration(undefined)}
         customFooter={
-          <div className="flex items-center justify-end p-4 border-t border-overlay-border">
-            <Button type="default" onClick={() => setSelectedMigration(undefined)}>
-              Close
-            </Button>
+          <div className="flex items-center justify-end p-4 border-t">
+            <Button onClick={() => setSelectedMigration(undefined)}>Close</Button>
           </div>
         }
       >
         <div className="h-full">
           <div className="relative h-full">
             <CodeEditor
+              // The CodeEditor does not react to content only changes,
+              // specifically when two projects have migrations with the same version but different content.
+              // Setting the key ensure it always update when the migration changes
+              key={`${project?.ref}-${selectedMigration?.version}`}
               isReadOnly
               id={selectedMigration?.version ?? ''}
               language="pgsql"
-              defaultValue={selectedMigration?.statements?.join('\n')}
+              value={
+                selectedMigration?.statements?.join(';\n') +
+                (selectedMigration?.statements?.length ? ';' : '')
+              }
             />
           </div>
         </div>
@@ -207,5 +206,3 @@ const Migrations = () => {
     </>
   )
 }
-
-export default Migrations

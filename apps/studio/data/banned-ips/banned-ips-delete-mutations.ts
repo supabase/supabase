@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { BannedIPKeys } from './keys'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type IPDeleteVariables = {
   projectRef: string
@@ -17,6 +17,7 @@ export async function deleteBannedIPs({ projectRef, ips }: IPDeleteVariables) {
       path: { ref: projectRef },
     },
     body: { ipv4_addresses: ips },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

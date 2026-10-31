@@ -13,12 +13,48 @@ import schemas from './pg-meta-schemas'
 import tablePrivileges from './pg-meta-table-privileges'
 import * as tables from './pg-meta-tables'
 import triggers from './pg-meta-triggers'
-import types from './pg-meta-types'
+import * as types from './pg-meta-types'
 import version from './pg-meta-version'
 import views from './pg-meta-views'
 import * as query from './query/index'
-import { getIndexStatusesSQL, USER_SEARCH_INDEXES } from './sql/studio/get-index-statuses'
-import { getIndexWorkerStatusSQL } from './sql/studio/get-index-worker-status'
+
+/**
+ * Studio specific SQL queries
+ * [Joshen] If it gets cumbersome, we can also consider path exports for studio queries
+ * So consumption can look something like:
+ * import { ... } from '@supabase/pg-meta/table-editor'
+ */
+export * from './sql/studio/advisor'
+export * from './sql/studio/auth'
+export * from './sql/studio/storage'
+export * from './sql/studio/database'
+export * from './sql/studio/table-editor'
+export * from './sql/studio/sql-editor'
+export * from './sql/studio/role-impersonation'
+export * from './sql/studio/integrations'
+
+export {
+  ident,
+  literal,
+  keyword,
+  safeSql,
+  rawSql,
+  untrustedSql,
+  acceptUntrustedSql,
+  joinSqlFragments,
+} from './pg-format'
+export type { SafeSqlFragment, UntrustedSqlFragment, DisplayableSqlFragment } from './pg-format'
+
+export type { PGTable, PGTablePrimaryKey, PGTableRelationship } from './pg-meta-tables'
+export type { PGColumn } from './pg-meta-columns'
+export type { PGPolicy } from './pg-meta-policies'
+export type { PGTrigger, PGTriggerCreate, PGTriggerUpdate } from './pg-meta-triggers'
+export type { PGView } from './pg-meta-views'
+export type { PGMaterializedView } from './pg-meta-materialized-views'
+export type { PGForeignTable } from './pg-meta-foreign-tables'
+export type { PGSchema } from './pg-meta-schemas'
+export type { PGPublication } from './pg-meta-publications'
+export type { PGType } from './pg-meta-types'
 
 export default {
   roles,
@@ -40,7 +76,4 @@ export default {
   indexes,
   columnPrivileges,
   query,
-  getIndexWorkerStatusSQL,
-  getIndexStatusesSQL,
-  USER_SEARCH_INDEXES,
 }

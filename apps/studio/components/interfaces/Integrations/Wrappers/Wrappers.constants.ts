@@ -1,5 +1,6 @@
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
 import type { ServerOption, WrapperMeta } from './Wrappers.types'
+import { BRAND_ICONS, resolveLightIconSrc } from '@/lib/brand-icons'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 export const WRAPPER_HANDLERS = {
   STRIPE: 'stripe_fdw_handler',
@@ -47,6 +48,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'StripeFdw',
     label: 'Stripe',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/stripe`,
+    categories: ['billing'],
     server: {
       options: [
         {
@@ -1214,6 +1216,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'FirebaseFdw',
     label: 'Firebase',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/firebase`,
+    categories: ['devtools', 'auth'],
     server: {
       options: [
         {
@@ -1341,6 +1344,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'S3Fdw',
     label: 'S3',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/s3`,
+    categories: ['storage'],
     server: {
       options: [
         {
@@ -1424,7 +1428,8 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Cloud storage service for high-dimensional vectors',
     extensionName: 'S3VectorsFdw',
     label: 'S3 Vectors',
-    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/s3-vectors`,
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`,
+    categories: ['ai_vectors', 'storage'],
     minimumExtensionVersion: '0.5.6',
     server: {
       options: [
@@ -1468,11 +1473,13 @@ export const WRAPPERS: WrapperMeta[] = [
     name: 'clickhouse_wrapper',
     handlerName: WRAPPER_HANDLERS.CLICK_HOUSE,
     validatorName: 'click_house_fdw_validator',
-    icon: `${BASE_PATH}/img/icons/clickhouse-icon.svg`,
+    // Light variant: IntegrationLogo / wrapper cards force a white tile.
+    icon: resolveLightIconSrc(BRAND_ICONS.clickhouse),
     description: 'Column-oriented analytics database',
     extensionName: 'ClickHouseFdw',
     label: 'ClickHouse',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/clickhouse`,
+    categories: ['data-platform'],
     server: {
       options: [
         {
@@ -1513,20 +1520,14 @@ export const WRAPPERS: WrapperMeta[] = [
     name: 'bigquery_wrapper',
     handlerName: WRAPPER_HANDLERS.BIG_QUERY,
     validatorName: 'big_query_fdw_validator',
-    icon: `${BASE_PATH}/img/icons/bigquery-icon.svg`,
+    icon: resolveLightIconSrc(BRAND_ICONS.bigquery),
     description: 'Serverless data warehouse and analytics',
     extensionName: 'BigQueryFdw',
     label: 'BigQuery',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/bigquery`,
+    categories: ['data-platform'],
     server: {
       options: [
-        {
-          name: 'sa_key_id',
-          label: 'Service Account Key',
-          required: true,
-          encrypted: true,
-          secureEntry: true,
-        },
         {
           name: 'project_id',
           label: 'Project ID',
@@ -1540,6 +1541,13 @@ export const WRAPPERS: WrapperMeta[] = [
           required: true,
           encrypted: false,
           secureEntry: false,
+        },
+        {
+          name: 'sa_key_id',
+          label: 'Service Account Key',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
         },
       ],
     },
@@ -1593,6 +1601,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'airtableFdw',
     label: 'Airtable',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/airtable`,
+    categories: ['data-platform'],
     server: {
       options: [
         {
@@ -1636,6 +1645,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'logflareFdw',
     label: 'Logflare',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/logflare`,
+    categories: ['observability'],
     server: {
       options: [
         {
@@ -1672,6 +1682,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'Auth0Fdw',
     label: 'Auth0',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/auth0`,
+    categories: ['auth'],
     minimumExtensionVersion: '0.3.0',
     server: {
       options: [
@@ -1803,6 +1814,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'CognitoFdw',
     label: 'Cognito',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/cognito`,
+    categories: ['auth'],
     minimumExtensionVersion: '0.3.0',
     server: {
       options: [
@@ -1898,6 +1910,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'mssqlFdw',
     label: 'Microsoft SQL Server',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/mssql`,
+    categories: ['data-platform'],
     minimumExtensionVersion: '0.3.0',
     server: {
       options: [
@@ -1935,6 +1948,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'redisFdw',
     label: 'Redis',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/redis`,
+    categories: ['caching-offline-first'],
     minimumExtensionVersion: '0.3.0',
     server: {
       options: [
@@ -2189,6 +2203,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'paddleFdw',
     label: 'Paddle',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/paddle`,
+    categories: ['billing'],
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -2285,11 +2300,12 @@ export const WRAPPERS: WrapperMeta[] = [
     name: 'snowflake_wrapper',
     handlerName: WRAPPER_HANDLERS.SNOWFLAKE,
     validatorName: 'wasm_fdw_validator',
-    icon: `${BASE_PATH}/img/icons/snowflake-icon.svg`,
+    icon: resolveLightIconSrc(BRAND_ICONS.snowflake),
     description: 'Cloud data warehouse platform',
     extensionName: 'snowflakeFdw',
     label: 'Snowflake',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/snowflake`,
+    categories: ['data-platform'],
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -2393,6 +2409,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'icebergFdw',
     label: 'Iceberg',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/iceberg`,
+    categories: ['data-platform'],
     minimumExtensionVersion: '0.5.3',
     customComponent: true,
     server: {
@@ -2479,6 +2496,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'calFdw',
     label: 'Cal.com',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/cal`,
+    categories: ['devtools', 'api'],
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -2686,6 +2704,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'calendlyFdw',
     label: 'Calendly',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/calendly`,
+    categories: ['devtools', 'api'],
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -2923,6 +2942,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'clerkFdw',
     label: 'Clerk',
     docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/clerk`,
+    categories: ['auth'],
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -3263,6 +3283,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'NotionFdw',
     label: 'Notion',
     docsUrl: 'https://fdw.dev/catalog/notion/',
+    categories: ['devtools'],
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -3417,6 +3438,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'SlackFdw',
     label: 'Slack',
     docsUrl: 'https://fdw.dev/catalog/slack/',
+    categories: ['messaging'],
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -3667,6 +3689,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'Cfd1Fdw',
     label: 'Cloudflare D1',
     docsUrl: 'https://fdw.dev/catalog/cfd1/',
+    categories: ['data-platform'],
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -3803,6 +3826,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'HubspotFdw',
     label: 'HubSpot',
     docsUrl: 'https://fdw.dev/catalog/hubspot/',
+    categories: ['devtools', 'api'],
     minimumExtensionVersion: '0.4.0',
     server: {
       options: [
@@ -4093,6 +4117,7 @@ export const WRAPPERS: WrapperMeta[] = [
     minimumExtensionVersion: '0.4.0',
     label: 'Orb',
     docsUrl: 'https://fdw.dev/catalog/orb/',
+    categories: ['billing'],
     server: {
       options: [
         {

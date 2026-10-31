@@ -1,11 +1,16 @@
 import { useRef } from 'react'
-
-import { VirtualizedTable, VirtualizedTableBody } from 'components/ui/VirtualizedTable'
-import { Bucket } from 'data/storage/buckets-query'
 import { Table, TableBody } from 'ui'
-import { BucketTableEmptyState, BucketTableHeader, BucketTableRow } from './BucketTable'
+
 import { LoadMoreRow } from './BucketsTable.LoadMoreRow'
 import type { BucketsTablePaginationProps } from './BucketsTable.types'
+import {
+  BucketTableEmptyState,
+  BucketTableHeader,
+  BucketTableRow,
+  useVersioningColumnSpan,
+} from './BucketTable'
+import { VirtualizedTable, VirtualizedTableBody } from '@/components/ui/VirtualizedTable'
+import { Bucket } from '@/data/storage/buckets-query'
 
 type BucketsTableProps = {
   buckets: Bucket[]
@@ -15,8 +20,16 @@ type BucketsTableProps = {
   pagination: BucketsTablePaginationProps
 }
 
+// [Joshen] To investigate: There's a lot of duplicate logic + components between
+// this FilesBuckets/BucketsTable and BucketsPickerDialog/BucketsTable. Check separately
+// if they can be cleaned up and consolidated. The latter should take precedence as it aims to
+// reduce footprint on the giant StorageExplorerState.
+
 export const BucketsTable = (props: BucketsTableProps) => {
+  // [Joshen] To investigate: Can't we just default to virtualized?
+  // Do we need to dynamically decide whether to use a virtualized or unvirtualized one?
   const isVirtualized = props.buckets.length > 50
+
   return isVirtualized ? (
     <BucketsTableVirtualized {...props} />
   ) : (
@@ -32,6 +45,7 @@ const BucketsTableUnvirtualized = ({
   pagination: { hasMore = false, isLoadingMore = false, onLoadMore },
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
+  const versioningColumnSpan = useVersioningColumnSpan()
 
   return (
     <Table
@@ -57,7 +71,7 @@ const BucketsTableUnvirtualized = ({
         )}
         <LoadMoreRow
           mode="standard"
-          colSpan={6}
+          colSpan={6 + versioningColumnSpan}
           hasMore={hasMore}
           isLoadingMore={isLoadingMore}
           onLoadMore={onLoadMore}
@@ -75,6 +89,7 @@ const BucketsTableVirtualized = ({
   pagination: { hasMore = false, isLoadingMore = false, onLoadMore },
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
+  const versioningColumnSpan = useVersioningColumnSpan()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   return (
@@ -86,7 +101,7 @@ const BucketsTableVirtualized = ({
     >
       <BucketTableHeader mode="virtualized" hasBuckets={buckets.length > 0} />
       <VirtualizedTableBody<Bucket>
-        paddingColSpan={5}
+        paddingColSpan={5 + versioningColumnSpan}
         emptyContent={
           showSearchEmptyState ? (
             <BucketTableEmptyState mode="virtualized" filterString={filterString} />
@@ -95,7 +110,7 @@ const BucketsTableVirtualized = ({
         trailingContent={
           <LoadMoreRow
             mode="virtualized"
-            colSpan={6}
+            colSpan={6 + versioningColumnSpan}
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}
             onLoadMore={onLoadMore}

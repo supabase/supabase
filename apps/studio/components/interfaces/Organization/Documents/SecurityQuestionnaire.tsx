@@ -1,30 +1,28 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { Button } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import NoPermission from 'components/ui/NoPermission'
-import { getDocument } from 'data/documents/document-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+} from '@/components/layouts/Scaffold'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { getDocument } from '@/data/documents/document-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const SecurityQuestionnaire = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
 
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const track = useTrack()
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
   const { hasAccess: hasAccessToQuestionnaire, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('security.questionnaire')
@@ -45,11 +43,7 @@ export const SecurityQuestionnaire = () => {
   const handleDownloadClick = () => {
     if (!slug) return
 
-    sendEvent({
-      action: 'document_view_button_clicked',
-      properties: { documentName: 'Standard Security Questionnaire' },
-      groups: { organization: slug },
-    })
+    track('document_view_button_clicked', { documentName: 'Standard Security Questionnaire' })
     fetchQuestionnaire(slug)
   }
 
@@ -72,7 +66,7 @@ export const SecurityQuestionnaire = () => {
           <NoPermission resourceText="access our security questionnaire" />
         ) : !hasAccessToQuestionnaire ? (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button asChild type="default">
+            <Button asChild>
               <Link
                 href={`/org/${slug}/billing?panel=subscriptionPlan&source=securityQuestionnaire`}
               >
@@ -82,12 +76,7 @@ export const SecurityQuestionnaire = () => {
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button
-              type="default"
-              icon={<Download />}
-              onClick={handleDownloadClick}
-              disabled={!slug}
-            >
+            <Button icon={<DownloadIcon />} onClick={handleDownloadClick} disabled={!slug}>
               Download Questionnaire
             </Button>
           </div>

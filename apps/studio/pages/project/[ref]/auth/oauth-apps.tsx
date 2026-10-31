@@ -1,10 +1,3 @@
-import { OAuthAppsList } from 'components/interfaces/Auth/OAuthApps/OAuthAppsList'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
-import { PageSection, PageSectionContent } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -13,6 +6,14 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+
+import { OAuthAppsList } from '@/components/interfaces/Auth/OAuthApps/OAuthAppsList'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const OAuthApps: NextPageWithLayout = () => (
   <>
@@ -38,7 +39,7 @@ const OAuthApps: NextPageWithLayout = () => (
 
 OAuthApps.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="OAuth Apps">{page}</AuthLayout>
   </DefaultLayout>
 )
 

@@ -1,26 +1,29 @@
-import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Link from 'next/link'
-import {
-  Accordion_Shadcn_ as Accordion,
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
-  cn,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import { BlockItem } from './block-item'
+import { BlockOverview } from './block-overview'
 import { BlockPreview } from './block-preview'
 import { Callout } from './callout'
+import { CatalogPreview } from './catalog-preview'
 import { ComponentPreview } from './component-preview'
 import { CopyButton } from './copy-button'
 import { DualRealtimeChat } from './dual-realtime-chat'
-import { RegistryBlock } from './registry-block'
+import { DualRealtimeFlow } from './dual-realtime-flow'
+import { DualRealtimeMonaco } from './dual-realtime-monaco'
+import { FrameworkQuickstart, FrameworkQuickstartTab, QuickstartStep } from './framework-quickstart'
 import { StyleWrapper } from './style-wrapper'
 import TanStackBeta from './tanstack-beta'
+import { TanstackDBGenerator } from './tanstack-db-generator'
+import { useMDXComponent } from '@/lib/use-mdx-component'
 import type { Style } from '@/registry/styles'
 
 const components = {
-  RegistryBlock,
+  BlockOverview,
+  CatalogPreview,
+  FrameworkQuickstart,
+  FrameworkQuickstartTab,
+  QuickstartStep,
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -58,17 +61,14 @@ const components = {
   a: ({ className, ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
     <a
       className={cn(
-        'text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2',
+        'text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2',
         className
       )}
       {...props}
     />
   ),
   p: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p
-      className={cn('leading-7 [&:not(:first-child)]:mt-6 text-foreground-light', className)}
-      {...props}
-    />
+    <p className={cn('leading-7 not-first:mt-6 text-foreground-light', className)} {...props} />
   ),
   ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
     <ul className={cn('my-6 ml-6 list-disc text-foreground-light', className)} {...props} />
@@ -100,7 +100,7 @@ const components = {
   th: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <th
       className={cn(
-        'border px-4 py-2 text-left font-normal [&[align=center]]:text-center [&[align=right]]:text-right',
+        'border px-4 py-2 text-left font-normal [[align=center]]:text-center [[align=right]]:text-right',
         className
       )}
       {...props}
@@ -109,7 +109,7 @@ const components = {
   td: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <td
       className={cn(
-        'border text-foreground-light px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right',
+        'border text-foreground-light px-4 py-2 text-left [[align=center]]:text-center [[align=right]]:text-right',
         className
       )}
       {...props}
@@ -148,13 +148,7 @@ const components = {
     )
   },
   code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <code
-      className={cn(
-        'relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm',
-        className
-      )}
-      {...props}
-    />
+    <code className={className} {...props} />
   ),
   Callout,
   ComponentPreview,
@@ -163,7 +157,7 @@ const components = {
   Card: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <div
       className={cn(
-        'flex w-full flex-col items-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow transition-colors hover:bg-muted/50 sm:p-10',
+        'flex w-full flex-col items-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow-sm transition-colors hover:bg-muted/50 sm:p-10',
         className
       )}
       {...props}
@@ -172,7 +166,7 @@ const components = {
   LinkedCard: ({ className, ...props }: React.ComponentProps<typeof Link>) => (
     <Link
       className={cn(
-        'flex w-full flex-col items-center justify-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow transition-colors hover:bg-muted/50 sm:p-10 h-52',
+        'flex w-full flex-col items-center justify-center rounded-xl border bg-surface-100 text-card-background py-6 px-4 shadow-sm transition-colors hover:bg-muted/50 sm:p-10 h-52',
         className
       )}
       {...props}
@@ -181,6 +175,9 @@ const components = {
   BlockItem,
   BlockPreview,
   DualRealtimeChat,
+  DualRealtimeFlow,
+  DualRealtimeMonaco,
+  TanstackDBGenerator,
 }
 
 interface MdxProps {

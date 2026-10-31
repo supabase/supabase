@@ -38,7 +38,7 @@ const ButtonGroupItem = React.forwardRef<HTMLButtonElement, ButtonGroupItemProps
     return (
       <Button
         ref={ref}
-        type="text"
+        variant="text"
         icon={icon}
         asChild={asChild}
         className={cn(

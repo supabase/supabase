@@ -1,16 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useClientSecretCreateMutation } from 'data/oauth-secrets/client-secret-create-mutation'
-import { CreatedSecret, useClientSecretsQuery } from 'data/oauth-secrets/client-secrets-query'
-import { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, InfoIcon } from 'ui'
+import { useState } from 'react'
+import { Alert, AlertTitle, InfoIcon } from 'ui'
+
 import { SecretRow } from './SecretRow'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useClientSecretCreateMutation } from '@/data/oauth-secrets/client-secret-create-mutation'
+import { CreatedSecret, useClientSecretsQuery } from '@/data/oauth-secrets/client-secrets-query'
+import { OAuthApp } from '@/data/oauth/oauth-apps-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { DOCS_URL } from '@/lib/constants'
 
 interface Props {
   selectedApp?: OAuthApp
@@ -19,7 +18,9 @@ interface Props {
 export const OAuthSecrets = ({ selectedApp }: Props) => {
   const { slug } = useParams()
   const [createdSecret, setCreatedSecret] = useState<CreatedSecret>()
-  const { can: canManageSecrets } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  )
 
   const { id: appId } = selectedApp ?? {}
 
@@ -54,7 +55,6 @@ export const OAuthSecrets = ({ selectedApp }: Props) => {
 
         {canManageSecrets && (
           <ButtonTooltip
-            type="default"
             disabled={!appId || secrets.length >= 5}
             onClick={handleCreateSecret}
             loading={isCreatingSecret}
@@ -71,12 +71,12 @@ export const OAuthSecrets = ({ selectedApp }: Props) => {
       </div>
 
       {createdSecret && (
-        <Alert_Shadcn_ variant="default">
+        <Alert variant="default">
           <InfoIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             Make sure to copy your new client secret now. You won't be able to see it again.
-          </AlertTitle_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertTitle>
+        </Alert>
       )}
 
       <div className="-space-y-px">

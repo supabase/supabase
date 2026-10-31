@@ -6,13 +6,32 @@ Refer to the [Development Guide](../../DEVELOPERS.md) to learn how to run this s
 
 To get started copy the example env file using `cp .env.local.example .env.local`.
 
+## Production builds
+
+Run `pnpm build` from `apps/www`, or `pnpm build --filter=www` from the repository
+root. Vercel uses the app's `build` script by default.
+
+`prebuild` refreshes remote content before Turbo hashes it. Turbo caches
+`build:next` (Next.js, sitemaps, and the customer RSS feed), then `postbuild`
+uploads assets even on cache hits. The outer `build` task stays uncached so
+neither preparation nor upload can be skipped. Uploads run after caching because
+the upload script removes `.next/static`.
+
+Production cache reuse requires the same commit and inputs: CDN URLs include
+`VERCEL_GIT_COMMIT_SHA`. Set `FORCE_ASSET_CDN=-1` to disable local uploads.
+Running `build:next` directly skips content preparation and uploads.
+
+Run `pnpm exec vitest run turbo-build.test.ts` to check cache invalidation and
+asset restoration using real pnpm, Turbo, and the upload script with fixture
+generators, a stub compiler, and a fake AWS CLI.
+
 ## Best practices
 
 ### Images
 
 - **Resize images**: All new images should be resized to only the maximum resolution needed when rendering on the frontend. Don't upload images larger than what will be displayed.
 - **Compress images**: All new images should be compressed before committing. Use tools like Clop or ImageOptim to reduce file size without noticeable quality loss.
-- **Image locations**: Store blog post images in `apps/www/public/images/blog/`. Event images go in `apps/www/public/images/events/`.
+- **Image locations**: Store blog post images in `apps/www/public/images/blog/`. Event images go in `apps/www/public/images/events/`. Customer logos go in `apps/www/public/images/customers/logos/on-light/` and `on-dark/` (see Customer Stories below).
 
 ### OG image generation
 
@@ -97,6 +116,10 @@ imgThumb: my-image.png
 ---
 ```
 
+#### Blog post dates
+
+Use quoted `YYYY-MM-DD` values. `date` is the publication date. Set optional `updated` for substantive content revisions, excluding typo, link, or image fixes. It must be on or after `date` and supplies the sitemap and structured-data modification date. When absent, `date` supplies both.
+
 #### Events
 
 Events use different image fields to avoid confusion with their display patterns:
@@ -130,6 +153,66 @@ og_image: /images/events/2025-01-meetup/custom-og.png # Optional override
 
 **Note**: The `og_image` field is optional. If not provided, OG images are generated automatically via the Edge Function.
 
+## End-to-end checks
+
+Content pages are loaded and scanned with axe-core by the Playwright suite in
+`e2e/www`. Pull requests test the pages your change affects. Today the suite
+enforces one accessibility rule, `page-has-heading-one`.
+
+To test the pages your current branch changes:
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:www
+```
+
+That resolves which pages to test from your branch, but reads them from
+production, so it won't see your edits and will 404 on a page you just added.
+Point `PLAYWRIGHT_BASE_URL` at your pull request's preview to test your own
+content.
+
+See [`e2e/www/README.md`](https://github.com/supabase/supabase/blob/master/e2e/www/README.md)
+for coverage and limits.
+
+## Redirects
+
+Redirects for non-docs URLs live in [`lib/redirects.js`](lib/redirects.js). Redirects for `/docs` URLs moved to the docs app, so add new `/docs` redirects in [`apps/docs/lib/redirects/`](../docs/lib/redirects/README.md) instead.
+
+## Go pages (`/go/*`)
+
+`/go/` is a system for building standalone campaign landing pages (lead generation, legal, thank-you flows). The name is intentionally generic — these pages are typically linked from ads, emails, or partner campaigns and are not part of the main site navigation.
+
+Pages are defined as TypeScript objects (not MDX files) and validated against Zod schemas at build time.
+
+### Parts
+
+| Location                                    | Purpose                                                                                              |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `apps/www/_go/`                             | Page definitions. Each file exports a page object. `index.tsx` registers all pages.                  |
+| `apps/www/app/go/[slug]/page.tsx`           | App Router route — renders the page for a given slug, handles 404s and metadata.                     |
+| `apps/www/components/Go/GoPageRenderer.tsx` | www-specific wrapper — adds the Supabase logo header and footer, registers custom section renderers. |
+| `packages/marketing/src/go/`                | Framework-agnostic core: schemas, section components, templates, form server action.                 |
+| `packages/marketing/src/crm/`               | CRM client abstraction (HubSpot + Customer.io) used by the form server action.                       |
+
+### Page structure
+
+Each page specifies a `template` which determines its top-level layout:
+
+- **`lead-gen`** — hero + arbitrary sections (form, metrics, feature grid, tweets, social proof, etc.)
+- **`thank-you`** — hero + sections + confetti animation
+- **`legal`** — hero + table-of-contents sidebar + markdown body
+
+Pages are arrays of typed section objects. The `SectionRenderer` in `packages/marketing` dispatches each section to the right component based on its `type` field.
+
+### Custom renderers
+
+The `marketing` package doesn't know about `topTweets` data or the Pages Router `basePath`, so the `tweets` section type has no default renderer. `GoPageRenderer.tsx` in www registers `TweetsSection` as a custom renderer for that type. This is the extension point for any section that requires www-specific dependencies.
+
+### Adding a new page
+
+1. Create a new file in `apps/www/_go/<category>/my-page.tsx` exporting a page object.
+2. Register it in `apps/www/_go/index.tsx`.
+3. The page will be available at `/go/<slug>` automatically via static generation.
+
 #### Customer Stories (Case Studies)
 
 Customer stories are defined in MDX files (`apps/www/_customers/*.mdx`) and use a different approach:
@@ -140,6 +223,21 @@ Customer stories are defined in MDX files (`apps/www/_customers/*.mdx`) and use 
 
 Do not include an `og_image` field in customer story frontmatter. It will be ignored. OG images are always generated dynamically.
 
+**Logos**
+
+Customer logos are monochrome and transparent. Prefer SVG; PNG is also fine. Put each theme variant in the folder named for the background it sits on:
+
+| Folder                              | Mark        | Frontmatter    | Shown in   |
+| ----------------------------------- | ----------- | -------------- | ---------- |
+| `/images/customers/logos/on-light/` | Dark/black  | `logo`         | Light mode |
+| `/images/customers/logos/on-dark/`  | Light/white | `logo_inverse` | Dark mode  |
+
+Do not use coloured brand marks. Preview `/customers` in both themes before merging.
+
+Icon-only assets (homepage chips, etc.) stay at `/images/customers/logos/{slug}-icon.svg`.
+
+Customer story OG images are generated by the `og-images` Edge Function, which fetches `https://supabase.com/images/customers/logos/on-dark/{slug}.png`. Satori cannot rasterise SVG, so stories still need an `on-dark/{slug}.png` even if the site uses SVG.
+
 **Example** (in `apps/www/_customers/company-abc.mdx`):
 
 ```yaml
@@ -147,7 +245,8 @@ Do not include an `og_image` field in customer story frontmatter. It will be ign
 name: Company ABC
 title: Company ABC built their platform with Supabase
 # DO NOT include og_image - it's generated automatically
-logo: /images/customers/logos/company-abc.png
+logo: /images/customers/logos/on-light/company-abc.svg
+logo_inverse: /images/customers/logos/on-dark/company-abc.svg
 ---
 ```
 
@@ -165,8 +264,9 @@ logo: /images/customers/logos/company-abc.png
   title: 'Company ABC built their platform with Supabase',
   description: '...',
   organization: 'Company ABC',
-  imgUrl: 'images/customers/logos/company-abc.png', // Full path from public/
-  logo: '/images/customers/logos/company-abc.png',
+  imgUrl: 'images/customers/logos/on-light/company-abc.svg', // Full path from public/
+  logo: '/images/customers/logos/on-light/company-abc.svg',
+  logo_inverse: '/images/customers/logos/on-dark/company-abc.svg',
   url: '/customers/company-abc',
 }
 ```

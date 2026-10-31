@@ -4,19 +4,16 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useCallback } from 'react'
 
 import {
-  QueryPerformanceSort,
-  useQueryPerformanceQuery,
-} from 'components/interfaces/Reports/Reports.queries'
-import { databaseIndexesKeys } from 'data/database-indexes/keys'
-import { databaseKeys } from 'data/database/keys'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
   QUERY_PERFORMANCE_PRESET_MAP,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from '../QueryPerformance.constants'
+import { type QueryPerformanceSort } from '../QueryPerformance.types'
+import { useQueryPerformanceQuery } from '../useQueryPerformanceQuery'
 import { useIndexAdvisorStatus } from './useIsIndexAdvisorStatus'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
+import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import { databaseIndexesKeys } from '@/data/database-indexes/keys'
+import { databaseKeys } from '@/data/database/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function useIndexInvalidation() {
   const router = useRouter()
@@ -33,7 +30,11 @@ export function useIndexInvalidation() {
 
   const { invalidate: invalidateTableIndexAdvisor } = useTableIndexAdvisor()
 
-  const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
+  // Falls back to UNIFIED so an unrecognized preset param doesn't resolve to
+  // undefined and crash generateQueryPerformanceSql.
+  const preset =
+    QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES] ??
+    QUERY_PERFORMANCE_PRESET_MAP[QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED]
   const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
   const roles = router?.query?.roles ?? []
 

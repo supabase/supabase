@@ -1,16 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { configKeys } from './keys'
+import { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectStorageConfigVariables = {
   projectRef?: string
 }
 
-export type ProjectStorageConfigResponse = components['schemas']['StorageConfigResponse']
+export type ProjectStorageConfigResponse = components['schemas']['StorageConfigResponse_Output']
 
 export async function getProjectStorageConfig(
   { projectRef }: ProjectStorageConfigVariables,
@@ -48,7 +49,7 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
   useQuery<ProjectStorageConfigData, ProjectStorageConfigError, TData>({
     queryKey: configKeys.storage(projectRef),
     queryFn: ({ signal }) => getProjectStorageConfig({ projectRef }, signal),
-    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && projectRef !== '_',
     ...options,
   })
 
@@ -59,7 +60,12 @@ export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: stri
 }
 
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
-  const { data } = useProjectStorageConfigQuery({ projectRef })
-  const isVectorBucketsEnabled = !!data?.features.vectorBuckets?.enabled
+  const { data: isVectorBucketsEnabledData } = useProjectStorageConfigQuery(
+    { projectRef },
+    { select: (data) => data?.features.vectorBuckets?.enabled }
+  )
+  const { isCli, isPlatform } = useDeploymentMode()
+
+  const isVectorBucketsEnabled = isCli || (isPlatform && !!isVectorBucketsEnabledData)
   return isVectorBucketsEnabled
 }

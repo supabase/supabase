@@ -1,18 +1,19 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
-
-import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { parseAsString, useQueryState } from 'nuqs'
-import type { Organization } from 'types'
-import { Badge, Button, Card, CardHeader, CardTitle, Input_Shadcn_ } from 'ui'
+import { useMemo, useState } from 'react'
+import { Badge, Button, Card, CardHeader, CardTitle, Input } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { ButtonTooltip } from './ButtonTooltip'
+import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import type { Organization } from '@/types'
 
 export interface ProjectClaimChooseOrgProps {
   onSelect: (orgSlug: string) => void
   maxOrgsToShow?: number
+  canCreateNewOrg: boolean
 }
 
 const OrganizationCard = ({
@@ -84,7 +85,11 @@ const OrganizationCard = ({
   )
 }
 
-export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectClaimChooseOrgProps) {
+export function OrganizationSelector({
+  onSelect,
+  maxOrgsToShow = 5,
+  canCreateNewOrg,
+}: ProjectClaimChooseOrgProps) {
   const {
     data: organizations = [],
     isPending: isLoadingOrgs,
@@ -131,7 +136,7 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
         </span>
       ) : (
         <>
-          <Input_Shadcn_
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -147,13 +152,12 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
             {organizations.length > maxOrgsToShow && !showAll && !search && (
               <div className="flex justify-center py-2">
                 <Button
-                  icon={<ChevronDown className="w-4 h-4" />}
+                  icon={<ChevronDownIcon className="w-4 h-4" />}
                   size="tiny"
                   onClick={() => {
                     setSearch('')
                     setShowAll(true)
                   }}
-                  type="default"
                 >
                   Show all organizations
                 </Button>
@@ -162,14 +166,16 @@ export function OrganizationSelector({ onSelect, maxOrgsToShow = 5 }: ProjectCla
           </div>
         </>
       )}
-      <Card className="flex items-center justify-between border-dashed pr-6">
-        <CardHeader className="border-none">
-          <CardTitle>Need a new organization?</CardTitle>
-        </CardHeader>
-        <Button size="small" className="" asChild type="default">
-          <Link href={`/new?${searchParams.toString()}`}>New Organization</Link>
-        </Button>
-      </Card>
+      {canCreateNewOrg && (
+        <Card className="flex items-center justify-between border-dashed pr-6">
+          <CardHeader className="border-none">
+            <CardTitle>Need a new organization?</CardTitle>
+          </CardHeader>
+          <Button size="small" className="" asChild>
+            <Link href={`/new?${searchParams.toString()}`}>New Organization</Link>
+          </Button>
+        </Card>
+      )}
     </div>
   )
 }

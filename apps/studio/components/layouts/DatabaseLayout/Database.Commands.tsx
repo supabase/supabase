@@ -1,12 +1,12 @@
-import { Blocks, Code, Database, History, Search } from 'lucide-react'
-
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { BlocksIcon, CodeIcon, DatabaseIcon, HistoryIcon, SearchIcon } from 'lucide-react'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useDatabaseGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -25,7 +25,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'run-sql',
         name: 'Run SQL',
         route: `/project/${ref}/sql/new`,
-        icon: () => <Code />,
+        icon: () => <CodeIcon />,
       },
     ],
     {
@@ -61,6 +61,13 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         defaultHidden: true,
       },
       {
+        id: 'nav-database-policies',
+        name: 'Policies',
+        value: 'Database: Policies (RLS)',
+        route: `/project/${ref}/database/policies`,
+        defaultHidden: true,
+      },
+      {
         id: 'nav-database-extensions',
         name: 'Extensions',
         value: 'Database: Extensions',
@@ -82,20 +89,13 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         ? [
             {
               id: 'nav-database-replication',
-              name: 'Replication',
-              value: 'Database: Replication',
-              route: `/project/${ref}/database/replication`,
+              name: 'Pipelines',
+              value: 'Database: Pipelines',
+              route: `/project/${ref}/database/pipelines`,
               defaultHidden: true,
             } as IRouteCommand,
           ]
         : []),
-      {
-        id: 'nav-database-hooks',
-        name: 'Webhooks',
-        value: 'Database: Webhooks',
-        route: `/project/${ref}/integrations/webhooks`,
-        defaultHidden: true,
-      },
       {
         id: 'nav-database-backups',
         name: 'Backups',
@@ -132,37 +132,43 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'run-schema-visualizer',
         name: 'View your schemas',
         route: `/project/${ref}/database/schemas`,
-        icon: () => <Search />,
+        icon: () => <SearchIcon />,
       },
       {
         id: 'run-view-database-functions',
         name: 'View and create functions',
         route: `/project/${ref}/database/functions`,
-        icon: () => <Database />,
+        icon: () => <DatabaseIcon />,
       },
       {
         id: 'run-view-database-triggers',
         name: 'View and create triggers',
         route: `/project/${ref}/database/triggers`,
-        icon: () => <Database />,
+        icon: () => <DatabaseIcon />,
       },
       {
         id: 'run-view-database-enumerated-types',
         name: 'View and create enumerated types',
         route: `/project/${ref}/database/types`,
-        icon: () => <Database />,
+        icon: () => <DatabaseIcon />,
       },
       {
         id: 'run-view-database-extensions',
         name: 'View your extensions',
         route: `/project/${ref}/database/extensions`,
-        icon: () => <Blocks />,
+        icon: () => <BlocksIcon />,
       },
       {
         id: 'run-view-database-indexes',
         name: 'View and create indexes',
         route: `/project/${ref}/database/indexes`,
-        icon: () => <Database />,
+        icon: () => <DatabaseIcon />,
+      },
+      {
+        id: 'run-view-database-policies',
+        name: 'View and create RLS policies',
+        route: `/project/${ref}/database/policies`,
+        icon: () => <DatabaseIcon />,
       },
       ...(databaseRoles
         ? [
@@ -170,7 +176,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
               id: 'run-view-database-roles',
               name: 'View your roles',
               route: `/project/${ref}/database/roles`,
-              icon: () => <Database />,
+              icon: () => <DatabaseIcon />,
             } as IRouteCommand,
           ]
         : []),
@@ -178,13 +184,13 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'run-view-database-backups',
         name: 'View your backups',
         route: `/project/${ref}/database/backups/scheduled`,
-        icon: () => <Database />,
+        icon: () => <DatabaseIcon />,
       },
       {
         id: 'run-view-database-migrations',
         name: 'View your migrations',
         route: `/project/${ref}/database/migrations`,
-        icon: () => <History />,
+        icon: () => <HistoryIcon />,
       },
     ],
     {

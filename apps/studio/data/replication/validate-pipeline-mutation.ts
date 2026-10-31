@@ -1,18 +1,22 @@
 import { useMutation } from '@tanstack/react-query'
 import { components } from 'api-types'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { type TableSyncCopyConfig } from './types'
+import { buildPipelineApiConfig } from './utils'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type ValidatePipelineParams = {
   projectRef: string
   sourceId: number
   publicationName: string
   maxFillMs?: number
-  maxSize?: number
   maxTableSyncWorkers?: number
+  maxCopyConnectionsPerTable?: number
+  invalidatedSlotBehavior?: 'error' | 'recreate'
+  tableSyncCopy: TableSyncCopyConfig
 }
-type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse']
+type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse_Output']
 
 async function validatePipeline(
   {
@@ -20,34 +24,34 @@ async function validatePipeline(
     sourceId,
     publicationName,
     maxFillMs,
-    maxSize,
     maxTableSyncWorkers,
+    maxCopyConnectionsPerTable,
+    invalidatedSlotBehavior,
+    tableSyncCopy,
   }: ValidatePipelineParams,
   signal?: AbortSignal
 ): Promise<ValidatePipelineResponse> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!sourceId) throw new Error('sourceId is required')
 
-  const batchConfig =
-    maxFillMs !== undefined || maxSize !== undefined
-      ? { max_fill_ms: maxFillMs, max_size: maxSize }
-      : undefined
-
   const { data, error } = await post('/platform/replication/{ref}/pipelines/validate', {
     params: { path: { ref: projectRef } },
     body: {
       source_id: sourceId,
-      config: {
-        publication_name: publicationName,
-        max_table_sync_workers: maxTableSyncWorkers,
-        batch: batchConfig,
-      },
+      config: buildPipelineApiConfig({
+        publicationName,
+        maxTableSyncWorkers,
+        maxCopyConnectionsPerTable,
+        invalidatedSlotBehavior,
+        tableSyncCopy,
+        batch: maxFillMs === undefined ? undefined : { maxFillMs },
+      }),
     },
     signal,
   })
 
   if (error) handleError(error)
-  return data as ValidatePipelineResponse
+  return data
 }
 
 type ValidatePipelineData = Awaited<ReturnType<typeof validatePipeline>>

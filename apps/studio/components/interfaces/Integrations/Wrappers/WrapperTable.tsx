@@ -1,8 +1,6 @@
 import { useParams } from 'common'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Card,
@@ -23,6 +21,8 @@ import { DeleteWrapperModal } from './DeleteWrapperModal'
 import { EditWrapperSheet } from './EditWrapperSheet'
 import { WrapperRow } from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface WrapperTableProps {
   isLatest?: boolean
@@ -35,7 +35,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
 
   const [isClosingEditWrapper, setIsClosingEditWrapper] = useState(false)
 
-  const { data, isSuccess } = useFDWsQuery({
+  const { data, isError, isSuccess } = useFDWsQuery({
     projectRef: ref,
     connectionString: project?.connectionString,
   })
@@ -50,13 +50,20 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
 
   const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
   const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
+  const openedWrapperId = useRef<string | null>(null)
 
   useEffect(() => {
-    if (isSuccess && !!selectedWrapperIdToEdit && !selectedWrapperToEdit) {
-      toast('Wrapper not found')
+    if (!selectedWrapperIdToEdit) {
+      openedWrapperId.current = null
+    } else if (selectedWrapperToEdit) {
+      openedWrapperId.current = selectedWrapperIdToEdit
+    } else if (isSuccess || isError) {
+      if (openedWrapperId.current !== selectedWrapperIdToEdit) {
+        toast('Wrapper not found')
+      }
       setSelectedWrapperToEdit(null)
     }
-  }, [isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
+  }, [isError, isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 
   if (!integration || integration.type !== 'wrapper') {
     return (
@@ -74,16 +81,16 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
             <TableRow>
               <TableHead className="w-[220px]">Name</TableHead>
               <TableHead>Tables</TableHead>
-              <TableHead>Encrypted key</TableHead>
+              <TableHead>Encrypted keys</TableHead>
               <TableHead className="w-24">
                 <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => {
-              return <WrapperRow key={x.id} wrapper={x} />
-            })}
+            {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => (
+              <WrapperRow key={x.id} wrapper={x} />
+            ))}
           </TableBody>
           <TableFooter
             className={cn(
@@ -94,7 +101,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
               wrappers.length === 0 ? 'border-t-0' : ''
             )}
           >
-            <TableRow>
+            <TableRow className="border-b-0">
               <TableCell colSpan={4}>
                 {wrappers.length} {integration?.name}
                 {wrappers.length === 0 || wrappers.length > 1 ? 's' : ''} created
@@ -110,7 +117,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
           if (!open) setIsClosingEditWrapper(true)
         }}
       >
-        <SheetContent size="lg" tabIndex={undefined}>
+        <SheetContent size="lg">
           {selectedWrapperToEdit && (
             <EditWrapperSheet
               wrapper={selectedWrapperToEdit}

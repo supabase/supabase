@@ -1,11 +1,5 @@
 import { Injectable } from '@angular/core'
-import {
-  AuthChangeEvent,
-  createClient,
-  Session,
-  SupabaseClient,
-  User,
-} from '@supabase/supabase-js'
+import { AuthChangeEvent, createClient, Session, SupabaseClient, User } from '@supabase/supabase-js'
 import { environment } from '../environments/environment'
 
 export interface Profile {
@@ -22,7 +16,7 @@ export class SupabaseService {
   private supabase: SupabaseClient
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
+    this.supabase = createClient(environment.supabaseUrl, environment.supabasePublishableKey)
   }
 
   async getUser(): Promise<User | null> {

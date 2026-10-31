@@ -95,6 +95,7 @@ export function resolveSteps(schema: ConnectSchema, state: ConnectState): Resolv
         id: step.id,
         title: step.title,
         description: step.description,
+        optional: step.optional,
         content: content ?? '',
       }
     })
@@ -196,7 +197,7 @@ function resolveFieldOptions(field: { options?: unknown }, state: ConnectState):
 /**
  * Gets default state for the schema, using first mode and default field values.
  */
-export function getDefaultState(schema: ConnectSchema): ConnectState {
+export function getDefaultState({ schema }: { schema: ConnectSchema }): ConnectState {
   const defaultMode = schema.modes[0]?.id ?? 'direct'
 
   const state: ConnectState = { mode: defaultMode }

@@ -1,14 +1,10 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import { JWTSigningKey } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { ArrowRight, ExternalLink, Info, Key, Timer } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon, InfoIcon, KeyIcon, TimerIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
   DialogDescription,
   DialogFooter,
@@ -16,12 +12,16 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Label_Shadcn_,
+  Label,
   Skeleton,
 } from 'ui'
 
 import { algorithmLabels } from '../algorithm-details'
 import { statusColors } from '../jwt.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
+import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
 export function RotateKeyDialog({
   projectRef,
@@ -60,7 +60,7 @@ export function RotateKeyDialog({
         <DialogTitle>Rotate JWT signing key</DialogTitle>
         <DialogDescription>
           Change the key used by Supabase Auth to create new JSON Web Tokens. Non-expired tokens
-          remain <span className="text-brand">valid and accepted</span>!
+          remain <span className="text-primary">valid and accepted</span>!
         </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
@@ -72,11 +72,11 @@ export function RotateKeyDialog({
               'px-4 py-1 gap-2 flex flex-row items-center uppercase'
             )}
           >
-            <Timer size={14} />
+            <TimerIcon size={14} />
             Standby key
           </Badge>
           <div>
-            <ArrowRight className="size-4 text-foreground-light" />
+            <ArrowRightIcon className="size-4 text-foreground-light" />
           </div>
           <div>
             <Badge
@@ -85,7 +85,7 @@ export function RotateKeyDialog({
                 'px-4 py-1 gap-2 flex flex-row items-center uppercase'
               )}
             >
-              <Key size={14} />
+              <KeyIcon size={14} />
               Current key
             </Badge>
           </div>
@@ -103,11 +103,11 @@ export function RotateKeyDialog({
               'px-4 py-1 gap-2 flex flex-row items-center uppercase'
             )}
           >
-            <Key size={14} />
+            <KeyIcon size={14} />
             Current key
           </Badge>
           <div>
-            <ArrowRight className="h-4 w-4 text-foreground-light" />
+            <ArrowRightIcon className="h-4 w-4 text-foreground-light" />
           </div>
           <Badge
             className={cn(
@@ -115,7 +115,7 @@ export function RotateKeyDialog({
               'px-4 py-1 gap-2 flex flex-row items-center uppercase'
             )}
           >
-            <Timer size={14} />
+            <TimerIcon size={14} />
             Previous key
           </Badge>
           <div />
@@ -138,11 +138,11 @@ export function RotateKeyDialog({
           <>
             <div className="text-sm">To proceed please confirm:</div>
 
-            <Label_Shadcn_
+            <Label
               htmlFor="understands-standby"
-              className="flex items-top gap-4 text-sm leading-none"
+              className="flex items-start gap-4 text-sm leading-none"
             >
-              <Checkbox_Shadcn_
+              <Checkbox
                 id="understands-standby"
                 className="mt-0.5"
                 checked={isStandbyUnderstood}
@@ -152,8 +152,7 @@ export function RotateKeyDialog({
                 All of my application's components have picked up the standby key.
               </p>
               <ButtonTooltip
-                type="default"
-                icon={<Info />}
+                icon={<InfoIcon />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
                   content: {
@@ -172,13 +171,13 @@ export function RotateKeyDialog({
                   },
                 }}
               />
-            </Label_Shadcn_>
+            </Label>
 
-            <Label_Shadcn_
+            <Label
               htmlFor="understands-previously-used"
-              className="flex items-top gap-4 text-sm leading-none"
+              className="flex items-start gap-4 text-sm leading-none"
             >
-              <Checkbox_Shadcn_
+              <Checkbox
                 className="mt-0.5"
                 id="understands-previously-used"
                 checked={isPreviouslyUsedUnderstood}
@@ -188,8 +187,7 @@ export function RotateKeyDialog({
                 To invalidate non-expired JWTs I need to explicitly revoke the currently used key.
               </p>
               <ButtonTooltip
-                type="default"
-                icon={<Info />}
+                icon={<InfoIcon />}
                 className="px-1.5 py-2 mt-0.5"
                 tooltip={{
                   content: {
@@ -197,7 +195,7 @@ export function RotateKeyDialog({
                     text: (
                       <p>
                         Rotating the signing key only changes what key is used by Supabase Auth to
-                        issue <em className="text-brand not-italic">new tokens</em>
+                        issue <em className="text-primary not-italic">new tokens</em>
                         .<br />
                         <br />
                         To prevent users from being prematurely signed out, you have to manually
@@ -211,11 +209,11 @@ export function RotateKeyDialog({
                   },
                 }}
               />
-            </Label_Shadcn_>
+            </Label>
 
             {verifyJWTEdgeFunctions.length > 0 && (
-              <Label_Shadcn_ htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
-                <Checkbox_Shadcn_
+              <Label htmlFor="edge-functions-verify-jwt" className="flex gap-4 text-sm">
+                <Checkbox
                   id="edge-functions-verify-jwt"
                   className="mt-0.5"
                   checked={isEdgeFunctionsVerifyJWTUnderstood}
@@ -233,7 +231,7 @@ export function RotateKeyDialog({
                         target="_blank"
                         title={name}
                       >
-                        <ExternalLink className="size-3 inline-block" /> <code>{name}</code>
+                        <ExternalLinkIcon className="size-3 inline-block" /> <code>{name}</code>
                       </a>
                     ))
                     .reduce<React.ReactNode[]>(
@@ -242,8 +240,8 @@ export function RotateKeyDialog({
                     )}
                 </p>
                 <ButtonTooltip
-                  type="default"
-                  icon={<Info />}
+                  variant="default"
+                  icon={<InfoIcon />}
                   className="px-1.5 py-2 mt-0.5"
                   tooltip={{
                     content: {
@@ -252,9 +250,11 @@ export function RotateKeyDialog({
                         <p>
                           Some of your Edge Functions are set up to require a JWT in the{' '}
                           <code>Authorization</code> header signed with the{' '}
-                          <em className="text-brand not-italic">legacy JWT secret</em>. Rotation
+                          <em className="text-primary not-italic">legacy JWT secret</em>. Rotation
                           causes{' '}
-                          <em className="text-brand not-italic">invocations by signed-in users</em>{' '}
+                          <em className="text-primary not-italic">
+                            invocations by signed-in users
+                          </em>{' '}
                           to fail with HTTP 401 Unauthorized, as the JWT no longer meets this
                           requirement.
                           <br />
@@ -268,13 +268,14 @@ export function RotateKeyDialog({
                     },
                   }}
                 />
-              </Label_Shadcn_>
+              </Label>
             )}
           </>
         )}
       </DialogSection>
       <DialogFooter>
         <Button
+          variant="primary"
           onClick={() => mutate({ projectRef, keyId: standbyKey.id, status: 'in_use' })}
           disabled={
             isLoadingEdgeFunctions ||

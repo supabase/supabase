@@ -1,25 +1,31 @@
 import { useQuery } from '@tanstack/react-query'
-import { handleError, post } from 'data/fetchers'
 import { CloudProvider } from 'shared-data'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { configKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectCreationPostgresVersionsVariables = {
   cloudProvider: CloudProvider
   dbRegion: string
   organizationSlug: string | undefined
+  highAvailability?: boolean
 }
 
 export async function getPostgresCreationVersions(
-  { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
+  {
+    cloudProvider,
+    dbRegion,
+    organizationSlug,
+    highAvailability,
+  }: ProjectCreationPostgresVersionsVariables,
   signal?: AbortSignal
 ) {
   if (!organizationSlug) throw new Error('organizationSlug is required')
 
   const { data, error } = await post('/platform/organizations/{slug}/available-versions', {
     params: { path: { slug: organizationSlug } },
-    body: { provider: cloudProvider, region: dbRegion },
+    body: { provider: cloudProvider, region: dbRegion, high_availability: highAvailability },
     signal,
   })
 
@@ -33,7 +39,12 @@ export type ProjectCreationPostgresVersionData = Awaited<
 export type ProjectCreationPostgresVersionError = ResponseError
 
 export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationPostgresVersionData>(
-  { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
+  {
+    cloudProvider,
+    dbRegion,
+    organizationSlug,
+    highAvailability,
+  }: ProjectCreationPostgresVersionsVariables,
   {
     enabled = true,
     ...options
@@ -44,20 +55,30 @@ export const useProjectCreationPostgresVersionsQuery = <TData = ProjectCreationP
   > = {}
 ) => {
   return useQuery<ProjectCreationPostgresVersionData, ProjectCreationPostgresVersionError, TData>({
-    queryKey: configKeys.projectCreationPostgresVersions(organizationSlug, cloudProvider, dbRegion),
+    queryKey: configKeys.projectCreationPostgresVersions(
+      organizationSlug,
+      cloudProvider,
+      dbRegion,
+      highAvailability
+    ),
     queryFn: ({ signal }) =>
-      getPostgresCreationVersions({ organizationSlug, cloudProvider, dbRegion }, signal),
+      getPostgresCreationVersions(
+        { organizationSlug, cloudProvider, dbRegion, highAvailability },
+        signal
+      ),
     enabled:
-      enabled &&
-      typeof organizationSlug !== 'undefined' &&
-      organizationSlug !== '_' &&
-      typeof dbRegion !== 'undefined',
+      enabled && typeof organizationSlug !== 'undefined' && organizationSlug !== '_' && !!dbRegion,
     ...options,
   })
 }
 
 export const useAvailableOrioleImageVersion = (
-  { cloudProvider, dbRegion, organizationSlug }: ProjectCreationPostgresVersionsVariables,
+  {
+    cloudProvider,
+    dbRegion,
+    organizationSlug,
+    highAvailability,
+  }: ProjectCreationPostgresVersionsVariables,
   { enabled = true }: { enabled?: boolean } = {}
 ) => {
   const { data } = useProjectCreationPostgresVersionsQuery(
@@ -65,6 +86,7 @@ export const useAvailableOrioleImageVersion = (
       cloudProvider,
       dbRegion,
       organizationSlug,
+      highAvailability,
     },
     {
       enabled,

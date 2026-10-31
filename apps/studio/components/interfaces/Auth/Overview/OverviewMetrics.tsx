@@ -1,13 +1,21 @@
 import { useQuery } from '@tanstack/react-query'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { ChevronRight, ExternalLink, Telescope, BarChart2, Bot } from 'lucide-react'
+import { BarChart2Icon, ChevronRightIcon, ExternalLinkIcon, TelescopeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-
-import { useParams } from 'common'
-import { getStatusLevel } from 'components/interfaces/UnifiedLogs/UnifiedLogs.utils'
-import AlertError from 'components/ui/AlertError'
-import { cn, Tooltip, TooltipContent, TooltipTrigger, Button } from 'ui'
+import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Chart,
+  ChartActions,
+  ChartCard,
+  ChartContent,
+  ChartEmptyState,
+  ChartHeader,
+  ChartLoadingState,
+  ChartMetric,
+  ChartTitle,
+} from 'ui-patterns/Chart'
 import {
   PageSection,
   PageSectionContent,
@@ -15,69 +23,56 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import {
-  Chart,
-  ChartCard,
-  ChartHeader,
-  ChartActions,
-  ChartMetric,
-  ChartTitle,
-  ChartContent,
-  ChartEmptyState,
-  ChartLoadingState,
-} from 'ui-patterns/Chart'
+import { StatusCode } from 'ui-patterns/StatusCode'
+
 import {
   AuthErrorCodeRow,
   fetchTopAuthErrorCodes,
   fetchTopResponseErrors,
+  parseAuthErrorCodes,
+  parseResponseErrors,
   ResponseErrorRow,
 } from './OverviewErrors.constants'
+import { formatMetricChange, formatMetricValue } from './OverviewMetrics.utils'
 import { OverviewTable } from './OverviewTable'
 import {
   AuthMetricsResponse,
   calculatePercentageChange,
+  calculatePercentagePointChange,
   getApiSuccessRates,
   getAuthSuccessRates,
   getMetricValues,
 } from './OverviewUsage.constants'
-import { getStatusColor } from 'components/ui/DataTable/DataTable.utils'
-import { AiIconAnimation } from 'ui'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AlertError } from '@/components/ui/AlertError'
+import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
+import { Service } from '@/data/graphql/graphql'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 const StatCard = ({
   title,
   current,
-  previous,
+  change,
   loading,
   suffix = '',
-  invert = false,
   href,
   tooltip,
 }: {
   title: string
-  current: number
-  previous: number
+  current: number | null
+  change: number | null
   loading: boolean
   suffix?: string
-  invert?: boolean
   href?: string
   tooltip?: string
 }) => {
   const router = useRouter()
-  const formattedCurrent =
-    suffix === 'ms'
-      ? current.toFixed(2)
-      : suffix === '%'
-        ? current.toFixed(1)
-        : Math.round(current).toLocaleString()
-  // const signChar = previous > 0 ? '+' : previous < 0 ? '-' : ''
 
   const actions = [
     {
       label: 'Go to Auth Report',
-      icon: <ExternalLink size={12} />,
+      icon: <ExternalLinkIcon size={12} />,
       onClick: href ? () => router.push(href) : undefined,
     },
   ]
@@ -90,8 +85,8 @@ const StatCard = ({
             className="pb-4"
             label={title}
             tooltip={tooltip}
-            diffValue={`${previous.toFixed(1)}%`}
-            value={`${formattedCurrent}${suffix}`}
+            diffValue={formatMetricChange(change, suffix)}
+            value={formatMetricValue(current, suffix)}
           />
           <ChartActions actions={actions} />
         </ChartHeader>
@@ -104,36 +99,19 @@ const LogsLink = ({ href }: { href: string }) => (
   <Tooltip>
     <TooltipTrigger asChild>
       <Button
-        type="text"
+        variant="text"
         size="tiny"
         className="p-1.5 text-foreground-lighter hover:text-foreground"
         asChild
       >
         <Link href={href} aria-label="Go to Logs">
-          <ChevronRight size={12} />
+          <ChevronRightIcon size={12} />
         </Link>
       </Button>
     </TooltipTrigger>
     <TooltipContent>Go to Logs</TooltipContent>
   </Tooltip>
 )
-
-function isResponseErrorRow(row: unknown): row is ResponseErrorRow {
-  if (!row || typeof row !== 'object') return false
-  const r = row as Record<string, unknown>
-  return (
-    typeof r.method === 'string' &&
-    typeof r.path === 'string' &&
-    typeof r.status_code === 'number' &&
-    typeof r.count === 'number'
-  )
-}
-
-function isAuthErrorCodeRow(row: unknown): row is AuthErrorCodeRow {
-  if (!row || typeof row !== 'object') return false
-  const r = row as Record<string, unknown>
-  return typeof r.error_code === 'string' && typeof r.count === 'number'
-}
 
 interface OverviewMetricsProps {
   metrics?: AuthMetricsResponse
@@ -143,6 +121,7 @@ interface OverviewMetricsProps {
 
 export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsProps) => {
   const { ref } = useParams()
+  const useOtel = useFlag('otelLegacyLogs')
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(24, 'hour').toISOString()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -166,32 +145,42 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
   const { current: authSuccessRateCurrent, previous: authSuccessRatePrevious } =
     getAuthSuccessRates(metrics)
 
-  const apiSuccessRateChange = calculatePercentageChange(
+  const apiSuccessRateChange = calculatePercentagePointChange(
     apiSuccessRateCurrent,
     apiSuccessRatePrevious
   )
-  const authSuccessRateChange = calculatePercentageChange(
+  const authSuccessRateChange = calculatePercentagePointChange(
     authSuccessRateCurrent,
     authSuccessRatePrevious
   )
 
-  const { data: respErrData, isPending: isLoadingResp } = useQuery({
-    queryKey: ['auth-overview', ref, 'top-response-errors'],
-    queryFn: () => fetchTopResponseErrors(ref as string),
+  const {
+    data: respErrData,
+    isPending: isLoadingResp,
+    isError: isResponseError,
+    error: responseError,
+  } = useQuery({
+    queryKey: ['auth-overview', ref, 'top-response-errors', { otel: useOtel }],
+    queryFn: () => fetchTopResponseErrors(ref as string, useOtel),
     enabled: !!ref,
   })
 
-  const { data: codeErrData, isPending: isLoadingCodes } = useQuery({
-    queryKey: ['auth-overview', ref, 'top-auth-error-codes'],
-    queryFn: () => fetchTopAuthErrorCodes(ref as string),
+  const {
+    data: codeErrData,
+    isPending: isLoadingCodes,
+    isError: isCodeError,
+    error: codeError,
+  } = useQuery({
+    queryKey: ['auth-overview', ref, 'top-auth-error-codes', { otel: useOtel }],
+    queryFn: () => fetchTopAuthErrorCodes(ref as string, useOtel),
     enabled: !!ref,
   })
 
   const responseErrors: ResponseErrorRow[] = Array.isArray(respErrData?.result)
-    ? (respErrData?.result as unknown[]).filter(isResponseErrorRow)
+    ? parseResponseErrors(respErrData.result)
     : []
   const errorCodes: AuthErrorCodeRow[] = Array.isArray(codeErrData?.result)
-    ? (codeErrData?.result as unknown[]).filter(isAuthErrorCodeRow)
+    ? parseAuthErrorCodes(codeErrData.result)
     : []
 
   const errorCodesActions = [
@@ -228,9 +217,9 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                 href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
                 className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all text-sm inline-flex items-center gap-x-1.5"
               >
-                <Telescope size={14} className="text-foreground-lighter" />
+                <TelescopeIcon size={14} className="text-foreground-lighter" />
                 <span>Go to observability</span>
-                <ChevronRight size={14} className="text-foreground-lighter" />
+                <ChevronRightIcon size={14} className="text-foreground-lighter" />
               </Link>
             </div>
           </PageSectionSummary>
@@ -240,7 +229,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <StatCard
               title="Auth Activity"
               current={activeUsersCurrent}
-              previous={activeUsersChange}
+              change={activeUsersChange}
               loading={isLoading}
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
               tooltip="Users who generated any Auth event in this period. This metric tracks authentication activity, not total product usage. Some active users won't appear here if their session stayed valid."
@@ -248,7 +237,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <StatCard
               title="Sign ups"
               current={signUpsCurrent}
-              previous={signUpsChange}
+              change={signUpsChange}
               loading={isLoading}
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#usage`}
             />
@@ -267,34 +256,45 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
             <StatCard
               title="Auth API Success Rate"
               current={apiSuccessRateCurrent}
-              previous={apiSuccessRateChange}
+              change={apiSuccessRateChange}
               loading={isLoading}
               suffix="%"
+              tooltip="Change from the previous period in percentage points (pp); no data means no requests were recorded."
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#monitoring`}
             />
             <StatCard
               title="Auth Server Success Rate"
               current={authSuccessRateCurrent}
-              previous={authSuccessRateChange}
+              change={authSuccessRateChange}
               loading={isLoading}
               suffix="%"
+              tooltip="Change from the previous period in percentage points (pp); no data means no requests were recorded."
               href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}#monitoring`}
             />
           </div>
 
           <div className="grid grid-cols-1 gap-4">
-            <Chart isLoading={isLoadingResp}>
+            <Chart isLoading={isLoadingResp} isErrored={isResponseError}>
               <ChartCard>
                 <ChartHeader>
                   <ChartTitle>Auth API Errors</ChartTitle>
                 </ChartHeader>
                 <ChartContent
-                  className="p-0"
+                  className="p-0!"
                   isEmpty={responseErrors.length === 0}
+                  errorState={
+                    <div className="p-6">
+                      <AlertError
+                        projectRef={ref}
+                        subject="Failed to retrieve Auth API errors"
+                        error={responseError}
+                      />
+                    </div>
+                  }
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState
-                        icon={<BarChart2 size={16} />}
+                        icon={<BarChart2Icon size={16} />}
                         title="No data to show"
                         description="It may take up to 24 hours for data to refresh"
                       />
@@ -313,29 +313,9 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                       {
                         key: 'request',
                         header: 'Request',
-                        className: 'w-auto !pr-0',
+                        className: 'w-auto pr-0!',
                         render: (row) => {
-                          const level = getStatusLevel(row.status_code)
-                          const colors = getStatusColor(level)
-                          return (
-                            <div className="flex items-center gap-2">
-                              <span className="flex-shrink-0 flex items-center text-xs font-mono">
-                                <span className="select-text py-0.5 px-2 text-center rounded-l rounded-r-none bg-surface-75 text-foreground-light border border-r-0">
-                                  {row.method}
-                                </span>
-                                <span
-                                  className={cn(
-                                    'py-0.5 px-2 border rounded-l-0 rounded-r tabular-nums',
-                                    colors.text,
-                                    colors.bg,
-                                    colors.border
-                                  )}
-                                >
-                                  {row.status_code}
-                                </span>
-                              </span>
-                            </div>
-                          )
+                          return <StatusCode method={row.method} statusCode={row.status_code} />
                         },
                       },
                       {
@@ -351,7 +331,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                       {
                         key: 'count',
                         header: 'Count',
-                        className: 'text-right flex-shrink-0 ml-auto justify-end',
+                        className: 'text-right shrink-0 ml-auto justify-end',
                         render: (row) => (
                           <div className="flex justify-end items-center gap-2">
                             <div className="text-right text-xs tabular-nums">{row.count}</div>
@@ -365,19 +345,28 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
               </ChartCard>
             </Chart>
 
-            <Chart isLoading={isLoadingCodes}>
+            <Chart isLoading={isLoadingCodes} isErrored={isCodeError}>
               <ChartCard>
                 <ChartHeader>
                   <ChartTitle>Auth Server Errors</ChartTitle>
                   <ChartActions actions={errorCodesActions} />
                 </ChartHeader>
                 <ChartContent
-                  className="p-0"
+                  className="p-0!"
                   isEmpty={errorCodes.length === 0}
+                  errorState={
+                    <div className="p-6">
+                      <AlertError
+                        projectRef={ref}
+                        subject="Failed to retrieve Auth server errors"
+                        error={codeError}
+                      />
+                    </div>
+                  }
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState
-                        icon={<BarChart2 size={16} />}
+                        icon={<BarChart2Icon size={16} />}
                         title="No data to show"
                         description="It may take up to 24 hours for data to refresh"
                       />
@@ -398,9 +387,11 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                         header: 'Error code',
                         className: 'w-full',
                         render: (row) => (
-                          <span className="line-clamp-1 font-mono uppercase text-xs inline-flex text-foreground-light">
-                            {row.error_code}
-                          </span>
+                          <ErrorCodeTooltip errorCode={row.error_code} service={Service.Auth}>
+                            <span className="line-clamp-1 font-mono uppercase text-xs inline-flex text-foreground-light cursor-default">
+                              {row.error_code}
+                            </span>
+                          </ErrorCodeTooltip>
                         ),
                       },
                       {

@@ -2,9 +2,10 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invalidateSchemasQuery } from './schemas-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type SchemaCreateVariables = {
   name: string
@@ -19,6 +20,7 @@ export async function createSchema({ name, projectRef, connectionString }: Schem
     connectionString,
     sql,
     queryKey: ['schema', 'create'],
+    grant: unguarded.migrating,
   })
   return result
 }

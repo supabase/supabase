@@ -1,7 +1,6 @@
-import { describe, it, expect } from 'vitest'
-
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
+import { describe, expect, it } from 'vitest'
 
 import { partialsRemark } from './Partial'
 import { fromDocsMarkdown } from './utils.server'
@@ -116,7 +115,12 @@ Some more text.
     await expect(partialsRemark()(mdast)).rejects.toThrowError(/valid JSON/)
   })
 
-  it('should error when required variable is missing', async () => {
+  it('should render an unprovided variable as an empty string', async () => {
+    // The variables.mdx fixture reads "Here is a partial that takes a {{ .var }}."
+    // When `var` is not provided, the `{{ .var }}` placeholder is replaced with
+    // an empty string rather than throwing. The trailing " ." in the expected
+    // output is the intended result: the placeholder is gone, leaving nothing
+    // between "a" and the period.
     const markdown = `
 # Embed partial
 
@@ -126,27 +130,48 @@ Some more text.
 `.trim()
 
     const mdast = fromDocsMarkdown(markdown)
-    await expect(partialsRemark()(mdast)).rejects.toThrowError(
-      /Missing required variable in \$Partial ".*variables\.mdx": "var"/
-    )
+    const transformed = await partialsRemark()(mdast)
+    const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+    // Note the empty gap where `{{ .var }}` used to be — this is deliberate.
+    const expected = `
+# Embed partial
+
+Here is a partial that takes a .
+
+Some more text.
+`.trimStart()
+
+    expect(output).toEqual(expected)
+    // The placeholder must be fully removed, not left as literal `{{ .var }}`.
+    expect(output).not.toContain('{{')
   })
 
-  it('should error when unexpected variable is provided', async () => {
+  it('should ignore a variable that is not referenced in the partial', async () => {
+    // The variables.mdx fixture only references `var`. Providing an additional
+    // `extra` variable that the partial never uses is silently ignored rather
+    // than throwing — `var` is substituted and `extra` leaves no trace.
     const markdown = `
 # Embed partial
 
-<$Partial path="/_fixtures/variables.mdx" variables={{ "var": "correct", "extra": "unexpected" }} />
+<$Partial path="/_fixtures/variables.mdx" variables={{ "var": "correct", "extra": "unused" }} />
 
 Some more text.
 `.trim()
 
     const mdast = fromDocsMarkdown(markdown)
-    await expect(partialsRemark()(mdast)).rejects.toThrowError(
-      /Unexpected variable in \$Partial ".*variables\.mdx": "extra"/
-    )
+    const transformed = await partialsRemark()(mdast)
+    const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+    expect(output).toContain('Here is a partial that takes a correct.')
+    expect(output).not.toContain('unused')
   })
 
-  it('should error with detailed message for multiple missing variables', async () => {
+  it('should render only the unprovided variables as empty when some are provided', async () => {
+    // The multiple-variables.mdx fixture reads:
+    //   "This partial has {{ .var1 }}, {{ .var2 }}, and {{ .var3 }}."
+    // Only `var1` is provided here, so `var2` and `var3` collapse to empty
+    // strings while `var1` is substituted normally.
     const markdown = `
 # Embed partial
 
@@ -156,24 +181,13 @@ Some more text.
 `.trim()
 
     const mdast = fromDocsMarkdown(markdown)
-    await expect(partialsRemark()(mdast)).rejects.toThrowError(
-      /Missing required variables.*"var2".*"var3".*Expected variables.*"var1".*"var2".*"var3".*Provided variable: "var1"/s
-    )
-  })
+    const transformed = await partialsRemark()(mdast)
+    const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
 
-  it('should error with detailed message for multiple unexpected variables', async () => {
-    const markdown = `
-# Embed partial
-
-<$Partial path="/_fixtures/variables.mdx" variables={{ "var": "correct", "extra1": "wrong", "extra2": "also wrong" }} />
-
-Some more text.
-`.trim()
-
-    const mdast = fromDocsMarkdown(markdown)
-    await expect(partialsRemark()(mdast)).rejects.toThrowError(
-      /Unexpected variables.*"extra1".*"extra2".*Expected variable: "var".*Provided variables.*"var".*"extra1".*"extra2"/s
-    )
+    // Provided variable is substituted; the two unprovided ones leave empty gaps.
+    expect(output).toContain('This partial has value1, , and .')
+    // No placeholder text survives for the unprovided variables.
+    expect(output).not.toContain('{{')
   })
 
   it('should succeed when all variables match exactly', async () => {
@@ -212,7 +226,12 @@ Some more text.
     expect(output).toContain('alphanumeric value')
   })
 
-  it('should error when hyphenated variable is missing', async () => {
+  it('should render unprovided hyphenated variables as empty', async () => {
+    // The hyphenated-variables.mdx fixture reads:
+    //   "This partial has {{ .my-var }}, {{ .another_var }}, and {{ .myVar123 }}."
+    // Only `my-var` is provided, so the underscore and alphanumeric variables
+    // collapse to empty strings — confirming the empty-substitution behavior
+    // applies to all supported variable name styles.
     const markdown = `
 # Embed partial
 
@@ -222,8 +241,10 @@ Some more text.
 `.trim()
 
     const mdast = fromDocsMarkdown(markdown)
-    await expect(partialsRemark()(mdast)).rejects.toThrowError(
-      /Missing required variables.*"another_var".*"myVar123".*Expected variables.*"my-var".*"another_var".*"myVar123".*Provided variable: "my-var"/s
-    )
+    const transformed = await partialsRemark()(mdast)
+    const output = toMarkdown(transformed, { extensions: [mdxToMarkdown()] })
+
+    expect(output).toContain('This partial has value, , and .')
+    expect(output).not.toContain('{{')
   })
 })

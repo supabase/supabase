@@ -1,0 +1,348 @@
+import { AWS_REGIONS } from 'shared-data'
+import { describe, expect, it } from 'vitest'
+
+import type { AvailableRegions } from './ProjectCreation.utils'
+import {
+  AUTO_REGION_VALUE,
+  extractPostgresVersionDetails,
+  filterHighAvailabilityRegions,
+  getAvailableRegions,
+  getFreeTierGeneralRegionExperimentVariant,
+  getHighAvailabilityRegionCode,
+  getRegionSelectionType,
+  resolveDefaultDbRegion,
+  resolvePostgresVersion,
+  smartRegionToExactRegion,
+} from './ProjectCreation.utils'
+import type { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
+
+describe('smartRegionToExactRegion', () => {
+  it('maps the Auto option to the exact region of Americas', () => {
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe(smartRegionToExactRegion('Americas'))
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe('East US (North Virginia)')
+  })
+
+  it('passes through values that are not smart regions', () => {
+    expect(smartRegionToExactRegion('us-east-1')).toBe('us-east-1')
+  })
+})
+
+describe('resolveDefaultDbRegion', () => {
+  const base = {
+    cloudProvider: 'AWS_NIMBUS',
+    isHighAvailabilityRestricted: false,
+    highAvailabilityRegionName: undefined,
+    isSmartRegionEnabled: false,
+    recommendedSmartRegion: undefined,
+    autoDefaultRegion: undefined,
+    fixedDefaultRegion: AWS_REGIONS.EAST_US.displayName,
+    environment: 'prod',
+  } as const
+
+  it('prefers the high availability region when restricted, even while it is still loading', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        isHighAvailabilityRestricted: true,
+        highAvailabilityRegionName: AWS_REGIONS.EAST_US.displayName,
+      })
+    ).toBe(AWS_REGIONS.EAST_US.displayName)
+    expect(resolveDefaultDbRegion({ ...base, isHighAvailabilityRestricted: true })).toBeUndefined()
+  })
+
+  it('uses the recommended smart region when smart regions are enabled', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        cloudProvider: 'AWS',
+        isSmartRegionEnabled: true,
+        recommendedSmartRegion: 'Americas',
+        autoDefaultRegion: AWS_REGIONS.SOUTHEAST_ASIA.displayName,
+      })
+    ).toBe('Americas')
+  })
+
+  it('falls back to the first available smart region when there is no recommendation', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        cloudProvider: 'AWS',
+        isSmartRegionEnabled: true,
+        recommendedSmartRegion: undefined,
+        firstAvailableSmartRegion: 'Americas',
+      })
+    ).toBe('Americas')
+  })
+
+  it('prefers the Auto option over the recommended smart region when it is available', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        cloudProvider: 'AWS',
+        isSmartRegionEnabled: true,
+        isAutoRegionAvailable: true,
+        recommendedSmartRegion: 'Americas',
+      })
+    ).toBe(AUTO_REGION_VALUE)
+  })
+
+  it('still prefers the high availability region over Auto when restricted', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        isHighAvailabilityRestricted: true,
+        highAvailabilityRegionName: AWS_REGIONS.EAST_US.displayName,
+        isSmartRegionEnabled: true,
+        isAutoRegionAvailable: true,
+      })
+    ).toBe(AWS_REGIONS.EAST_US.displayName)
+  })
+
+  it('uses the geolocated region when the provider offers it', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        cloudProvider: 'AWS',
+        autoDefaultRegion: AWS_REGIONS.SOUTHEAST_ASIA.displayName,
+      })
+    ).toBe(AWS_REGIONS.SOUTHEAST_ASIA.displayName)
+  })
+
+  it('falls back to the fixed default when the provider does not offer the geolocated region', () => {
+    expect(
+      resolveDefaultDbRegion({ ...base, autoDefaultRegion: AWS_REGIONS.SOUTHEAST_ASIA.displayName })
+    ).toBe(AWS_REGIONS.EAST_US.displayName)
+  })
+
+  it('falls back to the fixed default when no geolocated region resolved', () => {
+    expect(resolveDefaultDbRegion(base)).toBe(AWS_REGIONS.EAST_US.displayName)
+  })
+})
+
+describe('getAvailableRegions', () => {
+  it.each(['local', 'staging', 'prod'])('returns all AWS regions for AWS on %s', (environment) => {
+    expect(getAvailableRegions('AWS', environment)).toEqual(AWS_REGIONS)
+    expect(getAvailableRegions('AWS_K8S', environment)).toEqual(AWS_REGIONS)
+  })
+
+  it.each([
+    ['local', { SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA }],
+    ['staging', { SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA }],
+    ['prod', { EAST_US: AWS_REGIONS.EAST_US }],
+  ])('returns the single AWS_NIMBUS region on %s', (environment, expectedRegions) => {
+    expect(getAvailableRegions('AWS_NIMBUS', environment)).toEqual(expectedRegions)
+  })
+})
+
+describe('High Availability project creation constraints', () => {
+  it.each([
+    ['local', 'eu-central-1'],
+    ['staging', 'us-east-1'],
+    ['prod', 'us-east-1'],
+  ])('resolves the %s region restriction', (environment, expectedRegion) => {
+    expect(getHighAvailabilityRegionCode(environment)).toBe(expectedRegion)
+  })
+
+  it.each([
+    ['local', undefined],
+    ['staging', 'us-east-1'],
+    ['prod', 'us-east-1'],
+  ])(
+    'applies the %s region restriction to high availability projects',
+    (environment, expectedRegion) => {
+      const regions = [{ code: 'us-east-1' }, { code: 'eu-central-1' }, { code: 'ap-southeast-1' }]
+
+      expect(filterHighAvailabilityRegions(regions, true, environment)).toEqual(
+        expectedRegion === undefined ? regions : [{ code: expectedRegion }]
+      )
+      expect(filterHighAvailabilityRegions(regions, false, environment)).toEqual(regions)
+    }
+  )
+})
+
+describe('getFreeTierGeneralRegionExperimentVariant', () => {
+  const base = {
+    isFreePlan: true,
+    smartRegionEnabled: true,
+    enrollmentFlag: true,
+    selectionFlag: true,
+  }
+
+  it('returns test when in the experiment and the selection flag is on', () => {
+    expect(getFreeTierGeneralRegionExperimentVariant(base)).toBe('test')
+  })
+
+  it('returns control when in the experiment and the selection flag is off', () => {
+    expect(getFreeTierGeneralRegionExperimentVariant({ ...base, selectionFlag: false })).toBe(
+      'control'
+    )
+  })
+
+  it('returns undefined for a paid plan', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, isFreePlan: false })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined when smart regions are disabled (AWS_NIMBUS)', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, smartRegionEnabled: false })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined when the enrollment flag is off', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, enrollmentFlag: false })
+    ).toBeUndefined()
+  })
+})
+
+describe('getRegionSelectionType', () => {
+  const availableRegions: AvailableRegions = {
+    smartGroup: [{ code: 'americas', name: 'Americas', type: 'smartGroup' }],
+    specific: [
+      { code: 'us-east-1', name: 'East US (North Virginia)', provider: 'AWS', type: 'specific' },
+    ],
+  }
+
+  it('classifies a smart group region as general', () => {
+    expect(getRegionSelectionType({ dbRegion: 'Americas', availableRegions })).toBe('general')
+  })
+
+  it('classifies a specific region as specific', () => {
+    expect(getRegionSelectionType({ dbRegion: 'East US (North Virginia)', availableRegions })).toBe(
+      'specific'
+    )
+  })
+
+  it('returns undefined when the region matches neither list', () => {
+    expect(getRegionSelectionType({ dbRegion: 'Nonexistent', availableRegions })).toBeUndefined()
+  })
+
+  it('classifies the Auto option as auto when it is available', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: AUTO_REGION_VALUE,
+        availableRegions: {
+          ...availableRegions,
+          auto: { code: 'auto', name: 'Auto', type: 'auto' },
+        },
+      })
+    ).toBe('auto')
+  })
+
+  it('returns undefined for the Auto option when it is not available', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: AUTO_REGION_VALUE, availableRegions })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined when dbRegion is undefined', () => {
+    expect(getRegionSelectionType({ dbRegion: undefined, availableRegions })).toBeUndefined()
+  })
+
+  it('returns undefined when availableRegions is undefined', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: 'Americas', availableRegions: undefined })
+    ).toBeUndefined()
+  })
+
+  it('classifies an untouched field as auto, even if it resolved to a specific region', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: 'East US (North Virginia)',
+        availableRegions,
+        isDbRegionDirty: false,
+      })
+    ).toBe('auto')
+  })
+
+  it('returns undefined for an untouched field holding a stale region matching neither list', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: 'Nonexistent',
+        availableRegions,
+        isDbRegionDirty: false,
+      })
+    ).toBeUndefined()
+  })
+
+  it('classifies a touched field normally', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })
+    ).toBe('general')
+  })
+})
+
+describe('extractPostgresVersionDetails', () => {
+  it('splits engine and release channel', () => {
+    expect(extractPostgresVersionDetails('17|ga')).toEqual({
+      postgresEngine: '17',
+      releaseChannel: 'ga',
+    })
+  })
+
+  it('returns undefined fields for an empty value', () => {
+    expect(extractPostgresVersionDetails('')).toEqual({
+      postgresEngine: undefined,
+      releaseChannel: undefined,
+    })
+  })
+})
+
+describe('resolvePostgresVersion', () => {
+  const availableOrioleVersion: {
+    postgres_engine: PostgresEngine
+    release_channel: ReleaseChannel
+  } = { postgres_engine: '17-oriole', release_channel: 'preview' }
+
+  it('uses the selection for OrioleDB when it is an OrioleDB version', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17-oriole|ga',
+        useOrioleDb: true,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17-oriole', releaseChannel: 'ga' })
+  })
+
+  it('falls back to the available OrioleDB image when there is no selection', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '',
+        useOrioleDb: true,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17-oriole', releaseChannel: 'preview' })
+  })
+
+  it('falls back to the available OrioleDB image when the selection is a stale Postgres version', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17|ga',
+        useOrioleDb: true,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17-oriole', releaseChannel: 'preview' })
+  })
+
+  it('uses the selection for Postgres', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17|ga',
+        useOrioleDb: false,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17', releaseChannel: 'ga' })
+  })
+
+  it('ignores a stale OrioleDB selection when OrioleDB is off', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17-oriole|ga',
+        useOrioleDb: false,
+        availableOrioleVersion,
+      })
+    ).toEqual({})
+  })
+})

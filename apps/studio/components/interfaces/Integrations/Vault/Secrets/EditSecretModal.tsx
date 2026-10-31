@@ -1,13 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
-import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import type { VaultSecret } from 'types'
 import {
   Button,
   Dialog,
@@ -17,16 +13,21 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretUpdateMutation } from '@/data/vault/vault-secret-update-mutation'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { VaultSecret } from '@/types'
 
 const SecretSchema = z.object({
   name: z.string().min(1, 'Please provide a name for your secret'),
@@ -131,76 +132,86 @@ export const EditSecretModal = () => {
         ) : (
           <>
             <DialogSection>
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form
                   id={formId}
                   className="flex flex-col gap-4"
                   autoComplete="off"
                   onSubmit={form.handleSubmit(onSubmit)}
                 >
-                  <FormField_Shadcn_
+                  <FormField
                     key="name"
                     name="name"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="name" label="Name">
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_ id="name" {...field} />
-                        </FormControl_Shadcn_>
+                      <FormItemLayout label="Name">
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     key="description"
                     name="description"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout
-                        name="description"
-                        label="Description"
-                        labelOptional="Optional"
-                      >
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_ id="description" {...field} data-lpignore="true" />
-                        </FormControl_Shadcn_>
+                      <FormItemLayout label="Description" labelOptional="Optional">
+                        <FormControl>
+                          <Input {...field} data-lpignore="true" />
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     key="secret"
                     name="secret"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItemLayout name="secret" label="Secret value">
-                        <FormControl_Shadcn_>
-                          <div className="relative">
-                            <Input_Shadcn_
-                              id="secret"
-                              type={showSecretValue ? 'text' : 'password'}
+                      <FormItemLayout label="Secret value">
+                        <div className="relative">
+                          <FormControl>
+                            <Textarea
                               {...field}
+                              rows={1}
+                              ref={(el) => {
+                                field.ref(el)
+                                if (el) {
+                                  el.style.height = 'auto'
+                                  el.style.height = Math.max(40, el.scrollHeight) + 'px'
+                                }
+                              }}
                               data-lpignore="true"
-                            />
-                            <Button
-                              type="default"
-                              title={showSecretValue ? `Hide secret value` : `Show secret value`}
-                              aria-label={
-                                showSecretValue ? `Hide secret value` : `Show secret value`
+                              className="min-h-0 resize-none"
+                              style={
+                                {
+                                  WebkitTextSecurity: showSecretValue ? undefined : 'disc',
+                                } as React.CSSProperties
                               }
-                              className="absolute right-2 top-1 px-3 py-2"
-                              icon={showSecretValue ? <EyeOff /> : <Eye />}
-                              onClick={() => setShowSecretValue(!showSecretValue)}
+                              onChange={(e) => {
+                                field.onChange(e)
+                                e.currentTarget.style.height = 'auto'
+                                e.currentTarget.style.height =
+                                  Math.max(40, e.currentTarget.scrollHeight) + 'px'
+                              }}
                             />
-                          </div>
-                        </FormControl_Shadcn_>
+                          </FormControl>
+                          <Button
+                            title={showSecretValue ? `Hide secret value` : `Show secret value`}
+                            aria-label={showSecretValue ? `Hide secret value` : `Show secret value`}
+                            className="absolute right-1 top-1 w-7"
+                            icon={showSecretValue ? <EyeOffIcon /> : <EyeIcon />}
+                            onClick={() => setShowSecretValue(!showSecretValue)}
+                          />
+                        </div>
                       </FormItemLayout>
                     )}
                   />
                 </form>
-              </Form_Shadcn_>
+              </Form>
             </DialogSection>
             <DialogFooter>
               <Button
-                type="default"
                 disabled={isSubmitting}
                 onClick={() => {
                   form.reset()
@@ -209,7 +220,7 @@ export const EditSecretModal = () => {
               >
                 Cancel
               </Button>
-              <Button form={formId} htmlType="submit" loading={isSubmitting}>
+              <Button variant="primary" form={formId} type="submit" loading={isSubmitting}>
                 Update secret
               </Button>
             </DialogFooter>

@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { projectKeys } from './keys'
 
-export type CloneStatus = components['schemas']['ProjectClonedStatusResponse']
+import { projectKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+export type CloneStatus = components['schemas']['ProjectClonedStatusResponse_Output']
 
 export async function getCloneStatus(projectRef?: string) {
   if (!projectRef) throw new Error('Project ref is required')

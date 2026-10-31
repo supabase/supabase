@@ -1,25 +1,33 @@
-import { useFlag } from 'common'
-import {
-  loadTableEditorStateFromLocalStorage,
-  parseSupaTable,
-  saveTableEditorStateToLocalStorageDebounced,
-} from 'components/grid/SupabaseGrid.utils'
-import { TableIndexAdvisorProvider } from 'components/grid/context/TableIndexAdvisorContext'
-import { Filter, SupaRow } from 'components/grid/types'
-import { getInitialGridColumns } from 'components/grid/utils/column'
-import { getGridColumns } from 'components/grid/utils/gridColumns'
-import { Entity } from 'data/table-editor/table-editor-types'
-import { PropsWithChildren, createContext, useContext, useEffect, useRef } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useRef } from 'react'
 import { CalculatedColumn } from 'react-data-grid'
 import { proxy, ref, subscribe, useSnapshot } from 'valtio'
 import { proxySet } from 'valtio/utils'
 
 import { useTableEditorStateSnapshot } from './table-editor'
+import { TableIndexAdvisorProvider } from '@/components/grid/context/TableIndexAdvisorContext'
+import {
+  loadTableEditorStateFromLocalStorage,
+  parseSupaTable,
+  saveTableEditorStateToLocalStorageDebounced,
+} from '@/components/grid/SupabaseGrid.utils'
+import { Filter, SupaRow } from '@/components/grid/types'
+import { getInitialGridColumns } from '@/components/grid/utils/column'
+import { getGridColumns } from '@/components/grid/utils/gridColumns'
+import { Entity } from '@/data/table-editor/table-editor-types'
+
+const FALLBACK_TABLE_STATE = proxy({}) as TableEditorTableState
+
+// Helper to extract sensitive data marker from column comment
+const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+const isSensitiveDataColumn = (comment: string | null | undefined): boolean => {
+  return comment ? comment.includes(SENSITIVE_DATA_MARKER) : false
+}
 
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
   editable = true,
+  preflightCheck = true,
   onAddColumn,
   onExpandJSONEditor,
   onExpandTextEditor,
@@ -28,6 +36,7 @@ export const createTableEditorTableState = ({
   table: Entity
   /** If set to true, render an additional "+" column to support adding a new column in the grid editor */
   editable?: boolean
+  preflightCheck?: boolean
   onAddColumn: () => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
   onExpandTextEditor: (column: string, row: SupaRow) => void
@@ -45,6 +54,9 @@ export const createTableEditorTableState = ({
     }),
     savedState
   )
+
+  // userToggledColumns: columns user has explicitly toggled OFF (persisted)
+  const userToggledColumns = new Set<string>((savedState as any)?.sensitiveDataColumns ?? [])
 
   const state = proxy({
     /* Table */
@@ -71,10 +83,20 @@ export const createTableEditorTableState = ({
         { gridColumns: state.gridColumns }
       )
 
+      // Preserve user's toggle choices across table updates
+      // Only clear toggles for columns that no longer exist
+      const currentColumnNames = new Set(table.columns.map((col) => col.name))
+      const preservedToggles = new Set(
+        Array.from(state.userToggledSensitiveColumns).filter((col) => currentColumnNames.has(col))
+      )
+      state.userToggledSensitiveColumns = proxySet(preservedToggles)
+
       state.table = supaTable
       state.gridColumns = gridColumns
-      state.originalTable = table
+      // ref() must run before the assignment below — otherwise valtio's proxy() would wrap
+      // and mutate `table`'s nested properties in place, corrupting the shared react-query cache object
       state._originalTableRef = ref(table)
+      state.originalTable = table
     },
 
     /* Rows */
@@ -91,13 +113,44 @@ export const createTableEditorTableState = ({
 
     /* Columns */
     gridColumns,
+    userToggledSensitiveColumns: proxySet<string>(userToggledColumns),
+    temporarilyRevealedColumns: proxySet<string>(),
+    toggleSensitiveDataColumn: (columnKey: string) => {
+      // Track which columns user has toggled OFF from their default masked state
+      if (state.userToggledSensitiveColumns.has(columnKey)) {
+        state.userToggledSensitiveColumns.delete(columnKey)
+      } else {
+        state.userToggledSensitiveColumns.add(columnKey)
+      }
+    },
+    get sensitiveDataColumns() {
+      // Single source of truth: columns marked sensitive = defaults minus user toggles (persistent only)
+      const defaultSensitiveColumns = new Set(
+        state.table.columns
+          .filter((col) => isSensitiveDataColumn(col.comment))
+          .map((col) => col.name)
+      )
+      return new Set(
+        Array.from(defaultSensitiveColumns).filter(
+          (col) => !state.userToggledSensitiveColumns.has(col)
+        )
+      )
+    },
     moveColumn: (fromKey: string, toKey: string) => {
       const fromIdx = state.gridColumns.findIndex((x) => x.key === fromKey)
       const toIdx = state.gridColumns.findIndex((x) => x.key === toKey)
+      if (fromIdx === -1 || toIdx === -1) return
       const moveItem = state.gridColumns[fromIdx]
+      const overItem = state.gridColumns[toIdx]
+      if (moveItem.frozen || overItem.frozen) return
 
       state.gridColumns.splice(fromIdx, 1)
       state.gridColumns.splice(toIdx, 0, moveItem)
+
+      // Update idx values to match new positions
+      state.gridColumns.forEach((col, i) => {
+        ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
+      })
     },
     updateColumnSize: (index: number, width: number) => {
       if (state.gridColumns[index]) {
@@ -106,17 +159,35 @@ export const createTableEditorTableState = ({
     },
     freezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      if (state.gridColumns[index]) {
-        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
-          true
-      }
+      if (index === -1) return
+      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen = true
+
+      // Move the column to just after the last currently-frozen column
+      const lastFrozenIdx = state.gridColumns.reduce(
+        (last, col, i) => (col.frozen && i !== index ? i : last),
+        -1
+      )
+      const col = state.gridColumns[index]
+      state.gridColumns.splice(index, 1)
+      state.gridColumns.splice(lastFrozenIdx + 1, 0, col)
+      state.gridColumns.forEach((col, i) => {
+        ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
+      })
     },
     unfreezeColumn: (columnKey: string) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
-      if (state.gridColumns[index]) {
-        ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
-          false
-      }
+      if (index === -1) return
+      ;(state.gridColumns[index] as CalculatedColumn<any, any> & { frozen?: boolean }).frozen =
+        false
+
+      // Move the column to just after the remaining frozen columns
+      const col = state.gridColumns[index]
+      state.gridColumns.splice(index, 1)
+      const lastFrozenIdx = state.gridColumns.reduce((last, col, i) => (col.frozen ? i : last), -1)
+      state.gridColumns.splice(lastFrozenIdx + 1, 0, col)
+      state.gridColumns.forEach((col, i) => {
+        ;(col as CalculatedColumn<any, any> & { idx: number }).idx = i
+      })
     },
     updateColumnIdx: (columnKey: string, columnIdx: number) => {
       const index = state.gridColumns.findIndex((x) => x.key === columnKey)
@@ -171,6 +242,9 @@ export const createTableEditorTableState = ({
     clearFilters: () => {
       state.filters = []
     },
+
+    preflightCheck,
+    setPreflightCheck: (value: boolean) => (state.preflightCheck = value),
   })
 
   return state
@@ -191,7 +265,6 @@ export const TableEditorTableStateContextProvider = ({
   table,
   ...props
 }: PropsWithChildren<TableEditorTableStateContextProviderProps>) => {
-  const showIndexAdvisor = useFlag('ShowIndexAdvisorOnTableEditor')
   const tableEditorSnap = useTableEditorStateSnapshot()
   const state = useRef(
     createTableEditorTableState({
@@ -219,7 +292,8 @@ export const TableEditorTableStateContextProvider = ({
           gridColumns: state.gridColumns,
           projectRef,
           tableId: state.table.id,
-        })
+          sensitiveDataColumns: Array.from(state.userToggledSensitiveColumns),
+        } as any)
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -241,7 +315,7 @@ export const TableEditorTableStateContextProvider = ({
 
   return (
     <TableEditorTableStateContext.Provider value={state}>
-      {showIndexAdvisor && state.table.schema ? (
+      {state.table.schema ? (
         <TableIndexAdvisorProvider schema={state.table.schema ?? 'public'} table={state.table.name}>
           {children}
         </TableIndexAdvisorProvider>
@@ -257,6 +331,17 @@ export const useTableEditorTableStateSnapshot = (options?: Parameters<typeof use
   // as TableEditorTableState so this doesn't get marked as readonly,
   // making adopting this state easier since we're migrating from react-tracked
   return useSnapshot(state, options) as TableEditorTableState
+}
+
+/**
+ * Same as useTableEditorTableStateSnapshot but returns undefined when called
+ * outside a TableEditorTableStateContextProvider instead of crashing.
+ * Use this for components that may render outside the provider (e.g. sidebar).
+ */
+export const useOptionalTableEditorTableStateSnapshot = (): TableEditorTableState | undefined => {
+  const state = useContext(TableEditorTableStateContext)
+  const snap = useSnapshot(state ?? FALLBACK_TABLE_STATE)
+  return state != undefined ? (snap as TableEditorTableState) : undefined
 }
 
 export type TableEditorTableStateSnapshot = ReturnType<typeof useTableEditorTableStateSnapshot>

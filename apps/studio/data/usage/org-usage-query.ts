@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { usageKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrgUsageVariables = {
   orgSlug?: string
@@ -13,8 +13,8 @@ export type OrgUsageVariables = {
   end?: Date
 }
 
-export type OrgUsageResponse = components['schemas']['OrgUsageResponse']
-export type OrgMetricsUsage = components['schemas']['OrgUsageResponse']['usages'][0]
+export type OrgUsageResponse = components['schemas']['OrgUsageResponse_Output']
+export type OrgMetricsUsage = components['schemas']['OrgUsageResponse_Output']['usages'][0]
 
 export async function getOrgUsage(
   { orgSlug, projectRef, start, end }: OrgUsageVariables,

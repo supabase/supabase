@@ -1,5 +1,4 @@
-import { X } from 'lucide-react'
-
+import { XIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface FilterPillProps {
@@ -21,7 +20,7 @@ export const FilterPill = ({ label, value, onClear }: FilterPillProps) => {
             onClear(e)
           }}
         >
-          <X size={14} className="text-foreground-light hover:text-foreground" />
+          <XIcon size={14} className="text-foreground-light hover:text-foreground" />
         </TooltipTrigger>
         <TooltipContent side="bottom">Clear {label.toLowerCase()} filter</TooltipContent>
       </Tooltip>

@@ -1,11 +1,11 @@
-import { Building, Forward, Wrench } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { IS_PLATFORM } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsInfiniteQuery } from 'data/projects/projects-infinite-query'
+import { BuildingIcon, ForwardIcon, WrenchIcon } from 'lucide-react'
+import { useMemo } from 'react'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
+
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'Switch project'
 const ORGANIZATION_SWITCHER_PAGE_NAME = 'Configure organization'
@@ -32,7 +32,7 @@ export function useProjectSwitchCommand() {
             name,
             value: `${name} (${ref})`,
             route: `/project/${ref}`,
-            icon: () => <Forward />,
+            icon: () => <ForwardIcon />,
           })),
         },
       ],
@@ -48,7 +48,7 @@ export function useProjectSwitchCommand() {
         name: 'Switch project...',
         value: 'Switch project, Change project, Select project',
         action: () => setPage(PROJECT_SWITCHER_PAGE_NAME),
-        icon: () => <Wrench />,
+        icon: () => <WrenchIcon />,
       },
     ],
     { enabled: !!projects && projects.length > 0 }
@@ -74,12 +74,12 @@ export function useConfigureOrganizationCommand() {
               name,
               value: `${name} (${slug})`,
               route: `/org/${slug}/general`,
-              icon: () => <Building />,
+              icon: () => <BuildingIcon />,
             })) ?? [],
         },
       ],
     },
-    { deps: [organizations], enabled: !!organizations && organizations.length > 0 }
+    { deps: [organizations], enabled: IS_PLATFORM && !!organizations && organizations.length > 0 }
   )
 
   useRegisterCommands(
@@ -90,9 +90,9 @@ export function useConfigureOrganizationCommand() {
         name: 'Configure organization...',
         value: 'Configure organization, Change organization, Select organization',
         action: () => setPage(ORGANIZATION_SWITCHER_PAGE_NAME),
-        icon: () => <Building />,
+        icon: () => <BuildingIcon />,
       },
     ],
-    { enabled: !!organizations && organizations.length > 0 }
+    { enabled: IS_PLATFORM && !!organizations && organizations.length > 0 }
   )
 }

@@ -1,17 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
-
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
-import { clientSecretKeys } from './keys'
-
 import { components } from 'api-types'
 
+import { clientSecretKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
 export type Secret =
-  components['schemas']['ListOAuthAppClientSecretsResponse']['client_secrets'][0] & {
-    client_secret?: components['schemas']['CreateOAuthAppClientSecretResponse']['client_secret']
+  components['schemas']['ListOAuthAppClientSecretsResponse_Output']['client_secrets'][0] & {
+    client_secret?: components['schemas']['CreateOAuthAppClientSecretResponse_Output']['client_secret']
   }
 
-export type CreatedSecret = components['schemas']['CreateOAuthAppClientSecretResponse']
+export type CreatedSecret = components['schemas']['CreateOAuthAppClientSecretResponse_Output']
 
 export interface SecretRowProps {
   secret: Secret

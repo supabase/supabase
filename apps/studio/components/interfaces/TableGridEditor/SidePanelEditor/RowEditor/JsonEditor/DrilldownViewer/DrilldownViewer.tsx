@@ -1,9 +1,9 @@
 import { isEmpty, last } from 'lodash'
 import { useState } from 'react'
 
-import type { Dictionary } from 'types'
 import DrilldownBreadCrumbs from './DrilldownBreadCrumbs'
 import DrilldownPane from './DrilldownPane'
+import type { Dictionary } from '@/types'
 
 interface DrilldownViewerProps {
   jsonData: Dictionary<any>

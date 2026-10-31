@@ -1,7 +1,8 @@
-import { unsafeEntitiesInApiSql } from '@/data/queries/sql/tables-without-rls'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { getUnsafeEntitiesInApiSql } from '@supabase/pg-meta'
 
 import type { EnableCheckAction, EnableCheckState } from './DataApiEnableSwitch.types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 
 export type ExposedEntity = {
   schema: string
@@ -31,8 +32,9 @@ export async function queryUnsafeEntitiesInApi({
   const { result } = await executeSql<Array<ExposedEntity>>({
     projectRef,
     connectionString,
-    sql: unsafeEntitiesInApiSql(schemas),
+    sql: getUnsafeEntitiesInApiSql({ schemas }),
     queryKey: ['unsafe-entities-in-api'],
+    grant: unguarded.migrating,
   })
 
   return result ?? []

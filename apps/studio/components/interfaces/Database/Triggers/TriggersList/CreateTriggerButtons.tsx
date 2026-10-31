@@ -1,10 +1,10 @@
-import { Plus } from 'lucide-react'
-
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
+import { PlusIcon } from 'lucide-react'
 import { AiIconAnimation } from 'ui'
+
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface CreateTriggerButtonsProps {
   hasTables: boolean
@@ -29,11 +29,11 @@ export const CreateTriggerButtons = ({
   return (
     <div className="flex items-center gap-x-2">
       <ButtonTooltip
-        type={buttonType}
+        variant={buttonType}
         disabled={!hasTables || !canCreateTriggers}
         onClick={onCreateTrigger}
-        className="flex-grow"
-        icon={showPlusIcon ? <Plus /> : undefined}
+        className="grow"
+        icon={showPlusIcon ? <PlusIcon /> : undefined}
         tooltip={{
           content: {
             side: 'bottom',
@@ -50,7 +50,6 @@ export const CreateTriggerButtons = ({
 
       {hasTables && (
         <ButtonTooltip
-          type="default"
           disabled={!hasTables || !canCreateTriggers}
           className="px-1 pointer-events-auto"
           icon={<AiIconAnimation size={16} />}

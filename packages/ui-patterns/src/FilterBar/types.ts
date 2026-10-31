@@ -9,6 +9,7 @@ export type CustomOptionProps = {
 export type FilterOptionObject = {
   label: string
   value: string
+  count?: number
 }
 
 export type CustomOptionObject = {
@@ -57,6 +58,12 @@ export type FilterProperty = {
   type: 'string' | 'number' | 'date' | 'boolean'
   options?: FilterOption[] | AsyncOptionsFunction | SyncOptionsFunction | CustomOptionObject
   operators?: FilterOperator[]
+  /** Whether this property can be added or selected when changing a filter. Defaults to true. */
+  isAvailable?: boolean
+  /** Only offer this property in the root group, not inside nested groups. Defaults to false. */
+  topLevelOnly?: boolean
+  /** Display a readable label while preserving the underlying value for editing. */
+  formatValue?: (value: FilterCondition['value']) => string
 }
 
 export type FilterCondition = {
@@ -89,6 +96,7 @@ export type FilterBarAction = {
 export type MenuItem = {
   value: string
   label: string
+  count?: number
   icon?: React.ReactNode
   isCustom?: boolean
   customOption?: (props: CustomOptionProps) => React.ReactElement
@@ -97,6 +105,12 @@ export type MenuItem = {
   actionInputValue?: string
   group?: FilterOperatorGroup
   operatorSymbol?: string
+  isDefaultOperator?: boolean
+  defaultValue?: string
+  isFreeformSearch?: boolean
+  freeformPropertyName?: string
+  freeformValue?: string
+  disabled?: boolean
 }
 
 export type GroupedMenuItem = {
@@ -130,13 +144,20 @@ export type ActiveInputState =
   | { type: 'value'; path: ConditionPath }
   | { type: 'operator'; path: ConditionPath }
   | { type: 'group'; path: ConditionPath }
+  | { type: 'property'; path: ConditionPath }
   | null
 
 export type KeyboardNavigationConfig = {
   activeInput: ActiveInputState
   setActiveInput: (input: ActiveInputState) => void
   activeFilters: FilterGroup
-  onFilterChange: (filters: FilterGroup) => void
+  commitFilters: (filters: FilterGroup) => void
   highlightedConditionPath: ConditionPath | null
   setHighlightedConditionPath: (path: ConditionPath | null) => void
+}
+
+export type ResolvedPropertyChange = {
+  operator: string
+  value: string
+  focusTarget: 'operator' | 'value'
 }

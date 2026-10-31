@@ -5,7 +5,6 @@ Quick run-through of the different building blocks that make up the SQL Editor, 
 ## UI structure
 
 - Folders and snippets (in the product menu) are rendered via `SQLEditorMenu` and `SQLEditorNav`, in which the data are all loaded from the API via React Query directly. (Refer to point 3 under "Data Structure" below)
-
   - [`SQLEditorMenu`](https://github.com/supabase/supabase/blob/master/apps/studio/components/layouts/SQLEditorLayout/SQLEditorMenu.tsx): Wraps around `SQLEditorNav` + renders search input + View running queries button
   - [`SQLEditorNav`](https://github.com/supabase/supabase/blob/master/apps/studio/components/layouts/SQLEditorLayout/SQLEditorNavV2/SQLEditorNav.tsx): Renders the 3 collapsible snippet sections
 
@@ -26,7 +25,6 @@ Quick run-through of the different building blocks that make up the SQL Editor, 
 ## Data fetching
 
 - The endpoint to fetch snippets and folders are via [`useSQLSnippetFoldersQuery`](https://github.com/supabase/supabase/blob/master/apps/studio/data/content/sql-folders-query.ts) and [`useSqlSnippetsQuery`](https://github.com/supabase/supabase/blob/master/apps/studio/data/content/sql-snippets-query.ts), both of which are paginated (limit set at 100)
-
   - [`useSQLSnippetFoldersQuery`](https://github.com/supabase/supabase/blob/master/apps/studio/data/content/sql-folders-query.ts): Specifically for fetching private snippets and folders
   - [`useSqlSnippetsQuery`](https://github.com/supabase/supabase/blob/master/apps/studio/data/content/sql-snippets-query.ts): For fetching shared and favorite snippets
 
@@ -39,7 +37,6 @@ Quick run-through of the different building blocks that make up the SQL Editor, 
 - Snippets and folders are all initially loaded via React Query in [`SQLEditorNav`](https://github.com/supabase/supabase/blob/master/apps/studio/components/layouts/SQLEditorLayout/SQLEditorNavV2/SQLEditorNav.tsx), which are then initialized into the Valtio store via [`snapV2.addSnippet`](https://github.com/supabase/supabase/blob/master/apps/studio/components/layouts/SQLEditorLayout/SQLEditorNavV2/SQLEditorNav.tsx#L415) calls in the `useEffects`
 
 - On `/editor/sql`
-
   - We'll redirect users to the last visited snippet if there's one (`/editor/sql/[id]`), otherwise will redirect to `/editor/sql/new` (within [`[id].tsx`](https://github.com/supabase/supabase/blob/master/apps/studio/pages/project/%5Bref%5D/sql/%5Bid%5D.tsx) )
 
 - On `/editor/sql/[id]`
@@ -48,7 +45,6 @@ Quick run-through of the different building blocks that make up the SQL Editor, 
 ### Writing a snippet
 
 - On `/editor/sql/new`:
-
   - The first character input will [update the Valtio store](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/MonacoEditor.tsx#L192) with a snippet skeleton via `snapV2.addSnippet` and user will be redirected to `/editor/sql/[id]`, using the `id` from the skeleton
   - Note that `snapV2.addSnippet` only handles adding snippets to the store and does not queue the snippet for saving
   - Subsequent character inputs will follow below as per `/editor/sql/[id]`
@@ -60,7 +56,6 @@ Quick run-through of the different building blocks that make up the SQL Editor, 
 ### Running a snippet
 
 - There's several safeguards in place before we run the query
-
   - [Check for destructive operations](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L293): Will open a confirmation modal before running the query
   - [Check for update statements without where clause](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L300): Will open a confirmation modal before running the query
   - [Append a preset limit to the query if it's a select](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/SQLEditor/SQLEditor.tsx#L333): To prevent accidentally running an expensive query on the database. Users can explicitly opt out of this to set "No limit"

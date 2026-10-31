@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BackupDownloadVariables = {
   ref: string
@@ -16,6 +16,7 @@ export async function downloadBackup({ ref, backup }: BackupDownloadVariables) {
     body: {
       id: backup.id,
     },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data

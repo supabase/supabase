@@ -1,10 +1,10 @@
-import { Check, Mail } from 'lucide-react'
+import { CheckIcon, MailIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
 import { Button, cn, DialogSectionSeparator } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+
 import { LinkSupportTicketForm } from './LinkSupportTicketForm'
 
 export function LinkSupportTicketPage() {
@@ -38,7 +38,7 @@ function LinkSupportTicketPageContent() {
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded border bg-panel-body-light shadow-md border-default'
+        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md border-default'
       )}
     >
       {isSuccess ? (
@@ -58,9 +58,9 @@ function LinkSupportTicketSuccess() {
     <div className="w-full flex flex-col items-center">
       <div className="flex flex-col items-center gap-y-4 py-8">
         <div className="relative">
-          <Mail strokeWidth={1.5} size={60} className="text-brand" />
-          <div className="h-6 w-6 rounded-full bg-brand absolute bottom-1 -right-1.5 flex items-center justify-center">
-            <Check strokeWidth={4} size={16} className="text-contrast" />
+          <MailIcon strokeWidth={1.5} size={60} className="text-primary" />
+          <div className="h-6 w-6 rounded-full bg-brand-default absolute bottom-1 -right-1.5 flex items-center justify-center">
+            <CheckIcon strokeWidth={4} size={16} className="text-contrast" />
           </div>
         </div>
         <div className="flex items-center flex-col gap-y-2 text-center">
@@ -72,7 +72,7 @@ function LinkSupportTicketSuccess() {
       </div>
       <DialogSectionSeparator />
       <div className="w-full py-4 px-4 flex items-center justify-end">
-        <Button asChild type="default">
+        <Button asChild>
           <Link href="/">Finish</Link>
         </Button>
       </div>

@@ -1,14 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useParams } from 'common'
-import { ProtectionAuthSettingsForm } from 'components/interfaces/Auth/ProtectionAuthSettingsForm/ProtectionAuthSettingsForm'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import NoPermission from 'components/ui/NoPermission'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -20,13 +10,21 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { ProtectionAuthSettingsForm } from '@/components/interfaces/Auth/ProtectionAuthSettingsForm/ProtectionAuthSettingsForm'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
+
 const ProtectionPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const showAttackProtection = useIsFeatureEnabled('authentication:attack_protection')
 
-  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
   if (!showAttackProtection) {
@@ -66,7 +64,7 @@ const ProtectionPage: NextPageWithLayout = () => {
 
 ProtectionPage.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Attack Protection">{page}</AuthLayout>
   </DefaultLayout>
 )
 

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Table2 } from 'lucide-react'
+import { Table2Icon } from 'lucide-react'
 
 import { DocSection } from './DocSection'
 import CodeSnippet from '@/components/interfaces/Docs/CodeSnippet'
@@ -7,13 +7,12 @@ import Description from '@/components/interfaces/Docs/Description'
 import Param from '@/components/interfaces/Docs/Param'
 import Snippets from '@/components/interfaces/Docs/Snippets'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ResourceContentProps {
-  apiEndpoint: string
   resourceId: string
   resources: { [key: string]: { id: string; displayName: string; camelCase: string } }
   selectedLang: 'bash' | 'js'
@@ -22,7 +21,6 @@ interface ResourceContentProps {
 }
 
 export const ResourceContent = ({
-  apiEndpoint,
   resourceId,
   resources,
   selectedLang,
@@ -30,16 +28,12 @@ export const ResourceContent = ({
   refreshDocs,
 }: ResourceContentProps) => {
   const { ref } = useParams()
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
 
   const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
   const { paths, definitions } = jsonSchema || {}
 
-  const endpoint =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain.hostname}`
-      : apiEndpoint
+  const { data: endpoint = '' } = useProjectApiUrl({ projectRef: ref })
 
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
   const resourcePaths = paths?.[`/${resourceId}`]
@@ -61,7 +55,7 @@ export const ResourceContent = ({
       <DocSection
         title={
           <span className="flex items-center gap-2 text-subTitle">
-            <Table2 size={16} strokeWidth={1.5} />
+            <Table2Icon size={16} strokeWidth={1.5} />
             {resourceId}
           </span>
         }

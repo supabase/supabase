@@ -1,15 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ident, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { noop } from 'lodash'
+import { LoaderIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button, ExpandingTextArea } from 'ui'
 
-import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { timeout } from 'lib/helpers'
-import { Loader } from 'lucide-react'
-import { Button } from 'ui'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { timeout } from '@/lib/helpers'
 
 // Removes some auto-generated Postgrest text
 // Ideally PostgREST wouldn't add this if there is already a comment
@@ -42,21 +42,20 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
   const hasChanged = value != contentText
   const animateCss = `transition duration-150`
 
-  const { can: canUpdateDescription } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_QUERY,
-    '*'
+  const { can: canUpdateDescription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const updateDescription = async () => {
     if (isUpdating || !canUpdateDescription) return false
 
     setIsUpdating(true)
-    let query = ''
-    let description = value.replaceAll("'", "''")
+    let query: SafeSqlFragment | undefined
     if (table && column)
-      query = `comment on column public."${table}"."${column}" is '${description}';`
-    if (table && !column) query = `comment on table public."${table}" is '${description}';`
-    if (rpc) query = `comment on function "${rpc}" is '${description}';`
+      query = safeSql`comment on column ${ident('public')}.${ident(table)}.${ident(column)} is ${literal(value)};`
+    if (table && !column)
+      query = safeSql`comment on table ${ident('public')}.${ident(table)} is ${literal(value)};`
+    if (rpc) query = safeSql`comment on function ${ident(rpc)} is ${literal(value)};`
 
     if (query) {
       try {
@@ -64,6 +63,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           sql: query,
+          grant: unguarded.migrating,
         })
         // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
         await timeout(500)
@@ -86,9 +86,9 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
   }
 
   return (
-    <div className="space-y-2">
-      <AutoTextArea
-        className="w-full"
+    <div className="space-y-2 px-0.5">
+      <ExpandingTextArea
+        className="w-full min-h-auto"
         placeholder="Click to edit."
         value={value}
         onChange={(e: any) => setValue(e.target.value)}
@@ -99,7 +99,6 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         } ${animateCss}`}
       >
         <Button
-          type="default"
           disabled={!hasChanged}
           onClick={() => {
             setValue(contentText)
@@ -108,9 +107,9 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         >
           Cancel
         </Button>
-        <Button disabled={!hasChanged} onClick={updateDescription}>
+        <Button variant="primary" disabled={!hasChanged} onClick={updateDescription}>
           {isUpdating ? (
-            <Loader className="mx-auto animate-spin" size={14} strokeWidth={2} />
+            <LoaderIcon className="mx-auto animate-spin" size={14} strokeWidth={2} />
           ) : (
             <span>Save</span>
           )}

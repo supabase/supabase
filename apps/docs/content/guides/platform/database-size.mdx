@@ -26,7 +26,7 @@ Database size is consumed primarily by your data, indexes, and materialized view
 
 <Admonition type="note">
 
-Depending on your billing plan, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Disk Management](#disk-management) section.
+Depending on your billing plan, your database can go into read-only mode which can prevent you inserting and deleting data. There are instructions for managing read-only mode in the [Read-Only Mode](#read-only-mode) section.
 
 </Admonition>
 
@@ -42,7 +42,7 @@ select pg_size_pretty(sum(size)) as wal_size from pg_ls_waldir();
 
 ### Vacuum operations
 
-Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. They are marked as "removed" until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed. As a result, deleting data from your database may not immediately reduce the reported disk usage. You can use the [Supabase CLI](/docs/guides/cli/getting-started) `inspect db bloat` command to view all dead tuples in your database. Alternatively, you can run the [query](https://github.com/supabase/cli/blob/c9cce58025fded16b4c332747f819a44f45c3b83/internal/inspect/bloat/bloat.go#L17) found in the CLI's GitHub repo in the [SQL Editor](/dashboard/project/_/sql/)
+Postgres does not immediately reclaim the physical space used by dead tuples (i.e., deleted rows) in the DB. They are marked as "removed" until a [vacuum operation](https://www.postgresql.org/docs/current/routine-vacuuming.html) is executed. As a result, deleting data from your database may not immediately reduce the reported disk usage. You can use the [Supabase CLI](/docs/guides/local-development/cli/getting-started) `inspect db bloat` command to view all dead tuples in your database. Alternatively, you can run the [query](https://github.com/supabase/cli/blob/c9cce58025fded16b4c332747f819a44f45c3b83/internal/inspect/bloat/bloat.go#L17) found in the CLI's GitHub repo in the [SQL Editor](/dashboard/project/_/sql/)
 
 ```bash
 # Login to the CLI
@@ -58,7 +58,7 @@ npx supabase link
 npx supabase inspect db bloat --linked
 ```
 
-If you find a table you would like to immediately clean, you can run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+If you find a table you would like to immediately clean, run `vacuum full` on it. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 vacuum full <table name>;
@@ -71,6 +71,7 @@ Vacuum operations can temporarily increase resource utilization, which may adver
 </Admonition>
 
 Supabase projects have automatic vacuuming enabled, which ensures that these operations are performed regularly to keep the database healthy and performant.
+
 It is possible to [fine-tune](https://www.percona.com/blog/2018/08/10/tuning-autovacuum-in-postgresql-and-autovacuum-internals/) the [autovacuum parameters](https://www.enterprisedb.com/blog/postgresql-vacuum-and-analyze-best-practice-tips), or [manually initiate](https://www.postgresql.org/docs/current/sql-vacuum.html) vacuum operations.
 Running a manual vacuum after deleting large amounts of data from your DB could help reduce the database size reported by Postgres.
 
@@ -84,9 +85,9 @@ Supabase uses network-attached storage to balance performance with scalability. 
 
 ### Paid plan behavior
 
-Projects on the Pro Plan and higher have auto-scaling disks.
+Projects on the Pro Plan and higher have autoscaling disks.
 
-Disk size expands automatically when the database reaches 90% of the allocated disk size. The disk is expanded to be 50% larger (for example, 8 GB -> 12 GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
+Disk size expands automatically when the database reaches 90% of the allocated disk size. The disk is expanded to be 50% larger (for example, 8 GB -> 12 GB). Autoscaling is limited to four modifications within a rolling 24-hour window. If you reach 95% disk utilization and have exhausted your modification quota, your project will enter read-only mode.
 
 <Admonition type="note">
 
@@ -98,28 +99,84 @@ Disk size can also be manually expanded on the [Database Settings page](/dashboa
 
 <Admonition type="note">
 
-You may want to import a lot of data into your database which requires multiple disk expansions. for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the disk size manually on the [Database Settings page](/dashboard/project/_/database/settings).
+You may want to import a lot of data into your database which requires multiple disk expansions. For example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the disk size manually on the [Database Settings page](/dashboard/project/_/database/settings).
 
-Due to restrictions on the underlying cloud provider, disk expansions can occur only once every six hours. During the six hour cool down window, the disk cannot be resized again.
+Due to restrictions on the underlying cloud provider, disk expansions can occur only once every four hours. During the four hour cool down window, the disk cannot be resized again.
 
 </Admonition>
 
 ### Free Plan behavior
 
-Free Plan projects enter [read-only](#read-only-mode) mode when you exceed the 500 MB limit. Once in read-only mode, you have these options:
+Free Plan projects have a fixed disk size of 2 GB. The disk does not autoscale.
 
-- [Upgrade to the Pro Plan](/dashboard/org/_/billing) to increase the limit to 8 GB. [Disable the Spend Cap](https://app.supabase.com/org/_/billing?panel=costControl) if you want your Pro instance to auto-scale beyond the 8 GB disk size limit.
+When disk usage reaches 95%, Supabase puts your database into [read-only mode](#read-only-mode). This helps prevent the disk from filling completely. When disk usage goes below 95%, Supabase turns off read-only mode automatically.
+
+<Admonition type="danger">
+
+If the disk becomes full, Postgres shuts down. It stays down until you upgrade to the Pro Plan. Read-only mode at 95% is a best-effort safeguard. Writes that are already in progress, and WAL, can continue to fill the disk after read-only mode starts.
+
+To prevent this, keep disk usage well below 95%, or upgrade to the Pro Plan before you reach the limit.
+
+</Admonition>
+
+Read-only mode depends on _disk usage_. The 500 MB _database size_ quota does not trigger it. The database size quota is a billing quota for your organization. For more information, see [Fair use database size restriction](#fair-use-database-size-restriction).
+
+If your project is in read-only mode and Postgres is still running, you have these options:
+
+- [Upgrade to the Pro Plan](/dashboard/org/_/billing) to get an 8 GB disk that autoscales. To autoscale beyond 8 GB, [disable the Spend Cap](/dashboard/org/_/billing?panel=costControl).
 - [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
+
+If your database is down because the disk is full:
+
+1. [Upgrade to the Pro Plan](/dashboard/org/_/billing).
+2. On the [General settings page](/dashboard/project/_/settings/general), select **Restart project**.
+3. Wait about 10 minutes for the project to recover.
+
+#### Write Ahead Log (WAL) on the Free Plan
+
+The [Write Ahead Log (WAL)](#disk-space-usage) uses disk space in addition to your data. On a 2 GB disk, WAL can fill the disk even when your database size is small.
+
+WAL grows fast when you write a lot of data in a short time. Examples are bulk imports, large `update` or `delete` statements, and index builds. During heavy writes, WAL can grow past the default `max_wal_size` of 1 GB before Postgres removes old WAL files. An inactive [replication slot](/docs/guides/database/replication) can also keep WAL on the disk. By default, `max_slot_wal_keep_size` limits this to about 512 MB.
+
+To keep WAL small:
+
+- Split large writes into smaller batches.
+- Drop replication slots that you do not use with `select pg_drop_replication_slot('<slot_name>');`.
+
+### Fair use database size restriction
+
+Separate from the per-project read-only mode above, your organization can be placed under a [Fair Use](/docs/guides/platform/billing-faq#fair-use-policy) service restriction (requests return a `402` status code) when its database size exceeds the plan quota. This quota is evaluated **per organization**, summing the database size across all of your projects.
+
+Importantly, it is based on the **average daily database size over the billing period**, not the live size. Reducing your database size does not immediately lift the restriction: the average stays elevated until enough lower-usage days accumulate, and it effectively resets when your billing cycle rolls over. This is why a project that is well under the limit today can still be restricted, as its average across the period is still over.
+
+To resolve it, upgrade your plan or disable your Spend Cap to lift the restriction immediately. Otherwise, reduce your database size and wait for the new billing cycle, at which point the average restarts from your current size.
 
 ### Read-only mode
 
 In some cases Supabase may put your database into read-only mode to prevent your database from exceeding the billing or disk limitations.
 
-In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`. Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size,
+In read-only mode, clients will encounter errors such as `cannot execute INSERT in a read-only transaction`. The Postgres SQLSTATE code for this error is **25006** (`read_only_sql_transaction`). During severe disk exhaustion, **SQLSTATE 53100** (`disk_full`) may also appear. Regular operation (read-write mode) is automatically re-enabled once usage is below 95% of the disk size.
+
+While in read-only mode, all write operations are blocked — including background jobs, scheduled tasks, and internal monitoring writes. Data that those jobs write (such as disk usage snapshots) will be stale until the database returns to read-write mode.
+
+To confirm that your database has entered read-only mode, query Postgres logs for the relevant SQLSTATE codes using the [Logs Explorer](/dashboard/project/_/logs/explorer) with the query source set to **Logs**:
+
+```sql
+select
+  timestamp,
+  log_attributes['parsed.error_severity'] as severity,
+  log_attributes['parsed.sql_state_code'] as sqlstate,
+  event_message
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.sql_state_code'] in ('25006', '53100', '57P03')
+order by timestamp desc
+limit 50;
+```
 
 ### Disabling read-only mode
 
-You manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](/dashboard/project/_/sql):
+You can manually override read-only mode to reduce disk size. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 First, change the [transaction access mode](https://www.postgresql.org/docs/current/sql-set-transaction.html):
 
@@ -127,7 +184,7 @@ First, change the [transaction access mode](https://www.postgresql.org/docs/curr
 set session characteristics as transaction read write;
 ```
 
-This allows you to delete data from within the session. After deleting data, consider running a vacuum to reclaim as much space as possible:
+This allows you to delete data from within the current session. After deleting data, consider running a vacuum to reclaim as much space as possible:
 
 ```sql
 vacuum;
@@ -139,9 +196,15 @@ Once you have reclaimed space, you can run the following to disable [read-only](
 set default_transaction_read_only = 'off';
 ```
 
+<Admonition type="note">
+
+`SET SESSION CHARACTERISTICS` applies only to the current session. Background jobs and scheduled tasks resume writes automatically once the platform exits read-only mode — no manual step is needed.
+
+</Admonition>
+
 ### Disk size distribution
 
-You can check the distribution of your disk size on your [project's compute and disk page](/dashboard/project/_/settings/compute-and-disk).
+You can check the distribution of your disk size on your [project's Infrastructure page](/dashboard/project/_/settings/infrastructure).
 
 ![Disk Size Distribution](/docs/img/guides/platform/database-size/disk-size-distribution.png)
 
@@ -157,4 +220,4 @@ Disks don't automatically downsize during normal operation. Once you have [reduc
 
 In case you have a large WAL directory, you may [modify WAL settings](/docs/guides/database/custom-postgres-config) such as `max_wal_size`. Use at your own risk as changing these settings can have side effects. To query your current WAL size, use `SELECT SUM(size) FROM pg_ls_waldir()`.
 
-In the event that your project is already on the latest version of Postgres and cannot be upgraded, a new version of Postgres will be released approximately every week which you can then upgrade to once it becomes available.
+In the event that your project is already on the latest version of Postgres and waiting for the next release to allow upgrading is a concern, you can migrate your database to a new project as an alternative following the [Migrating within Supabase guide](/docs/guides/platform/migrating-within-supabase).

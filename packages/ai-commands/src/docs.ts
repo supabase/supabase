@@ -3,7 +3,7 @@ import { codeBlock, oneLine } from 'common-tags'
 import type OpenAI from 'openai'
 
 import { ApplicationError, UserError } from './errors'
-import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from './tokenizer'
+import { estimateTokenCount, getChatRequestTokenCount, getMaxTokenCount } from './tokenizer'
 import type { Message } from './types'
 
 interface PageSection {
@@ -13,8 +13,6 @@ interface PageSection {
   }
   rag_ignore?: boolean
 }
-
-type MatchPageSectionsFunction = 'match_page_sections_v2' | 'match_page_sections_v2_nimbus'
 
 export async function clippy(
   openai: OpenAI,
@@ -94,14 +92,16 @@ export async function clippy(
   for (let i = 0; i < pageSections.length; i++) {
     const pageSection = pageSections[i]
     const content = pageSection.content
-    const encoded = tokenizer.encode(content)
-    tokenCount += encoded.length
+    tokenCount += estimateTokenCount(content)
 
     if (tokenCount >= 1500) {
       break
     }
 
-    const pagePath = pageSection.page.path
+    const pagePath = options?.useAltSearchIndex
+      ? // @ts-ignore
+        pageSection.page_nimbus.path
+      : pageSection.page.path
 
     // Include source reference with each section
     contextText += `[Source ${sourceIndex}: ${pagePath}]\n${content.trim()}\n---\n`

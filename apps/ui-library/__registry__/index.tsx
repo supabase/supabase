@@ -15,6 +15,14 @@ export const Index = {
       component: React.lazy(() => import("@/registry/default/examples/realtime-cursor-demo.tsx")),
     }
     ,
+    "realtime-flow-demo": {
+      component: React.lazy(() => import("@/registry/default/examples/realtime-flow-demo.tsx")),
+    }
+    ,
+    "realtime-monaco-demo": {
+      component: React.lazy(() => import("@/registry/default/examples/realtime-monaco-demo.tsx")),
+    }
+    ,
     "password-based-auth-demo": {
       component: React.lazy(() => import("@/registry/default/examples/password-based-auth.tsx")),
     }

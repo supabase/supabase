@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
-import type { operations } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { actionKeys } from './keys'
+import type { operations } from '@/data/api'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ActionsVariables = operations['v1-list-action-runs']['parameters']['path']
 
@@ -11,6 +11,7 @@ export async function listActionRuns(params: ActionsVariables, signal?: AbortSig
   const { data, error } = await get(`/v1/projects/{ref}/actions`, {
     params: { path: params },
     signal,
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data

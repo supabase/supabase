@@ -1,28 +1,34 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { replicationKeys } from './keys'
+import { handleError, put } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreatePublicationParams = {
   projectRef: string
   sourceId: number
   name: string
-  tables: { schema: string; name: string }[]
+  tableIds: number[]
+  publishViaPartitionRoot?: boolean
 }
 
 async function createPublication(
-  { projectRef, sourceId, name, tables }: CreatePublicationParams,
+  { projectRef, sourceId, name, tableIds, publishViaPartitionRoot = true }: CreatePublicationParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await post(
-    '/platform/replication/{ref}/sources/{source_id}/publications',
+  const { data, error } = await put(
+    '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
     {
-      params: { path: { ref: projectRef, source_id: sourceId } },
-      body: { name, tables },
+      params: { path: { ref: projectRef, source_id: sourceId, publication_name: name } },
+      body: {
+        type: 'tables',
+        tables: tableIds.map((id) => ({ id })),
+        operations: ['insert', 'update', 'delete', 'truncate'],
+        publish_via_partition_root: publishViaPartitionRoot,
+      },
       signal,
     }
   )

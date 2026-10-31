@@ -1,7 +1,7 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useEffect } from 'react'
-
 import { cn, Skeleton, TableCell, TableRow } from 'ui'
+
 import { ShimmeringCard } from './ShimmeringCard'
 
 interface LoadMoreRowProps {

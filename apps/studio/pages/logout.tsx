@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-
-import { useSignOut } from 'lib/auth'
-import type { NextPageWithLayout } from 'types'
 import { LogoLoader } from 'ui'
+
+import { useSignOut } from '@/lib/auth'
+import type { NextPageWithLayout } from '@/types'
 
 const LogoutPage: NextPageWithLayout = () => {
   const router = useRouter()

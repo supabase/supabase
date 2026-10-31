@@ -1,5 +1,4 @@
-import { X } from 'lucide-react'
-
+import { XIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface SortIndicatorProps {
@@ -15,7 +14,7 @@ export const SortIndicator = ({ sort, onClearSort }: SortIndicatorProps) => {
       </p>
       <Tooltip>
         <TooltipTrigger onClick={onClearSort}>
-          <X size={14} className="text-foreground-light hover:text-foreground" />
+          <XIcon size={14} className="text-foreground-light hover:text-foreground" />
         </TooltipTrigger>
         <TooltipContent side="bottom">Clear sort</TooltipContent>
       </Tooltip>

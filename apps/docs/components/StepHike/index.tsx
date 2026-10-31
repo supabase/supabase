@@ -77,7 +77,7 @@ const Step = ({ children, title, step }) => {
       "
               >
                 <div className="flex items-center gap-6">
-                  <div className="border bg-selection border-strong flex w-7 h-7 items-center justify-center rounded text-base text-foreground font-semibold font-mono">
+                  <div className="border bg-selection border-strong flex w-7 h-7 items-center justify-center rounded-sm text-base text-foreground font-semibold font-mono">
                     {step}
                   </div>
                   <h3 className="text-foreground text-xl" id={cleanTitleId}>

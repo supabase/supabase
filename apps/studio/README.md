@@ -23,12 +23,14 @@ Project settings are managed outside of the Dashboard. If you use docker compose
 
 ## How to contribute?
 
+For Assistant work, start with the [Supabase Assistant code guide](lib/ai/README.md) for the architecture, file map, tools, and validation workflow.
+
 - Branch from `master` and name your branches with the following structure
   - `{type}/{branch_name}`
     - Type: `chore | fix | feature`
     - The branch name is arbitrary — just make sure it summarizes the work.
 - When you send a PR to `master`, it will automatically tag members of the frontend team for review.
-- Review the [contributing checklists](contributing/contributing-checklists.md) to help test your feature before sending a PR.
+- Review the main [contributing guide](../../CONTRIBUTING.md) to help test your feature before sending a PR.
 - The Dashboard is under active development. You should run `git pull` frequently to make sure you're up to date.
 
 ### Developer Quickstart
@@ -37,7 +39,7 @@ Project settings are managed outside of the Dashboard. If you use docker compose
 > **Supabase internal use:** To develop on Studio locally with the backend services, see the instructions in the [internal `infrastructure` repo](https://github.com/supabase/platform/blob/develop/docs/contributing.md).
 
 ```bash
-# You'll need to be on Node v20
+# You'll need to be on Node v22
 # in /studio
 
 ## For external contributors

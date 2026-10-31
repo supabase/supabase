@@ -1,11 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { subscriptionKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
@@ -40,9 +39,8 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
 ) => {
   // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
   // unnecessary requests, although this behaviour still needs handling on the UI
-  const { can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
   return useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>({

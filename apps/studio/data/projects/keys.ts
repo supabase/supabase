@@ -9,7 +9,6 @@ export const projectKeys = {
   infiniteListByOrg: (
     slug: string | undefined,
     params?: {
-      limit: number
       sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
       search?: string
       statuses?: string[]
@@ -31,9 +30,13 @@ export const projectKeys = {
   pauseStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'pause-status'] as const,
 
+  projectMembers: (projectRef: string | undefined) => ['project', projectRef, 'members'] as const,
+
   // Clone to new project
   listCloneBackups: (projectRef: string | undefined) =>
     ['projects', projectRef, 'clone-backups'] as const,
   listCloneStatus: (projectRef: string | undefined) =>
     ['projects', projectRef, 'clone-status'] as const,
+
+  bannerProjectsByOrg: (slug: string) => ['banner', 'org-projects', slug] as const,
 }

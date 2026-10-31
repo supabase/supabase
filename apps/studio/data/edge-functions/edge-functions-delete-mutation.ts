@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { edgeFunctionsKeys } from './keys'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type EdgeFunctionsDeleteVariables = {
   projectRef: string
@@ -17,6 +17,7 @@ export async function deleteEdgeFunction({ projectRef, slug }: EdgeFunctionsDele
     params: {
       path: { ref: projectRef, function_slug: slug },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

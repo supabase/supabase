@@ -1,20 +1,10 @@
+import { replicationLagSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+
 import { replicaKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
-
-export const replicationLagSql = () => {
-  const sql = /* SQL */ `
-select 
-  case
-    when (select count(*) from pg_stat_wal_receiver) = 1 and pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn()
-    then 0
-    else coalesce(extract(epoch from now() - pg_last_xact_replay_timestamp()),0)
-  end as physical_replica_lag_second
-  `
-
-  return sql
-}
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ReplicationLagVariables = {
   id: string
@@ -29,7 +19,13 @@ export async function getReplicationLag(
   const sql = replicationLagSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['replica-lag', id] },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['replica-lag', id],
+      grant: unguarded.migrating,
+    },
     signal
   )
 
@@ -37,7 +33,7 @@ export async function getReplicationLag(
 }
 
 export type ReplicationLagData = Awaited<ReturnType<typeof getReplicationLag>>
-export type ReplicationLagError = ExecuteSqlError
+export type ReplicationLagError = ResponseError
 
 export const useReplicationLagQuery = <TData = ReplicationLagData>(
   { projectRef, connectionString, id }: ReplicationLagVariables,

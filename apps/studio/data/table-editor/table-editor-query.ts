@@ -1,11 +1,11 @@
+import { getTableEditorSql } from '@supabase/pg-meta'
 import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
-import { id } from 'common-tags'
-import { UseCustomQueryOptions } from 'types'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { tableEditorKeys } from './keys'
-import { getTableEditorSql } from './table-editor-query-sql'
 import { Entity } from './table-editor-types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type TableEditorArgs = {
   id?: number
@@ -24,13 +24,14 @@ export async function getTableEditor(
     throw new Error('id is required')
   }
 
-  const sql = getTableEditorSql(id)
+  const sql = getTableEditorSql({ id })
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
       sql,
       queryKey: ['table-editor', id],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -39,7 +40,7 @@ export async function getTableEditor(
 }
 
 export type TableEditorData = Awaited<ReturnType<typeof getTableEditor>>
-export type TableEditorError = ExecuteSqlError
+export type TableEditorError = ResponseError
 
 export const useTableEditorQuery = <TData = TableEditorData>(
   { projectRef, connectionString, id }: TableEditorVariables,
@@ -47,8 +48,8 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TableEditorData, TableEditorError, TData> = {}
-) =>
-  useQuery<TableEditorData, TableEditorError, TData>({
+) => {
+  return useQuery<TableEditorData, TableEditorError, TData>({
     ...tableEditorQueryOptions({ projectRef, connectionString, id }),
     enabled:
       enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
@@ -57,6 +58,7 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     staleTime: 5 * 60 * 1000,
     ...options,
   })
+}
 
 export function prefetchTableEditor(
   client: QueryClient,

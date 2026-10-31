@@ -1,7 +1,6 @@
-import { useMemo } from 'react'
 import type { UseQueryResult } from '@tanstack/react-query'
-
 import dayjs from 'dayjs'
+import { useMemo } from 'react'
 
 import type { AnalyticsData, AnalyticsInterval, DataPoint } from './constants'
 import type {
@@ -10,8 +9,8 @@ import type {
   InfraMonitoringSingleResponse,
 } from './infra-monitoring-query'
 import {
-  InfraMonitoringMultiData,
   InfraMonitoringError,
+  InfraMonitoringMultiData,
   useInfraMonitoringAttributesQuery,
 } from './infra-monitoring-query'
 
@@ -41,7 +40,8 @@ export function useInfraMonitoringQueries(
   interval: AnalyticsInterval,
   databaseIdentifier: string | undefined,
   data: unknown,
-  isVisible: boolean
+  isVisible: boolean,
+  preserveMissingAttribute?: string
 ) {
   const shouldFetch = data === undefined && isVisible
   const hasAttributes = attributes.length > 0
@@ -60,35 +60,47 @@ export function useInfraMonitoringQueries(
 
   const seriesByAttribute = useMemo(() => {
     if (!query.data) return undefined
-    return mapResponseToAnalyticsData(query.data, attributes)
-  }, [query.data, attributes])
+    return mapResponseToAnalyticsData(query.data, attributes, undefined, preserveMissingAttribute)
+  }, [query.data, attributes, preserveMissingAttribute])
 
   if (!hasAttributes) {
     return []
   }
 
-  return attributes.map<InfraQueryResult>((attribute) => ({
-    data: seriesByAttribute?.[attribute],
-    error: query.error,
-    isError: query.isError,
-    isFetching: query.isFetching,
-    isLoading: query.isLoading,
-    status: query.status,
-  }))
+  return attributes.map<InfraQueryResult>((attribute) => {
+    const metricError =
+      query.data && 'errors' in query.data ? query.data.errors?.[attribute] : undefined
+    return {
+      data: seriesByAttribute?.[attribute],
+      error: query.error ?? metricError ?? null,
+      isError: query.isError || !!metricError,
+      isFetching: query.isFetching,
+      isLoading: query.isLoading,
+      status: metricError ? 'error' : query.status,
+    }
+  })
 }
 
 type AggregatedBucket = {
   period_start: string
   periodStartFormatted: string
   _counts: Record<string, number>
-  [key: string]: string | number | Record<string, number>
+  _missingAttributes: Set<string>
+  [key: string]: string | number | Set<string> | Record<string, number>
 }
 
 type DataPointWithFormatted = DataPoint & {
   periodStartFormatted: string
 }
 
-export const aggregate1MinTo2Min = (dataPoints: DataPoint[]): DataPointWithFormatted[] => {
+function shouldPreserveMissingAttribute(attribute: string, preserveMissingAttribute?: string) {
+  return attribute === 'ram_commit_limit' || attribute === preserveMissingAttribute
+}
+
+export const aggregate1MinTo2Min = (
+  dataPoints: DataPoint[],
+  preserveMissingAttribute?: string
+): DataPointWithFormatted[] => {
   const aggregated = new Map<string, AggregatedBucket>()
   const valueKeys = new Set<string>()
 
@@ -116,6 +128,7 @@ export const aggregate1MinTo2Min = (dataPoints: DataPoint[]): DataPointWithForma
         period_start: bucketKey,
         periodStartFormatted: twoMinBucket.format('HH:mm DD MMM'),
         _counts: Object.fromEntries(Array.from(valueKeys).map((key) => [key, 0])),
+        _missingAttributes: new Set(),
       }
       // Initialize all value keys to 0
       valueKeys.forEach((key) => {
@@ -127,6 +140,12 @@ export const aggregate1MinTo2Min = (dataPoints: DataPoint[]): DataPointWithForma
     const bucket = aggregated.get(bucketKey)!
     valueKeys.forEach((key) => {
       const value = point[key]
+      if (
+        shouldPreserveMissingAttribute(key, preserveMissingAttribute) &&
+        typeof value !== 'number'
+      ) {
+        bucket._missingAttributes.add(key)
+      }
       if (typeof value === 'number') {
         const currentValue = typeof bucket[key] === 'number' ? bucket[key] : 0
         bucket[key] = currentValue + value
@@ -137,12 +156,17 @@ export const aggregate1MinTo2Min = (dataPoints: DataPoint[]): DataPointWithForma
 
   // Calculate averages
   const result: DataPointWithFormatted[] = Array.from(aggregated.values()).map((bucket) => {
-    const { _counts, period_start, periodStartFormatted, ...rest } = bucket
+    const { _counts, _missingAttributes, period_start, periodStartFormatted, ...rest } = bucket
     const averaged: DataPointWithFormatted = {
       period_start,
       periodStartFormatted,
     }
     valueKeys.forEach((key) => {
+      if (
+        shouldPreserveMissingAttribute(key, preserveMissingAttribute) &&
+        (_missingAttributes.has(key) || _counts[key] === 0)
+      )
+        return
       if (_counts[key] > 0) {
         const restValue = rest[key]
         averaged[key] = typeof restValue === 'number' ? restValue / _counts[key] : 0
@@ -159,7 +183,8 @@ export const aggregate1MinTo2Min = (dataPoints: DataPoint[]): DataPointWithForma
 export function mapResponseToAnalyticsData(
   response: InfraMonitoringMultiData,
   attributes: InfraMonitoringAttribute[],
-  dateFormat: string = DEFAULT_DATE_FORMAT
+  dateFormat: string = DEFAULT_DATE_FORMAT,
+  preserveMissingAttribute?: string
 ): Record<string, AnalyticsData> {
   const needs2MinAggregation = (response as { _originalInterval?: '2m' })._originalInterval === '2m'
 
@@ -171,15 +196,20 @@ export function mapResponseToAnalyticsData(
 
       let dataPoints = response.data.map((point) => {
         const value = point.values?.[attribute]
-        return {
+        const dataPoint: DataPointWithFormatted = {
           period_start: point.period_start,
           periodStartFormatted: dayjs(point.period_start).format(dateFormat),
-          [attribute]: value === undefined ? 0 : Number(value),
         }
+        const numericValue = Number(value ?? 0)
+        const isMissingPreservedValue =
+          shouldPreserveMissingAttribute(attribute, preserveMissingAttribute) &&
+          (value == null || !Number.isFinite(numericValue))
+        if (!isMissingPreservedValue) dataPoint[attribute] = numericValue
+        return dataPoint
       })
 
       if (needs2MinAggregation) {
-        dataPoints = aggregate1MinTo2Min(dataPoints)
+        dataPoints = aggregate1MinTo2Min(dataPoints, preserveMissingAttribute)
       }
 
       acc[attribute] = {
@@ -202,15 +232,20 @@ export function mapResponseToAnalyticsData(
 
   let dataPoints = singleResponse.data.map((point) => {
     const value = point[attribute]
-    return {
+    const dataPoint: DataPointWithFormatted = {
       period_start: point.period_start,
       periodStartFormatted: dayjs(point.period_start).format(dateFormat),
-      [attribute]: value === undefined ? 0 : Number(value),
     }
+    const numericValue = Number(value ?? 0)
+    const isMissingPreservedValue =
+      shouldPreserveMissingAttribute(attribute, preserveMissingAttribute) &&
+      (value == null || !Number.isFinite(numericValue))
+    if (!isMissingPreservedValue) dataPoint[attribute] = numericValue
+    return dataPoint
   })
 
   if (needs2MinAggregation) {
-    dataPoints = aggregate1MinTo2Min(dataPoints)
+    dataPoints = aggregate1MinTo2Min(dataPoints, preserveMissingAttribute)
   }
 
   return {
@@ -222,6 +257,3 @@ export function mapResponseToAnalyticsData(
     },
   }
 }
-
-/** @deprecated Use mapResponseToAnalyticsData instead */
-export const mapMultiResponseToAnalyticsData = mapResponseToAnalyticsData

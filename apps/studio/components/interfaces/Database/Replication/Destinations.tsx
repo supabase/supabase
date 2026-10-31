@@ -1,90 +1,139 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
-import { replicationKeys } from 'data/replication/keys'
-import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
-import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { DOCS_URL } from 'lib/constants'
-import { Plus, Search, X } from 'lucide-react'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
+import { useRouter as useTanStackRouter } from '@tanstack/react-router'
+import { useFeatureFlags, useParams } from 'common'
+import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
+import { useRouter as useNextRouter } from 'next/compat/router'
+import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
   CardContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
-  cn,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
-import { EnableReplicationCallout } from './EnableReplicationCallout'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
-import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { DisablePipelinesDialog } from './DisablePipelinesDialog'
+import { EnablePipelinesModal } from './EnablePipelinesCallout'
+import { getStatusName } from './Pipeline.utils'
+import { PipelineStatusName } from './Replication.constants'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
+} from './useIsETLPrivateAlpha'
+import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { replicationKeys } from '@/data/replication/keys'
+import {
+  replicationPipelineStatusQueryOptions,
+  type ReplicationPipelineStatusData,
+} from '@/data/replication/pipeline-status-query'
+import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
+import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+type DestinationSortColumn = 'name' | 'status'
+type DestinationSort = `${DestinationSortColumn}:${'asc' | 'desc'}`
+
+// Worst first, so sorting ascending by status surfaces the pipelines that need attention.
+const STATUS_SORT_ORDER: PipelineStatusName[] = [
+  PipelineStatusName.FAILED,
+  PipelineStatusName.STOPPED,
+  PipelineStatusName.STOPPING,
+  PipelineStatusName.STARTING,
+  PipelineStatusName.STARTED,
+  PipelineStatusName.UNKNOWN,
+]
+
+// Keyed by pipeline id from the responses themselves, so this never closes over component state.
+const combinePipelineStatuses = (
+  results: { data?: ReplicationPipelineStatusData }[]
+): Map<string, PipelineStatusName | undefined> =>
+  new Map(
+    results
+      .map((result) => result.data)
+      .filter((data): data is ReplicationPipelineStatusData => data !== undefined)
+      .map((data) => [data.pipeline_id, getStatusName(data.status)])
+  )
+
+const compareStatusNames = (
+  a: PipelineStatusName | undefined,
+  b: PipelineStatusName | undefined,
+  direction: 'asc' | 'desc'
+) => {
+  if (a === undefined) return b === undefined ? 0 : 1
+  if (b === undefined) return -1
+
+  const comparison = STATUS_SORT_ORDER.indexOf(a) - STATUS_SORT_ORDER.indexOf(b)
+  return direction === 'asc' ? comparison : -comparison
+}
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
+  const router = useTanStackRouter({ warn: false })
+  const nextRouter = useNextRouter()
+  const { isEnabled: isWizardEnabled, isLoading: isPreviewLoading } = usePipelineCreationPreview()
+  const bigQuery = useIsETLBigQueryPrivateAlpha()
+  const duckLake = useIsETLDucklakePrivateAlpha()
+  const snowflake = useIsETLSnowflakePrivateAlpha()
+  const clickHouse = useIsETLClickHousePrivateAlpha()
+  const hasWizardDestination = bigQuery || duckLake || snowflake || clickHouse
+  const { hasLoaded: hasFlagsLoaded } = useFeatureFlags()
+  const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
   const { ref: projectRef } = useParams()
-  const { hasAccess: hasETLReplicationAccess, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('replication.etl')
+  const { data: organization } = useSelectedOrganizationQuery()
 
-  const unifiedReplication = useFlag('unifiedReplication')
+  useRedirectLegacyReadReplicaDestination()
 
   const prefetchedRef = useRef(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
-  const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+  const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
+  const pendingCreationTypeRef = useRef<DestinationType | null>(null)
+  const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
-  const [_, setDestinationType] = useQueryState(
-    'type',
+  const [, setDestinationType] = useQueryState(
+    'destinationType',
     parseAsStringEnum<DestinationType>([
-      'Read Replica',
       'BigQuery',
       'Analytics Bucket',
+      'DuckLake',
+      'Snowflake',
+      'ClickHouse',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
     })
   )
-
-  const {
-    data: databases = [],
-    error: databasesError,
-    isPending: isDatabasesLoading,
-    isError: isDatabasesError,
-    isSuccess: isDatabasesSuccess,
-  } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
-  const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
-  const filteredReplicas =
-    filterString.length === 0
-      ? readReplicas
-      : readReplicas.filter((replica) => replica.identifier.includes(filterString.toLowerCase()))
-
-  const {
-    data: sourcesData,
-    error: sourcesError,
-    isPending: isSourcesLoading,
-    isError: isSourcesError,
-    isSuccess: isSourcesSuccess,
-  } = useReplicationSourcesQuery({
-    projectRef,
-  })
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
-  const replicationNotEnabled = isSourcesSuccess && !sourceId
 
   const {
     data: destinationsData,
@@ -95,28 +144,154 @@ export const Destinations = () => {
   } = useReplicationDestinationsQuery({
     projectRef,
   })
-  const destinations = destinationsData?.destinations ?? []
+  const destinations = useMemo(
+    () => destinationsData?.destinations ?? [],
+    [destinationsData?.destinations]
+  )
   const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
-  const filteredDestinations =
-    filterString.length === 0
-      ? destinations ?? []
-      : (destinations ?? []).filter((destination) =>
-          destination.name.toLowerCase().includes(filterString.toLowerCase())
-        )
+  const filteredDestinations = useMemo(
+    () =>
+      filterString.length === 0
+        ? destinations
+        : destinations.filter((destination) =>
+            destination.name.toLowerCase().includes(filterString.toLowerCase())
+          ),
+    [destinations, filterString]
+  )
 
-  const {
-    data: pipelinesData,
-    error: pipelinesError,
-    isPending: isPipelinesLoading,
-    isError: isPipelinesError,
-    isSuccess: isPipelinesSuccess,
-  } = useReplicationPipelinesQuery({
+  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
     projectRef,
   })
+  const pipelines = useMemo(() => pipelinesData?.pipelines ?? [], [pipelinesData?.pipelines])
 
-  const isLoading =
-    isSourcesLoading || isDestinationsLoading || isDatabasesLoading || isLoadingEntitlement
-  const hasErrorsFetchingData = isSourcesError || isDestinationsError || isDatabasesError
+  // Sorting by status needs every pipeline's status up here, not just inside each row. These share
+  // the rows' query keys, so each status is still only fetched once.
+  const statusByPipelineId = useQueries({
+    queries: pipelines.map((pipeline) =>
+      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id })
+    ),
+    combine: combinePipelineStatuses,
+  })
+
+  const getDestinationStatus = (destinationId: number) => {
+    const pipeline = pipelines.find((p) => p.destination_id === destinationId)
+    return pipeline === undefined ? undefined : statusByPipelineId.get(pipeline.id)
+  }
+
+  const [sort, setSort] = useState<DestinationSort>('name:asc')
+  const [sortColumn, sortDirection] = sort.split(':') as [DestinationSortColumn, 'asc' | 'desc']
+
+  const getAriaSort = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return 'none'
+    return sortDirection === 'asc' ? 'ascending' : 'descending'
+  }
+
+  const handleSortChange = (column: DestinationSortColumn) => {
+    if (sortColumn !== column) return setSort(`${column}:asc`)
+    setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
+  }
+
+  // Not memoized: the status map is rebuilt whenever a pipeline status refetches, so a useMemo
+  // here would never hit. Sorting a handful of destinations per render costs nothing.
+  const sortedDestinations = [...filteredDestinations].sort((a, b) => {
+    if (sortColumn === 'status') {
+      const nameComparison = a.name.localeCompare(b.name)
+
+      return (
+        compareStatusNames(getDestinationStatus(a.id), getDestinationStatus(b.id), sortDirection) ||
+        (sortDirection === 'asc' ? nameComparison : -nameComparison)
+      )
+    }
+
+    const comparison = a.name.localeCompare(b.name)
+    return sortDirection === 'asc' ? comparison : -comparison
+  })
+
+  const {
+    data: sourcesData,
+    isSuccess: isSourcesSuccess,
+    isError: isSourcesError,
+    error: sourcesError,
+    refetch: refetchSources,
+  } = useReplicationSourcesQuery({
+    projectRef,
+  })
+  const externalReplicationSource = useMemo(
+    () => sourcesData?.sources.find((source) => source.name === projectRef),
+    [projectRef, sourcesData?.sources]
+  )
+  const replicationNotEnabled = isSourcesSuccess && !externalReplicationSource
+
+  const canDisablePipelines =
+    isSourcesSuccess &&
+    isDestinationsSuccess &&
+    isPipelinesSuccess &&
+    !!externalReplicationSource &&
+    destinations.length === 0 &&
+    pipelines.length === 0
+
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
+
+  const canCreate = isSourcesSuccess && !isCreationGateLoading
+  const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
+  const sourceErrorTitle = checkLocalETLNotSetUp(sourcesError)
+    ? 'Replication unavailable locally'
+    : 'Failed to retrieve pipeline enablement status'
+
+  const canLinkToWizard =
+    isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
+  const wizardHref = `/project/${projectRef}/database/pipelines/new`
+
+  const openCreation = (type: DestinationType) => {
+    if (isWizardEnabled && hasWizardDestination && projectRef) {
+      if (router)
+        void router.navigate({
+          to: '/project/$ref/database/pipelines/new',
+          params: { ref: projectRef },
+        })
+      else void nextRouter?.push(`/project/${projectRef}/database/pipelines/new`)
+    } else {
+      setDestinationType(type)
+    }
+  }
+
+  const handleAddPipeline = () => {
+    if (!canCreate) return
+    if (replicationNotEnabled) {
+      pendingCreationTypeRef.current = 'BigQuery'
+      setShowEnablePipelinesDialog(true)
+      return
+    }
+    openCreation('BigQuery')
+  }
+
+  const handleEnableDialogOpenChange = (open: boolean) => {
+    setShowEnablePipelinesDialog(open)
+    if (!open) pendingCreationTypeRef.current = null
+  }
+
+  const handlePipelinesEnabled = () => {
+    const type = pendingCreationTypeRef.current
+    pendingCreationTypeRef.current = null
+    if (
+      type &&
+      queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
+    ) {
+      openCreation(type)
+    }
+  }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search pipelines' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
 
   useEffect(() => {
     if (
@@ -139,91 +314,159 @@ export const Destinations = () => {
     }
   }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
 
-  useEffect(() => {
-    if (!isDatabasesSuccess) return
-
-    const pollReplicas = async () => {
-      const fixedStatuses = [
-        REPLICA_STATUS.ACTIVE_HEALTHY,
-        REPLICA_STATUS.ACTIVE_UNHEALTHY,
-        REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
-      ]
-
-      const replicasInTransition = readReplicas.filter((db) => !fixedStatuses.includes(db.status))
-      const hasTransientStatus = replicasInTransition.length > 0
-
-      // If all replicas are active healthy, stop fetching statuses
-      if (!hasTransientStatus) setStatusRefetchInterval(false)
-    }
-
-    pollReplicas()
-  }, [isDatabasesSuccess, readReplicas])
-
   return (
-    <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Input
-              placeholder="Filter destinations"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-              actions={
-                filterString.length > 0 && (
-                  <Button
-                    type="text"
-                    icon={<X />}
-                    className="p-0 h-5 w-5"
-                    onClick={() => setFilterString('')}
-                  />
-                )
-              }
-            />
-          </div>
-          <div className="flex items-center gap-x-2">
-            {(unifiedReplication || !!sourceId) && (
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Input
+            ref={searchInputRef}
+            placeholder="Search pipelines"
+            size="tiny"
+            icon={<SearchIcon />}
+            value={filterString}
+            className="w-full lg:w-52"
+            onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+            actions={
+              filterString.length > 0 && (
+                <Button
+                  aria-label="Clear search"
+                  variant="text"
+                  icon={<XIcon />}
+                  className="p-0 h-5 w-5"
+                  onClick={() => setFilterString('')}
+                />
+              )
+            }
+          />
+        </div>
+        <div className="flex items-center gap-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
-                type="default"
-                icon={<Plus />}
-                onClick={() => setDestinationType('Read Replica')}
-              >
-                Add destination
-              </Button>
-            )}
-            <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
-          </div>
+                aria-label="More actions"
+                variant="default"
+                icon={<MoreVerticalIcon />}
+                className="w-6.5 hit-area-1"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuItem asChild>
+                <Link href={`/org/${organization?.slug}/usage#pipeline-initial-sync-data`}>
+                  View Pipelines usage
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {replicationNotEnabled ? (
+                <DropdownMenuItem
+                  onClick={() => {
+                    pendingCreationTypeRef.current = null
+                    setShowEnablePipelinesDialog(true)
+                  }}
+                >
+                  Enable Pipelines
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  className="data-disabled:pointer-events-auto data-disabled:cursor-not-allowed"
+                  disabled={!canDisablePipelines}
+                  onClick={() => {
+                    if (!canDisablePipelines) return
+                    setShowDisablePipelinesDialog(true)
+                  }}
+                >
+                  <div className="flex flex-col gap-y-0.5">
+                    <p>Disable Pipelines</p>
+                    {!canDisablePipelines && (
+                      <p className="text-foreground-lighter">Delete all pipelines first</p>
+                    )}
+                  </div>
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+            label="Add pipeline"
+            onTrigger={handleAddPipeline}
+            options={{ enabled: canCreate }}
+            side="bottom"
+            tooltipOpen={canCreate ? undefined : false}
+          >
+            <ButtonTooltip
+              tooltip={{
+                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+              }}
+              variant="primary"
+              icon={<PlusIcon />}
+              loading={isCheckingPipelineStatus}
+              disabled={!canCreate}
+              asChild={canLinkToWizard}
+              onClick={canLinkToWizard ? undefined : handleAddPipeline}
+            >
+              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
+            </ButtonTooltip>
+          </Shortcut>
         </div>
       </div>
 
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
-        {hasErrorsFetchingData && (
+        {/* Mounted whether or not it has anything to say, so the update is announced */}
+        <p role="status" aria-live="polite" className="sr-only">
+          {isDestinationsLoading ? 'Loading pipelines' : ''}
+        </p>
+
+        {isSourcesError && (
           <AlertError
-            error={sourcesError || destinationsError || databasesError}
-            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
+            layout="responsive"
+            projectRef={projectRef}
+            error={sourcesError}
+            subject={sourceErrorTitle}
+            hideContactSupport={checkLocalETLNotSetUp(sourcesError)}
+            description={
+              checkLocalETLNotSetUp(sourcesError)
+                ? 'Configure the replication API to manage pipelines in local development.'
+                : undefined
+            }
+            additionalActions={<Button onClick={() => refetchSources()}>Retry</Button>}
           />
         )}
 
-        {isLoading ? (
-          <GenericSkeletonLoader />
-        ) : !unifiedReplication && replicationNotEnabled ? (
-          <EnableReplicationCallout hasAccess={hasETLReplicationAccess} />
-        ) : (unifiedReplication && hasReplicas) || hasDestinations ? (
+        {hasErrorsFetchingData && (
+          <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
+        )}
+
+        {isDestinationsLoading && (
+          <GenericTableLoader headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]} />
+        )}
+
+        {!isDestinationsLoading && hasDestinations && (
           <Card>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead key="type" className="w-[20px]" />
-                    <TableHead key="name" className="w-[250px]">
-                      Name
+                    <TableHead key="type" className="w-[40px]" />
+                    <TableHead key="name" className="w-[250px]" aria-sort={getAriaSort('name')}>
+                      <TableHeadSort
+                        column="name"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Name
+                      </TableHeadSort>
                     </TableHead>
-                    <TableHead key="status" className="w-[150px]">
-                      Status
+                    <TableHead key="status" className="w-[150px]" aria-sort={getAriaSort('status')}>
+                      <TableHeadSort
+                        column="status"
+                        currentSort={sort}
+                        onSortChange={handleSortChange}
+                      >
+                        Status
+                      </TableHeadSort>
                     </TableHead>
-                    <TableHead key="lag" className="w-[80px]">
+                    <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>
                     <TableHead key="publication">Publication</TableHead>
@@ -231,71 +474,54 @@ export const Destinations = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {unifiedReplication &&
-                    filteredReplicas.map((replica) => {
-                      return (
-                        <ReadReplicaRow
-                          key={replica.identifier}
-                          replica={replica}
-                          onUpdateReplica={() => setStatusRefetchInterval(5000)}
-                        />
-                      )
-                    })}
-
-                  {filteredDestinations.map((destination) => (
+                  {sortedDestinations.map((destination) => (
                     <DestinationRow key={destination.id} destinationId={destination.id} />
                   ))}
 
-                  {!isLoading &&
+                  {!isDestinationsLoading &&
                     filteredDestinations.length === 0 &&
-                    filteredReplicas.length === 0 &&
-                    ((unifiedReplication && hasReplicas) || hasDestinations) && (
-                      <TableRow>
-                        <TableCell colSpan={5}>
-                          <p>No results found</p>
-                          <p className="text-foreground-light">
-                            Your search for "{filterString}" did not return any results
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
+                    hasDestinations && <TableRowNoResults colSpan={6} search={filterString} />}
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
-        ) : (
-          !isLoading &&
-          !hasErrorsFetchingData && (
-            <div
-              className={cn(
-                'w-full',
-                'border border-dashed bg-surface-100 border-overlay',
-                'flex flex-col px-16 rounded-lg justify-center items-center py-8 mt-4'
-              )}
+        )}
+
+        {!isDestinationsLoading && !hasDestinations && !hasErrorsFetchingData && (
+          <EmptyStatePresentational
+            icon={WorkflowIcon}
+            title="Add a pipeline"
+            description="Send tables to an external destination for analytics workloads."
+          >
+            <ButtonTooltip
+              tooltip={{
+                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+              }}
+              variant="default"
+              icon={<PlusIcon />}
+              loading={isCheckingPipelineStatus}
+              disabled={!canCreate}
+              asChild={canLinkToWizard}
+              onClick={canLinkToWizard ? undefined : handleAddPipeline}
             >
-              <h4>
-                {unifiedReplication
-                  ? 'Replication keeps your data in sync across systems'
-                  : 'Create your first destination'}
-              </h4>
-              <p className="text-foreground-light text-sm text-balance text-center mt-1">
-                {unifiedReplication
-                  ? 'Deploy read replicas for lower latency and better resource management, or capture database changes to external platforms for real-time data pipelines.'
-                  : 'Destinations are external platforms where your database changes are automatically sent. Connect to various data warehouses and analytics platforms to enable real-time data pipelines.'}
-              </p>
-              <Button
-                icon={<Plus />}
-                onClick={() => setDestinationType('Read Replica')}
-                className="mt-4"
-              >
-                Add destination
-              </Button>
-            </div>
-          )
+              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
+            </ButtonTooltip>
+          </EmptyStatePresentational>
         )}
       </div>
 
-      <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
-    </>
+      <DestinationPanel />
+
+      <EnablePipelinesModal
+        open={showEnablePipelinesDialog}
+        onOpenChange={handleEnableDialogOpenChange}
+        onSuccess={handlePipelinesEnabled}
+      />
+
+      <DisablePipelinesDialog
+        open={showDisablePipelinesDialog}
+        setOpen={setShowDisablePipelinesDialog}
+      />
+    </div>
   )
 }

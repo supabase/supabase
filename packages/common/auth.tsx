@@ -128,7 +128,16 @@ export const useAuth = () => useContext(AuthContext)
 
 export const useSession = () => useAuth().session
 
-export const useUser = () => useSession()?.user ?? null
+export const useUser = () => {
+  const user = useSession()?.user ?? null
+
+  // auth-js substitutes a throwing proxy for `user` when it was configured with
+  // `userStorage` and hasn't migrated the user into storage yet. Treat that as
+  // "no user" instead of crashing whenever a property on it is read.
+  if (user && (user as any).__isUserNotAvailableProxy) return null
+
+  return user
+}
 
 export const useIsUserLoading = () => useAuth().isLoading
 
@@ -153,11 +162,7 @@ export const logOut = async () => {
   clearLocalStorage()
 }
 
-let currentSession: Session | null = null
-
-gotrueClient.onAuthStateChange((event, session) => {
-  currentSession = session
-})
+gotrueClient.onAuthStateChange((_event, _session) => {})
 
 /**
  * Gets a current access token.

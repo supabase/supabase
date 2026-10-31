@@ -1,0 +1,163 @@
+'use client'
+
+import { useBreakpoint, useDebounce } from 'common'
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import type React from 'react'
+import { cn, CommandInput } from 'ui'
+
+import { useCurrentPage, usePopPage } from './hooks/pagesHooks'
+import { useQuery, useSetQuery } from './hooks/queryHooks'
+import { useCommandMenuTelemetryContext } from './hooks/useCommandMenuTelemetryContext'
+
+const INPUT_TYPED_EVENT_DEBOUNCE_TIME = 2000 // 2s
+
+function useFocusInputOnWiderScreens(ref: React.ForwardedRef<HTMLInputElement>) {
+  const isBelowSm = useBreakpoint('sm')
+  const isBelowSmSynchronous = useRef(isBelowSm)
+  isBelowSmSynchronous.current = isBelowSm
+
+  const internalRef = useRef<HTMLInputElement | null>(null)
+  const combinedRef = (element: HTMLInputElement) => {
+    if (ref instanceof Function) {
+      ref(element)
+    } else if (!!ref) {
+      ref.current = element
+    }
+    internalRef.current = element
+  }
+
+  useEffect(() => {
+    // This will always be false in the first iteration (since isBelowSm
+    // switches from false -> true on narrow screens). To avoid a preemptive
+    // focus, we need to delay this. But then we need to access the current
+    // value of isBelowSm, not the stale value, which explains the business
+    // with syncing state into a ref above.
+    setTimeout(() => {
+      if (!isBelowSmSynchronous.current) {
+        internalRef.current?.focus()
+      }
+    })
+  }, [])
+
+  return combinedRef
+}
+
+const CommandMenuInput = forwardRef<
+  React.ElementRef<typeof CommandInput>,
+  React.ComponentPropsWithoutRef<typeof CommandInput>
+>(({ className, wrapperClassName, onKeyDown, value, onValueChange, ...props }, ref) => {
+  const inputRef = useFocusInputOnWiderScreens(ref)
+
+  const page = useCurrentPage()
+  const popPage = usePopPage()
+
+  const query = useQuery()
+  const setQuery = useSetQuery()
+
+  const [inputValue, setInputValue] = useState(query)
+  useEffect(() => {
+    setInputValue(query)
+    previousValueRef.current = query
+  }, [query])
+
+  // Support both controlled (value + onValueChange) and uncontrolled usage, so
+  // the query, telemetry and backspace navigation always follow what is shown
+  const isControlled = value !== undefined
+  const currentValue = isControlled ? value : inputValue
+
+  // Get telemetry context
+  const telemetryContext = useCommandMenuTelemetryContext()
+  const previousValueRef = useRef<string>(currentValue)
+
+  const inputTelemetryEvent = useCallback(
+    (value: string) => {
+      if (telemetryContext?.onTelemetry) {
+        const event = {
+          action: 'command_menu_search_submitted' as const,
+          properties: {
+            value: value,
+            app: telemetryContext.app,
+          },
+          groups: {},
+        }
+        telemetryContext.onTelemetry(event)
+      }
+    },
+    [telemetryContext]
+  )
+
+  const debouncedTelemetry = useDebounce(
+    useCallback(() => {
+      inputTelemetryEvent(currentValue)
+      previousValueRef.current = currentValue
+    }, [inputTelemetryEvent, currentValue]),
+    INPUT_TYPED_EVENT_DEBOUNCE_TIME
+  )
+
+  const handleValueChange = useCallback(
+    (newValue: string) => {
+      if (!isControlled) setInputValue(newValue)
+      onValueChange?.(newValue)
+
+      // Only trigger telemetry if the user is adding characters (not removing with backspace)
+      const isAddingCharacters = newValue.length > previousValueRef.current.length
+
+      if (!isAddingCharacters) {
+        previousValueRef.current = newValue
+        return
+      }
+
+      // Trigger debounced telemetry
+      debouncedTelemetry()
+    },
+    [isControlled, onValueChange, debouncedTelemetry]
+  )
+
+  // To handle CJK input
+  const [imeComposing, setImeComposing] = useState(false)
+  useEffect(() => {
+    if (!imeComposing) {
+      setQuery(currentValue)
+    }
+  }, [currentValue, imeComposing])
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    onKeyDown?.(event)
+    if (event.defaultPrevented) return
+
+    // Backspace on an empty input steps back to the previous page
+    if (event.key === 'Backspace' && !currentValue && !imeComposing && page) {
+      event.preventDefault()
+      popPage()
+    }
+  }
+
+  return (
+    <div className="relative w-full" cmdk-input-wrapper="">
+      <CommandInput
+        // Focus needs to be manually handled to check breakpoint first, due to
+        // delays from useEffect
+        autoFocus={false}
+        ref={inputRef}
+        placeholder="Run a command or search..."
+        onCompositionStart={() => setImeComposing(true)}
+        onCompositionEnd={() => setImeComposing(false)}
+        wrapperClassName={cn('px-4', wrapperClassName)}
+        className={cn(
+          'flex h-11 w-full rounded-md bg-transparent px-2 y-4 md:py-7 outline-hidden',
+          'focus:shadow-none focus:ring-transparent',
+          'text-sm text-foreground-light placeholder:text-foreground-muted disabled:cursor-not-allowed disabled:opacity-50 border-0',
+          className
+        )}
+        {...props}
+        value={currentValue}
+        onValueChange={handleValueChange}
+        onKeyDown={handleKeyDown}
+      />
+    </div>
+  )
+})
+
+CommandMenuInput.displayName = 'CommandMenuInput'
+
+export { CommandMenuInput }

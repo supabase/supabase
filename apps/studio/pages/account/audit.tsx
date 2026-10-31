@@ -1,10 +1,3 @@
-import { AuditLogs } from 'components/interfaces/Account/AuditLogs'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import type { NextPageWithLayout } from 'types'
-import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -13,32 +6,36 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { AuditLogs } from '@/components/interfaces/Account/AuditLogs'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import type { NextPageWithLayout } from '@/types'
+
 const Audit: NextPageWithLayout = () => {
   return (
-    <>
-      <PageHeader size="small">
+    <div className="flex flex-col h-full">
+      <PageHeader size="full">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Audit Logs</PageHeaderTitle>
             <PageHeaderDescription>
-              View a detailed history of account activities and security events.
+              Detailed history of your account activities and security events.
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="small" className="mt-8">
+      <div className="flex-1 min-h-0">
         <AuditLogs />
-      </PageContainer>
-    </>
+      </div>
+    </div>
   )
 }
 
 Audit.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout hideMobileMenu headerTitle="Account">
-      <OrganizationLayout>
-        <AccountLayout title="Audit Logs">{page}</AccountLayout>
-      </OrganizationLayout>
+    <DefaultLayout headerTitle="Account">
+      <AccountLayout title="Audit Logs">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
 )

@@ -5,7 +5,16 @@ export interface ForeignKey {
 
   schema: string
   table: string
-  columns: { source: string; sourceType?: string; target: string; targetType?: string }[]
+  columns: {
+    source: string
+    sourceType?: string
+    sourceTypeSchema?: string
+    sourceIsArray?: boolean
+    target: string
+    targetType?: string
+    targetTypeSchema?: string
+    targetIsArray?: boolean
+  }[]
   deletionAction: string
   updateAction: string
   toRemove?: boolean
@@ -20,6 +29,10 @@ export interface SelectorErrors {
 export interface SelectorTypeError {
   source: string
   sourceType: string
+  sourceTypeSchema?: string
+  sourceIsArray?: boolean
   target: string
   targetType: string
+  targetTypeSchema?: string
+  targetIsArray?: boolean
 }

@@ -5,7 +5,7 @@ categories:
   - developers
 tags:
   - vibe-coding
-date: '2025-08-17:10:00'
+date: '2025-08-17T10:00'
 toc_depth: 3
 author: prashant
 ---
@@ -22,7 +22,7 @@ The fastest way to ruin your night is to treat your one Supabase project as both
 
 Create them in the Supabase Dashboard and give them obvious names like `myapp-dev` and `myapp-prod`. Boring names reduce mistakes. Grab the Project Reference IDs from **Settings > General** and stash them in a safe place.
 
-Then set up the Supabase CLI:
+Then set up the [Supabase CLI](/features/cli):
 
 ```bash
 npm install supabase --save-dev
@@ -126,7 +126,7 @@ Even better, enable [Point in Time Recovery](https://supabase.com/docs/guides/pl
 
 Backups are only useful if you know they work. Schedule a monthly drill: restore a backup to a new project, run through your app, and confirm the data is intact. If you cannot restore, you do not have a backup.
 
-For high stakes apps, combine PITR with read replicas and multi region deployments. That way you can recover from mistakes without downtime or lost data.
+For high stakes apps, combine PITR with [read replicas](/features/read-replicas) and multi region deployments. That way you can recover from mistakes without downtime or lost data.
 
 ## Environment variables without the oops
 

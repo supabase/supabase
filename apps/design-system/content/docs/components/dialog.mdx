@@ -58,11 +58,20 @@ import {
 
 - **Use for non-critical interactions:** Dialog is appropriate when dismissal has no serious consequences.
 - **Design for cancellation**: Assume users may close the dialog without completing the action.
+- **Guard dirty forms on dismissal:** For form dialogs, keep `Dialog` dismissible but intercept close attempts when the form is dirty and show a discard-confirmation dialog (for example, Studio's `DiscardChangesConfirmationDialog` pattern via `useConfirmOnClose`).
 - **Keep focus contained**: Dialog content should remain scoped to a single task or flow.
 - **Avoid destructive confirmations**: If the dialog’s primary purpose is to confirm a risky action, use a confirmation-focused pattern instead.
 - **Compose freely**: Dialog is intentionally unopinionated. Build custom layouts, forms, or step-based flows as needed.
 
 ## Examples
+
+### Optional details
+
+Use `DialogDisclosure` to reveal optional help or context inside a dialog. Put the trigger in the dialog body above the footer, and add a section separator when the disclosure follows other content. Keep the primary action visible while the details are open or closed.
+
+`Collapsible` provides the open and closed state. `DialogDisclosure` adds the trigger and content presentation used in dialogs. Use `Accordion` when several related sections each need a heading and expandable content.
+
+<ComponentPreview name="dialog-disclosure-demo" peekCode wide />
 
 ### Custom close button
 

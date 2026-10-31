@@ -1,25 +1,19 @@
-import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
-import { useMemo } from 'react'
-
-import AlertError from 'components/ui/AlertError'
-import Panel from 'components/ui/Panel'
-import { PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
-import { PROJECT_STATUS } from 'lib/constants'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  CriticalIcon,
-} from 'ui'
+import { useEffect, useMemo } from 'react'
+import { Alert, AlertDescription, AlertTitle, Button, cn, CriticalIcon } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { AlertError } from '@/components/ui/AlertError'
+import Panel from '@/components/ui/Panel'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { OrgUsageResponse } from '@/data/usage/org-usage-query'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export interface DiskUsageProps {
   slug: string
@@ -39,14 +33,22 @@ export const DiskUsage = ({
   usage,
   currentBillingCycleSelected,
 }: DiskUsageProps) => {
-  const {
-    data,
-    isError,
-    isPending: isLoading,
-    isSuccess,
-    error,
-  } = useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
+  const { data, isError, isPending, isFetching, isSuccess, error, hasNextPage, fetchNextPage } =
+    useOrgProjectsInfiniteQuery({ slug }, { enabled: currentBillingCycleSelected })
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) || [], [data?.pages])
+  const shouldFindSelectedProject =
+    currentBillingCycleSelected &&
+    !!projectRef &&
+    !projects.some((project) => project.ref === projectRef) &&
+    hasNextPage &&
+    !isError
+  const isLoading = isPending || shouldFindSelectedProject
+
+  useEffect(() => {
+    if (shouldFindSelectedProject && !isFetching) {
+      void fetchNextPage()
+    }
+  }, [shouldFindSelectedProject, isFetching, fetchNextPage])
 
   const relevantProjects = useMemo(() => {
     return isSuccess
@@ -56,24 +58,30 @@ export const DiskUsage = ({
             const isBranchExceedingFreeQuota =
               project.is_branch && project.databases.some((db) => (db.disk_volume_size_gb ?? 8) > 8)
 
+            const isFilteredBranch = project.is_branch && project.ref === projectRef
+
             const isActiveProject = project.status !== PROJECT_STATUS.INACTIVE
 
             const isHostedOnAws = project.databases.every((db) => db.cloud_provider === 'AWS')
 
             return (
-              (!project.is_branch || isBranchExceedingFreeQuota) && isActiveProject && isHostedOnAws
+              (!project.is_branch || isBranchExceedingFreeQuota || isFilteredBranch) &&
+              isActiveProject &&
+              isHostedOnAws
             )
           })
           .filter((it) => it.ref === projectRef || !projectRef)
       : []
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, projects, projectRef])
+
+  const hasReplicas = useMemo(
+    () => relevantProjects.some((it) => it.databases.some((db) => db.type === 'READ_REPLICA')),
+    [relevantProjects]
+  )
 
   const hasProjectsExceedingDiskSize = useMemo(() => {
     return relevantProjects.some((it) =>
-      it.databases.some(
-        (db) => db.type === 'READ_REPLICA' || (db.disk_volume_size_gb && db.disk_volume_size_gb > 8)
-      )
+      it.databases.some((db) => db.disk_volume_size_gb && db.disk_volume_size_gb > 8)
     )
   }, [relevantProjects])
 
@@ -95,20 +103,35 @@ export const DiskUsage = ({
           </div>
         )}
         {isError && <AlertError subject="Failed to retrieve usage data" error={error} />}
-        {isSuccess && (
+        {isSuccess && !isLoading && (
           <div className="space-y-4">
             {currentBillingCycleSelected &&
               subscription?.usage_billing_enabled === false &&
               hasProjectsExceedingDiskSize && (
-                <Alert_Shadcn_ variant="warning">
+                <Alert variant="warning">
                   <CriticalIcon />
-                  <AlertTitle_Shadcn_>Projects exceeding quota</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>Projects exceeding quota</AlertTitle>
+                  <AlertDescription>
                     You have projects that are exceeding 8 GB of provisioned disk size, but do not
                     allow any overages with the Spend Cap on. Reduce the disk size or disable the
                     spend cap.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertDescription>
+                </Alert>
+              )}
+            {currentBillingCycleSelected &&
+              subscription?.usage_billing_enabled === false &&
+              !hasProjectsExceedingDiskSize &&
+              hasReplicas && (
+                <Alert variant="warning">
+                  <CriticalIcon />
+                  <AlertTitle>
+                    Read replicas add disk usage beyond your plan's included quota
+                  </AlertTitle>
+                  <AlertDescription>
+                    You have read replicas in your projects, but do not allow any overages with the
+                    Spend Cap on. Remove the read replicas or disable the spend cap.
+                  </AlertDescription>
+                </Alert>
               )}
 
             <div>
@@ -125,8 +148,8 @@ export const DiskUsage = ({
                 <p className="text-xs">8 GB GP3 disk per project</p>
               </div>
 
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-foreground-light">Overages in period</p>
+              <div className="flex items-center justify-between py-1">
+                <p className="text-xs text-foreground-light">Overage in period</p>
                 <p className="text-xs">
                   {(gp3UsageInPeriod?.usage ?? 0).toLocaleString()} GP3 GB-Hrs
                   {io2UsageInPeriod?.usage
@@ -159,65 +182,60 @@ export const DiskUsage = ({
                   </Panel>
                 )}
 
-                {relevantProjects.map((project, idx) => {
-                  const primaryDiskUsage = project.databases
-                    .filter((it) => it.type === 'PRIMARY')
-                    .reduce((acc, curr) => acc + (curr.disk_volume_size_gb ?? 8), 0)
-                  const replicaDbs = project.databases.filter((it) => it.type !== 'PRIMARY')
-                  const replicaDiskUsage = replicaDbs.reduce(
-                    (acc, curr) => acc + (curr.disk_volume_size_gb ?? 8),
-                    0
-                  )
+                <div className="flex flex-col gap-y-2">
+                  {relevantProjects.map((project, idx) => {
+                    const primaryDiskUsage = project.databases
+                      .filter((it) => it.type === 'PRIMARY')
+                      .reduce((acc, curr) => acc + (curr.disk_volume_size_gb ?? 8), 0)
+                    const replicaDbs = project.databases.filter((it) => it.type !== 'PRIMARY')
+                    const replicaDiskUsage = replicaDbs.reduce(
+                      (acc, curr) => acc + (curr.disk_volume_size_gb ?? 8),
+                      0
+                    )
 
-                  const totalDiskUsage = primaryDiskUsage + replicaDiskUsage
+                    const totalDiskUsage = primaryDiskUsage + replicaDiskUsage
 
-                  return (
-                    <div
-                      key={`usage-project-${project.ref}`}
-                      className={idx !== relevantProjects.length - 1 ? 'border-b pb-2' : ''}
-                    >
-                      <div className="flex justify-between">
-                        <span className="text-foreground-light flex items-center gap-2">
-                          {project.name}
-                        </span>
-                        <Button asChild type="default" size={'tiny'}>
-                          <Link href={`/project/${project.ref}/settings/compute-and-disk`}>
-                            Manage Disk
-                          </Link>
+                    return (
+                      <div
+                        key={`usage-project-${project.ref}`}
+                        className={cn(
+                          'flex items-center justify-between',
+                          idx !== relevantProjects.length - 1 && 'border-b pb-2'
+                        )}
+                      >
+                        <div>
+                          <p className="text-foreground-light text-sm flex items-center gap-2">
+                            {project.name}
+                          </p>
+                          <div className="flex items-center gap-x-2">
+                            <span className="text-foreground-lighter text-sm flex items-center gap-2">
+                              {totalDiskUsage} GB Disk provisioned
+                            </span>
+                            <InfoTooltip side="right">
+                              <p>{primaryDiskUsage} GB for Primary Database</p>
+                              {replicaDbs.length > 0 && (
+                                <>
+                                  <p>
+                                    {replicaDiskUsage} GB for {replicaDbs.length} Read{' '}
+                                    {replicaDbs.length === 1 ? 'Replica' : 'Replicas'}
+                                  </p>
+                                  <p className="mt-1">
+                                    Read replicas have their own disk and use 25% more disk to
+                                    account for WAL files.
+                                  </p>
+                                </>
+                              )}
+                            </InfoTooltip>
+                          </div>
+                        </div>
+
+                        <Button asChild size="tiny">
+                          <Link href={getInfrastructurePath(project.ref)}>Manage Disk</Link>
                         </Button>
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center h-6 gap-3">
-                          <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-                            <span className="text-foreground font-semibold -mt-[2px]">
-                              <MotionNumber
-                                value={totalDiskUsage}
-                                style={{ lineHeight: 0.8 }}
-                                className="font-mono"
-                              />
-                            </span>{' '}
-                            GB Disk provisioned
-                          </span>
-                          <InfoTooltip side="top">
-                            <p>{primaryDiskUsage} GB for Primary Database</p>
-                            {replicaDbs.length > 0 && (
-                              <>
-                                <p>
-                                  {replicaDiskUsage} GB for {replicaDbs.length} Read{' '}
-                                  {replicaDbs.length === 1 ? 'Replica' : 'Replicas'}
-                                </p>
-                                <p className="mt-1">
-                                  Read replicas have their own disk and use 25% more disk to account
-                                  for WAL files.
-                                </p>
-                              </>
-                            )}
-                          </InfoTooltip>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
             ) : (
               <Panel>

@@ -1,6 +1,7 @@
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import { PropsWithChildren } from 'react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 
 interface DropdownControlProps {
   options: {
@@ -29,8 +30,8 @@ export const DropdownControl = ({
     <DropdownMenu>
       <DropdownMenuTrigger className={className}>{children}</DropdownMenuTrigger>
       <DropdownMenuContent side={side} align={align}>
-        <div className="dropdown-control" style={{ maxHeight: '30vh' }}>
-          {options.length === 0 && <p className="dropdown-control__empty-text">No more items</p>}
+        <div className="overflow-auto" style={{ maxHeight: '30vh' }}>
+          {options.length === 0 && <p>No more items</p>}
           {options.map((x) => {
             return (
               <DropdownMenuItemTooltip

@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
 
 type VectorBucketDeleteVariables = {
   projectRef: string
@@ -38,16 +38,16 @@ export const useVectorBucketDeleteMutation = ({
 
   return useMutation<VectorBucketDeleteData, ResponseError, VectorBucketDeleteVariables>({
     mutationFn: (vars) => deleteVectorBucket(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: storageKeys.vectorBuckets(projectRef) })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to delete vector bucket: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

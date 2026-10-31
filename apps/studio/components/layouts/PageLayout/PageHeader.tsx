@@ -1,9 +1,7 @@
-import { ChevronLeft } from 'lucide-react'
+import { useParams } from 'common'
+import { ChevronLeftIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, ReactNode } from 'react'
-
-import { useParams } from 'common'
-import { cn } from 'ui'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,7 +9,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage as BreadcrumbPageItem,
   BreadcrumbSeparator,
-} from 'ui/src/components/shadcn/ui/breadcrumb'
+  cn,
+} from 'ui'
+
 import { ScaffoldDescription, ScaffoldTitle } from '../Scaffold'
 
 interface PageHeaderProps {
@@ -63,7 +63,7 @@ export const PageHeader = ({
                           <BreadcrumbLink asChild className="flex items-center gap-2">
                             <Link href={!!ref ? item.href.replace('[ref]', ref) : item.href}>
                               {breadcrumbs.length === 1 && !isCompact && (
-                                <ChevronLeft size={16} strokeWidth={1.5} />
+                                <ChevronLeftIcon size={16} strokeWidth={1.5} />
                               )}
                               {item.label}
                             </Link>
@@ -71,7 +71,7 @@ export const PageHeader = ({
                         ) : (
                           <BreadcrumbPageItem className="flex items-center gap-2">
                             {breadcrumbs.length === 1 && (
-                              <ChevronLeft size={16} strokeWidth={1.5} />
+                              <ChevronLeftIcon size={16} strokeWidth={1.5} />
                             )}
                             {item.label}
                           </BreadcrumbPageItem>
@@ -95,7 +95,7 @@ export const PageHeader = ({
             ) : null}
           </div>
           {isCompact && (
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               {secondaryActions && (
                 <div className="flex items-center gap-2">{secondaryActions}</div>
               )}

@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { organizationKeys } from './keys'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type OrganizationProjectClaimVariables = {
   slug: string
@@ -54,6 +55,7 @@ async function getOrganizationProjectClaim(
   const { data, error } = await get(`/v1/organizations/{slug}/project-claim/{token}`, {
     params: { path: { slug, token } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

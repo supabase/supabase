@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { MousePointer2 } from 'lucide-react'
+import { MousePointer2Icon } from 'lucide-react'
+import { motion } from 'motion/react'
+import { useEffect, useState } from 'react'
 
 export const AnimatedCursors = () => {
   const [cursor1Position, setCursor1Position] = useState({ x: 20, y: 20 })
@@ -42,10 +42,10 @@ export const AnimatedCursors = () => {
         }}
         style={{ width: 20, height: 20 }}
       >
-        <MousePointer2 size={20} />
+        <MousePointer2Icon size={20} />
       </motion.div>
       <motion.div
-        className="absolute text-brand"
+        className="absolute text-primary"
         animate={{ x: cursor2Position.x, y: cursor2Position.y }}
         transition={{
           duration: 1.2,
@@ -54,7 +54,7 @@ export const AnimatedCursors = () => {
         }}
         style={{ width: 20, height: 20 }}
       >
-        <MousePointer2 size={20} />
+        <MousePointer2Icon size={20} />
       </motion.div>
     </div>
   )

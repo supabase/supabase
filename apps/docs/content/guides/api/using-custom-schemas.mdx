@@ -45,6 +45,7 @@ Now you can access these schemas from data APIs:
 ```js
 // Initialize the JS client
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   db: { schema: 'myschema' },
 })
@@ -56,6 +57,12 @@ const { data: todos, error } = await supabase.from('todos').select('*')
 const { data: todos, error } = await supabase.schema('myschema').from('todos').select('*')
 ```
 
+<Admonition type="note">
+
+With generated `Database` types that include `public`, `createClient<Database>(...)` type-checks `db.schema` against `public` only, unless the schema name is also passed as the second generic: `createClient<Database, 'myschema'>(...)`. `supabase.schema('myschema').from(...)` infers its schema per call and needs no second generic. In both cases `myschema` has to be present in the generated `Database` type.
+
+</Admonition>
+
 </TabPanel>
 <$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
@@ -63,7 +70,7 @@ const { data: todos, error } = await supabase.schema('myschema').from('todos').s
 // Initialize the Flutter client
 await Supabase.initialize(
   url: supabaseUrl,
-  anonKey: supabaseKey,
+  publishableKey: publishableKey,
   postgrestOptions: const PostgrestClientOptions(schema: 'myschema'),
 );
 final supabase = Supabase.instance.client;
@@ -75,6 +82,24 @@ final data = await supabase.from('todos').select();
 final data = await supabase.schema('myschema').from('todos').select();
 
 ````
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Initialize the client with a custom schema
+var supabase = new Supabase.Client(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  new SupabaseOptions { Schema = "myschema" }
+);
+await supabase.InitializeAsync();
+
+// Make a request
+var todos = await supabase.From<Todo>().Get();
+```
+
 </TabPanel>
 </$Show>
 <TabPanel id="curl" label="cURL">

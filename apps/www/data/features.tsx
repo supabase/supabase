@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react'
+import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
 import {
   Activity,
   BarChart,
@@ -17,6 +17,7 @@ import {
   GitBranch,
   Globe,
   Image,
+  KeyRound,
   Lock,
   Mail,
   MessageCircle,
@@ -34,14 +35,14 @@ import {
   UserX,
   Zap,
 } from 'lucide-react'
-import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
+import type { LucideIcon } from 'lucide-react'
+import { FunctionComponent } from 'react'
 import {
   PRODUCT,
   PRODUCT_MODULE,
   PRODUCT_MODULES_SHORTNAMES,
   PRODUCT_SHORTNAMES,
 } from 'shared-data/products'
-import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
   PLATFORM = 'platform',
@@ -95,9 +96,17 @@ export type FeatureType = {
    */
   heroImageLight?: string
   /**
+   * omit the hero block (image, video, or icon placeholder) from the feature page
+   */
+  hideHero?: boolean
+  /**
    * url to docs or blog page for this feature
    */
   docsUrl?: string
+  /**
+   * url to a related blog post
+   */
+  blogUrl?: string
   /**
    * feature metadata on its status
    */
@@ -158,7 +167,7 @@ Supabase provides an open source toolkit for developing AI applications using Po
 `,
     icon: ChartScatter,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: 'https://www.youtube-nocookie.com/embed/ibzlEQmgPPY',
+    heroImage: 'https://www.youtube-nocookie.com/embed/6xchFWcHkaI',
     docsUrl: 'https://supabase.com/docs/guides/ai',
     slug: 'vector-database',
     status: {
@@ -298,6 +307,46 @@ By using custom domains, you create a more cohesive brand experience and gain fl
     },
   },
   {
+    title: 'Custom Identity Providers',
+    subtitle: 'Connect any OAuth2 or OIDC identity provider to Supabase Auth.',
+    description: `Supabase Auth ships with 20+ built-in providers. For providers not on that list, Custom Identity Providers lets you add them in two ways:
+
+- **OIDC providers** — supply an issuer URL and Supabase auto-fetches the discovery document, JWKS, and endpoints automatically.
+- **OAuth2-only providers** — supply the authorization, token, and userinfo endpoint URLs directly for providers that don't expose an OIDC discovery document.
+
+Once configured, your users sign in with \`signInWithOAuth({ provider: 'custom:my-provider' })\`, the same call used for any built-in provider. Same client libraries (JS, Flutter, Swift, Kotlin), same RLS enforcement, no special client-side handling required.
+
+## Key benefits
+1. Auto-discovery (OIDC): Supply an issuer URL and Supabase resolves the discovery document, JWKS, and endpoints automatically. No manual endpoint wiring.
+2. Manual endpoint control (OAuth2): Supply the authorization URL, token URL, and userinfo URL directly for providers without OIDC discovery.
+3. Any provider: GitHub Enterprise Server, regional compliance IdPs, internal OAuth2 servers, and proprietary identity systems. If it speaks OAuth2 or OIDC, it works.
+4. PKCE by default: All custom providers use PKCE (Proof Key for Code Exchange) automatically. No client-side changes needed.
+5. Same sign-in flow: One code path for all OAuth flows. Same client libraries and RLS enforcement as built-in providers.
+6. Multi-platform support: List additional client IDs via \`acceptable_client_ids\` for web, iOS, and Android apps.
+7. Full management via Dashboard and Admin API: Create, update, rotate secrets, toggle enabled state, or delete providers without touching your code.
+8. Email-optional: Providers that don't return an email address are supported via the \`email_optional\` setting.
+9. Custom authorization params: Append extra query parameters to the authorization URL for consent screens, offline access, login hints, and more.
+
+## Custom Identity Providers are valuable for:
+- Teams using a SAML-to-OIDC bridge, GitHub Enterprise Server, or GitLab self-managed for SSO
+- Applications in regulated industries with mandated regional identity providers
+- Internal tools authenticating against a company's custom OAuth2 server
+- Platforms with proprietary OAuth2 implementations that don't expose a discovery document
+- Platforms integrating with niche identity networks (gaming, healthcare, device-based auth)
+- Multi-platform apps (web, iOS, Android) needing unified auth across client IDs
+- Enterprise buyers evaluating Supabase Auth for compliance-sensitive deployments
+- Developers who need precise control over endpoint configuration`,
+    icon: Shield,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: 'https://www.youtube-nocookie.com/embed/WrX3FfKj6I8',
+    docsUrl: 'https://supabase.com/docs/guides/auth/custom-oauth-providers',
+    slug: 'custom-oidc-providers',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
     title: 'Network restrictions',
     subtitle: 'Restrict IP ranges that can connect to your database.',
     description: `
@@ -375,38 +424,39 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
   },
   {
     title: 'Branching',
-    subtitle: 'Test and preview changes using Supabase Branches.',
+    subtitle: 'Test schema changes without touching production.',
     description: `
-Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. Branching 2.0 (currently in public alpha) removes the Git requirement—spin up branches directly from the dashboard, CLI, or Management API, with or without GitHub integration.
+Branching without Git is the default for every Supabase project. Create a branch from the Supabase Dashboard, make schema changes, review the diff, and merge. Git-based branching stays fully supported for teams that manage migrations in version control, and GitHub-connected branches are now ready nearly five times faster than before.
+
+## Two ways to branch
+
+**Dashboard branching (default)**
+Create branches directly from the Supabase Dashboard. Each branch gets its own Postgres instance with your current production schema. Make changes in the SQL Editor or Table Editor, preview the diff, and merge. The whole workflow stays inside Supabase.
+
+**Git-based branching**
+Connect a GitHub repo to your project. Migrations live in version control, and branches are created when you open a pull request and cleaned up when it closes.
 
 ## Key features
-1. No-Git workflows: Create branches directly from dashboard or CLI without requiring GitHub connection.
-2. Git-based workflow: Optionally integrate with GitHub, creating preview branches for each pull request.
-3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
-4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
-5. Data seeding: Preview branches can be seeded with sample data using ./supabase/seed.sql.
-6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
-7. Merge requests: Review schema diffs and merge changes directly in the dashboard.
+1. No-Git workflow: Create and merge branches from the dashboard with no GitHub connection.
+2. Git-based workflow: Optionally integrate with GitHub for pull request-driven schema reviews.
+3. Inherited configuration: Each branch has its own Supabase instance with separate API credentials and starts with its base project's Postgres, Auth, Storage, network, and Edge Functions configuration.
+4. Fast provisioning: GitHub-connected branches are ready in about 20 seconds at the median, down from about a minute and a half.
+5. Automatic migrations: Runs new migrations when changes are pushed to \`./supabase/migrations\`.
+6. Data seeding: Seed branches with sample data from \`./supabase/seed.sql\`.
+7. Merge requests: Review schema diffs and merge directly in the dashboard.
+8. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
 
-## Benefits:
-- Risk-free experimentation: Test changes without affecting the production environment.
-- Improved collaboration: Multiple team members can work on different features simultaneously.
-- Streamlined reviews: Facilitate thorough checks of database changes before merging.
-- Rapid iteration: Quickly prototype and validate database-driven features.
-- Flexible workflows: Use Git integration, dashboard creation, or combine both approaches.
-
-## Supabase Branching is valuable for:
-- Agile teams working on multiple features concurrently
-- Projects with complex database schemas requiring careful management
-- Applications undergoing significant refactoring or upgrades
-- CI/CD pipelines integrating database changes
-- Teams preferring no-code or database-first development workflows
+## When to use branching
+- Developers prototyping schema changes who want fast iteration without upfront configuration
+- AI agents that create and manage database branches programmatically
+- Teams managing migrations in Git who want PR-driven schema reviews
+- CI/CD pipelines that ship database changes alongside application code
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '/images/features/branching.png',
     heroImageLight: '/images/features/branching-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/platform/branching',
+    docsUrl: 'https://supabase.com/docs/guides/deployment/branching',
     slug: 'branching',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -478,8 +528,6 @@ Supabase Read Replicas distribute read traffic across multiple databases. Use th
 ## Get Started
 
 Deploy your first Read Replica in minutes from Project Settings > Infrastructure. Choose a region—same region for analytics isolation, different region for geo-distribution. Select a compute size to match your workload.
-
-[Read blog post](https://supabase.com/blog/read-replicas-vs-bigger-compute)
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -557,7 +605,8 @@ Dedicated Poolers provide an alternative to Supavisor for specific use cases, gi
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres#serverside-poolers',
+    docsUrl:
+      'https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler',
     slug: 'dedicated-poolers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -599,38 +648,41 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
     },
   },
   {
-    title: 'Supabase ETL',
-    subtitle: 'Real-time data replication to analytical destinations.',
-    description: `Supabase ETL is a change-data-capture pipeline built in Rust that replicates your Postgres tables to analytical destinations in near real-time. Reading directly from the Postgres Write Ahead Log, ETL ensures your analytics data stays synchronized with your production database.
+    title: 'Supabase Pipelines',
+    subtitle: 'Replicate Postgres data to analytical destinations.',
+    description: `Supabase Pipelines is a managed change data capture (CDC) product that uses Postgres logical replication to deliver published data to analytical destinations in near real time.
 
 ## Key benefits
-1. Real-time replication: Near real-time data synchronization using Postgres logical replication.
-2. Analytics Buckets support: Replicate to Iceberg format for large-scale analytics.
-3. BigQuery integration: Direct replication to Google's data warehouse.
-4. Complete change history: Captures INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Optimized for analytics: Faster queries and lower storage costs through compression.
-6. Production isolation: Complete separation of analytics and production workloads.
+1. Initial sync: Copy existing rows from published tables.
+2. Ongoing replication: Capture and deliver subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
+3. Managed operation: Monitor pipeline status, lag, table state, and errors in the Dashboard.
+4. Workload isolation: Keep analytical queries away from the primary database.
 
-## How it works
-ETL uses Postgres logical replication to capture changes. Each replicated table includes a \`cdc_operation\` column tracking the type of change. For Analytics Buckets, data is stored in append-only changelog format using Parquet files. For BigQuery, a view is created for each table backed by versioned tables.
+## Destinations
+BigQuery, ClickHouse, DuckLake, and Snowflake are available in public alpha. See the [destination guides](/docs/guides/database/replication#supported-destinations) to get started.
 
-## Supabase ETL is valuable for:
-- Data warehousing and business intelligence
-- Historical analysis and audit trails
-- Large-scale analytics requiring separation from production
-- Compliance scenarios requiring complete data history
+## Setup
+Create a Postgres publication for the tables to replicate. In Database > Pipelines, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+
+## Requirements
+Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
+
+## Pipelines is valuable for:
+- Near real-time analytics data movement
+- Analytics separation from production
+- Managed replication to supported destination systems
 
 ## Limitations
-Tables require primary keys. DDL support (schema changes) is currently in development.
+Schema change support is destination-specific and limited. Destination-specific constraints apply.
 
-Supabase ETL provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
+BigQuery and DuckLake keep current-state tables synchronized. ClickHouse supports current-state ReplacingMergeTree tables or append-only MergeTree CDC history. Snowflake stores append-only CDC history. Source \`TRUNCATE\` operations and table resets erase accumulated destination data. Schema changes can alter retained history in append-only ClickHouse and Snowflake tables.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
-    docsUrl: 'https://supabase.github.io/etl/',
-    slug: 'supabase-etl',
+    heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
+    slug: 'supabase-pipelines',
     status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: false,
     },
   },
@@ -681,7 +733,7 @@ This feature is particularly useful for teams looking to enhance their security 
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
     },
   },
@@ -720,9 +772,10 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
 ## Key features
 1. Event-based listening: Subscribe to INSERT, UPDATE, DELETE, or all (*) events.
 2. Schema and table targeting: Listen to changes in specific schemas or tables.
-3. Granular filtering: Apply filters to receive only relevant changes.
+3. Granular filtering: Apply filters on one or more columns to receive only relevant changes.
 4. Multiple subscriptions: Listen to different combinations of events, schemas, and tables in a single channel.
 5. Row-level security integration: Respect database permissions when broadcasting changes.
+6. Column selection: Opt in to receive only the columns you choose in the event payload, with the primary key always included.
 
 ## Benefits:
 - Real-time updates: Receive instant notifications when data changes, enabling live-updating UIs.
@@ -736,12 +789,10 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
 - Real-time dashboards and analytics platforms
 - Live chat and messaging systems
 - Applications requiring instant updates based on database changes
-
-Supabase's Realtime Postgres Changes feature provides a powerful tool for creating responsive, real-time applications while leveraging the full capabilities of your Postgres database.
 `,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: 'https://www.youtube-nocookie.com/embed/2rUjcmgZDwQ',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/postgres-changes',
     slug: 'realtime-postgres-changes',
     status: {
@@ -782,7 +833,7 @@ Supabase's Realtime Broadcast feature provides a powerful tool for creating resp
 `,
     icon: MessageCircle,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast',
     slug: 'realtime-broadcast',
     status: {
@@ -822,7 +873,7 @@ Supabase's Realtime Presence feature provides a powerful tool for creating inter
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/presence',
     slug: 'realtime-presence',
     status: {
@@ -989,10 +1040,10 @@ Supabase's Email Login provides a robust foundation for user authentication, all
     },
   },
   {
-    title: 'Social login',
-    subtitle: 'Provide social logins from platforms like Apple, GitHub, and Slack.',
+    title: 'Social sign-in',
+    subtitle: 'Provide social sign-in from platforms like Apple, GitHub, and Slack.',
     description: `
-Supabase's Social Login feature enables users to authenticate using their existing accounts from popular social platforms and services, providing a streamlined, password-free access to your application.
+Supabase's Social Sign-in feature enables users to authenticate using their existing accounts from popular social platforms and services, providing a streamlined, password-free access to your application.
 
 ## Key features
 1. Multiple provider support: Integrate with various platforms like Google, Facebook, Twitter, and more.
@@ -1007,21 +1058,21 @@ Supabase's Social Login feature enables users to authenticate using their existi
 - Enhanced security: Leverage the robust security measures of established platforms.
 - Rich user profiles: Access additional user data to personalize experiences.
 
-## Social login is valuable for:
+## Social sign-in is valuable for:
 - Mobile apps seeking to minimize user input
 - E-commerce platforms aiming to reduce cart abandonment
 - Content platforms looking to personalize user experiences
 - Community-driven websites fostering user engagement
 - B2B applications integrating with professional networks
 
-Supabase's Social Login feature allows you to improve user experience and potentially increase signup rates while maintaining security and control over user authentication.
+Supabase's Social Sign-in feature allows you to improve user experience and potentially increase signup rates while maintaining security and control over user authentication.
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '/images/features/social-login.png',
     heroImageLight: '/images/features/social-login-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/auth/social-login',
-    slug: 'social-login',
+    docsUrl: 'https://supabase.com/docs/guides/auth/social-sign-in',
+    slug: 'social-sign-in',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
@@ -1234,7 +1285,7 @@ JWT Signing Keys provide modern, secure JWT management with the flexibility requ
     slug: 'jwt-signing-keys',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: false,
+      availableOnSelfHosted: true,
     },
   },
   {
@@ -1566,7 +1617,7 @@ Supabase Storage simplifies adding robust file management to your applications, 
 2. Automatic compaction: S3 Tables merges small files automatically for optimal performance.
 3. Built-in time travel: Query historical data using snapshots.
 4. Schema evolution: Evolve schema over time without breaking queries.
-5. Integrated with ETL: Real-time replication from Postgres via Supabase ETL.
+5. Open ingestion: Populate buckets with your own Iceberg-compatible ingestion pipeline.
 6. Query from Postgres: Use Iceberg Foreign Data Wrapper to join with operational data.
 
 ## Query tools supported
@@ -1890,6 +1941,7 @@ Supabase's Deno Edge Functions allow you to deploy and run custom TypeScript fun
 6. Versatile use cases: Support for webhooks, third-party integrations, and custom API endpoints.
 7. Open-source and portable: Run locally or on any Deno-compatible platform.
 8. Rich ecosystem: Wide range of examples and integrations available.
+9. Middleware: \`@supabase/middleware\` lets you write per-request logic once and run it on Edge Functions and any other runtime that has fetch.
 
 ## Benefits:
 - Low-latency responses: Ideal for globally distributed applications.
@@ -1910,11 +1962,83 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
 `,
     icon: FileCode2,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: 'https://www.youtube-nocookie.com/embed/5OWH9c4u68M',
+    heroImage: 'https://www.youtube-nocookie.com/embed/EQ5h3NSWMbk',
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
     status: {
       stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Supabase Middleware',
+    subtitle: 'Write per-request logic once and run it on any runtime that has fetch.',
+    description: `
+\`@supabase/middleware\` is composable, type-safe middleware for Web Fetch handlers. You write per-request logic once, and the same middleware runs on any runtime that has fetch, or inside a framework through a short bridge you copy. Available now.
+
+## Key benefits
+1. Write once, run on any fetch runtime: Supabase Edge Functions, Vercel Functions, Cloudflare Workers, Deno, Bun, and Node 22+.
+2. Use it inside your framework: copy a short, typechecked bridge for Hono, H3, Elysia, NestJS, or TanStack Start. It adds no dependency.
+3. Typed shared context: each middleware adds one typed key to \`ctx\`, and your handler sees everything upstream, typed.
+4. Mistakes fail early: duplicate keys, and a middleware placed before the one it needs, fail to compile on TypeScript 5.4+.
+5. Stop or change a request anywhere: any middleware can return a \`Response\` and stop the chain, or change the response on the way back.
+6. Supabase middleware included: claims, Supabase and admin clients, Postgres clients (one with RLS applied, one that bypasses RLS), and \`withOAuthProtectedResource\` for your app's own MCP server, from \`@supabase/server\`. The engine also ships \`withCors\` and \`withFeatureFlag\`. The Postgres clients don't run on Cloudflare Workers, because \`pg\` needs a TCP socket.
+7. Open source and portable: it's built on the Web Fetch standard. If you leave Supabase, you keep the engine and what you wrote with it.
+
+## Supabase Middleware is valuable for:
+- Verifying the caller and scoping a database connection to them without rewriting it in every function
+- Giving your app its own MCP server that an agent calls as the signed-in user
+- Keeping CORS, auth, and flag checks the same across many functions and projects
+- Moving logic between Edge Functions and a framework like Hono without a rewrite
+- Publishing shared per-request logic as a package for other projects
+`,
+    icon: Package,
+    products: [PRODUCT_SHORTNAMES.FUNCTIONS],
+    heroImage: 'https://www.youtube-nocookie.com/embed/kL4M0auf4UU',
+    docsUrl: 'https://supabase.com/docs/reference/middleware/introduction',
+    slug: 'supabase-middleware',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Server SDK',
+    subtitle: "Extend your app to users' agents with your Auth and RLS.",
+    description: `
+Use the Server SDK to give your Supabase app its own MCP server, so your users connect from Claude, Cursor, or ChatGPT (in developer mode) and work with their own records. They sign in with the account they already have, and every tool call runs as that user, so the RLS policies already in your database decide what the agent can read. If your app runs on Supabase Postgres and Supabase Auth, the access rules are already written.
+
+The same SDK, \`@supabase/server\`, checks who's calling your Edge Functions and other server code. The Supabase MCP server is separate: it connects your coding agent to your project so you can build the app.
+
+## Key benefits
+1. Give each agent the user's own view: Every tool call runs as the signed-in user, so a user's agent sees what that user can see in your app.
+2. Reuse the RLS you already wrote: The RLS policies that scope your web app decide what each MCP client can read, with no per-tool authorization code.
+3. Let users sign in with the account they have: Supabase Auth runs the OAuth 2.1 flow, dynamic client registration included, so users approve the MCP client once and never make a new account.
+4. Let users manage their own agents: The OAuth grant management endpoints list connected clients, and the Headless App block ships an \`/agents\` page for it. A user removes an agent's access from inside your app.
+5. Start from two blocks: The MCP Server block installs the Edge Function with a \`whoami\` tool. The OAuth Consent block adds the \`/oauth/consent\` route for Next.js, React, React Router, or TanStack Start.
+6. Keep your runtime: The same code also runs off Edge Functions, in a Next.js route handler, a SvelteKit endpoint, Cloudflare Workers, or a Node, Bun, or Deno server. There, you set the server URLs yourself.
+
+## When to use the Server SDK
+- Users of your CRM, ops, or analytics tool want to work on their own records from Claude, ChatGPT, Cursor, or VS Code (tool calls scoped by the RLS policies on those tables)
+- Staff need agent access to company data as themselves, with the row filters the web app already applies (a user session for every tool call, through your existing login)
+- You run a separate Express server beside your project to own one \`.well-known\` route (one Edge Function replaces it, with OAuth discovery served by the middleware)
+
+## How it works
+Turn on the OAuth 2.1 server and dynamic client registration under Authentication > OAuth Server. Host a consent screen in your frontend at the Auth Site URL. The project must sign JWTs with an asymmetric key (ES256 or RS256). Your function composes \`withOAuthProtectedResource()\` and \`withSupabase({ auth: 'user' })\` in a \`pipeline\` ahead of your MCP handler and sets \`verify_jwt = false\`. The first serves the protected resource metadata and the \`WWW-Authenticate\` challenge, so an MCP client needs the server URL and nothing else. The second rejects requests without a valid user token and hands your handler a client for that user, so anything a tool reads or writes goes through RLS. Test your RLS policies before you connect agents.
+
+## Get started
+- Start from the [Server SDK reference](https://supabase.com/docs/reference/server/introduction).
+- Run \`npx shadcn@latest add https://supabase.com/library/r/mcp.json\` to install the [MCP Server block](https://supabase.com/library/docs/headless/mcp).
+- Follow [Add authentication](https://supabase.com/docs/guides/ai-tools/byo-mcp#add-authentication) in the Deploy MCP servers guide.
+- Read the [authenticated example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/authenticated-mcp-server) with the \`todos\` tools, migration, and RLS policy.
+`,
+    icon: Server,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION, PRODUCT_SHORTNAMES.FUNCTIONS],
+    heroImage: 'https://www.youtube-nocookie.com/embed/vEv87D-eJK4',
+    docsUrl: 'https://supabase.com/docs/reference/server/introduction',
+    slug: 'server-sdk',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },
@@ -1944,13 +2068,13 @@ Persistent Storage backed by S3 protocol survives invocations. Ephemeral Storage
 - Machine learning model storage
 
 ## Setup
-Requires S3 credentials as environment variables: \`AWS_ACCESS_KEY_ID\`, \`AWS_SECRET_ACCESS_KEY\`, \`AWS_REGION\`, \`AWS_ENDPOINT_URL_S3\`.
+Requires S3 credentials as environment variables: \`S3FS_ACCESS_KEY_ID\`, \`S3FS_SECRET_ACCESS_KEY\`, \`S3FS_REGION\`, \`S3FS_ENDPOINT_URL\`.
 
 Persistent Storage transforms Edge Functions into stateful, high-performance computing environments.`,
     icon: UploadCloud,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/storage',
+    docsUrl: 'https://supabase.com/docs/guides/functions/ephemeral-storage',
     slug: 'persistent-storage',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2073,38 +2197,128 @@ Automatic Embeddings eliminate the manual work of generating and maintaining vec
   },
   // Platform
   {
-    title: 'CLI',
-    subtitle: 'Use our CLI to develop your project locally and deploy.',
+    title: 'Local development',
+    subtitle: 'Run a local Supabase project for every agent, with or without Docker.',
     description: `
-Supabase's Command Line Interface (CLI) tool provides developers with a powerful and flexible way to manage their Supabase projects directly from the terminal. This feature streamlines the development workflow, allowing for local development, testing, and seamless deployment of Supabase projects.
+The Supabase CLI runs several local projects on one machine, one per git worktree. Each coding agent gets its own Postgres, Storage, Edge Functions, and MCP server. Projects start in seconds. In our Linux benchmark, nine idle projects fit in the memory one used to take because only the services you use are running. In sandboxes and CI runners that have no container engine, the native runtime runs every Supabase service as a plain process at the same pinned versions as the Docker images.
 
-## Key benefits
-1. Local development: Set up and run a local Supabase instance for development and testing.
-2. Version control integration: Easily manage database migrations and schema changes with Git-like workflows.
-3. Automated deployments: Deploy changes to your Supabase project with simple CLI commands.
-4. Database migrations: Generate, apply, and revert database migrations effortlessly.
-5. Environment management: Handle multiple environments (development, staging, production) efficiently.
-6. Seed data management: Populate your database with test data for consistent development and testing.
-7. CI/CD integration: Incorporate Supabase operations into your continuous integration and deployment pipelines.
+## Key features
+1. One project per worktree: The CLI picks and remembers ports for each project. Agents stop coordinating project IDs by hand.
+2. Isolated data: Reset one project's database while another is mid test run. Schema changes, resets, and Storage uploads never cross over.
+3. Services start on demand: Postgres comes up first and everything else wakes on its first request. Pass \`--eager\` to start everything up front.
+4. Native runtime: Run without Docker or Podman on Linux (amd64 and arm64 with glibc 2.35 or later) and macOS 14 or later on Apple silicon. The CLI downloads and verifies the service archives on first start and picks the native runtime when no container engine responds. Use Docker or Podman for several projects on one machine. The native runtime is intended for one project per sandbox or CI runner.
+5. Per-project MCP server: Each local project serves its own \`/mcp\` endpoint. An agent only sees the database it's working on.
 
-## The CLI is particularly valuable for:
-- Development teams working on Supabase projects collaboratively
-- DevOps professionals managing Supabase deployments across multiple environments
-- Open-source projects requiring reproducible Supabase setups
-- Developers preferring command-line tools for increased productivity
-- Projects with complex database schemas requiring careful version control
-- Any application needing a streamlined local-to-production workflow with Supabase
+## When to use it
+- Several coding agents working on the same app in parallel
+- Hosted sandboxes and CI runners with no Docker daemon
+- Laptops where the default stack is too heavy to run more than once
 
-By leveraging the Supabase CLI, you can significantly improve your development workflow, ensuring consistency between local and production environments, streamlining deployments, and making it easier to manage complex Supabase projects. This tool empowers developers to work more efficiently with Supabase, whether they're building small prototypes or large-scale applications.
+Update to CLI v2.119.0 or later, then turn it on with \`SUPABASE_EXPERIMENTAL_STACK=1 supabase init\` for a new app. For an existing app, add \`stack = true\` under \`[experimental]\` in \`supabase/config.toml\` and remove the fixed ports from it before the first start. Read the [multiple local projects guide](https://supabase.com/docs/guides/local-development/running-multiple-local-projects) and the [Docker and native runtimes guide](https://supabase.com/docs/guides/local-development/docker-and-native-runtimes).
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/features/local-development.png',
+    heroImageLight: '/images/features/local-development-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    slug: 'local-development',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'CLI',
+    subtitle: 'Develop locally, manage migrations, and deploy from the terminal.',
+    description: `
+The Supabase CLI runs the full Supabase stack on your machine or in CI, captures schema changes as migrations, and pushes them to a hosted project. Run one local project or several at once, in Docker containers or as native processes.
+
+## Key features
+1. Local development: Run a local project with Docker, or opt into the experimental setting for several projects at once and the native runtime. See [Local development](/features/local-development).
+2. Migrations: Generate, apply, and roll back database migrations, or write declarative schema files and let the CLI diff them.
+3. Config as code: Define project settings in \`config.toml\` and apply them to hosted projects.
+4. Deployments: Push migrations, deploy Edge Functions, and apply config to a linked project, each with its own command.
+5. Type generation: Generate TypeScript types from your database schema.
+6. Seed data: Populate local databases with test data on every reset.
+7. CI/CD: Run every command headlessly in GitHub Actions or any other runner.
+
+## When to use it
+- Teams that want schema changes reviewed in pull requests
+- Projects that need reproducible local environments
+- Coding agents that set up, test, and deploy a backend without a browser
+- Deployments managed from CI
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
-    docsUrl:
-      'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
+    docsUrl: 'https://supabase.com/docs/guides/local-development',
     slug: 'cli',
     status: {
       stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Parallel local projects',
+    subtitle: 'Run a local Supabase project for every app or git worktree.',
+    description: `
+The Supabase CLI can run more than one local Supabase project on the same machine. Each local project belongs to its project directory and git branch. Every app or git worktree gets its own Postgres database, Auth, Storage, and other services, with separate ports and data.
+
+With the default ports, a second \`supabase start\` on the same machine fails with a port conflict. With the experimental setting on, \`supabase start\` assigns ports automatically and keeps them stable across restarts. One app can also run several named local projects, such as \`dev\` and \`test\`. A destructive test run never touches your development data. See [Local development](/features/local-development) for the overview.
+
+## Key benefits
+1. One local project per worktree: Run coding agents in separate git worktrees, each against its own database.
+2. Automatic ports: The CLI assigns ports from a shared range and keeps them across restarts. Remove the fixed ports from \`config.toml\` once, or initialize the app with \`SUPABASE_EXPERIMENTAL_STACK=1 supabase init\`.
+3. Named environments: Run a dev and a test project side by side in one app.
+4. Docker or native runtime: Run in containers, or as processes on your machine without Docker on Linux and on macOS on Apple silicon. Use Docker when you run several local projects on one machine.
+5. Services start on demand: Postgres starts right away. Other services start on their first request. Most of them stop when idle, which keeps idle local projects light.
+
+## Parallel local projects are valuable for:
+- Developers running coding agents in git worktrees
+- Teams that keep separate development and test databases on one machine
+- Freelancers and consultants switching between several client apps
+- CI jobs and agent sandboxes that run without a Docker daemon
+
+Running several local projects is experimental and needs CLI v2.119.0 or later. Flags and output can change between releases. See the documentation for the full workflow and limitations.
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    hideHero: true,
+    docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    slug: 'parallel-local-projects',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Native runtime for local development',
+    subtitle: 'Run a local Supabase project as processes on your machine, without Docker.',
+    description: `
+The Supabase CLI can run a local Supabase project as native processes instead of containers. Coding agent sandboxes and CI runners often have no Docker daemon. To run there, [turn on the experimental setting](https://supabase.com/docs/guides/local-development/running-multiple-local-projects#turn-on-the-stack-commands) in CLI v2.119.0 or later. Then \`supabase start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the other services directly on the host. See [Local development](/features/local-development) for the overview.
+
+It is the same local project you get from \`supabase start\`, with the same services and most of the same \`config.toml\` settings. The CLI picks Docker when its daemon responds, then Podman, then native. To require one, pass \`--runtime docker\`, \`--runtime podman\`, or \`--runtime native\`.
+
+## Key benefits
+1. Works without Docker: Bring up a real local Supabase project in environments that can't run a container engine.
+2. Verified binaries: The CLI downloads service archives from Supabase's GitHub releases and checks them before extracting.
+3. Same project, same services: Postgres with the full extension set, Auth, PostgREST, Realtime, Storage, Edge Functions, Studio, and more.
+
+## The native runtime is valuable for:
+- Coding agents running in sandboxes with no container engine
+- CI jobs on runners without a Docker daemon
+
+The native runtime supports Linux on amd64 and arm64 with glibc 2.35 or later, and macOS 14 or later on Apple silicon. Windows and Intel Macs use Docker. For several local projects on one machine, Docker remains the recommended runtime. The native runtime is experimental.
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/features/local-development.png',
+    heroImageLight: '/images/features/local-development-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/docker-and-native-runtimes',
+    slug: 'native-local-runtime',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
     },
   },
@@ -2145,6 +2359,56 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     },
   },
   {
+    title: 'Personal Access Tokens',
+    subtitle: 'Limit a token to the organizations, projects, and permissions its job needs.',
+    description: `
+Personal Access Tokens authenticate your CLI, scripts, CI pipelines, and AI coding agents to your Supabase account. You can limit each token to the organizations, projects, and permissions its job needs, instead of handing a tool access to everything you can reach.
+
+Tokens you create in the Dashboard are scoped by default. Access is checked on every request and never exceeds your own role.
+
+## Key benefits
+1. Least privilege: Give a CI pipeline or coding agent a token limited to one project and the permissions its job needs.
+2. Contained leaks: A leaked token exposes only what it was scoped to, not your whole account.
+3. Review before you create: A review screen shows what a token can reach before you create it.
+4. Expiry: Set an expiry date so a temporary tool doesn't hold a token forever.
+5. Bounded by your role: A token never has more access than you do. If you lose access to a project, the token does too.
+6. Works where you work: Use a token with the CLI, the Management API, and the Supabase MCP server.
+
+## Personal Access Tokens are particularly valuable for:
+- CI pipelines that deploy a single project
+- AI coding agents connected through the Supabase MCP server
+- Scripts and tools that do one narrow task
+- Developers who belong to several organizations and want a token that reaches only one
+
+## Frequently asked questions
+
+### Can I change a token's scope after I create it?
+
+No. A token's scope is fixed when you create it. To change it, create a replacement token.
+
+### Can I scope the token that Supabase login creates?
+
+Not yet. \`supabase login\` in the browser creates a token with full account access today. Create the token in the Dashboard and pass it with \`supabase login --token\`.
+
+### What happens if I lose access to a project?
+
+The token loses that access too. If your access is restored, the token works again.
+
+Get started with the [Personal Access Tokens documentation](https://supabase.com/docs/guides/platform/personal-access-tokens).
+`,
+    icon: KeyRound,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/features/personal-access-tokens.png',
+    heroImageLight: '/images/features/personal-access-tokens-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/platform/personal-access-tokens',
+    blogUrl: 'https://supabase.com/blog/scope-your-personal-access-tokens',
+    slug: 'personal-access-tokens',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
     title: 'Role-Based Access Control (RBAC)',
     icon: ShieldPlus,
     subtitle: 'Define and manage user roles securely',
@@ -2171,7 +2435,7 @@ Supabase's Role-Based Access Control (RBAC) feature provides a powerful and flex
 By leveraging Role-Based Access Control, you can create a secure, scalable, and easily manageable access control system for your application. This feature allows you to implement complex permission structures with ease, ensuring that users only have access to the resources and functionalities appropriate for their role within the system.
 `,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://www.youtube-nocookie.com/embed/kwoKmi6inAw',
+    heroImage: 'https://www.youtube-nocookie.com/embed/168PHFnxkok',
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
@@ -2194,6 +2458,7 @@ Supabase Reports provide comprehensive insights into your project's performance,
 4. Trend analysis: Observe usage patterns over time to predict future needs and potential issues.
 5. Security overview: Monitor authentication attempts, failed queries, and other security-related metrics.
 6. Customizable dashboards: Create tailored views of the metrics most important to your team.
+7. Connection sessions: Database Connections, under Observability, shows which sessions hold your connections and what blocks them, so you can find the query holding up the rest. See [Database Connections](/features/database-connections).
 
 ## Reports are particularly valuable for:
 - Development teams needing to optimize application performance
@@ -2211,6 +2476,45 @@ By leveraging Supabase Reports, you gain a understanding of your project's perfo
     heroImageLight: '/images/features/reports-and-metrics-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
     slug: 'reports-and-metrics',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Database Connections',
+    subtitle: 'See your running queries and stop the one blocking your app.',
+    description: `
+When your app slows down or hangs, Database Connections shows which queries are slow or stuck and which one holds up the most others. You can cancel a query or end a session without writing SQL.
+
+## Key benefits
+1. Start with the top blocker: Top blocker names the query that blocks the most others, so you know where to look first.
+2. Find the root blocker: The Root blockers filter lists sessions that block others but aren't blocked themselves, the ones to stop first.
+3. Slow and stuck sessions stand out: Run time turns amber at 30 seconds for an active query and red at 10 seconds for a transaction left open with nothing running.
+4. Read each session's details: Every row shows the query text, state, process ID (PID), and run time, so you can tell what each session is doing.
+5. Connections by service: Filter by application name to see which service holds the connections.
+6. Stop a session from the same page: Open the row's menu and choose Cancel query or Terminate session to clear the block.
+7. Get a summary: Click Summarize activity and the AI Assistant lists blocked, stuck, and slow sessions by PID.
+
+## When to use Database Connections
+- One query holds a lock and the rest of your app waits (Top blocker)
+- A migration hangs because an open transaction holds a lock (the Idle in transaction count and Terminate session)
+- Your app's connections keep climbing and you can't tell which service opened them (the application name filter)
+
+## How it works
+If a query waits on more than one session, the Blocked by column lists them all, but the chain shows only the first. Cancel query works only on active queries. Neither action works on a session owned by a superuser role.
+
+## Get started
+- In the dashboard, open Observability, then Database Connections. It's on by default for every project, including self-hosted.
+- Read [Diagnosing stuck and blocked queries](https://supabase.com/docs/guides/database/connection-management#diagnosing-stuck-and-blocked-queries).
+`,
+    icon: Activity,
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    hideHero: true,
+    docsUrl:
+      'https://supabase.com/docs/guides/database/connection-management#diagnosing-stuck-and-blocked-queries',
+    slug: 'database-connections',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
@@ -2298,6 +2602,8 @@ The Logs & Analytics feature in Supabase provides users with comprehensive loggi
 
 OpenTelemetry integration allows you to export logs, metrics, and traces to any OTel-compatible tool—Datadog, Honeycomb, Grafana, or your preferred monitoring platform. The Metrics API exposes ~200 Prometheus-compatible Postgres metrics, including CPU, IO, WAL, connections, and query statistics.
 
+Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python can propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id. It is opt-in and works with any W3C-compliant tracer, including OTLP, Sentry, Datadog, Honeycomb, and Grafana. See the [client-side tracing guide](https://supabase.com/docs/guides/observability/client-side-tracing) for the latest on supported SDKs and target platforms.
+
 ## Key benefits
 1. Real-Time Monitoring: Access live data on application performance and user interactions to make informed decisions.
 2. Comprehensive Log Management: Ingest and store logs from multiple sources, allowing for centralized management of application events.
@@ -2306,6 +2612,8 @@ OpenTelemetry integration allows you to export logs, metrics, and traces to any 
 5. Scalability: Handle large volumes of log data with a robust infrastructure designed for high availability and performance.
 6. OpenTelemetry Support: Export telemetry data to vendor-agnostic monitoring platforms for unified observability.
 7. Metrics API: Stream Postgres performance metrics for CPU, IO, WAL, connections, and query statistics.
+8. Client-Side Trace Propagation: correlate a trace from your client app — web, mobile, or server-side — with the matching API Gateway and Edge Function log under one shared 'trace_id'.
+9. Agent Log Queries: The \`query_logs\` tool in the Supabase MCP Server lets your coding agent run read-only SQL on up to 24 hours of logs per request, so it can find the failing request for you. See [Query logs with SQL](https://supabase.com/docs/guides/observability/advanced-log-filtering#mcp).
 
 This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
 `,
@@ -2505,7 +2813,8 @@ The Security & Performance Advisor feature in Supabase offers users actionable i
 2. Performance optimization: Analyzes query performance to recommend optimizations that enhance efficiency.
 3. User-friendly dashboard: Presents findings in an easily digestible format within Supabase Studio.
 4. Actionable recommendations: Provides clear steps for addressing identified issues, empowering users to enhance their database environments.
-5. Ongoing monitoring: Continuously evaluates changes in database usage to adapt recommendations accordingly.
+5. Run on demand: Open the advisors in the dashboard, or run them with \`supabase db advisors\` or the Management API, after you change your schema, so you catch a missing index or an RLS problem early.
+6. Health checks: A Health tab beside Security and Performance flags error rates that stay high in the Data API, Auth, Storage, and Edge Functions, so you know which service to check first. See [Health Check Advisors](/features/health-check-advisors).
 
 This feature is essential for organizations aiming to maintain high security standards while ensuring optimal performance across their applications.
 `,
@@ -2518,6 +2827,44 @@ This feature is essential for organizations aiming to maintain high security sta
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Health Check Advisors',
+    subtitle: 'Find which Supabase service has a high server error rate.',
+    description: `
+With Health Check Advisors, you know which Supabase service to look at first. Run the checks for Auth, Storage, Edge Functions, and the Data API from the Health tab or the Management API. When you run them, each service whose error rate stays high returns a result.
+
+## Key benefits
+1. Know where to look: With one check per service, you see which one has a high error rate before you open a log.
+2. Sort by severity: Every result has a severity level, and you can start with the worst one.
+3. Go straight to the logs: In the dashboard, View logs on any result opens the API Gateway logs, so you can check the errors yourself.
+4. Trust an empty result: No result means every check ran and found no high error rate.
+5. Give your agent a starting point: Over the Management API, your agent gets the results you see in the dashboard.
+6. Read Health like the other advisors: Health results use the same fields as Security and Performance in the dashboard and the Management API, so all three read the same way.
+
+## When to use Health Check Advisors
+- Your app throws server errors and you don't know which service is behind them (one check per service, run on demand)
+- After a deploy, you want to see if any service's server errors stay high (run the checks from the Health tab)
+- Your agent needs to know which service to debug first (the same checks over the Management API)
+
+## How it works
+The checks measure the server error (5xx) rate in recent request logs for each service. The error rate has to stay high over a period, so a result can take a while to clear after a fix. Results are cached, and quick repeat calls return the same snapshot. Over the Management API, a check that could not run says so.
+
+## Get started
+- In the dashboard, open Advisors, then Health.
+- From the Management API, call \`POST /v2/projects/{ref}/advisors/run\` ([API reference](https://supabase.com/docs/reference/api/v2-run-project-advisors)).
+- Read the [Advisors docs](https://supabase.com/docs/guides/observability/advisors).
+`,
+    icon: Activity,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    hideHero: true,
+    docsUrl: 'https://supabase.com/docs/guides/observability/advisors',
+    slug: 'health-check-advisors',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -2606,26 +2953,30 @@ This feature is particularly beneficial for developers working with complex data
   },
   {
     title: 'Log Drains',
-    subtitle: 'Export logs to external destinations for enhanced monitoring.',
+    subtitle: 'Export logs to Datadog, Grafana, Sentry, S3, and more — now available on Pro.',
     description: `
-Log Drains enable developers to export logs generated by Supabase products—such as the Database, Storage, Realtime, and Auth—to external destinations like Datadog or custom HTTP endpoints. This feature provides a unified view of logs within existing logging and monitoring systems, allowing teams to build robust alerting and observability pipelines.
+Log Drains enable developers to export logs generated by Supabase services—Postgres, Auth, Storage, Edge Functions, Realtime, and the API Gateway—directly to their existing observability tools. Previously available on Team and Enterprise plans only, Log Drains are now available as a Pro plan add-on.
 
 ## Key benefits
-1. Centralized logging: Consolidate logs from multiple Supabase services into a single location for easier management and analysis.
-2. Custom alerting: Ingest logs into Security Information and Event Management (SIEM) or Intrusion Detection Systems (IDS) to create tailored alerting rules based on database events.
-3. Extended retention: Supports longer log retention periods to meet compliance requirements, ensuring data availability for audits and investigations.
-4. Flexible configuration: Easily set up Log Drains through the project settings, with support for popular destinations like Datadog and custom HTTP endpoints.
-5. Scalable architecture: Built on Logflare's multi-node Elixir cluster, allowing for efficient and scalable log dispatching to multiple destinations.
+1. Full-stack visibility: Export logs from every layer of your Supabase infrastructure—not just application code—into a single dashboard alongside your other services.
+2. Centralized logging: Consolidate logs from multiple Supabase services into your existing observability stack without building custom polling infrastructure.
+3. Custom alerting: Ingest logs into Datadog, Grafana, or Sentry to trigger alerts on database errors, auth failures, or traffic anomalies.
+4. Extended retention: Route logs to AWS S3 for low-cost long-term archival, meeting compliance and audit requirements.
+5. Near-real-time delivery: Logs are batched (up to 250 per batch or flushed every second) and compressed with gzip when the destination supports it.
 
-This feature is particularly useful for teams seeking to enhance their observability practices while maintaining compliance and security standards across their applications.
+## Supported destinations
+Datadog, Grafana Loki, Sentry, AWS S3, Axiom, and a generic HTTP endpoint for custom routing.
+
+## Pricing
+$60 per drain per project, plus $0.20 per million events and $0.09 per GB egress.
 `,
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
-    docsUrl: 'https://supabase.com/blog/log-drains',
+    docsUrl: 'https://supabase.com/docs/guides/observability/log-drains',
     slug: 'log-drains',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
@@ -2647,7 +2998,7 @@ This feature is particularly valuable for developers looking to build dynamic we
     icon: JsIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/start',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/introduction',
     slug: 'client-library-javascript',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2672,7 +3023,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     icon: FlutterIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/dart/start',
+    docsUrl: 'https://supabase.com/docs/reference/dart/introduction',
     slug: 'client-library-flutter',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2781,50 +3132,8 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
     slug: 'orioledb',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
-    },
-  },
-  {
-    title: 'Replication',
-    subtitle: 'Replicate database changes to external destinations.',
-    description: `Replication uses Postgres logical replication to replicate database changes to external destinations like Analytics Buckets and BigQuery. Changes are captured from the Write Ahead Log and delivered in near real-time to analytical systems.
-
-## Key benefits
-1. Near real-time sync: Changes replicated as they occur using WAL reading.
-2. Analytics Buckets support: Append-only changelog format in Iceberg.
-3. BigQuery integration: Direct replication to Google's data warehouse.
-4. Complete change capture: INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Managed pipeline: Monitor status, lag, and errors in dashboard.
-
-## Destinations
-Analytics Buckets create append-only changelog with \`cdc_operation\` column, preserving complete change history in Iceberg format. BigQuery creates views backed by versioned tables for efficient querying.
-
-## Setup
-Create Postgres publication for tables to replicate. Add destination in Replication section of dashboard. Configure destination-specific settings. Monitor pipeline in dashboard.
-
-## Requirements
-Tables must have primary keys. Logical replication must be enabled.
-
-## Replication is valuable for:
-- Real-time data warehousing
-- Analytics separation from production
-- Historical data archival
-- Multi-destination data sync
-- Compliance and audit trails
-
-## Limitations
-No DDL support yet (ALTER TABLE, ADD COLUMN). Destination-specific constraints may apply.
-
-Replication provides the real-time data pipeline required for modern analytics architectures.`,
-    icon: DatabaseZap,
-    products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/replication/replication-setup',
-    slug: 'replication',
-    status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
-      availableOnSelfHosted: false,
     },
   },
   {
@@ -2853,6 +3162,40 @@ Supabase Queues provides the reliability of Postgres with the simplicity of Supa
     },
   },
   {
+    title: 'Agent Skills',
+    subtitle: 'Teach your coding agent to build and debug on Supabase.',
+    description: `
+With Supabase Agent Skills, your coding agent checks the current Supabase docs and changelog before it writes code, so it knows what changed after its training data. The skills are open-source instructions your agent loads when a task involves Supabase. They work in Claude Code, Codex, Cursor, GitHub Copilot, and other agents that support Agent Skills.
+
+## Key benefits
+1. Avoid common security mistakes: The skill tells your agent that views skip RLS by default and how to make a view follow your policies.
+2. Debug quiet failures: When a query returns no rows or RLS blocks it, your agent reads the Observability docs before it suggests a fix.
+3. Search logs with SQL: The \`query_logs\` tool in the Supabase MCP server runs read-only SQL on up to 24 hours of logs per request, so your agent can find what failed.
+4. Check your project on a schedule: Agent prompts tell your agent to check Health, Security, Performance, or Resources and report what it finds.
+
+## When to use Agent Skills
+- Your agent writes Supabase code from old training data (the skill checks the changelog and current docs first)
+- Your agent hits a Supabase error and suggests a fix from memory (the skill sends your agent to the Observability docs)
+- You want your agent to report on your project regularly (Agent prompts, with the MCP server set to \`read_only=true\`)
+
+## Get started
+- Run \`npx skills add supabase/agent-skills --all\` to install the skills for every detected agent.
+- Install the skills and the MCP server together with the [Supabase plugin](https://supabase.com/docs/guides/ai-tools/plugins).
+- Read the [Agent Skills docs](https://supabase.com/docs/guides/ai-tools/ai-skills), the [Agent prompts guide](https://supabase.com/docs/guides/observability/automate-with-agents), and the [Agent Skills blog post](https://supabase.com/blog/supabase-agent-skills).
+`,
+    icon: Brain,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    hideHero: true,
+    docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-skills',
+    blogUrl: 'https://supabase.com/blog/supabase-agent-skills',
+    slug: 'agent-skills',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
     title: 'MCP Server',
     subtitle:
       'Connect your AI tools using the official Supabase Model Context Protocol (MCP) server.',
@@ -2865,7 +3208,7 @@ With the MCP Server, you can:
 - Design tables, generate migrations, and manage schema.
 - Query data and run reports using SQL.
 - Manage branches, configurations, and TypeScript types.
-- Retrieve logs for debugging and troubleshooting.
+- Debug from the client: \`query_logs\` runs read-only SQL on up to 24 hours of logs per request, and \`get_advisors\` returns Security and Performance findings, so you find the failing request without opening the dashboard.
 - Automate repetitive tasks and streamline AI-assisted development workflows.
 
 The MCP Server simplifies the integration of AI tools with Supabase, enabling a seamless development experience without the need for custom APIs or wrappers.
@@ -2875,7 +3218,7 @@ The MCP Server simplifies the integration of AI tools with Supabase, enabling a 
 2. Standardized tool ecosystem: MCP standardizes how tools interact with Supabase, enabling a plug-and-play experience for AI-powered workflows.
 3. Streamlined workflows: Build faster by offloading repetitive tasks like schema design and configuration management to your AI assistant.
 4. Extensive toolset: Access over 20 tools for database design, data querying, and project management.
-5. Evolving capabilities: MCP continues to evolve, with upcoming support for native OAuth authentication, Edge Function deployment, and advanced schema discovery.
+5. Evolving capabilities: MCP continues to evolve, with support for native OAuth authentication, Edge Function deployment, and advanced schema discovery.
 
 The MCP Server empowers developers to build AI-native applications, accelerating productivity and reducing the complexity of working across multiple tools.
 
@@ -2910,11 +3253,11 @@ MCP is a standard that defines how AI tools and platforms communicate. It enable
 
 ### Do I need a personal access token (PAT) to use the MCP Server?
 
-Yes, you'll need to create a PAT in your Supabase settings to authenticate the MCP Server. Future versions of MCP will support OAuth login flows for simpler authentication.
+No, a PAT is no longer required. The MCP Server now uses OAuth by default via dynamic client registration, so your AI tool authenticates through a browser-based flow. A PAT is only needed for CI/CD or non-interactive scenarios.
 
 ### Can I use the MCP Server with self-hosted Supabase instances?
 
-No, the official Supabase MCP Server connects directly to Supabase Cloud. For local instances, you can use the Postgres MCP Server instead.
+Yes, self-hosted Supabase instances are supported. Follow the [self-hosted MCP guide](/docs/guides/self-hosting/enable-mcp) to configure secure access via SSH tunnel or VPN.
 
 ### Which AI tools are compatible with the MCP Server?
 
@@ -2930,72 +3273,74 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
     slug: 'mcp-server',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
   {
     title: 'Declarative Schemas',
-    subtitle: 'Simplify database management with declarative schema files.',
+    subtitle: 'Keep your schema in SQL files and let the CLI write the migrations.',
     description: `
-Declarative schemas help you manage complex Postgres databases more easily by defining your database structure in SQL files that represent the final, desired state. These schema files can be stored and versioned alongside your codebase, enabling better collaboration and simplified reviews.
+Declarative schemas define your desired database structure in SQL files alongside your application code. Edit the files, generate a migration, review it, and apply it.
 
-With declarative schemas, you can:
+Declarative Schemas 2.0 runs on Supabase's open source diff engine, \`pg-delta\`. It covers gaps in the legacy \`migra\` engine, including column privileges, \`security_invoker\` on views, and publication membership.
 
-- Maintain a single source of truth for your database schema, reducing duplication and errors.
-- Generate migration files automatically by diffing your declarative schema against the current database state.
-- Review changes easily through concise, readable diffs instead of long, complex migration scripts.
+The CLI loads your schema files into one temporary Postgres database and replays your migration history into another. \`pg-delta\` compares their system catalogs to generate a migration. This comparison never reads your live database.
+
+\`pg-delta\` is still in alpha. New CLI projects get it from \`supabase init\`. Existing projects turn it on with \`[experimental.pgdelta]\` and \`enabled = true\` in \`config.toml\`.
 
 ## Key benefits
-1. Single source of truth: Define your entire database schema in a single, centralized location for better visibility and control.
-2. Version-controlled changes: Store your schema files alongside your application code, ensuring consistency across environments.
-3. Simplified code reviews: Schema changes become small, focused diffs that are easier to understand and validate.
-4. Reduce merge conflicts: Minimize the risk of conflicts when multiple developers work on the same schema.
-5. Support for advanced Postgres features: Manage tables, views, functions, triggers, policies, and more through declarative SQL files.
 
-Declarative schemas make it easier to manage growing database complexity, so your team can iterate faster without sacrificing stability or control.
+1. Version-controlled schema: Keep your schema in \`supabase/schemas/\` and review changes alongside your application code.
+2. Smaller schema diffs: A one-line change to a view appears as one changed line in the schema file. Review the generated migration too before applying it.
+3. Fewer merge conflicts: Separate files for tables, views, and functions help developers work on different objects independently.
+4. Broader coverage: Generate changes for RLS policies, grants, views, partitions, publications, domains, and comments. If your schema includes something the engine cannot track, such as a custom operator or text search configuration, it reports a warning.
+5. Automatic dependency ordering: The engine orders statements for you. You no longer hand-order files in \`schema_paths\`.
+6. Supabase-aware diffs: Supabase-managed objects stay out. Your customizations, including profile triggers on \`auth.users\`, stay in.
 
-## Use Cases for Declarative Schemas
+## Use cases
 
-Declarative schemas are valuable for a wide range of teams and scenarios:
+Declarative schemas help teams maintain databases with many views, functions, and policies. Developers can edit definitions in place and generate migrations in CI. Existing projects can export their database into schema files to adopt the same workflow.
 
-- Teams managing complex databases. Simplify schema management when working with multiple tables, views, policies, and functions.
-- Collaborative teams. Reduce merge conflicts and improve review processes when multiple developers are making schema changes.
-- CI/CD pipelines. Use declarative schemas to automate schema updates in your deployment workflows.
-- Teams adopting best practices. Adopt a more robust, maintainable approach to schema management with declarative patterns.
+## Supabase CLI workflow
 
-## Integration capabilities with Supabase
+Declarative schemas are part of the Supabase CLI:
 
-Declarative schemas integrate directly with the Supabase CLI, allowing you to:
+- Define your schema in SQL files under \`supabase/schemas/\`. One file per table works well but the layout is up to you.
+- Run \`supabase db schema declarative sync --no-apply\` to generate a migration for review.
+- Review the generated SQL, including any statements the CLI flags as destructive.
+- Apply the migration locally with \`supabase migration up\` and push it with \`supabase db push\`.
+- Schema files are plain SQL. Editor tooling such as the Postgres Language Server works on them.
 
-- Define your schema in SQL files within the \`supabase/schemas\` directory.
-- Use \`supabase db diff\` to generate migration files based on schema changes.
-- Apply and deploy migrations using the Supabase CLI, ensuring consistency across local and remote environments.
-- Combine with the Postgres Language Server for enhanced IDE support when working with declarative schemas.
-
-These tools help you maintain control over your database while moving faster and reducing the risk of errors.
-
-## FAQs about Declarative Schemas
-
-Below are answers to common questions about declarative schemas.
+## Frequently asked questions
 
 ### How do declarative schemas differ from migrations?
 
-Migrations are a record of incremental changes to your database schema. Declarative schemas define the final desired state of your schema, and the necessary migration files are generated by comparing the current database state with your schema files.
+Migrations record incremental changes. Declarative schemas describe the state you want. The CLI compares your schema files with your migration history and writes plain SQL migrations in \`supabase/migrations/\`. Hand-written migrations keep working alongside them.
 
 ### Do I need to write my own migration files?
 
-No. Supabase provides a schema diff tool (\`supabase db diff\`) that automatically generates migration files from your declarative schema files.
+The CLI generates schema migrations, but some changes need manual edits. A renamed column, for example, comes out as a drop followed by an add. Review and adjust the migration to preserve your data. Data changes still need seed files or hand-written migrations.
 
 ### Can I use declarative schemas with my existing projects?
 
-Yes. You can pull your production schema into declarative files by running \`supabase db dump > supabase/schemas/prod.sql\`. From there, you can split the schema into smaller files and adopt a declarative workflow.
+Yes. Turn on \`pg-delta\` first. If the project has no migration history, run \`supabase db pull\` to create a baseline. Run \`supabase db schema declarative generate --linked\` to export your database into SQL files under \`supabase/schemas/\`. Then edit, generate, review, and apply as usual. See the docs for [adopting declarative schemas on the legacy engine](https://supabase.com/docs/guides/local-development/declarative-database-schemas#starting-from-an-existing-database-on-the-legacy-engine).
+
+### What changes if I already use declarative schemas on migra?
+
+Turn on \`pg-delta\` in \`config.toml\` and remove \`schema_paths\`. Run \`supabase db pull\` to capture any objects missing from your migration history. Then switch your scripts from \`supabase db diff\` to \`supabase db schema declarative sync\`. Follow the [diff engines guide](https://supabase.com/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta) for the full procedure. Projects that don't opt in keep using \`migra\`.
 
 ### Are there any limitations to declarative schemas?
 
-The schema diff tool handles most Postgres objects, but some entities (like DML statements) are not captured and may still require manual migrations.
+\`pg-delta\` does not diff application data or Storage buckets. Buckets are rows in \`storage.buckets\`. RLS policies on \`storage.objects\` are schema objects and are included in diffs.
 
-For detailed instructions and best practices, see the [Declarative Schemas documentation](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
+The engine does not orchestrate zero-downtime rollouts. See [known caveats](https://supabase.com/docs/guides/local-development/declarative-database-schemas#known-caveats) for unsupported objects and extension-specific behavior.
+
+### Does pg-delta work outside Supabase?
+
+Yes. \`pg-delta\` is open source under the PostgreSQL License and ships on npm as \`@supabase/pg-delta\`. Point it at any two Postgres databases from version 14 through 18. It writes the migration between them. The engine is at [supabase/pg-delta](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta).
+
+Get started with the [Declarative Schemas documentation](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -3005,6 +3350,58 @@ For detailed instructions and best practices, see the [Declarative Schemas docum
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'PrivateLink',
+    subtitle: 'Secure private network connectivity to your Supabase database.',
+    description: `
+Supabase PrivateLink provides enterprise-grade private network connectivity between your AWS VPC and your Supabase database using AWS VPC Lattice. This eliminates exposure to the public internet by creating a secure, private connection that keeps your database traffic within the AWS network backbone.
+
+When enabled, your database connections stay entirely within the AWS network. No public internet exposure. No additional attack surface. From a network perspective, your Supabase database behaves like it's inside your own VPC.
+
+## Key benefits
+1. Enhanced security posture: Database traffic flows through private AWS infrastructure only, minimizing attack vectors by eliminating public exposure.
+2. Compliance ready: Meet strict regulatory requirements for private network connectivity in healthcare, finance, and other industries with high compliance requirements.
+3. Reduced latency: Connection latency is typically lower than public connections because traffic takes a more direct path through AWS networks.
+4. Network isolation: Keep sensitive database connections completely separate from public internet traffic.
+5. Simplified architecture: No need to manage complex VPN configurations or additional networking infrastructure.
+6. Flexible deployment: Connect through a dedicated PrivateLink endpoint or integrate with existing VPC Lattice Service Networks.
+
+## How PrivateLink works
+
+Supabase PrivateLink uses AWS VPC Lattice under the hood. When you enable PrivateLink, Supabase shares a VPC Lattice Resource Configuration with your AWS account. You accept the share and create an endpoint in your VPC.
+
+Your applications connect to the endpoint using a private DNS name. Traffic flows through AWS infrastructure to your Supabase database. The connection supports both direct Postgres connections and PgBouncer for connection pooling.
+
+## When to use PrivateLink
+
+PrivateLink is particularly valuable for:
+
+- **Highly regulated industries**: Healthcare, finance, and other organizations with high compliance requirements often require private network connectivity to meet these standards.
+- **Security-conscious teams**: Minimize your attack surface by disabling public database access entirely once PrivateLink is configured.
+- **AWS-native workloads**: If your applications already run on AWS, setting up PrivateLink is straightforward and keeps all traffic within the same cloud provider.
+- **Enterprise deployments**: Organizations handling sensitive data that need additional layers of network security.
+
+## Current considerations
+
+PrivateLink is currently in Beta with some constraints:
+
+- **AWS environments required**: This initial release supports connections to AWS VPCs via PrivateLink. Your workloads needs to run in AWS to use PrivateLink.
+- **Database connections only**: PrivateLink works for Postgres and PgBouncer connections. It does not cover the Supabase API, Storage, Auth, or Realtime services, which still use public endpoints.
+- **Same region required**: Your AWS VPC must be in the same region as your Supabase project.
+- **Team or Enterprise plan required**: PrivateLink is available on Team and Enterprise plans.
+
+By leveraging PrivateLink, you can satisfy stringent compliance requirements, reduce your security attack surface, and ensure your most sensitive database connections never traverse the public internet.
+`,
+    icon: Shield,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/blog/2026/security-retro/privatelink.png',
+    docsUrl: 'https://supabase.com/docs/guides/platform/privatelink',
+    slug: 'privatelink',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: false,
     },
   },
 ]

@@ -1,11 +1,14 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import { AiIconAnimation, Button, Card, cn } from 'ui'
 
+import { SuspensionNotice } from '../../Settings/SuspensionNotice'
 import { AnimatedCursors } from './AnimatedCursors'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useRealtimeConfigurationQuery } from '@/data/realtime/realtime-config-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 /**
  * Acts as a container component for the entire log display
@@ -13,6 +16,9 @@ import { AnimatedCursors } from './AnimatedCursors'
 export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
+
+  const { data } = useRealtimeConfigurationQuery({ projectRef })
+  const isSuspended = Boolean(data?.admin_suspended_at)
 
   const handleCreateTriggerWithAssistant = () => {
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
@@ -25,20 +31,20 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
   return (
     <div className="flex grow items-center justify-center p-12 @container">
       <div className="w-full max-w-4xl flex flex-col items-center gap-0">
-        <div className="text-center mb-12">
+        <div className={cn('text-center', !isSuspended && 'mb-12')}>
           <AnimatedCursors />
           <h2 className="heading-section mb-1">Create realtime experiences</h2>
           <p className="text-foreground-light mb-6">
             Send your first realtime message from your database, application code or edge function
           </p>
-          <Button
-            type="default"
-            icon={<AiIconAnimation />}
-            onClick={handleCreateTriggerWithAssistant}
-          >
-            Set up realtime for me
-          </Button>
+          {!isSuspended && (
+            <Button icon={<AiIconAnimation />} onClick={handleCreateTriggerWithAssistant}>
+              Set up realtime for me
+            </Button>
+          )}
         </div>
+
+        {isSuspended && <SuspensionNotice suspendedAt={data?.admin_suspended_at} />}
 
         <Card className="grid grid-cols-1 @xl:grid-cols-3 bg divide-x mb-8">
           <div className="flex flex-col h-full p-6">
@@ -55,7 +61,7 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
             <p className="text-foreground-light text-sm mb-4 flex-1">
               Send messages to a channel from your client application or database via triggers.
             </p>
-            <Button type="default" className="w-full">
+            <Button className="w-full">
               <Link href={`/project/${projectRef}/database/triggers`}>Create a trigger</Link>
             </Button>
           </div>
@@ -74,7 +80,7 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
             <p className="text-foreground-light text-sm mb-4 flex-1">
               Set up Row Level Security policies to control who can see messages within a channel
             </p>
-            <Button type="default">
+            <Button>
               <Link href={`/project/${projectRef}/realtime/policies`}>Write a policy</Link>
             </Button>
           </div>
@@ -93,13 +99,10 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
             <p className="text-foreground-light text-sm mb-4 flex-1">
               Receive realtime messages in your application by listening to a channel
             </p>
-            <Button type="default" asChild>
-              <Link
-                href={`${DOCS_URL}/guides/realtime/subscribing-to-database-changes#listening-on-client-side`}
-              >
-                Read the guide
-              </Link>
-            </Button>
+            <DocsButton
+              abbrev={false}
+              href={`${DOCS_URL}/guides/realtime/subscribing-to-database-changes#listening-on-client-side`}
+            />
           </div>
         </Card>
       </div>

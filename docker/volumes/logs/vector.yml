@@ -30,7 +30,7 @@ transforms:
     inputs:
       - project_logs
     route:
-      kong: '.appname == "supabase-kong"'
+      kong: '.appname == "supabase-kong" || .appname == "supabase-envoy"'
       auth: '.appname == "supabase-auth"'
       rest: '.appname == "supabase-rest"'
       realtime: '.appname == "realtime-dev.supabase-realtime"'

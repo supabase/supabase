@@ -1,6 +1,4 @@
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { ArrowDownNarrowWide, ArrowDownWideNarrow } from 'lucide-react'
-
+import { ArrowDownNarrowWideIcon, ArrowDownWideNarrowIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -13,6 +11,8 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+
 interface SortDropdownProps {
   specificFilterColumn: string
   sortColumn: string
@@ -24,6 +24,7 @@ interface SortDropdownProps {
   improvedSearchEnabled: boolean
 }
 
+/** [Joshen] To refactor to use the SortDropdown component in components/ui */
 export const SortDropdown = ({
   specificFilterColumn,
   sortColumn,
@@ -38,8 +39,8 @@ export const SortDropdown = ({
     return (
       <ButtonTooltip
         disabled
-        type="default"
-        icon={<ArrowDownNarrowWide />}
+        variant="default"
+        icon={<ArrowDownNarrowWideIcon />}
         tooltip={{
           content: {
             side: 'bottom',
@@ -62,7 +63,9 @@ export const SortDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button icon={sortOrder === 'desc' ? <ArrowDownWideNarrow /> : <ArrowDownNarrowWide />}>
+        <Button
+          icon={sortOrder === 'desc' ? <ArrowDownWideNarrowIcon /> : <ArrowDownNarrowWideIcon />}
+        >
           Sorted by {sortColumn === 'id' ? 'user ID' : sortColumn.replaceAll('_', ' ')}
         </Button>
       </DropdownMenuTrigger>

@@ -1,6 +1,7 @@
-import type { NextRouter } from 'next/router'
-import { BASE_PATH } from './constants'
 import { useRouter } from 'next/navigation'
+import type { NextRouter } from 'next/router'
+
+import { BASE_PATH } from './constants'
 
 type Router = NextRouter | ReturnType<typeof useRouter>
 
@@ -66,7 +67,9 @@ export const createNavigationHandler = (url: string, router: Router) => {
       return
     }
 
-    // Handle regular left click
+    // Regular left click only. Other aux buttons (e.g. right-click) must not navigate.
+    if ('button' in event && event.button !== 0) return
+
     router.push(url)
   }
 }

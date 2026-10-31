@@ -1,12 +1,13 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { tableRowKeys } from 'data/table-rows/keys'
-import { useOperationQueueSaveMutation } from 'data/table-rows/operation-queue-save-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import { useGetImpersonatedRoleState } from 'state/role-impersonation-state'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { QueuedOperation } from 'state/table-editor-operation-queue.types'
+
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { useOperationQueueSaveMutation } from '@/data/table-rows/operation-queue-save-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { QueuedOperation } from '@/state/table-editor-operation-queue.types'
 
 interface UseOperationQueueActionsOptions {
   onSaveSuccess?: () => void

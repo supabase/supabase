@@ -1,8 +1,9 @@
-import { type UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
-import { handleError, post } from 'data/fetchers'
+import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import type { ResponseError } from 'types'
+
 import { branchKeys } from './keys'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
 
 export type BranchRestoreVariables = {
   branchRef: string
@@ -14,6 +15,7 @@ export async function restoreBranch({ branchRef }: BranchRestoreVariables) {
     params: {
       path: { branch_id_or_ref: branchRef },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -33,16 +35,16 @@ export const useBranchRestoreMutation = ({
   const queryClient = useQueryClient()
   return useMutation<BranchRestoreData, ResponseError, BranchRestoreVariables>({
     mutationFn: (vars) => restoreBranch(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to restore branch: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

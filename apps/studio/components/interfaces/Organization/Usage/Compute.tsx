@@ -1,20 +1,20 @@
-import { BarChart2 } from 'lucide-react'
+import { BarChart2Icon } from 'lucide-react'
 import { useMemo } from 'react'
-
-import Panel from 'components/ui/Panel'
-import { DataPoint } from 'data/analytics/constants'
-import {
-  ComputeUsageMetric,
-  computeUsageMetricLabel,
-  type OrgDailyUsageResponse,
-} from 'data/analytics/org-daily-stats-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { SectionContent } from './SectionContent'
 import { Attribute, AttributeColor } from './Usage.constants'
 import { dailyUsageToDataPoints } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
+import Panel from '@/components/ui/Panel'
+import { DataPoint } from '@/data/analytics/constants'
+import {
+  ComputeUsageMetric,
+  computeUsageMetricLabel,
+  type OrgDailyUsageResponse,
+} from '@/data/analytics/org-daily-stats-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface ComputeProps {
   orgDailyStats: OrgDailyUsageResponse | undefined
@@ -135,7 +135,7 @@ const Compute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) => {
               <Panel>
                 <Panel.Content>
                   <div className="flex flex-col items-center justify-center">
-                    <BarChart2 className="text-foreground-light mb-2" />
+                    <BarChart2Icon className="text-foreground-light mb-2" />
                     <p className="text-sm">No data in period</p>
                     <p className="text-sm text-foreground-light">May take up to one hour to show</p>
                   </div>

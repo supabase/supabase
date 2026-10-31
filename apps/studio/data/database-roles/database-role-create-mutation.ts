@@ -2,9 +2,10 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { invalidateRolesQuery } from './database-roles-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type CreateRoleBody = Parameters<typeof pgMeta.roles.create>[0]
 
@@ -25,6 +26,7 @@ export async function createDatabaseRole({
     connectionString,
     sql,
     queryKey: ['roles', 'create'],
+    grant: unguarded.migrating,
   })
   return result
 }

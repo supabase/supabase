@@ -1,20 +1,29 @@
-import { authKeys } from 'data/auth/keys'
-import { databaseExtensionsKeys } from 'data/database-extensions/keys'
-import { databaseIndexesKeys } from 'data/database-indexes/keys'
-import { databasePoliciesKeys } from 'data/database-policies/keys'
-import { databaseTriggerKeys } from 'data/database-triggers/keys'
-import { databaseKeys } from 'data/database/keys'
-import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
-import { handleError } from 'data/fetchers'
-import { tableKeys } from 'data/tables/keys'
-import { tryParseJson } from 'lib/helpers'
+import { isToolUIPart, type UIMessage } from 'ai'
 import { toast } from 'sonner'
-import { ResponseError } from 'types'
 
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
+import {
+  isLogsSource,
+  sqlSourceToFenceLanguage,
+} from '@/components/interfaces/SQLEditor/querySource'
+import { authKeys } from '@/data/auth/keys'
+import { databaseExtensionsKeys } from '@/data/database-extensions/keys'
+import { databaseIndexesKeys } from '@/data/database-indexes/keys'
+import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { databaseTriggerKeys } from '@/data/database-triggers/keys'
+import { databaseKeys } from '@/data/database/keys'
+import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
+import { handleError } from '@/data/fetchers'
+import { tableKeys } from '@/data/tables/keys'
+import { isManualApprovalRequested } from '@/lib/ai/message-utils'
+import { tryParseJson } from '@/lib/helpers'
+import type { SqlSnippet } from '@/state/ai-assistant-state'
+import { ResponseError } from '@/types'
+
+export type MutationCategory = 'functions' | 'rls-policies'
 
 // [Joshen] This is just very basic identification, but possible can extend perhaps
-export const identifyQueryType = (query: string) => {
+export const identifyQueryType = (query: string): MutationCategory | undefined => {
   const formattedQuery = query.toLowerCase().replaceAll('\n', ' ')
   if (
     formattedQuery.includes('create function') ||
@@ -24,6 +33,7 @@ export const identifyQueryType = (query: string) => {
   } else if (formattedQuery.includes('create policy') || formattedQuery.includes('alter policy')) {
     return 'rls-policies'
   }
+  return undefined
 }
 
 // Check for function calls that aren't in the safe list
@@ -72,6 +82,36 @@ export const isReadOnlySelect = (query: string): boolean => {
   return true
 }
 
+export const hasPendingToolApproval = (messages: Pick<UIMessage, 'role' | 'parts'>[]) => {
+  return messages.some((message) => {
+    if (message.role !== 'assistant') return false
+
+    return message.parts?.some((part) => isManualApprovalRequested(part))
+  })
+}
+
+export const resolvePendingToolApprovalsAsDenied = (messages: UIMessage[]): UIMessage[] => {
+  return messages.map((message) => {
+    if (message.role !== 'assistant') return message
+
+    const parts = message.parts?.map((part) => {
+      if (!isToolUIPart(part) || part.state !== 'approval-requested') return part
+
+      return {
+        ...part,
+        state: 'output-denied',
+        approval: {
+          id: part.approval.id,
+          approved: false,
+          reason: 'Skipped because the user sent a follow-up message.',
+        },
+      } as UIMessage['parts'][number]
+    })
+
+    return { ...message, parts } as UIMessage
+  })
+}
+
 const getContextKey = (pathname: string) => {
   const [, , , ...rest] = pathname.split('/')
   const key = rest.join('/')
@@ -93,9 +133,12 @@ export const getContextualInvalidationKeys = ({
     (
       {
         'auth/users': [authKeys.usersInfinite(ref)],
-        'auth/policies': [databasePoliciesKeys.list(ref)],
+        'database/policies': [databasePoliciesKeys.list(ref)],
         'database/functions': [databaseKeys.databaseFunctions(ref)],
-        'database/tables': [tableKeys.list(ref, schema, true), tableKeys.list(ref, schema, false)],
+        'database/tables': [
+          tableKeys.list(ref, schema, { includeColumns: true }),
+          tableKeys.list(ref, schema, { includeColumns: false }),
+        ],
         'database/triggers': [databaseTriggerKeys.list(ref)],
         'database/types': [enumeratedTypesKeys.list(ref)],
         'database/extensions': [databaseExtensionsKeys.list(ref)],
@@ -121,4 +164,42 @@ export const onErrorChat = (error: Error) => {
       toast.error('An unknown error occurred')
     }
   }
+}
+
+export function containsLogsSnippets(snippets: readonly SqlSnippet[] | undefined): boolean {
+  return (snippets ?? []).some(
+    (snippet) => typeof snippet !== 'string' && isLogsSource(snippet.source)
+  )
+}
+
+export const getSnippetLabel = (snippet: SqlSnippet, index: number): string =>
+  typeof snippet === 'string' ? `Snippet ${index + 1}` : snippet.label
+
+export const getSnippetContent = (snippet: SqlSnippet): string =>
+  typeof snippet === 'string' ? snippet : snippet.content
+
+/**
+ * The fence language an attached query is written into the message with. A logs query
+ * is fenced as `clickhouse` so the model can tell which attachment is ClickHouse
+ * against the `logs` table — a single message can carry both dialects.
+ *
+ * It also keeps the two apart in the rendered message: MessageMarkdown treats a `sql`
+ * fence as runnable Postgres (`AssistantQueryCell`, branded with `untrustedSql`),
+ * which a ClickHouse query must never be offered as.
+ */
+function getSnippetFenceLanguage(snippet: SqlSnippet): 'sql' | 'clickhouse' {
+  return sqlSourceToFenceLanguage(typeof snippet === 'string' ? undefined : snippet.source)
+}
+
+/**
+ * Renders attached queries as the fenced code blocks appended to the message text,
+ * each labelled with its own dialect.
+ */
+export function formatAttachedSnippets(snippets: readonly SqlSnippet[]): string {
+  return snippets
+    .map(
+      (snippet) =>
+        '```' + getSnippetFenceLanguage(snippet) + '\n' + getSnippetContent(snippet) + '\n```'
+    )
+    .join('\n')
 }

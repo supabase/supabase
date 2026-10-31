@@ -1,13 +1,14 @@
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
+import type { CommandOptions } from 'ui-patterns/CommandMenu'
+import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
 import {
   IntegrationDefinition,
   INTEGRATIONS,
-} from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { CommandOptions } from 'ui-patterns/CommandMenu'
-import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+} from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useIntegrationsGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -22,29 +23,15 @@ export function useIntegrationsGotoCommands(options?: CommandOptions) {
   const getName = (integration: IntegrationDefinition) => {
     switch (integration.id) {
       case 'cron':
-        return 'View and manage your Cron Jobs'
+        return 'Manage Cron Jobs'
       case 'graphiql':
         return 'Query database using GraphQL'
       case 'vault':
-        return 'View and manage your keys and secrets via Vault'
+        return 'Manage keys and secrets via Vault'
       default:
-        return `View and manage your ${integration.name}${integration.type === 'wrapper' ? 's' : ''}`
+        return `Manage ${integration.name}${integration.type === 'wrapper' ? 's' : ''}`
     }
   }
-
-  useRegisterCommands(
-    COMMAND_MENU_SECTIONS.NAVIGATE,
-    allIntegrations.map((x) => {
-      return {
-        id: `nav-integrations-${x.id}`,
-        name: x.name,
-        value: `Integrations: ${x.name}`,
-        route: `/project/${ref}/integrations/${x.id}/overview`,
-        defaultHidden: true,
-      }
-    }),
-    { ...options, deps: [ref] }
-  )
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.INTEGRATIONS,
@@ -54,7 +41,7 @@ export function useIntegrationsGotoCommands(options?: CommandOptions) {
         name: getName(x),
         route: `/project/${ref}/integrations/${x.id}/overview`,
         icon: () => (
-          <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:!p-1 [&>svg]:!p-1">
+          <div className="w-6 h-6 relative bg-white border rounded-md flex items-center justify-center [&>img]:p-1! [&>svg]:p-1!">
             {x.icon()}
           </div>
         ),

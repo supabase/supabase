@@ -1,27 +1,34 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
+import { FeatureFlagContext, useFlag, useParams } from 'common'
+import dayjs from 'dayjs'
 import { isEqual } from 'lodash'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 
-import { useParams } from 'common'
-import { get } from 'data/fetchers'
-import { generateRegexpWhere } from '../Reports.constants'
+import { generateRegexpWhereSafe, PRESET_CONFIG } from '../Reports.constants'
 import { ReportFilterItem } from '../Reports.types'
+import { getLogsSql } from '../Reports.utils'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
+import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { reportKeys } from '@/data/reports/keys'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const SHARED_API_REPORT_SQL = {
   totalRequests: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs') => `
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+      safeSql`
         --reports-api-total-requests
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
-        FROM ${src} t
+        FROM edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -29,7 +36,8 @@ export const SHARED_API_REPORT_SQL = {
   },
   topRoutes: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs') => `
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+      safeSql`
         -- reports-api-top-routes
         select
           request.path as path,
@@ -37,12 +45,12 @@ export const SHARED_API_REPORT_SQL = {
           request.search as search,
           response.status_code as status_code,
           count(t.id) as count
-        from ${src} t
+        from edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -52,19 +60,20 @@ export const SHARED_API_REPORT_SQL = {
   },
   errorCounts: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs') => `
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+      safeSql`
         -- reports-api-error-counts
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           count(t.id) as count
-        FROM ${src} t
+        FROM edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
         WHERE
           response.status_code >= 400
-        ${generateRegexpWhere(filters, false)}
+        ${generateRegexpWhereSafe(filters, false)}
         GROUP BY
           timestamp
         ORDER BY
@@ -73,7 +82,8 @@ export const SHARED_API_REPORT_SQL = {
   },
   topErrorRoutes: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs') => `
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+      safeSql`
         -- reports-api-top-error-routes
         select
           request.path as path,
@@ -81,14 +91,14 @@ export const SHARED_API_REPORT_SQL = {
           request.search as search,
           response.status_code as status_code,
           count(t.id) as count
-        from ${src} t
+        from edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
         where
           response.status_code >= 400
-        ${generateRegexpWhere(filters, false)}
+        ${generateRegexpWhereSafe(filters, false)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -98,18 +108,19 @@ export const SHARED_API_REPORT_SQL = {
   },
   responseSpeed: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs') => `
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+      safeSql`
         -- reports-api-response-speed
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
           avg(response.origin_time) as avg
         FROM
-          ${src} t
+          edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -118,7 +129,8 @@ export const SHARED_API_REPORT_SQL = {
   },
   topSlowRoutes: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs') => `
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+      safeSql`
         -- reports-api-top-slow-routes
         select
           request.path as path,
@@ -127,12 +139,12 @@ export const SHARED_API_REPORT_SQL = {
           response.status_code as status_code,
           count(t.id) as count,
           avg(response.origin_time) as avg
-        from ${src} t
+        from edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
-        ${generateRegexpWhere(filters)}
+        ${generateRegexpWhereSafe(filters)}
         group by
           request.path, request.method, request.search, response.status_code
         order by
@@ -142,7 +154,8 @@ export const SHARED_API_REPORT_SQL = {
   },
   networkTraffic: {
     queryType: 'logs',
-    sql: (filters: ReportFilterItem[], src = 'edge_logs') => `
+    safeSql: (filters: ReportFilterItem[]): SafeLogSqlFragment =>
+      safeSql`
         -- reports-api-network-traffic
         select
           cast(timestamp_trunc(t.timestamp, hour) as datetime) as timestamp,
@@ -165,13 +178,13 @@ export const SHARED_API_REPORT_SQL = {
             0
           ) as egress_mb,
         FROM
-          ${src} t
+          edge_logs t
           cross join unnest(metadata) as m
           cross join unnest(m.response) as response
           cross join unnest(m.request) as request
           cross join unnest(request.headers) as headers
           cross join unnest(response.headers) as resp_headers
-          ${generateRegexpWhere(filters)}
+          ${generateRegexpWhereSafe(filters)}
         GROUP BY
           timestamp
         ORDER BY
@@ -182,51 +195,8 @@ export const SHARED_API_REPORT_SQL = {
 
 export type SharedAPIReportKey = keyof typeof SHARED_API_REPORT_SQL
 
-const fetchLogs = async ({
-  projectRef,
-  sql,
-  start,
-  end,
-}: {
-  projectRef: string
-  sql: string
-  start: string
-  end: string
-}) => {
-  const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      query: {
-        sql,
-        iso_timestamp_start: start,
-        iso_timestamp_end: end,
-      },
-    },
-  })
+export type SharedAPIReportFilterBy = 'auth' | 'realtime' | 'postgrest'
 
-  if (error || data?.error) {
-    Sentry.captureException({
-      message: 'Shared API Report Error',
-      data: {
-        error,
-        data,
-      },
-    })
-    throw error || data?.error
-  }
-
-  return data
-}
-
-const DEFAULT_KEYS = ['shared-api-report']
-
-export type SharedAPIReportFilterBy =
-  | 'auth'
-  | 'realtime'
-  | 'storage'
-  | 'graphql'
-  | 'functions'
-  | 'postgrest'
 type SharedAPIReportParams = {
   filterBy: SharedAPIReportFilterBy
   start: string
@@ -234,6 +204,17 @@ type SharedAPIReportParams = {
   projectRef: string
   enabled?: boolean
 }
+export const getSharedAPIReportSql = (
+  queryName: SharedAPIReportKey,
+  filters: ReportFilterItem[],
+  { start, end, useOtel }: { start: string; end: string; useOtel: boolean }
+): SafeLogSqlFragment => {
+  const granularity = dayjs(end).diff(dayjs(start), 'minute') <= 60 ? 'minute' : 'hour'
+  return useOtel
+    ? getLogsSql(PRESET_CONFIG.api.queries[queryName], filters, true, granularity)
+    : SHARED_API_REPORT_SQL[queryName].safeSql(filters)
+}
+
 export const useSharedAPIReport = ({
   filterBy,
   start,
@@ -243,20 +224,10 @@ export const useSharedAPIReport = ({
   const { ref } = useParams() as { ref: string }
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const queryClient = useQueryClient()
-  const filterByMapSource = {
-    functions: 'function_edge_logs',
-    realtime: 'edge_logs',
-    storage: 'edge_logs',
-    graphql: 'edge_logs',
-    postgrest: 'edge_logs',
-    auth: 'edge_logs',
-  }
-
-  const filterByMapValue = {
-    functions: '/functions',
+  const flagUseOtel = useFlag('otelReports')
+  const { hasLoaded: hasLoadedFlags } = useContext(FeatureFlagContext)
+  const filterByMapValue: Record<SharedAPIReportFilterBy, string> = {
     realtime: '/realtime',
-    storage: '/storage',
-    graphql: '/graphql',
     postgrest: '/rest',
     auth: '/auth',
   }
@@ -268,31 +239,58 @@ export const useSharedAPIReport = ({
   }
 
   const allFilters = [baseFilter, ...filters]
+  const source = 'edge_logs'
+  const useOtel = IS_PLATFORM && Boolean(flagUseOtel)
+  const isQueryModeReady = !IS_PLATFORM || hasLoadedFlags === true
+  const keys = Object.keys(SHARED_API_REPORT_SQL) as SharedAPIReportKey[]
+  const getQuerySql = (queryName: SharedAPIReportKey) =>
+    getSharedAPIReportSql(queryName, allFilters, { start, end, useOtel })
+  const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
+    totalRequests: getQuerySql('totalRequests'),
+    topRoutes: getQuerySql('topRoutes'),
+    errorCounts: getQuerySql('errorCounts'),
+    topErrorRoutes: getQuerySql('topErrorRoutes'),
+    responseSpeed: getQuerySql('responseSpeed'),
+    topSlowRoutes: getQuerySql('topSlowRoutes'),
+    networkTraffic: getQuerySql('networkTraffic'),
+  }
 
   const queries = useQueries({
-    queries: Object.entries(SHARED_API_REPORT_SQL).map(([key, value]) => ({
-      queryKey: [
-        ...DEFAULT_KEYS,
+    queries: keys.map((queryName) => ({
+      queryKey: reportKeys.sharedApiMetric({
         filterBy,
-        key,
-        filterByMapSource[filterBy],
+        queryName,
+        source,
         filters,
         start,
         end,
-        ref,
-      ],
-      enabled: enabled && !!ref && !!filterBy,
-      queryFn: () =>
-        fetchLogs({
-          projectRef: ref,
-          sql: value.sql(allFilters, filterByMapSource[filterBy]),
-          start,
-          end,
-        }),
+        projectRef: ref,
+        useOtel,
+      }),
+      enabled: enabled && isQueryModeReady && !!ref && !!filterBy,
+      queryFn: async ({ signal }) => {
+        try {
+          const data = await executeAnalyticsSql({
+            projectRef: ref,
+            endpoint: logsAllEndpointUrl(useOtel),
+            sql: SQLMap[queryName],
+            iso_timestamp_start: start,
+            iso_timestamp_end: end,
+            method: 'get',
+            signal,
+          })
+          if (data?.error !== undefined) {
+            const message = typeof data.error === 'string' ? data.error : data.error.message
+            throw new Error(message)
+          }
+          return data
+        } catch (err) {
+          Sentry.captureException({ message: 'Shared API Report Error', data: { error: err } })
+          throw err
+        }
+      },
     })),
   })
-
-  const keys = Object.keys(SHARED_API_REPORT_SQL) as Array<keyof typeof SHARED_API_REPORT_SQL>
 
   const data = keys.reduce(
     (acc, key, i) => {
@@ -304,15 +302,15 @@ export const useSharedAPIReport = ({
 
   const error = keys.reduce(
     (acc, key, i) => {
-      acc[key] = queries[i].error as unknown as string
+      acc[key] = queries[i].error
       return acc
     },
-    {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: string }
+    {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: Error | null }
   )
 
   const isLoading = keys.reduce(
     (acc, key, i) => {
-      acc[key] = queries[i].isLoading
+      acc[key] = !isQueryModeReady || queries[i].isLoading
       return acc
     },
     {} as { [K in keyof typeof SHARED_API_REPORT_SQL]: boolean }
@@ -341,29 +339,13 @@ export const useSharedAPIReport = ({
 
   const isLoadingData = Object.values(isLoading).some(Boolean)
 
-  const SQLMap: Record<SharedAPIReportKey, string> = {
-    totalRequests: SHARED_API_REPORT_SQL.totalRequests.sql(allFilters, filterByMapSource[filterBy]),
-    topRoutes: SHARED_API_REPORT_SQL.topRoutes.sql(allFilters, filterByMapSource[filterBy]),
-    errorCounts: SHARED_API_REPORT_SQL.errorCounts.sql(allFilters, filterByMapSource[filterBy]),
-    topErrorRoutes: SHARED_API_REPORT_SQL.topErrorRoutes.sql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-    responseSpeed: SHARED_API_REPORT_SQL.responseSpeed.sql(allFilters, filterByMapSource[filterBy]),
-    topSlowRoutes: SHARED_API_REPORT_SQL.topSlowRoutes.sql(allFilters, filterByMapSource[filterBy]),
-    networkTraffic: SHARED_API_REPORT_SQL.networkTraffic.sql(
-      allFilters,
-      filterByMapSource[filterBy]
-    ),
-  }
-
   return {
     data,
     error,
     isLoading,
     isLoadingData,
-    isRefetching: queryClient.isFetching({ queryKey: DEFAULT_KEYS }) > 0 || false,
-    refetch: () => queryClient.invalidateQueries({ queryKey: DEFAULT_KEYS }),
+    isRefetching: queryClient.isFetching({ queryKey: reportKeys.allSharedApi }) > 0 || false,
+    refetch: () => queryClient.invalidateQueries({ queryKey: reportKeys.allSharedApi }),
     filters,
     addFilter,
     removeFilters,

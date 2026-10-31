@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  enforceAndLogicalOperator,
   FilterGroupType,
   isFilterGroup,
   serializeOperators,
@@ -29,41 +28,11 @@ describe('isFilterGroup', () => {
 })
 
 describe('serializeOptions', () => {
-  test('returns undefined for undefined input', () => {
-    expect(serializeOptions(undefined)).toBeUndefined()
+  test.each([undefined, null, []])('returns undefined for %o', (input) => {
+    expect(serializeOptions(input as Parameters<typeof serializeOptions>[0])).toBeUndefined()
   })
 
-  test('returns undefined for non-array input', () => {
-    expect(serializeOptions(null as any)).toBeUndefined()
-  })
-
-  test('returns undefined for empty array', () => {
-    expect(serializeOptions([])).toBeUndefined()
-  })
-
-  test('handles string options', () => {
-    expect(serializeOptions(['option1', 'option2'])).toEqual(['option1', 'option2'])
-  })
-
-  test('extracts label from object options', () => {
-    expect(serializeOptions([{ label: 'Label 1' }, { label: 'Label 2' }])).toEqual([
-      'Label 1',
-      'Label 2',
-    ])
-  })
-
-  test('falls back to value when label is not present', () => {
-    expect(serializeOptions([{ value: 'value1' }, { value: 'value2' }])).toEqual([
-      'value1',
-      'value2',
-    ])
-  })
-
-  test('prefers label over value', () => {
-    expect(serializeOptions([{ label: 'Label', value: 'value' }])).toEqual(['Label'])
-  })
-
-  test('handles mixed option types', () => {
+  test('serializes strings as-is and objects by label, falling back to value', () => {
     expect(
       serializeOptions([
         'string',
@@ -80,48 +49,19 @@ describe('serializeOptions', () => {
 })
 
 describe('serializeOperators', () => {
-  test('returns default ["="] for undefined input', () => {
-    expect(serializeOperators(undefined)).toEqual(['='])
+  test.each([undefined, null, []])('returns default ["="] for %o', (input) => {
+    expect(serializeOperators(input as Parameters<typeof serializeOperators>[0])).toEqual(['='])
   })
 
-  test('returns default ["="] for empty array', () => {
-    expect(serializeOperators([])).toEqual(['='])
-  })
-
-  test('returns default ["="] for non-array input', () => {
-    expect(serializeOperators(null as any)).toEqual(['='])
-  })
-
-  test('handles string operators', () => {
-    expect(serializeOperators(['=', '>', '<'])).toEqual(['=', '>', '<'])
-  })
-
-  test('extracts value from object operators', () => {
+  test('serializes strings as-is and objects by value, falling back to label', () => {
     expect(
       serializeOperators([
-        { value: '=', label: 'equals' },
-        { value: '>', label: 'greater than' },
+        '=',
+        { value: '>' },
+        { label: 'less than' },
+        { value: '!=', label: 'ne' },
       ])
-    ).toEqual(['=', '>'])
-  })
-
-  test('falls back to label when value is not present', () => {
-    expect(serializeOperators([{ label: 'equals' }, { label: 'greater than' }])).toEqual([
-      'equals',
-      'greater than',
-    ])
-  })
-
-  test('prefers value over label', () => {
-    expect(serializeOperators([{ value: '=', label: 'equals' }])).toEqual(['='])
-  })
-
-  test('handles mixed operator types', () => {
-    expect(serializeOperators(['=', { value: '>' }, { label: 'less than' }])).toEqual([
-      '=',
-      '>',
-      'less than',
-    ])
+    ).toEqual(['=', '>', 'less than', '!='])
   })
 
   test('returns default if all operators are invalid', () => {
@@ -205,61 +145,5 @@ describe('validateFilterGroup', () => {
       conditions: [],
     }
     expect(validateFilterGroup(group, properties)).toBe(true)
-  })
-})
-
-describe('enforceAndLogicalOperator', () => {
-  test('converts OR to AND at root level', () => {
-    const group: FilterGroupType = {
-      logicalOperator: 'OR',
-      conditions: [{ propertyName: 'name', operator: '=', value: 'test' }],
-    }
-    const result = enforceAndLogicalOperator(group)
-    expect(result.logicalOperator).toBe('AND')
-  })
-
-  test('preserves conditions when converting', () => {
-    const condition = { propertyName: 'name', operator: '=', value: 'test' }
-    const group: FilterGroupType = {
-      logicalOperator: 'OR',
-      conditions: [condition],
-    }
-    const result = enforceAndLogicalOperator(group)
-    expect(result.conditions).toEqual([condition])
-  })
-
-  test('recursively converts nested groups to AND', () => {
-    const group: FilterGroupType = {
-      logicalOperator: 'OR',
-      conditions: [
-        { propertyName: 'name', operator: '=', value: 'test' },
-        {
-          logicalOperator: 'OR',
-          conditions: [
-            { propertyName: 'age', operator: '>', value: 18 },
-            {
-              logicalOperator: 'OR',
-              conditions: [{ propertyName: 'active', operator: '=', value: true }],
-            },
-          ],
-        },
-      ],
-    }
-    const result = enforceAndLogicalOperator(group)
-
-    expect(result.logicalOperator).toBe('AND')
-    expect((result.conditions[1] as FilterGroupType).logicalOperator).toBe('AND')
-    expect(
-      ((result.conditions[1] as FilterGroupType).conditions[1] as FilterGroupType).logicalOperator
-    ).toBe('AND')
-  })
-
-  test('handles empty conditions array', () => {
-    const group: FilterGroupType = {
-      logicalOperator: 'OR',
-      conditions: [],
-    }
-    const result = enforceAndLogicalOperator(group)
-    expect(result).toEqual({ logicalOperator: 'AND', conditions: [] })
   })
 })

@@ -1,13 +1,14 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { components } from 'data/api'
-import { handleError, post } from 'data/fetchers'
-import { PROVIDERS } from 'lib/constants'
-import { captureCriticalError } from 'lib/error-reporting'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { DesiredInstanceSize, PostgresEngine, ReleaseChannel } from './new-project.constants'
 import { useInvalidateProjectsInfiniteQuery } from './org-projects-infinite-query'
+import type { components } from '@/data/api'
+import { handleError, post } from '@/data/fetchers'
+import { invalidatePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
+import { PROVIDERS } from '@/lib/constants'
+import { captureCriticalError } from '@/lib/error-reporting'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CloudProvider = CreateProjectBody['cloud_provider']
@@ -26,8 +27,12 @@ export type ProjectCreateVariables = {
   dbInstanceSize?: DesiredInstanceSize
   dataApiExposedSchemas?: string[]
   dataApiUseApiSchema?: boolean
+  dataApiRevokeDefaultPrivileges?: boolean
   postgresEngine?: PostgresEngine
   releaseChannel?: ReleaseChannel
+  highAvailability?: boolean
+  githubInstallationId?: CreateProjectBody['github_installation_id']
+  githubRepositoryId?: CreateProjectBody['github_repository_id']
 }
 
 export async function createProject({
@@ -43,8 +48,12 @@ export async function createProject({
   dbInstanceSize,
   dataApiExposedSchemas,
   dataApiUseApiSchema,
+  dataApiRevokeDefaultPrivileges,
   postgresEngine,
   releaseChannel,
+  highAvailability,
+  githubInstallationId,
+  githubRepositoryId,
 }: ProjectCreateVariables) {
   const body: CreateProjectBody = {
     cloud_provider: cloudProvider as CloudProvider,
@@ -61,8 +70,12 @@ export async function createProject({
     desired_instance_size: dbInstanceSize,
     data_api_exposed_schemas: dataApiExposedSchemas,
     data_api_use_api_schema: dataApiUseApiSchema,
+    data_api_revoke_default_privileges: dataApiRevokeDefaultPrivileges,
     postgres_engine: postgresEngine,
     release_channel: releaseChannel,
+    high_availability: highAvailability,
+    github_installation_id: githubInstallationId,
+    github_repository_id: githubRepositoryId,
   }
 
   const { data, error } = await post(`/platform/projects`, {
@@ -83,12 +96,13 @@ export const useProjectCreateMutation = ({
   UseCustomMutationOptions<ProjectCreateData, ResponseError, ProjectCreateVariables>,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   return useMutation<ProjectCreateData, ResponseError, ProjectCreateVariables>({
     mutationFn: (vars) => createProject(vars),
     async onSuccess(data, variables, context) {
-      await invalidateProjectsQuery()
+      await Promise.all([invalidateProjectsQuery(), invalidatePermissionsQueryV2(queryClient)])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

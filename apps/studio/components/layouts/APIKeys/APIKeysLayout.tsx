@@ -1,13 +1,15 @@
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { DOCS_URL } from '@/lib/constants'
 
 const ApiKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()
+  const { isHighAvailability } = useHighAvailability()
 
   const navigationItems = [
     {
@@ -15,11 +17,15 @@ const ApiKeysLayout = ({ children }: PropsWithChildren) => {
       href: `/project/${projectRef}/settings/api-keys`,
       id: 'new-keys',
     },
-    {
-      label: 'Legacy anon, service_role API keys',
-      href: `/project/${projectRef}/settings/api-keys/legacy`,
-      id: 'legacy-keys',
-    },
+    ...(isHighAvailability
+      ? []
+      : [
+          {
+            label: 'Legacy anon, service_role API keys',
+            href: `/project/${projectRef}/settings/api-keys/legacy`,
+            id: 'legacy-keys',
+          },
+        ]),
   ]
 
   return (

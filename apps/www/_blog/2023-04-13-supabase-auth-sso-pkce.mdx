@@ -41,7 +41,7 @@ Building SSO into your application isn't necessarily hard, but does come with so
 
 ### Getting Started with SAML 2.0
 
-To get started, enable the [“SAML 2.0“](https://supabase.com/dashboard/project/phcnitosaawbzytgyznx/auth/providers) [authentication method in the dashboard](https://supabase.com/dashboard/project/_/auth/providers). We've added new commands to the [Supabase CLI](https://supabase.com/docs/guides/cli) to help with the configuration process:
+To get started, enable the [“SAML 2.0“](https://supabase.com/dashboard/project/phcnitosaawbzytgyznx/auth/providers) [authentication method in the dashboard](https://supabase.com/dashboard/project/_/auth/providers). We've added new commands to the [Supabase CLI](https://supabase.com/docs/guides/local-development) to help with the configuration process:
 
 ```bash
 $ supabase sso --help
@@ -71,7 +71,7 @@ if (data.url) window.location.href = data.url
 
 As usual, we've engineered this feature around the excellent capabilities of PostgreSQL.
 
-For example, you can use Row Level Security (RLS) to build multi-tenant applications, simply by using the provider's unique identifier in the user's JWT:
+For example, you can use [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS) to build multi-tenant applications, simply by using the provider's unique identifier in the user's JWT:
 
 ```sql
 create policy "Only allow read-write access to tenants" on tablename as restrictive to authenticated using (
@@ -91,7 +91,7 @@ When we [launched](https://news.ycombinator.com/item?id=24072051) Supabase Auth,
 
 <Img
   alt="diagram reference"
-  className="!m-0"
+  className="m-0!"
   src={{
     light:
       '/images/blog/launch-week-7/day-4-supabase-auth-sso-pkce/supabase-auth-implicit-grant-flow--light.svg',
@@ -124,7 +124,7 @@ The PKCE flow introduces a _code verifier_ (a randomly generated secret) and a _
 
 <Img
   alt="diagram reference"
-  className="!m-0"
+  className="m-0!"
   src={{
     light:
       '/images/blog/launch-week-7/day-4-supabase-auth-sso-pkce/supabase-auth-pkce-flow--light.svg',
@@ -134,7 +134,7 @@ The PKCE flow introduces a _code verifier_ (a randomly generated secret) and a _
 
 ### Migrating to PKCE on the client
 
-Over the next few weeks, you'll be able to use it with the Supabase libraries. We've already added PKCE to the [JavaScript](https://supabase.com/docs/reference/javascript/installing) client library and our [auth-helpers](https://supabase.com/docs/guides/auth/auth-helpers) library. If you're using `supabase-js` , you can switch to PKCE by initializing your client with the following option:
+Over the next few weeks, you'll be able to use it with the Supabase libraries. We've already added PKCE to the [JavaScript](https://supabase.com/docs/reference/javascript/installing) client library and our [auth-helpers](https://supabase.com/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) library. If you're using `supabase-js` , you can switch to PKCE by initializing your client with the following option:
 
 ```tsx
 import { createClient } from '@supabase/supabase-js'
@@ -224,7 +224,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 Since this is a major update that touches many of the authentication routes, we will roll it out gradually over the next few weeks. You will receive a notification in your dashboard when the feature is available for your project. Reach out to us if you want early access to this feature.
 
-**Update**: Server-Side Auth (PKCE) is now available on all projects. Please refer to our [Server Side Auth Guide](https://supabase.com/docs/guides/auth/server-side-rendering) for further details on how to add PKCE to your project.
+**Update**: Server-Side Auth (PKCE) is now available on all projects. Please refer to our [Server Side Auth Guide](https://supabase.com/docs/guides/auth/server-side) for further details on how to add PKCE to your project.
 
 ## Native Apple login on iOS
 

@@ -16,14 +16,14 @@ toc_depth: 2
 
 Authentication of your apps is one of the most important topics, and by combining Angular logic with [Supabase authentication](https://supabase.com/docs/guides/auth) functionality we can build powerful and secure applications in no time.
 
-In this tutorial, we will create an [Ionic Angular application with Supabase](https://supabase.com/docs/guides/with-ionic-angular) backend to build a simple realtime messaging app.
+In this tutorial, we will create an [Ionic Angular application with Supabase](https://supabase.com/docs/guides/getting-started/tutorials/with-ionic-angular) backend to build a simple realtime messaging app.
 
 ![Ionic Angular Authentication with Supabase](/images/blog/simmon-grim-ionic-angular-authentication/ionic-angular-authentication-supabase.gif)
 
 Along the way we will dive into:
 
 - User **registration and login** with email/password
-- Adding [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) to protect our database
+- Adding [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) to protect our database
 - Angular **guards** and token handling logic
 - **Magic link** authentication for both web and **native mobile apps**
 
@@ -626,7 +626,8 @@ ion-content {
   --padding-top: 20%;
   --padding-start: 5%;
   --padding-end: 5%;
-  --background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
+  --background:
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
     url('https://images.unsplash.com/photo-1508964942454-1a56651d54ac?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1035&q=80')
       no-repeat;
 }
@@ -792,7 +793,8 @@ ion-content {
   --padding-top: 20%;
   --padding-start: 5%;
   --padding-end: 5%;
-  --background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
+  --background:
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
     url('https://images.unsplash.com/photo-1508964942454-1a56651d54ac?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1035&q=80')
       no-repeat;
 }
@@ -1519,7 +1521,7 @@ We've come a long way and covered everything from setting up tables, to defining
 
 You can [find the full code of this tutorial on GitHub](https://github.com/saimon24/supa-chat) where you just need to insert your own Supabase instance and then create the tables with the included SQL file, plus updating the authentication settings as we did in the tutorial
 
-Although we can now use magic link auth, something probably even better fitting for native apps would be [phone auth with Twilio](https://supabase.com/docs/guides/auth/phone-login/twilio) that's also easily possible with Supabase - just like tons of other authentication providers!
+Although we can now use magic link auth, something probably even better fitting for native apps would be [phone auth with Twilio](https://supabase.com/docs/guides/auth/phone-login?showSmsProvider=Twilio) that's also easily possible with Supabase - just like tons of other authentication providers!
 
 Protecting your Ionic Angular app with Supabase is a breeze, and through the security rules, you can make sure your data and tables are protected in the best possible way.
 

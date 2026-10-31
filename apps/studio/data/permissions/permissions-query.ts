@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
-
+import { useQuery, type QueryClient } from '@tanstack/react-query'
 import { useIsLoggedIn } from 'common'
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { Permission, ResponseError, UseCustomQueryOptions } from 'types'
+
 import { permissionKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { Permission, ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type PermissionsResponse = Permission[]
 
@@ -43,4 +43,8 @@ export const usePermissionsQuery = <TData = PermissionsData>({
     enabled: IS_PLATFORM && enabled && isLoggedIn,
     staleTime: 5 * 60 * 1000,
   })
+}
+
+export function invalidatePermissionsQuery(client: QueryClient) {
+  return client.invalidateQueries({ queryKey: permissionKeys.list() })
 }

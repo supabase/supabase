@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { jwtSigningKeysKeys } from './keys'
+import { handleError, patch, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 interface JWTSigningKeyUpdateVariables {
   projectRef?: string
@@ -21,6 +21,7 @@ export async function updateJWTSigningKey(payload: JWTSigningKeyUpdateVariables)
     body: {
       status: payload.status,
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

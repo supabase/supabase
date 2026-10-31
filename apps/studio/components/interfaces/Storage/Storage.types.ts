@@ -1,5 +1,7 @@
-import type { PolicyFormField } from 'components/interfaces/Auth/Policies/Policies.types'
+import type { components } from 'api-types'
+
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from './Storage.constants'
+import { PolicyFormField } from './StoragePolicies/StoragePolicies.types'
 
 export interface StoragePolicyFormField extends PolicyFormField {
   allowedOperations: string[]
@@ -19,6 +21,7 @@ export interface BucketCreatePayload extends BucketUpdatePayload {
 export interface StorageColumn {
   id: string | null
   name: string
+  path: string
   status: string
   items: StorageItem[]
   hasMoreItems?: boolean
@@ -34,9 +37,11 @@ export interface StorageItem {
   created_at: string | null
   updated_at: string | null
   last_accessed_at: string | null
+  is_versioned?: boolean | null
   // UI specific properties, not from API
   isCorrupted: boolean
   path?: string
+  archived?: { archivedObjectId?: string }
 }
 
 export type StorageItemWithColumn = StorageItem & { columnIndex: number }
@@ -50,3 +55,7 @@ export interface StorageItemMetadata {
   lastModified: string
   mimetype: string
 }
+
+/** A folder entry as returned by the storage list-v2 endpoint's `folders` array */
+export type StorageObjectV2Folder =
+  components['schemas']['StorageListResponseV2_Output']['folders'][number]

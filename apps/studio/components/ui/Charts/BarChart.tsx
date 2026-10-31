@@ -1,12 +1,12 @@
-import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
-import dayjs from 'dayjs'
 import { ComponentProps, useMemo, useState } from 'react'
 import {
   Bar,
   CartesianGrid,
   Cell,
   Legend,
+  Line,
   BarChart as RechartBarChart,
+  ComposedChart as RechartComposedChart,
   Tooltip,
   XAxis,
   YAxis,
@@ -18,6 +18,8 @@ import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { useChartHoverState } from './useChartHoverState'
+import { CHART_COLORS, DateTimeFormats } from '@/components/ui/Charts/Charts.constants'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
 
 export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
@@ -31,6 +33,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   XAxisProps?: ComponentProps<typeof XAxis>
   YAxisProps?: ComponentProps<typeof YAxis>
   showGrid?: boolean
+  chartStyle?: 'bar' | 'line'
   syncId?: string
 }
 
@@ -56,7 +59,9 @@ function BarChart<D extends Datum = Datum>({
   YAxisProps,
   showGrid = false,
   syncId,
+  chartStyle = 'bar',
 }: BarChartProps<D>) {
+  const Chart = chartStyle === 'line' ? RechartComposedChart : RechartBarChart
   const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } =
     useChartHoverState('default')
   const { Container } = useChartSize(size)
@@ -83,7 +88,14 @@ function BarChart<D extends Datum = Datum>({
     width: 0,
   }
 
-  const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker, which
+  // `useFormatDateTime` reads from context.
+  const formatPickerDate = useFormatDateTime()
+  const formatChartDate = (value: number | string) =>
+    displayDateInUtc
+      ? formatDateTime(value, { tz: 'UTC', format: customDateFormat })
+      : formatPickerDate(value, customDateFormat)
 
   function getHeaderLabel() {
     if (!xAxisIsDate) {
@@ -94,7 +106,7 @@ function BarChart<D extends Datum = Datum>({
       (focusDataIndex !== null &&
         data &&
         data[focusDataIndex] !== undefined &&
-        day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+        formatChartDate(data[focusDataIndex][xAxisKey] as number | string)) ||
       highlightedLabel
     )
   }
@@ -136,7 +148,7 @@ function BarChart<D extends Datum = Datum>({
         attributes={[]}
       />
       <Container>
-        <RechartBarChart
+        <Chart
           data={transformedData}
           className="overflow-visible"
           onMouseMove={(e: any) => {
@@ -171,11 +183,11 @@ function BarChart<D extends Datum = Datum>({
             key={xAxisKey}
           />
           <Tooltip
-            content={(props) =>
+            content={(_props) =>
               syncId && isHovered && isCurrentChart && hoveredIndex !== null ? (
-                <div className="bg-black/90 text-white p-2 rounded text-xs">
+                <div className="bg-black/90 text-white p-2 rounded-sm text-xs">
                   <div className="font-medium">
-                    {dayjs(data[hoveredIndex]?.[xAxisKey]).format(customDateFormat)}
+                    {formatChartDate(data[hoveredIndex]?.[xAxisKey] as number | string)}
                   </div>
                   <div>
                     {numberFormatter(Number(data[hoveredIndex]?.[yAxisKey]) || 0, valuePrecision)}
@@ -185,35 +197,47 @@ function BarChart<D extends Datum = Datum>({
               ) : null
             }
           />
-          <Bar
-            dataKey={yAxisKey}
-            fill={CHART_COLORS.GREEN_1}
-            animationDuration={300}
-            maxBarSize={48}
-          >
-            {data?.map((_entry: D, index: number) => (
-              <Cell
-                key={`cell-${index}`}
-                className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
-                fill={
-                  focusDataIndex === index || focusDataIndex === null
-                    ? CHART_COLORS.GREEN_1
-                    : CHART_COLORS.GREEN_2
-                }
-                enableBackground={12}
-              />
-            ))}
-          </Bar>
-        </RechartBarChart>
+          {chartStyle === 'line' ? (
+            <Line
+              dataKey={yAxisKey}
+              type="linear"
+              stroke={CHART_COLORS.GREEN_1}
+              dot={false}
+              animationDuration={300}
+            />
+          ) : (
+            <Bar
+              dataKey={yAxisKey}
+              fill={CHART_COLORS.GREEN_1}
+              animationDuration={300}
+              maxBarSize={48}
+            >
+              {data?.map((_entry: D, index: number) => (
+                <Cell
+                  key={`cell-${index}`}
+                  className={`transition-all duration-300 ${onBarClick ? 'cursor-pointer' : ''}`}
+                  fill={
+                    focusDataIndex === index || focusDataIndex === null
+                      ? CHART_COLORS.GREEN_1
+                      : CHART_COLORS.GREEN_2
+                  }
+                  enableBackground={12}
+                />
+              ))}
+            </Bar>
+          )}
+        </Chart>
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
           <span>
-            {xAxisIsDate ? day(data[0][xAxisKey]).format(customDateFormat) : data[0][xAxisKey]}
+            {xAxisIsDate
+              ? formatChartDate(data[0][xAxisKey] as number | string)
+              : data[0][xAxisKey]}
           </span>
           <span>
             {xAxisIsDate
-              ? day(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)
+              ? formatChartDate(data[data?.length - 1]?.[xAxisKey] as number | string)
               : data[data?.length - 1]?.[xAxisKey]}
           </span>
         </div>

@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { useIsLoggedIn } from 'common'
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import { invoicesKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
 
-export type OverdueInvoicesResponse = components['schemas']['OverdueInvoiceCount']
+import { invoicesKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import { UseCustomQueryOptions } from '@/types'
+
+export type OverdueInvoicesResponse = components['schemas']['OverdueInvoiceCount_Output']
 
 export async function getOverdueInvoices(signal?: AbortSignal) {
   const { data, error } = await get('/platform/stripe/invoices/overdue', {

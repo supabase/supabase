@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
-import Link from 'next/link'
 import { ArrowUpRight, Check, Copy } from 'lucide-react'
-import { Button, cn, TextLink, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import SectionContainer from 'components/Layouts/SectionContainer'
+import Link from 'next/link'
+import React, { useState } from 'react'
+import { Button, cn, FloatingPlate, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { TextLink } from 'ui-patterns/TextLink'
+
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 interface AIPrompt {
   id: string
@@ -50,18 +52,19 @@ const CodeSnippet = ({ prompt }: { prompt: AIPrompt }) => {
       <div className="p-4 relative">
         {prompt.copyable && (
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="default"
-                className="text-foreground-light hover:text-foreground absolute top-2 right-2 w-7 h-7 p-1 shadow-lg"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(prompt.code)
-                  updateCopyStatus()
-                }}
-              >
-                {text === 'copy' ? <Copy className="w-3 h-3" /> : <Check className="w-3 h-3" />}
-              </Button>
-            </TooltipTrigger>
+            <FloatingPlate className="absolute top-2 right-2">
+              <TooltipTrigger asChild>
+                <Button
+                  className="text-foreground-light hover:text-foreground w-7 h-7 p-1 shadow-lg"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(prompt.code)
+                    updateCopyStatus()
+                  }}
+                >
+                  {text === 'copy' ? <Copy className="w-3 h-3" /> : <Check className="w-3 h-3" />}
+                </Button>
+              </TooltipTrigger>
+            </FloatingPlate>
             <TooltipContent>Copy to clipboard</TooltipContent>
           </Tooltip>
         )}

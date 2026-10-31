@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type PitrRestoreVariables = {
   ref: string
@@ -13,6 +13,7 @@ export async function restoreFromPitr({ ref, recovery_time_target_unix }: PitrRe
   const { data, error } = await post('/platform/database/{ref}/backups/pitr', {
     params: { path: { ref } },
     body: { recovery_time_target_unix },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data

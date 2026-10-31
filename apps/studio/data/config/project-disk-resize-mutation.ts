@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { usageKeys } from '../usage/keys'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import { usageKeys } from '@/data/usage/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ProjectDiskResizeVariables = {
   projectRef: string
@@ -18,6 +18,7 @@ export async function resizeProjectDisk({ projectRef, volumeSize }: ProjectDiskR
   const { data, error } = await post('/platform/projects/{ref}/resize', {
     params: { path: { ref: projectRef } },
     body: payload,
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data

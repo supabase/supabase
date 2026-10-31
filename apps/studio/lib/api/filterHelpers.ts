@@ -46,6 +46,11 @@ export const filterGroupSchema: z.ZodType<FilterGroupType> = z.lazy(() =>
   })
 )
 
+export const filterGroupSchemaForAI = z.object({
+  logicalOperator: z.literal('AND'),
+  conditions: z.array(filterConditionSchema),
+})
+
 export const requestSchema = z.object({
   prompt: z.string().min(1, 'Prompt is required'),
   filterProperties: z
@@ -78,15 +83,6 @@ export function validateFilterGroup(
 
     return true
   })
-}
-
-export function enforceAndLogicalOperator(group: FilterGroupType): FilterGroupType {
-  return {
-    logicalOperator: 'AND',
-    conditions: group.conditions.map((condition) =>
-      isFilterGroup(condition) ? enforceAndLogicalOperator(condition) : condition
-    ),
-  }
 }
 
 export function serializeOptions(

@@ -1,6 +1,78 @@
-import { writeFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 import { globby } from 'globby'
 import prettier from 'prettier'
+
+import { parseFrontmatter } from '../lib/frontmatter.mjs'
+
+const DATED_COLLECTIONS = ['_blog/', '_alternatives/', '_customers/']
+const ISO_DATE_SHAPE =
+  /^(\d{4}-\d{2}-\d{2})(?:T(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z|[+-](?:[01]\d|2[0-3]):?[0-5]\d)?)?$/
+const RSS_PUB_DATE_SHAPE =
+  /^[A-Z][a-z]{2}, \d{2} [A-Z][a-z]{2} \d{4} \d{2}:\d{2}:\d{2} (?:[+-]\d{4}|GMT|UTC)$/
+
+function lastmodError(source, value, hint = '') {
+  return new Error(
+    `${source}: cannot derive lastmod from date value ${JSON.stringify(value)}${hint}`
+  )
+}
+
+function toIsoDate(value, source) {
+  if (typeof value !== 'string') throw lastmodError(source, value)
+  const match = ISO_DATE_SHAPE.exec(value)
+  if (!match) throw lastmodError(source, value)
+  const candidate = match[1]
+  const roundTrip = new Date(`${candidate}T00:00:00Z`)
+  if (Number.isNaN(roundTrip.getTime()) || roundTrip.toISOString().slice(0, 10) !== candidate) {
+    throw lastmodError(source, value, '; not a real calendar day')
+  }
+  return candidate
+}
+
+function contentLastmod(filePath) {
+  const { data } = parseFrontmatter(readFileSync(filePath, 'utf-8'))
+  const published = data.date == null ? undefined : toIsoDate(data.date, filePath)
+  const updated = data.updated == null ? undefined : toIsoDate(data.updated, filePath)
+  if (published && updated && updated < published) {
+    throw lastmodError(filePath, data.updated, '; updated is earlier than date')
+  }
+  return updated ?? published
+}
+
+function changelogLastmod(pubDate, link) {
+  const source = `changelog-rss ${link}`
+  if (!RSS_PUB_DATE_SHAPE.test(pubDate)) throw lastmodError(source, pubDate)
+  const instant = new Date(pubDate)
+  if (Number.isNaN(instant.getTime())) throw lastmodError(source, pubDate)
+  return instant.toISOString().slice(0, 10)
+}
+
+// Next writes prerendered HTML to a different place depending on how it builds (with an
+// adapter, as on Vercel, it is not under .next/server/pages), so read prerendered paths
+// for a dynamic route from the manifest instead of globbing the output directory.
+function prerenderedPaths(srcRoute) {
+  let manifest
+  try {
+    manifest = JSON.parse(readFileSync('.next/prerender-manifest.json', 'utf-8'))
+  } catch (error) {
+    if (error.code === 'ENOENT') return []
+    throw error
+  }
+  return Object.entries(manifest.routes ?? {})
+    .filter(([, route]) => route.srcRoute === srcRoute)
+    .map(([path]) => path)
+    .sort((a, b) => a.localeCompare(b))
+}
+
+function urlEntry(loc, lastmod) {
+  return `
+        <url>
+            <loc>${loc}</loc>
+            ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}
+            <changefreq>weekly</changefreq>
+            <priority>0.5</priority>
+        </url>
+      `
+}
 
 async function generate() {
   const prettierConfig = await prettier.resolveConfig('./.prettierrc.js')
@@ -10,20 +82,16 @@ async function generate() {
     'pages/*.tsx',
     'pages/*.mdx',
     'pages/**/*.tsx',
-    'data/**/*.mdx',
+    'app/**/page.tsx',
     '_blog/*.mdx',
     '_case-studies/*.mdx',
     '_customers/*.mdx',
     '_events/*.mdx',
     '_alternatives/*.mdx',
-    '!data/*.mdx',
     '!pages/_*.js',
     '!pages/_*.tsx',
     '!pages/api',
     '!pages/404.tsx',
-    '.next/server/pages/partners/integrations/*.html',
-    '.next/server/pages/partners/experts/*.html',
-    '.next/server/pages/features/*.html',
   ])
 
   const pages = unsortedPages.sort((a, b) => a.localeCompare(b))
@@ -36,10 +104,15 @@ async function generate() {
   // Generate URLs for static pages
   const staticUrls = pages
     .map((page) => {
+      if (page.startsWith('app/')) {
+        const segments = page.split('/').slice(1, -1)
+        if (segments.some((segment) => segment.includes('['))) return null
+        const path = segments.filter((segment) => !/^\(.*\)$/.test(segment)).join('/')
+        return urlEntry(`https://supabase.com${path ? `/${path}` : ''}`)
+      }
+
       const path = page
-        .replace('.next/server/pages', '')
-        .replace('pages', '')
-        .replace('.html', '')
+        .replace(/^pages/, '')
         // add a `/` for blog posts
         .replace('_blog', `/${blogUrl}`)
         .replace('_case-studies', `/${caseStudiesUrl}`)
@@ -62,8 +135,10 @@ async function generate() {
       if (route === '/blog/categories/[category]') return null
       if (route === '/partners/experts/[slug]') return null
       if (route === '/partners/integrations/[slug]') return null
+      if (route === '/partners/catalog/[slug]') return null
       if (route === '/launch-week/ticket-image') return null
       if (route === '/launch-week/tickets/[username]') return null
+      if (route === '/changelog/[slug]') return null
 
       /**
        * Blog based urls
@@ -105,20 +180,50 @@ async function generate() {
         route = `/${eventsUrl}/` + substring
       }
 
-      return `
-        <url>
-            <loc>${`https://supabase.com${route}`}</loc>
-            <changefreq>weekly</changefreq>
-            <priority>0.5</priority>
-        </url>
-      `
+      const lastmod = DATED_COLLECTIONS.some((prefix) => page.startsWith(prefix))
+        ? contentLastmod(page)
+        : undefined
+
+      return urlEntry(`https://supabase.com${route}`, lastmod)
     })
     .filter(Boolean)
+
+  const featurePaths = prerenderedPaths('/features/[slug]')
+  if (process.env.VERCEL && featurePaths.length === 0) {
+    throw new Error(
+      'No prerendered /features/[slug] pages found in .next/prerender-manifest.json; refusing to write a sitemap without them'
+    )
+  }
+  const featureUrls = featurePaths.map((path) => urlEntry(`https://supabase.com${path}`))
+
+  // Changelog detail pages are dynamic routes; include them from generated changelog RSS links.
+  const changelogDetailUrls = (() => {
+    let rss
+    try {
+      rss = readFileSync('public/changelog-rss.xml', 'utf-8')
+    } catch {
+      return []
+    }
+
+    const lastmodByUrl = new Map()
+    for (const [, item] of rss.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
+      const link = item.match(/<link>(https:\/\/supabase\.com\/changelog\/[^<]+)<\/link>/)?.[1]
+      if (!link || lastmodByUrl.has(link)) continue
+      const pubDate = item.match(/<pubDate>([^<]*)<\/pubDate>/)?.[1]
+      lastmodByUrl.set(link, pubDate ? changelogLastmod(pubDate, link) : undefined)
+    }
+
+    return [...lastmodByUrl].map(([url, lastmod]) => urlEntry(url, lastmod))
+  })()
+
+  // /evals is a separate app proxied onto supabase.com via a rewrite in lib/rewrites.js,
+  // so it has no page file for the globs above to find. Hardcode it here.
+  const proxiedAppUrls = [urlEntry('https://supabase.com/evals')]
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${[...staticUrls].join('')}
+        ${[...staticUrls, ...featureUrls, ...changelogDetailUrls, ...proxiedAppUrls].join('')}
     </urlset>
     `
 
@@ -139,6 +244,9 @@ async function generate() {
   </sitemap>
   <sitemap>
     <loc>https://supabase.com/docs/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://supabase.com/kb/sitemap-index.xml</loc>
   </sitemap>
 </sitemapindex>
 `

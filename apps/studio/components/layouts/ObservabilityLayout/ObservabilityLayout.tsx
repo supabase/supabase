@@ -1,22 +1,19 @@
-import { PropsWithChildren, useEffect } from 'react'
-import { useParams } from 'common'
-import { LOCAL_STORAGE_KEYS, IS_PLATFORM } from 'common'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { withAuth } from 'hooks/misc/withAuth'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { BannerMetricsAPI } from 'components/ui/BannerStack/Banners/BannerMetricsAPI'
-import { ProjectLayout } from '../ProjectLayout'
-import ObservabilityMenu from './ObservabilityMenu'
-import { BannerStackProvider, useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
-import { BannerStack } from 'components/ui/BannerStack/BannerStack'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { usePathname } from 'next/navigation'
-import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { BannerIndexAdvisor } from 'components/ui/BannerStack/Banners/BannerIndexAdvisor'
-import { useRef } from 'react'
+import { PropsWithChildren, useEffect, useRef } from 'react'
+
+import { ProjectLayout } from '../ProjectLayout'
+import { ObservabilityMenu } from './ObservabilityMenu'
+import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 interface ObservabilityLayoutProps {
-  title?: string
+  title: string
 }
 
 const ObservabilityLayoutContent = ({
@@ -28,28 +25,10 @@ const ObservabilityLayoutContent = ({
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
-  const [isMetricsBannerDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
-    false
-  )
-
   const [isIndexAdvisorBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''),
     false
   )
-
-  useEffect(() => {
-    if (!isMetricsBannerDismissed && IS_PLATFORM) {
-      addBanner({
-        id: 'metrics-api-banner',
-        isDismissed: false,
-        content: <BannerMetricsAPI />,
-        priority: 1,
-      })
-    } else {
-      dismissBanner('metrics-api-banner')
-    }
-  }, [isMetricsBannerDismissed, addBanner, dismissBanner])
 
   const prevPathnameRef = useRef(pathname)
 
@@ -87,8 +66,8 @@ const ObservabilityLayoutContent = ({
   if (reportsAll) {
     return (
       <ProjectLayout
-        title={title}
         product="Observability"
+        browserTitle={{ section: title }}
         productMenu={<ObservabilityMenu />}
         isBlocking={false}
       >
@@ -105,12 +84,7 @@ const ObservabilityLayout = (props: PropsWithChildren<ObservabilityLayoutProps>)
   const { reportsAll } = useIsFeatureEnabled(['reports:all'])
 
   if (reportsAll) {
-    return (
-      <BannerStackProvider>
-        <ObservabilityLayoutContent {...props} />
-        <BannerStack />
-      </BannerStackProvider>
-    )
+    return <ObservabilityLayoutContent {...props} />
   } else {
     return <UnknownInterface urlBack={`/project/${ref}`} />
   }

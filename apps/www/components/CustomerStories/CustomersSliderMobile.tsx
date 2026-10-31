@@ -24,19 +24,19 @@ const CustomersSliderMobile: React.FC<Props> = ({ columns, className }) => (
       threshold={2}
       updateOnWindowResize
       allowTouchMove
-      className="!px-6 w-full h-full overflow-visible"
+      className="px-6! w-full h-full overflow-visible"
     >
       {columns.map((column: CompositionColType, i: number) => (
         <SwiperSlide
           className={cn(
-            'flex w-full !h-full',
-            column.type === 'expanded' ? 'w-full max-w-[450px]' : '!w-[250px]'
+            'flex w-full h-full!',
+            column.type === 'expanded' ? 'w-full max-w-[450px]' : 'w-[250px]!'
           )}
           key={`${column.cards[0].organization}-mobile-customer-${i}`}
         >
           <CompositionCol
             className={cn(
-              'flex flex-col w-full !h-full gap-3',
+              'flex flex-col w-full h-full! gap-3',
               column.type === 'expanded' ? 'w-full' : 'w-[250px]'
             )}
             column={column}

@@ -1,6 +1,12 @@
 import { Search } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
 import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   DropdownMenu,
@@ -8,7 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
   Table,
   TableBody,
   TableCell,
@@ -16,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -26,7 +35,7 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-export default function PageLayoutList(): React.JSX.Element {
+export default function PageLayoutList() {
   const functions = [
     {
       id: 1,
@@ -53,7 +62,21 @@ export default function PageLayoutList(): React.JSX.Element {
 
   return (
     <div className="w-full">
-      <PageHeader size="large">
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/project/demo/database">Database</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Functions</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Database Functions</PageHeaderTitle>
@@ -62,20 +85,24 @@ export default function PageLayoutList(): React.JSX.Element {
         </PageHeaderMeta>
       </PageHeader>
 
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <div className="w-full space-y-4">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-                  <Input
-                    placeholder="Search for a function"
-                    size="tiny"
-                    icon={<Search />}
-                    className="w-full lg:w-52"
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      placeholder="Search for a function"
+                      size="tiny"
+                      className="w-full lg:w-52"
+                    />
+                    <InputGroupAddon>
+                      <Search />
+                    </InputGroupAddon>
+                  </InputGroup>
                 </div>
-                <Button type="primary">Create a new function</Button>
+                <Button variant="primary">Create a new function</Button>
               </div>
 
               <Card>
@@ -99,7 +126,7 @@ export default function PageLayoutList(): React.JSX.Element {
                         <TableCell>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="text" size="small">
+                              <Button variant="text" size="small">
                                 Actions
                               </Button>
                             </DropdownMenuTrigger>

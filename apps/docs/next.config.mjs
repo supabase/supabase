@@ -6,6 +6,8 @@ import withYaml from 'next-plugin-yaml'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 import { parse as parseToml } from 'smol-toml'
+
+import { dynamicRedirects } from './lib/redirects/dynamic-redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -31,6 +33,9 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
     dangerouslyAllowSVG: false,
+    // Some guides add `?v=N` to local image paths for cache busting, which Next.js rejects unless
+    // `localPatterns` allows it. Omitting `search` allows any query string.
+    localPatterns: [{ pathname: '/**' }],
     // @ts-ignore
     remotePatterns,
   },
@@ -52,6 +57,7 @@ const nextConfig = {
     'ui',
     'ui-patterns',
     'common',
+    'docs-search',
     'dayjs',
     'shared-data',
     'api-types',
@@ -60,7 +66,8 @@ const nextConfig = {
   ],
   outputFileTracingIncludes: {
     '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
-    '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
+    '/api/guides-md/**/*': ['./public/markdown/guides/**/*'],
+    '/guides/**/*': ['./content/guides/**/*', './examples/**/*'],
     '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
   serverExternalPackages: ['libpg-query', 'twoslash'],
@@ -120,50 +127,29 @@ const nextConfig = {
   },
 
   /**
-   * Doc rewrites and redirects are
-   * handled by the `www` nextjs config:
-   *
-   * ./apps/www/lib/redirects.js
-   *
-   * Only add dev/preview specific redirects
-   * in this config.
+   * Redirects for /docs paths live in ./lib/redirects (see its README.md).
+   * Static one-to-one rules are served by Vercel bulk redirects via vercel.json.
+   * Dynamic rules, including the dev/preview redirects, come from dynamic-redirects.js.
    */
   async redirects() {
-    return [
-      // Redirect root to docs base path in dev/preview envs
-      {
-        source: '/',
-        destination: '/docs',
-        basePath: false,
-        permanent: false,
-      },
+    // For /docs/guides/ dynamic redirects, auto-generate .md variants so renamed/deleted pages
+    // redirect correctly when fetched as markdown
+    const docsMdRedirects = dynamicRedirects
+      .filter(
+        (r) =>
+          r.source.startsWith('/docs/guides/') &&
+          typeof r.destination === 'string' &&
+          r.destination.startsWith('/')
+      )
+      .map((r) => ({ ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }))
 
-      // Redirect dashboard links in dev/preview envs
-      {
-        source: '/dashboard/:path*',
-        destination: 'https://supabase.com/dashboard/:path*',
-        basePath: false,
-        permanent: false,
-      },
-
-      // Redirect blog links in dev/preview envs
-      {
-        source: '/blog/:path*',
-        destination: 'https://supabase.com/blog/:path*',
-        basePath: false,
-        permanent: false,
-      },
-    ]
+    return [...docsMdRedirects, ...dynamicRedirects]
   },
   typescript: {
     // On previews, typechecking is run via GitHub Action only for efficiency
     // On production, we turn it on to prevent errors from conflicting PRs getting into
     // prod
     ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
-  },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
-    ignoreDuringBuilds: true,
   },
 }
 
@@ -179,6 +165,13 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'docs',
+  applicationKey: 'supabase-docs',
+  webpack: {
+    treeshake: {
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      removeDebugLogging: true,
+    },
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
@@ -194,9 +187,6 @@ export default withSentryConfig(configExport, {
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
   // tunnelRoute: "/monitoring",
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
 })
 
 function getAssetPrefix() {

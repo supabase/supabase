@@ -104,7 +104,7 @@ const CommunitySlider = () => {
   }, [ref.current, swiperInstance?.autoplay])
 
   const Card = (card: CardInterface) => (
-    <div className="bg-surface-100 hover:border-strong border-overlay rounded-2xl border p-6 drop-shadow-sm flex flex-col gap-4">
+    <div className="bg-surface-100 hover:border-strong border-overlay rounded-2xl border p-6 drop-shadow-xs flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <div className="h-10 w-10 overflow-hidden rounded-full border border-control">
           <Image src={card.avatar!} layout="responsive" width="64" height="64" alt={card.author} />
@@ -131,7 +131,7 @@ const CommunitySlider = () => {
       <p className="text-foreground-muted my-3 text-base">{card.abstract}</p>
 
       {card.url && (
-        <div className="text-brand block cursor-pointer text-sm">Read Customer Story</div>
+        <div className="text-primary block cursor-pointer text-sm">Read Customer Story</div>
       )}
     </div>
   )
@@ -146,7 +146,7 @@ const CommunitySlider = () => {
           objectFit={isSm ? 'cover' : 'contain'}
         />
       </div>
-      <SectionContainer className="!py-0">
+      <SectionContainer className="py-0!">
         <div className="col-span-12 text-center relative z-10">
           <h3 className="text-3xl md:text-4xl heading-gradient">
             Join a growing <br />

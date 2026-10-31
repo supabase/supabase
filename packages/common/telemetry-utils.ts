@@ -1,4 +1,4 @@
-import { IS_PROD, LOCAL_STORAGE_KEYS } from './constants'
+import { IS_PROD } from './constants'
 import { isBrowser } from './helpers'
 
 export function getTelemetryCookieOptions() {
@@ -8,11 +8,6 @@ export function getTelemetryCookieOptions() {
   const hostname = window.location.hostname
   const isSupabaseCom = hostname === 'supabase.com' || hostname.endsWith('.supabase.com')
   return isSupabaseCom ? 'path=/; domain=supabase.com; SameSite=Lax' : 'path=/; SameSite=Lax'
-}
-
-export function clearTelemetryDataCookie() {
-  if (!isBrowser) return
-  document.cookie = `${LOCAL_STORAGE_KEYS.TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0; ${getTelemetryCookieOptions()}`
 }
 
 // Parse session_id from PostHog cookie since SDK doesn't expose session ID

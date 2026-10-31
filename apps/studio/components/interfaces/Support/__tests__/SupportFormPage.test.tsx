@@ -1,29 +1,83 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
-// End of third-party imports
-
-import { API_URL, BASE_PATH } from 'lib/constants'
+import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
-import { createMockOrganization, createMockProject } from 'tests/helpers'
-import { customRender } from 'tests/lib/custom-render'
-import { addAPIMock, mswServer } from 'tests/lib/msw'
-import { createMockProfileContext } from 'tests/lib/profile-helpers'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
-import { SupportFormPage } from '../SupportFormPage'
+import { NO_PROJECT_MARKER } from '../SupportForm.utils'
+import { SupportForm, SupportFormPage, SupportFormStatusButton } from '../SupportFormPage'
+// End of third-party imports
+
+import { API_URL, BASE_PATH } from '@/lib/constants'
+import type { StatusPageResponse } from '@/lib/status-page/status-page.schema'
+import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
+import { createMockProfileContext } from '@/tests/lib/profile-helpers'
+
+// The project selector's infinite-scroll sentinel uses IntersectionObserver, which jsdom lacks
+mockIntersectionObserver()
+
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
+type OrganizationProjectsProject = OrganizationProjectsResponse['projects'][number]
+type SendFeedbackResponse = components['schemas']['SendFeedbackResponse_Output']
+
+// Builders that return shapes matching the OpenAPI contract for endpoints
+// the support form depends on. The test only exercises a few fields, but the
+// constraints catch silent drift between mocks and the API.
+const toProjectDetailResponse = (project: {
+  id: number
+  ref: string
+  name: string
+  organization_id: number
+}): ProjectDetailResponse => ({
+  id: project.id,
+  ref: project.ref,
+  name: project.name,
+  organization_id: project.organization_id,
+  cloud_provider: 'AWS',
+  db_host: `db.${project.ref}.example.com`,
+  high_availability: false,
+  inserted_at: new Date().toISOString(),
+  integration_source: null,
+  is_branch_enabled: false,
+  is_physical_backups_enabled: false,
+  region: 'us-east-1',
+  restUrl: `https://${project.ref}.example.com/rest`,
+  status: 'ACTIVE_HEALTHY',
+  subscription_id: 'subscription-1',
+  updated_at: new Date().toISOString(),
+  connectionString: '',
+})
+
+const toOrganizationProject = (project: {
+  ref: string
+  name: string
+}): OrganizationProjectsProject => ({
+  cloud_provider: 'AWS',
+  databases: [],
+  inserted_at: new Date().toISOString(),
+  integration_source: null,
+  is_branch: false,
+  name: project.name,
+  ref: project.ref,
+  region: 'us-east-1',
+  status: 'ACTIVE_HEALTHY',
+})
 
 type Screen = typeof screen
 
 const mockOrganizations = [
-  createMockOrganization({
+  createMockOrganizationResponse({
     id: 1,
     slug: 'org-1',
     name: 'Organization 1',
     plan: { id: 'free', name: 'Free' },
   }),
-  createMockOrganization({
+  createMockOrganizationResponse({
     id: 2,
     slug: 'org-2',
     name: 'Organization 2',
@@ -98,7 +152,7 @@ vi.mock('../support-storage-client', () => ({
   createSupportStorageClient: vi.fn(),
 }))
 
-vi.mock(import('lib/breadcrumbs'), async (importOriginal) => {
+vi.mock(import('@/lib/breadcrumbs'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
@@ -108,7 +162,7 @@ vi.mock(import('lib/breadcrumbs'), async (importOriginal) => {
 
 let createSupportStorageClientMock: ReturnType<typeof vi.fn>
 let getBreadcrumbSnapshotMock: ReturnType<typeof vi.fn>
-let generateAttachmentUrlSpy: ReturnType<typeof vi.fn>
+let generateAttachmentUrlSpy: ReturnType<typeof vi.fn<(...args: any[]) => any>>
 
 // Mock sonner toast
 vi.mock('sonner', () => ({
@@ -118,7 +172,7 @@ vi.mock('sonner', () => ({
   },
 }))
 
-vi.mock('data/utils/deployment-commit-query', () => ({
+vi.mock('@/data/utils/deployment-commit-query', () => ({
   useDeploymentCommitQuery: mockUseDeploymentCommitQuery,
 }))
 
@@ -137,6 +191,7 @@ vi.mock(import('common'), async (importOriginal) => {
     ...actual,
     useParams: vi.fn().mockReturnValue({ ref: 'default' }),
     useIsLoggedIn: vi.fn().mockReturnValue(true),
+    useFlag: vi.fn().mockReturnValue(false),
     isFeatureEnabled: vi.fn((feature: any, disabledFeatures: any) => {
       if (typeof feature === 'string') {
         if (feature === 'support:show_client_libraries') {
@@ -163,7 +218,7 @@ vi.mock(import('common'), async (importOriginal) => {
   }
 })
 
-vi.mock(import('lib/gotrue'), async (importOriginal) => {
+vi.mock(import('@/lib/gotrue'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
@@ -174,7 +229,7 @@ vi.mock(import('lib/gotrue'), async (importOriginal) => {
   }
 })
 
-vi.mock(import('lib/constants'), async (importOriginal) => {
+vi.mock(import('@/lib/constants'), async (importOriginal) => {
   const actual = await importOriginal()
   return {
     ...actual,
@@ -184,6 +239,21 @@ vi.mock(import('lib/constants'), async (importOriginal) => {
 
 const renderSupportFormPage = (options?: Parameters<typeof customRender>[1]) =>
   customRender(<SupportFormPage />, {
+    profileContext: createMockProfileContext(),
+    ...options,
+  })
+
+const renderSupportForm = (
+  props?: Parameters<typeof SupportForm>[0],
+  options?: Parameters<typeof customRender>[1]
+) =>
+  customRender(<SupportForm {...props} />, {
+    profileContext: createMockProfileContext(),
+    ...options,
+  })
+
+const renderSupportFormStatusButton = (options?: Parameters<typeof customRender>[1]) =>
+  customRender(<SupportFormStatusButton />, {
     profileContext: createMockProfileContext(),
     ...options,
   })
@@ -253,6 +323,19 @@ const getDashboardLogsToggle = (screen: Screen, type: 'find' | 'query' = 'find')
     : screen.queryByRole('switch', { name: labelMatcher })
 }
 
+const getSupportAccessToggle = (screen: Screen, type: 'find' | 'query' = 'find') => {
+  const labelMatcher = /allow support access to your project/i
+  return type === 'find'
+    ? screen.findByRole('switch', { name: labelMatcher })
+    : screen.queryByRole('switch', { name: labelMatcher })
+}
+
+const selectNoSpecificProject = async (screen: Screen) => {
+  await userEvent.click(getProjectSelector(screen))
+  const option = await screen.findByRole('option', { name: /no specific project/i })
+  await userEvent.click(option)
+}
+
 const getSupportForm = () => {
   const form = document.querySelector<HTMLFormElement>('form#support-form')
   expect(form).not.toBeNull()
@@ -260,15 +343,18 @@ const getSupportForm = () => {
 }
 
 const getAttachmentFileInput = () => {
-  const input = getSupportForm().querySelector<HTMLInputElement>(
-    'input[type="file"][accept*="image"]'
-  )
+  const input = getSupportForm().querySelector<HTMLInputElement>('input[type="file"]')
   expect(input).not.toBeNull()
   return input!
 }
 
 const getAttachmentRemoveButtons = (screen: Screen) =>
   screen.queryAllByRole('button', { name: 'Remove attachment' })
+
+const fillField = async (field: Element, text: string) => {
+  await userEvent.click(field)
+  await userEvent.paste(text)
+}
 
 const createDeferred = () => {
   let resolve!: () => void
@@ -333,15 +419,9 @@ describe('SupportFormPage', () => {
 
     generateAttachmentUrlSpy = vi.fn()
     mswServer.use(
-      http.post('*/rest/v1/rpc/docs_search_fts', async () => {
-        return HttpResponse.json([])
-      }),
-      http.post('*/rest/v1/rpc/docs_search_fts_nimbus', async () => {
-        return HttpResponse.json([])
-      }),
-      http.post('*/functions/v1/search-embeddings', async () => {
-        return HttpResponse.json([])
-      }),
+      // Docs suggestions search as the subject is typed
+      http.post('*/api/search/fts', () => HttpResponse.json([])),
+      http.post('*/api/search/embeddings', () => HttpResponse.json([])),
       http.post('http://localhost:3000/api/generate-attachment-url', async ({ request }) => {
         const body = (await request.json()) as {
           bucket?: string
@@ -355,7 +435,7 @@ describe('SupportFormPage', () => {
       })
     )
 
-    const breadcrumbsModule = await import('lib/breadcrumbs')
+    const breadcrumbsModule = await import('@/lib/breadcrumbs')
     getBreadcrumbSnapshotMock = vi.mocked(breadcrumbsModule.getOwnershipOfBreadcrumbSnapshot)
     getBreadcrumbSnapshotMock.mockReset()
     getBreadcrumbSnapshotMock.mockReturnValue([
@@ -401,13 +481,21 @@ describe('SupportFormPage', () => {
         const { ref } = params as { ref: string }
         const project = mockProjects.projects.find((candidate) => candidate.ref === ref)
         return project
-          ? HttpResponse.json(project)
-          : HttpResponse.json({ msg: 'Project not found' }, { status: 404 })
+          ? HttpResponse.json<ProjectDetailResponse>(toProjectDetailResponse(project))
+          : HttpResponse.json<APIErrorBody>({ message: 'Project not found' }, { status: 404 })
       },
     })
 
     mswServer.use(
-      http.get(`${BASE_PATH}/api/incident-status`, () => HttpResponse.json([], { status: 200 }))
+      http.get(`${BASE_PATH}/api/status-page`, () =>
+        HttpResponse.json<StatusPageResponse>({
+          page_title: 'Supabase status',
+          page_url: 'https://status.supabase.com/',
+          ongoing_incidents: [],
+          in_progress_maintenances: [],
+          scheduled_maintenances: [],
+        })
+      )
     )
 
     addAPIMock({
@@ -441,8 +529,8 @@ describe('SupportFormPage', () => {
 
         const paginated = sorted.slice(offset, offset + limit)
 
-        return HttpResponse.json({
-          projects: paginated,
+        return HttpResponse.json<OrganizationProjectsResponse>({
+          projects: paginated.map(toOrganizationProject),
           pagination: {
             count: projects.length,
             limit,
@@ -458,28 +546,50 @@ describe('SupportFormPage', () => {
   })
 
   test('shows system status: healthy', async () => {
-    renderSupportFormPage()
+    renderSupportFormStatusButton()
 
     await waitFor(() => {
       expect(getStatusLink(screen)).toHaveTextContent('All systems operational')
     })
   })
 
+  test('shows system status: check failed', async () => {
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/status-page`, () =>
+        HttpResponse.json({ msg: 'Status service unavailable' }, { status: 500 })
+      )
+    )
+
+    renderSupportFormStatusButton()
+
+    await waitFor(() => {
+      expect(getStatusLink(screen)).toHaveTextContent('Failed to check status')
+    })
+  })
+
   test('shows system status: not healthy', async () => {
     mswServer.use(
-      http.get(`${BASE_PATH}/api/incident-status`, () =>
-        HttpResponse.json(
-          [
+      http.get(`${BASE_PATH}/api/status-page`, () =>
+        HttpResponse.json<StatusPageResponse>({
+          page_title: 'Supabase status',
+          page_url: 'https://status.supabase.com/',
+          ongoing_incidents: [
             {
-              id: 'z3qp8rln72pl',
-              active_since: '2026-01-26T10:30:00Z',
-              impact: 'critical',
-              status: 'in_progress',
-              name: 'Test incident',
+              id: 'inc-1',
+              name: 'Elevated errors',
+              url: 'https://status.supabase.com/incidents/inc-1',
+              last_update_at: '2026-01-01T00:00:00Z',
+              last_update_message: null,
+              affected_components: [],
+              status: 'investigating',
+              current_worst_impact: 'full_outage',
+              visible: true,
+              show_banner: true,
             },
           ],
-          { status: 200 }
-        )
+          in_progress_maintenances: [],
+          scheduled_maintenances: [],
+        })
       )
     )
 
@@ -488,20 +598,27 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(getStatusLink(screen)).toHaveTextContent('Active incident ongoing')
     })
+
+    expect(await screen.findByText('Elevated errors')).toBeInTheDocument()
+    expect(
+      screen.getByText('We are investigating this issue. Follow the status page for updates.')
+    ).toBeInTheDocument()
+
+    expect(screen.queryByText('Try Supabase Assistant')).not.toBeInTheDocument()
   })
 
-  test('shows system status: check failed', async () => {
-    mswServer.use(
-      http.get(`${BASE_PATH}/api/incident-status`, () =>
-        HttpResponse.json({ msg: 'Status service unavailable' }, { status: 500 })
-      )
+  test('loading with initial params prefills the organization and project', async () => {
+    renderSupportForm({ initialParams: { projectRef: 'project-3' } })
+
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(screen.getByRole('combobox', { name: 'Select a project' })).toHaveTextContent(
+          'Project 3'
+        )
+      },
+      { timeout: 5_000 }
     )
-
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      expect(getStatusLink(screen)).toHaveTextContent('Failed to check status')
-    })
   })
 
   test('loading a URL with a valid project slug prefills the organization and project', async () => {
@@ -512,21 +629,28 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(screen.getByRole('combobox', { name: 'Select a project' })).toHaveTextContent(
-        'Project 3'
-      )
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(screen.getByRole('combobox', { name: 'Select a project' })).toHaveTextContent(
+          'Project 3'
+        )
+      },
+      { timeout: 5_000 }
+    )
   })
 
-  test('loading a URL with no project slug falls back to first organization and project', async () => {
+  test('loading a URL with no project slug falls back to first organization and project, and suggests the AI Assistant', async () => {
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
+    expect(await screen.findByText('Try Supabase Assistant')).toBeInTheDocument()
   })
 
   test('loading a URL with explicit no project ref falls back to first organization and no project', async () => {
@@ -537,11 +661,71 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
+      },
+      { timeout: 5_000 }
+    )
+  })
+
+  test('hides support access toggle and submits allowSupportAccess: false when no project is selected', async () => {
+    const submitSpy = vi.fn()
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: async ({ request }) => {
+        submitSpy(await request.json())
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
+      },
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
+
+    await selectCategoryOption(screen, 'Dashboard bug')
     await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
+    })
+
+    // A project is selected, so the toggle to grant support access is available
+    await expect(getSupportAccessToggle(screen)).resolves.toBeInTheDocument()
+
+    await selectNoSpecificProject(screen)
+    await waitFor(() => {
       expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
     })
-  })
+
+    // Support access is granted on a per-project basis, so the toggle should disappear
+    // once no project is selected, rather than allowing it to be enabled with nothing to grant access to
+    await waitFor(() => {
+      expect(getSupportAccessToggle(screen, 'query')).not.toBeInTheDocument()
+    })
+
+    await fillField(getSummaryField(screen), 'Cannot access my account')
+    await fillField(getMessageField(screen), 'I need help accessing my Supabase account')
+
+    await userEvent.click(getSubmitButton(screen))
+
+    await waitFor(() => {
+      expect(submitSpy).toHaveBeenCalledTimes(1)
+    })
+
+    const payload = submitSpy.mock.calls[0]?.[0]
+    expect(payload).toMatchObject({
+      organizationSlug: 'org-1',
+      allowSupportAccess: false,
+    })
+  }, 10_000)
 
   test('loading a URL with an invalid project slug falls back to first organization and project', async () => {
     mswServer.use(
@@ -556,89 +740,21 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
   })
 
-  test('loading a URL with a message prefills the message field', async () => {
+  test('loading a URL with a message, subject, and category prefills those fields', async () => {
     const testMessage = 'This is a test support message from URL'
-    Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?message=${encodeURIComponent(testMessage)}`),
-      writable: true,
-    })
-
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      expect(getMessageField(screen)).toHaveValue(testMessage)
-    })
-  })
-
-  test('loading a URL with a subject prefills the subject field', async () => {
-    const testSubject = 'Test Subject'
-    Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?subject=${encodeURIComponent(testSubject)}`),
-      writable: true,
-    })
-
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      const subjectField = getSummaryField(screen)
-      expect(subjectField).toHaveValue(testSubject)
-    })
-  })
-
-  test('loading a URL with a category prefills the category field', async () => {
-    const testCategory = 'Problem'
-    Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?category=${encodeURIComponent(testCategory)}`),
-      writable: true,
-    })
-
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      expect(getCategorySelector(screen)).toHaveTextContent('APIs and client libraries')
-    })
-  })
-
-  test('loading a URL with a category prefills the category field (case-insensitive)', async () => {
-    const testCategory = 'dashboard_bug'
-    Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?category=${encodeURIComponent(testCategory)}`),
-      writable: true,
-    })
-
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
-    })
-  })
-
-  test('loading a URL with an invalid category gracefully falls back', async () => {
-    const testCategory = 'Invalid'
-    Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?category=${encodeURIComponent(testCategory)}`),
-      writable: true,
-    })
-
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      expect(getCategorySelector(screen)).toHaveTextContent('Select an issue')
-    })
-  })
-
-  test('loading a URL with multiple initial fields fills them all in', async () => {
-    const testCategory = 'Problem'
     const testSubject = 'Test Subject'
     Object.defineProperty(window, 'location', {
       value: createMockLocation(
-        `?category=${encodeURIComponent(testCategory)}&subject=${encodeURIComponent(testSubject)}`
+        `?category=Problem&subject=${encodeURIComponent(testSubject)}&message=${encodeURIComponent(testMessage)}`
       ),
       writable: true,
     })
@@ -648,99 +764,28 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(getCategorySelector(screen)).toHaveTextContent('APIs and client libraries')
       expect(getSummaryField(screen)).toHaveValue(testSubject)
+      expect(getMessageField(screen)).toHaveValue(testMessage)
     })
   })
 
-  test('includes Sentry issue ID from URL in submission payload', async () => {
-    const sentryIssueId = 'mock-sentry-id'
+  test.each([
+    { category: 'dashboard_bug', expected: 'Dashboard bug' },
+    { category: 'Invalid', expected: 'Select an issue' },
+  ])(
+    'loading a URL with category "$category" shows "$expected" (case-insensitive, invalid falls back)',
+    async ({ category, expected }) => {
+      Object.defineProperty(window, 'location', {
+        value: createMockLocation(`?category=${encodeURIComponent(category)}`),
+        writable: true,
+      })
 
-    const submitSpy = vi.fn()
-    addAPIMock({
-      method: 'post',
-      path: '/platform/feedback/send',
-      response: async ({ request }) => {
-        submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
-      },
-    })
+      renderSupportFormPage()
 
-    Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?sid=${encodeURIComponent(sentryIssueId)}`),
-      writable: true,
-    })
-
-    renderSupportFormPage()
-
-    await waitFor(
-      () => {
-        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-      },
-      { timeout: 5_000 }
-    )
-
-    await selectCategoryOption(screen, 'Dashboard bug')
-    await waitFor(() => {
-      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
-    })
-
-    await userEvent.type(getSummaryField(screen), 'Dashboard stopped loading')
-    await userEvent.type(getMessageField(screen), 'The dashboard page loads blank after login')
-
-    await userEvent.click(getSubmitButton(screen))
-
-    await waitFor(() => {
-      expect(submitSpy).toHaveBeenCalledTimes(1)
-    })
-    expect(submitSpy.mock.calls[0]?.[0]?.dashboardSentryIssueId).toBe(sentryIssueId)
-  }, 10_000)
-
-  test('includes initial error message from URL in submission payload', async () => {
-    const initialError = 'failed to fetch user data'
-    const messageBody = 'The dashboard page loads blank after login'
-
-    const submitSpy = vi.fn()
-    addAPIMock({
-      method: 'post',
-      path: '/platform/feedback/send',
-      response: async ({ request }) => {
-        submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
-      },
-    })
-
-    Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?error=${encodeURIComponent(initialError)}`),
-      writable: true,
-    })
-
-    renderSupportFormPage()
-
-    await waitFor(
-      () => {
-        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-      },
-      { timeout: 5_000 }
-    )
-
-    await selectCategoryOption(screen, 'Dashboard bug')
-    await waitFor(() => {
-      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
-    })
-
-    await userEvent.type(getSummaryField(screen), 'Dashboard stopped loading')
-    await userEvent.type(getMessageField(screen), messageBody)
-
-    await userEvent.click(getSubmitButton(screen))
-
-    await waitFor(() => {
-      expect(submitSpy).toHaveBeenCalledTimes(1)
-    })
-
-    const payload = submitSpy.mock.calls[0]?.[0]
-    expect(payload?.message).toMatch(initialError)
-  }, 10_000)
+      await waitFor(() => {
+        expect(getCategorySelector(screen)).toHaveTextContent(expected)
+      })
+    }
+  )
 
   test('submits support request with problem category, library, and affected services', async () => {
     const submitSpy = vi.fn()
@@ -749,7 +794,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -796,11 +841,11 @@ describe('SupportFormPage', () => {
 
     const summaryField = getSummaryField(screen)
     await userEvent.clear(summaryField)
-    await userEvent.type(summaryField, 'API requests failing in production')
+    await userEvent.paste('API requests failing in production')
 
     const messageField = getMessageField(screen)
     await userEvent.clear(messageField)
-    await userEvent.type(messageField, 'Requests return status 500 when calling the RPC endpoint')
+    await userEvent.paste('Requests return status 500 when calling the RPC endpoint')
 
     const supportAccessToggle = screen.getByRole('switch', {
       name: /allow support access to your project/i,
@@ -852,7 +897,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -870,17 +915,23 @@ describe('SupportFormPage', () => {
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await userEvent.click(getOrganizationSelector(screen))
     await userEvent.click(await screen.findByRole('option', { name: 'Organization 2' }))
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 2')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 2')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 2')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 2')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Issues with logging in')
     await waitFor(() => {
@@ -894,11 +945,11 @@ describe('SupportFormPage', () => {
 
     const summaryField = getSummaryField(screen)
     await userEvent.clear(summaryField)
-    await userEvent.type(summaryField, 'Cannot log in to dashboard')
+    await userEvent.paste('Cannot log in to dashboard')
 
     const messageField = getMessageField(screen)
     await userEvent.clear(messageField)
-    await userEvent.type(messageField, 'MFA challenge fails with an unknown error code')
+    await userEvent.paste('MFA challenge fails with an unknown error code')
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -930,7 +981,7 @@ describe('SupportFormPage', () => {
     })
   }, 10_000)
 
-  test('submits database unresponsive ticket with initial error', async () => {
+  test('submits database unresponsive ticket with initial error and Sentry issue ID, without dashboard logs', async () => {
     const submitSpy = vi.fn()
 
     addAPIMock({
@@ -938,7 +989,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -954,29 +1005,22 @@ describe('SupportFormPage', () => {
       },
     })
 
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref',
-      response: ({ params }) => {
-        const { ref } = params as { ref: string }
-        const project = mockProjects.projects.find((candidate) => candidate.ref === ref)
-        return project
-          ? HttpResponse.json(project)
-          : HttpResponse.json({ msg: 'Project not found' }, { status: 404 })
-      },
-    })
-
     Object.defineProperty(window, 'location', {
-      value: createMockLocation('?projectRef=project-3&error=Connection timeout detected'),
+      value: createMockLocation(
+        '?projectRef=project-3&errorMessage=Connection timeout detected&sid=mock-sentry-id'
+      ),
       writable: true,
     })
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 3')
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 3')
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Database unresponsive')
     await waitFor(() => {
@@ -988,13 +1032,16 @@ describe('SupportFormPage', () => {
       expect(getSeveritySelector(screen)).toHaveTextContent('Normal')
     })
 
+    // Dashboard logs are only offered for dashboard bugs
+    expect(getDashboardLogsToggle(screen, 'query')).not.toBeInTheDocument()
+
     const summaryField = getSummaryField(screen)
     await userEvent.clear(summaryField)
-    await userEvent.type(summaryField, 'Database unreachable after upgrade')
+    await userEvent.paste('Database unreachable after upgrade')
 
     const messageField = getMessageField(screen)
     await userEvent.clear(messageField)
-    await userEvent.type(messageField, 'Connections time out after 30 seconds')
+    await userEvent.paste('Connections time out after 30 seconds')
 
     const supportAccessToggle = screen.getByRole('switch', {
       name: /allow support access to your project/i,
@@ -1027,97 +1074,15 @@ describe('SupportFormPage', () => {
     expect(payload.message).toBe(
       'Connections time out after 30 seconds\n\nError: Connection timeout detected'
     )
+    expect(payload.dashboardSentryIssueId).toBe('mock-sentry-id')
+    // The attach-logs value defaults to true even while hidden, so make sure nothing was uploaded
+    expect(payload.dashboardLogs).toBeUndefined()
+    expect(generateAttachmentUrlSpy).not.toHaveBeenCalled()
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()
     })
   }, 10_000)
-
-  test('when organization changes, project selector updates to match', async () => {
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
-
-    await userEvent.click(getOrganizationSelector(screen))
-    await userEvent.click(screen.getByRole('option', { name: 'Organization 2' }))
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 2')
-    })
-
-    await waitFor(() => {
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 2')
-    })
-  })
-
-  test('AI Assistant suggestion displays when valid project and organization are selected', async () => {
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      expect(screen.getByText('Try Supabase Assistant')).toBeInTheDocument()
-    })
-  })
-
-  test('can upload attachments', async () => {
-    const url = URL as unknown as {
-      createObjectURL?: (obj: Blob) => string
-      revokeObjectURL?: (url: string) => void
-    }
-    const originalCreateObjectURL = url.createObjectURL
-    const originalRevokeObjectURL = url.revokeObjectURL
-
-    let urlIndex = 0
-    const createObjectURLMock = vi.fn(() => {
-      urlIndex += 1
-      return `blob:mock-url-${urlIndex}`
-    })
-    const revokeObjectURLMock = vi.fn()
-    url.createObjectURL = createObjectURLMock
-    url.revokeObjectURL = revokeObjectURLMock
-
-    let unmount: (() => void) | undefined
-    try {
-      const renderResult = renderSupportFormPage()
-      unmount = renderResult.unmount
-
-      await waitFor(() => {
-        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      })
-
-      const fileInput = getAttachmentFileInput()
-      const firstFile = new File(['first file'], 'first.png', { type: 'image/png' })
-      const secondFile = new File(['second file'], 'second.jpg', { type: 'image/jpeg' })
-      await userEvent.upload(fileInput, [firstFile, secondFile])
-
-      await waitFor(() => {
-        expect(getAttachmentRemoveButtons(screen)).toHaveLength(2)
-      })
-      expect(createObjectURLMock).toHaveBeenCalledTimes(2)
-
-      const firstRemoveButton = getAttachmentRemoveButtons(screen)[0]
-      await userEvent.click(firstRemoveButton)
-
-      await waitFor(() => {
-        expect(getAttachmentRemoveButtons(screen)).toHaveLength(1)
-      })
-      expect(revokeObjectURLMock).toHaveBeenCalled()
-
-      const thirdFile = new File(['third file'], 'third.png', { type: 'image/png' })
-      await userEvent.upload(getAttachmentFileInput(), thirdFile)
-
-      await waitFor(() => {
-        expect(getAttachmentRemoveButtons(screen)).toHaveLength(2)
-      })
-
-      expect(createObjectURLMock).toHaveBeenCalled()
-    } finally {
-      unmount?.()
-      url.createObjectURL = originalCreateObjectURL
-      url.revokeObjectURL = originalRevokeObjectURL
-    }
-  })
 
   test('cannot submit form again while it is submitting', async () => {
     const submission = createDeferred()
@@ -1129,24 +1094,27 @@ describe('SupportFormPage', () => {
       response: async () => {
         submitSpy()
         await submission.promise
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
     renderSupportFormPage()
 
     try {
-      await waitFor(() => {
-        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-      })
+      await waitFor(
+        () => {
+          expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+          expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+        },
+        { timeout: 5_000 }
+      )
 
       await selectCategoryOption(screen, 'Dashboard bug')
       await waitFor(() => {
         expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
       })
-      await userEvent.type(getSummaryField(screen), 'Unable to connect to database')
-      await userEvent.type(getMessageField(screen), 'Connections time out after 30 seconds')
+      await fillField(getSummaryField(screen), 'Unable to connect to database')
+      await fillField(getMessageField(screen), 'Connections time out after 30 seconds')
 
       const submitButton = getSubmitButton(screen)
       await userEvent.click(submitButton)
@@ -1175,9 +1143,12 @@ describe('SupportFormPage', () => {
   test('shows dashboard logs toggle only for Dashboard bug issues', async () => {
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     expect(getDashboardLogsToggle(screen, 'query')).not.toBeInTheDocument()
 
@@ -1196,143 +1167,7 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(getDashboardLogsToggle(screen, 'query')).not.toBeInTheDocument()
     })
-
-    await selectCategoryOption(screen, 'Dashboard bug')
-    await waitFor(() => {
-      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
-    })
-    const dashboardLogToggleAgain = await getDashboardLogsToggle(screen)
-    expect(dashboardLogToggleAgain).toBeChecked()
-  })
-
-  test('skips dashboard log upload when toggle is disabled', async () => {
-    const submitSpy = vi.fn()
-    const upload = vi.fn(async () => ({
-      data: { path: 'dashboard-logs/mock.log.json' },
-      error: null,
-    }))
-    const createSignedUrls = vi.fn(async (paths: string[]) => ({
-      data: paths.map((path) => ({
-        signedUrl: `https://storage.example.com/${path}`,
-        path,
-        error: null,
-      })),
-      error: null,
-    }))
-
-    createSupportStorageClientMock.mockReturnValue({
-      storage: {
-        from: vi.fn(() => ({
-          upload,
-          createSignedUrls,
-        })),
-      },
-    } as any)
-
-    addAPIMock({
-      method: 'post',
-      path: '/platform/feedback/send',
-      response: async ({ request }) => {
-        submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
-      },
-    })
-
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
-
-    await selectCategoryOption(screen, 'Dashboard bug')
-    await waitFor(() => {
-      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
-    })
-
-    const dashboardLogToggle = await getDashboardLogsToggle(screen)
-    expect(dashboardLogToggle).toBeChecked()
-    await userEvent.click(dashboardLogToggle!)
-    expect(dashboardLogToggle).not.toBeChecked()
-
-    await userEvent.type(getSummaryField(screen), 'Dashboard charts crashing')
-    await userEvent.type(getMessageField(screen), 'Charts throw error on load')
-
-    await userEvent.click(getSubmitButton(screen))
-
-    await waitFor(() => {
-      expect(submitSpy).toHaveBeenCalledTimes(1)
-    })
-
-    expect(upload).not.toHaveBeenCalled()
-    expect(createSignedUrls).not.toHaveBeenCalled()
-
-    const payload = submitSpy.mock.calls[0]?.[0]
-    expect(payload.message).toContain('Charts throw error on load')
-    expect(payload.message).not.toContain('Dashboard logs:')
-  })
-
-  test('skips dashboard log upload when toggle hidden', async () => {
-    const submitSpy = vi.fn()
-    const upload = vi.fn(async () => ({
-      data: { path: 'dashboard-logs/mock.log.json' },
-      error: null,
-    }))
-    const createSignedUrls = vi.fn(async (paths: string[]) => ({
-      data: paths.map((path) => ({
-        signedUrl: `https://storage.example.com/${path}`,
-        path,
-        error: null,
-      })),
-      error: null,
-    }))
-
-    createSupportStorageClientMock.mockReturnValue({
-      storage: {
-        from: vi.fn(() => ({
-          upload,
-          createSignedUrls,
-        })),
-      },
-    } as any)
-
-    addAPIMock({
-      method: 'post',
-      path: '/platform/feedback/send',
-      response: async ({ request }) => {
-        submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
-      },
-    })
-
-    renderSupportFormPage()
-
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
-
-    await selectCategoryOption(screen, 'Database unresponsive')
-    await waitFor(() => {
-      expect(getCategorySelector(screen)).toHaveTextContent('Database unresponsive')
-    })
-
-    expect(getDashboardLogsToggle(screen, 'query')).not.toBeInTheDocument()
-
-    await userEvent.type(getSummaryField(screen), 'Dashboard charts crashing')
-    await userEvent.type(getMessageField(screen), 'Charts throw error on load')
-
-    await userEvent.click(getSubmitButton(screen))
-
-    await waitFor(() => {
-      expect(submitSpy).toHaveBeenCalledTimes(1)
-    })
-
-    expect(upload).not.toHaveBeenCalled()
-    expect(createSignedUrls).not.toHaveBeenCalled()
-
-    const payload = submitSpy.mock.calls[0]?.[0]
-    expect(payload.message).toContain('Charts throw error on load')
-    expect(payload.message).not.toContain('Dashboard logs:')
-  })
+  }, 10_000)
 
   test('uploads dashboard logs when enabled and appends link to message', async () => {
     const submitSpy = vi.fn()
@@ -1360,15 +1195,18 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Dashboard bug')
     await waitFor(() => {
@@ -1380,11 +1218,8 @@ describe('SupportFormPage', () => {
     })
     expect(dashboardLogToggle).toBeChecked()
 
-    await userEvent.type(getSummaryField(screen), 'Dashboard navigation broken')
-    await userEvent.type(
-      getMessageField(screen),
-      'Navigation menu does not respond after latest deploy'
-    )
+    await fillField(getSummaryField(screen), 'Dashboard navigation broken')
+    await fillField(getMessageField(screen), 'Navigation menu does not respond after latest deploy')
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -1404,7 +1239,7 @@ describe('SupportFormPage', () => {
     expect(payload.message).toBe('Navigation menu does not respond after latest deploy')
     expect(payload.dashboardLogs).toMatch(/^https:\/\/storage\.example\.com\/signed\/.+\.json$/)
     expect(payload.dashboardStudioVersion).toBe(mockStudioVersion)
-  })
+  }, 10_000)
 
   test('shows toast on submission error and allows form re-editing and resubmission', async () => {
     const submitSpy = vi.fn()
@@ -1422,24 +1257,27 @@ describe('SupportFormPage', () => {
       method: 'post',
       path: '/platform/feedback/send',
       response: async () => {
-        return HttpResponse.json({ message: errorMessage }, { status: 500 })
+        return HttpResponse.json<APIErrorBody>({ message: errorMessage }, { status: 500 })
       },
     })
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
 
     await selectCategoryOption(screen, 'Dashboard bug')
     await waitFor(() => {
       expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
     })
 
-    await userEvent.type(getSummaryField(screen), 'Cannot access settings')
-    await userEvent.type(getMessageField(screen), 'Settings page shows 500 error')
+    await fillField(getSummaryField(screen), 'Cannot access settings')
+    await fillField(getMessageField(screen), 'Settings page shows 500 error')
 
     const submitButton = getSubmitButton(screen)
     await userEvent.click(submitButton)
@@ -1458,13 +1296,13 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
     const messageField = getMessageField(screen)
     await userEvent.clear(messageField)
-    await userEvent.type(messageField, 'Settings page shows 500 error - updated description')
+    await userEvent.paste('Settings page shows 500 error - updated description')
 
     await userEvent.click(submitButton)
 
@@ -1486,7 +1324,7 @@ describe('SupportFormPage', () => {
     })
   }, 10_000)
 
-  test('submits support request with attachments and includes attachment URLs in message', async () => {
+  test('can add and remove attachments, and submits attachment URLs in the message', async () => {
     const submitSpy = vi.fn()
 
     // Mock URL.createObjectURL and revokeObjectURL
@@ -1538,7 +1376,7 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
@@ -1559,10 +1397,13 @@ describe('SupportFormPage', () => {
       const renderResult = renderSupportFormPage()
       unmount = renderResult.unmount
 
-      await waitFor(() => {
-        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-      })
+      await waitFor(
+        () => {
+          expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+          expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+        },
+        { timeout: 5_000 }
+      )
 
       await selectCategoryOption(screen, 'Database unresponsive')
       await waitFor(() => {
@@ -1576,20 +1417,29 @@ describe('SupportFormPage', () => {
 
       const summaryField = getSummaryField(screen)
       await userEvent.clear(summaryField)
-      await userEvent.type(summaryField, 'Query timeouts after maintenance')
+      await userEvent.paste('Query timeouts after maintenance')
 
       const messageField = getMessageField(screen)
       await userEvent.clear(messageField)
-      await userEvent.type(
-        messageField,
-        'All queries timing out after scheduled maintenance window'
-      )
+      await userEvent.paste('All queries timing out after scheduled maintenance window')
 
       const fileInput = getAttachmentFileInput()
       const firstFile = new File(['screenshot 1'], 'error-screenshot.png', { type: 'image/png' })
       const secondFile = new File(['screenshot 2'], 'logs-screenshot.jpg', { type: 'image/jpeg' })
-      await userEvent.upload(fileInput, [firstFile, secondFile])
+      const removedFile = new File(['removed'], 'removed.png', { type: 'image/png' })
+      await userEvent.upload(fileInput, [removedFile, firstFile])
+      await waitFor(() => {
+        expect(getAttachmentRemoveButtons(screen)).toHaveLength(2)
+      })
 
+      // Removing an attachment drops it from the list and releases its preview URL
+      await userEvent.click(getAttachmentRemoveButtons(screen)[0])
+      await waitFor(() => {
+        expect(getAttachmentRemoveButtons(screen)).toHaveLength(1)
+      })
+      expect(revokeObjectURLMock).toHaveBeenCalled()
+
+      await userEvent.upload(getAttachmentFileInput(), secondFile)
       await waitFor(() => {
         expect(getAttachmentRemoveButtons(screen)).toHaveLength(2)
       })
@@ -1638,7 +1488,7 @@ describe('SupportFormPage', () => {
     }
   }, 10_000)
 
-  test('can submit form with no organizations and no projects', async () => {
+  test('can submit form with no organizations and no projects, skipping dashboard logs when toggled off', async () => {
     const submitSpy = vi.fn()
 
     addAPIMock({
@@ -1658,15 +1508,18 @@ describe('SupportFormPage', () => {
       path: '/platform/feedback/send',
       response: async ({ request }) => {
         submitSpy(await request.json())
-        return HttpResponse.json({ ok: true })
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
       },
     })
 
     renderSupportFormPage()
 
-    await waitFor(() => {
-      expect(getOrganizationSelector(screen)).toHaveTextContent('No specific organization')
-    })
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('No specific organization')
+      },
+      { timeout: 5_000 }
+    )
     await waitFor(() => {
       expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
     })
@@ -1681,8 +1534,11 @@ describe('SupportFormPage', () => {
     await userEvent.click(dashboardLogToggle!)
     expect(dashboardLogToggle).not.toBeChecked()
 
-    await userEvent.type(getSummaryField(screen), 'Cannot access my account')
-    await userEvent.type(getMessageField(screen), 'I need help accessing my Supabase account')
+    // Support access is per-project, so with no project selected the toggle shouldn't be offered
+    expect(getSupportAccessToggle(screen, 'query')).not.toBeInTheDocument()
+
+    await fillField(getSummaryField(screen), 'Cannot access my account')
+    await fillField(getMessageField(screen), 'I need help accessing my Supabase account')
 
     await userEvent.click(getSubmitButton(screen))
 
@@ -1694,17 +1550,17 @@ describe('SupportFormPage', () => {
     expect(payload).toMatchObject({
       subject: 'Cannot access my account',
       category: 'Dashboard_bug',
-      projectRef: NO_PROJECT_MARKER,
-      organizationSlug: NO_ORG_MARKER,
       library: '',
       affectedServices: '',
-      allowSupportAccess: true,
+      allowSupportAccess: false,
       verified: true,
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',
       dashboardStudioVersion: mockStudioVersion,
     })
     expect(payload.message).toBe('I need help accessing my Supabase account')
+    expect(payload.dashboardLogs).toBeUndefined()
+    expect(generateAttachmentUrlSpy).not.toHaveBeenCalled()
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /support request sent/i })).toBeInTheDocument()

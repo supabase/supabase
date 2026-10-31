@@ -2,13 +2,13 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { Badge } from 'ui'
 
-import Table from 'components/to-be-cleaned/Table'
-import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
-import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
+import Table from '@/components/to-be-cleaned/Table'
+import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
+import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const RPC = ({ language }: ContentProps) => {
   const { ref } = useParams()

@@ -2,9 +2,17 @@
 
 import { components } from 'api-types'
 import { FlagValues } from 'flags/react'
-import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
-import { useAuth } from './auth'
+import { useAuth, useUser } from './auth'
 import { getFlags as getDefaultConfigCatFlags } from './configcat'
 import { hasConsented } from './consent-state'
 import { get, post } from './fetchWrappers'
@@ -12,7 +20,8 @@ import { ensurePlatformSuffix } from './helpers'
 import { useParams } from './hooks'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
-export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponse']
+export type CallFeatureFlagsResponse =
+  components['schemas']['TelemetryCallFeatureFlagsResponse_Output']
 
 export async function getFeatureFlags(
   API_URL: string,
@@ -51,6 +60,21 @@ export type FeatureFlagContextType = {
   configcat: { [key: string]: boolean | number | string | null }
   posthog: CallFeatureFlagsResponse
   hasLoaded?: boolean
+  /**
+   * True while ConfigCat flags are being re-evaluated after `getConfigCatFlags` changed,
+   * e.g. because its custom attributes changed. Until then, `configcat` holds values
+   * evaluated with the previous attributes.
+   */
+  isConfigCatStale?: boolean
+}
+
+type ConfigCatFlagsFetcher = (
+  userEmail?: string
+) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
+
+type FeatureFlagStore = FeatureFlagContextType & {
+  /** The `getConfigCatFlags` that produced the current ConfigCat values */
+  configCatFetcher?: ConfigCatFlagsFetcher
 }
 
 export const FeatureFlagContext = createContext<FeatureFlagContextType>({
@@ -86,18 +110,17 @@ export const FeatureFlagProvider = ({
   organizationSlug?: string
   projectRef?: string
   /** Custom fetcher for ConfigCat flags if passing in custom attributes */
-  getConfigCatFlags?: (
-    userEmail?: string
-  ) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
+  getConfigCatFlags?: ConfigCatFlagsFetcher
 }>) => {
-  const { session, isLoading } = useAuth()
-  const userEmail = session?.user?.email
+  const { isLoading } = useAuth()
+  const user = useUser()
+  const userEmail = user?.user_metadata?.email ?? user?.email
   const params = useParams()
   const resolvedOrganizationSlug = organizationSlug ?? params.slug
   const resolvedProjectRef = projectRef ?? params.ref
   const lastSentGroupContextRef = useRef<string | null>(null)
 
-  const [store, setStore] = useState<FeatureFlagContextType>({
+  const [store, setStore] = useState<FeatureFlagStore>({
     API_URL,
     configcat: {},
     posthog: {},
@@ -110,7 +133,7 @@ export const FeatureFlagProvider = ({
     async function ensureGroupContext() {
       if (!API_URL) return
 
-      const userId = session?.user?.id
+      const userId = user?.id
       if (!userId) return
       if (!hasConsented()) return
 
@@ -143,10 +166,14 @@ export const FeatureFlagProvider = ({
         (enabled === true || (typeof enabled === 'object' && enabled.ph)) && !!API_URL
       const loadCCFlags = enabled === true || (typeof enabled === 'object' && enabled.cc)
 
-      let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
+      let flagStore: FeatureFlagStore = {
+        configcat: {},
+        posthog: {},
+        configCatFetcher: getConfigCatFlags,
+      }
 
-      // Run both async operations in parallel
-      const [flags, flagValues] = await Promise.all([
+      // Run both async operations in parallel — allSettled so a failure in one doesn't block the other
+      const [phResult, ccResult] = await Promise.allSettled([
         loadPHFlags
           ? (async () => {
               await ensureGroupContext()
@@ -163,7 +190,17 @@ export const FeatureFlagProvider = ({
           : Promise.resolve([]),
       ])
 
-      const isLocalDev = process.env.NODE_ENV === 'development'
+      const flags = phResult.status === 'fulfilled' ? phResult.value : {}
+      if (phResult.status === 'rejected') {
+        console.warn('[FeatureFlags] PostHog flags failed', phResult.reason)
+      }
+      const flagValues = ccResult.status === 'fulfilled' ? ccResult.value : []
+
+      // Dev toolbar flag overrides are available in local dev and staging.
+      // Duplicated for tree-shaking — bundler must see literal process.env reference.
+      // Keep in sync: dev-tools/index.ts, DevToolbarContext.tsx, DevToolbar.tsx, DevToolbarTrigger.tsx
+      const env = process.env.NEXT_PUBLIC_ENVIRONMENT
+      const isDevToolsEnabled = env === 'local' || env === 'staging'
 
       const safeParse = (value: string | undefined): Record<string, boolean | number | string> => {
         if (!value) return {}
@@ -176,8 +213,8 @@ export const FeatureFlagProvider = ({
 
       // Process PostHog flags if loaded
       if (Object.keys(flags).length > 0) {
-        // Apply local dev overrides for PostHog flags
-        if (isLocalDev) {
+        // Apply dev toolbar overrides for PostHog flags
+        if (isDevToolsEnabled) {
           try {
             const cookies = getCookies()
             const phOverrides = safeParse(cookies['x-ph-flag-overrides'])
@@ -196,10 +233,10 @@ export const FeatureFlagProvider = ({
 
         try {
           const cookies = getCookies()
-          // Merge overrides: vercel-flag-overrides first, then x-cc-flag-overrides (local only)
-          // x-cc-flag-overrides takes precedence in local dev
+          // Merge overrides: vercel-flag-overrides first, then x-cc-flag-overrides (dev toolbar only)
+          // x-cc-flag-overrides takes precedence when dev tools are enabled
           const vercelOverrides = safeParse(cookies['vercel-flag-overrides'])
-          const ccOverrides = isLocalDev ? safeParse(cookies['x-cc-flag-overrides']) : {}
+          const ccOverrides = isDevToolsEnabled ? safeParse(cookies['x-cc-flag-overrides']) : {}
 
           overridesCookieValue = {
             ...vercelOverrides,
@@ -210,7 +247,7 @@ export const FeatureFlagProvider = ({
         flagValues.forEach((item) => {
           flagStore['configcat'][item.settingKey] =
             overridesCookieValue[item.settingKey] ??
-            (item.settingValue === null ? null : item.settingValue ?? false)
+            (item.settingValue === null ? null : (item.settingValue ?? false))
         })
       }
 
@@ -235,14 +272,20 @@ export const FeatureFlagProvider = ({
     isLoading,
     userEmail,
     API_URL,
-    session?.user?.id,
+    user?.id,
     resolvedOrganizationSlug,
     resolvedProjectRef,
     getConfigCatFlags,
   ])
 
+  // Memoized so consumers only re-render when the flags or their staleness change
+  const contextValue = useMemo<FeatureFlagContextType>(() => {
+    const { configCatFetcher, ...flags } = store
+    return { ...flags, isConfigCatStale: configCatFetcher !== getConfigCatFlags }
+  }, [store, getConfigCatFlags])
+
   return (
-    <FeatureFlagContext.Provider value={store}>
+    <FeatureFlagContext.Provider value={contextValue}>
       {/*
         [Joshen] Just support configcat flags in Vercel flags for now for simplicity
         although I think it should be fairly simply to support PH too

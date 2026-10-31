@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
+
 import { analyticsKeys } from './keys'
 
 export const useInvalidateAnalyticsQuery = () => {

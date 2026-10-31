@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { replicationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ReplicationDestinationByIdParams = { projectRef?: string; destinationId?: number | null }
 
@@ -24,7 +24,7 @@ async function fetchReplicationDestinationById(
   return data
 }
 
-export type ReplicationDestinationByIdData = components['schemas']['ReplicationDestinationResponse']
+export type ReplicationDestinationByIdData = components['schemas']['DestinationResponse_Output']
 
 export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinationByIdData>(
   { projectRef, destinationId }: ReplicationDestinationByIdParams,

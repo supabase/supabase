@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { organizationKeys } from './keys'
-import { UseCustomQueryOptions } from 'types'
 
-export type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit']
+import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomQueryOptions } from '@/types'
+
+export type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
 
 export type FreeProjectLimitCheckVariables = {
   slug?: string

@@ -1,21 +1,48 @@
 import dayjs from 'dayjs'
 import { groupBy } from 'lodash'
 
-import { DataPoint } from 'data/analytics/constants'
-import type { OrgDailyUsageResponse, PricingMetric } from 'data/analytics/org-daily-stats-query'
-import type { OrgSubscription } from 'data/subscriptions/types'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { DataPoint } from '@/data/analytics/constants'
+import type { OrgDailyUsageResponse, PricingMetric } from '@/data/analytics/org-daily-stats-query'
+import type { Branch } from '@/data/branches/branches-query'
+import type { OrgSubscription } from '@/data/subscriptions/types'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {
   const tempArray = new Array(days).fill(0)
-  return tempArray.map((x, idx) => {
+  return tempArray.map((_x, idx) => {
     return {
       loopId: (idx + 1).toString(),
       period_start: `${idx + 1}`,
       [attribute]: Math.floor(Math.random() * 100).toString(),
     }
   })
+}
+
+export function getUsageBranchOptions(branches: Branch[] | undefined) {
+  const previewBranches = (branches ?? [])
+    .filter((branch) => !branch.is_default)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+  if (previewBranches.length === 0) return []
+
+  const mainBranch = branches?.find((branch) => branch.is_default)
+
+  return mainBranch ? [mainBranch, ...previewBranches] : previewBranches
+}
+
+export function resolveUsageProjectRef(
+  selectedProjectRef: string | null,
+  branchOptions: Branch[],
+  selectedBranchRef: string | null
+) {
+  if (!selectedProjectRef) return null
+
+  const selectedBranch = branchOptions.find(
+    (branch) =>
+      branch.project_ref === selectedBranchRef && branch.parent_project_ref === selectedProjectRef
+  )
+  return selectedBranch?.project_ref ?? selectedProjectRef
 }
 
 export function useGetUpgradeUrl(slug: string, subscription?: OrgSubscription, source?: string) {

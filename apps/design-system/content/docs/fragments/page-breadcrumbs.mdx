@@ -1,0 +1,44 @@
+---
+title: Page Breadcrumbs
+description: Full-width breadcrumb row for page chrome, placed above PageHeader and page content.
+fragment: true
+---
+
+<ComponentPreview
+  name="page-breadcrumbs-demo"
+  description="Breadcrumb row with optional actions"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+## Usage
+
+```tsx
+import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
+```
+
+```tsx
+<PageBreadcrumbs
+  actions={
+    <PageBreadcrumbsActions>
+      <Button variant="primary" size="tiny">
+        Create
+      </Button>
+    </PageBreadcrumbsActions>
+  }
+>
+  <BreadcrumbList>{/* … */}</BreadcrumbList>
+</PageBreadcrumbs>
+```
+
+## Sub-components
+
+- `PageBreadcrumbs` — bordered, full-width breadcrumb bar (wraps shadcn `Breadcrumb`)
+- `PageBreadcrumbsActions` — actions on the right of the breadcrumb row (pass via `actions` prop)
+
+`PageBreadcrumbs` uses `PageContainer` with `size="full"` for width and padding. It does not depend on `PageHeader`.
+
+Place it as a sibling above `PageHeader` and page content, not inside `PageHeader`. For legacy pages that still nest breadcrumbs inside `PageHeader`, use `PageHeaderBreadcrumb` instead.

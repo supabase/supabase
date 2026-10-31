@@ -1,9 +1,9 @@
 import type { Column } from 'react-data-grid'
-import type { VaultSecret } from 'types'
 import { cn } from 'ui'
 
 import { SecretRow } from './SecretRow'
 import { SecretTableColumn } from './Secrets.types'
+import type { VaultSecret } from '@/types'
 
 export const SECRET_TABLE_COLUMNS: SecretTableColumn[] = [
   { id: 'secret', name: 'Secret', minWidth: 300, width: 360 },
@@ -33,7 +33,7 @@ export const formatSecretColumns = (): Column<VaultSecret>[] => {
               col.id === 'secret' && 'ml-8'
             )}
           >
-            <p className="!text-foreground">{col.name}</p>
+            <p className="text-foreground!">{col.name}</p>
           </div>
         )
       },

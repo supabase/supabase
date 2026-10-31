@@ -1,14 +1,23 @@
 import type { Metadata } from 'next'
+
 import PricingContent from './PricingContent'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { canonicalAlternates } from '@/lib/canonical'
+import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
+import { mdAlternates } from '@/lib/md-alternates'
 
 export const metadata: Metadata = {
   title: 'Pricing & Fees | Supabase',
   description:
-    'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.',
+    "Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up. Projects on paid plans aren't paused for inactivity.",
+  alternates: {
+    ...canonicalAlternates('/pricing'),
+    ...mdAlternates('pricing'),
+  },
   openGraph: {
     title: 'Pricing & Fees | Supabase',
     description:
-      'Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up.',
+      "Explore Supabase fees and pricing information. Find our competitive pricing Plans, with no hidden pricing. We have a generous Free Plan for those getting started, and Pay As You Go for those scaling up. Projects on paid plans aren't paused for inactivity.",
     url: 'https://supabase.com/pricing',
     images: [
       {
@@ -19,5 +28,15 @@ export const metadata: Metadata = {
 }
 
 export default function PricingPage() {
-  return <PricingContent />
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.pricing)),
+        }}
+      />
+      <PricingContent />
+    </>
+  )
 }

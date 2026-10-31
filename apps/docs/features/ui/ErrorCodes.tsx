@@ -1,8 +1,8 @@
-import Link from 'next/link'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import _authErrorCodes from '~/content/errorCodes/authErrorCodes.toml'
-import _realtimeErrorCodes from '~/content/errorCodes/realtimeErrorCodes.toml'
+import _authErrorCodes from '~/data/errorCodes/authErrorCodes.json'
+import _realtimeErrorCodes from '~/data/errorCodes/realtimeErrorCodes.json'
+import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { type ErrorCodeDefinition } from '~/resources/error/errorTypes'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 const errorCodesByService = {
   auth: _authErrorCodes as Record<string, ErrorCodeDefinition>,
@@ -41,7 +41,7 @@ export function ErrorCodes({ service }: ErrorCodesProps) {
                     <ul>
                       {definition.references.map((reference) => (
                         <li key={reference.href}>
-                          <Link href={reference.href}>{reference.description}</Link>
+                          <MdxAnchor href={reference.href}>{reference.description}</MdxAnchor>
                         </li>
                       ))}
                     </ul>

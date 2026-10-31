@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { databaseKeys } from './keys'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DownloadableBackupVariables = {
   projectRef?: string
@@ -17,6 +17,7 @@ export async function getDownloadableBackup(
   const { data, error } = await get(`/platform/database/{ref}/backups/downloadable-backups`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

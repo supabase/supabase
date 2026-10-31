@@ -1,9 +1,14 @@
 import { z } from 'zod'
 
-import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { filterByList } from './helpers'
-import { ident, literal } from './pg-format'
-import { COLUMN_PRIVILEGES_SQL } from './sql/column-privileges'
+import {
+  ident,
+  joinSqlFragments,
+  keyword,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from './pg-format'
+import { getScopedColumnPrivilegesSql } from './sql/column-privileges'
 
 const pgColumnPrivilegeGrant = z.object({
   grantor: z.string(),
@@ -43,6 +48,7 @@ function list({
   includedSchemas,
   excludedSchemas,
   columnIds,
+  relationName,
   limit,
   offset,
 }: {
@@ -50,42 +56,39 @@ function list({
   includedSchemas?: string[]
   excludedSchemas?: string[]
   columnIds?: string[]
+  /** Restricts to a single relation by name. Pair with `includedSchemas`. */
+  relationName?: string
   limit?: number
   offset?: number
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgColumnPrivilegesArrayZod
 } {
-  let sql = `
-  with column_privileges as (${COLUMN_PRIVILEGES_SQL})
+  const base = getScopedColumnPrivilegesSql({
+    includeSystemSchemas,
+    includedSchemas,
+    excludedSchemas,
+    relationName,
+    // `columnIds` are "<attrelid>.<attnum>" pairs. Their relation half narrows
+    // the base scan; the exact attnum half stays an outer predicate below.
+    relationIds: columnIds?.length
+      ? [...new Set(columnIds.map((columnId) => columnId.split('.')[0]))]
+      : undefined,
+  })
+
+  let sql = safeSql`
+  with column_privileges as (${base})
   select *
   from column_privileges
   `
-
-  const conditions: string[] = []
-
-  const filter = filterByList(
-    includedSchemas,
-    excludedSchemas,
-    !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
-  )
-  if (filter) {
-    conditions.push(`relation_schema ${filter}`)
-  }
-
   if (columnIds?.length) {
-    conditions.push(`column_id in (${columnIds.map(literal).join(',')})`)
+    sql = safeSql`${sql} where column_id in (${joinSqlFragments(columnIds.map(literal), ',')})`
   }
-
-  if (conditions.length > 0) {
-    sql += ` where ${conditions.join(' and ')}`
-  }
-
   if (limit) {
-    sql += ` limit ${limit}`
+    sql = safeSql`${sql} limit ${literal(limit)}`
   }
   if (offset) {
-    sql += ` offset ${offset}`
+    sql = safeSql`${sql} offset ${literal(offset)}`
   }
   return {
     sql,
@@ -93,61 +96,72 @@ function list({
   }
 }
 
+/**
+ * The `%I.%I` arguments of a `format()` call that name the table of the
+ * `col` record (a `pg_attribute` row): its schema and name.
+ *
+ * `%s` with `col.attrelid::regclass` would build the same statement, but `%s`
+ * substitutes raw text, so a server that statically checks `DO` blocks (such as
+ * Multigres) can't prove the statement fixed and rejects the block. A format
+ * string made only of `%I`/`%L` conversions can be checked.
+ */
+const colRelationIdentArgs = safeSql`(select n.nspname from pg_class c join pg_namespace n on n.oid = c.relnamespace where c.oid = col.attrelid), (select relname from pg_class where oid = col.attrelid)`
+
+function granteeSql(grantee: string): SafeSqlFragment {
+  return grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
+}
+
 type ColumnPrivilegesGrant = z.infer<typeof privilegeGrant>
-function grant(grants: ColumnPrivilegesGrant[]): { sql: string } {
-  const sql = `
+function grant(grants: ColumnPrivilegesGrant[]): { sql: SafeSqlFragment } {
+  const sql = safeSql`
 do $$
 declare
   col record;
 begin
-${grants
-  .map(({ privilegeType, columnId, grantee, isGrantable }) => {
+${joinSqlFragments(
+  grants.map(({ privilegeType, columnId, grantee, isGrantable }) => {
     const [relationId, columnNumber] = columnId.split('.')
-    return `
+    return safeSql`
 select *
 from pg_attribute a
 where a.attrelid = ${literal(relationId)}
   and a.attnum = ${literal(columnNumber)}
 into col;
-execute format(
-  'grant ${privilegeType} (%I) on %s to ${
-    grantee.toLowerCase() === 'public' ? 'public' : ident(grantee)
-  } ${isGrantable ? 'with grant option' : ''}',
-  col.attname,
-  col.attrelid::regclass
-);`
-  })
-  .join('\n')}
+execute format(${literal(
+      `grant ${keyword(privilegeType)} (%I) on %I.%I to ${granteeSql(grantee)}${
+        isGrantable ? ' with grant option' : ''
+      }`
+    )}, col.attname, ${colRelationIdentArgs});`
+  }),
+  '\n'
+)}
 end $$;
 `
   return { sql }
 }
 
 type ColumnPrivilegesRevoke = Omit<ColumnPrivilegesGrant, 'isGrantable'>
-function revoke(revokes: ColumnPrivilegesRevoke[]): { sql: string } {
-  const sql = `
+function revoke(revokes: ColumnPrivilegesRevoke[]): { sql: SafeSqlFragment } {
+  const sql = safeSql`
 do $$
 declare
   col record;
 begin
-${revokes
-  .map(({ privilegeType, columnId, grantee }) => {
+${joinSqlFragments(
+  revokes.map(({ privilegeType, columnId, grantee }) => {
     const [relationId, columnNumber] = columnId.split('.')
-    return `
+    return safeSql`
 select *
 from pg_attribute a
 where a.attrelid = ${literal(relationId)}
   and a.attnum = ${literal(columnNumber)}
 into col;
-execute format(
-  'revoke ${privilegeType} (%I) on %s from ${
-    grantee.toLowerCase() === 'public' ? 'public' : ident(grantee)
-  }',
-  col.attname,
-  col.attrelid::regclass
-);`
-  })
-  .join('\n')}
+execute format(${literal(
+      `revoke ${keyword(privilegeType)} (%I) on %I.%I from ${granteeSql(grantee)}`
+    )}, col.attname, ${colRelationIdentArgs});`
+  }),
+  '\n'
+)}
 end $$;
 `
   return { sql }

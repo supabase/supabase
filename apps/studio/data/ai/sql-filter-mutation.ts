@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
-
-import { constructHeaders, fetchHandler } from 'data/fetchers'
-import { BASE_PATH } from 'lib/constants'
-import { ResponseError, UseCustomMutationOptions } from 'types'
 import { AIFilterRequestPayload, FilterGroup } from 'ui-patterns/FilterBar'
+
+import { constructHeaders, fetchHandler } from '@/data/fetchers'
+import { BASE_PATH } from '@/lib/constants'
+import { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type SqlFilterGenerateResponse = FilterGroup
 

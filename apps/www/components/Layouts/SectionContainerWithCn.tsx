@@ -1,22 +1,27 @@
-import { Ref, forwardRef } from 'react'
-import { cn } from 'ui'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { forwardRef, Ref } from 'react'
+import { cn } from 'ui'
 
-const sectionContainerVariants = cva('max-w-7xl relative mx-auto px-6', {
+const sectionContainerVariants = cva('section-container relative', {
   variants: {
     width: {
-      normal: 'lg:px-16 xl:px-20',
+      normal: '',
       smallScreenFull: 'max-w-full lg:container px-0',
     },
     height: {
-      normal: 'py-16 md:py-24 lg:py-24',
-      narrow: 'py-6 md:py-8',
+      normal: 'py-16 md:py-18 lg:py-24',
+      narrow: 'py-6 md:py-8 lg:py-8 xl:py-10',
       none: '',
+    },
+    spacing: {
+      none: '',
+      sections: 'space-y-8 md:space-y-16',
     },
   },
   defaultVariants: {
     width: 'normal',
     height: 'normal',
+    spacing: 'none',
   },
 })
 
@@ -33,8 +38,12 @@ interface Props extends VariantProps<typeof sectionContainerVariants> {
  * @param height - 'normal' (default) or 'narrow'
  */
 const SectionContainerWithCn = forwardRef(
-  ({ children, className, id, width, height }: Props, ref: Ref<HTMLDivElement>) => (
-    <div ref={ref} id={id} className={cn(sectionContainerVariants({ width, height }), className)}>
+  ({ children, className, id, width, height, spacing }: Props, ref: Ref<HTMLDivElement>) => (
+    <div
+      ref={ref}
+      id={id}
+      className={cn(sectionContainerVariants({ width, height, spacing }), className)}
+    >
       {children}
     </div>
   )

@@ -1,11 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit2, MoreVertical, Trash } from 'lucide-react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import type { ProjectSecret } from 'data/secrets/secrets-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Edit2Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
+import { toast } from 'sonner'
 import {
   Button,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -13,8 +10,15 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import type { ProjectSecret } from '@/data/secrets/secrets-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret
@@ -23,22 +27,30 @@ interface EdgeFunctionSecretProps {
 }
 
 const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFunctionSecretProps) => {
-  const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
-  // [Joshen] Following API's validation:
-  // https://github.com/supabase/platform/blob/develop/api/src/routes/v1/projects/ref/secrets/secrets.controller.ts#L106
-  const isReservedSecret = !!secret.name.match(/^(SUPABASE_).*/)
+  const { can: canUpdateSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
+  )
 
   return (
     <TableRow>
       <TableCell>
-        <p className="truncate py-2">{secret.name}</p>
+        <Tooltip>
+          <TooltipTrigger
+            onClick={() => {
+              copyToClipboard(secret.name)
+              toast.success(`Copied ${secret.name}`)
+            }}
+          >
+            <p className="truncate py-1">
+              <code>{secret.name}</code>
+            </p>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Click to copy</TooltipContent>
+        </Tooltip>
       </TableCell>
       <TableCell>
-        <p
-          className="font-mono text-sm max-w-96 truncate text-foreground-light"
-          title={secret.value}
-        >
-          {secret.value}
+        <p className="max-w-96 truncate" title={secret.value}>
+          <code className="text-foreground-light!">{secret.value}</code>
         </p>
       </TableCell>
       <TableCell>
@@ -47,7 +59,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
             displayAs="utc"
             utcTimestamp={secret.updated_at}
             labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-            className="!text-sm text-foreground-light whitespace-nowrap"
+            className="text-sm! text-foreground-light whitespace-nowrap"
           />
         ) : (
           '-'
@@ -57,29 +69,22 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
         <div className="flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                aria-label="More options"
-                type="default"
-                className="px-1"
-                icon={<MoreVertical />}
-              />
+              <Button aria-label="More options" className="px-1" icon={<MoreVerticalIcon />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem asChild>
                 <ButtonTooltip
-                  type="text"
-                  icon={<Edit2 size={14} />}
+                  variant="text"
+                  icon={<Edit2Icon size={14} />}
                   className="w-full justify-start group text-inherit"
-                  disabled={!canUpdateSecrets || isReservedSecret}
+                  disabled={!canUpdateSecrets}
                   onClick={() => onSelectEdit()}
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: isReservedSecret
-                        ? 'This is a reserved secret and cannot be changed'
-                        : !canUpdateSecrets
-                          ? 'You need additional permissions to edit edge function secrets'
-                          : undefined,
+                      text: !canUpdateSecrets
+                        ? 'You need additional permissions to edit edge function secrets'
+                        : undefined,
                     },
                   }}
                 >
@@ -91,19 +96,17 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
 
               <DropdownMenuItem asChild>
                 <ButtonTooltip
-                  type="text"
-                  icon={<Trash size={14} className="group-[&:not(:disabled)]:text-destructive" />}
+                  variant="text"
+                  icon={<TrashIcon size={14} className="group-not-disabled:text-destructive" />}
                   className="w-full justify-start group text-inherit"
-                  disabled={!canUpdateSecrets || isReservedSecret}
+                  disabled={!canUpdateSecrets}
                   onClick={() => onSelectDelete()}
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: isReservedSecret
-                        ? 'This is a reserved secret and cannot be deleted'
-                        : !canUpdateSecrets
-                          ? 'You need additional permissions to delete edge function secrets'
-                          : undefined,
+                      text: !canUpdateSecrets
+                        ? 'You need additional permissions to delete edge function secrets'
+                        : undefined,
                     },
                   }}
                 >

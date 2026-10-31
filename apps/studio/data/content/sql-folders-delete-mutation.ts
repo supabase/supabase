@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { contentKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DeleteSQLSnippetFoldersVariables = {
   projectRef: string
@@ -15,8 +15,8 @@ export async function deleteSQLSnippetFolders(
   signal?: AbortSignal
 ) {
   const { data, error } = await del('/platform/projects/{ref}/content/folders', {
-    // @ts-ignore [Joshen] API codegen issue
-    params: { path: { ref: projectRef }, query: { ids } },
+    // @ts-expect-error The generated endpoint type omits its required `{ref}` path parameter.
+    params: { path: { ref: projectRef }, query: { ids: ids.join(',') } },
     signal,
   })
 

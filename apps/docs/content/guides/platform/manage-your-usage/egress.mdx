@@ -5,7 +5,7 @@ title: 'Manage Egress usage'
 
 ## What you are charged for
 
-You are charged for the network data transmitted out of the system to a connected client. Egress is incurred by all services - Database, Auth, Storage, Edge Functions, Realtime and Log Drains.
+You are charged for the network data transmitted out of the system to a connected client. Egress is incurred by all services - Database, Auth, Storage, Edge Functions, Realtime and [Log Drains](/docs/guides/observability/log-drains).
 
 ### Database Egress
 
@@ -47,7 +47,7 @@ Data pushed to clients via Supabase Realtime for subscribed events.
 
 Data sent to the client when using the shared connection pooler (Supavisor) to access your database. When using the shared connection pooler, we do not count database egress, as this would otherwise count double (Database -> Shared Pooler + Shared Pooler -> Client).
 
-**Example:** You are using our [shared connection pooler](/docs/guides/database/connecting-to-postgres#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
+**Example:** You are using our [shared connection pooler](/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler) and you query a list of invoices in your backend. The data returned from that query is contributing to Shared Pooler Egress.
 
 ### Log Drain Egress
 
@@ -62,6 +62,12 @@ Cached and uncached egress have independent quotas and independent pricing. Cach
 ## How charges are calculated
 
 Egress is charged by gigabyte. Charges apply only for usage exceeding your subscription plan's quota. This quota is called the Unified Egress Quota because it can be used across all services (Database, Auth, Storage etc.).
+
+<Admonition type="note">
+
+Egress accumulates over the billing cycle and resets at the start of the next cycle. Usage that has already been served cannot be reduced retroactively, so the optimizations below lower future egress only. If your organization is restricted for egress, the restriction clears at the start of the next billing cycle, or immediately if you upgrade your plan or disable your Spend Cap.
+
+</Admonition>
 
 ### Usage on your invoice
 
@@ -88,26 +94,26 @@ The organization's Egress usage is within the quota, so no charges for Egress ap
 | Line Item           | Units     | Costs                    |
 | ------------------- | --------- | ------------------------ |
 | Pro Plan            | 1         | <Price price="25" />     |
-| Compute Hours Micro | 744 hours | <Price price="10" />     |
+| Compute Hours Small | 730 hours | <Price price="15" />     |
 | Egress              | 200 GB    | <Price price="0" />      |
 | Cached Egress       | 230 GB    | <Price price="0" />      |
-| **Subtotal**        |           | **<Price price="35" />** |
+| **Subtotal**        |           | **<Price price="40" />** |
 | Compute Credits     |           | -<Price price="10" />    |
-| **Total**           |           | **<Price price="25" />** |
+| **Total**           |           | **<Price price="30" />** |
 
 ### Exceeding quota
 
 The organization's Egress usage exceeds the uncached egress quota by 50 GB and the cached egress quota by 550 GB, incurring charges for this additional usage.
 
-| Line Item           | Units     | Costs                      |
-| ------------------- | --------- | -------------------------- |
-| Pro Plan            | 1         | <Price price="25" />       |
-| Compute Hours Micro | 744 hours | <Price price="10" />       |
-| Egress              | 300 GB    | <Price price="4.5" />      |
-| Cached Egress       | 800 GB    | <Price price="16.5" />     |
-| **Subtotal**        |           | **<Price price="47.5" />** |
-| Compute Credits     |           | -<Price price="10" />      |
-| **Total**           |           | **<Price price="37.5" />** |
+| Line Item           | Units     | Costs                    |
+| ------------------- | --------- | ------------------------ |
+| Pro Plan            | 1         | <Price price="25" />     |
+| Compute Hours Small | 730 hours | <Price price="15" />     |
+| Egress              | 300 GB    | <Price price="4.5" />    |
+| Cached Egress       | 800 GB    | <Price price="16.5" />   |
+| **Subtotal**        |           | **<Price price="61" />** |
+| Compute Credits     |           | -<Price price="10" />    |
+| **Total**           |           | **<Price price="51" />** |
 
 ## View usage
 
@@ -115,13 +121,17 @@ The organization's Egress usage exceeds the uncached egress quota by 50 GB and t
 
 You can view Egress usage on the [organization's usage page](/dashboard/org/_/usage). The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
 
+Each [Preview branch](/docs/guides/deployment/branching) records its own Egress, which counts toward the organization total but is not included in the parent project's usage. To see a branch's Egress, select the parent project, then select the branch from the branch list.
+
 <Image
   alt="Usage page navigation bar"
   src={{
     light: '/docs/img/guides/platform/usage-navbar--light.png',
     dark: '/docs/img/guides/platform/usage-navbar--dark.png',
   }}
-  zoomable
+
+width={1546}
+height={208}
 />
 
 In the Total Egress section, you can see the usage for the selected time period. Hover over a specific date to view a breakdown by service. Note that this includes the cached egress.
@@ -132,6 +142,9 @@ In the Total Egress section, you can see the usage for the selected time period.
     light: '/docs/img/guides/platform/unified-egress--light.png',
     dark: '/docs/img/guides/platform/unified-egress.png',
   }}
+
+width={803}
+height={460}
 />
 
 Separately, you can see the cached egress right below:
@@ -142,6 +155,9 @@ Separately, you can see the cached egress right below:
     light: '/docs/img/guides/platform/cached-egress--light.png',
     dark: '/docs/img/guides/platform/cached-egress.png',
   }}
+
+width={1422}
+height={586}
 />
 
 ### Custom report
@@ -155,12 +171,14 @@ Separately, you can see the cached egress right below:
     light: '/docs/img/guides/platform/egress-report--light.png',
     dark: '/docs/img/guides/platform/egress-report--dark.png',
   }}
-  zoomable
+
+width={2884}
+height={948}
 />
 
 ## Debug usage
 
-To better understand your Egress usage, identify what’s driving the most traffic. Check the most frequent database queries, or analyze the most requested API paths to pinpoint high-egress endpoints.
+To better understand your [Egress usage](/kb/troubleshooting/all-about-supabase-egress-a_Sg_e), identify what’s driving the most traffic. Check the most frequent database queries, or analyze the most requested API paths to pinpoint high-egress endpoints.
 
 ### Frequent database queries
 
@@ -172,12 +190,14 @@ On the Advisors [Query performance view](/dashboard/project/_/database/query-per
     light: '/docs/img/guides/platform/advisor-most-frequent-queries--light.png',
     dark: '/docs/img/guides/platform/advisor-most-frequent-queries--dark.png',
   }}
-  zoomable
+
+width={5006}
+height={510}
 />
 
 ### Most requested API endpoints
 
-In the [Logs Explorer](/dashboard/project/_/logs/explorer) you can access Edge Logs, and review the top paths to identify heavily queried endpoints. These logs currently do not include response byte data. That data will be available in the future too.
+In [Explorer](/dashboard/project/_/explorer), select query source **Logs** and [query API Gateway events](/docs/guides/observability/advanced-log-filtering) to identify heavily queried paths. These logs currently do not include response byte data. That data will be available in the future too.
 
 <Image
   alt="Top paths"
@@ -185,7 +205,9 @@ In the [Logs Explorer](/dashboard/project/_/logs/explorer) you can access Edge L
     light: '/docs/img/guides/platform/logs-top-paths--light.png',
     dark: '/docs/img/guides/platform/logs-top-paths--dark.png',
   }}
-  zoomable
+
+width={4492}
+height={1166}
 />
 
 ## Optimize usage

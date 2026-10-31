@@ -1,10 +1,5 @@
-import {
-  cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-} from 'ui'
+import { cn, Command, CommandGroup, CommandItem, CommandList } from 'ui'
+
 import type { ResourcePickerRenderProps } from './SecondLevelNav.Layout'
 
 type NamedResource = { name: string }
@@ -27,18 +22,18 @@ export const ResourcePickerList = ({
   }
 
   return (
-    <Command_Shadcn_>
-      <CommandList_Shadcn_>
-        <CommandGroup_Shadcn_>
+    <Command>
+      <CommandList>
+        <CommandGroup>
           {items.length === 0 && (
-            <CommandItem_Shadcn_ disabled className="cursor-default px-4">
+            <CommandItem disabled className="cursor-default px-4">
               <p className="text-foreground-light">{emptyMessage}</p>
-            </CommandItem_Shadcn_>
+            </CommandItem>
           )}
           {items.map((item) => {
             const isActive = item.name === selectedResource
             return (
-              <CommandItem_Shadcn_
+              <CommandItem
                 key={item.name}
                 className={cn(
                   'cursor-pointer px-4',
@@ -47,11 +42,11 @@ export const ResourcePickerList = ({
                 onSelect={() => handleSelect(item.name)}
               >
                 <p className="truncate">{item.name}</p>
-              </CommandItem_Shadcn_>
+              </CommandItem>
             )
           })}
-        </CommandGroup_Shadcn_>
-      </CommandList_Shadcn_>
-    </Command_Shadcn_>
+        </CommandGroup>
+      </CommandList>
+    </Command>
   )
 }

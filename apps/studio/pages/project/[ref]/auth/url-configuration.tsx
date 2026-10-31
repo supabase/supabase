@@ -1,12 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { RedirectUrls } from 'components/interfaces/Auth/RedirectUrls/RedirectUrls'
-import SiteUrl from 'components/interfaces/Auth/SiteUrl/SiteUrl'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -18,10 +9,17 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { RedirectUrls } from '@/components/interfaces/Auth/RedirectUrls/RedirectUrls'
+import SiteUrl from '@/components/interfaces/Auth/SiteUrl/SiteUrl'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { NextPageWithLayout } from '@/types'
+
 const URLConfiguration: NextPageWithLayout = () => {
-  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
   if (isPermissionsLoaded && !canReadAuthSettings) {
@@ -60,7 +58,7 @@ const URLConfiguration: NextPageWithLayout = () => {
 
 URLConfiguration.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="URL Configuration">{page}</AuthLayout>
   </DefaultLayout>
 )
 

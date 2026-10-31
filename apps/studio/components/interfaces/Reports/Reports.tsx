@@ -1,52 +1,51 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import dayjs from 'dayjs'
+import { useParams } from 'common'
 import { groupBy, isEqual, isNull } from 'lodash'
-import { ArrowRight, Plus, RefreshCw, Save } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { PlusIcon, RefreshCwIcon, SaveIcon } from 'lucide-react'
 import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { DateRangePicker } from 'components/ui/DateRangePicker'
-import NoPermission from 'components/ui/NoPermission'
-import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import { analyticsKeys } from 'data/analytics/keys'
-import { useContentQuery } from 'data/content/content-query'
-import {
-  UpsertContentPayload,
-  useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
-import { Metric, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import type { Dashboards } from 'types'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { analyticsKeys } from '@/data/analytics/keys'
+import { ContentOfType, useContentQuery } from '@/data/content/content-query'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
+import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import type { Dashboards } from '@/types'
 
 const DEFAULT_CHART_COLUMN_COUNT = 1
 const DEFAULT_CHART_ROW_COUNT = 1
 
 const Reports = () => {
-  const router = useRouter()
   const { id: reportId, ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const queryClient = useQueryClient()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -56,9 +55,6 @@ const Reports = () => {
   const [endDate, setEndDate] = useState<string>()
   const [hasEdits, setHasEdits] = useState<boolean>(false)
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
-
-  const [navigateUrl, setNavigateUrl] = useState<string>()
-  const [confirmNavigate, setConfirmNavigate] = useState(false)
 
   const {
     data: userContents,
@@ -77,34 +73,37 @@ const Reports = () => {
       if (vars.payload.type === 'report') toast.error(`Failed to update report: ${error.message}`)
     },
   })
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
-  const currentReport = userContents?.content.find((report) => report.id === reportId)
+  const currentReport = userContents?.content.find(
+    (report): report is ContentOfType<'report'> => report.id === reportId
+  )
   const currentReportContent = currentReport?.content as Dashboards.Content
 
-  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'user_content',
-    {
-      resource: {
-        type: 'report',
-        visibility: currentReport?.visibility,
-        owner_id: currentReport?.owner_id,
-      },
-      subject: { id: profile?.id },
-    }
-  )
-  const { can: canUpdateReport } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'user_content',
-    {
-      resource: {
-        type: 'report',
-        visibility: currentReport?.visibility,
-        owner_id: currentReport?.owner_id,
-      },
-      subject: { id: profile?.id },
-    }
+  const { can: canReadReport, isLoading: isLoadingPermissions } =
+    useAsyncCheckUserContentPermissions(
+      FGA_PERMISSIONS.PROJECT.SNIPPETS_READ,
+      currentReport
+        ? {
+            mode: 'existing',
+            type: 'report',
+            visibility: currentReport.visibility,
+            ownerId: currentReport.owner_id,
+            subjectId: profile?.id,
+          }
+        : undefined
+    )
+  const { can: canUpdateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    currentReport
+      ? {
+          mode: 'existing',
+          type: 'report',
+          visibility: currentReport.visibility,
+          ownerId: currentReport.owner_id,
+          subjectId: profile?.id,
+        }
+      : undefined
   )
 
   function handleDateRangePicker({ period_start, period_end }: any) {
@@ -262,7 +261,11 @@ const Reports = () => {
     if (config === undefined) return console.error('Config is required')
     upsertContent({
       projectRef: ref,
-      payload: { ...currentReport, content: config },
+      payload: {
+        ...currentReport,
+        description: currentReport.description ?? undefined,
+        content: config,
+      },
     })
   }
 
@@ -350,10 +353,7 @@ const Reports = () => {
         },
       }
     )
-    sendEvent({
-      action: 'custom_report_assistant_sql_block_added',
-      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
-    })
+    track('custom_report_assistant_sql_block_added')
   }
 
   useEffect(() => {
@@ -364,30 +364,10 @@ const Reports = () => {
     checkEditState()
   }, [config])
 
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasEdits) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-
-    const handleBrowseAway = (url: string) => {
-      if (hasEdits && !confirmNavigate) {
-        setNavigateUrl(url)
-        throw 'Route change declined' // Just to prevent the route change
-      } else {
-        setNavigateUrl(undefined)
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    router.events.on('routeChangeStart', handleBrowseAway)
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      router.events.off('routeChangeStart', handleBrowseAway)
-    }
-  }, [hasEdits, confirmNavigate, router])
+  const { handleCancelNavigation, handleConfirmNavigation, shouldConfirmNavigation } =
+    usePreventNavigationOnUnsavedChanges({
+      hasChanges: hasEdits,
+    })
 
   if (isLoading || isLoadingPermissions) {
     return <LogoLoader />
@@ -397,26 +377,24 @@ const Reports = () => {
     return <NoPermission isFullPage resourceText="access this custom report" />
   }
 
+  const reportTitle = currentReport?.name || 'Reports'
+
   return (
     <>
       <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h1>{currentReport?.name || 'Reports'}</h1>
+            <h1>{reportTitle}</h1>
             <p className="text-foreground-light">{currentReport?.description}</p>
           </div>
           {hasEdits && (
             <div className="flex items-center gap-x-2">
-              <Button
-                type="default"
-                disabled={isSaving}
-                onClick={() => setConfig(currentReportContent)}
-              >
+              <Button disabled={isSaving} onClick={() => setConfig(currentReportContent)}>
                 Cancel
               </Button>
               <Button
-                type="primary"
-                icon={<Save />}
+                variant="primary"
+                icon={<SaveIcon />}
                 loading={isSaving}
                 onClick={() => onSaveReport()}
               >
@@ -427,14 +405,6 @@ const Reports = () => {
         </div>
         <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
           <div className="flex items-center gap-x-2">
-            <ButtonTooltip
-              type="default"
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              disabled={isRefreshing}
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
             <div className="flex items-center gap-x-3">
               <DateRangePicker
                 value="7d"
@@ -450,28 +420,22 @@ const Reports = () => {
                   </div>
                 }
               />
-
-              {startDate && endDate && (
-                <div className="hidden items-center space-x-1 lg:flex ">
-                  <span className="text-sm text-foreground-light">
-                    {dayjs(startDate).format('MMM D, YYYY')}
-                  </span>
-                  <span className="text-foreground-lighter">
-                    <ArrowRight size={12} />
-                  </span>
-                  <span className="text-sm text-foreground-light">
-                    {dayjs(endDate).format('MMM D, YYYY')}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
 
           <div className="flex items-center gap-x-2">
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.customReport} topic={reportTitle} />
+            <ButtonTooltip
+              icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
+              className="w-7"
+              disabled={isRefreshing}
+              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+              onClick={onRefreshReport}
+            />
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<Plus />}>
+                  <Button icon={<PlusIcon />}>
                     <span>Add block</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -482,8 +446,7 @@ const Reports = () => {
             ) : (
               <ButtonTooltip
                 disabled
-                type="default"
-                icon={<Plus />}
+                icon={<PlusIcon />}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -502,7 +465,7 @@ const Reports = () => {
         {config?.layout !== undefined && config.layout.length === 0 ? (
           <div
             className={cn(
-              'flex min-h-full items-center justify-center rounded border-2 border-dashed p-16 border-default transition duration-100',
+              'flex min-h-full items-center justify-center rounded-sm border-2 border-dashed p-16 border-default transition duration-100',
               isDraggedOver ? 'bg-surface-100' : ''
             )}
             onDragOver={onDragOverEmptyState}
@@ -512,9 +475,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<Plus size={14} />}>
-                    Add your first chart
-                  </Button>
+                  <Button iconRight={<PlusIcon size={14} />}>Add your first chart</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="center">
                   <MetricOptions config={config} handleChartSelection={handleChartSelection} />
@@ -525,7 +486,7 @@ const Reports = () => {
             )}
           </div>
         ) : (
-          <div className="relative mb-16 flex-grow">
+          <div className="relative mb-16 grow">
             {config && startDate && endDate && (
               <GridResize
                 startDate={startDate}
@@ -542,27 +503,11 @@ const Reports = () => {
           </div>
         )}
       </div>
-      <ConfirmationModal
-        visible={!!navigateUrl}
-        variant="warning"
-        title="You have unsaved changes in your report"
-        confirmLabel="Confirm"
-        onConfirm={() => {
-          setConfirmNavigate(true)
-          let urlToNavigate = navigateUrl ?? '/'
-          if (BASE_PATH && urlToNavigate.startsWith(BASE_PATH)) {
-            urlToNavigate = urlToNavigate.slice(BASE_PATH.length) || '/'
-          }
-          if (!urlToNavigate.startsWith('/')) urlToNavigate = `/${urlToNavigate}`
-          setNavigateUrl(undefined)
-          router.push(urlToNavigate)
-        }}
-        onCancel={() => setNavigateUrl(undefined)}
-      >
-        <p className="text-sm">
-          Unsaved changes will be lost, are you sure you want to navigate away?
-        </p>
-      </ConfirmationModal>
+      <DiscardChangesConfirmationDialog
+        visible={shouldConfirmNavigation}
+        onCancel={handleCancelNavigation}
+        onClose={handleConfirmNavigation}
+      />
     </>
   )
 }

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { branchKeys } from './keys'
+import { handleError, patch, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BranchUpdateVariables = {
   branchRef: string
@@ -31,6 +31,7 @@ export async function updateBranch({
       persistent,
       request_review: requestReview,
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

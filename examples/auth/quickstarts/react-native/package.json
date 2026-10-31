@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
-    "@supabase/supabase-js": "^2.93.2",
+    "@supabase/supabase-js": "^2",
     "expo": "~54.0.32",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",

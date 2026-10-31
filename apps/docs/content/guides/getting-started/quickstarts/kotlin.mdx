@@ -2,189 +2,197 @@
 title: 'Use Supabase with Android Kotlin'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Android Kotlin app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<AiPrompt id="kotlin" />
 
-  <StepHikeCompact.Step step={1}>
+<$Partial path="quickstart_db_setup.mdx" />
 
-    <$Partial path="quickstart_db_setup.mdx" />
+## 3. Create an Android app with Android Studio
 
-  </StepHikeCompact.Step>
+Select the **Android Studio > New > New Android Project** menu item.
 
-  <StepHikeCompact.Step step={2}>
+## 4. Set up AI tooling (optional)
 
-    <StepHikeCompact.Details title="Create an Android app with Android Studio">
-      Open Android Studio > New > New Android Project.
+<$Partial path="quickstart_ai_tooling.mdx" />
 
-    </StepHikeCompact.Details>
+## 5. Install dependencies
 
-  </StepHikeCompact.Step>
+Open `build.gradle.kts` (app) file and add the serialization plugin, Ktor client, and Supabase client.
 
-  <StepHikeCompact.Step step={3}>
+Replace the version placeholders `$kotlin_version` with the Kotlin version of the project, and `$supabase_version` and `$ktor_version` with the respective latest versions. For example, Kotlin `2.2.21`, supabase-kt BOM `3.5.0`, and Ktor `3.0.3`.
 
-    <StepHikeCompact.Details title="Install the Dependencies">
-    Open `build.gradle.kts` (app) file and add the serialization plug, Ktor client, and Supabase client.
+<Admonition type="note">
 
-    Replace the version placeholders `$kotlin_version` with the Kotlin version of the project, and  `$supabase_version` and `$ktor_version` with the respective latest versions.
+If your project uses Kotlin 2.0 or newer with Jetpack Compose, declare the Compose compiler plugin in your root `build.gradle.kts`:
 
-    The latest supabase-kt version can be found [here](https://github.com/supabase-community/supabase-kt/releases) and Ktor version can be found [here](https://ktor.io/docs/welcome.html).
+```kotlin
+id("org.jetbrains.kotlin.plugin.compose") version "$kotlin_version" apply false
+```
 
-    </StepHikeCompact.Details>
+Then apply it in the app module, without the version and without `apply false`:
 
-    <StepHikeCompact.Code>
-      ```kotlin
-      plugins {
-        ...
-        kotlin("plugin.serialization") version "$kotlin_version"
-      }
-      ...
-      dependencies {
-        ...
-        implementation(platform("io.github.jan-tennert.supabase:bom:$supabase_version"))
-        implementation("io.github.jan-tennert.supabase:postgrest-kt")
-        implementation("io.ktor:ktor-client-android:$ktor_version")
-      }
-      ```
+```kotlin
+id("org.jetbrains.kotlin.plugin.compose")
+```
 
-    </StepHikeCompact.Code>
+</Admonition>
 
-  </StepHikeCompact.Step>
+<Admonition type="note">
 
-  <StepHikeCompact.Step step={4}>
+You can find the latest supabase-kt version [on GitHub](https://github.com/supabase-community/supabase-kt/releases) and Ktor [in the Ktor documentation](https://ktor.io/docs/welcome.html). Match your Kotlin version to the supabase-kt release requirements.
 
-    <StepHikeCompact.Details title="Add internet access permission">
-      Add the following line to the `AndroidManifest.xml` file under the `manifest` tag and outside the `application` tag.
-    </StepHikeCompact.Details>
+</Admonition>
 
-    <StepHikeCompact.Code>
-      ```xml
-      ...
-      <uses-permission android:name="android.permission.INTERNET" />
-      ...
-      ```
+```kotlin
+plugins {
+  ...
+  kotlin("plugin.serialization") version "$kotlin_version"
+}
+...
+dependencies {
+  ...
+  implementation(platform("io.github.jan-tennert.supabase:bom:$supabase_version"))
+  implementation("io.github.jan-tennert.supabase:postgrest-kt")
+  implementation("io.ktor:ktor-client-android:$ktor_version")
+}
+```
 
-    </StepHikeCompact.Code>
+## 6. Add internet access permission
 
-  </StepHikeCompact.Step>
+Add the following line to the `AndroidManifest.xml` file under the `manifest` tag and outside the `application` tag.
 
-  <StepHikeCompact.Step step={5}>
+```xml
+...
+<uses-permission android:name="android.permission.INTERNET" />
+...
+```
 
-    <StepHikeCompact.Details title="Initialize the Supabase client">
-      You can create a Supabase client whenever you need to perform an API call.
+## 7. Initialize the Supabase client
 
-      For the sake of simplicity, we will create a client in the `MainActivity.kt` file at the top just below the imports.
+You can create a Supabase client whenever you need to perform an API call.
 
-      Replace the `supabaseUrl` and `supabaseKey` with your own:
+For a quick example, create a client at the top of the `MainActivity.kt` file below the imports.
 
-      <ProjectConfigVariables variable="url" />
-      <ProjectConfigVariables variable="publishable" />
-      <ProjectConfigVariables variable="anon" />
+Replace the `supabaseUrl` and `supabaseKey` with your own, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=androidkotlin&connectTab=mobiles):
 
-    </StepHikeCompact.Details>
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=androidkotlin">
+    Open Connect panel
+  </a>
+</Button>
 
-    <StepHikeCompact.Code>
+```kotlin
+import io.github.jan.supabase.postgrest.from
+import ...
 
-      ```kotlin
-      import ...
+val supabase = createSupabaseClient(
+    supabaseUrl = "YOUR_SUPABASE_URL",
+    supabaseKey = "YOUR_SUPABASE_PUBLISHABLE_KEY"
+  ) {
+    install(Postgrest)
+}
+...
+```
 
-      val supabase = createSupabaseClient(
-          supabaseUrl = "https://xyzcompany.supabase.co",
-          supabaseKey = "your_public_anon_key"
-        ) {
-          install(Postgrest)
-      }
-      ...
-      ```
+<$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
 
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
+<$Partial path="quickstart_mobile_env_note.mdx" />
 
-    </StepHikeCompact.Code>
+## 8. Create a data model for instruments
 
-  </StepHikeCompact.Step>
+Create a serializable data class to represent the data from the database.
 
-  <StepHikeCompact.Step step={6}>
+Add the following below the `createSupabaseClient` function in the `MainActivity.kt` file.
 
-    <StepHikeCompact.Details title="Create a data model for instruments">
-      Create a serializable data class to represent the data from the database.
+```kotlin
+import kotlinx.serialization.Serializable
 
-      Add the following below the `createSupabaseClient` function in the `MainActivity.kt` file.
-    </StepHikeCompact.Details>
+@Serializable
+data class Instrument(
+    val id: Int,
+    val name: String,
+)
+```
 
-    <StepHikeCompact.Code>
-      ```kotlin
-      @Serializable
-      data class Instrument(
-          val id: Int,
-          val name: String,
-      )
-      ```
+## 9. Query data from the app
 
-    </StepHikeCompact.Code>
+Use `LaunchedEffect` to fetch data from the database and display it in a `LazyColumn`.
 
-  </StepHikeCompact.Step>
+Replace the default `MainActivity` class with the following code.
 
-  <StepHikeCompact.Step step={7}>
+<Admonition type="note">
 
-    <StepHikeCompact.Details title="Query data from the app">
-      Use `LaunchedEffect` to fetch data from the database and display it in a `LazyColumn`.
+This example application makes a network request from the UI code. In production, you should use a `ViewModel` to separate the UI and data fetching logic.
 
-      Replace the default `MainActivity` class with the following code.
+</Admonition>
 
-      Note that we are making a network request from our UI code. In production, you should probably use a `ViewModel` to separate the UI and data fetching logic.
-    </StepHikeCompact.Details>
+<Admonition type="note">
 
-    <StepHikeCompact.Code>
-      ```kotlin
-      class MainActivity : ComponentActivity() {
-          override fun onCreate(savedInstanceState: Bundle?) {
-              super.onCreate(savedInstanceState)
-              setContent {
-                  SupabaseTutorialTheme {
-                      // A surface container using the 'background' color from the theme
-                      Surface(
-                          modifier = Modifier.fillMaxSize(),
-                          color = MaterialTheme.colorScheme.background
-                      ) {
-                          InstrumentsList()
-                      }
-                  }
-              }
-          }
-      }
+This snippet omits the app-specific theme wrapper that Android Studio generates (named after your project, e.g. `<YourAppName>Theme`), so it compiles regardless of what you named your project. Wrap the `Surface` in your generated theme composable from `ui/theme/Theme.kt` if you want your project's Material theme applied.
 
-      @Composable
-      fun InstrumentsList() {
-          var instruments by remember { mutableStateOf<List<Instrument>>(listOf()) }
-          LaunchedEffect(Unit) {
-              withContext(Dispatchers.IO) {
-                  instruments = supabase.from("instruments")
-                                    .select().decodeList<Instrument>()
-              }
-          }
-          LazyColumn {
-              items(
-                  instruments,
-                  key = { instrument -> instrument.id },
-              ) { instrument ->
-                  Text(
-                      instrument.name,
-                      modifier = Modifier.padding(8.dp),
-                  )
-              }
-          }
-      }
-      ```
-    </StepHikeCompact.Code>
+</Admonition>
 
-  </StepHikeCompact.Step>
+```kotlin
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            // A surface container using the 'background' color from the theme
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                InstrumentsList()
+            }
+        }
+    }
+}
 
-  <StepHikeCompact.Step step={8}>
-    <StepHikeCompact.Details title="Start the app">
-      Run the app on an emulator or a physical device by clicking the `Run app` button in Android Studio.
-    </StepHikeCompact.Details>
+@Composable
+fun InstrumentsList() {
+    var instruments by remember { mutableStateOf<List<Instrument>>(listOf()) }
+    var error by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            try {
+                instruments = supabase.from("instruments")
+                                  .select().decodeList<Instrument>()
+            } catch (e: Exception) {
+                error = e.message
+            }
+        }
+    }
+    if (error != null) {
+        Text(
+            "Error loading instruments: $error",
+            modifier = Modifier.padding(8.dp),
+        )
+        return
+    }
+    LazyColumn {
+        items(
+            instruments,
+            key = { instrument -> instrument.id },
+        ) { instrument ->
+            Text(
+                instrument.name,
+                modifier = Modifier.padding(8.dp),
+            )
+        }
+    }
+}
+```
 
-  </StepHikeCompact.Step>
+## 10. Start the app
 
-</StepHikeCompact>
+Run the app on an emulator or a physical device by clicking the `Run app` button in Android Studio.
+
+<$Partial path="quickstart_going_to_production.mdx" />
+
+## Next steps
+
+- Learn how to build a complete user management app with authentication in the [Kotlin tutorial](/docs/guides/getting-started/tutorials/with-kotlin)
+- Explore the [supabase-kt](https://github.com/supabase-community/supabase-kt) library on GitHub
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

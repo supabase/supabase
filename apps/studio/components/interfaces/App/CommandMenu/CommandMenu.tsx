@@ -1,12 +1,10 @@
 import { IS_PLATFORM } from 'common'
-import { useBranchCommands } from 'components/interfaces/BranchManagement/Branch.Commands'
 import {
-  useQueryTableCommands,
-  useSnippetCommands,
-} from 'components/layouts/SQLEditorLayout/SqlEditor.Commands'
-import { useProjectLevelTableEditorCommands } from 'components/layouts/TableEditorLayout/TableEditor.Commands'
-import { useLayoutNavCommands } from 'components/layouts/useLayoutNavCommands'
-import { CommandHeader, CommandInput, CommandList, CommandMenu } from 'ui-patterns/CommandMenu'
+  CommandHeader,
+  CommandMenu,
+  CommandMenuInput,
+  CommandMenuList,
+} from 'ui-patterns/CommandMenu'
 import { useChangelogCommand } from 'ui-patterns/CommandMenu/prepackaged/Changelog'
 import { useDocsAiCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsAi'
 import { useDocsSearchCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsSearch'
@@ -16,12 +14,32 @@ import { useApiKeysCommands } from './ApiKeys'
 import { useApiUrlCommand } from './ApiUrl'
 import { useContextSearchCommands } from './ContextSearchCommands'
 import { useCreateCommands } from './CreateCommands'
+import { useDatabaseEntitySearchCommands } from './DatabaseEntitySearchCommands'
+import { useFeaturePreviewCommands } from './FeaturePreviews'
 import { orderCommandSectionsByPriority } from './ordering'
 import { useConfigureOrganizationCommand, useProjectSwitchCommand } from './OrgProjectSwitcher'
 import { useSupportCommands } from './Support'
+import { useBranchCommands } from '@/components/interfaces/BranchManagement/Branch.Commands'
 import { useConnectCommands } from '@/components/interfaces/ConnectButton/Connect.Commands'
+import {
+  useQueryTableCommands,
+  useSnippetCommands,
+} from '@/components/layouts/SQLEditorLayout/SqlEditor.Commands'
+import { useProjectLevelTableEditorCommands } from '@/components/layouts/TableEditorLayout/TableEditor.Commands'
+import { useLayoutNavCommands } from '@/components/layouts/useLayoutNavCommands'
 
-export default function StudioCommandMenu() {
+export function CommandMenuInnerContent() {
+  return (
+    <>
+      <CommandHeader>
+        <CommandMenuInput />
+      </CommandHeader>
+      <CommandMenuList />
+    </>
+  )
+}
+
+export function StudioCommandMenu() {
   useCreateCommands()
   useApiKeysCommands()
   useApiUrlCommand()
@@ -43,13 +61,12 @@ export default function StudioCommandMenu() {
   useChangelogCommand({ enabled: IS_PLATFORM })
   useThemeSwitcherCommands()
   useContextSearchCommands()
+  useDatabaseEntitySearchCommands()
+  useFeaturePreviewCommands()
 
   return (
     <CommandMenu>
-      <CommandHeader>
-        <CommandInput />
-      </CommandHeader>
-      <CommandList />
+      <CommandMenuInnerContent />
     </CommandMenu>
   )
 }

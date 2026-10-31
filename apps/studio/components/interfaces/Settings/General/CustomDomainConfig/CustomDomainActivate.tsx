@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { DocsButton } from 'components/ui/DocsButton'
-import Panel from 'components/ui/Panel'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
-import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { Admonition } from 'ui-patterns/admonition'
+
+import { DocsButton } from '@/components/ui/DocsButton'
+import Panel from '@/components/ui/Panel'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useCheckCNAMERecordMutation } from '@/data/custom-domains/check-cname-mutation'
+import { useCustomDomainActivateMutation } from '@/data/custom-domains/custom-domains-activate-mutation'
+import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-domains-delete-mutation'
+import type { CustomDomainResponse } from '@/data/custom-domains/custom-domains-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
   customDomain: CustomDomainResponse
 }
 
-const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
+export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -62,7 +62,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
             <h4 className="text-foreground">Enable your custom domain</h4>
             <p className="text-sm text-foreground-light">
               Set up is almost complete. Press “Activate” below to enable{' '}
-              <code className="text-code-inline">{customDomain.hostname}</code> for this project.
+              <code>{customDomain.hostname}</code> for this project.
             </p>
             <p className="text-sm text-foreground-light">
               We recommend that you schedule a downtime window of 20 - 30 minutes for your
@@ -76,14 +76,9 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
               title="Retain your CNAME record for service continuity after activation"
             >
               <p>
-                Your custom domain CNAME record for{' '}
-                <code className="text-code-inline">{customDomain.hostname}</code> should resolve to{' '}
-                {endpoint ? (
-                  <code className="text-code-inline">{endpoint}</code>
-                ) : (
-                  "your project's API URL"
-                )}
-                . If you're using Cloudflare as your DNS provider, disable the proxy option.
+                Your custom domain CNAME record for <code>{customDomain.hostname}</code> should
+                resolve to {endpoint ? <code>{endpoint}</code> : "your project's API URL"}. If
+                you're using Cloudflare as your DNS provider, disable the proxy option.
               </p>
             </Admonition>
           </div>
@@ -95,15 +90,11 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
           <div className="flex items-center justify-between">
             <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
             <div className="flex items-center space-x-2">
-              <Button
-                type="default"
-                className="self-end"
-                onClick={onCancelCustomDomain}
-                loading={isDeleting}
-              >
+              <Button className="self-end" onClick={onCancelCustomDomain} loading={isDeleting}>
                 Cancel
               </Button>
               <Button
+                variant="primary"
                 disabled={isDeleting}
                 onClick={() => setIsActivateConfirmModalVisible(true)}
                 className="self-end"
@@ -126,13 +117,11 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
         onConfirm={onActivateCustomDomain}
       >
         <p className="text-sm">
-          Activating <code className="text-code-inline !break-normal">{customDomain.hostname}</code>{' '}
-          will make it visible to users in place of your project’s Supabase domain. The Supabase
-          domain will continue to work too.
+          Activating <code className="break-normal!">{customDomain.hostname}</code> will make it
+          visible to users in place of your project’s Supabase domain. The Supabase domain will
+          continue to work too.
         </p>
       </ConfirmationModal>
     </>
   )
 }
-
-export default CustomDomainActivate

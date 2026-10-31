@@ -1,4 +1,4 @@
-import { PlanId } from 'data/subscriptions/types'
+import { PlanId } from '@/data/subscriptions/types'
 
 // Disk Storage expands automatically when the database reaches 90% of the disk size
 export const AUTOSCALING_THRESHOLD = 0.9
@@ -30,11 +30,11 @@ export const DISK_PRICING = {
 export const DISK_LIMITS = {
   [DiskType.GP3]: {
     minStorage: 1,
-    maxStorage: 16384,
+    maxStorage: 65536,
     minIops: 3000,
-    maxIops: 16000,
+    maxIops: 80000,
     minThroughput: 125,
-    maxThroughput: 1000,
+    maxThroughput: 2000,
     includedIops: 3000,
     includedThroughput: 125,
   },

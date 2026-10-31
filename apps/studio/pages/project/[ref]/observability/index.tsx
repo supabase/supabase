@@ -1,24 +1,25 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useFlag, useParams } from 'common'
-import { ObservabilityOverview } from 'components/interfaces/Observability/ObservabilityOverview'
-import { CreateReportModal } from 'components/interfaces/Reports/CreateReportModal'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { useContentQuery } from 'data/content/content-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useProfile } from 'lib/profile'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
-import type { NextPageWithLayout } from 'types'
+import { useEffect } from 'react'
 import { LogoLoader } from 'ui'
+
+import { ObservabilityOverview } from '@/components/interfaces/Observability/ObservabilityOverview'
+import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
+import { useContentQuery } from '@/data/content/content-query'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
+import type { NextPageWithLayout } from '@/types'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const { profile } = useProfile()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const showOverview = useFlag('observabilityOverview')
   const [showCreateReportModal, setShowCreateReportModal] = useQueryState(
@@ -43,16 +44,15 @@ export const UserReportPage: NextPageWithLayout = () => {
     const reports = data.content
       .filter((x) => x.type === 'report')
       .sort((a, b) => a.name.localeCompare(b.name))
-    if (reports.length >= 1) router.push(`/project/${ref}/observability/${reports[0].id}`)
-    if (reports.length === 0) router.push(`/project/${ref}/observability/api-overview`)
+    if (reports.length >= 1) router.replace(`/project/${ref}/observability/${reports[0].id}`)
+    if (reports.length === 0) router.replace(`/project/${ref}/observability/api-overview`)
   }, [isSuccess, data, router, ref, showOverview, flagsLoaded])
 
-  const { can: canCreateReport } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
+  const { can: canCreateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
     {
-      resource: { type: 'report', owner_id: profile?.id },
-      subject: { id: profile?.id },
+      mode: 'create',
+      type: 'report',
     }
   )
 
@@ -96,7 +96,7 @@ export const UserReportPage: NextPageWithLayout = () => {
 
 UserReportPage.getLayout = (page) => (
   <DefaultLayout>
-    <ObservabilityLayout>{page}</ObservabilityLayout>
+    <ObservabilityLayout title="Overview">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 

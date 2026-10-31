@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { secretsKeys } from './keys'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type SecretsDeleteVariables = {
   projectRef?: string
@@ -16,6 +16,7 @@ export async function deleteSecrets({ projectRef, secrets }: SecretsDeleteVariab
   const { data, error } = await del('/v1/projects/{ref}/secrets', {
     params: { path: { ref: projectRef } },
     body: secrets,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

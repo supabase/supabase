@@ -37,11 +37,13 @@ export type FeatureKey =
   | 'database.pausing'
   | 'database.branching'
   | 'database.egress'
+  | 'database.replication'
   | 'auth.totalUsers'
   | 'auth.maus'
   | 'auth.userDataOwnership'
   | 'auth.anonSignIns'
   | 'auth.socialOAuthProviders'
+  | 'auth.oauthServer'
   | 'auth.customSMTPServer'
   | 'auth.removeSupabaseBranding'
   | 'auth.auditLogs'
@@ -60,21 +62,22 @@ export type FeatureKey =
   | 'storage.cachedEgress'
   | 'storage.cdn'
   | 'storage.transformations'
-  | 'storage.byoc'
   | 'functions.invocations'
   | 'functions.scriptSize'
   | 'functions.numberOfFunctions'
+  | 'platform.logRetention'
+  | 'platform.logQuery'
+  | 'platform.logIngestion'
   | 'realtime.postgresChanges'
   | 'realtime.concurrentConnections'
   | 'realtime.messagesPerMonth'
   | 'realtime.maxMessageSize'
   | 'dashboard.teamMembers'
   | 'security.platformAuditLogs'
-  | 'security.byoc'
-  | 'security.logRetention'
   | 'security.logDrain'
   | 'security.metricsEndpoint'
   | 'security.soc2'
+  | 'security.iso27001'
   | 'security.hipaa'
   | 'security.privateLink'
   | 'security.sso'
@@ -194,6 +197,25 @@ export const pricing: Pricing = {
         },
         usage_based: true,
       },
+      {
+        key: 'database.replication',
+        title: 'Pipelines',
+        plans: {
+          free: false,
+          pro: [
+            '$0.053 per pipeline per hour',
+            '$3.00 per GB processed during ongoing replication',
+            '$0.60 per GB processed during initial sync',
+          ],
+          team: [
+            '$0.053 per pipeline per hour',
+            '$3.00 per GB processed during ongoing replication',
+            '$0.60 per GB processed during initial sync',
+          ],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
     ],
   },
   auth: {
@@ -248,6 +270,17 @@ export const pricing: Pricing = {
       {
         key: 'auth.socialOAuthProviders',
         title: 'Social OAuth providers',
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        key: 'auth.oauthServer',
+        title: 'OAuth 2.1 Server',
         plans: {
           free: true,
           pro: true,
@@ -401,8 +434,8 @@ export const pricing: Pricing = {
         title: 'Storage',
         plans: {
           free: '1 GB included',
-          pro: ['100 GB included', 'then $0.021 per GB'],
-          team: ['100 GB included', 'then $0.021 per GB'],
+          pro: ['100 GB included', 'then $0.0213 per GB'],
+          team: ['100 GB included', 'then $0.0213 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -461,17 +494,6 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         usage_based: true,
-      },
-      {
-        key: 'storage.byoc',
-        title: 'Bring your own storage provider',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
       },
     ],
   },
@@ -564,18 +586,7 @@ export const pricing: Pricing = {
     icon: 'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z',
     features: [
       {
-        key: 'security.byoc',
-        title: 'BYO cloud',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
-      {
-        key: 'security.logRetention',
+        key: 'platform.logRetention',
         title: 'Log retention (API & Database)',
         plans: {
           free: '1 day',
@@ -586,11 +597,33 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        key: 'platform.logIngestion',
+        title: 'Log Ingestion',
+        plans: {
+          free: '1 GB included',
+          pro: ['20 GB included', 'then $0.50 per GB'],
+          team: ['20 GB included', 'then $0.50 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
+        key: 'platform.logQuery',
+        title: 'Log Query',
+        plans: {
+          free: '100 GB included',
+          pro: 'Log Ingestion Usage x 100',
+          team: 'Log Ingestion Usage x 100',
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
         key: 'security.logDrain',
         title: 'Log Drain',
         plans: {
           free: false,
-          pro: false,
+          pro: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           team: ['$60 per drain per month', '+ $0.20 per million events', '+ $0.09 per GB egress'],
           enterprise: 'Custom',
         },
@@ -621,6 +654,17 @@ export const pricing: Pricing = {
       {
         key: 'security.soc2',
         title: 'SOC2',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        key: 'security.iso27001',
+        title: 'ISO 27001',
         plans: {
           free: false,
           pro: false,
