@@ -117,7 +117,10 @@ describe('ConnectConfigSection', () => {
     const listbox = screen.getByRole('listbox')
     expect(combobox!.getAttribute('aria-controls')).toBe(listbox.id)
 
-    expect(listbox).toHaveClass('max-h-72', 'overscroll-contain')
+    expect(listbox.closest('[data-radix-scroll-area-viewport]')).toHaveClass(
+      'max-h-72',
+      'overscroll-contain'
+    )
     expect(screen.getAllByRole('option')).toHaveLength(20)
   })
 })

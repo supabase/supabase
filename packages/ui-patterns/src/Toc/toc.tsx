@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment, useRef, type ComponentProps, type HTMLAttributes, type ReactNode } from 'react'
-import { cn, removeAnchor, ScrollArea, ScrollViewport } from 'ui'
+import { cn, removeAnchor, ScrollBar, ScrollRoot, ScrollViewport } from 'ui'
 
 import type { TOCItemType } from './server/get-toc'
 import * as Primitive from './toc-primitive'
@@ -24,14 +24,17 @@ export function Toc(props: HTMLAttributes<HTMLDivElement>) {
     <div
       id="toc"
       {...props}
-      className={cn('sticky top-(--header-height) h-fit max-md:hidden', props.className)}
+      className={cn(
+        'sticky top-(--header-height) flex h-fit min-h-0 flex-col max-md:hidden',
+        props.className
+      )}
       style={
         {
           ...props.style,
         } as object
       }
     >
-      <div className="flex h-fit w-(--toc-width) max-w-full flex-col gap-3 pe-4">
+      <div className="flex h-fit min-h-0 w-(--toc-width) max-w-full flex-col gap-3 pe-4">
         {props.children}
       </div>
     </div>
@@ -41,11 +44,14 @@ export function Toc(props: HTMLAttributes<HTMLDivElement>) {
 export function TOCScrollArea({
   isMenu,
   ...props
-}: ComponentProps<typeof ScrollArea> & { isMenu?: boolean }) {
+}: ComponentProps<typeof ScrollRoot> & { isMenu?: boolean }) {
   const viewRef = useRef<HTMLDivElement>(null)
 
   return (
-    <ScrollArea {...props} className={cn('flex flex-col ps-px', props.className)}>
+    <ScrollRoot
+      {...props}
+      className={cn('flex min-h-0 flex-col overflow-hidden ps-px', props.className)}
+    >
       <Primitive.ScrollProvider containerRef={viewRef}>
         <ScrollViewport
           className={cn('relative min-h-0 text-sm', isMenu && 'mt-2 mb-4 mx-4 md:mx-6')}
@@ -54,17 +60,26 @@ export function TOCScrollArea({
           {props.children}
         </ScrollViewport>
       </Primitive.ScrollProvider>
-    </ScrollArea>
+      <ScrollBar />
+    </ScrollRoot>
   )
 }
 
-export function TocSection({ items, className }: { items: TOCItemType[]; className?: string }) {
+export function TocSection({
+  items,
+  className,
+  scrollAreaClassName,
+}: {
+  items: TOCItemType[]
+  className?: string
+  scrollAreaClassName?: string
+}) {
   return (
     <Toc className={cn('-ml-[calc(0.25rem+6px)]', className)}>
       <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-7.5">
         On this page
       </h3>
-      <TOCScrollArea>
+      <TOCScrollArea className={scrollAreaClassName}>
         <TOCItems items={items} />
       </TOCScrollArea>
     </Toc>

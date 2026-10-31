@@ -1,7 +1,17 @@
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
-import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
+import {
+  cn,
+  ScrollBar,
+  ScrollRoot,
+  ScrollViewport,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from 'ui'
 
 import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
@@ -167,34 +177,43 @@ export const ConnectSheet = () => {
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
-        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden divide-y">
-          <div className="p-8">
-            <ModeSelector
-              modes={availableModes}
-              selected={state.mode}
-              onChange={handleModeChange}
-            />
-          </div>
+        <ScrollRoot className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <ScrollViewport className="[&>div]:block!">
+            <div className="flex min-w-0 flex-col divide-y">
+              <div className="p-8">
+                <ModeSelector
+                  modes={availableModes}
+                  selected={state.mode}
+                  onChange={handleModeChange}
+                />
+              </div>
 
-          {state.mode === 'warehouse' ? (
-            <WarehouseTab />
-          ) : (
-            <>
-              {activeFields.length > 0 && (
-                <div className="p-8">
-                  <ConnectConfigSection
+              {state.mode === 'warehouse' ? (
+                <WarehouseTab />
+              ) : (
+                <>
+                  {activeFields.length > 0 && (
+                    <div className="p-8">
+                      <ConnectConfigSection
+                        state={state}
+                        activeFields={activeFields}
+                        onFieldChange={handleFieldChange}
+                        getFieldOptions={getFieldOptions}
+                      />
+                    </div>
+                  )}
+
+                  <ConnectStepsSection
+                    steps={resolvedSteps}
                     state={state}
-                    activeFields={activeFields}
-                    onFieldChange={handleFieldChange}
-                    getFieldOptions={getFieldOptions}
+                    projectKeys={projectKeys}
                   />
-                </div>
+                </>
               )}
-
-              <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
-            </>
-          )}
-        </div>
+            </div>
+          </ScrollViewport>
+          <ScrollBar />
+        </ScrollRoot>
       </SheetContent>
     </Sheet>
   )

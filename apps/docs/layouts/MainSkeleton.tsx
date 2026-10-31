@@ -27,7 +27,7 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react'
-import { cn } from 'ui'
+import { cn, ScrollBar, ScrollRoot, ScrollViewport } from 'ui'
 import { MobileNavLock } from 'ui-patterns/MobileNav/MobileNavLock'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
@@ -120,38 +120,35 @@ const NavContainer = memo(function NavContainer({
       )}
     >
       {mobileMenuOpen ? <MobileNavLock toggleRef={toggleRef} /> : null}
-      <div
-        className={cn(
-          'top-0',
-          'h-full',
-          'relative',
-          'w-full lg:w-auto',
-          'h-fit lg:h-full overflow-y-scroll lg:overflow-auto',
-          'overscroll-contain',
-          'lg:backdrop-blur-sm lg:backdrop-filter bg-background',
-          'flex flex-col flex-1 min-h-0'
-        )}
-      >
-        <span id="main-nav-title" className="sr-only">
-          Main menu
-        </span>
-        <div className="top-0 sticky h-0 z-10">
-          <div className="bg-linear-to-b from-background to-transparent h-4 w-full"></div>
-        </div>
-        <div
+      <ScrollRoot className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <ScrollViewport
           className={cn(
-            'transition-all ease-out duration-200',
-            'absolute left-0 right-0',
-            'px-6 pt-6 pb-16 lg:pb-32',
-            'bg-background',
-            // desktop styles
-            'lg:relative lg:left-0 lg:pb-10 lg:px-10 lg:flex',
-            'lg:opacity-100 lg:visible'
+            'relative',
+            'overscroll-contain',
+            'lg:backdrop-blur-sm lg:backdrop-filter bg-background'
           )}
         >
-          {children}
-        </div>
-      </div>
+          <span id="main-nav-title" className="sr-only">
+            Main menu
+          </span>
+          <div className="top-0 sticky h-0 z-10">
+            <div className="bg-linear-to-b from-background to-transparent h-4 w-full"></div>
+          </div>
+          <div
+            className={cn(
+              'transition-all ease-out duration-200',
+              'px-6 pt-6 pb-16 lg:pb-32',
+              'bg-background',
+              // desktop styles
+              'lg:pb-10 lg:px-10 lg:flex',
+              'lg:opacity-100 lg:visible'
+            )}
+          >
+            {children}
+          </div>
+        </ScrollViewport>
+        <ScrollBar />
+      </ScrollRoot>
       <GlobalMenuDrawerFooter className="shrink-0 border-t bg-background px-6 py-4 lg:hidden" />
     </nav>
   )
