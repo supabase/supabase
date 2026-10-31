@@ -1,13 +1,13 @@
 import { Handle, Position } from '@xyflow/react'
 import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
-import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DestinationLogo } from '../DestinationLogo'
 import { getStatusName } from '../Pipeline.utils'
+import { getDestinationStorageRegion } from '../PipelineConnectionDetails.utils'
+import { ReplicationRegionLabel } from '../ReplicationRegionLabel'
 import { getReplicationDestinationType } from './Nodes.utils'
-import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
@@ -36,16 +36,18 @@ export const PrimaryDatabaseNode = () => {
   const { data: destinationsData } = useReplicationDestinationsQuery({ projectRef })
   const hasDestinations = (destinationsData?.destinations ?? []).length > 0
 
-  const region = Object.values(AWS_REGIONS).find((x) => x.code === project?.region)
-
   return (
     <NodeContainer>
       <div className="text-sm flex flex-col gap-y-0.5">
+        <p className="text-xs uppercase tracking-wide text-foreground-lighter">Source</p>
         <p>Primary Database</p>
-        <p className="text-foreground-light">{region?.displayName}</p>
-        <p className="text-foreground-light">{region?.code}</p>
+        {project?.region && (
+          <ReplicationRegionLabel
+            code={project.region}
+            className="mt-2 text-sm text-foreground-light"
+          />
+        )}
       </div>
-      {!!project && <RegionFlag className="mt-0.5 w-8" region={project.region} />}
       <Handle
         type="source"
         position={Position.Right}
@@ -72,10 +74,12 @@ export const ReplicationNode = ({ id }: { id: string }) => {
   const statusName = getStatusName(pipelineStatusData?.status)
 
   const type = getReplicationDestinationType(destination?.config)
+  const storageRegion = getDestinationStorageRegion(destination?.config)
 
   return (
     <NodeContainer>
       <div className="text-sm flex flex-col gap-y-0.5">
+        <p className="text-xs uppercase tracking-wide text-foreground-lighter">Destination</p>
         <div className="flex items-center">
           <p>{type}</p>
           {(statusName === 'started' || statusName === 'failed') && (
@@ -98,6 +102,15 @@ export const ReplicationNode = ({ id }: { id: string }) => {
         </div>
         <p className="text-foreground-light">{destination?.name}</p>
         <p className="text-foreground-light">ID: {destination?.id}</p>
+        {storageRegion && (
+          <div className="mt-1 max-w-56 text-xs text-foreground-light">
+            <p className="text-foreground-lighter">Storage region</p>
+            <ReplicationRegionLabel
+              code={storageRegion}
+              className="text-sm text-foreground-light"
+            />
+          </div>
+        )}
       </div>
       {type ? <DestinationLogo type={type} /> : null}
       <Handle type="target" position={Position.Left} className="opacity-25" />

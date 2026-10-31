@@ -4,14 +4,14 @@ import { Edge, Node, Position } from '@xyflow/react'
 import { NODE_WIDTH } from './Nodes'
 
 const NODE_SEP = 0
-const NODE_ROW_HEIGHT = 200
+const NODE_ROW_HEIGHT = 320
 
 export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
   dagreGraph.setGraph({
     rankdir: 'LR',
-    ranksep: 200,
+    ranksep: 360,
     nodesep: NODE_SEP,
     align: nodes.length <= 2 ? 'UL' : undefined,
   })

@@ -34,6 +34,7 @@ import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoad
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
 import { getStatusName } from '../Pipeline.utils'
+import { PipelineConnectionDetails } from '../PipelineConnectionDetails'
 import { PipelineStatusName } from '../Replication.constants'
 import { RestartTableDialog } from '../RestartTableDialog'
 import { PipelineHealthSection } from './PipelineHealthSection'
@@ -42,12 +43,14 @@ import { getDisabledStateConfig } from './ReplicationPipelineStatus.utils'
 import { TableReplicationRow } from './TableReplicationRow'
 import { AlertError } from '@/components/ui/AlertError'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
+import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import {
   useReplicationPipelineReplicationStatusQuery,
   type ReplicationPipelineTableStatus,
 } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import {
   PipelineStatusRequestStatus,
@@ -141,6 +144,12 @@ export const ReplicationPipelineStatus = () => {
   } = useReplicationPipelineByIdQuery({
     projectRef,
     pipelineId,
+  })
+
+  const { data: project } = useSelectedProjectQuery()
+  const { data: destination } = useReplicationDestinationByIdQuery({
+    projectRef,
+    destinationId: pipeline?.destination_id,
   })
 
   const { data: pipelineStatusData, isPending: isPipelineStatusLoading } =
@@ -243,6 +252,13 @@ export const ReplicationPipelineStatus = () => {
         )}
 
         {isLoading && <PipelineOverviewSkeleton />}
+
+        {!isPipelineLoading && !isPipelineError && (
+          <PipelineConnectionDetails
+            sourceRegion={project?.region}
+            destinationConfig={destination?.config}
+          />
+        )}
 
         {!isLoading && (
           <PipelineHealthSection metrics={applyLagMetrics ?? undefined}>

@@ -184,7 +184,6 @@ vi.mock('ui', async (importOriginal) => {
       </button>
     ),
     DialogSectionSeparator: () => null,
-    Form: ({ children }: PropsWithChildren) => children,
     Select: ({ children }: PropsWithChildren) => <div>{children}</div>,
     SelectContent: ({ children }: PropsWithChildren) => <div>{children}</div>,
     SelectItem: ({ children }: PropsWithChildren) => <div>{children}</div>,
