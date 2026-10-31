@@ -1,19 +1,19 @@
 ---
 title: 'Branching via the dashboard'
-subtitle: 'Create, manage, review, and merge branches directly in the dashboard'
+description: 'Create, manage, review, and merge branches directly in the dashboard'
 ---
 
-You can create, manage, review, and merge Supabase branches directly via the dashboard. This is useful for quick testing, prototyping, or when you prefer to work in a no-code way. You can also connect a Supabase branch to a GitHub branch at a later time if needed.
+You can create, manage, review, and merge Supabase branches directly in the Supabase Dashboard. This is useful for quick testing, prototyping, or when you prefer to work in a no-code way. You can also connect a Supabase branch to a GitHub branch at a later time if needed.
 
 <Admonition type="note" title="Public Alpha">
 
-Branch management via the dashboard is currently in public alpha. Features and functionality may change.
+Branch management in the Supabase Dashboard is currently in public alpha. Features and functionality may change.
 
 </Admonition>
 
 ## How Branching works
 
-You can do the following directly from the Supabase dashboard:
+You can do the following directly from the Supabase Dashboard:
 
 - Create preview branches
 - Make changes to your public schema or edge functions
@@ -41,7 +41,11 @@ Once you've enabled the feature, you can create a new branch:
 1. Click the arrows next to the branch name in the top menu bar. (The top menu bar has the format `YOUR_ORGANIZATION / YOUR_PROJECT / CURRENT_BRANCH_NAME`.)
 2. Click `Create branch`.
 
-The new branch is a clone of your base project. It starts with the project's schema, Edge Functions, and the configuration set.
+The new branch is a clone of your base project. It starts with the project's schema, Edge Functions, and the configuration set. For the full list of what it inherits, see [What a new branch starts with](/docs/guides/deployment/branching#what-a-new-branch-starts-with).
+
+### Where a dashboard branch gets its schema
+
+A dashboard branch has no git branch to read migrations from. Instead, it reads your base project's migration history and applies each entry as a migration. The branch ends up with the same schema as your base project. If your base project has no migration history, the branch dumps the base project's schema and uses the dump as its first migration.
 
 ### Include production data
 
@@ -81,7 +85,7 @@ When reviewing a merge request you may see a notice at the top of the page askin
 
 There are a few limitations you should be aware of before deciding to use branching without git.
 
-- Custom roles created through the dashboard are not captured on branch creation
+- Custom roles created through the Supabase Dashboard are not captured on branch creation
 - Branches can only be merged to main; merging between preview branches is not supported
 - If your branch is out of date, you can pull in latest changes from main, but keep in mind that all functions will be overwritten
 - Deleting functions must be done manually on main branch

@@ -1,8 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -10,6 +9,12 @@ import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 
 import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
+import { PipelineConnectionSection } from '../../CreatePipeline/PipelineConnectionSection'
+import { PipelineDataReview } from '../../CreatePipeline/PipelineDataReview'
+import { PipelineDataSection } from '../../CreatePipeline/PipelineDataSection'
+import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinationReview'
+import { PipelineReviewCosts } from '../../CreatePipeline/PipelineReviewCosts'
+import { PipelineValidationAdmonition } from '../../CreatePipeline/PipelineValidationAdmonition'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -37,6 +42,7 @@ import {
   pruneStaleTableOptions,
 } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
+import { DUCKLAKE_MODE_SUPABASE } from './DuckLake/DuckLake.constants'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
@@ -45,12 +51,17 @@ import { PipelineCostDialog } from './PipelineCostDialog'
 import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
-import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
+import {
+  getSnowflakeValidationIssues,
+  SNOWFLAKE_PRIVATE_KEY_FORMAT_MESSAGE,
+} from './Snowflake/Snowflake.utils'
 import { TableCopySelection } from './TableCopySelection'
 import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
+import { AlertError } from '@/components/ui/AlertError'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -58,7 +69,8 @@ import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'destination-editor'
 
@@ -82,13 +94,28 @@ export const DestinationForm = ({
   onCancel = onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
+  const isOrioleDb = useIsOrioleDb({ enabled: selectedType === 'DuckLake' })
+  const {
+    isPending: isProjectPending,
+    isSuccess: isProjectSuccess,
+    isFetched: isProjectFetched,
+    isFetching: isProjectFetching,
+    error: projectError,
+    refetch: refetchProject,
+  } = useSelectedProjectQuery({ enabled: selectedType === 'DuckLake' })
+  const isDuckLakeProjectBlocked =
+    selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb !== false)
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
+    // api keys reveal = true will require this perms
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
+  ])
 
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)
@@ -101,6 +128,8 @@ export const DestinationForm = ({
   const validationSectionRef = useRef<HTMLDivElement>(null)
 
   const editMode = !!existingDestination
+  const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
+  const shouldShowConnectionSection = isCreationPreviewEnabled && !editMode
 
   // Compute available destinations based on feature flags
   const availableDestinations = useMemo(() => {
@@ -176,10 +205,9 @@ export const DestinationForm = ({
         pipelineData,
         catalogToken,
         region: projectSettings?.region,
-        projectRef,
         editMode,
       }),
-    [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode]
+    [destinationData, pipelineData, catalogToken, projectSettings, editMode]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -217,17 +245,18 @@ export const DestinationForm = ({
             addRequiredFieldError(path, message)
           })
         } else if (selectedType === 'DuckLake') {
-          getDucklakeValidationIssues(data, { secretsOptional: editMode }).forEach(
+          getDucklakeValidationIssues(data, { secretsOptional: editMode, isOrioleDb }).forEach(
             ({ path, message }) => {
               addRequiredFieldError(path, message)
             }
           )
         } else if (selectedType === 'Snowflake') {
-          getSnowflakeValidationIssues(data, { secretsOptional: editMode }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
+          getSnowflakeValidationIssues(data, {
+            secretsOptional: editMode,
+            validatePrivateKeyFormat: false,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'ClickHouse') {
           getClickHouseValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
@@ -242,6 +271,8 @@ export const DestinationForm = ({
   // See https://react-hook-form.com/docs/useform/formstate
   const { isDirty } = form.formState
 
+  const ducklakeMode = useWatch({ control: form.control, name: 'ducklakeMode' })
+  const isManagedDuckLake = selectedType === 'DuckLake' && ducklakeMode === DUCKLAKE_MODE_SUPABASE
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
   const { data: selectedPublication, isSuccess: isSuccessPublication } =
     useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
@@ -272,6 +303,7 @@ export const DestinationForm = ({
 
   const isSubmitDisabled =
     isSaving ||
+    (isManagedDuckLake && isDuckLakeProjectBlocked) ||
     !isExistingConfigReady ||
     !isSuccessPublicationNames ||
     (!!publicationName && !isSuccessPublication) ||
@@ -283,10 +315,10 @@ export const DestinationForm = ({
       return existingDestination?.enabled ? 'Apply and restart pipeline' : 'Apply changes'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Create and start pipeline anyway'
+        return 'Start pipeline anyway'
       }
 
-      return 'Create and start pipeline'
+      return 'Start pipeline'
     }
   }
 
@@ -305,6 +337,8 @@ export const DestinationForm = ({
   }
 
   const onSubmit = async (rawData: z.infer<typeof FormSchema>) => {
+    if (rawData.ducklakeMode === DUCKLAKE_MODE_SUPABASE && isDuckLakeProjectBlocked) return
+
     if (!isSuccessPublication || !selectedPublication) {
       toast.error('Publication tables are unavailable. Refresh and try again.')
       return
@@ -341,6 +375,16 @@ export const DestinationForm = ({
       )
       if (jsonIssue) {
         form.setError(jsonIssue.path, { message: jsonIssue.message })
+        return
+      }
+    }
+
+    if (selectedType === 'Snowflake') {
+      const privateKeyIssue = getSnowflakeValidationIssues(data, {
+        secretsOptional: editMode,
+      }).find((issue) => issue.message === SNOWFLAKE_PRIVATE_KEY_FORMAT_MESSAGE)
+      if (privateKeyIssue) {
+        form.setError(privateKeyIssue.path, { message: privateKeyIssue.message })
         return
       }
     }
@@ -411,6 +455,9 @@ export const DestinationForm = ({
     const values = pendingFormValues
     setShowCostDialog(false)
 
+    // Project details may have failed to refresh while validation or confirmation was open.
+    if (values.ducklakeMode === DUCKLAKE_MODE_SUPABASE && isDuckLakeProjectBlocked) return
+
     await submitPipeline({
       data: values,
       existingDestination,
@@ -438,6 +485,57 @@ export const DestinationForm = ({
     }
   }, [visible, defaultValues, form, isDirty, resetValidation])
 
+  const destinationFields = (
+    <>
+      {selectedType === 'BigQuery' && etlEnableBigQuery && (
+        <BigQueryFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
+        <AnalyticsBucketFields
+          form={form}
+          editMode={editMode}
+          onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+        />
+      )}
+      {selectedType === 'DuckLake' && etlEnableDucklake && (
+        <>
+          <p role="status" className="px-5 pt-5 text-sm text-foreground-light empty:sr-only">
+            {isManagedDuckLake && isProjectPending && !isProjectFetched
+              ? 'Checking project compatibility...'
+              : ''}
+          </p>
+          {/* Keep this mounted during retries: AlertError's telemetry also observes the project. */}
+          {isManagedDuckLake &&
+            isProjectFetched &&
+            (!isProjectSuccess || isOrioleDb === undefined) && (
+              <AlertError
+                className="mx-5 mt-5"
+                subject="Failed to load project"
+                error={projectError ?? { message: 'The project database version is unavailable.' }}
+                projectRef={projectRef}
+                additionalActions={
+                  <Button
+                    type="button"
+                    loading={isProjectFetching}
+                    onClick={() => refetchProject()}
+                  >
+                    Retry
+                  </Button>
+                }
+              />
+            )}
+          <DuckLakeFields form={form} editMode={editMode} />
+        </>
+      )}
+      {selectedType === 'Snowflake' && etlEnableSnowflake && (
+        <SnowflakeFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'ClickHouse' && etlEnableClickHouse && (
+        <ClickHouseFields form={form} editMode={editMode} />
+      )}
+    </>
+  )
+
   return (
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
@@ -448,63 +546,84 @@ export const DestinationForm = ({
           <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <fieldset disabled={!isExistingConfigReady} className="contents">
-                <div className="p-5 flex flex-col gap-y-6">
-                  {isErrorExistingConfig && (
-                    <Admonition type="warning">
-                      <p className="leading-normal!">
-                        The existing destination or pipeline settings could not be loaded. Refresh
-                        before applying changes.
-                      </p>
-                    </Admonition>
-                  )}
-                  <p className="text-sm font-medium text-foreground">Destination details</p>
-
-                  <div className="flex flex-col gap-y-4">
-                    <DestinationNameInput form={form} />
-                    <PublicationSelection
-                      form={form}
-                      onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                    />
-                    <TableCopySelection form={form} editMode={editMode} />
-                    <PipelineRegionField destinationType={selectedType} />
-                  </div>
-                </div>
-
-                <DialogSectionSeparator />
-
-                {selectedType === 'BigQuery' && etlEnableBigQuery && (
-                  <BigQueryFields form={form} editMode={editMode} />
+                {shouldShowConnectionSection && (
+                  <>
+                    <PipelineConnectionSection type={selectedType} form={form}>
+                      {destinationFields}
+                    </PipelineConnectionSection>
+                    <DialogSectionSeparator />
+                  </>
                 )}
-                {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
-                  <AnalyticsBucketFields
+                {shouldShowConnectionSection ? (
+                  <PipelineDataSection
+                    type={selectedType}
                     form={form}
-                    editMode={editMode}
-                    onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+                    onSelectNewPublication={() => setPublicationPanelVisible(true)}
                   />
-                )}
-                {selectedType === 'DuckLake' && etlEnableDucklake && (
-                  <DuckLakeFields form={form} editMode={editMode} />
-                )}
-                {selectedType === 'Snowflake' && etlEnableSnowflake && (
-                  <SnowflakeFields form={form} editMode={editMode} />
-                )}
-                {selectedType === 'ClickHouse' && etlEnableClickHouse && (
-                  <ClickHouseFields form={form} editMode={editMode} />
+                ) : (
+                  <>
+                    <div className="p-5 flex flex-col gap-y-6">
+                      {isErrorExistingConfig && (
+                        <Admonition type="warning">
+                          <p className="leading-normal!">
+                            The existing destination or pipeline settings could not be loaded.
+                            Refresh before applying changes.
+                          </p>
+                        </Admonition>
+                      )}
+                      <p className="text-sm font-medium text-foreground">Destination details</p>
+
+                      <div className="flex flex-col gap-y-4">
+                        <DestinationNameInput form={form} destinationType={selectedType} />
+                        <PublicationSelection
+                          form={form}
+                          onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                        />
+                        <TableCopySelection form={form} editMode={editMode} />
+                        <PipelineRegionField destinationType={selectedType} />
+                      </div>
+                    </div>
+
+                    <DialogSectionSeparator />
+                    {destinationFields}
+
+                    <DialogSectionSeparator />
+
+                    <AdvancedSettings type={selectedType} form={form} group="all" />
+                  </>
                 )}
 
-                <DialogSectionSeparator />
-
-                <AdvancedSettings type={selectedType} form={form} />
+                {shouldShowConnectionSection && (
+                  <>
+                    <DialogSectionSeparator />
+                    <PipelineDestinationReview type={selectedType} control={form.control} />
+                    <DialogSectionSeparator />
+                    <PipelineDataReview
+                      type={selectedType}
+                      control={form.control}
+                      publication={selectedPublication}
+                    />
+                    <DialogSectionSeparator />
+                    <PipelineReviewCosts control={form.control} publication={selectedPublication} />
+                  </>
+                )}
 
                 {!editMode && hasRunValidation && !isValidating && (
                   <>
                     <DialogSectionSeparator />
 
                     <div ref={validationSectionRef}>
-                      <ValidationFailuresSection
-                        destinationFailures={destinationValidationFailures}
-                        pipelineFailures={pipelineValidationFailures}
-                      />
+                      {shouldShowConnectionSection ? (
+                        <PipelineValidationAdmonition
+                          failures={allValidationFailures}
+                          hint="Check credentials and Advanced settings above. Some issues may require changes to the project’s database settings."
+                        />
+                      ) : (
+                        <ValidationFailuresSection
+                          destinationFailures={destinationValidationFailures}
+                          pipelineFailures={pipelineValidationFailures}
+                        />
+                      )}
                     </div>
                   </>
                 )}
@@ -524,7 +643,7 @@ export const DestinationForm = ({
               exit={{ opacity: 0, y: 5 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              <Loader2 className="animate-spin" size={14} />
+              <Loader2Icon className="animate-spin" size={14} />
               <p className="text-foreground-light text-sm">{getSavingMessage()}</p>
             </motion.div>
           ) : (

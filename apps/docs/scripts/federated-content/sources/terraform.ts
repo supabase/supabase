@@ -13,6 +13,8 @@ const terraform: FederatedContentSource = {
     {
       meta: {
         title: 'Terraform Provider',
+        description:
+          'Overview of the Supabase Terraform provider, which manages Supabase project settings and branches as Terraform resources.',
       },
       remoteFile: 'README.md',
       useRoot: true,
@@ -22,6 +24,8 @@ const terraform: FederatedContentSource = {
       slug: 'tutorial',
       meta: {
         title: 'Using the Supabase Terraform Provider',
+        description:
+          'Step-by-step guide to set up the Supabase Terraform provider and create a Supabase project as a Terraform resource.',
       },
       remoteFile: 'tutorial.md',
     },

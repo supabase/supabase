@@ -1,4 +1,11 @@
-import { Check, ChevronDown, ChevronUp, PanelBottom, PanelRight, X } from 'lucide-react'
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  PanelBottomIcon,
+  PanelRightIcon,
+  XIcon,
+} from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -13,15 +20,12 @@ import { Shortcut } from '@/components/ui/Shortcut'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-interface ServiceFlowPanelControlsProps {
+interface LogPanelNavigationProps {
   dock: 'bottom' | 'right'
   setDock: (value: 'bottom' | 'right') => void
 }
 
-export const ServiceFlowPanelControls = ({
-  dock = 'bottom',
-  setDock,
-}: ServiceFlowPanelControlsProps) => {
+export const LogPanelNavigation = ({ dock = 'bottom', setDock }: LogPanelNavigationProps) => {
   const { table, openRowId, setOpenRowId, onSelectRow } = useDataTable()
   const rows = table.getRowModel().rows
   const index = rows.findIndex((row) => row.id === openRowId)
@@ -38,7 +42,6 @@ export const ServiceFlowPanelControls = ({
   }
   const onPrev = () => handleNavigate(prevId)
   const onNext = () => handleNavigate(nextId)
-  const onClose = () => setOpenRowId(undefined)
 
   useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW, () => handleNavigate(prevId, true), {
     enabled: !!prevId,
@@ -62,7 +65,7 @@ export const ServiceFlowPanelControls = ({
           disabled={!prevId}
           onClick={onPrev}
           className="px-1"
-          icon={<ChevronUp />}
+          icon={<ChevronUpIcon />}
         />
       </Shortcut>
 
@@ -79,52 +82,60 @@ export const ServiceFlowPanelControls = ({
           disabled={!nextId}
           onClick={onNext}
           className="px-1"
-          icon={<ChevronDown />}
+          icon={<ChevronDownIcon />}
         />
       </Shortcut>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
+            aria-label="Dock side"
             variant="text"
             className="px-1"
-            icon={dock === 'bottom' ? <PanelBottom /> : <PanelRight />}
+            icon={dock === 'bottom' ? <PanelBottomIcon /> : <PanelRightIcon />}
             tooltip={{ content: { side: 'top', text: 'Dock side' } }}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40" align="end">
           <DropdownMenuItem className="justify-between" onClick={() => setDock('bottom')}>
             <div className="flex items-center gap-x-2">
-              <PanelBottom size={14} />
+              <PanelBottomIcon size={14} />
               <span>Dock to bottom</span>
             </div>
-            {dock === 'bottom' && <Check size={14} className="text-primary" />}
+            {dock === 'bottom' && <CheckIcon size={14} className="text-primary" />}
           </DropdownMenuItem>
           <DropdownMenuItem className="justify-between" onClick={() => setDock('right')}>
             <div className="flex items-center gap-x-2">
-              <PanelRight size={14} />
+              <PanelRightIcon size={14} />
               <span>Dock to right</span>
             </div>
-            {dock === 'right' && <Check size={14} className="text-primary" />}
+            {dock === 'right' && <CheckIcon size={14} className="text-primary" />}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <Shortcut
-        id={SHORTCUT_IDS.UNIFIED_LOGS_CLOSE_PANEL}
-        onTrigger={onClose}
-        options={{ conflictBehavior: 'allow' }}
-        side="top"
-      >
-        <Button
-          aria-label="Clear selection"
-          size="tiny"
-          variant="text"
-          onClick={onClose}
-          className="px-1"
-          icon={<X />}
-        />
-      </Shortcut>
     </div>
+  )
+}
+
+export const LogPanelCloseButton = () => {
+  const { setOpenRowId } = useDataTable()
+  const onClose = () => setOpenRowId(undefined)
+
+  return (
+    <Shortcut
+      id={SHORTCUT_IDS.UNIFIED_LOGS_CLOSE_PANEL}
+      onTrigger={onClose}
+      options={{ conflictBehavior: 'allow' }}
+      side="bottom"
+    >
+      <Button
+        aria-label="Clear selection"
+        size="tiny"
+        variant="text"
+        onClick={onClose}
+        className="px-1"
+        icon={<XIcon />}
+      />
+    </Shortcut>
   )
 }

@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -18,21 +17,15 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from '@/data/config/project-compliance-config-mutation'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 export const ComplianceConfig = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const [isSensitive, setIsSensitive] = useState(false)
 
-  const { can: canUpdateComplianceConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: { project_id: project?.id },
-    }
+  const { can: canUpdateComplianceConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
   )
 
   const {
@@ -91,7 +84,7 @@ export const ComplianceConfig = () => {
             </div>
             <div className="flex items-center justify-end space-x-2">
               {(isLoading || isSubmitting) && (
-                <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+                <Loader2Icon className="animate-spin" strokeWidth={1.5} size={16} />
               )}
               {isError && (
                 <AlertError error={error} subject="Failed to retrieve project settings" />

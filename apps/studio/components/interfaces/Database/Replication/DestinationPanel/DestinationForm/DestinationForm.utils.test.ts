@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
-import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import {
@@ -128,6 +127,13 @@ describe('DestinationForm.utils table copy selection', () => {
         selectedTableIds: ['202', '101'],
       })
     ).toEqual({ type: mode, table_ids: [202, 101] })
+  })
+
+  it.each([
+    ['include_tables', 'Select at least one table for the initial sync.'],
+    ['skip_tables', 'Select at least one table to exclude from the initial sync.'],
+  ] as const)('explains the empty selection for %s', (mode, message) => {
+    expect(() => buildTableSyncCopyConfig({ mode, selectedTableIds: [] })).toThrow(message)
   })
 
   it('rejects an invalid selected table id', () => {
@@ -311,6 +317,16 @@ const baseClickHouseFormData = {
 }
 
 describe('DestinationForm.utils DuckLake', () => {
+  it('uses the default pool size when the advanced field is cleared', () => {
+    const config = buildDestinationConfigForValidation({
+      projectRef: 'project-ref',
+      selectedType: 'DuckLake',
+      data: { ...baseDucklakeFormData, ducklakePoolSize: '' },
+    })
+
+    expect(config).toMatchObject({ ducklake: { poolSize: undefined } })
+  })
+
   it('builds DuckLake validation config with required fields trimmed and blank optionals removed', () => {
     const config = buildDestinationConfigForValidation({
       projectRef: 'project-ref',
@@ -494,13 +510,32 @@ describe('DestinationForm.utils DuckLake', () => {
 const baseDucklakeSupabaseFormData = {
   ...baseDucklakeFormData,
   ducklakeMode: 'supabase' as const,
-  ducklakeCatalogProjectRef: 'catalog-ref',
-  ducklakeStorageProjectRef: 'storage-ref',
   ducklakeStorageBucket: 'ducklake-data',
 }
 
-describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
-  it('builds DuckLake validation config from project refs in supabase mode', () => {
+describe('DestinationForm.utils DuckLake (managed)', () => {
+  it('rejects only managed catalogs on OrioleDB', () => {
+    const managed = { ducklakeMode: 'supabase' as const, ducklakeStorageBucket: 'warehouse' }
+    expect(getDucklakeValidationIssues(managed, { isOrioleDb: true })).toEqual([
+      {
+        path: 'ducklakeMode',
+        message:
+          'OrioleDB cannot host a DuckLake metadata catalog. Enter connection details for a catalog using standard Postgres.',
+      },
+    ])
+    expect(getDucklakeValidationIssues(managed, { isOrioleDb: false })).toEqual([])
+    const custom = {
+      ducklakeMode: 'custom' as const,
+      ducklakeCatalogUrl: 'postgresql://user:pass@host:5432/catalog',
+      ducklakeDataPath: 's3://bucket/path',
+      ducklakeS3AccessKeyId: 'access-key',
+      ducklakeS3SecretAccessKey: 'secret-key',
+      ducklakeS3Region: 'eu-west-1',
+      ducklakeS3Endpoint: 's3.example.com',
+    }
+    expect(getDucklakeValidationIssues(custom, { isOrioleDb: true })).toEqual([])
+  })
+  it('uses the current project for the catalog and storage during validation', () => {
     const config = buildDestinationConfigForValidation({
       projectRef: 'project-ref',
       selectedType: 'DuckLake',
@@ -509,8 +544,8 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
 
     expect(config).toEqual({
       ducklake: {
-        catalogProjectRef: 'catalog-ref',
-        storageProjectRef: 'storage-ref',
+        catalogProjectRef: 'project-ref',
+        storageProjectRef: 'project-ref',
         bucket: 'ducklake-data',
         poolSize: 4,
         metadataSchema: 'ducklake_metadata',
@@ -518,7 +553,7 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     })
   })
 
-  it('builds DuckLake submit config from project refs in supabase mode', async () => {
+  it('uses the current project for the catalog and storage during submission', async () => {
     const createS3AccessKey = vi.fn()
     const resolveNamespace = vi.fn()
 
@@ -532,8 +567,8 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
 
     expect(config).toEqual({
       ducklake: {
-        catalogProjectRef: 'catalog-ref',
-        storageProjectRef: 'storage-ref',
+        catalogProjectRef: 'project-ref',
+        storageProjectRef: 'project-ref',
         bucket: 'ducklake-data',
         poolSize: 4,
         metadataSchema: 'ducklake_metadata',
@@ -543,11 +578,9 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     expect(resolveNamespace).not.toHaveBeenCalled()
   })
 
-  it('returns required-field errors for missing supabase selections, ignoring custom fields', () => {
+  it('requires a bucket and ignores connection fields', () => {
     const issues = getDucklakeValidationIssues({
       ducklakeMode: 'supabase',
-      ducklakeCatalogProjectRef: '',
-      ducklakeStorageProjectRef: '',
       ducklakeStorageBucket: '',
       // Custom-mode fields are intentionally blank and must not be validated in supabase mode
       ducklakeCatalogUrl: '',
@@ -559,19 +592,13 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
       ducklakeMetadataSchema: '',
     })
 
-    expect(issues).toEqual([
-      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required.' },
-      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required.' },
-      { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
-    ])
+    expect(issues).toEqual([{ path: 'ducklakeStorageBucket', message: 'Bucket is required.' }])
   })
 
-  it('accepts a complete supabase configuration', () => {
+  it('accepts a complete managed configuration', () => {
     expect(
       getDucklakeValidationIssues({
         ducklakeMode: 'supabase',
-        ducklakeCatalogProjectRef: 'catalog-ref',
-        ducklakeStorageProjectRef: 'storage-ref',
         ducklakeStorageBucket: 'ducklake-data',
         ducklakeCatalogUrl: '',
         ducklakeDataPath: '',
@@ -800,111 +827,6 @@ describe('DestinationForm.utils ClickHouse', () => {
         clickhouseDatabase: 'analytics',
       })
     ).toEqual([])
-  })
-})
-
-describe('DestinationForm.utils BigQuery', () => {
-  it('returns required-field errors for missing BigQuery settings', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: '',
-      datasetId: '',
-      serviceAccountKey: '',
-    })
-
-    expect(issues).toEqual([
-      { path: 'projectId', message: 'Project ID is required.' },
-      { path: 'datasetId', message: 'Dataset ID is required.' },
-      { path: 'serviceAccountKey', message: 'Service account key is required.' },
-    ])
-  })
-
-  it('treats whitespace-only values as missing', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: '   ',
-      datasetId: '\t',
-      serviceAccountKey: '\n',
-    })
-
-    expect(issues).toEqual([
-      { path: 'projectId', message: 'Project ID is required.' },
-      { path: 'datasetId', message: 'Dataset ID is required.' },
-      { path: 'serviceAccountKey', message: 'Service account key is required.' },
-    ])
-  })
-
-  it('returns no issues for a complete configuration', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: 'my-project',
-      datasetId: 'my_dataset',
-      serviceAccountKey: '{ "type": "service_account" }',
-    })
-
-    expect(issues).toEqual([])
-  })
-
-  it('rejects invalid JSON in the service account key', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: 'my-project',
-      datasetId: 'my_dataset',
-      serviceAccountKey: '{ "type": "service_account" ',
-    })
-
-    expect(issues).toEqual([
-      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
-    ])
-  })
-
-  it('skips JSON shape checks when validateJson is false', () => {
-    const issues = getBigQueryValidationIssues(
-      {
-        projectId: 'my-project',
-        datasetId: 'my_dataset',
-        serviceAccountKey: '{ "type": "service_account" ',
-      },
-      { validateJson: false }
-    )
-
-    expect(issues).toEqual([])
-  })
-
-  it('rejects non-JSON text in the service account key', () => {
-    const issues = getBigQueryValidationIssues({
-      projectId: 'my-project',
-      datasetId: 'my_dataset',
-      serviceAccountKey: 'not-json',
-    })
-
-    expect(issues).toEqual([
-      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
-    ])
-  })
-
-  it('validates JSON when replacing credentials in edit mode', () => {
-    const issues = getBigQueryValidationIssues(
-      {
-        projectId: 'my-project',
-        datasetId: 'my_dataset',
-        serviceAccountKey: '{ invalid',
-      },
-      { secretsOptional: true }
-    )
-
-    expect(issues).toEqual([
-      { path: 'serviceAccountKey', message: 'Service account key must be valid JSON.' },
-    ])
-  })
-
-  it('allows an omitted BigQuery service account key in edit mode', () => {
-    const issues = getBigQueryValidationIssues(
-      {
-        projectId: 'my-project',
-        datasetId: 'my_dataset',
-        serviceAccountKey: '',
-      },
-      { secretsOptional: true }
-    )
-
-    expect(issues).toEqual([])
   })
 })
 

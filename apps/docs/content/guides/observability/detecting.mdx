@@ -4,7 +4,7 @@ title: 'Detection checks'
 description: 'Repeatable health, security, performance, and capacity checks with explicit inputs and outcomes'
 ---
 
-Use these checks to identify evidence worth investigating. A finding does not establish a cause. The specialist [monitoring agents](/docs/guides/observability/automate-with-agents) use these same checks.
+Use these checks to identify evidence worth investigating. A finding does not establish a cause. The [agent prompts](/docs/guides/observability/automate-with-agents) use these same checks.
 
 ## Before running checks
 
@@ -44,7 +44,7 @@ limit 2;
 
 Rates use valid statuses only. Report `unknown_status` separately; no valid statuses makes the check unable to assess. Auth events without response statuses are not successful requests. A missing source row requires a capture/traffic check, not an assumed zero error rate.
 
-**Next:** narrow to the source and hour. Collect at most five event IDs with timestamps and status, then follow [API error troubleshooting](/docs/guides/troubleshooting/discovering-and-interpreting-api-errors-in-the-logs-7xREI9). Redact paths and messages. After a fix, rerun on a comparable window.
+**Next:** narrow to the source and hour. Collect at most five event IDs with timestamps and status, then follow [API error troubleshooting](/kb/troubleshooting/discovering-and-interpreting-api-errors-in-the-logs-7xREI9). Redact paths and messages. After a fix, rerun on a comparable window.
 
 ### Check connection pressure
 
@@ -213,4 +213,4 @@ Run the Health query for two separate complete UTC days. Compare API Gateway `ev
 
 ## Turn a detection into a diagnosis
 
-Report the check, outcome, project, observation time, window or snapshot, threshold, measured values and units, and an evidence identifier. Include one investigation link and a verification step. Separate observations from hypotheses; do not invent a cause or remediation SQL. Use the [troubleshooting guides](/docs/guides/troubleshooting) to investigate the evidence.
+Report the check, outcome, project, observation time, window or snapshot, threshold, measured values and units, and an evidence identifier. Include one investigation link and a verification step. Separate observations from hypotheses; do not invent a cause or remediation SQL. Use the [troubleshooting guides](/kb/topics/troubleshooting) to investigate the evidence.

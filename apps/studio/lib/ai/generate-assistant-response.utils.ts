@@ -1,8 +1,30 @@
-import { isToolUIPart, type DynamicToolUIPart, type ToolUIPart, type UIMessage } from 'ai'
+import {
+  isToolUIPart,
+  type DynamicToolUIPart,
+  type ModelMessage,
+  type ToolUIPart,
+  type UIMessage,
+} from 'ai'
+import { source } from 'common-tags'
 
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { decodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
+import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
+import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
+import { NO_DATA_ERROR } from '@/lib/ai/tools/execute-sql-output'
+import { decodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
+import { buildToolsPrompt } from '@/lib/ai/tools/tools-prompt'
+
+/** The chat system prompt for the tools the model is given. See `generateAssistantResponse` on caching. */
+export function buildSystemPrompt(toolNames: Iterable<string>): string {
+  return source`
+    ${GENERAL_PROMPT}
+    ${CHAT_PROMPT}
+    ${buildToolsPrompt(toolNames)}
+    ${SECURITY_PROMPT}
+    ${LIMITATIONS_PROMPT}
+  `
+}
 
 const INVALID_TOOL_STATES = [
   'input-streaming',
@@ -46,5 +68,27 @@ export function prepareMessagesForModel(rawMessages: UIMessage[], aiOptInLevel: 
       return { ...msg, parts: cleanedParts }
     }
     return msg
+  })
+}
+
+/**
+ * Database errors can echo row values. Sanitize same-request steps here.
+ * `prepareMessagesForModel` drops errors from later turns.
+ */
+export function hideToolErrorsFromModel(messages: ModelMessage[], aiOptInLevel: AiOptInLevel) {
+  if (isOptInLevelAtLeast(aiOptInLevel, 'schema_and_log_and_data')) return messages
+
+  return messages.map((message) => {
+    if (message.role !== 'tool') return message
+    return {
+      ...message,
+      content: message.content.map((part) =>
+        part.type === 'tool-result' &&
+        part.toolName === 'execute_sql' &&
+        (part.output.type === 'error-text' || part.output.type === 'error-json')
+          ? { ...part, output: { type: 'error-text' as const, value: NO_DATA_ERROR } }
+          : part
+      ),
+    }
   })
 }

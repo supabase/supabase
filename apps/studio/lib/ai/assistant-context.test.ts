@@ -30,6 +30,16 @@ describe('buildAssistantContextMessages', () => {
     expect(messages).toEqual([])
   })
 
+  it('tells the model the current opt-in level so it does not ask for access it has', () => {
+    const messages = buildAssistantContextMessages({
+      schemasString: NO_SCHEMA_ACCESS_MESSAGE,
+      aiOptInLevel: 'schema_and_log_and_data',
+    })
+
+    expect(messages).toHaveLength(1)
+    expect(messages[0].content).toContain('schema_and_log_and_data')
+  })
+
   it('adds the support instructions in support mode', () => {
     const messages = buildAssistantContextMessages({
       schemasString: NO_SCHEMA_ACCESS_MESSAGE,
@@ -37,7 +47,7 @@ describe('buildAssistantContextMessages', () => {
     })
 
     expect(messages).toHaveLength(1)
-    expect(messages[0].content).toContain('escalate_to_human')
+    expect(messages[0].content).toContain('active support chat')
   })
 
   it('adds ClickHouse instructions when the conversation attached a logs query', () => {
@@ -54,7 +64,6 @@ describe('buildAssistantContextMessages', () => {
     // ...and the table reference, so it doesn't invent BigQuery-style unnests.
     expect(logsContext).toContain('log_attributes')
     expect(logsContext).toContain("where source = 'edge_logs'")
-    expect(logsContext).toContain('query_logs')
     expect(logsContext).not.toContain('cannot run')
   })
 

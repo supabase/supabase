@@ -1,5 +1,5 @@
-import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowRightLeft } from 'lucide-react'
+import { ArrowRightLeftIcon } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { Card, CardContent, CardHeader, cn } from 'ui'
 
@@ -59,7 +59,7 @@ export const InterstitialLayout = ({
   const descriptionElement = description ? (
     <DescriptionElement
       className={cn(
-        '!m-0 px-3 !text-balance text-sm text-foreground-lighter leading-tight',
+        'm-0! px-3 text-balance! text-sm text-foreground-lighter',
         descriptionClassName
       )}
     >
@@ -115,7 +115,7 @@ export const InterstitialLayout = ({
 export const LogoBox = ({ children, className }: { children: ReactNode; className?: string }) => (
   <div
     className={cn(
-      'flex size-12 items-center justify-center overflow-hidden rounded-xl border bg-muted',
+      'flex size-12 items-center justify-center overflow-hidden rounded-lg border bg-muted',
       className
     )}
   >
@@ -127,7 +127,7 @@ export const LogoBox = ({ children, className }: { children: ReactNode; classNam
 export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode }) => (
   <div className="flex items-center justify-center gap-2.5">
     {left}
-    <ArrowRightLeft className="size-4 text-foreground-muted" />
+    <ArrowRightLeftIcon className="size-4 text-foreground-muted" />
     {right}
   </div>
 )

@@ -12,15 +12,15 @@ enableGlobalVirtualStore: false
 
 catalog:
   '@monaco-editor/react': 4.8.0-rc.3
-  '@sentry/nextjs': ^10.59.0
-  '@sentry/tanstackstart-react': ^10.59.0
-  '@supabase/auth-js': 2.116.0
-  '@supabase/postgrest-js': 2.116.0
-  '@supabase/realtime-js': 2.116.0
+  '@sentry/nextjs': ^10.75.2
+  '@sentry/tanstackstart-react': ^10.75.2
+  '@supabase/auth-js': 2.117.3
+  '@supabase/postgrest-js': 2.117.3
+  '@supabase/realtime-js': 2.117.3
   '@supabase/ssr': 0.12.7
-  '@supabase/supabase-js': 2.116.0
-  '@tanstack/react-router': ^1.169.2
-  '@tanstack/react-start': ^1.167.65
+  '@supabase/supabase-js': 2.117.3
+  '@tanstack/react-router': ^1.170.44
+  '@tanstack/react-start': ^1.169.2
   '@tanstack/react-table': ^8.21.3
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
@@ -34,16 +34,23 @@ catalog:
   '@vitejs/plugin-react': ^6.0.1
   '@vitest/coverage-v8': ^5.0.0
   '@vitest/ui': ^5.0.0
+  cn: ^0.4.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
+  # Latest v1.x that satisfies minimumReleaseAge (72h). Newer patch releases
+  # (1.56+) will be picked up automatically once they age in.
+  lucide-react: ^1.55.0
   monaco-editor: 0.52.2
-  next: ^16.3.5
+  motion: ^11.18.2
+  next: ^16.4.3
   next-themes: ^0.4.6
   postcss: ^8.5.18
   radix-ui: ^1.4.3
   react: ^19.2.6
   react-dom: ^19.2.6
   recharts: ^2.15.4
+  rehype-pretty-code: ^0.14.5
+  shiki: ^4.5.0
   tailwindcss: ^4.2.4
   tsx: ^4.22.0
   typescript: ~6.0.2
@@ -60,6 +67,7 @@ allowBuilds:
   '@supabase/pg-meta@file:packages/pg-meta': set this to true or false
   ai-commands@file:packages/ai-commands: set this to true or false
   api-types@file:packages/api-types: set this to true or false
+  braintrust: false
   common@file:packages/common: set this to true or false
   config@file:packages/config: set this to true or false
   contentlayer2: false
@@ -93,20 +101,10 @@ minimumReleaseAgeExclude:
   - react-use
   - '@astrojs/markdown-satteri@0.3.8'
   - astro@7.2.6
-  - next@16.3.5
-  - '@next/env@16.3.5'
-  - '@next/swc-darwin-arm64@16.3.5'
-  - '@next/swc-darwin-x64@16.3.5'
-  - '@next/swc-linux-arm64-gnu@16.3.5'
-  - '@next/swc-linux-arm64-musl@16.3.5'
-  - '@next/swc-linux-x64-gnu@16.3.5'
-  - '@next/swc-linux-x64-musl@16.3.5'
-  - '@next/swc-win32-arm64-msvc@16.3.5'
-  - '@next/swc-win32-x64-msvc@16.3.5'
 
 overrides:
-  '@ardatan/relay-compiler>immutable': ^3.8.3
   'monaco-editor': 'catalog:'
+  '@nuxt/devtools>simple-git': ^4.0.0
   '@mapbox/node-pre-gyp>tar': ^7.5.21
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
@@ -128,6 +126,7 @@ overrides:
   qs: ^6.15.2
   refractor>prismjs: ^1.30.0
   tmp: ^0.2.7
+  velite>sharp: ^0.35.0
   vite>esbuild: ^0.28.1
   webpack: ^5.104.1
   'codemirror-graphql>@codemirror/language': 6.11.0

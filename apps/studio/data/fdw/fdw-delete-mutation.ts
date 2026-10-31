@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { fdwKeys } from './keys'
 import type { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
@@ -14,7 +15,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string | null
-  wrapper: { id: number; name: string; server_name: string }
+  wrapper: { id: number; name: string; server_name: string; server_options?: string[] | null }
   wrapperMeta: WrapperMeta
 }
 
@@ -25,7 +26,13 @@ export async function deleteFDW({
   wrapperMeta,
 }: FDWDeleteVariables) {
   const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['delete-fdw'],
+    grant: unguarded.migrating,
+  })
   return result
 }
 

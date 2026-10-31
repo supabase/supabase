@@ -5,24 +5,23 @@ import {
   type LanguageModel,
   type ModelMessage,
   type SystemModelMessage,
+  type TimeoutConfiguration,
   type ToolSet,
   type UIMessage,
 } from 'ai'
 import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
-import { source } from 'common-tags'
 
 import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
-import { prepareMessagesForModel } from '@/lib/ai/generate-assistant-response.utils'
 import {
-  CHAT_PROMPT,
-  GENERAL_PROMPT,
-  LIMITATIONS_PROMPT,
-  NOTEBOOKS_PROMPT,
-  SECURITY_PROMPT,
-} from '@/lib/ai/prompts'
+  buildSystemPrompt,
+  hideToolErrorsFromModel,
+  prepareMessagesForModel,
+} from '@/lib/ai/generate-assistant-response.utils'
+import type { contract as renameChatContract } from '@/lib/ai/tools/rename-chat'
+import type { ToolContractInput } from '@/lib/ai/tools/types'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
 
@@ -43,11 +42,12 @@ export async function generateAssistantResponse({
   planId,
   isHighComplianceProject,
   includesLogsSnippets,
-  isExplorerEnabled,
   systemProviderOptions,
   providerOptions,
   requestedModel,
+  effectiveModel,
   abortSignal,
+  timeout,
   onSpanCreated,
 }: {
   messages: UIMessage[]
@@ -67,11 +67,13 @@ export async function generateAssistantResponse({
   isHighComplianceProject?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
-  isExplorerEnabled?: boolean
   requestedModel?: string
+  /** The model actually used after entitlement/throttle fallback. */
+  effectiveModel?: string
   systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
+  timeout?: TimeoutConfiguration<ToolSet>
   onSpanCreated?: (spanId: string) => void
 }) {
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
@@ -87,25 +89,10 @@ export async function generateAssistantResponse({
         : NO_SCHEMA_ACCESS_MESSAGE
 
     // Important: do not use per-request dynamic content in the system prompt or Bedrock will
-    // not cache it. isExplorerEnabled is a per-user flag, not per-request, so it only produces
-    // two prompt variants (on/off) rather than defeating caching.
-    const system = source`
-      ${GENERAL_PROMPT}
-      ${CHAT_PROMPT}
-      ${isExplorerEnabled ? NOTEBOOKS_PROMPT : ''}
-      ${SECURITY_PROMPT}
-      ${LIMITATIONS_PROMPT}
-
-      ## Available Knowledge
-
-      Before writing SQL or answering questions about the following topics, call \`load_knowledge\` to load detailed knowledge:
-      - \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
-      - \`logs\` — ClickHouse SQL against the project's logs table. Always load before calling \`query_logs\`.
-      - \`rls\` — Row Level Security policies for database tables.
-      - \`storage\` — Supabase Storage buckets, public/private bucket access, and \`storage.objects\` policies. Always load before creating Storage buckets or \`storage.objects\` policies.
-      - \`edge_functions\` — Supabase Edge Functions
-      - \`realtime\` — Supabase Realtime
-    `
+    // not cache it. The tools section varies with the tool set. That costs no extra cache
+    // misses: providers cache tools before the system prompt, so a change to the tool set
+    // already invalidates the cached system prompt.
+    const system = buildSystemPrompt(Object.keys(tools))
 
     const systemMessage: SystemModelMessage = {
       role: 'system',
@@ -120,20 +107,34 @@ export async function generateAssistantResponse({
         schemasString,
         supportMode,
         includesLogsSnippets,
+        aiOptInLevel,
       }),
       ...(await convertToModelMessages(messages)),
     ]
 
     const streamTextFn = shouldTrace ? tracedStreamText : ai.streamText
 
+    // onEnd still fires after an abort once a step has finished, so end the span only once.
+    let isSpanEnded = false
+    const endSpan = (metadata: Record<string, unknown>) => {
+      if (!span || isSpanEnded) return
+      isSpanEnded = true
+      span.log({ metadata })
+      span.end()
+    }
+
     return streamTextFn({
       model,
       instructions: systemMessage,
-      stopWhen: isStepCount(10),
+      stopWhen: isStepCount(20),
       messages: coreMessages,
+      prepareStep: ({ messages }) => ({
+        messages: hideToolErrorsFromModel(messages, aiOptInLevel),
+      }),
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
+      ...(timeout && { timeout }),
       ...(span && {
         onEnd: ({ steps, finishReason }) => {
           const metadata: Record<string, unknown> = {
@@ -142,13 +143,17 @@ export async function generateAssistantResponse({
           for (const step of steps) {
             for (const toolCall of step.toolCalls) {
               if (toolCall.toolName === 'rename_chat') {
-                const { newName } = toolCall.input as { newName: string }
+                const { newName } = toolCall.input as ToolContractInput<typeof renameChatContract>
                 metadata.chatName = newName
               }
             }
           }
-          span.log({ metadata })
-          span.end()
+          endSpan(metadata)
+        },
+        // The call aborts on either the request signal or `timeout`, so an unaborted
+        // request signal means the deadline stopped it.
+        onAbort: () => {
+          endSpan({ isAborted: true, isTimedOut: !abortSignal?.aborted })
         },
       }),
     } satisfies Parameters<typeof ai.streamText>[0])
@@ -179,6 +184,7 @@ export async function generateAssistantResponse({
         planId,
         isHighComplianceProject,
         requestedModel,
+        effectiveModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
         environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
       },

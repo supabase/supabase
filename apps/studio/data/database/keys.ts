@@ -3,6 +3,8 @@ import { sqlKeys } from '@/data/sql/keys'
 export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
   keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
+  entitySearch: (projectRef: string | undefined, query: string) =>
+    ['projects', projectRef, 'entity-search', query] as const,
   migrations: (projectRef: string | undefined) => ['projects', projectRef, 'migrations'] as const,
   tableColumns: (
     projectRef: string | undefined,
@@ -72,6 +74,8 @@ export const databaseKeys = {
     ['projects', projectRef, 'supamonitor-enabled'] as const,
   databaseActivity: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database-activity'] as const,
+  authenticatorRoleConfig: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'authenticator-role-config'] as const,
 }
 
 export const getLiveTupleEstimateKey = (

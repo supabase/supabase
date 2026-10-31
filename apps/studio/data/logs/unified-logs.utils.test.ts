@@ -5,6 +5,7 @@ import {
   mapUnifiedLogRow,
   parseUnifiedLogsQueryRows,
 } from './unified-logs.utils'
+import { columnSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
 
 describe('extractLogMetadata', () => {
   describe('non-auth logs', () => {
@@ -181,7 +182,7 @@ describe('extractLogMetadata', () => {
           launch_id: '1788424715503435269',
           log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
           log_stream: 'launch-1788424715503435269',
-          source: 'worker_guest_logs',
+          subservice: 'worker_guest_logs',
           worker: 'api',
         },
         project: 'cxkpapyhaaywrtudnqpl',
@@ -197,7 +198,7 @@ describe('extractLogMetadata', () => {
         launch_id: '1788424715503435269',
         log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
         log_stream: 'launch-1788424715503435269',
-        source: 'worker_guest_logs',
+        subservice: 'worker_guest_logs',
         worker: 'api',
       }
       const mapped = mapUnifiedLogRow({
@@ -227,6 +228,33 @@ describe('extractLogMetadata', () => {
         auth_user: null,
       })
       expect(mapped).not.toHaveProperty('project')
+    })
+
+    it('preserves runtime error details without adding HTTP request fields', () => {
+      const metadata = { event_type: 'Log', level: 'error', execution_id: 'exec-1' }
+      const mapped = mapUnifiedLogRow({
+        id: 'runtime-log',
+        timestamp: 1788424716876000,
+        log_type: 'edge function runtime',
+        metadata,
+        status: '',
+        level: 'error',
+        method: '',
+        pathname: '',
+        event_message: 'TypeError: failed to fetch',
+        log_count: null,
+        logs: null,
+      })
+
+      expect(mapped).toMatchObject({
+        log_type: 'edge function runtime',
+        event_message: 'TypeError: failed to fetch',
+        metadata,
+        level: 'error',
+        status: null,
+        method: null,
+        pathname: null,
+      })
     })
 
     it('does not add metadata to non-Compute rows', () => {
@@ -259,7 +287,7 @@ describe('parseUnifiedLogsQueryRows', () => {
       launch_id: '1788424715503435269',
       log_group: '/aws/lambda-microvms/workers/cxkpapyhaaywrtudnqpl/api',
       log_stream: 'launch-1788424715503435269',
-      source: 'worker_guest_logs',
+      subservice: 'worker_guest_logs',
       worker: 'api',
     },
     project: 'cxkpapyhaaywrtudnqpl',
@@ -294,6 +322,33 @@ describe('parseUnifiedLogsQueryRows', () => {
   it('returns an empty array for undefined results', () => {
     expect(parseUnifiedLogsQueryRows(undefined)).toEqual([])
   })
+
+  it.each([1788424716876123, '2026-09-03T08:38:36.876123456'])(
+    'preserves backend fields and raw timestamp %s in displayed rows',
+    (timestamp) => {
+      const [parsed] = parseUnifiedLogsQueryRows([
+        {
+          ...computeRow,
+          timestamp,
+          log_type: 'custom_logs',
+          status: '42P01',
+          method: 'PATCH',
+          log_count: null,
+        },
+      ])
+      const mapped = mapUnifiedLogRow(parsed)
+
+      expect(columnSchema.parse(mapped)).toMatchObject({
+        timestamp,
+        log_type: 'custom_logs',
+        status: '42P01',
+        method: 'PATCH',
+        log_count: null,
+        date: new Date('2026-09-03T08:38:36.876Z'),
+      })
+      expect(parsed.timestamp).toBe(timestamp)
+    }
+  )
 
   it('rejects invalid metadata', () => {
     expect(() => parseUnifiedLogsQueryRows([{ ...computeRow, metadata: 'invalid' }])).toThrow()

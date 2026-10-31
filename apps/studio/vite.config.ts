@@ -12,6 +12,7 @@ import viteReact from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
+import { getCdnUrlForBuiltFile, getTanstackAssetCdnUrl } from './asset-cdn'
 import { vercelSpaRoutes } from './scripts/vercel-spa-routes'
 import { getSecurityHeaders } from './security-headers'
 
@@ -385,6 +386,54 @@ function workersFollowClientAssetsDir(): Plugin {
   }
 }
 
+export function serverSourceMaps(): Plugin {
+  let ssrOutDir: string | undefined
+
+  return {
+    name: 'studio-server-source-maps',
+    apply: 'build',
+    enforce: 'pre',
+    applyToEnvironment: (environment) => environment.name === 'nitro',
+    configResolved(config) {
+      const outDir = config.environments.ssr?.build.outDir
+      if (outDir) ssrOutDir = path.resolve(config.root, outDir) + path.sep
+    },
+    async load(id) {
+      if (!ssrOutDir || !id.startsWith(ssrOutDir) || !/\.m?js$/.test(id)) return
+
+      // Vite does not load existing maps when Nitro rebundles the SSR service.
+      // Returning the adjacent map preserves the original application locations.
+      let map: string
+      try {
+        map = await fs.promises.readFile(`${id}.map`, 'utf8')
+      } catch (error) {
+        if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return
+        throw error
+      }
+      return { code: await fs.promises.readFile(id, 'utf8'), map }
+    },
+  }
+}
+
+export function sentryForFinalOutputs(
+  options: Parameters<typeof sentryTanstackStart>[0]
+): Plugin[] {
+  return sentryTanstackStart(options).map((plugin) => {
+    if (plugin.name !== 'sentry-vite-plugin') return plugin
+    const applyToEnvironment = plugin.applyToEnvironment
+    return {
+      ...plugin,
+      applyToEnvironment(environment) {
+        // Nitro rebundles SSR code, so intermediate debug IDs must not compete with final IDs.
+        if (environment.name === 'ssr' && environment.getTopLevelConfig().command === 'build') {
+          return false
+        }
+        return applyToEnvironment?.(environment) ?? true
+      },
+    }
+  })
+}
+
 export default defineConfig(({ command, mode }) => {
   // Match Next's "always production-NODE_ENV during build" behaviour.
   // `pnpm run e2e:setup:selfhosted` invokes the build with a shell
@@ -504,6 +553,16 @@ export default defineConfig(({ command, mode }) => {
   // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
   // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
+  // Client JS/CSS (and CSS-referenced fonts/images) load from the R2 asset CDN
+  // on production builds, uploaded by scripts/upload-static-assets.sh. Vite's
+  // base stays `/dashboard` so documents, server functions and API routes stay
+  // on Vercel. The shell's asset tags are rewritten by server.ts. Reads the
+  // process env, not `env`: the upload script only sees the process env, so a
+  // CDN switch set in a `.env*` file must not point the build at assets that
+  // were never uploaded.
+  const assetCdnUrl = command === 'build' ? getTanstackAssetCdnUrl(process.env) : undefined
+  const shouldUploadSourceMaps =
+    process.env.SKIP_ASSET_UPLOAD !== '1' && !!process.env.SENTRY_AUTH_TOKEN
 
   // Self-hosted responses get next.config.ts's security headers via Nitro
   // route rules. On Vercel they come from vercel.ts: a `/**` header route in
@@ -535,6 +594,12 @@ export default defineConfig(({ command, mode }) => {
   return {
     server: {
       port: 3000,
+      watch: {
+        // Next's build output, left behind when switching from
+        // STUDIO_FRAMEWORK=next, includes a full node_modules copy under
+        // `.next/standalone`.
+        ignored: ['**/.next/**'],
+      },
     },
     preview: {
       // The prerender step (@tanstack/start-plugin-core) boots `vite preview`
@@ -548,6 +613,12 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       tsconfigPaths: true,
       alias: [
+        // Blocking requires TanStack's native history API. Keep the original
+        // Next hook for the rollback runtime, which has no TanStack provider.
+        {
+          find: /^@\/hooks\/ui\/usePreventNavigationOnUnsavedChanges$/,
+          replacement: path.resolve(rootDir, 'compat/usePreventNavigationOnUnsavedChanges.ts'),
+        },
         // `@sentry/nextjs`'s client entry drags in Next runtime internals
         // (`next/dist/shared/lib/constants`), whose module scope evaluates
         // `process?.features?.typescript` — optional chaining doesn't guard
@@ -584,7 +655,19 @@ export default defineConfig(({ command, mode }) => {
     define: {
       ...publicEnvDefines,
       ...sharedDefines,
+      __STUDIO_ASSET_CDN_URL__: JSON.stringify(assetCdnUrl) ?? 'undefined',
     },
+    ...(assetCdnUrl && {
+      experimental: {
+        // Absolute CDN URLs for client assets referenced from JS and CSS. With
+        // this set, Vite's preload helper resolves a lazy chunk's deps against
+        // the importing chunk's URL, so they follow it to the CDN.
+        renderBuiltUrl(filename: string, { ssr }: { ssr: boolean }) {
+          if (ssr) return
+          return getCdnUrlForBuiltFile(filename, assetCdnUrl)
+        },
+      },
+    }),
     // Circular-dep workaround: pin shared library code into dedicated
     // chunks so per-component chunks don't import from a chunk that
     // (transitively) imports them back.
@@ -673,6 +756,10 @@ export default defineConfig(({ command, mode }) => {
             if (id.includes('packages/ui/src/components/shadcn/ui/slider.tsx')) {
               return 'ui-slider'
             }
+            // Keep Avatar in its own chunk to prevent a users-page import cycle through ui.
+            if (id.includes('packages/ui/src/components/shadcn/ui/avatar.tsx')) {
+              return 'ui-avatar'
+            }
             return undefined
           },
         },
@@ -735,12 +822,16 @@ export default defineConfig(({ command, mode }) => {
       umdAmdShortCircuit(),
       assertNoChunkCycles(),
       workersFollowClientAssetsDir(),
+      serverSourceMaps(),
       devtools(),
       tailwindcss(),
       // Nitro builds and hosts the server for every target: the Vercel
       // function (`.vercel/output`, preset auto-detected from `VERCEL`) and
       // the self-hosted node server (`.output`).
       nitro({
+        // Nitro controls both SSR and final server maps. Preserve source content for Sentry.
+        sourcemap: true,
+        experimental: { sourcemapMinify: false },
         // `server.ts` is TanStack Start's SSR entry, not a Nitro entry;
         // without this Nitro's scan picks it up as both and warns.
         serverEntry: false,
@@ -784,15 +875,26 @@ export default defineConfig(({ command, mode }) => {
       // SENTRY_AUTH_TOKEN (and under SKIP_ASSET_UPLOAD). We disable the
       // middleware auto-wrap because start.ts wires the Sentry global
       // middlewares explicitly.
-      ...sentryTanstackStart({
+      ...sentryForFinalOutputs({
         org: process.env.SENTRY_ORG ?? 'supabase',
         project: process.env.SENTRY_PROJECT ?? 'supabase-studio-tanstack',
         authToken: process.env.SENTRY_AUTH_TOKEN,
         autoInstrumentMiddleware: false,
-        sourcemaps:
-          process.env.SKIP_ASSET_UPLOAD === '1' || !process.env.SENTRY_AUTH_TOKEN
-            ? { disable: true }
-            : undefined,
+        sourcemaps: {
+          disable: !shouldUploadSourceMaps,
+          // Intermediate SSR maps must survive until Nitro composes the final server maps.
+          // Skipped uploads retain private server maps for local diagnostics.
+          filesToDeleteAfterUpload: [
+            path.join(rootDir, '.output/public/**/*.map'),
+            path.join(rootDir, '.vercel/output/static/**/*.map'),
+            ...(shouldUploadSourceMaps
+              ? [
+                  path.join(rootDir, '.output/server/**/*.map'),
+                  path.join(rootDir, '.vercel/output/functions/**/*.map'),
+                ]
+              : []),
+          ],
+        },
       }),
     ],
   }

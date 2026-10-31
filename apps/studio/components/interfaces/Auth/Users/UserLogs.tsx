@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { ExternalLink, RefreshCw } from 'lucide-react'
+import { ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
@@ -8,7 +8,6 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
-import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './Users.constants'
 import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -78,10 +77,6 @@ export const UserLogs = ({ user }: UserLogsProps) => {
 
   return (
     <div>
-      <UserHeader user={user} />
-
-      <Separator />
-
       <div className={cn('flex flex-col gap-y-3', PANEL_PADDING)}>
         <div>
           <p>Auth API logs</p>
@@ -134,7 +129,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           <Button
             loading={isLoadingAuthLogs}
             disabled={isLoadingAuthLogs}
-            icon={<RefreshCw />}
+            icon={<RefreshCwIcon />}
             onClick={() => refresh()}
           >
             Refresh
@@ -193,7 +188,7 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                         className="px-1.5 absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition bg-background focus-visible:opacity-100"
                       >
                         <Link href={`/project/${ref}/logs/auth-logs?log=${log.id}`}>
-                          <ExternalLink size="12" className="text-foreground-light" />
+                          <ExternalLinkIcon size="12" className="text-foreground-light" />
                         </Link>
                       </ButtonTooltip>
                     </p>

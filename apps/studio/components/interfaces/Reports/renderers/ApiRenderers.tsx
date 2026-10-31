@@ -1,6 +1,7 @@
+import { useFlag } from 'common'
 import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { Fragment, useRef, useState, type ReactNode } from 'react'
@@ -50,6 +51,7 @@ export const NetworkTrafficRenderer = (
     ingress: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
   const { data, error, isError } = useFillTimeseriesSorted({
     data: props.data,
@@ -84,6 +86,7 @@ export const NetworkTrafficRenderer = (
   return (
     <div className="flex flex-col gap-12 w-full">
       <BarChart
+        chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
         size="small"
         title="Ingress"
         highlightedValue={sumBy(props.data, 'ingress_mb')}
@@ -119,6 +122,7 @@ export const TotalRequestsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -148,6 +152,7 @@ export const TotalRequestsChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       highlightedValue={total}
@@ -248,6 +253,7 @@ export const ErrorCountsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -278,6 +284,7 @@ export const ErrorCountsChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       className="w-full"
@@ -296,6 +303,7 @@ export const ResponseSpeedChartRenderer = (
     avg: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const transformedData = props.data.map((datum) => ({
     timestamp: datum.timestamp,
     avg: datum.avg,
@@ -329,6 +337,7 @@ export const ResponseSpeedChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       highlightedValue={lastAvg}
       format="ms"
@@ -354,7 +363,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
       <div className="flex gap-2 items-center">
         <Button asChild variant="text" className=" py-0! p-1!" title="Show more route details">
           <span>
-            <ChevronRight
+            <ChevronRightIcon
               size={14}
               className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
             />

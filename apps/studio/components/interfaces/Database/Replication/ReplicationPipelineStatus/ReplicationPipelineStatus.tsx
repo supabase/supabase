@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Activity, ChevronDown, RotateCcw, Search, X } from 'lucide-react'
+import { ActivityIcon, ChevronDownIcon, RotateCcwIcon, SearchIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
@@ -112,7 +112,7 @@ const PipelineOverviewSkeleton = () => (
  * Supports both legacy 'error' state and new 'errored' state with retry policies.
  */
 export const ReplicationPipelineStatus = () => {
-  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
+  const { ref: projectRef, pipelineId } = useParams()
   const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
   const [showErrorDialog, setShowErrorDialog] = useState(false)
@@ -130,7 +130,6 @@ export const ReplicationPipelineStatus = () => {
   const [showBatchRestartDialog, setShowBatchRestartDialog] = useState(false)
   const [batchRestartMode, setBatchRestartMode] = useState<'all' | 'errored' | null>(null)
   const [resettingTableIds, setResettingTableIds] = useState<Set<number>>(new Set())
-  const pipelineId = Number(_pipelineId)
   const { getRequestStatus, isRequestPending } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
 
@@ -276,7 +275,7 @@ export const ReplicationPipelineStatus = () => {
                 actions={
                   <Button
                     variant="default"
-                    icon={<RotateCcw />}
+                    icon={<RotateCcwIcon />}
                     disabled={isPipelineBusy || isPipelineError}
                     loading={isPipelineBusy}
                     onClick={() => {
@@ -320,7 +319,7 @@ export const ReplicationPipelineStatus = () => {
                 <div className="flex flex-col gap-y-3">
                   <div className="flex items-center justify-between">
                     <Input
-                      icon={<Search />}
+                      icon={<SearchIcon />}
                       size="tiny"
                       className="text-xs w-52"
                       placeholder="Search tables"
@@ -333,7 +332,7 @@ export const ReplicationPipelineStatus = () => {
                           <Button
                             aria-label="Clear search"
                             variant="text"
-                            icon={<X />}
+                            icon={<XIcon />}
                             className="p-0 h-5 w-5"
                             onClick={() => setSearchString('')}
                           />
@@ -345,7 +344,7 @@ export const ReplicationPipelineStatus = () => {
                         size="tiny"
                         variant="default"
                         className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
-                        icon={<RotateCcw />}
+                        icon={<RotateCcwIcon />}
                         disabled={isPipelineBusy || showDisabledState || isPipelineError}
                         loading={isPipelineBusy}
                         onClick={() => {
@@ -360,7 +359,7 @@ export const ReplicationPipelineStatus = () => {
                           <Button
                             variant="default"
                             aria-label="More reset options"
-                            icon={<ChevronDown />}
+                            icon={<ChevronDownIcon />}
                             className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                             disabled={showDisabledState || isPipelineError}
                           />
@@ -481,7 +480,7 @@ export const ReplicationPipelineStatus = () => {
 
               {!hasTableData && (
                 <EmptyStatePresentational
-                  icon={Activity}
+                  icon={ActivityIcon}
                   title={emptyState.title}
                   description={emptyState.description}
                 />

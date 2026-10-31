@@ -1,7 +1,14 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
+import {
+  Edit3Icon,
+  EyeIcon,
+  EyeOffIcon,
+  KeyIcon,
+  LoaderIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+} from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
@@ -19,7 +26,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { SecretTableColumn } from './Secrets.types'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { VaultSecret } from '@/types'
 
@@ -37,9 +44,8 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   const [, setSelectedSecretToEdit] = useQueryState('edit', parseAsString)
   const [, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
 
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data: revealedValue, isFetching } = useVaultSecretDecryptedValueQuery(
@@ -64,7 +70,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
                   title="Manage Secret"
                   variant="text"
                   className="px-1"
-                  icon={<MoreVertical />}
+                  icon={<MoreVerticalIcon />}
                   aria-label="Manage secret"
                   // Tooltip repeats the label; screen readers would read it twice
                   aria-describedby={undefined}
@@ -82,7 +88,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
                 content: { side: 'left', text: 'You need additional permissions to edit secrets' },
               }}
             >
-              <Edit3 size={12} />
+              <Edit3Icon size={12} />
               <p>Edit</p>
             </DropdownMenuItemTooltip>
 
@@ -99,7 +105,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
                 },
               }}
             >
-              <Trash size={12} />
+              <TrashIcon size={12} />
               <p className="text-foreground-light">Delete</p>
             </DropdownMenuItemTooltip>
           </DropdownMenuContent>
@@ -118,11 +124,11 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
               className="px-1.5"
               icon={
                 isFetching && revealedValue === undefined ? (
-                  <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+                  <LoaderIcon className="animate-spin" size={16} strokeWidth={1.5} />
                 ) : !revealSecret ? (
-                  <Eye size={16} strokeWidth={1.5} />
+                  <EyeIcon size={16} strokeWidth={1.5} />
                 ) : (
-                  <EyeOff size={16} strokeWidth={1.5} />
+                  <EyeOffIcon size={16} strokeWidth={1.5} />
                 )
               }
               onClick={() => setRevealSecret(!revealSecret)}
@@ -160,7 +166,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   if (col.id === 'id') {
     return (
       <div className="w-full flex items-center">
-        <Key size={12} strokeWidth={2} className="text-foreground-light mr-2" />
+        <KeyIcon size={12} strokeWidth={2} className="text-foreground-light mr-2" />
         <p className="text-foreground-light text-xs font-mono truncate" title={row.id}>
           {row.id}
         </p>

@@ -11,8 +11,11 @@
 
 /apps/docs/ @supabase/docs
 
+/apps/kb/ @supabase/knowledgebase
+
 /apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
+/apps/www/public/schemas/ @supabase/cli
 /apps/www/lib/redirects.js
 
 /docker/ @supabase/cli @supabase/self-hosted
