@@ -1,9 +1,10 @@
-import { IS_PLATFORM } from 'common'
-import { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
+import { IS_PLATFORM } from '@/lib/constants'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
   switch (method) {
@@ -23,13 +24,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { url: requestUrl, method, body: requestBody, headers: customHeaders } = req.body
-    const url = IS_PLATFORM
-      ? requestUrl
-      : requestUrl.replace(process.env.SUPABASE_PUBLIC_URL, process.env.SUPABASE_URL)
+    const url =
+      typeof requestUrl === 'string' && URL.canParse(requestUrl) ? new URL(requestUrl) : undefined
+    const { SUPABASE_URL, SUPABASE_PUBLIC_URL } = process.env
 
-    const validEdgeFnUrl = isValidEdgeFunctionURL(url, IS_PLATFORM)
+    if (
+      !IS_PLATFORM &&
+      url &&
+      SUPABASE_URL &&
+      SUPABASE_PUBLIC_URL &&
+      URL.canParse(SUPABASE_URL) &&
+      URL.canParse(SUPABASE_PUBLIC_URL) &&
+      url.origin === new URL(SUPABASE_PUBLIC_URL).origin
+    ) {
+      const internalUrl = new URL(SUPABASE_URL)
+      url.protocol = internalUrl.protocol
+      url.host = internalUrl.host
+      url.port = internalUrl.port
+    }
 
-    if (!validEdgeFnUrl) {
+    if (!url || !isValidEdgeFunctionURL(url.href, IS_PLATFORM, SUPABASE_URL)) {
       return res.status(400).json({
         status: 400,
         error: { message: 'Provided URL is not a valid Supabase edge function URL' },
@@ -63,7 +77,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       }
     }
 
-    const response = await fetch(url, {
+    const response = await fetch(url.href, {
       method,
       headers: requestHeaders,
       body: finalBody,
@@ -97,4 +111,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       },
     })
   }
+}
+
+export default async function edgeFunctionTest(req: NextApiRequest, res: NextApiResponse) {
+  return apiWrapper(req, res, handler, { withAuth: true })
 }
