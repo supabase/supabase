@@ -49,6 +49,8 @@ Audit logs contain detailed information about each authentication event:
 }
 ```
 
+`ip_address` is recorded only for some events, such as MFA, passkeys, identity linking, and recovery codes. It is empty for most sign-up, sign-in, sign-out, and token events. To see the IP address for a session, check the `ip` column in `auth.sessions`.
+
 ### Log actions reference
 
 | Action                          | Description                             |
