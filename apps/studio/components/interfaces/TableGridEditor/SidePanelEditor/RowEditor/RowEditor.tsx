@@ -15,6 +15,9 @@ import {
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
+  getDuplicatePrimaryKeyMatch,
+  getTruncatedFieldErrors,
+  getTruncatedFieldNames,
   prepareRowForDuplication,
   validateFields,
 } from './RowEditor.utils'
@@ -22,7 +25,10 @@ import { TextEditor } from './TextEditor'
 import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { getCellValue } from '@/data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
@@ -50,6 +56,7 @@ export const RowEditor = ({
 }: RowEditorProps) => {
   const { data: project } = useSelectedProjectQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save'
 
   const [errors, setErrors] = useState<Dictionary<any>>({})
@@ -67,6 +74,7 @@ export const RowEditor = ({
   const isEditingJson = selectedValueForJsonEdit !== undefined
 
   const [loading, setLoading] = useState(false)
+  const [isLoadingFullValues, setIsLoadingFullValues] = useState(false)
   const [createMore, setCreateMore] = useState(false)
 
   // Generated columns are always computed by the database, so they are excluded from the form.
@@ -101,6 +109,59 @@ export const RowEditor = ({
         resolvedMode === 'duplicate' && row ? prepareRowForDuplication(row, selectedTable) : row
       const nextRowFields = generateRowFields(sourceRow, selectedTable, foreignKeys)
       setRowFields(nextRowFields)
+
+      const pkMatch = row ? getDuplicatePrimaryKeyMatch(row, selectedTable) : undefined
+      const truncatedColumns = getTruncatedFieldNames(nextRowFields)
+      if (
+        resolvedMode !== 'duplicate' ||
+        project === undefined ||
+        pkMatch === undefined ||
+        truncatedColumns.length === 0
+      ) {
+        return
+      }
+
+      // The grid only holds a preview of large values, and an insert writes every field, so
+      // load the full values from the source row. Anything that fails stays truncated and is
+      // rejected on save.
+      let isCurrent = true
+      setIsLoadingFullValues(true)
+      Promise.allSettled(
+        truncatedColumns.map((column) =>
+          getCellValue({
+            projectRef: project.ref,
+            connectionString: project.connectionString,
+            table: { schema: selectedTable.schema, name: selectedTable.name },
+            column,
+            pkMatch,
+            roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+          })
+        )
+      ).then((results) => {
+        if (!isCurrent) return
+        const fullValues: Dictionary<any> = {}
+        results.forEach((result, index) => {
+          if (result.status === 'fulfilled') fullValues[truncatedColumns[index]] = result.value
+        })
+        const fullFields = generateRowFields(
+          { ...sourceRow, ...fullValues },
+          selectedTable,
+          foreignKeys
+        )
+        setRowFields((fields) =>
+          fields.map((field) =>
+            field.name in fullValues
+              ? { ...field, value: fullFields.find((full) => full.name === field.name)?.value }
+              : field
+          )
+        )
+        setIsLoadingFullValues(false)
+      })
+
+      return () => {
+        isCurrent = false
+        setIsLoadingFullValues(false)
+      }
     }
   }, [visible])
 
@@ -134,7 +195,10 @@ export const RowEditor = ({
   const onSaveChanges = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    const errors = validateFields(rowFields)
+    const errors = {
+      ...validateFields(rowFields),
+      ...(resolvedMode === 'duplicate' ? getTruncatedFieldErrors(rowFields) : {}),
+    }
     setErrors(errors)
     setLoading(true)
 
@@ -192,7 +256,7 @@ export const RowEditor = ({
       onCancel={closePanel}
       customFooter={
         <ActionBar
-          loading={loading}
+          loading={loading || isLoadingFullValues}
           formId={formId}
           backButtonLabel="Cancel"
           applyButtonLabel={applyChangesLabel}
@@ -231,7 +295,7 @@ export const RowEditor = ({
                         onEditText={setSelectedValueForTextEdit}
                         onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                         isEditable={editable}
-                        isNewRow={isNewRecord || '__tempId' in row}
+                        isNewRow={isNewRecord || (row !== undefined && '__tempId' in row)}
                       />
                     )
                   })}
@@ -260,7 +324,7 @@ export const RowEditor = ({
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                           isEditable={editable}
-                          isNewRow={isNewRecord || '__tempId' in row}
+                          isNewRow={isNewRecord || (row !== undefined && '__tempId' in row)}
                         />
                       )
                     })}

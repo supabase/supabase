@@ -6,6 +6,9 @@ import {
   convertByteaToHex,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
+  getDuplicatePrimaryKeyMatch,
+  getTruncatedFieldErrors,
+  getTruncatedFieldNames,
   isValueTruncated,
   parseValue,
   prepareRowForDuplication,
@@ -996,5 +999,55 @@ describe('prepareRowForDuplication', () => {
         { primary_keys: [], columns: [{ name: 'name' }, { name: 'value' }] }
       )
     ).toEqual({ name: 'logs', value: 1 })
+  })
+
+  it.each([
+    ['missing', {}],
+    ['null', { primary_keys: null, columns: null }],
+  ])('copies data columns and drops grid metadata when table metadata is %s', (_, table) => {
+    expect(
+      prepareRowForDuplication(
+        { idx: 1, __tempId: 'tmp-1', __isDeleted: false, id: 2, name: 'Paris' },
+        table
+      )
+    ).toEqual({ id: 2, name: 'Paris' })
+  })
+})
+
+describe('getDuplicatePrimaryKeyMatch', () => {
+  it('reads every primary key from the source row', () => {
+    expect(
+      getDuplicatePrimaryKeyMatch(
+        { org: 1, id: 2, name: 'Paris' },
+        { primary_keys: [{ name: 'org' }, { name: 'id' }] }
+      )
+    ).toEqual({ org: 1, id: 2 })
+  })
+
+  it('returns undefined without a complete primary key', () => {
+    expect(getDuplicatePrimaryKeyMatch({ id: 2 }, { primary_keys: [] })).toBeUndefined()
+    expect(getDuplicatePrimaryKeyMatch({ id: 2 }, {})).toBeUndefined()
+    expect(
+      getDuplicatePrimaryKeyMatch({ id: 2 }, { primary_keys: [{ name: 'id' }, { name: 'org' }] })
+    ).toBeUndefined()
+  })
+})
+
+describe('getTruncatedFieldErrors', () => {
+  const field = (name: string, value: string) => ({ name, value, format: 'text' }) as RowField
+  const preview = 'x'.repeat(10240) + '...'
+
+  it('rejects a preview that would otherwise reach the insert payload', () => {
+    const fields = [field('body', preview), field('title', 'short')]
+
+    expect(generateRowObjectFromFields({ fields })).toMatchObject({ body: preview })
+    expect(getTruncatedFieldNames(fields)).toEqual(['body'])
+    expect(Object.keys(getTruncatedFieldErrors(fields))).toEqual(['body'])
+  })
+
+  it('accepts complete values, including long ones', () => {
+    expect(
+      getTruncatedFieldErrors([field('body', 'x'.repeat(12000)), field('title', 'short...')])
+    ).toEqual({})
   })
 })

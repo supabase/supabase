@@ -56,6 +56,33 @@ export const prepareRowForDuplication = (
   return duplicated
 }
 
+/**
+ * Primary key values of the source row, used to read its full values. Undefined when the row
+ * cannot be identified.
+ */
+export const getDuplicatePrimaryKeyMatch = (
+  row: Dictionary<any>,
+  table: DuplicateRowTable
+): Dictionary<any> | undefined => {
+  const primaryKeys = table.primary_keys ?? []
+  if (primaryKeys.length === 0 || primaryKeys.some(({ name }) => row[name] === undefined)) {
+    return undefined
+  }
+  return Object.fromEntries(primaryKeys.map(({ name }) => [name, row[name]]))
+}
+
+export const getTruncatedFieldNames = (fields: RowField[]) =>
+  fields.filter((field) => isValueTruncated(field.value, field.format)).map((field) => field.name)
+
+/** An insert writes every field, so a duplicated row must not save a truncated preview. */
+export const getTruncatedFieldErrors = (fields: RowField[]) =>
+  Object.fromEntries(
+    getTruncatedFieldNames(fields).map((name) => [
+      name,
+      'The full value could not be loaded, so it cannot be duplicated',
+    ])
+  )
+
 const getRowValue = ({ column, row }: { column: PGColumn; row?: Dictionary<any> }) => {
   const isNewRow = row === undefined
 
