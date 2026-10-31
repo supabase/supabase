@@ -13,16 +13,6 @@ export const BIGQUERY_DATASET_ID_FIELD_COPY = {
   description: 'The BigQuery dataset where replicated tables will be created.',
 } as const
 
-export const ANALYTICS_BUCKET_BUCKET_FIELD_COPY = {
-  label: 'Bucket',
-  description: 'The Analytics Bucket where data will be stored.',
-} as const
-
-export const ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY = {
-  label: 'Namespace',
-  description: 'The namespace within the bucket where tables will be organized.',
-} as const
-
 export const DUCKLAKE_BUCKET_FIELD_COPY = {
   label: 'Bucket',
   description: 'Files bucket for DuckLake data.',

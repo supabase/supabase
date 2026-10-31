@@ -27,10 +27,6 @@ export const useIsETLBigQueryPrivateAlpha = () => {
   return useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
 }
 
-export const useIsETLIcebergPrivateAlpha = () => {
-  return useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
-}
-
 export const useIsETLDucklakePrivateAlpha = () => {
   return useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
 }
@@ -45,14 +41,12 @@ export const useIsETLClickHousePrivateAlpha = () => {
 
 export const useIsETLPrivateAlpha = () => {
   const hasAccessToETLBigQuery = useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
-  const hasAccessToETLIceberg = useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
   const hasAccessToETLDucklake = useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
   const hasAccessToETLSnowflake = useIsCurrentOrgInFlagList('etlEnableSnowflakePrivateAlpha')
   const hasAccessToETLClickHouse = useIsCurrentOrgInFlagList('etlEnableClickHousePrivateAlpha')
 
   return (
     hasAccessToETLBigQuery ||
-    hasAccessToETLIceberg ||
     hasAccessToETLDucklake ||
     hasAccessToETLSnowflake ||
     hasAccessToETLClickHouse

@@ -17,7 +17,6 @@ import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
@@ -27,7 +26,7 @@ interface DestinationTypeOption {
   value: DestinationType
   label: string
   description: string
-  stage: 'Public Alpha' | 'Deprecated' | null
+  stage: 'Public Alpha' | null
   enabled: boolean
 }
 
@@ -39,7 +38,6 @@ interface DestinationTypeGroup {
 export const DestinationTypeSelection = () => {
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
@@ -48,7 +46,6 @@ export const DestinationTypeSelection = () => {
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
-      'Analytics Bucket',
       'DuckLake',
       'Snowflake',
       'ClickHouse',
@@ -104,18 +101,6 @@ export const DestinationTypeSelection = () => {
         },
       ],
     },
-    {
-      label: 'Deprecated',
-      options: [
-        {
-          value: 'Analytics Bucket',
-          label: 'Analytics Bucket',
-          description: 'Replicate changes to Supabase Storage as Apache Iceberg tables',
-          stage: 'Deprecated',
-          enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
-        },
-      ],
-    },
   ]
 
   const visibleGroups = groups
@@ -130,7 +115,6 @@ export const DestinationTypeSelection = () => {
     (type: DestinationType) => string
   > = {
     'Public Alpha': (type) => `${type} support is in public alpha.`,
-    Deprecated: (type) => `${type} is deprecated.`,
   }
 
   const stageDescription = selectedOption?.stage
