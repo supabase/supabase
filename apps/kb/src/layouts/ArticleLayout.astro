@@ -1,12 +1,11 @@
 ---
-import { ExternalLink } from 'lucide-react'
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, GithubIcon } from 'ui'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, GithubIcon, IconGitHubSolid } from 'ui'
 import type { TOCItemType } from 'ui-patterns/Toc/types'
 
 import { CodeBlockControlsIsland } from '../components/CodeBlockControlsIsland'
 import { FeaturedSection } from '../components/FeaturedSection'
 import { GuideSidebar } from '../components/GuideSidebar'
-import { formatDisplayDate } from '../lib/format-date'
+import { formatDisplayDate, toIsoDay } from '../lib/format-date'
 import { TocHeaderMenu } from '../components/TocHeaderMenu'
 import type { RelatedGuides } from '../lib/guides'
 import Layout from './Layout.astro'
@@ -56,41 +55,48 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 	}
 	<div class="section-container lg:grid lg:grid-cols-3 lg:gap-6">
 		<article class="prose prose-img:rounded-lg max-w-none min-w-0 py-16 lg:col-span-2">
-			<Breadcrumb className="not-prose mb-6">
-				<BreadcrumbList>
-					<BreadcrumbItem>
-						<BreadcrumbLink href={import.meta.env.BASE_URL}>Knowledge base</BreadcrumbLink>
-					</BreadcrumbItem>
-					{
-						topics.length > 0 && (
-							<>
-								<BreadcrumbSeparator />
-								{/* a guide can sit in several topics, so they share one level instead of nesting */}
-								<BreadcrumbItem>
-									{topics.map((topic, index) => (
-										<span>
-											{isKnownTopic(topic) ? (
-												<BreadcrumbLink
-													href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
-													title={getTopicDescription(topic)}
-												>
-													{topic}
-												</BreadcrumbLink>
-											) : (
-												topic
-											)}
-											{index < topics.length - 1 && ','}
-										</span>
-									))}
-								</BreadcrumbItem>
-							</>
-						)
-					}
-				</BreadcrumbList>
-			</Breadcrumb>
-			<header class="mb-8">
+			<div class="not-prose mb-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem>
+							<BreadcrumbLink href={import.meta.env.BASE_URL}>Knowledge base</BreadcrumbLink>
+						</BreadcrumbItem>
+						{
+							topics.length > 0 && (
+								<>
+									<BreadcrumbSeparator />
+									<BreadcrumbItem>
+										{topics.map((topic, index) => (
+											<span>
+												{isKnownTopic(topic) ? (
+													<BreadcrumbLink
+														href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
+														title={getTopicDescription(topic)}
+													>
+														{topic}
+													</BreadcrumbLink>
+												) : (
+													topic
+												)}
+												{index < topics.length - 1 && ','}
+											</span>
+										))}
+									</BreadcrumbItem>
+								</>
+							)
+						}
+					</BreadcrumbList>
+				</Breadcrumb>
+				{
+					lastEdited && (
+						<p class="text-foreground-lighter">
+							Updated <time datetime={toIsoDay(lastEdited)} class="whitespace-nowrap">{formatDisplayDate(lastEdited)}</time>
+						</p>
+					)
+				}
+			</div>
+			<header class="mb-12">
 				<h1 data-page-title={title} class="mt-0 mb-0 text-balance">{title}</h1>
-				{lastEdited && <p class="not-prose mt-3 text-sm text-foreground-lighter">Last edited: {formatDisplayDate(lastEdited)}</p>}
 				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
 			</header>
 			<slot />
@@ -120,9 +126,10 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 							href={viewGitHubLink}
 							target="_blank"
 							rel="noreferrer noopener edit"
-							class="w-fit inline-flex items-center gap-1 text-sm text-foreground-light hover:text-foreground"
+							class="relative w-fit inline-flex items-center gap-1.5 text-sm text-foreground-light transition-colors hover:text-foreground after:absolute after:-inset-y-3 after:inset-x-0"
 						>
-							View this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+							<IconGitHubSolid size={14} aria-hidden="true" />
+							Edit this page
 						</a>
 					</footer>
 				)

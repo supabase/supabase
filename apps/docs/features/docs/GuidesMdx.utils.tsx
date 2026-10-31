@@ -9,6 +9,7 @@ import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
+import { getGuideLastUpdated } from '~/lib/last-changed'
 import { mdAlternate } from '~/lib/md-alternates'
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
 import { fromMarkdown } from 'mdast-util-from-markdown'
@@ -21,6 +22,8 @@ import { newEditLink } from './GuidesMdx.template'
 import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
+
+type OpenGraphArticleMetadata = Extract<NonNullable<Metadata['openGraph']>, { type: 'article' }>
 
 const PUBLISHED_SECTIONS = [
   'ai',
@@ -83,11 +86,14 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       editLinkOverride ?? `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
     )
 
+    const lastUpdated = await getGuideLastUpdated(slug)
+
     return {
       pathname: `/guides/${slug.join('/')}` satisfies `/${string}`,
       meta: restMeta,
       content,
       editLink,
+      lastUpdated,
     }
   } catch (error: unknown) {
     // `fromFs` rethrows FileNotFoundError directly, so check the error itself
@@ -166,11 +172,15 @@ const genGuidesStaticParams = (directory?: string) => async () => {
 
 const genGuideMeta =
   <Params,>(
-    generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
+    generate: (params: Params) => OrPromise<{
+      meta: GuideFrontmatter
+      pathname: `/${string}`
+      lastUpdated?: string
+    }>
   ) =>
   async (props: { params: Promise<Params> }, parent: ResolvingMetadata): Promise<Metadata> => {
     const params = await props.params
-    const [parentAlternates, parentOg, { meta, pathname }] = await Promise.all([
+    const [parentAlternates, parentOg, { meta, pathname, lastUpdated }] = await Promise.all([
       pluckPromise(parent, 'alternates'),
       pluckPromise(parent, 'openGraph'),
       generate(params),
@@ -193,13 +203,15 @@ const genGuideMeta =
       },
       openGraph: {
         ...parentOg,
+        type: 'article',
+        modifiedTime: lastUpdated,
         url: `${BASE_PATH}${pathname}`,
         images: generateOpenGraphImageMeta({
           type: ogType,
           title: meta.title,
           description: meta.description,
         }),
-      },
+      } satisfies OpenGraphArticleMetadata,
     }
   }
 

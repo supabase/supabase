@@ -1,11 +1,11 @@
 // Page dates are UTC calendar days (frontmatter `date: 2026-09-24`), so both
 // helpers format in UTC and don't shift with the build machine's timezone.
 
-/** "September 24, 2026" */
+/** "Sep 24, 2026" */
 export function formatDisplayDate(date: Date): string {
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     timeZone: 'UTC',
   })
