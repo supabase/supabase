@@ -97,6 +97,36 @@ services:
           - /auth/v1/.well-known/openid-configuration
     plugins:
       - name: cors
+  - name: auth-v1-open-oauth-register
+    _comment: 'Auth: /auth/v1/oauth/clients/register -> http://auth:9999/oauth/clients/register'
+    url: http://auth:9999/oauth/clients/register
+    routes:
+      - name: auth-v1-open-oauth-register
+        strip_path: true
+        paths:
+          - /auth/v1/oauth/clients/register
+    plugins:
+      - name: cors
+  - name: auth-v1-open-oauth-authorize
+    _comment: 'Auth: /auth/v1/oauth/authorize -> http://auth:9999/oauth/authorize'
+    url: http://auth:9999/oauth/authorize
+    routes:
+      - name: auth-v1-open-oauth-authorize
+        strip_path: true
+        paths:
+          - /auth/v1/oauth/authorize
+    plugins:
+      - name: cors
+  - name: auth-v1-open-oauth-token
+    _comment: 'Auth: /auth/v1/oauth/token -> http://auth:9999/oauth/token'
+    url: http://auth:9999/oauth/token
+    routes:
+      - name: auth-v1-open-oauth-token
+        strip_path: true
+        paths:
+          - /auth/v1/oauth/token
+    plugins:
+      - name: cors
 
   - name: auth-v1-open-sso-acs
     url: "http://auth:9999/sso/saml/acs"
@@ -414,6 +444,17 @@ services:
         strip_path: true
         paths:
           - /.well-known/oauth-authorization-server/auth/v1
+    plugins:
+      - name: cors
+
+  - name: well-known-protected-resource-mcp
+    _comment: 'MCP: /.well-known/oauth-protected-resource/mcp -> http://functions:9000/.well-known/oauth-protected-resource/mcp'
+    url: http://functions:9000/
+    routes:
+      - name: well-known-protected-resource-mcp
+        strip_path: false
+        paths:
+          - /.well-known/oauth-protected-resource/mcp
     plugins:
       - name: cors
 

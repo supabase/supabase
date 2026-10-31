@@ -99,4 +99,8 @@ server {
     location = /.well-known/oauth-authorization-server/auth/v1 {
         proxy_pass http://api_gw_upstream;
     }
+
+    location = /.well-known/oauth-protected-resource/mcp {
+        proxy_pass http://api_gw_upstream;
+    }
 }

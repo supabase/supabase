@@ -1,5 +1,6 @@
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
 import { createSupabaseMcpServer, SupabasePlatform } from '@supabase/mcp-server-supabase'
+import { createClient } from '@supabase/supabase-js'
 import { stripIndent } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -17,6 +18,17 @@ import {
 } from '@/lib/api/self-hosted/mcp'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
+const supabase = createClient(
+  process.env.SUPABASE_URL || 'http://localhost:8000',
+  process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY!,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  }
+)
+
 const supportedFeatureGroupSchema = z.enum([
   'docs',
   'database',
@@ -24,6 +36,19 @@ const supportedFeatureGroupSchema = z.enum([
   'debugging',
   'feedback',
 ])
+const mcpOAuthEnabled = process.env.ENABLED_FEATURES_MCP_OAUTH === 'true'
+const mcpResourceUrl =
+  process.env.SUPABASE_PUBLIC_URL! + '/.well-known/oauth-protected-resource/mcp'
+
+const mcpAllowedUsers = process.env.MCP_ALLOWED_USERS?.split(',')
+  .map((email) => email.trim().toLowerCase())
+  .filter(Boolean)
+
+if (mcpOAuthEnabled && (!mcpAllowedUsers || mcpAllowedUsers.length === 0)) {
+  throw new Error(
+    'MCP OAuth is enabled, but MCP_ALLOWED_USERS is not configured. Set it to a comma-separated list of allowed user email addresses.'
+  )
+}
 
 const mcpQuerySchema = z.object({
   features: z
@@ -55,7 +80,37 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
+const getClaims = async (token?: string) => {
+  if (!token) return { data: null, error: new Error('invalid token') }
+  try {
+    return await supabase.auth.getClaims(token)
+  } catch (error) {
+    return { data: null, error: error as Error }
+  }
+}
+
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  if (mcpOAuthEnabled) {
+    const token = req.headers.authorization?.replace('Bearer ', '')
+    const { data, error } = await getClaims(token)
+
+    if (error || !data) {
+      res.setHeader(
+        'WWW-Authenticate',
+        `Bearer error="invalid_token", error_description="The access token provided is invalid", resource_metadata="${mcpResourceUrl}"`
+      )
+
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+    const { email, amr } = data.claims
+    const isValidAmr = !!amr?.some(
+      (e) => (typeof e === 'string' ? e : e.method) === 'oauth_provider/authorization_code'
+    )
+
+    if (!isValidAmr || !email || !mcpAllowedUsers!.includes(email.toLowerCase())) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
+  }
   const { error, data } = mcpQuerySchema.safeParse(req.query)
 
   if (error) {
