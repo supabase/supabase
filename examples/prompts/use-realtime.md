@@ -147,15 +147,19 @@ useEffect(() => {
   })
   channelRef.current = channel
 
-  // Set auth before subscribing
-  await supabase.realtime.setAuth()
+  let cancelled = false
 
-  channel
-    .on('broadcast', { event: 'message_created' }, handleMessage)
-    .on('broadcast', { event: 'user_joined' }, handleUserJoined)
-    .subscribe()
+  // Set auth before subscribing
+  supabase.realtime.setAuth().then(() => {
+    if (cancelled) return
+    channel
+      .on('broadcast', { event: 'message_created' }, handleMessage)
+      .on('broadcast', { event: 'user_joined' }, handleUserJoined)
+      .subscribe()
+  })
 
   return () => {
+    cancelled = true
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current)
       channelRef.current = null
