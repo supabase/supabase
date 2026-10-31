@@ -89,6 +89,7 @@ describe('/account/me', () => {
       profileShowInformation: true,
       profileShowAnalyticsAndMarketing: true,
       profileShowAccountDeletion: true,
+      accountShowSecuritySettings: true,
     })
     mockUseProfile.mockReturnValue({
       error: null,
@@ -104,7 +105,7 @@ describe('/account/me', () => {
     render(<PreferencesPage dehydratedState={{}} />)
 
     expect(screen.getByText('ProfileInformation')).toBeInTheDocument()
-    expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
+    expect(screen.queryByText('AccountIdentities')).not.toBeInTheDocument()
     expect(screen.getByText('AccountConnections')).toBeInTheDocument()
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
     expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()
@@ -112,6 +113,12 @@ describe('/account/me', () => {
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
     expect(screen.getByText('AnalyticsSettings')).toBeInTheDocument()
     expect(screen.getByText('AccountDeletion')).toBeInTheDocument()
+  })
+
+  it('keeps sign-in methods in Preferences when Security is unavailable', () => {
+    mockUseIsFeatureEnabled.mockReturnValue({ accountShowSecuritySettings: false })
+    render(<PreferencesPage dehydratedState={{}} />)
+    expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
   })
 
   it('renders only local preferences on self-hosted', () => {

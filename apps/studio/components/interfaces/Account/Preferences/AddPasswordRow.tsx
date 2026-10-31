@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  CardContent,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -17,14 +17,13 @@ import {
   FormField,
   Input,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input as InputWithActions } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import PasswordConditionsHelper from '@/components/interfaces/SignIn/PasswordConditionsHelper'
-import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useSetPasswordMutation } from '@/data/profile/profile-set-password-mutation'
-import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { passwordValidation } from '@/lib/password-validation'
 
 const FORM_ID = 'add-password-form'
@@ -42,29 +41,50 @@ const defaultValues: FormValues = { password: '' }
  * Auth creates the email identity for the user's current email when the password is
  * saved.
  */
-export const AddPasswordRow = ({ email }: { email: string }) => {
+export const AddPasswordRow = ({
+  email,
+  providerName,
+  isPrimary = false,
+}: {
+  email: string
+  providerName?: string
+  isPrimary?: boolean
+}) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const providerDisplay = getProviderDisplay('email')
+  const [securityAction, setSecurityAction] = useQueryState('securityAction', parseAsString)
+  const isOpen = isDialogOpen || securityAction === 'set-password'
+  const handleOpenChange = (open: boolean) => {
+    setIsDialogOpen(open)
+    if (!open && securityAction === 'set-password') void setSecurityAction(null)
+  }
 
   return (
     <>
-      <CardContent className="flex justify-between items-center py-4">
-        <div className="flex gap-x-4">
-          <IdentityProviderIcon display={providerDisplay} size={30} />
-          <div>
-            <p className="text-sm">{providerDisplay.displayName}</p>
-            <p className="text-sm text-foreground-lighter">{email}</p>
-          </div>
-        </div>
-        <Button onClick={() => setIsDialogOpen(true)}>Add password</Button>
-      </CardContent>
+      <Admonition
+        type={providerName ? 'warning' : 'default'}
+        layout="responsive"
+        title="Add a password for email sign-in"
+        description={
+          providerName
+            ? `Use ${email} and a password as another way to sign in if you lose access to ${providerName}.`
+            : `Add a password to sign in with ${email}.`
+        }
+        actions={
+          <Button
+            variant={isPrimary ? 'primary' : 'default'}
+            onClick={() => handleOpenChange(true)}
+          >
+            Add password
+          </Button>
+        }
+      />
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader className="border-b">
             <DialogTitle>Add password</DialogTitle>
           </DialogHeader>
-          <AddPasswordForm email={email} onClose={() => setIsDialogOpen(false)} />
+          <AddPasswordForm email={email} onClose={() => handleOpenChange(false)} />
         </DialogContent>
       </Dialog>
     </>
