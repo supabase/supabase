@@ -1,8 +1,8 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
-import { contributingDetails } from './contributing.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
+import { contributingDetails } from './contributing.data'
 import { databaseGetStarted, databaseMultigresWhatYouGet, databaseNextSteps } from './database.data'
 import {
   functionsExamplesAiMedia,
