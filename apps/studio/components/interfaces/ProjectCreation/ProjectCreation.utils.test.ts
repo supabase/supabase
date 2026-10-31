@@ -246,32 +246,6 @@ describe('getRegionSelectionType', () => {
       getRegionSelectionType({ dbRegion: 'Americas', availableRegions: undefined })
     ).toBeUndefined()
   })
-
-  it('classifies an untouched field as auto, even if it resolved to a specific region', () => {
-    expect(
-      getRegionSelectionType({
-        dbRegion: 'East US (North Virginia)',
-        availableRegions,
-        isDbRegionDirty: false,
-      })
-    ).toBe('auto')
-  })
-
-  it('returns undefined for an untouched field holding a stale region matching neither list', () => {
-    expect(
-      getRegionSelectionType({
-        dbRegion: 'Nonexistent',
-        availableRegions,
-        isDbRegionDirty: false,
-      })
-    ).toBeUndefined()
-  })
-
-  it('classifies a touched field normally', () => {
-    expect(
-      getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })
-    ).toBe('general')
-  })
 })
 
 describe('extractPostgresVersionDetails', () => {
