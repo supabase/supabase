@@ -1,0 +1,85 @@
+This Supabase for Platforms Addendum ("**Addendum**") is incorporated by reference into an Order between Customer and Supabase (Customer and Supabase each, a "**Party**" and collectively, the "**Parties**") that expressly references this Addendum. Capitalized terms not defined in this Addendum have the meanings given in the Agreement (as defined in the applicable Order). This Addendum applies only to the specific matters set forth below.
+
+## 1. Definitions.
+
+a. "**End User**" means any individual or entity that enters into a relationship with Customer to access and use Customer's products or services, and as part of such use, interacts with, uses or benefits from Supabase's backend services through Customer's platform. For clarity, End Users do not have a direct contractual relationship with Supabase. Any information, data, content, or other materials submitted, uploaded, transmitted, or otherwise provided by or on behalf of an End User to the Services through Customer's platform shall be deemed Customer Data for all purposes under the Agreement.
+
+b. A "**Material Usage Event**" means any planned initiative, promotion, migration, feature release, data backfill, bulk import/export, load test, or other activity that Customer knows or should reasonably know is likely to (a) increase Customer's aggregate workload on the Services by ≥20% over the highest 7-day peak in the prior 60 days, or (b) exceed any stated/planned usage and/or provisioned capacity associated with the Agreement.
+
+## 2. Access and Use.
+
+### a. Provision of Access to End Users
+
+Notwithstanding anything to the contrary in the Agreement, Supabase grants Customer a limited, non-exclusive right to integrate directly with the Supabase platform and to make the functionality of the Services available to Customer's own End Users as part of Customer's products and services (such right, referred to as "**SfP**"). SfP shall be considered a feature and inclusive of the Services. Customer remains solely responsible for all interactions between its End Users and the Services, including all application logic, data flows, prompts, access controls, security configurations, and any third-party tools or systems Customer uses in connection with such integrations. Supabase has no direct relationship with Customer's End Users and assumes no obligations to them. Customer shall ensure that its and its End Users' use of the Services complies with (i) this Addendum, (ii) the Agreement, and (iii) all applicable laws and regulations. Customer is responsible for its End Users' use of the Services and for all fees and charges arising from or relating to such use, whether authorized or unauthorized. Supabase may suspend Customer's integration if Customer's implementation creates a material security, performance, or operational risk to the platform or other Supabase customers.
+
+### b. End User Terms
+
+Customer shall ensure that each End User is bound by written terms of service that (a) are at least as protective of Supabase and the Services as the Agreement, (b) disclaim any warranties and liability of Supabase to the End User, (c) prohibit misuse of the Services, including violations of the Acceptable Use Policy, and (d) acknowledge that Supabase is a third-party beneficiary of such terms solely for purposes of enforcing the foregoing protections. Customer shall be responsible for any breach of such terms by its End Users. For purposes of Limitations of Liability as described in the Agreement, any claims brought by an End User relating to the Services shall be deemed claims by Customer and subject to the limitations and exclusions set forth therein. Similarly, Customer's indemnification obligations pursuant to the Agreement shall extend to any claim brought by an End User arising out of Customer's products or services, including Customer's integration with or use of the Services.
+
+## 3. Customer Responsibilities.
+
+### a. Capacity Planning and Management
+
+Customer will provide Supabase with at least three weeks prior written notice, or, if that is not reasonably practicable, as soon as reasonably possible after Customer becomes aware, of any Material Usage Event, including the expected start date and duration, anticipated peak and average request rates, expected storage/egress deltas, geographic distribution, and any relevant workload characteristics (e.g., burstiness, concurrency, long-running jobs, backfills); upon such notice, the Parties will cooperate in good faith on reasonable capacity planning measures, which may include enabling autoscaling parameters, staged rollouts, rate limiting, queueing strategies, partitioning/batching, (if applicable) non-production load tests during a mutually agreed window, and other configuration changes necessary to support the event.
+
+Supabase may pause any Customer or End User project that has experienced a continuous period of inactivity—defined as no API calls, no dashboard access, and no site visits—for at least five (5) consecutive days (an "**Inactivity Period**"). Supabase may pause a project immediately upon the end of the Inactivity Period. For clarity, pausing a project under this Section does not affect Customer's obligation to pay any accrued Fees.
+
+Supabase may implement reasonable rate limits, throttling, or other technical controls to protect platform stability and other customers. Supabase may suspend or restrict specific End User projects or traffic patterns that create disproportionate operational risk, abuse, or infrastructure strain.
+
+### b. Customer Control and Responsibility
+
+Customer has and will retain sole responsibility and liability for: (a) all Customer Data, including its content, accuracy, legality and use; (b) all information, instructions, and materials provided by or on behalf of Customer or any Authorized User or End User in connection with the Services; (c) Customer's information technology infrastructure, including computers, software, databases, electronic systems (including database management systems), and networks, whether operated directly by Customer or through the use of third-party services ("**Customer Systems**"); (d) the security and use of Customer's and its End Users' and Authorized Users' access credentials; and (e) all access to and use of the Services directly or indirectly by or through the Customer Systems or its or its End Users' and Authorized Users' access credentials, with or without Customer's knowledge or consent, including all results obtained from, and all conclusions, decisions, and actions based on, such access or use.
+
+### c. Security Measures
+
+Customer shall implement and maintain appropriate technical and organizational security measures consistent with industry standards to protect against unauthorized access, loss, or misuse of the Supabase platform and services. Under Supabase's shared responsibility model (found at https://supabase.com/docs/guides/deployment/shared-responsibility-model), Customer shall be solely responsible for the proper integration with, and configuration of, Supabase systems and services, including ensuring that Supabase is appropriately configured for use by its End Users. Customer shall take all reasonable steps to ensure that any integrations, access controls, environment variables, and data retention or exposure settings are secure and aligned with Supabase's documentation, recommendations, and best practices. Customer is required to use Supabase's Security Advisor feature and either directly act on all security alerts, or alternatively, notify End Users, on at least a weekly basis, of any outstanding security alerts to maintain the security of End User accounts. Supabase shall not be liable for any security incidents, data breaches, or system misuse resulting from Customer's misconfiguration, negligence, or failure to follow Supabase guidance. For the avoidance of doubt, Supabase shall have no liability, and Customer shall indemnify and hold Supabase harmless, for any security incident, privacy violation, breach of data protection or other applicable regulation, unauthorized access, or data breach to the extent arising from or relating to: (a) the design, configuration, or operation of the Customer's (or its End Users') application logic; (b) any third-party or Customer-developed prompts, AI models, training data, inference processes, fine-tuning, integrations, or outputs; (c) any use of Supabase's Services in conjunction with, or as integrated into, third-party platforms, tools, or Supabase for Platforms environments; or (d) any resulting data exposure, leakage, or misuse occurring outside of Supabase's reasonable control. This includes, without limitation, circumstances where Supabase's Services are embedded, wrapped, proxied, or otherwise made available through another service, such that Supabase does not control or configure the user interface, prompts, application flows, access controls, or post-processing of outputs. Supabase reserves the right to suspend or restrict Customer's access to the platform and services if it reasonably determines that Customer's use or configuration poses a material security or operational risk to Supabase's infrastructure, systems, or other customers.
+
+### d. Security Incidents and Vulnerabilities
+
+Customer shall notify Supabase without undue delay, and in any event within 48 hours of discovery, of any actual or suspected data breach, unauthorized access to data, data loss, security vulnerability, or other compromise of personal data or systems, or material misconfiguration that creates a significant risk of such compromise (hereafter, "**Reportable Incident**"), relating to its use of or integration with the Supabase platform or services. In the event of a suspected or confirmed Reportable Incident involving Customer's integration with or use of the Supabase platform and services, Supabase shall have the right to conduct a security review or technical audit, either directly or through third-party assessment. Customer shall cooperate reasonably and in good faith in the investigation, mitigation, remediation, and any required disclosure of such incidents, including providing access to relevant personnel, logs, and system information upon request.
+
+### e. Data Processing Addendum
+
+Each Party shall comply with applicable data protection laws. Customer represents and warrants that, wherein it is acting as a controller, it has obtained all required consents or has an independent legal basis for processing any personal data transmitted to Supabase and shall indemnify Supabase for any third-party claims arising from Customer's failure to do so. In the event of any conflict or inconsistency between the Agreement and the Data Processing Addendum with respect to the processing of personal data, the terms of the Data Processing Addendum shall govern. Customer acknowledges that it is responsible for obtaining all necessary End User consents and authorizations prior to allowing Supabase to process any personal data under the Agreement.
+
+### f. Monthly Project Classification Reporting
+
+Customer acknowledges that Supabase must distinguish between projects associated with Customer's free-tier End Users and paid-tier End Users for purposes of account administration and reporting. Accordingly, Customer shall, no later than the fifth (5th) business day of each calendar month, provide Supabase with an accurate report identifying and tagging all projects deployed on the Supabase platform in the prior month as either (a) free-tier End User projects or (b) paid-tier End User projects. For avoidance of doubt, Customer shall communicate and effectuate such classification by moving each project into one of two designated Customer organizations within the Supabase platform—one dedicated to free-tier End User projects and one dedicated to paid-tier End User projects—and Supabase shall rely on the organization in which a project resides as the definitive indicator of its classification. Customer shall ensure such tagging and organizational placement is complete, accurate, and updated monthly.
+
+### g. Support
+
+Customer shall provide first-line support to its End Users and shall be solely responsible for all communications, complaints, and claims raised by End Users. Supabase shall have no obligation to provide support, assistance, or responses directly to any End User.
+
+### h. Abuse Project Notification and Deactivation
+
+Customer shall promptly (and in no event later than twenty-four (24) hours) terminate, disable, or otherwise deactivate any project associated with an End User that Customer suspends, blocks, terminates, or otherwise restricts due to suspected or actual abuse, fraud, violation of applicable law, or breach of Customer's terms of service. To the extent Customer is technically unable to directly terminate or deactivate such project, Customer shall notify Supabase within twenty-four (24) hours and provide sufficient identifiers (including project IDs or other mutually agreed identifiers) to enable Supabase to take action. Customer shall implement and maintain an automated mechanism (including API-based signaling or other technical integrations specified by Supabase) to (i) effectuate such project deactivation and (ii) where applicable, transmit notices to Supabase in real time or near real time. Supabase reserves the right, but not the obligation, to independently suspend, throttle, restrict, or permanently disable any such project, End User, or associated resources. Customer shall be solely responsible for all Fees accrued in connection with any Supabase project associated with a Customer suspension, blocking, termination, or other restriction of an End User from the time of such action until the earlier of (i) the time such project is terminated, disabled, or deactivated by Customer in accordance with this Section 3(h), or (ii) twenty-four (24) hours following such action; provided that, if Customer fails to terminate, disable, or deactivate such project and provides notice to Supabase pursuant to this Section 3(h), Customer shall remain responsible for all Fees accrued until twenty-four (24) hours after Supabase receives such notice.
+
+## 4. Fees.
+
+Customer will pay Fees as described in the Agreement and as listed for Pro plan pricing at https://supabase.com/pricing, except as detailed in the table below. Supabase may modify its pricing upon at least thirty (30) days' prior written notice to Customer, with such changes taking effect at the start of the next billing period following the notice period. The Fees for SfP are as follows:
+
+|     | Fee Description    | Fee Amount (in USD)                                                                                   |
+| --- | ------------------ | ----------------------------------------------------------------------------------------------------- |
+| a.  | Compute Usage Fees | Compute: $0.03/hour/project, billed in 15-minute Compute Blocks at $0.0075 per block (see 4(a) below) |
+| b.  | Log Queries        | Ingestion $0.50/GB<br />Querying $0.002/GB<br />Logs are retained for 24 hours (See 4(d) below)       |
+| c.  | Other Usage Fees   | All other charges as listed for Pro plan pricing found at: https://supabase.com/pricing               |
+
+The following provisions apply with respect to the compute Fees listed in row (a) of the table above (the "**Compute Usage Fees**"):
+
+### a. Compute Blocks
+
+Compute Usage Fees are billed in fifteen (15)-minute increments (each, a "**Compute Block**"). Each hour is divided into four (4) Compute Blocks beginning at :00, :15, :30, and :45 (UTC). A Compute Block is billable if User Activity (as defined below) occurs during at least one minute of that block, regardless of the portion of the block during which the provisioned compute instance is actually in use. Each billable Compute Block is charged at one-quarter (1/4) of the applicable hourly rate.
+
+### b. User Activity
+
+For purposes of determining billable Compute Blocks only, "**User Activity**" means (i) any API request to the Supabase platform or (ii) any database query.
+
+### c. Inactive Compute Blocks
+
+A Compute Block in which no User Activity occurs is not billable. Billing shall recommence with the first Compute Block in which User Activity next occurs.
+
+The following provision applies with respect to Logs:
+
+### d. Log Retention
+
+Unless otherwise agreed in writing, Supabase will retain system and application logs for a standard retention period of twenty-four (24) hours, after which such logs may be automatically deleted in the ordinary course of operations.
