@@ -75,7 +75,7 @@ export function useCronJobsData({
     refetch: refetchCronJobs,
     fetchNextPage,
   } = useCronJobsInfiniteQuery(
-    { projectRef, connectionString, searchTerm: searchQuery ?? undefined },
+    { projectRef, connectionString, searchTerm: searchQuery },
     {
       enabled,
       placeholderData: Boolean(searchQuery) ? keepPreviousData : undefined,
@@ -95,7 +95,7 @@ export function useCronJobsData({
     refetch: refetchCronJobsMinimal,
     fetchNextPage: fetchNextPageMinimal,
   } = useCronJobsMinimalInfiniteQuery(
-    { projectRef, connectionString, searchTerm: searchQuery ?? undefined },
+    { projectRef, connectionString, searchTerm: searchQuery },
     {
       placeholderData: Boolean(searchQuery) ? keepPreviousData : undefined,
       staleTime: Infinity,
