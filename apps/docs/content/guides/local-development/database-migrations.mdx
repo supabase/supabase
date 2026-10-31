@@ -241,7 +241,7 @@ supabase link --project-ref <project-id>
 If your remote database already has schema changes that aren't in your local migrations (for example, tables you created directly in the Dashboard), capture them before you push:
 
 ```bash
-supabase db pull
+supabase db pull --remote
 supabase db reset
 ```
 
@@ -254,7 +254,7 @@ supabase db reset
 Deploy any local database migrations using [`db push`](/docs/reference/cli/usage#supabase-db-push):
 
 ```sh
-supabase db push
+supabase db push --remote
 ```
 
 Visiting your live project on [Supabase](/dashboard), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
@@ -292,20 +292,20 @@ If you have additional triggers or RLS policies defined on your `auth` schema, h
 
 <$Partial path="diff_engine_check.mdx" />
 
-On `pg-delta`, a plain `supabase db pull` captures your customizations automatically. Triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) and RLS policies on `auth` tables are included in the diff.
+On `pg-delta`, a plain `supabase db pull --remote` captures your customizations automatically. Triggers on managed tables (such as a trigger on `auth.users` calling a function in `public`) and RLS policies on `auth` tables are included in the diff.
 
 On the legacy `migra` engine, the initial pull's `pg_dump` skips the `auth` schema, but the diff pass that follows appends your triggers and RLS policies there to the same migration. Older CLI versions excluded the `auth` schema entirely and printed a message saying so. If you see that message, capture existing customizations once with an explicit pull:
 
 ```bash
-supabase db pull --schema auth
+supabase db pull --schema auth --remote
 ```
 
 ### Sync storage buckets
 
-On the `pg-delta` engine, your RLS policies on `storage.objects` and `storage.buckets` are also captured automatically by a plain `supabase db pull`. On the legacy `migra` engine, the diff pass that follows the initial `pg_dump` appends them to the same migration. If an older CLI prints a message that the `storage` schema was excluded, capture existing policies once with an explicit pull:
+On the `pg-delta` engine, your RLS policies on `storage.objects` and `storage.buckets` are also captured automatically by a plain `supabase db pull --remote`. On the legacy `migra` engine, the diff pass that follows the initial `pg_dump` appends them to the same migration. If an older CLI prints a message that the `storage` schema was excluded, capture existing policies once with an explicit pull:
 
 ```bash
-supabase db pull --schema storage
+supabase db pull --schema storage --remote
 ```
 
 The buckets and objects themselves are rows in the storage tables so they won't appear in your schema. You can instead define them via `supabase/config.toml` file. For example,
@@ -329,7 +329,7 @@ supabase seed buckets
 You can synchronize your database with a specific schema using the `--schema` option as follows:
 
 ```bash
-supabase db pull --schema <schema_name>
+supabase db pull --schema <schema_name> --remote
 ```
 
 <Admonition type="caution">
@@ -341,8 +341,8 @@ If the local `supabase/migrations` directory is empty, the `db pull` command wil
 To fix this, you can pull twice:
 
 ```bash
-supabase db pull
-supabase db pull --schema <schema_name>
+supabase db pull --remote
+supabase db pull --schema <schema_name> --remote
 ```
 
 </Admonition>

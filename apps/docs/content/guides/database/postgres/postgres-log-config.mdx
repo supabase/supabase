@@ -93,7 +93,7 @@ There are three potential ways to change log settings:
 ```sh
 supabase --experimental \
 postgres-config update --config log_lock_waits=true \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
 To remove overrides, you can run:
@@ -101,7 +101,7 @@ To remove overrides, you can run:
 ```sh
 supabase --experimental \
 postgres-config delete --config log_lock_waits,log_disconnections,... \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
     </AccordionItem>
@@ -214,7 +214,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 ```sh name=CLI
 supabase --experimental \
 postgres-config update --config log_autovacuum_min_duration=10ms \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
 </AccordionItem>
@@ -274,7 +274,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 ```sh name=CLI
 supabase --experimental \
 postgres-config update --config log_checkpoints=true \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
 </AccordionItem>
@@ -328,7 +328,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 ```sh name=CLI
 supabase --experimental \
 postgres-config update --config log_lock_waits=true \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
 ```sql name=SQL
@@ -379,7 +379,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 ```sh name=CLI
 supabase --experimental \
 postgres-config update --config log_recovery_conflict_waits=true \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
 </AccordionItem>
@@ -424,7 +424,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 ```sh name=CLI
 supabase --experimental \
 postgres-config update --config log_startup_progress_interval=1s \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
 </AccordionItem>
@@ -473,7 +473,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 ```sh name=CLI
 supabase --experimental \
 postgres-config update --config log_temp_files=10MB \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
 ```sql name=SQL
@@ -539,7 +539,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 ```sh name=CLI
 supabase --experimental \
 postgres-config update --config log_connections=true \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
   </AccordionItem>
@@ -589,7 +589,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 ```sh name=CLI
 supabase --experimental \
 postgres-config update --config log_disconnections=true \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
   </AccordionItem>
@@ -659,7 +659,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 ```sh name=CLI
 supabase --experimental \
 postgres-config update --config cron.log_statement=false --no-restart \
---project-ref <project-ref>
+--remote=<project-ref>
 ```
 
 </AccordionItem>
