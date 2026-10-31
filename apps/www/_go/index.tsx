@@ -33,6 +33,7 @@ import vercelShipSydneyContest from './events/vercel-ship-sydney-2026/contest'
 import vercelShipSydneyContestThankYou from './events/vercel-ship-sydney-2026/contest-thank-you'
 import askSupabaseSelect from './lead-gen/ask-supabase-select'
 import awsActivateOffer from './lead-gen/aws-activate-offer'
+import { buildWithChatgpt } from './lead-gen/build-with-chatgpt'
 import exampleLeadGen from './lead-gen/example-lead-gen'
 import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
@@ -43,6 +44,7 @@ import multigresEarlyAccessThankYou from './pre-release/multigres-early-access-t
 import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 
 const pages: GoPageInput[] = [
+  buildWithChatgpt,
   askSupabaseSelect, // maintain forever
   awsActivateOffer, // maintain forever
   exampleLeadGen, // sample lead gen page
