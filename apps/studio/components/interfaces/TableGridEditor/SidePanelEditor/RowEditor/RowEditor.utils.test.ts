@@ -1,4 +1,4 @@
-import { MAX_ARRAY_SIZE } from '@supabase/pg-meta/src/query/table-row-query'
+import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { describe, expect, it, vi } from 'vitest'
 
 import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
@@ -797,5 +797,103 @@ describe('generateUpdateRowPayload', () => {
     ]
     const payload = generateUpdateRowPayload({ id: '1', price: '100', is_discounted: true }, fields)
     expect(payload).toEqual({ price: '90' })
+  })
+
+  it('should omit untouched JSON column from update payload', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'name', format: 'text', value: 'Updated Name' }),
+      createField({ name: 'metadata', format: 'jsonb', value: JSON.stringify({ role: 'admin' }) }),
+    ]
+    const originalRow = {
+      id: '1',
+      name: 'Original Name',
+      metadata: { role: 'admin' },
+    }
+    const payload = generateUpdateRowPayload(originalRow, fields)
+    expect(payload).toEqual({ name: 'Updated Name' })
+  })
+
+  it('should include modified JSON column in update payload', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'metadata', format: 'jsonb', value: JSON.stringify({ role: 'editor' }) }),
+    ]
+    const originalRow = {
+      id: '1',
+      metadata: { role: 'admin' },
+    }
+    const payload = generateUpdateRowPayload(originalRow, fields)
+    expect(payload).toEqual({ metadata: { role: 'editor' } })
+  })
+
+  it('should omit untouched JSON column when formatting or whitespace differs', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({
+        name: 'metadata',
+        format: 'jsonb',
+        value: '{\n  "role": "admin",\n  "level": 2\n}',
+      }),
+    ]
+    const originalRow = {
+      id: '1',
+      metadata: { role: 'admin', level: 2 },
+    }
+    const payload = generateUpdateRowPayload(originalRow, fields)
+    expect(payload).toEqual({})
+  })
+
+  it('should omit untouched JSON column when originalRow holds stringified JSON', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'metadata', format: 'json', value: '{"active":true}' }),
+    ]
+    const originalRow = {
+      id: '1',
+      metadata: '{"active":true}',
+    }
+    const payload = generateUpdateRowPayload(originalRow, fields)
+    expect(payload).toEqual({})
+  })
+
+  it('should omit untouched JSON column when value is null', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'metadata', format: 'jsonb', value: null }),
+    ]
+    const originalRow = {
+      id: '1',
+      metadata: null,
+    }
+    const payload = generateUpdateRowPayload(originalRow, fields)
+    expect(payload).toEqual({})
+  })
+
+  it('should include JSON column when changed to null', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'metadata', format: 'jsonb', value: null }),
+    ]
+    const originalRow = {
+      id: '1',
+      metadata: { role: 'admin' },
+    }
+    const payload = generateUpdateRowPayload(originalRow, fields)
+    expect(payload).toEqual({ metadata: null })
+  })
+
+  it('should not include truncated JSON columns even if edited', () => {
+    const largeValue = '{"data":"' + 'x'.repeat(MAX_CHARACTERS) + '...'
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'metadata', format: 'jsonb', value: largeValue }),
+    ]
+    const originalRow = {
+      id: '1',
+      metadata: { data: 'original' },
+    }
+    const payload = generateUpdateRowPayload(originalRow, fields)
+    expect(payload).toEqual({})
   })
 })
