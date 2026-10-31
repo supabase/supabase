@@ -1,15 +1,25 @@
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import {
+  ChevronDownIcon,
   LockKeyholeIcon,
   PlusIcon,
   RectangleEllipsisIcon,
+  RefreshCwIcon,
   ShieldCheckIcon,
   TrashIcon,
 } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { Button, Card, CardContent, cn } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
@@ -62,6 +72,12 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
   })
   const { data: codes, status } = recoveryCodesStatus ?? {}
   const factorFinding = findings.find((finding) => finding.id === 'single-mfa-factor')
+  const codeFinding = findings.find(
+    (finding) => finding.action === 'generate-codes' || finding.action === 'regenerate-codes'
+  )
+  const isCodeActionPrimary =
+    primaryAction === 'generate-codes' || primaryAction === 'regenerate-codes'
+
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
   const disableDeleteFactor =
@@ -165,44 +181,147 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
         </PageSectionContent>
       </PageSection>
 
-      {shouldVerifyRecoveryCodes && (
-        <PageSection>
+      {enableAuthRecoveryCodes && (
+        <PageSection id="recovery-codes" className="scroll-mt-6">
           <PageSectionMeta>
             <PageSectionSummary>
               <PageSectionTitle>Recovery codes</PageSectionTitle>
               <PageSectionDescription>
-                Recovery codes allow you to recover your account in case you lost access to your MFA
-                apps.
+                Recover your account in case you lose access to your MFA methods.
               </PageSectionDescription>
             </PageSectionSummary>
           </PageSectionMeta>
-          <PageSectionContent aria-live="polite">
+          <PageSectionContent aria-live="polite" className="flex flex-col gap-4">
+            {isLoading && <GenericSkeletonLoader />}
+            {isError && (
+              <p className="text-sm text-foreground-lighter">
+                Recovery code status is unavailable until your MFA methods can be checked.
+              </p>
+            )}
+            {isSuccess && totpFactors.length === 0 && (
+              <EmptyStatePresentational
+                icon={RectangleEllipsisIcon}
+                title="Set up recovery codes"
+                description="Enable multi-factor authentication first, then generate codes to recover access if you lose your authenticator."
+              >
+                <Button variant="default" icon={<PlusIcon />} onClick={handleAddNewApp}>
+                  Set up MFA first
+                </Button>
+              </EmptyStatePresentational>
+            )}
             {recoveryCodesIsError && (
               <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />
             )}
-            {status === 'unenrolled' && <GenerateRecoveryCodesModal />}
-            {status === 'available' && codes && (
-              <Card>
-                <CardContent className="flex items-center justify-between">
-                  <div className="flex items-center gap-x-4">
-                    <div className="w-9 h-9 rounded-full bg-selection flex items-center justify-center">
-                      <RectangleEllipsisIcon size={18} className="text-foreground-lighter" />
-                    </div>
-                    <div className="text-sm">
-                      <p className={cn(codes.remaining < 2 ? 'text-warning' : '')}>
-                        {codes.remaining}/{codes.total} recovery codes available
-                      </p>
-                      <p className="text-foreground-lighter">Each code can only be used once</p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 ml-auto">
-                    <RegenerateRecoveryCodesModal />
-                    <UnenrollRecoveryCodesModal />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {shouldVerifyRecoveryCodes && recoveryCodesIsPending && <GenericSkeletonLoader />}
+            <GenerateRecoveryCodesModal>
+              {({ onClick, isPending }) =>
+                shouldVerifyRecoveryCodes && status === 'unenrolled' && !recoveryCodesIsError ? (
+                  <>
+                    {codeFinding && (
+                      <Admonition
+                        type="warning"
+                        title="No recovery codes"
+                        description="Save recovery codes so you can sign in if you lose access to your authenticator."
+                      />
+                    )}
+                    <EmptyStatePresentational
+                      icon={RectangleEllipsisIcon}
+                      title="Set up recovery codes"
+                      description="Save a backup way to sign in if you lose your authenticator."
+                    >
+                      <Button
+                        variant={isCodeActionPrimary ? 'primary' : 'default'}
+                        onClick={onClick}
+                        loading={isPending}
+                      >
+                        Generate recovery codes
+                      </Button>
+                    </EmptyStatePresentational>
+                  </>
+                ) : null
+              }
+            </GenerateRecoveryCodesModal>
+            <UnenrollRecoveryCodesModal>
+              {({ onClick: onRemove }) => (
+                <RegenerateRecoveryCodesModal>
+                  {({ onClick, isPending }) => {
+                    if (
+                      !shouldVerifyRecoveryCodes ||
+                      status !== 'available' ||
+                      !codes ||
+                      recoveryCodesIsError
+                    )
+                      return null
+                    const action = (
+                      <div className="flex w-fit">
+                        <Button
+                          variant={isCodeActionPrimary ? 'primary' : 'default'}
+                          className="flex-1 @lg:flex-none rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
+                          icon={<RefreshCwIcon />}
+                          onClick={onClick}
+                          loading={isPending}
+                        >
+                          Regenerate
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant={isCodeActionPrimary ? 'primary' : 'default'}
+                              aria-label="Recovery code options"
+                              className="shrink-0 rounded-l-none px-1 py-1.25 -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                              icon={<ChevronDownIcon />}
+                            />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem onSelect={onRemove}>Remove codes</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )
+                    return (
+                      <>
+                        {codeFinding && (
+                          <Admonition
+                            type={codeFinding.severity === 'critical' ? 'destructive' : 'warning'}
+                            title={
+                              codeFinding.id === 'recovery-codes-exhausted'
+                                ? 'Recovery codes used up'
+                                : `${codes.remaining} recovery ${codes.remaining === 1 ? 'code' : 'codes'} remaining`
+                            }
+                            description={
+                              codeFinding.id === 'recovery-codes-exhausted'
+                                ? 'Generate a new set so you have a backup way to sign in.'
+                                : 'Generate a new set before you need them to recover your account.'
+                            }
+                          />
+                        )}
+                        <Card>
+                          <CardContent className="flex flex-wrap items-center justify-between gap-4">
+                            <div className="flex items-center gap-x-4">
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+                                <RectangleEllipsisIcon
+                                  size={18}
+                                  className="text-foreground-lighter"
+                                />
+                              </div>
+                              <div className="text-sm">
+                                <p>
+                                  {codes.remaining} of {codes.total} recovery codes available
+                                </p>
+                                <p className="text-foreground-lighter">
+                                  Each code can only be used once. Keep them somewhere safe.
+                                </p>
+                              </div>
+                            </div>
+                            {action}
+                          </CardContent>
+                        </Card>
+                      </>
+                    )
+                  }}
+                </RegenerateRecoveryCodesModal>
+              )}
+            </UnenrollRecoveryCodesModal>
           </PageSectionContent>
         </PageSection>
       )}
