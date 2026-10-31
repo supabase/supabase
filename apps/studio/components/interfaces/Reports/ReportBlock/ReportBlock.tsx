@@ -10,7 +10,6 @@ import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
 import { LogsSnippetReportBlock } from './LogsSnippetReportBlock'
 import { UnavailableChartBlock } from './UnavailableChartBlock'
-import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '@/components/ui/QueryBlock/QueryBlock'
@@ -21,7 +20,7 @@ import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { sqlKeys } from '@/data/sql/keys'
 import { applyAutoLimit } from '@/data/sql/utils'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards, SqlSnippets } from '@/types'
 
@@ -54,14 +53,12 @@ export const ReportBlock = ({
 }: ReportBlockProps) => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
-  const { data: project } = useSelectedProjectQuery()
 
   const [isWriteQuery, setIsWriteQuery] = useState(false)
 
   const isSnippet = item.attribute.startsWith('snippet_')
-  const isUnavailableBurstChart =
-    BURSTABLE_IO_METRIC_KEYS.includes(item.attribute) &&
-    !hasBurstableIO(project?.infra_compute_size)
+  const { isBurstable } = useProjectDiskLimits()
+  const isUnavailableBurstChart = BURSTABLE_IO_METRIC_KEYS.includes(item.attribute) && !isBurstable
 
   const {
     data,

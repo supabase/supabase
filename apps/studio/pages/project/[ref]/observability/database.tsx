@@ -41,6 +41,7 @@ import { useDatabaseReport } from '@/data/reports/database-report-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -213,6 +214,7 @@ const DatabaseUsage = () => {
   const isSpendCapEnabled = entitledFeatures.includes('database') && !org?.usage_billing_enabled
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
+  const { limits: projectDiskLimits } = useProjectDiskLimits()
   const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
   const showMemoryCommitmentRiskZones = useFlag('showMemoryCommitmentRiskZones')
   const memoryCommitmentPreview = useMemoryCommitmentPreview(ref)
@@ -231,7 +233,8 @@ const DatabaseUsage = () => {
     isSpendCapEnabled,
     showDiskIOBurstBalanceChart,
     showMemoryCommitmentChart,
-    showMemoryCommitmentRiskZones
+    showMemoryCommitmentRiskZones,
+    projectDiskLimits
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({

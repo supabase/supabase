@@ -23,13 +23,12 @@ import {
   getUsageMetricStatus,
   type UsageMetricStatus,
 } from './ComputeAndDiskUsageCharts.utils'
-import { hasBurstableIO } from './DiskManagement.utils'
 import type { InfraMonitoringAttribute } from '@/data/analytics/infra-monitoring-query'
 import {
   getInfraMonitoringAttributes,
   useInfraMonitoringAttributesQuery,
 } from '@/data/analytics/infra-monitoring-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { formatBytes } from '@/lib/helpers'
 
 const USAGE_ATTRIBUTES = [
@@ -100,8 +99,7 @@ const getUsageCardClassName = (status: UsageMetricStatus) =>
 
 export const ComputeAndDiskUsageCharts = ({ className }: { className?: string }) => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const supportsBurstableIO = hasBurstableIO(project?.infra_compute_size)
+  const { isBurstable: supportsBurstableIO } = useProjectDiskLimits()
 
   // Anchor query key dates to mount time; fetch uses a rolling 7-day window on each refetch.
   const { startDate, endDate } = useMemo(getRollingWindow, [])
