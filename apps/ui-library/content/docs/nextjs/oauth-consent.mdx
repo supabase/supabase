@@ -38,7 +38,7 @@ try {
 
 Set the `productName` prop to replace the `Your product` placeholder in the consent header.
 
-Your middleware must let unauthenticated requests reach `/oauth/consent`. The middleware in `lib/supabase/middleware.ts` exempts only `/oauth/consent`. Middleware that redirects to a login page before the consent route runs drops the authorization and ends the OAuth flow at your login screen.
+Your proxy must let unauthenticated requests reach `/oauth/consent`. The proxy in `lib/supabase/proxy.ts` exempts only `/oauth/consent`. A proxy that redirects to a login page before the consent route runs drops the authorization and ends the OAuth flow at your login screen.
 
 ### Getting started
 
