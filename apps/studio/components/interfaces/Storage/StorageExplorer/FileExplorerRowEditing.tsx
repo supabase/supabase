@@ -67,10 +67,11 @@ export const FileExplorerRowEditing = ({
   }
 
   useEffect(() => {
-    // select just the name of the file without the extension
+    // Select the full folder name or the file name without the extension
     if (inputRef.current) {
       const dotIndex = item.name.lastIndexOf('.')
-      const selectionEnd = dotIndex !== -1 ? dotIndex : item.name.length
+      const selectionEnd =
+        dotIndex !== -1 && item.type === STORAGE_ROW_TYPES.FILE ? dotIndex : item.name.length
       inputRef.current.setSelectionRange(0, selectionEnd)
       inputRef.current.focus()
     }
