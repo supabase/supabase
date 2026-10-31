@@ -1,0 +1,112 @@
+---
+title: 'Enterprise-Managed Authorization for MCP'
+description: "Let your identity provider, or Claude on its behalf, automatically authorize your organization's use of the Supabase MCP Server, without per-user OAuth prompts."
+---
+
+<Admonition type="note">
+
+This feature is only available on the [Team and Enterprise Plans](/pricing).
+
+</Admonition>
+
+Let your identity provider (IdP), or Claude on its behalf, authorize the [Supabase MCP Server](/docs/guides/ai-tools/mcp) for your whole organization. Normally, each member signs in and approves their AI tool's connection individually. With enterprise-managed authorization, after your IdP and MCP client trust each other for single sign-on (SSO), members get access without a separate approval prompt.
+
+This page covers the Supabase MCP Server. If you're building your own MCP server backed by Supabase Auth, see [Model Context Protocol (MCP) Authentication](/docs/guides/auth/oauth-server/mcp-authentication) instead.
+
+This feature is Supabase's implementation of the MCP specification's [Enterprise-Managed Authorization extension](https://modelcontextprotocol.io/extensions/auth/enterprise-managed-authorization). It relies on an _Identity Assertion JWT Authorization Grant_ (ID-JAG), issued by your IdP or by Claude.
+
+## Prerequisites
+
+Before members can use enterprise-managed authorization:
+
+- **SSO must be configured** for your organization. To set it up, see [Enable SSO for your organization](/docs/guides/platform/sso).
+- **Your identity provider, or Claude, must issue ID-JAGs** for MCP's Enterprise-Managed Authorization extension. Check with your IdP whether it supports the extension and how to enable it. If it doesn't and your members use Claude, see [Using Claude as the ID-JAG issuer](#using-claude-as-the-id-jag-issuer).
+- **The MCP client must be authorized for your organization.** An organization owner or admin authorizes the client once. They connect it to Supabase through the standard sign-in flow and approve it for your organization on the consent screen. The approved client then appears under [**Authorized apps**](/dashboard/org/_/apps) in your organization settings, where you can review or revoke it.
+
+## Who's involved
+
+The following parties take part in the flow:
+
+| Party                                         | Role                                                                                                                                         |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Identity provider (IdP)**, for example Okta | Signs your members in via SSO, and issues the MCP client an ID-JAG scoped for Supabase when asked                                            |
+| **MCP client**                                | The AI tool your members use. It signs the member in to the IdP, requests the ID-JAG, then presents it to Supabase                           |
+| **Supabase**                                  | Runs the MCP Server your client ultimately calls, and the OAuth server that validates the ID-JAG and issues the access token used to call it |
+
+## How it works
+
+1. **Member signs in to the MCP client via your IdP**, using the same SSO sign-in your members already use, over OpenID Connect (OIDC) or SAML. The IdP returns an identity token to the MCP client.
+2. **MCP client exchanges that identity token for an ID-JAG, at the IdP.** This is a separate request the client makes to the IdP (an [RFC 8693](https://datatracker.ietf.org/doc/html/rfc8693) token exchange), asking for a token scoped specifically to Supabase. The IdP checks its own policy before issuing one.
+3. **IdP returns the ID-JAG to the MCP client.**
+4. **MCP client presents the ID-JAG to Supabase's OAuth server**, using it as a [JWT authorization grant](https://datatracker.ietf.org/doc/html/rfc7523), with no interactive consent screen.
+5. **Supabase validates the ID-JAG.** It checks the signature against your IdP's public keys and confirms the member belongs to your organization with a matching SSO identity. It also confirms an organization owner or admin has authorized the MCP client. If all checks pass, Supabase issues a short-lived access token.
+6. **MCP client calls the Supabase MCP Server** using that access token, same as any other authenticated request.
+
+The MCP client repeats the ID-JAG exchange whenever the access token expires.
+
+When Claude is the issuer, the ID-JAG exchange happens inside Claude rather than at your IdP. Supabase then checks the ID-JAG against Claude's public keys instead of your IdP's. Sign-in and the call to the MCP Server are unchanged.
+
+## Why use enterprise-managed authorization
+
+Without enterprise-managed authorization, every member has to connect and authorize the MCP client manually, and do it again whenever access expires. At the scale of an organization, this manual flow creates:
+
+- **Onboarding friction**: new members have to discover and go through the approval flow themselves.
+- **No central control**: admins can't see or revoke the MCP client's access at the organization level; it's spread across individual user approvals.
+- **Inconsistent access**: a member's access through the MCP client can drift from the role your IdP assigns them.
+
+With enterprise-managed authorization, an organization owner or admin authorizes the MCP client once for the whole organization. From then on, access follows your SSO sign-in, with no separate approval and no manual reconnection when a token expires.
+
+## Configuring your ID-JAG issuer
+
+After SSO is set up, an organization owner can add the ID-JAG issuer URL from your identity provider:
+
+1. Go to the [**SSO**](/dashboard/org/_/sso) page of your organization settings.
+2. Open **Advanced settings**.
+3. In the **ID-JAG Issuer** field, enter your identity provider's issuer URL.
+
+<Admonition type="note">
+
+Because SAML assertions don't carry the issuer URL, Supabase can't derive it from your metadata and you have to enter it yourself. Your IdP's documentation lists it as the `iss` claim on the tokens it issues, usually the same base URL used for OIDC discovery.
+
+</Admonition>
+
+After you save, Supabase uses the URL to fetch your IdP's public keys and verify ID-JAGs presented by your MCP client on behalf of your members.
+
+### Using Claude as the ID-JAG issuer
+
+If your IdP doesn't issue ID-JAGs and your members use Claude, Claude can issue them instead. Your members still sign in to Claude through your IdP. Claude then issues the ID-JAG for Supabase on their behalf.
+
+Because Supabase validates ID-JAGs against whichever issuer you configure, the only Supabase-side change is the URL you enter. The Claude issuer URL is fixed for your Claude organization, and you enter it once.
+
+<Admonition type="caution">
+
+Entering the Claude issuer URL replaces your IdP's issuer URL for that SSO provider. Supabase then rejects ID-JAGs issued by your IdP until you restore the IdP's URL.
+
+</Admonition>
+
+To use Claude as the issuer:
+
+1. In Claude, go to **Organization settings** > **Connectors** and select the Supabase connector.
+2. On the **Configuration** tab, next to **Managed authorization**, click **Set up**.
+3. In the **Connect** step, copy the **Issuer URL**. Leave **Tenant ID** empty, because Supabase doesn't use one.
+4. In the Supabase Dashboard, follow [Configuring your ID-JAG issuer](#configuring-your-id-jag-issuer) and enter the Claude issuer URL in the **ID-JAG Issuer** field.
+5. In Claude, in the **Connect** step, confirm that every check passes, including **Exchange for access token** and **Probe connector**. If a check fails, correct the issuer URL and click **Run again**.
+
+For more information about the Claude side of the setup, see Anthropic's guide [Authorize MCP connectors for your entire organization](https://support.claude.com/en/articles/15537633-authorize-mcp-connectors-for-your-entire-organization).
+
+The following constraints apply when Claude is the issuer:
+
+- **Members still need an SSO identity in Supabase.** Supabase matches the ID-JAG's email against members who signed in to your organization through SSO. A member must sign in to Supabase through your SSO provider at least once before a Claude-issued ID-JAG works for them.
+- **Disabling a member in your IdP doesn't cut off their access.** Your IdP issues an ID-JAG only while the member has an active session with it. Claude issues one whenever its own records show the member belongs to your Claude organization and has a verified email address. Neither Claude nor Supabase checks back with your IdP. The member keeps access until you remove them from your Supabase organization or their Claude organization membership ends.
+
+## Security considerations
+
+- **Access is always scoped to the user.** An ID-JAG can never grant access beyond what the authenticated member already has permission to see.
+- **The MCP client must be explicitly authorized.** Adding an ID-JAG issuer alone doesn't grant it access. An organization owner or admin still has to approve it once through the standard sign-in flow. Approved clients are listed under **Authorized apps** in your organization settings.
+- **Access tokens are short-lived and non-renewable.** There's no refresh token.
+- **Revoke access at the source.** To revoke the MCP client for your whole organization, remove its authorization under **Authorized apps**. To revoke a single member's access, remove the member from the organization in the Supabase Dashboard.
+
+## Next steps
+
+- [Enable SSO for your organization](/docs/guides/platform/sso)
+- [Enterprise-Managed Authorization for MCP (blog post)](https://blog.modelcontextprotocol.io/posts/enterprise-managed-auth/)

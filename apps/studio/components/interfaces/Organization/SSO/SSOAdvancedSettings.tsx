@@ -12,8 +12,8 @@ export const SSOAdvancedSettings = ({ form }: { form: UseFormReturn<SSOConfigFor
     title="Advanced settings"
     description={
       <>
-        Required for enterprise-managed MCP authentication.{' '}
-        <InlineLink href={`${DOCS_URL}/guides/platform/sso/enterprise-mcp-authentication`}>
+        Required for enterprise-managed MCP authorization.{' '}
+        <InlineLink href={`${DOCS_URL}/guides/platform/sso/enterprise-mcp-authorization`}>
           Learn more
         </InlineLink>
         .
