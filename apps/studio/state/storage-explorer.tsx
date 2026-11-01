@@ -871,9 +871,11 @@ export function createStorageExplorerState({
 
         if (state.selectedBucket.public) {
           for (const filePath of filePaths) {
+            const encodedBucketId = encodeURIComponent(state.selectedBucket.id)
+            const encodedFilePath = filePath.split('/').map(encodeURIComponent).join('/')
             urlByPath.set(
               filePath,
-              `${clientEndpoint}/storage/v1/object/public/${state.selectedBucket.id}/${filePath}`
+              `${clientEndpoint}/storage/v1/object/public/${encodedBucketId}/${encodedFilePath}`
             )
           }
         } else {
