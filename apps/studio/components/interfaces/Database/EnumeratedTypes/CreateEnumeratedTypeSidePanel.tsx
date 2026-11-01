@@ -13,15 +13,12 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircleIcon, ExternalLinkIcon, PlusIcon } from 'lucide-react'
+import { ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
   Button,
   cn,
   Form,
@@ -40,6 +37,7 @@ import { NATIVE_POSTGRES_TYPES } from './EnumeratedTypes.constants'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 import { useEnumeratedTypeCreateMutation } from '@/data/enumerated-types/enumerated-type-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { Admonition } from 'ui-patterns/Admonition'
 
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -183,25 +181,24 @@ const CreateEnumeratedTypeSidePanel = ({
               >
                 Values
               </span>
-              <Alert>
-                <AlertCircleIcon strokeWidth={1.5} />
-                <AlertTitle>After creation, values cannot be deleted or sorted</AlertTitle>
-                <AlertDescription>
-                  <p className="leading-normal! track">
-                    You will need to delete and recreate the enumerated type with the updated values
-                    instead.
-                  </p>
-                  <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
-                    <Link
-                      href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Learn more
-                    </Link>
-                  </Button>
-                </AlertDescription>
-              </Alert>
+              <Admonition
+                type="default"
+                title="After creation, values cannot be deleted or sorted"
+              >
+                <p className="leading-normal! track">
+                  You will need to delete and recreate the enumerated type with the updated values
+                  instead.
+                </p>
+                <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
+                  <Link
+                    href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Learn more
+                  </Link>
+                </Button>
+              </Admonition>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
