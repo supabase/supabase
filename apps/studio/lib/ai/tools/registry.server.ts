@@ -9,9 +9,11 @@ import { createTool as createGetActiveIncidents } from './get-active-incidents.s
 import { createTool as createGetNotebook } from './get-notebook.server'
 import { createTool as createGetReport } from './get-report.server'
 import { createTool as createListDatabases } from './list-databases.server'
+import { createTool as createListFunctions } from './list-functions.server'
 import { createTool as createListNotebooks } from './list-notebooks.server'
 import { createTool as createListPolicies } from './list-policies.server'
 import { createTool as createListReports } from './list-reports.server'
+import { createTool as createListTables } from './list-tables.server'
 import { createTool as createLoadKnowledge } from './load-knowledge.server'
 import {
   isToolAvailable,
@@ -40,9 +42,11 @@ export const TOOL_FACTORIES = {
   get_notebook: createGetNotebook,
   get_report: createGetReport,
   list_databases: createListDatabases,
+  list_functions: createListFunctions,
   list_notebooks: createListNotebooks,
   list_policies: createListPolicies,
   list_reports: createListReports,
+  list_tables: createListTables,
   load_knowledge: createLoadKnowledge,
   rename_chat: createRenameChat,
   resolve_support_conversation: createResolveSupportConversation,
