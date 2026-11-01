@@ -173,7 +173,7 @@ const CreateEnumeratedTypeSidePanel = ({
               )}
             />
 
-            <div>
+            <div className="space-y-4">
               <span
                 className={cn(
                   'text-foreground-light text-sm',
