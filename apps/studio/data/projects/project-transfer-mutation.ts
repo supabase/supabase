@@ -18,14 +18,13 @@ export async function transferProject({
   if (!projectRef) throw new Error('projectRef is required')
   if (!targetOrganizationSlug) throw new Error('targetOrganizationSlug is required')
 
-  const { data, error } = await post('/v2/projects/{ref}/transfers', {
+  const payload: { target_organization_slug: string } = {
+    target_organization_slug: targetOrganizationSlug,
+  }
+
+  const { data, error } = await post('/platform/projects/{ref}/transfer', {
     params: { path: { ref: projectRef } },
-    body: {
-      data: {
-        type: 'project_transfer_input',
-        attributes: { target_organization_slug: targetOrganizationSlug },
-      },
-    },
+    body: payload,
   })
   if (error) handleError(error)
   return data

@@ -1,5 +1,12 @@
 import { Auth, Compute, EdgeFunctions, Realtime, Storage } from 'icons'
-import { BoxIcon, CableIcon, Code2Icon, DatabaseIcon, NetworkIcon } from 'lucide-react'
+import {
+  BoxIcon,
+  CableIcon,
+  Code2Icon,
+  DatabaseIcon,
+  NetworkIcon,
+  TerminalIcon,
+} from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface LogTypeIconProps {
@@ -17,6 +24,7 @@ const ICON_MAP = new Map<string, IconComponent>([
   ['postgrest', Code2Icon],
   ['auth', Auth],
   ['edge function', EdgeFunctions],
+  ['edge function runtime', TerminalIcon],
   ['postgres', DatabaseIcon],
   ['storage', Storage],
   ['realtime', Realtime],

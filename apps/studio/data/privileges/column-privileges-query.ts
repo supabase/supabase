@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { executeSql } from '../sql/execute-sql-mutation'
 import { privilegeKeys } from './keys'
 import type { components } from '@/data/api'
+import { unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ColumnPrivilegesVariables = {
@@ -40,7 +41,10 @@ export async function getColumnPrivileges(
     relationName: table,
   }).sql
   const queryKey = ['column-privileges', schema, table]
-  const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey, grant: unguarded.migrating },
+    signal
+  )
   return result as ColumnPrivilegesData
 }
 

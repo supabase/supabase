@@ -9,12 +9,14 @@ import {
   type GitHubConfigDriftSummary,
 } from '@/components/interfaces/ConfigDrift/github-config-drift'
 import type { Branch } from '@/data/branches/branches-query'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useGitHubConfigQuery } from '@/data/config/github-config-query'
 import { projectConfigV2QueryOptions } from '@/data/config/project-config-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 const EMPTY_SUMMARY: GitHubConfigDriftSummary = {
   driftedFields: [],
@@ -35,9 +37,15 @@ export function useSelectedGitHubConfigDrift() {
   const projectQuery = useSelectedProjectQuery()
   const project = projectQuery.data
   const parentProjectRef = project?.parentRef ?? projectRef
-  const shouldLoad = IS_PLATFORM && Boolean(projectRef) && Boolean(project)
-
-  const branchesQuery = useBranchesQuery({ projectRef: parentProjectRef }, { enabled: shouldLoad })
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+  const isPermissionDenied = branchesGrant.status === 'denied'
+  const shouldLoad = IS_PLATFORM && Boolean(projectRef) && Boolean(project) && !isPermissionDenied
+  const branchesQuery = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    enabled: shouldLoad,
+  })
   const connectionQuery = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
   const connection = connectionQuery.data
   const hasConnection = connection !== undefined
@@ -57,21 +65,29 @@ export function useSelectedGitHubConfigDrift() {
     { enabled: queriesEnabled }
   )
 
+  const { refetch: permissionsRefetch } = usePermissionsQueryV2()
   const { refetch: branchesRefetch } = branchesQuery
   const { refetch: connectionRefetch } = connectionQuery
   const { refetch: projectConfigRefetch } = projectConfigQuery
   const { refetch: githubConfigRefetch } = githubConfigQuery
 
-  const refetch = useCallback(
-    () =>
-      Promise.all([
-        branchesRefetch(),
-        connectionRefetch(),
-        projectConfigRefetch(),
-        githubConfigRefetch(),
-      ]),
-    [branchesRefetch, connectionRefetch, projectConfigRefetch, githubConfigRefetch]
-  )
+  const isGrantError = branchesGrant.status === 'error'
+  const refetch = useCallback(() => {
+    if (isGrantError) return Promise.all([permissionsRefetch(), connectionRefetch()])
+    return Promise.all([
+      branchesRefetch(),
+      connectionRefetch(),
+      projectConfigRefetch(),
+      githubConfigRefetch(),
+    ])
+  }, [
+    isGrantError,
+    permissionsRefetch,
+    branchesRefetch,
+    connectionRefetch,
+    projectConfigRefetch,
+    githubConfigRefetch,
+  ])
 
   const driftResult = useMemo((): ConfigDriftMemoResult => {
     let dashboardConfig
@@ -104,10 +120,19 @@ export function useSelectedGitHubConfigDrift() {
   const summary = driftResult.status === 'success' ? driftResult.summary : EMPTY_SUMMARY
   const conversionError = driftResult.status === 'error' ? driftResult.error : undefined
 
+  const branchesState = {
+    isPending:
+      branchesGrant.status === 'loading' ||
+      (branchesGrant.status === 'granted' && branchesQuery.isPending),
+    isFetching: branchesQuery.isFetching,
+    isError: branchesQuery.isError || branchesGrant.status === 'error',
+    error: branchesGrant.status === 'error' ? branchesGrant.error : branchesQuery.error,
+  }
+
   const activeQueries = [
     projectQuery,
-    ...(shouldLoad ? [branchesQuery, connectionQuery] : []),
-    ...(shouldLoad && hasConnection ? [projectConfigQuery, githubConfigQuery] : []),
+    ...(shouldLoad ? [branchesState, connectionQuery] : []),
+    ...(queriesEnabled ? [projectConfigQuery, githubConfigQuery] : []),
   ]
 
   const isReady =
@@ -124,6 +149,7 @@ export function useSelectedGitHubConfigDrift() {
   return {
     requestedGitBranch: gitBranch,
     isReady,
+    isPermissionDenied,
     isPending: activeQueries.some((query) => query.isPending),
     isFetching: activeQueries.some((query) => query.isFetching),
     isError: activeQueries.some((query) => query.isError) || conversionError !== undefined,

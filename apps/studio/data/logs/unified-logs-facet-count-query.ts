@@ -89,7 +89,7 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) => {
-  const useOtel = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend(search)
   const scopedSearch =
     facet === 'pathname'
       ? {
@@ -101,18 +101,17 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
       : search
   const facetScope = {
     ...scopedSearch,
-    latency: null,
-    'timing.dns': null,
-    'timing.connection': null,
-    'timing.tls': null,
-    'timing.ttfb': null,
-    'timing.transfer': null,
-    sort: null,
+    latency: undefined,
+    'timing.dns': undefined,
+    'timing.connection': undefined,
+    'timing.tls': undefined,
+    'timing.ttfb': undefined,
+    'timing.transfer': undefined,
+    sort: undefined,
     size: 40,
     start: 0,
     direction: 'next' as const,
     cursor: new Date(0),
-    id: null,
   }
   return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: [

@@ -112,7 +112,7 @@ const PipelineOverviewSkeleton = () => (
  * Supports both legacy 'error' state and new 'errored' state with retry policies.
  */
 export const ReplicationPipelineStatus = () => {
-  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
+  const { ref: projectRef, pipelineId } = useParams()
   const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
   const [showErrorDialog, setShowErrorDialog] = useState(false)
@@ -130,7 +130,6 @@ export const ReplicationPipelineStatus = () => {
   const [showBatchRestartDialog, setShowBatchRestartDialog] = useState(false)
   const [batchRestartMode, setBatchRestartMode] = useState<'all' | 'errored' | null>(null)
   const [resettingTableIds, setResettingTableIds] = useState<Set<number>>(new Set())
-  const pipelineId = Number(_pipelineId)
   const { getRequestStatus, isRequestPending } = usePipelineRequestStatus()
   const requestStatus = getRequestStatus(pipelineId)
 

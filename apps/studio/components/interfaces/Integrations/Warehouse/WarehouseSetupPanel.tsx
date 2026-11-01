@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -12,15 +13,49 @@ import {
   WarehouseReplicatedTablesSection,
 } from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useWarehouseDisableMutation } from '@/data/warehouse/warehouse-disable-mutation'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
+import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
 
 export const WarehouseSetupPanel = () => {
+  const [statusMessage, setStatusMessage] = useState('')
+  const statusRef = useRef<HTMLParagraphElement>(null)
+
+  useEffect(() => {
+    if (statusMessage) statusRef.current?.focus()
+  }, [statusMessage])
+
+  return (
+    <>
+      <p ref={statusRef} role="status" tabIndex={-1} className="sr-only">
+        {statusMessage}
+      </p>
+      <WarehouseSetupPanelContent onStatusChange={setStatusMessage} />
+    </>
+  )
+}
+
+const WarehouseSetupPanelContent = ({
+  onStatusChange,
+}: {
+  onStatusChange: (message: string) => void
+}) => {
   const { ref: projectRef } = useParams()
   const track = useTrack()
+  const isOrioleDb = useIsOrioleDb()
+  const {
+    isPending: isProjectPending,
+    isSuccess: isProjectSuccess,
+    isFetched: isProjectFetched,
+    isFetching: isProjectFetching,
+    error: projectError,
+    refetch: refetchProject,
+  } = useSelectedProjectQuery()
 
   const { data, isPending, isFetching, isError, error, refetch } = useWarehouseSetupStatusQuery(
     { projectRef },
@@ -33,6 +68,36 @@ export const WarehouseSetupPanel = () => {
     }
   )
 
+  const shouldCheckCatalogCompatibility =
+    data?.setup_status === 'not_started' ||
+    data?.setup_status === 'disabled' ||
+    data?.setup_status === 'error'
+
+  const {
+    data: destinations,
+    isPending: isDestinationsPending,
+    isSuccess: isDestinationsSuccess,
+    isFetched: isDestinationsFetched,
+    isFetching: isDestinationsFetching,
+    error: destinationsError,
+    refetch: refetchDestinations,
+  } = useReplicationDestinationsQuery(
+    { projectRef },
+    {
+      enabled: shouldCheckCatalogCompatibility && isOrioleDb === true,
+    }
+  )
+
+  // Existing destinations may use another project's catalog; the API validates that project.
+  const hasWarehouseDestination =
+    destinations?.destinations.some(
+      (destination) => destination.name === WAREHOUSE_PUBLICATION_NAME
+    ) ?? false
+  const canSetUpWarehouse =
+    isProjectSuccess &&
+    (isOrioleDb === false ||
+      (isOrioleDb === true && isDestinationsSuccess && hasWarehouseDestination))
+
   const disableMutation = useWarehouseDisableMutation({ onError: () => {} })
   // Rendered inline by the picker rather than as a toast: a setup failure is something the user
   // has to act on, so it must not disappear.
@@ -40,6 +105,7 @@ export const WarehouseSetupPanel = () => {
 
   const handleSetup = (targets: WarehouseSetupTarget[]) => {
     if (!projectRef || targets.length === 0) return
+    if (shouldCheckCatalogCompatibility && !canSetUpWarehouse) return
     const isInitialSetup = data?.setup_status !== 'complete'
 
     setupMutation.mutate(
@@ -87,6 +153,65 @@ export const WarehouseSetupPanel = () => {
   if (!data) return <GenericSkeletonLoader />
 
   const status = data.setup_status
+
+  if (shouldCheckCatalogCompatibility) {
+    if (isProjectPending && !isProjectFetched) return <GenericSkeletonLoader />
+    if (!isProjectSuccess || isOrioleDb === undefined) {
+      return (
+        <AlertError
+          subject="Failed to check project compatibility"
+          error={projectError ?? { message: 'The project database version is unavailable.' }}
+          projectRef={projectRef}
+          additionalActions={
+            <Button variant="default" loading={isProjectFetching} onClick={() => refetchProject()}>
+              Retry
+            </Button>
+          }
+        />
+      )
+    }
+    if (isOrioleDb) {
+      if (isDestinationsPending && !isDestinationsFetched) return <GenericSkeletonLoader />
+      if (!isDestinationsSuccess) {
+        return (
+          <AlertError
+            subject="Failed to load Warehouse destination"
+            error={destinationsError}
+            projectRef={projectRef}
+            additionalActions={
+              <Button
+                variant="default"
+                loading={isDestinationsFetching}
+                onClick={async () => {
+                  onStatusChange('')
+                  const result = await refetchDestinations()
+                  if (
+                    result.isSuccess &&
+                    result.data?.destinations.some(
+                      (destination) => destination.name === WAREHOUSE_PUBLICATION_NAME
+                    )
+                  ) {
+                    onStatusChange('Warehouse destination loaded. You can continue setup.')
+                  }
+                }}
+              >
+                Retry
+              </Button>
+            }
+          />
+        )
+      }
+      if (!hasWarehouseDestination) {
+        return (
+          <Admonition
+            type="warning"
+            title="This project cannot host a Warehouse catalog"
+            description="Warehouse setup uses this project for its metadata catalog. OrioleDB is not supported. Set up Warehouse with a catalog on a project using standard Postgres."
+          />
+        )
+      }
+    }
+  }
 
   if (status === 'not_started' || status === 'disabled') {
     return (

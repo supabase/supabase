@@ -1,7 +1,8 @@
 import Breadcrumbs from '~/components/Breadcrumbs'
 import GuidesSidebar from '~/components/GuidesSidebar'
-import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
+import { GuideTocMenu, TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
+import { PageTitleObserver } from '~/layouts/MobileHeaderSlots'
 import type { WithRequired } from '~/features/helpers.types'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { PROD_URL } from '~/lib/constants'
@@ -117,6 +118,7 @@ const GuideTemplate = ({
           >
             <header className="mb-8">
               <h1 className="mt-0 mb-0 [&>p]:m-0">
+                <PageTitleObserver title={mdToPlainText(meta?.title || 'Supabase Docs')} />
                 <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
               </h1>
               {meta?.subtitle && (
@@ -125,6 +127,7 @@ const GuideTemplate = ({
                 </div>
               )}
             </header>
+            {hideToc ? null : <GuideTocMenu />}
 
             {content && (
               <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />

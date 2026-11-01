@@ -6,6 +6,7 @@ import {
   getEntityTypesSQL,
   getForeignKeyConstraintsSql,
   getIndexesSQL,
+  getSearchEntitiesSql,
   getTableColumnsSql,
   getTableConstraintsSql,
   getTableDefinitionSql,
@@ -469,4 +470,32 @@ test('tables.retrieve: composite FKs stay ordinally paired at stress scale', asy
     ['fk_id', 'id'],
     ['fk_tenant_id', 'tenant_id'],
   ])
+}, 60_000)
+
+// ── getSearchEntitiesSql (database/search-entities.ts) — command menu search ─
+// Runs on debounced keystrokes, so every case below must stay cheap at scale.
+// A substring (leading-wildcard) ILIKE cannot use pg_class_relname_nsp_index,
+// so one filtered seq scan of pg_class is structurally unavoidable. Everything
+// downstream (privilege checks, policy counts) is capped by the materialized
+// candidate CTE, so no other scaling catalog may be scanned.
+const SEARCH_ENTITIES_BUDGET = {
+  allowedSeqScans: {
+    pg_class: {
+      max: 1,
+      reason:
+        'substring name search: a leading-wildcard ILIKE cannot use pg_class_relname_nsp_index, so one filtered pass of pg_class is unavoidable',
+    },
+  },
+  maxExecutionTimeMs: 500,
+}
+
+test('getSearchEntitiesSql: broad search (thousands of matches) stays within budget', async () => {
+  // `t_1` matches t_1, t_10..t_19, t_100..t_199, ... -- a large share of the catalog
+  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 't_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 60_000)
+
+test('getSearchEntitiesSql: schema-qualified search stays within budget', async () => {
+  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'stress.t_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
 }, 60_000)

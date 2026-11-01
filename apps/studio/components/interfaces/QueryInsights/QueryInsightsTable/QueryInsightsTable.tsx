@@ -28,6 +28,7 @@ import { FilterPill } from '@/components/interfaces/QueryPerformance/components/
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
+import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -184,6 +185,7 @@ export const QueryInsightsTable = ({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           sql: wrapWithRollback(safeSql`EXPLAIN ANALYZE ${requestQuery}`),
+          grant: unguarded.migrating,
         },
         {
           onSuccess(data) {

@@ -6,6 +6,7 @@ import createClient from 'openapi-fetch'
 import type { paths } from './api'
 import { reportEmptyBodyResponse } from './empty-body-diagnostics'
 import { ERROR_PATTERNS } from './error-patterns'
+import { guardMethod, type GuardedClientMethod } from './guarded-fetch'
 import { API_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 import { ResponseError } from '@/types'
@@ -174,16 +175,14 @@ client.use(
   }
 )
 
-export const {
-  GET: get,
-  POST: post,
-  PUT: put,
-  PATCH: patch,
-  DELETE: del,
-  HEAD: head,
-  TRACE: trace,
-  OPTIONS: options,
-} = client
+export const get = guardMethod('get', client.GET) as GuardedClientMethod<paths, 'get'>
+export const post = guardMethod('post', client.POST) as GuardedClientMethod<paths, 'post'>
+export const put = guardMethod('put', client.PUT) as GuardedClientMethod<paths, 'put'>
+export const patch = guardMethod('patch', client.PATCH) as GuardedClientMethod<paths, 'patch'>
+export const del = guardMethod('delete', client.DELETE) as GuardedClientMethod<paths, 'delete'>
+export const { HEAD: head, TRACE: trace, OPTIONS: options } = client
+
+export { unguarded, type Unguarded } from './guarded-fetch'
 
 type HandleErrorOptions = {
   alwaysCapture?: boolean

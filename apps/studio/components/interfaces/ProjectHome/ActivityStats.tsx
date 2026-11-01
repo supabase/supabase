@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArchiveIcon, CpuIcon, DatabaseIcon, GitBranchIcon } from 'lucide-react'
@@ -11,7 +12,7 @@ import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastr
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { SingleStat } from '@/components/ui/SingleStat'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
@@ -20,6 +21,7 @@ import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { EMPTY_ARR } from '@/lib/void'
 
 interface BranchStatValueProps {
@@ -84,16 +86,20 @@ export const ActivityStats = () => {
   const projectResourceWarnings = resourceWarnings?.find((warning) => warning.project === ref)
   const parentProjectRef = project?.parent_project_ref ?? project?.ref
 
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
   const {
     data: branchesData,
-    isPending: isLoadingBranches,
-    isError: isBranchesError,
-  } = useBranchesQuery(
-    {
-      projectRef: parentProjectRef,
-    },
-    { enabled: !isHighAvailability }
-  )
+    isPending: isPendingBranches,
+    isError: isBranchesQueryError,
+  } = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    enabled: !isHighAvailability,
+  })
+  const isLoadingBranches =
+    branchesGrant.status === 'loading' || (branchesGrant.status === 'granted' && isPendingBranches)
+  const isBranchesError = isBranchesQueryError || branchesGrant.status === 'error'
   const isDefaultProject = project?.parent_project_ref === undefined
   const currentBranch = useMemo(
     () => (branchesData ?? []).find((b) => b.project_ref === ref),

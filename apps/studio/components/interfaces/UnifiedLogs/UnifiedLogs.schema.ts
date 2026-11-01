@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { METHODS, REGIONS } from './UnifiedLogs.constants'
+import { METHODS, REGIONS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import {
   ARRAY_DELIMITER,
   LEVELS,
@@ -81,3 +81,36 @@ export const timelineChartSchema = z.object({
 }) satisfies z.ZodType<BaseChartSchema>
 
 export type TimelineChartSchema = z.infer<typeof timelineChartSchema>
+
+export const unifiedLogsScopeSchema = z.object({
+  filters: z.array(
+    z.object({
+      column: z.string().min(1),
+      operator: z.enum(['=', '<>', '~~*', '!~~*']),
+      value: z.string(),
+    })
+  ),
+})
+
+export const querySearchParamsSchema = z.object({
+  scope: unifiedLogsScopeSchema.optional(),
+  filter: z.array(z.string()).optional(),
+  latency: z.array(z.number()).optional(),
+  'timing.dns': z.array(z.number()).optional(),
+  'timing.connection': z.array(z.number()).optional(),
+  'timing.tls': z.array(z.number()).optional(),
+  'timing.ttfb': z.array(z.number()).optional(),
+  'timing.transfer': z.array(z.number()).optional(),
+  date: z.array(z.date()).optional(),
+  sort: z.object({ id: z.string(), desc: z.boolean() }).optional(),
+  size: z.number().default(SEARCH_PARAMS_PARSER.size.defaultValue),
+  start: z.number().default(SEARCH_PARAMS_PARSER.start.defaultValue),
+  direction: z.enum(['prev', 'next']).default(SEARCH_PARAMS_PARSER.direction.defaultValue),
+  cursor: z.date().default(SEARCH_PARAMS_PARSER.cursor.defaultValue),
+  uuid: z.string().optional(),
+  show_connection_logs: z.boolean().default(SEARCH_PARAMS_PARSER.show_connection_logs.defaultValue),
+  edge_auth: z.boolean().default(SEARCH_PARAMS_PARSER.edge_auth.defaultValue),
+  edge_storage: z.boolean().default(SEARCH_PARAMS_PARSER.edge_storage.defaultValue),
+  edge_postgrest: z.boolean().default(SEARCH_PARAMS_PARSER.edge_postgrest.defaultValue),
+  user: z.string().optional(),
+})

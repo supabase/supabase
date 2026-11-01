@@ -139,18 +139,16 @@ export const DisplayApiSettings = ({
               label={
                 <div className="flex items-center space-x-1">
                   {x.tags?.split(',').map((x, i: number) => (
-                    <code key={`${x}${i}`} className="text-code-inline">
-                      {x}
-                    </code>
+                    <code key={`${x}${i}`}>{x}</code>
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="text-code-inline bg-destructive! text-destructive-foreground! border-destructive!">
+                      <code className="bg-destructive! text-destructive-foreground! border-destructive!">
                         secret
                       </code>
                     </>
                   )}
-                  {x.tags === 'anon' && <code className="text-code-inline">public</code>}
+                  {x.tags === 'anon' && <code>public</code>}
                 </div>
               }
               description={

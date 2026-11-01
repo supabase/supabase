@@ -31,6 +31,7 @@ Reference these guidelines when:
 | 2        | Test Coverage    | CRITICAL | `testing-` |
 | 3        | Component Tests  | HIGH     | `testing-` |
 | 4        | E2E Tests        | HIGH     | `testing-` |
+| 5        | Test Speed       | HIGH     | `testing-` |
 
 ## Quick Reference
 
@@ -53,6 +54,18 @@ Reference these guidelines when:
 
 - `testing-e2e-shared-features` - Write E2E tests for features used in both
   self-hosted and platform; cover clicks AND keyboard shortcuts
+
+### 5. Test Speed (HIGH)
+
+- `testing-node-environment` - Pure-logic tests go in `.test.ts` (runs in node);
+  only `.test.tsx` gets jsdom
+- `testing-fake-timers` - Never wait on real time; advance fake timers past
+  debounces and poll intervals
+- `testing-paste-not-type` - Set input values with `user.paste` or
+  `fireEvent.change` unless keystroke behavior is under test
+- `testing-scope-queries` - Scope `*ByRole` option queries to the open listbox
+- `testing-no-redundant-tests` - Merge near-duplicates into `test.each`; delete
+  tests that can't fail or only cover libraries, class names, or snapshots
 
 ## Decision Tree: Which Test Type?
 
@@ -132,6 +145,10 @@ test('rejects unrecognized operator', () => { ... })
 test('allows empty filter value', () => { ... })
 ```
 
+When several cases share the same arrange/act/assert shape, write one
+`test.each` table instead of copy-pasted tests. Each row is a permutation;
+the table makes gaps easy to spot. See section 5 for what not to test.
+
 ## 3. Component Tests for Complex UI Only (HIGH)
 
 Only write component tests when there is complex UI interaction logic that
@@ -177,12 +194,133 @@ Extract reusable interactions into `e2e/studio/utils/*-helpers.ts`. Use
 try/finally for resource cleanup. For E2E execution details, see the
 `studio-e2e-tests` skill.
 
+## 5. Keep Tests Fast (HIGH)
+
+Studio has thousands of unit tests, and a few seconds per file adds up to
+minutes on every PR. These patterns took CI from ~14 minutes to ~9 before
+sharding. Apply them to every new test.
+
+### Put pure logic in `.test.ts` so it runs in node
+
+`vitest.config.ts` runs `**/*.test.ts` in the `node` environment and
+`**/*.test.tsx` in `jsdom`. jsdom costs ~1s of setup per file, so:
+
+- Utility, schema, and resolver tests: name the file `.test.ts` and don't
+  import anything from Testing Library.
+- A `.test.ts` file that genuinely needs the DOM (e.g. `renderHook`,
+  `window.localStorage`) opts in with a docblock as the **first line**:
+
+```ts
+// @vitest-environment jsdom
+import { renderHook } from '@testing-library/react'
+```
+
+Don't rename a pure-logic test to `.tsx` or add the docblock "just in case".
+DOM setup files (`tests/setup/dom.ts`, `tests/setup/radix.js`) no-op in node.
+
+### Never wait on real time
+
+Don't sleep (`setTimeout(resolve, …)`), raise `findBy*` timeouts to wait out
+a poll interval, or bump per-test timeouts. Use fake timers and advance
+them. `shouldAdvanceTime: true` keeps `waitFor` polling, MSW, and router
+microtasks working:
+
+```tsx
+// ❌ Waits 4s+ of real time per poll (this file took 18s)
+expect(
+  await screen.findByText('Restoration complete!', {}, { timeout: POLL_INTERVAL_MS + 2000 })
+).toBeInTheDocument()
+
+// ✅ Advance past the poll instead (same file now takes 0.3s)
+beforeEach(() => {
+  vi.useFakeTimers({ shouldAdvanceTime: true })
+})
+afterEach(() => {
+  vi.useRealTimers()
+})
+
+const advancePoll = () => act(() => vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS))
+
+await advancePoll()
+expect(await screen.findByText('Restoration complete!')).toBeInTheDocument()
+```
+
+The same applies to debounces: `act(() => vi.advanceTimersByTimeAsync(650))`
+instead of a 650ms sleep. Export the interval/debounce constant from the
+source so the test doesn't hard-code it.
+
+### Paste, don't type
+
+`user.type` fires keydown/keypress/input/keyup per character, and each one
+can re-render a whole form. Unless keystroke-level behavior is what you're
+testing (input masks, shortcuts, per-key validation), set the value in one go:
+
+```tsx
+// ❌ One re-render per character
+await user.type(screen.getByPlaceholderText('Project name'), 'my-project')
+
+// ✅ Focus then paste
+await user.click(input)
+await user.paste('my-project')
+
+// ✅ Or a single change event
+fireEvent.change(input, { target: { value: 'my-project' } })
+```
+
+If you do need `userEvent`, create it with `userEvent.setup({ delay: null })`
+to drop the per-action delay.
+
+### Scope `*ByRole` queries
+
+`*ByRole` checks accessibility (including `getComputedStyle`) for every
+candidate element. Radix `Select` renders a hidden native `<option>` for
+each item, so an unscoped `findByRole('option')` on a large form checks
+hundreds of elements. Scope it to the open listbox:
+
+```tsx
+// ❌ Scans every hidden <option> on the page
+await user.click(await screen.findByRole('option', { name: 'East US' }))
+
+// ✅ Only the open listbox
+const findOption = async (name: string | RegExp) =>
+  within(await screen.findByRole('listbox')).findByRole('option', { name })
+
+await user.click(await findOption('East US'))
+```
+
+For very large pages, `configure({ defaultHidden: true })` skips the
+per-element visibility check and makes each `*ByRole` query about 3x
+cheaper. Only use it when your assertions don't depend on visibility.
+
+### Don't write redundant tests
+
+Every test costs CI time. Don't add tests that:
+
+- Duplicate another test with different literals. Add a `test.each` row instead.
+- Exercise a library rather than our code (e.g. that zod rejects a wrong type,
+  that dayjs formats a date).
+- Assert on class names or snapshots. They break on styling changes and don't
+  catch behavior bugs.
+- Exist only for coverage numbers.
+
+Make sure every test can fail. Common ways a test passes no matter what:
+
+- Unawaited async assertions (`expect(promise).resolves…` or `waitFor(…)`
+  without `await`).
+- A fixture equal to the default value, so the "changed" path is never hit.
+- Calling the wrong function (e.g. a `semverGte` test that calls `semverLte`).
+
+Quick check: break the code under test and confirm the test goes red.
+
 ## Codebase References
 
 | What                    | Where                                                                                                                                                                                     |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Util test examples      | `apps/studio/tests/components/Grid/Grid.utils.test.ts`, `apps/studio/tests/components/Billing/TaxID.utils.test.ts`, `apps/studio/tests/components/Editor/SpreadsheetImport.utils.test.ts` |
 | Component test examples | `apps/studio/tests/features/logs/LogsFilterPopover.test.tsx`, `apps/studio/tests/components/CopyButton.test.tsx`                                                                          |
+| Fake timers (polling)   | `apps/studio/components/layouts/ProjectLayout/RestoringState.test.tsx`                                                                                                                    |
+| Fake timers (debounce)  | `apps/studio/hooks/misc/__tests__/useTableEditorFiltersSort.navigation.test.tsx`                                                                                                          |
+| Scoped listbox queries  | `apps/studio/tests/pages/new/[slug].test.tsx`, `apps/studio/components/interfaces/Account/AccessTokens/Scoped/Form/ResourceAccessStep.test.tsx`                                           |
 | E2E test example        | `e2e/studio/features/filter-bar.spec.ts`                                                                                                                                                  |
 | E2E helpers pattern     | `e2e/studio/utils/filter-bar-helpers.ts`                                                                                                                                                  |
 | Custom render           | `apps/studio/tests/lib/custom-render.tsx`                                                                                                                                                 |

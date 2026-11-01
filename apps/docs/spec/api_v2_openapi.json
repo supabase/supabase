@@ -343,6 +343,79 @@
         "x-fga-permissions": [["advisors_read"]]
       }
     },
+    "/v2/projects/{ref}/backups/download": {
+      "post": {
+        "operationId": "v2-download-project-backup",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/DownloadBackupBody" } }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DownloadBackupResponse_Output" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "403": {
+            "description": "Forbidden action",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          },
+          "500": {
+            "description": "Failed to download project backup",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponseBody" } }
+            }
+          }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Download project backup",
+        "tags": ["Projects"],
+        "x-badges": [{ "name": "OAuth scope: database:write", "position": "after" }],
+        "x-endpoint-owners": ["infra", "control-plane"],
+        "x-fga-permissions": [["backups_write"]],
+        "x-oauth-scope": "database:write"
+      }
+    },
     "/v2/projects/{ref}/branches": {
       "post": {
         "description": "Creates a database branch from the specified project. Compute and disk size can be set here so the branch is provisioned at the requested size, instead of being resized after creation.",
@@ -14150,6 +14223,7 @@
               "unauthorized",
               "validation_failed",
               "agentic_credential_not_found",
+              "backup_unsupported",
               "branch_admin_required",
               "compute_build_context_too_large",
               "compute_build_in_progress",
@@ -14749,7 +14823,9 @@
                             "log_data_api_error_rate_high",
                             "log_auth_error_rate_high",
                             "log_storage_error_rate_high",
-                            "log_edge_function_error_rate_high"
+                            "log_edge_function_error_rate_high",
+                            "realtime_authorization_timeouts",
+                            "realtime_postgres_changes_spike"
                           ]
                         }
                       },
@@ -14830,6 +14906,8 @@
                             "log_auth_error_rate_high",
                             "log_storage_error_rate_high",
                             "log_edge_function_error_rate_high",
+                            "realtime_authorization_timeouts",
+                            "realtime_postgres_changes_spike",
                             "project_not_active",
                             "advisor_check_unavailable"
                           ]
@@ -14901,6 +14979,47 @@
               }
             },
             "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "DownloadBackupBody": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["project_backup_file_url"]
+              },
+              "id": { "type": "number" }
+            },
+            "required": ["type", "id"]
+          }
+        },
+        "required": ["data"]
+      },
+      "DownloadBackupResponse_Output": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Resource type.",
+                "enum": ["project_backup_file_url"]
+              },
+              "id": { "type": "number" },
+              "attributes": {
+                "type": "object",
+                "properties": { "file_url": { "type": "string" } },
+                "required": ["file_url"]
+              }
+            },
+            "required": ["type", "id", "attributes"]
           }
         },
         "required": ["data"]
@@ -17050,6 +17169,7 @@
                   "unauthorized",
                   "validation_failed",
                   "agentic_credential_not_found",
+                  "backup_unsupported",
                   "branch_admin_required",
                   "compute_build_context_too_large",
                   "compute_build_in_progress",
@@ -17550,6 +17670,7 @@
               "unauthorized",
               "validation_failed",
               "agentic_credential_not_found",
+              "backup_unsupported",
               "branch_admin_required",
               "compute_build_context_too_large",
               "compute_build_in_progress",

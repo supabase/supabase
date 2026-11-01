@@ -9,9 +9,7 @@ const DynamicCodeBlock = dynamic(() =>
   import('../CodeBlock').then((m) => ({ default: m.CodeBlock }))
 )
 
-export const InlineCode = ({ className, ...props }: HTMLAttributes<HTMLElement>) => (
-  <code className={cn('text-code-inline', className)} {...props} />
-)
+export const InlineCode = (props: HTMLAttributes<HTMLElement>) => <code {...props} />
 
 export const Blockquote = ({ className, ...props }: HTMLAttributes<HTMLElement>) => (
   <blockquote

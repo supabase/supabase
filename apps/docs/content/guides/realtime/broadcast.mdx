@@ -297,6 +297,14 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
 
 ## Send messages
 
+<Admonition type="caution" title="Sending from a server or Edge Function">
+
+Subscribing to a channel only to send messages from a server can multiply your Realtime bill. Each subscribed process holds its own connection, and in Edge Functions every worker is a separate process. Each connection counts toward [Peak Connections](/docs/guides/platform/manage-your-usage/realtime-peak-connections) and is billed as a recipient of every message on the channel until it closes.
+
+To send from a server, use `channel.httpSend()` (`supabase-js` 2.76.0 or later) or the [REST API](#broadcast-using-the-rest-api), which don't open a connection. Subscribe only in code that needs to receive messages.
+
+</Admonition>
+
 ### Broadcast using the client libraries
 
 You can use the Supabase client libraries to send Broadcast messages.
@@ -618,6 +626,8 @@ You can pass configuration options while initializing the Supabase Client.
 
 ### Self-send messages
 
+With self-send enabled, each message delivered back to the sender is billed as a received message. To confirm that the server received a message, use [acknowledgements](#acknowledge-messages) instead.
+
 <Tabs
   scrollable
   size="small"
@@ -935,7 +945,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
   <TabPanel id="js" label="JavaScript">
     <Admonition type="note">
 
-    `channel.httpSend()` always uses the REST API regardless of WebSocket connection state, and is available from the Supabase JavaScript client version 2.107.0 and later. `ArrayBuffer` and `ArrayBufferView` (e.g. `Uint8Array`) payloads are sent as `application/octet-stream`; all other payloads are JSON-encoded.
+    `channel.httpSend()` always uses the REST API regardless of WebSocket connection state, and is available from the Supabase JavaScript client version 2.76.0 and later. `ArrayBuffer` and `ArrayBufferView` (e.g. `Uint8Array`) payloads require version 2.107.0 or later and are sent as `application/octet-stream`; all other payloads are JSON-encoded.
 
     </Admonition>
 
@@ -1021,7 +1031,7 @@ Broadcast Changes allows you to trigger messages from your database. To achieve 
 
 It uses partitioned tables per day, which allows performant deletion of your previous messages by dropping the physical tables of this partitioned table. Tables older than 3 days are deleted.
 
-A client connecting over WebSocket creates those daily partitions. `realtime.send` does not. With no partition for today, the insert fails and Postgres logs a `WarnSendingBroadcastMessage` warning, so connect a client before you broadcast from the database. See [Realtime: `WarnSendingBroadcastMessage`](/docs/guides/troubleshooting/realtime-warn-sending-broadcast-message) if you hit that warning.
+A client connecting over WebSocket creates those daily partitions. `realtime.send` does not. With no partition for today, the insert fails and Postgres logs a `WarnSendingBroadcastMessage` warning, so connect a client before you broadcast from the database. See [Realtime: `WarnSendingBroadcastMessage`](/kb/troubleshooting/realtime-warn-sending-broadcast-message) if you hit that warning.
 
 Broadcasting from the database works like a client-side broadcast, using WebSockets to send JSON payloads. [Realtime Authorization](/docs/guides/realtime/authorization) is required and enabled by default to protect your data.
 

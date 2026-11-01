@@ -128,6 +128,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Code Block',
+          href: '/docs/fragments/code-block',
+          items: [],
+        },
+        {
           title: 'Collapsible Card Section',
           href: '/docs/fragments/collapsible-card-section',
           items: [],

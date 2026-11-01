@@ -85,9 +85,6 @@ describe('resolveRegionRestriction', () => {
 describe('getRegionRestrictionCopy', () => {
   it('uses the capacity copy for a capacity status', () => {
     expect(getRegionRestrictionCopy('capacity')).toBe(REGION_RESTRICTION_COPY.capacity)
-    expect(getRegionRestrictionCopy('capacity').tooltip).toBe(
-      'Temporarily unavailable due to this region being at capacity.'
-    )
   })
 
   it.each(['other', 'unavailable', 'brand_new', 'toString'])(

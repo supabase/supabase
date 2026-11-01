@@ -135,9 +135,9 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
         <DialogSection className="text-sm flex flex-col gap-y-2">
           <p>
-            Tables in exposed schemas such as <code className="text-code-inline">public</code> are
-            reachable through your project’s API. Enable Row Level Security (RLS) on these tables so
-            access is governed by the policies you define, not just the project API key.
+            Tables in exposed schemas such as <code>public</code> are reachable through your
+            project’s API. Enable Row Level Security (RLS) on these tables so access is governed by
+            the policies you define, not just the project API key.
           </p>
           <p>
             This trigger automatically enables RLS whenever a new table is created. Review the SQL

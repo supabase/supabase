@@ -35,7 +35,7 @@ functions:
 
       *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
-      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use [Native Google Auth](/docs/guides/auth/social-login/auth-google?platform=android). \
+      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use [Native Google Auth](/docs/guides/auth/social-sign-in/auth-google?platform=android). \
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically. \
       **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 

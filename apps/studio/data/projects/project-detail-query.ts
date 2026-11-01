@@ -7,7 +7,7 @@ import { projectKeys } from './keys'
 import { OrgProjectsResponse } from './org-projects-infinite-query'
 import { getProjectStatusOverride } from './project-status-override'
 import type { components } from '@/data/api'
-import { get, handleError, isValidConnString, post } from '@/data/fetchers'
+import { get, handleError, isValidConnString, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string; skipWake?: boolean }
@@ -49,6 +49,7 @@ export async function getProjectDetail(
       params: { path: { ref } },
       signal,
       headers,
+      grant: unguarded.migrating,
     })
 
     // We will still let the user load the page in case of a wake error, but log it for debugging purposes

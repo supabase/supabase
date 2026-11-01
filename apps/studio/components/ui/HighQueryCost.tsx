@@ -76,7 +76,7 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
               <TooltipContent side="bottom" className="flex flex-col gap-y-1">
                 <p>Estimated cost: {metadata?.cost.toLocaleString()}</p>
                 <p className="text-foreground-light">
-                  Determined via the <code className="text-code-inline">EXPLAIN</code> command
+                  Determined via the <code>EXPLAIN</code> command
                 </p>
               </TooltipContent>
             </Tooltip>{' '}
@@ -150,7 +150,7 @@ const LoadDataWarningDialog = ({
               <TooltipContent side="bottom" className="flex flex-col gap-y-1">
                 <p>Estimated cost: {metadata?.cost.toLocaleString()}</p>
                 <p className="text-foreground-light">
-                  Determined via the <code className="text-code-inline">EXPLAIN</code> command
+                  Determined via the <code>EXPLAIN</code> command
                 </p>
               </TooltipContent>
             </Tooltip>{' '}

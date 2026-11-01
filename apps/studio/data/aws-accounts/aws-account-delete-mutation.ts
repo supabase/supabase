@@ -16,22 +16,28 @@ export async function deleteAWSAccount({
   awsAccountId,
   databaseIdentifier,
 }: AWSAccountDeleteVariables) {
-  const { data, error } = databaseIdentifier
-    ? await del(
-        '/v2/projects/{ref}/private-link/associations/aws-account/{aws_account_id}/database/{database_identifier}',
-        {
-          params: {
-            path: {
-              ref: projectRef,
-              aws_account_id: awsAccountId,
-              database_identifier: databaseIdentifier,
-            },
-          },
-        }
-      )
-    : await del('/v2/projects/{ref}/private-link/associations/aws-account/{aws_account_id}', {
-        params: { path: { ref: projectRef, aws_account_id: awsAccountId } },
-      })
+  const deleteRequest = del as unknown as (
+    path: string,
+    init: {
+      params: {
+        path: Record<string, string>
+      }
+    }
+  ) => Promise<{ data: unknown; error: unknown }>
+
+  const path = databaseIdentifier
+    ? '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}/database/{database_identifier}'
+    : '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}'
+
+  const { data, error } = await deleteRequest(path, {
+    params: {
+      path: {
+        ref: projectRef,
+        aws_account_id: awsAccountId,
+        ...(databaseIdentifier ? { database_identifier: databaseIdentifier } : {}),
+      },
+    },
+  })
 
   if (error) handleError(error)
   return data

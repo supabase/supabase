@@ -3,6 +3,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { getAuthenticatorDbSchemasOverride } from './authenticator-role-config-query.utils'
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError } from '@/types'
 
@@ -27,6 +28,7 @@ export async function getAuthenticatorRoleConfig(
       connectionString,
       sql: getAuthenticatorRoleConfigSql,
       queryKey: ['authenticator-role-config'],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -44,7 +46,6 @@ export const authenticatorRoleConfigQueryOptions = ({
   connectionString,
 }: AuthenticatorRoleConfigVariables) =>
   queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: databaseKeys.authenticatorRoleConfig(projectRef),
     queryFn: ({ signal }) => getAuthenticatorRoleConfig({ projectRef, connectionString }, signal),
     // The fix for this override is usually applied outside the Dashboard (SQL editor, another

@@ -65,8 +65,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
             <SheetTitle>
-              Insert vectors into{' '}
-              <code className="text-code-inline text-sm!">{index.indexName}</code>
+              Insert vectors into <code className="text-sm!">{index.indexName}</code>
             </SheetTitle>
           </SheetHeader>
 
@@ -204,9 +203,8 @@ const result = await index.putVectors({
   return (
     <SheetSection className="flex flex-col gap-6">
       <p className="text-sm text-foreground-light">
-        Use the following code snippet to insert vectors into your table. The{' '}
-        <code className="text-code-inline">data</code> property should contain all of your vector
-        data.
+        Use the following code snippet to insert vectors into your table. The <code>data</code>{' '}
+        property should contain all of your vector data.
       </p>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between">

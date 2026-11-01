@@ -89,27 +89,11 @@ const mockSetupStatus = (status: Partial<WarehouseSetupStatusResponse>) =>
       }),
   })
 
-const mockProject = () =>
-  addAPIMock({
-    method: 'get',
-    path: '/platform/projects/:ref',
-    // @ts-expect-error partial project response used by AlertError
-    response: {
-      cloud_provider: 'localhost',
-      id: 1,
-      inserted_at: '2021-08-02T06:40:40.646Z',
-      name: 'Default Project',
-      organization_id: 1,
-      ref: 'default',
-      region: 'local',
-      status: 'ACTIVE_HEALTHY',
-    },
-  })
-
-const REPLICATION_PROJECT: ProjectDetail = {
+const PROJECT: ProjectDetail = {
   cloud_provider: 'AWS',
   connectionString: 'postgresql://postgres@localhost:5432/postgres',
   db_host: 'db.default.supabase.co',
+  dbVersion: 'supabase-postgres-17.6.1.001',
   high_availability: false,
   id: 1,
   inserted_at: '2026-01-01T00:00:00.000Z',
@@ -173,10 +157,9 @@ const PUBLICATION_TABLES: PublicationDetailsResponse['tables'] = [
   { id: 3, schema: 'analytics', name: 'events', kind: 'table', partition_parent_id: null },
 ]
 
-// The disable card reads what is currently replicated from these four queries.
+// The disable card reads what is currently replicated from these queries.
 const mockReplicatedTableQueries = () => {
   const publicationRequests: string[] = []
-  addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: REPLICATION_PROJECT })
   addAPIMock({
     method: 'post',
     path: '/platform/pg-meta/:ref/query',
@@ -224,6 +207,7 @@ describe('WarehouseOverviewTab', () => {
   beforeEach(() => {
     mockIsMarketplaceEnabled.mockReturnValue(true)
     mockTrack.mockClear()
+    addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: PROJECT })
   })
 
   test.each([false, true])(
@@ -275,23 +259,7 @@ describe('WarehouseOverviewTab', () => {
     }
   )
 
-  test('keeps the table picker available after setup fails', async () => {
-    mockProject()
-    mockSetupStatus({
-      setup_status: 'error',
-      steps: [{ name: 'warehouse_copy', status: 'error', message: 'Failed to copy public.orders' }],
-      tables: [{ schema: 'public', name: 'orders', copy_name: 'public.orders', state: 'error' }],
-    })
-
-    customRender(<WarehouseOverviewTab />)
-
-    expect(await screen.findByText('Replicated tables picker')).toBeInTheDocument()
-    expect(screen.getByText('Picker error: Failed to copy public.orders')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Submit initial tables' })).toBeInTheDocument()
-  })
-
-  test('shows the latest error when retrying setup fails', async () => {
-    mockProject()
+  test('keeps the table picker available after setup fails and shows the latest retry error', async () => {
     mockSetupStatus({
       setup_status: 'error',
       steps: [{ name: 'warehouse_copy', status: 'error', message: 'Initial setup failed' }],
@@ -306,7 +274,8 @@ describe('WarehouseOverviewTab', () => {
 
     customRender(<WarehouseOverviewTab />)
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Submit initial tables' }))
+    expect(await screen.findByText('Picker error: Initial setup failed')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Submit initial tables' }))
 
     expect(await screen.findByText('Picker error: Retry could not be started')).toBeInTheDocument()
     expect(screen.queryByText('Picker error: Initial setup failed')).not.toBeInTheDocument()
@@ -358,7 +327,7 @@ describe('WarehouseOverviewTab', () => {
     expect(headings).toEqual(['Status', 'Tables', 'Connect', 'Disable'])
   })
 
-  test('tracks initial setup but not table selection edits as enablement', async () => {
+  test('tracks initial setup as enablement', async () => {
     mockSetupStatus({ setup_status: 'not_started' })
     addAPIMock({
       method: 'post',
@@ -394,9 +363,9 @@ describe('WarehouseOverviewTab', () => {
     expect(mockTrack).not.toHaveBeenCalledWith('warehouse_enabled', expect.anything())
   })
 
-  test('preserves copied Warehouse data by default after confirmation', async () => {
+  test('preserves copied data by default, resets the option on reopen, and tracks what was replicated', async () => {
     mockSetupStatus({ setup_status: 'complete' })
-    mockReplicatedTableQueries()
+    const { publicationRequests } = mockReplicatedTableQueries()
     const deleteRequests: (string | null)[] = []
     addAPIMock({
       method: 'delete',
@@ -410,32 +379,31 @@ describe('WarehouseOverviewTab', () => {
     customRender(<WarehouseOverviewTab />)
 
     await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
-    expect(deleteRequests).toEqual([])
-
-    const dialog = await screen.findByRole('alertdialog')
+    let dialog = await screen.findByRole('alertdialog')
     expect(dialog).toHaveTextContent('Deletes the copied data and its storage permanently')
     expect(within(dialog).getByRole('checkbox')).not.toBeChecked()
     expect(screen.queryByPlaceholderText('Type the project ref to confirm')).not.toBeInTheDocument()
 
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
-
-    await waitFor(() => expect(deleteRequests).toEqual(['false']))
-  })
-
-  test('resets the copied data option when the confirmation is reopened', async () => {
-    mockSetupStatus({ setup_status: 'complete' })
-    mockReplicatedTableQueries()
-    customRender(<WarehouseOverviewTab />)
-
-    await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
-    const dialog = await screen.findByRole('alertdialog')
     await userEvent.click(within(dialog).getByRole('checkbox'))
     expect(within(dialog).getByRole('checkbox')).toBeChecked()
     await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
+    expect(deleteRequests).toEqual([])
 
     await userEvent.click(screen.getByRole('button', { name: 'Disable Warehouse' }))
-    expect(within(await screen.findByRole('alertdialog')).getByRole('checkbox')).not.toBeChecked()
+    dialog = await screen.findByRole('alertdialog')
+    expect(within(dialog).getByRole('checkbox')).not.toBeChecked()
+    await waitFor(() => expect(publicationRequests).toEqual(['supabase_warehouse']))
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
+
+    await waitFor(() => expect(deleteRequests).toEqual(['false']))
+    await waitFor(() =>
+      expect(mockTrack).toHaveBeenCalledWith('warehouse_disabled', {
+        schemaTargetCount: 1,
+        tableTargetCount: 1,
+      })
+    )
   })
 
   test('shows disable progress and polls until Warehouse can be enabled again', async () => {
@@ -451,19 +419,23 @@ describe('WarehouseOverviewTab', () => {
           steps: [],
         }),
     })
-    customRender(<WarehouseOverviewTab />)
-    expect(await screen.findByText('Warehouse is being disabled')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
-    status = 'disabled'
-    expect(
-      await screen.findByText('Replicated tables picker', {}, { timeout: 5000 })
-    ).toBeInTheDocument()
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    try {
+      customRender(<WarehouseOverviewTab />)
+      expect(await screen.findByText('Warehouse is being disabled')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
+      status = 'disabled'
+      // The panel polls every 3s while disabling.
+      await vi.advanceTimersByTimeAsync(3000)
+      expect(await screen.findByText('Replicated tables picker')).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   test.each([false, true])(
     'retries failed cleanup with the saved delete_data option (%s)',
     async (shouldDeleteData) => {
-      mockProject()
       mockSetupStatus({
         setup_status: 'deletion_failed',
         error: 'Storage cleanup failed',
@@ -488,32 +460,6 @@ describe('WarehouseOverviewTab', () => {
       expect(deleteRequests).toEqual([String(shouldDeleteData)])
     }
   )
-
-  test('tracks how much was being replicated when Warehouse is disabled', async () => {
-    mockSetupStatus({ setup_status: 'complete' })
-    const { publicationRequests } = mockReplicatedTableQueries()
-    addAPIMock({
-      method: 'delete',
-      path: '/platform/warehouse/:ref',
-      response: () =>
-        HttpResponse.json<WarehouseDeleteResponse>({ status: 'accepted' }, { status: 202 }),
-    })
-
-    customRender(<WarehouseOverviewTab />)
-
-    await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
-    const dialog = await screen.findByRole('alertdialog')
-    await waitFor(() => expect(publicationRequests).toEqual(['supabase_warehouse']))
-
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
-
-    await waitFor(() =>
-      expect(mockTrack).toHaveBeenCalledWith('warehouse_disabled', {
-        schemaTargetCount: 1,
-        tableTargetCount: 1,
-      })
-    )
-  })
 
   test('shows a disable error and allows retrying from the open confirmation', async () => {
     mockSetupStatus({ setup_status: 'complete' })
@@ -613,8 +559,6 @@ describe('WarehouseOverviewTab', () => {
       path: '/platform/warehouse/:ref/setup-status',
       response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
     })
-    mockProject()
-
     customRender(<WarehouseOverviewTab />)
 
     expect(await screen.findByText('Failed to load Warehouse status')).toBeInTheDocument()

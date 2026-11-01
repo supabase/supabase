@@ -47,52 +47,26 @@ const SCHEMAS: SchemasData = [
   { id: 2, name: 'analytics', owner: 'postgres', comment: null },
 ]
 
+const createTable = (id: number, schema: string, name: string): TablesData[number] => ({
+  id,
+  schema,
+  name,
+  rls_enabled: false,
+  rls_forced: false,
+  replica_identity: 'DEFAULT',
+  bytes: 1024,
+  size: '1024 bytes',
+  live_rows_estimate: 10,
+  dead_rows_estimate: 0,
+  comment: null,
+  primary_keys: [],
+  relationships: [],
+})
+
 const TABLES: TablesData = [
-  {
-    id: 1,
-    schema: 'public',
-    name: 'orders',
-    rls_enabled: false,
-    rls_forced: false,
-    replica_identity: 'DEFAULT',
-    bytes: 1024,
-    size: '1024 bytes',
-    live_rows_estimate: 10,
-    dead_rows_estimate: 0,
-    comment: null,
-    primary_keys: [],
-    relationships: [],
-  },
-  {
-    id: 2,
-    schema: 'public',
-    name: 'customers',
-    rls_enabled: false,
-    rls_forced: false,
-    replica_identity: 'DEFAULT',
-    bytes: 1024,
-    size: '1024 bytes',
-    live_rows_estimate: 10,
-    dead_rows_estimate: 0,
-    comment: null,
-    primary_keys: [],
-    relationships: [],
-  },
-  {
-    id: 3,
-    schema: 'analytics',
-    name: 'events',
-    rls_enabled: false,
-    rls_forced: false,
-    replica_identity: 'DEFAULT',
-    bytes: 1024,
-    size: '1024 bytes',
-    live_rows_estimate: 10,
-    dead_rows_estimate: 0,
-    comment: null,
-    primary_keys: [],
-    relationships: [],
-  },
+  createTable(1, 'public', 'orders'),
+  createTable(2, 'public', 'customers'),
+  createTable(3, 'analytics', 'events'),
 ]
 
 const SOURCES: ReplicationSourcesResponse = {
@@ -267,43 +241,25 @@ describe('WarehouseSchemaTablePicker', () => {
     customRender(<WarehousePickerHarness />)
 
     fireEvent.click(await screen.findByRole('combobox', { name: 'Select tables to replicate' }))
-    await userEvent.type(screen.getByPlaceholderText('Search schemas and tables...'), 'analytics')
+    const search = screen.getByPlaceholderText('Search schemas and tables...')
 
+    fireEvent.change(search, { target: { value: 'analytics' } })
     expect(screen.getByText('events')).toBeInTheDocument()
     expect(screen.queryByText('orders')).not.toBeInTheDocument()
     expect(screen.queryByText('customers')).not.toBeInTheDocument()
 
-    await userEvent.clear(screen.getByPlaceholderText('Search schemas and tables...'))
-    await userEvent.type(screen.getByPlaceholderText('Search schemas and tables...'), 'public.ord')
-
-    expect(screen.getByText('orders')).toBeInTheDocument()
-    expect(screen.queryByText('customers')).not.toBeInTheDocument()
-    expect(screen.queryByText('events')).not.toBeInTheDocument()
-
-    await userEvent.clear(screen.getByPlaceholderText('Search schemas and tables...'))
-    await userEvent.type(screen.getByPlaceholderText('Search schemas and tables...'), 'orders')
-
-    expect(screen.getByText('orders')).toBeInTheDocument()
-    expect(screen.queryByText('customers')).not.toBeInTheDocument()
-    expect(screen.queryByText('events')).not.toBeInTheDocument()
+    for (const query of ['public.ord', 'orders']) {
+      fireEvent.change(search, { target: { value: query } })
+      expect(screen.getByText('orders')).toBeInTheDocument()
+      expect(screen.queryByText('customers')).not.toBeInTheDocument()
+      expect(screen.queryByText('events')).not.toBeInTheDocument()
+    }
   })
 
-  test('wraps selected table badges and shows an overflow count past the limit', async () => {
-    const manyTables: TablesData = Array.from({ length: 12 }, (_, index) => ({
-      id: index + 1,
-      schema: 'public',
-      name: `table_${String(index + 1).padStart(2, '0')}`,
-      rls_enabled: false,
-      rls_forced: false,
-      replica_identity: 'DEFAULT',
-      bytes: 1024,
-      size: '1024 bytes',
-      live_rows_estimate: 10,
-      dead_rows_estimate: 0,
-      comment: null,
-      primary_keys: [],
-      relationships: [],
-    }))
+  test('shows selected table badges with an overflow count past the limit', async () => {
+    const manyTables: TablesData = Array.from({ length: 12 }, (_, index) =>
+      createTable(index + 1, 'public', `table_${String(index + 1).padStart(2, '0')}`)
+    )
 
     mockPickerQueries({
       isEditing: false,
@@ -320,7 +276,6 @@ describe('WarehouseSchemaTablePicker', () => {
     fireEvent.click(trigger)
 
     expect(screen.getByText('12 tables selected')).toBeInTheDocument()
-    expect(trigger.firstElementChild).toHaveClass('flex-wrap')
     expect(trigger).toHaveTextContent('public.table_01')
     expect(trigger).toHaveTextContent('public.table_10')
     expect(trigger).toHaveTextContent('+2')

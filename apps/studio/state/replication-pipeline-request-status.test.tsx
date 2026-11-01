@@ -15,19 +15,25 @@ import {
 import { CustomWrapper } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-const setup = (initialStatus: ReplicationPipelineStatusResponse['status']['name'] = 'started') => {
+const setup = (
+  initialStatus: ReplicationPipelineStatusResponse['status']['name'] = 'started',
+  pipelineId: string = '1'
+) => {
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
     response: () =>
       HttpResponse.json<ReplicationPipelineStatusResponse>({
-        pipeline_id: 1,
+        pipeline_id: pipelineId,
         status: { name: initialStatus },
       }),
   })
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  const options = replicationPipelineStatusQueryOptions({ projectRef: 'default', pipelineId: 1 })
-  queryClient.setQueryData(options.queryKey, { pipeline_id: 1, status: { name: initialStatus } })
+  const options = replicationPipelineStatusQueryOptions({ projectRef: 'default', pipelineId })
+  queryClient.setQueryData(options.queryKey, {
+    pipeline_id: pipelineId,
+    status: { name: initialStatus },
+  })
   const hook = renderHook(usePipelineRequestStatus, {
     wrapper: ({ children }) => (
       <CustomWrapper queryClient={queryClient}>
@@ -40,7 +46,10 @@ const setup = (initialStatus: ReplicationPipelineStatusResponse['status']['name'
       method: 'get',
       path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
       response: () =>
-        HttpResponse.json<ReplicationPipelineStatusResponse>({ pipeline_id: 1, status: { name } }),
+        HttpResponse.json<ReplicationPipelineStatusResponse>({
+          pipeline_id: pipelineId,
+          status: { name },
+        }),
     })
     await act(async () => {
       await queryClient.fetchQuery(options)
@@ -58,6 +67,30 @@ const deferred = () => {
 }
 
 describe('pipeline request state', () => {
+  test.each(['1', '003l8j9rxqi6c8rd5mcx1w2ya'])(
+    'shares request state with the route representation of pipeline %s',
+    async (pipelineId) => {
+      const { result } = setup('started', pipelineId)
+      const action = deferred()
+      let operation: Promise<void>
+      act(() => {
+        operation = result.current.runWithRequestStatus(
+          pipelineId,
+          Status.StopRequested,
+          () => action.promise
+        )
+      })
+      expect(result.current.getRequestStatus(String(pipelineId))).toBe(Status.StopRequested)
+      expect(result.current.isRequestPending(String(pipelineId))).toBe(true)
+      await act(async () => {
+        action.resolve()
+        await operation
+      })
+      expect(result.current.getRequestStatus(String(pipelineId))).toBe(Status.None)
+      expect(result.current.isRequestPending(String(pipelineId))).toBe(false)
+    }
+  )
+
   test.each(['started', 'stopping', 'stopped', 'starting', 'failed', 'unknown'] as const)(
     'keeps feedback during the operation, then accepts a fresh status: %s',
     async (backendStatus) => {
@@ -66,22 +99,22 @@ describe('pipeline request state', () => {
       let operation: Promise<void>
       act(() => {
         operation = result.current.runWithRequestStatus(
-          1,
+          '1',
           Status.StopRequested,
           () => action.promise
         )
       })
-      expect(result.current.getRequestStatus(1)).toBe(Status.StopRequested)
+      expect(result.current.getRequestStatus('1')).toBe(Status.StopRequested)
       await refresh(backendStatus)
-      expect(result.current.getRequestStatus(1)).toBe(Status.StopRequested)
+      expect(result.current.getRequestStatus('1')).toBe(Status.StopRequested)
       // A read during the operation cannot acknowledge that the operation has completed.
-      expect(result.current.isRequestPending(1)).toBe(true)
+      expect(result.current.isRequestPending('1')).toBe(true)
       await act(async () => {
         action.resolve()
         await operation
       })
-      expect(result.current.isRequestPending(1)).toBe(false)
-      expect(result.current.getRequestStatus(1)).toBe(Status.None)
+      expect(result.current.isRequestPending('1')).toBe(false)
+      expect(result.current.getRequestStatus('1')).toBe(Status.None)
     }
   )
 
@@ -104,34 +137,41 @@ describe('pipeline request state', () => {
         await (isOldRead ? oldRead.promise : freshRead.promise)
         activeReads -= 1
         return HttpResponse.json<ReplicationPipelineStatusResponse>({
-          pipeline_id: 1,
+          pipeline_id: '1',
           status: { name: isOldRead ? 'started' : 'starting' },
         })
       },
     })
-    const options = replicationPipelineStatusQueryOptions({ projectRef: 'default', pipelineId: 1 })
+    const options = replicationPipelineStatusQueryOptions({
+      projectRef: 'default',
+      pipelineId: '1',
+    })
     const oldFetch = queryClient.fetchQuery(options)
     await waitFor(() => expect(reads).toBe(1))
     let operation: Promise<void>
     act(() => {
-      operation = result.current.runWithRequestStatus(1, Status.StopRequested, () => action.promise)
+      operation = result.current.runWithRequestStatus(
+        '1',
+        Status.StopRequested,
+        () => action.promise
+      )
     })
     await act(async () => {
       action.resolve()
     })
     expect(reads).toBe(1)
-    expect(result.current.getRequestStatus(1)).toBe(Status.StopRequested)
+    expect(result.current.getRequestStatus('1')).toBe(Status.StopRequested)
     await act(async () => {
       oldRead.resolve()
       await oldFetch
     })
     await waitFor(() => expect(reads).toBe(2))
-    expect(result.current.getRequestStatus(1)).toBe(Status.StopRequested)
+    expect(result.current.getRequestStatus('1')).toBe(Status.StopRequested)
     await act(async () => {
       freshRead.resolve()
       await operation
     })
-    expect(result.current.getRequestStatus(1)).toBe(Status.None)
+    expect(result.current.getRequestStatus('1')).toBe(Status.None)
     expect(queryClient.getQueryData(options.queryKey)?.status.name).toBe('starting')
     expect(maxActiveReads).toBe(1)
   })
@@ -141,15 +181,15 @@ describe('pipeline request state', () => {
     const action = deferred()
     let operation: Promise<void>
     act(() => {
-      operation = result.current.runWithRequestStatus(1, Status.None, () => action.promise)
+      operation = result.current.runWithRequestStatus('1', Status.None, () => action.promise)
     })
-    expect(result.current.getRequestStatus(1)).toBe(Status.None)
-    expect(result.current.isRequestPending(1)).toBe(true)
+    expect(result.current.getRequestStatus('1')).toBe(Status.None)
+    expect(result.current.isRequestPending('1')).toBe(true)
     await act(async () => {
       action.resolve()
       await operation
     })
-    expect(result.current.isRequestPending(1)).toBe(false)
+    expect(result.current.isRequestPending('1')).toBe(false)
   })
 
   test('preserves the operation error even when refreshing status also fails', async () => {
@@ -162,13 +202,13 @@ describe('pipeline request state', () => {
     })
     await act(async () => {
       await expect(
-        result.current.runWithRequestStatus(1, Status.StopRequested, async () => {
+        result.current.runWithRequestStatus('1', Status.StopRequested, async () => {
           throw new Error('Stop failed')
         })
       ).rejects.toThrow('Stop failed')
     })
-    expect(result.current.getRequestStatus(1)).toBe(Status.None)
-    expect(result.current.isRequestPending(1)).toBe(false)
+    expect(result.current.getRequestStatus('1')).toBe(Status.None)
+    expect(result.current.isRequestPending('1')).toBe(false)
   })
 
   test('an older action settling cannot clear a newer pending action', async () => {
@@ -178,15 +218,15 @@ describe('pipeline request state', () => {
     let first: Promise<void>
     let second: Promise<void>
     act(() => {
-      first = result.current.runWithRequestStatus(1, Status.StopRequested, () => older.promise)
-      second = result.current.runWithRequestStatus(1, Status.StartRequested, () => newer.promise)
+      first = result.current.runWithRequestStatus('1', Status.StopRequested, () => older.promise)
+      second = result.current.runWithRequestStatus('1', Status.StartRequested, () => newer.promise)
     })
     await act(async () => {
       older.resolve()
       await first
     })
-    expect(result.current.getRequestStatus(1)).toBe(Status.StartRequested)
-    expect(result.current.isRequestPending(1)).toBe(true)
+    expect(result.current.getRequestStatus('1')).toBe(Status.StartRequested)
+    expect(result.current.isRequestPending('1')).toBe(true)
     await act(async () => {
       newer.resolve()
       await second

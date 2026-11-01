@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databasePoliciesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -38,6 +39,7 @@ export async function createDatabasePolicy({
     connectionString,
     sql,
     queryKey: ['policy', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result

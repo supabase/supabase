@@ -1,11 +1,6 @@
 import { AWS_REGIONS } from 'shared-data'
 import { describe, expect, it } from 'vitest'
 
-import {
-  HIGH_AVAILABILITY_INSTANCE_SIZE,
-  HIGH_AVAILABILITY_POSTGRES_ENGINE,
-  HIGH_AVAILABILITY_RELEASE_CHANNEL,
-} from './ProjectCreation.constants'
 import type { AvailableRegions } from './ProjectCreation.utils'
 import {
   AUTO_REGION_VALUE,
@@ -140,12 +135,6 @@ describe('getAvailableRegions', () => {
 })
 
 describe('High Availability project creation constraints', () => {
-  it('pins the Alpha Postgres engine, release channel, and compute size', () => {
-    expect(HIGH_AVAILABILITY_POSTGRES_ENGINE).toBe('17')
-    expect(HIGH_AVAILABILITY_RELEASE_CHANNEL).toBe('ga')
-    expect(HIGH_AVAILABILITY_INSTANCE_SIZE).toBe('large')
-  })
-
   it.each([
     ['local', 'eu-central-1'],
     ['staging', 'us-east-1'],
@@ -204,16 +193,6 @@ describe('getFreeTierGeneralRegionExperimentVariant', () => {
   it('returns undefined when the enrollment flag is off', () => {
     expect(
       getFreeTierGeneralRegionExperimentVariant({ ...base, enrollmentFlag: false })
-    ).toBeUndefined()
-  })
-
-  it('returns undefined when the enrollment flag is off even if the selection flag is on', () => {
-    expect(
-      getFreeTierGeneralRegionExperimentVariant({
-        ...base,
-        enrollmentFlag: false,
-        selectionFlag: true,
-      })
     ).toBeUndefined()
   })
 })

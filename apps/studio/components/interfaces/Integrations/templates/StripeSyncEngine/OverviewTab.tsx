@@ -374,7 +374,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
         </p>
         <ul className="list-disc pl-5 mt-2 text-sm text-foreground-light space-y-1">
           <li>
-            Remove the <code className="text-code-inline">stripe</code> schema and all tables
+            Remove the <code>stripe</code> schema and all tables
           </li>
           <li>Delete all synced Stripe data</li>
           <li>Remove the associated Edge Functions</li>

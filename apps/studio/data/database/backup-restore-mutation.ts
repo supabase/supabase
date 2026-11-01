@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from '@/data/api'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BackupRestoreVariables = {
@@ -18,6 +18,7 @@ export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables)
     const { data, error } = await post('/platform/database/{ref}/backups/restore-physical', {
       params: { path: { ref } },
       body: { id: backup.id },
+      grant: unguarded.migrating,
     })
     if (error) throw error
     return data
@@ -26,6 +27,7 @@ export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables)
   const { data, error } = await post('/platform/database/{ref}/backups/restore', {
     params: { path: { ref } },
     body: { id: backup.id },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data

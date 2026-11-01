@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { createTool as createCreateNotebookTool } from './create-notebook.server'
+import { createTool as createDeleteNotebookTool } from './delete-notebook.server'
 import { getMockTools, MOCK_NOTEBOOKS_DATA } from './mock-tools'
-import { getNotebookTools } from './notebook-tools'
+import { createTool as createUpdateNotebookTool } from './update-notebook.server'
 import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
 import type * as SearchDocsToolModule from '@/lib/ai/tools/search-docs-tool'
@@ -121,11 +123,19 @@ describe('ai/tools/mock-tools getMockTools', () => {
       })
     })
 
-    it('overrides create_notebook needsApproval to false, unlike the real tool', async () => {
+    it('overrides needsApproval to false for notebook mutations, unlike the real tools', async () => {
       const mockTools = await getMockTools(undefined)
+      const ctx = { aiOptInLevel: 'schema' } as const
+      const realTools = {
+        create_notebook: createCreateNotebookTool(ctx),
+        update_notebook: createUpdateNotebookTool(ctx),
+        delete_notebook: createDeleteNotebookTool(ctx),
+      }
 
-      expect(getNotebookTools({ aiOptInLevel: 'schema' }).create_notebook.needsApproval).toBe(true)
-      expect(mockTools.create_notebook.needsApproval).toBe(false)
+      for (const name of ['create_notebook', 'update_notebook', 'delete_notebook'] as const) {
+        expect(realTools[name].needsApproval).toBe(true)
+        expect(mockTools[name].needsApproval).toBe(false)
+      }
     })
 
     it('create_notebook stores a new notebook visible via get_notebook and list_notebooks', async () => {
@@ -162,13 +172,6 @@ describe('ai/tools/mock-tools getMockTools', () => {
       expect(listed.notebooks).toHaveLength(3)
       const newEntry = listed.notebooks.find((notebook) => notebook.id === created.id)
       expect(newEntry?.cell_count).toBe(2)
-    })
-
-    it('overrides update_notebook needsApproval to false, unlike the real tool', async () => {
-      const mockTools = await getMockTools(undefined)
-
-      expect(getNotebookTools({ aiOptInLevel: 'schema' }).update_notebook.needsApproval).toBe(true)
-      expect(mockTools.update_notebook.needsApproval).toBe(false)
     })
 
     it('update_notebook inserts and deletes cells, and list_notebooks reflects the new cell count', async () => {
@@ -244,13 +247,6 @@ describe('ai/tools/mock-tools getMockTools', () => {
         { toolCallId: 'test', messages: [], context: {} }
       )
       expect(after.cells.map((cell) => cell._tag)).toEqual(['markdown_cell', 'log_cell'])
-    })
-
-    it('overrides delete_notebook needsApproval to false, unlike the real tool', async () => {
-      const mockTools = await getMockTools(undefined)
-
-      expect(getNotebookTools({ aiOptInLevel: 'schema' }).delete_notebook.needsApproval).toBe(true)
-      expect(mockTools.delete_notebook.needsApproval).toBe(false)
     })
 
     it('delete_notebook removes the notebook, and list_notebooks no longer returns it', async () => {

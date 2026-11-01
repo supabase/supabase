@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import { usageKeys } from '@/data/usage/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -12,6 +12,7 @@ export type TempDisableReadOnlyModeVariables = {
 export async function tempDisableReadOnlyMode({ projectRef }: TempDisableReadOnlyModeVariables) {
   const { data, error } = await post('/v1/projects/{ref}/readonly/temporary-disable', {
     params: { path: { ref: projectRef } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

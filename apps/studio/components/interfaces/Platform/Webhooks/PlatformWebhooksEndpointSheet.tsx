@@ -457,8 +457,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                     />
                                   </FormControl>
                                   <span className="text-sm text-foreground">
-                                    Subscribe to all events{' '}
-                                    <code className="text-code-inline">(*)</code>
+                                    Subscribe to all events <code>(*)</code>
                                   </span>
                                 </Label>
                               </div>
@@ -555,7 +554,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                                 )
                                               }}
                                             />
-                                            <code className="text-code-inline">{eventType}</code>
+                                            <code>{eventType}</code>
                                           </Label>
                                         )
                                       })}

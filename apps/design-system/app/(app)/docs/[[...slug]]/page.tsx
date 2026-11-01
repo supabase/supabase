@@ -8,7 +8,6 @@ import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl } from '@/lib/utils'
 /* eslint-disable turbo/no-undeclared-env-vars */
 
-import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
 
 import { ChevronRight } from 'lucide-react'

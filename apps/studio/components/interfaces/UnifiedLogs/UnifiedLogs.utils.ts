@@ -1,11 +1,19 @@
 import { type Table as TTable } from '@tanstack/react-table'
+import { createSerializer } from 'nuqs'
 import { cn } from 'ui'
 
-import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
+import {
+  LOG_TYPE_TO_SOURCE,
+  LOG_TYPES,
+  LOG_TYPES_LABELS,
+  SEARCH_PARAMS_PARSER,
+} from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
-import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
+import { ColumnSchema, FacetMetadataSchema, querySearchParamsSchema } from './UnifiedLogs.schema'
+import type { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
+import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 
 export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 
@@ -27,12 +35,69 @@ export function getComputeLogsAvailability({
   }
 }
 
+export function getLogTypeVisibility(
+  visibility: Partial<Record<UnifiedLogType, boolean>>,
+  scope?: UnifiedLogsScope
+): Partial<Record<UnifiedLogType, boolean>> {
+  const scopeLogTypes = scope?.filters
+    .filter((filter) => filter.column === 'log_type' && filter.operator === '=')
+    .map((filter) => filter.value)
+  if (!scopeLogTypes?.length) return { ...visibility, 'edge function runtime': false }
+
+  return Object.fromEntries(
+    LOG_TYPES.map((logType) => [
+      logType,
+      scopeLogTypes.includes(logType) && visibility[logType] !== false,
+    ])
+  )
+}
+
+export const isOfferedFilter = (name: string, offeredFilters?: readonly string[]) =>
+  !offeredFilters || offeredFilters.includes(name)
+
+export const serializeUnifiedLogsSearchParams = createSerializer(SEARCH_PARAMS_PARSER)
+
+export function toQuerySearchParams(
+  search: Partial<SearchParamsType>,
+  scope?: UnifiedLogsScope
+): QuerySearchParamsType {
+  const query: Partial<QuerySearchParamsType> = Object.fromEntries(
+    Object.entries(search).filter(([, value]) => value !== null && value !== undefined)
+  )
+  if (scope !== undefined) query.scope = scope
+  const result = querySearchParamsSchema.safeParse(query)
+  if (!result.success) {
+    throw new Error('Invalid unified logs search parameters', { cause: result.error })
+  }
+  return result.data
+}
+
+export const createUnifiedLogsSearch = (
+  params: Partial<SearchParamsType> = {},
+  scope?: UnifiedLogsScope
+) => toQuerySearchParams(params, scope)
+
+export function getUniqueLogRows<T extends { id: string }>(
+  pages: { data?: T[] }[] | undefined
+): T[] {
+  return deduplicateUnifiedLogs((pages ?? []).flatMap((page) => page.data ?? []))
+}
+
+export function getLogRowClassName(
+  row: Pick<ColumnSchema, 'level' | 'timestamp'>,
+  liveTimestamp?: number
+): string {
+  const isPast = Number(row.timestamp) <= (liveTimestamp || -1)
+  return cn(getLevelRowClassName(row.level), isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
+}
+
 export const buildUnifiedLogsUrl = ({
   projectRef,
   logType,
   user,
   start,
   end,
+  logId,
 }: {
   projectRef: string
   logType?: UnifiedLogType
@@ -40,15 +105,20 @@ export const buildUnifiedLogsUrl = ({
   user?: string
   start?: string | Date
   end?: string | Date
-}) => {
-  const params = new URLSearchParams()
-  if (logType) params.append('filter', `log_type:eq:${logType}`)
-  if (user) params.set('user', user)
-  if (start && end) {
-    params.set('date', `${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
-  }
-  return `/project/${projectRef}/logs?${params.toString()}`
-}
+  logId?: string
+}) =>
+  serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
+    filter: logType ? [`log_type:eq:${logType}`] : null,
+    user: user ?? null,
+    date: start && end ? [new Date(start), new Date(end)] : null,
+    id: logId ?? null,
+  })
+
+export const getFacetValueCount = (
+  facets: Record<string, FacetMetadataSchema> | undefined,
+  facet: string,
+  value: string
+) => facets?.[facet]?.rows.find((row) => row.value === value)?.total ?? 0
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {
@@ -65,6 +135,11 @@ export const getFacetedMinMaxValues = <TData>(facets?: Record<string, FacetMetad
     if (typeof max === 'number') return [max, max]
     return undefined
   }
+}
+
+export function getLogTypeSource(logType: string) {
+  const sources: Partial<Record<string, string>> = LOG_TYPE_TO_SOURCE
+  return sources[logType]
 }
 
 /**

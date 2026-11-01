@@ -187,12 +187,8 @@ export const EdgeFunctionDetails = () => {
                                   <em className="text-foreground not-italic">
                                     only by the legacy secret
                                   </em>{' '}
-                                  in the{' '}
-                                  <code className="text-code-inline break-keep!">
-                                    Authorization
-                                  </code>{' '}
-                                  header. The <code className="text-code-inline">anon</code> key
-                                  satisfies this.
+                                  in the <code className="break-keep!">Authorization</code> header.
+                                  The <code>anon</code> key satisfies this.
                                 </p>
                                 <p>
                                   Recommended: OFF with JWT and custom auth logic in your function

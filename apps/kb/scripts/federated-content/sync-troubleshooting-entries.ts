@@ -27,12 +27,12 @@ const RetryOctokit = Octokit.plugin(retry)
 const octokit = new RetryOctokit(githubAuthOptions())
 
 async function readLocalGuides(): Promise<Array<{ slug: string; title: string; body: string }>> {
-  const filenames = (await readdir(TROUBLESHOOTING_DIRECTORY)).filter((f) => f.endsWith('.md'))
+  const filenames = (await readdir(TROUBLESHOOTING_DIRECTORY)).filter((f) => f.endsWith('.mdx'))
   return Promise.all(
     filenames.map(async (filename) => {
       const raw = await readFile(join(TROUBLESHOOTING_DIRECTORY, filename), 'utf-8')
       const { data, content: body } = matter(raw)
-      return { slug: filename.replace(/\.md$/, ''), title: data.title as string, body }
+      return { slug: filename.replace(/\.mdx$/, ''), title: data.title as string, body }
     })
   )
 }

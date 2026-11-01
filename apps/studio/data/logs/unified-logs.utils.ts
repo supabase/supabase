@@ -12,7 +12,7 @@ type UnifiedLogMetadataRow = {
   event_message?: string | null
 }
 
-const unifiedLogsQueryRowSchema = z.object({
+export const unifiedLogsQueryRowSchema = z.object({
   id: z.string(),
   timestamp: z.union([z.string(), z.number()]),
   log_type: z.string(),
@@ -46,8 +46,10 @@ const extractLeadingStatus = (s?: string) => {
   return m ? Number(m[1]) : undefined
 }
 
+const NON_REQUEST_LOG_TYPES = new Set(['compute', 'edge function runtime'])
+
 export const extractLogMetadata = (row: UnifiedLogMetadataRow) => {
-  if (row.log_type === 'compute') {
+  if (row.log_type && NON_REQUEST_LOG_TYPES.has(row.log_type)) {
     return { status: null, method: null, pathname: null }
   }
 
@@ -85,6 +87,8 @@ export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
     auth_user: isComputeLog ? null : row.auth_user || null,
   }
 
-  if (isComputeLog) return { ...mappedRow, metadata: row.metadata ?? null }
+  if (isComputeLog || row.log_type === 'edge function runtime') {
+    return { ...mappedRow, metadata: row.metadata ?? null }
+  }
   return mappedRow
 }

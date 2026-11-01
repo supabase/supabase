@@ -77,8 +77,7 @@ export const CustomDomainVerify = () => {
       <Panel.Content className="space-y-6">
         <div>
           <h4 className="text-foreground mb-2">
-            Configure TXT verification for your custom domain{' '}
-            <code className="text-code-inline">{customDomain?.hostname}</code>
+            Configure TXT verification for your custom domain <code>{customDomain?.hostname}</code>
           </h4>
           <p className="text-sm text-foreground-light">
             Set the following TXT record(s) in your DNS provider, then click verify to confirm your
@@ -105,9 +104,8 @@ export const CustomDomainVerify = () => {
                 {isNotVerifiedYet && (
                   <p className="mt-1">
                     Some registrars will require you to remove the domain name when creating DNS
-                    records. As an example, to create a record for{' '}
-                    <code className="text-code-inline">foo.app.example.com</code>, you would need to
-                    create an entry for <code className="text-code-inline">foo.app</code>.
+                    records. As an example, to create a record for <code>foo.app.example.com</code>,
+                    you would need to create an entry for <code>foo.app</code>.
                   </p>
                 )}
               </Admonition>
@@ -121,8 +119,8 @@ export const CustomDomainVerify = () => {
             <AlertTitle>Certificate Authority Authentication (CAA) error</AlertTitle>
             <AlertDescription>
               Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
-              <code className="text-code-inline">{customDomain?.hostname}</code>. For example:{' '}
-              <code className="text-code-inline">0 issue "digicert.com"</code>
+              <code>{customDomain?.hostname}</code>. For example:{' '}
+              <code>0 issue "digicert.com"</code>
             </AlertDescription>
           </Alert>
         )}

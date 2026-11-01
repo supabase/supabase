@@ -70,27 +70,12 @@ describe('/project/[ref]/settings/jwt', () => {
     expect(screen.queryByText('LocalSetupGuide')).not.toBeInTheDocument()
   })
 
-  it('renders only the CLI LocalSetupGuide on self-hosted (CLI mode)', () => {
+  it.each([
+    { mode: 'CLI', isCli: true, isSelfHosted: false },
+    { mode: 'Docker', isCli: false, isSelfHosted: true },
+  ])('renders only the LocalSetupGuide on self-hosted ($mode mode)', ({ isCli, isSelfHosted }) => {
     mockIsPlatform.value = false
-    mockUseDeploymentMode.mockReturnValue({
-      isPlatform: false,
-      isCli: true,
-      isSelfHosted: false,
-    })
-
-    render(<JWTSigningKeysPage dehydratedState={{}} />)
-
-    expect(screen.queryByText('JWTSecretKeysTable')).not.toBeInTheDocument()
-    expect(screen.getAllByText('LocalSetupGuide')).toHaveLength(1)
-  })
-
-  it('renders only the self-hosted LocalSetupGuide on self-hosted (Docker mode)', () => {
-    mockIsPlatform.value = false
-    mockUseDeploymentMode.mockReturnValue({
-      isPlatform: false,
-      isCli: false,
-      isSelfHosted: true,
-    })
+    mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli, isSelfHosted })
 
     render(<JWTSigningKeysPage dehydratedState={{}} />)
 

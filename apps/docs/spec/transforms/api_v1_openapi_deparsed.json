@@ -2229,6 +2229,9 @@
           "403": {
             "description": "Forbidden action"
           },
+          "404": {
+            "description": "API key not found for project"
+          },
           "429": {
             "description": "Rate limit exceeded"
           }
@@ -2304,6 +2307,9 @@
           },
           "403": {
             "description": "Forbidden action"
+          },
+          "404": {
+            "description": "API key not found for project"
           },
           "429": {
             "description": "Rate limit exceeded"
@@ -2402,6 +2408,9 @@
           },
           "403": {
             "description": "Forbidden action"
+          },
+          "404": {
+            "description": "API key not found for project"
           },
           "429": {
             "description": "Rate limit exceeded"
@@ -17488,6 +17497,8 @@
                     "log_auth_error_rate_high",
                     "log_storage_error_rate_high",
                     "log_edge_function_error_rate_high",
+                    "realtime_authorization_timeouts",
+                    "realtime_postgres_changes_spike",
                     "project_not_active",
                     "advisor_check_unavailable"
                   ]

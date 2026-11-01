@@ -11,8 +11,9 @@ export type LogDrainDeleteVariables = {
 }
 
 export async function deleteLogDrain({ projectRef, token }: LogDrainDeleteVariables) {
-  const { data, error } = await del('/v2/projects/{ref}/analytics/log-drains/{id}', {
-    params: { path: { ref: projectRef, id: token } },
+  // @ts-ignore Just sample, TS lint will validate if the endpoint is valid
+  const { data, error } = await del('/platform/projects/{ref}/analytics/log-drains/{token}', {
+    params: { path: { ref: projectRef, token } },
   })
 
   if (error) handleError(error)
