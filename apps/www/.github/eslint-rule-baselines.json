@@ -1,8 +1,8 @@
 {
   "rules": {
-    "shadcn/no-arbitrary-values": 527,
-    "shadcn/no-unknown-classes": 112,
-    "shadcn/no-raw-colors": 212
+    "shadcn/no-arbitrary-values": 522,
+    "shadcn/no-unknown-classes": 111,
+    "shadcn/no-raw-colors": 208
   },
   "ruleFiles": {
     "shadcn/no-arbitrary-values": {
@@ -21,12 +21,11 @@
       "app/state-of-startups/register/RegisterContent.tsx": 12,
       "components/Blog/BlogGridItem.tsx": 1,
       "components/BuiltWithSupabaseSection.tsx": 2,
-      "components/Changelog/ChangelogInlineMarkdown.tsx": 1,
       "components/Changelog/ChangelogLlmMarkdownButton.tsx": 2,
       "components/Changelog/ChangelogTimelineList.tsx": 2,
       "components/Contribute/Hero.tsx": 1,
       "components/Contribute/Icons.tsx": 2,
-      "components/Contribute/UnansweredThreadsTable.tsx": 2,
+      "components/Contribute/UnansweredThreadsTable.tsx": 1,
       "components/Contribute/UserProfile.tsx": 2,
       "components/CustomerStories/CutomsersSliderDesktop.tsx": 1,
       "components/Error404.tsx": 3,
@@ -86,7 +85,6 @@
       "components/LaunchWeek/X/Releases/components/AdventCard.tsx": 7,
       "components/LaunchWeek/X/Releases/components/DaySection.tsx": 9,
       "components/Nav/ProductDropdown.tsx": 1,
-      "components/Nav/index.tsx": 3,
       "components/OpenSource/OSSHero.tsx": 1,
       "components/OpenSource/Sponsorships.tsx": 2,
       "components/Panel/Panel.tsx": 1,
@@ -204,7 +202,7 @@
       "components/Solutions/CTAForm.tsx": 1,
       "components/Solutions/FeaturesGrid.tsx": 2,
       "components/Solutions/TwoColumnsSection.tsx": 2,
-      "components/Tabs/Tabs.tsx": 2,
+      "components/Tabs/Tabs.tsx": 1,
       "components/TabsWithHighlights.tsx": 2,
       "components/VideoWithHighlights.tsx": 2,
       "components/logos.tsx": 2,
@@ -220,7 +218,7 @@
       "app/(home)/_components/logos/PublicityLogos.tsx": 12,
       "app/(products)/auth/_components/FeaturesSection.tsx": 9,
       "app/(products)/database/_components/FeaturesSection.tsx": 4,
-      "app/(products)/realtime/_components/FeaturesSection.tsx": 4,
+      "app/(products)/realtime/_components/FeaturesSection.tsx": 3,
       "app/state-of-startups/StateOfStartups2026Content.tsx": 2,
       "components/AIDemo/Panel.tsx": 1,
       "components/CaseStudies/benchmark.tsx": 1,
@@ -240,7 +238,6 @@
       "components/Nav/ProductDropdown.tsx": 1,
       "components/OpenSource/RepoCard.tsx": 2,
       "components/Panel/Panel.tsx": 1,
-      "components/Partners/BackgroundPattern.tsx": 1,
       "components/Pricing/PricingIcons.tsx": 1,
       "components/Pricing/PricingTableRow.tsx": 1,
       "components/Products/DatabaseVisual.tsx": 3,
@@ -267,7 +264,6 @@
       "data/solutions/vibe-coders.tsx": 1,
       "pages/assistant.tsx": 2,
       "pages/beta.tsx": 2,
-      "pages/brand.tsx": 2,
       "pages/modules/cron.tsx": 1,
       "pages/modules/queues.tsx": 1,
       "pages/modules/vector.tsx": 1,
