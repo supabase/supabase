@@ -211,7 +211,7 @@ const EditEnumeratedTypeSidePanel = ({
                 className={cn(
                   'text-foreground-light text-sm',
                   'transition-colors',
-                  'leading-normal' 
+                  'leading-normal'
                 )}
               >
                 Values
@@ -230,25 +230,27 @@ const EditEnumeratedTypeSidePanel = ({
                   </Link>
                 </Button>
               </Admonition>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext items={fields} strategy={verticalListSortingStrategy}>
-                  {fields.map((field, index) => (
-                    <EnumeratedTypeValueRow
-                      key={field.id}
-                      id={field.id}
-                      name={`values.${index}.updatedValue`}
-                      index={index}
-                      control={form.control}
-                      isDisabled={!field.isNew}
-                      onRemoveValue={() => remove(index)}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
+              <div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext items={fields} strategy={verticalListSortingStrategy}>
+                    {fields.map((field, index) => (
+                      <EnumeratedTypeValueRow
+                        key={field.id}
+                        id={field.id}
+                        name={`values.${index}.updatedValue`}
+                        index={index}
+                        control={form.control}
+                        isDisabled={!field.isNew}
+                        onRemoveValue={() => remove(index)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              </div>
             </div>
 
             <Button

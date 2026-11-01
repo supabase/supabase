@@ -192,25 +192,27 @@ const CreateEnumeratedTypeSidePanel = ({
                   </Link>
                 </Button>
               </Admonition>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext items={fields} strategy={verticalListSortingStrategy}>
-                  {fields.map((field, index) => (
-                    <EnumeratedTypeValueRow
-                      key={field.id}
-                      id={field.id}
-                      name={`values.${index}.value`}
-                      index={index}
-                      control={form.control}
-                      isDisabled={fields.length < 2}
-                      onRemoveValue={() => remove(index)}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
+              <div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext items={fields} strategy={verticalListSortingStrategy}>
+                    {fields.map((field, index) => (
+                      <EnumeratedTypeValueRow
+                        key={field.id}
+                        id={field.id}
+                        name={`values.${index}.value`}
+                        index={index}
+                        control={form.control}
+                        isDisabled={fields.length < 2}
+                        onRemoveValue={() => remove(index)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              </div>
             </div>
 
             <Button icon={<PlusIcon strokeWidth={1.5} />} onClick={() => append({ value: '' })}>
