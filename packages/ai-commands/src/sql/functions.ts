@@ -105,10 +105,15 @@ export async function debugSql(
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-4o-mini-2024-07-18',
+      model: 'gpt-6-luna',
       messages: completionMessages,
       max_tokens: 2048,
       temperature: 0,
+      // GPT-6 models only accept Chat Completions function calling with
+      // `reasoning_effort: 'none'`. The installed `openai@4` types predate that
+      // value, so they reject it.
+      // @ts-expect-error - valid at runtime, the SDK type is outdated
+      reasoning_effort: 'none',
       tool_choice: {
         type: 'function',
         function: {
@@ -165,10 +170,15 @@ export async function titleSql(openai: OpenAI, sql: string) {
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-4o-mini-2024-07-18',
+      model: 'gpt-6-luna',
       messages: completionMessages,
       max_tokens: 1024,
       temperature: 0,
+      // GPT-6 models only accept Chat Completions function calling with
+      // `reasoning_effort: 'none'`. The installed `openai@4` types predate that
+      // value, so they reject it.
+      // @ts-expect-error - valid at runtime, the SDK type is outdated
+      reasoning_effort: 'none',
       tool_choice: {
         type: 'function',
         function: {

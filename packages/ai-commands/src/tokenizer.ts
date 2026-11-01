@@ -18,7 +18,7 @@ export function estimateTokenCount(text: string): number {
  */
 export function getChatRequestTokenCount(
   messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-  model = 'gpt-4o-mini-2024-07-18'
+  model = 'gpt-6-luna'
 ): number {
   const tokensPerRequest = 3 // every reply is primed with <|im_start|>assistant<|im_sep|>
   const numTokens = messages.reduce((acc, message) => acc + getMessageTokenCount(message, model), 0)
@@ -34,7 +34,7 @@ export function getChatRequestTokenCount(
  */
 export function getMessageTokenCount(
   message: OpenAI.Chat.Completions.ChatCompletionMessageParam,
-  model = 'gpt-4o-mini-2024-07-18'
+  model = 'gpt-6-luna'
 ): number {
   let tokensPerMessage: number
   let tokensPerName: number
@@ -52,7 +52,7 @@ export function getMessageTokenCount(
       tokensPerMessage = 4 // every message follows <|start|>{role/name}\n{content}<|end|>\n
       tokensPerName = -1 // if there's a name, the role is omitted
       break
-    case 'gpt-4o-mini-2024-07-18':
+    case 'gpt-6-luna':
       tokensPerMessage = 3
       tokensPerName = 1
       break
@@ -96,8 +96,8 @@ export function getMaxTokenCount(model: string): number {
       return 4097
     case 'gpt-4-0314':
       return 4097
-    case 'gpt-4o-mini-2024-07-18':
-      return 4097
+    case 'gpt-6-luna':
+      return 1_050_000
     default:
       throw new Error(`Unknown model '${model}'`)
   }
