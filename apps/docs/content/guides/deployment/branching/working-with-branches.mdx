@@ -400,6 +400,19 @@ Branches are completely isolated from each other. Changes made in one branch don
 - Edge Functions
 - Auth configurations
 
+## Branch permissions and API access
+
+When managing branches through the [Management API](/docs/reference/api/introduction), requests are governed by OAuth scopes and [Personal Access Token (PAT) permissions](/docs/guides/platform/access-control/scoped-pats):
+
+- **Read operations** (`List all branches`, `Get a branch`, `Get a branch config`) require `environment:read` or the `Read` permission for Development or Production Branches.
+- **Write operations** (`Create a branch`, `Delete a branch`, `Merge a branch`, `Push a branch`, `Reset a branch`, `Restore a branch`) require `environment:write` or the `Read-write` permission for Development or Production Branches.
+
+### Schema diff permissions
+
+Although fetching a database branch diff (`GET /v1/branches/{branch_id_or_ref}/diff`) uses the HTTP `GET` method, it requires the `environment:write` OAuth scope and `Read-write` branch permissions.
+
+This is because the diff engines ([`pg-delta` or `migra`](/docs/guides/local-development/diff-engines)) calculate schema differences by dynamically provisioning a temporary shadow database and applying schemas to inspect the resulting definitions. Because this operation creates and executes DDL on temporary resources server-side, it requires write privileges.
+
 ## Next steps
 
 - Learn about [branch configuration](/docs/guides/deployment/branching/configuration)
