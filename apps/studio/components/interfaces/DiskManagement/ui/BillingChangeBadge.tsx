@@ -23,47 +23,51 @@ export const BillingChangeBadge = ({
 }: BillingChangeBadgeProps) => {
   return (
     <AnimatePresence>
-      {beforePrice !== undefined && afterPrice !== undefined && show && (
-        <motion.div
-          initial={{ opacity: 0, x: -4, height: 0 }}
-          animate={{ opacity: 1, x: 0, height: 'auto' }}
-          exit={{ opacity: 0, x: -4, height: 0 }}
-          transition={{ type: 'spring', stiffness: 800, damping: 40, duration: 0.3 }}
-        >
-          <Badge
-            variant="default"
-            className={cn(
-              free ? `bg-violet-200 border-violet-900` : 'bg-alternative',
-              `text-warning`,
-              className
-            )}
+      {beforePrice !== undefined &&
+        afterPrice !== undefined &&
+        !Number.isNaN(beforePrice) &&
+        !Number.isNaN(afterPrice) &&
+        show && (
+          <motion.div
+            initial={{ opacity: 0, x: -4, height: 0 }}
+            animate={{ opacity: 1, x: 0, height: 'auto' }}
+            exit={{ opacity: 0, x: -4, height: 0 }}
+            transition={{ type: 'spring', stiffness: 800, damping: 40, duration: 0.3 }}
           >
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-mono text-foreground-muted" translate="no">
-                    {formatCurrency(beforePrice)}
-                  </span>
-                  <ChevronRightIcon size={12} strokeWidth={2} className="text-foreground-muted" />
-                  <motion.span
-                    key={afterPrice} // This key will change whenever any form value changes
-                    className={cn(
-                      free ? 'text-violet-1100' : 'text-foreground',
-                      'text-xs font-mono'
-                    )}
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 0.12 }}
-                    translate="no"
-                  >
-                    {`${formatCurrency(afterPrice)}/month`}
-                  </motion.span>
-                </div>
-              </TooltipTrigger>
-              {tooltip !== undefined && <TooltipContent side="bottom">{tooltip}</TooltipContent>}
-            </Tooltip>
-          </Badge>
-        </motion.div>
-      )}
+            <Badge
+              variant="default"
+              className={cn(
+                free ? `bg-violet-200 border-violet-900` : 'bg-alternative',
+                `text-warning`,
+                className
+              )}
+            >
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-mono text-foreground-muted" translate="no">
+                      {formatCurrency(beforePrice)}
+                    </span>
+                    <ChevronRightIcon size={12} strokeWidth={2} className="text-foreground-muted" />
+                    <motion.span
+                      key={afterPrice} // This key will change whenever any form value changes
+                      className={cn(
+                        free ? 'text-violet-1100' : 'text-foreground',
+                        'text-xs font-mono'
+                      )}
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 0.12 }}
+                      translate="no"
+                    >
+                      {`${formatCurrency(afterPrice)}/month`}
+                    </motion.span>
+                  </div>
+                </TooltipTrigger>
+                {tooltip !== undefined && <TooltipContent side="bottom">{tooltip}</TooltipContent>}
+              </Tooltip>
+            </Badge>
+          </motion.div>
+        )}
     </AnimatePresence>
   )
 }

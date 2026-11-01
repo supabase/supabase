@@ -119,12 +119,15 @@ export function useDiskManagementReviewChanges(
   const advancedBeforePrice = Number(iopsPrice.oldPrice) + Number(throughputPrice.oldPrice)
   const advancedAfterPrice = Number(iopsPrice.newPrice) + Number(throughputPrice.newPrice)
 
-  const showComputeBillingBadge = shouldShowComputeBillingBadge({
-    isDirty,
-    hasComputeSizeError: !!errors.computeSize,
-    oldPrice: computeSizePrice.oldPrice,
-    newPrice: computeSizePrice.newPrice,
-  })
+  const showComputeBillingBadge =
+    computeSizePrice.oldPrice != null &&
+    computeSizePrice.newPrice != null &&
+    shouldShowComputeBillingBadge({
+      isDirty,
+      hasComputeSizeError: !!errors.computeSize,
+      oldPrice: computeSizePrice.oldPrice,
+      newPrice: computeSizePrice.newPrice,
+    })
 
   const showDiskBillingBadge =
     isDirty &&

@@ -48,6 +48,7 @@ import { useUpdateDiskAutoscaleConfigMutation } from '@/data/config/disk-autosca
 import { useDiskUtilizationQuery } from '@/data/config/disk-utilization-query'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { AddonVariantId } from '@/data/subscriptions/types'
@@ -257,13 +258,22 @@ export function DiskManagementForm({
         if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
       },
     })
+  const { mutateAsync: removeSubscriptionAddon, isPending: isRemovingCompute } =
+    useProjectAddonRemoveMutation({
+      // this is to suppress to toast message
+      onError: () => {},
+      onSuccess: () => {
+        if (projectRef) setProjectStatus({ ref: projectRef, status: PROJECT_STATUS.RESIZING })
+      },
+    })
   const { mutateAsync: updateDiskAutoscaleConfig, isPending: isUpdatingDiskAutoscaleConfig } =
     useUpdateDiskAutoscaleConfigMutation({
       // this is to suppress to toast message
       onError: () => {},
     })
 
-  const isUpdatingConfig = isUpdatingDisk || isUpdatingCompute || isUpdatingDiskAutoscaleConfig
+  const isUpdatingConfig =
+    isUpdatingDisk || isUpdatingCompute || isRemovingCompute || isUpdatingDiskAutoscaleConfig
 
   const onSubmit = async (data: DiskStorageSchemaType) => {
     let payload = data
@@ -306,17 +316,29 @@ export function DiskManagementForm({
         })
       }
 
+      console.log(payload.computeSize)
+
       if (
         !isHighAvailability &&
         payload.computeSize !== form.formState.defaultValues?.computeSize
       ) {
-        await updateSubscriptionAddon({
-          projectRef: projectRef,
-          // cast variant to AddonVariantId to satisfy type
-          variant: payload.computeSize as AddonVariantId,
-          type: 'compute_instance',
-          suppressToast: true,
-        })
+        const previousComputeSize = form.formState.defaultValues?.computeSize
+        if (payload.computeSize.includes('nano')) {
+          if (!projectRef) throw new Error('Project ref is required')
+          // Nano is the base compute, so downgrading to it means removing the current compute addon
+          await removeSubscriptionAddon({
+            projectRef: projectRef,
+            variant: previousComputeSize as AddonVariantId,
+          })
+        } else {
+          await updateSubscriptionAddon({
+            projectRef: projectRef,
+            // cast variant to AddonVariantId to satisfy type
+            variant: payload.computeSize as AddonVariantId,
+            type: 'compute_instance',
+            suppressToast: true,
+          })
+        }
       }
 
       setIsDialogOpen(false)

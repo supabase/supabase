@@ -124,7 +124,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                   Before
                 </span>
                 <span className="text-3xl text-foreground-light tabular-nums" translate="no">
-                  {formatCurrency(totalBeforePrice)}
+                  {isNaN(totalBeforePrice) ? 'N/A' : formatCurrency(totalBeforePrice)}
                 </span>
                 <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   per month
@@ -146,7 +146,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                   After
                 </span>
                 <span className="text-3xl text-foreground tabular-nums" translate="no">
-                  {formatCurrency(totalAfterPrice)}
+                  {isNaN(totalAfterPrice) ? 'N/A' : formatCurrency(totalAfterPrice)}
                 </span>
                 <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   per month
@@ -166,9 +166,11 @@ export const DiskManagementReviewAndSubmitDialog = ({
               >
                 <div className="flex flex-col items-end gap-0.5">
                   <ValueChange from={oldComputeLabel} to={newComputeLabel} />
-                  <PriceDelta
-                    delta={Number(computeSizePrice.newPrice) - Number(computeSizePrice.oldPrice)}
-                  />
+                  {computeSizePrice.newPrice != null && computeSizePrice.oldPrice != null && (
+                    <PriceDelta
+                      delta={Number(computeSizePrice.newPrice) - Number(computeSizePrice.oldPrice)}
+                    />
+                  )}
                 </div>
               </BreakdownRow>
             )}

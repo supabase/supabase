@@ -1,6 +1,4 @@
-import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { CloudProvider } from 'shared-data'
 import {
   cn,
   FormField,
@@ -10,36 +8,27 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  useWatch,
 } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { HIGH_AVAILABILITY_INSTANCE_SIZE, sizes } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
-import { instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSizeSelectorProps {
   form: UseFormReturn<CreateProjectForm>
+  sizeOptions: DesiredInstanceSize[]
+  highAvailability: boolean
 }
 
-export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
-  const cloudProvider = useWatch({ control: form.control, name: 'cloudProvider' }) as CloudProvider
-  const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
-
-  const sizeOptions = useMemo(
-    () =>
-      highAvailability
-        ? [HIGH_AVAILABILITY_INSTANCE_SIZE]
-        : sizes.filter((option) =>
-            instanceSizeSpecs[option].cloud_providers.includes(cloudProvider)
-          ),
-    [highAvailability, cloudProvider]
-  )
-
+export const ComputeSizeSelector = ({
+  form,
+  sizeOptions,
+  highAvailability,
+}: ComputeSizeSelectorProps) => {
   return (
     <Panel.Content>
       <FormField
@@ -98,8 +87,9 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                               )}
                               data-field="instance-details"
                             >
-                              ${instanceSizeSpecs[option].priceHourly}/hour (~$
-                              {instanceSizeSpecs[option].priceMonthly}/month)
+                              {instanceSizeSpecs[option].priceHourly === null
+                                ? 'Pricing Info N/A'
+                                : `$${instanceSizeSpecs[option].priceHourly}/hour (~$${instanceSizeSpecs[option].priceMonthly}/month)`}
                             </p>
                             {highAvailability && (
                               <p

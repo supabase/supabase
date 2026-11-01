@@ -78,8 +78,13 @@ export function ComputeSectionBillingBadge({
 export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
-  const { project, isProjectLoading, isEntitlementLoading, showMicroUpgradeBadge } =
-    useShowMicroUpgradeBadge()
+  const {
+    project,
+    isProjectLoading,
+    isEntitlementLoading,
+    showMicroUpgradeBadge,
+    availableComputeSizes,
+  } = useShowMicroUpgradeBadge()
   const { isHighAvailability } = useHighAvailability()
 
   // High Availability projects run on a fixed compute size during Alpha,
@@ -152,17 +157,22 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   const lockedNanoDueToPlan =
                     org?.plan.id !== 'free' &&
                     project?.infra_compute_size !== 'nano' &&
-                    compute.identifier === 'ci_nano'
+                    compute.identifier === 'ci_nano' &&
+                    !availableComputeSizes.includes('nano')
                   const lockedDueToHighAvailability =
                     isHighAvailability && compute.identifier !== currentComputeVariantId
 
                   const lockedOption = lockedNanoDueToPlan || lockedDueToHighAvailability
 
                   // Nano on a paid plan is billed at the Micro rate
+                  // Nano instances are available to a tiny subset of customers at a custom rate (outside of SfP)
+                  // TODO(kevin): Output available compute sizes with their contractual price and billing mode (active vs non-active) to avoid doing all these
+                  // implicit checks
                   const isNanoBilledAsMicro =
                     org?.plan.id !== 'free' &&
                     project?.infra_compute_size === 'nano' &&
-                    compute.identifier === 'ci_nano'
+                    compute.identifier === 'ci_nano' &&
+                    !availableComputeSizes.includes('nano')
 
                   const price = isNanoBilledAsMicro
                     ? availableOptions.find(
@@ -226,21 +236,26 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                         <LockIcon size={14} />
                                       </div>
                                     )}
-                                    {!lockedOption && showComputePrice && (
-                                      <>
-                                        <span
-                                          className="text-foreground text-sm font-semibold"
-                                          translate="no"
-                                        >
-                                          ${price}
-                                        </span>
-                                        <span className="text-foreground-light translate-y-px">
-                                          {' '}
-                                          /{' '}
-                                          {compute.price_interval === 'monthly' ? 'month' : 'hour'}
-                                        </span>
-                                      </>
-                                    )}
+                                    {!lockedOption &&
+                                      showComputePrice &&
+                                      price != null &&
+                                      price > 0 && (
+                                        <>
+                                          <span
+                                            className="text-foreground text-sm font-semibold"
+                                            translate="no"
+                                          >
+                                            ${price}
+                                          </span>
+                                          <span className="text-foreground-light translate-y-px">
+                                            {' '}
+                                            /{' '}
+                                            {compute.price_interval === 'monthly'
+                                              ? 'month'
+                                              : 'hour'}
+                                          </span>
+                                        </>
+                                      )}
                                   </div>
                                 </div>
 

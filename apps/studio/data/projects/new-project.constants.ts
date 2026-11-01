@@ -4,7 +4,7 @@ import { PROVIDERS } from '@/lib/constants'
 
 export type DesiredInstanceSize = Exclude<
   components['schemas']['CreateProjectBody']['desired_instance_size'],
-  undefined | 'pico' | 'nano'
+  undefined | 'pico'
 >
 export type ReleaseChannel = Exclude<
   components['schemas']['CreateProjectBody']['release_channel'],
@@ -21,11 +21,21 @@ export const instanceSizeSpecs: Record<
     label: string
     ram: string
     cpu: string
-    priceHourly: number
-    priceMonthly: number
+    priceHourly: number | null
+    priceMonthly: number | null
     cloud_providers: string[]
   }
 > = {
+  // TODO(kevin): move this info to an API endpoint given this is not fixed per customer
+  nano: {
+    label: 'Nano',
+    ram: '0.5 GB',
+    cpu: 'Shared compute',
+    // Not public info, varies for a customer
+    priceHourly: null,
+    priceMonthly: null,
+    cloud_providers: [PROVIDERS.AWS.id, PROVIDERS.AWS_K8S.id, PROVIDERS.AWS_NIMBUS.id],
+  },
   micro: {
     label: 'Micro',
     ram: '1 GB',

@@ -69,15 +69,15 @@ export const calculateComputeSizePrice = ({
     _oldComputeSize = 'ci_micro'
   }
 
-  const oldPrice = availableOptions?.find((x) => x.identifier === _oldComputeSize)?.price ?? 0
-  const newPrice = availableOptions?.find((x) => x.identifier === newComputeSize)?.price ?? 0
+  const oldPrice = availableOptions?.find((x) => x.identifier === _oldComputeSize)?.price ?? null
+  const newPrice = availableOptions?.find((x) => x.identifier === newComputeSize)?.price ?? null
 
-  const oldPriceMonthly = oldPrice * 720
-  const newPriceMonthly = newPrice * 720
+  const oldPriceMonthly = oldPrice ? oldPrice * 720 : null
+  const newPriceMonthly = newPrice ? newPrice * 720 : null
 
   return {
-    oldPrice: oldPriceMonthly.toFixed(2),
-    newPrice: newPriceMonthly.toFixed(2),
+    oldPrice: oldPriceMonthly?.toFixed(2),
+    newPrice: newPriceMonthly?.toFixed(2),
   }
 }
 

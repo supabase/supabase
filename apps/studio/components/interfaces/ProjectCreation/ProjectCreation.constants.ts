@@ -263,4 +263,4 @@ export const COUNTRY_LAT_LON = {
   ZW: { lat: -20, lon: 30 },
 }
 
-export const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']
+export const sizes: DesiredInstanceSize[] = ['nano', 'micro', 'small', 'medium']

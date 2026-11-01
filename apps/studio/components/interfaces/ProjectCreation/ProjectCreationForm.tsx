@@ -22,6 +22,7 @@ import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
 import {
+  HIGH_AVAILABILITY_INSTANCE_SIZE,
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
   sizes,
@@ -58,7 +59,7 @@ import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { DesiredInstanceSize } from '@/data/projects/new-project.constants'
+import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
 import {
   OrgProject,
   useOrgProjectsInfiniteQuery,
@@ -189,7 +190,7 @@ export const ProjectCreationForm = ({
       githubRepositoryId: '',
       githubInstallationId: undefined,
       githubRepositoryName: '',
-      instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
+      instanceSize: undefined,
       dataApi: true,
       dataApiDefaultPrivileges: !isDataApiRevokeOnCreateDefault,
       enableRlsEventTrigger: false,
@@ -200,7 +201,7 @@ export const ProjectCreationForm = ({
   })
   const { getFieldState, resetField, setError, setValue } = form
   const {
-    instanceSize: watchedInstanceSize,
+    instanceSize,
     cloudProvider,
     dbRegion,
     githubRepositoryName,
@@ -237,12 +238,24 @@ export const ProjectCreationForm = ({
     form.formState
   ).isDirty
 
-  // [Charis] Since the form is updated in a useEffect, there is an edge case
-  // when switching from free to paid, where canChooseInstanceSize is true for
-  // an in-between render, but watchedInstanceSize is still undefined from the
-  // form state carried over from the free plan. To avoid this, we set a
-  // default instance size in this case.
-  const instanceSize = canChooseInstanceSize ? (watchedInstanceSize ?? sizes[0]) : undefined
+  const { getEntitlementSetValues, isLoading: isLoadingEntitlements } = useCheckEntitlements(
+    'instances.compute_update_available_sizes'
+  )
+  const sizeOptions = useMemo(() => {
+    if (highAvailability) {
+      return [HIGH_AVAILABILITY_INSTANCE_SIZE]
+    }
+    if (isLoadingEntitlements) {
+      return []
+    }
+
+    return sizes.filter(
+      (option) =>
+        instanceSizeSpecs[option].cloud_providers.includes(cloudProvider as CloudProvider) &&
+        getEntitlementSetValues().includes(option)
+    )
+  }, [highAvailability, cloudProvider, isLoadingEntitlements, getEntitlementSetValues])
+
   const { data: membersExceededLimit = [], isLoading: isLoadingFreeProjectLimit } =
     useFreeProjectLimitCheckQuery({ slug }, { enabled: isFreePlan })
   const hasMembersExceedingFreeTierLimit = membersExceededLimit.length > 0
@@ -708,15 +721,18 @@ export const ProjectCreationForm = ({
     }
   }, [smartRegionEnabled, regionError, resetField, fixedDefaultRegion])
 
+  // The valid sizes depend on plan, cloud provider, HA and entitlements, so the form starts
+  // without a size and picks the first valid option once those have resolved.
   useEffect(() => {
-    if (watchedInstanceSize !== instanceSize) {
-      setValue('instanceSize', instanceSize, {
-        shouldDirty: false,
-        shouldValidate: false,
-        shouldTouch: false,
-      })
+    if (!canChooseInstanceSize) {
+      if (instanceSize !== undefined) setValue('instanceSize', undefined)
+      return
     }
-  }, [instanceSize, watchedInstanceSize, setValue])
+    if (sizeOptions.length === 0) return
+    if (instanceSize === undefined || !sizeOptions.includes(instanceSize as DesiredInstanceSize)) {
+      setValue('instanceSize', sizeOptions[0])
+    }
+  }, [canChooseInstanceSize, instanceSize, sizeOptions, setValue])
 
   useEffect(() => {
     const isK8sProvider = cloudProvider === 'AWS_K8S' || cloudProvider === 'AWS_NIMBUS'
@@ -854,7 +870,13 @@ export const ProjectCreationForm = ({
                       highAvailabilityRegionName={highAvailabilityRegion?.name}
                     />
 
-                    {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
+                    {canChooseInstanceSize && (
+                      <ComputeSizeSelector
+                        form={form}
+                        sizeOptions={sizeOptions}
+                        highAvailability={!!highAvailability}
+                      />
+                    )}
 
                     <DatabasePasswordInput form={form} />
 
