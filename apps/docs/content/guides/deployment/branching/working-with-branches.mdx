@@ -411,7 +411,7 @@ When managing branches through the [Management API](/docs/reference/api/introduc
 
 Although fetching a database branch diff (`GET /v1/branches/{branch_id_or_ref}/diff`) uses the HTTP `GET` method, it requires the `environment:write` OAuth scope and `Read-write` branch permissions.
 
-This is because schema diffing requires elevated privileges server-side to inspect and evaluate schema definitions across branches. Depending on the diff engine ([`pg-delta` or `migra`](/docs/guides/local-development/diff-engines)), this process may provision a shadow database and execute catalog queries to generate the structural migration diff. Because the operation involves provisioning and running DDL against temporary database instances, it is classified under write access.
+This is because schema diffing requires server-side access to compare schema definitions across branches. [`pg-delta`](/docs/guides/local-development/diff-engines) compares the live database against a shadow database built from migrations and reads the Postgres catalog. Legacy `migra` compares live Postgres databases instead. The endpoint uses write-level authorization even though it uses `GET`.
 
 ## Next steps
 
