@@ -23,11 +23,7 @@ import {
   cn,
   Form,
   FormControl,
-  FormDescription,
   FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Input,
   SidePanel,
 } from 'ui'
@@ -38,6 +34,7 @@ import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 import { useEnumeratedTypeCreateMutation } from '@/data/enumerated-types/enumerated-type-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -148,26 +145,22 @@ const CreateEnumeratedTypeSidePanel = ({
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
+                <FormItemLayout layout="vertical" label="Name">
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
+                </FormItemLayout>
               )}
             />
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
+                <FormItemLayout layout="vertical" label="Description" description="Optional">
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormDescription>Optional</FormDescription>
-                </FormItem>
+                </FormItemLayout>
               )}
             />
 
